@@ -19,6 +19,7 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
@@ -229,7 +230,7 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
   }
 
   @Override
-  public <T extends Serializable> void updateJobPercentage(Plugin<T> plugin, int percentage) {
+  public <T extends Serializable> void updateJobState(Plugin<T> plugin, JOB_STATE state) {
     // TODO Auto-generated method stub
 
   }

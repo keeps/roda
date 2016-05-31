@@ -40,6 +40,7 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -53,6 +54,8 @@ import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.typesafe.config.Config;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
@@ -97,8 +100,9 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     runningJobs = new HashMap<>();
 
+    Config akkaConfig = RodaCoreFactory.getAkkaConfiguration();
     numberOfWorkers = JobsHelper.getNumberOfPluginWorkers();
-    workersSystem = ActorSystem.create("WorkersSystem");
+    workersSystem = ActorSystem.create("WorkersSystem", akkaConfig);
 
     Props workersProps = new RoundRobinPool(numberOfWorkers)
       .props(Props.create(AkkaWorkerActor.class, storage, model, index));
@@ -175,14 +179,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       plugin.afterAllExecute(index, model, storage);
 
-      PluginHelper.updateJobPercentage(plugin, 100);
-      LOGGER.info("Ended {}", plugin.getName());
-
     } catch (Exception e) {
       LOGGER.error("Error running plugin from index", e);
     }
 
-    PluginHelper.updateJobPercentage(plugin, 100);
+    PluginHelper.updateJobState(plugin, JOB_STATE.COMPLETED);
     LOGGER.info("Ended {}", plugin.getName());
   }
 
@@ -227,14 +228,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       plugin.afterAllExecute(index, model, storage);
 
-      PluginHelper.updateJobPercentage(plugin, 100);
-      LOGGER.info("Ended {}", plugin.getName());
-
     } catch (Exception e) {
       LOGGER.error("Error running plugin on AIPs", e);
     }
 
-    PluginHelper.updateJobPercentage(plugin, 100);
+    PluginHelper.updateJobState(plugin, JOB_STATE.COMPLETED);
     LOGGER.info("Ended {}", plugin.getName());
   }
 
@@ -280,14 +278,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       plugin.afterAllExecute(index, model, storage);
 
-      PluginHelper.updateJobPercentage(plugin, 100);
-      LOGGER.info("Ended {}", plugin.getName());
-
     } catch (Exception e) {
       LOGGER.error("Error running plugin on Representations", e);
     }
 
-    PluginHelper.updateJobPercentage(plugin, 100);
+    PluginHelper.updateJobState(plugin, JOB_STATE.COMPLETED);
     LOGGER.info("Ended {}", plugin.getName());
 
   }
@@ -334,14 +329,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       plugin.afterAllExecute(index, model, storage);
 
-      PluginHelper.updateJobPercentage(plugin, 100);
-      LOGGER.info("Ended {}", plugin.getName());
-
     } catch (Exception e) {
       LOGGER.error("Error running plugin on Files", e);
     }
 
-    PluginHelper.updateJobPercentage(plugin, 100);
+    PluginHelper.updateJobState(plugin, JOB_STATE.COMPLETED);
     LOGGER.info("Ended {}", plugin.getName());
 
   }
@@ -393,14 +385,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       plugin.afterAllExecute(index, model, storage);
 
-      PluginHelper.updateJobPercentage(plugin, 100);
-      LOGGER.info("Ended {}", plugin.getName());
-
     } catch (Exception e) {
       LOGGER.error("Error running plugin on all AIPs", e);
     }
 
-    PluginHelper.updateJobPercentage(plugin, 100);
+    PluginHelper.updateJobState(plugin, JOB_STATE.COMPLETED);
     LOGGER.info("Ended {}", plugin.getName());
 
   }
@@ -455,14 +444,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       plugin.afterAllExecute(index, model, storage);
 
-      PluginHelper.updateJobPercentage(plugin, 100);
-      LOGGER.info("Ended {}", plugin.getName());
-
     } catch (Exception e) {
       LOGGER.error("Error running plugin on all representations", e);
     }
 
-    PluginHelper.updateJobPercentage(plugin, 100);
+    PluginHelper.updateJobState(plugin, JOB_STATE.COMPLETED);
     LOGGER.info("Ended {}", plugin.getName());
 
   }
@@ -533,14 +519,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       plugin.afterAllExecute(index, model, storage);
 
-      PluginHelper.updateJobPercentage(plugin, 100);
-      LOGGER.info("Ended {}", plugin.getName());
-
     } catch (Exception e) {
       LOGGER.error("Error running plugin on all files", e);
     }
 
-    PluginHelper.updateJobPercentage(plugin, 100);
+    PluginHelper.updateJobState(plugin, JOB_STATE.COMPLETED);
     LOGGER.info("Ended {}", plugin.getName());
 
   }
@@ -589,14 +572,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       plugin.afterAllExecute(index, model, storage);
 
-      PluginHelper.updateJobPercentage(plugin, 100);
-      LOGGER.info("Ended {}", plugin.getName());
-
     } catch (Exception e) {
       LOGGER.error("Error running plugin on transferred resources", e);
     }
 
-    PluginHelper.updateJobPercentage(plugin, 100);
+    PluginHelper.updateJobState(plugin, JOB_STATE.COMPLETED);
     LOGGER.info("Ended {}", plugin.getName());
 
   }
@@ -615,16 +595,10 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       future.onSuccess(new OnSuccess<Object>() {
         @Override
         public void onSuccess(Object msg) throws Throwable {
-          // FIXME this should be sent inside a message that can be easily
-          // identified as a list of reports
-          if (msg != null && msg instanceof List<?>) {
-            LOGGER.info("Success running plugin: {}", (List<Report>) msg);
-          }
-
           plugin.afterBlockExecute(index, model, storage);
           plugin.afterAllExecute(index, model, storage);
 
-          PluginHelper.updateJobPercentage(plugin, 100);
+          PluginHelper.updateJobState(plugin, JOB_STATE.COMPLETED);
 
           LOGGER.info("Ended {}", plugin.getName());
         }
@@ -637,7 +611,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
           plugin.afterBlockExecute(index, model, storage);
           plugin.afterAllExecute(index, model, storage);
 
-          PluginHelper.updateJobPercentage(plugin, 100);
+          PluginHelper.updateJobState(plugin, JOB_STATE.COMPLETED);
 
           LOGGER.info("Ended {}", plugin.getName());
         }
@@ -806,20 +780,21 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public <T extends Serializable> void updateJobPercentage(Plugin<T> plugin, int percentage) {
+  public <T extends Serializable> void updateJobState(Plugin<T> plugin, JOB_STATE state) {
     String jobId = PluginHelper.getJobId(plugin);
     if (jobId != null) {
       // FIXME 20160331 hsilva: this will block the update of all jobs (whereas
       // it should block per job)
       synchronized (runningJobs) {
-        PluginHelper.updateJobPercentage(plugin, model, percentage);
-        if (percentage == 100) {
+        PluginHelper.updateJobState(plugin, model, state);
+        if (state == JOB_STATE.COMPLETED) {
           runningJobs.remove(jobId);
         }
       }
     } else {
-      LOGGER.error("Got a NULL jobId when updating Job percentage");
+      LOGGER.error("Got a NULL jobId when updating Job state");
     }
+
   }
 
   @Override

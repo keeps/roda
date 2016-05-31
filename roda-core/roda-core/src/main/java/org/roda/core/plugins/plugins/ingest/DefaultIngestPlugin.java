@@ -321,7 +321,9 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
           report.addReport(reportItem);
           report.setId(reportItem.getId());
           report.setJobId(reportItem.getJobId());
+          report.setSourceObjectClass(reportItem.getSourceObjectClass());
           report.setOutcomeObjectId(reportItem.getOutcomeObjectId());
+          report.setOutcomeObjectClass(reportItem.getOutcomeObjectClass());
           report.setOutcomeObjectState(reportItem.getOutcomeObjectState());
           jobPluginInfo.addReport(reportItem.getSourceObjectId(), reportItem.getOutcomeObjectId(), report);
         } else if (StringUtils.isNotBlank(reportItem.getOutcomeObjectId())

@@ -136,7 +136,7 @@
 		<spring.version>4.1.1.RELEASE</spring.version>
 		<grizzly.version>2.3.16</grizzly.version>
 		<jena.version>2.13.0</jena.version>
-		<solr.version>5.5.0</solr.version>
+		<solr.version>5.5.1</solr.version>
 		<tika.version>1.11</tika.version>
 		<akka.version>2.4.5</akka.version>
 		<httpcomponents.version>4.5.2</httpcomponents.version>
@@ -1040,6 +1040,11 @@
 			<dependency>
 				<groupId>com.typesafe.akka</groupId>
 				<artifactId>akka-persistence_2.11</artifactId>
+				<version>${akka.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.typesafe.akka</groupId>
+				<artifactId>akka-slf4j_2.11</artifactId>
 				<version>${akka.version}</version>
 			</dependency>
 			<dependency>

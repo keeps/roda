@@ -18,7 +18,7 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.plugins.orchestrate.JobException;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 
@@ -62,6 +62,6 @@ public interface PluginOrchestrator {
   public <T extends Serializable> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo)
     throws JobException;
 
-  public <T extends Serializable> void updateJobPercentage(Plugin<T> plugin, int percentage);
+  public <T extends Serializable> void updateJobState(Plugin<T> plugin, JOB_STATE state);
 
 }

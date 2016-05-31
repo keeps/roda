@@ -25,6 +25,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.JobsHelper;
 import org.roda.core.plugins.plugins.PluginHelper;
@@ -47,7 +48,7 @@ public class AkkaJobWorkerActor extends UntypedActor {
       Plugin<?> plugin = (Plugin<?>) RodaCoreFactory.getPluginManager().getPlugin(job.getPlugin());
       PluginHelper.setPluginParameters(plugin, job);
 
-      PluginHelper.updateJobPercentage(plugin, 0);
+      PluginHelper.updateJobState(plugin, JOB_STATE.STARTED);
 
       if (job.getSourceObjects() instanceof SelectedItemsAll<?>) {
         runOnAll(job, plugin);

@@ -65,7 +65,7 @@ public class Job implements IsIndexed, Serializable {
   // plugin parameters
   private Map<String, String> pluginParameters = new HashMap<String, String>();
 
-  // objects to act upon (All, ListOfIds, Filter, etc.)
+  // objects to act upon (All, None, List, Filter, etc.)
   private SelectedItems<?> sourceObjects = null;
   private String outcomeObjectsClass = "";
 

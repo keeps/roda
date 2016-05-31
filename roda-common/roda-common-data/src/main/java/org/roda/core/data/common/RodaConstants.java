@@ -65,6 +65,7 @@ public final class RodaConstants {
   public static final String CORE_STORAGE_FOLDER = "storage";
   public static final String CORE_INDEX_FOLDER = "index";
   public static final String CORE_CROSSWALKS_FOLDER = "crosswalks";
+  public static final String CORE_ORCHESTRATOR_FOLDER = "orchestrator";
   public static final String CORE_JOBREPORT_FOLDER = "jobreport";
   public static final String CORE_JOB_FOLDER = "job";
   public static final String CORE_TRANSFERREDRESOURCE_FOLDER = "transferredresource";
@@ -421,8 +422,10 @@ public final class RodaConstants {
   public static final String JOB_REPORT_ID = "id";
   public static final String JOB_REPORT_JOB_ID = "jobId";
   public static final String JOB_REPORT_SOURCE_OBJECT_ID = "sourceObjectId";
+  public static final String JOB_REPORT_SOURCE_OBJECT_CLASS = "sourceObjectClass";
   public static final String JOB_REPORT_SOURCE_OBJECT_ORIGINAL_ID = "sourceObjectOriginalId";
   public static final String JOB_REPORT_OUTCOME_OBJECT_ID = "outcomeObjectId";
+  public static final String JOB_REPORT_OUTCOME_OBJECT_CLASS = "outcomeObjectClass";
   public static final String JOB_REPORT_OUTCOME_OBJECT_STATE = "outcomeObjectState";
   public static final String JOB_REPORT_TITLE = "title";
   public static final String JOB_REPORT_DATE_CREATED = "dateCreated";

@@ -43,6 +43,11 @@
 		<appender-ref ref="CORE_FILEOUT" />
 	</logger>
 
+	<logger name="akka" additivity="false">
+		<level value="DEBUG" />
+		<appender-ref ref="CORE_FILEOUT" />
+	</logger>
+
 	<logger name="gov.loc.repository.bagit" additivity="false">
 		<level value="DEBUG" />
 		<appender-ref ref="CORE_FILEOUT" />

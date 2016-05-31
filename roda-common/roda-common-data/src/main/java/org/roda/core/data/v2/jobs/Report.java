@@ -27,8 +27,10 @@ public class Report implements Serializable, IsIndexed {
   private String id = "";
   private String jobId = "";
   private String sourceObjectId = "";
+  private String sourceObjectClass = "";
   private String sourceObjectOriginalId = "";
   private String outcomeObjectId = "";
+  private String outcomeObjectClass = "";
   private AIPState outcomeObjectState = AIPState.getDefault();
 
   private String title = "";
@@ -56,8 +58,10 @@ public class Report implements Serializable, IsIndexed {
     this.id = report.getId();
     this.jobId = report.getJobId();
     this.sourceObjectId = report.getSourceObjectId();
+    this.sourceObjectClass = report.getSourceObjectClass();
     this.sourceObjectOriginalId = report.getSourceObjectOriginalId();
     this.outcomeObjectId = report.getOutcomeObjectId();
+    this.outcomeObjectClass = report.getOutcomeObjectClass();
     this.outcomeObjectState = report.getOutcomeObjectState();
     this.title = report.getTitle();
     this.dateCreated = report.getDateCreated();
@@ -96,6 +100,15 @@ public class Report implements Serializable, IsIndexed {
     return this;
   }
 
+  public String getSourceObjectClass() {
+    return sourceObjectClass;
+  }
+
+  public Report setSourceObjectClass(String sourceObjectClass) {
+    this.sourceObjectClass = sourceObjectClass;
+    return this;
+  }
+
   public String getSourceObjectOriginalId() {
     return sourceObjectOriginalId;
   }
@@ -111,6 +124,15 @@ public class Report implements Serializable, IsIndexed {
 
   public Report setOutcomeObjectId(String outcomeObjectId) {
     this.outcomeObjectId = outcomeObjectId;
+    return this;
+  }
+
+  public String getOutcomeObjectClass() {
+    return outcomeObjectClass;
+  }
+
+  public Report setOutcomeObjectClass(String outcomeObjectClass) {
+    this.outcomeObjectClass = outcomeObjectClass;
     return this;
   }
 
@@ -245,8 +267,9 @@ public class Report implements Serializable, IsIndexed {
 
   @Override
   public String toString() {
-    return "Report [id=" + id + ", jobId=" + jobId + ", sourceObjectId=" + sourceObjectId + ", sourceObjectOriginalId="
-      + sourceObjectOriginalId + ", outcomeObjectId=" + outcomeObjectId + ", outcomeObjectState=" + outcomeObjectState
+    return "Report [id=" + id + ", jobId=" + jobId + ", sourceObjectId=" + sourceObjectId + ", sourceObjectClass="
+      + sourceObjectClass + ", sourceObjectOriginalId=" + sourceObjectOriginalId + ", outcomeObjectId="
+      + outcomeObjectId + ", outcomeObjectClass=" + outcomeObjectClass + ", outcomeObjectState=" + outcomeObjectState
       + ", title=" + title + ", dateCreated=" + dateCreated + ", dateUpdated=" + dateUpdated + ", completionPercentage="
       + completionPercentage + ", stepsCompleted=" + stepsCompleted + ", totalSteps=" + totalSteps + ", plugin="
       + plugin + ", pluginState=" + pluginState + ", pluginDetails=" + pluginDetails + ", htmlPluginDetails="

@@ -80,7 +80,8 @@ public final class PluginHelper {
   public static <T extends Serializable> Report initPluginReportItem(Plugin<T> plugin,
     TransferredResource transferredResource) {
     return initPluginReportItem(plugin, "", transferredResource.getUUID())
-      .setOutcomeObjectState(AIPState.INGEST_PROCESSING);
+      .setSourceObjectClass(TransferredResource.class.getCanonicalName())
+      .setOutcomeObjectClass(AIP.class.getCanonicalName()).setOutcomeObjectState(AIPState.INGEST_PROCESSING);
   }
 
   public static <T extends Serializable> Report initPluginReportItem(Plugin<T> plugin, String outcomeObjectId,
@@ -214,10 +215,10 @@ public final class PluginHelper {
   }
 
   /**
-   * Updates the job percentage
+   * Updates the job state
    */
-  public static <T extends Serializable> void updateJobPercentage(Plugin<T> plugin, int percentage) {
-    RodaCoreFactory.getPluginOrchestrator().updateJobPercentage(plugin, percentage);
+  public static <T extends Serializable> void updateJobState(Plugin<T> plugin, JOB_STATE state) {
+    RodaCoreFactory.getPluginOrchestrator().updateJobState(plugin, state);
   }
 
   /**
@@ -237,28 +238,16 @@ public final class PluginHelper {
     return jobPluginInfo;
   }
 
-  private static <T extends Serializable> Job getJobAndSetPercentage(Plugin<T> plugin, ModelService model,
-    int percentage) throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
-    Job job = PluginHelper.getJobFromModel(plugin, model);
-    job.setCompletionPercentage(percentage);
-
-    if (percentage == 0) {
-      job.setState(JOB_STATE.STARTED);
-    } else if (percentage == 100) {
-      job.setState(JOB_STATE.COMPLETED);
-      job.setEndDate(new Date());
-    }
-    return job;
-  }
-
   /**
-   * 20160331 hsilva: Only orchestrators should invoke this method
+   * 20160531 hsilva: Only orchestrators should invoke this method
    */
-  public static <T extends Serializable> void updateJobPercentage(Plugin<T> plugin, ModelService model,
-    int percentage) {
-    LOGGER.debug("New job completionPercentage: {}", percentage);
+  public static <T extends Serializable> void updateJobState(Plugin<T> plugin, ModelService model, JOB_STATE state) {
     try {
-      Job job = getJobAndSetPercentage(plugin, model, percentage);
+      Job job = PluginHelper.getJobFromModel(plugin, model);
+      job.setState(state);
+      if (job.getState() == JOB_STATE.COMPLETED) {
+        job.setEndDate(new Date());
+      }
 
       model.createOrUpdateJob(job);
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
@@ -284,8 +273,6 @@ public final class PluginHelper {
 
   /**
    * 20160331 hsilva: Only orchestrators should invoke this method
-   * 
-   * @throws GenericException
    */
   public static <T extends Serializable> void updateJobInformation(Plugin<T> plugin, ModelService model,
     JobPluginInfo jobPluginInfo) {
@@ -296,7 +283,8 @@ public final class PluginHelper {
     try {
       int completionPercentage = jobPluginInfo.getCompletionPercentage();
       LOGGER.debug("New job completionPercentage: {}", completionPercentage);
-      Job job = getJobAndSetPercentage(plugin, model, completionPercentage);
+      Job job = PluginHelper.getJobFromModel(plugin, model);
+      job.setCompletionPercentage(completionPercentage);
       job = setJobCounters(job, jobPluginInfo);
 
       model.createOrUpdateJob(job);

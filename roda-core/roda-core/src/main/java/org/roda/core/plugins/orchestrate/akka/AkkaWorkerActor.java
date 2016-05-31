@@ -37,9 +37,11 @@ public class AkkaWorkerActor extends UntypedActor {
       Plugin<?> plugin = message.getPlugin();
       try {
         plugin.execute(index, model, storage, message.getList());
+        getSender().tell("", getSelf());
         // getSender().tell(returnMessage, getSelf());
       } catch (Throwable e) {
         logger.error("Error executing action!", e);
+        getSender().tell("", getSelf());
         // getSender().tell(returnMessage, getSelf());
         throw e;
       }

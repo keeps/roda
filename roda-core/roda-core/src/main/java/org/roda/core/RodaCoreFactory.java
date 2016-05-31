@@ -130,6 +130,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
@@ -174,6 +177,7 @@ public class RodaCoreFactory {
   private static AkkaDistributedPluginOrchestrator akkaDistributedPluginOrchestrator;
   private static AkkaDistributedPluginWorker akkaDistributedPluginWorker;
   private static boolean FEATURE_DISTRIBUTED_AKKA = false;
+  private static Config akkaConfig;
 
   // ApacheDS related objects
   private static ApacheDS ldap;
@@ -523,10 +527,6 @@ public class RodaCoreFactory {
    * 
    */
   private static void instantiateSolrAndIndexService() throws URISyntaxException {
-    LOGGER.info(
-      "Warnings like '2016-03-21 11:21:34,319 WARN  org.apache.solr.core.Config - Beginning with Solr 5.5, <maxMergeDocs> is deprecated, configure it on the relevant <mergePolicyFactory> instead.'"
-        + " are due to a bug, explained in https://issues.apache.org/jira/browse/SOLR-8734, as we don't declare those parameters in RODA solr configurations."
-        + " The warning will be removed and as soon as that happens, this messages should be deleted as well.");
     if (nodeType == NodeType.MASTER) {
       Path solrHome = configPath.resolve(RodaConstants.CORE_INDEX_FOLDER);
       if (!Files.exists(solrHome) || FEATURE_OVERRIDE_INDEX_CONFIGS) {
@@ -618,49 +618,73 @@ public class RodaCoreFactory {
   }
 
   private static void instantiateNodeSpecificObjects(NodeType nodeType) {
+    // FIXME 20160531 hsilva: this should be moved to somewhere closely to Akka
+    // instantiation code
+    loadAkkaConfiguration();
     if (nodeType == NodeType.MASTER) {
-      if (FEATURE_DISTRIBUTED_AKKA) {
-        akkaDistributedPluginOrchestrator = new AkkaDistributedPluginOrchestrator(
-          getSystemProperty(RodaConstants.CORE_NODE_HOSTNAME, RodaConstants.DEFAULT_NODE_HOSTNAME),
-          getSystemProperty(RodaConstants.CORE_NODE_PORT, RodaConstants.DEFAULT_NODE_PORT));
-      } else {
-        // pluginOrchestrator = new EmbeddedActionOrchestrator();
-        pluginOrchestrator = new AkkaEmbeddedPluginOrchestrator();
-        pluginOrchestrator.cleanUnfinishedJobs();
-      }
+      instantiateMasterNodeSpecificObjects();
+    } else if (nodeType == NodeType.WORKER) {
+      instantiateWorkerNodeSpecificObjects();
+    } else if (nodeType == NodeType.TEST) {
+      instantiateTestNodeSpecificObjects();
+    } else {
+      LOGGER.error("Unknown node type '{}'", nodeType);
+    }
+  }
 
+  private static void loadAkkaConfiguration() {
+    akkaConfig = ConfigFactory
+      .load(RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_ORCHESTRATOR_FOLDER + "/application.conf");
+  }
+
+  public static Config getAkkaConfiguration() {
+    return akkaConfig;
+  }
+
+  private static void instantiateMasterNodeSpecificObjects() {
+    if (FEATURE_DISTRIBUTED_AKKA) {
+      akkaDistributedPluginOrchestrator = new AkkaDistributedPluginOrchestrator(
+        getSystemProperty(RodaConstants.CORE_NODE_HOSTNAME, RodaConstants.DEFAULT_NODE_HOSTNAME),
+        getSystemProperty(RodaConstants.CORE_NODE_PORT, RodaConstants.DEFAULT_NODE_PORT));
+      akkaDistributedPluginOrchestrator.cleanUnfinishedJobs();
+    } else {
+      // pluginOrchestrator = new EmbeddedActionOrchestrator();
+      pluginOrchestrator = new AkkaEmbeddedPluginOrchestrator();
+      pluginOrchestrator.cleanUnfinishedJobs();
+    }
+
+    startApacheDS();
+
+    try {
+      startTransferredResourcesScanner();
+    } catch (Exception e) {
+      LOGGER.error("Error starting Transferred Resources Scanner: " + e.getMessage(), e);
+    }
+  }
+
+  private static void instantiateWorkerNodeSpecificObjects() {
+    akkaDistributedPluginWorker = new AkkaDistributedPluginWorker(
+      getSystemProperty(RodaConstants.CORE_CLUSTER_HOSTNAME, RodaConstants.DEFAULT_NODE_HOSTNAME),
+      getSystemProperty(RodaConstants.CORE_CLUSTER_PORT, RodaConstants.DEFAULT_NODE_PORT),
+      getSystemProperty(RodaConstants.CORE_NODE_HOSTNAME, RodaConstants.DEFAULT_NODE_HOSTNAME),
+      getSystemProperty(RodaConstants.CORE_NODE_PORT, "0"));
+  }
+
+  private static void instantiateTestNodeSpecificObjects() {
+    if (TEST_DEPLOY_LDAP) {
       startApacheDS();
+    }
 
+    if (TEST_DEPLOY_SCANNER) {
       try {
         startTransferredResourcesScanner();
       } catch (Exception e) {
         LOGGER.error("Error starting Transferred Resources Scanner: " + e.getMessage(), e);
       }
+    }
 
-    } else if (nodeType == NodeType.WORKER) {
-      akkaDistributedPluginWorker = new AkkaDistributedPluginWorker(
-        getSystemProperty(RodaConstants.CORE_CLUSTER_HOSTNAME, RodaConstants.DEFAULT_NODE_HOSTNAME),
-        getSystemProperty(RodaConstants.CORE_CLUSTER_PORT, RodaConstants.DEFAULT_NODE_PORT),
-        getSystemProperty(RodaConstants.CORE_NODE_HOSTNAME, RodaConstants.DEFAULT_NODE_HOSTNAME),
-        getSystemProperty(RodaConstants.CORE_NODE_PORT, "0"));
-    } else if (nodeType == NodeType.TEST) {
-      if (TEST_DEPLOY_LDAP) {
-        startApacheDS();
-      }
-
-      if (TEST_DEPLOY_SCANNER) {
-        try {
-          startTransferredResourcesScanner();
-        } catch (Exception e) {
-          LOGGER.error("Error starting Transferred Resources Scanner: " + e.getMessage(), e);
-        }
-      }
-
-      if (TEST_DEPLOY_ORCHESTRATOR) {
-        pluginOrchestrator = new AkkaEmbeddedPluginOrchestrator();
-      }
-    } else {
-      LOGGER.error("Unknown node type '{}'", nodeType);
+    if (TEST_DEPLOY_ORCHESTRATOR) {
+      pluginOrchestrator = new AkkaEmbeddedPluginOrchestrator();
     }
   }
 
@@ -973,6 +997,7 @@ public class RodaCoreFactory {
           }
 
           if (schemaStream != null) {
+            // FIXME 20160531 hsilva: what about 1.1 xsds???
             SchemaFactory schemaFactory = SchemaFactory.newInstance(RodaConstants.W3C_XML_SCHEMA_NS_URI);
             schemaFactory.setResourceResolver(new ResourceResolver());
             try {
