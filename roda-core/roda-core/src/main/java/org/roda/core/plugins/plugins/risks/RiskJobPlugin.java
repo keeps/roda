@@ -163,7 +163,7 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
     Report pluginReport = PluginHelper.initPluginReport(this);
 
     try {
-      SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo(list.size());
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       if (!list.isEmpty() && riskIds != null) {
@@ -185,7 +185,7 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
         }
       }
 
-      jobPluginInfo.done();
+      jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
     } catch (JobException e) {
       throw new PluginException("A job exception has occurred", e);

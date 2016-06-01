@@ -167,7 +167,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
         }
       }
 
-      jobPluginInfo.done();
+      jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
     } catch (JobException e) {
       throw new PluginException("A job exception has occurred", e);

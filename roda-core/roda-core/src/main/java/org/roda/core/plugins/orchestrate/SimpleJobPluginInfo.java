@@ -8,59 +8,54 @@ import org.roda.core.plugins.Plugin;
 public class SimpleJobPluginInfo extends JobPluginInfo {
   private static final long serialVersionUID = 2210879753936753174L;
 
-  private boolean pluginExecutionDone = false;
-
   public SimpleJobPluginInfo() {
     super();
   }
 
-  public SimpleJobPluginInfo(int sourceObjectsCount) {
-    super(sourceObjectsCount);
+  public void update(SimpleJobPluginInfo jobPluginInfo) {
+    this.setCompletionPercentage(jobPluginInfo.getCompletionPercentage());
+    this.setSourceObjectsCount(jobPluginInfo.getSourceObjectsCount());
+    this.setSourceObjectsBeingProcessed(jobPluginInfo.getSourceObjectsBeingProcessed());
+    this.setSourceObjectsWaitingToBeProcessed(jobPluginInfo.getSourceObjectsWaitingToBeProcessed());
+    this.setSourceObjectsProcessedWithSuccess(jobPluginInfo.getSourceObjectsProcessedWithSuccess());
+    this.setSourceObjectsProcessedWithFailure(jobPluginInfo.getSourceObjectsProcessedWithFailure());
   }
 
   @Override
   public <T extends Serializable> JobPluginInfo processJobPluginInformation(Plugin<T> plugin, Integer taskObjectsCount,
     Map<Plugin<?>, JobPluginInfo> jobInfos) {
+    // update information in the map<plugin, pluginInfo>
+    // FIXME/INFO 20160601 hsilva: the following code would be necessary in a
+    // distributed architecture
+    // SimpleJobPluginInfo jobPluginInfo = (SimpleJobPluginInfo)
+    // jobInfos.get(plugin);
+    // jobPluginInfo.update(this);
 
-    SimpleJobPluginInfo jobPluginInfo = (SimpleJobPluginInfo) jobInfos.get(plugin);
-    jobPluginInfo.setCompletionPercentage(this.getCompletionPercentage());
-    jobPluginInfo.setSourceObjectsCount(this.getSourceObjectsCount());
-    jobPluginInfo.setSourceObjectsBeingProcessed(pluginExecutionDone ? 0 : this.getSourceObjectsBeingProcessed());
-    jobPluginInfo
-      .setSourceObjectsWaitingToBeProcessed(pluginExecutionDone ? 0 : this.getSourceObjectsWaitingToBeProcessed());
-    jobPluginInfo.setSourceObjectsProcessedWithSuccess(this.getSourceObjectsProcessedWithSuccess());
-    jobPluginInfo.setSourceObjectsProcessedWithFailure(this.getSourceObjectsProcessedWithFailure());
-
-    int objectsCount = 0;
-    int beingProcessed = 0;
-    int processedWithSuccess = 0;
-    int processedWithFailure = 0;
+    float percentage = 0f;
+    int sourceObjectsCount = 0;
+    int sourceObjectsBeingProcessed = 0;
+    int sourceObjectsProcessedWithSuccess = 0;
+    int sourceObjectsProcessedWithFailure = 0;
     for (JobPluginInfo jpi : jobInfos.values()) {
       SimpleJobPluginInfo pluginInfo = (SimpleJobPluginInfo) jpi;
-      objectsCount += pluginInfo.getSourceObjectsCount();
-      processedWithSuccess += pluginInfo.getSourceObjectsProcessedWithSuccess();
-      processedWithFailure += pluginInfo.getSourceObjectsProcessedWithFailure();
-      beingProcessed += pluginInfo.getSourceObjectsBeingProcessed();
+
+      float pluginPercentage = pluginInfo.isDone() ? 1 : 0;
+      float pluginWeight = ((float) pluginInfo.getSourceObjectsCount()) / taskObjectsCount;
+      percentage += (pluginPercentage * pluginWeight);
+
+      sourceObjectsProcessedWithSuccess += pluginInfo.getSourceObjectsProcessedWithSuccess();
+      sourceObjectsProcessedWithFailure += pluginInfo.getSourceObjectsProcessedWithFailure();
+      sourceObjectsBeingProcessed += pluginInfo.getSourceObjectsBeingProcessed();
+      sourceObjectsCount += pluginInfo.getSourceObjectsCount();
     }
 
     SimpleJobPluginInfo infoUpdated = new SimpleJobPluginInfo();
-    infoUpdated.setSourceObjectsCount(objectsCount);
-    infoUpdated.setSourceObjectsBeingProcessed(beingProcessed);
-    infoUpdated.setSourceObjectsProcessedWithSuccess(processedWithSuccess);
-    infoUpdated.setSourceObjectsProcessedWithFailure(processedWithFailure);
+    infoUpdated.setCompletionPercentage(Math.round((percentage * 100)));
+    infoUpdated.setSourceObjectsCount(sourceObjectsCount);
+    infoUpdated.setSourceObjectsBeingProcessed(sourceObjectsBeingProcessed);
+    infoUpdated.setSourceObjectsProcessedWithSuccess(sourceObjectsProcessedWithSuccess);
+    infoUpdated.setSourceObjectsProcessedWithFailure(sourceObjectsProcessedWithFailure);
     return infoUpdated;
-  }
-
-  public boolean isPluginExecutionDone() {
-    return pluginExecutionDone;
-  }
-
-  public void setPluginExecutionDone(boolean pluginExecutionIsDone) {
-    this.pluginExecutionDone = pluginExecutionIsDone;
-  }
-
-  public void done() {
-    this.pluginExecutionDone = false;
   }
 
 }

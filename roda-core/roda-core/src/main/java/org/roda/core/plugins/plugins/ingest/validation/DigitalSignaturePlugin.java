@@ -228,7 +228,7 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
     Report report = PluginHelper.initPluginReport(this);
 
     try {
-      SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo(list.size());
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       for (AIP aip : list) {
@@ -371,7 +371,7 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
         }
       }
 
-      jobPluginInfo.done();
+      jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
     } catch (JobException e) {
       throw new PluginException("A job exception has occurred", e);
@@ -387,7 +387,7 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
     Report report = PluginHelper.initPluginReport(this);
 
     try {
-      SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo(list.size());
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       for (Representation representation : list) {
@@ -530,7 +530,7 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
         }
       }
 
-      jobPluginInfo.done();
+      jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
     } catch (JobException e) {
       throw new PluginException("A job exception has occurred", e);
@@ -545,7 +545,7 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
     Report report = PluginHelper.initPluginReport(this);
 
     try {
-      SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo(list.size());
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       String newRepresentationID = UUID.randomUUID().toString();
@@ -682,7 +682,7 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
         }
       }
 
-      jobPluginInfo.done();
+      jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error retrieving aip from file");

@@ -99,7 +99,7 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
     Report report = PluginHelper.initPluginReport(this);
 
     try {
-      SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo(list.size());
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       for (AIP aip : list) {
@@ -149,7 +149,7 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
         PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
       }
 
-      jobPluginInfo.done();
+      jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
     } catch (JobException e) {
       throw new PluginException("A job exception has occurred", e);

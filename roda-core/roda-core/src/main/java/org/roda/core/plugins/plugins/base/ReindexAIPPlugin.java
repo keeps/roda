@@ -91,7 +91,7 @@ public class ReindexAIPPlugin extends AbstractPlugin<AIP> {
     throws PluginException {
 
     try {
-      SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo(list.size());
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       for (AIP aip : list) {
@@ -100,7 +100,7 @@ public class ReindexAIPPlugin extends AbstractPlugin<AIP> {
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
       }
 
-      jobPluginInfo.done();
+      jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
     } catch (JobException e) {
       LOGGER.error("Could not update Job information");

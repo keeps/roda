@@ -58,7 +58,6 @@ import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.JobException;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.orchestrate.JobPluginInfoInterface;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultStoragePath;
@@ -235,8 +234,8 @@ public final class PluginHelper {
   /**
    * Updates the job status for a particular plugin instance
    */
-  public static <T extends Serializable> JobPluginInfoInterface updateJobInformation(Plugin<T> plugin,
-    JobPluginInfo jobPluginInfo) throws JobException {
+  public static <T extends Serializable> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo)
+    throws JobException {
 
     Map<String, String> parameterValues = plugin.getParameterValues();
 
@@ -245,15 +244,17 @@ public final class PluginHelper {
         .get(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS).equals(plugin.getClass().getCanonicalName()))) {
       RodaCoreFactory.getPluginOrchestrator().updateJobInformation(plugin, jobPluginInfo);
     }
-
-    return jobPluginInfo;
   }
 
   public static <T extends Serializable> SimpleJobPluginInfo getInitialJobInformation(Plugin<T> plugin,
     int sourceObjectsCount) throws JobException {
     JobPluginInfo jobInformation = RodaCoreFactory.getPluginOrchestrator().getJobInformation(plugin);
-    jobInformation.setSourceObjectsBeingProcessed(sourceObjectsCount).setSourceObjectsWaitingToBeProcessed(0);
-    return (SimpleJobPluginInfo) jobInformation;
+    if (jobInformation != null) {
+      jobInformation.setSourceObjectsBeingProcessed(sourceObjectsCount).setSourceObjectsWaitingToBeProcessed(0);
+      return (SimpleJobPluginInfo) jobInformation;
+    } else {
+      return new SimpleJobPluginInfo();
+    }
   }
 
   public static <T extends Serializable> JobPluginInfo getInitialJobInformation(Plugin<T> plugin) throws JobException {
@@ -287,8 +288,8 @@ public final class PluginHelper {
     Long objectsCount) {
     try {
       Job job = PluginHelper.getJobFromModel(plugin, model);
-      job.getJobStats().setSourceObjectsCount(objectsCount.intValue());
-      job.getJobStats().setSourceObjectsWaitingToBeProcessed(objectsCount.intValue());
+      job.getJobStats().setSourceObjectsCount(objectsCount.intValue())
+        .setSourceObjectsWaitingToBeProcessed(objectsCount.intValue());
 
       model.createOrUpdateJob(job);
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
@@ -306,10 +307,8 @@ public final class PluginHelper {
 
     // update job
     try {
-      int completionPercentage = jobPluginInfo.getCompletionPercentage();
-      LOGGER.debug("New job completionPercentage: {}", completionPercentage);
+      LOGGER.debug("New job completionPercentage: {}", jobPluginInfo.getCompletionPercentage());
       Job job = PluginHelper.getJobFromModel(plugin, model);
-      job.getJobStats().setCompletionPercentage(completionPercentage);
       job = setJobCounters(job, jobPluginInfo);
 
       model.createOrUpdateJob(job);
@@ -331,6 +330,9 @@ public final class PluginHelper {
 
   public static Job setJobCounters(Job job, JobPluginInfo jobPluginInfo) {
     JobStats jobStats = job.getJobStats();
+
+    jobStats.setCompletionPercentage(jobPluginInfo.getCompletionPercentage());
+    jobStats.setSourceObjectsCount(jobPluginInfo.getSourceObjectsCount());
     jobStats.setSourceObjectsBeingProcessed(jobPluginInfo.getSourceObjectsBeingProcessed());
     jobStats.setSourceObjectsProcessedWithSuccess(jobPluginInfo.getSourceObjectsProcessedWithSuccess());
     jobStats.setSourceObjectsProcessedWithFailure(jobPluginInfo.getSourceObjectsProcessedWithFailure());

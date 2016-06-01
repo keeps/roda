@@ -163,7 +163,7 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
     Report report = PluginHelper.initPluginReport(this);
 
     try {
-      SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo(list.size());
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       for (AIP aip : list) {
@@ -254,7 +254,7 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
         PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
       }
 
-      jobPluginInfo.done();
+      jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
     } catch (JobException e) {
       throw new PluginException("A job exception has occurred", e);
@@ -268,7 +268,7 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
     Report report = PluginHelper.initPluginReport(this);
 
     try {
-      SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo(list.size());
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       for (Representation representation : list) {
@@ -355,7 +355,7 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
         PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
       }
 
-      jobPluginInfo.done();
+      jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
     } catch (JobException e) {
       throw new PluginException("A job exception has occurred", e);
@@ -371,7 +371,7 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
     Report report = PluginHelper.initPluginReport(this);
 
     try {
-      SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo(list.size());
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       try {
@@ -442,7 +442,7 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
         LOGGER.error("Could not run VeraPDF successfully");
       }
 
-      jobPluginInfo.done();
+      jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
     } catch (JobException e) {
       throw new PluginException("A job exception has occurred", e);

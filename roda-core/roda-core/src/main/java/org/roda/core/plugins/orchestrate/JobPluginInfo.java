@@ -12,24 +12,24 @@ import org.roda.core.data.v2.jobs.JobStats;
 public abstract class JobPluginInfo extends JobStats implements JobPluginInfoInterface {
   private static final long serialVersionUID = 2106710222456788707L;
 
+  private boolean done = false;
+
   public JobPluginInfo() {
     super();
   }
 
-  /**
-   * Constructor that sets both sourceObjectsCount & sourceObjectsBeingProcessed
-   * to sourceObjectsCount
-   */
-  public JobPluginInfo(int sourceObjectsCount) {
-    super();
-    setSourceObjectsCount(sourceObjectsCount);
-    setSourceObjectsBeingProcessed(sourceObjectsCount);
+  public boolean isDone() {
+    return done;
   }
 
-  public void finalizeCounters() {
-    setSourceObjectsProcessedWithSuccess(getSourceObjectsCount() - getSourceObjectsProcessedWithFailure());
+  public void setDone(boolean done) {
+    this.done = done;
+  }
+
+  public void finalizeInfo() {
+    setDone(true);
     setSourceObjectsBeingProcessed(0);
     setSourceObjectsWaitingToBeProcessed(0);
-    setCompletionPercentage(100);
   }
+
 }

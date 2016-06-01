@@ -137,7 +137,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       Report pluginReport;
 
       IngestJobPluginInfo jobPluginInfo = (IngestJobPluginInfo) PluginHelper.getInitialJobInformation(this);
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
+      PluginHelper.updateJobInformation(this, jobPluginInfo.setTotalSteps(getTotalSteps()));
 
       // 0) process "parent id" and "force parent id" info. (because we might
       // need to fallback to default values)
@@ -257,7 +257,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       }
 
       // X) final job info update
-      jobPluginInfo.finalizeCounters();
+      jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       // delete SIP from transfer
