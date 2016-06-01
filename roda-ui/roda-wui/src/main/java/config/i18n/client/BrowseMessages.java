@@ -815,4 +815,28 @@ public interface BrowseMessages extends Messages {
     "UNDER_APPRAISAL", "under appraisal"})
   String aipState(@Select AIPState state);
 
+  /************* Search pre-filters ****************/
+
+  @DefaultMessage("{0}: {1}")
+  SafeHtml searchPreFilterSimpleFilterParameter(String searchPreFilterName, String searchPreFilterValue);
+  
+  @DefaultMessage("{0}: {1}")
+  SafeHtml searchPreFilterBasicSearchFilterParameter(String searchPreFilterName, String searchPreFilterValue);
+  
+  @DefaultMessage("NOT {0}: {1}")
+  SafeHtml searchPreFilterNotSimpleFilterParameter(String searchPreFilterName, String searchPreFilterValue);
+  
+  @DefaultMessage("NO {0}")
+  SafeHtml searchPreFilterEmptyKeyFilterParameter(String searchPreFilterName);
+
+  @DefaultMessage("{0}")
+  @AlternateMessage({"state", "state", "ingestJobId", "job", "parentId", "parent", "ancestors", "ancestors"})
+  String searchPreFilterName(@Select String name);
+
+  @DefaultMessage("{0}")
+  @AlternateMessage({"UNDER_APPRAISAL", "under appraisal"})
+  String searchPreFilterValue(@Select String name);
+
+  
+
 }

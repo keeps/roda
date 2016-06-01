@@ -43,7 +43,13 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
+import config.i18n.client.BrowseMessages;
+
 public class SearchPanel extends Composite implements HasValueChangeHandlers<String> {
+  private static final String FILTER_ICON = "<i class='fa fa-filter' aria-hidden='true'></i>";
+
+  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
+
   private static final Binder binder = GWT.create(Binder.class);
 
   interface Binder extends UiBinder<Widget, SearchPanel> {
@@ -102,7 +108,7 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
     searchAdvancedPanel.setVisible(false);
 
     searchInputBox.addKeyDownHandler(new KeyDownHandler() {
-      
+
       @Override
       public void onKeyDown(KeyDownEvent event) {
         if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
@@ -145,55 +151,38 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
 
   private void drawSearchPreFilters() {
     searchPreFilters.clear();
-    HTML header = new HTML(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-filter' aria-hidden='true'></i>"));
-    header.addStyleName("inline gray");
-    searchPreFilters.add(header);
-        
+
     for (FilterParameter parameter : defaultFilter.getParameters()) {
+      HTML header = new HTML(SafeHtmlUtils.fromSafeConstant(FILTER_ICON));
+      header.addStyleName("inline gray");
+      searchPreFilters.add(header);
+
+      HTML html = null;
+
       if (parameter instanceof SimpleFilterParameter) {
-        SimpleFilterParameter sfp = (SimpleFilterParameter) parameter;
-        SafeHtmlBuilder b = new SafeHtmlBuilder();
-        b.append(SafeHtmlUtils.fromString(sfp.getName()));
-        b.append(SafeHtmlUtils.fromSafeConstant(": "));
-        b.append(SafeHtmlUtils.fromString(sfp.getValue()));
-        HTML html = new HTML(b.toSafeHtml());
-        html.addStyleName("xsmall gray inline");
-        searchPreFilters.add(html);
+        SimpleFilterParameter p = (SimpleFilterParameter) parameter;
+        html = new HTML(messages.searchPreFilterSimpleFilterParameter(messages.searchPreFilterName(p.getName()),
+          messages.searchPreFilterValue(p.getValue())));
       } else if (parameter instanceof BasicSearchFilterParameter) {
-        BasicSearchFilterParameter bsfp = (BasicSearchFilterParameter) parameter;
+        BasicSearchFilterParameter p = (BasicSearchFilterParameter) parameter;
         // TODO put '*' in some constant, see Search
-        if (!"*".equals(bsfp.getValue())) {
-          SafeHtmlBuilder b = new SafeHtmlBuilder();
-          b.append(SafeHtmlUtils.fromString(bsfp.getName()));
-          b.append(SafeHtmlUtils.fromSafeConstant(": "));
-          b.append(SafeHtmlUtils.fromString(bsfp.getValue()));
-          HTML html = new HTML(b.toSafeHtml());
-          html.addStyleName("xsmall gray inline");
-          searchPreFilters.add(html);
+        if (!"*".equals(p.getValue())) {
+          html = new HTML(messages.searchPreFilterBasicSearchFilterParameter(messages.searchPreFilterName(p.getName()),
+            messages.searchPreFilterValue(p.getValue())));
         }
       } else if (parameter instanceof NotSimpleFilterParameter) {
-        NotSimpleFilterParameter nsfp = (NotSimpleFilterParameter) parameter;
-        SafeHtmlBuilder b = new SafeHtmlBuilder();
-        b.append(SafeHtmlUtils.fromSafeConstant("NOT "));
-        b.append(SafeHtmlUtils.fromString(nsfp.getName()));
-        b.append(SafeHtmlUtils.fromSafeConstant(": "));
-        b.append(SafeHtmlUtils.fromString(nsfp.getValue()));
-        HTML html = new HTML(b.toSafeHtml());
-        html.addStyleName("xsmall gray inline");
-        searchPreFilters.add(html);
+        NotSimpleFilterParameter p = (NotSimpleFilterParameter) parameter;
+        html = new HTML(messages.searchPreFilterNotSimpleFilterParameter(messages.searchPreFilterName(p.getName()),
+          messages.searchPreFilterValue(p.getValue())));
       } else if (parameter instanceof EmptyKeyFilterParameter) {
-        EmptyKeyFilterParameter ekfp = (EmptyKeyFilterParameter) parameter;
-        SafeHtmlBuilder b = new SafeHtmlBuilder();
-        b.append(SafeHtmlUtils.fromSafeConstant("NO "));
-        b.append(SafeHtmlUtils.fromString(ekfp.getName()));
-        HTML html = new HTML(b.toSafeHtml());
-        html.addStyleName("xsmall gray inline");
-        searchPreFilters.add(html);
+        EmptyKeyFilterParameter p = (EmptyKeyFilterParameter) parameter;
+        html = new HTML(messages.searchPreFilterEmptyKeyFilterParameter(messages.searchPreFilterName(p.getName())));
       } else {
-        SafeHtmlBuilder b = new SafeHtmlBuilder();
-        b.append(SafeHtmlUtils.fromString(parameter.getClass().getSimpleName()));
-        HTML html = new HTML(b.toSafeHtml());
-        html.addStyleName("xsmall gray inline");
+        html = new HTML(SafeHtmlUtils.fromString(parameter.getClass().getSimpleName()));
+      }
+
+      if (html != null) {
+        html.addStyleName("xsmall gray inline nowrap");
         searchPreFilters.add(html);
       }
     }
