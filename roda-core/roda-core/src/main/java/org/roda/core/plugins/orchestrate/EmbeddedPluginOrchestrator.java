@@ -385,4 +385,10 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   }
 
+  @Override
+  public <T extends Serializable> JobPluginInfo getJobInformation(Plugin<T> plugin) throws JobException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

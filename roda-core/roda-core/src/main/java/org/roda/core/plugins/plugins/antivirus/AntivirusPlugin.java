@@ -110,7 +110,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
     Report report = PluginHelper.initPluginReport(this);
 
     try {
-      SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo(list.size());
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       for (AIP aip : list) {

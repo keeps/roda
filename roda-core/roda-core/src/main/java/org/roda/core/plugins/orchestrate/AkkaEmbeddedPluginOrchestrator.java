@@ -798,6 +798,21 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
+  public <T extends Serializable> JobPluginInfo getJobInformation(Plugin<T> plugin) throws JobException {
+    String jobId = PluginHelper.getJobId(plugin);
+    if (jobId != null) {
+      JobInfo jobInfo = runningJobs.get(jobId);
+      if (jobInfo.isHasTimeoutOccurred()) {
+        throw new TimeoutJobException("Job timeout occurred");
+      } else {
+        return jobInfo.getJobInfo().get(plugin);
+      }
+    } else {
+      throw new JobException("Job id is null");
+    }
+  }
+
+  @Override
   public <T extends Serializable> void updateJobInformation(Plugin<T> plugin, JobPluginInfo info) throws JobException {
     String jobId = PluginHelper.getJobId(plugin);
     if (jobId != null) {

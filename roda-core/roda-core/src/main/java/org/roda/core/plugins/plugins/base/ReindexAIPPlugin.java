@@ -90,8 +90,6 @@ public class ReindexAIPPlugin extends AbstractPlugin<AIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
 
-    LOGGER.debug("Reindexing a total of {} AIPs", list.size());
-
     try {
       SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo(list.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
@@ -121,8 +119,8 @@ public class ReindexAIPPlugin extends AbstractPlugin<AIP> {
         index.clearIndex(RodaConstants.INDEX_AIP);
         index.clearIndex(RodaConstants.INDEX_REPRESENTATION);
         index.clearIndex(RodaConstants.INDEX_PRESERVATION_EVENTS);
-        index.clearIndex(RodaConstants.INDEX_PRESERVATION_AGENTS);
         index.clearIndex(RodaConstants.INDEX_FILE);
+        index.clearIndex(RodaConstants.INDEX_PRESERVATION_AGENTS);
       } catch (GenericException e) {
         throw new PluginException("Error clearing index", e);
       }

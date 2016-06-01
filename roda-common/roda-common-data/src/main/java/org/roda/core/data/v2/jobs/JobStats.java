@@ -28,56 +28,63 @@ public class JobStats implements Serializable {
     return completionPercentage;
   }
 
-  public void setCompletionPercentage(int completionPercentage) {
+  public JobStats setCompletionPercentage(int completionPercentage) {
     this.completionPercentage = completionPercentage;
+    return this;
   }
 
   public int getSourceObjectsCount() {
     return sourceObjectsCount;
   }
 
-  public void setSourceObjectsCount(int sourceObjectsCount) {
+  public JobStats setSourceObjectsCount(int sourceObjectsCount) {
     this.sourceObjectsCount = sourceObjectsCount;
+    return this;
   }
 
   public int getSourceObjectsBeingProcessed() {
     return sourceObjectsBeingProcessed;
   }
 
-  public void setSourceObjectsBeingProcessed(int sourceObjectsBeingProcessed) {
+  public JobStats setSourceObjectsBeingProcessed(int sourceObjectsBeingProcessed) {
     this.sourceObjectsBeingProcessed = sourceObjectsBeingProcessed;
+    return this;
   }
 
   public int getSourceObjectsWaitingToBeProcessed() {
     return sourceObjectsWaitingToBeProcessed;
   }
 
-  public void setSourceObjectsWaitingToBeProcessed(int sourceObjectsWaitingToBeProcessed) {
+  public JobStats setSourceObjectsWaitingToBeProcessed(int sourceObjectsWaitingToBeProcessed) {
     this.sourceObjectsWaitingToBeProcessed = sourceObjectsWaitingToBeProcessed;
+    return this;
   }
 
   public int getSourceObjectsProcessedWithSuccess() {
     return sourceObjectsProcessedWithSuccess;
   }
 
-  public void setSourceObjectsProcessedWithSuccess(int sourceObjectsProcessedWithSuccess) {
+  public JobStats setSourceObjectsProcessedWithSuccess(int sourceObjectsProcessedWithSuccess) {
     this.sourceObjectsProcessedWithSuccess = sourceObjectsProcessedWithSuccess;
+    return this;
   }
 
   public int getSourceObjectsProcessedWithFailure() {
     return sourceObjectsProcessedWithFailure;
   }
 
-  public void setSourceObjectsProcessedWithFailure(int sourceObjectsProcessedWithFailure) {
+  public JobStats setSourceObjectsProcessedWithFailure(int sourceObjectsProcessedWithFailure) {
     this.sourceObjectsProcessedWithFailure = sourceObjectsProcessedWithFailure;
+    return this;
   }
 
   public int getOutcomeObjectsWithManualIntervention() {
     return outcomeObjectsWithManualIntervention;
   }
 
-  public void setOutcomeObjectsWithManualIntervention(int outcomeObjectsWithManualIntervention) {
+  public JobStats setOutcomeObjectsWithManualIntervention(int outcomeObjectsWithManualIntervention) {
     this.outcomeObjectsWithManualIntervention = outcomeObjectsWithManualIntervention;
+    return this;
   }
 
   public void incrementObjectsProcessedWithFailure() {

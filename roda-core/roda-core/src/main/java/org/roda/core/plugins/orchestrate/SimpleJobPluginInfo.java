@@ -6,6 +6,7 @@ import java.util.Map;
 import org.roda.core.plugins.Plugin;
 
 public class SimpleJobPluginInfo extends JobPluginInfo {
+  private static final long serialVersionUID = 2210879753936753174L;
 
   private boolean pluginExecutionDone = false;
 

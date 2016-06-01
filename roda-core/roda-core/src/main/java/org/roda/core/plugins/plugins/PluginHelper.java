@@ -59,6 +59,7 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.JobException;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.JobPluginInfoInterface;
+import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
@@ -232,7 +233,7 @@ public final class PluginHelper {
   }
 
   /**
-   * Updates the job status
+   * Updates the job status for a particular plugin instance
    */
   public static <T extends Serializable> JobPluginInfoInterface updateJobInformation(Plugin<T> plugin,
     JobPluginInfo jobPluginInfo) throws JobException {
@@ -246,6 +247,20 @@ public final class PluginHelper {
     }
 
     return jobPluginInfo;
+  }
+
+  public static <T extends Serializable> SimpleJobPluginInfo getInitialJobInformation(Plugin<T> plugin,
+    int sourceObjectsCount) throws JobException {
+    JobPluginInfo jobInformation = RodaCoreFactory.getPluginOrchestrator().getJobInformation(plugin);
+    jobInformation.setSourceObjectsBeingProcessed(sourceObjectsCount).setSourceObjectsWaitingToBeProcessed(0);
+    return (SimpleJobPluginInfo) jobInformation;
+  }
+
+  public static <T extends Serializable> JobPluginInfo getInitialJobInformation(Plugin<T> plugin) throws JobException {
+    JobPluginInfo jobInformation = RodaCoreFactory.getPluginOrchestrator().getJobInformation(plugin);
+    jobInformation.setSourceObjectsBeingProcessed(jobInformation.getSourceObjectsCount())
+      .setSourceObjectsWaitingToBeProcessed(0);
+    return jobInformation;
   }
 
   /**

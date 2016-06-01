@@ -22,6 +22,7 @@ import org.roda.core.common.IdUtils;
 import org.roda.core.common.MetadataFileUtils;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -55,7 +56,7 @@ public class TikaFullTextPluginUtils {
   public static Report runTikaFullTextOnRepresentation(Report reportItem, IndexService index, ModelService model,
     StorageService storage, AIP aip, Representation representation, boolean doFeatureExtraction,
     boolean doFulltextExtraction) throws NotFoundException, GenericException, RequestNotValidException,
-      AuthorizationDeniedException, ValidationException {
+    AuthorizationDeniedException, ValidationException {
 
     boolean recursive = true;
     CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(), representation.getId(),
@@ -80,7 +81,7 @@ public class TikaFullTextPluginUtils {
 
               @Override
               public InputStream createInputStream() throws IOException {
-                return new ReaderInputStream(reader);
+                return new ReaderInputStream(reader, RodaConstants.DEFAULT_ENCODING);
               }
             });
 

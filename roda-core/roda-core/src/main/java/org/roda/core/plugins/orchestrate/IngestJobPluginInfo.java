@@ -44,16 +44,18 @@ public class IngestJobPluginInfo extends JobPluginInfo {
     return stepsCompleted;
   }
 
-  public void setStepsCompleted(int stepsCompleted) {
+  public IngestJobPluginInfo setStepsCompleted(int stepsCompleted) {
     this.stepsCompleted = stepsCompleted;
+    return this;
   }
 
   public int getTotalSteps() {
     return totalSteps;
   }
 
-  public void setTotalSteps(int totalSteps) {
+  public IngestJobPluginInfo setTotalSteps(int totalSteps) {
     this.totalSteps = totalSteps;
+    return this;
   }
 
   public IngestJobPluginInfo incrementStepsCompletedByOne() {
@@ -61,19 +63,28 @@ public class IngestJobPluginInfo extends JobPluginInfo {
     return this;
   }
 
+  public void update(IngestJobPluginInfo ingestJobPluginInfo) {
+    boolean pluginIsDone = (ingestJobPluginInfo.getStepsCompleted() == ingestJobPluginInfo.getTotalSteps());
+
+    this.setTotalSteps(ingestJobPluginInfo.getTotalSteps());
+    this.setStepsCompleted(ingestJobPluginInfo.getStepsCompleted());
+    this.setCompletionPercentage(ingestJobPluginInfo.getCompletionPercentage());
+    this.setSourceObjectsBeingProcessed(pluginIsDone ? 0 : ingestJobPluginInfo.getSourceObjectsBeingProcessed());
+    this.setSourceObjectsWaitingToBeProcessed(
+      pluginIsDone ? 0 : ingestJobPluginInfo.getSourceObjectsWaitingToBeProcessed());
+    this.setSourceObjectsProcessedWithSuccess(ingestJobPluginInfo.getSourceObjectsProcessedWithSuccess());
+    this.setSourceObjectsProcessedWithFailure(ingestJobPluginInfo.getSourceObjectsProcessedWithFailure());
+    this.setOutcomeObjectsWithManualIntervention(ingestJobPluginInfo.getOutcomeObjectsWithManualIntervention());
+  }
+
   public <T extends Serializable> JobPluginInfo processJobPluginInformation(Plugin<T> plugin, Integer taskObjectsCount,
     Map<Plugin<?>, JobPluginInfo> jobInfos) {
     // update information in the map<plugin, pluginInfo>
-    boolean pluginIsDone = (this.getStepsCompleted() == this.getTotalSteps());
-    IngestJobPluginInfo jobPluginInfo = (IngestJobPluginInfo) jobInfos.get(plugin);
-    jobPluginInfo.setTotalSteps(this.getTotalSteps());
-    jobPluginInfo.setStepsCompleted(this.getStepsCompleted());
-    jobPluginInfo.setCompletionPercentage(this.getCompletionPercentage());
-    jobPluginInfo.setSourceObjectsBeingProcessed(pluginIsDone ? 0 : this.getSourceObjectsBeingProcessed());
-    jobPluginInfo.setSourceObjectsWaitingToBeProcessed(pluginIsDone ? 0 : this.getSourceObjectsWaitingToBeProcessed());
-    jobPluginInfo.setSourceObjectsProcessedWithSuccess(this.getSourceObjectsProcessedWithSuccess());
-    jobPluginInfo.setSourceObjectsProcessedWithFailure(this.getSourceObjectsProcessedWithFailure());
-    jobPluginInfo.setOutcomeObjectsWithManualIntervention(this.getOutcomeObjectsWithManualIntervention());
+    // FIXME/INFO 20160601 hsilva: the following code would be necessary in a
+    // distributed architecture
+    // IngestJobPluginInfo jobPluginInfo = (IngestJobPluginInfo)
+    // jobInfos.get(plugin);
+    // jobPluginInfo.update(this);
 
     // calculate general counters
     float percentage = 0f;

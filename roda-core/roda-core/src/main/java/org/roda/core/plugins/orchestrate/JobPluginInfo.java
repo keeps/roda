@@ -16,6 +16,10 @@ public abstract class JobPluginInfo extends JobStats implements JobPluginInfoInt
     super();
   }
 
+  /**
+   * Constructor that sets both sourceObjectsCount & sourceObjectsBeingProcessed
+   * to sourceObjectsCount
+   */
   public JobPluginInfo(int sourceObjectsCount) {
     super();
     setSourceObjectsCount(sourceObjectsCount);
