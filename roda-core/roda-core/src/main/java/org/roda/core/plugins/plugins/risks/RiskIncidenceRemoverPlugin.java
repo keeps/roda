@@ -41,7 +41,6 @@ public class RiskIncidenceRemoverPlugin extends AbstractPlugin<AIP> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RiskIncidenceRemoverPlugin.class);
   private static String riskIds;
-  private static String OTHER_METADATA_TYPE = "RiskIncidence";
 
   @Override
   public void init() throws PluginException {
@@ -89,10 +88,10 @@ public class RiskIncidenceRemoverPlugin extends AbstractPlugin<AIP> {
         String[] risks = riskIds.split(",");
         for (String riskId : risks) {
           for (AIP aip : list) {
-            model.deleteRiskIncidence(riskId, aip.getId(), null, null, null, OTHER_METADATA_TYPE);
+            model.deleteRiskIncidence(riskId, aip.getId(), null, null, null);
 
             for (Representation representation : aip.getRepresentations()) {
-              model.deleteRiskIncidence(riskId, aip.getId(), representation.getId(), null, null, OTHER_METADATA_TYPE);
+              model.deleteRiskIncidence(riskId, aip.getId(), representation.getId(), null, null);
 
               boolean recursive = true;
               CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
@@ -100,8 +99,7 @@ public class RiskIncidenceRemoverPlugin extends AbstractPlugin<AIP> {
 
               for (OptionalWithCause<File> ofile : allFiles) {
                 File file = ofile.get();
-                model.deleteRiskIncidence(riskId, aip.getId(), representation.getId(), new ArrayList<>(), file.getId(),
-                  OTHER_METADATA_TYPE);
+                model.deleteRiskIncidence(riskId, aip.getId(), representation.getId(), new ArrayList<>(), file.getId());
               }
 
               IOUtils.closeQuietly(allFiles);

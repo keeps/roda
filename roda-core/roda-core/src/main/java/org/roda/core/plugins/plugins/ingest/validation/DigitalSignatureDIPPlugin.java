@@ -26,7 +26,6 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.common.OptionalWithCause;
-import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
@@ -103,7 +102,7 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
       aipId = representation.getAipId();
       boolean notify = true;
       // FIXME 20160516 hsilva: see how to set initial initialOutcomeObjectState
-      Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(), AIPState.ACTIVE);
+      Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(), Representation.class);
 
       try {
         LOGGER.debug("Processing representation {}", representation);

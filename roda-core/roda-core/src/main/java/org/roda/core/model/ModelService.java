@@ -1632,14 +1632,15 @@ public class ModelService extends ModelObservable {
   }
 
   public RiskIncidence addRiskIncidence(String riskId, String aipId, String representationId,
-    List<String> fileDirectoryPath, String fileId, String type) throws GenericException {
+    List<String> fileDirectoryPath, String fileId)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
 
     RiskIncidence riskIncidence = null;
     String fileSuffix = RodaConstants.RISK_INCIDENCE_FILE_EXTENSION;
 
     try {
       Binary incidenceBinary = this.retrieveOtherMetadataBinary(aipId, representationId, fileDirectoryPath, fileId,
-        fileSuffix, type);
+        fileSuffix, RodaConstants.OTHER_METADATA_TYPE_RISK_INCIDENCE);
 
       InputStream inputStream = incidenceBinary.getContent().createInputStream();
       riskIncidence = JsonUtils.getObjectFromJson(inputStream, RiskIncidence.class);
@@ -1668,30 +1669,24 @@ public class ModelService extends ModelObservable {
 
     }
 
-    try {
-      riskIncidence.addRisk(riskId);
-      String riskIncidenceAsJson = JsonUtils.getJsonFromObject(riskIncidence);
-      this.createOtherMetadata(aipId, representationId, fileDirectoryPath, fileId, fileSuffix, type,
-        new StringContentPayload(riskIncidenceAsJson), true);
-      notifyRiskIncidenceCreatedOrUpdated(riskIncidence, true);
-
-    } catch (RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
-      LOGGER.error("Error adding risk incidence in storage", e);
-    }
+    riskIncidence.addRisk(riskId);
+    String riskIncidenceAsJson = JsonUtils.getJsonFromObject(riskIncidence);
+    this.createOtherMetadata(aipId, representationId, fileDirectoryPath, fileId, fileSuffix,
+      RodaConstants.OTHER_METADATA_TYPE_RISK_INCIDENCE, new StringContentPayload(riskIncidenceAsJson), true);
+    notifyRiskIncidenceCreatedOrUpdated(riskIncidence, true);
 
     return riskIncidence;
   }
 
   public void deleteRiskIncidence(String riskId, String aipId, String representationId, List<String> fileDirectoryPath,
-    String fileId, String type)
-    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
+    String fileId) throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
 
     String fileSuffix = RodaConstants.RISK_INCIDENCE_FILE_EXTENSION;
 
     try {
       try {
         Binary incidenceBinary = this.retrieveOtherMetadataBinary(aipId, representationId, fileDirectoryPath, fileId,
-          fileSuffix, type);
+          fileSuffix, RodaConstants.OTHER_METADATA_TYPE_RISK_INCIDENCE);
 
         InputStream inputStream = incidenceBinary.getContent().createInputStream();
         RiskIncidence riskIncidence = JsonUtils.getObjectFromJson(inputStream, RiskIncidence.class);
@@ -1700,8 +1695,8 @@ public class ModelService extends ModelObservable {
 
         if (riskIncidence.getRisks().size() > 0) {
           String riskIncidenceAsJson = JsonUtils.getJsonFromObject(riskIncidence);
-          this.createOtherMetadata(aipId, representationId, fileDirectoryPath, fileId, fileSuffix, type,
-            new StringContentPayload(riskIncidenceAsJson), false);
+          this.createOtherMetadata(aipId, representationId, fileDirectoryPath, fileId, fileSuffix,
+            RodaConstants.OTHER_METADATA_TYPE_RISK_INCIDENCE, new StringContentPayload(riskIncidenceAsJson), false);
           notifyRiskIncidenceCreatedOrUpdated(riskIncidence, true);
         } else {
           storage.deleteResource(incidenceBinary.getStoragePath());
@@ -1721,14 +1716,13 @@ public class ModelService extends ModelObservable {
   }
 
   public RiskIncidence retrieveRiskIncidence(String aipId, String representationId, List<String> fileDirectoryPath,
-    String fileId, String type)
-    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
+    String fileId) throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
 
     String fileSuffix = RodaConstants.RISK_INCIDENCE_FILE_EXTENSION;
 
     try {
       Binary incidenceBinary = this.retrieveOtherMetadataBinary(aipId, representationId, fileDirectoryPath, fileId,
-        fileSuffix, type);
+        fileSuffix, RodaConstants.OTHER_METADATA_TYPE_RISK_INCIDENCE);
 
       if (incidenceBinary != null) {
         InputStream inputStream = incidenceBinary.getContent().createInputStream();

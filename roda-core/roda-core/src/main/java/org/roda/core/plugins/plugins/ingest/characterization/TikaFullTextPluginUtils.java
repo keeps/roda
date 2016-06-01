@@ -87,7 +87,8 @@ public class TikaFullTextPluginUtils {
 
             if (doFulltextExtraction) {
               model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(),
-                TikaFullTextPlugin.FILE_SUFFIX_FULLTEXT, TikaFullTextPlugin.OTHER_METADATA_TYPE, payload, notify);
+                TikaFullTextPlugin.FILE_SUFFIX_FULLTEXT, RodaConstants.OTHER_METADATA_TYPE_APACHE_TIKA, payload,
+                notify);
             }
 
           } catch (IOException | RODAException e) {
@@ -114,8 +115,8 @@ public class TikaFullTextPluginUtils {
               String metadataAsString = MetadataFileUtils.generateMetadataFile(metadata);
               ContentPayload metadataAsPayload = new StringContentPayload(metadataAsString);
               model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(),
-                TikaFullTextPlugin.FILE_SUFFIX_METADATA, TikaFullTextPlugin.OTHER_METADATA_TYPE, metadataAsPayload,
-                notify);
+                TikaFullTextPlugin.FILE_SUFFIX_METADATA, RodaConstants.OTHER_METADATA_TYPE_APACHE_TIKA,
+                metadataAsPayload, notify);
 
               // update PREMIS
               String creatingApplicationName = metadata.get("Application-Name");

@@ -168,7 +168,7 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
 
       for (AIP aip : list) {
         LOGGER.debug("Processing AIP {}", aip.getId());
-        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIPState.INGEST_PROCESSING);
+        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
         PluginState pluginResultState = PluginState.SUCCESS;
         PluginState reportState = PluginState.SUCCESS;
 
@@ -275,7 +275,8 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
         List<String> resourceList = new ArrayList<String>();
         // FIXME 20160516 hsilva: see how to set initial
         // initialOutcomeObjectState
-        Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(), AIPState.INGEST_PROCESSING);
+        Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(), Representation.class,
+          AIPState.INGEST_PROCESSING);
         PluginState pluginResultState = PluginState.SUCCESS;
         PluginState reportState = PluginState.SUCCESS;
         StringBuilder details = new StringBuilder();
@@ -379,7 +380,8 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
           List<String> resourceList = new ArrayList<String>();
           // FIXME 20160516 hsilva: see how to set initial
           // initialOutcomeObjectState
-          Report reportItem = PluginHelper.initPluginReportItem(this, file.getId(), AIPState.INGEST_PROCESSING);
+          Report reportItem = PluginHelper.initPluginReportItem(this, file.getId(), File.class,
+            AIPState.INGEST_PROCESSING);
           PluginState pluginResultState = PluginState.SUCCESS;
           PluginState reportState = PluginState.SUCCESS;
           StringBuilder details = new StringBuilder();

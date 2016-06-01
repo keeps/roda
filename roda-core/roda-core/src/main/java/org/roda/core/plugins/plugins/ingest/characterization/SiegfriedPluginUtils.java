@@ -22,6 +22,7 @@ import org.json.JSONObject;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.PremisV3Utils;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -133,7 +134,7 @@ public class SiegfriedPluginUtils {
         ContentPayload payload = new StringContentPayload(fileObject.toString());
 
         model.createOtherMetadata(aip.getId(), representation.getId(), fileDirectoryPath, fileId,
-          SiegfriedPlugin.FILE_SUFFIX, SiegfriedPlugin.OTHER_METADATA_TYPE, payload, notify);
+          SiegfriedPlugin.FILE_SUFFIX, RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED, payload, notify);
 
         // Update PREMIS files
         JSONArray matches = (JSONArray) fileObject.get("matches");

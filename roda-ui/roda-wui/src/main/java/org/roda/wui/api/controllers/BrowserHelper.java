@@ -1734,17 +1734,16 @@ public class BrowserHelper {
     Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.RISK_INCIDENCE_ID, idList));
     IndexResult<RiskIncidence> incidenceList = RodaCoreFactory.getIndexService().find(RiskIncidence.class, filter, null,
       new Sublist(0, 10));
-    String omType = "RiskIncidence";
 
     for (RiskIncidence incidence : incidenceList.getResults()) {
       if (AIP.class.getSimpleName().equals(incidence.getObjectClass())) {
-        RodaCoreFactory.getModelService().deleteRiskIncidence(riskId, incidence.getAipId(), null, null, null, omType);
+        RodaCoreFactory.getModelService().deleteRiskIncidence(riskId, incidence.getAipId(), null, null, null);
       } else if (Representation.class.getSimpleName().equals(incidence.getObjectClass())) {
         RodaCoreFactory.getModelService().deleteRiskIncidence(riskId, incidence.getAipId(),
-          incidence.getRepresentationId(), null, null, omType);
+          incidence.getRepresentationId(), null, null);
       } else if (File.class.getSimpleName().equals(incidence.getObjectClass())) {
         RodaCoreFactory.getModelService().deleteRiskIncidence(riskId, incidence.getAipId(),
-          incidence.getRepresentationId(), incidence.getFilePath(), incidence.getFileId(), omType);
+          incidence.getRepresentationId(), incidence.getFilePath(), incidence.getFileId());
       }
     }
 

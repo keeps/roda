@@ -236,6 +236,21 @@ public final class RodaConstants {
   public static final String STORAGE_AIP_METADATA_FILENAME = "aip.json";
 
   /*
+   * OTHER METADATA TYPES
+   */
+  public static final String OTHER_METADATA_TYPE_RISK_INCIDENCE = "RiskIncidence";
+  public static final String OTHER_METADATA_TYPE_SIEGFRIED = "Siegfried";
+  public static final String OTHER_METADATA_TYPE_APACHE_TIKA = "ApacheTika";
+  public static final String OTHER_METADATA_TYPE_DIGITAL_SIGNATURE = "DigitalSignature";
+  public static final String OTHER_METADATA_TYPE_DROID = "DROID";
+  public static final String OTHER_METADATA_TYPE_EXIFTOOL = "ExifTool";
+  public static final String OTHER_METADATA_TYPE_FFPROBE = "FFProbe";
+  public static final String OTHER_METADATA_TYPE_FITS = "FITS";
+  public static final String OTHER_METADATA_TYPE_JHOVE = "JHOVE";
+  public static final String OTHER_METADATA_TYPE_JPYLYZER = "jpylyzer";
+  public static final String OTHER_METADATA_TYPE_MEDIAINFO = "MediaInfo";
+
+  /*
    * Permissions
    */
   public static final String INDEX_PERMISSION_USERS_PREFIX = "permission_users_";
@@ -654,7 +669,8 @@ public final class RodaConstants {
     // extra types...
     WELLFORMEDNESS_CHECK("wellformedness check"), UNPACKING("unpacking"), METADATA_EXTRACTION("metadata extraction"),
     ACCESSION("accession"), AUTHORIZATION_CHECK("authorization check"), FORMAT_IDENTIFICATION("format identification"),
-    FORMAT_VALIDATION("format validation"), INGEST_START("ingest start"), INGEST_END("ingest end");
+    FORMAT_VALIDATION("format validation"), INGEST_START("ingest start"), INGEST_END("ingest end"),
+    RISK_MANAGEMENT("risk management");
 
     private final String text;
 

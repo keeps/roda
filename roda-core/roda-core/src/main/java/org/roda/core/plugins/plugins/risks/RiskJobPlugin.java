@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.common.IdUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -25,17 +24,13 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
-import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -62,18 +57,12 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
   private static final Logger LOGGER = LoggerFactory.getLogger(RiskJobPlugin.class);
 
   private static String riskIds = null;
-  private static String OTHER_METADATA_TYPE = "RiskIncidence";
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_ID,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_RISK_ID, "Risks", PluginParameterType.RISK_ID, "", false, false,
         "Add the risks that will be associated with the objects above."));
-
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION, "Job finished notification",
-        PluginParameterType.STRING, "", false, false,
-        "Send a notification, after finishing the process, to one or more e-mail addresses (comma separated)"));
   }
 
   @Override
@@ -89,7 +78,6 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
   public List<PluginParameter> getParameters() {
     ArrayList<PluginParameter> parameters = new ArrayList<PluginParameter>();
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_RISK_ID));
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION));
     return parameters;
   }
 
@@ -133,27 +121,8 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-
-    try {
-      String emails = PluginHelper.getStringFromParameters(this,
-        pluginParameters.get(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION));
-      if (!"".equals(emails)) {
-        List<String> emailList = new ArrayList<String>(Arrays.asList(emails.split("\\s*,\\s*")));
-        Notification notification = new Notification();
-        notification.setSubject("RODA risk process finished");
-        notification.setFromUser(this.getClass().getSimpleName());
-        notification.setRecipientUsers(emailList);
-        Map<String, Object> scopes = new HashMap<String, Object>();
-
-        // FIXME template has to be created and changed here
-        model.createNotification(notification, RodaConstants.INGEST_EMAIL_TEMPLATE, scopes);
-      }
-
-    } catch (GenericException e) {
-      LOGGER.error("Could not send risk job notification");
-    }
-
-    return new Report();
+    // do nothing
+    return null;
   }
 
   public <T extends Serializable> Report executePlugin(IndexService index, ModelService model, StorageService storage,
@@ -167,22 +136,20 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       if (!list.isEmpty() && riskIds != null) {
-        String[] risks = riskIds.split(",");
+        List<String> risks = Arrays.asList(riskIds.split(","));
+        Pair<SimpleJobPluginInfo, Report> jobInfo = new Pair<SimpleJobPluginInfo, Report>();
 
-        for (String riskId : risks) {
-          Pair<SimpleJobPluginInfo, Report> jobInfo = new Pair<SimpleJobPluginInfo, Report>();
-
-          if (list.get(0) instanceof AIP) {
-            jobInfo = addIncidenceToAIPList(model, index, list, riskId, jobPluginInfo, pluginReport);
-          } else if (list.get(0) instanceof Representation) {
-            jobInfo = addIncidenceToRepresentationList(model, index, list, riskId, jobPluginInfo, pluginReport);
-          } else if (list.get(0) instanceof File) {
-            jobInfo = addIncidenceToFileList(model, index, list, riskId, jobPluginInfo, pluginReport);
-          }
-
-          jobPluginInfo = jobInfo.getFirst();
-          pluginReport = jobInfo.getSecond();
+        if (list.get(0) instanceof AIP) {
+          jobInfo = addIncidenceToAIPList(model, index, list, risks, jobPluginInfo, pluginReport);
+        } else if (list.get(0) instanceof Representation) {
+          jobInfo = addIncidenceToRepresentationList(model, index, list, risks, jobPluginInfo, pluginReport);
+        } else if (list.get(0) instanceof File) {
+          jobInfo = addIncidenceToFileList(model, index, list, risks, jobPluginInfo, pluginReport);
         }
+
+        jobPluginInfo = jobInfo.getFirst();
+        pluginReport = jobInfo.getSecond();
+
       }
 
       jobPluginInfo.finalizeInfo();
@@ -195,21 +162,23 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
   }
 
   private <T extends Serializable> Pair<SimpleJobPluginInfo, Report> addIncidenceToAIPList(ModelService model,
-    IndexService index, List<T> list, String riskId, SimpleJobPluginInfo jobPluginInfo, Report pluginReport)
+    IndexService index, List<T> list, List<String> risks, SimpleJobPluginInfo jobPluginInfo, Report pluginReport)
     throws JobException {
 
-    PluginState state = PluginState.SUCCESS;
     List<AIP> aipList = (List<AIP>) list;
     for (AIP aip : aipList) {
-      try {
-        model.addRiskIncidence(riskId, aip.getId(), null, null, null, OTHER_METADATA_TYPE);
-        jobPluginInfo.incrementObjectsProcessedWithSuccess();
-      } catch (GenericException e) {
-        jobPluginInfo.incrementObjectsProcessedWithFailure();
-        state = PluginState.FAILURE;
+      PluginState state = PluginState.SUCCESS;
+
+      for (String riskId : risks) {
+        try {
+          model.addRiskIncidence(riskId, aip.getId(), null, null, null);
+        } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
+          state = PluginState.FAILURE;
+        }
       }
 
-      Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIPState.ACTIVE);
+      jobPluginInfo.incrementObjectsProcessed(state);
+      Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
       reportItem.setPluginState(state).setPluginDetails("Risk job plugin ran on an AIP");
       pluginReport.addReport(reportItem);
       PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
@@ -218,7 +187,7 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
         PluginHelper.createPluginEvent(this, aip.getId(), model, index, state, "", true);
       } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
         | ValidationException | AlreadyExistsException e) {
-        LOGGER.error("Could not create a Risk Job Plugin event");
+        LOGGER.error("Could not create a risk job plugin event");
       }
     }
 
@@ -226,34 +195,33 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
   }
 
   private <T extends Serializable> Pair<SimpleJobPluginInfo, Report> addIncidenceToRepresentationList(
-    ModelService model, IndexService index, List<T> list, String riskId, SimpleJobPluginInfo jobPluginInfo,
+    ModelService model, IndexService index, List<T> list, List<String> risks, SimpleJobPluginInfo jobPluginInfo,
     Report pluginReport) throws JobException {
 
-    PluginState state = PluginState.SUCCESS;
     List<Representation> representationList = (List<Representation>) list;
     for (Representation representation : representationList) {
-      try {
-        model.addRiskIncidence(riskId, representation.getAipId(), representation.getId(), null, null,
-          OTHER_METADATA_TYPE);
-        jobPluginInfo.incrementObjectsProcessedWithSuccess();
-      } catch (GenericException e) {
-        jobPluginInfo.incrementObjectsProcessedWithFailure();
-        state = PluginState.FAILURE;
+      PluginState state = PluginState.SUCCESS;
+
+      for (String riskId : risks) {
+        try {
+          model.addRiskIncidence(riskId, representation.getAipId(), representation.getId(), null, null);
+        } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
+          state = PluginState.FAILURE;
+        }
       }
 
-      try {
-        IndexedRepresentation iRepresentation = index.retrieve(IndexedRepresentation.class,
-          IdUtils.getRepresentationId(representation));
-        Report reportItem = PluginHelper.initPluginReportItem(this, iRepresentation.getUUID(), AIPState.ACTIVE);
-        reportItem.setPluginState(state).setPluginDetails("Risk job plugin ran on a representation");
-        pluginReport.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+      jobPluginInfo.incrementObjectsProcessed(state);
+      Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(), Representation.class);
+      reportItem.setPluginState(state).setPluginDetails("Risk job plugin ran on a representation");
+      pluginReport.addReport(reportItem);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
 
-        PluginHelper.createPluginEvent(this, representation.getAipId(), representation.getId(), model, index,
-          new ArrayList<>(), new ArrayList<>(), state, "", true);
+      try {
+        PluginHelper.createPluginEvent(this, representation.getAipId(), representation.getId(), model, index, null,
+          null, state, "", true);
       } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
         | ValidationException | AlreadyExistsException e) {
-        LOGGER.error("Could not create a Risk Job Plugin event");
+        LOGGER.error("Could not create a risk job plugin event");
       }
     }
 
@@ -261,35 +229,33 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
   }
 
   private <T extends Serializable> Pair<SimpleJobPluginInfo, Report> addIncidenceToFileList(ModelService model,
-    IndexService index, List<T> list, String riskId, SimpleJobPluginInfo jobPluginInfo, Report pluginReport)
+    IndexService index, List<T> list, List<String> risks, SimpleJobPluginInfo jobPluginInfo, Report pluginReport)
     throws JobException {
 
-    PluginState state = PluginState.SUCCESS;
     List<File> fileList = (List<File>) list;
     for (File file : fileList) {
-      try {
-        model.addRiskIncidence(riskId, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
-          OTHER_METADATA_TYPE);
-        jobPluginInfo.incrementObjectsProcessedWithSuccess();
-      } catch (GenericException e) {
-        jobPluginInfo.incrementObjectsProcessedWithFailure();
-        state = PluginState.FAILURE;
+      PluginState state = PluginState.SUCCESS;
+
+      for (String riskId : risks) {
+        try {
+          model.addRiskIncidence(riskId, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId());
+        } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
+          state = PluginState.FAILURE;
+        }
       }
 
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
+      jobPluginInfo.incrementObjectsProcessed(state);
+      Report reportItem = PluginHelper.initPluginReportItem(this, file.getId(), File.class);
+      reportItem.setPluginState(state).setPluginDetails("Risk job plugin ran on a file");
+      pluginReport.addReport(reportItem);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
 
       try {
-        IndexedFile iFile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
-        Report reportItem = PluginHelper.initPluginReportItem(this, iFile.getUUID(), AIPState.ACTIVE);
-        reportItem.setPluginState(state).setPluginDetails("Risk job plugin ran on a file");
-        pluginReport.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
-
         PluginHelper.createPluginEvent(this, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
-          model, index, new ArrayList<>(), new ArrayList<>(), state, "", true);
+          model, index, null, null, state, "", true);
       } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
         | ValidationException | AlreadyExistsException e) {
-        LOGGER.error("Could not create a Risk Job Plugin event");
+        LOGGER.error("Could not create a risk job plugin event");
       }
 
     }
@@ -329,13 +295,12 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
 
   @Override
   public PreservationEventType getPreservationEventType() {
-    // TODO change to a more adequate event type?
-    return PreservationEventType.VALIDATION;
+    return PreservationEventType.RISK_MANAGEMENT;
   }
 
   @Override
   public String getPreservationEventDescription() {
-    return "Job responsible to associate risk with objects";
+    return getDescription();
   }
 
   @Override

@@ -9,6 +9,8 @@ package org.roda.core.data.v2.jobs;
 
 import java.io.Serializable;
 
+import org.roda.core.data.v2.jobs.Report.PluginState;
+
 public class JobStats implements Serializable {
   private static final long serialVersionUID = 2048747729436732179L;
 
@@ -85,6 +87,14 @@ public class JobStats implements Serializable {
   public JobStats setOutcomeObjectsWithManualIntervention(int outcomeObjectsWithManualIntervention) {
     this.outcomeObjectsWithManualIntervention = outcomeObjectsWithManualIntervention;
     return this;
+  }
+
+  public void incrementObjectsProcessed(PluginState state) {
+    if (state.equals(PluginState.SUCCESS)) {
+      incrementObjectsProcessedWithSuccess();
+    } else {
+      incrementObjectsProcessedWithFailure();
+    }
   }
 
   public void incrementObjectsProcessedWithFailure() {

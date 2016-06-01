@@ -42,8 +42,6 @@ import org.slf4j.LoggerFactory;
 
 public class SiegfriedPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(SiegfriedPlugin.class);
-
-  public static final String OTHER_METADATA_TYPE = "Siegfried";
   public static final String FILE_SUFFIX = ".json";
 
   private boolean createsPluginEvent = true;
@@ -86,16 +84,14 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
     super.setParameterValues(parameters);
 
     // updates the flag responsible to allow plugin event creation
-    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT)) {
-      createsPluginEvent = Boolean
-        .parseBoolean(getParameterValues().get(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT));
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT)) {
+      createsPluginEvent = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT));
     }
   }
 
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
-
     Report report = PluginHelper.initPluginReport(this);
 
     try {
@@ -103,7 +99,7 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       for (AIP aip : list) {
-        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIPState.INGEST_PROCESSING);
+        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
         PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
 
         LOGGER.debug("Processing AIP {}", aip.getId());
@@ -118,21 +114,16 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
             model.notifyRepresentationUpdated(representation);
           }
 
-          reportItem.setPluginState(PluginState.SUCCESS);
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
-          PluginHelper.updateJobInformation(this, jobPluginInfo);
+          reportItem.setPluginState(PluginState.SUCCESS);
         } catch (PluginException | NotFoundException | GenericException | RequestNotValidException
           | AuthorizationDeniedException | AlreadyExistsException e) {
           LOGGER.error("Error running Siegfried " + aip.getId() + ": " + e.getMessage(), e);
 
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
           reportItem.setPluginState(PluginState.FAILURE)
             .setPluginDetails("Error running Siegfried " + aip.getId() + ": " + e.getMessage());
-
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
-          PluginHelper.updateJobInformation(this, jobPluginInfo);
         }
-
-        report.addReport(reportItem);
 
         if (createsPluginEvent) {
           try {
@@ -146,6 +137,7 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
           }
         }
 
+        report.addReport(reportItem);
         PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
       }
 
@@ -160,14 +152,12 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
-
     return null;
   }
 
   @Override
   public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
-
     return null;
   }
 
@@ -227,7 +217,7 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CHARACTERISATION);
   }
 
 }

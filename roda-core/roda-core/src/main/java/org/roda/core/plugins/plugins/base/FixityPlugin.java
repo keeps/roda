@@ -12,7 +12,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.xmlbeans.XmlException;
@@ -23,7 +22,6 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -34,8 +32,6 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.Fixity;
-import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
-import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -61,6 +57,7 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public void init() {
+    // do nothing
   }
 
   @Override
@@ -84,17 +81,6 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    super.setParameterValues(parameters);
-  }
-
-  @Override
-  public List<PluginParameter> getParameters() {
-    ArrayList<PluginParameter> parameters = new ArrayList<PluginParameter>();
-    return parameters;
-  }
-
-  @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
     Report report = PluginHelper.initPluginReport(this);
@@ -104,103 +90,63 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       for (AIP aip : list) {
-        boolean isAipFailed = false;
+        boolean aipFailed = false;
 
         for (Representation r : aip.getRepresentations()) {
           LOGGER.debug("Checking fixity for files in representation " + r.getId() + " of AIP " + aip.getId());
 
           try {
+            List<String> passedFiles = new ArrayList<String>();
+            List<String> failedFiles = new ArrayList<String>();
             boolean recursive = true;
             CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(), r.getId(),
               recursive);
 
-            List<String> okFileIDS = new ArrayList<String>();
-            List<String> koFileIDS = new ArrayList<String>();
             for (OptionalWithCause<File> oFile : allFiles) {
               if (oFile.isPresent()) {
                 File file = oFile.get();
-                if (!file.isDirectory()) {
 
+                if (!file.isDirectory()) {
                   StoragePath storagePath = ModelUtils.getFileStoragePath(file);
                   Binary currentFileBinary = storage.getBinary(storagePath);
                   Binary premisFile = model.retrievePreservationFile(file);
                   List<Fixity> fixities = PremisV3Utils.extractFixities(premisFile);
 
                   if (fixities != null) {
-                    boolean fixityOK = true;
+                    boolean passedFixity = true;
+
                     for (Fixity f : fixities) {
                       try {
                         Fixity currentFixity = PremisV3Utils.calculateFixity(currentFileBinary,
                           f.getMessageDigestAlgorithm(), "FixityCheck action");
 
                         if (!f.getMessageDigest().trim().equalsIgnoreCase(currentFixity.getMessageDigest().trim())) {
-                          fixityOK = false;
+                          passedFixity = false;
                           break;
                         }
                       } catch (NoSuchAlgorithmException nsae) {
-                        fixityOK = false;
+                        passedFixity = false;
                         break;
                       }
                     }
-                    if (fixityOK) {
+
+                    if (passedFixity) {
                       // TODO support file path
-                      okFileIDS.add(file.getId());
+                      passedFiles.add(file.getId());
                     } else {
-                      koFileIDS.add(file.getId());
-                      isAipFailed = true;
+                      failedFiles.add(file.getId());
+                      aipFailed = true;
 
-                      try {
-                        model.retrieveRisk(riskId);
-                      } catch (NotFoundException e) {
-                        PluginHelper.createDefaultRisk(model, riskId, FixityPlugin.class);
-                      }
-
+                      PluginHelper.createRiskIfNotExists(model, riskId, getClass());
                       model.addRiskIncidence(riskId, file.getAipId(), file.getRepresentationId(), file.getPath(),
-                        file.getId(), "RiskIncidence");
+                        file.getId());
                     }
                   }
 
                 } else {
-                  LOGGER.warn("Cannot process File", oFile.getCause());
+                  LOGGER.warn("Cannot process File ", oFile.getCause());
                 }
               }
-            }
-
-            if (koFileIDS.size() > 0) {
-              LOGGER.debug("Fixity error for representation " + r.getId() + " of AIP " + aip.getId());
-              StringBuilder sb = new StringBuilder();
-              sb.append("<p>The following files have bad checksums:</p>");
-              sb.append("<ul>");
-              for (String s : koFileIDS) {
-                sb.append("<li>" + s + "</li>");
-              }
-              sb.append("</ul>");
-
-              // TODO FIXE PREMIS EVENT CREATION
-              /*
-               * PreservationMetadata pm = PluginHelper.createPluginEvent(this,
-               * aip.getId(), r.getId(), null, null, model,
-               * RodaConstants.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
-               * "Checksums recorded in PREMIS were compared with the files in the repository"
-               * , Arrays.asList(IdUtils.getLinkingIdentifierId(aip.getId(),
-               * r.getId(), null, null)), null, "failure", "Reason",
-               * sb.toString(), inotify);
-               * notifyUserOfFixityCheckError(r.getId(), okFileIDS, koFileIDS,
-               * pm);
-               */
-            } else {
-              /*
-               * LOGGER.debug("Fixity OK for representation " + r.getId() +
-               * " of AIP " + aip.getId()); PreservationMetadata pm =
-               * PluginHelper.createPluginEvent(this, aip.getId(), r.getId(),
-               * null, null, model,
-               * RodaConstants.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
-               * "Checksums recorded in PREMIS were compared with the files in the repository"
-               * , Arrays.asList(r.getId()), null, "success", okFileIDS.size() +
-               * " files checked successfully", okFileIDS.toString(), inotify);
-               * notifyUserOfFixityCheckSuccess(r.getId(), okFileIDS, koFileIDS,
-               * pm);
-               */
             }
 
             IOUtils.closeQuietly(allFiles);
@@ -208,20 +154,19 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
           } catch (IOException | RODAException | XmlException e) {
             LOGGER.error("Error processing Representation " + r.getId() + " - " + e.getMessage(), e);
           }
-
         }
 
         try {
-          Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIPState.ACTIVE);
+          Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
 
-          if (!isAipFailed) {
-            reportItem.setPluginState(PluginState.SUCCESS).setPluginDetails("Fixity checking ran successfully");
-            jobPluginInfo.incrementObjectsProcessedWithSuccess();
-            PluginHelper.createPluginEvent(this, aip.getId(), model, index, PluginState.SUCCESS, "", true);
-          } else {
+          if (aipFailed) {
             reportItem.setPluginState(PluginState.FAILURE).setPluginDetails("Fixity checking did not run successfully");
             jobPluginInfo.incrementObjectsProcessedWithFailure();
             PluginHelper.createPluginEvent(this, aip.getId(), model, index, PluginState.FAILURE, "", true);
+          } else {
+            reportItem.setPluginState(PluginState.SUCCESS).setPluginDetails("Fixity checking ran successfully");
+            jobPluginInfo.incrementObjectsProcessedWithSuccess();
+            PluginHelper.createPluginEvent(this, aip.getId(), model, index, PluginState.SUCCESS, "", true);
           }
 
           report.addReport(reportItem);
@@ -240,32 +185,15 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
     return report;
   }
 
-  private void notifyUserOfFixityCheckUndetermined(String representationID, PreservationMetadata event,
-    String message) {
-    // TODO Auto-generated method stub
-  }
-
-  private void notifyUserOfFixityCheckSuccess(String representationID, List<String> okFileIDS, List<String> koFileIDS,
-    PreservationMetadata event) {
-    // TODO Auto-generated method stub
-  }
-
-  private void notifyUserOfFixityCheckError(String representationID, List<String> okFileIDS, List<String> koFileIDS,
-    PreservationMetadata event) {
-    // TODO Auto-generated method stub
-  }
-
   @Override
   public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
-
     return null;
   }
 
   @Override
   public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
-
     return null;
   }
 

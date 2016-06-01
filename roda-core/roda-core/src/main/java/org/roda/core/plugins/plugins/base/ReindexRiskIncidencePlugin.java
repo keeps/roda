@@ -41,7 +41,6 @@ public class ReindexRiskIncidencePlugin extends AbstractPlugin<AIP> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ReindexRiskIncidencePlugin.class);
   private boolean clearIndexes = false;
-  private static String OTHER_METADATA_TYPE = "RiskIncidence";
 
   @Override
   public void init() throws PluginException {
@@ -84,7 +83,7 @@ public class ReindexRiskIncidencePlugin extends AbstractPlugin<AIP> {
       for (AIP aip : list) {
         LOGGER.debug("Reindexing incidences of AIP {}", aip.getId());
         try {
-          RiskIncidence aipIncidence = model.retrieveRiskIncidence(aip.getId(), null, null, null, OTHER_METADATA_TYPE);
+          RiskIncidence aipIncidence = model.retrieveRiskIncidence(aip.getId(), null, null, null);
           index.create(RiskIncidence.class, aipIncidence);
         } catch (NotFoundException e) {
           // do nothing
@@ -92,8 +91,7 @@ public class ReindexRiskIncidencePlugin extends AbstractPlugin<AIP> {
 
         for (Representation representation : aip.getRepresentations()) {
           try {
-            RiskIncidence repIncidence = model.retrieveRiskIncidence(aip.getId(), representation.getId(), null, null,
-              OTHER_METADATA_TYPE);
+            RiskIncidence repIncidence = model.retrieveRiskIncidence(aip.getId(), representation.getId(), null, null);
             index.create(RiskIncidence.class, repIncidence);
           } catch (NotFoundException e) {
             // do nothing
@@ -107,7 +105,7 @@ public class ReindexRiskIncidencePlugin extends AbstractPlugin<AIP> {
             File file = ofile.get();
             try {
               RiskIncidence fileIncidence = model.retrieveRiskIncidence(aip.getId(), representation.getId(),
-                file.getPath(), file.getId(), OTHER_METADATA_TYPE);
+                file.getPath(), file.getId());
               index.create(RiskIncidence.class, fileIncidence);
             } catch (NotFoundException e) {
               // do nothing

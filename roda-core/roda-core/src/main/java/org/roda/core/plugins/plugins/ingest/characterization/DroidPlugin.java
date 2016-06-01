@@ -92,8 +92,8 @@ public class DroidPlugin extends AbstractPlugin<AIP> {
             String xmlOutput = "<droid>" + format + "</droid>";
             ContentPayload payload = new StringContentPayload(xmlOutput);
 
-            model.createOtherMetadata(aip.getId(), representation.getId(), fileDirectoryPath, fileId, ".xml", "DROID",
-              payload, inotify);
+            model.createOtherMetadata(aip.getId(), representation.getId(), fileDirectoryPath, fileId, ".xml",
+              RodaConstants.OTHER_METADATA_TYPE_DROID, payload, inotify);
           }
         } catch (RODAException e) {
           LOGGER.error("Error processing AIP {}: {}", aip.getId(), e.getMessage());

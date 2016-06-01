@@ -91,7 +91,7 @@ public class FFProbePlugin extends AbstractPlugin<AIP> {
                 ContentPayload payload = new StringContentPayload(ffProbeResults);
                 // TODO support file path
                 model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), ".xml",
-                  "FFProbe", payload, inotify);
+                  RodaConstants.OTHER_METADATA_TYPE_FFPROBE, payload, inotify);
               }
             } else {
               LOGGER.error("Cannot process AIP representation file", oFile.getCause());

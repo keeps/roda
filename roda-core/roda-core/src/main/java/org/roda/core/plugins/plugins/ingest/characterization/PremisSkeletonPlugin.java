@@ -34,6 +34,8 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.orchestrate.JobException;
+import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -81,9 +83,8 @@ public class PremisSkeletonPlugin extends AbstractPlugin<AIP> {
     super.setParameterValues(parameters);
 
     // updates the flag responsible to allow plugin event creation
-    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT)) {
-      createsPluginEvent = Boolean
-        .parseBoolean(getParameterValues().get(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT));
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT)) {
+      createsPluginEvent = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT));
     }
   }
 
@@ -92,54 +93,63 @@ public class PremisSkeletonPlugin extends AbstractPlugin<AIP> {
     throws PluginException {
     Report report = PluginHelper.initPluginReport(this);
 
-    for (AIP aip : list) {
-      LOGGER.debug("Processing AIP {}", aip.getId());
-      Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIPState.INGEST_PROCESSING);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+    try {
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      try {
-        for (Representation representation : aip.getRepresentations()) {
-          LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
-          PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, storage, aip, representation.getId());
-          model.notifyRepresentationUpdated(representation);
-        }
+      for (AIP aip : list) {
+        LOGGER.debug("Processing AIP {}", aip.getId());
+        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
 
-        reportItem.setPluginState(PluginState.SUCCESS);
-      } catch (RODAException | XmlException | IOException e) {
-        LOGGER.error("Error processing AIP " + aip.getId(), e);
-
-        reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
-      }
-
-      if (createsPluginEvent) {
         try {
-          boolean notify = true;
-          PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(), "", notify);
-        } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
-          | AuthorizationDeniedException | AlreadyExistsException e) {
-          LOGGER.error("Error creating event: " + e.getMessage(), e);
+          for (Representation representation : aip.getRepresentations()) {
+            LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
+            PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, storage, aip, representation.getId());
+            model.notifyRepresentationUpdated(representation);
+          }
+
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+          reportItem.setPluginState(PluginState.SUCCESS);
+        } catch (RODAException | XmlException | IOException e) {
+          LOGGER.error("Error processing AIP " + aip.getId(), e);
+
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
         }
 
+        if (createsPluginEvent) {
+          try {
+            boolean notify = true;
+            PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(), "", notify);
+          } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
+            | AuthorizationDeniedException | AlreadyExistsException e) {
+            LOGGER.error("Error creating event: " + e.getMessage(), e);
+          }
+        }
+
+        report.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
       }
-      report.addReport(reportItem);
 
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
-
+      jobPluginInfo.finalizeInfo();
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+    } catch (JobException e) {
+      throw new PluginException("A job exception has occurred", e);
     }
+
     return report;
   }
 
   @Override
   public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
-
     return null;
   }
 
   @Override
   public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
-
     return null;
   }
 
@@ -193,7 +203,7 @@ public class PremisSkeletonPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CHARACTERISATION);
   }
 
 }

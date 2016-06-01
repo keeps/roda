@@ -114,8 +114,9 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       for (AIP aip : list) {
-        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIPState.INGEST_PROCESSING);
+        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
         PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+        PluginState reportState = PluginState.SUCCESS;
 
         VirusCheckResult virusCheckResult = null;
         Exception exception = null;
@@ -127,19 +128,14 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
           directAccess = storage.getDirectAccess(aipPath);
           virusCheckResult = getAntiVirus().checkForVirus(directAccess.getPath());
 
-          PluginState reportState = virusCheckResult.isClean() ? PluginState.SUCCESS : PluginState.FAILURE;
+          reportState = virusCheckResult.isClean() ? PluginState.SUCCESS : PluginState.FAILURE;
           reportItem.setPluginState(reportState).setPluginDetails(virusCheckResult.getReport());
-
-          if (reportState.equals(PluginState.SUCCESS)) {
-            jobPluginInfo.incrementObjectsProcessedWithSuccess();
-          } else {
-            jobPluginInfo.incrementObjectsProcessedWithFailure();
-          }
 
           LOGGER.debug("Done with checking if AIP {} has virus. Is clean of virus: {}", aip.getId(),
             virusCheckResult.isClean());
         } catch (Exception e) {
-          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
+          reportState = PluginState.FAILURE;
+          reportItem.setPluginState(reportState).setPluginDetails(e.getMessage());
           jobPluginInfo.incrementObjectsProcessedWithFailure();
 
           exception = e;
@@ -152,16 +148,14 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
         }
 
         // FIXME 20160314 hsilva: perhaps the following code should be put
-        // inside
-        // the above finally block, because if an error occurs the event
-        // creation
-        // will never happen
+        // inside the above finally block, because if an error occurs the event
+        // creation will never happen
         try {
+          jobPluginInfo.incrementObjectsProcessed(reportState);
           boolean notify = true;
           createEvent(virusCheckResult, exception, reportItem.getPluginState(), aip, model, index, notify);
           report.addReport(reportItem);
           PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
-
         } catch (Throwable e) {
           LOGGER.error("Error updating event and job", e);
         }
@@ -197,14 +191,12 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
-
     return null;
   }
 
   @Override
   public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
-
     return null;
   }
 

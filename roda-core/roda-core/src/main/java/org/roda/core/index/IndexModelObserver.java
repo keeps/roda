@@ -304,7 +304,8 @@ public class IndexModelObserver implements ModelObserver {
     InputStream inputStream = null;
     try {
       Binary fulltextBinary = model.retrieveOtherMetadataBinary(file.getAipId(), file.getRepresentationId(),
-        file.getPath(), file.getId(), TikaFullTextPlugin.FILE_SUFFIX_FULLTEXT, TikaFullTextPlugin.OTHER_METADATA_TYPE);
+        file.getPath(), file.getId(), TikaFullTextPlugin.FILE_SUFFIX_FULLTEXT,
+        RodaConstants.OTHER_METADATA_TYPE_APACHE_TIKA);
       if (fulltextBinary.getSizeInBytes() < RodaCoreFactory.getRodaConfigurationAsInt(TEN_MB_IN_BYTES,
         "core.index.fulltext_threshold_in_bytes")) {
         inputStream = fulltextBinary.getContent().createInputStream();
@@ -644,7 +645,7 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void otherMetadataCreated(OtherMetadata otherMetadataBinary) {
-    if (otherMetadataBinary.getType().equalsIgnoreCase(TikaFullTextPlugin.OTHER_METADATA_TYPE)
+    if (otherMetadataBinary.getType().equalsIgnoreCase(RodaConstants.OTHER_METADATA_TYPE_APACHE_TIKA)
       && otherMetadataBinary.getFileSuffix().equalsIgnoreCase(TikaFullTextPlugin.FILE_SUFFIX_METADATA)) {
       try {
         SolrInputDocument solrFile = SolrUtils.addOtherPropertiesToIndexedFile("tika_", otherMetadataBinary, model,

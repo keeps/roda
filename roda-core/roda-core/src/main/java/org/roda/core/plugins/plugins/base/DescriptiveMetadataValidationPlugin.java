@@ -28,6 +28,8 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.orchestrate.JobException;
+import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -113,34 +115,50 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
 
     Report pluginReport = PluginHelper.initPluginReport(this);
     List<ValidationReport> reports = new ArrayList<ValidationReport>();
-    for (AIP aip : list) {
-      Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIPState.INGEST_PROCESSING);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
-      try {
-        LOGGER.debug("Validating AIP {}", aip.getId());
-        ValidationReport report = ValidationUtils.isAIPMetadataValid(forceDescriptiveMetadataType,
-          validateDescriptiveMetadata, metadataType, metadataVersion, validatePremis, model, aip.getId());
-        reports.add(report);
-        if (report.isValid()) {
-          reportItem.setPluginState(PluginState.SUCCESS);
-        } else {
-          reportItem.setPluginState(PluginState.FAILURE).setHtmlPluginDetails(true)
-            .setPluginDetails(report.toHtml(false, false));
+
+    try {
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+
+      for (AIP aip : list) {
+        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+        PluginState state = PluginState.SUCCESS;
+
+        try {
+          LOGGER.debug("Validating AIP {}", aip.getId());
+          ValidationReport report = ValidationUtils.isAIPMetadataValid(forceDescriptiveMetadataType,
+            validateDescriptiveMetadata, metadataType, metadataVersion, validatePremis, model, aip.getId());
+          reports.add(report);
+          if (report.isValid()) {
+            reportItem.setPluginState(state);
+          } else {
+            state = PluginState.FAILURE;
+            reportItem.setPluginState(state).setHtmlPluginDetails(true).setPluginDetails(report.toHtml(false, false));
+          }
+        } catch (RODAException mse) {
+          state = PluginState.FAILURE;
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage(), mse);
         }
 
-        boolean notify = true;
-        createEvent(aip, model, index, reportItem.getPluginState(), notify);
-        pluginReport.addReport(reportItem);
-      } catch (RODAException mse) {
-        LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage(), mse);
+        try {
+          boolean notify = true;
+          createEvent(aip, model, index, reportItem.getPluginState(), notify);
+          jobPluginInfo.incrementObjectsProcessed(state);
+
+          pluginReport.addReport(reportItem);
+          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+        } catch (Throwable e) {
+          LOGGER.error("Error updating job report", e);
+        }
       }
 
-      try {
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
-      } catch (Throwable e) {
-        LOGGER.error("Error updating job report", e);
-      }
+      jobPluginInfo.finalizeInfo();
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+    } catch (JobException e) {
+      throw new PluginException("A job exception has occurred", e);
     }
+
     return pluginReport;
   }
 
@@ -151,20 +169,17 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
     } catch (RODAException e) {
       throw new PluginException(e.getMessage(), e);
     }
-
   }
 
   @Override
   public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
-
     return null;
   }
 
   @Override
   public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
-
     return null;
   }
 
@@ -218,6 +233,6 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_FORMAT_VALIDATION);
   }
 }

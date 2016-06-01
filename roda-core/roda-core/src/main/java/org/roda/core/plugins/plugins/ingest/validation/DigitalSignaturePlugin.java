@@ -31,6 +31,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
@@ -108,50 +109,6 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
     // do nothing
   }
 
-  public List<String> getApplicableTo() {
-    return applicableTo;
-  }
-
-  public Map<String, List<String>> getPronomToExtension() {
-    return pronomToExtension;
-  }
-
-  public Map<String, List<String>> getMimetypeToExtension() {
-    return mimetypeToExtension;
-  }
-
-  public boolean getDoVerify() {
-    return doVerify;
-  }
-
-  public void setDoVerify(boolean verify) {
-    doVerify = verify;
-  }
-
-  public boolean getDoExtract() {
-    return doExtract;
-  }
-
-  public void setDoExtract(boolean extract) {
-    doExtract = extract;
-  }
-
-  public boolean getDoStrip() {
-    return doStrip;
-  }
-
-  public void getDoStrip(boolean strip) {
-    doStrip = strip;
-  }
-
-  public boolean getVerificationAffectsOnOutcome() {
-    return verificationAffectsOnOutcome;
-  }
-
-  public void setVerificationAffectsOnOutcome(boolean affects) {
-    verificationAffectsOnOutcome = affects;
-  }
-
   public static String getStaticName() {
     return "Validation of digital signature";
   }
@@ -219,7 +176,7 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
       }
     }
 
-    return new Report();
+    return PluginHelper.initPluginReport(this);
   }
 
   public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, List<AIP> list)
@@ -232,7 +189,7 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       for (AIP aip : list) {
-        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), (Class<T>) AIP.class);
+        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
         PluginState reportState = PluginState.SUCCESS;
 
         try {
@@ -404,8 +361,8 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
         // not representation level)
         // FIXME 20160516 hsilva: see how to set initial
         // initialOutcomeObjectState
-        Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(),
-          (Class<T>) Representation.class);
+        Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(), Representation.class,
+          AIPState.INGEST_PROCESSING);
         PluginState reportState = PluginState.SUCCESS;
 
         try {
@@ -564,7 +521,8 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
 
       for (File file : list) {
         LOGGER.debug("Processing file {}", file);
-        Report reportItem = PluginHelper.initPluginReportItem(this, file.getId(), (Class<T>) File.class);
+        Report reportItem = PluginHelper.initPluginReportItem(this, file.getId(), File.class,
+          AIPState.INGEST_PROCESSING);
         PluginState reportState = PluginState.SUCCESS;
 
         try {
@@ -829,6 +787,18 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
   @Override
   public List<String> getCategories() {
     return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_FORMAT_VALIDATION);
+  }
+
+  public List<String> getApplicableTo() {
+    return applicableTo;
+  }
+
+  public Map<String, List<String>> getPronomToExtension() {
+    return pronomToExtension;
+  }
+
+  public Map<String, List<String>> getMimetypeToExtension() {
+    return mimetypeToExtension;
   }
 
 }

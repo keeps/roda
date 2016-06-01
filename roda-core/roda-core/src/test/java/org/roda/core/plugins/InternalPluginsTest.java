@@ -402,13 +402,13 @@ public class InternalPluginsTest {
     // // Files with Siegfried output
     // Assert.assertEquals(CORPORA_FILES_COUNT,
     // Iterables.size(model.listOtherMetadata(aip.getId(),
-    // SiegfriedPlugin.OTHER_METADATA_TYPE, true)));
+    // RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED, true)));
     //
     // Binary om = model.retrieveOtherMetadataBinary(aip.getId(),
     // aip.getRepresentations().get(0).getId(),
     // Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT,
     // SiegfriedPlugin.FILE_SUFFIX,
-    // SiegfriedPlugin.OTHER_METADATA_TYPE);
+    // RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED);
     //
     // Assert.assertNotNull(om);
     //
@@ -504,7 +504,6 @@ public class InternalPluginsTest {
     // index.find(IndexedPreservationEvent.class, filter, null,
     // new Sublist(0, 10));
     // Assert.assertEquals(1, events.getTotalCount());
-
   }
 
   @Test
@@ -539,13 +538,13 @@ public class InternalPluginsTest {
     // // Files with Apache Tika output each tika run creates 2 files
     // Assert.assertEquals(2 * CORPORA_FILES_COUNT,
     // Iterables.size(model.listOtherMetadata(aip.getId(),
-    // TikaFullTextPlugin.OTHER_METADATA_TYPE, true)));
+    // RodaConstants.OTHER_METADATA_TYPE_APACHE_TIKA, true)));
     //
     // Binary om = model.retrieveOtherMetadataBinary(aip.getId(),
     // aip.getRepresentations().get(0).getId(),
     // Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT,
     // TikaFullTextPlugin.FILE_SUFFIX_FULLTEXT,
-    // TikaFullTextPlugin.OTHER_METADATA_TYPE);
+    // RodaConstants.OTHER_METADATA_TYPE_APACHE_TIKA);
     //
     // Assert.assertNotNull(om);
     //

@@ -90,6 +90,9 @@ public class ReindexAIPPlugin extends AbstractPlugin<AIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
 
+    LOGGER.debug("Reindexing a total of {} AIPs", list.size());
+    Report pluginReport = PluginHelper.initPluginReport(this);
+
     try {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
@@ -106,7 +109,7 @@ public class ReindexAIPPlugin extends AbstractPlugin<AIP> {
       LOGGER.error("Could not update Job information");
     }
 
-    return PluginHelper.initPluginReport(this);
+    return pluginReport;
   }
 
   @Override

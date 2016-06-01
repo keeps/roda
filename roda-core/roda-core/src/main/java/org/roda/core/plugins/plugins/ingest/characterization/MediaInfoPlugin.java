@@ -115,8 +115,8 @@ public class MediaInfoPlugin extends AbstractPlugin<AIP> {
             ContentPayload payload = new FSPathContentPayload(entry.getValue());
             LOGGER.debug("Creating other metadata (AIP: {}, REPRESENTATION: {}, FILE: {})", aip.getId(),
               representation.getId(), entry.getValue().toFile().getName());
-            model.createOtherMetadata(aip.getId(), representation.getId(), directoryPath, fileId, ".xml", "MediaInfo",
-              payload, inotify);
+            model.createOtherMetadata(aip.getId(), representation.getId(), directoryPath, fileId, ".xml",
+              RodaConstants.OTHER_METADATA_TYPE_MEDIAINFO, payload, inotify);
           }
         } catch (RODAException | IOException | CommandException | XPathExpressionException
           | ParserConfigurationException | SAXException | TransformerFactoryConfigurationError

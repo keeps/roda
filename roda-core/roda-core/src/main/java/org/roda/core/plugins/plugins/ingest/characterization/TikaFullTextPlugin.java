@@ -49,7 +49,6 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
 
   public static final String FILE_SUFFIX_FULLTEXT = ".fulltext.txt";
   public static final String FILE_SUFFIX_METADATA = ".metadata.xml";
-  public static final String OTHER_METADATA_TYPE = "ApacheTika";
 
   private boolean createsPluginEvent = true;
   private boolean doFeatureExtraction = true;
@@ -117,19 +116,16 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
     super.setParameterValues(parameters);
 
     // updates the flag responsible to allow plugin event creation
-    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT)) {
-      createsPluginEvent = Boolean
-        .parseBoolean(getParameterValues().get(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT));
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT)) {
+      createsPluginEvent = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT));
     }
 
-    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION)) {
-      doFeatureExtraction = Boolean
-        .parseBoolean(getParameterValues().get(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION));
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION)) {
+      doFeatureExtraction = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION));
     }
 
-    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_DO_FULLTEXT_EXTRACTION)) {
-      doFulltextExtraction = Boolean
-        .parseBoolean(getParameterValues().get(RodaConstants.PLUGIN_PARAMS_DO_FULLTEXT_EXTRACTION));
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_DO_FULLTEXT_EXTRACTION)) {
+      doFulltextExtraction = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_DO_FULLTEXT_EXTRACTION));
     }
   }
 
@@ -144,10 +140,10 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       for (AIP aip : list) {
-        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIPState.INGEST_PROCESSING);
+        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
         PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
-
         LOGGER.debug("Processing AIP {}", aip.getId());
+
         try {
           for (Representation representation : aip.getRepresentations()) {
             LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
@@ -156,15 +152,14 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
             model.notifyRepresentationUpdated(representation);
           }
 
-          reportItem.setPluginState(PluginState.SUCCESS);
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
+          reportItem.setPluginState(PluginState.SUCCESS);
         } catch (RODAException e) {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
 
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
           reportItem.setPluginState(PluginState.FAILURE)
             .setPluginDetails("Error running Tika " + aip.getId() + ": " + e.getMessage());
-
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
         }
 
         report.addReport(reportItem);
@@ -178,7 +173,6 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
             | AuthorizationDeniedException | AlreadyExistsException e) {
             LOGGER.error("Error creating preservation event", e);
           }
-
         }
       }
 
@@ -194,14 +188,12 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
-
     return null;
   }
 
   @Override
   public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
-
     return null;
   }
 

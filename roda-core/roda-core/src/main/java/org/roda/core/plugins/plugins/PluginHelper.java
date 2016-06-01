@@ -92,9 +92,15 @@ public final class PluginHelper {
   }
 
   public static <T extends Serializable> Report initPluginReportItem(Plugin<T> plugin, String objectId,
-    Class<T> clazz) {
+    Class<?> clazz) {
     return initPluginReportItem(plugin, objectId, objectId).setSourceObjectClass(clazz.getCanonicalName())
       .setOutcomeObjectClass(clazz.getCanonicalName());
+  }
+
+  public static <T extends Serializable> Report initPluginReportItem(Plugin<T> plugin, String objectId, Class<?> clazz,
+    AIPState initialOutcomeObjectState) {
+    return initPluginReportItem(plugin, objectId, objectId).setSourceObjectClass(clazz.getCanonicalName())
+      .setOutcomeObjectClass(clazz.getCanonicalName()).setOutcomeObjectState(initialOutcomeObjectState);
   }
 
   public static <T extends Serializable> Report initPluginReportItem(Plugin<T> plugin, String outcomeObjectId,
@@ -434,7 +440,17 @@ public final class PluginHelper {
     }
   }
 
-  public static <T extends AbstractPlugin> void createDefaultRisk(ModelService model, String riskId,
+  public static <T extends AbstractPlugin> void createRiskIfNotExists(ModelService model, String riskId,
+    Class<T> pluginClass) throws RequestNotValidException, GenericException, AuthorizationDeniedException,
+    AlreadyExistsException, NotFoundException {
+    try {
+      model.retrieveRisk(riskId);
+    } catch (NotFoundException e) {
+      createDefaultRisk(model, riskId, pluginClass);
+    }
+  }
+
+  private static <T extends AbstractPlugin> void createDefaultRisk(ModelService model, String riskId,
     Class<T> pluginClass) throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException {
     String configurationFile = RodaCoreFactory.getRodaConfigurationAsString("core.plugins.risk",

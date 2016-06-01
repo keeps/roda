@@ -21,6 +21,7 @@ import org.roda.common.certification.ODFSignatureUtils;
 import org.roda.common.certification.OOXMLSignatureUtils;
 import org.roda.common.certification.PDFSignatureUtils;
 import org.roda.common.certification.SignatureUtils;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -37,7 +38,6 @@ import com.itextpdf.text.DocumentException;
 public class DigitalSignaturePluginUtils {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalSignaturePluginUtils.class);
-  private static final String OTHER_METADATA_TYPE = "DigitalSignature";
 
   public static String runDigitalSignatureVerify(Path input, String fileFormat, String mimetype) {
 
@@ -73,12 +73,12 @@ public class DigitalSignaturePluginUtils {
 
           model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
             file.getId().substring(0, file.getId().lastIndexOf('.')), ".xml",
-            DigitalSignaturePluginUtils.OTHER_METADATA_TYPE, mainPayload, true);
+            RodaConstants.OTHER_METADATA_TYPE_DIGITAL_SIGNATURE, mainPayload, true);
 
           if (extractResult.get(1).toFile().length() > 0) {
             model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
               file.getId().substring(0, file.getId().lastIndexOf('.')), ".pkcs7",
-              DigitalSignaturePluginUtils.OTHER_METADATA_TYPE, contentsPayload, true);
+              RodaConstants.OTHER_METADATA_TYPE_DIGITAL_SIGNATURE, contentsPayload, true);
           }
         }
       } else if (generalFileFormat.equals("ooxml")) {
@@ -89,7 +89,7 @@ public class DigitalSignaturePluginUtils {
           ContentPayload mainPayload = new FSPathContentPayload(p);
           model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
             file.getId().substring(0, file.getId().lastIndexOf('.')) + "_" + extractMap.get(p), ".xml",
-            DigitalSignaturePluginUtils.OTHER_METADATA_TYPE, mainPayload, true);
+            RodaConstants.OTHER_METADATA_TYPE_DIGITAL_SIGNATURE, mainPayload, true);
         }
       } else if (generalFileFormat.equals("odf")) {
         extractResult = ODFSignatureUtils.runDigitalSignatureExtract(input);
@@ -98,7 +98,7 @@ public class DigitalSignaturePluginUtils {
           ContentPayload mainPayload = new FSPathContentPayload(extractResult.get(0));
           model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
             file.getId().substring(0, file.getId().lastIndexOf('.')), ".xml",
-            DigitalSignaturePluginUtils.OTHER_METADATA_TYPE, mainPayload, true);
+            RodaConstants.OTHER_METADATA_TYPE_DIGITAL_SIGNATURE, mainPayload, true);
         }
       }
     } catch (IOException | RequestNotValidException | GenericException | NotFoundException

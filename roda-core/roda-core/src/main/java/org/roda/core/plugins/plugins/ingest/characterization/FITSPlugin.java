@@ -99,7 +99,7 @@ public class FITSPlugin extends AbstractPlugin<AIP> {
               LOGGER.debug("Creating other metadata (AIP: {}, REPRESENTATION: {}, FILE: {})", aip.getId(),
                 representation.getId(), file.getId());
               model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), ".xml",
-                "FITS", payload, inotify);
+                RodaConstants.OTHER_METADATA_TYPE_FITS, payload, inotify);
             } else {
               LOGGER.error("Cannot process AIP representation file", oFile.getCause());
             }

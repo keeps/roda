@@ -80,7 +80,7 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
     Report report = PluginHelper.initPluginReport(this);
 
     for (AIP aip : list) {
-      Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIPState.INGEST_PROCESSING);
+      Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
       PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
 
       String outcomeDetail = "";
