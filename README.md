@@ -26,6 +26,11 @@ For more information, please fell free to visit RODA website:
 
 Install [Kitematic Docker Toolbox](https://kitematic.com), search for `keeps/roda` and create and run the container. Click on the top-right button to open RODA (it might take a minute to initialize).
 
+![Create container](doc/images/kitematic_search.png "Create container")
+
+![Open RODA](doc/images/kitematic_open.png "Open RODA")
+
+
 #### Linux
 
 On Linux, as Kitematic Docker Toolbox is not yet available, use the following instructions:
