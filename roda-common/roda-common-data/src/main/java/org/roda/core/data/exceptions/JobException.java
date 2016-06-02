@@ -5,24 +5,24 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.orchestrate;
+package org.roda.core.data.exceptions;
 
-public class TimeoutJobException extends JobException {
+public class JobException extends RODAException {
   private static final long serialVersionUID = 1893131595923947285L;
 
-  public TimeoutJobException() {
+  public JobException() {
     super();
   }
 
-  public TimeoutJobException(String message) {
+  public JobException(String message) {
     super(message);
   }
 
-  public TimeoutJobException(String message, Throwable cause) {
+  public JobException(String message, Throwable cause) {
     super(message, cause);
   }
 
-  public TimeoutJobException(Throwable cause) {
+  public JobException(Throwable cause) {
     super(cause);
   }
 }

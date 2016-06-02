@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
+import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
@@ -19,7 +20,6 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
-import org.roda.core.plugins.orchestrate.JobException;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 
 public interface PluginOrchestrator {

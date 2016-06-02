@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.orchestrate.akka;
+package org.roda.core.plugins.orchestrate.akka.distributed;
 
 import static akka.actor.SupervisorStrategy.escalate;
 import static akka.actor.SupervisorStrategy.restart;
@@ -14,13 +14,13 @@ import static akka.actor.SupervisorStrategy.stop;
 import java.io.Serializable;
 import java.util.UUID;
 
-import org.roda.core.plugins.orchestrate.akka.Master.Ack;
-import org.roda.core.plugins.orchestrate.akka.Master.Work;
-import org.roda.core.plugins.orchestrate.akka.MasterWorkerProtocol.RegisterWorker;
-import org.roda.core.plugins.orchestrate.akka.MasterWorkerProtocol.WorkFailed;
-import org.roda.core.plugins.orchestrate.akka.MasterWorkerProtocol.WorkIsDone;
-import org.roda.core.plugins.orchestrate.akka.MasterWorkerProtocol.WorkIsReady;
-import org.roda.core.plugins.orchestrate.akka.MasterWorkerProtocol.WorkerRequestsWork;
+import org.roda.core.plugins.orchestrate.akka.distributed.Master.Ack;
+import org.roda.core.plugins.orchestrate.akka.distributed.Master.Work;
+import org.roda.core.plugins.orchestrate.akka.distributed.MasterWorkerProtocol.RegisterWorker;
+import org.roda.core.plugins.orchestrate.akka.distributed.MasterWorkerProtocol.WorkFailed;
+import org.roda.core.plugins.orchestrate.akka.distributed.MasterWorkerProtocol.WorkIsDone;
+import org.roda.core.plugins.orchestrate.akka.distributed.MasterWorkerProtocol.WorkIsReady;
+import org.roda.core.plugins.orchestrate.akka.distributed.MasterWorkerProtocol.WorkerRequestsWork;
 
 import akka.actor.ActorInitializationException;
 import akka.actor.ActorRef;

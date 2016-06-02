@@ -5,24 +5,24 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.orchestrate.akka;
+package org.roda.core.plugins.orchestrate.akka.distributed;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.roda.core.plugins.orchestrate.akka.MasterWorkerProtocol.RegisterWorker;
-import org.roda.core.plugins.orchestrate.akka.MasterWorkerProtocol.WorkFailed;
-import org.roda.core.plugins.orchestrate.akka.MasterWorkerProtocol.WorkIsDone;
-import org.roda.core.plugins.orchestrate.akka.MasterWorkerProtocol.WorkIsReady;
-import org.roda.core.plugins.orchestrate.akka.MasterWorkerProtocol.WorkerRequestsWork;
-import org.roda.core.plugins.orchestrate.akka.WorkState.WorkAccepted;
-import org.roda.core.plugins.orchestrate.akka.WorkState.WorkCompleted;
-import org.roda.core.plugins.orchestrate.akka.WorkState.WorkDomainEvent;
-import org.roda.core.plugins.orchestrate.akka.WorkState.WorkStarted;
-import org.roda.core.plugins.orchestrate.akka.WorkState.WorkerFailed;
-import org.roda.core.plugins.orchestrate.akka.WorkState.WorkerTimedOut;
+import org.roda.core.plugins.orchestrate.akka.distributed.MasterWorkerProtocol.RegisterWorker;
+import org.roda.core.plugins.orchestrate.akka.distributed.MasterWorkerProtocol.WorkFailed;
+import org.roda.core.plugins.orchestrate.akka.distributed.MasterWorkerProtocol.WorkIsDone;
+import org.roda.core.plugins.orchestrate.akka.distributed.MasterWorkerProtocol.WorkIsReady;
+import org.roda.core.plugins.orchestrate.akka.distributed.MasterWorkerProtocol.WorkerRequestsWork;
+import org.roda.core.plugins.orchestrate.akka.distributed.WorkState.WorkAccepted;
+import org.roda.core.plugins.orchestrate.akka.distributed.WorkState.WorkCompleted;
+import org.roda.core.plugins.orchestrate.akka.distributed.WorkState.WorkDomainEvent;
+import org.roda.core.plugins.orchestrate.akka.distributed.WorkState.WorkStarted;
+import org.roda.core.plugins.orchestrate.akka.distributed.WorkState.WorkerFailed;
+import org.roda.core.plugins.orchestrate.akka.distributed.WorkState.WorkerTimedOut;
 
 import akka.actor.ActorRef;
 import akka.actor.Cancellable;

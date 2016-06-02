@@ -5,9 +5,9 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.orchestrate.akka;
+package org.roda.core.plugins.orchestrate.akka.distributed;
 
-import org.roda.core.plugins.orchestrate.akka.Master.WorkResult;
+import org.roda.core.plugins.orchestrate.akka.distributed.Master.WorkResult;
 
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;

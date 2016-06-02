@@ -30,8 +30,10 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
+import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.TimeoutJobException;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -48,7 +50,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginOrchestrator;
-import org.roda.core.plugins.orchestrate.akka.AkkaJobWorkerActor;
+import org.roda.core.plugins.orchestrate.akka.AkkaJobActor;
 import org.roda.core.plugins.orchestrate.akka.AkkaWorkerActor;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
@@ -108,7 +110,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       .props(Props.create(AkkaWorkerActor.class, storage, model, index));
     workersRouter = workersSystem.actorOf(workersProps, "WorkersRouter");
 
-    Props jobsProps = new RoundRobinPool(numberOfWorkers).props(Props.create(AkkaJobWorkerActor.class));
+    Props jobsProps = new RoundRobinPool(numberOfWorkers).props(Props.create(AkkaJobActor.class));
     jobWorkersRouter = workersSystem.actorOf(jobsProps, "JobWorkersRouter");
 
     // FiniteDuration within = FiniteDuration.create(10, TimeUnit.MILLISECONDS);

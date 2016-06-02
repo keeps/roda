@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.orchestrate.akka;
+package org.roda.core.plugins.orchestrate.akka.distributed;
 
 import akka.actor.UntypedActor;
 import akka.event.Logging;

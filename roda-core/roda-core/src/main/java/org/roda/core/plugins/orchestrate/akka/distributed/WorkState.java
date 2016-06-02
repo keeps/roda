@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.orchestrate.akka;
+package org.roda.core.plugins.orchestrate.akka.distributed;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import org.roda.core.plugins.orchestrate.akka.Master.Work;
+import org.roda.core.plugins.orchestrate.akka.distributed.Master.Work;
 
 public final class WorkState {
 

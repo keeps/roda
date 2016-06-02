@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.orchestrate;
+package org.roda.core.plugins.orchestrate.akka.distributed;
 
 import java.util.List;
 

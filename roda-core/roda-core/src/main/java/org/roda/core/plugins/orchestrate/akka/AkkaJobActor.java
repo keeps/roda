@@ -34,10 +34,10 @@ import org.slf4j.LoggerFactory;
 
 import akka.actor.UntypedActor;
 
-public class AkkaJobWorkerActor extends UntypedActor {
-  private static final Logger LOGGER = LoggerFactory.getLogger(AkkaJobWorkerActor.class);
+public class AkkaJobActor extends UntypedActor {
+  private static final Logger LOGGER = LoggerFactory.getLogger(AkkaJobActor.class);
 
-  public AkkaJobWorkerActor() {
+  public AkkaJobActor() {
 
   }
 
@@ -61,7 +61,7 @@ public class AkkaJobWorkerActor extends UntypedActor {
       }
 
     } else {
-      LOGGER.error(AkkaJobWorkerActor.class.getName() + " received a message that it doesn't know how to process...");
+      LOGGER.error(AkkaJobActor.class.getName() + " received a message that it doesn't know how to process...");
     }
   }
 
