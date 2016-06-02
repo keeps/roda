@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>RODA by keeps</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">RODA</h1>
+      <h2 class="project-tagline">Repository of Authentic Digital Objects</h2>
+      <a href="https://github.com/keeps/roda" class="btn">View on GitHub</a>
+      <a href="https://github.com/keeps/roda/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/keeps/roda/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="roda-20---repository-of-authentic-digital-objects" class="anchor" href="#roda-20---repository-of-authentic-digital-objects" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>RODA 2.0 - Repository of Authentic Digital Objects</h1>
+
+<h2>
+<a id="what-is-roda" class="anchor" href="#what-is-roda" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What is RODA?</h2>
+
+<p>RODA is a complete digital repository that delivers functionality for all the main units of the OAIS reference model. RODA is capable of ingesting, managing and providing access to the various types of digital objects produced by large corporations or public bodies. RODA is based on open-source technologies and is supported by existing standards such as the OAIS, METS, EAD and PREMIS.</p>
+
+<h2>
+<a id="some-technical-information-about-roda" class="anchor" href="#some-technical-information-about-roda" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Some technical information about RODA</h2>
+
+<ul>
+<li>Uses native file system or Fedora 4 for digital object storage</li>
+<li>Uses any XML format as descriptive metadata</li>
+<li>Uses PREMIS for preservation metadata</li>
+<li>Has a configurable multi-step ingestion workflow</li>
+<li>Supports LDAP and CAS for authentication &amp; authorization</li>
+<li>Supports pluggable preservation actions</li>
+<li>Has a user friendly graphical user interface based on GWT</li>
+</ul>
+
+<p>For more information, please fell free to visit RODA website:
+<strong><a href="http://www.roda-community.org">http://www.roda-community.org</a></strong></p>
+
+<h2>
+<a id="install-and-run" class="anchor" href="#install-and-run" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Install and run</h2>
+
+<h3>
+<a id="demo-mode-based-on-docker-containers" class="anchor" href="#demo-mode-based-on-docker-containers" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Demo mode (based on docker containers)</h3>
+
+<h4>
+<a id="windows-and-macos-x" class="anchor" href="#windows-and-macos-x" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Windows and MacOS X</h4>
+
+<p>Install <a href="https://kitematic.com">Kitematic Docker Toolbox</a>, search for <code>keeps/roda</code> and create and run the container. Click on the top-right button to open RODA (it might take a minute to initialize).</p>
+
+<p><img src="doc/images/kitematic_search.png" alt="Create container" title="Create container"></p>
+
+<p><img src="doc/images/kitematic_open.png" alt="Open RODA" title="Open RODA"></p>
+
+<h4>
+<a id="linux" class="anchor" href="#linux" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Linux</h4>
+
+<p>On Linux, as Kitematic Docker Toolbox is not yet available, use the following instructions:</p>
+
+<ol>
+<li>Install docker for your system: <a href="https://docs.docker.com/engine/installation/">https://docs.docker.com/engine/installation/</a>
+</li>
+<li>Pull or update to the latest roda container, on the command line run:  <code>sudo docker pull keeps/roda</code>
+</li>
+<li>Run the container: <code>sudo docker run -p 8080:8080 -v ~/.roda:/root/.roda keeps/roda</code>
+</li>
+<li>Access RODA on your browser: <a href="http://localhost:8080">http://localhost:8080</a>
+</li>
+</ol>
+
+<p>NOTE: the docker commands only need <code>sudo</code> if your user does not belong to the <code>docker</code> group.</p>
+
+<h3>
+<a id="production-mode" class="anchor" href="#production-mode" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Production mode</h3>
+
+<p>To install RODA from base, i.e. without containers, see the <a href="INSTALL.md">base install instructions</a>.</p>
+
+<h2>
+<a id="quick-start" class="anchor" href="#quick-start" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Quick start</h2>
+
+<p>Please log in with the following credentials:</p>
+
+<ul>
+<li>Username: admin</li>
+<li>Password: roda</li>
+</ul>
+
+<p>With this you will have access to all features.</p>
+
+<p>Then you can start using RODA:</p>
+
+<ol>
+<li>Go to Catalogue and click the button <strong>NEW</strong>, select Dublin Core and fill the title of your new collection</li>
+<li>Go to <strong>Ingest &gt; Transfer</strong> and upload files (e.g. PDF) or SIPs made by <a href="http://rodain.roda-community.org/">RODA-in</a>. SIPs will have metadata while PDFs wont. To know how to use RODA-in <a href="http://rodain.roda-community.org/">watch the tutorials</a>.</li>
+<li>After upload, select the SIPs or files to ingest on the checkbox and click the button <strong>PROCESS</strong> on the sidebar under the section Ingest.</li>
+<li>Now configure the ingest workflow, select the SIP format, if you upload a file select <strong>Uploaded file/folder</strong>, if you uploaded a SIP select the SIP format (E-ARK or Bagit).</li>
+<li>Under the <strong>Parent Object</strong> you can select the new collection you created above</li>
+<li>After configuring ingest click the <strong>CREATE</strong> button</li>
+<li>Now ingest will start and you can see the status of it at <strong>Ingest &gt; Process</strong>, you can also inspect the status by clicking the table row</li>
+<li>When finished you can go to <strong>Catalogue</strong> or <strong>Search</strong> to find your new ingested content</li>
+</ol>
+
+<h2>
+<a id="developers" class="anchor" href="#developers" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Developers</h2>
+
+<p>To start developing for RODA check the <a href="https://github.com/keeps/roda/wiki/Developer-guide">Developer guide</a> which has information on:</p>
+
+<ol>
+<li><a href="https://github.com/keeps/roda/wiki/Developer-guide#-how-to-get-the-source-code">How to get the source code</a></li>
+<li><a href="https://github.com/keeps/roda/wiki/Developer-guide#-how-the-code-is-laid-out">How the code is laid out</a></li>
+<li><a href="https://github.com/keeps/roda/wiki/Developer-guide#-how-to-set-up-the-development-environment">How to set up the development environment</a></li>
+<li><a href="https://github.com/keeps/roda/wiki/Developer-guide#-how-to-contribute">How to contribute</a></li>
+</ol>
+
+<p><a href="https://travis-ci.org/keeps/roda"><img src="https://travis-ci.org/keeps/roda.png?branch=master" alt="Build Status"></a></p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/keeps/roda">RODA</a> is maintained by <a href="https://github.com/keeps">keeps</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
