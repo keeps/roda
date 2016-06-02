@@ -1,35 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
-	xmlns:u="urn:import:org.roda.wui.management.user.client">
+	     xmlns:g="urn:import:com.google.gwt.user.client.ui"
+>
 
-	<ui:with field='constants' type='config.i18n.client.UserManagementConstants' />
-	<ui:with field='messages' type='config.i18n.client.UserManagementMessages' />
+	<ui:with field='constants' type='config.i18n.client.UserManagementConstants'/>
+	<ui:with field='messages' type='config.i18n.client.UserManagementMessages'/>
 
 	<ui:style>
-	
+
 	</ui:style>
 
-	<g:FlowPanel styleName="wui-browse-edit-metadata"
-		addStyleNames="wrapper skip_padding">
+	<g:FlowPanel styleName="wui-browse-metadata-descriptive-versions"
+		     addStyleNames="skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
 				<g:Label styleName="h1">New descriptive metadata</g:Label>
+				<g:Label styleName="wui-browse-metadata-descriptive-versions-type">
+					New file
+				</g:Label>
 				<g:Label addStyleNames="form-label">
 					Type
 				</g:Label>
-				<g:ListBox ui:field="type" addStyleNames="form-listbox" />
+				<g:ListBox ui:field="type" addStyleNames="form-listbox"/>
 				<g:Label addStyleNames="form-label">
 					File name
 				</g:Label>
-				<g:TextBox ui:field="id" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">
-					Content
+				<g:TextBox ui:field="id" addStyleNames="form-textbox"/>
+				<g:Label ui:field="formOrXMLLabel"> <!--styleName="wui-browse-metadata-descriptive-versions-type"-->
+					Form
 				</g:Label>
-				<g:TextArea ui:field="xml" addStyleNames="form-textbox metadata-edit-area" />
-				<g:HTML visible="false" ui:field="errors" addStyleNames="metadata-edit-errors" />
+				<g:FocusPanel ui:field="showXml" styleName="toolbarLink">
+					<g:HTML>
+						<i class="fa fa-code"></i>
+					</g:HTML>
+				</g:FocusPanel>
+				<g:FlowPanel addStyleNames="panel">
+					<g:FlowPanel ui:field="formOrXML" addStyleNames="panel-body"/>
+				</g:FlowPanel>
+
+				<g:HTML visible="false" ui:field="errors" addStyleNames="metadata-edit-errors"/>
 			</g:FlowPanel>
 
 			<g:FlowPanel addStyleNames="col_2 last sidebar">

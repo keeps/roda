@@ -1,8 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<simpledc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <title>{{title}}</title>
-  <creator>{{user}}</creator>
-  <publisher>{{user}}</publisher>
-  <identifier>{{id}}</identifier>
-  <date>{{date}}</date>
+<?xml version="1.0"?>
+
+<simpledc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../schemas/dc.xsd">
+
+    <title>{{title order='2' auto-generate='title'}}</title>
+    <identifier>{{id order='1' auto-generate='id'}}</identifier>
+    <creator>{{creator}}</creator>
+    <date>{{dateInitial order='3' type='date'}}</date>
+    <date>{{dateFinal order='4' type='date'}}</date>
+    <description>{{description type='text-area'}}</description>
+    <publisher>{{producer}}</publisher>
+    <rights>{{rights}}</rights>
+    <language>{{language auto-generate='language'}}</language>
+
 </simpledc>

@@ -2,22 +2,19 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
- *
+ * <p>
  * https://github.com/keeps/roda
  */
 package org.roda.wui.api.controllers;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -27,6 +24,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.MissingResourceException;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -131,6 +130,7 @@ import org.roda.wui.client.browse.BrowseItemBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataViewBundle;
+import org.roda.wui.client.browse.MetadataValue;
 import org.roda.wui.client.browse.PreservationEventViewBundle;
 import org.roda.wui.client.browse.SupportedMetadataTypeBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
@@ -145,14 +145,11 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.github.mustachejava.DefaultMustacheFactory;
-import com.github.mustachejava.Mustache;
-import com.github.mustachejava.MustacheFactory;
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Template;
 
 /**
- * 
  * @author Luis Faria <lfaria@keep.pt>
- *
  */
 public class BrowserHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(BrowserHelper.class);
@@ -1182,7 +1179,7 @@ public class BrowserHelper {
     return node;
   }
 
-  public static List<SupportedMetadataTypeBundle> getSupportedMetadata(RodaUser user, Locale locale)
+  public static List<SupportedMetadataTypeBundle> getSupportedMetadata(RodaUser user, IndexedAIP aip, Locale locale)
     throws GenericException {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     String[] types = RodaCoreFactory.getRodaConfiguration()
@@ -1203,26 +1200,28 @@ public class BrowserHelper {
           key += "." + version;
         }
         String label = messages.getTranslation(key, type);
-        String template = null;
         InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream("templates/"
           + ((version != null) ? type + RodaConstants.METADATA_VERSION_SEPARATOR + version : type) + ".xml");
 
-        //
-        Map<String, Object> scopes = new HashMap<String, Object>();
-        scopes.put("id", "");
-        scopes.put("title", "");
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        scopes.put("date", format.format(new Date()));
-        scopes.put("user", user.getFullName());
+        String template = null;
+        try {
+          template = IOUtils.toString(templateStream, "UTF-8");
+        } catch (IOException e) {
+          LOGGER.error("Error getting the template from the stream", e);
+        }
 
-        Writer writer = new StringWriter();
-        MustacheFactory mf = new DefaultMustacheFactory();
-        Mustache mustache = mf.compile(new InputStreamReader(templateStream), type);
-        mustache.execute(writer, scopes);
-        template = writer.toString();
-        IOUtils.closeQuietly(templateStream);
+        TreeSet<MetadataValue> values = ServerTools.transform(template);
+        for (MetadataValue mv : values) {
+          String generator = mv.get("auto-generate");
+          if (generator != null && generator.length() > 0) {
+            String value = ServerTools.autoGenerateValue(aip, user, generator);
+            if (value != null) {
+              mv.set("value", value);
+            }
+          }
+        }
 
-        SupportedMetadataTypeBundle b = new SupportedMetadataTypeBundle(type, version, label, template);
+        SupportedMetadataTypeBundle b = new SupportedMetadataTypeBundle(type, version, label, template, values);
         supportedMetadata.add(b);
       }
     }
@@ -1931,4 +1930,36 @@ public class BrowserHelper {
     }
   }
 
+  public static String getDescriptiveMetadataPreview(String aipId, SupportedMetadataTypeBundle bundle) {
+    String rawTemplate = bundle.getTemplate();
+    String result = null;
+    try {
+      Handlebars handlebars = new Handlebars();
+      Map<String, String> data = new HashMap<>();
+      handlebars.registerHelperMissing((o, options) -> {
+        if (data.containsKey(options.helperName)) {
+          return data.get(options.helperName);
+        }
+        return "";
+      });
+      Template tmpl = handlebars.compileInline(rawTemplate);
+
+      Set<MetadataValue> values = bundle.getValues();
+      if (values != null) {
+        values.forEach(metadataValue -> {
+          String val = (String) metadataValue.get("value");
+          if (val != null) {
+            val = val.replaceAll("\\s", "");
+            if (!"".equals(val)) {
+              data.put(metadataValue.getId(), (String) metadataValue.get("value"));
+            }
+          }
+        });
+      }
+      result = tmpl.apply(data);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return result;
+  }
 }

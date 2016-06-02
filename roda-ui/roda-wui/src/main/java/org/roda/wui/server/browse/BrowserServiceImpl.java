@@ -279,6 +279,14 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     AlreadyExistsException, ValidationException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
 
+    // If the bundle has values from the form, we need to update the XML by
+    // applying the values of the form to the raw tempalte
+    if (bundle.getValues() != null) {
+      SupportedMetadataTypeBundle smtb = new SupportedMetadataTypeBundle(bundle.getType(), bundle.getVersion(),
+        bundle.getId(), bundle.getRawTemplate(), bundle.getValues());
+      bundle.setXml(Browser.createDescriptiveMetadataPreview(user, aipId, smtb));
+    }
+
     String metadataId = bundle.getId();
     String descriptiveMetadataType = bundle.getType();
     String descriptiveMetadataVersion = bundle.getVersion();
@@ -286,6 +294,15 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
     Browser.createDescriptiveMetadataFile(user, aipId, metadataId, descriptiveMetadataType, descriptiveMetadataVersion,
       payload);
+  }
+
+  @Override
+  public String getDescriptiveMetadataPreview(String aipId, SupportedMetadataTypeBundle bundle)
+    throws AuthorizationDeniedException, GenericException, ValidationException, NotFoundException,
+    RequestNotValidException {
+
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.createDescriptiveMetadataPreview(user, aipId, bundle);
   }
 
   @Override
@@ -416,11 +433,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public List<SupportedMetadataTypeBundle> getSupportedMetadata(String localeString)
-    throws AuthorizationDeniedException, GenericException {
+  public List<SupportedMetadataTypeBundle> getSupportedMetadata(String aipId, String localeString)
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     Locale locale = ServerTools.parseLocale(localeString);
-    return Browser.getSupportedMetadata(user, locale);
+    return Browser.getSupportedMetadata(user, aipId, locale);
   }
 
   @Override

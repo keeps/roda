@@ -7,3 +7,5 @@ roda-installer/roda-installer_v*
 *~
 **/.DS_Store
 roda-core/roda-core/velocity.log.1
+.idea/
+*.iml

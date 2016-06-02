@@ -68,6 +68,8 @@ public interface BrowserServiceAsync {
   void createDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle newBundle,
     AsyncCallback<Void> asyncCallback);
 
+  void getDescriptiveMetadataPreview(String aipId, SupportedMetadataTypeBundle bundle, AsyncCallback<String> async);
+
   void createTransferredResourcesFolder(String parent, String folderName, AsyncCallback<String> callback);
 
   void removeTransferredResources(SelectedItems<TransferredResource> selected, AsyncCallback<Void> callback);
@@ -86,7 +88,7 @@ public interface BrowserServiceAsync {
 
   void getViewersProperties(AsyncCallback<Viewers> callback);
 
-  void getSupportedMetadata(String locale, AsyncCallback<List<SupportedMetadataTypeBundle>> callback);
+  void getSupportedMetadata(String aipId, String locale, AsyncCallback<List<SupportedMetadataTypeBundle>> callback);
 
   void isCookiesMessageActive(AsyncCallback<Boolean> callback);
 
@@ -173,5 +175,4 @@ public interface BrowserServiceAsync {
   void getRepresentationFromId(String representationId, AsyncCallback<IndexedRepresentation> asyncCallback);
 
   void getFileFromId(String fileId, AsyncCallback<IndexedFile> asyncCallback);
-
 }

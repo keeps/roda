@@ -904,4 +904,13 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("RODA - {0}")
   public String windowTitle(String history);
+
+  /************* Metadata creation ****************/
+
+  @DefaultMessage("View metadata form")
+  String confirmChangeToFormTitle();
+
+  @DefaultMessage("Are you sure you want to view the metadata form? All the changes made to the file will be lost.")
+  String confirmChangeToFormMessage();
+
 }

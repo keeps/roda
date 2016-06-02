@@ -8,6 +8,7 @@
 package org.roda.wui.client.browse;
 
 import java.io.Serializable;
+import java.util.TreeSet;
 
 public class DescriptiveMetadataEditBundle implements Serializable {
 
@@ -17,12 +18,25 @@ public class DescriptiveMetadataEditBundle implements Serializable {
   private String type;
   private String xml;
   private String version;
+  private String rawTemplate;
+  private TreeSet<MetadataValue> values;
 
   public DescriptiveMetadataEditBundle() {
     super();
   }
 
-  public DescriptiveMetadataEditBundle(String id, String type, String version,String xml) {
+  public DescriptiveMetadataEditBundle(String id, String type, String version, String xml, String rawTemplate,
+    TreeSet<MetadataValue> values) {
+    super();
+    this.id = id;
+    this.type = type;
+    this.xml = xml;
+    this.version = version;
+    this.rawTemplate = rawTemplate;
+    this.values = values;
+  }
+
+  public DescriptiveMetadataEditBundle(String id, String type, String version, String xml) {
     super();
     this.id = id;
     this.type = type;
@@ -62,4 +76,19 @@ public class DescriptiveMetadataEditBundle implements Serializable {
     this.version = version;
   }
 
+  public String getRawTemplate() {
+    return rawTemplate;
+  }
+
+  public void setRawTemplate(String rawTemplate) {
+    this.rawTemplate = rawTemplate;
+  }
+
+  public TreeSet<MetadataValue> getValues() {
+    return values;
+  }
+
+  public void setValues(TreeSet<MetadataValue> values) {
+    this.values = values;
+  }
 }

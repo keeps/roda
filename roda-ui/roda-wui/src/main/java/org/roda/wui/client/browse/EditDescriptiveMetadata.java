@@ -56,17 +56,17 @@ public class EditDescriptiveMetadata extends Composite {
         BrowserService.Util.getInstance().getDescriptiveMetadataEditBundle(aipId, descriptiveMetadataId,
           new AsyncCallback<DescriptiveMetadataEditBundle>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            callback.onFailure(caught);
-          }
+            @Override
+            public void onFailure(Throwable caught) {
+              callback.onFailure(caught);
+            }
 
-          @Override
-          public void onSuccess(DescriptiveMetadataEditBundle bundle) {
-            EditDescriptiveMetadata edit = new EditDescriptiveMetadata(aipId, bundle);
-            callback.onSuccess(edit);
-          }
-        });
+            @Override
+            public void onSuccess(DescriptiveMetadataEditBundle bundle) {
+              EditDescriptiveMetadata edit = new EditDescriptiveMetadata(aipId, bundle);
+              callback.onSuccess(edit);
+            }
+          });
       } else {
         Tools.newHistory(Browse.RESOLVER);
         callback.onSuccess(null);
@@ -137,7 +137,7 @@ public class EditDescriptiveMetadata extends Composite {
 
     id.setEnabled(false);
 
-    BrowserService.Util.getInstance().getSupportedMetadata(LocaleInfo.getCurrentLocale().getLocaleName(),
+    BrowserService.Util.getInstance().getSupportedMetadata(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
       new AsyncCallback<List<SupportedMetadataTypeBundle>>() {
 
         @Override

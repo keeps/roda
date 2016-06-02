@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<name>roda-wui</name>
 	<artifactId>roda-wui</artifactId>
@@ -70,8 +70,8 @@
 						</executions>
 					</plugin>
 					<plugin>
-							<groupId>pl.project13.maven</groupId>
-							<artifactId>git-commit-id-plugin</artifactId>
+						<groupId>pl.project13.maven</groupId>
+						<artifactId>git-commit-id-plugin</artifactId>
 					</plugin>
 				</plugins>
 			</build>
@@ -158,8 +158,8 @@
 						</executions>
 					</plugin>
 					<plugin>
-							<groupId>pl.project13.maven</groupId>
-							<artifactId>git-commit-id-plugin</artifactId>
+						<groupId>pl.project13.maven</groupId>
+						<artifactId>git-commit-id-plugin</artifactId>
 					</plugin>
 				</plugins>
 			</build>
@@ -247,11 +247,11 @@
 			<artifactId>roda-core</artifactId>
 			<exclusions>
 				<!-- 20160218 hsilva: this is needed for apache tika parsers, so commenting
-					out -->
+				    out -->
 				<!-- <exclusion> <artifactId>asm</artifactId> <groupId>org.ow2.asm</groupId>
-					</exclusion> <exclusion> <artifactId>asm-commons</artifactId> <groupId>org.ow2.asm</groupId>
-					</exclusion> <exclusion> <artifactId>asm-debug-all</artifactId> <groupId>org.ow2.asm</groupId>
-					</exclusion> -->
+				    </exclusion> <exclusion> <artifactId>asm-commons</artifactId> <groupId>org.ow2.asm</groupId>
+				    </exclusion> <exclusion> <artifactId>asm-debug-all</artifactId> <groupId>org.ow2.asm</groupId>
+				    </exclusion> -->
 				<exclusion>
 					<artifactId>*</artifactId>
 					<groupId>org.eclipse.jetty</groupId>
@@ -347,6 +347,10 @@
 			<artifactId>commons-compress</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.github.jknack</groupId>
+			<artifactId>handlebars</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.github.spullara.mustache.java</groupId>
 			<artifactId>compiler</artifactId>
 			<version>0.9.1</version>
@@ -367,7 +371,7 @@
 					</configuration>
 				</plugin>
 				<!--This plugin's configuration is used to store Eclipse m2e settings
-					only. It has no influence on the Maven build itself. -->
+				    only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -391,7 +395,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore />
+										<ignore/>
 									</action>
 								</pluginExecution>
 							</pluginExecutions>

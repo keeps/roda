@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<name>RODA - Repositório de Objetos Digitais Autênticos</name>
 	<url>http://roda.keep.pt/</url>
@@ -8,7 +8,9 @@
 	<artifactId>roda</artifactId>
 	<version>2.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<description>RODA is an full-featured open-source digital preservation repository providing all the functionality prescribed by the OAIS reference model.</description>
+	<description>RODA is an full-featured open-source digital preservation repository providing all the functionality
+		prescribed by the OAIS reference model.
+	</description>
 	<scm>
 		<url>https://github.com/KEEPS/RODA</url>
 	</scm>
@@ -348,7 +350,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore />
+										<ignore/>
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
@@ -361,24 +363,26 @@
 					<version>0.4.10</version>
 				</plugin>
 				<plugin>
-							<groupId>pl.project13.maven</groupId>
-							<artifactId>git-commit-id-plugin</artifactId>
-							<version>2.2.1</version>
-							<executions>
-									<execution>
-											<goals>
-													<goal>revision</goal>
-											 </goals>
-									</execution>
-							</executions>
-							<configuration>
-							    <!-- this is false by default, forces the plugin to generate the file -->
-							    <generateGitPropertiesFile>true</generateGitPropertiesFile>
+					<groupId>pl.project13.maven</groupId>
+					<artifactId>git-commit-id-plugin</artifactId>
+					<version>2.2.1</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>revision</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<!-- this is false by default, forces the plugin to generate the file -->
+						<generateGitPropertiesFile>true</generateGitPropertiesFile>
 
-							    <!-- The path for the properties file to be generated. See Super Pom for default variable reference https://maven.apache.org/guides/introduction/introduction-to-the-pom.html -->
-							    <generateGitPropertiesFilename>${project.build.directory}/${project.build.finalName}/version.json</generateGitPropertiesFilename>
-									<format>json</format>
-							</configuration>
+						<!-- The path for the properties file to be generated. See Super Pom for default variable reference https://maven.apache.org/guides/introduction/introduction-to-the-pom.html -->
+						<generateGitPropertiesFilename>
+							${project.build.directory}/${project.build.finalName}/version.json
+						</generateGitPropertiesFilename>
+						<format>json</format>
+					</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -1103,6 +1107,12 @@
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpclient</artifactId>
 				<version>${httpcomponents.version}</version>
+			</dependency>
+			<!-- Templating system dependencies -->
+			<dependency>
+				<groupId>com.github.jknack</groupId>
+				<artifactId>handlebars</artifactId>
+				<version>4.0.5</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

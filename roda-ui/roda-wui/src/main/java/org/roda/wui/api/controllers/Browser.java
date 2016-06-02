@@ -934,12 +934,14 @@ public class Browser extends RodaCoreService {
     BrowserHelper.runTransferredResourceScan(subFolderUUID, waitToFinish);
   }
 
-  public static List<SupportedMetadataTypeBundle> getSupportedMetadata(RodaUser user, Locale locale)
-    throws AuthorizationDeniedException, GenericException {
+  public static List<SupportedMetadataTypeBundle> getSupportedMetadata(RodaUser user, String aipId, Locale locale)
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
     Date startDate = new Date();
 
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
+
     // delegate
-    List<SupportedMetadataTypeBundle> supportedMetadata = BrowserHelper.getSupportedMetadata(user, locale);
+    List<SupportedMetadataTypeBundle> supportedMetadata = BrowserHelper.getSupportedMetadata(user, aip, locale);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
@@ -1532,4 +1534,21 @@ public class Browser extends RodaCoreService {
     return ret;
   }
 
+  public static String createDescriptiveMetadataPreview(RodaUser user, String aipId, SupportedMetadataTypeBundle bundle)
+    throws AuthorizationDeniedException {
+    Date startDate = new Date();
+
+    // check permissions
+    UserUtility.checkRoles(user, BROWSE_ROLE);
+
+    // delegate
+    String payload = BrowserHelper.getDescriptiveMetadataPreview(aipId, bundle);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, BROWSER_COMPONENT, "createDescriptiveMetadataPreview", null, duration, "template",
+      bundle.getLabel());
+
+    return payload;
+  }
 }

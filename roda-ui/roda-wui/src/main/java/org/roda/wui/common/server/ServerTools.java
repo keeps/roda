@@ -7,11 +7,29 @@
  */
 package org.roda.wui.common.server;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
+import java.util.TreeSet;
+
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.user.RodaUser;
+import org.roda.wui.client.browse.MetadataValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Template;
 
 public class ServerTools {
+  private static final Logger LOGGER = LoggerFactory.getLogger(ServerTools.class);
+
   /**
    * Parse a locale string into a Locale
    * 
@@ -96,6 +114,70 @@ public class ServerTools {
       isURL = false;
     }
     return isURL;
+  }
+
+  public static TreeSet<MetadataValue> transform(String content) {
+    if (content == null)
+      return null;
+
+    TreeSet<MetadataValue> values = new TreeSet<>();
+    Set<String> addedTags = new HashSet<>();
+    Handlebars handlebars = new Handlebars();
+
+    Template tmpl;
+    try {
+      handlebars.helpers().clear();
+      handlebars.registerHelperMissing((context, options) -> {
+        String tagID = options.helperName;
+        if (context != null && !addedTags.contains(tagID)) {
+          HashMap<String, String> newHash = new HashMap<>();
+          for (String hashKey : options.hash.keySet()) {
+            String hashValue = options.hash.get(hashKey).toString();
+            newHash.put(hashKey, hashValue);
+          }
+          values.add(new MetadataValue(tagID, new HashMap<>(newHash)));
+          addedTags.add(tagID);
+        }
+        return options.fn();
+      });
+      tmpl = handlebars.compileInline(content);
+      tmpl.apply(new HashMap<>());
+    } catch (IOException e) {
+      LOGGER.error("Error getting the MetadataValue list from the template");
+    }
+    return values;
+  }
+
+  public static String autoGenerateValue(IndexedAIP aip, RodaUser user, String generator) {
+    String result = null;
+    switch (generator) {
+      case "now":
+        result = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        break;
+      case "id":
+        result = aip.getId();
+        break;
+      case "title":
+        result = aip.getTitle();
+        break;
+      case "language":
+        result = Locale.getDefault().getDisplayLanguage();
+        break;
+      case "parentid":
+        result = aip.getParentID();
+        break;
+      case "level":
+        result = aip.getLevel();
+        break;
+      case "full-name":
+        result = user.getFullName();
+        break;
+      case "email":
+        result = user.getEmail();
+      default:
+        break;
+    }
+    return result;
   }
 
 }

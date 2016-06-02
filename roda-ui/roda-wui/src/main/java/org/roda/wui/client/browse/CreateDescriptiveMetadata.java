@@ -12,13 +12,16 @@ package org.roda.wui.client.browse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.TreeSet;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationIssue;
+import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
@@ -28,7 +31,12 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -37,11 +45,15 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.datepicker.client.DateBox;
 
 import config.i18n.client.BrowseMessages;
 
@@ -96,7 +108,12 @@ public class CreateDescriptiveMetadata extends Composite {
 
   private final boolean isNew;
 
+  private boolean inXML = false;
+
   private List<SupportedMetadataTypeBundle> metadataTypes = new ArrayList<SupportedMetadataTypeBundle>();
+  private SupportedMetadataTypeBundle selectedBundle = null;
+  private TextArea metadataXML;
+  private String metadataTextFromForm = null;
 
   // private ClientLogger logger = new ClientLogger(getClass().getName());
 
@@ -107,7 +124,13 @@ public class CreateDescriptiveMetadata extends Composite {
   ListBox type;
 
   @UiField
-  TextArea xml;
+  Label formOrXMLLabel;
+
+  @UiField
+  FocusPanel showXml;
+
+  @UiField
+  FlowPanel formOrXML;
 
   @UiField
   Button buttonApply;
@@ -129,6 +152,8 @@ public class CreateDescriptiveMetadata extends Composite {
     this.isNew = isNew;
 
     initWidget(uiBinder.createAndBindUi(this));
+    metadataXML = new TextArea();
+    metadataXML.addStyleName("form-textbox metadata-edit-area metadata-form-textbox");
 
     type.addChangeHandler(new ChangeHandler() {
 
@@ -136,8 +161,8 @@ public class CreateDescriptiveMetadata extends Composite {
       public void onChange(ChangeEvent event) {
         String value = type.getSelectedValue();
 
+        selectedBundle = null;
         if (value != null && value.length() > 0) {
-          SupportedMetadataTypeBundle selectedBundle = null;
           for (SupportedMetadataTypeBundle bundle : metadataTypes) {
             if (value.contains(RodaConstants.METADATA_VERSION_SEPARATOR) && bundle.getVersion() != null) {
               String type = value.substring(0, value.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));
@@ -153,20 +178,15 @@ public class CreateDescriptiveMetadata extends Composite {
             }
           }
 
-          if (selectedBundle != null) {
-            // TODO only set text if it was not yet edited
-            xml.setText(selectedBundle.getTemplate() != null ? selectedBundle.getTemplate() : "");
-          }
-
           id.setText(value + ".xml");
-
         } else if (value != null) {
           id.setText("");
         }
+        updateFormOrXML();
       }
     });
 
-    BrowserService.Util.getInstance().getSupportedMetadata(LocaleInfo.getCurrentLocale().getLocaleName(),
+    BrowserService.Util.getInstance().getSupportedMetadata(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
       new AsyncCallback<List<SupportedMetadataTypeBundle>>() {
 
         @Override
@@ -191,29 +211,288 @@ public class CreateDescriptiveMetadata extends Composite {
 
           type.setSelectedIndex(type.getItemCount() - 1);
 
+          updateFormOrXML();
         }
       });
 
+  }
+
+  private void createForm(SupportedMetadataTypeBundle bundle) {
+    formOrXML.clear();
+    for (MetadataValue mv : bundle.getValues()) {
+      FlowPanel layout = new FlowPanel();
+      layout.addStyleName("plugin-options-parameter");
+      String controlType = mv.get("type");
+      if (controlType == null) {
+        addTextField(layout, mv);
+      } else {
+        switch (controlType) {
+          case "text":
+            addTextField(layout, mv);
+            break;
+          case "textarea":
+          case "big-text":
+          case "text-area":
+            addTextArea(layout, mv);
+            break;
+          case "list":
+            addList(layout, mv);
+            break;
+          case "date":
+            addDatePicker(layout, mv);
+            break;
+          default:
+            addTextField(layout, mv);
+            break;
+        }
+      }
+    }
+  }
+
+  private void addTextField(final FlowPanel layout, final MetadataValue mv) {
+    // Top label
+    Label mvLabel = new Label(mv.getId());
+    mvLabel.addStyleName("form-label");
+
+    // Field
+    final TextBox mvText = new TextBox();
+    mvText.addStyleName("form-textbox");
+    if (mv.get("value") != null) {
+      mvText.setText(mv.get("value"));
+    }
+    mvText.addChangeHandler(new ChangeHandler() {
+      @Override
+      public void onChange(ChangeEvent changeEvent) {
+        mv.set("value", mvText.getValue());
+      }
+    });
+
+    layout.add(mvLabel);
+    layout.add(mvText);
+
+    // Description
+    String description = mv.get("description");
+    if (description != null && description.length() > 0) {
+      Label mvDescription = new Label(description);
+      mvDescription.addStyleName("form-help");
+      layout.add(mvDescription);
+    }
+
+    formOrXML.add(layout);
+  }
+
+  private void addTextArea(final FlowPanel layout, final MetadataValue mv) {
+    // Top label
+    Label mvLabel = new Label(mv.getId());
+    mvLabel.addStyleName("form-label");
+
+    // Field
+    final TextArea mvText = new TextArea();
+    mvText.addStyleName("form-textbox metadata-form-text-area");
+    if (mv.get("value") != null) {
+      mvText.setText(mv.get("value"));
+    }
+    mvText.addChangeHandler(new ChangeHandler() {
+      @Override
+      public void onChange(ChangeEvent changeEvent) {
+        mv.set("value", mvText.getValue());
+      }
+    });
+
+    layout.add(mvLabel);
+    layout.add(mvText);
+
+    // Description
+    String description = mv.get("description");
+    if (description != null && description.length() > 0) {
+      Label mvDescription = new Label(description);
+      mvDescription.addStyleName("form-help");
+      layout.add(mvDescription);
+    }
+
+    formOrXML.add(layout);
+  }
+
+  private void addList(final FlowPanel layout, final MetadataValue mv) {
+    // Top Label
+    Label mvLabel = new Label(mv.getId());
+    mvLabel.addStyleName("form-label");
+
+    // Field
+    final ListBox mvList = new ListBox();
+    mvList.addStyleName("form-textbox");
+
+    String list = mv.get("list");
+    if (list != null) {
+      JSONArray jsonArray = JSONParser.parseLenient(list).isArray();
+      for (int i = 0; i < jsonArray.size(); i++) {
+        String value = jsonArray.get(i).isString().stringValue();
+        mvList.addItem(value);
+
+        if (value.equals(mv.get("value"))) {
+          mvList.setSelectedIndex(i);
+        }
+      }
+    }
+    mvList.addChangeHandler(new ChangeHandler() {
+      @Override
+      public void onChange(ChangeEvent changeEvent) {
+        mv.set("value", mvList.getSelectedValue());
+      }
+    });
+
+    layout.add(mvLabel);
+    layout.add(mvList);
+
+    // Description
+    String description = mv.get("description");
+    if (description != null && description.length() > 0) {
+      Label mvDescription = new Label(description);
+      mvDescription.addStyleName("form-help");
+      layout.add(mvDescription);
+    }
+
+    formOrXML.add(layout);
+  }
+
+  private void addDatePicker(final FlowPanel layout, final MetadataValue mv) {
+    // Top label
+    final DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat("yyyy-MM-dd");
+    Label mvLabel = new Label(mv.getId());
+    mvLabel.addStyleName("form-label");
+
+    // Field
+    final DateBox mvDate = new DateBox();
+    mvDate.addStyleName("form-textbox");
+    mvDate.setFormat(new DateBox.DefaultFormat() {
+      @Override
+      public String format(DateBox dateBox, Date date) {
+        if (date == null)
+          return null;
+        return dateTimeFormat.format(date);
+      }
+    });
+    if (mv.get("value") != null) {
+      Date date = dateTimeFormat.parse(mv.get("value"));
+      mvDate.setValue(date);
+    }
+    mvDate.addValueChangeHandler(new ValueChangeHandler<Date>() {
+      @Override
+      public void onValueChange(ValueChangeEvent<Date> valueChangeEvent) {
+        String newValue = dateTimeFormat.format(mvDate.getValue());
+        mv.set("value", newValue);
+      }
+    });
+
+    layout.add(mvLabel);
+    layout.add(mvDate);
+
+    // Description
+    String description = mv.get("description");
+    if (description != null && description.length() > 0) {
+      Label mvDescription = new Label(description);
+      mvDescription.addStyleName("form-help");
+      layout.add(mvDescription);
+    }
+
+    formOrXML.add(layout);
+  }
+
+  public void setInXML(boolean inHTML) {
+    this.inXML = inHTML;
+    if (inHTML) {
+      showXml.removeStyleName("toolbarLink-selected");
+    } else {
+      showXml.addStyleName("toolbarLink-selected");
+    }
+  }
+
+  @UiHandler("showXml")
+  void buttonShowXmlHandler(ClickEvent e) {
+    setInXML(!inXML);
+    updateFormOrXML();
+  }
+
+  private void updateFormOrXML() {
+    if (selectedBundle != null && selectedBundle.getValues() != null) {
+      showXml.setVisible(true);
+      if (inXML) {
+        updateMetadataXML();
+      } else {
+        // if the user changed the metadata text
+        if (metadataTextFromForm != null && !metadataXML.getText().equals(metadataTextFromForm)) {
+          Dialogs.showConfirmDialog(messages.confirmChangeToFormTitle(), messages.confirmChangeToFormMessage(),
+            messages.dialogCancel(), messages.dialogYes(), new AsyncCallback<Boolean>() {
+              @Override
+              public void onFailure(Throwable throwable) {
+                Toast.showError(throwable.getClass().getName(), throwable.getMessage());
+              }
+
+              @Override
+              public void onSuccess(Boolean aBoolean) {
+                if (aBoolean) {
+                  formOrXML.clear();
+                  createForm(selectedBundle);
+                  formOrXMLLabel.setText("Form");
+                } else {
+                  setInXML(!inXML);
+                }
+              }
+            });
+        } else {
+          formOrXML.clear();
+          createForm(selectedBundle);
+          formOrXMLLabel.setText("Form");
+        }
+      }
+    } else {
+      formOrXML.clear();
+      if (selectedBundle != null)
+        metadataXML.setText(selectedBundle.getTemplate());
+      else
+        metadataXML.setText("");
+      formOrXML.add(metadataXML);
+      formOrXMLLabel.setText("Template preview");
+      showXml.setVisible(false);
+    }
+  }
+
+  private void updateMetadataXML() {
+    BrowserService.Util.getInstance().getDescriptiveMetadataPreview(aipId, selectedBundle, new AsyncCallback<String>() {
+      @Override
+      public void onFailure(Throwable caught) {
+        Toast.showError(caught.getClass().getName(), caught.getMessage());
+      }
+
+      @Override
+      public void onSuccess(String preview) {
+        formOrXML.clear();
+        metadataXML.setText(preview);
+        formOrXML.add(metadataXML);
+        formOrXMLLabel.setText("Template preview");
+        metadataTextFromForm = preview;
+      }
+    });
   }
 
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
     buttonApply.setEnabled(false);
     String idText = id.getText();
-    String typeText = type.getSelectedValue();
-    String typeVersion = null;
-    String xmlText = xml.getText();
-
-    if (typeText.contains(RodaConstants.METADATA_VERSION_SEPARATOR)) {
-      typeVersion = typeText.substring(typeText.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1,
-        typeText.length());
-      typeText = typeText.substring(0, typeText.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));
-    }
+    String typeText = selectedBundle.getType();
+    String typeVersion = selectedBundle.getVersion();
+    String xmlText = metadataXML.getText();
+    boolean hasOverridenTheForm = inXML && !xmlText.equals(metadataTextFromForm);
 
     if (idText.length() > 0) {
-
+      TreeSet<MetadataValue> values = null;
+      // we only send the values map if the user hasn't overriden the form by
+      // modifying the XML directly
+      if (!hasOverridenTheForm) {
+        values = selectedBundle.getValues();
+      }
       DescriptiveMetadataEditBundle newBundle = new DescriptiveMetadataEditBundle(idText, typeText, typeVersion,
-        xmlText);
+        xmlText, selectedBundle.getTemplate(), values);
 
       BrowserService.Util.getInstance().createDescriptiveMetadataFile(aipId, newBundle, new AsyncCallback<Void>() {
 
