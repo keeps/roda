@@ -20,9 +20,12 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsFilter;
 import org.roda.core.data.v2.index.SelectedItemsList;
+import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.wui.client.browse.BrowserService;
@@ -35,10 +38,11 @@ import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.ListBox;
 
 import config.i18n.client.BrowseMessages;
 
@@ -73,20 +77,31 @@ public class CreateActionJob extends CreateJob<IsIndexed> {
         if (ids.size() == 0) {
           getTargetPanel().clear();
 
-          Button searchButton = new Button();
-          searchButton.addStyleName("btn");
-          searchButton.addStyleName("btn-search");
-          searchButton.setText("Search");
-          searchButton.addClickHandler(new ClickHandler() {
+          final ListBox list = new ListBox();
+          list.addItem("All intelectual entities", AIP.class.getCanonicalName());
+          list.addItem("All representations", Representation.class.getCanonicalName());
+          list.addItem("All files", File.class.getCanonicalName());
+          list.addItem("Select items", "select");
+
+          list.addStyleName("form-selectbox");
+          list.addStyleName("form-textbox-small");
+          setSelectedClass(list.getSelectedValue());
+
+          list.addChangeHandler(new ChangeHandler() {
 
             @Override
-            public void onClick(ClickEvent event) {
-              Tools.newHistory(Search.RESOLVER);
+            public void onChange(ChangeEvent event) {
+              if (list.getSelectedValue().equals("select")) {
+                Tools.newHistory(Search.RESOLVER);
+              } else {
+                setSelectedClass(list.getSelectedValue());
+              }
             }
+
           });
 
-          getTargetPanel().add(searchButton);
-          setJobSelectedDescription(messages.createJobSelectedObject());
+          getTargetPanel().add(list);
+          setJobSelectedDescription(messages.createJobSelectObject());
           return true;
         }
 

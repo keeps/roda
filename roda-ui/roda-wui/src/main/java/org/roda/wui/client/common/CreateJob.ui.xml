@@ -21,10 +21,6 @@
 					<ui:text from='{messages.createJobName}' />
 				</g:Label>
 				<g:TextBox ui:field="name" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label" ui:field="runOnAllObjectsLabel">
-					<ui:text from='{messages.createJobSelectedAllObject}' />
-				</g:Label>
-				<g:FlowPanel ui:field="runOnAllObjectsPanel"/>
 				<g:Label addStyleNames="form-label" ui:field="selectedObject">
 					<ui:text from='{messages.createJobSelectedSIP}' />
 				</g:Label>

@@ -64,6 +64,10 @@ public class ValidationReport implements Serializable {
   }
 
   public String toHtml(boolean fullHtml, boolean addDefaultCss) {
+    return toHtml(fullHtml, addDefaultCss, true, "");
+  }
+
+  public String toHtml(boolean fullHtml, boolean addDefaultCss, boolean addIssueValues, String title) {
 
     StringBuilder sb = new StringBuilder();
     if (fullHtml) {
@@ -83,12 +87,16 @@ public class ValidationReport implements Serializable {
     sb.append(getDivBeginning("report"));
 
     // is it valid?
-    getValidationEntryAttribute(sb, "valid", "Is valid?", isValid() ? "yes" : "no");
+    if (title.isEmpty()) {
+      getValidationEntryAttribute(sb, "valid", "Is valid?", isValid() ? "yes" : "no");
+    } else {
+      getValidationEntryAttribute(sb, "valid", title, "");
+    }
 
     // add validation entries
     sb.append(getDivBeginning("entries"));
     for (ValidationIssue validationEntry : issues) {
-      sb.append(getValidationEntryDiv(validationEntry));
+      sb.append(getValidationEntryDiv(validationEntry, addIssueValues));
     }
     sb.append(getDivEnding());
 
@@ -111,17 +119,19 @@ public class ValidationReport implements Serializable {
     return "</div>";
   }
 
-  private String getValidationEntryDiv(ValidationIssue validationEntry) {
+  private String getValidationEntryDiv(ValidationIssue validationEntry, boolean addIssueValues) {
     StringBuilder sb = new StringBuilder();
     sb.append(getDivBeginning("entry " + "level_error"));
     // message
     getValidationEntryAttribute(sb, "message", "Message", validationEntry.getMessage());
 
-    // line number
-    getValidationEntryAttribute(sb, "line_number", "Line number", validationEntry.getLineNumber() + "");
+    if (addIssueValues) {
+      // line number
+      getValidationEntryAttribute(sb, "line_number", "Line number", validationEntry.getLineNumber() + "");
 
-    // column number
-    getValidationEntryAttribute(sb, "column_number", "Column number", validationEntry.getColumnNumber() + "");
+      // column number
+      getValidationEntryAttribute(sb, "column_number", "Column number", validationEntry.getColumnNumber() + "");
+    }
 
     sb.append(getDivEnding());
     return sb.toString();

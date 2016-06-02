@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.common.IdUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -211,7 +212,8 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
       }
 
       jobPluginInfo.incrementObjectsProcessed(state);
-      Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(), Representation.class);
+      Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
+        Representation.class);
       reportItem.setPluginState(state).setPluginDetails("Risk job plugin ran on a representation");
       pluginReport.addReport(reportItem);
       PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
@@ -245,7 +247,7 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
       }
 
       jobPluginInfo.incrementObjectsProcessed(state);
-      Report reportItem = PluginHelper.initPluginReportItem(this, file.getId(), File.class);
+      Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class);
       reportItem.setPluginState(state).setPluginDetails("Risk job plugin ran on a file");
       pluginReport.addReport(reportItem);
       PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);

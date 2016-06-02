@@ -9,7 +9,9 @@ package org.roda.core.plugins.plugins.base;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,18 +22,24 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
+import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
@@ -42,6 +50,13 @@ public class ReindexJobPlugin extends AbstractPlugin<Job> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ReindexJobPlugin.class);
   private boolean clearIndexes = true;
+
+  private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
+  static {
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "Clear indexes", PluginParameterType.BOOLEAN,
+        "false", false, false, "Clear all the Job and Report indexes before reindexing them."));
+  }
 
   @Override
   public void init() throws PluginException {
@@ -69,8 +84,16 @@ public class ReindexJobPlugin extends AbstractPlugin<Job> {
   }
 
   @Override
+  public List<PluginParameter> getParameters() {
+    ArrayList<PluginParameter> parameters = new ArrayList<PluginParameter>();
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES));
+    return parameters;
+  }
+
+  @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
+
     if (parameters != null && parameters.get(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES) != null) {
       clearIndexes = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES));
     }
@@ -81,23 +104,37 @@ public class ReindexJobPlugin extends AbstractPlugin<Job> {
     throws PluginException {
 
     CloseableIterable<Resource> listResourcesUnderDirectory = null;
-    try {
-      boolean recursive = false;
-      listResourcesUnderDirectory = storage.listResourcesUnderDirectory(ModelUtils.getJobContainerPath(), recursive);
 
-      for (Resource resource : listResourcesUnderDirectory) {
-        Binary binary = storage.getBinary(resource.getStoragePath());
-        InputStream inputStream = binary.getContent().createInputStream();
-        Job objectFromJson = JsonUtils.getObjectFromJson(inputStream, Job.class);
-        IOUtils.closeQuietly(inputStream);
-        index.reindexJob(objectFromJson);
+    try {
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+      PluginState state = PluginState.SUCCESS;
+
+      try {
+        boolean recursive = false;
+        listResourcesUnderDirectory = storage.listResourcesUnderDirectory(ModelUtils.getJobContainerPath(), recursive);
+
+        for (Resource resource : listResourcesUnderDirectory) {
+          Binary binary = storage.getBinary(resource.getStoragePath());
+          InputStream inputStream = binary.getContent().createInputStream();
+          Job objectFromJson = JsonUtils.getObjectFromJson(inputStream, Job.class);
+          IOUtils.closeQuietly(inputStream);
+          index.reindexJob(objectFromJson);
+        }
+
+      } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
+        | IOException e) {
+        state = PluginState.FAILURE;
+        LOGGER.error("", e);
+      } finally {
+        IOUtils.closeQuietly(listResourcesUnderDirectory);
       }
 
-    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
-      | IOException e) {
-      LOGGER.error("", e);
-    } finally {
-      IOUtils.closeQuietly(listResourcesUnderDirectory);
+      jobPluginInfo.incrementObjectsProcessed(state);
+      jobPluginInfo.finalizeInfo();
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+    } catch (JobException e) {
+      LOGGER.error("Could not update Job information");
     }
 
     try {
@@ -123,8 +160,7 @@ public class ReindexJobPlugin extends AbstractPlugin<Job> {
     }
 
     // FIXME 20160329 hsilva: this should return a better report
-    return new Report();
-
+    return PluginHelper.initPluginReport(this);
   }
 
   @Override
@@ -210,7 +246,7 @@ public class ReindexJobPlugin extends AbstractPlugin<Job> {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_REINDEX);
   }
 
 }

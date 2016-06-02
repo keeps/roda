@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -44,6 +45,8 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.validation.ValidationException;
+import org.roda.core.data.v2.validation.ValidationIssue;
+import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
@@ -71,6 +74,7 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
   private List<String> applicableTo;
   private Map<String, List<String>> pronomToExtension;
   private Map<String, List<String>> mimetypeToExtension;
+  private boolean ignoreFiles = true;
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
@@ -85,6 +89,10 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_SIGNATURE_STRIP,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_SIGNATURE_STRIP, "Strip digital signature",
         PluginParameterType.BOOLEAN, "true", true, false, "Strips the digital signature of the file"));
+
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES, "Ignore non PDF files",
+        PluginParameterType.BOOLEAN, "true", false, false, "Ignore files that are not recognised as PDF"));
   }
 
   public DigitalSignaturePlugin() {
@@ -138,6 +146,7 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_SIGNATURE_VERIFY));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_SIGNATURE_EXTRACT));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_SIGNATURE_STRIP));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES));
     return parameters;
   }
 
@@ -158,6 +167,10 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
     // do the digital signature strip
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_SIGNATURE_STRIP)) {
       doStrip = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_SIGNATURE_STRIP));
+    }
+
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES)) {
+      ignoreFiles = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES));
     }
 
   }
@@ -191,6 +204,7 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
       for (AIP aip : list) {
         Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
         PluginState reportState = PluginState.SUCCESS;
+        ValidationReport validationReport = new ValidationReport();
 
         try {
           for (Representation representation : aip.getRepresentations()) {
@@ -285,6 +299,16 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
 
                   } else {
                     unchangedFiles.add(file);
+
+                    if (ignoreFiles) {
+                      ValidationIssue issue = new ValidationIssue();
+                      issue.setMessage(
+                        StringUtils.join(Arrays.asList(representation.getId(), file.getPath(), file.getId()), '/'));
+                      validationReport.addIssue(issue);
+                    } else {
+                      reportState = PluginState.FAILURE;
+                    }
+
                   }
                 }
               } else {
@@ -310,12 +334,12 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
               reportState, notifyEvent);
           }
 
-          if (reportState.equals(PluginState.SUCCESS)) {
-            jobPluginInfo.incrementObjectsProcessedWithSuccess();
-            reportItem.setPluginState(PluginState.SUCCESS);
-          } else {
-            jobPluginInfo.incrementObjectsProcessedWithFailure();
-            reportItem.setPluginState(PluginState.FAILURE).setPluginDetails("Digital signature process failed");
+          jobPluginInfo.incrementObjectsProcessed(reportState);
+          reportItem.setPluginState(reportState);
+
+          if (ignoreFiles) {
+            reportItem.setHtmlPluginDetails(true)
+              .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
           }
 
         } catch (Throwable e) {
@@ -340,7 +364,6 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
   public Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage,
     List<Representation> list) throws PluginException {
     List<String> newRepresentations = new ArrayList<String>();
-    String aipId = null;
     Report report = PluginHelper.initPluginReport(this);
 
     try {
@@ -354,16 +377,17 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
         List<File> extractedFiles = new ArrayList<File>();
         List<File> newFiles = new ArrayList<File>();
         Map<String, String> verifiedFiles = new HashMap<String, String>();
-        aipId = representation.getAipId();
+        String aipId = representation.getAipId();
         String verification = null;
         boolean notify = true;
         // FIXME 20160329 hsilva: the report item should be at AIP level (and
         // not representation level)
         // FIXME 20160516 hsilva: see how to set initial
         // initialOutcomeObjectState
-        Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(), Representation.class,
-          AIPState.INGEST_PROCESSING);
+        Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
+          Representation.class, AIPState.INGEST_PROCESSING);
         PluginState reportState = PluginState.SUCCESS;
+        ValidationReport validationReport = new ValidationReport();
 
         try {
           LOGGER.debug("Processing representation {}", representation);
@@ -427,6 +451,8 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
                         newRepresentations.add(newRepresentationID);
                         model.createRepresentation(aipId, newRepresentationID, original, representation.getType(),
                           notify);
+                        reportItem.setOutcomeObjectId(
+                          IdUtils.getRepresentationId(representation.getAipId(), newRepresentationID));
                       }
 
                       // update file on new representation
@@ -445,6 +471,14 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
                   IOUtils.closeQuietly(directAccess);
                 } else {
                   unchangedFiles.add(file);
+
+                  if (ignoreFiles) {
+                    ValidationIssue issue = new ValidationIssue();
+                    issue.setMessage(file.getId());
+                    validationReport.addIssue(issue);
+                  } else {
+                    reportState = PluginState.FAILURE;
+                  }
                 }
               }
             } else {
@@ -469,11 +503,11 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
           createEvent(alteredFiles, extractedFiles, newFiles, verifiedFiles, model.retrieveAIP(aipId),
             newRepresentationID, model, index, reportState, notifyEvent);
           reportItem.setPluginState(reportState);
+          jobPluginInfo.incrementObjectsProcessed(reportState);
 
-          if (reportState.equals(PluginState.SUCCESS)) {
-            jobPluginInfo.incrementObjectsProcessedWithSuccess();
-          } else {
-            jobPluginInfo.incrementObjectsProcessedWithFailure();
+          if (ignoreFiles) {
+            reportItem.setHtmlPluginDetails(true)
+              .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
           }
 
         } catch (Throwable e) {
@@ -521,7 +555,7 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
 
       for (File file : list) {
         LOGGER.debug("Processing file {}", file);
-        Report reportItem = PluginHelper.initPluginReportItem(this, file.getId(), File.class,
+        Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class,
           AIPState.INGEST_PROCESSING);
         PluginState reportState = PluginState.SUCCESS;
 
@@ -588,6 +622,8 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
                     notify);
                   alteredFiles.add(file);
                   newFiles.add(f);
+
+                  reportItem.setOutcomeObjectId(IdUtils.getFileId(f));
                   reportItem.setPluginState(reportState);
 
                 } else {
@@ -603,6 +639,12 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
               IOUtils.closeQuietly(directAccess);
             } else {
               unchangedFiles.add(file);
+
+              if (ignoreFiles) {
+                reportItem.setPluginDetails("This file was ignored.");
+              } else {
+                reportState = PluginState.FAILURE;
+              }
             }
           }
 
@@ -632,12 +674,7 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
         boolean notifyEvent = true;
         createEvent(alteredFiles, extractedFiles, newFiles, verifiedFiles, model.retrieveAIP(file.getAipId()),
           newRepresentationID, model, index, reportState, notifyEvent);
-
-        if (reportState.equals(PluginState.SUCCESS)) {
-          jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        } else {
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
-        }
+        jobPluginInfo.incrementObjectsProcessed(reportState);
       }
 
       jobPluginInfo.finalizeInfo();

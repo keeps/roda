@@ -103,6 +103,12 @@ public final class PluginHelper {
       .setOutcomeObjectClass(clazz.getCanonicalName()).setOutcomeObjectState(initialOutcomeObjectState);
   }
 
+  public static <T extends Serializable> Report initPluginReportItem(Plugin<T> plugin, String sourceObjectId,
+    String outcomeObjectId, Class<?> clazz, AIPState initialOutcomeObjectState) {
+    return initPluginReportItem(plugin, outcomeObjectId, sourceObjectId).setSourceObjectClass(clazz.getCanonicalName())
+      .setOutcomeObjectClass(clazz.getCanonicalName()).setOutcomeObjectState(initialOutcomeObjectState);
+  }
+
   public static <T extends Serializable> Report initPluginReportItem(Plugin<T> plugin, String outcomeObjectId,
     String sourceObjectId) {
     String jobId = getJobId(plugin);

@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -48,6 +49,8 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.validation.ValidationException;
+import org.roda.core.data.v2.validation.ValidationIssue;
+import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
@@ -67,6 +70,7 @@ import org.verapdf.core.VeraPDFException;
 public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(VeraPDFPlugin.class);
   private String profile;
+  private boolean ignoreFiles = true;
   private boolean hasFeatures = false;
   private boolean hasPartialSuccessOnOutcome;
 
@@ -76,10 +80,9 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_PDF_PROFILE, "PDF Profile", PluginParameterType.STRING, "1b",
         VeraPDFPluginUtils.getProfileList(), true, false, "Validation of the file is always based on the profile"));
 
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION, "Job finished notification",
-        PluginParameterType.STRING, "", false, false,
-        "Send a notification, after finishing the process, to one or more e-mail addresses (comma separated)"));
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES, "Ignore non PDF files",
+        PluginParameterType.BOOLEAN, "true", false, false, "Ignore files that are not recognised as PDF"));
   }
 
   public VeraPDFPlugin() {
@@ -127,7 +130,7 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
   public List<PluginParameter> getParameters() {
     ArrayList<PluginParameter> parameters = new ArrayList<PluginParameter>();
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_PDF_PROFILE));
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES));
     return parameters;
   }
 
@@ -139,6 +142,9 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
       profile = parameters.get(RodaConstants.PLUGIN_PARAMS_PDF_PROFILE);
     }
 
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES)) {
+      ignoreFiles = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES));
+    }
   }
 
   @Override
@@ -171,6 +177,7 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
         Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
         PluginState pluginResultState = PluginState.SUCCESS;
         PluginState reportState = PluginState.SUCCESS;
+        ValidationReport validationReport = new ValidationReport();
 
         for (Representation representation : aip.getRepresentations()) {
           List<String> resourceList = new ArrayList<String>();
@@ -221,6 +228,15 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
                     }
 
                     IOUtils.closeQuietly(directAccess);
+                  } else {
+                    if (ignoreFiles) {
+                      ValidationIssue issue = new ValidationIssue();
+                      issue.setMessage(
+                        StringUtils.join(Arrays.asList(representation.getId(), file.getPath(), file.getId()), '/'));
+                      validationReport.addIssue(issue);
+                    } else {
+                      pluginResultState = PluginState.FAILURE;
+                    }
                   }
                 }
               } else {
@@ -243,13 +259,14 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
           }
         }
 
-        if (reportState.equals(PluginState.SUCCESS)) {
-          jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        } else {
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
+        jobPluginInfo.incrementObjectsProcessed(reportState);
+        reportItem.setPluginState(reportState);
+
+        if (ignoreFiles) {
+          reportItem.setHtmlPluginDetails(true)
+            .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
         }
 
-        reportItem.setPluginState(reportState).setPluginDetails("VeraPDF validation on AIP");
         report.addReport(reportItem);
         PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
       }
@@ -275,12 +292,13 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
         List<String> resourceList = new ArrayList<String>();
         // FIXME 20160516 hsilva: see how to set initial
         // initialOutcomeObjectState
-        Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(), Representation.class,
-          AIPState.INGEST_PROCESSING);
+        Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
+          Representation.class, AIPState.INGEST_PROCESSING);
         PluginState pluginResultState = PluginState.SUCCESS;
         PluginState reportState = PluginState.SUCCESS;
         StringBuilder details = new StringBuilder();
         AIP aip = model.retrieveAIP(representation.getAipId());
+        ValidationReport validationReport = new ValidationReport();
 
         try {
           LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
@@ -324,6 +342,14 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
                   }
 
                   IOUtils.closeQuietly(directAccess);
+                } else {
+                  if (ignoreFiles) {
+                    ValidationIssue issue = new ValidationIssue();
+                    issue.setMessage(file.getId());
+                    validationReport.addIssue(issue);
+                  } else {
+                    reportState = PluginState.FAILURE;
+                  }
                 }
               }
             } else {
@@ -345,13 +371,14 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
           createEvent(resourceList, aip, representation.getId(), model, index, pluginResultState, details);
         }
 
-        if (reportState.equals(PluginState.SUCCESS)) {
-          jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        } else {
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
+        jobPluginInfo.incrementObjectsProcessed(reportState);
+        reportItem.setPluginState(reportState);
+
+        if (ignoreFiles) {
+          reportItem.setHtmlPluginDetails(true)
+            .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
         }
 
-        reportItem.setPluginState(reportState).setPluginDetails("VeraPDF validation on Representation");
         report.addReport(reportItem);
         PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
       }
@@ -380,7 +407,7 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
           List<String> resourceList = new ArrayList<String>();
           // FIXME 20160516 hsilva: see how to set initial
           // initialOutcomeObjectState
-          Report reportItem = PluginHelper.initPluginReportItem(this, file.getId(), File.class,
+          Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class,
             AIPState.INGEST_PROCESSING);
           PluginState pluginResultState = PluginState.SUCCESS;
           PluginState reportState = PluginState.SUCCESS;
@@ -419,6 +446,12 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
               }
 
               IOUtils.closeQuietly(directAccess);
+            } else {
+              if (ignoreFiles) {
+                reportItem.setPluginDetails("This file was ignored.");
+              } else {
+                pluginResultState = PluginState.FAILURE;
+              }
             }
           }
 
@@ -427,14 +460,8 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
           }
 
           createEvent(resourceList, aip, file.getRepresentationId(), model, index, pluginResultState, details);
-
-          if (reportState.equals(PluginState.SUCCESS)) {
-            jobPluginInfo.incrementObjectsProcessedWithSuccess();
-          } else {
-            jobPluginInfo.incrementObjectsProcessedWithFailure();
-          }
-
-          reportItem.setPluginState(reportState).setPluginDetails("VeraPDF validation on File");
+          jobPluginInfo.incrementObjectsProcessed(reportState);
+          reportItem.setPluginState(reportState);
           report.addReport(reportItem);
           PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
         }

@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -47,6 +48,8 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.validation.ValidationException;
+import org.roda.core.data.v2.validation.ValidationIssue;
+import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
@@ -69,6 +72,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
 
   private String inputFormat;
   private String outputFormat;
+  private boolean ignoreFiles = true;
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
@@ -79,6 +83,10 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT, "Output format", PluginParameterType.STRING, "",
         true, false, "Output file format to be converted."));
+
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES, "Ignore non PDF files",
+        PluginParameterType.BOOLEAN, "true", false, false, "Ignore files that are not recognised as PDF"));
   }
 
   protected AbstractConvertPlugin() {
@@ -136,6 +144,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
     List<PluginParameter> parameters = new ArrayList<PluginParameter>();
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_INPUT_FORMAT));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES));
     return parameters;
   }
 
@@ -151,6 +160,10 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
     // output image format
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT)) {
       setOutputFormat(parameters.get(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT));
+    }
+
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES)) {
+      ignoreFiles = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES));
     }
   }
 
@@ -187,6 +200,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
         String newRepresentationID = null;
         boolean notify = true;
         PluginState reportState = PluginState.SUCCESS;
+        ValidationReport validationReport = new ValidationReport();
 
         for (Representation representation : aip.getRepresentations()) {
           List<File> alteredFiles = new ArrayList<File>();
@@ -196,7 +210,8 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
           PluginState pluginResultState = PluginState.SUCCESS;
           // FIXME 20160516 hsilva: see how to set initial
           // initialOutcomeObjectState
-          Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(), AIPState.ACTIVE);
+          Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
+            newRepresentationID, Representation.class, AIPState.ACTIVE);
 
           try {
             LOGGER.debug("Processing representation {}", representation);
@@ -247,6 +262,8 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
                         String newRepresentationType = representation.getType();
                         model.createRepresentation(aip.getId(), newRepresentationID, original, newRepresentationType,
                           notify);
+                        reportItem.setOutcomeObjectId(
+                          IdUtils.getRepresentationId(representation.getAipId(), newRepresentationID));
                       }
 
                       String newFileId = file.getId().replaceFirst("[.][^.]+$", "." + outputFormat);
@@ -256,7 +273,8 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
                       newFiles.add(f);
                       IOUtils.closeQuietly(directAccess);
 
-                      Report fileReportItem = PluginHelper.initPluginReportItem(this, file.getId(), AIPState.ACTIVE);
+                      Report fileReportItem = PluginHelper.initPluginReportItem(this, file.getId(), File.class,
+                        AIPState.ACTIVE);
                       fileReportItem.setPluginState(pluginResultState).setPluginDetails(result);
                       reportItem.addReport(fileReportItem);
 
@@ -265,7 +283,8 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
                       pluginResultState = PluginState.PARTIAL_SUCCESS;
                       reportState = pluginResultState;
 
-                      Report fileReportItem = PluginHelper.initPluginReportItem(this, file.getId(), AIPState.ACTIVE);
+                      Report fileReportItem = PluginHelper.initPluginReportItem(this, file.getId(), File.class,
+                        AIPState.ACTIVE);
                       fileReportItem.setPluginState(pluginResultState).setPluginDetails(e.getMessage());
                       reportItem.addReport(fileReportItem);
 
@@ -275,6 +294,15 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
 
                   } else {
                     unchangedFiles.add(file);
+
+                    if (ignoreFiles) {
+                      ValidationIssue issue = new ValidationIssue();
+                      issue.setMessage(
+                        StringUtils.join(Arrays.asList(representation.getId(), file.getPath(), file.getId()), '/'));
+                      validationReport.addIssue(issue);
+                    } else {
+                      reportState = PluginState.FAILURE;
+                    }
                   }
                 }
               } else {
@@ -284,6 +312,11 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
             IOUtils.closeQuietly(allFiles);
 
             reportItem.setPluginState(pluginResultState);
+
+            if (ignoreFiles) {
+              reportItem.setHtmlPluginDetails(true)
+                .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
+            }
 
             // add unchanged files to the new representation if created
             if (!alteredFiles.isEmpty()) {
@@ -307,22 +340,10 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
         }
 
         try {
-          /*
-           * for (String repId : newRepresentations) {
-           * AbstractConvertPluginUtils. reIndexingRepresentationAfterConversion
-           * (this, index, model, storage, aip.getId(), repId); }
-           */
-
           model.notifyAIPUpdated(aip.getId());
-
-          if (reportState.equals(PluginState.SUCCESS)) {
-            jobPluginInfo.incrementObjectsProcessedWithSuccess();
-          } else {
-            jobPluginInfo.incrementObjectsProcessedWithFailure();
-          }
-
+          jobPluginInfo.incrementObjectsProcessed(reportState);
         } catch (Exception e) {
-          LOGGER.debug("Error re-indexing new representation {}", newRepresentationID);
+          LOGGER.debug("Error on update AIP notify");
         }
 
       }
@@ -358,7 +379,9 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
         boolean notify = true;
         // FIXME 20160516 hsilva: see how to set initial
         // initialOutcomeObjectState
-        Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(), AIPState.ACTIVE);
+        Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
+          Representation.class, AIPState.ACTIVE);
+        ValidationReport validationReport = new ValidationReport();
 
         try {
           LOGGER.debug("Processing representation {}", representation);
@@ -405,6 +428,8 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
                       // representation type
                       String newRepresentationType = representation.getType();
                       model.createRepresentation(aipId, newRepresentationID, original, newRepresentationType, notify);
+                      reportItem.setOutcomeObjectId(
+                        IdUtils.getRepresentationId(representation.getAipId(), newRepresentationID));
                     }
 
                     String newFileId = file.getId().replaceFirst("[.][^.]+$", "." + outputFormat);
@@ -414,7 +439,8 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
                     newFiles.add(newFile);
                     IOUtils.closeQuietly(directAccess);
 
-                    Report fileReportItem = PluginHelper.initPluginReportItem(this, file.getId(), AIPState.ACTIVE);
+                    Report fileReportItem = PluginHelper.initPluginReportItem(this, file.getId(), File.class,
+                      AIPState.ACTIVE);
                     fileReportItem.setPluginState(PluginState.SUCCESS).setPluginDetails(result);
                     reportItem.addReport(fileReportItem);
 
@@ -422,7 +448,8 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
                     detailExtension += file.getId() + ": " + e.getOutput();
                     pluginResultState = PluginState.PARTIAL_SUCCESS;
 
-                    Report fileReportItem = PluginHelper.initPluginReportItem(this, file.getId(), AIPState.ACTIVE);
+                    Report fileReportItem = PluginHelper.initPluginReportItem(this, file.getId(), File.class,
+                      AIPState.ACTIVE);
                     fileReportItem.setPluginState(PluginState.PARTIAL_SUCCESS).setPluginDetails(e.getMessage());
                     reportItem.addReport(fileReportItem);
 
@@ -431,6 +458,14 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
                   }
                 } else {
                   unchangedFiles.add(file);
+
+                  if (ignoreFiles) {
+                    ValidationIssue issue = new ValidationIssue();
+                    issue.setMessage(file.getId());
+                    validationReport.addIssue(issue);
+                  } else {
+                    pluginResultState = PluginState.FAILURE;
+                  }
                 }
               }
             } else {
@@ -440,6 +475,12 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
           IOUtils.closeQuietly(allFiles);
 
           reportItem.setPluginState(pluginResultState);
+
+          if (ignoreFiles) {
+            reportItem.setHtmlPluginDetails(true)
+              .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
+          }
+
           report.addReport(reportItem);
           PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
 
@@ -460,12 +501,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
           report.addReport(reportItem);
         }
 
-        if (pluginResultState.equals(PluginState.SUCCESS)) {
-          jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        } else {
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
-        }
-
+        jobPluginInfo.incrementObjectsProcessed(pluginResultState);
         LOGGER.debug("Creating convert plugin event for the representation " + representation.getId());
         boolean notifyEvent = false;
         createEvent(alteredFiles, newFiles, aipId, newRepresentationID, model, index, outputFormat, pluginResultState,
@@ -490,7 +526,6 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
   private Report executeOnFile(IndexService index, ModelService model, StorageService storage, List<File> list)
     throws PluginException {
 
-    PluginState pluginResultState = PluginState.SUCCESS;
     Map<String, String> changedRepresentationsOnAIPs = new HashMap<String, String>();
     boolean notify = true;
     String newRepresentationID = null;
@@ -499,6 +534,8 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
     String detailExtension = "";
     Report report = PluginHelper.initPluginReport(this);
     Report reportItem = null;
+    PluginState reportState = PluginState.SUCCESS;
+    PluginState pluginResultState = PluginState.SUCCESS;
 
     try {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
@@ -508,10 +545,11 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
         try {
           LOGGER.debug("Processing file {}", file.getId());
 
+          reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class, AIPState.ACTIVE);
           newRepresentationID = UUID.randomUUID().toString();
+          pluginResultState = PluginState.SUCCESS;
           // FIXME 20160516 hsilva: see how to set initial
           // initialOutcomeObjectState
-          reportItem = PluginHelper.initPluginReportItem(this, file.getId(), AIPState.ACTIVE);
 
           if (!file.isDirectory()) {
             IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
@@ -556,9 +594,11 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
                 File f = model.createFile(file.getAipId(), newRepresentationID, file.getPath(), newFileId, payload,
                   notify);
                 newFiles.add(f);
+                reportItem.setOutcomeObjectId(IdUtils.getFileId(f));
                 changedRepresentationsOnAIPs.put(file.getRepresentationId(), file.getAipId());
 
-                Report fileReportItem = PluginHelper.initPluginReportItem(this, file.getId(), AIPState.ACTIVE);
+                Report fileReportItem = PluginHelper.initPluginReportItem(this, file.getId(), File.class,
+                  AIPState.ACTIVE);
                 fileReportItem.setPluginState(PluginState.SUCCESS).setPluginDetails(result);
                 reportItem.addReport(fileReportItem);
 
@@ -566,34 +606,42 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
                 detailExtension += file.getId() + ": " + e.getOutput();
                 pluginResultState = PluginState.PARTIAL_SUCCESS;
 
-                Report fileReportItem = PluginHelper.initPluginReportItem(this, file.getId(), AIPState.ACTIVE);
+                Report fileReportItem = PluginHelper.initPluginReportItem(this, file.getId(), File.class,
+                  AIPState.ACTIVE);
                 fileReportItem.setPluginState(PluginState.PARTIAL_SUCCESS).setPluginDetails(e.getMessage());
                 reportItem.addReport(fileReportItem);
 
                 LOGGER.debug("Conversion ({} to {}) failed on file {} of representation {} from AIP {}", fileFormat,
                   outputFormat, file.getId(), file.getRepresentationId(), file.getAipId());
               }
+            } else {
+              if (ignoreFiles) {
+                reportItem.setPluginDetails("This file was ignored.");
+              } else {
+                pluginResultState = PluginState.FAILURE;
+              }
             }
+          }
+
+          if (!pluginResultState.equals(PluginState.SUCCESS)) {
+            reportState = PluginState.FAILURE;
           }
 
         } catch (RuntimeException | NotFoundException | GenericException | RequestNotValidException
           | AuthorizationDeniedException | ValidationException | IOException | AlreadyExistsException e) {
           LOGGER.error("Error processing File " + file.getId() + ": " + e.getMessage(), e);
-          pluginResultState = PluginState.FAILURE;
-          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
+          reportState = PluginState.FAILURE;
+          reportItem.setPluginDetails(e.getMessage());
+        } finally {
+          reportItem.setPluginState(pluginResultState);
+          report.addReport(reportItem);
+          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
         }
 
-        if (pluginResultState.equals(PluginState.SUCCESS)) {
-          jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        } else {
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
-        }
-
+        jobPluginInfo.incrementObjectsProcessed(reportState);
         boolean notifyEvent = false;
         createEvent(Arrays.asList(file), newFiles, file.getAipId(), newRepresentationID, model, index, outputFormat,
-          pluginResultState, detailExtension, notifyEvent);
-        report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+          reportState, detailExtension, notifyEvent);
       }
 
       jobPluginInfo.finalizeInfo();

@@ -283,8 +283,8 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Name")
   String createJobName();
 
-  @DefaultMessage("Selected objects")
-  String createJobSelectedObject();
+  @DefaultMessage("Run on:")
+  String createJobSelectObject();
 
   @DefaultMessage("Run on all objects")
   String createJobSelectedAllObject();
@@ -464,6 +464,18 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Executed {1} of {2} tasks ({0}%)")
   String showJobReportProgress(Integer completionPercentage, Integer stepsCompleted, Integer totalSteps);
+
+  @DefaultMessage("Submission Information Package")
+  String showSIPExtended();
+
+  @DefaultMessage("Archival Information Package")
+  String showAIPExtended();
+
+  @DefaultMessage("Representation")
+  String showRepresentationExtended();
+
+  @DefaultMessage("File")
+  String showFileExtended();
 
   /************* Browse ****************/
   @DefaultMessage("Loading...")
@@ -819,13 +831,13 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("{0}: {1}")
   SafeHtml searchPreFilterSimpleFilterParameter(String searchPreFilterName, String searchPreFilterValue);
-  
+
   @DefaultMessage("{0}: {1}")
   SafeHtml searchPreFilterBasicSearchFilterParameter(String searchPreFilterName, String searchPreFilterValue);
-  
+
   @DefaultMessage("NOT {0}: {1}")
   SafeHtml searchPreFilterNotSimpleFilterParameter(String searchPreFilterName, String searchPreFilterValue);
-  
+
   @DefaultMessage("NO {0}")
   SafeHtml searchPreFilterEmptyKeyFilterParameter(String searchPreFilterName);
 
@@ -836,7 +848,5 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("{0}")
   @AlternateMessage({"UNDER_APPRAISAL", "under appraisal"})
   String searchPreFilterValue(@Select String name);
-
-  
 
 }

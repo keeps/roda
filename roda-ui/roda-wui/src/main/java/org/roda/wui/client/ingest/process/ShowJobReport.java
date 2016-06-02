@@ -18,6 +18,7 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
@@ -25,6 +26,7 @@ import org.roda.wui.client.browse.ViewRepresentation;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.process.IngestProcess;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Humanize;
@@ -151,11 +153,16 @@ public class ShowJobReport extends Composite {
       objectId.setText(!"".equals(jobReport.getSourceObjectOriginalId()) ? jobReport.getSourceObjectOriginalId()
         : jobReport.getSourceObjectId());
 
-      if (AIP.class.getCanonicalName().equals(jobReport.getSourceObjectClass())) {
+      if (TransferredResource.class.getCanonicalName().equals(jobReport.getSourceObjectClass())) {
+        objectId.setHref(Tools.createHistoryHashLink(IngestTransfer.RESOLVER, jobReport.getSourceObjectId()));
+        objectLabel.setText(messages.showSIPExtended());
+
+      } else if (AIP.class.getCanonicalName().equals(jobReport.getSourceObjectClass())) {
         objectId.setHref(Tools.createHistoryHashLink(Browse.RESOLVER, objectId.getText()));
+        objectLabel.setText(messages.showAIPExtended());
 
       } else if (Representation.class.getCanonicalName().equals(jobReport.getSourceObjectClass())) {
-        BrowserService.Util.getInstance().getRepresentationFromId(objectId.getText(),
+        BrowserService.Util.getInstance().retrieve(IndexedRepresentation.class.getCanonicalName(), objectId.getText(),
           new AsyncCallback<IndexedRepresentation>() {
 
             @Override
@@ -166,6 +173,7 @@ public class ShowJobReport extends Composite {
             @Override
             public void onSuccess(IndexedRepresentation result) {
               if (result != null) {
+                objectLabel.setText(messages.showRepresentationExtended());
                 objectId.setHref(Tools.createHistoryHashLink(Browse.RESOLVER,
                   ViewRepresentation.RESOLVER.getHistoryToken(), result.getAipId(), result.getUUID()));
               }
@@ -173,22 +181,24 @@ public class ShowJobReport extends Composite {
           });
 
       } else if (File.class.getCanonicalName().equals(jobReport.getSourceObjectClass())) {
-        BrowserService.Util.getInstance().getFileFromId(objectId.getText(), new AsyncCallback<IndexedFile>() {
+        BrowserService.Util.getInstance().retrieve(IndexedFile.class.getCanonicalName(), objectId.getText(),
+          new AsyncCallback<IndexedFile>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            // do nothing
-          }
-
-          @Override
-          public void onSuccess(IndexedFile result) {
-            if (result != null) {
-              objectId
-                .setHref(Tools.createHistoryHashLink(Browse.RESOLVER, ViewRepresentation.RESOLVER.getHistoryToken(),
-                  result.getAipId(), result.getRepresentationUUID(), result.getUUID()));
+            @Override
+            public void onFailure(Throwable caught) {
+              // do nothing
             }
-          }
-        });
+
+            @Override
+            public void onSuccess(IndexedFile result) {
+              if (result != null) {
+                objectLabel.setText(messages.showFileExtended());
+                objectId
+                  .setHref(Tools.createHistoryHashLink(Browse.RESOLVER, ViewRepresentation.RESOLVER.getHistoryToken(),
+                    result.getAipId(), result.getRepresentationUUID(), result.getUUID()));
+              }
+            }
+          });
       }
     } else {
       hasSource = false;
@@ -203,10 +213,11 @@ public class ShowJobReport extends Composite {
 
       if (AIP.class.getCanonicalName().equals(jobReport.getOutcomeObjectClass())) {
         aip.setHref(Tools.createHistoryHashLink(Browse.RESOLVER, jobReport.getOutcomeObjectId()));
+        aipLabel.setText(messages.showAIPExtended());
 
       } else if (Representation.class.getCanonicalName().equals(jobReport.getOutcomeObjectClass())) {
-        BrowserService.Util.getInstance().getRepresentationFromId(jobReport.getOutcomeObjectId(),
-          new AsyncCallback<IndexedRepresentation>() {
+        BrowserService.Util.getInstance().retrieve(IndexedRepresentation.class.getCanonicalName(),
+          jobReport.getOutcomeObjectId(), new AsyncCallback<IndexedRepresentation>() {
 
             @Override
             public void onFailure(Throwable caught) {
@@ -216,6 +227,7 @@ public class ShowJobReport extends Composite {
             @Override
             public void onSuccess(IndexedRepresentation result) {
               if (result != null) {
+                aipLabel.setText(messages.showRepresentationExtended());
                 aip.setHref(Tools.createHistoryHashLink(Browse.RESOLVER, ViewRepresentation.RESOLVER.getHistoryToken(),
                   result.getAipId(), result.getUUID()));
               }
@@ -223,7 +235,7 @@ public class ShowJobReport extends Composite {
           });
 
       } else if (File.class.getCanonicalName().equals(jobReport.getOutcomeObjectClass())) {
-        BrowserService.Util.getInstance().getFileFromId(jobReport.getOutcomeObjectId(),
+        BrowserService.Util.getInstance().retrieve(IndexedFile.class.getCanonicalName(), jobReport.getOutcomeObjectId(),
           new AsyncCallback<IndexedFile>() {
 
             @Override
@@ -234,6 +246,7 @@ public class ShowJobReport extends Composite {
             @Override
             public void onSuccess(IndexedFile result) {
               if (result != null) {
+                aipLabel.setText(messages.showFileExtended());
                 aip.setHref(Tools.createHistoryHashLink(Browse.RESOLVER, ViewRepresentation.RESOLVER.getHistoryToken(),
                   result.getAipId(), result.getRepresentationUUID(), result.getUUID()));
               }

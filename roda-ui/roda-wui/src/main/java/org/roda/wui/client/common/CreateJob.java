@@ -17,10 +17,6 @@ import java.util.List;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
-import org.roda.core.data.v2.index.SelectedItemsList;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -39,7 +35,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -52,7 +47,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -117,12 +111,6 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
   TextBox name;
 
   @UiField
-  Label runOnAllObjectsLabel;
-
-  @UiField
-  FlowPanel runOnAllObjectsPanel;
-
-  @UiField
   FlowPanel targetPanel;
 
   @UiField
@@ -155,33 +143,11 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
   public CreateJob(Class<T> classToReceive, final List<PluginType> pluginType) {
     if (classToReceive.getCanonicalName().equals(TransferredResource.class.getCanonicalName())) {
       this.selected = IngestTransfer.getInstance().getSelected();
-      initWidget(uiBinder.createAndBindUi(this));
-      runOnAllObjectsLabel.setVisible(false);
-      runOnAllObjectsPanel.setVisible(false);
     } else {
       this.selected = Search.getInstance().getSelected();
-      initWidget(uiBinder.createAndBindUi(this));
-
-      if (this.selected instanceof SelectedItemsList && ((SelectedItemsList) this.selected).getIds().size() == 0) {
-        runOnAllObjectsLabel.setVisible(true);
-        runOnAllObjectsPanel.setVisible(true);
-
-        if (runOnAllObjectsPanel.getWidgetCount() == 0) {
-          RadioButton aipRadio = getRadioButton(AIP.class);
-          setSelectedClass(AIP.class.getCanonicalName());
-          aipRadio.setValue(true);
-
-          runOnAllObjectsPanel.add(aipRadio);
-          runOnAllObjectsPanel.add(getRadioButton(Representation.class));
-          runOnAllObjectsPanel.add(getRadioButton(File.class));
-        }
-      } else {
-        runOnAllObjectsLabel.setVisible(false);
-        runOnAllObjectsPanel.setVisible(false);
-        setSelectedClass(null);
-      }
     }
 
+    initWidget(uiBinder.createAndBindUi(this));
     BrowserService.Util.getInstance().getPluginsInfo(pluginType, new AsyncCallback<List<PluginInfo>>() {
 
       @Override
@@ -351,34 +317,6 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
       }
     }
     return p;
-  }
-
-  private RadioButton getRadioButton(Class<?> radioClass) {
-    RadioButton aipRadio = new RadioButton(radioClass.getCanonicalName(), radioClass.getSimpleName());
-
-    aipRadio.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-
-        RadioButton sourceButton = (RadioButton) event.getSource();
-        setSelectedClass(sourceButton.getName());
-
-        if (sourceButton.getValue()) {
-          for (int i = 0; i < runOnAllObjectsPanel.getWidgetCount(); i++) {
-            Widget widget = runOnAllObjectsPanel.getWidget(i);
-            RadioButton button = (RadioButton) widget;
-
-            if (!sourceButton.equals(button)) {
-              button.setValue(false);
-            }
-          }
-        }
-      }
-
-    });
-
-    return aipRadio;
   }
 
   @UiHandler("buttonCreate")

@@ -28,15 +28,11 @@
 								<g:Anchor ui:field="job" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label addStyleNames="label" ui:field="objectLabel">
-									Submission Information Package
-								</g:Label>
+								<g:Label addStyleNames="label" ui:field="objectLabel"/>
 								<g:Anchor ui:field="objectId" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label addStyleNames="label" ui:field="aipLabel">
-									Archival Information Package
-								</g:Label>
+								<g:Label addStyleNames="label" ui:field="aipLabel"/>
 								<g:Anchor ui:field="aip" addStyleNames="inline" />
 								<g:HTML ui:field="aipState" addStyleNames="inline small" />
 							</g:FlowPanel>
