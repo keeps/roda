@@ -19,6 +19,7 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.storage.StorageService;
 
 /**
@@ -158,6 +159,17 @@ public interface Plugin<T extends Serializable> {
    * @throws PluginException
    */
   public void init() throws PluginException;
+
+  /**
+   * Method to be invoked by the PluginOrchestrator to inject the job plugin
+   * info to be used by the plugin
+   */
+  public void injectJobPluginInfo(JobPluginInfo jobPluginInfo);
+
+  /**
+   * Method retrieve job plugin info of a certain class
+   */
+  public <T extends JobPluginInfo> T getJobPluginInfo(Class<T> jobPluginInfoClass);
 
   /**
    * Method executed by {@link PluginOrchestrator} before splitting the workload

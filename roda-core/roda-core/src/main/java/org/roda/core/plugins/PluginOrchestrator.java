@@ -59,8 +59,6 @@ public interface PluginOrchestrator {
 
   public void cleanUnfinishedJobs();
 
-  public <T extends Serializable> JobPluginInfo getJobInformation(Plugin<T> plugin) throws JobException;
-
   public <T extends Serializable> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo)
     throws JobException;
 

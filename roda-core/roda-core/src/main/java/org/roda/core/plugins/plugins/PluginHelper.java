@@ -254,20 +254,25 @@ public final class PluginHelper {
 
   public static <T extends Serializable> SimpleJobPluginInfo getInitialJobInformation(Plugin<T> plugin,
     int sourceObjectsCount) throws JobException {
-    JobPluginInfo jobInformation = RodaCoreFactory.getPluginOrchestrator().getJobInformation(plugin);
-    if (jobInformation != null) {
-      jobInformation.setSourceObjectsBeingProcessed(sourceObjectsCount).setSourceObjectsWaitingToBeProcessed(0);
-      return (SimpleJobPluginInfo) jobInformation;
+    SimpleJobPluginInfo jobPluginInfo = plugin.getJobPluginInfo(SimpleJobPluginInfo.class);
+    if (jobPluginInfo != null) {
+      jobPluginInfo.setSourceObjectsBeingProcessed(sourceObjectsCount).setSourceObjectsWaitingToBeProcessed(0);
+      return jobPluginInfo;
     } else {
       return new SimpleJobPluginInfo();
     }
   }
 
-  public static <T extends Serializable> JobPluginInfo getInitialJobInformation(Plugin<T> plugin) throws JobException {
-    JobPluginInfo jobInformation = RodaCoreFactory.getPluginOrchestrator().getJobInformation(plugin);
-    jobInformation.setSourceObjectsBeingProcessed(jobInformation.getSourceObjectsCount())
-      .setSourceObjectsWaitingToBeProcessed(0);
-    return jobInformation;
+  public static <T extends Serializable, T1 extends JobPluginInfo> T1 getInitialJobInformation(Plugin<T> plugin,
+    Class<T1> jobPluginInfoClass) throws JobException {
+    T1 jobPluginInfo = plugin.getJobPluginInfo(jobPluginInfoClass);
+    if (jobPluginInfo != null) {
+      jobPluginInfo.setSourceObjectsBeingProcessed(jobPluginInfo.getSourceObjectsCount())
+        .setSourceObjectsWaitingToBeProcessed(0);
+    } else {
+      throw new JobException("Cannot obtain job plugin info (that supposedly was set by plugin orchestrator)");
+    }
+    return jobPluginInfo;
   }
 
   /**

@@ -90,7 +90,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   private ActorRef jobWorkersRouter;
   private int numberOfWorkers;
 
-  // Map< jobId, JobInfo>
+  // Map<jobId, JobInfo>
   private Map<String, JobInfo> runningJobs;
 
   public AkkaEmbeddedPluginOrchestrator() {
@@ -638,9 +638,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         if (PluginType.INGEST == plugin.getType()) {
           IngestJobPluginInfo jobPluginInfo = new IngestJobPluginInfo();
           initJobPluginInfo(innerPlugin, jobId, jobPluginInfo, objectsCount);
+          innerPlugin.injectJobPluginInfo(jobPluginInfo);
         } else if (PluginType.MISC == plugin.getType() || PluginType.AIP_TO_AIP == plugin.getType()) {
-          SimpleJobPluginInfo pluginInfo = new SimpleJobPluginInfo();
-          initJobPluginInfo(innerPlugin, jobId, pluginInfo, objectsCount);
+          SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo();
+          initJobPluginInfo(innerPlugin, jobId, jobPluginInfo, objectsCount);
+          innerPlugin.injectJobPluginInfo(jobPluginInfo);
         }
       }
     }
@@ -795,21 +797,6 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       LOGGER.error("Got a NULL jobId when updating Job state");
     }
 
-  }
-
-  @Override
-  public <T extends Serializable> JobPluginInfo getJobInformation(Plugin<T> plugin) throws JobException {
-    String jobId = PluginHelper.getJobId(plugin);
-    if (jobId != null) {
-      JobInfo jobInfo = runningJobs.get(jobId);
-      if (jobInfo.isHasTimeoutOccurred()) {
-        throw new TimeoutJobException("Job timeout occurred");
-      } else {
-        return jobInfo.getJobInfo().get(plugin);
-      }
-    } else {
-      throw new JobException("Job id is null");
-    }
   }
 
   @Override

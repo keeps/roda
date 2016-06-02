@@ -172,6 +172,9 @@ public class IngestJobPluginInfo extends JobPluginInfo {
 
   public void finalizeInfo() {
     super.finalizeInfo();
+    // INFO 20160601 hsilva: the following line is needed because we only mark,
+    // during ingest processing, the failure and therefore in the end we have to
+    // set the success counter
     setSourceObjectsProcessedWithSuccess(getSourceObjectsCount() - getSourceObjectsProcessedWithFailure());
     setStepsCompleted(getTotalSteps());
   }

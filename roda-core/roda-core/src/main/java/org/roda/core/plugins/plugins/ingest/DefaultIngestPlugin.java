@@ -136,7 +136,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       Report report = PluginHelper.initPluginReport(this);
       Report pluginReport;
 
-      IngestJobPluginInfo jobPluginInfo = (IngestJobPluginInfo) PluginHelper.getInitialJobInformation(this);
+      IngestJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, IngestJobPluginInfo.class);
       PluginHelper.updateJobInformation(this, jobPluginInfo.setTotalSteps(getTotalSteps()));
 
       // 0) process "parent id" and "force parent id" info. (because we might

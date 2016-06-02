@@ -28,7 +28,7 @@ public class MinimalIngestPlugin extends DefaultIngestPlugin {
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS, "Format of the Submission Information Packages",
-        PluginParameterType.PLUGIN_SIP_TO_AIP, "", true, false,
+        PluginParameterType.PLUGIN_SIP_TO_AIP, "org.roda.core.plugins.plugins.ingest.EARKSIPToAIPPlugin", true, false,
         "Select the format of the Submission Information Packages to be ingested in this ingest process."));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_PARENT_ID, "Parent Object", PluginParameterType.AIP_ID, "", false,

@@ -16,12 +16,24 @@ import java.util.Map;
 import org.roda.core.data.common.RodaConstants.PreservationAgentType;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 
 public abstract class AbstractPlugin<T extends Serializable> implements Plugin<T> {
 
   private List<PluginParameter> pluginParameters = new ArrayList<PluginParameter>();
   private Map<String, String> parameterValues = new HashMap<String, String>();
   private String version = null;
+  private JobPluginInfo jobPluginInfo;
+
+  @Override
+  public void injectJobPluginInfo(JobPluginInfo jobPluginInfo) {
+    this.jobPluginInfo = jobPluginInfo;
+  }
+
+  @Override
+  public <T extends JobPluginInfo> T getJobPluginInfo(Class<T> jobPluginInfoClass) {
+    return jobPluginInfoClass.cast(jobPluginInfo);
+  }
 
   @Override
   public PreservationAgentType getAgentType() {

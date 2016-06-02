@@ -615,9 +615,9 @@ public class IndexModelObserver implements ModelObserver {
       SolrInputDocument premisFileDocument = SolrUtils.premisToSolr(pm.getType(), aip, pm.getRepresentationId(),
         pm.getId(), binary);
       PreservationMetadataType type = pm.getType();
-      if (type.equals(PreservationMetadataType.EVENT)) {
+      if (PreservationMetadataType.EVENT.equals(type)) {
         index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisFileDocument);
-      } else if (type.equals(PreservationMetadataType.AGENT)) {
+      } else if (PreservationMetadataType.AGENT.equals(type)) {
         index.add(RodaConstants.INDEX_PRESERVATION_AGENTS, premisFileDocument);
       }
     } catch (IOException | SolrServerException | GenericException | RequestNotValidException | NotFoundException
@@ -636,17 +636,17 @@ public class IndexModelObserver implements ModelObserver {
   public void preservationMetadataDeleted(PreservationMetadata preservationMetadata) {
     PreservationMetadataType type = preservationMetadata.getType();
     String preservationMetadataId = preservationMetadata.getId();
-    if (type.equals(PreservationMetadataType.EVENT)) {
+    if (PreservationMetadataType.EVENT.equals(type)) {
       deleteDocumentFromIndex(IndexedPreservationEvent.class, preservationMetadataId);
-    } else if (type.equals(PreservationMetadataType.AGENT)) {
+    } else if (PreservationMetadataType.AGENT.equals(type)) {
       deleteDocumentFromIndex(IndexedPreservationAgent.class, preservationMetadataId);
     }
   }
 
   @Override
   public void otherMetadataCreated(OtherMetadata otherMetadataBinary) {
-    if (otherMetadataBinary.getType().equalsIgnoreCase(RodaConstants.OTHER_METADATA_TYPE_APACHE_TIKA)
-      && otherMetadataBinary.getFileSuffix().equalsIgnoreCase(TikaFullTextPlugin.FILE_SUFFIX_METADATA)) {
+    if (RodaConstants.OTHER_METADATA_TYPE_APACHE_TIKA.equalsIgnoreCase(otherMetadataBinary.getType())
+      && TikaFullTextPlugin.FILE_SUFFIX_METADATA.equalsIgnoreCase(otherMetadataBinary.getFileSuffix())) {
       try {
         SolrInputDocument solrFile = SolrUtils.addOtherPropertiesToIndexedFile("tika_", otherMetadataBinary, model,
           index);
@@ -789,7 +789,7 @@ public class IndexModelObserver implements ModelObserver {
       for (OptionalWithCause<PreservationMetadata> opm : preservationMetadata) {
         if (opm.isPresent()) {
           PreservationMetadata pm = opm.get();
-          if (pm.getType().equals(PreservationMetadataType.EVENT)) {
+          if (PreservationMetadataType.EVENT.equals(pm.getType())) {
             try {
               preservationEventPermissionsUpdated(pm, aip.getPermissions());
             } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException

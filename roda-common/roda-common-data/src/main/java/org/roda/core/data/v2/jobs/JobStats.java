@@ -90,7 +90,7 @@ public class JobStats implements Serializable {
   }
 
   public void incrementObjectsProcessed(PluginState state) {
-    if (state.equals(PluginState.SUCCESS)) {
+    if (PluginState.SUCCESS.equals(state)) {
       incrementObjectsProcessedWithSuccess();
     } else {
       incrementObjectsProcessedWithFailure();
