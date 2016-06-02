@@ -8,12 +8,10 @@
 package org.roda.core.plugins.orchestrate;
 
 import java.io.Serializable;
-import java.util.Map;
 
 import org.roda.core.plugins.Plugin;
 
 public interface JobPluginInfoInterface {
 
-  <T extends Serializable> JobPluginInfo processJobPluginInformation(Plugin<T> plugin, Integer taskObjectsCount,
-    Map<Plugin<?>, JobPluginInfo> jobInfos);
+  <T extends Serializable> JobPluginInfo processJobPluginInformation(Plugin<T> plugin, JobInfo jobInfo);
 }

@@ -22,8 +22,9 @@ public class SimpleJobPluginInfo extends JobPluginInfo {
   }
 
   @Override
-  public <T extends Serializable> JobPluginInfo processJobPluginInformation(Plugin<T> plugin, Integer taskObjectsCount,
-    Map<Plugin<?>, JobPluginInfo> jobInfos) {
+  public <T extends Serializable> JobPluginInfo processJobPluginInformation(Plugin<T> plugin, JobInfo jobInfo) {
+    int taskObjectsCount = jobInfo.getObjectsCount();
+    Map<Plugin<?>, JobPluginInfo> jobInfos = jobInfo.getJobInfo();
     // update information in the map<plugin, pluginInfo>
     // FIXME/INFO 20160601 hsilva: the following code would be necessary in a
     // distributed architecture

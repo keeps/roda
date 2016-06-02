@@ -10,7 +10,6 @@ package org.roda.core.plugins.orchestrate.akka;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
-import org.roda.core.plugins.orchestrate.AkkaEmbeddedPluginOrchestrator.PluginMessage;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,8 +31,8 @@ public class AkkaWorkerActor extends UntypedActor {
 
   @Override
   public void onReceive(Object msg) throws Exception {
-    if (msg instanceof PluginMessage) {
-      PluginMessage message = (PluginMessage) msg;
+    if (msg instanceof Messages.PluginMessage) {
+      Messages.PluginMessage message = (Messages.PluginMessage) msg;
       Plugin<?> plugin = message.getPlugin();
       try {
         plugin.execute(index, model, storage, message.getList());

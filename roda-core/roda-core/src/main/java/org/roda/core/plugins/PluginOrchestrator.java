@@ -58,6 +58,9 @@ public interface PluginOrchestrator {
   public void startJobsInTheStateCreated();
 
   public void cleanUnfinishedJobs();
+  
+  // FIXME 20160602 hsilva: rename this (in akka case this will receive the ActorRef for the actor holding JobInfo 
+  public void setInitialJobInfo(String jobId, Object object);
 
   public <T extends Serializable> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo)
     throws JobException;

@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,9 @@ import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.SimpleFilterParameter;
+import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -41,9 +45,11 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.OptionalWithCause;
+import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.SelectedItemsNone;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
@@ -158,25 +164,20 @@ public class EARKSIPPluginsTest {
     TransferredResource transferredResource = createCorpora();
     Assert.assertNotNull(transferredResource);
 
-    // FIXME 20160601 hsilva: commented out as PluginOrchestrator methods, from
-    // now on, don't return anything (as the work will be done asynchronously)
-    // List<Report> reports =
-    // RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(plugin,
-    // Arrays.asList(transferredResource.getUUID()));
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(plugin,
+      Arrays.asList(transferredResource.getUUID()));
     // assertReports(reports);
-    //
-    // index.commitAIPs();
-    //
-    // IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
-    // new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID,
-    // root.getId())), null, new Sublist(0, 10));
-    //
-    // Assert.assertEquals(1L, find.getTotalCount());
-    // IndexedAIP indexedAIP = find.getResults().get(0);
-    //
-    // AIP aip = model.retrieveAIP(indexedAIP.getId());
-    // return aip;
-    return new AIP();
+
+    index.commitAIPs();
+
+    IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
+      new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10));
+
+    Assert.assertEquals(1L, find.getTotalCount());
+    IndexedAIP indexedAIP = find.getResults().get(0);
+
+    AIP aip = model.retrieveAIP(indexedAIP.getId());
+    return aip;
   }
 
   @Test

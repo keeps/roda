@@ -32,6 +32,8 @@ import org.roda.core.plugins.plugins.PluginHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import akka.actor.ActorRef;
+import akka.actor.Props;
 import akka.actor.UntypedActor;
 
 public class AkkaJobActor extends UntypedActor {
@@ -49,6 +51,10 @@ public class AkkaJobActor extends UntypedActor {
       PluginHelper.setPluginParameters(plugin, job);
 
       PluginHelper.updateJobState(plugin, JOB_STATE.STARTED);
+
+      String jobId = job.getId();
+      ActorRef jobInfoActor = getContext().actorOf(Props.create(AkkaJobInfoActor.class), jobId);
+      RodaCoreFactory.getPluginOrchestrator().setInitialJobInfo(jobId, jobInfoActor);
 
       if (job.getSourceObjects() instanceof SelectedItemsAll<?>) {
         runOnAll(job, plugin);

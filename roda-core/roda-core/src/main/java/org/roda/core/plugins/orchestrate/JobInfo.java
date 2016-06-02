@@ -50,9 +50,8 @@ public class JobInfo implements Serializable {
     this.hasTimeoutOccurred = hasTimeoutOccurred;
   }
 
-  public <T extends Serializable> void put(Plugin<T> innerPlugin, JobPluginInfo jobPluginInfo, int objectsCount) {
+  public <T extends Serializable> void put(Plugin<T> innerPlugin, JobPluginInfo jobPluginInfo) {
     pluginsInfo.put(innerPlugin, jobPluginInfo);
-    this.objectsCount += objectsCount;
   }
 
   @Override

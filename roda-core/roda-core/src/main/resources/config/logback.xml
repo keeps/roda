@@ -22,6 +22,22 @@
 			<pattern>%d %-5level %logger{36} - %msg%n</pattern>
 		</encoder>
 	</appender>
+	
+	<appender name="AKKA_FILE" class="ch.qos.logback.core.FileAppender">
+		<file>${roda.home}/log/roda-core-akka.log</file>
+		<encoder>
+			<pattern>%d [%X{akkaSource} %X{sourceThread}] %-5level %logger{36} - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="AKKA" class="ch.qos.logback.classic.AsyncAppender">
+		<appender-ref ref="AKKA_FILE" />
+	</appender>
+	
+	<logger name="org.roda.core.plugins.orchestrate.akka" additivity="false">
+		<level value="DEBUG" />
+		<appender-ref ref="AKKA" />
+	</logger>
 
 	<logger name="org.roda.core.plugins.PluginManager" additivity="false">
 		<level value="INFO" />
@@ -42,10 +58,10 @@
 		<level value="INFO" />
 		<appender-ref ref="CORE_FILEOUT" />
 	</logger>
-
+	
 	<logger name="akka" additivity="false">
 		<level value="DEBUG" />
-		<appender-ref ref="CORE_FILEOUT" />
+		<appender-ref ref="AKKA" />
 	</logger>
 
 	<logger name="gov.loc.repository.bagit" additivity="false">

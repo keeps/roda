@@ -82,6 +82,7 @@ import jersey.repackaged.com.google.common.collect.Lists;
 
 public class InternalConvertPluginsTest {
   private static final String FAKE_JOB_ID = "NONE";
+  private static final String FAKE_REPORTING_CLASS = "NONE";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(InternalConvertPluginsTest.class);
 
@@ -487,6 +488,7 @@ public class InternalConvertPluginsTest {
     Plugin<Representation> plugin = new SoxConvertPlugin<Representation>();
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
+    parameters.put(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS, FAKE_REPORTING_CLASS);
     parameters.put("outputFormat", "ogg");
     plugin.setParameterValues(parameters);
 
@@ -498,6 +500,7 @@ public class InternalConvertPluginsTest {
     Plugin<Representation> plugin2 = new ImageMagickConvertPlugin<Representation>();
     Map<String, String> parameters2 = new HashMap<>();
     parameters2.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
+    parameters.put(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS, FAKE_REPORTING_CLASS);
     parameters2.put("outputFormat", "tiff");
     plugin2.setParameterValues(parameters2);
 
@@ -665,22 +668,18 @@ public class InternalConvertPluginsTest {
     parameters.put("hasFeatures", "False");
     plugin.setParameterValues(parameters);
 
-    // FIXME 20160601 hsilva: commented out as PluginOrchestrator methods, from
-    // now on, don't return anything (as the work will be done asynchronously)
-    // List<Report> reports =
-    // RodaCoreFactory.getPluginOrchestrator().runPluginOnAllAIPs(plugin);
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllAIPs(plugin);
     // Report report0 = reports.get(0).getReports().get(0);
     // if (!PluginState.PARTIAL_SUCCESS.equals(report0.getPluginState())) {
     // Assert.fail("Report not a partial success: " + report0);
     // }
-    //
-    // Plugin<Representation> plugin2 = new PdfToPdfaPlugin<Representation>();
-    // RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(plugin2);
-    //
-    // Plugin<AIP> plugin3 = new VeraPDFPlugin();
-    // plugin3.setParameterValues(parameters);
-    // reports =
-    // RodaCoreFactory.getPluginOrchestrator().runPluginOnAllAIPs(plugin3);
+
+    Plugin<Representation> plugin2 = new PdfToPdfaPlugin<Representation>();
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(plugin2);
+
+    Plugin<AIP> plugin3 = new VeraPDFPlugin();
+    plugin3.setParameterValues(parameters);
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllAIPs(plugin3);
     // Report report1 = reports.get(0).getReports().get(1);
     // if (!PluginState.SUCCESS.equals(report1.getPluginState())) {
     // Assert.fail("Report failed: " + report1);
