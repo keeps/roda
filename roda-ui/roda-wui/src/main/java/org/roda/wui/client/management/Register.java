@@ -182,16 +182,16 @@ public class Register extends Composite {
                   constants.registerSuccessDialogMessageActive(), constants.registerSuccessDialogButton(),
                   new AsyncCallback<Void>() {
 
-                  @Override
-                  public void onSuccess(Void result) {
-                    Tools.newHistory(Login.RESOLVER);
-                  }
+                    @Override
+                    public void onSuccess(Void result) {
+                      Tools.newHistory(Login.RESOLVER);
+                    }
 
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    Tools.newHistory(Login.RESOLVER);
-                  }
-                });
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      Tools.newHistory(Login.RESOLVER);
+                    }
+                  });
               } else {
                 UserManagementService.Util.getInstance().sendEmailVerification(user.getId(), new AsyncCallback<Void>() {
 
@@ -201,16 +201,16 @@ public class Register extends Composite {
                       constants.registerSuccessDialogMessage(), constants.registerSuccessDialogButton(),
                       new AsyncCallback<Void>() {
 
-                      @Override
-                      public void onSuccess(Void result) {
-                        Tools.newHistory(Login.RESOLVER);
-                      }
+                        @Override
+                        public void onSuccess(Void result) {
+                          Tools.newHistory(Login.RESOLVER);
+                        }
 
-                      @Override
-                      public void onFailure(Throwable caught) {
-                        Tools.newHistory(Login.RESOLVER);
-                      }
-                    });
+                        @Override
+                        public void onFailure(Throwable caught) {
+                          Tools.newHistory(Login.RESOLVER);
+                        }
+                      });
                   }
 
                   @Override
@@ -241,7 +241,9 @@ public class Register extends Composite {
   }
 
   private void errorMessage(Throwable caught) {
-    recaptchaWidget.reset();
+    if (recaptchaActive) {
+      recaptchaWidget.reset();
+    }
     if (caught instanceof EmailAlreadyExistsException) {
       Toast.showError(constants.registerEmailAlreadyExists());
     } else if (caught instanceof UserAlreadyExistsException) {
