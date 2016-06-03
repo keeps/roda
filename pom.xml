@@ -934,6 +934,11 @@
 				<version>${jersey.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>org.glassfish.jersey.core</groupId>
+				<artifactId>jersey-client</artifactId>
+				<version>${jersey.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>org.glassfish.jersey.test-framework</groupId>
 				<artifactId>jersey-test-framework-core</artifactId>
 				<version>${jersey.version}</version>

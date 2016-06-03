@@ -12,15 +12,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.HttpRequestUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -30,14 +36,16 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.plugins.plugins.base.ReindexAIPPlugin;
 import org.roda.core.storage.StorageService;
 import org.roda.core.util.CommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AIPRsyncPlugin extends AbstractPlugin<AIP> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(AIPRsyncPlugin.class);
+public class ReplicationPlugin extends AbstractPlugin<AIP> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(ReplicationPlugin.class);
 
   @Override
   public void init() throws PluginException {
@@ -50,7 +58,7 @@ public class AIPRsyncPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticName() {
-    return "Rsync AIPs";
+    return "AIP replication plugin";
   }
 
   @Override
@@ -76,43 +84,71 @@ public class AIPRsyncPlugin extends AbstractPlugin<AIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
 
-    List<PreservationMetadata> pms = new ArrayList<PreservationMetadata>();
-    PluginState state = PluginState.SUCCESS;
-    String commandResult = null;
-
     try {
-      commandResult = AIPRsyncPluginUtils.executeRsyncAIP(list);
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-    } catch (UnsupportedOperationException | CommandException | IOException e) {
-      LOGGER.error("Could not run rsync command on AIPs: ", e);
-      state = PluginState.FAILURE;
-    }
+      List<PreservationMetadata> pms = new ArrayList<PreservationMetadata>();
+      PluginState state = PluginState.SUCCESS;
+      String commandResult = null;
+      List<String> aipIds = new ArrayList<String>();
 
-    for (AIP aip : list) {
-      pms.add(createEvent(commandResult, state, aip, model, index));
-    }
-
-    if (state.equals(PluginState.SUCCESS)) {
       try {
-        AIPRsyncPluginUtils.executeRsyncEvents(pms);
+        commandResult = ReplicationPluginUtils.executeRsyncAIP(list);
       } catch (UnsupportedOperationException | CommandException | IOException e) {
-        LOGGER.error("Could not run rsync command on AIPs ", e);
+        LOGGER.error("Could not run rsync command on AIPs: ", e);
+        state = PluginState.FAILURE;
       }
+
+      try {
+        for (AIP aip : list) {
+          pms.add(PluginHelper.createPluginEvent(this, aip.getId(), model, index, state, commandResult, true));
+          aipIds.add(aip.getId());
+        }
+      } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
+        | AuthorizationDeniedException | AlreadyExistsException e) {
+        LOGGER.error("Error creating event", e);
+        state = PluginState.FAILURE;
+      }
+
+      if (state.equals(PluginState.SUCCESS)) {
+        try {
+          ReplicationPluginUtils.executeRsyncEvents(pms);
+        } catch (UnsupportedOperationException | CommandException | IOException e) {
+          LOGGER.error("Could not run rsync command on AIP events: ", e);
+        }
+      }
+
+      if (state.equals(PluginState.SUCCESS)) {
+        sendReindexRequest(aipIds);
+      }
+
+      jobPluginInfo.incrementObjectsProcessed(state);
+      jobPluginInfo.finalizeInfo();
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+    } catch (JobException e) {
+      throw new PluginException("A job exception has occurred", e);
     }
 
     return PluginHelper.initPluginReport(this);
   }
 
-  private PreservationMetadata createEvent(String outcomeDetail, PluginState state, AIP aip, ModelService model,
-    IndexService index) throws PluginException {
+  private void sendReindexRequest(List<String> aipIds) {
+    String targetApi = RodaCoreFactory.getRodaConfigurationAsString("core", "aip_rsync", "target_api");
+    String targetResource = RodaCoreFactory.getRodaConfigurationAsString("core", "aip_rsync", "target_job_resource");
+    String username = RodaCoreFactory.getRodaConfigurationAsString("ldap", "adminUsername");
+    String password = RodaCoreFactory.getRodaConfigurationAsString("ldap", "adminPassword");
+
+    Job job = new Job();
+    job.setName(getClass().getSimpleName() + " " + job.getStartDate());
+    job.setSourceObjects(new SelectedItemsList<>(aipIds, AIP.class.getCanonicalName()));
+    job.setPlugin(ReindexAIPPlugin.class.getCanonicalName());
+    job.setPluginType(PluginType.MISC);
 
     try {
-      boolean notify = true;
-      return PluginHelper.createPluginEvent(this, aip.getId(), model, index, state, outcomeDetail, notify);
-    } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
-      | AuthorizationDeniedException | AlreadyExistsException e) {
-      LOGGER.error("Error creating event: " + e.getMessage(), e);
-      return null;
+      HttpRequestUtility.sendPostRequest(job, Job.class, targetApi, targetResource, username, password);
+    } catch (RODAException e) {
+      LOGGER.error("Error send post request to reindex AIPs");
     }
   }
 
@@ -132,12 +168,12 @@ public class AIPRsyncPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public Plugin<AIP> cloneMe() {
-    return new AIPRsyncPlugin();
+    return new ReplicationPlugin();
   }
 
   @Override
   public PluginType getType() {
-    return PluginType.AIP_TO_AIP;
+    return PluginType.MISC;
   }
 
   @Override
