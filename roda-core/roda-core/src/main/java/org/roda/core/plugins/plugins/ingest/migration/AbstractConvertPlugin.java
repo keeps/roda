@@ -654,7 +654,6 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
   }
 
   public abstract String executePlugin(Path inputPath, Path outputPath, String fileFormat)
-
     throws UnsupportedOperationException, IOException, CommandException;
 
   private void createEvent(List<File> alteredFiles, List<File> newFiles, String aipId, String newRepresentationID,

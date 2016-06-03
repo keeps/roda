@@ -431,6 +431,7 @@ public final class RodaConstants {
   public static final String PLUGIN_CATEGORY_INGEST = "ingest";
   public static final String PLUGIN_CATEGORY_FIXITY_CHECK = "fixity_check";
   public static final String PLUGIN_CATEGORY_REINDEX = "reindex";
+  public static final String PLUGIN_CATEGORY_REPLICATION = "replication";
 
   public static final String PLUGIN_CATEGORY_NOT_LISTABLE = "not_listable";
 
