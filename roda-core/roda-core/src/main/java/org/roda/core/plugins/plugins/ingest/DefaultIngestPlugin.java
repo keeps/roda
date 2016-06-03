@@ -118,6 +118,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
     // do nothing
+    LOGGER.debug("Doing nothing in beforeAllExecute");
     return null;
   }
 
@@ -125,6 +126,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
     // do nothing
+    LOGGER.debug("Doing nothing in beforeBlockExecute");
     return null;
   }
 
@@ -278,11 +280,13 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
     // do nothing
+    LOGGER.debug("Doing nothing in afterBlockExecute");
     return null;
   }
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+    LOGGER.debug("Doing stuff in afterAllExecute");
     try {
       sendNotification(model);
     } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {

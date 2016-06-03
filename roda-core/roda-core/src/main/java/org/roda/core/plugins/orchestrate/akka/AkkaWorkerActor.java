@@ -31,8 +31,8 @@ public class AkkaWorkerActor extends UntypedActor {
 
   @Override
   public void onReceive(Object msg) throws Exception {
-    if (msg instanceof Messages.PluginMessage) {
-      Messages.PluginMessage message = (Messages.PluginMessage) msg;
+    if (msg instanceof Messages.PluginToBeExecuted) {
+      Messages.PluginToBeExecuted message = (Messages.PluginToBeExecuted) msg;
       Plugin<?> plugin = message.getPlugin();
       try {
         plugin.execute(index, model, storage, message.getList());

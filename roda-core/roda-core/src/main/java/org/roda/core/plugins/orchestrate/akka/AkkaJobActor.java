@@ -53,7 +53,7 @@ public class AkkaJobActor extends UntypedActor {
       PluginHelper.updateJobState(plugin, JOB_STATE.STARTED);
 
       String jobId = job.getId();
-      ActorRef jobInfoActor = getContext().actorOf(Props.create(AkkaJobInfoActor.class), jobId);
+      ActorRef jobInfoActor = getContext().actorOf(Props.create(AkkaJobInfoActor.class, plugin), jobId);
       RodaCoreFactory.getPluginOrchestrator().setInitialJobInfo(jobId, jobInfoActor);
 
       if (job.getSourceObjects() instanceof SelectedItemsAll<?>) {

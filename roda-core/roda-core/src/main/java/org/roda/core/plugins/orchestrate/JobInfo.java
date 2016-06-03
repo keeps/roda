@@ -10,6 +10,7 @@ package org.roda.core.plugins.orchestrate;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.roda.core.plugins.Plugin;
 
@@ -19,11 +20,13 @@ public class JobInfo implements Serializable {
   private Map<Plugin<?>, JobPluginInfo> pluginsInfo;
   private int objectsCount;
   private boolean hasTimeoutOccurred;
+  private boolean done;
 
   public JobInfo() {
     pluginsInfo = new HashMap<>();
     objectsCount = 0;
     hasTimeoutOccurred = false;
+    done = false;
   }
 
   public Map<Plugin<?>, JobPluginInfo> getJobInfo() {
@@ -50,8 +53,24 @@ public class JobInfo implements Serializable {
     this.hasTimeoutOccurred = hasTimeoutOccurred;
   }
 
+  public boolean isDone() {
+    return done;
+  }
+
+  public void setDone(boolean done) {
+    this.done = done;
+  }
+
   public <T extends Serializable> void put(Plugin<T> innerPlugin, JobPluginInfo jobPluginInfo) {
     pluginsInfo.put(innerPlugin, jobPluginInfo);
+    boolean isDone = true;
+    for (Entry<Plugin<?>, JobPluginInfo> jpi : pluginsInfo.entrySet()) {
+      if (!jpi.getValue().isDone()) {
+        isDone = false;
+        break;
+      }
+    }
+    done = isDone;
   }
 
   @Override

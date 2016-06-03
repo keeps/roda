@@ -282,7 +282,8 @@ public final class PluginHelper {
   }
 
   /**
-   * 20160531 hsilva: Only orchestrators should invoke this method
+   * 20160531 hsilva:Only orchestrators/orchestrators related classes should
+   * invoke this method
    */
   public static <T extends Serializable> void updateJobState(Plugin<T> plugin, ModelService model, JOB_STATE state) {
     try {
@@ -299,7 +300,8 @@ public final class PluginHelper {
   }
 
   /**
-   * 20160331 hsilva: Only orchestrators should invoke this method
+   * 20160531 hsilva:Only orchestrators/orchestrators related classes should
+   * invoke this method
    */
   public static <T extends Serializable> void updateJobObjectsCount(Plugin<T> plugin, ModelService model,
     Long objectsCount) {
@@ -315,12 +317,11 @@ public final class PluginHelper {
   }
 
   /**
-   * 20160331 hsilva: Only orchestrators should invoke this method
+   * 20160531 hsilva:Only orchestrators/orchestrators related classes should
+   * invoke this method
    */
   public static <T extends Serializable> void updateJobInformation(Plugin<T> plugin, ModelService model,
     JobPluginInfo jobPluginInfo) {
-
-    // do stuff with concrete JobPluginInfo
 
     // update job
     try {

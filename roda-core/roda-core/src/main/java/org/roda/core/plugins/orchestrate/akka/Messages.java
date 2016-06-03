@@ -8,13 +8,13 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 
 public class Messages {
-  public static final class JobInfoMessage implements Serializable {
+  public static final class JobInfoUpdated implements Serializable {
     private static final long serialVersionUID = -6918015956027259760L;
 
     public Plugin<?> plugin;
     public JobPluginInfo jobPluginInfo;
 
-    public JobInfoMessage(Plugin<?> plugin, JobPluginInfo jobPluginInfo) {
+    public JobInfoUpdated(Plugin<?> plugin, JobPluginInfo jobPluginInfo) {
       this.plugin = plugin;
       this.jobPluginInfo = jobPluginInfo;
     }
@@ -25,13 +25,13 @@ public class Messages {
     }
   }
 
-  public static final class JobIsDone implements Serializable {
+  public static final class JobStateUpdated implements Serializable {
     private static final long serialVersionUID = 1946036502369851214L;
 
     public Plugin<?> plugin;
     public JOB_STATE state;
 
-    public JobIsDone(Plugin<?> plugin, JOB_STATE state) {
+    public JobStateUpdated(Plugin<?> plugin, JOB_STATE state) {
       this.plugin = plugin;
       this.state = state;
     }
@@ -43,13 +43,13 @@ public class Messages {
 
   }
 
-  public static class PluginMessage<T extends Serializable> implements Serializable {
+  public static class PluginToBeExecuted<T extends Serializable> implements Serializable {
     private static final long serialVersionUID = -5214600055070295410L;
 
     private List<T> list;
     private Plugin<T> plugin;
 
-    public PluginMessage(List<T> list, Plugin<T> plugin) {
+    public PluginToBeExecuted(List<T> list, Plugin<T> plugin) {
       this.list = list;
       this.plugin = plugin;
     }

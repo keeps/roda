@@ -14,8 +14,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
@@ -43,7 +41,6 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.PluginType;
-import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
@@ -61,18 +58,10 @@ import com.typesafe.config.Config;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-import akka.actor.Kill;
 import akka.actor.Props;
 import akka.actor.Terminated;
-import akka.dispatch.Futures;
 import akka.dispatch.OnComplete;
-import akka.dispatch.OnFailure;
-import akka.dispatch.OnSuccess;
-import akka.pattern.Patterns;
-import akka.routing.Broadcast;
 import akka.routing.RoundRobinPool;
-import akka.util.Timeout;
-import scala.concurrent.Await;
 import scala.concurrent.Future;
 
 /*
@@ -113,17 +102,6 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     Props jobsProps = new RoundRobinPool(numberOfWorkers).props(Props.create(AkkaJobActor.class));
     jobWorkersRouter = workersSystem.actorOf(jobsProps, "JobWorkersRouter");
 
-    // FiniteDuration within = FiniteDuration.create(10, TimeUnit.MILLISECONDS);
-    // FiniteDuration interval = FiniteDuration.create(1, TimeUnit.MINUTES);
-    // Props workersProps = new TailChoppingPool(numberOfWorkers, within,
-    // interval)
-    // .props(Props.create(AkkaWorkerActor.class, storage, model, index));
-    // workersRouter = workersSystem.actorOf(workersProps, "WorkersRouter");
-    //
-    // Props jobsProps = new TailChoppingPool(numberOfWorkers, within, interval)
-    // .props(Props.create(AkkaJobWorkerActor.class));
-    // jobWorkersRouter = workersSystem.actorOf(jobsProps, "JobWorkersRouter");
-
   }
 
   @Override
@@ -149,222 +127,145 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public <T extends IsIndexed> void runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin) {
     try {
-      LOGGER.info("Started {}", plugin.getName());
+      LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
       int blockSize = JobsHelper.getBlockSize();
       IndexResult<T> find;
       int offset = 0;
-      int multiplier = 0;
-      List<Future<Object>> futures = new ArrayList<>();
-      List<Plugin<T>> innerPlugins = new ArrayList<>();
       Plugin<T> innerPlugin;
 
       plugin.beforeAllExecute(index, model, storage);
 
-      Timeout timeout = JobsHelper.getPluginTimeout(plugin.getClass());
       do {
         find = RodaCoreFactory.getIndexService().find(classToActOn, filter, Sorter.NONE,
           new Sublist(offset, blockSize));
-        innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, classToActOn, innerPlugins,
-          (int) find.getLimit());
+        innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, classToActOn, (int) find.getLimit());
         offset += find.getLimit();
-        multiplier++;
-
-        futures
-          .add(Patterns.ask(workersRouter, new Messages.PluginMessage<T>(find.getResults(), innerPlugin), timeout));
+        workersRouter.tell(new Messages.PluginToBeExecuted<T>(find.getResults(), innerPlugin), ActorRef.noSender());
 
       } while (find.getTotalCount() > find.getOffset() + find.getLimit());
 
-      waitForFuturesToComplete(plugin, multiplier, futures);
-
-      for (Plugin<T> p : innerPlugins) {
-        p.afterBlockExecute(index, model, storage);
-      }
-
-      plugin.afterAllExecute(index, model, storage);
-
     } catch (Exception e) {
       LOGGER.error("Error running plugin from index", e);
+      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE);
     }
 
-    PluginHelper.updateJobState(plugin, JOB_STATE.COMPLETED);
-    LOGGER.info("Ended {}", plugin.getName());
   }
 
   @Override
   public void runPluginOnAIPs(Plugin<AIP> plugin, List<String> uuids) {
     try {
-      LOGGER.info("Started {}", plugin.getName());
+      LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
       int blockSize = JobsHelper.getBlockSize();
-      int multiplier = 0;
       List<AIP> aips = JobsHelper.getAIPs(model, index, uuids);
       Iterator<AIP> iter = aips.iterator();
-      List<Future<Object>> futures = new ArrayList<>();
-      List<Plugin<AIP>> innerPlugins = new ArrayList<>();
       Plugin<AIP> innerPlugin;
 
       plugin.beforeAllExecute(index, model, storage);
 
       List<AIP> block = new ArrayList<AIP>();
-      Timeout timeout = JobsHelper.getPluginTimeout(plugin.getClass());
       while (iter.hasNext()) {
         if (block.size() == blockSize) {
-          innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, AIP.class, innerPlugins, blockSize);
-          futures.add(Patterns.ask(workersRouter, new Messages.PluginMessage<AIP>(block, innerPlugin), timeout));
-          block = new ArrayList<AIP>();
-          multiplier++;
+          innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, AIP.class, blockSize);
+          workersRouter.tell(new Messages.PluginToBeExecuted<AIP>(block, innerPlugin), ActorRef.noSender());
+          block = new ArrayList<>();
         }
-
         block.add(iter.next());
       }
 
       if (!block.isEmpty()) {
-        innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, AIP.class, innerPlugins, block.size());
-        futures.add(Patterns.ask(workersRouter, new Messages.PluginMessage<AIP>(block, innerPlugin), timeout));
-        multiplier++;
+        innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, AIP.class, block.size());
+        workersRouter.tell(new Messages.PluginToBeExecuted<AIP>(block, innerPlugin), ActorRef.noSender());
       }
-
-      waitForFuturesToComplete(plugin, multiplier, futures);
-
-      for (Plugin<AIP> p : innerPlugins) {
-        p.afterBlockExecute(index, model, storage);
-      }
-
-      plugin.afterAllExecute(index, model, storage);
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on AIPs", e);
+      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE);
     }
 
-    PluginHelper.updateJobState(plugin, JOB_STATE.COMPLETED);
-    LOGGER.info("Ended {}", plugin.getName());
   }
 
   @Override
   public void runPluginOnRepresentations(Plugin<Representation> plugin, List<String> uuids) {
     try {
-      LOGGER.info("Started {}", plugin.getName());
+      LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
       int blockSize = JobsHelper.getBlockSize();
-      int multiplier = 0;
       List<Representation> representations = JobsHelper.getRepresentations(model, index, uuids);
       Iterator<Representation> iter = representations.iterator();
-      List<Future<Object>> futures = new ArrayList<>();
-      List<Plugin<Representation>> innerPlugins = new ArrayList<>();
       Plugin<Representation> innerPlugin;
 
       plugin.beforeAllExecute(index, model, storage);
 
       List<Representation> block = new ArrayList<Representation>();
-      Timeout timeout = JobsHelper.getPluginTimeout(plugin.getClass());
       while (iter.hasNext()) {
         if (block.size() == blockSize) {
-          innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, Representation.class, innerPlugins, blockSize);
-          futures
-            .add(Patterns.ask(workersRouter, new Messages.PluginMessage<Representation>(block, innerPlugin), timeout));
-          block = new ArrayList<Representation>();
-          multiplier++;
+          innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, Representation.class, blockSize);
+          workersRouter.tell(new Messages.PluginToBeExecuted<Representation>(block, innerPlugin), ActorRef.noSender());
+          block = new ArrayList<>();
         }
-
         block.add(iter.next());
-
       }
 
       if (!block.isEmpty()) {
-        innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, Representation.class, innerPlugins, block.size());
-        futures
-          .add(Patterns.ask(workersRouter, new Messages.PluginMessage<Representation>(block, innerPlugin), timeout));
-        multiplier++;
+        innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, Representation.class, block.size());
+        workersRouter.tell(new Messages.PluginToBeExecuted<Representation>(block, innerPlugin), ActorRef.noSender());
       }
-
-      waitForFuturesToComplete(plugin, multiplier, futures);
-
-      for (Plugin<Representation> p : innerPlugins) {
-        p.afterBlockExecute(index, model, storage);
-      }
-
-      plugin.afterAllExecute(index, model, storage);
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on Representations", e);
+      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE);
     }
-
-    PluginHelper.updateJobState(plugin, JOB_STATE.COMPLETED);
-    LOGGER.info("Ended {}", plugin.getName());
-
   }
 
   @Override
   public void runPluginOnFiles(Plugin<File> plugin, List<String> uuids) {
     try {
-      LOGGER.info("Started {}", plugin.getName());
+      LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
       int blockSize = JobsHelper.getBlockSize();
-      int multiplier = 0;
       List<File> files = JobsHelper.getFiles(model, index, uuids);
       Iterator<File> iter = files.iterator();
-      List<Future<Object>> futures = new ArrayList<>();
-      List<Plugin<File>> innerPlugins = new ArrayList<>();
       Plugin<File> innerPlugin;
 
       plugin.beforeAllExecute(index, model, storage);
 
       List<File> block = new ArrayList<File>();
-      Timeout timeout = JobsHelper.getPluginTimeout(plugin.getClass());
       while (iter.hasNext()) {
         if (block.size() == blockSize) {
-          innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, File.class, innerPlugins, blockSize);
-          futures.add(Patterns.ask(workersRouter, new Messages.PluginMessage<File>(block, innerPlugin), timeout));
-          block = new ArrayList<File>();
-          multiplier++;
+          innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, File.class, blockSize);
+          workersRouter.tell(new Messages.PluginToBeExecuted<File>(block, innerPlugin), ActorRef.noSender());
+          block = new ArrayList<>();
         }
-
         block.add(iter.next());
-
       }
 
       if (!block.isEmpty()) {
-        innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, File.class, innerPlugins, block.size());
-        futures.add(Patterns.ask(workersRouter, new Messages.PluginMessage<File>(block, innerPlugin), timeout));
-        multiplier++;
+        innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, File.class, block.size());
+        workersRouter.tell(new Messages.PluginToBeExecuted<File>(block, innerPlugin), ActorRef.noSender());
       }
-
-      waitForFuturesToComplete(plugin, multiplier, futures);
-
-      for (Plugin<File> p : innerPlugins) {
-        p.afterBlockExecute(index, model, storage);
-      }
-
-      plugin.afterAllExecute(index, model, storage);
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on Files", e);
+      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE);
     }
-
-    PluginHelper.updateJobState(plugin, JOB_STATE.COMPLETED);
-    LOGGER.info("Ended {}", plugin.getName());
 
   }
 
   @Override
   public void runPluginOnAllAIPs(Plugin<AIP> plugin) {
     try {
-      LOGGER.info("Started {}", plugin.getName());
+      LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
       int blockSize = JobsHelper.getBlockSize();
-      int multiplier = 0;
       CloseableIterable<OptionalWithCause<AIP>> aips = model.listAIPs();
       Iterator<OptionalWithCause<AIP>> iter = aips.iterator();
-      List<Future<Object>> futures = new ArrayList<>();
-      List<Plugin<AIP>> innerPlugins = new ArrayList<>();
       Plugin<AIP> innerPlugin;
 
       plugin.beforeAllExecute(index, model, storage);
 
       List<AIP> block = new ArrayList<AIP>();
-      Timeout timeout = JobsHelper.getPluginTimeout(plugin.getClass());
       while (iter.hasNext()) {
         if (block.size() == blockSize) {
-          innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, AIP.class, innerPlugins, blockSize);
-          futures.add(Patterns.ask(workersRouter, new Messages.PluginMessage<AIP>(block, innerPlugin), timeout));
-          block = new ArrayList<AIP>();
-          multiplier++;
+          innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, AIP.class, blockSize);
+          workersRouter.tell(new Messages.PluginToBeExecuted<AIP>(block, innerPlugin), ActorRef.noSender());
+          block = new ArrayList<>();
         }
         OptionalWithCause<AIP> nextAIP = iter.next();
         if (nextAIP.isPresent()) {
@@ -375,57 +276,40 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       }
 
       if (!block.isEmpty()) {
-        innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, AIP.class, innerPlugins, block.size());
-        futures.add(Patterns.ask(workersRouter, new Messages.PluginMessage<AIP>(block, innerPlugin), timeout));
-        multiplier++;
+        innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, AIP.class, block.size());
+        workersRouter.tell(new Messages.PluginToBeExecuted<AIP>(block, innerPlugin), ActorRef.noSender());
       }
 
       IOUtils.closeQuietly(aips);
 
-      waitForFuturesToComplete(plugin, multiplier, futures);
-
-      for (Plugin<AIP> p : innerPlugins) {
-        p.afterBlockExecute(index, model, storage);
-      }
-
-      plugin.afterAllExecute(index, model, storage);
-
     } catch (Exception e) {
       LOGGER.error("Error running plugin on all AIPs", e);
+      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE);
     }
-
-    PluginHelper.updateJobState(plugin, JOB_STATE.COMPLETED);
-    LOGGER.info("Ended {}", plugin.getName());
 
   }
 
   @Override
   public void runPluginOnAllRepresentations(Plugin<Representation> plugin) {
     try {
-      LOGGER.info("Started {}", plugin.getName());
+      LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
       int blockSize = JobsHelper.getBlockSize();
-      int multiplier = 0;
       CloseableIterable<OptionalWithCause<AIP>> aips = model.listAIPs();
       Iterator<OptionalWithCause<AIP>> aipIter = aips.iterator();
-      List<Future<Object>> futures = new ArrayList<>();
-      List<Plugin<Representation>> innerPlugins = new ArrayList<>();
       Plugin<Representation> innerPlugin;
 
       plugin.beforeAllExecute(index, model, storage);
 
       List<Representation> block = new ArrayList<Representation>();
-      Timeout timeout = JobsHelper.getPluginTimeout(plugin.getClass());
       while (aipIter.hasNext()) {
         OptionalWithCause<AIP> aip = aipIter.next();
         if (aip.isPresent()) {
           for (Representation representation : aip.get().getRepresentations()) {
             if (block.size() == blockSize) {
-              innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, Representation.class, innerPlugins,
-                blockSize);
-              futures.add(
-                Patterns.ask(workersRouter, new Messages.PluginMessage<Representation>(block, innerPlugin), timeout));
-              block = new ArrayList<Representation>();
-              multiplier++;
+              innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, Representation.class, blockSize);
+              workersRouter.tell(new Messages.PluginToBeExecuted<Representation>(block, innerPlugin),
+                ActorRef.noSender());
+              block = new ArrayList<>();
             }
             block.add(representation);
           }
@@ -435,47 +319,31 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       }
 
       if (!block.isEmpty()) {
-        innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, Representation.class, innerPlugins, block.size());
-        futures
-          .add(Patterns.ask(workersRouter, new Messages.PluginMessage<Representation>(block, innerPlugin), timeout));
-        multiplier++;
+        innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, Representation.class, block.size());
+        workersRouter.tell(new Messages.PluginToBeExecuted<Representation>(block, innerPlugin), ActorRef.noSender());
       }
 
       IOUtils.closeQuietly(aips);
 
-      waitForFuturesToComplete(plugin, multiplier, futures);
-
-      for (Plugin<Representation> p : innerPlugins) {
-        p.afterBlockExecute(index, model, storage);
-      }
-
-      plugin.afterAllExecute(index, model, storage);
-
     } catch (Exception e) {
       LOGGER.error("Error running plugin on all representations", e);
+      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE);
     }
-
-    PluginHelper.updateJobState(plugin, JOB_STATE.COMPLETED);
-    LOGGER.info("Ended {}", plugin.getName());
 
   }
 
   @Override
   public void runPluginOnAllFiles(Plugin<File> plugin) {
     try {
-      LOGGER.info("Started {}", plugin.getName());
+      LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
       int blockSize = JobsHelper.getBlockSize();
-      int multiplier = 0;
       CloseableIterable<OptionalWithCause<AIP>> aips = model.listAIPs();
       Iterator<OptionalWithCause<AIP>> aipIter = aips.iterator();
-      List<Future<Object>> futures = new ArrayList<>();
-      List<Plugin<File>> innerPlugins = new ArrayList<>();
       Plugin<File> innerPlugin;
 
       plugin.beforeAllExecute(index, model, storage);
 
       List<File> block = new ArrayList<File>();
-      Timeout timeout = JobsHelper.getPluginTimeout(plugin.getClass());
       while (aipIter.hasNext()) {
         OptionalWithCause<AIP> aip = aipIter.next();
         if (aip.isPresent()) {
@@ -488,10 +356,9 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
             while (fileIter.hasNext()) {
 
               if (block.size() == blockSize) {
-                innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, File.class, innerPlugins, blockSize);
-                futures.add(Patterns.ask(workersRouter, new Messages.PluginMessage<File>(block, innerPlugin), timeout));
-                block = new ArrayList<File>();
-                multiplier++;
+                innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, File.class, blockSize);
+                workersRouter.tell(new Messages.PluginToBeExecuted<File>(block, innerPlugin), ActorRef.noSender());
+                block = new ArrayList<>();
               }
 
               OptionalWithCause<File> file = fileIter.next();
@@ -511,133 +378,95 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       }
 
       if (!block.isEmpty()) {
-        innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, File.class, innerPlugins, block.size());
-        futures.add(Patterns.ask(workersRouter, new Messages.PluginMessage<File>(block, innerPlugin), timeout));
-        multiplier++;
+        innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, File.class, block.size());
+        workersRouter.tell(new Messages.PluginToBeExecuted<File>(block, innerPlugin), ActorRef.noSender());
       }
 
       IOUtils.closeQuietly(aips);
 
-      waitForFuturesToComplete(plugin, multiplier, futures);
-
-      for (Plugin<File> p : innerPlugins) {
-        p.afterBlockExecute(index, model, storage);
-      }
-
-      plugin.afterAllExecute(index, model, storage);
-
     } catch (Exception e) {
       LOGGER.error("Error running plugin on all files", e);
+      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE);
     }
-
-    PluginHelper.updateJobState(plugin, JOB_STATE.COMPLETED);
-    LOGGER.info("Ended {}", plugin.getName());
 
   }
 
   @Override
   public void runPluginOnTransferredResources(Plugin<TransferredResource> plugin, List<String> uuids) {
     try {
-      LOGGER.info("Started {}", plugin.getName());
+      LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
       int blockSize = JobsHelper.getBlockSize();
-      int multiplier = 0;
       List<TransferredResource> resources = JobsHelper.getTransferredResources(index, uuids);
-      List<Future<Object>> futures = new ArrayList<>();
-      List<Plugin<TransferredResource>> innerPlugins = new ArrayList<>();
       Plugin<TransferredResource> innerPlugin;
 
       plugin.beforeAllExecute(index, model, storage);
 
       List<TransferredResource> block = new ArrayList<TransferredResource>();
-      Timeout timeout = JobsHelper.getPluginTimeout(plugin.getClass());
       for (TransferredResource resource : resources) {
         if (block.size() == blockSize) {
-          innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, TransferredResource.class, innerPlugins,
-            blockSize);
-          futures.add(
-            Patterns.ask(workersRouter, new Messages.PluginMessage<TransferredResource>(block, innerPlugin), timeout));
-          block = new ArrayList<TransferredResource>();
-          multiplier++;
+          innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, TransferredResource.class, blockSize);
+          workersRouter.tell(new Messages.PluginToBeExecuted<TransferredResource>(block, innerPlugin),
+            ActorRef.noSender());
+          block = new ArrayList<>();
         }
-
         block.add(resource);
       }
 
       if (!block.isEmpty()) {
-        innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, TransferredResource.class, innerPlugins,
-          block.size());
-        futures.add(
-          Patterns.ask(workersRouter, new Messages.PluginMessage<TransferredResource>(block, innerPlugin), timeout));
-        multiplier++;
+        innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, TransferredResource.class, block.size());
+        workersRouter.tell(new Messages.PluginToBeExecuted<TransferredResource>(block, innerPlugin),
+          ActorRef.noSender());
       }
-
-      LOGGER.info("Before waitForFuturesToComplete");
-      waitForFuturesToComplete(plugin, multiplier, futures);
-      LOGGER.info("After waitForFuturesToComplete");
-
-      for (Plugin<TransferredResource> p : innerPlugins) {
-        p.afterBlockExecute(index, model, storage);
-      }
-
-      plugin.afterAllExecute(index, model, storage);
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on transferred resources", e);
+      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE);
     }
-
-    PluginHelper.updateJobState(plugin, JOB_STATE.COMPLETED);
-    LOGGER.info("Ended {}", plugin.getName());
-
   }
 
   @Override
   public <T extends Serializable> void runPlugin(Plugin<T> plugin) {
     try {
-      LOGGER.info("Started {}", plugin.getName());
+      LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
+
       plugin.beforeAllExecute(index, model, storage);
-      plugin.beforeBlockExecute(index, model, storage);
 
-      // FIXME what to do with the askFuture???
-      Future<Object> future = Patterns.ask(workersRouter, new Messages.PluginMessage<T>(new ArrayList<T>(), plugin),
-        JobsHelper.getPluginTimeout(plugin.getClass()));
-
-      future.onSuccess(new OnSuccess<Object>() {
-        @Override
-        public void onSuccess(Object msg) throws Throwable {
-          plugin.afterBlockExecute(index, model, storage);
-          plugin.afterAllExecute(index, model, storage);
-
-          PluginHelper.updateJobState(plugin, JOB_STATE.COMPLETED);
-
-          LOGGER.info("Ended {}", plugin.getName());
-        }
-      }, workersSystem.dispatcher());
-      future.onFailure(new OnFailure() {
-        @Override
-        public void onFailure(Throwable error) throws Throwable {
-          LOGGER.error("Failure running plugin: {}", error);
-
-          plugin.afterBlockExecute(index, model, storage);
-          plugin.afterAllExecute(index, model, storage);
-
-          PluginHelper.updateJobState(plugin, JOB_STATE.COMPLETED);
-
-          LOGGER.info("Ended {}", plugin.getName());
-        }
-      }, workersSystem.dispatcher());
+      ArrayList<T> list = new ArrayList<T>();
+      getNewPluginInstanceAndRunBeforeExecute(plugin, list.size());
+      workersRouter.tell(new Messages.PluginToBeExecuted<T>(list, plugin), ActorRef.noSender());
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin", e);
+      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE);
     }
   }
 
-  private <T extends Serializable> Plugin<T> getNewPluginInstanceAndRunBeforeExecute(Plugin<T> plugin,
-    Class<T> pluginClass, List<Plugin<T>> innerPlugins, int objectsCount)
+  private <T extends Serializable> void getNewPluginInstanceAndRunBeforeExecute(Plugin<T> plugin, int objectsCount)
     throws InvalidParameterException, PluginException {
+    plugin.beforeBlockExecute(index, model, storage);
+
+    // keep track of each job/plugin relation
+    String jobId = PluginHelper.getJobId(plugin);
+    if (jobId != null && runningJobs.get(jobId) != null) {
+      ActorRef jobInfoActor = runningJobs.get(jobId);
+      if (PluginType.INGEST == plugin.getType()) {
+        IngestJobPluginInfo jobPluginInfo = new IngestJobPluginInfo();
+        initJobPluginInfo(plugin, jobId, jobInfoActor, jobPluginInfo, objectsCount);
+        plugin.injectJobPluginInfo(jobPluginInfo);
+      } else if (PluginType.MISC == plugin.getType() || PluginType.AIP_TO_AIP == plugin.getType()) {
+        SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo();
+        initJobPluginInfo(plugin, jobId, jobInfoActor, jobPluginInfo, objectsCount);
+        plugin.injectJobPluginInfo(jobPluginInfo);
+      }
+    }
+
+  }
+
+  private <T extends Serializable> Plugin<T> getNewPluginInstanceAndRunBeforeExecute(Plugin<T> plugin,
+    Class<T> pluginClass, int objectsCount) throws InvalidParameterException, PluginException {
     Plugin<T> innerPlugin = RodaCoreFactory.getPluginManager().getPlugin(plugin.getClass().getCanonicalName(),
       pluginClass);
     innerPlugin.setParameterValues(plugin.getParameterValues());
-    innerPlugins.add(innerPlugin);
     innerPlugin.beforeBlockExecute(index, model, storage);
 
     // keep track of each job/plugin relation
@@ -659,47 +488,12 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   }
 
-  private <T extends Serializable> Optional<Iterable<Object>> waitForFuturesToComplete(Plugin<T> plugin, int multiplier,
-    List<Future<Object>> futures) {
-    final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
-    Optional<Iterable<Object>> reports = Optional.empty();
-    try {
-      reports = Optional
-        .ofNullable(Await.result(sequenceResult, JobsHelper.getDuration(plugin.getClass(), multiplier)));
-    } catch (TimeoutException e) {
-      String jobId = PluginHelper.getJobId(plugin);
-      if (jobId != null) {
-        // FIXME 20160602 hsilva: this was commented out but the whole method
-        // will must certainly be removed
-        // runningJobs.get(jobId).setHasTimeoutOccurred(true);
-      }
-      LOGGER.error("A timeout occured while waiting for futures to complete", e);
-    } catch (Exception e) {
-      LOGGER.error("Error while waiting for futures to complete", e);
-    }
-    return reports;
-  }
-
-  private List<Report> mapToReports(Optional<Iterable<Object>> reports) {
-    List<Report> ret = new ArrayList<>();
-    if (reports.isPresent()) {
-      for (Object o : reports.get()) {
-        if (o instanceof Report) {
-          ret.add((Report) o);
-        } else {
-          LOGGER.warn("Got a response that was not a report: {}", o.getClass().getName());
-        }
-      }
-    }
-    return ret;
-  }
-
   private <T extends Serializable> void initJobPluginInfo(Plugin<T> innerPlugin, String jobId, ActorRef jobInfoActor,
     JobPluginInfo jobPluginInfo, int objectsCount) {
     jobPluginInfo.setSourceObjectsCount(objectsCount);
     jobPluginInfo.setSourceObjectsWaitingToBeProcessed(objectsCount);
 
-    jobInfoActor.tell(new Messages.JobInfoMessage(innerPlugin, jobPluginInfo), ActorRef.noSender());
+    jobInfoActor.tell(new Messages.JobInfoUpdated(innerPlugin, jobPluginInfo), ActorRef.noSender());
   }
 
   @Override
@@ -721,9 +515,10 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     // FIXME 20160328 hsilva: this is not the solution as the messages are sent
     // async and until the processing of the current message is done, no other
     // is read
-    Timeout defaultTimeout = JobsHelper.getDefaultTimeout();
-    Patterns.ask(workersRouter, new Broadcast(Kill.getInstance()), defaultTimeout);
-    Patterns.ask(workersRouter, Kill.getInstance(), defaultTimeout);
+    // Timeout defaultTimeout = JobsHelper.getDefaultTimeout();
+    // Patterns.ask(workersRouter, new Broadcast(Kill.getInstance()),
+    // defaultTimeout);
+    // Patterns.ask(workersRouter, Kill.getInstance(), defaultTimeout);
   }
 
   @Override
@@ -791,13 +586,13 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     String jobId = PluginHelper.getJobId(plugin);
     if (jobId != null && runningJobs.get(jobId) != null) {
       ActorRef jobInfoActor = runningJobs.get(jobId);
-      jobInfoActor.tell(new Messages.JobIsDone(plugin, state), ActorRef.noSender());
+      jobInfoActor.tell(new Messages.JobStateUpdated(plugin, state), ActorRef.noSender());
       if (state == JOB_STATE.COMPLETED) {
         runningJobs.remove(jobId);
       }
 
     } else {
-      LOGGER.error("Got a NULL jobId when updating Job state");
+      LOGGER.error("Got job id or job information null when updating Job state");
     }
 
   }
@@ -812,9 +607,9 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     String jobId = PluginHelper.getJobId(plugin);
     if (jobId != null && runningJobs.get(jobId) != null) {
       ActorRef jobInfoActor = runningJobs.get(jobId);
-      jobInfoActor.tell(new Messages.JobInfoMessage(plugin, info), ActorRef.noSender());
+      jobInfoActor.tell(new Messages.JobInfoUpdated(plugin, info), ActorRef.noSender());
     } else {
-      throw new JobException("Job id is null");
+      throw new JobException("Job id or job information is null");
     }
   }
 
