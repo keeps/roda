@@ -42,6 +42,24 @@ On Linux, as Kitematic Docker Toolbox is not yet available, use the following in
 
 NOTE: the docker commands only need `sudo` if your user does not belong to the `docker` group.
 
+To start as a service you can install supervisord and create the file `/etc/supervisor/conf.d/roda.conf` with:
+
+```
+[program:roda]
+command=docker run -p 8080:8080 -v /home/roda/:/root/.roda keeps/roda
+directory=/tmp/
+autostart=true
+autorestart=true
+startretries=3
+stderr_logfile=/var/log/supervisor/roda.err.log
+stdout_logfile=/var/log/supervisor/roda.out.log
+user=roda
+```
+
+1. Create user 'roda': `sudo adduser roda`
+2. Add user 'roda' to 'docker' group: `sudo usermod -aG docker roda`
+3. Then restart supervisord (`sudo service supervisord restart`)
+
 ### Production mode
 
 To install RODA from base, i.e. without containers, see the [base install instructions](INSTALL.md).
