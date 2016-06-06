@@ -120,11 +120,13 @@ public class SimpleJobReportList extends BasicAsyncTableCell<Report> {
         if (job != null) {
           if (job.getPlugin() != null) {
             PluginInfo pluginInfo = pluginsInfo.get(job.getPlugin());
+            String pluginName;
             if (pluginInfo != null) {
-              value = messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion());
+              pluginName = pluginInfo.getName();
             } else {
-              value = job.getPlugin();
+              pluginName = job.getPlugin();
             }
+            value = messages.pluginLabel(pluginName, job.getPluginVersion());
           }
         }
 

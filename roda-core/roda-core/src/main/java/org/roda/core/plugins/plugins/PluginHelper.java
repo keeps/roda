@@ -125,6 +125,7 @@ public final class PluginHelper {
     reportItem.setOutcomeObjectId(outcomeObjectId);
     reportItem.setTitle(plugin.getName());
     reportItem.setPlugin(plugin.getClass().getCanonicalName());
+    reportItem.setPluginVersion(plugin.getVersion());
     reportItem.setDateCreated(new Date());
     reportItem.setTotalSteps(getTotalStepsFromParameters(plugin));
 

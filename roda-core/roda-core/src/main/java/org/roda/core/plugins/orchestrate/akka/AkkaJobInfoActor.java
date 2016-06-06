@@ -50,7 +50,9 @@ public class AkkaJobInfoActor extends UntypedActor {
     } else if (msg instanceof Messages.JobStateUpdated) {
       Messages.JobStateUpdated message = (Messages.JobStateUpdated) msg;
       PluginHelper.updateJobState(message.plugin, RodaCoreFactory.getModelService(), message.state);
-      getContext().stop(getSelf());
+      if (message.state == JOB_STATE.COMPLETED) {
+        getContext().stop(getSelf());
+      }
     } else {
       LOGGER.error(AkkaJobInfoActor.class.getName() + " received a message that it doesn't know how to process...");
     }

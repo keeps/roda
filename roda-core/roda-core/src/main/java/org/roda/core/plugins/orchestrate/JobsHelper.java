@@ -42,10 +42,18 @@ public final class JobsHelper {
 
   }
 
-  public static int getNumberOfPluginWorkers() {
-    int defaultNumberOfWorkers = Runtime.getRuntime().availableProcessors() + 1;
+  public static int getMaxNumberOfJobsInParallel() {
+    int defaultMaxNumberOfJobsInParallel = Runtime.getRuntime().availableProcessors() + 1;
 
-    return RodaCoreFactory.getRodaConfiguration().getInt("core.orchestrator.nr_of_workers", defaultNumberOfWorkers);
+    return RodaCoreFactory.getRodaConfiguration().getInt("core.orchestrator.max_jobs_in_parallel",
+      defaultMaxNumberOfJobsInParallel);
+  }
+
+  public static int getNumberOfJobsWorkers() {
+    int defaultNumberOfJobsWorkers = Runtime.getRuntime().availableProcessors() + 1;
+
+    return RodaCoreFactory.getRodaConfiguration().getInt("core.orchestrator.nr_of_jobs_workers",
+      defaultNumberOfJobsWorkers);
   }
 
   public static int getBlockSize() {

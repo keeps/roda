@@ -79,12 +79,16 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   private ActorSystem workersSystem;
   private ActorRef workersRouter;
   private ActorRef jobWorkersRouter;
-  private int numberOfWorkers;
+  private int maxNumberOfJobsInParallel;
+  private int numberOfJobsWorkers;
 
   // Map<jobId, ActorRef>
   private Map<String, ActorRef> runningJobs;
 
   public AkkaEmbeddedPluginOrchestrator() {
+    maxNumberOfJobsInParallel = JobsHelper.getMaxNumberOfJobsInParallel();
+    numberOfJobsWorkers = JobsHelper.getNumberOfJobsWorkers();
+
     index = RodaCoreFactory.getIndexService();
     model = RodaCoreFactory.getModelService();
     storage = RodaCoreFactory.getStorageService();
@@ -92,15 +96,14 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     runningJobs = new HashMap<>();
 
     Config akkaConfig = RodaCoreFactory.getAkkaConfiguration();
-    numberOfWorkers = JobsHelper.getNumberOfPluginWorkers();
     workersSystem = ActorSystem.create("WorkersSystem", akkaConfig);
 
-    Props workersProps = new RoundRobinPool(numberOfWorkers)
+    Props jobsProps = new RoundRobinPool(maxNumberOfJobsInParallel).props(Props.create(AkkaJobActor.class));
+    jobWorkersRouter = workersSystem.actorOf(jobsProps, "JobWorkersRouter");
+
+    Props workersProps = new RoundRobinPool(numberOfJobsWorkers)
       .props(Props.create(AkkaWorkerActor.class, storage, model, index));
     workersRouter = workersSystem.actorOf(workersProps, "WorkersRouter");
-
-    Props jobsProps = new RoundRobinPool(numberOfWorkers).props(Props.create(AkkaJobActor.class));
-    jobWorkersRouter = workersSystem.actorOf(jobsProps, "JobWorkersRouter");
 
   }
 

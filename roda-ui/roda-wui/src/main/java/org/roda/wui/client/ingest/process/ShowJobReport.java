@@ -285,10 +285,10 @@ public class ShowJobReport extends Composite {
       panel.add(panelBody);
 
       // FIXME
-      Label attributeLabel = new Label("Plugin");
+      Label attributeLabel = new Label("Agent");
       attributeLabel.setStyleName("label");
       panelBody.add(attributeLabel);
-      Label attributeValue = new Label(reportItem.getPlugin());
+      Label attributeValue = new Label(messages.pluginLabel(reportItem.getPlugin(), reportItem.getPluginVersion()));
       attributeValue.setStyleName("value");
       panelBody.add(attributeValue);
 

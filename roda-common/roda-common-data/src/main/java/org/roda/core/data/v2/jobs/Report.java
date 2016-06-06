@@ -40,6 +40,7 @@ public class Report implements Serializable, IsIndexed {
   private Integer stepsCompleted = 0;
   private Integer totalSteps = 0;
   private String plugin = "";
+  private String pluginVersion = "";
   private PluginState pluginState = PluginState.RUNNING;
   private String pluginDetails = "";
   private boolean htmlPluginDetails = false;
@@ -69,6 +70,8 @@ public class Report implements Serializable, IsIndexed {
     this.completionPercentage = report.getCompletionPercentage();
     this.stepsCompleted = report.getStepsCompleted();
     this.totalSteps = report.getTotalSteps();
+    this.plugin = report.getPlugin();
+    this.pluginVersion = report.getPluginVersion();
     this.pluginState = report.getPluginState();
     this.pluginDetails = report.getPluginDetails();
     this.reports = new ArrayList<Report>();
@@ -208,6 +211,15 @@ public class Report implements Serializable, IsIndexed {
     return this;
   }
 
+  public String getPluginVersion() {
+    return pluginVersion;
+  }
+
+  public Report setPluginVersion(String pluginVersion) {
+    this.pluginVersion = pluginVersion;
+    return this;
+  }
+
   public PluginState getPluginState() {
     return pluginState;
   }
@@ -248,6 +260,7 @@ public class Report implements Serializable, IsIndexed {
       completionPercentage = Math.round(((100f / totalSteps) * stepsCompleted));
     }
     setPlugin(report.getPlugin());
+    setPluginVersion(report.getPluginVersion());
     setPluginState(report.getPluginState());
     setOutcomeObjectState(report.getOutcomeObjectState());
 
@@ -272,8 +285,8 @@ public class Report implements Serializable, IsIndexed {
       + outcomeObjectId + ", outcomeObjectClass=" + outcomeObjectClass + ", outcomeObjectState=" + outcomeObjectState
       + ", title=" + title + ", dateCreated=" + dateCreated + ", dateUpdated=" + dateUpdated + ", completionPercentage="
       + completionPercentage + ", stepsCompleted=" + stepsCompleted + ", totalSteps=" + totalSteps + ", plugin="
-      + plugin + ", pluginState=" + pluginState + ", pluginDetails=" + pluginDetails + ", htmlPluginDetails="
-      + htmlPluginDetails + ", reports=" + reports + "]";
+      + plugin + ", pluginVersion=" + pluginVersion + ", pluginState=" + pluginState + ", pluginDetails="
+      + pluginDetails + ", htmlPluginDetails=" + htmlPluginDetails + ", reports=" + reports + "]";
   }
 
   @JsonIgnore
