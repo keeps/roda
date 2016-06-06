@@ -9,6 +9,7 @@ package org.roda.core.plugins.orchestrate.akka;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Optional;
 
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.plugins.Plugin;
@@ -37,10 +38,12 @@ public class Messages {
 
     public Plugin<?> plugin;
     public JOB_STATE state;
+    public Optional<String> stateDatails;
 
-    public JobStateUpdated(Plugin<?> plugin, JOB_STATE state) {
+    public JobStateUpdated(Plugin<?> plugin, JOB_STATE state, Optional<String> stateDatails) {
       this.plugin = plugin;
       this.state = state;
+      this.stateDatails = stateDatails;
     }
 
     @Override

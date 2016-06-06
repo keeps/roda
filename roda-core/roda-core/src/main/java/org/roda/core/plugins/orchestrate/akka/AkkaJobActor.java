@@ -8,6 +8,7 @@
 package org.roda.core.plugins.orchestrate.akka;
 
 import java.io.Serializable;
+import java.util.Optional;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.GenericException;
@@ -56,14 +57,20 @@ public class AkkaJobActor extends UntypedActor {
 
       PluginHelper.updateJobState(plugin, JOB_STATE.STARTED);
 
-      if (job.getSourceObjects() instanceof SelectedItemsAll<?>) {
-        runOnAll(job, plugin);
-      } else if (job.getSourceObjects() instanceof SelectedItemsNone<?>) {
-        RodaCoreFactory.getPluginOrchestrator().runPlugin(plugin);
-      } else if (job.getSourceObjects() instanceof SelectedItemsList<?>) {
-        runFromList(job, plugin);
-      } else if (job.getSourceObjects() instanceof SelectedItemsFilter<?>) {
-        runFromFilter(job, plugin);
+      try {
+        if (job.getSourceObjects() instanceof SelectedItemsAll<?>) {
+          runOnAll(job, plugin);
+        } else if (job.getSourceObjects() instanceof SelectedItemsNone<?>) {
+          RodaCoreFactory.getPluginOrchestrator().runPlugin(plugin);
+        } else if (job.getSourceObjects() instanceof SelectedItemsList<?>) {
+          runFromList(job, plugin);
+        } else if (job.getSourceObjects() instanceof SelectedItemsFilter<?>) {
+          runFromFilter(job, plugin);
+        }
+      } catch (GenericException e) {
+        jobInfoActor.tell(
+          new Messages.JobStateUpdated(plugin, JOB_STATE.FAILED_TO_COMPLETE, Optional.ofNullable(e.getMessage())),
+          ActorRef.noSender());
       }
 
     } else {
@@ -84,6 +91,8 @@ public class AkkaJobActor extends UntypedActor {
       RodaCoreFactory.getPluginOrchestrator().runPluginOnAllFiles((Plugin<File>) plugin);
     } else {
       LOGGER.error("Error executing job on unknown source objects class '{}'", sourceObjectsClass.getCanonicalName());
+      throw new GenericException(
+        "Error executing job on unknown source objects class '" + sourceObjectsClass.getCanonicalName() + "'");
     }
   }
 

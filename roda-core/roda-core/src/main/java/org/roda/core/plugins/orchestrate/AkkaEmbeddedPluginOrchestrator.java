@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
@@ -589,7 +590,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     String jobId = PluginHelper.getJobId(plugin);
     if (jobId != null && runningJobs.get(jobId) != null) {
       ActorRef jobInfoActor = runningJobs.get(jobId);
-      jobInfoActor.tell(new Messages.JobStateUpdated(plugin, state), ActorRef.noSender());
+      jobInfoActor.tell(new Messages.JobStateUpdated(plugin, state, Optional.empty()), ActorRef.noSender());
       if (state == JOB_STATE.COMPLETED) {
         runningJobs.remove(jobId);
       }

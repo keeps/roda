@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
@@ -286,10 +287,14 @@ public final class PluginHelper {
    * 20160531 hsilva:Only orchestrators/orchestrators related classes should
    * invoke this method
    */
-  public static <T extends Serializable> void updateJobState(Plugin<T> plugin, ModelService model, JOB_STATE state) {
+  public static <T extends Serializable> void updateJobState(Plugin<T> plugin, ModelService model, JOB_STATE state,
+    Optional<String> stateDetails) {
     try {
       Job job = PluginHelper.getJobFromModel(plugin, model);
       job.setState(state);
+      if (stateDetails.isPresent()) {
+        job.setStateDetails(stateDetails.get());
+      }
       if (job.getState() == JOB_STATE.COMPLETED) {
         job.setEndDate(new Date());
       }

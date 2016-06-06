@@ -130,6 +130,7 @@ public class ShowJobReport extends Composite {
   Label duration;
   @UiField
   HTML status;
+  // FIXME 20160606 hsilva: added jobStateDetails
   @UiField
   Label progress;
   @UiField

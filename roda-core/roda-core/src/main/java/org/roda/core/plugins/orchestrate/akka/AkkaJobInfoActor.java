@@ -7,6 +7,8 @@
  */
 package org.roda.core.plugins.orchestrate.akka;
 
+import java.util.Optional;
+
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.plugins.Plugin;
@@ -44,12 +46,14 @@ public class AkkaJobInfoActor extends UntypedActor {
         if (jobInfo.isDone()) {
           plugin.afterAllExecute(RodaCoreFactory.getIndexService(), RodaCoreFactory.getModelService(),
             RodaCoreFactory.getStorageService());
-          PluginHelper.updateJobState(message.plugin, RodaCoreFactory.getModelService(), JOB_STATE.COMPLETED);
+          PluginHelper.updateJobState(message.plugin, RodaCoreFactory.getModelService(), JOB_STATE.COMPLETED,
+            Optional.empty());
         }
       }
     } else if (msg instanceof Messages.JobStateUpdated) {
       Messages.JobStateUpdated message = (Messages.JobStateUpdated) msg;
-      PluginHelper.updateJobState(message.plugin, RodaCoreFactory.getModelService(), message.state);
+      PluginHelper.updateJobState(message.plugin, RodaCoreFactory.getModelService(), message.state,
+        message.stateDatails);
       if (message.state == JOB_STATE.COMPLETED) {
         getContext().stop(getSelf());
       }
