@@ -24,7 +24,7 @@
 	<g:FlowPanel styleName="wui-ingest-list" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1" ui:field="ingestProcessTitle">Job Process</g:Label>
+				<g:Label styleName="h1" ui:field="ingestProcessTitle">Preservation actions</g:Label>
 				<g:FlowPanel addStyleNames="page-description" ui:field="ingestProcessDescription">
 				</g:FlowPanel>
 				<lists:JobList ui:field="jobList" />

@@ -106,6 +106,8 @@ public class AkkaJobActor extends UntypedActor {
         ((SelectedItemsList<TransferredResource>) job.getSourceObjects()).getIds());
     } else {
       LOGGER.error("Error executing job on unknown source objects class '{}'", sourceObjectsClass.getCanonicalName());
+      throw new GenericException(
+        "Error executing job on unknown source objects class '" + sourceObjectsClass.getCanonicalName() + "'");
     }
   }
 

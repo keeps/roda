@@ -200,8 +200,7 @@ public class NotificationRegister extends Composite {
     if (historyTokens.size() == 0) {
       notificationList.refresh();
       callback.onSuccess(this);
-    } else if (historyTokens.size() > 1
-      && ShowNotification.RESOLVER.getHistoryToken().equals(historyTokens.get(0))) {
+    } else if (historyTokens.size() > 1 && ShowNotification.RESOLVER.getHistoryToken().equals(historyTokens.get(0))) {
       ShowNotification.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {
       Tools.newHistory(RESOLVER);

@@ -14,7 +14,7 @@
 	<g:FlowPanel styleName="wui-log" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1">Log</g:Label>
+				<g:Label styleName="h1">Activity log</g:Label>
 				<g:FlowPanel addStyleNames="page-description" ui:field="userLogDescription">
 				</g:FlowPanel>
 				<common:SearchPanel ui:field="searchPanel" />

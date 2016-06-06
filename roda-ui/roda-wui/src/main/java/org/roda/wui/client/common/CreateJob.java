@@ -288,6 +288,7 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
       workflowListDescription.setVisible(false);
       workflowOptions.setPluginInfo(null);
     } else {
+      name.setText(selectedPlugin.getName());
       String description = selectedPlugin.getDescription();
       if (description != null && description.length() > 0) {
         workflowListDescription.setText(description);
