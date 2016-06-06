@@ -195,7 +195,7 @@ public class SolrUtils {
         ret.add(solrDocumentTo(classToRetrieve, doc));
       }
     } catch (SolrServerException | IOException e) {
-      throw new GenericException("Could not retrieve AIP from index", e);
+      throw new GenericException("Could not retrieve object from index", e);
     }
     return ret;
   }

@@ -9,6 +9,7 @@ package org.roda.core.plugins.orchestrate;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.roda.core.data.adapter.filter.Filter;
@@ -232,7 +233,8 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
   }
 
   @Override
-  public <T extends Serializable> void updateJobState(Plugin<T> plugin, JOB_STATE state) {
+  public <T extends Serializable> void updateJobState(Plugin<T> plugin, JOB_STATE state,
+    Optional<String> stateDetails) {
     // TODO Auto-generated method stub
 
   }
@@ -240,7 +242,7 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
   @Override
   public void setInitialJobInfo(String jobId, Object object) {
     // TODO Auto-generated method stub
-    
+
   }
 
 }

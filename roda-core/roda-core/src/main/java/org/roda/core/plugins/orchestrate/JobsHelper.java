@@ -35,8 +35,6 @@ public final class JobsHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(JobsHelper.class);
 
   private static final int DEFAULT_BLOCK_SIZE = 100;
-  private static final int DEFAULT_TIMEOUT = 1;
-  private static final String DEFAULT_TIMEOUT_TIMEUNIT = "HOURS";
 
   private JobsHelper() {
 
@@ -72,19 +70,16 @@ public final class JobsHelper {
     return job;
   }
 
-  public static List<TransferredResource> getTransferredResources(IndexService index, List<String> uuids) {
-    List<TransferredResource> res = new ArrayList<TransferredResource>();
-
-    try {
-      res.addAll(index.retrieve(TransferredResource.class, uuids));
-    } catch (NotFoundException | GenericException e) {
-      LOGGER.error("Error retrieving TransferredResource", e);
+  public static List<TransferredResource> getTransferredResources(IndexService index, List<String> uuids)
+    throws NotFoundException, GenericException {
+    List<TransferredResource> ret = index.retrieve(TransferredResource.class, uuids);
+    if (ret.isEmpty()) {
+      throw new NotFoundException("Could not retrive the Transferred Resources");
     }
-
-    return res;
+    return ret;
   }
 
-  public static List<AIP> getAIPs(ModelService model, IndexService index, List<String> uuids) {
+  public static List<AIP> getAIPs(ModelService model, IndexService index, List<String> uuids) throws NotFoundException {
     List<AIP> aipsToReturn = new ArrayList<>();
 
     if (!uuids.isEmpty()) {
@@ -100,10 +95,15 @@ public final class JobsHelper {
       }
     }
 
+    if (aipsToReturn.isEmpty()) {
+      throw new NotFoundException("Could not retrive the AIPs");
+    }
+
     return aipsToReturn;
   }
 
-  public static List<Representation> getRepresentations(ModelService model, IndexService index, List<String> uuids) {
+  public static List<Representation> getRepresentations(ModelService model, IndexService index, List<String> uuids)
+    throws NotFoundException {
     List<Representation> representationsToReturn = new ArrayList<>();
 
     if (!uuids.isEmpty()) {
@@ -120,10 +120,15 @@ public final class JobsHelper {
       }
     }
 
+    if (representationsToReturn.isEmpty()) {
+      throw new NotFoundException("Could not retrive the Representations");
+    }
+
     return representationsToReturn;
   }
 
-  public static List<File> getFiles(ModelService model, IndexService index, List<String> uuids) {
+  public static List<File> getFiles(ModelService model, IndexService index, List<String> uuids)
+    throws NotFoundException {
     List<File> filesToReturn = new ArrayList<>();
 
     if (!uuids.isEmpty()) {
@@ -138,6 +143,10 @@ public final class JobsHelper {
       } catch (Throwable e) {
         LOGGER.error("Error while retrieving files from index", e);
       }
+    }
+
+    if (filesToReturn.isEmpty()) {
+      throw new NotFoundException("Could not retrive the Files");
     }
 
     return filesToReturn;

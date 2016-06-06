@@ -9,6 +9,7 @@ package org.roda.core.plugins;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Optional;
 
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
@@ -58,13 +59,14 @@ public interface PluginOrchestrator {
   public void startJobsInTheStateCreated();
 
   public void cleanUnfinishedJobs();
-  
-  // FIXME 20160602 hsilva: rename this (in akka case this will receive the ActorRef for the actor holding JobInfo 
+
+  // FIXME 20160602 hsilva: rename this (in akka case this will receive the
+  // ActorRef for the actor holding JobInfo
   public void setInitialJobInfo(String jobId, Object object);
 
   public <T extends Serializable> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo)
     throws JobException;
 
-  public <T extends Serializable> void updateJobState(Plugin<T> plugin, JOB_STATE state);
+  public <T extends Serializable> void updateJobState(Plugin<T> plugin, JOB_STATE state, Optional<String> stateDetails);
 
 }

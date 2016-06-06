@@ -12,6 +12,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -332,7 +333,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       finishedSubmit();
       plugin.afterBlockExecute(index, model, storage);
 
-    } catch (PluginException e) {
+    } catch (Exception e) {
       // TODO review this exception handling
       LOGGER.error("Error running plugin on transferred resources", e);
     }
@@ -380,7 +381,8 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public <T extends Serializable> void updateJobState(Plugin<T> plugin, JOB_STATE state) {
+  public <T extends Serializable> void updateJobState(Plugin<T> plugin, JOB_STATE state,
+    Optional<String> stateDetails) {
     // TODO Auto-generated method stub
 
   }
@@ -388,7 +390,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public void setInitialJobInfo(String jobId, Object object) {
     // TODO Auto-generated method stub
-    
+
   }
 
 }

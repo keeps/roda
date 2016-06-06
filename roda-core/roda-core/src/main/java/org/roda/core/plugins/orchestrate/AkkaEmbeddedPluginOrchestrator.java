@@ -150,7 +150,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin from index", e);
-      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE);
+      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, Optional.ofNullable(e.getMessage()));
     }
 
   }
@@ -183,7 +183,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on AIPs", e);
-      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE);
+      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, Optional.ofNullable(e.getMessage()));
     }
 
   }
@@ -216,7 +216,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on Representations", e);
-      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE);
+      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, Optional.ofNullable(e.getMessage()));
     }
   }
 
@@ -248,7 +248,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on Files", e);
-      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE);
+      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, Optional.ofNullable(e.getMessage()));
     }
 
   }
@@ -288,7 +288,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on all AIPs", e);
-      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE);
+      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, Optional.ofNullable(e.getMessage()));
     }
 
   }
@@ -331,7 +331,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on all representations", e);
-      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE);
+      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, Optional.ofNullable(e.getMessage()));
     }
 
   }
@@ -390,7 +390,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on all files", e);
-      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE);
+      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, Optional.ofNullable(e.getMessage()));
     }
 
   }
@@ -424,7 +424,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on transferred resources", e);
-      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE);
+      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, Optional.ofNullable(e.getMessage()));
     }
   }
 
@@ -441,7 +441,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin", e);
-      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE);
+      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, Optional.ofNullable(e.getMessage()));
     }
   }
 
@@ -586,11 +586,12 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public <T extends Serializable> void updateJobState(Plugin<T> plugin, JOB_STATE state) {
+  public <T extends Serializable> void updateJobState(Plugin<T> plugin, JOB_STATE state,
+    Optional<String> stateDetails) {
     String jobId = PluginHelper.getJobId(plugin);
     if (jobId != null && runningJobs.get(jobId) != null) {
       ActorRef jobInfoActor = runningJobs.get(jobId);
-      jobInfoActor.tell(new Messages.JobStateUpdated(plugin, state, Optional.empty()), ActorRef.noSender());
+      jobInfoActor.tell(new Messages.JobStateUpdated(plugin, state, stateDetails), ActorRef.noSender());
       if (state == JOB_STATE.COMPLETED) {
         runningJobs.remove(jobId);
       }
