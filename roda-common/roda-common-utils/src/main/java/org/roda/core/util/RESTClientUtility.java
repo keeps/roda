@@ -1,4 +1,11 @@
-package org.roda.core.common;
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/keeps/roda
+ */
+package org.roda.core.util;
 
 import java.io.Serializable;
 
@@ -15,7 +22,7 @@ import org.roda.core.data.exceptions.RODAException;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 
-public class HttpRequestUtility {
+public class RESTClientUtility {
 
   public static <T extends Serializable> T sendPostRequest(T element, Class<T> elementClass, String url,
     String resource, String username, String password) throws RODAException {

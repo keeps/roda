@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.HttpRequestUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -41,6 +40,7 @@ import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.plugins.plugins.base.ReindexAIPPlugin;
 import org.roda.core.storage.StorageService;
 import org.roda.core.util.CommandException;
+import org.roda.core.util.RESTClientUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -146,7 +146,7 @@ public class ReplicationPlugin extends AbstractPlugin<AIP> {
     job.setPluginType(PluginType.MISC);
 
     try {
-      HttpRequestUtility.sendPostRequest(job, Job.class, targetApi, targetResource, username, password);
+      RESTClientUtility.sendPostRequest(job, Job.class, targetApi, targetResource, username, password);
     } catch (RODAException e) {
       LOGGER.error("Error send post request to reindex AIPs");
     }
