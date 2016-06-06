@@ -150,7 +150,7 @@ public class ReplicationPlugin extends AbstractPlugin<AIP> {
     String password = RodaCoreFactory.getRodaConfigurationAsString("core", "aip_rsync", "password");
 
     Job job = new Job();
-    job.setName(getClass().getSimpleName());
+    job.setName(getName());
     job.setSourceObjects(new SelectedItemsList<>(aipIds, IndexedAIP.class.getCanonicalName()));
     job.setPlugin(ReindexAIPPlugin.class.getCanonicalName());
     job.setPluginType(PluginType.MISC);

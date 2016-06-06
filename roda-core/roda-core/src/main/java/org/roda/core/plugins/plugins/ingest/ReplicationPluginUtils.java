@@ -53,9 +53,8 @@ public class ReplicationPluginUtils {
     rsyncCommand = addIncludeOnCommand(rsyncCommand,
       RodaConstants.CORE_STORAGE_FOLDER + "/" + RodaConstants.STORAGE_CONTAINER_AIP + "/" + pm.getAipId() + "/"
         + RodaConstants.STORAGE_DIRECTORY_METADATA + "/" + RodaConstants.STORAGE_DIRECTORY_PRESERVATION + "/");
-    rsyncCommand = addIncludeOnCommand(rsyncCommand,
-      "storage/aip/" + pm.getAipId() + "/" + RodaConstants.STORAGE_DIRECTORY_METADATA + "/"
-        + RodaConstants.STORAGE_DIRECTORY_PRESERVATION + "/" + pm.getId());
+    rsyncCommand = addIncludeOnCommand(rsyncCommand, "storage/aip/" + pm.getAipId() + "/"
+      + RodaConstants.STORAGE_DIRECTORY_METADATA + "/" + RodaConstants.STORAGE_DIRECTORY_PRESERVATION + "/***");
 
     rsyncCommand.addAll(finalCommand);
     return CommandUtility.execute(rsyncCommand);
@@ -64,7 +63,7 @@ public class ReplicationPluginUtils {
   public static String executeRsyncAgents() throws CommandException, IOException, UnsupportedOperationException {
     List<String> rsyncCommand = new ArrayList<String>(initialCommand);
     rsyncCommand = addIncludeOnCommand(rsyncCommand,
-      RodaConstants.CORE_STORAGE_FOLDER + "/" + RodaConstants.STORAGE_CONTAINER_AGENT + "/");
+      RodaConstants.CORE_STORAGE_FOLDER + "/" + RodaConstants.STORAGE_CONTAINER_AGENT + "/***");
     rsyncCommand.addAll(finalCommand);
     return CommandUtility.execute(rsyncCommand);
   }
@@ -79,7 +78,7 @@ public class ReplicationPluginUtils {
 
     command.add("--exclude");
     command.add("*");
-    command.add(sourcePath);
+    command.add(sourcePath + "/");
     command.add(targetUser + "@" + targetHost + ":" + targetPath);
 
     return command;
@@ -89,7 +88,7 @@ public class ReplicationPluginUtils {
     List<String> command = new ArrayList<String>();
 
     command.add("rsync");
-    command.add("--dry-run");
+    // command.add("--dry-run");
     command.add("-vzurltD");
     command.add("--delete");
     command = addIncludeOnCommand(command, RodaConstants.CORE_STORAGE_FOLDER + "/");
