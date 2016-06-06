@@ -223,6 +223,9 @@ public class InternalPluginsTest {
     // ReportAssertUtils.assertReports(reports, null,
     // transferredResourcesUUIDs);
 
+    // TODO wait for job to finish
+    Thread.sleep(1000);
+
     index.commitAIPs();
 
     IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
@@ -267,6 +270,9 @@ public class InternalPluginsTest {
     List<String> aipIdList = Arrays.asList(aip.getId());
     RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, aipIdList);
     // ReportAssertUtils.assertReports(reports, aipIdList);
+
+    // TODO wait for job to finish
+    Thread.sleep(1000);
 
     aip = model.retrieveAIP(aip.getId());
 
@@ -328,6 +334,9 @@ public class InternalPluginsTest {
     RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, aipIdList);
     // ReportAssertUtils.assertReports(reports, aipIdList);
 
+    // TODO wait for job to finish
+    Thread.sleep(1000);
+
     aip = model.retrieveAIP(aip.getId());
 
     CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadata = model
@@ -385,6 +394,8 @@ public class InternalPluginsTest {
 
     RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, aipIdList);
     // ReportAssertUtils.assertReports(reports, aipIdList);
+    // TODO wait for job to finish
+    Thread.sleep(1000);
 
     aip = model.retrieveAIP(aip.getId());
 
@@ -493,8 +504,12 @@ public class InternalPluginsTest {
     parameters2.put(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION, Boolean.TRUE.toString());
     plugin.setParameterValues(parameters2);
 
+    
     RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, aipIdList);
     // ReportAssertUtils.assertReports(reports, aipIdList);
+    
+    Job job = new Job();
+    RodaCoreFactory.getPluginOrchestrator().executeJob(job);
 
     aip = model.retrieveAIP(aip.getId());
 
@@ -545,6 +560,8 @@ public class InternalPluginsTest {
     autoAcceptPlugin.setParameterValues(parameters);
 
     RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(autoAcceptPlugin, Arrays.asList(aip.getId()));
+    // TODO wait for job to finish
+    Thread.sleep(1000);
 
     aip = model.retrieveAIP(aip.getId());
 

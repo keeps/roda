@@ -177,6 +177,9 @@ public class InternalConvertPluginsTest {
     RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(plugin,
       transferredResources.stream().map(tr -> tr.getUUID()).collect(Collectors.toList()));
 
+    // TODO wait for job to finish
+    Thread.sleep(1000);
+
     index.commitAIPs();
 
     IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
