@@ -204,7 +204,7 @@ public class RecoverLogin extends Composite {
   private void doRecover() {
     if (isValid()) {
       String recaptchaResponse = null;
-      if (recaptchaActive) {
+      if (recaptchaActive && recaptchaWidget != null) {
         recaptchaResponse = recaptchaWidget.getResponse();
       }
       UserManagementService.Util.getInstance().requestPasswordReset(usernameOrEmail.getValue(), recaptchaResponse,
@@ -221,23 +221,26 @@ public class RecoverLogin extends Composite {
               constants.recoverLoginSuccessDialogMessage(), constants.recoverLoginSuccessDialogButton(),
               new AsyncCallback<Void>() {
 
-              @Override
-              public void onFailure(Throwable caught) {
-                Tools.newHistory(Login.RESOLVER);
-              }
+                @Override
+                public void onFailure(Throwable caught) {
+                  Tools.newHistory(Login.RESOLVER);
+                }
 
-              @Override
-              public void onSuccess(Void result) {
-                Tools.newHistory(Login.RESOLVER);
-              }
-            });
+                @Override
+                public void onSuccess(Void result) {
+                  Tools.newHistory(Login.RESOLVER);
+                }
+              });
           }
         });
     }
   }
 
   private void errorMessage(Throwable caught) {
-    recaptchaWidget.reset();
+    if (recaptchaWidget != null) {
+      recaptchaWidget.reset();
+    }
+
     if (caught instanceof RecaptchaException) {
       Toast.showError(constants.recoverLoginCaptchaFailed());
     } else if (caught instanceof NotFoundException) {

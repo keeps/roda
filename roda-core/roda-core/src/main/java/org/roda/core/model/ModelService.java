@@ -1978,7 +1978,7 @@ public class ModelService extends ModelObservable {
 
       String templatePath = RodaCoreFactory.getRodaConfigurationAsString("core", "notification", "template_path");
 
-      InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(templatePath + templateName + ".vm");
+      InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(templatePath + templateName);
       String template = IOUtils.toString(templateStream, "UTF-8");
       IOUtils.closeQuietly(templateStream);
 

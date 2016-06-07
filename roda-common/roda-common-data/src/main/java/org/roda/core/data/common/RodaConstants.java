@@ -729,6 +729,9 @@ public final class RodaConstants {
   public static final String DEFAULT_DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
   /* Template Constants */
-  public static final String INGEST_EMAIL_TEMPLATE = "ingestion-template";
+  public static final String INGEST_EMAIL_TEMPLATE = "ingestion-template.vm";
+  public static final String INGEST_EMAIL_VERIFICATION_TEMPLATE = "emailverification_html.vm";
+  public static final String INGEST_EMAIL_RECOVER_LOGIN_TEMPLATE = "recoverlogin_html.vm";
+  public static final String INGEST_EMAIL_NOTIFY_PRODUCER_TEMPLATE = "notifyproducer_html.vm";
 
 }
