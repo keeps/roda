@@ -26,7 +26,6 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -98,24 +97,21 @@ public class ReplicationPlugin extends AbstractPlugin<AIP> {
         try {
           commandResults.put(aip.getId(), ReplicationPluginUtils.executeRsyncAIP(aip));
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        } catch (UnsupportedOperationException | CommandException | IOException e) {
+          pms.add(PluginHelper.createPluginEvent(this, aip.getId(), model, index, PluginState.SUCCESS,
+            commandResults.get(aip.getId()), true));
+        } catch (UnsupportedOperationException | CommandException | IOException | RequestNotValidException
+          | NotFoundException | GenericException | AuthorizationDeniedException | ValidationException
+          | AlreadyExistsException e) {
+
           LOGGER.error("Could not run rsync command on AIPs: ", e);
           jobPluginInfo.incrementObjectsProcessedWithFailure();
-        }
-      }
-
-      for (AIP aip : list) {
-        try {
-          if (commandResults.containsKey(aip.getId())) {
-            pms.add(PluginHelper.createPluginEvent(this, aip.getId(), model, index, PluginState.SUCCESS,
-              commandResults.get(aip.getId()), true));
-          } else {
+          try {
             pms.add(PluginHelper.createPluginEvent(this, aip.getId(), model, index, PluginState.FAILURE,
               "Rsync of this AIP did not run successfully", true));
+          } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
+            | ValidationException | AlreadyExistsException e1) {
+            LOGGER.error("Could not create replication plugin event");
           }
-        } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
-          | AuthorizationDeniedException | AlreadyExistsException e) {
-          LOGGER.error("Error creating replication plugin event for AIP {}", aip.getId(), e);
         }
       }
 
@@ -151,7 +147,7 @@ public class ReplicationPlugin extends AbstractPlugin<AIP> {
 
     Job job = new Job();
     job.setName(getName());
-    job.setSourceObjects(new SelectedItemsList<>(aipIds, IndexedAIP.class.getCanonicalName()));
+    job.setSourceObjects(new SelectedItemsList<>(aipIds, AIP.class.getCanonicalName()));
     job.setPlugin(ReindexAIPPlugin.class.getCanonicalName());
     job.setPluginType(PluginType.MISC);
 

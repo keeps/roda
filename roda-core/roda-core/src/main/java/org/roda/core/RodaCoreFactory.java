@@ -1168,7 +1168,7 @@ public class RodaCoreFactory {
 
   public static void runReindexAipsPlugin(List<String> aipIds) {
     Plugin<AIP> reindexPlugin = new ReindexAIPPlugin();
-    getPluginOrchestrator().runPluginOnAIPs(reindexPlugin, aipIds);
+    getPluginOrchestrator().runPluginOnAIPs(reindexPlugin, aipIds, true);
   }
 
   public static void runReindex(List<String> args) {

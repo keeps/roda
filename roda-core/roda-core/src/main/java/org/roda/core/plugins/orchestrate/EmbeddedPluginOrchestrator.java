@@ -146,7 +146,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void runPluginOnAIPs(Plugin<AIP> plugin, List<String> ids) {
+  public void runPluginOnAIPs(Plugin<AIP> plugin, List<String> ids, boolean retrieveFromModel) {
     try {
       plugin.beforeBlockExecute(index, model, storage);
       Iterator<String> iter = ids.iterator();

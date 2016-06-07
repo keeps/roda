@@ -79,24 +79,35 @@ public final class JobsHelper {
     return ret;
   }
 
-  public static List<AIP> getAIPs(ModelService model, IndexService index, List<String> uuids) throws NotFoundException {
+  public static List<AIP> getAIPs(ModelService model, IndexService index, List<String> uuids, boolean retrieveFromModel)
+    throws NotFoundException {
     List<AIP> aipsToReturn = new ArrayList<>();
 
     if (!uuids.isEmpty()) {
-      try {
-        List<IndexedAIP> retrieve = index.retrieve(IndexedAIP.class, uuids);
-
-        for (IndexedAIP indexedAIP : retrieve) {
-          aipsToReturn.add(model.retrieveAIP(indexedAIP.getId()));
+      if (retrieveFromModel) {
+        for (String uuid : uuids) {
+          try {
+            aipsToReturn.add(model.retrieveAIP(uuid));
+          } catch (Throwable e) {
+            LOGGER.error("Error while retrieving AIP from model", e);
+          }
         }
+      } else {
+        try {
+          List<IndexedAIP> retrieve = index.retrieve(IndexedAIP.class, uuids);
 
-      } catch (Throwable e) {
-        LOGGER.error("Error while retrieving representations from index", e);
+          for (IndexedAIP indexedAIP : retrieve) {
+            aipsToReturn.add(model.retrieveAIP(indexedAIP.getId()));
+          }
+
+        } catch (Throwable e) {
+          LOGGER.error("Error while retrieving AIP from index", e);
+        }
       }
     }
 
     if (aipsToReturn.isEmpty()) {
-      throw new NotFoundException("Could not retrive the AIPs");
+      throw new NotFoundException("Could not retrieve the AIPs");
     }
 
     return aipsToReturn;

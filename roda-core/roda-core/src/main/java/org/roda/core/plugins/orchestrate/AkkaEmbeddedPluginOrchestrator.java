@@ -156,11 +156,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void runPluginOnAIPs(Plugin<AIP> plugin, List<String> uuids) {
+  public void runPluginOnAIPs(Plugin<AIP> plugin, List<String> uuids, boolean retrieveFromModel) {
     try {
       LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
       int blockSize = JobsHelper.getBlockSize();
-      List<AIP> aips = JobsHelper.getAIPs(model, index, uuids);
+      List<AIP> aips = JobsHelper.getAIPs(model, index, uuids, retrieveFromModel);
       Iterator<AIP> iter = aips.iterator();
       Plugin<AIP> innerPlugin;
 

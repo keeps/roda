@@ -268,7 +268,7 @@ public class InternalPluginsTest {
     plugin.setParameterValues(parameters);
 
     List<String> aipIdList = Arrays.asList(aip.getId());
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, aipIdList);
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, aipIdList, false);
     // ReportAssertUtils.assertReports(reports, aipIdList);
 
     // TODO wait for job to finish
@@ -331,7 +331,7 @@ public class InternalPluginsTest {
     plugin.setParameterValues(parameters);
 
     List<String> aipIdList = Arrays.asList(aip.getId());
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, aipIdList);
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, aipIdList, false);
     // ReportAssertUtils.assertReports(reports, aipIdList);
 
     // TODO wait for job to finish
@@ -384,7 +384,7 @@ public class InternalPluginsTest {
     premisSkeletonPlugin.setParameterValues(parameters);
 
     List<String> aipIdList = Arrays.asList(aip.getId());
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(premisSkeletonPlugin, aipIdList);
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(premisSkeletonPlugin, aipIdList, false);
 
     Plugin<AIP> plugin = new SiegfriedPlugin();
     Map<String, String> parameters2 = new HashMap<>();
@@ -392,7 +392,7 @@ public class InternalPluginsTest {
     parameters2.put(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS, FAKE_REPORTING_CLASS);
     plugin.setParameterValues(parameters2);
 
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, aipIdList);
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, aipIdList, false);
     // ReportAssertUtils.assertReports(reports, aipIdList);
     // TODO wait for job to finish
     Thread.sleep(1000);
@@ -494,7 +494,7 @@ public class InternalPluginsTest {
     premisSkeletonPlugin.setParameterValues(parameters);
 
     List<String> aipIdList = Arrays.asList(aip.getId());
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(premisSkeletonPlugin, aipIdList);
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(premisSkeletonPlugin, aipIdList, false);
 
     Plugin<AIP> plugin = new TikaFullTextPlugin();
     Map<String, String> parameters2 = new HashMap<>();
@@ -504,10 +504,9 @@ public class InternalPluginsTest {
     parameters2.put(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION, Boolean.TRUE.toString());
     plugin.setParameterValues(parameters2);
 
-    
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, aipIdList);
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, aipIdList, false);
     // ReportAssertUtils.assertReports(reports, aipIdList);
-    
+
     Job job = new Job();
     RodaCoreFactory.getPluginOrchestrator().executeJob(job);
 
@@ -559,7 +558,7 @@ public class InternalPluginsTest {
     parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
     autoAcceptPlugin.setParameterValues(parameters);
 
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(autoAcceptPlugin, Arrays.asList(aip.getId()));
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(autoAcceptPlugin, Arrays.asList(aip.getId()), false);
     // TODO wait for job to finish
     Thread.sleep(1000);
 

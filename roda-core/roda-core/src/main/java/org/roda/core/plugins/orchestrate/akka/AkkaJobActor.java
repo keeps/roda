@@ -101,9 +101,12 @@ public class AkkaJobActor extends UntypedActor {
     Class<Serializable> sourceObjectsClass = JobsHelper
       .getSelectedClassFromString(job.getSourceObjects().getSelectedClass());
 
-    if (IndexedAIP.class.getCanonicalName().equals(sourceObjectsClass.getCanonicalName())) {
+    if (AIP.class.getCanonicalName().equals(sourceObjectsClass.getCanonicalName())) {
       RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin,
-        ((SelectedItemsList<IndexedAIP>) job.getSourceObjects()).getIds());
+        ((SelectedItemsList<IndexedAIP>) job.getSourceObjects()).getIds(), true);
+    } else if (IndexedAIP.class.getCanonicalName().equals(sourceObjectsClass.getCanonicalName())) {
+      RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin,
+        ((SelectedItemsList<IndexedAIP>) job.getSourceObjects()).getIds(), false);
     } else if (IndexedRepresentation.class.getCanonicalName().equals(sourceObjectsClass.getCanonicalName())) {
       RodaCoreFactory.getPluginOrchestrator().runPluginOnRepresentations((Plugin<Representation>) plugin,
         ((SelectedItemsList<IndexedRepresentation>) job.getSourceObjects()).getIds());

@@ -20,65 +20,60 @@ import org.roda.core.util.CommandUtility;
 
 public class ReplicationPluginUtils {
   private static List<String> initialCommand = addInitialCommandPart();
-  private static List<String> finalCommand = addFinalCommandPart();
+  private static List<String> finalStorageCommand = addFinalCommandPart(RodaConstants.CORE_STORAGE_FOLDER);
+  private static List<String> finalHistoryCommand = addFinalCommandPart(RodaConstants.CORE_STORAGE_HISTORY_FOLDER);
 
   public static String executeRsyncAIP(AIP aip) throws CommandException, IOException, UnsupportedOperationException {
     List<String> rsyncCommand = new ArrayList<String>(initialCommand);
+    rsyncCommand = addIncludeOnCommand(rsyncCommand, RodaConstants.STORAGE_CONTAINER_AIP + "/");
+    rsyncCommand = addIncludeOnCommand(rsyncCommand, RodaConstants.STORAGE_CONTAINER_AIP + "/" + aip.getId() + "/***");
+    rsyncCommand.addAll(finalStorageCommand);
+    String result = CommandUtility.execute(rsyncCommand);
 
-    rsyncCommand = addIncludeOnCommand(rsyncCommand,
-      RodaConstants.CORE_STORAGE_FOLDER + "/" + RodaConstants.STORAGE_CONTAINER_AIP + "/");
-    rsyncCommand = addIncludeOnCommand(rsyncCommand, RodaConstants.CORE_STORAGE_HISTORY_FOLDER + "/");
-    rsyncCommand = addIncludeOnCommand(rsyncCommand,
-      RodaConstants.CORE_STORAGE_HISTORY_FOLDER + "/" + RodaConstants.STORAGE_CONTAINER_AIP + "/");
-    rsyncCommand = addIncludeOnCommand(rsyncCommand,
-      RodaConstants.CORE_STORAGE_FOLDER + "/" + RodaConstants.STORAGE_CONTAINER_AIP + "/" + aip.getId() + "/***");
-    rsyncCommand = addIncludeOnCommand(rsyncCommand, RodaConstants.CORE_STORAGE_HISTORY_FOLDER + "/"
-      + RodaConstants.STORAGE_CONTAINER_AIP + "/" + aip.getId() + "/***");
+    rsyncCommand = new ArrayList<String>(initialCommand);
+    rsyncCommand = addIncludeOnCommand(rsyncCommand, RodaConstants.STORAGE_CONTAINER_AIP + "/");
+    rsyncCommand = addIncludeOnCommand(rsyncCommand, RodaConstants.STORAGE_CONTAINER_AIP + "/" + aip.getId() + "/***");
+    rsyncCommand.addAll(finalHistoryCommand);
+    result += CommandUtility.execute(rsyncCommand);
 
-    rsyncCommand.addAll(finalCommand);
-    return CommandUtility.execute(rsyncCommand);
+    return result;
   }
 
   public static String executeRsyncEvents(PreservationMetadata pm)
     throws CommandException, IOException, UnsupportedOperationException {
     List<String> rsyncCommand = new ArrayList<String>(initialCommand);
-    rsyncCommand = addIncludeOnCommand(rsyncCommand,
-      RodaConstants.CORE_STORAGE_FOLDER + "/" + RodaConstants.STORAGE_CONTAINER_AIP + "/");
+    rsyncCommand = addIncludeOnCommand(rsyncCommand, RodaConstants.STORAGE_CONTAINER_AIP + "/");
 
+    rsyncCommand = addIncludeOnCommand(rsyncCommand, RodaConstants.STORAGE_CONTAINER_AIP + "/" + pm.getAipId() + "/");
     rsyncCommand = addIncludeOnCommand(rsyncCommand,
-      RodaConstants.CORE_STORAGE_FOLDER + "/" + RodaConstants.STORAGE_CONTAINER_AIP + "/" + pm.getAipId() + "/");
-    rsyncCommand = addIncludeOnCommand(rsyncCommand,
-      RodaConstants.CORE_STORAGE_FOLDER + "/" + RodaConstants.STORAGE_CONTAINER_AIP + "/" + pm.getAipId() + "/"
-        + RodaConstants.STORAGE_DIRECTORY_METADATA + "/");
-    rsyncCommand = addIncludeOnCommand(rsyncCommand,
-      RodaConstants.CORE_STORAGE_FOLDER + "/" + RodaConstants.STORAGE_CONTAINER_AIP + "/" + pm.getAipId() + "/"
-        + RodaConstants.STORAGE_DIRECTORY_METADATA + "/" + RodaConstants.STORAGE_DIRECTORY_PRESERVATION + "/");
-    rsyncCommand = addIncludeOnCommand(rsyncCommand, "storage/aip/" + pm.getAipId() + "/"
+      RodaConstants.STORAGE_CONTAINER_AIP + "/" + pm.getAipId() + "/" + RodaConstants.STORAGE_DIRECTORY_METADATA + "/");
+    rsyncCommand = addIncludeOnCommand(rsyncCommand, RodaConstants.STORAGE_CONTAINER_AIP + "/" + pm.getAipId() + "/"
+      + RodaConstants.STORAGE_DIRECTORY_METADATA + "/" + RodaConstants.STORAGE_DIRECTORY_PRESERVATION + "/");
+    rsyncCommand = addIncludeOnCommand(rsyncCommand, RodaConstants.STORAGE_CONTAINER_AIP + "/" + pm.getAipId() + "/"
       + RodaConstants.STORAGE_DIRECTORY_METADATA + "/" + RodaConstants.STORAGE_DIRECTORY_PRESERVATION + "/***");
 
-    rsyncCommand.addAll(finalCommand);
+    rsyncCommand.addAll(finalStorageCommand);
     return CommandUtility.execute(rsyncCommand);
   }
 
   public static String executeRsyncAgents() throws CommandException, IOException, UnsupportedOperationException {
     List<String> rsyncCommand = new ArrayList<String>(initialCommand);
-    rsyncCommand = addIncludeOnCommand(rsyncCommand,
-      RodaConstants.CORE_STORAGE_FOLDER + "/" + RodaConstants.STORAGE_CONTAINER_AGENT + "/***");
-    rsyncCommand.addAll(finalCommand);
+    rsyncCommand = addIncludeOnCommand(rsyncCommand, RodaConstants.STORAGE_CONTAINER_AGENT + "/***");
+    rsyncCommand.addAll(finalStorageCommand);
     return CommandUtility.execute(rsyncCommand);
   }
 
-  private static List<String> addFinalCommandPart() {
+  private static List<String> addFinalCommandPart(String folder) {
     List<String> command = new ArrayList<String>();
 
     String sourcePath = RodaCoreFactory.getDataPath().toString();
     String targetUser = RodaCoreFactory.getRodaConfigurationAsString("core", "aip_rsync", "target_user");
     String targetHost = RodaCoreFactory.getRodaConfigurationAsString("core", "aip_rsync", "target_host");
-    String targetPath = RodaCoreFactory.getRodaConfigurationAsString("core", "aip_rsync", "target_path");
+    String targetPath = RodaCoreFactory.getRodaConfigurationAsString("core", "aip_rsync", folder, "target_path");
 
     command.add("--exclude");
     command.add("*");
-    command.add(sourcePath + "/");
+    command.add(sourcePath + "/" + folder + "/");
     command.add(targetUser + "@" + targetHost + ":" + targetPath);
 
     return command;
@@ -86,13 +81,10 @@ public class ReplicationPluginUtils {
 
   private static List<String> addInitialCommandPart() {
     List<String> command = new ArrayList<String>();
-
     command.add("rsync");
-    // command.add("--dry-run");
     command.add("-vzurltD");
     command.add("--delete");
-    command = addIncludeOnCommand(command, RodaConstants.CORE_STORAGE_FOLDER + "/");
-
+    // command.add("--dry-run");
     return command;
   }
 

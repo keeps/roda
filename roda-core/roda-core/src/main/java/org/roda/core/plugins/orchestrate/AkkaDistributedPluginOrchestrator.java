@@ -154,7 +154,7 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
   }
 
   @Override
-  public void runPluginOnAIPs(Plugin<AIP> plugin, List<String> uuids) {
+  public void runPluginOnAIPs(Plugin<AIP> plugin, List<String> uuids, boolean retrieveFromModel) {
     // TODO Auto-generated method stub
 
   }

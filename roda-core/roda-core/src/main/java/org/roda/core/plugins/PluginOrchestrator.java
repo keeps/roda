@@ -31,7 +31,7 @@ public interface PluginOrchestrator {
 
   public <T extends IsIndexed> void runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin);
 
-  public void runPluginOnAIPs(Plugin<AIP> plugin, List<String> uuids);
+  public void runPluginOnAIPs(Plugin<AIP> plugin, List<String> uuids, boolean retrieveFromModel);
 
   public void runPluginOnRepresentations(Plugin<Representation> plugin, List<String> uuids);
 
