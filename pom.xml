@@ -360,6 +360,26 @@
 					<artifactId>docker-maven-plugin</artifactId>
 					<version>0.4.10</version>
 				</plugin>
+				<plugin>
+							<groupId>pl.project13.maven</groupId>
+							<artifactId>git-commit-id-plugin</artifactId>
+							<version>2.2.1</version>
+							<executions>
+									<execution>
+											<goals>
+													<goal>revision</goal>
+											 </goals>
+									</execution>
+							</executions>
+							<configuration>
+							    <!-- this is false by default, forces the plugin to generate the file -->
+							    <generateGitPropertiesFile>true</generateGitPropertiesFile>
+
+							    <!-- The path for the properties file to be generated. See Super Pom for default variable reference https://maven.apache.org/guides/introduction/introduction-to-the-pom.html -->
+							    <generateGitPropertiesFilename>${project.build.directory}/${project.build.finalName}/version.json</generateGitPropertiesFilename>
+									<format>json</format>
+							</configuration>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>

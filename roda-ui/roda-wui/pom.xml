@@ -69,6 +69,10 @@
 							</execution>
 						</executions>
 					</plugin>
+					<plugin>
+							<groupId>pl.project13.maven</groupId>
+							<artifactId>git-commit-id-plugin</artifactId>
+					</plugin>
 				</plugins>
 			</build>
 		</profile>
@@ -152,6 +156,10 @@
 								</goals>
 							</execution>
 						</executions>
+					</plugin>
+					<plugin>
+							<groupId>pl.project13.maven</groupId>
+							<artifactId>git-commit-id-plugin</artifactId>
 					</plugin>
 				</plugins>
 			</build>
@@ -238,11 +246,11 @@
 			<groupId>org.roda-project</groupId>
 			<artifactId>roda-core</artifactId>
 			<exclusions>
-				<!-- 20160218 hsilva: this is needed for apache tika parsers, so commenting 
+				<!-- 20160218 hsilva: this is needed for apache tika parsers, so commenting
 					out -->
-				<!-- <exclusion> <artifactId>asm</artifactId> <groupId>org.ow2.asm</groupId> 
-					</exclusion> <exclusion> <artifactId>asm-commons</artifactId> <groupId>org.ow2.asm</groupId> 
-					</exclusion> <exclusion> <artifactId>asm-debug-all</artifactId> <groupId>org.ow2.asm</groupId> 
+				<!-- <exclusion> <artifactId>asm</artifactId> <groupId>org.ow2.asm</groupId>
+					</exclusion> <exclusion> <artifactId>asm-commons</artifactId> <groupId>org.ow2.asm</groupId>
+					</exclusion> <exclusion> <artifactId>asm-debug-all</artifactId> <groupId>org.ow2.asm</groupId>
 					</exclusion> -->
 				<exclusion>
 					<artifactId>*</artifactId>
@@ -358,7 +366,7 @@
 						<failOnMissingWebXml>false</failOnMissingWebXml>
 					</configuration>
 				</plugin>
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
+				<!--This plugin's configuration is used to store Eclipse m2e settings
 					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
