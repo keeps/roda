@@ -309,9 +309,9 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
 
   private PluginInfo lookupPlugin(String selectedPluginId) {
     PluginInfo p = null;
-    if (plugins != null) {
+    if (plugins != null && selectedPluginId != null) {
       for (PluginInfo pluginInfo : plugins) {
-        if (pluginInfo.getId().equals(selectedPluginId)) {
+        if (pluginInfo != null && pluginInfo.getId().equals(selectedPluginId)) {
           p = pluginInfo;
           break;
         }

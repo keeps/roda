@@ -21,12 +21,17 @@ public class PluginUtils {
       @Override
       public int compare(PluginInfo o1, PluginInfo o2) {
         int ret;
-        String name1 = o1.getName();
-        String name2 = o2.getName();
-        if (name1 != null && name2 != null) {
-          ret = name1.compareTo(name2);
+
+        if (o1 != null && o2 != null) {
+          String name1 = o1.getName();
+          String name2 = o2.getName();
+          if (name1 != null && name2 != null) {
+            ret = name1.compareTo(name2);
+          } else {
+            ret = 0;
+          }
         } else {
-          ret = 0;
+          ret = o1 == o2 ? 0 : 1;
         }
         return ret;
       }
