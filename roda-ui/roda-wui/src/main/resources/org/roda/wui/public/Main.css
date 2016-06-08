@@ -3404,6 +3404,7 @@ td.datePickerMonth, td.datePickerYear {
 	margin-top: 20px;
 	width: 120px;
 	float: left;
+	margin-right: 10px;
 }
 
 .recover-link {

@@ -7,20 +7,21 @@
  */
 package org.roda.wui.api.controllers;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.mail.internet.InternetAddress;
-
-import org.apache.velocity.VelocityContext;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
@@ -32,12 +33,12 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.RodaCoreService;
-import org.roda.wui.common.server.VelocityMail;
 
 public class UserManagement extends RodaCoreService {
 
@@ -387,43 +388,53 @@ public class UserManagement extends RodaCoreService {
 
   private static void sendEmailVerification(String servletPath, User user) throws GenericException {
     try {
+
+      Notification notification = new Notification();
+      notification.setSubject("Registration in RODA");
+      notification.setFromUser("RODA Admin");
+      notification.setRecipientUsers(Arrays.asList(user.getEmail()));
+
       String token = user.getEmailConfirmationToken();
       String username = user.getName();
-      String email = user.getEmail();
       String verificationURL = servletPath + "/#verifyemail";
       String verificationCompleteURL = verificationURL + "/" + URLEncoder.encode(username, "UTF-8") + "/" + token;
 
-      Map<String, String> contextMap = new HashMap<String, String>();
-      contextMap.put("username", username);
-      contextMap.put("token", token);
-      contextMap.put("verificationURL", verificationURL);
-      contextMap.put("verificationCompleteURL", verificationCompleteURL);
+      Map<String, Object> scopes = new HashMap<String, Object>();
+      scopes.put("username", username);
+      scopes.put("token", token);
+      scopes.put("verificationURL", verificationURL);
+      scopes.put("verificationCompleteURL", verificationCompleteURL);
 
-      VelocityMail vmail = VelocityMail.getDefaultInstance();
-      InternetAddress address = new InternetAddress(email);
-      vmail.send("emailverification", address, new VelocityContext(contextMap));
-    } catch (Exception e) {
+      RodaCoreFactory.getModelService().createNotification(notification, RodaConstants.VERIFICATION_EMAIL_TEMPLATE,
+        scopes);
+
+    } catch (GenericException | UnsupportedEncodingException e) {
       throw new GenericException("Problem sending email");
     }
   }
 
   private static void sendRecoverLoginEmail(String servletPath, User user) throws GenericException {
     try {
+
+      Notification notification = new Notification();
+      notification.setSubject("Recover login in RODA");
+      notification.setFromUser("RODA Admin");
+      notification.setRecipientUsers(Arrays.asList(user.getEmail()));
+
       String token = user.getResetPasswordToken();
       String username = user.getName();
-      String email = user.getEmail();
       String recoverLoginURL = servletPath + "/#resetpassword";
       String recoverLoginCompleteURL = recoverLoginURL + "/" + URLEncoder.encode(username, "UTF-8") + "/" + token;
 
-      Map<String, String> contextMap = new HashMap<String, String>();
-      contextMap.put("username", username);
-      contextMap.put("token", token);
-      contextMap.put("recoverLoginURL", recoverLoginURL);
-      contextMap.put("recoverLoginCompleteURL", recoverLoginCompleteURL);
+      Map<String, Object> scopes = new HashMap<String, Object>();
+      scopes.put("username", username);
+      scopes.put("token", token);
+      scopes.put("recoverLoginURL", recoverLoginURL);
+      scopes.put("recoverLoginCompleteURL", recoverLoginCompleteURL);
 
-      VelocityMail vmail = VelocityMail.getDefaultInstance();
-      InternetAddress address = new InternetAddress(email);
-      vmail.send("recoverlogin", address, new VelocityContext(contextMap));
+      RodaCoreFactory.getModelService().createNotification(notification, RodaConstants.RECOVER_LOGIN_EMAIL_TEMPLATE,
+        scopes);
+
     } catch (Exception e) {
       throw new GenericException("Problem sending email");
     }

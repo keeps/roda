@@ -14,8 +14,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
+import org.roda.core.common.IdUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -103,12 +105,12 @@ public class ReindexJobPlugin extends AbstractPlugin<Job> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<Job> list)
     throws PluginException {
 
+    Report report = PluginHelper.initPluginReport(this);
     CloseableIterable<Resource> listResourcesUnderDirectory = null;
 
     try {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
-      PluginState state = PluginState.SUCCESS;
 
       try {
         boolean recursive = false;
@@ -124,13 +126,19 @@ public class ReindexJobPlugin extends AbstractPlugin<Job> {
 
       } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
         | IOException e) {
-        state = PluginState.FAILURE;
+        Report reportItem = PluginHelper.initPluginReportItem(this, "", Job.class);
+        if ("".equals(reportItem.getSourceObjectId())) {
+          reportItem.setId(IdUtils.getJobReportId(reportItem.getJobId(), UUID.randomUUID().toString()));
+        }
+        reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
+        report.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+
         LOGGER.error("", e);
       } finally {
         IOUtils.closeQuietly(listResourcesUnderDirectory);
       }
 
-      jobPluginInfo.incrementObjectsProcessed(state);
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
     } catch (JobException e) {
@@ -154,13 +162,17 @@ public class ReindexJobPlugin extends AbstractPlugin<Job> {
 
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
       | IOException e) {
+      Report reportItem = PluginHelper.initPluginReportItem(this, "", Report.class);
+      reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
+      report.addReport(reportItem);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+
       LOGGER.error("", e);
     } finally {
       IOUtils.closeQuietly(listResourcesUnderDirectory);
     }
 
-    // FIXME 20160329 hsilva: this should return a better report
-    return PluginHelper.initPluginReport(this);
+    return report;
   }
 
   @Override
@@ -246,7 +258,7 @@ public class ReindexJobPlugin extends AbstractPlugin<Job> {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_REINDEX);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
   }
 
 }

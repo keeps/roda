@@ -2,11 +2,11 @@
 <body>
 <p>A login recovery associated to this e-mail was requested.</p>
 
-<p>To continue the recovery process, access the following address <a href="$recoverLoginCompleteURL">$recoverLoginCompleteURL</a>.</p>
-<p>Alternatively, insert the necessary data in the following address <a href="$recoverLoginURL">$recoverLoginURL</a>.</p>
+<p>To continue the recovery process, access the following address <a href="{{recoverLoginCompleteURL}}">{{recoverLoginCompleteURL}}</a>.</p>
+<p>Alternatively, insert the necessary data in the following address <a href="{{recoverLoginURL}}">{{recoverLoginURL}}</a>.</p>
 <ul>
-<li><strong>Username:</strong> $username</li>
-<li><strong>Password for verification:</strong> $token</li>
+<li><strong>Username:</strong> {{username}}</li>
+<li><strong>Password for verification:</strong> {{token}}</li>
 </ul>
 <p>And modify your password.</p>
 <p>If you didn't ask the login recovery before mentioned, please ignore this e-mail.</p>

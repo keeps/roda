@@ -120,6 +120,7 @@ public final class PluginHelper {
     if (jobReportPartialId == null || "".equals(jobReportPartialId)) {
       jobReportPartialId = sourceObjectId;
     }
+
     reportItem.setId(IdUtils.getJobReportId(jobId, jobReportPartialId));
     reportItem.setJobId(jobId);
     reportItem.setSourceObjectId(sourceObjectId);
@@ -241,7 +242,8 @@ public final class PluginHelper {
   /**
    * Updates the job state
    */
-  public static <T extends Serializable> void updateJobState(Plugin<T> plugin, JOB_STATE state, Optional<String> stateDetails) {
+  public static <T extends Serializable> void updateJobState(Plugin<T> plugin, JOB_STATE state,
+    Optional<String> stateDetails) {
     RodaCoreFactory.getPluginOrchestrator().updateJobState(plugin, state, stateDetails);
   }
 

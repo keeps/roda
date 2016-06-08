@@ -23,11 +23,11 @@
 			<g:TextBox ui:field="token" addStyleNames="fieldTextBox"></g:TextBox>
 		</g:FlowPanel>
 		<g:FlowPanel addStyleNames="recover-buttons">
-			<g:Label ui:field="cancel" addStyleNames="recover-link">
-				<ui:text from='{constants.verifyEmailCancel}' />
-			</g:Label>
 			<g:Button ui:field="verify" addStyleNames="btn btn-play recover-button">
 				<ui:text from='{constants.verifyEmailSubmit}' />
+			</g:Button>
+			<g:Button ui:field="cancel" addStyleNames="btn btn-times-circle recover-button">
+				<ui:text from='{constants.verifyEmailCancel}' />
 			</g:Button>
 		</g:FlowPanel>
 	</g:FlowPanel>

@@ -25,18 +25,20 @@ import com.sun.mail.smtp.SMTPTransport;
 public class ConfigurableEmailUtility {
 
   private String protocol;
-  private String login;
+  private String user;
   private String password;
   private String from;
+  private String fromActor;
   private String subject;
   private javax.mail.Authenticator authenticator = null;
   private Properties props = new Properties();
 
-  public ConfigurableEmailUtility(String from, String subject) {
+  public ConfigurableEmailUtility(String fromActor, String subject) {
     this.protocol = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "protocol");
-    this.login = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "login");
+    this.user = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "user");
+    this.from = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "from");
     this.password = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "password");
-    this.from = from;
+    this.fromActor = fromActor;
     this.subject = subject;
 
     createSessionParameters();
@@ -49,9 +51,9 @@ public class ConfigurableEmailUtility {
 
     Message msg = new MimeMessage(session);
 
-    InternetAddress addressFrom = new InternetAddress(login);
+    InternetAddress addressFrom = new InternetAddress(from);
     msg.setFrom(addressFrom);
-    msg.addHeader("name", from);
+    msg.addHeader("name", fromActor);
     msg.setSubject(subject);
 
     InternetAddress recipientAddress = new InternetAddress(recipient);
@@ -87,7 +89,7 @@ public class ConfigurableEmailUtility {
     if (hasAuth) {
       authenticator = new javax.mail.Authenticator() {
         protected PasswordAuthentication getPasswordAuthentication() {
-          return new PasswordAuthentication(login, password);
+          return new PasswordAuthentication(user, password);
         }
       };
     }

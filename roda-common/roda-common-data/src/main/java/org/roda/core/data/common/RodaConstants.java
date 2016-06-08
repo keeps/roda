@@ -730,8 +730,8 @@ public final class RodaConstants {
 
   /* Template Constants */
   public static final String INGEST_EMAIL_TEMPLATE = "ingestion-template.vm";
-  public static final String INGEST_EMAIL_VERIFICATION_TEMPLATE = "emailverification_html.vm";
-  public static final String INGEST_EMAIL_RECOVER_LOGIN_TEMPLATE = "recoverlogin_html.vm";
-  public static final String INGEST_EMAIL_NOTIFY_PRODUCER_TEMPLATE = "notifyproducer_html.vm";
+  public static final String VERIFICATION_EMAIL_TEMPLATE = "emailverification_html.vm";
+  public static final String RECOVER_LOGIN_EMAIL_TEMPLATE = "recoverlogin_html.vm";
+  public static final String NOTIFY_PRODUCER_EMAIL_TEMPLATE = "notifyproducer_html.vm";
 
 }
