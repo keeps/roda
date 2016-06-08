@@ -3469,6 +3469,10 @@ td.datePickerMonth, td.datePickerYear {
 	display: none;
 }
 
+.viewRepresentation .searchPreFilters{
+	display: none;
+}
+
 .viewRepresentation .my-files-empty-info {
 	font-size: 13px;
 	margin-left: 10px;

@@ -23,6 +23,7 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -94,6 +95,8 @@ public class SimpleFileList extends BasicAsyncTableCell<IndexedFile> {
     // TODO externalize strings into constants
     addColumn(iconColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-files-o'></i>"), false, false, 2);
     addColumn(filenameColumn, "Name", false, false);
+
+    display.setColumnWidth(iconColumn, 2.5, Unit.EM);
 
     // define default sorting
     display.getColumnSortList().push(new ColumnSortInfo(filenameColumn, false));

@@ -153,10 +153,7 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
     searchPreFilters.clear();
 
     for (FilterParameter parameter : defaultFilter.getParameters()) {
-      HTML header = new HTML(SafeHtmlUtils.fromSafeConstant(FILTER_ICON));
-      header.addStyleName("inline gray");
-      searchPreFilters.add(header);
-
+     
       HTML html = null;
 
       if (parameter instanceof SimpleFilterParameter) {
@@ -182,6 +179,10 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
       }
 
       if (html != null) {
+        HTML header = new HTML(SafeHtmlUtils.fromSafeConstant(FILTER_ICON));
+        header.addStyleName("inline gray");
+        searchPreFilters.add(header);
+        
         html.addStyleName("xsmall gray inline nowrap");
         searchPreFilters.add(html);
       }
