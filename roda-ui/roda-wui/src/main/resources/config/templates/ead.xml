@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ead:ead xmlns:ead="urn:isbn:1-931666-22-9" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="urn:isbn:1-931666-22-9 ../schemas/ead.xsd http://www.w3.org/1999/xlink ../schemas/xlink.xsd">
-    <ead:eadheader>
-        <ead:eadid/>
-        <ead:filedesc>
-            <ead:titlestmt>
-                <ead:titleproper/>
-            </ead:titlestmt>
-        </ead:filedesc>
-        <ead:profiledesc>
-            <ead:creation>
-                <ead:date normal="{{date}}"/>
-            </ead:creation>
-        </ead:profiledesc>
-    </ead:eadheader>
-    <ead:archdesc level="item">
-        <ead:did>
-            <ead:unitid repositorycode="PT-RODA">{{id}}</ead:unitid>
-            <ead:unittitle>{{title}}</ead:unittitle>
-            <ead:unitdate normal="{{date}}"/>
-        </ead:did>
-    </ead:archdesc>
+<ead:ead xmlns:ead="urn:isbn:1-931666-22-9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="urn:isbn:1-931666-22-9 ../schemas/ead.xsd http://www.w3.org/1999/xlink ../schemas/xlink.xsd">
+	<ead:eadheader>
+		<ead:eadid/>
+		<ead:filedesc>
+			<ead:titlestmt>
+				<ead:titleproper/>
+			</ead:titlestmt>
+		</ead:filedesc>
+		<ead:profiledesc>
+			<ead:creation>
+				<ead:date normal='{{date auto-generate="now" type="date" label="{\"en\": \"Date\"}"}}'/>
+			</ead:creation>
+		</ead:profiledesc>
+	</ead:eadheader>
+	<ead:archdesc level="item">
+		<ead:did>
+			<ead:unitid repositorycode="PT-RODA">{{id auto-generate="id" label="{'en': 'ID'}"}}</ead:unitid>
+			<ead:unittitle>{{title auto-generate="title" label="{'en': 'Title'}"}}</ead:unittitle>
+			<ead:unitdate normal="{{date}}"/>
+		</ead:did>
+	</ead:archdesc>
 </ead:ead>

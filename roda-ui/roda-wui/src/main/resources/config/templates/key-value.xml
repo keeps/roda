@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <metadata>
-    <field name="id">{{id}}</field>
-    <field name="title">{{title}}</field>
-    <field name="producer">{{user}}</field>
-    <field name="date">{{date type="date"}}</field>
+	<field name="id">{{id auto-generate="id" label="{'en': 'ID'}"}}</field>
+	<field name="title">{{title label="{'en': 'Title'}" auto-generate="title"}}</field>
+	<field name="producer">{{user label="{'en': 'Producer'}"}}</field>
+	<field name="date">{{date type="date" label="{'en': 'Date'}" auto-generate="now"}}</field>
 </metadata>
