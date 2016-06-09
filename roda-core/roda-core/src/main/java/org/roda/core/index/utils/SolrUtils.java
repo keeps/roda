@@ -991,13 +991,11 @@ public class SolrUtils {
 
   private static void setQueryFacetParameter(SolrQuery query, SimpleFacetParameter facetParameter) {
     query.addFacetField(facetParameter.getName());
-    if (facetParameter.getMinCount() != FacetParameter.DEFAULT_MIN_COUNT) {
-      query.add(String.format("f.%s.facet.mincount", facetParameter.getName()),
-        String.valueOf(facetParameter.getMinCount()));
-    }
-    if (facetParameter.getLimit() != SimpleFacetParameter.DEFAULT_LIMIT) {
-      query.add(String.format("f.%s.facet.limit", facetParameter.getName()), String.valueOf(facetParameter.getLimit()));
-    }
+
+    query.add(String.format("f.%s.facet.mincount", facetParameter.getName()),
+      String.valueOf(facetParameter.getMinCount()));
+    query.add(String.format("f.%s.facet.limit", facetParameter.getName()), String.valueOf(facetParameter.getLimit()));
+
   }
 
   /*

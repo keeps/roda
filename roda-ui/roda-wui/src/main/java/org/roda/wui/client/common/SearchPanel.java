@@ -31,7 +31,6 @@ import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -153,7 +152,7 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
     searchPreFilters.clear();
 
     for (FilterParameter parameter : defaultFilter.getParameters()) {
-     
+
       HTML html = null;
 
       if (parameter instanceof SimpleFilterParameter) {
@@ -182,7 +181,7 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
         HTML header = new HTML(SafeHtmlUtils.fromSafeConstant(FILTER_ICON));
         header.addStyleName("inline gray");
         searchPreFilters.add(header);
-        
+
         html.addStyleName("xsmall gray inline nowrap");
         searchPreFilters.add(html);
       }

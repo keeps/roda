@@ -377,7 +377,7 @@ public class Search extends Composite {
       createItemsSearchResultPanel();
     }
 
-    searchPanel.setVariables(DEFAULT_FILTER_FILES, RodaConstants.REPRESENTATION_SEARCH, itemsSearchResultPanel,
+    searchPanel.setVariables(DEFAULT_FILTER_AIP, RodaConstants.AIP_SEARCH, itemsSearchResultPanel,
       itemsSearchAdvancedFieldsPanel);
     searchPanel.setSearchAdvancedFieldOptionsAddVisible(true);
 
@@ -393,7 +393,7 @@ public class Search extends Composite {
       createRepresentationsSearchResultPanel();
     }
 
-    searchPanel.setVariables(DEFAULT_FILTER_FILES, RodaConstants.REPRESENTATION_SEARCH,
+    searchPanel.setVariables(DEFAULT_FILTER_REPRESENTATIONS, RodaConstants.REPRESENTATION_SEARCH,
       representationsSearchResultPanel, representationsSearchAdvancedFieldsPanel);
     searchPanel.setSearchAdvancedFieldOptionsAddVisible(false);
 
