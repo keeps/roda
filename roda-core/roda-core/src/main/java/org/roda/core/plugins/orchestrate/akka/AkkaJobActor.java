@@ -34,8 +34,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import akka.actor.ActorRef;
+import akka.actor.OneForOneStrategy;
 import akka.actor.Props;
+import akka.actor.SupervisorStrategy;
 import akka.actor.UntypedActor;
+import akka.japi.pf.DeciderBuilder;
 
 public class AkkaJobActor extends UntypedActor {
   private static final Logger LOGGER = LoggerFactory.getLogger(AkkaJobActor.class);
@@ -55,7 +58,7 @@ public class AkkaJobActor extends UntypedActor {
       ActorRef jobInfoActor = getContext().actorOf(Props.create(AkkaJobInfoActor.class, plugin), jobId);
       RodaCoreFactory.getPluginOrchestrator().setInitialJobInfo(jobId, jobInfoActor);
 
-      PluginHelper.updateJobState(plugin, JOB_STATE.STARTED, Optional.empty());
+      jobInfoActor.tell(new Messages.JobStateUpdated(plugin, JOB_STATE.STARTED, Optional.empty()), ActorRef.noSender());
 
       try {
         if (job.getSourceObjects() instanceof SelectedItemsAll<?>) {
@@ -67,7 +70,7 @@ public class AkkaJobActor extends UntypedActor {
         } else if (job.getSourceObjects() instanceof SelectedItemsFilter<?>) {
           runFromFilter(job, plugin);
         }
-      } catch (GenericException e) {
+      } catch (Exception e) {
         jobInfoActor.tell(
           new Messages.JobStateUpdated(plugin, JOB_STATE.FAILED_TO_COMPLETE, Optional.ofNullable(e.getMessage())),
           ActorRef.noSender());
@@ -138,6 +141,19 @@ public class AkkaJobActor extends UntypedActor {
     // execute
     RodaCoreFactory.getPluginOrchestrator().runPluginFromIndex(sourceObjectsClass, selectedItems.getFilter(),
       (Plugin) plugin);
+  }
+
+  private SupervisorStrategy strategy = new OneForOneStrategy(false, DeciderBuilder.matchAny(e -> {
+    for (ActorRef actorRef : getContext().getChildren()) {
+      actorRef.tell(new Messages.JobStateUpdated(null, JOB_STATE.FAILED_TO_COMPLETE,
+        Optional.ofNullable(e.getClass().getName() + ": " + e.getMessage())), ActorRef.noSender());
+    }
+    return SupervisorStrategy.resume();
+  }).build());
+
+  @Override
+  public SupervisorStrategy supervisorStrategy() {
+    return strategy;
   }
 
 }

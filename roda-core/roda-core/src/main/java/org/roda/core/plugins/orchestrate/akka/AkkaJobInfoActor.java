@@ -18,6 +18,7 @@ import org.roda.core.plugins.plugins.PluginHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 
 public class AkkaJobInfoActor extends UntypedActor {
@@ -47,17 +48,19 @@ public class AkkaJobInfoActor extends UntypedActor {
       if (jobInfo.isDone()) {
         plugin.afterAllExecute(RodaCoreFactory.getIndexService(), RodaCoreFactory.getModelService(),
           RodaCoreFactory.getStorageService());
-        PluginHelper.updateJobState(message.plugin, RodaCoreFactory.getModelService(), JOB_STATE.COMPLETED,
-          Optional.empty());
+        getSelf().tell(new Messages.JobStateUpdated(plugin, JOB_STATE.COMPLETED, Optional.empty()),
+          ActorRef.noSender());
       }
     } else if (msg instanceof Messages.JobStateUpdated) {
       Messages.JobStateUpdated message = (Messages.JobStateUpdated) msg;
-      PluginHelper.updateJobState(message.plugin, RodaCoreFactory.getModelService(), message.state,
-        message.stateDatails);
+      Plugin<?> p = message.plugin == null ? plugin : message.plugin;
+      PluginHelper.updateJobState(p, RodaCoreFactory.getModelService(), message.state, message.stateDatails);
       if (message.state == JOB_STATE.COMPLETED) {
         getContext().stop(getSelf());
       }
     } else {
+      // FIXME 20160609 hsilva: throw exception so the parent put job in the
+      // failed to complete state
       LOGGER.error(AkkaJobInfoActor.class.getName() + " received a message that it doesn't know how to process...");
     }
   }
