@@ -30,6 +30,7 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.IngestJobReportList;
 import org.roda.wui.client.common.lists.SimpleJobReportList;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.process.ActionProcess;
@@ -344,7 +345,7 @@ public class ShowJob extends Composite {
 
               @Override
               public void onFailure(Throwable caught) {
-                Toast.showError(caught.getClass().getName(), caught.getMessage());
+                AsyncCallbackUtils.defaultFailureTreatment(caught);
               }
 
               @Override
