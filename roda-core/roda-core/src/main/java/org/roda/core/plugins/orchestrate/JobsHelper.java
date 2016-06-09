@@ -181,14 +181,16 @@ public final class JobsHelper {
       Class<?> clazz = Class.forName(selectedClass);
       if (clazz instanceof Serializable) {
         try {
-          IsIndexed.class.cast(clazz);
+          // IsIndexed.class.cast(clazz);
           return (Class<IsIndexed>) clazz;
         } catch (ClassCastException e) {
+          LOGGER.error("Error while casting class to IsIndexed", e);
           // do nothing and let exception in the end of the method be thrown
         }
       }
     } catch (ClassNotFoundException e) {
       // do nothing and let exception in the end of the method be thrown
+      LOGGER.error("Class not found", e);
     }
 
     throw new GenericException("Error while getting class from string");

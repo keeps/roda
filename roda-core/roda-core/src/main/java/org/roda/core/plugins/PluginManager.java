@@ -52,7 +52,7 @@ public class PluginManager {
   private static String RODA_PLUGIN_MANIFEST_KEY = "RODA-Plugin";
 
   private Timer loadPluginsTimer = null;
-  private Map<Path, JarPlugin> jarPluginCache = new HashMap<Path, JarPlugin>();
+  private Map<Path, JarPlugins> jarPluginCache = new HashMap<Path, JarPlugins>();
   private Map<String, Plugin<?>> internalPluginChache = new HashMap<String, Plugin<?>>();
   private Map<String, Plugin<?>> externalPluginChache = new HashMap<String, Plugin<?>>();
   private Map<PluginType, List<PluginInfo>> pluginInfoPerType = new HashMap<PluginType, List<PluginInfo>>();
@@ -143,14 +143,8 @@ public class PluginManager {
 
     boolean internalPluginTakesPrecedence = RodaCoreFactory.getRodaConfiguration()
       .getBoolean("core.plugins.internal.take_precedence_over_external");
-    if (plugin == null || !internalPluginTakesPrecedence) {
-
-      for (JarPlugin jarPlugin : this.jarPluginCache.values()) {
-        if (jarPlugin.plugin != null && jarPlugin.plugin.getClass().getName().equals(pluginID)) {
-          plugin = jarPlugin.plugin.cloneMe();
-          break;
-        }
-      }
+    if ((plugin == null || !internalPluginTakesPrecedence) && externalPluginChache.get(pluginID) != null) {
+      plugin = externalPluginChache.get(pluginID).cloneMe();
     }
     return plugin;
   }
@@ -184,9 +178,11 @@ public class PluginManager {
       this.loadPluginsTimer.cancel();
     }
 
-    for (JarPlugin jarPlugin : this.jarPluginCache.values()) {
-      if (jarPlugin.plugin != null) {
-        jarPlugin.plugin.shutdown();
+    for (JarPlugins jarPlugins : this.jarPluginCache.values()) {
+      for (Plugin<?> plugin : jarPlugins.plugins) {
+        if (plugin != null) {
+          plugin.shutdown();
+        }
       }
     }
   }
@@ -248,37 +244,40 @@ public class PluginManager {
 
           LOGGER.debug("{} is not loaded or modification dates differ. Inspecting Jar...", jarFile.getFileName());
 
-          Plugin<?> plugin = loadPlugin(jarFile, jarURLs);
+          List<Plugin<?>> plugins = loadPlugin(jarFile, jarURLs);
 
-          try {
-            if (plugin != null) {
+          for (Plugin<?> plugin : plugins) {
+            try {
+              if (plugin != null) {
 
-              plugin.init();
-              externalPluginChache.put(plugin.getName(), plugin);
-              addPluginToPluginTypeMapping(plugin);
-              LOGGER.debug("Plugin started {} (version {})", plugin.getName(), plugin.getVersion());
+                plugin.init();
+                externalPluginChache.put(plugin.getClass().getName(), plugin);
+                addPluginToPluginTypeMapping(plugin);
+                LOGGER.debug("Plugin started {} (version {})", plugin.getName(), plugin.getVersion());
 
-            } else {
+              } else {
 
-              LOGGER.trace("{} is not a Plugin", jarFile.getFileName());
+                LOGGER.trace("{} is not a Plugin", jarFile.getFileName());
 
+              }
+
+              synchronized (jarPluginCache) {
+                if (jarPluginCache.get(jarFile) != null) {
+                  jarPluginCache.get(jarFile).plugins.add(plugin);
+                } else {
+                  jarPluginCache.put(jarFile, new JarPlugins(plugin,
+                    Files.readAttributes(jarFile, BasicFileAttributes.class).lastModifiedTime().toMillis()));
+                }
+              }
+            } catch (Exception e) {
+              LOGGER.error("Plugin failed to initialize", e);
             }
-
-            synchronized (jarPluginCache) {
-              jarPluginCache.put(jarFile, new JarPlugin(plugin,
-                Files.readAttributes(jarFile, BasicFileAttributes.class).lastModifiedTime().toMillis()));
-            }
-
-          } catch (PluginException e) {
-            LOGGER.error("Plugin failed to initialize", e);
-          } catch (Exception e) {
-            LOGGER.error("Plugin failed to initialize", e);
           }
         }
 
       }
     } catch (IOException e) {
-      // FIXME
+      LOGGER.error("Error while instantiating external plugins", e);
     }
   }
 
@@ -317,9 +316,10 @@ public class PluginManager {
 
   }
 
-  private Plugin<?> loadPlugin(Path jarFile, List<URL> jarURLs) {
+  private List<Plugin<?>> loadPlugin(Path jarFile, List<URL> jarURLs) {
 
     JarFile jar = null;
+    List<Plugin<?>> ret = new ArrayList<>();
     Plugin<?> plugin = null;
 
     try {
@@ -349,6 +349,7 @@ public class PluginManager {
             if (Plugin.class.isAssignableFrom(object.getClass())) {
 
               plugin = (Plugin<?>) object;
+              ret.add(plugin);
 
             } else {
               LOGGER.error("{} is not a valid Plugin", pluginClassNames);
@@ -378,7 +379,7 @@ public class PluginManager {
       }
     }
 
-    return plugin;
+    return ret;
   }
 
   protected class SearchPluginsTask extends TimerTask {
@@ -393,23 +394,25 @@ public class PluginManager {
 
       for (Path jarFile : jarPluginCache.keySet()) {
 
-        Plugin<?> plugin = jarPluginCache.get(jarFile).plugin;
+        List<Plugin<?>> plugins = jarPluginCache.get(jarFile).plugins;
 
-        if (plugin != null) {
-          LOGGER.debug("- {}", jarFile.getFileName());
-          LOGGER.debug("--- {} - {} - {}", plugin.getName(), plugin.getVersion(), plugin.getDescription());
+        if (!plugins.isEmpty()) {
+          for (Plugin<?> plugin : plugins) {
+            LOGGER.debug("- {}", jarFile.getFileName());
+            LOGGER.debug("--- {} - {} - {}", plugin.getName(), plugin.getVersion(), plugin.getDescription());
+          }
         }
       }
     }
   }
 
-  protected class JarPlugin {
+  protected class JarPlugins {
 
-    private Plugin<?> plugin = null;
+    protected List<Plugin<?>> plugins = new ArrayList<>();
     private long lastModified = 0;
 
-    JarPlugin(Plugin<?> plugin, long lastModified) {
-      this.plugin = plugin;
+    JarPlugins(Plugin<?> plugin, long lastModified) {
+      plugins.add(plugin);
       this.lastModified = lastModified;
     }
   }

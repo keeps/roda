@@ -43,12 +43,12 @@ public class AkkaJobInfoActor extends UntypedActor {
       if (isJobPluginDone) {
         message.plugin.afterBlockExecute(RodaCoreFactory.getIndexService(), RodaCoreFactory.getModelService(),
           RodaCoreFactory.getStorageService());
-        if (jobInfo.isDone()) {
-          plugin.afterAllExecute(RodaCoreFactory.getIndexService(), RodaCoreFactory.getModelService(),
-            RodaCoreFactory.getStorageService());
-          PluginHelper.updateJobState(message.plugin, RodaCoreFactory.getModelService(), JOB_STATE.COMPLETED,
-            Optional.empty());
-        }
+      }
+      if (jobInfo.isDone()) {
+        plugin.afterAllExecute(RodaCoreFactory.getIndexService(), RodaCoreFactory.getModelService(),
+          RodaCoreFactory.getStorageService());
+        PluginHelper.updateJobState(message.plugin, RodaCoreFactory.getModelService(), JOB_STATE.COMPLETED,
+          Optional.empty());
       }
     } else if (msg instanceof Messages.JobStateUpdated) {
       Messages.JobStateUpdated message = (Messages.JobStateUpdated) msg;
