@@ -253,6 +253,10 @@ public class ShowJobReport extends Composite {
               }
             }
           });
+      } else {
+        aip.setVisible(false);
+        aipState.setVisible(false);
+        aipLabel.setVisible(false);
       }
     } else {
       // TODO show better message

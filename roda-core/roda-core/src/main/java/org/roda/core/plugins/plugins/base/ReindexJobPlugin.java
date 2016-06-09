@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
-import org.roda.core.common.IdUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -105,39 +104,15 @@ public class ReindexJobPlugin extends AbstractPlugin<Job> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<Job> list)
     throws PluginException {
 
-    Report report = PluginHelper.initPluginReport(this);
-    CloseableIterable<Resource> listResourcesUnderDirectory = null;
+    Report report = PluginHelper.initPluginReport(this).setOutcomeObjectId(UUID.randomUUID().toString());
+    report.setPluginState(PluginState.SUCCESS);
 
     try {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      try {
-        boolean recursive = false;
-        listResourcesUnderDirectory = storage.listResourcesUnderDirectory(ModelUtils.getJobContainerPath(), recursive);
-
-        for (Resource resource : listResourcesUnderDirectory) {
-          Binary binary = storage.getBinary(resource.getStoragePath());
-          InputStream inputStream = binary.getContent().createInputStream();
-          Job objectFromJson = JsonUtils.getObjectFromJson(inputStream, Job.class);
-          IOUtils.closeQuietly(inputStream);
-          index.reindexJob(objectFromJson);
-        }
-
-      } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
-        | IOException e) {
-        Report reportItem = PluginHelper.initPluginReportItem(this, "", Job.class);
-        if ("".equals(reportItem.getSourceObjectId())) {
-          reportItem.setId(IdUtils.getJobReportId(reportItem.getJobId(), UUID.randomUUID().toString()));
-        }
-        reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
-        report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
-
-        LOGGER.error("", e);
-      } finally {
-        IOUtils.closeQuietly(listResourcesUnderDirectory);
-      }
+      report = indexJobs(index, storage, report);
+      report = indexJobsReports(index, storage, report);
 
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
@@ -145,6 +120,46 @@ public class ReindexJobPlugin extends AbstractPlugin<Job> {
       LOGGER.error("Could not update Job information");
     }
 
+    PluginHelper.createJobReport(this, model, report);
+    return report;
+  }
+
+  private Report indexJobs(IndexService index, StorageService storage, Report report) {
+    CloseableIterable<Resource> listResourcesUnderDirectory = null;
+    try {
+      boolean recursive = false;
+      listResourcesUnderDirectory = storage.listResourcesUnderDirectory(ModelUtils.getJobContainerPath(), recursive);
+
+      for (Resource resource : listResourcesUnderDirectory) {
+        try {
+          Binary binary = storage.getBinary(resource.getStoragePath());
+          InputStream inputStream = binary.getContent().createInputStream();
+          Job objectFromJson = JsonUtils.getObjectFromJson(inputStream, Job.class);
+          IOUtils.closeQuietly(inputStream);
+          index.reindexJob(objectFromJson);
+
+        } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
+          | IOException e) {
+          // Report reportItem = PluginHelper.initPluginReportItem(this, "",
+          // Report.class);
+          // reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage())
+          // .setTitle(resource.getStoragePath().toString());
+          // report.addReport(reportItem);
+          report.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
+        }
+      }
+
+    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
+      LOGGER.error("", e);
+    } finally {
+      IOUtils.closeQuietly(listResourcesUnderDirectory);
+    }
+
+    return report;
+  }
+
+  private Report indexJobsReports(IndexService index, StorageService storage, Report report) {
+    CloseableIterable<Resource> listResourcesUnderDirectory = null;
     try {
       boolean recursive = true;
       listResourcesUnderDirectory = storage.listResourcesUnderDirectory(ModelUtils.getJobReportContainerPath(),
@@ -162,11 +177,12 @@ public class ReindexJobPlugin extends AbstractPlugin<Job> {
 
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
       | IOException e) {
-      Report reportItem = PluginHelper.initPluginReportItem(this, "", Report.class);
-      reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
-      report.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+      // Report reportItem = PluginHelper.initPluginReportItem(this, "",
+      // Report.class);
+      // reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
+      // report.addReport(reportItem);
 
+      report.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
       LOGGER.error("", e);
     } finally {
       IOUtils.closeQuietly(listResourcesUnderDirectory);
