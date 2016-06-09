@@ -59,7 +59,6 @@ import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 import com.google.gwt.view.client.SelectionChangeEvent;
 
 import config.i18n.client.BrowseMessages;
-import config.i18n.client.UserManagementConstants;
 
 /**
  * @author Luis Faria
@@ -109,10 +108,6 @@ public class RiskRegister extends Composite {
 
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
-
-  @SuppressWarnings("unused")
-  private static UserManagementConstants constants = (UserManagementConstants) GWT
-    .create(UserManagementConstants.class);
 
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
@@ -173,7 +168,7 @@ public class RiskRegister extends Composite {
       new SimpleFacetParameter(RodaConstants.RISK_POS_MITIGATION_SEVERITY_LEVEL),
       new SimpleFacetParameter(RodaConstants.RISK_MITIGATION_OWNER));
 
-    riskList = new RiskList(filter, facets, "Risks", true);
+    riskList = new RiskList(filter, facets, messages.risksTitle(), true);
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.RISK_SEARCH, messages.riskRegisterSearchPlaceHolder(),
       false, false);
@@ -312,7 +307,7 @@ public class RiskRegister extends Composite {
 
       @Override
       public void onSuccess(Void result) {
-        Toast.showInfo("Refresh action", "The refresh of risks is now done");
+        Toast.showInfo(messages.dialogRefresh(), messages.riskRefreshDone());
         riskList.refresh();
       }
     });

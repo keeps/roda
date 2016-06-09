@@ -5,7 +5,7 @@
 	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
 	xmlns:u="urn:import:org.roda.wui.client.management" xmlns:l="urn:import:org.roda.wui.client.common">
 
-	<ui:with field='constants' type='config.i18n.client.UserManagementConstants' />
+	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
 	
 	<ui:style>
 		.postalAddress {
@@ -20,45 +20,45 @@
 	<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width no_padding">
 			<g:FlowPanel addStyleNames="wui-data-panel">
-				<g:Label addStyleNames="form-label">Name</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.agentName}' /></g:Label>
 				<g:TextBox ui:field="name" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">Type</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.agentType}' /></g:Label>
 				<g:TextBox ui:field="type" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">Description</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.agentDescription}' /></g:Label>
 				<g:TextArea ui:field="description" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">Category</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.agentCategory}' /></g:Label>
 				<g:TextBox ui:field="category" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">Version</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.agentVersion}' /></g:Label>
 				<g:TextBox ui:field="version" addStyleNames="form-textbox form-textbox-small" />
-				<g:Label addStyleNames="form-label">License</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.agentLicense}' /></g:Label>
 				<g:TextBox ui:field="license" addStyleNames="form-textbox" />
 				
-				<g:Label addStyleNames="form-label">Initial Release</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.agentInitialRelease}' /></g:Label>
 				<d:DateBox ui:field="initialRelease" addStyleNames="form-textbox form-textbox-small" />
-				<g:Label addStyleNames="form-label">Popularity</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.agentPopularity}' /></g:Label>
 				<g:IntegerBox ui:field="popularity" addStyleNames="form-textbox form-textbox-small" />
 				
-				<g:Label addStyleNames="form-label">Website</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.agentWebsite}' /></g:Label>
 				<g:TextBox ui:field="website" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">Download</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.agentDownload}' /></g:Label>
 				<g:TextBox ui:field="download" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">Provenance Information</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.agentProvenanceInformation}' /></g:Label>
 				<g:TextArea ui:field="provenanceInformation" addStyleNames="form-textbox" />
 				
-				<g:Label addStyleNames="form-label">Platforms</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.agentPlatforms}' /></g:Label>
 				<l:IncrementalList ui:field="platforms"></l:IncrementalList>
-				<g:Label addStyleNames="form-label">Extensions</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.agentExtensions}' /></g:Label>
 				<l:IncrementalList ui:field="extensions"></l:IncrementalList>
-				<g:Label addStyleNames="form-label">Mimetypes</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.agentMimetypes}' /></g:Label>
 				<l:IncrementalList ui:field="mimetypes"></l:IncrementalList>
-				<g:Label addStyleNames="form-label">Pronoms</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.agentPronoms}' /></g:Label>
 				<l:IncrementalList ui:field="pronoms"></l:IncrementalList>
-				<g:Label addStyleNames="form-label">UTIs</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.agentUtis}' /></g:Label>
 				<l:IncrementalList ui:field="utis"></l:IncrementalList>
 				
-				<g:Label addStyleNames="form-label">Formats</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.agentFormats}' /></g:Label>
 				<l:IncrementalAssociativeList ui:field="formatIds"></l:IncrementalAssociativeList>
-				<g:Label addStyleNames="form-label">Required Agents</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.agentRequiredAgents}' /></g:Label>
 				<l:IncrementalAssociativeList ui:field="requiredAgents"></l:IncrementalAssociativeList>
 			</g:FlowPanel>
 		</g:FlowPanel>

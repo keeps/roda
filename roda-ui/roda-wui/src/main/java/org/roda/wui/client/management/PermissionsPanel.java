@@ -36,7 +36,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 
-import config.i18n.client.UserManagementConstants;
+import config.i18n.client.BrowseMessages;
 
 /**
  * @author Luis Faria
@@ -154,8 +154,7 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
     }
   }
 
-  private static UserManagementConstants constants = (UserManagementConstants) GWT
-    .create(UserManagementConstants.class);
+  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   @SuppressWarnings("unused")
   private final ClientLogger logger = new ClientLogger(getClass().getName());
@@ -197,7 +196,7 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
             String role = (String) rodaProperties.get(key);
             String description;
             try {
-              description = constants.getString(key.replace('.', '_'));
+              description = messages.role(role.replace('.', '_'));
             } catch (MissingResourceException e) {
               description = role + " (needs translation)";
             }

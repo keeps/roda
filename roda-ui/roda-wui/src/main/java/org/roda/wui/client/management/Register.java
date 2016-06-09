@@ -39,7 +39,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.UserManagementConstants;
+import config.i18n.client.BrowseMessages;
 
 /**
  * @author Luis Faria
@@ -102,8 +102,7 @@ public class Register extends Composite {
 
   private RecaptchaWidget recaptchaWidget;
 
-  private static UserManagementConstants constants = (UserManagementConstants) GWT
-    .create(UserManagementConstants.class);
+  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
@@ -178,8 +177,8 @@ public class Register extends Composite {
             @Override
             public void onSuccess(Void result) {
               if (registerActive) {
-                Dialogs.showInformationDialog(constants.registerSuccessDialogTitle(),
-                  constants.registerSuccessDialogMessageActive(), constants.registerSuccessDialogButton(),
+                Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
+                  messages.registerSuccessDialogMessageActive(), messages.registerSuccessDialogButton(),
                   new AsyncCallback<Void>() {
 
                     @Override
@@ -197,8 +196,8 @@ public class Register extends Composite {
 
                   @Override
                   public void onSuccess(Void result) {
-                    Dialogs.showInformationDialog(constants.registerSuccessDialogTitle(),
-                      constants.registerSuccessDialogMessage(), constants.registerSuccessDialogButton(),
+                    Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
+                      messages.registerSuccessDialogMessage(), messages.registerSuccessDialogButton(),
                       new AsyncCallback<Void>() {
 
                         @Override
@@ -245,17 +244,17 @@ public class Register extends Composite {
       recaptchaWidget.reset();
     }
     if (caught instanceof EmailAlreadyExistsException) {
-      Toast.showError(constants.registerEmailAlreadyExists());
+      Toast.showError(messages.registerEmailAlreadyExists());
     } else if (caught instanceof UserAlreadyExistsException) {
-      Toast.showError(constants.registerUserExists());
+      Toast.showError(messages.registerUserExists());
     } else if (caught instanceof RecaptchaException) {
-      Toast.showError(constants.registerWrongCaptcha());
+      Toast.showError(messages.registerWrongCaptcha());
     } else {
-      Toast.showError(constants.registerFailure());
+      Toast.showError(messages.registerFailure());
     }
   }
 
   private void sendEmailVerificationFailure(Throwable caught) {
-    Toast.showError(constants.registerSendEmailVerificationFailure());
+    Toast.showError(messages.registerSendEmailVerificationFailure());
   }
 }

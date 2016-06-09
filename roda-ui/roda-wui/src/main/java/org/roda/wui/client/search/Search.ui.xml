@@ -15,7 +15,7 @@
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
 				<g:HTML>
-					<h1>Search</h1>
+					<h1><ui:text from='{messages.searchTitle}' /></h1>
 				</g:HTML>
 				<g:FlowPanel addStyleNames="page-description" ui:field="searchDescription">
 				</g:FlowPanel>
@@ -26,13 +26,13 @@
 				<g:FlowPanel styleName="sidebar-group" ui:field="itemsFacets">
 					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 						<g:Label addStyleNames="h5 sidebar-facet-title">
-							Description levels
+							<ui:text from='{messages.searchDescriptionLevels}' />
 						</g:Label>
 						<g:FlowPanel ui:field="facetDescriptionLevels" />
 					</g:FlowPanel>
 					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 						<g:Label addStyleNames="h5 sidebar-facet-title">
-							Representations
+							<ui:text from='{messages.searchRepresentations}' />
 						</g:Label>
 						<g:FlowPanel ui:field="facetHasRepresentations" />
 					</g:FlowPanel>
@@ -40,27 +40,29 @@
 				<g:FlowPanel styleName="sidebar-group" ui:field="filesFacets">
 					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 						<g:Label addStyleNames="h5 sidebar-facet-title">
-							Formats
+							<ui:text from='{messages.searchFormats}' />
 						</g:Label>
 						<g:FlowPanel ui:field="facetFormats" />
 					</g:FlowPanel>
 					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 						<g:Label addStyleNames="h5 sidebar-facet-title">
-							PRONOM IDs
+							<ui:text from='{messages.searchPronomIds}' />
 						</g:Label>
 						<g:FlowPanel ui:field="facetPronoms" />
 					</g:FlowPanel>
 					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 						<g:Label addStyleNames="h5 sidebar-facet-title">
-							Mimetypes
+							<ui:text from='{messages.searchMimetypes}' />
 						</g:Label>
 						<g:FlowPanel ui:field="facetMimetypes" />
 					</g:FlowPanel>
 				</g:FlowPanel>
 				<g:FlowPanel addStyleNames="sidebar-facet-panel">
-					<g:Label addStyleNames="h4">Actions</g:Label>
+					<g:Label addStyleNames="h4">
+						<ui:text from='{messages.sidebarActionsTitle}' />
+					</g:Label>
 					<g:Button addStyleNames="btn btn-play" ui:field="newJobButton">
-						<ui:text from='{messages.riskRegisterProcessButton}' />
+						<ui:text from='{messages.newProcessPreservation}' />
 					</g:Button>
 				</g:FlowPanel>
 			</g:FlowPanel>

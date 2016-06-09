@@ -51,42 +51,42 @@ public class ActionsStatistics extends StatisticTab {
     if (super.init()) {
       ret = true;
 
-      createDescriptionObject = createStatisticPanel(constants.createDescriptionObjectTitle(),
-        constants.createDescriptionObjectDesc(), "logs\\.user\\.Editor\\.createDescriptionObject\\..*", true, true,
+      createDescriptionObject = createStatisticPanel(messages.createDescriptionObjectTitle(),
+        messages.createDescriptionObjectDesc(), "logs\\.user\\.Editor\\.createDescriptionObject\\..*", true, true,
         AGGREGATION_LAST);
-      modifyDescriptionObject = createStatisticPanel(constants.modifyDescriptionObjectTitle(),
-        constants.modifyDescriptionObjectDesc(), "logs\\.user\\.Editor\\.modifyDescriptionObject\\..*", true, true,
+      modifyDescriptionObject = createStatisticPanel(messages.modifyDescriptionObjectTitle(),
+        messages.modifyDescriptionObjectDesc(), "logs\\.user\\.Editor\\.modifyDescriptionObject\\..*", true, true,
         AGGREGATION_LAST);
-      removeDescriptionObject = createStatisticPanel(constants.removeDescriptionObjectTitle(),
-        constants.removeDescriptionObjectDesc(), "logs\\.user\\.Editor\\.removeDescriptionObject\\..*", true, true,
+      removeDescriptionObject = createStatisticPanel(messages.removeDescriptionObjectTitle(),
+        messages.removeDescriptionObjectDesc(), "logs\\.user\\.Editor\\.removeDescriptionObject\\..*", true, true,
         AGGREGATION_LAST);
-      moveDescriptionObject = createStatisticPanel(constants.moveDescriptionObjectTitle(),
-        constants.moveDescriptionObjectDesc(), "logs\\.user\\.Editor\\.moveDescriptionObject\\..*", true, true,
+      moveDescriptionObject = createStatisticPanel(messages.moveDescriptionObjectTitle(),
+        messages.moveDescriptionObjectDesc(), "logs\\.user\\.Editor\\.moveDescriptionObject\\..*", true, true,
         AGGREGATION_LAST);
-      addUser = createStatisticPanel(constants.addUserTitle(), constants.addUserDesc(),
+      addUser = createStatisticPanel(messages.addUserTitle(), messages.addUserDesc(),
         "logs\\.user\\.UserManagement\\.addUser\\..*", true, true, AGGREGATION_LAST);
-      modifyUser = createStatisticPanel(constants.modifyUserTitle(), constants.modifyUserDesc(),
+      modifyUser = createStatisticPanel(messages.modifyUserTitle(), messages.modifyUserDesc(),
         "logs\\.user\\.UserManagement\\.modifyUser\\..*", true, true, AGGREGATION_LAST);
-      removeUser = createStatisticPanel(constants.removeUserTitle(), constants.removeUserDesc(),
+      removeUser = createStatisticPanel(messages.removeUserTitle(), messages.removeUserDesc(),
         "logs\\.user\\.UserManagement\\.removeUser\\..*", true, true, AGGREGATION_LAST);
-      addGroup = createStatisticPanel(constants.addGroupTitle(), constants.addGroupDesc(),
+      addGroup = createStatisticPanel(messages.addGroupTitle(), messages.addGroupDesc(),
         "logs\\.user\\.UserManagement\\.addGroup\\..*", true, true, AGGREGATION_LAST);
-      modifyGroup = createStatisticPanel(constants.modifyGroupTitle(), constants.modifyGroupDesc(),
+      modifyGroup = createStatisticPanel(messages.modifyGroupTitle(), messages.modifyGroupDesc(),
         "logs\\.user\\.UserManagement\\.modifyGroup\\..*", true, true, AGGREGATION_LAST);
-      removeGroup = createStatisticPanel(constants.removeGroupTitle(), constants.removeGroupDesc(),
+      removeGroup = createStatisticPanel(messages.removeGroupTitle(), messages.removeGroupDesc(),
         "logs\\.user\\.UserManagement\\.removeGroup\\..*", true, true, AGGREGATION_LAST);
 
-      setUserPassword = createStatisticPanel(constants.setUserPasswordTitle(), constants.setUserPasswordDesc(),
+      setUserPassword = createStatisticPanel(messages.setUserPasswordTitle(), messages.setUserPasswordDesc(),
         "logs\\.user\\.UserManagement\\.setUserPassword\\..*", true, true, AGGREGATION_LAST);
 
-      acceptSIP = createStatisticPanel(constants.acceptSIPTitle(), constants.acceptSIPDesc(),
+      acceptSIP = createStatisticPanel(messages.acceptSIPTitle(), messages.acceptSIPDesc(),
         "logs\\.user\\.AcceptSIP\\.acceptSIP\\..*", true, true, AGGREGATION_LAST);
 
-      addTask = createStatisticPanel(constants.addTaskTitle(), constants.addTaskDesc(),
+      addTask = createStatisticPanel(messages.addTaskTitle(), messages.addTaskDesc(),
         "logs\\.user\\.Scheduler\\.addTask\\..*", true, true, AGGREGATION_LAST);
-      modifyTask = createStatisticPanel(constants.modifyTaskTitle(), constants.modifyTaskDesc(),
+      modifyTask = createStatisticPanel(messages.modifyTaskTitle(), messages.modifyTaskDesc(),
         "logs\\.user\\.Scheduler\\.modifyTask\\..*", true, true, AGGREGATION_LAST);
-      removeTask = createStatisticPanel(constants.removeTaskTitle(), constants.removeTaskDesc(),
+      removeTask = createStatisticPanel(messages.removeTaskTitle(), messages.removeTaskDesc(),
         "logs\\.user\\.Scheduler\\.removeTask\\..*", true, true, AGGREGATION_LAST);
 
       // TODO add task instances actions
@@ -116,7 +116,7 @@ public class ActionsStatistics extends StatisticTab {
    */
   @Override
   public String getTabText() {
-    return constants.actionsStatistics();
+    return messages.actionsStatistics();
   }
 
 }

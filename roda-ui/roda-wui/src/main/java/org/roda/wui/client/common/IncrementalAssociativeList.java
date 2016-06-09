@@ -21,7 +21,6 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.wui.client.common.dialogs.SelectDialog;
 import org.roda.wui.client.common.dialogs.SelectDialogFactory;
 import org.roda.wui.client.common.utils.StringUtils;
-import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
@@ -193,7 +192,7 @@ public class IncrementalAssociativeList extends Composite implements HasHandlers
           dialog.addValueChangeHandler(changeHandler);
 
         } catch (NotFoundException e) {
-          Toast.showError(actualClass.getSimpleName() + " dialog not found: " + e);
+          GWT.log(actualClass.getSimpleName() + " dialog not found: " + e);
         }
 
       }

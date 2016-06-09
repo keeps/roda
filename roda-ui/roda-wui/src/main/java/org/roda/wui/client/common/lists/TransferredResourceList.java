@@ -26,7 +26,7 @@ import org.roda.wui.common.client.tools.Humanize;
 
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.SafeHtmlCell;
-import com.google.gwt.cell.client.TextCell;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -34,11 +34,10 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
-import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.cellview.client.TextHeader;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Label;
+
+import config.i18n.client.BrowseMessages;
 
 /**
  * 
@@ -48,6 +47,7 @@ import com.google.gwt.user.client.ui.Label;
 public class TransferredResourceList extends BasicAsyncTableCell<TransferredResource> {
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
+  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   private Column<TransferredResource, SafeHtml> isFileColumn;
   private TextColumn<TransferredResource> nameColumn;
@@ -119,9 +119,9 @@ public class TransferredResourceList extends BasicAsyncTableCell<TransferredReso
     // TODO externalize strings into constants
 
     addColumn(isFileColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-files-o'></i>"), false, false, 3);
-    addColumn(nameColumn, "Name", true, false);
-    addColumn(sizeColumn, "Size", true, true, 7);
-    addColumn(creationDateColumn, "Date created", true, true, 11);
+    addColumn(nameColumn, messages.transferredResourceName(), true, false);
+    addColumn(sizeColumn, messages.transferredResourceSize(), true, true, 7);
+    addColumn(creationDateColumn, messages.transferredResourceDateCreated(), true, true, 11);
 
     addStyleName("my-list-transferredResource");
 

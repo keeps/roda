@@ -3,23 +3,25 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client">
+	
+	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
 
 	<g:FlowPanel addStyleNames="loginPanel">
 		<g:HTML>
-			<h1>Login</h1>
+			<h1><ui:text from='{messages.loginTitle}' /></h1>
 		</g:HTML>
 		<g:FlowPanel>
-			<g:Label addStyleNames="form-label">Username</g:Label>
+			<g:Label addStyleNames="form-label"><ui:text from='{messages.loginUsername}' /></g:Label>
 			<g:TextBox ui:field="username" addStyleNames="fieldTextBox"></g:TextBox>
-			<g:Label addStyleNames="form-label">Password</g:Label>
+			<g:Label addStyleNames="form-label"><ui:text from='{messages.loginPassword}' /></g:Label>
 			<g:PasswordTextBox ui:field="password"
 				addStyleNames="fieldTextBox"></g:PasswordTextBox>
 		</g:FlowPanel>
 		<g:Label ui:field="error" addStyleNames="login-error"></g:Label>
 		<g:FlowPanel addStyleNames="login-buttons">
-			<g:Button ui:field="recover" addStyleNames="btn btn-link login-link">Recover password</g:Button>
-		    <g:Button ui:field="register" addStyleNames="btn btn-link login-link">Sign up</g:Button>
-		    <g:Button ui:field="login" addStyleNames="btn btn-play login-button">Login</g:Button>
+			<g:Button ui:field="recover" addStyleNames="btn btn-link login-link"><ui:text from='{messages.loginRecoverPassword}' /></g:Button>
+		    <g:Button ui:field="register" addStyleNames="btn btn-link login-link"><ui:text from='{messages.loginRegister}' /></g:Button>
+		    <g:Button ui:field="login" addStyleNames="btn btn-play login-button"><ui:text from='{messages.loginLogin}' /></g:Button>
 		</g:FlowPanel>		
 	</g:FlowPanel>
 

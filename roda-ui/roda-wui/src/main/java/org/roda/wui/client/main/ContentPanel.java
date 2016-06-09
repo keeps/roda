@@ -12,7 +12,6 @@ package org.roda.wui.client.main;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.MissingResourceException;
 import java.util.Set;
 
 import org.roda.wui.client.browse.Browse;
@@ -38,7 +37,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.BrowseConstants;
 import config.i18n.client.BrowseMessages;
 
 /**
@@ -64,7 +62,6 @@ public class ContentPanel extends SimplePanel {
   }
 
   private static final Set<HistoryResolver> resolvers = new HashSet<HistoryResolver>();
-  private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
   private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   private Widget currWidget;
@@ -172,12 +169,16 @@ public class ContentPanel extends SimplePanel {
     boolean resolved = false;
     List<String> tokens = historyTokens;
     while (!resolved && tokens.size() > 0) {
-      try {
-        tokenI18N = constants.getString("title_" + Tools.join(tokens, "_")).toUpperCase();
-        resolved = true;
-      } catch (MissingResourceException e) {
+
+      tokenI18N = messages.title(Tools.join(tokens, "_")).toUpperCase();
+      resolved = true;
+
+      if (tokenI18N.isEmpty()) {
         tokens = Tools.removeLast(tokens);
+      } else {
+        resolved = true;
       }
+
     }
     if (!resolved) {
       tokenI18N = historyTokens.get(historyTokens.size() - 1).toUpperCase();

@@ -21,7 +21,7 @@ import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HTML;
 
-import config.i18n.client.BrowseConstants;
+import config.i18n.client.BrowseMessages;
 
 /**
  * @author Luís Faria
@@ -29,7 +29,7 @@ import config.i18n.client.BrowseConstants;
  */
 public class HTMLWidgetWrapper extends HTML {
 
-  private static final BrowseConstants constants = GWT.create(BrowseConstants.class);
+  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   public HTMLWidgetWrapper(String resourceId) {
@@ -37,7 +37,7 @@ public class HTMLWidgetWrapper extends HTML {
       resourceId = resourceId.substring(0, resourceId.length() - 5);
     }
 
-    String localizedResourceId = resourceId + "_" + constants.locale() + ".html";
+    String localizedResourceId = resourceId + "_" + messages.locale() + ".html";
     String defaultResourceId = resourceId + ".html";
 
     RequestBuilder request = new RequestBuilder(RequestBuilder.GET,

@@ -184,7 +184,6 @@ public class IngestTransfer extends Composite {
 
   private IngestTransfer() {
     Facets facets = null;
-
     transferredResourceList = new TransferredResourceList(DEFAULT_FILTER, facets, messages.ingestTransferList(), true);
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.TRANSFERRED_RESOURCE_SEARCH,
@@ -263,6 +262,7 @@ public class IngestTransfer extends Composite {
       transferredResourceList.setVisible(true);
       download.setVisible(false);
     }
+
     breadcrumb.updatePath(getBreadcrumbs(r));
     breadcrumb.setVisible(true);
 
@@ -282,7 +282,7 @@ public class IngestTransfer extends Composite {
     itemIconHtmlPanel.addStyleName("browseItemIcon-all");
 
     itemIcon.setWidget(itemIconHtmlPanel);
-    itemTitle.setText("All transferred packages");
+    itemTitle.setText(messages.ingestAllTransferredPackages());
     itemDates.setText("");
     itemTitle.addStyleName("browseTitle-allCollections");
     itemIcon.getParent().addStyleName("browseTitle-allCollections-wrapper");
@@ -399,7 +399,7 @@ public class IngestTransfer extends Composite {
       @Override
       public void onFailure(Throwable caught) {
         if (caught instanceof IsStillUpdatingException) {
-          Toast.showInfo("Refresh", "Another update is currently running. Try again later");
+          Toast.showInfo(messages.dialogRefresh(), messages.updateIsCurrentlyRunning());
         } else {
           AsyncCallbackUtils.defaultFailureTreatment(caught);
         }
@@ -410,7 +410,7 @@ public class IngestTransfer extends Composite {
 
       @Override
       public void onSuccess(Void result) {
-        Toast.showInfo("Refresh", "Updated files under this folder");
+        Toast.showInfo(messages.dialogRefresh(), messages.updatedFilesUnderFolder());
         transferredResourceList.refresh();
         refresh.setEnabled(true);
       }

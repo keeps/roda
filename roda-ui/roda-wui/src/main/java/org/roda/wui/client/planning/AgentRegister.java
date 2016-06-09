@@ -140,7 +140,7 @@ public class AgentRegister extends Composite {
     Filter filter = null;
     Facets facets = null;
 
-    agentList = new AgentList(filter, facets, "Agents", true);
+    agentList = new AgentList(filter, facets, messages.agentsTitle(), true);
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.AGENT_SEARCH, messages.agentRegisterSearchPlaceHolder(),
       false, false);

@@ -22,6 +22,7 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.common.client.ClientLogger;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
@@ -29,11 +30,13 @@ import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Label;
+
+import config.i18n.client.BrowseMessages;
 
 public class RiskIncidenceList extends BasicAsyncTableCell<RiskIncidence> {
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
+  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   private TextColumn<RiskIncidence> objectColumn;
   private TextColumn<RiskIncidence> objectTypeColumn;
@@ -86,13 +89,13 @@ public class RiskIncidenceList extends BasicAsyncTableCell<RiskIncidence> {
     objectTypeColumn.setSortable(true);
 
     // TODO externalize strings into constants
-    addColumn(objectColumn, "Object ID", false, false);
-    addColumn(objectTypeColumn, "Object Type", true, true, 8);
+    addColumn(objectColumn, messages.riskIncidenceObjectId(), false, false);
+    addColumn(objectTypeColumn, messages.riskIncidenceObjectType(), true, true, 8);
 
     // define default sorting
     display.getColumnSortList().push(new ColumnSortInfo(objectTypeColumn, true));
     addStyleName("my-collections-table");
-    
+
   }
 
   @Override

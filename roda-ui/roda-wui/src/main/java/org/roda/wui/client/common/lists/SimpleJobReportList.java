@@ -166,8 +166,8 @@ public class SimpleJobReportList extends BasicAsyncTableCell<Report> {
       public String getValue(Report report) {
         String value = "";
         if (report != null) {
-          value = report.getStepsCompleted() + " of " + report.getTotalSteps() + " (" + report.getCompletionPercentage()
-            + "%)";
+          value = report.getStepsCompleted() + " " + messages.ofWordMessage() + " " + report.getTotalSteps() + " ("
+            + report.getCompletionPercentage() + "%)";
         }
 
         return value;
@@ -182,16 +182,16 @@ public class SimpleJobReportList extends BasicAsyncTableCell<Report> {
     completionStatusColumn.setSortable(false);
 
     // TODO externalize strings into constants
-    addColumn(sourceColumn, "Source", true, false);
-    addColumn(outcomeColumn, "Outcome", true, false);
-    addColumn(updatedDateColumn, "Last updated at", true, false, 11);
-    addColumn(lastPluginRunColumn, "Last run task", true, false);
-    addColumn(lastPluginRunStateColumn, "Status", true, false, 8);
-    addColumn(completionStatusColumn, "Progress", true, false, 8);
+    addColumn(sourceColumn, messages.reportSource(), true, false);
+    addColumn(outcomeColumn, messages.reportOutcome(), true, false);
+    addColumn(updatedDateColumn, messages.reportLastUpdatedAt(), true, false, 11);
+    addColumn(lastPluginRunColumn, messages.reportLastRunTask(), true, false);
+    addColumn(lastPluginRunStateColumn, messages.reportStatus(), true, false, 8);
+    addColumn(completionStatusColumn, messages.reportProgress(), true, false, 8);
 
     // display.setColumnWidth(sourceObjectColumn, "100%");
 
-    Label emptyInfo = new Label("No items to display");
+    Label emptyInfo = new Label(messages.noItemsToDisplay());
     display.setEmptyTableWidget(emptyInfo);
 
     // default sorting

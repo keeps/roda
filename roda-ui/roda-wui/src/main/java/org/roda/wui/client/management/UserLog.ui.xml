@@ -14,7 +14,9 @@
 	<g:FlowPanel styleName="wui-log" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1">Activity log</g:Label>
+				<g:Label styleName="h1">
+					<ui:text from='{messages.activityLogTitle}' />
+				</g:Label>
 				<g:FlowPanel addStyleNames="page-description" ui:field="userLogDescription">
 				</g:FlowPanel>
 				<common:SearchPanel ui:field="searchPanel" />
@@ -25,19 +27,19 @@
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 					<g:Label addStyleNames="h5 sidebar-facet-title">
-						<ui:msg>Components</ui:msg>
+						<ui:text from='{messages.logComponents}' />
 					</g:Label>
 					<g:FlowPanel ui:field="facetComponents" />
 				</g:FlowPanel>
 				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 					<g:Label addStyleNames="h5 sidebar-facet-title">
-						<ui:msg>Methods</ui:msg>
+						<ui:text from='{messages.logMethods}' />
 					</g:Label>
 					<g:FlowPanel ui:field="facetMethods" />
 				</g:FlowPanel>
 				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 					<g:Label addStyleNames="h5 sidebar-facet-title">
-						<ui:msg>Users</ui:msg>
+						<ui:text from='{messages.logUsers}' />
 					</g:Label>
 					<g:FlowPanel ui:field="facetUsers" />
 				</g:FlowPanel>

@@ -63,14 +63,14 @@ public class CreateIngestJob extends CreateJob<TransferredResource> {
       if (selected instanceof SelectedItemsList) {
         List<String> ids = ((SelectedItemsList) selected).getIds();
         Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_UUID, ids));
-        TransferredResourceList list = new TransferredResourceList(filter, null, "Transferred resources", false, 10,
-          10);
+        TransferredResourceList list = new TransferredResourceList(filter, null, messages.transferredResourcesTitle(),
+          false, 10, 10);
         getTargetPanel().clear();
         getTargetPanel().add(list);
       } else if (selected instanceof SelectedItemsFilter) {
         Filter filter = ((SelectedItemsFilter) selected).getFilter();
-        TransferredResourceList list = new TransferredResourceList(filter, null, "Transferred resources", false, 10,
-          10);
+        TransferredResourceList list = new TransferredResourceList(filter, null, messages.transferredResourcesTitle(),
+          false, 10, 10);
         getTargetPanel().clear();
         getTargetPanel().add(list);
       } else {
@@ -96,13 +96,13 @@ public class CreateIngestJob extends CreateJob<TransferredResource> {
 
           @Override
           public void onFailure(Throwable caught) {
-            Toast.showError("Error", caught.getMessage());
+            Toast.showError(messages.dialogFailure(), caught.getMessage());
             getButtonCreate().setEnabled(true);
           }
 
           @Override
           public void onSuccess(Job result) {
-            Toast.showInfo("Done", "New ingest process created");
+            Toast.showInfo(messages.dialogDone(), messages.processCreated());
             Tools.newHistory(IngestProcess.RESOLVER);
           }
         });

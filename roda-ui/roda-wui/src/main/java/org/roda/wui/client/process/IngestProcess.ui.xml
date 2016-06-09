@@ -24,7 +24,9 @@
 	<g:FlowPanel styleName="wui-ingest-list" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1" ui:field="ingestProcessTitle">Ingest process</g:Label>
+				<g:Label styleName="h1" ui:field="ingestProcessTitle">
+					<ui:text from='{messages.ingestProcessTitle}' />
+				</g:Label>
 				<g:FlowPanel addStyleNames="page-description" ui:field="ingestProcessDescription">
 				</g:FlowPanel>
 				<lists:JobList ui:field="jobList" />
@@ -33,13 +35,13 @@
 				<g:FlowPanel styleName="sidebar-group">
 					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 						<g:Label addStyleNames="h5 sidebar-facet-title">
-							Status
+							<ui:text from='{messages.processStatus}' />
 						</g:Label>
 						<g:FlowPanel ui:field="stateFacets" />
 					</g:FlowPanel>
 					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 						<g:Label addStyleNames="h5 sidebar-facet-title">
-							Creators
+							<ui:text from='{messages.processCreators}' />
 						</g:Label>
 						<g:FlowPanel ui:field="producerFacets" />
 					</g:FlowPanel>
@@ -60,8 +62,9 @@
 					<g:Label addStyleNames="h4">
 						<ui:text from='{messages.sidebarActionsTitle}' />
 					</g:Label>
-					<g:Button addStyleNames="btn btn-plus" ui:field="newJob">Start new
-						process</g:Button>
+					<g:Button addStyleNames="btn btn-plus" ui:field="newJob">
+						<ui:text from='{messages.newProcessPreservation}' />
+					</g:Button>
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>

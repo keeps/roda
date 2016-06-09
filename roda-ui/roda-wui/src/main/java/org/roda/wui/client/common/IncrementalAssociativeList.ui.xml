@@ -13,6 +13,8 @@
 
 	<g:FlowPanel>
 		<g:FlowPanel ui:field="textBoxPanel"></g:FlowPanel>
-		<g:Button addStyleNames="btn btn-incremental-list-add btn-plus" ui:field="addDynamicTextBoxButton">Add</g:Button>
+		<g:Button addStyleNames="btn btn-incremental-list-add btn-plus" ui:field="addDynamicTextBoxButton">
+			<ui:text from='{messages.addButton}' />
+		</g:Button>
 	</g:FlowPanel>
 </ui:UiBinder>

@@ -25,7 +25,7 @@ import com.google.gwt.user.client.ui.SourcesChangeEvents;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.UserManagementConstants;
+import config.i18n.client.BrowseMessages;
 
 /**
  * 
@@ -35,8 +35,7 @@ import config.i18n.client.UserManagementConstants;
 @SuppressWarnings("deprecation")
 public class GroupSelectListBox extends HorizontalPanel implements SourcesChangeEvents {
 
-  private static UserManagementConstants constants = (UserManagementConstants) GWT
-    .create(UserManagementConstants.class);
+  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   private static CommonImageBundle commonImageBundle = (CommonImageBundle) GWT.create(CommonImageBundle.class);
 
@@ -64,7 +63,7 @@ public class GroupSelectListBox extends HorizontalPanel implements SourcesChange
     changeListeners = new Vector<ChangeListener>();
 
     VerticalPanel allGroupsPanel = new VerticalPanel();
-    Label allGroupsLabel = new Label(constants.allGroups());
+    Label allGroupsLabel = new Label(messages.allGroups());
     allGroupsLabel.setWordWrap(false);
 
     allGroups = new GroupListBox(false);
@@ -85,7 +84,7 @@ public class GroupSelectListBox extends HorizontalPanel implements SourcesChange
     this.add(groupControlButtons);
 
     VerticalPanel memberGroupsPanel = new VerticalPanel();
-    Label memberGroupsLabel = new Label(constants.memberGroups());
+    Label memberGroupsLabel = new Label(messages.memberGroups());
     memberGroupsLabel.setWordWrap(false);
 
     memberGroups = new ListBox();

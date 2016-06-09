@@ -191,7 +191,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
       }
     });
 
-    Label emptyInfo = new Label("No items to display");
+    Label emptyInfo = new Label(messages.noItemsToDisplay());
     display.setEmptyTableWidget(emptyInfo);
   }
 

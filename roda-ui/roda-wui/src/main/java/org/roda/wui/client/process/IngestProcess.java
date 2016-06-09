@@ -133,7 +133,7 @@ public class IngestProcess extends Composite {
       new SimpleFacetParameter(RodaConstants.JOB_USERNAME));
 
     // TODO externalise strings
-    jobList = new JobList(filter, facets, "Ingest job list", false);
+    jobList = new JobList(filter, facets, messages.ingestJobList(), false);
     producerFacets = new FlowPanel();
     stateFacets = new FlowPanel();
 

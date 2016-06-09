@@ -13,7 +13,7 @@ package org.roda.wui.common.client.widgets;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.ListBox;
 
-import config.i18n.client.BrowseConstants;
+import config.i18n.client.BrowseMessages;
 
 /**
  * @author Luis Faria
@@ -40,7 +40,7 @@ public class MonthPicker extends ListBox {
     FEBRUARY
   }
 
-  private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
+  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   // private GWTLogger logger = new GWTLogger(GWT.getTypeName(this));
 
@@ -54,18 +54,18 @@ public class MonthPicker extends ListBox {
   }
 
   protected void init() {
-    addItem(constants.january());
-    addItem(constants.february());
-    addItem(constants.march());
-    addItem(constants.april());
-    addItem(constants.may());
-    addItem(constants.june());
-    addItem(constants.july());
-    addItem(constants.august());
-    addItem(constants.september());
-    addItem(constants.october());
-    addItem(constants.november());
-    addItem(constants.december());
+    addItem(messages.january());
+    addItem(messages.february());
+    addItem(messages.march());
+    addItem(messages.april());
+    addItem(messages.may());
+    addItem(messages.june());
+    addItem(messages.july());
+    addItem(messages.august());
+    addItem(messages.september());
+    addItem(messages.october());
+    addItem(messages.november());
+    addItem(messages.december());
     setSelectedIndex(0);
   }
 

@@ -227,7 +227,7 @@ public class Browse extends Composite {
     viewingTop = true;
     handlers = new ArrayList<HandlerRegistration>();
 
-    String summary = "List of items";
+    String summary = messages.listOfItems();
     boolean selectable = true;
 
     aipList = new AIPList(Filter.NONE, justActive, Facets.NONE, summary, selectable);
@@ -391,7 +391,7 @@ public class Browse extends Composite {
     if (caught instanceof NotFoundException) {
       title = messages.notFoundErrorTitle();
       message = messages.notFoundErrorMessage(aipId);
-      GWT.log("Not found", caught);
+      GWT.log(messages.notFoundError(), caught);
     } else {
       title = messages.genericErrorTitle();
       message = messages.genericErrorMessage(caught.getMessage());
@@ -584,7 +584,7 @@ public class Browse extends Composite {
             @Override
             public void execute() {
               // TODO find better error message
-              Toast.showError("Unknown ancestor");
+              Toast.showError(messages.unknownAncestorError());
             }
           });
           ret.add(unknownAncestorBreadcrumb);
@@ -816,7 +816,8 @@ public class Browse extends Composite {
           });
 
       } else {
-        Dialogs.showInformationDialog("Select an item", "Please select one or more items to remove", "OK");
+        Dialogs.showInformationDialog(messages.selectAnItemTitle(), messages.selectAnItemDescription(),
+          messages.dialogOk());
       }
     } else {
       // Remove all selected
@@ -928,7 +929,8 @@ public class Browse extends Composite {
           }
         });
       } else {
-        Dialogs.showInformationDialog("Select an item", "Please select one or more items to move", "OK");
+        Dialogs.showInformationDialog(messages.selectAnItemTitle(), messages.selectAnItemDescription(),
+          messages.dialogOk());
       }
     } else {
       // Move all selected
@@ -980,7 +982,7 @@ public class Browse extends Composite {
 
   @UiHandler("newProcess")
   void buttonNewProcessHandler(ClickEvent e) {
-    Toast.showInfo("Sorry", "Feature not yet implemented");
+    Toast.showInfo(messages.dialogSorry(), messages.featureNotYetImplemented());
   }
 
   @UiHandler("editPermissions")
@@ -1034,7 +1036,7 @@ public class Browse extends Composite {
 
       @Override
       public void onSuccessImpl(Void result) {
-        Toast.showInfo("Done", "Item was accepted");
+        Toast.showInfo(messages.dialogDone(), messages.itemWasAccepted());
         // reload
         clear();
         viewAction(aipId);
@@ -1046,7 +1048,7 @@ public class Browse extends Composite {
   void appraisalRejectHandler(ClickEvent e) {
     final boolean accept = false;
     final SelectedItems<IndexedAIP> selected = SelectedItemsList.create(IndexedAIP.class, aipId);
-    Dialogs.showPromptDialog("Reject message", "What is the reason for rejecting this item?", RegExp.compile(".+"),
+    Dialogs.showPromptDialog(messages.rejectMessage(), messages.rejectQuestion(), RegExp.compile(".+"),
       messages.dialogCancel(), messages.dialogOk(), new AsyncCallback<String>() {
 
         @Override
@@ -1060,7 +1062,7 @@ public class Browse extends Composite {
 
             @Override
             public void onSuccessImpl(Void result) {
-              Toast.showInfo("Done", "Item was rejected");
+              Toast.showInfo(messages.dialogDone(), messages.itemWasRejected());
               Tools.newHistory(IngestAppraisal.RESOLVER);
             }
           });

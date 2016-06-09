@@ -7,6 +7,7 @@
  */
 package org.roda.wui.client.common;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -24,7 +25,11 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 
+import config.i18n.client.BrowseMessages;
+
 public class Dialogs {
+
+  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   public static void showConfirmDialog(String title, String message, String cancelButtonText, String confirmButtonText,
     final AsyncCallback<Boolean> callback) {
@@ -210,7 +215,7 @@ public class Dialogs {
     dialogBox.setText("Loading...");
 
     FlowPanel layout = new FlowPanel();
-    Label messageLabel = new Label("We are executing your requested task, please wait...");
+    Label messageLabel = new Label(messages.executingTaskMessage());
 
     layout.add(messageLabel);
 

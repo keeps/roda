@@ -37,7 +37,7 @@ import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.BrowseConstants;
+import config.i18n.client.BrowseMessages;
 
 /**
  * @author Luis Faria
@@ -45,7 +45,7 @@ import config.i18n.client.BrowseConstants;
  */
 public class EditObjectPermissionsPanel extends Composite {
 
-  private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
+  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
@@ -79,16 +79,16 @@ public class EditObjectPermissionsPanel extends Composite {
     groupMiniPermissionPanels = new Vector<GroupMiniPermissionPanel>();
 
     layout = new DockPanel();
-    title = new Label(constants.editProducersTitle());
+    title = new Label(messages.editProducersTitle());
     memberListPanel = new VerticalPanel();
     memberListScroll = new ScrollPanel(memberListPanel);
 
-    applyRecursivelly = new CheckBox(constants.objectPermissionsApplyRecursivelly());
+    applyRecursivelly = new CheckBox(messages.objectPermissionsApplyRecursivelly());
 
     actionButtons = new ArrayList<WUIButton>();
-    addUser = new WUIButton(constants.objectPermissionsAddUser(), WUIButton.Left.ROUND, WUIButton.Right.PLUS);
-    addGroup = new WUIButton(constants.objectPermissionsAddGroup(), WUIButton.Left.ROUND, WUIButton.Right.PLUS);
-    apply = new WUIButton(constants.objectPermissionsSave(), WUIButton.Left.ROUND, WUIButton.Right.REC);
+    addUser = new WUIButton(messages.objectPermissionsAddUser(), WUIButton.Left.ROUND, WUIButton.Right.PLUS);
+    addGroup = new WUIButton(messages.objectPermissionsAddGroup(), WUIButton.Left.ROUND, WUIButton.Right.PLUS);
+    apply = new WUIButton(messages.objectPermissionsSave(), WUIButton.Left.ROUND, WUIButton.Right.REC);
 
     actionButtons.add(addUser);
     actionButtons.add(addGroup);

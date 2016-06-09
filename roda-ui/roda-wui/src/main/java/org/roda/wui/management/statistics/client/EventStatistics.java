@@ -35,16 +35,16 @@ public class EventStatistics extends StatisticTab {
     boolean ret = false;
     if (super.init()) {
       ret = true;
-      taskCount = createStatisticPanel(constants.taskCountTitle(), constants.taskCountDesc(), "tasks", false,
+      taskCount = createStatisticPanel(messages.taskCountTitle(), messages.taskCountDesc(), "tasks", false,
         AGGREGATION_LAST);
 
-      taskState = createStatisticPanel(constants.taskStateTitle(), constants.taskStateDesc(), "tasks\\.state\\..*",
-        true, AGGREGATION_LAST);
+      taskState = createStatisticPanel(messages.taskStateTitle(), messages.taskStateDesc(), "tasks\\.state\\..*", true,
+        AGGREGATION_LAST);
 
-      instanceCount = createStatisticPanel(constants.taskInstanceCountTitle(), constants.taskInstanceCountDesc(),
+      instanceCount = createStatisticPanel(messages.taskInstanceCountTitle(), messages.taskInstanceCountDesc(),
         "instances", false, AGGREGATION_LAST);
 
-      instanceState = createStatisticPanel(constants.taskInstanceStateTitle(), constants.taskInstanceStateDesc(),
+      instanceState = createStatisticPanel(messages.taskInstanceStateTitle(), messages.taskInstanceStateDesc(),
         "instances\\.state\\..*", true, AGGREGATION_LAST);
 
       layout.add(taskCount);
@@ -61,7 +61,7 @@ public class EventStatistics extends StatisticTab {
 
   @Override
   public String getTabText() {
-    return constants.repositoryStatistics();
+    return messages.repositoryStatistics();
   }
 
 }

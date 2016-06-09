@@ -529,7 +529,7 @@ public class IngestAppraisal extends Composite {
 
         @Override
         public void onSuccessImpl(Void result) {
-          Toast.showInfo("Done", "All selected items were accepted");
+          Toast.showInfo(messages.dialogDone(), messages.allItemsWereAccepted());
           refresh();
         }
       });
@@ -539,7 +539,7 @@ public class IngestAppraisal extends Composite {
   void buttonRejectHandler(ClickEvent e) {
     final boolean accept = false;
     final SelectedItems<?> selected = getSelected();
-    Dialogs.showPromptDialog("Reject message", "What is the reason for rejecting these SIPs?", RegExp.compile(".+"),
+    Dialogs.showPromptDialog(messages.rejectMessage(), messages.rejectSIPQuestion(), RegExp.compile(".+"),
       messages.dialogCancel(), messages.dialogOk(), new AsyncCallback<String>() {
 
         @Override
@@ -556,7 +556,7 @@ public class IngestAppraisal extends Composite {
 
               @Override
               public void onSuccessImpl(Void result) {
-                Toast.showInfo("Done", "All selected items were rejected");
+                Toast.showInfo(messages.dialogDone(), messages.allItemsWereAccepted());
                 refresh();
               }
             });

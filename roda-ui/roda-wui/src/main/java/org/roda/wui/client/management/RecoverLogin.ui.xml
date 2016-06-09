@@ -4,26 +4,26 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client">
 
-	<ui:with field='constants' type='config.i18n.client.UserManagementConstants' />
+	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
 
 	<g:FlowPanel addStyleNames="recoverPanel">
 		<g:HTML>
 			<h1>
-				<ui:text from='{constants.recoverLoginTitle}' />
+				<ui:text from='{messages.recoverLoginTitle}' />
 			</h1>
 		</g:HTML>
 		<g:FlowPanel ui:field="recoverPanel">
 			<g:Label addStyleNames="form-label">
-				<ui:text from='{constants.recoverLoginUsernameOrEmail}' />
+				<ui:text from='{messages.recoverLoginUsernameOrEmail}' />
 			</g:Label>
 			<g:TextBox ui:field="usernameOrEmail" addStyleNames="fieldTextBox"></g:TextBox>
 		</g:FlowPanel>
 		<g:FlowPanel addStyleNames="recover-buttons">
 			<g:Label ui:field="cancel" addStyleNames="btn btn-link recover-link pull-right">
-				<ui:text from='{constants.recoverLoginCancel}' />
+				<ui:text from='{messages.recoverLoginCancel}' />
 			</g:Label>
 			<g:Button ui:field="recover" addStyleNames="btn btn-play recover-button">
-				<ui:text from='{constants.recoverLoginSubmit}' />
+				<ui:text from='{messages.recoverLoginSubmit}' />
 			</g:Button>
 		</g:FlowPanel>
 	</g:FlowPanel>

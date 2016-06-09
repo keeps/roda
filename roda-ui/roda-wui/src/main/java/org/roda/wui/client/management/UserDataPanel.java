@@ -10,11 +10,10 @@
  */
 package org.roda.wui.client.management;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.MissingResourceException;
 import java.util.Set;
 
 import org.roda.core.data.v2.user.Group;
@@ -52,7 +51,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.DateBox;
 import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 
-import config.i18n.client.UserManagementConstants;
+import config.i18n.client.BrowseMessages;
 
 /**
  * @author Luis Faria
@@ -65,8 +64,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  private static UserManagementConstants constants = (UserManagementConstants) GWT
-    .create(UserManagementConstants.class);
+  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   @UiField
   TextBox username;
@@ -182,12 +180,31 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     password = new PasswordPanel(editmode);
 
     MultiWordSuggestOracle nationalityOracle = new MultiWordSuggestOracle();
-    List<String> nationalityList = Arrays.asList(constants.nationalityList());
+    List<String> nationalityList = new ArrayList<String>();
+
+    int i = 0;
+    String message = "";
+    do {
+      message = messages.nationalityList(i++);
+      if (!message.isEmpty()) {
+        nationalityList.add(message);
+      }
+    } while (!message.isEmpty());
+
     nationalityOracle.addAll(nationalityList);
     nationality = new SuggestBox(nationalityOracle);
 
     MultiWordSuggestOracle countryOracle = new MultiWordSuggestOracle();
-    List<String> countryList = Arrays.asList(constants.countryList());
+    List<String> countryList = new ArrayList<String>();
+
+    i = 0;
+    do {
+      message = messages.countryList(i++);
+      if (!message.isEmpty()) {
+        countryList.add(message);
+      }
+    } while (!message.isEmpty());
+
     countryOracle.addAll(countryList);
     country = new SuggestBox(countryOracle);
 
@@ -203,18 +220,23 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     permissionsSelectPanel.setVisible(enablePermissions);
 
     businessCategory.setVisibleItemCount(1);
-    for (String function : constants.getJobFunctions()) {
-      businessCategory.addItem(function);
-    }
+
+    i = 0;
+    do {
+      message = messages.getJobFunctions(i++);
+      if (!message.isEmpty()) {
+        businessCategory.addItem(message);
+      }
+    } while (!message.isEmpty());
 
     idType.setVisibleItemCount(1);
     for (String type : User.ID_TYPES) {
-      String typeText;
-      try {
-        typeText = constants.getString("id_type_" + type);
-      } catch (MissingResourceException e) {
+      String typeText = messages.id_type(type);
+
+      if (typeText.isEmpty()) {
         typeText = type;
       }
+
       idType.addItem(typeText, type);
     }
 

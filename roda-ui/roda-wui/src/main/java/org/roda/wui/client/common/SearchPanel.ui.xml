@@ -44,10 +44,9 @@
 			<g:FlowPanel styleName="searchAdvancedPanelButtons"
 				ui:field="searchAdvancedPanelButtons">
 				<g:Button styleName="btn btn-plus advancedAddButton"
-					ui:field="searchAdvancedFieldOptionsAdd">Add search
-					field</g:Button>
+					ui:field="searchAdvancedFieldOptionsAdd"><ui:text from='{messages.addSearchField}' /></g:Button>
 				<g:Button styleName="btn btn-search advancedSearchButton"
-					ui:field="searchAdvancedGo" enabled="false">Search</g:Button>
+					ui:field="searchAdvancedGo" enabled="false"><ui:text from='{messages.searchButton}' /></g:Button>
 			</g:FlowPanel>
 		</g:FlowPanel>
 		<g:FlowPanel addStyleNames="searchPreFilters" ui:field="searchPreFilters"/>

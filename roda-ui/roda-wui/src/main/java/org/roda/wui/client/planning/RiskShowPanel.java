@@ -45,7 +45,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SelectionChangeEvent;
 
 import config.i18n.client.BrowseMessages;
-import config.i18n.client.UserManagementConstants;
 
 /**
  * @author Luis Faria
@@ -57,10 +56,6 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
-  @SuppressWarnings("unused")
-  private static UserManagementConstants constants = (UserManagementConstants) GWT
-    .create(UserManagementConstants.class);
 
   private static BrowseMessages messages = GWT.create(BrowseMessages.class);
 
@@ -152,13 +147,13 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   public RiskShowPanel() {
-    incidenceList = new RiskIncidenceList(null, null, "Incidences", false);
+    incidenceList = new RiskIncidenceList(null, null, messages.riskIncidences(), false);
     initWidget(uiBinder.createAndBindUi(this));
   }
 
   public RiskShowPanel(Risk risk, boolean hasTitle) {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISKS, risk.getId()));
-    incidenceList = new RiskIncidenceList(filter, null, "Incidences", false);
+    incidenceList = new RiskIncidenceList(filter, null, messages.riskIncidences(), false);
 
     incidenceList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
 

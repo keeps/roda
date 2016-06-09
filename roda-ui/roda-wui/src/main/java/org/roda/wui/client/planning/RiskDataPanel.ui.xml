@@ -5,7 +5,7 @@
 	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
 	xmlns:u="urn:import:org.roda.wui.client.management" xmlns:s="urn:import:org.roda.wui.client.search">
 
-	<ui:with field='constants' type='config.i18n.client.UserManagementConstants' />
+	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
 	
 	<ui:style>
 		.postalAddress {
@@ -20,71 +20,71 @@
 	<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width no_padding">
 			<g:FlowPanel addStyleNames="wui-data-panel">
-				<g:Label addStyleNames="form-label">Identifier</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.riskIdentifier}' /></g:Label>
 				<g:Label ui:field="id" styleName="value" />
 				<g:TextBox ui:field="idBox" styleName="form-textbox" />
-				<g:Label addStyleNames="form-label">Name</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.riskName}' /></g:Label>
 				<g:TextBox ui:field="name" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">Description</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.riskDescription}' /></g:Label>
 				<g:TextArea ui:field="description" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">Identified on</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.riskIdentifiedOn}' /></g:Label>
 				<d:DateBox ui:field="identifiedOn" addStyleNames="form-textbox form-textbox-small" />
-				<g:Label addStyleNames="form-label">Identified by</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.riskIdentifiedBy}' /></g:Label>
 				<s:SearchSuggestBox ui:field="identifiedBy" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">Category</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.riskCategory}' /></g:Label>
 				<s:SearchSuggestBox ui:field="category" addStyleNames="form-textbox"/>
-				<g:Label addStyleNames="form-label">Notes</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.riskNotes}' /></g:Label>
 				<g:TextArea ui:field="notes" addStyleNames="form-textbox" />
 				
-				<g:Label styleName="h4">Pre-mitigation</g:Label>
+				<g:Label styleName="h4"><ui:text from='{messages.riskPreMitigation}' /></g:Label>
 				<g:FlowPanel addStyleNames="form-risk-mitigation-inline">
 					<g:FlowPanel>
-						<g:Label addStyleNames="form-label">Probability</g:Label>
+						<g:Label addStyleNames="form-label"><ui:text from='{messages.riskPreMitigationProbability}' /></g:Label>
 						<g:ListBox ui:field="preMitigationProbability" addStyleNames="form-selectbox form-textbox-small form-risk-mitigation-margin" />
 					</g:FlowPanel>
 					<g:FlowPanel>
-						<g:Label addStyleNames="form-label">Impact</g:Label>
+						<g:Label addStyleNames="form-label"><ui:text from='{messages.riskPreMitigationImpact}' /></g:Label>
 						<g:ListBox ui:field="preMitigationImpact" addStyleNames="form-selectbox form-textbox-small form-risk-mitigation-margin" />
 					</g:FlowPanel>
 					<g:FlowPanel>
-						<g:Label addStyleNames="form-label" ui:field="preMitigationSeverityKey">Severity</g:Label>
+						<g:Label addStyleNames="form-label" ui:field="preMitigationSeverityKey"><ui:text from='{messages.riskPreMitigationSeverity}' /></g:Label>
 						<g:HTML ui:field="preMitigationSeverityValue"></g:HTML>
 					</g:FlowPanel>
 				</g:FlowPanel>
-				<g:Label addStyleNames="form-label">Notes</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.riskPreMitigationNotes}' /></g:Label>
 				<g:TextArea ui:field="preMitigationNotes" addStyleNames="form-textbox" />
 				
-				<g:Label styleName="h4">Mitigation</g:Label>
-				<g:Label addStyleNames="form-label">Mitigation strategy/actions</g:Label>
+				<g:Label styleName="h4"><ui:text from='{messages.riskMitigation}' /></g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.riskMitigationStrategy}' /></g:Label>
 				<g:TextArea ui:field="mitigationStrategy" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label" ui:field="mitigationOwnerTypeKey">Risk owner type</g:Label>
+				<g:Label addStyleNames="form-label" ui:field="mitigationOwnerTypeKey"><ui:text from='{messages.riskMitigationOwnerType}' /></g:Label>
 				<g:TextBox ui:field="mitigationOwnerType" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">Risk owner</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.riskMitigationOwner}' /></g:Label>
 				<s:SearchSuggestBox ui:field="mitigationOwner" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label not-visible">Related event identifier type</g:Label>
+				<g:Label addStyleNames="form-label not-visible"><ui:text from='{messages.riskMitigationRelatedEventIdentifierType}' /></g:Label>
 				<g:TextBox ui:field="mitigationRelatedEventIdentifierType" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label not-visible">Related event identifier value</g:Label>
+				<g:Label addStyleNames="form-label not-visible"><ui:text from='{messages.riskMitigationRelatedEventIdentifierValue}' /></g:Label>
 				<g:TextBox ui:field="mitigationRelatedEventIdentifierValue" addStyleNames="form-textbox" />
 				
-				<g:Label styleName="h4">Post-mitigation</g:Label>
+				<g:Label styleName="h4"><ui:text from='{messages.riskPostMitigation}' /></g:Label>
 				<g:FlowPanel addStyleNames="form-risk-mitigation-inline">
 					<g:FlowPanel>
-						<g:Label addStyleNames="form-label">Probability</g:Label>
+						<g:Label addStyleNames="form-label"><ui:text from='{messages.riskPostMitigationProbability}' /></g:Label>
 						<g:ListBox ui:field="posMitigationProbability" addStyleNames="form-selectbox form-textbox-small form-risk-mitigation-margin" />
 					</g:FlowPanel>
 					<g:FlowPanel>
-						<g:Label addStyleNames="form-label">Impact</g:Label>
+						<g:Label addStyleNames="form-label"><ui:text from='{messages.riskPostMitigationImpact}' /></g:Label>
 						<g:ListBox ui:field="posMitigationImpact" addStyleNames="form-selectbox form-textbox-small form-risk-mitigation-margin" />
 					</g:FlowPanel>
 					<g:FlowPanel>
-						<g:Label addStyleNames="form-label" ui:field="posMitigationSeverityKey">Severity</g:Label>
+						<g:Label addStyleNames="form-label" ui:field="posMitigationSeverityKey"><ui:text from='{messages.riskPostMitigationSeverity}' /></g:Label>
 						<g:HTML ui:field="posMitigationSeverityValue"></g:HTML>
 					</g:FlowPanel>
 				</g:FlowPanel>
-				<g:Label addStyleNames="form-label">Notes</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.riskPostMitigationNotes}' /></g:Label>
 				<g:TextArea ui:field="posMitigationNotes" addStyleNames="form-textbox" />
 				
-				<g:Label styleName="h4">Incidences</g:Label>
+				<g:Label styleName="h4"><ui:text from='{messages.riskIncidences}' /></g:Label>
 				<g:FlowPanel ui:field="incidenceListPanel"></g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>

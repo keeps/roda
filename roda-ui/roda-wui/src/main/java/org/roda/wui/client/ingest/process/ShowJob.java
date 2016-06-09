@@ -85,7 +85,7 @@ public class ShowJob extends Composite {
           @Override
           public void onFailure(Throwable caught) {
             if (caught instanceof NotFoundException) {
-              Toast.showError("Not found", "The job you requested was not found");
+              Toast.showError(messages.notFoundError(), messages.jobNotFound());
             } else {
               Toast.showError(caught.getClass().getName(), caught.getMessage());
             }
@@ -131,7 +131,6 @@ public class ShowJob extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   // private ClientLogger logger = new ClientLogger(getClass().getName());
@@ -191,14 +190,14 @@ public class ShowJob extends Composite {
     // TODO get better name for job report list
     if (job.getPluginType().equals(PluginType.INGEST)) {
       jobReports = new IngestJobReportList(
-        new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId())), null, "Job report list",
-        pluginsInfo, false);
+        new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId())), null,
+        messages.reportList(), pluginsInfo, false);
       simpleJobReports = new SimpleJobReportList();
       isIngest = true;
     } else {
       simpleJobReports = new SimpleJobReportList(
-        new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId())), null, "Job report list",
-        pluginsInfo, false);
+        new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId())), null,
+        messages.reportList(), pluginsInfo, false);
       jobReports = new IngestJobReportList();
     }
 
@@ -321,7 +320,8 @@ public class ShowJob extends Composite {
 
     progress.setHTML(b.toSafeHtml());
 
-    buttonAppraisal.setText("Appraisal (" + job.getJobStats().getOutcomeObjectsWithManualIntervention() + ")");
+    buttonAppraisal
+      .setText(messages.appraisalTitle() + " (" + job.getJobStats().getOutcomeObjectsWithManualIntervention() + ")");
 
     // set button visibility
     // buttonStop.setVisible(isJobRunning());

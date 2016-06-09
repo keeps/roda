@@ -34,13 +34,13 @@ public class UserStatistics extends StatisticTab {
     boolean ret = false;
     if (super.init()) {
       ret = true;
-      userCount = createStatisticPanel(constants.userCountTitle(), constants.userCountDesc(), "users\\.state\\..*",
-        true, AGGREGATION_LAST);
-      groupCount = createStatisticPanel(constants.groupCountTitle(), constants.groupCountDesc(), "groups", false,
+      userCount = createStatisticPanel(messages.userCountTitle(), messages.userCountDesc(), "users\\.state\\..*", true,
+        AGGREGATION_LAST);
+      groupCount = createStatisticPanel(messages.groupCountTitle(), messages.groupCountDesc(), "groups", false,
         AGGREGATION_LAST);
 
-      groupTop5 = createStatisticPanel(constants.groupTop5Title(), constants.groupTop5Desc(), "users\\.group\\..*",
-        true, AGGREGATION_LAST);
+      groupTop5 = createStatisticPanel(messages.groupTop5Title(), messages.groupTop5Desc(), "users\\.group\\..*", true,
+        AGGREGATION_LAST);
 
       layout.add(userCount);
       layout.add(groupCount);
@@ -55,7 +55,7 @@ public class UserStatistics extends StatisticTab {
 
   @Override
   public String getTabText() {
-    return constants.userStatistics();
+    return messages.userStatistics();
   }
 
 }

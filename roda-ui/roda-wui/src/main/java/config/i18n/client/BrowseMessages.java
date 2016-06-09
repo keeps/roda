@@ -25,574 +25,632 @@ import com.google.gwt.safehtml.shared.SafeHtml;
  */
 public interface BrowseMessages extends Messages {
 
-  @DefaultMessage("Unable to move the element because the levels of description are not appropriate. Details: {0}")
-  public String moveIllegalOperation(String message);
+  String moveIllegalOperation(String message);
 
-  @DefaultMessage("Unable to move the element because it or the destination were not found in the repository. Details: {0}")
-  public String moveNoSuchObject(String message);
+  String moveNoSuchObject(String message);
+
+  String ofWordMessage();
+
+  /******* TITLES ******************************************/
+
+  String genericTitle();
+
+  String processTitle();
+
+  String reportTitle();
+
+  String ingestAppraisalTitle();
+
+  String riskHistoryTitle();
+
+  String riskRegisterTitle();
+
+  String newFormatTitle();
+
+  String createFormatTitle();
+
+  String editFormatTitle();
+
+  String showFormatTitle();
+
+  String formatsTitle();
+
+  String newAgentTitle();
+
+  String createAgentTitle();
+
+  String editAgentTitle();
+
+  String showAgentTitle();
+
+  String agentsTitle();
+
+  String newRiskTitle();
+
+  String createRiskTitle();
+
+  String editRiskTitle();
+
+  String showRiskTitle();
+
+  String risksTitle();
+
+  String newDescriptiveMetadataTitle();
+
+  String editDescriptiveMetadataTitle();
+
+  String historyDescriptiveMetadataTitle();
+
+  String catalogueTitle();
+
+  String preservationActionsTitle();
+
+  String ingestProcessTitle();
+
+  String loginTitle();
+
+  String searchTitle();
+
+  String activityLogTitle();
+
+  String showLogEntryTitle();
+
+  String notificationsTitle();
+
+  String notificationTitle();
+
+  String usersAndGroupsTitle();
+
+  String logsTitle();
 
   /******* SIDEBAR ******************************************/
 
-  @DefaultMessage("Dates")
   String sidebarFilterDates();
 
-  @DefaultMessage("From date")
   String sidebarFilterFromDatePlaceHolder();
 
-  @DefaultMessage("To date")
   String sidebarFilterToDatePlaceHolder();
 
-  @DefaultMessage("Folders and files")
   String sidebarFoldersFilesTitle();
 
-  @DefaultMessage("Process")
   String sidebarProcessTitle();
 
-  @DefaultMessage("Ingest")
   String sidebarIngestTitle();
 
-  @DefaultMessage("Actions")
   String sidebarActionsTitle();
 
-  @DefaultMessage("Preservation")
   String sidebarPreservationTitle();
 
-  @DefaultMessage("Agents")
   String sidebarAgentsTitle();
 
-  @DefaultMessage("Formats")
   String sidebarFormatsTitle();
 
-  @DefaultMessage("Risks")
   String sidebarRisksTitle();
 
-  @DefaultMessage("Error in line {0}, column {1}: {2}")
+  String sidebarAppraisalTitle();
+
   SafeHtml metadataParseError(int line, int column, String message);
 
-  @DefaultMessage("Error")
   SafeHtml notFoundErrorTitle();
 
-  @DefaultMessage("Item with id {0} could not be found.")
   SafeHtml notFoundErrorMessage(String id);
 
-  @DefaultMessage("Error")
   SafeHtml genericErrorTitle();
 
-  @DefaultMessage("An unexpected error occurred when retrieving item. <pre><code>{0}</code></pre>")
   SafeHtml genericErrorMessage(String message);
 
-  @DefaultMessage("Error transforming descriptive metadata into HTML")
   SafeHtml descriptiveMetadataTranformToHTMLError();
 
-  @DefaultMessage("Error transforming preservation metadata into HTML")
   SafeHtml preservationMetadataTranformToHTMLError();
 
-  @DefaultMessage("All collections")
+  String notFoundError();
+
   String allCollectionsTitle();
 
-  @DefaultMessage("Error loading descriptive metadata: {0}")
   String errorLoadingDescriptiveMetadata(String message);
 
-  @DefaultMessage("Error loading preservation metadata: {0}")
   String errorLoadingPreservationMetadata(String message);
 
-  @DefaultMessage("{0,number} files, {1}")
-  @AlternateMessage({"one", "One file, {1}"})
   String downloadRepresentationInfo(@PluralCount int numberOfFiles, String readableFileSize);
 
-  @DefaultMessage("Original ({0})")
   SafeHtml downloadTitleOriginal(String repType);
 
-  @DefaultMessage("Alternative ({0})")
   SafeHtml downloadTitleDefault(String repType);
 
-  @DefaultMessage("")
   String titleDatesEmpty();
 
-  @DefaultMessage("From {0,localdatetime,predef:DATE_LONG}")
   String titleDatesNoFinal(Date dateInitial);
 
-  @DefaultMessage("Up to {0,localdatetime,predef:DATE_LONG}")
   String titleDatesNoInitial(Date dateFinal);
 
-  @DefaultMessage("From {0,localdatetime,predef:DATE_LONG} to {1,localdatetime,predef:DATE_LONG}")
   String titleDates(Date dateInitial, Date dateFinal);
 
-  @DefaultMessage("")
   String simpleDatesEmpty();
 
-  @DefaultMessage("{0,date,yyyy-MM-dd}")
   String simpleDatesNoFinal(Date dateInitial);
 
-  @DefaultMessage("To {0,date,yyyy-MM-dd}")
   String simpleDatesNoInitial(Date dateFinal);
 
-  @DefaultMessage("{0,date,yyyy-MM-dd} to {1,date,yyyy-MM-dd}")
   String simpleDates(Date dateInitial, Date dateFinal);
+
+  String featureNotYetImplemented();
+
+  String itemWasAccepted();
+
+  String itemWasRejected();
+
+  String rejectMessage();
+
+  String rejectQuestion();
+
+  String rejectSIPQuestion();
+
+  String allItemsWereAccepted();
+
+  String jobNotFound();
+
+  String updateIsCurrentlyRunning();
+
+  String updatedFilesUnderFolder();
+
+  String riskRefreshDone();
+
+  String processCreated();
+
+  String otherItem();
+
+  String metadataFileCreated();
+
+  String metadataFileSaved();
+
+  String metadataFileRemoved();
+
+  String versionReverted();
+
+  String versionDeleted();
+
+  String selectUserOrGroupToAdd();
+
+  String permissionsChanged();
+
+  String couldNotFindPreservationEvent();
+
+  String intellectualEntity();
+
+  String inspectIntellectualEntity();
+
+  String inspectRepresentation();
+
+  String inspectFile();
+
+  String allIntellectualEntities();
+
+  String allRepresentations();
+
+  String allFiles();
+
+  String selectItems();
+
+  String inspectTransferredResource();
+
+  String identifierNotFound();
+
+  String originalRepresentation();
+
+  String alternativeRepresentation();
+
+  String representationStatus();
+
+  String executingTaskMessage();
+
+  String noItemsToDisplay();
+
+  String browserOfflineError();
+
+  String cannotReachServerError();
 
   /****** INGEST TRANSFER **********/
 
-  @DefaultMessage("Ingest transfer")
   String ingestTransferTitle();
 
-  @DefaultMessage("Transferred resources list")
   String ingestTransferList();
 
-  @DefaultMessage("Search transferred resources...")
   String ingestTransferSearchPlaceHolder();
 
-  @DefaultMessage("Created at {0,localdatetime,predef:DATE_TIME_MEDIUM}, with {1}")
   String ingestTransferItemInfo(Date creationDate, String readableFileSize);
 
-  @DefaultMessage("Confirm remove folder")
   String ingestTransferRemoveFolderConfirmDialogTitle();
 
-  @DefaultMessage("Are you sure you want to remove the whole folder \"{0}\"?")
   String ingestTransferRemoveFolderConfirmDialogMessage(String folderName);
 
-  @DefaultMessage("Are you sure you want to remove the the selected {0} files and folders?")
   String ingestTransferRemoveSelectedConfirmDialogMessage(Long size);
 
-  @DefaultMessage("No")
   String ingestTransferRemoveFolderConfirmDialogCancel();
 
-  @DefaultMessage("Yes")
   String ingestTransferRemoveFolderConfirmDialogOk();
 
-  @DefaultMessage("Removed items")
   String ingestTransferRemoveSuccessTitle();
 
-  @DefaultMessage("Successfully removed {0} items")
   String ingestTransferRemoveSuccessMessage(Long size);
 
-  @DefaultMessage("Last checked at {0,localdatetime,predef:DATE_TIME_MEDIUM}")
   String ingestTransferLastScanned(Date lastScanDate);
 
-  @DefaultMessage("Upload")
   String ingestTransferButtonUploadFiles();
 
-  @DefaultMessage("Refresh")
   String ingestTransferButtonRefresh();
 
-  @DefaultMessage("Download")
   String ingestTransferButtonDownload();
 
-  @DefaultMessage("New folder")
   String ingestTransferButtonCreateFolder();
 
-  @DefaultMessage("Remove")
   String ingestTransferButtonRemoveWholeFolder();
 
-  @DefaultMessage("Remove")
   String ingestTransferButtonRemoveSelectedItems();
 
-  @DefaultMessage("Process")
   String ingestTransferButtonIngestWholeFolder();
 
-  @DefaultMessage("Process")
   String ingestTransferButtonIngestSelectedItems();
 
-  @DefaultMessage("Resource not found")
   String ingestTransferNotFoundDialogTitle();
 
-  @DefaultMessage("The resource was not found")
   String ingestTransferNotFoundDialogMessage();
 
-  @DefaultMessage("Continue")
   String ingestTransferNotFoundDialogButton();
 
-  @DefaultMessage("New folder name")
   String ingestTransferCreateFolderTitle();
 
-  @DefaultMessage("Please select a name for your new folder")
   String ingestTransferCreateFolderMessage();
+
+  String ingestAllTransferredPackages();
+
+  String ingestJobList();
 
   /***** CREATE PROCESS JOB *********/
 
-  @DefaultMessage("New process")
   String createJobTitle();
 
-  @DefaultMessage("Name")
   String createJobName();
 
-  @DefaultMessage("Run on:")
   String createJobSelectObject();
 
-  @DefaultMessage("Run on all objects")
   String createJobSelectedAllObject();
 
-  @DefaultMessage("Selected submission information packages (SIP)")
   String createJobSelectedSIP();
 
-  @DefaultMessage("Selected archival information packages (AIP)")
   String createJobSelectedAIP();
 
-  @DefaultMessage("Selected representations")
   String createJobSelectedRepresentation();
 
-  @DefaultMessage("Selected files")
   String createJobSelectedFile();
 
-  @DefaultMessage("Ingest workflow")
   String createJobIngestWorkflow();
 
-  @DefaultMessage("Create")
   String createJobCreateTitle();
 
-  @DefaultMessage("Cancel")
   String createJobCancelTitle();
 
-  @DefaultMessage("Workflow")
   String createJobWorkflow();
 
-  @DefaultMessage("Category")
   String createJobCategoryWorkflow();
 
-  @DefaultMessage("All")
   String allCategoryItem();
 
-  @DefaultMessage("Empty")
   String emptyAssociativeObjectLabel();
 
   /****** INGEST TRANSFER UPLOAD *********/
 
-  @DefaultMessage("Ingest transfer upload")
   String ingestTransferUploadTitle();
 
-  @DefaultMessage("Drop files here")
   String ingestTransferUploadDropHere();
 
-  @DefaultMessage("Choose files...")
   String ingestTransferUploadBrowseFiles();
 
-  @DefaultMessage("done")
   String ingestTransferUploadFinishButton();
 
   /******** DIALOG GENERIC **************/
 
-  @DefaultMessage("Cancel")
   String dialogCancel();
 
-  @DefaultMessage("OK")
   String dialogOk();
 
-  @DefaultMessage("Yes")
   String dialogYes();
+
+  String dialogSorry();
+
+  String dialogDone();
+
+  String dialogSuccess();
+
+  String dialogFailure();
+
+  String dialogRefresh();
+
+  /*** Generic Buttons ***/
+
+  String backButton();
+
+  String cancelButton();
+
+  String revertButton();
+
+  String removeButton();
+
+  String refreshButton();
+
+  String newButton();
+
+  String createButton();
+
+  String editButton();
+
+  String saveButton();
+
+  String addButton();
+
+  String applyAllButton();
 
   /*** View representation ***/
 
-  @DefaultMessage("Back")
-  String backButton();
-
-  @DefaultMessage("Next file")
   String viewRepresentationNextFileButton();
 
-  @DefaultMessage("Previous file")
   String viewRepresentationPreviousFileButton();
 
-  @DefaultMessage("Download")
   String viewRepresentationDownloadFileButton();
 
-  @DefaultMessage("File info")
   String viewRepresentationInfoFileButton();
 
-  @DefaultMessage("Please select a file from the list on left panel")
   String viewRepresentationEmptyPreview();
 
-  @DefaultMessage("An error occurred while trying to view the file")
   String viewRepresentationErrorPreview();
 
-  @DefaultMessage("File preview not supported")
   String viewRepresentationNotSupportedPreview();
 
-  @DefaultMessage("Search files...")
   String viewRepresentationSearchPlaceHolder();
 
-  @DefaultMessage("Details")
   String viewRepresentationInfoTitle();
 
-  @DefaultMessage("Filename")
   String viewRepresentationInfoFilename();
 
-  @DefaultMessage("Size")
   String viewRepresentationInfoSize();
 
-  @DefaultMessage("Mimetype")
   String viewRepresentationInfoMimetype();
 
-  @DefaultMessage("Format")
   String viewRepresentationInfoFormat();
 
-  @DefaultMessage("PRONOM")
   String viewRepresentationInfoPronom();
 
-  @DefaultMessage("Created date")
   String viewRepresentationInfoCreatedDate();
 
-  @DefaultMessage("Creating application name")
   String viewRepresentationInfoCreatingApplicationName();
 
-  @DefaultMessage("Creating application version")
   String viewRepresentationInfoCreatingApplicationVersion();
 
-  @DefaultMessage("Date created by application")
   String viewRepresentationInfoDateCreatedByApplication();
 
-  @DefaultMessage("Fixity")
   String viewRepresentationInfoHash();
 
-  @DefaultMessage("Storage path")
   String viewRepresentationInfoStoragePath();
 
   /************* process new ****************/
-  @DefaultMessage("Job {0,localdatetime,predef:DATE_TIME_SHORT}")
   String processNewDefaultName(Date date);
 
-  @DefaultMessage("{0} ({1})")
   String pluginLabel(String name, String version);
 
-  @DefaultMessage("Select")
   String pluginAipIdButton();
 
-  @DefaultMessage("Missing mandatory information")
   String processNewMissingMandatoryInfoDialogTitle();
 
-  @DefaultMessage("Please fill the following mandatory parameters: {0,list}")
   String processNewMissingMandatoryInfoDialogMessage(List<String> missingPluginNames);
 
   /************* Ingest process show ****************/
-  @DefaultMessage("waiting")
   String showJobStatusCreated();
 
-  @DefaultMessage("running")
   String showJobStatusStarted();
 
-  @DefaultMessage("done")
   String showJobStatusCompleted();
 
-  @DefaultMessage("failed to start")
   String showJobStatusFailedDuringCreation();
 
-  @DefaultMessage("failed")
   String showJobStatusFailedToComplete();
 
-  @DefaultMessage("{0}% done")
   SafeHtml showJobProgressCompletionPercentage(int completionPercentage);
 
-  @DefaultMessage("{0,number} total")
   SafeHtml showJobProgressTotalCount(int objectsCount);
 
-  @DefaultMessage("{0,number} successful")
   SafeHtml showJobProgressSuccessfulCount(int objectsProcessedWithSuccess);
 
-  @DefaultMessage("{0,number} failed")
   SafeHtml showJobProgressFailedCount(int objectsProcessedWithFailure);
 
-  @DefaultMessage("{0,number} processing")
   SafeHtml showJobProgressProcessingCount(int objectsBeingProcessed);
 
-  @DefaultMessage("{0,number} waiting")
   SafeHtml showJobProgressWaitingCount(int objectsWaitingToBeProcessed);
 
-  @DefaultMessage("Executed {1} of {2} tasks ({0}%)")
   String showJobReportProgress(Integer completionPercentage, Integer stepsCompleted, Integer totalSteps);
 
-  @DefaultMessage("Submission Information Package")
   String showSIPExtended();
 
-  @DefaultMessage("Archival Information Package")
   String showAIPExtended();
 
-  @DefaultMessage("Representation")
   String showRepresentationExtended();
 
-  @DefaultMessage("File")
   String showFileExtended();
 
+  String showTransferredResourceExtended();
+
   /************* Browse ****************/
-  @DefaultMessage("Loading...")
   String browseLoading();
 
-  @DefaultMessage("Confirm remove items")
   String browseRemoveConfirmDialogTitle();
 
-  @DefaultMessage("Are you sure you want the selected items, including all their nested items?")
   String browseRemoveConfirmDialogMessage();
 
   /************* Search ****************/
-  @DefaultMessage("Intelectual entities")
   String searchListBoxItems();
 
-  @DefaultMessage("Representations")
   String searchListBoxRepresentations();
 
-  @DefaultMessage("Files")
   String searchListBoxFiles();
 
-  @DefaultMessage("Search...")
   String searchPlaceHolder();
 
-  @DefaultMessage("Search results")
   String searchResults();
 
-  @DefaultMessage("2008-04-01")
   String searchFieldDatePlaceHolder();
 
-  @DefaultMessage("2008-04-01")
   String searchFieldDateFromPlaceHolder();
 
-  @DefaultMessage("2016-06-20")
   String searchFieldDateToPlaceHolder();
 
-  @DefaultMessage("42")
   String searchFieldNumericPlaceHolder();
 
-  @DefaultMessage("42")
   String searchFieldNumericFromPlaceHolder();
 
-  @DefaultMessage("108")
   String searchFieldNumericToPlaceHolder();
 
-  @DefaultMessage("Identifier")
   String searchRepresentationFieldIdentifier();
 
-  @DefaultMessage("Size")
   String searchRepresentationFieldSize();
 
-  @DefaultMessage("Number of files")
   String searchRepresentationFieldNumberOfFiles();
 
-  @DefaultMessage("Original")
   String searchRepresentationFieldOriginal();
 
-  @DefaultMessage("Filename")
   String searchFileFieldFilename();
 
-  @DefaultMessage("Format")
   String searchFileFieldFormat();
 
-  @DefaultMessage("Pronom")
   String searchFileFieldPronom();
 
-  @DefaultMessage("Mimetype")
   String searchFileFieldMimetype();
 
-  @DefaultMessage("Filesize")
   String searchFileFieldFilesize();
 
-  @DefaultMessage("Fulltext")
   String searchFileFieldFulltext();
+
+  String addSearchField();
+
+  String searchButton();
+
+  /*************
+   * AIP, Representations, File & Transferred Resources
+   *************/
+
+  String aipsTitle();
+
+  String aipGenericTitle();
+
+  String aipDates();
+
+  String fileName();
+
+  String filePath();
+
+  String fileFormat();
+
+  String fileSize();
+
+  String fileLength();
+
+  String transferredResourceName();
+
+  String transferredResourcePath();
+
+  String transferredResourceSize();
+
+  String transferredResourceDateCreated();
+
+  String numberOfFiles(long count);
+
+  String representationId();
+
+  String representationOriginal();
+
+  String representationType();
+
+  String representationSize();
+
+  String representationFiles();
+
+  String representationDocumentation();
+
+  String representationSchemas();
 
   /************* Preservation Event List ****************/
 
-  @DefaultMessage("Date")
   String preservationEventListHeaderDate();
 
-  @DefaultMessage("Agents")
   String preservationEventListHeaderAgent();
 
-  @DefaultMessage("Type")
   String preservationEventListHeaderType();
 
-  @DefaultMessage("Detail")
   String preservationEventListHeaderDetail();
 
-  @DefaultMessage("Source objects")
   String preservationEventListHeaderSourceObject();
 
-  @DefaultMessage("Outcome objects")
   String preservationEventListHeaderOutcomeObject();
 
-  @DefaultMessage("Outcome")
   String preservationEventListHeaderOutcome();
 
   /*** Preservation events ***/
 
-  @DefaultMessage("Download")
   String preservationEventsDownloadButton();
 
-  @DefaultMessage("Back")
   String preservationEventsBackButton();
 
-  @DefaultMessage("Preservation events")
   String preservationEventsTitle();
 
-  @DefaultMessage("Preservation event")
   String preservationEventTitle();
 
-  @DefaultMessage("Identifier")
   String preservationEventId();
 
-  @DefaultMessage("Date")
   String preservationEventDatetime();
 
-  @DefaultMessage("Outcome")
   String preservationEventOutcome();
 
-  @DefaultMessage("Type")
   String preservationEventType();
 
-  @DefaultMessage("Detail")
   String preservationEventDetail();
 
-  @DefaultMessage("Agents")
   String preservationEventAgentsHeader();
 
-  @DefaultMessage("Role")
   String preservationEventAgentRole();
 
-  @DefaultMessage("Source objects")
   String preservationEventSourceObjectsHeader();
 
-  @DefaultMessage("Outcome objects")
   String preservationEventOutcomeObjectsHeader();
 
-  @DefaultMessage("Identifier")
   String preservationEventObjectId();
 
-  @DefaultMessage("Role")
   String preservationEventObjectRole();
 
-  @DefaultMessage("Outcome detail")
   String preservationEventOutcomeDetailHeader();
 
-  @DefaultMessage("Note")
   String preservationEventOutcomeDetailNote();
 
-  @DefaultMessage("Extension")
   String preservationEventOutcomeDetailExtension();
 
-  @DefaultMessage("{0} at {1,localdatetime,predef:DATE_TIME_MEDIUM}")
   String descriptiveMetadataHistoryLabel(String versionKey, Date createdDate);
 
   /************* Select AIP Dialog ****************/
 
-  @DefaultMessage("Cancel")
   String selectAipCancelButton();
 
-  @DefaultMessage("Move to root")
   String selectAipEmptyParentButton();
 
-  @DefaultMessage("Select")
   String selectAipSelectButton();
 
-  @DefaultMessage("Search results")
   String selectAipSearchResults();
 
-  @DefaultMessage("Search records...")
   String selectAipSearchPlaceHolder();
 
   /************* Move Item ****************/
 
-  @DefaultMessage("Move item")
   String moveItemTitle();
 
-  @DefaultMessage("Error moving item!")
   String moveItemFailed();
 
   /************* Select Parent ****************/
 
-  @DefaultMessage("Select parent")
   String selectParentTitle();
 
   /*************
@@ -601,309 +659,1455 @@ public interface BrowseMessages extends Messages {
    * @param count
    ****************/
 
-  @DefaultMessage("Select all {0} items")
   String listSelectAllMessage(int count);
 
   /************* User log ****************/
 
-  @DefaultMessage("Search log...")
   String userLogSearchPlaceHolder();
 
   /************* Notification messages ****************/
 
-  @DefaultMessage("Search message...")
   String messageSearchPlaceHolder();
 
-  @DefaultMessage("yes")
   String showMessageAcknowledged();
 
-  @DefaultMessage("no")
   String showMessageNotAcknowledged();
 
   /************* Humanize ****************/
 
-  @DefaultMessage("{0} days")
-  @AlternateMessage({"one", "1 day"})
   String durationDHMSDay(@PluralCount int days);
 
-  @DefaultMessage("{0} hours")
-  @AlternateMessage({"one", "1 hour"})
   String durationDHMSHour(@PluralCount int hours);
 
-  @DefaultMessage("{0} minutes")
-  @AlternateMessage({"one", "1 minute"})
   String durationDHMSMinutes(@PluralCount int minutes);
 
-  @DefaultMessage("{0} seconds")
-  @AlternateMessage({"one", "1 seconds"})
   String durationDHMSSeconds(@PluralCount int seconds);
 
-  @DefaultMessage("less than a second")
   String durationDHMSLessThanASecond();
 
-  @DefaultMessage(", ")
   String durationDHMSSeparator();
 
-  @DefaultMessage(" and ")
   String durationDHMSSecondSeparator();
 
-  @DefaultMessage("{0}d {1,number,##}h {2,number,##}m {3,number,##}s")
   String durationDHMSShortDays(int days, int hours, int minutes, int seconds);
 
-  @DefaultMessage("{0,number,##}h {1,number,##}m {2,number,##}s")
   String durationDHMSShortHours(int hours, int minutes, int seconds);
 
-  @DefaultMessage("{0,number,##}m {1,number,##}s")
   String durationDHMSShortMinutes(int minutes, int seconds);
 
-  @DefaultMessage("{0,number,##}s")
   String durationDHMSShortSeconds(int seconds);
 
-  @DefaultMessage("Unknown")
-  @AlternateMessage({"CREATE", "Create", "DELETE", "Delete", "GRANT", "Grant", "READ", "Read", "UPDATE", "Update"})
   String objectPermission(@Select PermissionType permissionType);
 
-  @DefaultMessage("")
-  @AlternateMessage({"CREATE", "Permission to submit or create a new archival package under this one", "DELETE",
-    "Permission to delete this archival package or any of its sub-components", "GRANT",
-    "Permission to change the permissions of this archival package", "READ",
-    "Permission to seach or access this archival package", "UPDATE",
-    "Permission to change this archival package or any of its sub-components"})
   String objectPermissionDescription(@Select PermissionType permissionType);
 
   /************* Ingest appraisal ****************/
 
-  @DefaultMessage("Accept")
   String ingestAppraisalAcceptButton();
 
-  @DefaultMessage("Reject")
   String ingestAppraisalRejectButton();
 
-  @DefaultMessage("Unknown")
-  @AlternateMessage({"ACTIVE", "active", "CREATED", "created", "DELETED", "deleted", "INGEST_PROCESSING", "ingesting",
-    "UNDER_APPRAISAL", "under appraisal"})
   String aipState(@Select AIPState state);
 
   /************* Search pre-filters ****************/
 
-  @DefaultMessage("{0}: {1}")
   SafeHtml searchPreFilterSimpleFilterParameter(String searchPreFilterName, String searchPreFilterValue);
 
-  @DefaultMessage("{0}: {1}")
   SafeHtml searchPreFilterBasicSearchFilterParameter(String searchPreFilterName, String searchPreFilterValue);
 
-  @DefaultMessage("NOT {0}: {1}")
   SafeHtml searchPreFilterNotSimpleFilterParameter(String searchPreFilterName, String searchPreFilterValue);
 
-  @DefaultMessage("NO {0}")
   SafeHtml searchPreFilterEmptyKeyFilterParameter(String searchPreFilterName);
 
-  @DefaultMessage("{0}")
-  @AlternateMessage({"state", "state", "ingestJobId", "job", "parentId", "parent", "ancestors", "ancestors"})
   String searchPreFilterName(@Select String name);
 
-  @DefaultMessage("{0}")
-  @AlternateMessage({"UNDER_APPRAISAL", "under appraisal"})
   String searchPreFilterValue(@Select String name);
 
   /************* Risk register ****************/
 
-  @DefaultMessage("Risks of AIP {0}")
   String showRiskAIPTitle(String aipId);
 
-  @DefaultMessage("Risk register")
-  String riskRegisterTitle();
-
-  @DefaultMessage("Category")
   String riskRegisterCategory();
 
-  @DefaultMessage("Severity")
   String riskRegisterSeverity();
 
-  @DefaultMessage("Owner")
   String riskRegisterOwner();
 
-  @DefaultMessage("New")
-  String riskRegisterNewButton();
-
-  @DefaultMessage("Edit")
-  String riskRegisterEditButton();
-
-  @DefaultMessage("Remove")
-  String riskRegisterRemoveButton();
-
-  @DefaultMessage("Start new process")
   String riskRegisterProcessButton();
 
-  @DefaultMessage("Search risks...")
   String riskRegisterSearchPlaceHolder();
 
-  @DefaultMessage("This object has {0,number} risks")
-  @AlternateMessage({"one", "This object has 1 risk"})
   String showObjectsRiskCounter(@PluralCount int counter);
 
-  @DefaultMessage("Risk creation failed {0}")
   String createRiskFailure(String message);
 
-  @DefaultMessage("Risk not found {0}")
   String editRiskNotFound(String name);
 
-  @DefaultMessage("Risk edit failed {0}")
   String editRiskFailure(String message);
 
-  @DefaultMessage("Confirm remove risk")
   String riskRemoveFolderConfirmDialogTitle();
 
-  @DefaultMessage("Are you sure you want to remove the the selected {0} risk(s)?")
   String riskRemoveSelectedConfirmDialogMessage(Long size);
 
-  @DefaultMessage("No")
   String riskRemoveFolderConfirmDialogCancel();
 
-  @DefaultMessage("Yes")
   String riskRemoveFolderConfirmDialogOk();
 
-  @DefaultMessage("Removed risk(s)")
   String riskRemoveSuccessTitle();
 
-  @DefaultMessage("Successfully removed {0} risk(s)")
   String riskRemoveSuccessMessage(Long size);
 
-  @DefaultMessage("Risk was modified")
   String modifyRiskMessage();
 
-  @DefaultMessage("{0} at {1,localdatetime,predef:DATE_TIME_MEDIUM}")
   String riskHistoryLabel(String versionKey, Date createdDate);
 
-  @DefaultMessage("Low")
   String showLowSeverity();
 
-  @DefaultMessage("Moderate")
   String showModerateSeverity();
 
-  @DefaultMessage("High")
   String showHighSeverity();
 
-  @DefaultMessage("Risks")
   String getRisksDialogName();
+
+  String riskHistoryButton();
 
   /************* Agent register ****************/
 
-  @DefaultMessage("Agent register")
   String agentRegisterTitle();
 
-  @DefaultMessage("New")
-  String agentRegisterNewButton();
-
-  @DefaultMessage("Edit")
-  String agentRegisterEditButton();
-
-  @DefaultMessage("Remove")
-  String agentRegisterRemoveButton();
-
-  @DefaultMessage("Start new process")
   String agentRegisterProcessButton();
 
-  @DefaultMessage("Search agents...")
   String agentRegisterSearchPlaceHolder();
 
-  @DefaultMessage("Agent creation failed {0}")
   String createAgentFailure(String message);
 
-  @DefaultMessage("Agent not found {0}")
   String editAgentNotFound(String name);
 
-  @DefaultMessage("Agent edit failed {0}")
   String editAgentFailure(String message);
 
-  @DefaultMessage("Confirm remove agent")
   String agentRemoveFolderConfirmDialogTitle();
 
-  @DefaultMessage("Are you sure you want to remove the the selected {0} agent(s)?")
   String agentRemoveSelectedConfirmDialogMessage(Long size);
 
-  @DefaultMessage("No")
   String agentRemoveFolderConfirmDialogCancel();
 
-  @DefaultMessage("Yes")
   String agentRemoveFolderConfirmDialogOk();
 
-  @DefaultMessage("Removed agent(s)")
   String agentRemoveSuccessTitle();
 
-  @DefaultMessage("Successfully removed {0} agent(s)")
   String agentRemoveSuccessMessage(Long size);
 
-  @DefaultMessage("{0}")
   String agentListItems(String item);
 
-  @DefaultMessage("Agents")
   String getAgentsDialogName();
 
   /************* Format register ****************/
 
-  @DefaultMessage("Formats")
   String getFormatsDialogName();
 
-  @DefaultMessage("Format register")
   String formatRegisterTitle();
 
-  @DefaultMessage("New")
-  String formatRegisterNewButton();
-
-  @DefaultMessage("Edit")
-  String formatRegisterEditButton();
-
-  @DefaultMessage("Remove")
-  String formatRegisterRemoveButton();
-
-  @DefaultMessage("Start new process")
   String formatRegisterProcessButton();
 
-  @DefaultMessage("Search formats...")
   String formatRegisterSearchPlaceHolder();
 
-  @DefaultMessage("Format creation failed {0}")
   String createFormatFailure(String message);
 
-  @DefaultMessage("Format not found {0}")
   String editFormatNotFound(String name);
 
-  @DefaultMessage("Format edit failed {0}")
   String editFormatFailure(String message);
 
-  @DefaultMessage("Confirm remove format")
   String formatRemoveFolderConfirmDialogTitle();
 
-  @DefaultMessage("Are you sure you want to remove the the selected {0} format(s)?")
   String formatRemoveSelectedConfirmDialogMessage(Long size);
 
-  @DefaultMessage("No")
   String formatRemoveFolderConfirmDialogCancel();
 
-  @DefaultMessage("Yes")
   String formatRemoveFolderConfirmDialogOk();
 
-  @DefaultMessage("Removed format(s)")
   String formatRemoveSuccessTitle();
 
-  @DefaultMessage("Successfully removed {0} format(s)")
   String formatRemoveSuccessMessage(Long size);
 
-  @DefaultMessage("{0}")
   String formatListItems(String item);
 
   /************* Common Messages ****************/
 
-  @DefaultMessage("{0}: {1}")
   String logParameter(String name, String value);
 
   // Content Panel
-  @DefaultMessage("Page not found: {0}")
-  public String pageNotFound(String error);
+  String pageNotFound(String error);
 
-  @DefaultMessage("RODA - {0}")
-  public String windowTitle(String history);
+  String windowTitle(String history);
+
+  /************* User management Messages ****************/
+
+  // Create
+  String createUserFailure(String reason);
+
+  String createGroupFailure(String reason);
+
+  String createUserAlreadyExists(String username);
+
+  String createUserEmailAlreadyExists(String email);
+
+  String createGroupAlreadyExists(String groupname);
+
+  // Edit
+  String editUserFailure(String username, String reason);
+
+  String editGroupFailure(String groupname, String reason);
+
+  String editUserNotFound(String username);
+
+  String editUserEmailAlreadyExists(String email);
+
+  String editGroupNotFound(String groupname);
+
+  // Remove
+  String removeUserConfirm(String username);
+
+  String removeUserFailure(String username, String reason);
+
+  String removeUserNotPossible(String name);
+
+  String removeGroupConfirm(String groupname);
+
+  String removeGroupFailure(String groupname, String reason);
+
+  // User/Group Alphabet Sorted List
+  String userCount(int count);
+
+  String groupCount(int count);
+
+  // Action Report Window
+  String actionResportTitle(String username);
+
+  // User log
+  String userLogEntriesTotal(int total);
+
+  // Member management
+
+  String userStatus();
+
+  String userType();
+
+  String addUserButton();
+
+  String addGroupButton();
+
+  String userIdentifier();
+
+  String userName();
+
+  /*** Show job and report ****/
+
+  String jobName();
+
+  String jobCreator();
+
+  String jobStartDate();
+
+  String jobEndDate();
+
+  String jobDuration();
+
+  String jobStatus();
+
+  String jobProgress();
+
+  String jobPlugin();
+
+  String jobProcessed();
+
+  String jobList();
+
+  String reportJob();
+
+  String reportDateCreated();
+
+  String reportDateUpdated();
+
+  String reportDuration();
+
+  String reportStatus();
+
+  String reportProgress();
+
+  String reportRunTasks();
+
+  String jobTotalCountMessage();
+
+  String jobSuccessCountMessage();
+
+  String jobFailureCountMessage();
+
+  String jobProcessingCountMessage();
+
+  String jobWaitingCountMessage();
+
+  String showSIPNotExtended();
+
+  String showAIPNotExtended();
+
+  String reportLastUpdatedAt();
+
+  String reportLastRunTask();
+
+  String reportOutcome();
+
+  String reportSource();
+
+  String reportList();
+
+  String reportAgent();
+
+  String reportStartDatetime();
+
+  String reportEndDatetime();
+
+  String reportOutcomeDetails();
+
+  /*** Appraisal ***/
+
+  String ingestAppraisalDescriptionLevels();
+
+  String ingestAppraisalRepresentations();
+
+  String ingestAppraisalFormats();
+
+  String ingestAppraisalPronomIds();
+
+  String ingestAppraisalMimetypes();
+
+  /*** Risks ***/
+
+  String riskIdentifier();
+
+  String riskName();
+
+  String riskDescription();
+
+  String riskIdentifiedOn();
+
+  String riskIdentifiedBy();
+
+  String riskCategory();
+
+  String riskNotes();
+
+  String riskPreMitigation();
+
+  String riskPreMitigationProbability();
+
+  String riskPreMitigationImpact();
+
+  String riskPreMitigationSeverity();
+
+  String riskPreMitigationNotes();
+
+  String riskMitigation();
+
+  String riskMitigationStrategy();
+
+  String riskMitigationOwnerType();
+
+  String riskMitigationOwner();
+
+  String riskMitigationRelatedEventIdentifierType();
+
+  String riskMitigationRelatedEventIdentifierValue();
+
+  String riskPostMitigation();
+
+  String riskPostMitigationProbability();
+
+  String riskPostMitigationImpact();
+
+  String riskPostMitigationSeverity();
+
+  String riskPostMitigationNotes();
+
+  String riskIncidences();
+
+  String riskIncidenceObjectId();
+
+  String riskIncidenceObjectType();
+
+  String riskObjects();
+
+  /*** AGents ***/
+
+  String agentName();
+
+  String agentType();
+
+  String agentDescription();
+
+  String agentCategory();
+
+  String agentVersion();
+
+  String agentLicense();
+
+  String agentInitialRelease();
+
+  String agentPopularity();
+
+  String agentWebsite();
+
+  String agentDownload();
+
+  String agentProvenanceInformation();
+
+  String agentPlatforms();
+
+  String agentExtensions();
+
+  String agentMimetypes();
+
+  String agentPronoms();
+
+  String agentUtis();
+
+  String agentFormats();
+
+  String agentRequiredAgents();
+
+  /*** Formats ***/
+
+  String formatIdentifier();
+
+  String formatName();
+
+  String formatDefinition();
+
+  String formatCategory();
+
+  String formatLatestVersion();
+
+  String formatPopularity();
+
+  String formatDeveloper();
+
+  String formatInitialRelease();
+
+  String formatStandard();
+
+  String formatOpen();
+
+  String formatWebsite();
+
+  String formatProvenanceInformation();
+
+  String formatExtensions();
+
+  String formatMimetypes();
+
+  String formatPronoms();
+
+  String formatUtis();
+
+  /****** Descriptive Metadata ****/
+
+  String metadataType();
+
+  String metadataFilename();
+
+  String metadataContent();
+
+  /*** Browse ****/
+
+  String sublevels();
+
+  String appraisalTitle();
+
+  String appraisalAccept();
+
+  String appraisalReject();
+
+  String representationsTitle();
+
+  String filesTitle();
+
+  String transferredResourcesTitle();
+
+  String archivalPackageTitle();
+
+  String newArchivalPackage();
+
+  String moveArchivalPackage();
+
+  String archivalPackagePermissions();
+
+  String archivalPackagePermissionsTitle();
+
+  String removeArchivalPackage();
+
+  String preservationTitle();
+
+  String newProcessPreservation();
+
+  String preservationEvents();
+
+  String preservationRisks();
+
+  String downloadTitle();
+
+  String downloadArchivalPackage();
+
+  String downloadSubmission();
+
+  String downloadDocumentation();
+
+  String downloadSchemas();
+
+  String addPermission();
+
+  String permissionAssignedGroups();
+
+  String permissionAssignedUsers();
+
+  String listOfItems();
+
+  String unknownAncestorError();
+
+  String selectAnItemTitle();
+
+  String selectAnItemDescription();
+
+  /***** Job processes ****/
+
+  String processJobTypes();
+
+  String processStatus();
+
+  String processCreators();
+
+  /*** Login ***/
+
+  String loginUsername();
+
+  String loginPassword();
+
+  String loginRecoverPassword();
+
+  /*** More Search ***/
+
+  String searchDescriptionLevels();
+
+  String searchRepresentations();
+
+  String searchFormats();
+
+  String searchPronomIds();
+
+  String searchMimetypes();
+
+  /**** Activity log ****/
+
+  String logComponents();
+
+  String logMethods();
+
+  String logUsers();
+
+  String logEntryIdentifier();
+
+  String logEntryComponent();
+
+  String logEntryMethod();
+
+  String logEntryAddress();
+
+  String logEntryDatetime();
+
+  String logEntryDatetimeExtended();
+
+  String logEntryDuration();
+
+  String logEntryRelatedObject();
+
+  String logEntryUsername();
+
+  String logEntryUser();
+
+  String logEntryParameters();
+
+  /*** Notifications ***/
+
+  String notificationRecipients();
+
+  String notificationAcknowledged();
+
+  String notificationAck();
+
+  String notificationIdentifier();
+
+  String notificationSubject();
+
+  String notificationBody();
+
+  String notificationSentOn();
+
+  String notificationFrom();
+
+  String notificationFromUser();
+
+  String notificationIsAcknowledged();
+
+  String notificationAcknowledgedUsers();
+
+  String notificationNotAcknowledgedUsers();
+
+  /*** Browse Constants **/
+
+  /** Advanced Search Constants **/
+
+  String january();
+
+  String february();
+
+  String march();
+
+  String april();
+
+  String may();
+
+  String june();
+
+  String july();
+
+  String august();
+
+  String september();
+
+  String october();
+
+  String november();
+
+  String december();
+
+  /** Common Constants **/
+
+  String locale();
+
+  // Alphabet Sorted List
+
+  String AlphabetSortedListAll();
+
+  // User Info Panel
+
+  String userInfoDetails();
+
+  String userInfoFullname();
+
+  String userInfoBusinessCategory();
+
+  String userInfoOrganization();
+
+  String userInfoEmail();
+
+  String userInfoTelephoneNumber();
+
+  String userInfoFax();
+
+  String userInfoPostalAddress();
+
+  String userInfoPostalCode();
+
+  String userInfoLocality();
+
+  String userInfoCountry();
+
+  // Logger
+
+  String alertErrorTitle();
+
+  // Report Window
+
+  String reportWindowClose();
+
+  String reportWindowPrintPDF();
+
+  String reportWindowPrintCSV();
+
+  // ID Type
+
+  String simpleID();
+
+  String fullID();
+
+  // Redaction Type
+
+  String input();
+
+  String output();
+
+  String focusPanelTitle();
+
+  /** Main constants **/
+
+  // Content titles
+
+  String title(@Select String title);
+
+  // Login Panel
+
+  String loginLogin();
+
+  String loginRegister();
+
+  String loginProfile();
+
+  String loginLogout();
+
+  // Login Dialog
+
+  String loginDialogTitle();
+
+  String loginDialogLogin();
+
+  String loginDialogCancel();
+
+  // Home
+
+  String homeTitle();
+
+  // Content Panel
+
+  String authorizationDeniedAlert();
+
+  String casForwardWarning();
+
+  // Cookies
+
+  String cookiesMessage();
+
+  String cookiesDismisse();
+
+  String cookiesLearnMore();
+
+  /** Metadata editor constants **/
+
+  // Move element
+
+  String moveChooseDestinationTitle();
+
+  String moveChooseDestinationChoose();
+
+  String moveChooseDestinationCancel();
+
+  String moveSuccessful();
+
+  // Edit Producers Panel
+
+  String editProducersTitle();
+
+  String editProducersAddUser();
+
+  String editProducersAddGroup();
+
+  String editProducersDelete();
+
+  String editProducersRodaIn();
+
+  // Edit Object Permissions Panel
+
+  String objectPermissionsApplyRecursivelly();
+
+  String objectPermissionsAddUser();
+
+  String objectPermissionsAddGroup();
+
+  String objectPermissionsSave();
+
+  // Meta permissions
+
+  String permission_object_NoAccess();
+
+  String permission_object_ReadOnly();
+
+  String permission_object_ReadAndEditMetadata();
+
+  String permission_object_FullControl();
+
+  /** User management constants **/
+
+  // Create/Edit User/Group
+  String dataTabTitle();
+
+  String permissionsTabTitle();
+
+  // Control Panel
+  String list();
+
+  String users();
+
+  String groups();
+
+  String search();
+
+  String userActions();
+
+  String report();
+
+  String createUser();
+
+  String editUser();
+
+  String removeUser();
+
+  String setActive();
+
+  String setInactive();
+
+  String groupActions();
+
+  String createGroup();
+
+  String editGroup();
+
+  String removeGroup();
+
+  String actions();
+
+  // Select User/Group
+  String selectNoUser();
+
+  String selectNoGroup();
+
+  String selectNoActiveUser();
+
+  String selectNoInactiveUser();
+
+  String selectNoUserOrGroup();
+
+  // Create User
+  String createUserTitle();
+
+  String createUserCancel();
+
+  String createUserCreate();
+
+  // Edit User
+  String editUserTitle();
+
+  String editUserCancel();
+
+  String editUserRemove();
+
+  String editUserActivate();
+
+  String editUserDeactivate();
+
+  String editUserApply();
+
+  // User Data Panel
+  String username();
+
+  String password();
+
+  String passwordNote();
+
+  String userDataChangePassword();
+
+  String fullname();
+
+  String jobFunction();
+
+  String getJobFunctions(@Select int index);
+
+  String idTypeAndNumber();
+
+  String id_type(@Select String item);
+
+  String idDateAndLocality();
+
+  String nationality();
+
+  String nationalityList(@Select int index);
+
+  String address();
+
+  String postalCodeAndLocality();
+
+  String country();
+
+  String countryList(@Select int index);
+
+  String nif();
+
+  String email();
+
+  String phonenumber();
+
+  String fax();
+
+  String userDataNote();
+
+  String allGroups();
+
+  String memberGroups();
+
+  String userGroups();
+
+  String userPermissions();
+
+  // Create Group
+  String createGroupTitle();
+
+  String createGroupCreate();
+
+  String createGroupCancel();
+
+  // Edit Group
+  String editGroupTitle();
+
+  String editGroupApply();
+
+  String editGroupRemove();
+
+  String editGroupCancel();
+
+  // Group data panel
+  String groupName();
+
+  String groupFullname();
+
+  String groupDataNote();
+
+  String groupGroups();
+
+  String groupPermissions();
+
+  // Preferences
+  String preferencesUserDataTitle();
+
+  String preferencesSubmit();
+
+  String preferencesCancel();
+
+  String preferencesEmailAlreadyExists();
+
+  String preferencesSubmitSuccess();
+
+  // Roles Description
+
+  String role(@Select String role);
+
+  // Action Report Window
+  String actionReportClose();
+
+  String actionReportLogTabTitle();
+
+  // User Log
+  String actionReportLogDateTime();
+
+  String actionReportLogAction();
+
+  String actionReportLogParameters();
+
+  String actionReportLogUser();
+
+  String userlog_initialDate();
+
+  String userlog_finalDate();
+
+  String userlog_setFilter();
+
+  String userlog_actions();
+
+  String userlog_allActions();
+
+  // Register
+  String registerUserDataTitle();
+
+  String registerDisclaimer();
+
+  String registerCaptchaTitle();
+
+  String registerSubmit();
+
+  String registerCancel();
+
+  String registerUserExists();
+
+  String registerEmailAlreadyExists();
+
+  String registerWrongCaptcha();
+
+  String registerFailure();
+
+  String registerSendEmailVerificationFailure();
+
+  String registerSuccessDialogTitle();
+
+  String registerSuccessDialogMessage();
+
+  String registerSuccessDialogMessageActive();
+
+  String registerSuccessDialogButton();
+
+  // Verify Email
+  String verifyEmailTitle();
+
+  String verifyEmailUsername();
+
+  String verifyEmailToken();
+
+  String verifyEmailVerify();
+
+  String verifyEmailResend();
+
+  String verifyEmailChange();
+
+  String verifyEmailSubmit();
+
+  String verifyEmailCancel();
+
+  String verifyEmailNoSuchUser();
+
+  String verifyEmailWrongToken();
+
+  String verifyEmailResendSuccess();
+
+  String verifyEmailResendFailure();
+
+  String verifyEmailChangePrompt();
+
+  String verifyEmailChangeFailure();
+
+  String verifyEmailAlreadyExists();
+
+  String verifyEmailChangeSuccess();
+
+  String verifyEmailFailure();
+
+  String verifyEmailSuccessDialogTitle();
+
+  String verifyEmailSuccessDialogMessage();
+
+  String verifyEmailSuccessDialogButton();
+
+  // Recover Login
+  String recoverLoginTitle();
+
+  String recoverLoginUsernameOrEmail();
+
+  String recoverLoginCaptchaTitle();
+
+  String recoverLoginSubmit();
+
+  String recoverLoginCancel();
+
+  String recoverLoginCaptchaFailed();
+
+  String recoverLoginNoSuchUser();
+
+  String recoverLoginFailure();
+
+  String recoverLoginSuccessDialogTitle();
+
+  String recoverLoginSuccessDialogMessage();
+
+  String recoverLoginSuccessDialogButton();
+
+  // Reset Password
+  String resetPasswordTitle();
+
+  String resetPasswordUsername();
+
+  String resetPasswordToken();
+
+  String resetPasswordNewPassword();
+
+  String resetPasswordRepeatPassword();
+
+  String resetPasswordSubmit();
+
+  String resetPasswordCancel();
+
+  String resetPasswordInvalidToken();
+
+  String resetPasswordNoSuchUser();
+
+  String resetPasswordFailure();
+
+  String resetPasswordSuccessDialogTitle();
+
+  String resetPasswordSuccessDialogMessage();
+
+  String resetPasswordSuccessDialogButton();
+
+  // Select User Window
+  String selectUserWindowTitle();
+
+  String selectUserWindowSelect();
+
+  String selectUserWindowCancel();
+
+  // Select Group Window
+  String selectGroupWindowTitle();
+
+  String selectGroupWindowSelect();
+
+  String selectGroupWindowCancel();
+
+  /**** Statistics Constants ***/
+
+  String timeSegmentationLabel();
+
+  // segmentation
+  String segmentation_YEAR();
+
+  String segmentation_MONTH();
+
+  String segmentation_DAY();
+
+  // statistic type classes
+
+  String systemStatistics();
+
+  String repositoryStatistics();
+
+  String userStatistics();
+
+  String userActionsStatistics();
+
+  String eventStatistics();
+
+  String ingestStatistics();
+
+  String accessStatistics();
+
+  String actionsStatistics();
+
+  String producersStatistics();
+
+  String chartActual();
+
+  String chartHistory();
+
+  String chartPieTooltip();
+
+  String noDataAvailable();
+
+  String viewImpossibleBcSipNotIngested();
+
+  String dateIntervalPickerWindowTitle();
+
+  String dateIntervalLabelInitial();
+
+  String dateIntervalLabelFinal();
+
+  String dateIntervalPickerWindowApply();
+
+  // Statistic panel titles
+
+  String descriptiveObjectsCountTitle();
+
+  String descriptiveObjectsCountDesc();
+
+  String fondsCountTitle();
+
+  String fondsCountDesc();
+
+  String presEventCountTitle();
+
+  String presEventCountDesc();
+
+  String presRepCountTitle();
+
+  String presRepCountDesc();
+
+  String representationObjectsCountTitle();
+
+  String representationObjectsCountDesc();
+
+  String representationObjectTypeTitle();
+
+  String representationObjectTypeDesc();
+
+  String representationObjectSubTypeTitle();
+
+  String representationObjectSubTypeDesc();
+
+  String userCountTitle();
+
+  String userCountDesc();
+
+  String groupCountTitle();
+
+  String groupCountDesc();
+
+  String groupTop5Title();
+
+  String groupTop5Desc();
+
+  String logWuiLoginTitle();
+
+  String logWuiLoginDesc();
+
+  String logWuiPageHitsTitle();
+
+  String logWuiPageHitsDesc();
+
+  String logWuiErrorsTitle();
+
+  String logWuiErrorsDesc();
+
+  String logDescriptiveMetadataViewsTitle();
+
+  String logDescriptiveMetadataViewsDesc();
+
+  String logPreservationMetadataViewsTitle();
+
+  String logPreservationMetadataViewsDesc();
+
+  String logBasicSearchTitle();
+
+  String logBasicSearchDesc();
+
+  String logAdvancedSearchTitle();
+
+  String logAdvancedSearchDesc();
+
+  String disseminatorHitsTitle();
+
+  String disseminatorHitsDesc();
+
+  String disseminatorMissTitle();
+
+  String disseminatorMissDesc();
+
+  String logRegisterUserTitle();
+
+  String logRegisterUserDesc();
+
+  String logUserEmailConfirmationTitle();
+
+  String logUserEmailConfirmationDesc();
+
+  String logUserPasswordResetTitle();
+
+  String logUserPasswordResetDesc();
+
+  String taskCountTitle();
+
+  String taskCountDesc();
+
+  String taskStateTitle();
+
+  String taskStateDesc();
+
+  String taskInstanceCountTitle();
+
+  String taskInstanceCountDesc();
+
+  String taskInstanceStateTitle();
+
+  String taskInstanceStateDesc();
+
+  String sipCountTitle();
+
+  String sipCountDesc();
+
+  String sipCompletenessTitle();
+
+  String sipCompletenessDesc();
+
+  String sipStateTitle();
+
+  String sipStateDesc();
+
+  String sipDurationAutoTitle();
+
+  String sipDurationAutoDesc();
+
+  String sipDurationManualTitle();
+
+  String sipDurationManualDesc();
+
+  String sipMinAutomaticProcessingTimeTitle();
+
+  String sipMinAutomaticProcessingTimeDesc();
+
+  String sipMaxAutomaticProcessingTimeTitle();
+
+  String sipMaxAutomaticProcessingTimeDesc();
+
+  String sipMinManualProcessingTimeTitle();
+
+  String sipMinManualProcessingTimeDesc();
+
+  String sipMaxManualProcessingTimeTitle();
+
+  String sipMaxManualProcessingTimeDesc();
+
+  String producerTitle();
+
+  String producerLastSubmissionDate();
+
+  String producerSubmissionStateChartTitle();
+
+  String producerSubmissionStateChartDesc();
+
+  String createDescriptionObjectTitle();
+
+  String createDescriptionObjectDesc();
+
+  String modifyDescriptionObjectTitle();
+
+  String modifyDescriptionObjectDesc();
+
+  String removeDescriptionObjectTitle();
+
+  String removeDescriptionObjectDesc();
+
+  String moveDescriptionObjectTitle();
+
+  String moveDescriptionObjectDesc();
+
+  String addUserTitle();
+
+  String addUserDesc();
+
+  String modifyUserTitle();
+
+  String modifyUserDesc();
+
+  String removeUserTitle();
+
+  String removeUserDesc();
+
+  String addGroupTitle();
+
+  String addGroupDesc();
+
+  String modifyGroupTitle();
+
+  String modifyGroupDesc();
+
+  String removeGroupTitle();
+
+  String removeGroupDesc();
+
+  String setUserPasswordTitle();
+
+  String setUserPasswordDesc();
+
+  String acceptSIPTitle();
+
+  String acceptSIPDesc();
+
+  String addTaskTitle();
+
+  String addTaskDesc();
+
+  String modifyTaskTitle();
+
+  String modifyTaskDesc();
+
+  String removeTaskTitle();
+
+  String removeTaskDesc();
+
+  String systemStatisticsLink();
+
+  // Reports
+  String statisticsReportClose();
+
+  String statisticsReportSegmentationLabel();
+
+  String statisticsReportDateSeparatorLabel();
+
+  String statisticsReportChart();
+
+  String statisticsReportList();
+
+  String statisticsReportListTotal();
+
+  String statisticsReportListHeaderDate();
+
+  String statisticsReportListHeaderType();
+
+  String statisticsReportListHeaderValue();
+
+  // Statistic types
+  String statistic_type_others();
+
+  String tasks_state_running();
+
+  String tasks_state_suspended();
+
+  String instances_state_running();
+
+  String instances_state_paused();
+
+  String instances_state_stopped();
+
+  String sips_complete_true();
+
+  String sips_complete_false();
+
+  String sips_state_DROPED_FTP();
+
+  String sips_state_DROPED_UPLOAD_SERVICE();
+
+  String sips_state_DROPED_LOCAL();
+
+  String sips_state_UNPACKED();
+
+  String sips_state_VIRUS_FREE();
+
+  String sips_state_SIP_VALID();
+
+  String sips_state_AUTHORIZED();
+
+  String sips_state_SIP_INGESTED();
+
+  String sips_state_SIP_NORMALIZED();
+
+  String sips_state_ACCEPTED();
+
+  String sips_state_QUARANTINE();
+
+  String object_representation_type_digitalized_work();
+
+  String object_representation_type_email();
+
+  String object_representation_type_structured_text();
+
+  String object_representation_type_presentation();
+
+  String object_representation_type_spreadsheet();
+
+  String object_representation_type_vector_graphic();
+
+  String object_representation_type_relational_database();
+
+  String object_representation_type_video();
+
+  String object_representation_type_audio();
+
+  String object_representation_type_unknown();
+
+  String users_state_active();
+
+  String users_state_inactive();
+
+  /**** Language Switcher ****/
+
+  @Key("lang.en")
+  String lang_en();
+
+  @Key("lang.pt")
+  String lang_pt();
+
+  @Key("lang.cz")
+  String lang_cz();
+
 
   /************* Metadata creation ****************/
 

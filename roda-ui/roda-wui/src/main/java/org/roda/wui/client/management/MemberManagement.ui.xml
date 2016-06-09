@@ -5,6 +5,8 @@
 	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
 	xmlns:lists="urn:import:org.roda.wui.client.common.lists">
 
+	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
+
 	<ui:style>
 
 	</ui:style>
@@ -12,7 +14,7 @@
 	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1">Users and groups</g:Label>
+				<g:Label styleName="h1"><ui:text from='{messages.usersAndGroupsTitle}' /></g:Label>
 				<g:FlowPanel addStyleNames="page-description" ui:field="memberManagementDescription">
 				</g:FlowPanel>
 				<lists:RodaMemberList addStyleNames="searchResults"
@@ -22,29 +24,33 @@
 				<g:FlowPanel>
 					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 						<g:Label addStyleNames="h5 sidebar-facet-title">
-							<ui:msg>Status</ui:msg>
+							<ui:text from='{messages.userStatus}' />
 						</g:Label>
 						<g:FlowPanel ui:field="facetIsActive" />
 					</g:FlowPanel>
 					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 						<g:Label addStyleNames="h5 sidebar-facet-title">
-							<ui:msg>Type</ui:msg>
+							<ui:text from='{messages.userType}' />
 						</g:Label>
 						<g:FlowPanel ui:field="facetIsUser" />
 					</g:FlowPanel>
 					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 						<g:Label addStyleNames="h5 sidebar-facet-title">
-							<ui:msg>Groups</ui:msg>
+							<ui:text from='{messages.userGroups}' />
 						</g:Label>
 						<g:FlowPanel ui:field="facetGroups" />
 					</g:FlowPanel>
 				</g:FlowPanel>
 				<g:FlowPanel>
 					<g:Label addStyleNames="h5">
-						<ui:msg>Actions</ui:msg>
+						<ui:text from='{messages.sidebarActionsTitle}' />
 					</g:Label>
-					<g:Button addStyleNames="btn btn-plus" ui:field="buttonAddUser">Add user</g:Button>
-					<g:Button addStyleNames="btn btn-plus" ui:field="buttonAddGroup">Add group</g:Button>
+					<g:Button addStyleNames="btn btn-plus" ui:field="buttonAddUser">
+						<ui:text from='{messages.addUserButton}' />
+					</g:Button>
+					<g:Button addStyleNames="btn btn-plus" ui:field="buttonAddGroup">
+						<ui:text from='{messages.addGroupButton}' />
+					</g:Button>
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>

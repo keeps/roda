@@ -4,8 +4,8 @@
 	     xmlns:g="urn:import:com.google.gwt.user.client.ui"
 >
 
-	<ui:with field='constants' type='config.i18n.client.UserManagementConstants'/>
-	<ui:with field='messages' type='config.i18n.client.UserManagementMessages'/>
+	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
+
 
 	<ui:style>
 
@@ -15,18 +15,17 @@
 		     addStyleNames="skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1">New descriptive metadata</g:Label>
+				<g:Label styleName="h1"><ui:text from='{messages.newDescriptiveMetadataTitle}' /></g:Label>
 				<g:Label addStyleNames="form-label">
-					Type
+					<ui:text from='{messages.metadataType}' />
 				</g:Label>
 				<g:ListBox ui:field="type" addStyleNames="form-listbox"/>
 				<g:Label addStyleNames="form-label">
-					File name
+					<ui:text from='{messages.metadataFilename}' />
 				</g:Label>
+
 				<g:TextBox ui:field="id" addStyleNames="form-textbox"/>
-				<g:Label ui:field="formOrXMLLabel">
-					Form
-				</g:Label>
+				<g:Label ui:field="formOrXMLLabel"/>
 				<g:FocusPanel ui:field="showXml" styleName="toolbarLink">
 					<g:HTML>
 						<i class="fa fa-code"></i>
@@ -42,13 +41,13 @@
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel>
 					<g:Label addStyleNames="h4">
-						<ui:msg>Actions</ui:msg>
+						<ui:text from='{messages.sidebarActionsTitle}' />
 					</g:Label>
 					<g:Button addStyleNames="btn btn-play" ui:field="buttonApply">
-						Save
+						<ui:text from='{messages.saveButton}' />
 					</g:Button>
 					<g:Button addStyleNames="btn btn-times-circle" ui:field="buttonCancel">
-						Cancel
+						<ui:text from='{messages.cancelButton}' />
 					</g:Button>
 
 				</g:FlowPanel>

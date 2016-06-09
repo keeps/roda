@@ -43,37 +43,37 @@ public class AccessStatistics extends StatisticTab {
     boolean ret = false;
     if (super.init()) {
       ret = true;
-      wuiLogins = createStatisticPanel(constants.logWuiLoginTitle(), constants.logWuiLoginDesc(),
+      wuiLogins = createStatisticPanel(messages.logWuiLoginTitle(), messages.logWuiLoginDesc(),
         "logs.action.RODAWUI.login", false, true, AGGREGATION_LAST);
-      wuiPageHits = createStatisticPanel(constants.logWuiPageHitsTitle(), constants.logWuiPageHitsDesc(),
+      wuiPageHits = createStatisticPanel(messages.logWuiPageHitsTitle(), messages.logWuiPageHitsDesc(),
         "logs.action.RODAWUI.pageHit", false, true, AGGREGATION_LAST);
-      wuiErrors = createStatisticPanel(constants.logWuiErrorsTitle(), constants.logWuiErrorsDesc(),
+      wuiErrors = createStatisticPanel(messages.logWuiErrorsTitle(), messages.logWuiErrorsDesc(),
         "logs.action.RODAWUI.error", false, true, AGGREGATION_LAST);
-      doViews = createStatisticPanel(constants.logDescriptiveMetadataViewsTitle(),
-        constants.logDescriptiveMetadataViewsDesc(), "logs.action.Browser.getDescriptionObject", false, true,
+      doViews = createStatisticPanel(messages.logDescriptiveMetadataViewsTitle(),
+        messages.logDescriptiveMetadataViewsDesc(), "logs.action.Browser.getDescriptionObject", false, true,
         AGGREGATION_LAST);
-      poViews = createStatisticPanel(constants.logPreservationMetadataViewsTitle(),
-        constants.logPreservationMetadataViewsDesc(), "logs.action.Browser.getPreservationEvents", false, true,
+      poViews = createStatisticPanel(messages.logPreservationMetadataViewsTitle(),
+        messages.logPreservationMetadataViewsDesc(), "logs.action.Browser.getPreservationEvents", false, true,
         AGGREGATION_LAST);
-      basicSearch = createStatisticPanel(constants.logBasicSearchTitle(), constants.logBasicSearchDesc(),
+      basicSearch = createStatisticPanel(messages.logBasicSearchTitle(), messages.logBasicSearchDesc(),
         "logs.action.Search.basicSearch", false, true, AGGREGATION_LAST);
-      advancedSearch = createStatisticPanel(constants.logAdvancedSearchTitle(), constants.logAdvancedSearchDesc(),
+      advancedSearch = createStatisticPanel(messages.logAdvancedSearchTitle(), messages.logAdvancedSearchDesc(),
         "logs.action.Search.advancedSearch", false, true, AGGREGATION_LAST);
 
-      disseminatorHits = createStatisticPanel(constants.disseminatorHitsTitle(), constants.disseminatorHitsDesc(),
+      disseminatorHits = createStatisticPanel(messages.disseminatorHitsTitle(), messages.disseminatorHitsDesc(),
         "disseminator\\.hit\\..*", true, true, AGGREGATION_LAST);
-      disseminatorMiss = createStatisticPanel(constants.disseminatorMissTitle(), constants.disseminatorMissDesc(),
+      disseminatorMiss = createStatisticPanel(messages.disseminatorMissTitle(), messages.disseminatorMissDesc(),
         "disseminator\\.miss\\..*", true, true, AGGREGATION_LAST);
 
-      registerUser = createStatisticPanel(constants.logRegisterUserTitle(), constants.logRegisterUserDesc(),
+      registerUser = createStatisticPanel(messages.logRegisterUserTitle(), messages.logRegisterUserDesc(),
         "logs.action.UserRegistration.registerUser", false, true, AGGREGATION_LAST);
 
-      userEmailConfirmation = createStatisticPanel(constants.logUserEmailConfirmationTitle(),
-        constants.logUserEmailConfirmationDesc(), "logs.action.UserRegistration.confirmUserEmail", false, true,
+      userEmailConfirmation = createStatisticPanel(messages.logUserEmailConfirmationTitle(),
+        messages.logUserEmailConfirmationDesc(), "logs.action.UserRegistration.confirmUserEmail", false, true,
         AGGREGATION_LAST);
 
-      userPasswordReset = createStatisticPanel(constants.logUserPasswordResetTitle(),
-        constants.logUserPasswordResetDesc(), "logs.action.UserRegistration.resetUserPassword", false, true,
+      userPasswordReset = createStatisticPanel(messages.logUserPasswordResetTitle(),
+        messages.logUserPasswordResetDesc(), "logs.action.UserRegistration.resetUserPassword", false, true,
         AGGREGATION_LAST);
 
       // TODO Add download of preservation metadata
@@ -99,7 +99,7 @@ public class AccessStatistics extends StatisticTab {
 
   @Override
   public String getTabText() {
-    return constants.accessStatistics();
+    return messages.accessStatistics();
   }
 
 }

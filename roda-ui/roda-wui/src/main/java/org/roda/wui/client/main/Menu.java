@@ -54,8 +54,7 @@ import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.BrowseConstants;
-import config.i18n.client.LanguageSwitcherPanelConstants;
+import config.i18n.client.BrowseMessages;
 
 /**
  * @author Luis Faria
@@ -65,9 +64,7 @@ public class Menu extends Composite {
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
-  private static LanguageSwitcherPanelConstants languagesConstants = (LanguageSwitcherPanelConstants) GWT
-    .create(LanguageSwitcherPanelConstants.class);
+  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
@@ -119,51 +116,53 @@ public class Menu extends Composite {
   public Menu() {
     initWidget(uiBinder.createAndBindUi(this));
 
-    about = customMenuItem("fa fa-home", constants.title_about(), "menu-item-label", null,
+    about = customMenuItem("fa fa-home", messages.title("about"), "menu-item-label", null,
       createCommand(Welcome.RESOLVER.getHistoryPath()));
 
-    dissemination_browse = new MenuItem(constants.title_dissemination_browse(),
+    dissemination_browse = new MenuItem(messages.title("dissemination_browse"),
       createCommand(Browse.RESOLVER.getHistoryPath()));
-    dissemination_searchBasic = new MenuItem(constants.title_dissemination_search_basic(),
+    dissemination_searchBasic = new MenuItem(messages.title("dissemination_search_basic"),
       createCommand(Search.RESOLVER.getHistoryPath()));
 
     ingestMenu = new MenuBar(true);
-    ingest_pre = ingestMenu.addItem(constants.title_ingest_pre(), createCommand(PreIngest.RESOLVER.getHistoryPath()));
-    ingest_transfer = ingestMenu.addItem(constants.title_ingest_transfer(),
+    ingest_pre = ingestMenu.addItem(messages.title("ingest_preIngest"),
+      createCommand(PreIngest.RESOLVER.getHistoryPath()));
+    ingest_transfer = ingestMenu.addItem(messages.title("ingest_transfer"),
       createCommand(IngestTransfer.RESOLVER.getHistoryPath()));
-    ingest_list = ingestMenu.addItem(constants.title_ingest_list(),
+    ingest_list = ingestMenu.addItem(messages.title("ingest_list"),
       createCommand(IngestProcess.RESOLVER.getHistoryPath()));
-    ingest_appraisal = ingestMenu.addItem(constants.title_ingest_appraisal(),
+    ingest_appraisal = ingestMenu.addItem(messages.title("ingest_appraisal"),
       createCommand(IngestAppraisal.RESOLVER.getHistoryPath()));
 
     administrationMenu = new MenuBar(true);
-    administration_actions = administrationMenu.addItem(constants.title_administration_actions(),
+    administration_actions = administrationMenu.addItem(messages.title("administration_actions"),
       createCommand(ActionProcess.RESOLVER.getHistoryPath()));
-    administration_user = administrationMenu.addItem(constants.title_administration_user(),
+    administration_user = administrationMenu.addItem(messages.title("administration_user"),
       createCommand(MemberManagement.RESOLVER.getHistoryPath()));
-    administration_log = administrationMenu.addItem(constants.title_administration_log(),
+    administration_log = administrationMenu.addItem(messages.title("administration_log"),
       createCommand(UserLog.RESOLVER.getHistoryPath()));
     // FIXME add constant for notification title
-    administration_notifications = administrationMenu.addItem("Notifications",
+    administration_notifications = administrationMenu.addItem(messages.title("administration_notifications"),
       createCommand(NotificationRegister.RESOLVER.getHistoryPath()));
     // administration_preferences =
-    // administrationMenu.addItem(constants.title_administration_preferences(),
+    // administrationMenu.addItem(messages.title("administration_preferences"),
     // createCommand(Management.RESOLVER.getHistoryPath()));
 
     planningMenu = new MenuBar(true);
     // planning_monitoring =
-    // planningMenu.addItem(constants.title_planning_monitoring(),
+    // planningMenu.addItem(messages.title("planning_monitoring"),
     // createCommand(Planning.RESOLVER.getHistoryPath()));
-    planning_risk = planningMenu.addItem(constants.title_planning_risk(),
+    planning_risk = planningMenu.addItem(messages.title("planning_risk"),
       createCommand(RiskRegister.RESOLVER.getHistoryPath()));
-    // planning_agents = planningMenu.addItem(constants.title_planning_agent(),
+
+    // planning_agents = planningMenu.addItem(messages.title("planning_agent"),
     // createCommand(AgentRegister.RESOLVER.getHistoryPath()));
-    planning_format = planningMenu.addItem(constants.title_planning_format(),
+    planning_format = planningMenu.addItem(messages.title("planning_format"),
       createCommand(FormatRegister.RESOLVER.getHistoryPath()));
 
     userMenu = new MenuBar(true);
-    userMenu.addItem(constants.loginProfile(), createCommand(Profile.RESOLVER.getHistoryPath()));
-    userMenu.addItem(constants.loginLogout(), new ScheduledCommand() {
+    userMenu.addItem(messages.loginProfile(), createCommand(Profile.RESOLVER.getHistoryPath()));
+    userMenu.addItem(messages.loginLogout(), new ScheduledCommand() {
 
       @Override
       public void execute() {
@@ -240,7 +239,7 @@ public class Menu extends Composite {
     updateResolverSubItemVisibility(IngestTransfer.RESOLVER, ingest_transfer);
     updateResolverSubItemVisibility(IngestProcess.RESOLVER, ingest_list);
     updateResolverSubItemVisibility(IngestProcess.RESOLVER, ingest_appraisal);
-    updateResolverTopItemVisibility(Ingest.RESOLVER, new MenuItem(constants.title_ingest(), ingestMenu), 3);
+    updateResolverTopItemVisibility(Ingest.RESOLVER, new MenuItem(messages.title("ingest"), ingestMenu), 3);
 
     // Administration
     updateResolverSubItemVisibility(Management.RESOLVER, administration_actions);
@@ -250,24 +249,24 @@ public class Menu extends Composite {
     // updateResolverSubItemVisibility(Management.RESOLVER,
     // administration_preferences);
     updateResolverTopItemVisibility(Management.RESOLVER,
-      new MenuItem(constants.title_administration(), administrationMenu), 4);
+      new MenuItem(messages.title("administration"), administrationMenu), 4);
 
     // Planning
     // updateResolverSubItemVisibility(Planning.RESOLVER, planning_monitoring);
     updateResolverSubItemVisibility(Planning.RESOLVER, planning_risk);
     // updateResolverSubItemVisibility(Planning.RESOLVER, planning_agents);
     updateResolverSubItemVisibility(Planning.RESOLVER, planning_format);
-    updateResolverTopItemVisibility(Planning.RESOLVER, new MenuItem(constants.title_planning(), planningMenu), 5);
+    updateResolverTopItemVisibility(Planning.RESOLVER, new MenuItem(messages.title("planning"), planningMenu), 5);
 
     // User
     if (user.isGuest()) {
       rightMenu
-        .addItem(customMenuItem("fa fa-user", constants.loginLogin(), "menu-item-label", null, createLoginCommand()));
-      rightMenu.addItem(customMenuItem("fa fa-user-plus", constants.loginRegister(), "menu-item-label menu-register",
+        .addItem(customMenuItem("fa fa-user", messages.loginLogin(), "menu-item-label", null, createLoginCommand()));
+      rightMenu.addItem(customMenuItem("fa fa-user-plus", messages.loginRegister(), "menu-item-label menu-register",
         null, createCommand(Register.RESOLVER.getHistoryPath())));
     } else {
       // rightMenu.addItem(customMenuItem("fa fa-cog",
-      // constants.title_settings(), "menu-item-label", settingsMenu, null));
+      // messages.title("settings"), "menu-item-label", settingsMenu, null));
       rightMenu.addItem(customMenuItem("fa fa-user", user.getName(), "menu-item-label", userMenu, null));
     }
     rightMenu.addItem(customMenuItem("fa fa-globe", selectedLanguage, "menu-item-label", languagesMenu, null));
@@ -336,9 +335,9 @@ public class Menu extends Composite {
     String locale = LocaleInfo.getCurrentLocale().getLocaleName();
 
     Map<String, String> supportedLanguages = new HashMap<String, String>();
-    supportedLanguages.put("en", languagesConstants.lang_en());
-    supportedLanguages.put("pt_PT", languagesConstants.lang_pt());
-    supportedLanguages.put("cs_CZ", languagesConstants.lang_cz());
+    supportedLanguages.put("en", messages.lang_en());
+    supportedLanguages.put("pt_PT", messages.lang_pt());
+    supportedLanguages.put("cs_CZ", messages.lang_cz());
 
     languagesMenu.clearItems();
 

@@ -26,7 +26,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.BrowseConstants;
+import config.i18n.client.BrowseMessages;
 
 /**
  * @author Luis Faria
@@ -35,7 +35,7 @@ import config.i18n.client.BrowseConstants;
 public abstract class AlphabetSortedList extends DockPanel {
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
-  private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
+  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   private static int BLOCK_SIZE = 30;
 
@@ -94,7 +94,7 @@ public abstract class AlphabetSortedList extends DockPanel {
     this.header = new HorizontalPanel();
     this.alphabetPanel = new HorizontalPanel();
 
-    allLetter = new Label(constants.AlphabetSortedListAll());
+    allLetter = new Label(messages.AlphabetSortedListAll());
     allLetter.addClickListener(new ClickListener() {
       public void onClick(Widget sender) {
         setAllLetters();

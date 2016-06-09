@@ -13,7 +13,7 @@ package org.roda.wui.common.client.widgets;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.ListBox;
 
-import config.i18n.client.BrowseConstants;
+import config.i18n.client.BrowseMessages;
 
 /**
  * @author Luis Faria
@@ -32,7 +32,7 @@ public class IDTypePicker extends ListBox {
   private static String ATTRIBUTE_ALTRENDER_SIMPLE_ID = "id";
   private static String ATTRIBUTE_ALTRENDER_FULL_ID = "full_id";
 
-  private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
+  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   /**
    * Create a new id picker
@@ -44,8 +44,8 @@ public class IDTypePicker extends ListBox {
   }
 
   protected void init() {
-    addItem(constants.simpleID());
-    addItem(constants.fullID());
+    addItem(messages.simpleID());
+    addItem(messages.fullID());
     setSelectedIndex(0);
   }
 
@@ -66,9 +66,9 @@ public class IDTypePicker extends ListBox {
   public static String getIDTypeLabel(String type) {
     String label = null;
     if (type.equals(ATTRIBUTE_ALTRENDER_SIMPLE_ID)) {
-      label = constants.simpleID();
+      label = messages.simpleID();
     } else if (type.equals(ATTRIBUTE_ALTRENDER_FULL_ID)) {
-      label = constants.fullID();
+      label = messages.fullID();
     }
     return label;
   }

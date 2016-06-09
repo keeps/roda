@@ -154,7 +154,7 @@ public class EditPermissions extends Composite {
       filter.add(new NotSimpleFilterParameter(RodaConstants.MEMBERS_ID, groupname));
     }
 
-    MemberSelectDialog selectDialog = new MemberSelectDialog("Select user or group to add", filter);
+    MemberSelectDialog selectDialog = new MemberSelectDialog(messages.selectUserOrGroupToAdd(), filter);
     selectDialog.showAndCenter();
     selectDialog.addValueChangeHandler(new ValueChangeHandler<RODAMember>() {
 
@@ -226,7 +226,7 @@ public class EditPermissions extends Composite {
 
         @Override
         public void onSuccessImpl(Void result) {
-          Toast.showInfo("Success", "Permissions changed");
+          Toast.showInfo(messages.dialogSuccess(), messages.permissionsChanged());
         }
 
       });
@@ -291,7 +291,7 @@ public class EditPermissions extends Composite {
         valueCheckBox.addStyleName("permission-edit-checkbox");
       }
 
-      removePanel = new Button("Remove");
+      removePanel = new Button(messages.removeButton());
 
       panelBody.add(type);
       panelBody.add(nameLabel);

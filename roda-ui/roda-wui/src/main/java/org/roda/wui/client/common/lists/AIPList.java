@@ -25,6 +25,7 @@ import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Humanize;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -37,9 +38,12 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 
+import config.i18n.client.BrowseMessages;
+
 public class AIPList extends BasicAsyncTableCell<IndexedAIP> {
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
+  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   private Column<IndexedAIP, SafeHtml> levelColumn;
   private TextColumn<IndexedAIP> titleColumn;
@@ -98,10 +102,10 @@ public class AIPList extends BasicAsyncTableCell<IndexedAIP> {
 
     // TODO externalize strings into constants
     display.addColumn(levelColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-tag'></i>&nbsp;Level"));
-    display.addColumn(titleColumn, "Title");
-    display.addColumn(datesColumn, "Dates");
+    display.addColumn(titleColumn, messages.aipGenericTitle());
+    display.addColumn(datesColumn, messages.aipDates());
 
-    Label emptyInfo = new Label("No items to display");
+    Label emptyInfo = new Label(messages.noItemsToDisplay());
     display.setEmptyTableWidget(emptyInfo);
 
     // define default sorting

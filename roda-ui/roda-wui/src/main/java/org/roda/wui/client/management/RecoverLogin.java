@@ -45,7 +45,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.UserManagementConstants;
+import config.i18n.client.BrowseMessages;
 
 /**
  * @author Luis Faria
@@ -99,8 +99,7 @@ public class RecoverLogin extends Composite {
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private static UserManagementConstants constants = (UserManagementConstants) GWT
-    .create(UserManagementConstants.class);
+  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   private boolean recaptchaActive = true;
 
@@ -217,8 +216,8 @@ public class RecoverLogin extends Composite {
 
           @Override
           public void onSuccess(Void result) {
-            Dialogs.showInformationDialog(constants.recoverLoginSuccessDialogTitle(),
-              constants.recoverLoginSuccessDialogMessage(), constants.recoverLoginSuccessDialogButton(),
+            Dialogs.showInformationDialog(messages.recoverLoginSuccessDialogTitle(),
+              messages.recoverLoginSuccessDialogMessage(), messages.recoverLoginSuccessDialogButton(),
               new AsyncCallback<Void>() {
 
                 @Override
@@ -242,11 +241,11 @@ public class RecoverLogin extends Composite {
     }
 
     if (caught instanceof RecaptchaException) {
-      Toast.showError(constants.recoverLoginCaptchaFailed());
+      Toast.showError(messages.recoverLoginCaptchaFailed());
     } else if (caught instanceof NotFoundException) {
-      Toast.showError(constants.recoverLoginNoSuchUser());
+      Toast.showError(messages.recoverLoginNoSuchUser());
     } else {
-      Toast.showError(constants.recoverLoginFailure());
+      Toast.showError(messages.recoverLoginFailure());
     }
   }
 }

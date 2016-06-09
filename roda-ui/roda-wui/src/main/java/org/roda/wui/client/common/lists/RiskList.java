@@ -139,12 +139,12 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
     objectCounterColumn.setSortable(true);
 
     // TODO externalize strings into constants
-    addColumn(nameColumn, "Name", false, false);
-    addColumn(categoryColumn, "Category", false, false);
-    addColumn(ownerColumn, "Owner", false, false);
-    addColumn(identifiedOnColumn, "Identified on", false, false, 8);
-    addColumn(severityColumn, "Severity", false, false, 8);
-    addColumn(objectCounterColumn, "Objects", false, false, 5);
+    addColumn(nameColumn, messages.riskName(), false, false);
+    addColumn(categoryColumn, messages.riskCategory(), false, false);
+    addColumn(ownerColumn, messages.riskMitigationOwner(), false, false);
+    addColumn(identifiedOnColumn, messages.riskIdentifiedOn(), false, false, 8);
+    addColumn(severityColumn, messages.riskPostMitigationSeverity(), false, false, 8);
+    addColumn(objectCounterColumn, messages.riskObjects(), false, false, 5);
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(severityColumn, false));

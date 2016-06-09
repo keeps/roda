@@ -182,16 +182,16 @@ public class IngestJobReportList extends BasicAsyncTableCell<Report> {
     completionStatusColumn.setSortable(false);
 
     // TODO externalize strings into constants
-    addColumn(sourceObjectColumn, "SIP", true, false);
-    addColumn(outcomeObjectColumn, "AIP", true, false);
-    addColumn(updatedDateColumn, "Last updated at", true, false, 11);
-    addColumn(lastPluginRunColumn, "Last run task", true, false);
-    addColumn(lastPluginRunStateColumn, "Status", true, false, 8);
-    addColumn(completionStatusColumn, "Progress", true, false, 8);
+    addColumn(sourceObjectColumn, messages.showSIPExtended(), true, false);
+    addColumn(outcomeObjectColumn, messages.showAIPExtended(), true, false);
+    addColumn(updatedDateColumn, messages.reportLastRunTask(), true, false, 11);
+    addColumn(lastPluginRunColumn, messages.reportLastUpdatedAt(), true, false);
+    addColumn(lastPluginRunStateColumn, messages.reportStatus(), true, false, 8);
+    addColumn(completionStatusColumn, messages.reportProgress(), true, false, 8);
 
     // display.setColumnWidth(sourceObjectColumn, "100%");
 
-    Label emptyInfo = new Label("No items to display");
+    Label emptyInfo = new Label(messages.noItemsToDisplay());
     display.setEmptyTableWidget(emptyInfo);
 
     // default sorting

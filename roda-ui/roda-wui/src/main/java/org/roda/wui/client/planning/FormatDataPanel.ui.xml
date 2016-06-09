@@ -5,7 +5,7 @@
 	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
 	xmlns:u="urn:import:org.roda.wui.client.management" xmlns:l="urn:import:org.roda.wui.client.common">
 
-	<ui:with field='constants' type='config.i18n.client.UserManagementConstants' />
+	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
 	
 	<ui:style>
 		.postalAddress {
@@ -20,38 +20,38 @@
 	<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width no_padding">
 			<g:FlowPanel addStyleNames="wui-data-panel">
-				<g:Label addStyleNames="form-label">Name</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatName}' /></g:Label>
 				<g:TextBox ui:field="name" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">Definition</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatDefinition}' /></g:Label>
 				<g:TextArea ui:field="definition" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">Category</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatCategory}' /></g:Label>
 				<g:TextBox ui:field="category" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">Latest Version</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatLatestVersion}' /></g:Label>
 				<g:TextBox ui:field="latestVersion" addStyleNames="form-textbox form-textbox-small" />
-				<g:Label addStyleNames="form-label">Popularity</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatPopularity}' /></g:Label>
 				<g:IntegerBox ui:field="popularity" addStyleNames="form-textbox form-textbox-small" />
-				<g:Label addStyleNames="form-label">Developer</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatDeveloper}' /></g:Label>
 				<g:TextBox ui:field="developer" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">Initial Release</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatInitialRelease}' /></g:Label>
 				<d:DateBox ui:field="initialRelease" addStyleNames="form-textbox form-textbox-small" />
-				<g:Label addStyleNames="form-label">Standard</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatStandard}' /></g:Label>
 				<g:TextBox ui:field="standard" addStyleNames="form-textbox" />
 				<g:FlowPanel>
-					<g:Label addStyleNames="form-label">Open Format</g:Label>
+					<g:Label addStyleNames="form-label"><ui:text from='{messages.formatOpen}' /></g:Label>
 					<g:CheckBox ui:field="isOpenFormat" addStyleNames="form-checkbox" />
 				</g:FlowPanel>
-				<g:Label addStyleNames="form-label">Website</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatWebsite}' /></g:Label>
 				<g:TextBox ui:field="website" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">Provenance Information</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatProvenanceInformation}' /></g:Label>
 				<g:TextArea ui:field="provenanceInformation" addStyleNames="form-textbox" />
 				
-				<g:Label addStyleNames="form-label">Extensions</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatExtensions}' /></g:Label>
 				<l:IncrementalList ui:field="extensions"></l:IncrementalList>
-				<g:Label addStyleNames="form-label">Mimetypes</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatMimetypes}' /></g:Label>
 				<l:IncrementalList ui:field="mimetypes"></l:IncrementalList>
-				<g:Label addStyleNames="form-label">Pronoms</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatPronoms}' /></g:Label>
 				<l:IncrementalList ui:field="pronoms"></l:IncrementalList>
-				<g:Label addStyleNames="form-label">UTIs</g:Label>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatUtis}' /></g:Label>
 				<l:IncrementalList ui:field="utis"></l:IncrementalList>
 			</g:FlowPanel>
 		</g:FlowPanel>

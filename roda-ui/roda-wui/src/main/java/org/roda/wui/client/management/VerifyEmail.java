@@ -44,7 +44,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.UserManagementConstants;
+import config.i18n.client.BrowseMessages;
 
 /**
  * @author Luis Faria
@@ -107,8 +107,7 @@ public class VerifyEmail extends Composite {
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private static UserManagementConstants constants = (UserManagementConstants) GWT
-    .create(UserManagementConstants.class);
+  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   @UiField
   FlowPanel recoverPanel;
@@ -224,8 +223,8 @@ public class VerifyEmail extends Composite {
 
           @Override
           public void onSuccess(Void result) {
-            Dialogs.showInformationDialog(constants.verifyEmailSuccessDialogTitle(),
-              constants.verifyEmailSuccessDialogMessage(), constants.verifyEmailSuccessDialogButton(),
+            Dialogs.showInformationDialog(messages.verifyEmailSuccessDialogTitle(),
+              messages.verifyEmailSuccessDialogMessage(), messages.verifyEmailSuccessDialogButton(),
               new AsyncCallback<Void>() {
 
                 @Override
@@ -250,11 +249,11 @@ public class VerifyEmail extends Composite {
 
   private void errorMessage(Throwable caught) {
     if (caught instanceof NotFoundException) {
-      Toast.showError(constants.verifyEmailNoSuchUser());
+      Toast.showError(messages.verifyEmailNoSuchUser());
     } else if (caught instanceof InvalidTokenException) {
-      Toast.showError(constants.verifyEmailWrongToken());
+      Toast.showError(messages.verifyEmailWrongToken());
     } else {
-      Toast.showError(constants.verifyEmailFailure());
+      Toast.showError(messages.verifyEmailFailure());
     }
   }
 }

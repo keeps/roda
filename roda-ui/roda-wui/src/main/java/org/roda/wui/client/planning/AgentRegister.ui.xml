@@ -26,7 +26,7 @@
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:Label addStyleNames="h5 sidebar-facet-title">
-					Filter Dates
+					<ui:text from='{messages.sidebarFilterDates}' />
 				</g:Label>
 				<d:DateBox
 					addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
@@ -40,10 +40,10 @@
 						<ui:text from='{messages.sidebarAgentsTitle}' />
 					</g:Label>
 					<g:Button addStyleNames="btn btn-plus" ui:field="buttonAdd">
-						<ui:text from='{messages.agentRegisterNewButton}' />
+						<ui:text from='{messages.newButton}' />
 					</g:Button>
 					<g:Button addStyleNames="btn btn-ban" ui:field="buttonRemove">
-						<ui:text from='{messages.agentRegisterRemoveButton}' />
+						<ui:text from='{messages.removeButton}' />
 					</g:Button>
 				</g:FlowPanel>
 				<g:FlowPanel>

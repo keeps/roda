@@ -210,7 +210,7 @@ public class CreateDescriptiveMetadata extends Composite {
             }
           }
 
-          type.addItem("Other", "");
+          type.addItem(messages.otherItem(), "");
 
           type.setSelectedIndex(type.getItemCount() - 1);
 
@@ -339,7 +339,7 @@ public class CreateDescriptiveMetadata extends Composite {
         public void onSuccess(Void result) {
           errors.setText("");
           errors.setVisible(false);
-          Toast.showInfo("Success", "Created descriptive metadata file");
+          Toast.showInfo(messages.dialogSuccess(), messages.metadataFileCreated());
           Tools.newHistory(Browse.RESOLVER, aipId);
         }
       });

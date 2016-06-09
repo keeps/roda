@@ -24,12 +24,11 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 
-import config.i18n.client.UserManagementConstants;
+import config.i18n.client.BrowseMessages;
 
 public class PasswordPanel extends SimplePanel implements HasValueChangeHandlers<String> {
 
-  private static UserManagementConstants constants = (UserManagementConstants) GWT
-    .create(UserManagementConstants.class);
+  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   private DockPanel editLayout;
 
@@ -44,7 +43,7 @@ public class PasswordPanel extends SimplePanel implements HasValueChangeHandlers
   private boolean buttonMode;
 
   private boolean changed;
-  
+
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
@@ -53,13 +52,13 @@ public class PasswordPanel extends SimplePanel implements HasValueChangeHandlers
     editLayout = new DockPanel();
     editPassword = new PasswordTextBox();
     editPasswordRepeat = new PasswordTextBox();
-    editPasswordNote = new Label(constants.passwordNote());
+    editPasswordNote = new Label(messages.passwordNote());
 
     editLayout.add(editPassword, DockPanel.CENTER);
     editLayout.add(editPasswordRepeat, DockPanel.EAST);
     editLayout.add(editPasswordNote, DockPanel.SOUTH);
 
-    editButton = new Button(constants.userDataChangePassword());
+    editButton = new Button(messages.userDataChangePassword());
     editButton.addClickHandler(new ClickHandler() {
 
       @Override

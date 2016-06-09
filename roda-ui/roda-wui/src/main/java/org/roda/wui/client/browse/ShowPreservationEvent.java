@@ -169,7 +169,7 @@ public class ShowPreservationEvent extends Composite {
         @Override
         public void onFailure(Throwable caught) {
           if (caught instanceof NotFoundException) {
-            Toast.showError("Not found", "Could not find preservation event");
+            Toast.showError(messages.notFoundError(), messages.couldNotFindPreservationEvent());
             Tools.newHistory(Tools.concat(PreservationEvents.RESOLVER.getHistoryPath(), aipId));
           } else {
             AsyncCallbackUtils.defaultFailureTreatment(caught);
@@ -363,7 +363,7 @@ public class ShowPreservationEvent extends Composite {
     body.addStyleName("panel-body");
     layout.add(body);
 
-    Label header = new Label("Intellectual entity");
+    Label header = new Label(messages.intellectualEntity());
     header.addStyleName("panel-title");
     header.addStyleName("h5");
     heading.add(header);
@@ -372,7 +372,7 @@ public class ShowPreservationEvent extends Composite {
 
     if (iAIP != null) {
 
-      Label titleLabel = new Label("Title");
+      Label titleLabel = new Label(messages.genericTitle());
       titleLabel.addStyleName("label");
       Label titleValue = new Label(iAIP.getTitle());
       titleValue.addStyleName("value");
@@ -384,14 +384,14 @@ public class ShowPreservationEvent extends Composite {
       footer.addStyleName("panel-footer");
       layout.add(footer);
 
-      Anchor link = new Anchor("Inspect intellectual entity",
+      Anchor link = new Anchor(messages.inspectIntellectualEntity(),
         Tools.createHistoryHashLink(Browse.RESOLVER, iAIP.getId()));
       footer.add(link);
 
       link.addStyleName("btn");
 
     } else {
-      Label idLabel = new Label("Identifier (not found)");
+      Label idLabel = new Label(messages.identifierNotFound());
       idLabel.addStyleName("label");
       String path = LinkingObjectUtils.getLinkingObjectPath(idValue);
       Label id_Value = new Label(path);
@@ -411,7 +411,7 @@ public class ShowPreservationEvent extends Composite {
     body.addStyleName("panel-body");
     layout.add(body);
 
-    Label header = new Label("Representation");
+    Label header = new Label(messages.showRepresentationExtended());
     header.addStyleName("panel-title");
     header.addStyleName("h5");
     heading.add(header);
@@ -420,15 +420,16 @@ public class ShowPreservationEvent extends Composite {
 
     if (irep != null) {
 
-      Label originalLabel = new Label("Status");
+      Label originalLabel = new Label(messages.representationStatus());
       originalLabel.addStyleName("label");
-      Label originalValue = new Label(irep.isOriginal() ? "original" : "alternative");
+      Label originalValue = new Label(
+        irep.isOriginal() ? messages.originalRepresentation() : messages.alternativeRepresentation());
       originalValue.addStyleName("value");
 
       body.add(originalLabel);
       body.add(originalValue);
 
-      Anchor link = new Anchor("Inspect representation",
+      Anchor link = new Anchor(messages.inspectRepresentation(),
         Tools.createHistoryHashLink(ViewRepresentation.RESOLVER, irep.getAipId(), irep.getUUID()));
 
       link.addStyleName("btn");
@@ -439,7 +440,7 @@ public class ShowPreservationEvent extends Composite {
 
       footer.add(link);
     } else {
-      Label idLabel = new Label("Identifier (not found)");
+      Label idLabel = new Label(messages.identifierNotFound());
       idLabel.addStyleName("label");
       Label id_Value = new Label(idValue);
       id_Value.addStyleName("value");
@@ -458,7 +459,7 @@ public class ShowPreservationEvent extends Composite {
     body.addStyleName("panel-body");
     layout.add(body);
 
-    Label header = new Label("File");
+    Label header = new Label(messages.showFileExtended());
     header.addStyleName("panel-title");
     header.addStyleName("h5");
     heading.add(header);
@@ -466,7 +467,7 @@ public class ShowPreservationEvent extends Composite {
     IndexedFile ifile = bundle.getFiles().get(idValue);
 
     if (ifile != null) {
-      Label nameLabel = new Label("Name");
+      Label nameLabel = new Label(messages.fileName());
       nameLabel.addStyleName("label");
       Label nameValue = new Label(
         StringUtils.isNotBlank(ifile.getOriginalName()) ? ifile.getOriginalName() : ifile.getId());
@@ -475,13 +476,13 @@ public class ShowPreservationEvent extends Composite {
       Label pathLabel = null;
       Label pathValue = null;
       if (ifile.getPath() != null && !ifile.getPath().isEmpty()) {
-        pathLabel = new Label("Path");
+        pathLabel = new Label(messages.filePath());
         pathLabel.addStyleName("label");
         pathValue = new Label(Tools.join(ifile.getPath(), "/"));
         pathValue.addStyleName("value");
       }
 
-      Label formatLabel = new Label("Format");
+      Label formatLabel = new Label(messages.fileFormat());
       formatLabel.addStyleName("label");
       FileFormat fileFormat = ifile.getFileFormat();
       // TODO guard nulls
@@ -491,7 +492,7 @@ public class ShowPreservationEvent extends Composite {
 
       // TODO add pronom and mime type
 
-      Label sizeLabel = new Label("Size");
+      Label sizeLabel = new Label(messages.fileSize());
       sizeLabel.addStyleName("label");
       Label sizeValue = new Label(Humanize.readableFileSize(ifile.getSize()));
       sizeValue.addStyleName("value");
@@ -511,14 +512,14 @@ public class ShowPreservationEvent extends Composite {
       footer.addStyleName("panel-footer");
       layout.add(footer);
 
-      Anchor link = new Anchor("Inspect file", Tools.createHistoryHashLink(ViewRepresentation.RESOLVER,
+      Anchor link = new Anchor(messages.inspectFile(), Tools.createHistoryHashLink(ViewRepresentation.RESOLVER,
         ifile.getAipId(), ifile.getRepresentationUUID(), ifile.getUUID()));
 
       link.addStyleName("btn");
       footer.add(link);
 
     } else {
-      Label idLabel = new Label("Identifier (not found)");
+      Label idLabel = new Label(messages.identifierNotFound());
       idLabel.addStyleName("label");
       String path = LinkingObjectUtils.getLinkingObjectPath(idValue);
       Label id_Value = new Label(path);
@@ -537,7 +538,7 @@ public class ShowPreservationEvent extends Composite {
     body.addStyleName("panel-body");
     layout.add(body);
 
-    Label header = new Label("Transferred resource");
+    Label header = new Label(messages.showTransferredResourceExtended());
     header.addStyleName("panel-title");
     header.addStyleName("h5");
     heading.add(header);
@@ -545,12 +546,12 @@ public class ShowPreservationEvent extends Composite {
     TransferredResource tr = bundle.getTransferredResources().get(idValue);
 
     if (tr != null) {
-      Label nameLabel = new Label("Name");
+      Label nameLabel = new Label(messages.transferredResourceName());
       nameLabel.addStyleName("label");
       Label nameValue = new Label(tr.getName());
       nameValue.addStyleName("value");
 
-      Label pathLabel = new Label("Path");
+      Label pathLabel = new Label(messages.transferredResourcePath());
       pathLabel.addStyleName("label");
       Label pathValue = new Label(tr.getFullPath());
       pathValue.addStyleName("value");
@@ -564,14 +565,14 @@ public class ShowPreservationEvent extends Composite {
       footer.addStyleName("panel-footer");
       layout.add(footer);
 
-      Anchor link = new Anchor("Inspect transferred resource",
+      Anchor link = new Anchor(messages.inspectTransferredResource(),
         Tools.createHistoryHashLink(IngestTransfer.RESOLVER, tr.getUUID()));
       link.addStyleName("btn");
 
       footer.add(link);
 
     } else {
-      Label idLabel = new Label("Identifier (not found)");
+      Label idLabel = new Label(messages.identifierNotFound());
       idLabel.addStyleName("label");
       String path = LinkingObjectUtils.getLinkingObjectPath(idValue);
       Label id_Value = new Label(path);

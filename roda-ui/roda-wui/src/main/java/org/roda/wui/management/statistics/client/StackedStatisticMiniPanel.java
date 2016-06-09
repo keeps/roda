@@ -22,7 +22,6 @@ import org.roda.wui.common.client.images.CommonImageBundle;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.DockPanel;
 import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -136,20 +135,22 @@ public class StackedStatisticMiniPanel extends StatisticMiniPanel {
   @Override
   public void update() {
     loading.show();
-//    StatisticsService.Util.getInstance().getStatisticStackedList(getContentAdapter(), getFunctions(),
-//      getSegmentation(), getInitialDate(), getFinalDate(), new AsyncCallback<List<List<StatisticData>>>() {
-//
-//        public void onFailure(Throwable caught) {
-//          logger.error("Could not get statistics list", caught);
-//          loading.hide();
-//        }
-//
-//        public void onSuccess(List<List<StatisticData>> statistics) {
-//          update(statistics);
-//          loading.hide();
-//        }
-//
-//      });
+    // StatisticsService.Util.getInstance().getStatisticStackedList(getContentAdapter(),
+    // getFunctions(),
+    // getSegmentation(), getInitialDate(), getFinalDate(), new
+    // AsyncCallback<List<List<StatisticData>>>() {
+    //
+    // public void onFailure(Throwable caught) {
+    // logger.error("Could not get statistics list", caught);
+    // loading.hide();
+    // }
+    //
+    // public void onSuccess(List<List<StatisticData>> statistics) {
+    // update(statistics);
+    // loading.hide();
+    // }
+    //
+    // });
   }
 
   protected void update(List<List<StatisticData>> statistics) {
@@ -181,7 +182,7 @@ public class StackedStatisticMiniPanel extends StatisticMiniPanel {
       // getSegmentation());
       updatePieChart("", pieData, colors, actualChart);
     } else {
-      updatePieChart(constants.noDataAvailable(), pieData, colors, actualChart);
+      updatePieChart(messages.noDataAvailable(), pieData, colors, actualChart);
     }
 
   }
@@ -208,7 +209,7 @@ public class StackedStatisticMiniPanel extends StatisticMiniPanel {
     PieChart pie = new PieChart();
     pie.setAlpha(0.7f);
     pie.setNoLabels(true);
-    pie.setTooltip(constants.chartPieTooltip());
+    pie.setTooltip(messages.chartPieTooltip());
     pie.setAnimate(false);
     pie.setGradientFill(true);
 

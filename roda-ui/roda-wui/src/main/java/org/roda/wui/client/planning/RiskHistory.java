@@ -191,7 +191,7 @@ public class RiskHistory extends Composite {
 
         @Override
         public void onSuccess(Void result) {
-          Toast.showInfo("Done", "Version reverted");
+          Toast.showInfo(messages.dialogDone(), messages.versionReverted());
           Tools.newHistory(ShowRisk.RESOLVER, riskId);
         }
       });
@@ -208,7 +208,7 @@ public class RiskHistory extends Composite {
 
       @Override
       public void onSuccess(Void result) {
-        Toast.showInfo("Done", "Version deleted");
+        Toast.showInfo(messages.dialogDone(), messages.versionDeleted());
         refresh();
         if (bundle.getVersions().isEmpty()) {
           Tools.newHistory(ShowRisk.RESOLVER, riskId);

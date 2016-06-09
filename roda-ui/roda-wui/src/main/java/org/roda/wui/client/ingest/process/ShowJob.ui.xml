@@ -6,6 +6,8 @@
 	xmlns:u="urn:import:org.roda.wui.management.user.client" xmlns:p="urn:import:org.roda.wui.client.ingest.process"
 	xmlns:lists="urn:import:org.roda.wui.client.common.lists">
 
+	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
+
 	<ui:style>
 	
 	</ui:style>
@@ -16,46 +18,46 @@
 				<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
 					<g:FlowPanel addStyleNames="row full_width no_padding">
 						<g:FlowPanel addStyleNames="wui-data-panel">
-							<g:Label styleName="h1">Process</g:Label>
+							<g:Label styleName="h1"><ui:text from='{messages.processTitle}' /></g:Label>
 							<g:FlowPanel styleName="field">
 								<g:Label addStyleNames="label">
-									Name
+									<ui:text from='{messages.jobName}' />
 								</g:Label>
 								<g:Label styleName="value" ui:field="name" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
 								<g:Label addStyleNames="label">
-									Creator
+									<ui:text from='{messages.jobCreator}' />
 								</g:Label>
 								<g:Label styleName="value" ui:field="creator" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
 								<g:Label addStyleNames="label">
-									Start date
+									<ui:text from='{messages.jobStartDate}' />
 								</g:Label>
 								<g:Label styleName="value" ui:field="dateStarted" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
 								<g:Label addStyleNames="label" ui:field="dateEndedLabel">
-									End date
+									<ui:text from='{messages.jobEndDate}' />
 								</g:Label>
 								<g:Label styleName="value" ui:field="dateEnded" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
 								<g:Label addStyleNames="label">
-									Duration
+									<ui:text from='{messages.jobDuration}' />
 								</g:Label>
 								<g:Label styleName="value" ui:field="duration" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
 								<g:Label addStyleNames="label">
-									Status
+									<ui:text from='{messages.jobStatus}' />
 								</g:Label>
 								<g:HTML ui:field="status" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
 								<g:Label addStyleNames="label">
-									Progress
+									<ui:text from='{messages.jobProgress}' />
 								</g:Label>
 								<g:HTML ui:field="progress" />
 							</g:FlowPanel>
@@ -65,7 +67,7 @@
 
 							<g:FlowPanel styleName="field">
 								<g:Label addStyleNames="label">
-									Plugin
+									<ui:text from='{messages.jobPlugin}' />
 								</g:Label>
 								<g:Label styleName="value" ui:field="plugin" />
 								<g:FlowPanel styleName="panel" ui:field="pluginPanel">
@@ -74,7 +76,7 @@
 							</g:FlowPanel>
 
 							<g:Label addStyleNames="h4" ui:field="reportsLabel">
-								Processed
+								<ui:text from='{messages.jobProcessed}' />
 							</g:Label>
 							<lists:IngestJobReportList ui:field="jobReports" />
 							<lists:SimpleJobReportList ui:field="simpleJobReports" />
@@ -86,13 +88,13 @@
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel>
 					<g:Label addStyleNames="h4">
-						<ui:msg>Actions</ui:msg>
+						<ui:text from='{messages.sidebarActionsTitle}' />
 					</g:Label>
 					<g:Button addStyleNames="btn btn-play" ui:field="buttonAppraisal">
-						Appraisal
+						<ui:text from='{messages.sidebarAppraisalTitle}' />
 					</g:Button>
 					<g:Button addStyleNames="btn btn-times-circle" ui:field="buttonBack">
-						Back
+						<ui:text from='{messages.backButton}' />
 					</g:Button>
 
 				</g:FlowPanel>

@@ -18,7 +18,7 @@
 			<g:FlowPanel addStyleNames="col_10 content">
 				<g:Label styleName="h1" addStyleNames="browseTitle"
 					ui:field="browseTitle">
-					<ui:msg description="Browser title">Catalogue</ui:msg>
+					<ui:text from='{messages.catalogueTitle}' />
 				</g:Label>
 				<g:FlowPanel addStyleNames="page-description" ui:field="browseDescription">
 				</g:FlowPanel>
@@ -36,85 +36,85 @@
 				<g:TabPanel ui:field="itemMetadata" addStyleNames="browseItemMetadata" />
 				<g:FlowPanel styleName="browseNewDescriptiveMetadataButton">
 					<g:Button addStyleNames="btn btn-plus" ui:field="newDescriptiveMetadata">
-						<ui:msg>New descriptive metadata</ui:msg>
+						<ui:text from='{messages.newDescriptiveMetadataTitle}' />
 					</g:Button>
 				</g:FlowPanel>
 				<g:Label addStyleNames="h4 browseSearchListTitle" ui:field="fondsPanelTitle">
-					<ui:msg>Sublevels</ui:msg>
+					<ui:text from='{messages.sublevels}' />
 				</g:Label>
 				<lists:AIPList ui:field="aipList" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel ui:field="appraisalSidebar">
 					<g:Label addStyleNames="h4">
-						<ui:msg>Appraisal</ui:msg>
+						<ui:text from='{messages.appraisalTitle}' />
 					</g:Label>
 					<g:Button addStyleNames="btn btn-play" ui:field="appraisalAccept">
-						<ui:msg>Accept</ui:msg>
+						<ui:text from='{messages.appraisalAccept}' />
 					</g:Button>
 					<g:Button addStyleNames="btn btn-danger btn-ban" ui:field="appraisalReject">
-						<ui:msg>Reject</ui:msg>
+						<ui:text from='{messages.appraisalReject}' />
 					</g:Button>
 				</g:FlowPanel>
 				<g:FlowPanel ui:field="sidebarData">
 					<g:Label addStyleNames="h4">
-						<ui:msg>Representations</ui:msg>
+						<ui:text from='{messages.representationsTitle}' />
 					</g:Label>
 					<g:FlowPanel ui:field="downloadList">
 					</g:FlowPanel>
 				</g:FlowPanel>
 				<g:FlowPanel ui:field="actionsSidebar">
 					<g:Label addStyleNames="h4">
-						<ui:msg>Archival package</ui:msg>
+						<ui:text from='{messages.archivalPackageTitle}' />
 					</g:Label>
 					<g:Button addStyleNames="btn btn-plus" ui:field="createItem">
-						<ui:msg>New</ui:msg>
+						<ui:text from='{messages.newArchivalPackage}' />
 					</g:Button>
 					<g:Button addStyleNames="btn btn-edit" ui:field="moveItem">
-						<ui:msg>Move</ui:msg>
+						<ui:text from='{messages.moveArchivalPackage}' />
 					</g:Button>
 					<g:Button addStyleNames="btn btn-edit" ui:field="editPermissions">
-						<ui:msg>Permissions</ui:msg>
+						<ui:text from='{messages.archivalPackagePermissions}' />
 					</g:Button>
 					<g:Button addStyleNames="btn btn-danger btn-ban" ui:field="remove">
-						<ui:msg>Remove</ui:msg>
+						<ui:text from='{messages.removeArchivalPackage}' />
 					</g:Button>
 				</g:FlowPanel>
 				<g:FlowPanel ui:field="preservationSidebar">
 					<g:Label addStyleNames="h4">
-						<ui:msg>Preservation</ui:msg>
+						<ui:text from='{messages.preservationTitle}' />
 					</g:Label>
 					<g:Button addStyleNames="btn btn-play" ui:field="newProcess">
-						<ui:msg>Start new process</ui:msg>
+						<ui:text from='{messages.newProcessPreservation}' />
 					</g:Button>
 					<g:Button addStyleNames="btn btn-default btn-clock"
 						ui:field="preservationEvents">
-						<ui:msg>Events</ui:msg>
+						<ui:text from='{messages.preservationEvents}' />
 					</g:Button>
 					<g:Button addStyleNames="btn btn-default btn-exclamation-triangle"
 						ui:field="risks">
-						<ui:msg>Risks</ui:msg>
+						<ui:text from='{messages.preservationRisks}' />
 					</g:Button>
 				</g:FlowPanel>
 				<g:FlowPanel ui:field="downloadSection">
 					<g:Label addStyleNames="h4">
-						<ui:msg>Download</ui:msg>
+						<ui:text from='{messages.downloadTitle}' />
 					</g:Label>
 					<g:Button addStyleNames="btn btn-default btn-download"
 						ui:field="download">
-						<ui:msg>Archival package</ui:msg>
+						<ui:text from='{messages.downloadArchivalPackage}' />
 					</g:Button>
 					<g:Button addStyleNames="btn btn-default btn-download"
 						ui:field="submission">
-						<ui:msg>Submission</ui:msg>
+						<ui:text from='{messages.downloadSubmission}' />
 					</g:Button>
 					<g:Button addStyleNames="btn btn-default btn-download"
 						ui:field="documentation">
-						<ui:msg>Documentation</ui:msg>
+						<ui:text from='{messages.downloadDocumentation}' />
 					</g:Button>
 					<g:Button addStyleNames="btn btn-default btn-download"
 						ui:field="schemas">
-						<ui:msg>Schemas</ui:msg>
+						<ui:text from='{messages.downloadSchemas}' />
 					</g:Button>
 				</g:FlowPanel>
 			</g:FlowPanel>

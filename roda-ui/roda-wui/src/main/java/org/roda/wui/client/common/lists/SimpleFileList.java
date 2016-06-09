@@ -23,6 +23,7 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -33,11 +34,13 @@ import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Label;
+
+import config.i18n.client.BrowseMessages;
 
 public class SimpleFileList extends BasicAsyncTableCell<IndexedFile> {
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
+  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   private Column<IndexedFile, SafeHtml> iconColumn;
   private TextColumn<IndexedFile> filenameColumn;
@@ -94,7 +97,7 @@ public class SimpleFileList extends BasicAsyncTableCell<IndexedFile> {
 
     // TODO externalize strings into constants
     addColumn(iconColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-files-o'></i>"), false, false, 2);
-    addColumn(filenameColumn, "Name", false, false);
+    addColumn(filenameColumn, messages.fileName(), false, false);
 
     display.setColumnWidth(iconColumn, 2.5, Unit.EM);
 

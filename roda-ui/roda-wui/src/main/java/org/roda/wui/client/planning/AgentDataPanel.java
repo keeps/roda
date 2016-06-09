@@ -44,7 +44,6 @@ import com.google.gwt.user.datepicker.client.DateBox;
 import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 
 import config.i18n.client.BrowseMessages;
-import config.i18n.client.UserManagementConstants;
 
 /**
  * @author Luis Faria
@@ -56,11 +55,6 @@ public class AgentDataPanel extends Composite implements HasValueChangeHandlers<
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
-  @SuppressWarnings("unused")
-  private static UserManagementConstants constants = (UserManagementConstants) GWT
-    .create(UserManagementConstants.class);
-
   private static BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   @UiField

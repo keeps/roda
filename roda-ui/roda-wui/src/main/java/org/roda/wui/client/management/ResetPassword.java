@@ -43,7 +43,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.UserManagementConstants;
+import config.i18n.client.BrowseMessages;
 
 /**
  * @author Luis Faria
@@ -106,8 +106,7 @@ public class ResetPassword extends Composite {
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private static UserManagementConstants constants = (UserManagementConstants) GWT
-    .create(UserManagementConstants.class);
+  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   @UiField
   FlowPanel recoverPanel;
@@ -273,20 +272,20 @@ public class ResetPassword extends Composite {
 
           @Override
           public void onSuccess(Void result) {
-            Dialogs.showInformationDialog(constants.resetPasswordSuccessDialogTitle(),
-              constants.resetPasswordSuccessDialogMessage(), constants.resetPasswordSuccessDialogButton(),
+            Dialogs.showInformationDialog(messages.resetPasswordSuccessDialogTitle(),
+              messages.resetPasswordSuccessDialogMessage(), messages.resetPasswordSuccessDialogButton(),
               new AsyncCallback<Void>() {
 
-              @Override
-              public void onSuccess(Void result) {
-                Tools.newHistory(Login.RESOLVER);
-              }
+                @Override
+                public void onSuccess(Void result) {
+                  Tools.newHistory(Login.RESOLVER);
+                }
 
-              @Override
-              public void onFailure(Throwable caught) {
-                Tools.newHistory(Login.RESOLVER);
-              }
-            });
+                @Override
+                public void onFailure(Throwable caught) {
+                  Tools.newHistory(Login.RESOLVER);
+                }
+              });
           }
         });
     }
@@ -294,11 +293,11 @@ public class ResetPassword extends Composite {
 
   private void errorMessage(Throwable caught) {
     if (caught instanceof NotFoundException) {
-      Toast.showError(constants.resetPasswordNoSuchUser());
+      Toast.showError(messages.resetPasswordNoSuchUser());
     } else if (caught instanceof InvalidTokenException) {
-      Toast.showError(constants.resetPasswordInvalidToken());
+      Toast.showError(messages.resetPasswordInvalidToken());
     } else {
-      Toast.showError(constants.resetPasswordFailure());
+      Toast.showError(messages.resetPasswordFailure());
     }
   }
 }

@@ -21,7 +21,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.BrowseConstants;
+import config.i18n.client.BrowseMessages;
 
 /**
  * @author Luis Faria
@@ -29,7 +29,7 @@ import config.i18n.client.BrowseConstants;
  */
 public class UserInfoPanel {
 
-  private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
+  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   private final RodaUser user;
 
@@ -61,7 +61,7 @@ public class UserInfoPanel {
     infoLayout = createInfo();
     centerLayout.add(infoLayout);
 
-    detailsDisclosure = new DisclosurePanel(constants.userInfoDetails());
+    detailsDisclosure = new DisclosurePanel(messages.userInfoDetails());
 
     detailsLayout = createDetails();
 
@@ -86,7 +86,7 @@ public class UserInfoPanel {
     int rows = 0;
 
     if (user.getFullName() != null) {
-      Label fullNameLabel = new Label(constants.userInfoFullname() + ":");
+      Label fullNameLabel = new Label(messages.userInfoFullname() + ":");
       Label fullNameValue = new Label(user.getFullName());
       layout.setWidget(rows, 0, fullNameLabel);
       layout.setWidget(rows, 1, fullNameValue);
@@ -96,7 +96,7 @@ public class UserInfoPanel {
     }
 
     // if (user.getBusinessCategory() != null) {
-    // Label titleLabel = new Label(constants.userInfoBusinessCategory()+":");
+    // Label titleLabel = new Label(messages.userInfoBusinessCategory()+":");
     // Label titleValue = new Label(user.getBusinessCategory());
     // layout.setWidget(rows, 0, titleLabel);
     // layout.setWidget(rows, 1, titleValue);
@@ -113,7 +113,7 @@ public class UserInfoPanel {
     int rows = 0;
 
     if (user.getEmail() != null) {
-      Label emailLabel = new Label(constants.userInfoEmail() + ":");
+      Label emailLabel = new Label(messages.userInfoEmail() + ":");
       Label emailValue = new Label(user.getEmail());
       layout.setWidget(rows, 0, emailLabel);
       layout.setWidget(rows, 1, emailValue);
@@ -123,7 +123,7 @@ public class UserInfoPanel {
     }
 
     // if (user.getTelephoneNumber() != null) {
-    // Label phoneNumberLabel = new Label(constants.userInfoTelephoneNumber() +
+    // Label phoneNumberLabel = new Label(messages.userInfoTelephoneNumber() +
     // ":");
     // Label phoneNumberValue = new Label(user.getTelephoneNumber());
     // layout.setWidget(rows, 0, phoneNumberLabel);
@@ -134,7 +134,7 @@ public class UserInfoPanel {
     // }
     //
     // if (user.getFax() != null) {
-    // Label faxLabel = new Label(constants.userInfoFax() + ":");
+    // Label faxLabel = new Label(messages.userInfoFax() + ":");
     // Label faxValue = new Label(user.getFax());
     // layout.setWidget(rows, 0, faxLabel);
     // layout.setWidget(rows, 1, faxValue);
@@ -144,7 +144,7 @@ public class UserInfoPanel {
     // }
     //
     // if (user.getPostalAddress() != null) {
-    // Label addressLabel = new Label(constants.userInfoPostalAddress() + ":");
+    // Label addressLabel = new Label(messages.userInfoPostalAddress() + ":");
     // Label addressValue = new Label(user.getPostalAddress());
     // layout.setWidget(rows, 0, addressLabel);
     // layout.setWidget(rows, 1, addressValue);
@@ -154,7 +154,7 @@ public class UserInfoPanel {
     // }
     //
     // if (user.getPostalCode() != null) {
-    // Label postalCodeLabel = new Label(constants.userInfoPostalCode() + ":");
+    // Label postalCodeLabel = new Label(messages.userInfoPostalCode() + ":");
     // Label postalCodeValue = new Label(user.getPostalCode());
     // layout.setWidget(rows, 0, postalCodeLabel);
     // layout.setWidget(rows, 1, postalCodeValue);
@@ -164,7 +164,7 @@ public class UserInfoPanel {
     // }
     //
     // if (user.getLocalityName() != null) {
-    // Label localityLabel = new Label(constants.userInfoLocality() + ":");
+    // Label localityLabel = new Label(messages.userInfoLocality() + ":");
     // Label localityValue = new Label(user.getLocalityName());
     // layout.setWidget(rows, 0, localityLabel);
     // layout.setWidget(rows, 1, localityValue);
@@ -174,7 +174,7 @@ public class UserInfoPanel {
     // }
     //
     // if (user.getCountryName() != null) {
-    // Label countryLabel = new Label(constants.userInfoCountry() + ":");
+    // Label countryLabel = new Label(messages.userInfoCountry() + ":");
     // Label countryValue = new Label(user.getCountryName());
     // layout.setWidget(rows, 0, countryLabel);
     // layout.setWidget(rows, 1, countryValue);

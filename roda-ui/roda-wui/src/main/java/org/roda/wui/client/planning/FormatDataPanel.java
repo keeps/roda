@@ -35,8 +35,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.DateBox;
 import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 
-import config.i18n.client.UserManagementConstants;
-
 /**
  * @author Luis Faria
  *
@@ -47,10 +45,6 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
-  @SuppressWarnings("unused")
-  private static UserManagementConstants constants = (UserManagementConstants) GWT
-    .create(UserManagementConstants.class);
 
   @UiField
   TextBox name;

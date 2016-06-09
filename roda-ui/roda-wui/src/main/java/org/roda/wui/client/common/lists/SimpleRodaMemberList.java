@@ -23,6 +23,7 @@ import org.roda.wui.client.management.UserManagementService;
 import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -33,12 +34,16 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.view.client.ProvidesKey;
 
+import config.i18n.client.BrowseMessages;
+
 public class SimpleRodaMemberList extends BasicAsyncTableCell<RODAMember> {
 
   private static final int PAGE_SIZE = 5;
 
   @SuppressWarnings("unused")
   private final ClientLogger logger = new ClientLogger(getClass().getName());
+
+  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   private Column<RODAMember, SafeHtml> typeColumn;
   private TextColumn<RODAMember> idColumn;
@@ -86,8 +91,8 @@ public class SimpleRodaMemberList extends BasicAsyncTableCell<RODAMember> {
 
     // TODO externalize strings into constants
     addColumn(typeColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-user'></i>"), false, false, 2);
-    addColumn(idColumn, "Identifier", true, false);
-    addColumn(nameColumn, "Name", true, false);
+    addColumn(idColumn, messages.userIdentifier(), true, false);
+    addColumn(nameColumn, messages.userName(), true, false);
 
     addStyleName("my-list-rodamember");
   }

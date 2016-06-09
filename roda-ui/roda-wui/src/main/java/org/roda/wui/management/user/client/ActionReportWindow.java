@@ -19,8 +19,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 
-import config.i18n.client.UserManagementConstants;
-import config.i18n.client.UserManagementMessages;
+import config.i18n.client.BrowseMessages;
 
 /**
  * @author Luis Faria
@@ -28,10 +27,7 @@ import config.i18n.client.UserManagementMessages;
  */
 public class ActionReportWindow extends WUIWindow {
 
-  private static UserManagementConstants constants = (UserManagementConstants) GWT
-    .create(UserManagementConstants.class);
-
-  private static UserManagementMessages messages = (UserManagementMessages) GWT.create(UserManagementMessages.class);
+  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   private final WUIButton close;
 
@@ -48,10 +44,10 @@ public class ActionReportWindow extends WUIWindow {
     // FIXME set user
     actionReportPanel = new UserLog();
 
-    this.addTab(actionReportPanel, constants.actionReportLogTabTitle());
+    this.addTab(actionReportPanel, messages.actionReportLogTabTitle());
     this.selectTab(0);
 
-    close = new WUIButton(constants.actionReportClose(), WUIButton.Left.ROUND, WUIButton.Right.CROSS);
+    close = new WUIButton(messages.actionReportClose(), WUIButton.Left.ROUND, WUIButton.Right.CROSS);
     close.addClickHandler(new ClickHandler() {
 
       @Override

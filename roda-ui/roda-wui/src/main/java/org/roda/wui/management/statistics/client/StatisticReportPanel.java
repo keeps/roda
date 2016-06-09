@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.roda.core.data.StatisticData;
 import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.sort.SortParameter;
 import org.roda.wui.common.client.images.CommonImageBundle;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.DatePicker;
@@ -26,7 +25,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.DockPanel;
 import com.google.gwt.user.client.ui.Grid;
@@ -63,7 +61,7 @@ public abstract class StatisticReportPanel extends StatisticsPanel {
   private final Image changeDateInterval;
 
   private final ChartWidget chartWidget;
-//  private final LazyVerticalList<StatisticData> lazyList;
+  // private final LazyVerticalList<StatisticData> lazyList;
 
   private WUIWindow dateIntervalPickerWindow = null;
   private Grid dateIntervalPickerLayout = null;
@@ -92,7 +90,7 @@ public abstract class StatisticReportPanel extends StatisticsPanel {
 
     window = new WUIWindow(title, 900, 450);
 
-    close = new WUIButton(constants.statisticsReportClose(), WUIButton.Left.ROUND, WUIButton.Right.CROSS);
+    close = new WUIButton(messages.statisticsReportClose(), WUIButton.Left.ROUND, WUIButton.Right.CROSS);
 
     window.addToBottom(close);
 
@@ -107,7 +105,7 @@ public abstract class StatisticReportPanel extends StatisticsPanel {
 
     chartLayout = new DockPanel();
     chartHeader = new HorizontalPanel();
-    chartSegmentationLabel = new Label(constants.statisticsReportSegmentationLabel() + ":");
+    chartSegmentationLabel = new Label(messages.statisticsReportSegmentationLabel() + ":");
     chartSegmentationPicker = new SegmentationPicker();
 
     chartDateIntervalLabel = new Label();
@@ -161,60 +159,69 @@ public abstract class StatisticReportPanel extends StatisticsPanel {
     Filter lazyListFilter = new Filter();
     lazyListFilter.add(getTypeFilterParameter());
 
-//    lazyList = new LazyVerticalList<StatisticData>(new ContentSource<StatisticData>() {
-//
-//      public void getCount(Filter filter, AsyncCallback<Integer> callback) {
-//        StatisticsService.Util.getInstance().getStatisticCount(filter, callback);
-//
-//      }
-//
-//      public ElementPanel<StatisticData> getElementPanel(StatisticData element) {
-//        return new StatisticListItem(element);
-//      }
-//
-//      public void getElements(ContentAdapter adapter, final AsyncCallback<StatisticData[]> callback) {
-//        StatisticsService.Util.getInstance().getStatisticList(adapter, new AsyncCallback<List<StatisticData>>() {
-//
-//          public void onFailure(Throwable caught) {
-//            callback.onFailure(caught);
-//
-//          }
-//
-//          public void onSuccess(List<StatisticData> result) {
-//            callback.onSuccess(result.toArray(new StatisticData[] {}));
-//
-//          }
-//
-//        });
-//
-//      }
-//
-//      public String getTotalMessage(int total) {
-//        return total + " " + constants.statisticsReportListTotal();
-//      }
-//
-//      public void setReportInfo(ContentAdapter adapter, String locale, AsyncCallback<Void> callback) {
-//        StatisticsService.Util.getInstance().setStatisticListReportInfo(adapter, locale, callback);
-//
-//      }
-//
-//    }, false, lazyListFilter);
+    // lazyList = new LazyVerticalList<StatisticData>(new
+    // ContentSource<StatisticData>() {
+    //
+    // public void getCount(Filter filter, AsyncCallback<Integer> callback) {
+    // StatisticsService.Util.getInstance().getStatisticCount(filter, callback);
+    //
+    // }
+    //
+    // public ElementPanel<StatisticData> getElementPanel(StatisticData element)
+    // {
+    // return new StatisticListItem(element);
+    // }
+    //
+    // public void getElements(ContentAdapter adapter, final
+    // AsyncCallback<StatisticData[]> callback) {
+    // StatisticsService.Util.getInstance().getStatisticList(adapter, new
+    // AsyncCallback<List<StatisticData>>() {
+    //
+    // public void onFailure(Throwable caught) {
+    // callback.onFailure(caught);
+    //
+    // }
+    //
+    // public void onSuccess(List<StatisticData> result) {
+    // callback.onSuccess(result.toArray(new StatisticData[] {}));
+    //
+    // }
+    //
+    // });
+    //
+    // }
+    //
+    // public String getTotalMessage(int total) {
+    // return total + " " + messages.statisticsReportListTotal();
+    // }
+    //
+    // public void setReportInfo(ContentAdapter adapter, String locale,
+    // AsyncCallback<Void> callback) {
+    // StatisticsService.Util.getInstance().setStatisticListReportInfo(adapter,
+    // locale, callback);
+    //
+    // }
+    //
+    // }, false, lazyListFilter);
 
-//    lazyList.getHeader().addHeader(constants.statisticsReportListHeaderDate(), "statistic-list-header-date",
-//      new SortParameter[] {new SortParameter("datetime", true)}, false);
-//    lazyList.getHeader().addHeader(constants.statisticsReportListHeaderType(), "statistic-list-header-type",
-//      new SortParameter[] {new SortParameter("type", true)}, false);
-//    lazyList.getHeader().addHeader(constants.statisticsReportListHeaderValue(), "statistic-list-header-value",
-//      new SortParameter[] {new SortParameter("value", true)}, false);
-//
-//    lazyList.getHeader().setFillerHeader(2);
-//    lazyList.getHeader().setSelectedHeader(0);
-//
-//    lazyList.setScrollHeight("325px");
+    // lazyList.getHeader().addHeader(messages.statisticsReportListHeaderDate(),
+    // "statistic-list-header-date",
+    // new SortParameter[] {new SortParameter("datetime", true)}, false);
+    // lazyList.getHeader().addHeader(messages.statisticsReportListHeaderType(),
+    // "statistic-list-header-type",
+    // new SortParameter[] {new SortParameter("type", true)}, false);
+    // lazyList.getHeader().addHeader(messages.statisticsReportListHeaderValue(),
+    // "statistic-list-header-value",
+    // new SortParameter[] {new SortParameter("value", true)}, false);
+    //
+    // lazyList.getHeader().setFillerHeader(2);
+    // lazyList.getHeader().setSelectedHeader(0);
+    //
+    // lazyList.setScrollHeight("325px");
 
     // Add to window
-    window.addTab(chartLayout, constants.statisticsReportChart());
-//    window.addTab(lazyList.getWidget(), constants.statisticsReportList());
+    window.addTab(chartLayout, messages.statisticsReportChart());
+    // window.addTab(lazyList.getWidget(), messages.statisticsReportList());
 
     window.selectTab(0);
 
@@ -233,14 +240,14 @@ public abstract class StatisticReportPanel extends StatisticsPanel {
 
   protected WUIWindow getDateIntervalPickerWindow() {
     if (dateIntervalPickerWindow == null) {
-      dateIntervalPickerWindow = new WUIWindow(constants.dateIntervalPickerWindowTitle(), 400, 100);
+      dateIntervalPickerWindow = new WUIWindow(messages.dateIntervalPickerWindowTitle(), 400, 100);
       dateIntervalPickerLayout = new Grid(2, 2);
 
-      dateIntervalLabelInitial = new Label(constants.dateIntervalLabelInitial() + ":");
-      dateIntervalLabelFinal = new Label(constants.dateIntervalLabelFinal() + ":");
+      dateIntervalLabelInitial = new Label(messages.dateIntervalLabelInitial() + ":");
+      dateIntervalLabelFinal = new Label(messages.dateIntervalLabelFinal() + ":");
       dateIntervalPickerInitial = new DatePicker();
       dateIntervalPickerFinal = new DatePicker();
-      dateIntervalPickerApply = new WUIButton(constants.dateIntervalPickerWindowApply(), WUIButton.Left.ROUND,
+      dateIntervalPickerApply = new WUIButton(messages.dateIntervalPickerWindowApply(), WUIButton.Left.ROUND,
         WUIButton.Right.ARROW_FORWARD);
 
       dateIntervalPickerWindow.setWidget(dateIntervalPickerLayout);
@@ -297,7 +304,7 @@ public abstract class StatisticReportPanel extends StatisticsPanel {
 
   protected void updateDateIntervalLabel() {
     chartDateIntervalLabel.setText(DATE_FORMAT.format(getInitialDate()) + " "
-      + constants.statisticsReportDateSeparatorLabel() + " " + DATE_FORMAT.format(getFinalDate()));
+      + messages.statisticsReportDateSeparatorLabel() + " " + DATE_FORMAT.format(getFinalDate()));
 
   }
 

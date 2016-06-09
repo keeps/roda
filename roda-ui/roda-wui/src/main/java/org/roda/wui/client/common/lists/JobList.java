@@ -26,6 +26,7 @@ import org.roda.wui.common.client.tools.Humanize;
 
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.SafeHtmlCell;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -38,6 +39,8 @@ import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+import config.i18n.client.BrowseMessages;
+
 /**
  * 
  * @author Luis Faria <lfaria@keep.pt>
@@ -46,8 +49,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class JobList extends BasicAsyncTableCell<Job> {
 
   // private final ClientLogger logger = new ClientLogger(getClass().getName());
-  // private static final BrowseMessages messages =
-  // GWT.create(BrowseMessages.class);
+  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   private TextColumn<Job> nameColumn;
   private TextColumn<Job> usernameColumn;
@@ -214,17 +216,17 @@ public class JobList extends BasicAsyncTableCell<Job> {
 
     // TODO externalize strings into constants
 
-    addColumn(nameColumn, "Name", true, false);
-    addColumn(usernameColumn, "Creator", true, false);
-    addColumn(startDateColumn, "Start date", true, false, 11);
-    addColumn(durationColumn, "Duration", true, true, 6);
-    addColumn(statusColumn, "Status", true, false, 7);
-    addColumn(progressColumn, "Progress", true, true, 5);
-    addColumn(objectsTotalCountColumn, "Total", true, true, 5);
-    addColumn(objectsSuccessCountColumn, "Successful", true, true, 6);
-    addColumn(objectsFailureCountColumn, "Failed", true, true, 5);
-    addColumn(objectsProcessingCountColumn, "Processing", true, true, 6);
-    addColumn(objectsWaitingCountColumn, "Waiting", true, true, 5);
+    addColumn(nameColumn, messages.jobName(), true, false);
+    addColumn(usernameColumn, messages.jobCreator(), true, false);
+    addColumn(startDateColumn, messages.jobStartDate(), true, false, 11);
+    addColumn(durationColumn, messages.jobDuration(), true, true, 6);
+    addColumn(statusColumn, messages.jobStatus(), true, false, 7);
+    addColumn(progressColumn, messages.jobProgress(), true, true, 5);
+    addColumn(objectsTotalCountColumn, messages.jobTotalCountMessage(), true, true, 5);
+    addColumn(objectsSuccessCountColumn, messages.jobSuccessCountMessage(), true, true, 6);
+    addColumn(objectsFailureCountColumn, messages.jobFailureCountMessage(), true, true, 5);
+    addColumn(objectsProcessingCountColumn, messages.jobProcessingCountMessage(), true, true, 6);
+    addColumn(objectsWaitingCountColumn, messages.jobWaitingCountMessage(), true, true, 5);
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(startDateColumn, false));

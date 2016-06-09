@@ -27,6 +27,7 @@ import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -36,11 +37,13 @@ import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Label;
+
+import config.i18n.client.BrowseMessages;
 
 public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
+  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   private Column<IndexedFile, SafeHtml> iconColumn;
   private TextColumn<IndexedFile> pathColumn;
@@ -147,12 +150,12 @@ public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
     lengthColumn.setSortable(true);
 
     // TODO externalize strings into constants
-    
+
     addColumn(iconColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-files-o'></i>"), false, false, 3);
-    addColumn(filenameColumn, "Name", true, false);
-    addColumn(pathColumn, "Path", true, false);
-    addColumn(formatColumn, "Format", true, false);
-    addColumn(lengthColumn, "Length", true, false, 7);
+    addColumn(filenameColumn, messages.fileName(), true, false);
+    addColumn(pathColumn, messages.filePath(), true, false);
+    addColumn(formatColumn, messages.fileFormat(), true, false);
+    addColumn(lengthColumn, messages.fileLength(), true, false, 7);
 
     // define default sorting
     display.getColumnSortList().push(new ColumnSortInfo(filenameColumn, false));

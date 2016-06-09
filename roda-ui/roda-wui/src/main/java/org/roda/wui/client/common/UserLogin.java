@@ -40,12 +40,6 @@ public class UserLogin {
 
   private static final ClientLogger logger = new ClientLogger(UserLogin.class.getName());
 
-  // private static final CommonConstants constants = (CommonConstants)
-  // GWT.create(CommonConstants.class);
-  //
-  // private static final CommonMessages messages = (CommonMessages)
-  // GWT.create(CommonMessages.class);
-
   private static UserLoginServiceAsync userLoginService;
 
   private static UserLogin instance = null;
@@ -141,7 +135,7 @@ public class UserLogin {
   public void login() {
     String currentURL = Window.Location.getHref().replaceAll("#", "%23");
     String hash = Window.Location.getHash();
-    if(hash.length()>0) {
+    if (hash.length() > 0) {
       hash = hash.substring(1);
       hash = UriUtils.encode(hash);
     }

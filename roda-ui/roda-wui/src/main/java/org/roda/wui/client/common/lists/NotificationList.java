@@ -119,10 +119,10 @@ public class NotificationList extends BasicAsyncTableCell<Notification> {
 
     // TODO externalize strings into constants
 
-    addColumn(fromUser, "From", true, false);
-    addColumn(sentOn, "Sent On", true, false, 13);
-    addColumn(subject, "Subject", true, false);
-    addColumn(acknowledged, "Ack.", true, false, 5);
+    addColumn(fromUser, messages.notificationFrom(), true, false);
+    addColumn(sentOn, messages.notificationSentOn(), true, false, 13);
+    addColumn(subject, messages.notificationSubject(), true, false);
+    addColumn(acknowledged, messages.notificationAck(), true, false, 5);
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(sentOn, false));

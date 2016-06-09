@@ -290,35 +290,35 @@ public class ShowJobReport extends Composite {
       panel.add(panelBody);
 
       // FIXME
-      Label attributeLabel = new Label("Agent");
+      Label attributeLabel = new Label(messages.reportAgent());
       attributeLabel.setStyleName("label");
       panelBody.add(attributeLabel);
       Label attributeValue = new Label(messages.pluginLabel(reportItem.getPlugin(), reportItem.getPluginVersion()));
       attributeValue.setStyleName("value");
       panelBody.add(attributeValue);
 
-      attributeLabel = new Label("Start datetime");
+      attributeLabel = new Label(messages.reportStartDatetime());
       attributeLabel.setStyleName("label");
       panelBody.add(attributeLabel);
       attributeValue = new Label(dateTimeFormat.format(reportItem.getDateCreated()));
       attributeValue.setStyleName("value");
       panelBody.add(attributeValue);
 
-      attributeLabel = new Label("End datetime");
+      attributeLabel = new Label(messages.reportEndDatetime());
       attributeLabel.setStyleName("label");
       panelBody.add(attributeLabel);
       attributeValue = new Label(dateTimeFormat.format(reportItem.getDateUpdated()));
       attributeValue.setStyleName("value");
       panelBody.add(attributeValue);
 
-      attributeLabel = new Label("Outcome");
+      attributeLabel = new Label(messages.reportOutcome());
       attributeLabel.setStyleName("label");
       panelBody.add(attributeLabel);
       HTML outcomeHTML = new HTML(HtmlSnippetUtils.getPluginStateHTML(reportItem.getPluginState()));
       panelBody.add(outcomeHTML);
 
       if (reportItem.getPluginDetails() != null && !"".equals(reportItem.getPluginDetails())) {
-        attributeLabel = new Label("Outcome details");
+        attributeLabel = new Label(messages.reportOutcomeDetails());
         attributeLabel.setStyleName("label");
         panelBody.add(attributeLabel);
         if (reportItem.isHtmlPluginDetails()) {

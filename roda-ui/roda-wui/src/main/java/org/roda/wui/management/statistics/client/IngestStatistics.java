@@ -7,8 +7,6 @@
  */
 package org.roda.wui.management.statistics.client;
 
-import java.util.List;
-
 import org.roda.core.data.StatisticData;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
@@ -57,25 +55,25 @@ public class IngestStatistics extends StatisticTab {
     boolean ret = false;
     if (super.init()) {
       ret = true;
-      sipComplete = createStatisticPanel(constants.sipCompletenessTitle(), constants.sipCompletenessDesc(),
+      sipComplete = createStatisticPanel(messages.sipCompletenessTitle(), messages.sipCompletenessDesc(),
         "sips\\.complete\\..*", true, AGGREGATION_LAST);
-      sipState = createStatisticPanel(constants.sipStateTitle(), constants.sipStateDesc(), "sips\\.state\\..*", true,
+      sipState = createStatisticPanel(messages.sipStateTitle(), messages.sipStateDesc(), "sips\\.state\\..*", true,
         AGGREGATION_LAST);
 
-      sipDurationAuto = createStatisticPanel(constants.sipDurationAutoTitle(), constants.sipDurationAutoDesc(),
+      sipDurationAuto = createStatisticPanel(messages.sipDurationAutoTitle(), messages.sipDurationAutoDesc(),
         "sips.duration.auto", ValueDimension.MILLISECONDS, false, false, AGGREGATION_LAST);
 
-      sipDurationManual = createStatisticPanel(constants.sipDurationManualTitle(), constants.sipDurationManualDesc(),
+      sipDurationManual = createStatisticPanel(messages.sipDurationManualTitle(), messages.sipDurationManualDesc(),
         "sips.duration.manual", ValueDimension.MILLISECONDS, false, false, AGGREGATION_LAST);
 
-      Panel sipMinAutoDurationPanel = createSipLimitDurationPanel(constants.sipMinAutomaticProcessingTimeTitle(),
-        constants.sipMinAutomaticProcessingTimeDesc(), true, false);
-      Panel sipMaxAutoDurationPanel = createSipLimitDurationPanel(constants.sipMaxAutomaticProcessingTimeTitle(),
-        constants.sipMaxAutomaticProcessingTimeDesc(), true, true);
-      Panel sipMinManualDurationPanel = createSipLimitDurationPanel(constants.sipMinManualProcessingTimeTitle(),
-        constants.sipMinManualProcessingTimeDesc(), false, false);
-      Panel sipMaxManualDurationPanel = createSipLimitDurationPanel(constants.sipMaxManualProcessingTimeTitle(),
-        constants.sipMaxManualProcessingTimeDesc(), false, true);
+      Panel sipMinAutoDurationPanel = createSipLimitDurationPanel(messages.sipMinAutomaticProcessingTimeTitle(),
+        messages.sipMinAutomaticProcessingTimeDesc(), true, false);
+      Panel sipMaxAutoDurationPanel = createSipLimitDurationPanel(messages.sipMaxAutomaticProcessingTimeTitle(),
+        messages.sipMaxAutomaticProcessingTimeDesc(), true, true);
+      Panel sipMinManualDurationPanel = createSipLimitDurationPanel(messages.sipMinManualProcessingTimeTitle(),
+        messages.sipMinManualProcessingTimeDesc(), false, false);
+      Panel sipMaxManualDurationPanel = createSipLimitDurationPanel(messages.sipMaxManualProcessingTimeTitle(),
+        messages.sipMaxManualProcessingTimeDesc(), false, true);
 
       layout.add(sipComplete);
       layout.add(sipState);
@@ -117,7 +115,7 @@ public class IngestStatistics extends StatisticTab {
           if (data != null) {
             value.setText(Tools.formatValueMilliseconds(Long.parseLong(data.getValue()), false));
           } else {
-            value.setText(constants.noDataAvailable());
+            value.setText(messages.noDataAvailable());
           }
         }
       });
@@ -160,7 +158,7 @@ public class IngestStatistics extends StatisticTab {
             // // ViewWindow viewWindow = new ViewWindow(pid);
             // // viewWindow.show();
             // } else {
-            // Window.alert(constants.viewImpossibleBcSipNotIngested());
+            // Window.alert(messages.viewImpossibleBcSipNotIngested());
             // }
             // }
             //
@@ -170,7 +168,7 @@ public class IngestStatistics extends StatisticTab {
             //
             // });
           } else {
-            value.setText(constants.noDataAvailable());
+            value.setText(messages.noDataAvailable());
           }
         }
 
@@ -209,29 +207,30 @@ public class IngestStatistics extends StatisticTab {
     Sorter sorter = new Sorter();
     sorter.add(new SortParameter("datetime", true));
     Sublist subList = new Sublist(0, 1);
-//    ContentAdapter adapter = new ContentAdapter(filter, sorter, subList);
-//    StatisticsService.Util.getInstance().getStatisticList(adapter, new AsyncCallback<List<StatisticData>>() {
-//
-//      public void onFailure(Throwable caught) {
-//        callback.onFailure(caught);
-//      }
-//
-//      public void onSuccess(List<StatisticData> result) {
-//        if (result.size() > 0) {
-//          callback.onSuccess(result.get(0));
-//        } else {
-//          callback.onSuccess(null);
-//        }
-//
-//      }
-//
-//    });
+    // ContentAdapter adapter = new ContentAdapter(filter, sorter, subList);
+    // StatisticsService.Util.getInstance().getStatisticList(adapter, new
+    // AsyncCallback<List<StatisticData>>() {
+    //
+    // public void onFailure(Throwable caught) {
+    // callback.onFailure(caught);
+    // }
+    //
+    // public void onSuccess(List<StatisticData> result) {
+    // if (result.size() > 0) {
+    // callback.onSuccess(result.get(0));
+    // } else {
+    // callback.onSuccess(null);
+    // }
+    //
+    // }
+    //
+    // });
 
   }
 
   @Override
   public String getTabText() {
-    return constants.ingestStatistics();
+    return messages.ingestStatistics();
   }
 
 }

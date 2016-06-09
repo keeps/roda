@@ -44,7 +44,7 @@ public class SystemStatistics extends StatisticTab {
     boolean ret = false;
     if (super.init()) {
       link = new HTML("<a href='" + GWT.getModuleBaseURL() + "Munin/index.html' target='_blank'>"
-        + constants.systemStatisticsLink() + "</a>");
+        + messages.systemStatisticsLink() + "</a>");
 
       iframe = new Frame(GWT.getModuleBaseURL() + "Munin/index.html");
 
@@ -64,6 +64,6 @@ public class SystemStatistics extends StatisticTab {
 
   @Override
   public String getTabText() {
-    return constants.systemStatistics();
+    return messages.systemStatistics();
   }
 }

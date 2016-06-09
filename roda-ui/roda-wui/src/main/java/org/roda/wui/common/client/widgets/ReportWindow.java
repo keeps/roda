@@ -21,7 +21,7 @@ import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.BrowseConstants;
+import config.i18n.client.BrowseMessages;
 
 /**
  * @author Luis Faria
@@ -31,7 +31,7 @@ public class ReportWindow extends WUIWindow {
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
+  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   private String reportId;
 
@@ -51,15 +51,15 @@ public class ReportWindow extends WUIWindow {
     this.reportId = reportId;
     scroll = new ScrollPanel();
 
-    printPDF = new WUIButton(constants.reportWindowPrintPDF(), WUIButton.Left.ROUND, WUIButton.Right.ARROW_DOWN);
-    printCSV = new WUIButton(constants.reportWindowPrintCSV(), WUIButton.Left.ROUND, WUIButton.Right.ARROW_DOWN);
+    printPDF = new WUIButton(messages.reportWindowPrintPDF(), WUIButton.Left.ROUND, WUIButton.Right.ARROW_DOWN);
+    printCSV = new WUIButton(messages.reportWindowPrintCSV(), WUIButton.Left.ROUND, WUIButton.Right.ARROW_DOWN);
 
-    close = new WUIButton(constants.reportWindowClose(), WUIButton.Left.ROUND, WUIButton.Right.CROSS);
+    close = new WUIButton(messages.reportWindowClose(), WUIButton.Left.ROUND, WUIButton.Right.CROSS);
 
     printPDF.addClickListener(new ClickListener() {
 
       public void onClick(Widget sender) {
-        Window.open(GWT.getModuleBaseURL() + "ReportDownload?type=REPORT&output=PDF&locale=" + constants.locale()
+        Window.open(GWT.getModuleBaseURL() + "ReportDownload?type=REPORT&output=PDF&locale=" + messages.locale()
           + "&id=" + ReportWindow.this.reportId, "_blank", "");
       }
 
@@ -68,7 +68,7 @@ public class ReportWindow extends WUIWindow {
     printCSV.addClickListener(new ClickListener() {
 
       public void onClick(Widget sender) {
-        Window.open(GWT.getModuleBaseURL() + "ReportDownload?type=REPORT&output=CSV&locale=" + constants.locale()
+        Window.open(GWT.getModuleBaseURL() + "ReportDownload?type=REPORT&output=CSV&locale=" + messages.locale()
           + "&id=" + ReportWindow.this.reportId, "_blank", "");
       }
 

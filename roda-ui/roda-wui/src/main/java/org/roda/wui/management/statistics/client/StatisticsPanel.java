@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.MissingResourceException;
 
 import org.roda.core.data.StatisticData;
-import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.FilterParameter;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Tools;
@@ -27,7 +26,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.ui.Composite;
 
-import config.i18n.client.StatisticsConstants;
+import config.i18n.client.BrowseMessages;
 
 /**
  * @author Luis Faria
@@ -36,8 +35,8 @@ import config.i18n.client.StatisticsConstants;
 public abstract class StatisticsPanel extends Composite {
 
   protected static final int Y_STEPS = 10;
-  protected static final List<String> COLORS = Arrays.asList(new String[] {"#88AFBE", "#D7BC00", "#7e8a57", "#ff0000",
-    "#00ff00", "#0000ff", "#ff9900", "#ff00ff", "#79C2FF"});
+  protected static final List<String> COLORS = Arrays.asList(
+    new String[] {"#88AFBE", "#D7BC00", "#7e8a57", "#ff0000", "#00ff00", "#0000ff", "#ff9900", "#ff00ff", "#79C2FF"});
   protected static final String BACKGROUND = "#e6e7e9";
   protected static final String HALFGROUND = "#58595b";
   protected static final String FOREGROUND = "#000000";
@@ -71,7 +70,8 @@ public abstract class StatisticsPanel extends Composite {
     /**
      * No dimension or unit
      */
-    ADIMENSIONAL, /**
+    ADIMENSIONAL,
+    /**
      * Time in milliseconds
      */
     MILLISECONDS
@@ -79,7 +79,7 @@ public abstract class StatisticsPanel extends Composite {
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
-  protected StatisticsConstants constants = (StatisticsConstants) GWT.create(StatisticsConstants.class);
+  protected BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   // variables
   private final String title;
@@ -266,14 +266,14 @@ public abstract class StatisticsPanel extends Composite {
 
   protected abstract FilterParameter getTypeFilterParameter();
 
-//  protected ContentAdapter getContentAdapter() {
-//    Filter filter = new Filter();
-//    filter.add(getTypeFilterParameter());
-//
-//    ContentAdapter adapter = new ContentAdapter();
-//    adapter.setFilter(filter);
-//    return adapter;
-//  }
+  // protected ContentAdapter getContentAdapter() {
+  // Filter filter = new Filter();
+  // filter.add(getTypeFilterParameter());
+  //
+  // ContentAdapter adapter = new ContentAdapter();
+  // adapter.setFilter(filter);
+  // return adapter;
+  // }
 
   private static final DateTimeFormat YEAR_FORMAT = DateTimeFormat.getFormat("yyyy");
   private static final DateTimeFormat MONTH_FORMAT = DateTimeFormat.getFormat("yyyy-MM");
@@ -365,10 +365,12 @@ public abstract class StatisticsPanel extends Composite {
   protected String getTypeTranslated(String type) {
     String ret;
     if (type.contains("*")) {
-      ret = constants.statistic_type_others();
+      ret = messages.statistic_type_others();
     } else {
       try {
-        ret = constants.getString(type.replace('.', '_'));
+        // FIXME 20160614 commented because constants were merged with messages
+        // ret = messages.getString(type.replace('.', '_'));
+        ret = "";
       } catch (MissingResourceException e) {
         int dotIndex = type.lastIndexOf('.');
         if (dotIndex >= 0) {

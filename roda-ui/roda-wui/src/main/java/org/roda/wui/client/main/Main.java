@@ -39,7 +39,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.BrowseConstants;
+import config.i18n.client.BrowseMessages;
 
 /**
  * @author Luis Faria
@@ -49,7 +49,7 @@ public class Main extends Composite implements EntryPoint {
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
+  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   public void onModuleLoad() {
 
@@ -88,8 +88,8 @@ public class Main extends Composite implements EntryPoint {
       @Override
       public void onSuccess(Boolean result) {
         if (result) {
-          JavascriptUtils.setCookieOptions(constants.cookiesMessage(), constants.cookiesDismisse(),
-            constants.cookiesLearnMore(), "#" + Theme.RESOLVER.getHistoryToken() + "/CookiesPolicy.html");
+          JavascriptUtils.setCookieOptions(messages.cookiesMessage(), messages.cookiesDismisse(),
+            messages.cookiesLearnMore(), "#" + Theme.RESOLVER.getHistoryToken() + "/CookiesPolicy.html");
         }
       }
 
@@ -154,7 +154,7 @@ public class Main extends Composite implements EntryPoint {
       }
     });
 
-    homeLinkArea.setTitle(constants.homeTitle());
+    homeLinkArea.setTitle(messages.homeTitle());
   }
 
   private void onHistoryChanged(String historyToken) {

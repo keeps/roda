@@ -23,6 +23,7 @@ import org.roda.core.data.v2.log.LogEntry;
 import org.roda.wui.client.management.UserManagementService;
 
 import com.google.gwt.cell.client.DateCell;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.cellview.client.CellTable;
@@ -31,11 +32,14 @@ import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.DefaultSelectionEventManager;
 
+import config.i18n.client.BrowseMessages;
+
 public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
+
+  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   private Column<LogEntry, Date> dateColumn;
   private TextColumn<LogEntry> actionComponentColumn;
@@ -134,12 +138,12 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
 
     // TODO externalize strings into constants
 
-    addColumn(dateColumn, "Date and time", true, false, 14);
-    addColumn(actionComponentColumn, "Component", true, false);
-    addColumn(actionMethodColumn, "Method", true, false);
-    addColumn(usernameColumn, "User", true, false);
-    addColumn(durationColumn, "Duration", true, true, 5);
-    addColumn(addressColumn, "Address", true, false);
+    addColumn(dateColumn, messages.logEntryDatetimeExtended(), true, false, 14);
+    addColumn(actionComponentColumn, messages.logEntryComponent(), true, false);
+    addColumn(actionMethodColumn, messages.logEntryMethod(), true, false);
+    addColumn(usernameColumn, messages.logEntryUser(), true, false);
+    addColumn(durationColumn, messages.logEntryDuration(), true, true, 5);
+    addColumn(addressColumn, messages.logEntryAddress(), true, false);
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(dateColumn, false));

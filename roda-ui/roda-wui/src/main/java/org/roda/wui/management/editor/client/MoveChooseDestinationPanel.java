@@ -22,7 +22,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 
-import config.i18n.client.BrowseConstants;
 import config.i18n.client.BrowseMessages;
 
 /**
@@ -30,7 +29,6 @@ import config.i18n.client.BrowseMessages;
  * 
  */
 public class MoveChooseDestinationPanel extends WUIWindow {
-  private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
   private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
@@ -78,7 +76,7 @@ public class MoveChooseDestinationPanel extends WUIWindow {
   public MoveChooseDestinationPanel(IndexedAIP aip) {
     super(650, 550);
     this.source = aip;
-    setTitle(constants.moveChooseDestinationTitle());
+    setTitle(messages.moveChooseDestinationTitle());
     // collectionsTree = new CollectionsTreeVerticalScrollPanel(false);
     // setWidget(collectionsTree);
     //
@@ -86,8 +84,7 @@ public class MoveChooseDestinationPanel extends WUIWindow {
 
     listeners = new ArrayList<MoveListener>();
 
-    choose = new WUIButton(constants.moveChooseDestinationChoose(), WUIButton.Left.ROUND,
-      WUIButton.Right.ARROW_FORWARD);
+    choose = new WUIButton(messages.moveChooseDestinationChoose(), WUIButton.Left.ROUND, WUIButton.Right.ARROW_FORWARD);
 
     choose.setEnabled(false);
 
@@ -122,7 +119,7 @@ public class MoveChooseDestinationPanel extends WUIWindow {
     //
     // });
 
-    cancel = new WUIButton(constants.moveChooseDestinationCancel(), WUIButton.Left.ROUND, WUIButton.Right.CROSS);
+    cancel = new WUIButton(messages.moveChooseDestinationCancel(), WUIButton.Left.ROUND, WUIButton.Right.CROSS);
 
     cancel.addClickHandler(new ClickHandler() {
 

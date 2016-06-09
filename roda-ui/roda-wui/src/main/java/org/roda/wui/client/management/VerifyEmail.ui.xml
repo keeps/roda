@@ -4,30 +4,30 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client">
 
-	<ui:with field='constants' type='config.i18n.client.UserManagementConstants' />
+	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
 
 	<g:FlowPanel addStyleNames="recoverPanel">
 		<g:HTML>
 			<h1>
-				<ui:text from='{constants.verifyEmailTitle}' />
+				<ui:text from='{messages.verifyEmailTitle}' />
 			</h1>
 		</g:HTML>
 		<g:FlowPanel ui:field="recoverPanel">
 			<g:Label ui:field="usernameLabel" addStyleNames="form-label">
-				<ui:text from='{constants.verifyEmailUsername}' />
+				<ui:text from='{messages.verifyEmailUsername}' />
 			</g:Label>
 			<g:TextBox ui:field="username" addStyleNames="fieldTextBox"></g:TextBox>
 			<g:Label ui:field="tokenLabel" addStyleNames="form-label">
-				<ui:text from='{constants.verifyEmailToken}' />
+				<ui:text from='{messages.verifyEmailToken}' />
 			</g:Label>
 			<g:TextBox ui:field="token" addStyleNames="fieldTextBox"></g:TextBox>
 		</g:FlowPanel>
 		<g:FlowPanel addStyleNames="recover-buttons">
 			<g:Button ui:field="verify" addStyleNames="btn btn-play recover-button">
-				<ui:text from='{constants.verifyEmailSubmit}' />
+				<ui:text from='{messages.verifyEmailSubmit}' />
 			</g:Button>
 			<g:Button ui:field="cancel" addStyleNames="btn btn-times-circle recover-button">
-				<ui:text from='{constants.verifyEmailCancel}' />
+				<ui:text from='{messages.verifyEmailCancel}' />
 			</g:Button>
 		</g:FlowPanel>
 	</g:FlowPanel>

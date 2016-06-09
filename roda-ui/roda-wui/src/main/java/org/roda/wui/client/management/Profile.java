@@ -32,7 +32,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.UserManagementMessages;
+import config.i18n.client.BrowseMessages;
 
 /**
  * @author Luis Faria
@@ -88,7 +88,7 @@ public class Profile extends Composite {
 
   private final User user;
 
-  private static UserManagementMessages messages = (UserManagementMessages) GWT.create(UserManagementMessages.class);
+  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   @UiField
   Button buttonApply;

@@ -5,13 +5,13 @@
 	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
 	xmlns:u="urn:import:org.roda.wui.client.management">
 
-	<ui:with field='constants' type='config.i18n.client.UserManagementConstants' />
+	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
 
 	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
 				<g:Label styleName="h1">
-					<ui:text from="{constants.createUserTitle}" />
+					<ui:text from="{messages.createUserTitle}" />
 				</g:Label>
 				<u:UserDataPanel ui:field="userDataPanel" />
 			</g:FlowPanel>
@@ -19,13 +19,13 @@
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel>
 					<g:Label addStyleNames="h4">
-						<ui:text from="{constants.actions}" />
+						<ui:text from="{messages.actions}" />
 					</g:Label>
 					<g:Button addStyleNames="btn btn-play" ui:field="buttonApply">
-						<ui:text from='{constants.createUserCreate}' />
+						<ui:text from='{messages.createUserCreate}' />
 					</g:Button>
 					<g:Button addStyleNames="btn btn-times-circle" ui:field="buttonCancel">
-						<ui:text from='{constants.createUserCancel}' />
+						<ui:text from='{messages.createUserCancel}' />
 					</g:Button>
 				</g:FlowPanel>
 			</g:FlowPanel>

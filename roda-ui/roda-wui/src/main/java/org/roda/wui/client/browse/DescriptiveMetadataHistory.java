@@ -71,17 +71,17 @@ public class DescriptiveMetadataHistory extends Composite {
         BrowserService.Util.getInstance().getDescriptiveMetadataVersionsBundle(aipId, descriptiveMetadataId,
           LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<DescriptiveMetadataVersionsBundle>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            AsyncCallbackUtils.defaultFailureTreatment(caught);
-          }
+            @Override
+            public void onFailure(Throwable caught) {
+              AsyncCallbackUtils.defaultFailureTreatment(caught);
+            }
 
-          @Override
-          public void onSuccess(DescriptiveMetadataVersionsBundle bundle) {
-            DescriptiveMetadataHistory widget = new DescriptiveMetadataHistory(aipId, descriptiveMetadataId, bundle);
-            callback.onSuccess(widget);
-          }
-        });
+            @Override
+            public void onSuccess(DescriptiveMetadataVersionsBundle bundle) {
+              DescriptiveMetadataHistory widget = new DescriptiveMetadataHistory(aipId, descriptiveMetadataId, bundle);
+              callback.onSuccess(widget);
+            }
+          });
 
       } else {
         Tools.newHistory(Browse.RESOLVER);
@@ -316,7 +316,7 @@ public class DescriptiveMetadataHistory extends Composite {
 
         @Override
         public void onSuccess(Void result) {
-          Toast.showInfo("Done", "Version reverted");
+          Toast.showInfo(messages.dialogDone(), messages.versionReverted());
           Tools.newHistory(Browse.RESOLVER, aipId);
         }
       });
@@ -334,7 +334,7 @@ public class DescriptiveMetadataHistory extends Composite {
 
         @Override
         public void onSuccess(Void result) {
-          Toast.showInfo("Done", "Version deleted");
+          Toast.showInfo(messages.dialogDone(), messages.versionDeleted());
           refresh();
           if (bundle.getVersions().isEmpty()) {
             Tools.newHistory(Browse.RESOLVER, aipId);

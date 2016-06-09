@@ -21,6 +21,7 @@ import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.wui.client.browse.BrowserService;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
@@ -29,6 +30,8 @@ import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.view.client.ProvidesKey;
+
+import config.i18n.client.BrowseMessages;
 
 /**
  * 
@@ -40,8 +43,7 @@ public class FormatList extends BasicAsyncTableCell<Format> {
   private static final int PAGE_SIZE = 20;
 
   // private final ClientLogger logger = new ClientLogger(getClass().getName());
-  // private static final BrowseMessages messages =
-  // GWT.create(BrowseMessages.class);
+  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   private TextColumn<Format> nameColumn;
   private TextColumn<Format> categoryColumn;
@@ -78,8 +80,8 @@ public class FormatList extends BasicAsyncTableCell<Format> {
     categoryColumn.setSortable(true);
 
     // TODO externalize strings into constants
-    addColumn(nameColumn, "Name", false, false);
-    addColumn(categoryColumn, "Category", true, false);
+    addColumn(nameColumn, messages.formatName(), false, false);
+    addColumn(categoryColumn, messages.formatCategory(), true, false);
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(nameColumn, false));

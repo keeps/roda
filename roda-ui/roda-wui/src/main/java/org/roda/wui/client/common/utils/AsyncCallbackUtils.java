@@ -11,18 +11,23 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.widgets.Toast;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.StatusCodeException;
 
+import config.i18n.client.BrowseMessages;
+
 public class AsyncCallbackUtils {
+
+  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   public static final boolean treatCommonFailures(Throwable caught) {
     boolean treatedError = false;
     if (caught instanceof StatusCodeException && ((StatusCodeException) caught).getStatusCode() == 0) {
       // check if browser is offline
       if (!JavascriptUtils.isOnline()) {
-        Toast.showError("Your browser is offline, please check your connetivity");
+        Toast.showError(messages.browserOfflineError());
       } else {
-        Toast.showError("Cannot reach the server, please check your connectivity");
+        Toast.showError(messages.cannotReachServerError());
       }
       treatedError = true;
     } else if (caught instanceof AuthorizationDeniedException) {

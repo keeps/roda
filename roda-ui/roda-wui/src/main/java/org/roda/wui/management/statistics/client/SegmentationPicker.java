@@ -21,7 +21,7 @@ import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SourcesChangeEvents;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.StatisticsConstants;
+import config.i18n.client.BrowseMessages;
 
 /**
  * Picker for time segmentation
@@ -33,7 +33,7 @@ public class SegmentationPicker extends Composite implements SourcesChangeEvents
   private static final String RADIO_GROUP = "SEGMENTATION";
 
   // layout
-  private StatisticsConstants constants = (StatisticsConstants) GWT.create(StatisticsConstants.class);
+  private BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   private final HorizontalPanel layout;
   private final List<RadioButton> options;
@@ -63,7 +63,10 @@ public class SegmentationPicker extends Composite implements SourcesChangeEvents
     for (final Segmentation s : Segmentation.values()) {
       String segmentationLabel;
       try {
-        segmentationLabel = constants.getString("segmentation_" + s.toString());
+        // FIXME 20160614 commented because constants were merged with messages
+        // segmentationLabel = messages.getString("segmentation_" +
+        // s.toString());
+        segmentationLabel = "";
       } catch (MissingResourceException e) {
         segmentationLabel = s.toString();
       }

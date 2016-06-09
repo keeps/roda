@@ -6,6 +6,8 @@
 	xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
 	xmlns:common="urn:import:org.roda.wui.client.common" xmlns:lists="urn:import:org.roda.wui.client.common.lists">
 
+	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
+
 	<ui:style>
 	
 	</ui:style>
@@ -13,28 +15,28 @@
 	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1">Archival package permissions</g:Label>
-				<g:Label styleName="h4" ui:field="groupPermissionsHeader">Assigned groups</g:Label>
+				<g:Label styleName="h1"><ui:text from='{messages.archivalPackagePermissionsTitle}' /></g:Label>
+				<g:Label styleName="h4" ui:field="groupPermissionsHeader"><ui:text from='{messages.permissionAssignedGroups}' /></g:Label>
 				<g:FlowPanel ui:field="groupPermissionsPanel" />
-				<g:Label styleName="h4" ui:field="userPermissionsHeader">Assigned users</g:Label>
+				<g:Label styleName="h4" ui:field="userPermissionsHeader"><ui:text from='{messages.permissionAssignedUsers}' /></g:Label>
 				<g:FlowPanel ui:field="userPermissionsPanel" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel>
 					<g:Label addStyleNames="h5">
-						<ui:msg>Actions</ui:msg>
+						<ui:text from='{messages.sidebarActionsTitle}' />
 					</g:Label>
 					<g:Button addStyleNames="btn btn-plus" ui:field="buttonAdd">
-						Add permission
+						<ui:text from='{messages.addPermission}' />
 					</g:Button>
 					<g:Button addStyleNames="btn btn-play" ui:field="buttonApply">
-						Save
+						<ui:text from='{messages.saveButton}' />
 					</g:Button>
 					<g:Button addStyleNames="btn btn-play" ui:field="buttonApplyToAll">
-						Apply to all below
+						<ui:text from='{messages.applyAllButton}' />
 					</g:Button>
 					<g:Button addStyleNames="btn btn-default btn-times-circle" ui:field="buttonClose">
-						Back
+						<ui:text from='{messages.backButton}' />
 					</g:Button>
 				</g:FlowPanel>
 			</g:FlowPanel>

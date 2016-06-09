@@ -30,8 +30,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.UserManagementConstants;
-import config.i18n.client.UserManagementMessages;
+import config.i18n.client.BrowseMessages;
 
 /**
  * @author Luis Faria
@@ -85,9 +84,7 @@ public class EditUser extends Composite {
 
   private final User user;
 
-  private static UserManagementMessages messages = (UserManagementMessages) GWT.create(UserManagementMessages.class);
-  private static UserManagementConstants constants = (UserManagementConstants) GWT
-    .create(UserManagementConstants.class);
+  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   @UiField
   Button buttonApply;
@@ -122,7 +119,7 @@ public class EditUser extends Composite {
 
     buttonDeActivate.setEnabled(true);
     if (user.isActive()) {
-      buttonDeActivate.setText(constants.editUserDeactivate());
+      buttonDeActivate.setText(messages.editUserDeactivate());
     }
   }
 

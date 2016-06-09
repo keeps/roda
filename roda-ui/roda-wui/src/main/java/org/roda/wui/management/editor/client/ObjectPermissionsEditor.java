@@ -17,7 +17,7 @@ import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.BrowseConstants;
+import config.i18n.client.BrowseMessages;
 
 /**
  * @author Luis Faria
@@ -27,7 +27,7 @@ public class ObjectPermissionsEditor extends ListBox {
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
+  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   private ObjectPermissions permissions;
   private ObjectPermissions originalPermissions;
@@ -76,13 +76,13 @@ public class ObjectPermissionsEditor extends ListBox {
   private String toString(ObjectPermissions permissions) {
     String ret;
     if (permissions.equals(ObjectPermissions.NoAccess)) {
-      ret = constants.permission_object_NoAccess();
+      ret = messages.permission_object_NoAccess();
     } else if (permissions.equals(ObjectPermissions.ReadOnly)) {
-      ret = constants.permission_object_ReadOnly();
+      ret = messages.permission_object_ReadOnly();
     } else if (permissions.equals(ObjectPermissions.ReadAndEditMetadata)) {
-      ret = constants.permission_object_ReadAndEditMetadata();
+      ret = messages.permission_object_ReadAndEditMetadata();
     } else if (permissions.equals(ObjectPermissions.FullControl)) {
-      ret = constants.permission_object_FullControl();
+      ret = messages.permission_object_FullControl();
     } else {
       ret = "Custom(" + (permissions.isRead() ? "read," : "no read,")
         + (permissions.isEditMetadata() ? "edit," : "no edit,") + (permissions.isRemove() ? "remove," : "no remove,")

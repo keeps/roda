@@ -6,7 +6,6 @@
 	xmlns:u="urn:import:org.roda.wui.management.user.client" xmlns:s="urn:import:com.google.gwt.safehtml.shared" 
 	xmlns:lists="urn:import:org.roda.wui.client.common.lists">
 
-	<ui:with field='constants' type='config.i18n.client.UserManagementConstants' />
 
 	<ui:style>
 
@@ -17,95 +16,95 @@
 	<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width no_padding">
 			<g:FlowPanel addStyleNames="wui-data-panel">
-				<g:Label styleName="h1" ui:field="title">Risk</g:Label>
+				<g:Label styleName="h1" ui:field="title"><ui:text from='{messages.showRiskTitle}' /></g:Label>
 				<g:FlowPanel styleName="field">
-					<g:Label styleName="label">Identifier</g:Label>
+					<g:Label styleName="label"><ui:text from='{messages.riskIdentifier}' /></g:Label>
 					<g:Label styleName="value" ui:field="riskId" />
 				</g:FlowPanel>
 				<g:FlowPanel styleName="field">
-					<g:Label styleName="label">Name</g:Label>
+					<g:Label styleName="label"><ui:text from='{messages.riskName}' /></g:Label>
 					<g:Label styleName="value" ui:field="riskName" />
 				</g:FlowPanel>
 				<g:FlowPanel styleName="field">
-					<g:Label styleName="label" ui:field="riskDescriptionKey">Description</g:Label>
+					<g:Label styleName="label" ui:field="riskDescriptionKey"><ui:text from='{messages.riskDescription}' /></g:Label>
 					<g:Label styleName="value text-area-whitespace-wrap" ui:field="riskDescriptionValue" />
 				</g:FlowPanel>
 				<g:FlowPanel styleName="field">
-					<g:Label styleName="label">Identified on</g:Label>
+					<g:Label styleName="label"><ui:text from='{messages.riskIdentifiedOn}' /></g:Label>
 					<g:Label styleName="value" ui:field="riskIdentifiedOn" />
 				</g:FlowPanel>
 				<g:FlowPanel styleName="field">
-					<g:Label styleName="label">Identified by</g:Label>
+					<g:Label styleName="label"><ui:text from='{messages.riskIdentifiedBy}' /></g:Label>
 					<g:Label styleName="value" ui:field="riskIdentifiedBy" />
 				</g:FlowPanel>
 				<g:FlowPanel styleName="field">
-					<g:Label styleName="label">Category</g:Label>
+					<g:Label styleName="label"><ui:text from='{messages.riskCategory}' /></g:Label>
 					<g:Label styleName="value" ui:field="riskCategory" />
 				</g:FlowPanel>
 				<g:FlowPanel styleName="field">
-					<g:Label styleName="label" ui:field="riskNotesKey">Notes</g:Label>
+					<g:Label styleName="label" ui:field="riskNotesKey"><ui:text from='{messages.riskNotes}' /></g:Label>
 					<g:Label styleName="value text-area-whitespace-wrap" ui:field="riskNotesValue" />
 				</g:FlowPanel>
 				
-				<g:Label styleName="h4" ui:field="riskPreMitigationKey">Pre-mitigation</g:Label>
+				<g:Label styleName="h4" ui:field="riskPreMitigationKey"><ui:text from='{messages.riskPreMitigation}' /></g:Label>
 				<g:FlowPanel styleName="field">
-					<g:Label styleName="label">Probability</g:Label>
+					<g:Label styleName="label"><ui:text from='{messages.riskPreMitigationProbability}' /></g:Label>
 					<g:Label styleName="value" ui:field="riskPreMitigationProbability" />
 				</g:FlowPanel>
 				<g:FlowPanel styleName="field">
-					<g:Label styleName="label">Impact</g:Label>
+					<g:Label styleName="label"><ui:text from='{messages.riskPreMitigationImpact}' /></g:Label>
 					<g:Label styleName="value" ui:field="riskPreMitigationImpact" />
 				</g:FlowPanel>
 				<g:FlowPanel styleName="field">
-					<g:Label styleName="label">Severity</g:Label>
+					<g:Label styleName="label"><ui:text from='{messages.riskPreMitigationSeverity}' /></g:Label>
 					<g:HTML styleName="value" ui:field="riskPreMitigationSeverity"></g:HTML>
 				</g:FlowPanel>
 				<g:FlowPanel styleName="field">
-					<g:Label styleName="label" ui:field="riskPreMitigationNotesKey">Notes</g:Label>
+					<g:Label styleName="label" ui:field="riskPreMitigationNotesKey"><ui:text from='{messages.riskPreMitigationNotes}' /></g:Label>
 					<g:Label styleName="value text-area-whitespace-wrap" ui:field="riskPreMitigationNotesValue" />
 				</g:FlowPanel>
 				
-				<g:Label styleName="h4" ui:field="riskMitigationKey">Mitigation</g:Label>
+				<g:Label styleName="h4" ui:field="riskMitigationKey"><ui:text from='{messages.riskMitigation}' /></g:Label>
 				<g:FlowPanel styleName="field">
-					<g:Label styleName="label" ui:field="riskMitigationStrategyKey">Mitigation strategy/actions</g:Label>
+					<g:Label styleName="label" ui:field="riskMitigationStrategyKey"><ui:text from='{messages.riskMitigationStrategy}' /></g:Label>
 					<g:Label styleName="value text-area-whitespace-wrap" ui:field="riskMitigationStrategyValue" />	
 				</g:FlowPanel>
 				<g:FlowPanel styleName="field">
-					<g:Label styleName="label" ui:field="riskMitigationOwnerTypeKey">Risk owner type</g:Label>
+					<g:Label styleName="label" ui:field="riskMitigationOwnerTypeKey"><ui:text from='{messages.riskMitigationOwnerType}' /></g:Label>
 					<g:Label styleName="value" ui:field="riskMitigationOwnerTypeValue" />
 				</g:FlowPanel>
 				<g:FlowPanel styleName="field">
-					<g:Label styleName="label" ui:field="riskMitigationOwnerKey">Risk owner</g:Label>
+					<g:Label styleName="label" ui:field="riskMitigationOwnerKey"><ui:text from='{messages.riskMitigationOwner}' /></g:Label>
 					<g:Label styleName="value" ui:field="riskMitigationOwnerValue" />
 				</g:FlowPanel>
 				<g:FlowPanel styleName="field">
-					<g:Label styleName="label" ui:field="riskMitigationRelatedEventIdentifierTypeKey">Related event identifier type</g:Label>
+					<g:Label styleName="label" ui:field="riskMitigationRelatedEventIdentifierTypeKey"><ui:text from='{messages.riskMitigationRelatedEventIdentifierType}' /></g:Label>
 					<g:Label styleName="value" ui:field="riskMitigationRelatedEventIdentifierTypeValue" />
 				</g:FlowPanel>
 				<g:FlowPanel styleName="field">
-					<g:Label styleName="label" ui:field="riskMitigationRelatedEventIdentifierValueKey">Related event identifier value</g:Label>
+					<g:Label styleName="label" ui:field="riskMitigationRelatedEventIdentifierValueKey"><ui:text from='{messages.riskMitigationRelatedEventIdentifierValue}' /></g:Label>
 					<g:Label styleName="value" ui:field="riskMitigationRelatedEventIdentifierValueValue" />
 				</g:FlowPanel>
 				
-				<g:Label styleName="h4" ui:field="riskPosMitigationKey">Post-mitigation</g:Label>
+				<g:Label styleName="h4" ui:field="riskPosMitigationKey"><ui:text from='{messages.riskPostMitigation}' /></g:Label>
 				<g:FlowPanel styleName="field">
-					<g:Label styleName="label" ui:field="riskPosMitigationProbabilityKey">Probability</g:Label>
+					<g:Label styleName="label" ui:field="riskPosMitigationProbabilityKey"><ui:text from='{messages.riskPostMitigationProbability}' /></g:Label>
 					<g:Label styleName="value" ui:field="riskPosMitigationProbability" />
 				</g:FlowPanel>
 				<g:FlowPanel styleName="field">
-					<g:Label styleName="label" ui:field="riskPosMitigationImpactKey">Impact</g:Label>
+					<g:Label styleName="label" ui:field="riskPosMitigationImpactKey"><ui:text from='{messages.riskPostMitigationImpact}' /></g:Label>
 					<g:Label styleName="value" ui:field="riskPosMitigationImpact" />
 				</g:FlowPanel>
 				<g:FlowPanel styleName="field">
-					<g:Label styleName="label" ui:field="riskPosMitigationSeverityKey">Severity</g:Label>
+					<g:Label styleName="label" ui:field="riskPosMitigationSeverityKey"><ui:text from='{messages.riskPostMitigationSeverity}' /></g:Label>
 					<g:HTML styleName="value" ui:field="riskPosMitigationSeverity"></g:HTML>
 				</g:FlowPanel>
 				<g:FlowPanel styleName="field">
-					<g:Label styleName="label" ui:field="riskPosMitigationNotesKey">Notes</g:Label>
+					<g:Label styleName="label" ui:field="riskPosMitigationNotesKey"><ui:text from='{messages.riskPostMitigationNotes}' /></g:Label>
 					<g:Label styleName="value text-area-whitespace-wrap" ui:field="riskPosMitigationNotesValue" />
 				</g:FlowPanel>
 				
- 				<g:Label styleName="h4">Incidence List</g:Label> 
+ 				<g:Label styleName="h4"><ui:text from='{messages.riskIncidences}' /></g:Label> 
  				<lists:RiskIncidenceList addStyleNames="searchResults" ui:field="incidenceList" /> 
 				
 			</g:FlowPanel>

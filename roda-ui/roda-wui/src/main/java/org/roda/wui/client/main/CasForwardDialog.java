@@ -22,7 +22,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Label;
 
-import config.i18n.client.BrowseConstants;
+import config.i18n.client.BrowseMessages;
 
 /**
  * @author Luis Faria
@@ -34,7 +34,7 @@ public class CasForwardDialog extends WUIWindow {
 
   private String serviceURL;
 
-  private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
+  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   private final Label warning;
 
@@ -42,12 +42,12 @@ public class CasForwardDialog extends WUIWindow {
   private final Button cancel;
 
   public CasForwardDialog(String serviceURL) {
-    super(constants.loginDialogTitle(), 340, 70);
+    super(messages.loginDialogTitle(), 340, 70);
     this.serviceURL = serviceURL;
 
-    warning = new Label(constants.casForwardWarning());
-    forwardToCas = new Button(constants.loginDialogLogin());
-    cancel = new Button(constants.loginDialogCancel());
+    warning = new Label(messages.casForwardWarning());
+    forwardToCas = new Button(messages.loginDialogLogin());
+    cancel = new Button(messages.loginDialogCancel());
 
     forwardToCas.addStyleName("btn");
     forwardToCas.addStyleName("btn-play");

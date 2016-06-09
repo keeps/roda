@@ -24,6 +24,7 @@ import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Humanize;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
@@ -33,10 +34,13 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 
+import config.i18n.client.BrowseMessages;
+
 public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentation> {
 
   @SuppressWarnings("unused")
   private final ClientLogger logger = new ClientLogger(getClass().getName());
+  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   private TextColumn<IndexedRepresentation> idColumn;
   private TextColumn<IndexedRepresentation> originalColumn;
@@ -76,7 +80,8 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
 
       @Override
       public String getValue(IndexedRepresentation rep) {
-        return rep != null ? rep.isOriginal() ? "original" : "alternative" : null;
+        return rep != null ? rep.isOriginal() ? messages.originalRepresentation() : messages.alternativeRepresentation()
+          : null;
       }
     };
 
@@ -104,7 +109,7 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
 
       @Override
       public String getValue(IndexedRepresentation rep) {
-        return rep != null ? rep.getNumberOfDataFiles() + " files" : null;
+        return rep != null ? messages.numberOfFiles(rep.getNumberOfDataFiles()) : null;
       }
     };
 
@@ -112,7 +117,7 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
 
       @Override
       public String getValue(IndexedRepresentation rep) {
-        return rep != null ? rep.getNumberOfDocumentationFiles() + " files" : null;
+        return rep != null ? messages.numberOfFiles(rep.getNumberOfDocumentationFiles()) : null;
       }
     };
 
@@ -120,7 +125,7 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
 
       @Override
       public String getValue(IndexedRepresentation rep) {
-        return rep != null ? rep.getNumberOfSchemaFiles() + " files" : null;
+        return rep != null ? messages.numberOfFiles(rep.getNumberOfSchemaFiles()) : null;
       }
     };
 
@@ -134,18 +139,18 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
     numberOfSchemasFilesColumn.setSortable(true);
 
     // TODO externalize strings into constants
-    display.addColumn(idColumn, "Id");
-    display.addColumn(originalColumn, "Original");
-    display.addColumn(typeColumn, "Type");
-    display.addColumn(sizeInBytesColumn, "Size");
-    display.addColumn(numberOfDataFilesColumn, "Files");
-    display.addColumn(numberOfDocumentationFilesColumn, "Documentation");
-    display.addColumn(numberOfSchemasFilesColumn, "Schemas");
+    display.addColumn(idColumn, messages.representationId());
+    display.addColumn(originalColumn, messages.representationOriginal());
+    display.addColumn(typeColumn, messages.representationType());
+    display.addColumn(sizeInBytesColumn, messages.representationSize());
+    display.addColumn(numberOfDataFilesColumn, messages.representationFiles());
+    display.addColumn(numberOfDocumentationFilesColumn, messages.representationDocumentation());
+    display.addColumn(numberOfSchemasFilesColumn, messages.representationSchemas());
 
-    Label emptyInfo = new Label("No items to display");
+    Label emptyInfo = new Label(messages.noItemsToDisplay());
     display.setEmptyTableWidget(emptyInfo);
-    
-//    display.setColumnWidth(idColumn, "100%");
+
+    // display.setColumnWidth(idColumn, "100%");
 
     originalColumn.setCellStyleNames("nowrap");
     typeColumn.setCellStyleNames("nowrap");

@@ -228,14 +228,14 @@ public class EditDescriptiveMetadata extends Composite {
           updateFormOrXML();
 
           if (selected >= 0) {
-            type.addItem("Other", "");
+            type.addItem(messages.otherItem(), "");
             type.setSelectedIndex(selected);
           } else if ("".equals(bundle.getType())) {
-            type.addItem("Other", "");
+            type.addItem(messages.otherItem(), "");
             type.setSelectedIndex(type.getItemCount() - 1);
           } else {
-            type.addItem("Other (" + bundle.getType() + ")", bundle.getType());
-            type.addItem("Other", "");
+            type.addItem(messages.otherItem() + "(" + bundle.getType() + ")", bundle.getType());
+            type.addItem(messages.otherItem(), "");
             type.setSelectedIndex(type.getItemCount() - 2);
           }
         }
@@ -381,7 +381,7 @@ public class EditDescriptiveMetadata extends Composite {
       public void onSuccess(Void result) {
         errors.setText("");
         errors.setVisible(false);
-        Toast.showInfo("Success", "Saved descriptive metadata file");
+        Toast.showInfo(messages.dialogSuccess(), messages.metadataFileSaved());
         Tools.newHistory(Browse.RESOLVER, aipId);
       }
     });
@@ -413,7 +413,7 @@ public class EditDescriptiveMetadata extends Composite {
 
       @Override
       public void onSuccess(Void result) {
-        Toast.showInfo("Success", "Removed descriptive metadata file");
+        Toast.showInfo(messages.dialogSuccess(), messages.metadataFileRemoved());
         Tools.newHistory(Browse.RESOLVER, aipId);
       }
     });

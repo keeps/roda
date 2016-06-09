@@ -39,29 +39,29 @@ public class RepositoryStatistics extends StatisticTab {
     boolean ret = false;
     if (super.init()) {
       ret = true;
-      doCount = createStatisticPanel(constants.descriptiveObjectsCountTitle(), constants.descriptiveObjectsCountDesc(),
+      doCount = createStatisticPanel(messages.descriptiveObjectsCountTitle(), messages.descriptiveObjectsCountDesc(),
         "object.descriptive", false, AGGREGATION_LAST);
 
-      fondsCount = createStatisticPanel(constants.fondsCountTitle(), constants.fondsCountDesc(),
+      fondsCount = createStatisticPanel(messages.fondsCountTitle(), messages.fondsCountDesc(),
         "object.descriptive.fonds", false, AGGREGATION_LAST);
 
-      repCount = createStatisticPanel(constants.representationObjectsCountTitle(),
-        constants.representationObjectsCountDesc(), "object.representation", false, AGGREGATION_LAST);
+      repCount = createStatisticPanel(messages.representationObjectsCountTitle(),
+        messages.representationObjectsCountDesc(), "object.representation", false, AGGREGATION_LAST);
 
-      sipCount = createStatisticPanel(constants.sipCountTitle(), constants.sipCountDesc(), "sips", false,
+      sipCount = createStatisticPanel(messages.sipCountTitle(), messages.sipCountDesc(), "sips", false,
         AGGREGATION_LAST);
 
-      presEventCount = createStatisticPanel(constants.presEventCountTitle(), constants.presEventCountDesc(),
+      presEventCount = createStatisticPanel(messages.presEventCountTitle(), messages.presEventCountDesc(),
         "object.preservation.event", false, AGGREGATION_LAST);
 
-      presRepCount = createStatisticPanel(constants.presRepCountTitle(), constants.presRepCountDesc(),
+      presRepCount = createStatisticPanel(messages.presRepCountTitle(), messages.presRepCountDesc(),
         "object.preservation.representation", false, AGGREGATION_LAST);
 
-      repType = createStatisticPanel(constants.representationObjectTypeTitle(),
-        constants.representationObjectTypeDesc(), "object\\.representation\\.type\\..*", true, AGGREGATION_LAST);
+      repType = createStatisticPanel(messages.representationObjectTypeTitle(), messages.representationObjectTypeDesc(),
+        "object\\.representation\\.type\\..*", true, AGGREGATION_LAST);
 
-      repSubType = createStatisticPanel(constants.representationObjectSubTypeTitle(),
-        constants.representationObjectSubTypeDesc(), "object\\.representation\\.subtype\\..*", true, AGGREGATION_LAST);
+      repSubType = createStatisticPanel(messages.representationObjectSubTypeTitle(),
+        messages.representationObjectSubTypeDesc(), "object\\.representation\\.subtype\\..*", true, AGGREGATION_LAST);
 
       layout.add(doCount);
       layout.add(fondsCount);
@@ -81,7 +81,7 @@ public class RepositoryStatistics extends StatisticTab {
 
   @Override
   public String getTabText() {
-    return constants.repositoryStatistics();
+    return messages.repositoryStatistics();
   }
 
 }

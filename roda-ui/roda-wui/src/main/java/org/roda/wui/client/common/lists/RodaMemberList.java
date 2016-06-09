@@ -24,6 +24,7 @@ import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.StringUtility;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -32,12 +33,14 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Label;
+
+import config.i18n.client.BrowseMessages;
 
 public class RodaMemberList extends BasicAsyncTableCell<RODAMember> {
 
   @SuppressWarnings("unused")
   private final ClientLogger logger = new ClientLogger(getClass().getName());
+  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   private Column<RODAMember, SafeHtml> activeColumn;
   private Column<RODAMember, SafeHtml> typeColumn;
@@ -105,9 +108,9 @@ public class RodaMemberList extends BasicAsyncTableCell<RODAMember> {
 
     // TODO externalize strings into constants
     addColumn(typeColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-user'></i>"), false, false, 3);
-    addColumn(idColumn, "Identifier", true, false);
-    addColumn(nameColumn, "Name", true, false);
-    addColumn(groupsColumn, "Groups", true, false);
+    addColumn(idColumn, messages.userIdentifier(), true, false);
+    addColumn(nameColumn, messages.userName(), true, false);
+    addColumn(groupsColumn, messages.userGroups(), true, false);
     addColumn(activeColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-check-circle'></i>"), false, false, 2);
 
     addStyleName("my-list-rodamember");

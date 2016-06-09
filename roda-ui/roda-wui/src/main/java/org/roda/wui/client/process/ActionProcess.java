@@ -138,7 +138,7 @@ public class ActionProcess extends Composite {
       new SimpleFacetParameter(RodaConstants.JOB_USERNAME), new SimpleFacetParameter(RodaConstants.JOB_PLUGIN_TYPE));
 
     // TODO externalise strings
-    jobList = new JobList(filter, facets, "Job list", false);
+    jobList = new JobList(filter, facets, messages.jobList(), false);
     producerFacets = new FlowPanel();
     stateFacets = new FlowPanel();
     jobTypeFacets = new FlowPanel();

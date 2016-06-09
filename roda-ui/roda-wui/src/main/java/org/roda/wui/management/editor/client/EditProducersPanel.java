@@ -35,7 +35,7 @@ import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.BrowseConstants;
+import config.i18n.client.BrowseMessages;
 
 /**
  * @author Luis Faria
@@ -43,7 +43,7 @@ import config.i18n.client.BrowseConstants;
  */
 public class EditProducersPanel extends Composite {
 
-  private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
+  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
@@ -79,15 +79,15 @@ public class EditProducersPanel extends Composite {
     groupMiniPanels = new Vector<GroupMiniPanel>();
 
     layout = new DockPanel();
-    title = new Label(constants.editProducersTitle());
+    title = new Label(messages.editProducersTitle());
     memberListPanel = new VerticalPanel();
     memberListScroll = new ScrollPanel(memberListPanel);
 
     actionButtons = new ArrayList<WUIButton>();
-    addUser = new WUIButton(constants.editProducersAddUser(), WUIButton.Left.ROUND, WUIButton.Right.PLUS);
-    addGroup = new WUIButton(constants.editProducersAddGroup(), WUIButton.Left.ROUND, WUIButton.Right.PLUS);
-    delete = new WUIButton(constants.editProducersDelete(), WUIButton.Left.ROUND, WUIButton.Right.MINUS);
-    getRodaIn = new WUIButton(constants.editProducersRodaIn(), WUIButton.Left.ROUND, WUIButton.Right.ARROW_DOWN);
+    addUser = new WUIButton(messages.editProducersAddUser(), WUIButton.Left.ROUND, WUIButton.Right.PLUS);
+    addGroup = new WUIButton(messages.editProducersAddGroup(), WUIButton.Left.ROUND, WUIButton.Right.PLUS);
+    delete = new WUIButton(messages.editProducersDelete(), WUIButton.Left.ROUND, WUIButton.Right.MINUS);
+    getRodaIn = new WUIButton(messages.editProducersRodaIn(), WUIButton.Left.ROUND, WUIButton.Right.ARROW_DOWN);
 
     actionButtons.add(addUser);
     actionButtons.add(addGroup);

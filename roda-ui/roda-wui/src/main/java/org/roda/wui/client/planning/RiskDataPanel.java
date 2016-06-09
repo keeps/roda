@@ -50,7 +50,6 @@ import com.google.gwt.user.datepicker.client.DateBox;
 import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 
 import config.i18n.client.BrowseMessages;
-import config.i18n.client.UserManagementConstants;
 
 /**
  * @author Luis Faria
@@ -62,11 +61,6 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
-  @SuppressWarnings("unused")
-  private static UserManagementConstants constants = (UserManagementConstants) GWT
-    .create(UserManagementConstants.class);
-
   private static BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   @UiField
@@ -252,18 +246,6 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
         int severity = probability * impact;
         preMitigationSeverityValue.setHTML(getSeverityDefinition(severity, severityLowLimit, severityHighLimit));
 
-        // if (posMitigationProbability.getSelectedIndex() == probabilitiesSize
-        // - 1
-        // && preMitigationProbability.getSelectedIndex() != probabilitiesSize -
-        // 1) {
-        // posMitigationProbability.setSelectedIndex(probability - 1);
-        // }
-        //
-        // if (posMitigationImpact.getSelectedIndex() == impactsSize - 1
-        // && preMitigationImpact.getSelectedIndex() != impactsSize - 1) {
-        // posMitigationImpact.setSelectedIndex(probability - 1);
-        // }
-
         RiskDataPanel.this.onChange();
       }
     };
@@ -339,7 +321,7 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
       this.id.setVisible(false);
     } else {
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISKS, risk.getId()));
-      incidenceList = new RiskIncidenceList(filter, null, "Incidences", true);
+      incidenceList = new RiskIncidenceList(filter, null, messages.riskIncidences(), true);
       incidenceListPanel.add(incidenceList);
       this.idBox.setVisible(false);
       setRisk(risk);
