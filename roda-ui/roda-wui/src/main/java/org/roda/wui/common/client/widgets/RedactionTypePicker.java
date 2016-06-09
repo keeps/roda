@@ -13,7 +13,7 @@ package org.roda.wui.common.client.widgets;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.ListBox;
 
-import config.i18n.client.CommonConstants;
+import config.i18n.client.BrowseConstants;
 
 /**
  * @author Luis Faria
@@ -29,7 +29,7 @@ public class RedactionTypePicker extends ListBox {
     INPUT, OUTPUT
   }
 
-  private static CommonConstants constants = (CommonConstants) GWT.create(CommonConstants.class);
+  private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
 
   /**
    * Create a new RedactionType picker

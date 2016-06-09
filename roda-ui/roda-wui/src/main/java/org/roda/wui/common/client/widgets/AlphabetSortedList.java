@@ -26,7 +26,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.CommonConstants;
+import config.i18n.client.BrowseConstants;
 
 /**
  * @author Luis Faria
@@ -35,8 +35,7 @@ import config.i18n.client.CommonConstants;
 public abstract class AlphabetSortedList extends DockPanel {
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
-
-  private static CommonConstants constants = (CommonConstants) GWT.create(CommonConstants.class);
+  private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
 
   private static int BLOCK_SIZE = 30;
 
@@ -131,7 +130,8 @@ public abstract class AlphabetSortedList extends DockPanel {
     this.widgetListPanel = new VerticalPanel();
     this.scroll = new LazyScroll(widgetListPanel, BLOCK_SIZE, MAX_SIZE, new Loader() {
 
-      public void load(final int offset, final int windowOffset, final int limit, final AsyncCallback<Integer> callback) {
+      public void load(final int offset, final int windowOffset, final int limit,
+        final AsyncCallback<Integer> callback) {
         final int newLimit = (limit > itemsCount - offset) ? itemsCount - offset : limit;
         logger.debug("loading to alphabet list [" + offset + ", " + (offset + newLimit - 1) + "]");
         getItems(offset, newLimit, new AsyncCallback<AlphabetListItem[]>() {

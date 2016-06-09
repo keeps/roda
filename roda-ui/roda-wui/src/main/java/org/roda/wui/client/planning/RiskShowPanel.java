@@ -44,7 +44,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SelectionChangeEvent;
 
-import config.i18n.client.RiskMessages;
+import config.i18n.client.BrowseMessages;
 import config.i18n.client.UserManagementConstants;
 
 /**
@@ -62,7 +62,7 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
   private static UserManagementConstants constants = (UserManagementConstants) GWT
     .create(UserManagementConstants.class);
 
-  private static RiskMessages messages = GWT.create(RiskMessages.class);
+  private static BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   @UiField
   Label title;

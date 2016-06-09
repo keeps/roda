@@ -59,7 +59,6 @@ import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 import com.google.gwt.view.client.SelectionChangeEvent;
 
 import config.i18n.client.BrowseMessages;
-import config.i18n.client.RiskMessages;
 import config.i18n.client.UserManagementConstants;
 
 /**
@@ -115,8 +114,7 @@ public class RiskRegister extends Composite {
   private static UserManagementConstants constants = (UserManagementConstants) GWT
     .create(UserManagementConstants.class);
 
-  private static final BrowseMessages defaultMessages = GWT.create(BrowseMessages.class);
-  private static final RiskMessages messages = GWT.create(RiskMessages.class);
+  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   @UiField
   Label riskRegisterTitle;
@@ -239,8 +237,8 @@ public class RiskRegister extends Composite {
     inputDateFinal.setFireNullValues(true);
     inputDateFinal.addValueChangeHandler(valueChangeHandler);
 
-    inputDateInitial.getElement().setPropertyString("placeholder", defaultMessages.sidebarFilterFromDatePlaceHolder());
-    inputDateFinal.getElement().setPropertyString("placeholder", defaultMessages.sidebarFilterToDatePlaceHolder());
+    inputDateInitial.getElement().setPropertyString("placeholder", messages.sidebarFilterFromDatePlaceHolder());
+    inputDateFinal.getElement().setPropertyString("placeholder", messages.sidebarFilterToDatePlaceHolder());
   }
 
   private void updateDateFilter() {
@@ -255,7 +253,7 @@ public class RiskRegister extends Composite {
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 0) {
-      riskRegisterTitle.setText(defaultMessages.riskRegisterTitle());
+      riskRegisterTitle.setText(messages.riskRegisterTitle());
       riskList.setFilter(null);
       riskList.refresh();
       riskRegisterSubtitle.setVisible(false);
@@ -273,7 +271,7 @@ public class RiskRegister extends Composite {
     } else if (historyTokens.size() == 1) {
       final String aipId = historyTokens.get(0);
       final String riskIdConstant = RodaConstants.RISK_ID;
-      riskRegisterSubtitle.setText(defaultMessages.showRiskAIPTitle(aipId));
+      riskRegisterSubtitle.setText(messages.showRiskAIPTitle(aipId));
       riskRegisterSubtitle.setVisible(true);
 
       BrowserService.Util.getInstance().getRiskOnAIP(aipId, new AsyncCallback<List<String>>() {

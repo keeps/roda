@@ -39,7 +39,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.MainConstants;
+import config.i18n.client.BrowseConstants;
 
 /**
  * @author Luis Faria
@@ -49,7 +49,7 @@ public class Main extends Composite implements EntryPoint {
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private static MainConstants constants = (MainConstants) GWT.create(MainConstants.class);
+  private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
 
   public void onModuleLoad() {
 

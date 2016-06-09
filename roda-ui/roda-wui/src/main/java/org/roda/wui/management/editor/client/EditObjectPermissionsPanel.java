@@ -27,7 +27,6 @@ import org.roda.wui.common.client.widgets.LoadingPopup;
 import org.roda.wui.common.client.widgets.WUIButton;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.ClickListener;
@@ -38,7 +37,7 @@ import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.MetadataEditorConstants;
+import config.i18n.client.BrowseConstants;
 
 /**
  * @author Luis Faria
@@ -46,8 +45,7 @@ import config.i18n.client.MetadataEditorConstants;
  */
 public class EditObjectPermissionsPanel extends Composite {
 
-  private static MetadataEditorConstants constants = (MetadataEditorConstants) GWT
-    .create(MetadataEditorConstants.class);
+  private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
 

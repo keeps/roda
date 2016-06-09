@@ -25,72 +25,13 @@ import com.google.gwt.safehtml.shared.SafeHtml;
  */
 public interface BrowseMessages extends Messages {
 
-  /*********************************************************/
-  /******************* OLD MESSAGES ***********************/
-  /*********************************************************/
-
-  // Tree
-  @DefaultMessage("See {0}-{1}")
-  public String previousItems(int from, int to);
-
-  @DefaultMessage("See {0}-{1} (total {2})")
-  public String nextItems(int from, int to, int total);
-
-  // Item Popup
-  @DefaultMessage("To lock wait {0} sec.")
-  public String waitToLock(int sec);
-
-  @DefaultMessage("Click here to close")
-  public String close();
-
-  // Browse
-  @DefaultMessage("{0} fonds")
-  public String totalFondsNumber(int count);
-
-  @DefaultMessage("There is no such element in the repository identified by{0}.")
-  public String noSuchRODAObject(String pid);
-
-  // Edit
-  @DefaultMessage("Unable to save the changes. Details: {0}")
-  public String editSaveError(String message);
-
   @DefaultMessage("Unable to move the element because the levels of description are not appropriate. Details: {0}")
   public String moveIllegalOperation(String message);
 
   @DefaultMessage("Unable to move the element because it or the destination were not found in the repository. Details: {0}")
   public String moveNoSuchObject(String message);
 
-  // Representations Panel
-  @DefaultMessage("Disseminations of {0} - ''{1}''")
-  public String representationsTitle(String id, String title);
-
-  @DefaultMessage("{0} does not have associated representations")
-  public String noRepresentationsTitle(String id);
-
-  @DefaultMessage("Download representation with format {0}, {1} files, {2} bytes uncompressed")
-  public String representationDownloadTooltip(String format, int numberOfFiles, long sizeOfFiles);
-
-  // Preservation Metadata Panel
-  @DefaultMessage("{0} (original)")
-  public String preservationRepOriginal(String format);
-
-  @DefaultMessage("{0} (normalized)")
-  public String preservationRepNormalized(String format);
-
-  @DefaultMessage("{0}")
-  public String preservationRepAlternative(String format);
-
-  @DefaultMessage("{0} files, {1} bytes")
-  public String preservationRepTooltip(int numberOfFiles, long sizeOfFiles);
-
-  /*********************************************************/
-
-  /******************* NEW MESSAGES ***********************/
-  /*********************************************************/
-
   /******* SIDEBAR ******************************************/
-  @DefaultMessage("Filters")
-  String sidebarFiltersTitle();
 
   @DefaultMessage("Dates")
   String sidebarFilterDates();
@@ -125,9 +66,6 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Risks")
   String sidebarRisksTitle();
 
-  @DefaultMessage("Risks of AIP {0}")
-  String showRiskAIPTitle(String aipId);
-
   @DefaultMessage("Error in line {0}, column {1}: {2}")
   SafeHtml metadataParseError(int line, int column, String message);
 
@@ -157,12 +95,6 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Error loading preservation metadata: {0}")
   String errorLoadingPreservationMetadata(String message);
-
-  @DefaultMessage("download")
-  SafeHtml download();
-
-  @DefaultMessage("PREMIS")
-  String premisTitle();
 
   @DefaultMessage("{0,number} files, {1}")
   @AlternateMessage({"one", "One file, {1}"})
@@ -585,8 +517,6 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Preservation events")
   String preservationEventsTitle();
 
-  /*** Preservation event ***/
-
   @DefaultMessage("Preservation event")
   String preservationEventTitle();
 
@@ -673,79 +603,6 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Select all {0} items")
   String listSelectAllMessage(int count);
-
-  /************* Agent register ****************/
-
-  @DefaultMessage("Agent register")
-  String agentRegisterTitle();
-
-  @DefaultMessage("New")
-  String agentRegisterNewButton();
-
-  @DefaultMessage("Edit")
-  String agentRegisterEditButton();
-
-  @DefaultMessage("Remove")
-  String agentRegisterRemoveButton();
-
-  @DefaultMessage("Start new process")
-  String agentRegisterProcessButton();
-
-  @DefaultMessage("Search agents...")
-  String agentRegisterSearchPlaceHolder();
-
-  /************* Format register ****************/
-
-  @DefaultMessage("Format register")
-  String formatRegisterTitle();
-
-  @DefaultMessage("New")
-  String formatRegisterNewButton();
-
-  @DefaultMessage("Edit")
-  String formatRegisterEditButton();
-
-  @DefaultMessage("Remove")
-  String formatRegisterRemoveButton();
-
-  @DefaultMessage("Start new process")
-  String formatRegisterProcessButton();
-
-  @DefaultMessage("Search formats...")
-  String formatRegisterSearchPlaceHolder();
-
-  /************* Risk register ****************/
-
-  @DefaultMessage("Risk register")
-  String riskRegisterTitle();
-
-  @DefaultMessage("Category")
-  String riskRegisterCategory();
-
-  @DefaultMessage("Severity")
-  String riskRegisterSeverity();
-
-  @DefaultMessage("Owner")
-  String riskRegisterOwner();
-
-  @DefaultMessage("New")
-  String riskRegisterNewButton();
-
-  @DefaultMessage("Edit")
-  String riskRegisterEditButton();
-
-  @DefaultMessage("Remove")
-  String riskRegisterRemoveButton();
-
-  @DefaultMessage("Start new process")
-  String riskRegisterProcessButton();
-
-  @DefaultMessage("Search risks...")
-  String riskRegisterSearchPlaceHolder();
-
-  @DefaultMessage("This object has {0,number} risks")
-  @AlternateMessage({"one", "This object has 1 risk"})
-  String showObjectsRiskCounter(@PluralCount int counter);
 
   /************* User log ****************/
 
@@ -849,4 +706,202 @@ public interface BrowseMessages extends Messages {
   @AlternateMessage({"UNDER_APPRAISAL", "under appraisal"})
   String searchPreFilterValue(@Select String name);
 
+  /************* Risk register ****************/
+
+  @DefaultMessage("Risks of AIP {0}")
+  String showRiskAIPTitle(String aipId);
+
+  @DefaultMessage("Risk register")
+  String riskRegisterTitle();
+
+  @DefaultMessage("Category")
+  String riskRegisterCategory();
+
+  @DefaultMessage("Severity")
+  String riskRegisterSeverity();
+
+  @DefaultMessage("Owner")
+  String riskRegisterOwner();
+
+  @DefaultMessage("New")
+  String riskRegisterNewButton();
+
+  @DefaultMessage("Edit")
+  String riskRegisterEditButton();
+
+  @DefaultMessage("Remove")
+  String riskRegisterRemoveButton();
+
+  @DefaultMessage("Start new process")
+  String riskRegisterProcessButton();
+
+  @DefaultMessage("Search risks...")
+  String riskRegisterSearchPlaceHolder();
+
+  @DefaultMessage("This object has {0,number} risks")
+  @AlternateMessage({"one", "This object has 1 risk"})
+  String showObjectsRiskCounter(@PluralCount int counter);
+
+  @DefaultMessage("Risk creation failed {0}")
+  String createRiskFailure(String message);
+
+  @DefaultMessage("Risk not found {0}")
+  String editRiskNotFound(String name);
+
+  @DefaultMessage("Risk edit failed {0}")
+  String editRiskFailure(String message);
+
+  @DefaultMessage("Confirm remove risk")
+  String riskRemoveFolderConfirmDialogTitle();
+
+  @DefaultMessage("Are you sure you want to remove the the selected {0} risk(s)?")
+  String riskRemoveSelectedConfirmDialogMessage(Long size);
+
+  @DefaultMessage("No")
+  String riskRemoveFolderConfirmDialogCancel();
+
+  @DefaultMessage("Yes")
+  String riskRemoveFolderConfirmDialogOk();
+
+  @DefaultMessage("Removed risk(s)")
+  String riskRemoveSuccessTitle();
+
+  @DefaultMessage("Successfully removed {0} risk(s)")
+  String riskRemoveSuccessMessage(Long size);
+
+  @DefaultMessage("Risk was modified")
+  String modifyRiskMessage();
+
+  @DefaultMessage("{0} at {1,localdatetime,predef:DATE_TIME_MEDIUM}")
+  String riskHistoryLabel(String versionKey, Date createdDate);
+
+  @DefaultMessage("Low")
+  String showLowSeverity();
+
+  @DefaultMessage("Moderate")
+  String showModerateSeverity();
+
+  @DefaultMessage("High")
+  String showHighSeverity();
+
+  @DefaultMessage("Risks")
+  String getRisksDialogName();
+
+  /************* Agent register ****************/
+
+  @DefaultMessage("Agent register")
+  String agentRegisterTitle();
+
+  @DefaultMessage("New")
+  String agentRegisterNewButton();
+
+  @DefaultMessage("Edit")
+  String agentRegisterEditButton();
+
+  @DefaultMessage("Remove")
+  String agentRegisterRemoveButton();
+
+  @DefaultMessage("Start new process")
+  String agentRegisterProcessButton();
+
+  @DefaultMessage("Search agents...")
+  String agentRegisterSearchPlaceHolder();
+
+  @DefaultMessage("Agent creation failed {0}")
+  String createAgentFailure(String message);
+
+  @DefaultMessage("Agent not found {0}")
+  String editAgentNotFound(String name);
+
+  @DefaultMessage("Agent edit failed {0}")
+  String editAgentFailure(String message);
+
+  @DefaultMessage("Confirm remove agent")
+  String agentRemoveFolderConfirmDialogTitle();
+
+  @DefaultMessage("Are you sure you want to remove the the selected {0} agent(s)?")
+  String agentRemoveSelectedConfirmDialogMessage(Long size);
+
+  @DefaultMessage("No")
+  String agentRemoveFolderConfirmDialogCancel();
+
+  @DefaultMessage("Yes")
+  String agentRemoveFolderConfirmDialogOk();
+
+  @DefaultMessage("Removed agent(s)")
+  String agentRemoveSuccessTitle();
+
+  @DefaultMessage("Successfully removed {0} agent(s)")
+  String agentRemoveSuccessMessage(Long size);
+
+  @DefaultMessage("{0}")
+  String agentListItems(String item);
+
+  @DefaultMessage("Agents")
+  String getAgentsDialogName();
+
+  /************* Format register ****************/
+
+  @DefaultMessage("Formats")
+  String getFormatsDialogName();
+
+  @DefaultMessage("Format register")
+  String formatRegisterTitle();
+
+  @DefaultMessage("New")
+  String formatRegisterNewButton();
+
+  @DefaultMessage("Edit")
+  String formatRegisterEditButton();
+
+  @DefaultMessage("Remove")
+  String formatRegisterRemoveButton();
+
+  @DefaultMessage("Start new process")
+  String formatRegisterProcessButton();
+
+  @DefaultMessage("Search formats...")
+  String formatRegisterSearchPlaceHolder();
+
+  @DefaultMessage("Format creation failed {0}")
+  String createFormatFailure(String message);
+
+  @DefaultMessage("Format not found {0}")
+  String editFormatNotFound(String name);
+
+  @DefaultMessage("Format edit failed {0}")
+  String editFormatFailure(String message);
+
+  @DefaultMessage("Confirm remove format")
+  String formatRemoveFolderConfirmDialogTitle();
+
+  @DefaultMessage("Are you sure you want to remove the the selected {0} format(s)?")
+  String formatRemoveSelectedConfirmDialogMessage(Long size);
+
+  @DefaultMessage("No")
+  String formatRemoveFolderConfirmDialogCancel();
+
+  @DefaultMessage("Yes")
+  String formatRemoveFolderConfirmDialogOk();
+
+  @DefaultMessage("Removed format(s)")
+  String formatRemoveSuccessTitle();
+
+  @DefaultMessage("Successfully removed {0} format(s)")
+  String formatRemoveSuccessMessage(Long size);
+
+  @DefaultMessage("{0}")
+  String formatListItems(String item);
+
+  /************* Common Messages ****************/
+
+  @DefaultMessage("{0}: {1}")
+  String logParameter(String name, String value);
+
+  // Content Panel
+  @DefaultMessage("Page not found: {0}")
+  public String pageNotFound(String error);
+
+  @DefaultMessage("RODA - {0}")
+  public String windowTitle(String history);
 }

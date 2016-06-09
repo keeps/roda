@@ -21,7 +21,7 @@ import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.CommonConstants;
+import config.i18n.client.BrowseConstants;
 
 /**
  * @author Luis Faria
@@ -31,7 +31,7 @@ public class ReportWindow extends WUIWindow {
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private static CommonConstants constants = (CommonConstants) GWT.create(CommonConstants.class);
+  private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
 
   private String reportId;
 

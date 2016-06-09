@@ -27,7 +27,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.AgentMessages;
+import config.i18n.client.BrowseMessages;
 
 public class CreateAgent extends Composite {
 
@@ -60,7 +60,7 @@ public class CreateAgent extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   private Agent agent;
-  private static AgentMessages messages = GWT.create(AgentMessages.class);
+  private static BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   @UiField
   Button buttonApply;

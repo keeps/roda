@@ -27,7 +27,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.FormatMessages;
+import config.i18n.client.BrowseMessages;
 
 public class CreateFormat extends Composite {
 
@@ -60,7 +60,7 @@ public class CreateFormat extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   private Format format;
-  private static FormatMessages messages = GWT.create(FormatMessages.class);
+  private static BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   @UiField
   Button buttonApply;

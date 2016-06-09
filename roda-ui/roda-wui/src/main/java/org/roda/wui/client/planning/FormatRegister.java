@@ -52,7 +52,6 @@ import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 import com.google.gwt.view.client.SelectionChangeEvent;
 
 import config.i18n.client.BrowseMessages;
-import config.i18n.client.FormatMessages;
 
 /**
  * @author Luis Faria
@@ -103,8 +102,7 @@ public class FormatRegister extends Composite {
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private static final BrowseMessages defaultMessages = GWT.create(BrowseMessages.class);
-  private static final FormatMessages messages = GWT.create(FormatMessages.class);
+  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   @UiField
   FlowPanel formatRegisterDescription;
@@ -199,8 +197,8 @@ public class FormatRegister extends Composite {
     inputDateFinal.setFireNullValues(true);
     inputDateFinal.addValueChangeHandler(valueChangeHandler);
 
-    inputDateInitial.getElement().setPropertyString("placeholder", defaultMessages.sidebarFilterFromDatePlaceHolder());
-    inputDateFinal.getElement().setPropertyString("placeholder", defaultMessages.sidebarFilterToDatePlaceHolder());
+    inputDateInitial.getElement().setPropertyString("placeholder", messages.sidebarFilterFromDatePlaceHolder());
+    inputDateFinal.getElement().setPropertyString("placeholder", messages.sidebarFilterToDatePlaceHolder());
   }
 
   private void updateDateFilter() {

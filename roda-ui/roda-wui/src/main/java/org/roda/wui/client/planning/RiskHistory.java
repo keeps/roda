@@ -39,7 +39,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.RiskMessages;
+import config.i18n.client.BrowseMessages;
 
 /**
  * @author Luis Faria
@@ -92,9 +92,7 @@ public class RiskHistory extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
-  // private ClientLogger logger = new ClientLogger(getClass().getName());
-  private static final RiskMessages messages = GWT.create(RiskMessages.class);
+  private static BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   private final String riskId;
   private RiskVersionsBundle bundle;

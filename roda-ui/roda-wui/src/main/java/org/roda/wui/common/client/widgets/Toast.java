@@ -21,7 +21,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
 
-import config.i18n.client.CommonConstants;
+import config.i18n.client.BrowseConstants;
 
 /**
  * @author Luis Faria
@@ -59,7 +59,7 @@ public class Toast extends PopupPanel {
     ERROR_MESSAGE, INFO
   }
 
-  private static final CommonConstants constants = (CommonConstants) GWT.create(CommonConstants.class);
+  private static final BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
 
   private final int slotNumber;
 
@@ -139,7 +139,8 @@ public class Toast extends PopupPanel {
             slotOffset += slots[i].getOffsetHeight() + PADDING;
           }
         }
-        Toast.this.setPopupPosition(Window.getClientWidth() - offsetWidth - PADDING, Window.getScrollTop() + PADDING + slotOffset);
+        Toast.this.setPopupPosition(Window.getClientWidth() - offsetWidth - PADDING,
+          Window.getScrollTop() + PADDING + slotOffset);
       }
 
     });
@@ -190,6 +191,6 @@ public class Toast extends PopupPanel {
 
   public static void showError(Throwable caught) {
     showError(caught.getClass().getName(), caught.getMessage());
-    
+
   }
 }

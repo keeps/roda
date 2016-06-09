@@ -34,10 +34,10 @@ public class ConfigurableEmailUtility {
   private Properties props = new Properties();
 
   public ConfigurableEmailUtility(String fromActor, String subject) {
-    this.protocol = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "protocol");
-    this.user = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "user");
-    this.from = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "from");
-    this.password = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "password");
+    this.protocol = RodaCoreFactory.getRodaConfiguration().getString("core.email.protocol", "");
+    this.user = RodaCoreFactory.getRodaConfiguration().getString("core.email.user", "");
+    this.from = RodaCoreFactory.getRodaConfiguration().getString("core.email.from", "");
+    this.password = RodaCoreFactory.getRodaConfiguration().getString("core.email.password", "");
     this.fromActor = fromActor;
     this.subject = subject;
 
@@ -45,6 +45,10 @@ public class ConfigurableEmailUtility {
   }
 
   public void sendMail(String recipient, String message) throws MessagingException {
+
+    if ("".equals(from)) {
+      throw new MessagingException();
+    }
 
     Session session = Session.getDefaultInstance(props, authenticator);
     session.setDebug(false);

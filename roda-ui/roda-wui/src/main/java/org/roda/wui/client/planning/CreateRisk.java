@@ -29,7 +29,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.RiskMessages;
+import config.i18n.client.BrowseMessages;
 
 public class CreateRisk extends Composite {
 
@@ -59,7 +59,7 @@ public class CreateRisk extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static RiskMessages messages = GWT.create(RiskMessages.class);
+  private static BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   @UiField
   Button buttonApply;

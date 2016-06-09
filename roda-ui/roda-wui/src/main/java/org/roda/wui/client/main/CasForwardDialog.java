@@ -22,7 +22,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Label;
 
-import config.i18n.client.MainConstants;
+import config.i18n.client.BrowseConstants;
 
 /**
  * @author Luis Faria
@@ -34,7 +34,7 @@ public class CasForwardDialog extends WUIWindow {
 
   private String serviceURL;
 
-  private static MainConstants constants = (MainConstants) GWT.create(MainConstants.class);
+  private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
 
   private final Label warning;
 
@@ -83,7 +83,7 @@ public class CasForwardDialog extends WUIWindow {
   }
 
   private native void reload() /*-{
-                               $wnd.location.reload();
-                               }-*/;
+		$wnd.location.reload();
+  }-*/;
 
 }

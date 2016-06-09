@@ -45,11 +45,9 @@ import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.TextBox;
 
 import config.i18n.client.BrowseMessages;
-import config.i18n.client.RiskMessages;
 
 public class PluginParameterPanel extends Composite {
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
-  private static final RiskMessages riskMessages = GWT.create(RiskMessages.class);
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   private final PluginParameter parameter;
@@ -90,7 +88,7 @@ public class PluginParameterPanel extends Composite {
   private void createSelectRiskLayout() {
     Label parameterName = new Label(parameter.getName());
     IncrementalAssociativeList list = new IncrementalAssociativeList(IndexedRisk.class, RodaConstants.RISK_ID,
-      RodaConstants.RISK_SEARCH, riskMessages.getRisksDialogName());
+      RodaConstants.RISK_SEARCH, messages.getRisksDialogName());
 
     list.addChangeHandler(new ChangeHandler() {
 

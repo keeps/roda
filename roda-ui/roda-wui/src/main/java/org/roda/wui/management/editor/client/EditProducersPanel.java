@@ -26,7 +26,6 @@ import org.roda.wui.management.user.client.GroupMiniPanel;
 import org.roda.wui.management.user.client.UserMiniPanel;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.Composite;
@@ -36,7 +35,7 @@ import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.MetadataEditorConstants;
+import config.i18n.client.BrowseConstants;
 
 /**
  * @author Luis Faria
@@ -44,8 +43,7 @@ import config.i18n.client.MetadataEditorConstants;
  */
 public class EditProducersPanel extends Composite {
 
-  private static MetadataEditorConstants constants = (MetadataEditorConstants) GWT
-    .create(MetadataEditorConstants.class);
+  private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
@@ -258,20 +256,21 @@ public class EditProducersPanel extends Composite {
 
   private void initializeProducerList() {
     loading.show();
-//    EditorService.Util.getInstance().getProducers(fondsAip.getId(), new AsyncCallback<List<RODAMember>>() {
-//
-//      public void onFailure(Throwable caught) {
-//        loading.hide();
-//        logger.error("Error initialing producer list", caught);
-//      }
-//
-//      public void onSuccess(List<RODAMember> producers) {
-//        EditProducersPanel.this.producers = producers;
-//        updateMemberList();
-//        loading.hide();
-//      }
-//
-//    });
+    // EditorService.Util.getInstance().getProducers(fondsAip.getId(), new
+    // AsyncCallback<List<RODAMember>>() {
+    //
+    // public void onFailure(Throwable caught) {
+    // loading.hide();
+    // logger.error("Error initialing producer list", caught);
+    // }
+    //
+    // public void onSuccess(List<RODAMember> producers) {
+    // EditProducersPanel.this.producers = producers;
+    // updateMemberList();
+    // loading.hide();
+    // }
+    //
+    // });
   }
 
   private void addProducer(RODAMember producer) {

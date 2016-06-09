@@ -54,8 +54,8 @@ import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Widget;
 
+import config.i18n.client.BrowseConstants;
 import config.i18n.client.LanguageSwitcherPanelConstants;
-import config.i18n.client.MainConstants;
 
 /**
  * @author Luis Faria
@@ -65,7 +65,7 @@ public class Menu extends Composite {
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private static MainConstants constants = (MainConstants) GWT.create(MainConstants.class);
+  private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
   private static LanguageSwitcherPanelConstants languagesConstants = (LanguageSwitcherPanelConstants) GWT
     .create(LanguageSwitcherPanelConstants.class);
 

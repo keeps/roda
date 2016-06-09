@@ -21,7 +21,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.CommonConstants;
+import config.i18n.client.BrowseConstants;
 
 /**
  * @author Luis Faria
@@ -29,7 +29,7 @@ import config.i18n.client.CommonConstants;
  */
 public class UserInfoPanel {
 
-  private static CommonConstants constants = (CommonConstants) GWT.create(CommonConstants.class);
+  private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
 
   private final RodaUser user;
 

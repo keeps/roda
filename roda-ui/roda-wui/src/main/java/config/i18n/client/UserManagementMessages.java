@@ -18,9 +18,6 @@ import com.google.gwt.i18n.client.Messages;
  */
 public interface UserManagementMessages extends Messages {
 
-  // Action Report
-  String actionReportNoUser();
-
   // Create
   String createUserFailure(String reason);
 

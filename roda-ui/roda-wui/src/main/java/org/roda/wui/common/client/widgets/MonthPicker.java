@@ -13,7 +13,7 @@ package org.roda.wui.common.client.widgets;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.ListBox;
 
-import config.i18n.client.AdvancedSearchConstants;
+import config.i18n.client.BrowseConstants;
 
 /**
  * @author Luis Faria
@@ -40,8 +40,7 @@ public class MonthPicker extends ListBox {
     FEBRUARY
   }
 
-  private static AdvancedSearchConstants constants = (AdvancedSearchConstants) GWT
-    .create(AdvancedSearchConstants.class);
+  private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
 
   // private GWTLogger logger = new GWTLogger(GWT.getTypeName(this));
 

@@ -36,10 +36,9 @@ import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.ProvidesKey;
 
-import config.i18n.client.RiskMessages;
+import config.i18n.client.BrowseMessages;
 
 /**
  * 
@@ -51,10 +50,7 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
   private static final int PAGE_SIZE = 20;
   private Filter filter;
 
-  // private final ClientLogger logger = new ClientLogger(getClass().getName());
-  // private static final BrowseMessages messages =
-  // GWT.create(BrowseMessages.class);
-  private static final RiskMessages messages = GWT.create(RiskMessages.class);
+  private static BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   private TextColumn<IndexedRisk> nameColumn;
   private Column<IndexedRisk, Date> identifiedOnColumn;

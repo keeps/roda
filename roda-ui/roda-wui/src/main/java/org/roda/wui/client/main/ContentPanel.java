@@ -38,8 +38,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.MainConstants;
-import config.i18n.client.MainMessages;
+import config.i18n.client.BrowseConstants;
+import config.i18n.client.BrowseMessages;
 
 /**
  * @author Luis Faria
@@ -64,10 +64,8 @@ public class ContentPanel extends SimplePanel {
   }
 
   private static final Set<HistoryResolver> resolvers = new HashSet<HistoryResolver>();
-
-  private static MainConstants constants = (MainConstants) GWT.create(MainConstants.class);
-
-  private static MainMessages messages = (MainMessages) GWT.create(MainMessages.class);
+  private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
+  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   private Widget currWidget;
 

@@ -17,7 +17,7 @@ import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.MetadataEditorConstants;
+import config.i18n.client.BrowseConstants;
 
 /**
  * @author Luis Faria
@@ -27,8 +27,7 @@ public class ObjectPermissionsEditor extends ListBox {
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private static MetadataEditorConstants constants = (MetadataEditorConstants) GWT
-    .create(MetadataEditorConstants.class);
+  private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
 
   private ObjectPermissions permissions;
   private ObjectPermissions originalPermissions;

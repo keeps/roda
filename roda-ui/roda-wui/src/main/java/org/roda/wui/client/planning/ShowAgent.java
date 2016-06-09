@@ -36,7 +36,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.AgentMessages;
+import config.i18n.client.BrowseMessages;
 
 /**
  * @author Luis Faria
@@ -78,8 +78,7 @@ public class ShowAgent extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
-  private static AgentMessages messages = GWT.create(AgentMessages.class);
+  private static BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   @UiField
   Label agentId;

@@ -22,17 +22,15 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 
+import config.i18n.client.BrowseConstants;
 import config.i18n.client.BrowseMessages;
-import config.i18n.client.MetadataEditorConstants;
 
 /**
  * @author Luis Faria
  * 
  */
 public class MoveChooseDestinationPanel extends WUIWindow {
-  private static MetadataEditorConstants constants = (MetadataEditorConstants) GWT
-    .create(MetadataEditorConstants.class);
-
+  private static BrowseConstants constants = (BrowseConstants) GWT.create(BrowseConstants.class);
   private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
