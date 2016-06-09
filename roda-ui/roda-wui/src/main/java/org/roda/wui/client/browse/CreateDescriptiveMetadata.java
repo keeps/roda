@@ -36,7 +36,10 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONException;
+import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONString;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -220,6 +223,9 @@ public class CreateDescriptiveMetadata extends Composite {
   private void createForm(SupportedMetadataTypeBundle bundle) {
     formOrXML.clear();
     for (MetadataValue mv : bundle.getValues()) {
+      if (mv.get("hidden") != null && mv.get("hidden").equals("true"))
+        continue;
+
       FlowPanel layout = new FlowPanel();
       layout.addStyleName("plugin-options-parameter");
       String controlType = mv.get("type");
@@ -249,9 +255,29 @@ public class CreateDescriptiveMetadata extends Composite {
     }
   }
 
+  private String getFieldLabel(MetadataValue mv) {
+    String result = mv.getId();
+    String rawLabel = mv.get("label");
+    if (rawLabel != null && rawLabel.length() > 0) {
+      String loc = LocaleInfo.getCurrentLocale().getLocaleName();
+      try {
+        JSONObject jsonObject = JSONParser.parseLenient(rawLabel).isObject();
+        JSONString jsonString = jsonObject.get(loc).isString();
+
+        if (jsonString != null) {
+          result = jsonString.stringValue();
+        }
+      } catch (JSONException e) {
+        // do nothing, the JSON was malformed or the label for the desired
+        // language doesn't exist
+      }
+    }
+    return result;
+  }
+
   private void addTextField(final FlowPanel layout, final MetadataValue mv) {
     // Top label
-    Label mvLabel = new Label(mv.getId());
+    Label mvLabel = new Label(getFieldLabel(mv));
     mvLabel.addStyleName("form-label");
 
     // Field
@@ -283,7 +309,7 @@ public class CreateDescriptiveMetadata extends Composite {
 
   private void addTextArea(final FlowPanel layout, final MetadataValue mv) {
     // Top label
-    Label mvLabel = new Label(mv.getId());
+    Label mvLabel = new Label(getFieldLabel(mv));
     mvLabel.addStyleName("form-label");
 
     // Field
@@ -315,7 +341,7 @@ public class CreateDescriptiveMetadata extends Composite {
 
   private void addList(final FlowPanel layout, final MetadataValue mv) {
     // Top Label
-    Label mvLabel = new Label(mv.getId());
+    Label mvLabel = new Label(getFieldLabel(mv));
     mvLabel.addStyleName("form-label");
 
     // Field
@@ -334,12 +360,18 @@ public class CreateDescriptiveMetadata extends Composite {
         }
       }
     }
+
     mvList.addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent changeEvent) {
         mv.set("value", mvList.getSelectedValue());
       }
     });
+
+    if (mv.get("value") == null || mv.get("value").isEmpty()) {
+      mvList.setSelectedIndex(0);
+      mv.set("value", mvList.getSelectedValue());
+    }
 
     layout.add(mvLabel);
     layout.add(mvList);
@@ -358,7 +390,7 @@ public class CreateDescriptiveMetadata extends Composite {
   private void addDatePicker(final FlowPanel layout, final MetadataValue mv) {
     // Top label
     final DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat("yyyy-MM-dd");
-    Label mvLabel = new Label(mv.getId());
+    Label mvLabel = new Label(getFieldLabel(mv));
     mvLabel.addStyleName("form-label");
 
     // Field

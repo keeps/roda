@@ -1,68 +1,68 @@
 <ead xmlns="http://ead3.archivists.org/schema/"
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://ead3.archivists.org/schema/ ../schemas/ead3.xsd">
-    <control>
-        <recordid>{{id order=1 auto-generate='id'}}</recordid>
-        <filedesc>
-            <titlestmt>
-                <titleproper>{{title order='2' auto-generate='title'}}</titleproper>
-            </titlestmt>
-        </filedesc>
-        <maintenancestatus value="new"/>
-        <maintenanceagency>
-            <agencyname>{{producer}}</agencyname>
-        </maintenanceagency>
+	<control>
+		<recordid>{{id order=1 auto-generate='id' label="{'en': 'ID'}"}}</recordid>
+		<filedesc>
+			<titlestmt>
+				<titleproper>{{title order='2' auto-generate='title' label="{'en': 'Title'}"}}</titleproper>
+			</titlestmt>
+		</filedesc>
+		<maintenancestatus value="new"/>
+		<maintenanceagency>
+			<agencyname>{{producer label="{'en': 'Producer'}"}}</agencyname>
+		</maintenanceagency>
 
-        <maintenancehistory>
-            <maintenanceevent>
-                <eventtype value="created"/>
-                <eventdatetime standarddatetime="{{descDate order='3' type='date' auto-generate='now'}}">{{descDate}}
-                </eventdatetime>
-                <agenttype value="machine"/>
-                <agent>RODA version 2</agent>
-                <eventdescription>Creation of EAD record using RODA version 2</eventdescription>
-            </maintenanceevent>
-        </maintenancehistory>
-    </control>
+		<maintenancehistory>
+			<maintenanceevent>
+				<eventtype value="created"/>
+				<eventdatetime standarddatetime='{{descDate order="3" type="date" auto-generate="now" label="{\"en\": \"Description date\"}"}}'>{{descDate}}
+				</eventdatetime>
+				<agenttype value="machine"/>
+				<agent>RODA version 2</agent>
+				<eventdescription>Creation of EAD record using RODA version 2</eventdescription>
+			</maintenanceevent>
+		</maintenancehistory>
+	</control>
 
-    <archdesc
-            level='{{level order="6" type="list" list="[\"fonds\",\"subfonds\",\"series\",\"subseries\",\"file\",\"item\"]" auto-generate="level"}}'>
-        <did>
-            <unitid>{{id}}</unitid>
-            <unittitle>{{title}}</unittitle>
+	<archdesc
+		level='{{level order="6" type="list" list="[\"fonds\",\"subfonds\",\"series\",\"subseries\",\"file\",\"item\"]" auto-generate="level" label="{\"en\": \"Description level\"}"}}'>
+		<did>
+			<unitid>{{id}}</unitid>
+			<unittitle>{{title}}</unittitle>
 
-            <unitdatestructured calendar="gregorian">
-                <daterange>
-                    <fromdate standarddate="{{dateInitial order='4' type='date'}}">{{dateInitial}}</fromdate>
-                    <todate standarddate="{{dateFinal order='5' type='date'}}">{{dateFinal}}</todate>
-                </daterange>
-            </unitdatestructured>
+			<unitdatestructured calendar="gregorian">
+				<daterange>
+					<fromdate standarddate='{{dateInitial order="4" type="date" label="{\"en\": \"Initial date\"}"}}'>{{dateInitial}}</fromdate>
+					<todate standarddate='{{dateFinal order="5" type="date" label="{\"en\": \"Final date\"}"}}'>{{dateFinal}}</todate>
+				</daterange>
+			</unitdatestructured>
 
-            <origination label="producer">
-                <corpname>
-                    <part>{{producer}}</part>
-                </corpname>
-            </origination>
+			<origination label="producer">
+				<corpname>
+					<part>{{producer}}</part>
+				</corpname>
+			</origination>
 
-            <origination label="creator">
-                <persname>
-                    <part>{{creator}}</part>
-                </persname>
-            </origination>
+			<origination label="creator">
+				<persname>
+					<part>{{creator label="{'en': 'Creator'}"}}</part>
+				</persname>
+			</origination>
 
-            <langmaterial>
-                <language>{{language auto-generate='language'}}</language>
-            </langmaterial>
+			<langmaterial>
+				<language>{{language auto-generate='language' label="{'en': 'Language'}"}}</language>
+			</langmaterial>
 
-        </did>
+		</did>
 
-        <scopecontent>
-            <p>{{description type='text-area'}}</p>
-        </scopecontent>
+		<scopecontent>
+			<p>{{description type='text-area' label="{'en': 'Description'}"}}</p>
+		</scopecontent>
 
-        <userestrict>
-            <p>{{rights}}</p>
-        </userestrict>
-    </archdesc>
+		<userestrict>
+			<p>{{rights label="{'en': 'Rights'}"}}</p>
+		</userestrict>
+	</archdesc>
 
 </ead>

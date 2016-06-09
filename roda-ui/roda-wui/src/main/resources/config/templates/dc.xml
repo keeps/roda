@@ -1,16 +1,16 @@
 <?xml version="1.0"?>
 
 <simpledc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="../schemas/dc.xsd">
+	  xsi:noNamespaceSchemaLocation="../schemas/dc.xsd">
 
-    <title>{{title order='2' auto-generate='title'}}</title>
-    <identifier>{{id order='1' auto-generate='id'}}</identifier>
-    <creator>{{creator}}</creator>
-    <date>{{dateInitial order='3' type='date'}}</date>
-    <date>{{dateFinal order='4' type='date'}}</date>
-    <description>{{description type='text-area'}}</description>
-    <publisher>{{producer}}</publisher>
-    <rights>{{rights}}</rights>
-    <language>{{language auto-generate='language'}}</language>
+	<title>{{title order='2' auto-generate='title' label="{'en': 'Title'}"}}</title>
+	<identifier>{{id order='1' auto-generate='id' label="{'en': 'ID'}"}}</identifier>
+	<creator>{{creator label="{'en': 'Creator'}"}}</creator>
+	<date>{{dateInitial order='3' type='date' label="{'en': 'Initial date'}"}}</date>
+	<date>{{dateFinal order='4' type='date' label="{'en': 'Final date'}"}}</date>
+	<description>{{description type='text-area' label="{'en': 'Description'}"}}</description>
+	<publisher>{{producer label="{'en': 'Producer'}"}}</publisher>
+	<rights>{{rights label="{'en': 'Rights'}"}}</rights>
+	<language>{{language auto-generate='language' label="{'en': 'Language'}"}}</language>
 
 </simpledc>
