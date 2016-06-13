@@ -291,18 +291,38 @@ public class EditDescriptiveMetadata extends Composite {
 
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
+    String xmlText = metadataXML.getText();
+    boolean hasOverridenTheForm = inXML && !xmlText.equals(metadataTextFromForm);
+    if(hasOverridenTheForm){
+      updateMetadataOnServer(xmlText);
+    }else{
+      // Get the resulting XML using the data from the form
+      BrowserService.Util.getInstance().getDescriptiveMetadataPreview(aipId, supportedBundle, new AsyncCallback<String>() {
+        @Override
+        public void onFailure(Throwable caught) {
+          Toast.showError(caught.getClass().getName(), caught.getMessage());
+        }
+
+        @Override
+        public void onSuccess(String preview) {
+          updateMetadataOnServer(preview);
+        }
+      });
+    }
+  }
+
+  private void updateMetadataOnServer(String content){
     String typeText = type.getSelectedValue();
     String version = null;
 
     if (typeText.contains(RodaConstants.METADATA_VERSION_SEPARATOR)) {
       version = typeText.substring(typeText.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1,
-        typeText.length());
+          typeText.length());
       typeText = typeText.substring(0, typeText.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));
     }
-    String xmlText = metadataXML.getText();
 
     DescriptiveMetadataEditBundle updatedBundle = new DescriptiveMetadataEditBundle(bundle.getId(), typeText, version,
-      xmlText);
+        content);
 
     BrowserService.Util.getInstance().updateDescriptiveMetadataFile(aipId, updatedBundle, new AsyncCallback<Void>() {
 
