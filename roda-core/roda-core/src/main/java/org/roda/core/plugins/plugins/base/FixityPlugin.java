@@ -11,7 +11,10 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.xmlbeans.XmlException;
@@ -47,6 +50,7 @@ import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
+import org.roda.core.util.FileUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,19 +119,29 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
                   if (fixities != null) {
                     boolean passedFixity = true;
 
+                    // get all necessary hash algorithms
+                    Set<String> algorithms = new HashSet<>();
                     for (Fixity f : fixities) {
-                      try {
-                        Fixity currentFixity = PremisV3Utils.calculateFixity(currentFileBinary,
-                          f.getMessageDigestAlgorithm(), "FixityCheck action");
+                      algorithms.add(f.getMessageDigestAlgorithm());
+                    }
 
-                        if (!f.getMessageDigest().trim().equalsIgnoreCase(currentFixity.getMessageDigest().trim())) {
+                    // calculate hashes
+                    try {
+                      Map<String, String> checksums = FileUtility
+                        .checksums(currentFileBinary.getContent().createInputStream(), algorithms);
+
+                      for (Fixity f : fixities) {
+                        String checksum = checksums.get(f.getMessageDigest());
+
+                        if (!f.getMessageDigest().trim().equalsIgnoreCase(checksum.trim())) {
                           passedFixity = false;
                           break;
                         }
-                      } catch (NoSuchAlgorithmException nsae) {
-                        passedFixity = false;
-                        break;
                       }
+                    } catch (NoSuchAlgorithmException e) {
+                      passedFixity = false;
+                      // TODO add exception to plugin report
+                      LOGGER.debug("Could not check fixity", e);
                     }
 
                     if (passedFixity) {

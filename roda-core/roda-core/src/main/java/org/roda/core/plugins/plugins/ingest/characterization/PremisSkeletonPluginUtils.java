@@ -8,6 +8,7 @@
 package org.roda.core.plugins.plugins.ingest.characterization;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.xmlbeans.XmlException;
@@ -26,7 +27,6 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetada
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.ContentPayload;
-import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,9 +34,9 @@ public class PremisSkeletonPluginUtils {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PremisSkeletonPlugin.class);
 
-  public static void createPremisSkeletonOnRepresentation(ModelService model, StorageService storage, AIP aip,
-    String representationId) throws IOException, RequestNotValidException, GenericException, NotFoundException,
-      AuthorizationDeniedException, XmlException, ValidationException, AlreadyExistsException {
+  public static void createPremisSkeletonOnRepresentation(ModelService model, AIP aip, String representationId,
+    Collection<String> fixityAlgorithms) throws IOException, RequestNotValidException, GenericException, NotFoundException,
+    AuthorizationDeniedException, XmlException, ValidationException, AlreadyExistsException {
 
     gov.loc.premis.v3.Representation representation = PremisV3Utils.createBaseRepresentation(aip.getId(),
       representationId);
@@ -50,7 +50,7 @@ public class PremisSkeletonPluginUtils {
         File file = oFile.get();
         if (!file.isDirectory()) {
           LOGGER.debug("Processing {}", file);
-          ContentPayload filePreservation = PremisV3Utils.createBaseFile(file, model);
+          ContentPayload filePreservation = PremisV3Utils.createBaseFile(file, model, fixityAlgorithms);
           model.createPreservationMetadata(PreservationMetadataType.OBJECT_FILE, aip.getId(), representationId,
             file.getPath(), file.getId(), filePreservation, notifyInSteps);
           PremisV3Utils.linkFileToRepresentation(file, RodaConstants.PREMIS_RELATIONSHIP_TYPE_STRUCTURAL,

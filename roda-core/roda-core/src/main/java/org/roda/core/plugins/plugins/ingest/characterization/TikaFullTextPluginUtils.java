@@ -43,7 +43,6 @@ import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.InputStreamContentPayload;
 import org.roda.core.storage.InputStreamContentPayload.ProvidesInputStream;
-import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,9 +53,9 @@ public class TikaFullTextPluginUtils {
   private static final Tika tika = new Tika();
 
   public static Report runTikaFullTextOnRepresentation(Report reportItem, IndexService index, ModelService model,
-    StorageService storage, AIP aip, Representation representation, boolean doFeatureExtraction,
-    boolean doFulltextExtraction) throws NotFoundException, GenericException, RequestNotValidException,
-    AuthorizationDeniedException, ValidationException {
+    AIP aip, Representation representation, boolean doFeatureExtraction, boolean doFulltextExtraction)
+    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException,
+    ValidationException {
 
     boolean recursive = true;
     CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(), representation.getId(),
@@ -69,7 +68,7 @@ public class TikaFullTextPluginUtils {
         File file = oFile.get();
         if (!file.isDirectory() && (doFeatureExtraction || doFulltextExtraction)) {
           StoragePath storagePath = ModelUtils.getFileStoragePath(file);
-          Binary binary = storage.getBinary(storagePath);
+          Binary binary = model.getStorage().getBinary(storagePath);
 
           Metadata metadata = new Metadata();
           InputStream inputStream = null;

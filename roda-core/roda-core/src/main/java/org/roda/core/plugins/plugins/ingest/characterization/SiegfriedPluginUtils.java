@@ -41,7 +41,6 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DirectResourceAccess;
-import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
 import org.roda.core.util.Base64;
 import org.roda.core.util.CommandException;
@@ -102,12 +101,12 @@ public class SiegfriedPluginUtils {
   }
 
   public static <T extends Serializable> void runSiegfriedOnRepresentation(Plugin<T> plugin, IndexService index,
-    ModelService model, StorageService storage, AIP aip, Representation representation) throws GenericException,
-    RequestNotValidException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException, PluginException {
+    ModelService model, AIP aip, Representation representation) throws GenericException, RequestNotValidException,
+    AlreadyExistsException, NotFoundException, AuthorizationDeniedException, PluginException {
 
     StoragePath representationDataPath = ModelUtils.getRepresentationDataStoragePath(aip.getId(),
       representation.getId());
-    DirectResourceAccess directAccess = storage.getDirectAccess(representationDataPath);
+    DirectResourceAccess directAccess = model.getStorage().getDirectAccess(representationDataPath);
 
     Path representationFsPath = directAccess.getPath();
     if (Files.exists(representationFsPath)) {

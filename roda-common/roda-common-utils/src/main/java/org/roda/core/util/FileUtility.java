@@ -12,15 +12,20 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
-import org.apache.commons.transaction.util.FileHelper;
+import org.apache.commons.io.IOUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,65 +60,6 @@ public class FileUtility {
   }
 
   /**
-   * Copy <code>sourceFile</code> to <code>destinationFile</code>.
-   * 
-   * @param sourceFile
-   *          the source file.
-   * @param destinationFile
-   *          the destination file.
-   * @throws IOException
-   *           if something goes wrong with the copy.
-   */
-  public static void copyFile(File sourceFile, File destinationFile) throws IOException {
-
-    FileHelper.copy(sourceFile, destinationFile);
-
-  }
-
-  /**
-   * Copy <code>sourceFiles</code> to <code>destinationDir</code>.
-   * 
-   * @param sourceFiles
-   *          the source files.
-   * @param destinationDir
-   *          the destination directory.
-   * @return the number of copied files.
-   */
-  public static int copyFiles(List<File> sourceFiles, File destinationDir) {
-    int filesCopied = 0;
-
-    for (Iterator<File> iter = sourceFiles.iterator(); iter.hasNext();) {
-      File file = iter.next();
-      try {
-        copyFile(file, new File(destinationDir, file.getName()));
-        filesCopied++;
-      } catch (IOException e) {
-        LOGGER.error("Error copying file " + file + " to " + new File(destinationDir, file.getName()), e);
-      }
-    }
-
-    return filesCopied;
-  }
-
-  /**
-   * 
-   * @param file
-   * @param digestAlgorithm
-   * 
-   * @return a {@link String} with calculated checksum in hexadecimal.
-   * 
-   * @throws NoSuchAlgorithmException
-   * @throws IOException
-   */
-  public static String calculateChecksumInHex(File file, String digestAlgorithm)
-    throws NoSuchAlgorithmException, IOException {
-    FileInputStream fis = new FileInputStream(file);
-    String checksumInHex = calculateChecksumInHex(fis, digestAlgorithm);
-    fis.close();
-    return checksumInHex;
-  }
-
-  /**
    * 
    * @param is
    * @param digestAlgorithm
@@ -121,9 +67,8 @@ public class FileUtility {
    * @throws NoSuchAlgorithmException
    * @throws IOException
    */
-  public static String calculateChecksumInHex(InputStream is, String digestAlgorithm)
-    throws NoSuchAlgorithmException, IOException {
-    return byteArrayToHexString(calculateDigest(is, digestAlgorithm));
+  public static String checksum(InputStream is, String digestAlgorithm) throws NoSuchAlgorithmException, IOException {
+    return byteArrayToHexString(digest(is, digestAlgorithm));
   }
 
   /**
@@ -134,12 +79,10 @@ public class FileUtility {
    * @throws NoSuchAlgorithmException
    * @throws IOException
    */
-  public static byte[] calculateDigest(InputStream is, String digestAlgorithm)
-    throws NoSuchAlgorithmException, IOException {
+  private static byte[] digest(InputStream is, String digestAlgorithm) throws NoSuchAlgorithmException, IOException {
 
     MessageDigest digestor = MessageDigest.getInstance(digestAlgorithm);
 
-    // reads file at 1Kbyte chunks (1024 bytes)
     // reads file in 1Mbyte chunks (1048576 bytes - 2^20 bytes)
     int bufSize = 1048576; // 1 MByte
     byte[] buffer = new byte[bufSize];
@@ -148,11 +91,63 @@ public class FileUtility {
       digestor.update(buffer, 0, n);
       n = is.read(buffer, 0, bufSize);
     }
-    // is.close();
+    is.close();
 
     byte[] digest = digestor.digest();
 
     return digest;
+  }
+
+  public static Map<String, String> checksums(InputStream is, Collection<String> algorithms)
+    throws NoSuchAlgorithmException, IOException {
+    Map<String, String> ret = new HashMap<>();
+    Map<String, MessageDigest> digestors = new HashMap<>();
+
+    for (String algorithm : algorithms) {
+      digestors.put(algorithm, MessageDigest.getInstance(algorithm));
+    }
+
+    // reads file in 1Mbyte chunks (1048576 bytes - 2^20 bytes)
+    int bufSize = 1048576; // 1 MByte
+    byte[] buffer = new byte[bufSize];
+    int n = is.read(buffer, 0, bufSize);
+    while (n != -1) {
+
+      for (MessageDigest digestor : digestors.values()) {
+        digestor.update(buffer, 0, n);
+      }
+
+      n = is.read(buffer, 0, bufSize);
+    }
+
+    for (Entry<String, MessageDigest> entry : digestors.entrySet()) {
+      ret.put(entry.getKey(), byteArrayToHexString(entry.getValue().digest()));
+    }
+
+    IOUtils.closeQuietly(is);
+
+    return ret;
+  }
+
+  public static Map<String, String> copyAndChecksums(InputStream in, OutputStream out, Collection<String> algorithms)
+    throws NoSuchAlgorithmException, IOException {
+    Map<String, String> ret = new HashMap<>();
+    Map<String, DigestInputStream> streams = new HashMap<>();
+
+    InputStream stream = in;
+
+    for (String algorithm : algorithms) {
+      stream = new DigestInputStream(stream, MessageDigest.getInstance(algorithm));
+      streams.put(algorithm, (DigestInputStream) stream);
+    }
+
+    IOUtils.copyLarge(stream, out);
+
+    for (Entry<String, DigestInputStream> entry : streams.entrySet()) {
+      ret.put(entry.getKey(), byteArrayToHexString(entry.getValue().getMessageDigest().digest()));
+    }
+
+    return ret;
   }
 
   /**
@@ -242,26 +237,15 @@ public class FileUtility {
   /**
    * Gets file extension from filename
    * 
-   * @param file
+   * @param filename
    * @return file extension if filename has at least one dot ; otherwise an
    *         empty string
    */
-  public static String getFileExtension(File file) {
-    return getFileExtension(file.getName());
-  }
-
-  /**
-   * Gets file extension from filename
-   * 
-   * @param file
-   * @return file extension if filename has at least one dot ; otherwise an
-   *         empty string
-   */
-  public static String getFileExtension(String file) {
+  public static String getFileNameExtension(String filename) {
     String res = "";
-    int lastIndexOf = file.lastIndexOf('.');
+    int lastIndexOf = filename.lastIndexOf('.');
     if (lastIndexOf != -1) {
-      res = file.substring(lastIndexOf + 1);
+      res = filename.substring(lastIndexOf + 1);
     }
     return res;
   }

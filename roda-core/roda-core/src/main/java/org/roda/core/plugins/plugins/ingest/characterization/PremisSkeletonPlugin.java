@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.xmlbeans.XmlException;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -105,7 +106,9 @@ public class PremisSkeletonPlugin extends AbstractPlugin<AIP> {
         try {
           for (Representation representation : aip.getRepresentations()) {
             LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
-            PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, storage, aip, representation.getId());
+            List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
+            PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aip, representation.getId(),
+              algorithms);
             model.notifyRepresentationUpdated(representation);
           }
 

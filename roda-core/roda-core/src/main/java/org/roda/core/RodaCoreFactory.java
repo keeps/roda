@@ -33,6 +33,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -1040,8 +1041,21 @@ public class RodaCoreFactory {
     return rodaConfiguration.getInt(getConfigurationKey(keyParts), defaultValue);
   }
 
+  public static List<String> getRodaConfigurationAsList(String... keyParts) {
+    return Arrays.asList(rodaConfiguration.getStringArray(getConfigurationKey(keyParts)));
+  }
+
   public static int getRodaConfigurationAsInt(String... keyParts) {
     return getRodaConfigurationAsInt(0, keyParts);
+  }
+
+  public static List<String> getFixityAlgorithms() {
+    List<String> algorithms = RodaCoreFactory.getRodaConfigurationAsList("core", "premis", "fixity", "algorithms");
+
+    if (algorithms == null || algorithms.isEmpty()) {
+      algorithms = RodaConstants.DEFAULT_ALGORITHMS;
+    }
+    return algorithms;
   }
 
   public static Set<String> getFilenamesInsideConfigFolder(String folder) throws IOException {

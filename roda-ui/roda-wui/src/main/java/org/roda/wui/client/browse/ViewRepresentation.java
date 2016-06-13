@@ -29,6 +29,7 @@ import org.roda.wui.client.common.SearchPanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.SimpleFileList;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.common.client.ClientLogger;
@@ -865,60 +866,72 @@ public class ViewRepresentation extends Composite {
   }
 
   public void changeInfoFile() {
-    HashMap<String, String> values = new HashMap<String, String>();
+    HashMap<String, SafeHtml> values = new HashMap<String, SafeHtml>();
     infoFilePanel.clear();
 
     if (file != null) {
       String fileName = file.getOriginalName() != null ? file.getOriginalName() : file.getId();
-      values.put(messages.viewRepresentationInfoFilename(), fileName);
+      values.put(messages.viewRepresentationInfoFilename(), SafeHtmlUtils.fromString(fileName));
 
-      values.put(messages.viewRepresentationInfoSize(), Humanize.readableFileSize(file.getSize()));
+      values.put(messages.viewRepresentationInfoSize(),
+        SafeHtmlUtils.fromString(Humanize.readableFileSize(file.getSize())));
 
       if (file.getFileFormat() != null) {
         FileFormat fileFormat = file.getFileFormat();
 
-        if (fileFormat.getMimeType() != null) {
-          values.put(messages.viewRepresentationInfoMimetype(), fileFormat.getMimeType());
+        if (StringUtils.isNotBlank(fileFormat.getMimeType())) {
+          values.put(messages.viewRepresentationInfoMimetype(), SafeHtmlUtils.fromString(fileFormat.getMimeType()));
         }
 
-        if (fileFormat.getFormatDesignationName() != null) {
-          values.put(messages.viewRepresentationInfoFormat(), fileFormat.getFormatDesignationName());
+        if (StringUtils.isNotBlank(fileFormat.getFormatDesignationName())) {
+          values.put(messages.viewRepresentationInfoFormat(),
+            SafeHtmlUtils.fromString(fileFormat.getFormatDesignationName()));
         }
 
-        if (fileFormat.getPronom() != null) {
-          values.put(messages.viewRepresentationInfoPronom(), fileFormat.getPronom());
+        if (StringUtils.isNotBlank(fileFormat.getPronom())) {
+          values.put(messages.viewRepresentationInfoPronom(), SafeHtmlUtils.fromString(fileFormat.getPronom()));
         }
 
       }
 
-      if (file.getCreatingApplicationName() != null) {
-        values.put(messages.viewRepresentationInfoCreatingApplicationName(), file.getCreatingApplicationName());
+      if (StringUtils.isNotBlank(file.getCreatingApplicationName())) {
+        values.put(messages.viewRepresentationInfoCreatingApplicationName(),
+          SafeHtmlUtils.fromString(file.getCreatingApplicationName()));
       }
 
-      if (file.getCreatingApplicationVersion() != null) {
-        values.put(messages.viewRepresentationInfoCreatingApplicationVersion(), file.getCreatingApplicationVersion());
+      if (StringUtils.isNotBlank(file.getCreatingApplicationVersion())) {
+        values.put(messages.viewRepresentationInfoCreatingApplicationVersion(),
+          SafeHtmlUtils.fromString(file.getCreatingApplicationVersion()));
       }
 
-      if (file.getDateCreatedByApplication() != null) {
-        values.put(messages.viewRepresentationInfoDateCreatedByApplication(), file.getDateCreatedByApplication());
+      if (StringUtils.isNotBlank(file.getDateCreatedByApplication())) {
+        values.put(messages.viewRepresentationInfoDateCreatedByApplication(),
+          SafeHtmlUtils.fromString(file.getDateCreatedByApplication()));
       }
 
       if (file.getHash() != null && file.getHash().size() > 0) {
-        StringBuilder b = new StringBuilder();
+        SafeHtmlBuilder b = new SafeHtmlBuilder();
         boolean first = true;
         for (String hash : file.getHash()) {
           if (first) {
             first = false;
           } else {
-            b.append("\n");
+            b.append(SafeHtmlUtils.fromSafeConstant("<br/>"));
           }
-          b.append(hash);
+          b.append(SafeHtmlUtils.fromSafeConstant("<small>"));
+          b.append(SafeHtmlUtils.fromString(hash));
+          b.append(SafeHtmlUtils.fromSafeConstant("</small>"));
         }
-        values.put(messages.viewRepresentationInfoHash(), b.toString());
+        values.put(messages.viewRepresentationInfoHash(), b.toSafeHtml());
       }
 
       if (file.getStoragePath() != null) {
-        values.put(messages.viewRepresentationInfoStoragePath(), file.getStoragePath());
+        SafeHtmlBuilder b = new SafeHtmlBuilder();
+        b.append(SafeHtmlUtils.fromSafeConstant("<small>"));
+        b.append(SafeHtmlUtils.fromString(file.getStoragePath()));
+        b.append(SafeHtmlUtils.fromSafeConstant("</small>"));
+
+        values.put(messages.viewRepresentationInfoStoragePath(), b.toSafeHtml());
       }
     }
 
@@ -926,7 +939,7 @@ public class ViewRepresentation extends Composite {
       FlowPanel entry = new FlowPanel();
 
       Label keyLabel = new Label(key);
-      Label valueLabel = new Label(values.get(key));
+      HTML valueLabel = new HTML(values.get(key));
 
       entry.add(keyLabel);
       entry.add(valueLabel);

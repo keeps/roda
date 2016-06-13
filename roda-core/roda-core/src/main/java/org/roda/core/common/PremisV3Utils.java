@@ -18,13 +18,12 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
@@ -98,18 +97,29 @@ import gov.loc.premis.v3.StorageComplexType;
 import gov.loc.premis.v3.StringPlusAuthority;
 
 public class PremisV3Utils {
+  private static final String FIXITY_ORIGINATOR = "RODA";
+
   private static final Logger LOGGER = LoggerFactory.getLogger(PremisV3Utils.class);
 
-  private static final Set<String> MANDATORY_CHECKSUM_ALGORITHMS = new HashSet<>(Arrays.asList("SHA-256"));
   private static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
 
-  public static Fixity calculateFixity(Binary binary, String digestAlgorithm, String originator)
+  public static List<Fixity> calculateFixities(Binary binary, Collection<String> algorithms, String originator)
     throws IOException, NoSuchAlgorithmException {
-    InputStream dsInputStream = binary.getContent().createInputStream();
-    Fixity fixity = new Fixity(digestAlgorithm, FileUtility.calculateChecksumInHex(dsInputStream, digestAlgorithm),
-      originator);
-    dsInputStream.close();
-    return fixity;
+    List<Fixity> ret = new ArrayList<>();
+
+    InputStream stream = binary.getContent().createInputStream();
+
+    Map<String, String> checksums = FileUtility.checksums(stream, algorithms);
+
+    for (Entry<String, String> entry : checksums.entrySet()) {
+      String algorithm = entry.getKey();
+      String checksum = entry.getValue();
+      ret.add(new Fixity(algorithm, checksum, originator));
+    }
+
+    IOUtils.closeQuietly(stream);
+
+    return ret;
   }
 
   public static boolean isPremisV2(Binary binary) throws IOException, SAXException {
@@ -418,8 +428,9 @@ public class PremisV3Utils {
     return representation;
   }
 
-  public static ContentPayload createBaseFile(File originalFile, ModelService model) throws GenericException,
-    RequestNotValidException, NotFoundException, AuthorizationDeniedException, ValidationException, XmlException {
+  public static ContentPayload createBaseFile(File originalFile, ModelService model,
+    Collection<String> fixityAlgorithms) throws GenericException, RequestNotValidException, NotFoundException,
+    AuthorizationDeniedException, ValidationException, XmlException {
     ObjectDocument document = ObjectDocument.Factory.newInstance();
     gov.loc.premis.v3.File file = gov.loc.premis.v3.File.Factory.newInstance();
     file.addNewPreservationLevel()
@@ -439,13 +450,19 @@ public class PremisV3Utils {
     Binary binary = model.getStorage().getBinary(ModelUtils.getFileStoragePath(originalFile));
 
     if (binary.getContentDigest() != null && !binary.getContentDigest().isEmpty()) {
-      // TODO use binary content digest information
+      // use binary content digest information
+      for (Entry<String, String> entry : binary.getContentDigest().entrySet()) {
+        FixityComplexType premis_fixity = occt.addNewFixity();
+        premis_fixity.setMessageDigest(entry.getKey());
+        premis_fixity.setMessageDigestAlgorithm(getStringPlusAuthority(entry.getValue()));
+        premis_fixity.setMessageDigestOriginator(getStringPlusAuthority(FIXITY_ORIGINATOR));
+      }
     } else {
       // if binary does not contain digest, create a new one
       try {
-        for (String algorithm : MANDATORY_CHECKSUM_ALGORITHMS) {
-          // TODO set better originator
-          Fixity fixity = calculateFixity(binary, algorithm, "RODA");
+        List<Fixity> fixities = calculateFixities(binary, fixityAlgorithms, FIXITY_ORIGINATOR);
+
+        for (Fixity fixity : fixities) {
           FixityComplexType premis_fixity = occt.addNewFixity();
           premis_fixity.setMessageDigest(fixity.getMessageDigest());
           premis_fixity.setMessageDigestAlgorithm(getStringPlusAuthority(fixity.getMessageDigestAlgorithm()));
