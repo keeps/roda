@@ -212,12 +212,14 @@ public class EditDescriptiveMetadata extends Composite {
     CreateForm.create(formOrXML, bundle);
   }
 
-  public void setInXML(boolean inHTML) {
-    this.inXML = inHTML;
-    if (inHTML) {
+  public void setInXML(boolean inXML) {
+    this.inXML = inXML;
+    if (inXML) {
       showXml.removeStyleName("toolbarLink-selected");
+      formOrXML.addStyleName("metadata-edit-area-wrapper");
     } else {
       showXml.addStyleName("toolbarLink-selected");
+      formOrXML.removeStyleName("metadata-edit-area-wrapper");
     }
   }
 

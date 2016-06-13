@@ -2022,6 +2022,13 @@ td.datePickerMonth, td.datePickerYear {
 .metadata-edit-area {
     height: 300px;
     max-width: 100%;
+    padding: 10px;
+    margin: 0;
+}
+
+.metadata-edit-area-wrapper {
+    padding: 0;
+    line-height:0;
 }
 
 .metadata-edit-errors {

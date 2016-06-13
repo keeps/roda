@@ -10,14 +10,14 @@
 		</ead:filedesc>
 		<ead:profiledesc>
 			<ead:creation>
-				<ead:date normal='{{date auto-generate="now" type="date" label="{\"en\": \"Date\"}"}}'/>
+				<ead:date normal='{{date auto-generate="now" type="date" label="{\"en\": \"Date\"}"}} xpath="//ead:date ##%## //ead:unitdate"'/>
 			</ead:creation>
 		</ead:profiledesc>
 	</ead:eadheader>
 	<ead:archdesc level="item">
 		<ead:did>
-			<ead:unitid repositorycode="PT-RODA">{{id auto-generate="id" label="{'en': 'ID'}"}}</ead:unitid>
-			<ead:unittitle>{{title auto-generate="title" label="{'en': 'Title'}"}}</ead:unittitle>
+			<ead:unitid repositorycode="PT-RODA">{{id auto-generate="id" label="{'en': 'ID'}" xpath="//ead:unitid"}}</ead:unitid>
+			<ead:unittitle>{{title auto-generate="title" label="{'en': 'Title'}" xpath="//ead:unittitle"}}</ead:unittitle>
 			<ead:unitdate normal="{{date}}"/>
 		</ead:did>
 	</ead:archdesc>
