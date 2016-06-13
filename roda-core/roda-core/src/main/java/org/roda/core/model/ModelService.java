@@ -2006,6 +2006,8 @@ public class ModelService extends ModelObservable {
           LOGGER.debug("Sending email ...");
           emailUtility.sendMail(recipient, modifiedBody);
           LOGGER.debug("Email sent");
+        } else {
+          LOGGER.warn("SMTP not defined, cannot send emails");
         }
       }
 

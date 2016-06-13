@@ -7,6 +7,9 @@
  */
 package org.roda.core.common;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 import javax.mail.Message;
@@ -24,6 +27,7 @@ import com.sun.mail.smtp.SMTPTransport;
 
 public class ConfigurableEmailUtility {
 
+  private static final List<String> DEFAULT_PROPERTIES = Arrays.asList("host", "port", "auth", "starttls.enable");
   private String protocol;
   private String user;
   private String password;
@@ -81,13 +85,19 @@ public class ConfigurableEmailUtility {
     boolean hasAuth = false;
 
     String properties = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "properties");
-    String[] propertyList = properties.split(" ");
+    List<String> propertyList = new ArrayList<>(DEFAULT_PROPERTIES);
+    if (properties != null) {
+      propertyList.addAll(Arrays.asList(properties.split(" ")));
+    }
 
     for (String property : propertyList) {
       String mailProperty = RodaCoreFactory.getRodaConfigurationAsString("core", "email", property);
-      props.put("mail." + this.protocol + "." + property, mailProperty);
-      if (property.equals("auth") && mailProperty.equals("true"))
-        hasAuth = true;
+      if (mailProperty != null) {
+        props.put("mail." + this.protocol + "." + property, mailProperty);
+        if (property.equals("auth") && mailProperty.equals("true")) {
+          hasAuth = true;
+        }
+      }
     }
 
     if (hasAuth) {

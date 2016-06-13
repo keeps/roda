@@ -765,7 +765,7 @@ public class IndexServiceTest {
     notification.setFromUser("Test Message Index");
     notification.setRecipientUsers(Arrays.asList("recipientuser@example.com"));
 
-    model.createNotification(notification, "test-email-template", new HashMap<String, Object>());
+    model.createNotification(notification, "test-email-template.vm", new HashMap<String, Object>());
     index.commit(Notification.class);
 
     Notification message2 = model.retrieveNotification(notification.getId());
