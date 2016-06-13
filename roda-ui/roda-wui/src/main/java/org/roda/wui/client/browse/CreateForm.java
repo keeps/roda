@@ -200,8 +200,8 @@ public class CreateForm {
         return dateTimeFormat.format(date);
       }
     });
-    if (mv.get("value") != null) {
-      Date date = dateTimeFormat.parse(mv.get("value"));
+    if (mv.get("value") != null && mv.get("value").length() > 0) {
+      Date date = dateTimeFormat.parse(mv.get("value").trim());
       mvDate.setValue(date);
     }
     mvDate.addValueChangeHandler(new ValueChangeHandler<Date>() {

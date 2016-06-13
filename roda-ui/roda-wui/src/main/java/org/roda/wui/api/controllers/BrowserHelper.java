@@ -15,18 +15,8 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.MissingResourceException;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.WebApplicationException;
@@ -298,6 +288,7 @@ public class BrowserHelper {
             System.out.println("xpathRaw: " + xpathRaw);
             String[] xpaths = xpathRaw.split("##%##");
             String value = "";
+            Set<String> allValues = new HashSet<>();
             for (String xpath : xpaths) {
               System.out.println("xpath: " + xpath);
               List<String> result = ServerTools.applyXpath(xml, xpath);
@@ -306,8 +297,11 @@ public class BrowserHelper {
               if(allEqual && !result.isEmpty()){
                 value = result.get(0);
               }else {
-                value = String.join(" / ", result);
+                allValues.addAll(result);
               }
+            }
+            if(value.equals("")){
+              value += String.join(" / ", allValues);
             }
             System.out.println("value: " + value);
             mv.set("value", value);
