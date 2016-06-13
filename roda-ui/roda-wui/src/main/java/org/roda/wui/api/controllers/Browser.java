@@ -126,7 +126,7 @@ public class Browser extends RodaCoreService {
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
     // delegate
-    DescriptiveMetadataEditBundle bundle = BrowserHelper.getDescriptiveMetadataEditBundle(aipId, metadataId);
+    DescriptiveMetadataEditBundle bundle = BrowserHelper.getDescriptiveMetadataEditBundle(user, aip, metadataId);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();

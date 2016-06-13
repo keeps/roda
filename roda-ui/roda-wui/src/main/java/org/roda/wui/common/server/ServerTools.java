@@ -8,16 +8,15 @@
 package org.roda.wui.common.server;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
+import net.sf.saxon.s9api.*;
+import net.sf.saxon.xpath.XPathFactoryImpl;
+import org.apache.xpath.NodeSet;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.client.browse.MetadataValue;
@@ -26,6 +25,14 @@ import org.slf4j.LoggerFactory;
 
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
 
 public class ServerTools {
   private static final Logger LOGGER = LoggerFactory.getLogger(ServerTools.class);
@@ -176,6 +183,35 @@ public class ServerTools {
         result = user.getEmail();
       default:
         break;
+    }
+    return result;
+  }
+
+  public static List<String> applyXpath(String xml, String xpathString){
+    List<String> result = new ArrayList<>();
+    try {
+      // XPath objs:
+      Processor proc = new Processor(false);
+      XPathCompiler xpath = proc.newXPathCompiler();
+      DocumentBuilder builder = proc.newDocumentBuilder();
+
+      // Load the XML document.
+      StringReader reader = new StringReader(xml);
+      XdmNode doc = builder.build(new StreamSource(reader));
+
+      // Compile the xpath
+      XPathSelector selector = xpath.compile(xpathString).load();
+      selector.setContextItem(doc);
+
+      // Evaluate the expression.
+      XdmValue nodes = selector.evaluate();
+
+      for (XdmItem item : nodes) {
+        result.add(item.getStringValue());
+      }
+
+    } catch (Exception e) {
+      System.out.println(e.getLocalizedMessage());
     }
     return result;
   }

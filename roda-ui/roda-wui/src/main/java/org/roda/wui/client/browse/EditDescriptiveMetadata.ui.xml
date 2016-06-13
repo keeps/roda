@@ -28,7 +28,18 @@
 				<g:Label addStyleNames="form-label">
 					Content
 				</g:Label>
-				<g:TextArea ui:field="xml" addStyleNames="form-textbox metadata-edit-area" />
+				<g:Label ui:field="formOrXMLLabel">
+					Form
+				</g:Label>
+				<g:FocusPanel ui:field="showXml" styleName="toolbarLink">
+					<g:HTML>
+						<i class="fa fa-code"></i>
+					</g:HTML>
+				</g:FocusPanel>
+				<g:FlowPanel addStyleNames="panel">
+					<g:FlowPanel ui:field="formOrXML" addStyleNames="panel-body"/>
+				</g:FlowPanel>
+
 				<g:HTML visible="false" ui:field="errors" addStyleNames="metadata-edit-errors" />
 
 			</g:FlowPanel>

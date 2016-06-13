@@ -20,13 +20,14 @@ public class DescriptiveMetadataEditBundle implements Serializable {
   private String version;
   private String rawTemplate;
   private TreeSet<MetadataValue> values;
+  private boolean complete;
 
   public DescriptiveMetadataEditBundle() {
     super();
   }
 
   public DescriptiveMetadataEditBundle(String id, String type, String version, String xml, String rawTemplate,
-    TreeSet<MetadataValue> values) {
+    TreeSet<MetadataValue> values, boolean complete) {
     super();
     this.id = id;
     this.type = type;
@@ -34,6 +35,7 @@ public class DescriptiveMetadataEditBundle implements Serializable {
     this.version = version;
     this.rawTemplate = rawTemplate;
     this.values = values;
+    this.complete = complete;
   }
 
   public DescriptiveMetadataEditBundle(String id, String type, String version, String xml) {
@@ -90,5 +92,13 @@ public class DescriptiveMetadataEditBundle implements Serializable {
 
   public void setValues(TreeSet<MetadataValue> values) {
     this.values = values;
+  }
+
+  public boolean isComplete() {
+    return complete;
+  }
+
+  public void setComplete(boolean complete) {
+    this.complete = complete;
   }
 }

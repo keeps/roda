@@ -27,7 +27,7 @@
 					File name
 				</g:Label>
 				<g:TextBox ui:field="id" addStyleNames="form-textbox"/>
-				<g:Label ui:field="formOrXMLLabel"> <!--styleName="wui-browse-metadata-descriptive-versions-type"-->
+				<g:Label ui:field="formOrXMLLabel">
 					Form
 				</g:Label>
 				<g:FocusPanel ui:field="showXml" styleName="toolbarLink">

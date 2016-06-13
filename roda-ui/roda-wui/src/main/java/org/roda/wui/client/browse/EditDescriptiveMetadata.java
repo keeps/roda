@@ -10,11 +10,21 @@
  */
 package org.roda.wui.client.browse;
 
+import java.util.Date;
 import java.util.List;
 
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.json.client.*;
+import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.datepicker.client.DateBox;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationIssue;
+import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
@@ -29,13 +39,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.TextArea;
-import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.BrowseMessages;
 
@@ -95,6 +98,10 @@ public class EditDescriptiveMetadata extends Composite {
 
   private final String aipId;
   private final DescriptiveMetadataEditBundle bundle;
+  private final SupportedMetadataTypeBundle supportedBundle;
+  private boolean inXML = false;
+  private TextArea metadataXML;
+  private String metadataTextFromForm = null;
 
   // private ClientLogger logger = new ClientLogger(getClass().getName());
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
@@ -106,7 +113,13 @@ public class EditDescriptiveMetadata extends Composite {
   ListBox type;
 
   @UiField
-  TextArea xml;
+  Label formOrXMLLabel;
+
+  @UiField
+  FocusPanel showXml;
+
+  @UiField
+  FlowPanel formOrXML;
 
   @UiField
   Button buttonApply;
@@ -130,10 +143,14 @@ public class EditDescriptiveMetadata extends Composite {
     this.aipId = aipId;
     this.bundle = bundle;
 
+    supportedBundle = new SupportedMetadataTypeBundle(bundle.getType(), bundle.getVersion(), bundle.getId(), bundle.getRawTemplate(), bundle.getValues());
+
     initWidget(uiBinder.createAndBindUi(this));
+    metadataXML = new TextArea();
+    metadataXML.addStyleName("form-textbox metadata-edit-area metadata-form-textbox");
 
     id.setText(bundle.getId());
-    xml.setText(bundle.getXml());
+    //.setText(bundle.getXml());
 
     id.setEnabled(false);
 
@@ -172,6 +189,8 @@ public class EditDescriptiveMetadata extends Composite {
             index++;
           }
 
+          updateFormOrXML();
+
           if (selected >= 0) {
             type.addItem("Other", "");
             type.setSelectedIndex(selected);
@@ -188,6 +207,88 @@ public class EditDescriptiveMetadata extends Composite {
 
   }
 
+  private void createForm(SupportedMetadataTypeBundle bundle) {
+    formOrXML.clear();
+    CreateForm.create(formOrXML, bundle);
+  }
+
+  public void setInXML(boolean inHTML) {
+    this.inXML = inHTML;
+    if (inHTML) {
+      showXml.removeStyleName("toolbarLink-selected");
+    } else {
+      showXml.addStyleName("toolbarLink-selected");
+    }
+  }
+
+  @UiHandler("showXml")
+  void buttonShowXmlHandler(ClickEvent e) {
+    setInXML(!inXML);
+    updateFormOrXML();
+  }
+
+  private void updateFormOrXML() {
+    if (bundle != null && bundle.getValues() != null) {
+      showXml.setVisible(true);
+      if (inXML) {
+        updateMetadataXML();
+      } else {
+        // if the user changed the metadata text
+        if (metadataTextFromForm != null && !metadataXML.getText().equals(metadataTextFromForm)) {
+          Dialogs.showConfirmDialog(messages.confirmChangeToFormTitle(), messages.confirmChangeToFormMessage(),
+              messages.dialogCancel(), messages.dialogYes(), new AsyncCallback<Boolean>() {
+                @Override
+                public void onFailure(Throwable throwable) {
+                  Toast.showError(throwable.getClass().getName(), throwable.getMessage());
+                }
+
+                @Override
+                public void onSuccess(Boolean aBoolean) {
+                  if (aBoolean) {
+                    formOrXML.clear();
+                    createForm(supportedBundle);
+                    formOrXMLLabel.setText("Form");
+                  } else {
+                    setInXML(!inXML);
+                  }
+                }
+              });
+        } else {
+          formOrXML.clear();
+          createForm(supportedBundle);
+          formOrXMLLabel.setText("Form");
+        }
+      }
+    } else {
+      formOrXML.clear();
+      if (bundle != null)
+        metadataXML.setText(bundle.getRawTemplate());
+      else
+        metadataXML.setText("");
+      formOrXML.add(metadataXML);
+      formOrXMLLabel.setText("Template preview");
+      showXml.setVisible(false);
+    }
+  }
+
+  private void updateMetadataXML() {
+    BrowserService.Util.getInstance().getDescriptiveMetadataPreview(aipId, supportedBundle, new AsyncCallback<String>() {
+      @Override
+      public void onFailure(Throwable caught) {
+        Toast.showError(caught.getClass().getName(), caught.getMessage());
+      }
+
+      @Override
+      public void onSuccess(String preview) {
+        formOrXML.clear();
+        metadataXML.setText(preview);
+        formOrXML.add(metadataXML);
+        formOrXMLLabel.setText("Template preview");
+        metadataTextFromForm = preview;
+      }
+    });
+  }
+
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
     String typeText = type.getSelectedValue();
@@ -198,7 +299,7 @@ public class EditDescriptiveMetadata extends Composite {
         typeText.length());
       typeText = typeText.substring(0, typeText.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));
     }
-    String xmlText = xml.getText();
+    String xmlText = metadataXML.getText();
 
     DescriptiveMetadataEditBundle updatedBundle = new DescriptiveMetadataEditBundle(bundle.getId(), typeText, version,
       xmlText);

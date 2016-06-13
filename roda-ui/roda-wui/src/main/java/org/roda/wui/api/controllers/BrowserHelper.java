@@ -257,18 +257,67 @@ public class BrowserHelper {
     return getDescriptiveMetadataBundle(aipId, descriptiveMetadata, locale);
   }
 
-  public static DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(String aipId,
+  public static DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(RodaUser user, IndexedAIP aip,
     String descriptiveMetadataId)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     DescriptiveMetadataEditBundle ret;
     InputStream inputStream = null;
     try {
-      DescriptiveMetadata metadata = RodaCoreFactory.getModelService().retrieveDescriptiveMetadata(aipId,
+      // Get the metadata file
+      DescriptiveMetadata metadata = RodaCoreFactory.getModelService().retrieveDescriptiveMetadata(aip.getId(),
         descriptiveMetadataId);
-      Binary binary = RodaCoreFactory.getModelService().retrieveDescriptiveMetadataBinary(aipId, descriptiveMetadataId);
+      Binary binary = RodaCoreFactory.getModelService().retrieveDescriptiveMetadataBinary(aip.getId(), descriptiveMetadataId);
       inputStream = binary.getContent().createInputStream();
-      String xml = IOUtils.toString(inputStream);
-      ret = new DescriptiveMetadataEditBundle(descriptiveMetadataId, metadata.getType(), metadata.getVersion(), xml);
+      String xml = IOUtils.toString(inputStream, "UTF-8");
+
+      // Get the supported metadata type with the same type and version
+      // We need this to try to get get the values for the form
+      SupportedMetadataTypeBundle metadataTypeBundle = null;
+      List<SupportedMetadataTypeBundle> supportedMetadataTypeBundles = BrowserHelper.getSupportedMetadata(user, aip, Locale.getDefault());
+      for (SupportedMetadataTypeBundle typeBundle : supportedMetadataTypeBundles) {
+        if(typeBundle.getType() != null && typeBundle.getType().equalsIgnoreCase(metadata.getType())){
+          if(typeBundle.getVersion() != null && typeBundle.getVersion().equalsIgnoreCase(metadata.getVersion())){
+            metadataTypeBundle = typeBundle;
+            break;
+          }
+        }
+      }
+
+      // Get the values using XPath
+      TreeSet<MetadataValue> values = null;
+      String template = null;
+      System.out.println("metadataTypeBundle: " + metadataTypeBundle);
+      if(metadataTypeBundle != null){
+        values = metadataTypeBundle.getValues();
+        template = metadataTypeBundle.getTemplate();
+        System.out.println("values: " + values);
+        for (MetadataValue mv : values) {
+          String xpathRaw = mv.get("xpath");
+          System.out.println("mv: " + mv.getId());
+          if(xpathRaw != null && xpathRaw.length() > 0){
+            System.out.println("xpathRaw: " + xpathRaw);
+            String[] xpaths = xpathRaw.split(",");
+            String value = "";
+            for (String xpath : xpaths) {
+              System.out.println("xpath: " + xpath);
+              List<String> result = ServerTools.applyXpath(xml, xpath);
+              // if any of the values is different, concatenate all values in a string, otherwise return the value
+              boolean allEqual = result.stream().allMatch(s -> s.trim().equals(result.get(0).trim()));
+              if(allEqual){
+                value = result.get(0);
+              }else {
+                value = String.join(" / ", result);
+              }
+            }
+            System.out.println("value: " + value);
+            mv.set("value", value);
+          }
+        }
+      }
+
+      System.out.println("values_size: " + values.size());
+
+      ret = new DescriptiveMetadataEditBundle(descriptiveMetadataId, metadata.getType(), metadata.getVersion(), xml, template, values, true);
     } catch (IOException e) {
       throw new GenericException("Error getting descriptive metadata edit bundle: " + e.getMessage());
     } finally {
