@@ -12,7 +12,7 @@
 	
 	</ui:style>
 
-	<g:FlowPanel styleName="wui-browse-edit-metadata"
+	<g:FlowPanel styleName="wui-browse-metadata-descriptive-versions"
 		addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
@@ -25,9 +25,6 @@
 					File name
 				</g:Label>
 				<g:TextBox ui:field="id" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">
-					Content
-				</g:Label>
 				<g:Label ui:field="formOrXMLLabel">
 					Form
 				</g:Label>

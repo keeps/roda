@@ -296,7 +296,7 @@ public class BrowserHelper {
           System.out.println("mv: " + mv.getId());
           if(xpathRaw != null && xpathRaw.length() > 0){
             System.out.println("xpathRaw: " + xpathRaw);
-            String[] xpaths = xpathRaw.split(",");
+            String[] xpaths = xpathRaw.split("##%##");
             String value = "";
             for (String xpath : xpaths) {
               System.out.println("xpath: " + xpath);

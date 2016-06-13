@@ -190,7 +190,6 @@ public class ServerTools {
   public static List<String> applyXpath(String xml, String xpathString){
     List<String> result = new ArrayList<>();
     try {
-      // XPath objs:
       Processor proc = new Processor(false);
       XPathCompiler xpath = proc.newXPathCompiler();
       DocumentBuilder builder = proc.newDocumentBuilder();
