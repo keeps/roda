@@ -276,21 +276,16 @@ public class BrowserHelper {
       // Get the values using XPath
       TreeSet<MetadataValue> values = null;
       String template = null;
-      System.out.println("metadataTypeBundle: " + metadataTypeBundle);
       if(metadataTypeBundle != null){
         values = metadataTypeBundle.getValues();
         template = metadataTypeBundle.getTemplate();
-        System.out.println("values: " + values);
         for (MetadataValue mv : values) {
           String xpathRaw = mv.get("xpath");
-          System.out.println("mv: " + mv.getId());
           if(xpathRaw != null && xpathRaw.length() > 0){
-            System.out.println("xpathRaw: " + xpathRaw);
             String[] xpaths = xpathRaw.split("##%##");
             String value = "";
             Set<String> allValues = new HashSet<>();
             for (String xpath : xpaths) {
-              System.out.println("xpath: " + xpath);
               List<String> result = ServerTools.applyXpath(xml, xpath);
               // if any of the values is different, concatenate all values in a string, otherwise return the value
               boolean allEqual = result.stream().allMatch(s -> s.trim().equals(result.get(0).trim()));
@@ -303,13 +298,10 @@ public class BrowserHelper {
             if(value.equals("")){
               value += String.join(" / ", allValues);
             }
-            System.out.println("value: " + value);
             mv.set("value", value);
           }
         }
       }
-
-      System.out.println("values_size: " + values.size());
 
       ret = new DescriptiveMetadataEditBundle(descriptiveMetadataId, metadata.getType(), metadata.getVersion(), xml, template, values, true);
     } catch (IOException e) {
