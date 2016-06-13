@@ -276,7 +276,7 @@ public class BrowserHelper {
       List<SupportedMetadataTypeBundle> supportedMetadataTypeBundles = BrowserHelper.getSupportedMetadata(user, aip, Locale.getDefault());
       for (SupportedMetadataTypeBundle typeBundle : supportedMetadataTypeBundles) {
         if(typeBundle.getType() != null && typeBundle.getType().equalsIgnoreCase(metadata.getType())){
-          if(typeBundle.getVersion() != null && typeBundle.getVersion().equalsIgnoreCase(metadata.getVersion())){
+          if(typeBundle.getVersion() == metadata.getVersion() || (typeBundle.getVersion() != null && typeBundle.getVersion().equalsIgnoreCase(metadata.getVersion()))){
             metadataTypeBundle = typeBundle;
             break;
           }
@@ -303,7 +303,7 @@ public class BrowserHelper {
               List<String> result = ServerTools.applyXpath(xml, xpath);
               // if any of the values is different, concatenate all values in a string, otherwise return the value
               boolean allEqual = result.stream().allMatch(s -> s.trim().equals(result.get(0).trim()));
-              if(allEqual){
+              if(allEqual && !result.isEmpty()){
                 value = result.get(0);
               }else {
                 value = String.join(" / ", result);
