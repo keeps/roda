@@ -11,6 +11,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 import org.roda.core.common.JsonUtilsTest;
+import org.roda.core.common.MetadataFileUtilsEscapeTest;
 import org.roda.core.index.IndexServiceTest;
 import org.roda.core.index.PermissionsTest;
 import org.roda.core.index.SolrUtilsTest;
@@ -22,7 +23,7 @@ import org.roda.core.storage.fedora.FedoraStorageServiceTest;
 import org.roda.core.storage.fs.FileStorageServiceTest;
 
 @RunWith(Suite.class)
-@SuiteClasses({JsonUtilsTest.class, IndexServiceTest.class, ModelServiceTest.class, FileStorageServiceTest.class,
+@SuiteClasses({MetadataFileUtilsEscapeTest.class,JsonUtilsTest.class, IndexServiceTest.class, ModelServiceTest.class, FileStorageServiceTest.class,
   FedoraStorageServiceTest.class, SolrUtilsTest.class, InternalPluginsTest.class, InternalConvertPluginsTest.class,
   EARKSIPPluginsTest.class, PermissionsTest.class})
 public class AllTestsPlusExtra {

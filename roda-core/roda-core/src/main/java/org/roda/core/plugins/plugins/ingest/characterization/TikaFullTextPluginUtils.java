@@ -9,9 +9,7 @@ package org.roda.core.plugins.plugins.ingest.characterization;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.io.Reader;
-import java.io.StringWriter;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.ReaderInputStream;
@@ -26,7 +24,6 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
@@ -43,6 +40,7 @@ import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.InputStreamContentPayload;
 import org.roda.core.storage.InputStreamContentPayload.ProvidesInputStream;
+import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,9 +51,9 @@ public class TikaFullTextPluginUtils {
   private static final Tika tika = new Tika();
 
   public static Report runTikaFullTextOnRepresentation(Report reportItem, IndexService index, ModelService model,
-    AIP aip, Representation representation, boolean doFeatureExtraction, boolean doFulltextExtraction)
-    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException,
-    ValidationException {
+    StorageService storage, AIP aip, Representation representation, boolean doFeatureExtraction,
+    boolean doFulltextExtraction) throws NotFoundException, GenericException, RequestNotValidException,
+    AuthorizationDeniedException, ValidationException, IOException {
 
     boolean recursive = true;
     CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(), representation.getId(),
@@ -90,21 +88,8 @@ public class TikaFullTextPluginUtils {
                 notify);
             }
 
-          } catch (IOException | RODAException e) {
-            if (reportItem != null) {
-              StringWriter sw = new StringWriter();
-              PrintWriter pw = new PrintWriter(sw);
-              e.printStackTrace(pw);
-              String details = reportItem.getPluginDetails();
-              if (details == null) {
-                details = "";
-              }
-              details += sw.toString();
-              reportItem.setPluginDetails(details);
-              pw.close();
-            } else {
-              LOGGER.error("Error running Apache Tika", e);
-            }
+          } catch (Exception e) {
+            throw e;
           } finally {
             IOUtils.closeQuietly(inputStream);
           }
@@ -140,8 +125,8 @@ public class TikaFullTextPluginUtils {
                   file.getId(), premisFilePayload, notify);
               }
             }
-          } catch (IOException e) {
-            LOGGER.error("Error running Apache Tika", e);
+          } catch (Exception e) {
+            throw e;
           } finally {
             IOUtils.closeQuietly(inputStream);
           }

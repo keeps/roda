@@ -140,11 +140,11 @@ public class MetadataFileUtils {
     return otherProperties;
   }
   
-  private static String escapeAttribute(String value){
+  public static String escapeAttribute(String value){
     return XmlEscapers.xmlAttributeEscaper().escape(value);
   }
   
-  private static String escapeContent(String value){
+  public static String escapeContent(String value){
     return XmlEscapers.xmlContentEscaper().escape(value);
   }
   

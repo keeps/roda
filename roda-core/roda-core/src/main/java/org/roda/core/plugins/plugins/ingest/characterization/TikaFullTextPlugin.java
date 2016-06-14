@@ -21,7 +21,6 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
@@ -143,7 +142,7 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
         Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
         PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
         LOGGER.debug("Processing AIP {}", aip.getId());
-
+        Exception ex = null;
         try {
           for (Representation representation : aip.getRepresentations()) {
             LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
@@ -154,12 +153,23 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
 
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
           reportItem.setPluginState(PluginState.SUCCESS);
-        } catch (RODAException e) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
+        } catch (Exception e) {
+          ex = e;
+          LOGGER.error("Error running Tika on AIP " + aip.getId() + ": " + e.getMessage());
+          if (reportItem != null) {
+            String details = reportItem.getPluginDetails();
+            if (details == null) {
+              details = "";
+            }
+            details += e.getMessage();
+            reportItem.setPluginDetails(details);
+          } else {
+            LOGGER.error("Error running Apache Tika", e);
+          }
 
           jobPluginInfo.incrementObjectsProcessedWithFailure();
           reportItem.setPluginState(PluginState.FAILURE)
-            .setPluginDetails("Error running Tika " + aip.getId() + ": " + e.getMessage());
+            .setPluginDetails("Error running Tika on AIP " + aip.getId() + ": " + e.getMessage());
         }
 
         report.addReport(reportItem);
@@ -168,7 +178,12 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
         if (createsPluginEvent) {
           try {
             boolean notify = true;
-            PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(), "", notify);
+            String outcomeDetailExtension = "";
+            if (ex != null) {
+              outcomeDetailExtension = ex.getMessage();
+            }
+            PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(),
+              outcomeDetailExtension, notify);
           } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
             | AuthorizationDeniedException | AlreadyExistsException e) {
             LOGGER.error("Error creating preservation event", e);
