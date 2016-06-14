@@ -260,6 +260,16 @@ public class BrowserHelper {
   public static DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(RodaUser user, IndexedAIP aip,
     String descriptiveMetadataId)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+
+    DescriptiveMetadata metadata = RodaCoreFactory.getModelService().retrieveDescriptiveMetadata(aip.getId(),
+      descriptiveMetadataId);
+    return getDescriptiveMetadataEditBundle(user, aip, descriptiveMetadataId, metadata.getType(),
+      metadata.getVersion());
+  }
+
+  public static DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(RodaUser user, IndexedAIP aip,
+    String descriptiveMetadataId, String type, String version)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     DescriptiveMetadataEditBundle ret;
     InputStream inputStream = null;
     try {
@@ -277,9 +287,9 @@ public class BrowserHelper {
       List<SupportedMetadataTypeBundle> supportedMetadataTypeBundles = BrowserHelper.getSupportedMetadata(user, aip,
         Locale.getDefault());
       for (SupportedMetadataTypeBundle typeBundle : supportedMetadataTypeBundles) {
-        if (typeBundle.getType() != null && typeBundle.getType().equalsIgnoreCase(metadata.getType())) {
-          if (typeBundle.getVersion() == metadata.getVersion()
-            || (typeBundle.getVersion() != null && typeBundle.getVersion().equalsIgnoreCase(metadata.getVersion()))) {
+        if (typeBundle.getType() != null && typeBundle.getType().equalsIgnoreCase(type)) {
+          if (typeBundle.getVersion() == version
+            || (typeBundle.getVersion() != null && typeBundle.getVersion().equalsIgnoreCase(version))) {
             metadataTypeBundle = typeBundle;
             break;
           }
@@ -323,8 +333,7 @@ public class BrowserHelper {
         complete = templateWithValues.equals(xml);
       }
 
-      ret = new DescriptiveMetadataEditBundle(descriptiveMetadataId, metadata.getType(), metadata.getVersion(), xml,
-        template, values, complete);
+      ret = new DescriptiveMetadataEditBundle(descriptiveMetadataId, type, version, xml, template, values, complete);
     } catch (IOException e) {
       throw new GenericException("Error getting descriptive metadata edit bundle: " + e.getMessage());
     } finally {

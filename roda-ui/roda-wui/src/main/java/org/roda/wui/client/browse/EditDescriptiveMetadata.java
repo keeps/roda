@@ -22,6 +22,8 @@ import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -98,8 +100,8 @@ public class EditDescriptiveMetadata extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   private final String aipId;
-  private final DescriptiveMetadataEditBundle bundle;
-  private final SupportedMetadataTypeBundle supportedBundle;
+  private DescriptiveMetadataEditBundle bundle;
+  private SupportedMetadataTypeBundle supportedBundle;
   private boolean inXML = false;
   private TextArea metadataXML;
   private String metadataTextFromForm = null;
@@ -143,9 +145,9 @@ public class EditDescriptiveMetadata extends Composite {
    * @param user
    *          the user to edit
    */
-  public EditDescriptiveMetadata(final String aipId, final DescriptiveMetadataEditBundle bundle) {
+  public EditDescriptiveMetadata(final String aipId, final DescriptiveMetadataEditBundle bundleParam) {
     this.aipId = aipId;
-    this.bundle = bundle;
+    this.bundle = bundleParam;
 
     supportedBundle = new SupportedMetadataTypeBundle(bundle.getType(), bundle.getVersion(), bundle.getId(),
       bundle.getRawTemplate(), bundle.getValues());
@@ -157,7 +159,36 @@ public class EditDescriptiveMetadata extends Composite {
     id.setText(bundle.getId());
     id.setEnabled(false);
 
-    formCompleteDanger.setVisible(!bundle.isComplete());
+    type.addChangeHandler(new ChangeHandler() {
+      @Override
+      public void onChange(ChangeEvent changeEvent) {
+        String typeString = null, version = "";
+        String value = type.getSelectedValue();
+        if (value.contains(RodaConstants.METADATA_VERSION_SEPARATOR) && bundle.getVersion() != null) {
+          typeString = value.substring(0, value.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));
+          version = value.substring(value.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1, value.length());
+        }
+        if (typeString == null) {
+          typeString = value;
+        }
+
+        BrowserService.Util.getInstance().getDescriptiveMetadataEditBundle(aipId, bundle.getId(), typeString, version,
+          new AsyncCallback<DescriptiveMetadataEditBundle>() {
+            @Override
+            public void onFailure(Throwable caught) {
+              Toast.showError(caught.getClass().getName(), caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(DescriptiveMetadataEditBundle editBundle) {
+              bundle = editBundle;
+              supportedBundle = new SupportedMetadataTypeBundle(bundle.getType(), bundle.getVersion(), bundle.getId(),
+                bundle.getRawTemplate(), bundle.getValues());
+              updateFormOrXML();
+            }
+          });
+      }
+    });
 
     BrowserService.Util.getInstance().getSupportedMetadata(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
       new AsyncCallback<List<SupportedMetadataTypeBundle>>() {
@@ -234,6 +265,7 @@ public class EditDescriptiveMetadata extends Composite {
   }
 
   private void updateFormOrXML() {
+    formCompleteDanger.setVisible(!bundle.isComplete());
     if (bundle != null && bundle.getValues() != null) {
       showXml.setVisible(true);
       if (inXML) {

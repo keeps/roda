@@ -50,6 +50,9 @@ public interface BrowserServiceAsync {
 
   void getItemBundle(String aipId, String localeString, AsyncCallback<BrowseItemBundle> callback);
 
+  void getDescriptiveMetadataEditBundle(String aipId, String descId, String type, String version,
+    AsyncCallback<DescriptiveMetadataEditBundle> callback);
+
   void getDescriptiveMetadataEditBundle(String aipId, String descId,
     AsyncCallback<DescriptiveMetadataEditBundle> callback);
 

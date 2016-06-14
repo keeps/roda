@@ -15,13 +15,24 @@ import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
-import org.roda.core.data.exceptions.*;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.IsStillUpdatingException;
+import org.roda.core.data.exceptions.JobAlreadyStartedException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
-import org.roda.core.data.v2.ip.*;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -72,6 +83,9 @@ public interface BrowserService extends RemoteService {
 
   BrowseItemBundle getItemBundle(String aipId, String localeString)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
+
+  DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(String aipId, String descId, String type,
+    String version) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
   DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(String aipId, String descId)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
@@ -124,7 +138,7 @@ public interface BrowserService extends RemoteService {
   Viewers getViewersProperties() throws GenericException;
 
   List<SupportedMetadataTypeBundle> getSupportedMetadata(String aipId, String locale)
-      throws AuthorizationDeniedException, GenericException, NotFoundException;
+    throws AuthorizationDeniedException, GenericException, NotFoundException;
 
   boolean isCookiesMessageActive();
 

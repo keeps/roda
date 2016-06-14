@@ -116,6 +116,28 @@ public class Browser extends RodaCoreService {
   }
 
   public static DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(RodaUser user, String aipId,
+    String metadataId, String type, String version)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    Date startDate = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, BROWSE_ROLE);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
+    UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
+
+    // delegate
+    DescriptiveMetadataEditBundle bundle = BrowserHelper.getDescriptiveMetadataEditBundle(user, aip, metadataId, type,
+      version);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, BROWSER_COMPONENT, "getDescriptiveMetadataEditBundle", aipId, duration,
+      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
+
+    return bundle;
+  }
+
+  public static DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(RodaUser user, String aipId,
     String metadataId)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     Date startDate = new Date();

@@ -144,6 +144,13 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
+  public DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(String aipId, String descId, String type,
+    String version) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.getDescriptiveMetadataEditBundle(user, aipId, descId, type, version);
+  }
+
+  @Override
   public DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(String aipId, String descId)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
