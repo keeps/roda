@@ -96,19 +96,19 @@ public class Menu extends Composite {
   private MenuItem administration_user;
   private MenuItem administration_log;
   private MenuItem administration_notifications;
-  private MenuItem administration_preferences;
+  // private MenuItem administration_preferences;
 
   private final MenuBar planningMenu;
-  private MenuItem planning_monitoring;
+  // private MenuItem planning_monitoring;
   private MenuItem planning_risk;
-  private MenuItem planning_agents;
+  // private MenuItem planning_agents;
   private MenuItem planning_format;
 
   private final MenuBar userMenu;
 
   private final MenuBar languagesMenu;
 
-  private final MenuBar settingsMenu;
+  // private final MenuBar settingsMenu;
 
   private String selectedLanguage;
 
@@ -146,16 +146,18 @@ public class Menu extends Composite {
     // FIXME add constant for notification title
     administration_notifications = administrationMenu.addItem("Notifications",
       createCommand(NotificationRegister.RESOLVER.getHistoryPath()));
-    administration_preferences = administrationMenu.addItem(constants.title_administration_preferences(),
-      createCommand(Management.RESOLVER.getHistoryPath()));
+    // administration_preferences =
+    // administrationMenu.addItem(constants.title_administration_preferences(),
+    // createCommand(Management.RESOLVER.getHistoryPath()));
 
     planningMenu = new MenuBar(true);
-    planning_monitoring = planningMenu.addItem(constants.title_planning_monitoring(),
-      createCommand(Planning.RESOLVER.getHistoryPath()));
+    // planning_monitoring =
+    // planningMenu.addItem(constants.title_planning_monitoring(),
+    // createCommand(Planning.RESOLVER.getHistoryPath()));
     planning_risk = planningMenu.addItem(constants.title_planning_risk(),
       createCommand(RiskRegister.RESOLVER.getHistoryPath()));
-    planning_agents = planningMenu.addItem(constants.title_planning_agent(),
-      createCommand(AgentRegister.RESOLVER.getHistoryPath()));
+    // planning_agents = planningMenu.addItem(constants.title_planning_agent(),
+    // createCommand(AgentRegister.RESOLVER.getHistoryPath()));
     planning_format = planningMenu.addItem(constants.title_planning_format(),
       createCommand(FormatRegister.RESOLVER.getHistoryPath()));
 
@@ -172,7 +174,7 @@ public class Menu extends Composite {
     languagesMenu = new MenuBar(true);
     setLanguageMenu();
 
-    settingsMenu = new MenuBar(true);
+    // settingsMenu = new MenuBar(true);
 
     UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaUser>() {
 
@@ -245,14 +247,15 @@ public class Menu extends Composite {
     updateResolverSubItemVisibility(MemberManagement.RESOLVER, administration_user);
     updateResolverSubItemVisibility(UserLog.RESOLVER, administration_log);
     updateResolverSubItemVisibility(NotificationRegister.RESOLVER, administration_notifications);
-    updateResolverSubItemVisibility(Management.RESOLVER, administration_preferences);
+    // updateResolverSubItemVisibility(Management.RESOLVER,
+    // administration_preferences);
     updateResolverTopItemVisibility(Management.RESOLVER,
       new MenuItem(constants.title_administration(), administrationMenu), 4);
 
     // Planning
-    updateResolverSubItemVisibility(Planning.RESOLVER, planning_monitoring);
+    // updateResolverSubItemVisibility(Planning.RESOLVER, planning_monitoring);
     updateResolverSubItemVisibility(Planning.RESOLVER, planning_risk);
-    updateResolverSubItemVisibility(Planning.RESOLVER, planning_agents);
+    // updateResolverSubItemVisibility(Planning.RESOLVER, planning_agents);
     updateResolverSubItemVisibility(Planning.RESOLVER, planning_format);
     updateResolverTopItemVisibility(Planning.RESOLVER, new MenuItem(constants.title_planning(), planningMenu), 5);
 
@@ -263,7 +266,8 @@ public class Menu extends Composite {
       rightMenu.addItem(customMenuItem("fa fa-user-plus", constants.loginRegister(), "menu-item-label menu-register",
         null, createCommand(Register.RESOLVER.getHistoryPath())));
     } else {
-      rightMenu.addItem(customMenuItem("fa fa-cog", constants.title_settings(), "menu-item-label", settingsMenu, null));
+      // rightMenu.addItem(customMenuItem("fa fa-cog",
+      // constants.title_settings(), "menu-item-label", settingsMenu, null));
       rightMenu.addItem(customMenuItem("fa fa-user", user.getName(), "menu-item-label", userMenu, null));
     }
     rightMenu.addItem(customMenuItem("fa fa-globe", selectedLanguage, "menu-item-label", languagesMenu, null));

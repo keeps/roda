@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -142,6 +143,15 @@ public class RodaUtils {
     Source text = new StreamSource(fileReader);
     transformer.transform(text, new StreamResult(result));
   }
+
+  public static void indentXML(Reader input, Writer output) throws TransformerException {
+    Transformer transformer = TransformerFactory.newInstance().newTransformer();
+    transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+    StreamSource source = new StreamSource(input);
+    StreamResult result = new StreamResult(output);
+    transformer.transform(source, result);
+  }
+  
 
   public static long getPathSize(Path startPath) throws IOException {
     final AtomicLong size = new AtomicLong(0);
