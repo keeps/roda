@@ -43,6 +43,7 @@ public class CorporaConstants {
   public static final String DESCRIPTIVE_METADATA_ID_EADUNKNOWN = "ead_unknown.xml";
 
   public static final String REPRESENTATION_1_ID = "representation_1";
+  public static final String REPRESENTATION_1_URN = "urn:roda:premis:representation:6ef01e16-7de4-385a-91ee-b63810161c55";
   public static final String REPRESENTATION_1_TYPE = RodaConstants.REPRESENTATION_TYPE_MIXED;
   public static final boolean REPRESENTATION_1_ORIGINAL = true;
 
@@ -90,7 +91,7 @@ public class CorporaConstants {
   @Deprecated
   public static final String F0_PREMIS_XML = "F0";
   public static final String TEXT_XML = "text/xml";
-  public static final String REPRESENTATION_1_PREMIS_EVENT_ID = "roda_398";
+  public static final String REPRESENTATION_1_PREMIS_EVENT_ID = "urn:roda:premis:event:roda_398";
   public static final String INGESTION = "ingestion";
   public static final String RODA_8 = "roda:8";
   public static final String SUCCESS = "success";
@@ -100,7 +101,7 @@ public class CorporaConstants {
   public static final String REPRESENTATION_CONVERTER_ID_2 = "50b2c085-ce4a-44d1-8279-d99086400349";
   public static final String REPRESENTATION_CONVERTER_ID_3 = "d53a24ed-f157-42cf-a45a-a2ac87e8b61d";
 
-  public static final String AGENT_RODA_8 = "roda_8";
+  public static final String AGENT_RODA_8 = "urn:roda:premis:agent:roda_8";
   public static final String METS_XML = "METS.xml";
   public static final String SOFTWARE_INGEST_TASK = "software:ingest_task";
   public static final String INGEST_CREATE_AIP = "Ingest/Create AIP/1.0";

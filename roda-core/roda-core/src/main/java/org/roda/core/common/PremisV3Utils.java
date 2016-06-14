@@ -47,6 +47,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.metadata.Fixity;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
@@ -330,7 +331,7 @@ public class PremisV3Utils {
     EventComplexType ect = event.addNewEvent();
     EventIdentifierComplexType eict = ect.addNewEventIdentifier();
     eict.setEventIdentifierValue(eventID);
-    eict.setEventIdentifierType(getStringPlusAuthority("local"));
+    eict.setEventIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
     ect.setEventDateTime(DateParser.getIsoDate(date));
     ect.setEventType(getStringPlusAuthority(type));
     EventDetailInformationComplexType edict = ect.addNewEventDetailInformation();
@@ -361,7 +362,7 @@ public class PremisV3Utils {
       for (String agentId : agentIds) {
         LinkingAgentIdentifierComplexType agentIdentifier = ect.addNewLinkingAgentIdentifier();
         // FIXME lfaria 20160523: put agent identifier type in constant
-        agentIdentifier.setLinkingAgentIdentifierType(getStringPlusAuthority("local"));
+        agentIdentifier.setLinkingAgentIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
         agentIdentifier.setLinkingAgentIdentifierValue(agentId);
       }
     }
@@ -384,7 +385,7 @@ public class PremisV3Utils {
 
     AgentComplexType act = agent.addNewAgent();
     AgentIdentifierComplexType agentIdentifier = act.addNewAgentIdentifier();
-    agentIdentifier.setAgentIdentifierType(getStringPlusAuthority("local"));
+    agentIdentifier.setAgentIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
     agentIdentifier.setAgentIdentifierValue(id);
 
     act.setAgentType(getStringPlusAuthority(type.toString()));
@@ -419,12 +420,11 @@ public class PremisV3Utils {
 
     Representation representation = Representation.Factory.newInstance();
     ObjectIdentifierComplexType oict = representation.addNewObjectIdentifier();
-    oict.setObjectIdentifierType(getStringPlusAuthority("local"));
-    String identifier = IdUtils.getPreservationMetadataId(PreservationMetadataType.OBJECT_REPRESENTATION, aipID,
-      representationId);
+    oict.setObjectIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
+    String identifier = IdUtils.getPreservationId(PreservationMetadataType.REPRESENTATION, aipID,
+      representationId,null,null);
     oict.setObjectIdentifierValue(identifier);
     representation.addNewPreservationLevel().setPreservationLevelValue(getStringPlusAuthority(""));
-
     return representation;
   }
 
@@ -438,8 +438,8 @@ public class PremisV3Utils {
     ObjectIdentifierComplexType oict = file.addNewObjectIdentifier();
     String identifier = IdUtils.getFileId(originalFile.getAipId(), originalFile.getRepresentationId(),
       originalFile.getPath(), originalFile.getId());
-    oict.setObjectIdentifierValue(identifier);
-    oict.setObjectIdentifierType(getStringPlusAuthority("local"));
+    oict.setObjectIdentifierValue(URNUtils.createRodaPreservationURN(PreservationMetadataType.FILE, identifier));
+    oict.setObjectIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
     ObjectCharacteristicsComplexType occt = file.addNewObjectCharacteristics();
     // TODO
     // occt.setCompositionLevel(CompositionLevelComplexType.Factory.parse("0"));
@@ -735,7 +735,7 @@ public class PremisV3Utils {
     return model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload, notify);
   }
 
-  public static void linkFileToRepresentation(File file, String relationshipType, String relationshipSubType,
+  public static void linkFileToRepresentation(String fileId, String relationshipType, String relationshipSubType,
     Representation r) throws GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException, XmlException, IOException, ValidationException {
 
@@ -743,10 +743,8 @@ public class PremisV3Utils {
     relationship.setRelationshipType(getStringPlusAuthority(relationshipType));
     relationship.setRelationshipSubType(getStringPlusAuthority(relationshipSubType));
     RelatedObjectIdentifierComplexType roict = relationship.addNewRelatedObjectIdentifier();
-    roict.setRelatedObjectIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_LOCAL));
-    String id = IdUtils.getPreservationMetadataId(PreservationMetadataType.OBJECT_FILE, file.getAipId(),
-      file.getRepresentationId(), file.getPath(), file.getId());
-    roict.setRelatedObjectIdentifierValue(id);
+    roict.setRelatedObjectIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
+    roict.setRelatedObjectIdentifierValue(fileId);
   }
 
   public static List<LinkingIdentifier> extractAgentsFromEvent(Binary b) throws ValidationException, GenericException {

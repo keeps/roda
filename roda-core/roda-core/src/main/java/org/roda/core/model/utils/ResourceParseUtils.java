@@ -23,6 +23,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
@@ -97,27 +98,27 @@ public class ResourceParseUtils {
     String fileId = null;
 
     PreservationMetadataType type;
-    if (filename.endsWith(RodaConstants.PREMIS_AGENT_SUFFIX)) {
-      id = filename.substring(0, filename.length() - RodaConstants.PREMIS_AGENT_SUFFIX.length());
+    if (filename.startsWith(URNUtils.getPremisPrefix(PreservationMetadataType.AGENT))) {
+      id = filename.substring(0, filename.length() - RodaConstants.PREMIS_SUFFIX.length());
       type = PreservationMetadataType.AGENT;
       aipId = null;
       representationId = null;
-    } else if (filename.endsWith(RodaConstants.PREMIS_EVENT_SUFFIX)) {
-      id = filename.substring(0, filename.length() - RodaConstants.PREMIS_EVENT_SUFFIX.length());
+    } else if (filename.startsWith(URNUtils.getPremisPrefix(PreservationMetadataType.EVENT))) {
+      id = filename.substring(0, filename.length() - RodaConstants.PREMIS_SUFFIX.length());
       type = PreservationMetadataType.EVENT;
-    } else if (filename.endsWith(RodaConstants.PREMIS_FILE_SUFFIX)) {
-      type = PreservationMetadataType.OBJECT_FILE;
+    } else if (filename.startsWith(URNUtils.getPremisPrefix(PreservationMetadataType.FILE))) {
+      type = PreservationMetadataType.FILE;
       fileDirectoryPath = ModelUtils.extractFilePathFromRepresentationPreservationMetadata(resourcePath);
-      fileId = filename.substring(0, filename.length() - RodaConstants.PREMIS_FILE_SUFFIX.length());
+      fileId = filename.substring(0, filename.length() - RodaConstants.PREMIS_SUFFIX.length());
       id = fileId;
-    } else if (filename.endsWith(RodaConstants.OTHER_TECH_METADATA_FILE_SUFFIX)) {
+    } else if (filename.startsWith(URNUtils.getPremisPrefix(PreservationMetadataType.OTHER))) {
       type = PreservationMetadataType.OTHER;
       fileDirectoryPath = ModelUtils.extractFilePathFromRepresentationPreservationMetadata(resourcePath);
-      fileId = filename.substring(0, filename.length() - RodaConstants.OTHER_TECH_METADATA_FILE_SUFFIX.length());
+      fileId = filename.substring(0, filename.length() - RodaConstants.PREMIS_SUFFIX.length());
       id = fileId;
-    } else if (filename.endsWith(RodaConstants.PREMIS_REPRESENTATION_SUFFIX)) {
-      id = filename.substring(0, filename.length() - RodaConstants.PREMIS_REPRESENTATION_SUFFIX.length());
-      type = PreservationMetadataType.OBJECT_REPRESENTATION;
+    } else if (filename.startsWith(URNUtils.getPremisPrefix(PreservationMetadataType.REPRESENTATION))) {
+      id = filename.substring(0, filename.length() - RodaConstants.PREMIS_SUFFIX.length());
+      type = PreservationMetadataType.REPRESENTATION;
     } else {
       throw new RequestNotValidException("Unsupported PREMIS extension type in file: " + filename);
     }

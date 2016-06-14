@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <prem:object xsi:type="prem:file" xmlns:prem="http://www.loc.gov/premis/v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <prem:objectIdentifier>
-    <prem:objectIdentifierType>RODAObjectDatastreamID</prem:objectIdentifierType>
-    <prem:objectIdentifierValue>F0</prem:objectIdentifierValue>
+    <prem:objectIdentifierType>URN</prem:objectIdentifierType>
+    <prem:objectIdentifierValue>urn:roda:premis:file:77805724-14bc-3d1d-894f-f6a567278e0f</prem:objectIdentifierValue>
   </prem:objectIdentifier>
   <prem:preservationLevel>
     <prem:preservationLevelValue>full</prem:preservationLevelValue>

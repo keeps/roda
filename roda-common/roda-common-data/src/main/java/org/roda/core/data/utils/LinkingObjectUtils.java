@@ -5,10 +5,9 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.data.v2;
+package org.roda.core.data.utils;
 
 import org.roda.core.data.common.RodaConstants.RODA_TYPE;
-import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.ip.TransferredResource;
 
 public final class LinkingObjectUtils {
@@ -20,42 +19,31 @@ public final class LinkingObjectUtils {
 
   }
 
-  public static String getLinkingIdentifierId(RODA_TYPE type, String uuid) {
-    return URNUtils.createRodaURN(type, uuid);
+  public static String getLinkingIdentifierId(RODA_TYPE type, String id) {
+    return URNUtils.createRodaURN(type, id);
   }
 
-  public static String getLinkingIdentifierId(TransferredResource transferredResource) {
-    return getLinkingIdentifierId(RODA_TYPE.TRANSFERRED_RESOURCE, transferredResource.getRelativePath());
+  public static String getLinkingIdentifierId(RODA_TYPE type, TransferredResource transferredResource) {
+    return URNUtils.createRodaURN(type, transferredResource.getRelativePath());
   }
 
   public static RODA_TYPE getLinkingIdentifierType(String value) {
-    if (value.contains(":")) {
-      return RODA_TYPE.valueOf(value.split(":")[2].toUpperCase());
-    } else {
-      return null;
-    }
+    return URNUtils.getRodaType(value);
   }
 
-  public static String getLinkingObjectPath(String path) {
-    if (path.contains(":")) {
-      return path.substring(path.lastIndexOf(":") + 1);
-    } else {
-      return null;
-    }
-  }
-
-  public static String[] splitLinkingId(String id) {
-    return id.split(LINKING_ID_SEPARATOR);
+  public static String getLinkingObjectPath(String value) {
+    return URNUtils.getLinkingObjectPath(value);
+   
   }
 
   public static String getFileIdFromLinkingId(String linkingId) {
     String path = getLinkingObjectPath(linkingId);
-    return path.replaceAll(LINKING_ID_SEPARATOR, ID_SEPARATOR);
+    return path;
   }
 
   public static String getRepresentationIdFromLinkingId(String linkingId) {
     String path = getLinkingObjectPath(linkingId);
-    return path.replaceAll(LINKING_ID_SEPARATOR, ID_SEPARATOR);
+    return path;
   }
 
   public static String getAipIdFromLinkingId(String linkingId) {

@@ -443,10 +443,10 @@ public final class ModelUtils {
     if (type != null) {
       if (type.equals(PreservationMetadataType.AGENT)) {
         path = Arrays.asList(RodaConstants.STORAGE_CONTAINER_PRESERVATION, RodaConstants.STORAGE_DIRECTORY_AGENTS,
-          id + RodaConstants.PREMIS_AGENT_SUFFIX);
-      } else if (type.equals(PreservationMetadataType.OBJECT_REPRESENTATION)) {
+          id + RodaConstants.PREMIS_SUFFIX);
+      } else if (type.equals(PreservationMetadataType.REPRESENTATION)) {
         if (aipId != null && representationId != null) {
-          String pFileId = id + RodaConstants.PREMIS_REPRESENTATION_SUFFIX;
+          String pFileId = id + RodaConstants.PREMIS_SUFFIX;
           path = build(getRepresentationPreservationMetadataPath(aipId, representationId), pFileId);
         } else {
           throw new RequestNotValidException("Cannot request a representation object with null AIP or Representation. "
@@ -455,23 +455,23 @@ public final class ModelUtils {
       } else if (type.equals(PreservationMetadataType.EVENT)) {
         if (aipId != null) {
           if (representationId != null) {
-            String pFileId = id + RodaConstants.PREMIS_EVENT_SUFFIX;
+            String pFileId = id + RodaConstants.PREMIS_SUFFIX;
             path = build(getRepresentationPreservationMetadataPath(aipId, representationId), pFileId);
           } else {
-            String pFileId = id + RodaConstants.PREMIS_EVENT_SUFFIX;
+            String pFileId = id + RodaConstants.PREMIS_SUFFIX;
             path = build(getAIPPreservationMetadataPath(aipId), pFileId);
           }
 
         } else {
           throw new RequestNotValidException("Requested an event preservation object with null AIP id");
         }
-      } else if (type.equals(PreservationMetadataType.OBJECT_FILE)) {
+      } else if (type.equals(PreservationMetadataType.FILE)) {
         path = getRepresentationMetadataPath(aipId, representationId);
         path.add(RodaConstants.STORAGE_DIRECTORY_PRESERVATION);
         if (fileDirectoryPath != null) {
           path.addAll(fileDirectoryPath);
         }
-        path.add(fileId + RodaConstants.PREMIS_FILE_SUFFIX);
+        path.add(id + RodaConstants.PREMIS_SUFFIX);
       } else if (type.equals(PreservationMetadataType.OTHER)) {
         path = getRepresentationMetadataPath(aipId, representationId);
         path.add(RodaConstants.STORAGE_DIRECTORY_PRESERVATION);

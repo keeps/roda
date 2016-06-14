@@ -130,8 +130,8 @@ public class TikaFullTextPluginUtils {
                 PremisV3Utils.updateCreatingApplication(premisFile, creatingApplicationName, creatingApplicationVersion,
                   dateCreatedByApplication);
 
-                PreservationMetadataType type = PreservationMetadataType.OBJECT_FILE;
-                String id = IdUtils.getPreservationMetadataId(type, aip.getId(), representation.getId(), file.getPath(),
+                PreservationMetadataType type = PreservationMetadataType.FILE;
+                String id = IdUtils.getPreservationId(type, aip.getId(), representation.getId(), file.getPath(),
                   file.getId());
 
                 ContentPayload premisFilePayload = PremisV3Utils.fileToBinary(premisFile);

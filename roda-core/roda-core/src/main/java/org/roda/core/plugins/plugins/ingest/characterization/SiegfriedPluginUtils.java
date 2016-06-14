@@ -167,8 +167,8 @@ public class SiegfriedPluginUtils {
               File premisFile = PremisV3Utils.binaryToFile(premisBin.getContent(), false);
               PremisV3Utils.updateFileFormat(premisFile, format, version, pronom, mime);
 
-              PreservationMetadataType type = PreservationMetadataType.OBJECT_FILE;
-              String id = IdUtils.getPreservationMetadataId(type, aip.getId(), representation.getId(),
+              PreservationMetadataType type = PreservationMetadataType.FILE;
+              String id = IdUtils.getPreservationId(type, aip.getId(), representation.getId(),
                 fileDirectoryPath, fileId);
 
               ContentPayload premisFilePayload = PremisV3Utils.fileToBinary(premisFile);

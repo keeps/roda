@@ -134,7 +134,7 @@ public class ModelServiceTest {
   public void testCreateAIP() throws RODAException, ParseException, IOException, XmlException {
 
     // generate AIP ID
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = CorporaConstants.SOURCE_AIP_ID;
 
     // testing AIP
     final AIP aip = model.createAIP(aipId, corporaService,
@@ -250,9 +250,9 @@ public class ModelServiceTest {
     gov.loc.premis.v3.Representation rpo = PremisV3Utils.binaryToRepresentation(preservationObject.getContent(), true);
 
     ObjectIdentifierComplexType[] objectIdentifierArray = rpo.getObjectIdentifierArray();
-    assertEquals(RodaConstants.PREMIS_IDENTIFIER_TYPE_LOCAL,
+    assertEquals(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN,
       objectIdentifierArray[0].getObjectIdentifierType().getStringValue());
-    assertEquals(CorporaConstants.REPRESENTATION_1_ID, rpo.getObjectIdentifierArray()[0].getObjectIdentifierValue());
+    assertEquals(CorporaConstants.REPRESENTATION_1_URN, rpo.getObjectIdentifierArray()[0].getObjectIdentifierValue());
     assertEquals(CorporaConstants.PRESERVATION_LEVEL_FULL,
       rpo.getPreservationLevelArray(0).getPreservationLevelValue().getStringValue());
 
@@ -785,7 +785,7 @@ public class ModelServiceTest {
   @Test
   public void testRepresentationFileObject() throws RODAException {
     // set up
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = CorporaConstants.SOURCE_AIP_ID;
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
@@ -802,7 +802,7 @@ public class ModelServiceTest {
   public void testRepresentationPreservationObject() throws RODAException {
     // set up
 
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = CorporaConstants.SOURCE_AIP_ID;
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 

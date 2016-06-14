@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <event xmlns="http://www.loc.gov/premis/v3">
   <eventIdentifier>
-    <eventIdentifierType>RODAObjectPID</eventIdentifierType>
-    <eventIdentifierValue>roda:398</eventIdentifierValue>
+    <eventIdentifierType>URN</eventIdentifierType>
+    <eventIdentifierValue>urn:roda:premis:event:roda_398</eventIdentifierValue>
   </eventIdentifier>
   <eventType>ingestion</eventType>
   <eventDateTime>2013-09-17T10:53:58.29Z</eventDateTime>
@@ -19,8 +19,8 @@
     </eventOutcomeDetail>
   </eventOutcomeInformation>
   <linkingAgentIdentifier>
-    <linkingAgentIdentifierType>RODAObjectPID</linkingAgentIdentifierType>
-    <linkingAgentIdentifierValue>roda_8</linkingAgentIdentifierValue>
+    <linkingAgentIdentifierType>URN</linkingAgentIdentifierType>
+    <linkingAgentIdentifierValue>urn:roda:premis:agent:roda_8</linkingAgentIdentifierValue>
     <linkingAgentRole>ingest task</linkingAgentRole>
   </linkingAgentIdentifier>
   <linkingObjectIdentifier>

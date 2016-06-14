@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <prem:object xsi:type="prem:representation" xmlns:prem="http://www.loc.gov/premis/v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <prem:objectIdentifier>
-    <prem:objectIdentifierType>local</prem:objectIdentifierType>
-    <prem:objectIdentifierValue>representation_1</prem:objectIdentifierValue>
+    <prem:objectIdentifierType>URN</prem:objectIdentifierType>
+    <prem:objectIdentifierValue>urn:roda:premis:representation:6ef01e16-7de4-385a-91ee-b63810161c55</prem:objectIdentifierValue>
   </prem:objectIdentifier>
   <prem:preservationLevel>
     <prem:preservationLevelValue>full</prem:preservationLevelValue>

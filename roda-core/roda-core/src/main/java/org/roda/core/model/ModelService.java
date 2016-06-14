@@ -49,6 +49,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
@@ -805,9 +806,9 @@ public class ModelService extends ModelObservable {
 
   public Binary retrievePreservationRepresentation(String aipId, String representationId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-
-    StoragePath path = ModelUtils.getPreservationMetadataStoragePath(representationId,
-      PreservationMetadataType.OBJECT_REPRESENTATION, aipId, representationId);
+    String urn = IdUtils.getPreservationId(PreservationMetadataType.REPRESENTATION, aipId, representationId, null, null);
+    StoragePath path = ModelUtils.getPreservationMetadataStoragePath(urn,
+      PreservationMetadataType.REPRESENTATION, aipId, representationId);
     return storage.getBinary(path);
   }
 
@@ -815,14 +816,14 @@ public class ModelService extends ModelObservable {
     String fileId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
     return retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId,
-      PreservationMetadataType.OBJECT_FILE);
+      PreservationMetadataType.FILE);
   }
 
   public Binary retrievePreservationFile(String aipId, String representationId, List<String> fileDirectoryPath,
     String fileId, PreservationMetadataType type)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
-    String id = IdUtils.getPreservationMetadataId(type, aipId, representationId, fileDirectoryPath, fileId);
+    String id = IdUtils.getPreservationId(type, aipId, representationId, fileDirectoryPath, fileId);
     StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(id, type, aipId, representationId,
       fileDirectoryPath, fileId);
     return storage.getBinary(filePath);
@@ -851,20 +852,23 @@ public class ModelService extends ModelObservable {
     String representationId, List<String> fileDirectoryPath, String fileId, ContentPayload payload, boolean notify)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
     AlreadyExistsException {
-    String id = IdUtils.getPreservationMetadataId(type, aipId, representationId, fileDirectoryPath, fileId);
-    return createPreservationMetadata(type, id, aipId, representationId, fileDirectoryPath, fileId, payload, notify);
+    String identifier = IdUtils.getFileId(aipId, representationId,
+      fileDirectoryPath, fileId);
+    String urn = URNUtils.createRodaPreservationURN(type, identifier);
+    return createPreservationMetadata(type, urn, aipId, representationId, fileDirectoryPath, fileId, payload, notify);
   }
 
   public PreservationMetadata createPreservationMetadata(PreservationMetadataType type, String aipId,
     List<String> fileDirectoryPath, String fileId, ContentPayload payload, boolean notify) throws GenericException,
     NotFoundException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
-    String id = IdUtils.getPreservationMetadataId(type, aipId, null, fileDirectoryPath, fileId);
+    String id = IdUtils.getPreservationId(type, aipId, null, fileDirectoryPath, fileId);
     return createPreservationMetadata(type, id, aipId, null, fileDirectoryPath, fileId, payload, notify);
   }
 
-  public PreservationMetadata createPreservationMetadata(PreservationMetadataType type, String id, String aipId,
+  public PreservationMetadata createPreservationMetadata(PreservationMetadataType type, String aipId,
     String representationId, ContentPayload payload, boolean notify) throws GenericException, NotFoundException,
     RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
+    String id = IdUtils.getPreservationId(type, aipId, representationId, null, null);
     return createPreservationMetadata(type, id, aipId, representationId, null, null, payload, notify);
   }
 

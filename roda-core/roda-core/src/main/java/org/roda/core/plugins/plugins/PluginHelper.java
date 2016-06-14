@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.io.IOUtils;
@@ -26,6 +25,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.RODA_TYPE;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -36,7 +36,6 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.LinkingObjectUtils;
-import org.roda.core.data.v2.LinkingObjectUtils.LinkingObjectType;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -615,8 +614,7 @@ public final class PluginHelper {
         LOGGER.error("Error creating PREMIS agent", e);
       }
     }
-
-    String id = UUID.randomUUID().toString();
+    String id = IdUtils.createPreservationMetadataId(PreservationMetadataType.EVENT);
     String outcomeDetailNote = (outcome == PluginState.SUCCESS) ? plugin.getPreservationEventSuccessMessage()
       : plugin.getPreservationEventFailureMessage();
     ContentPayload premisEvent = PremisV3Utils.createPremisEventBinary(id, startDate,
@@ -634,28 +632,26 @@ public final class PluginHelper {
 
   public static LinkingIdentifier getLinkingIdentifier(TransferredResource transferredResource, String role) {
     LinkingIdentifier li = new LinkingIdentifier();
-    li.setValue(LinkingObjectUtils.getLinkingIdentifierId(LinkingObjectType.TRANSFERRED_RESOURCE, transferredResource));
+    li.setValue(LinkingObjectUtils.getLinkingIdentifierId(transferredResource));
     li.setType("URN");
     li.setRoles(Arrays.asList(role));
     return li;
   }
 
   public static LinkingIdentifier getLinkingIdentifier(String aipID, String role) {
-    return getLinkingIdentifier(LinkingObjectType.AIP, aipID, role);
+    return getLinkingIdentifier(RODA_TYPE.AIP, aipID, role);
   }
 
   public static LinkingIdentifier getLinkingIdentifier(String aipID, String representationID, String role) {
-    return getLinkingIdentifier(LinkingObjectType.REPRESENTATION, IdUtils.getRepresentationId(aipID, representationID),
-      role);
+    return getLinkingIdentifier(RODA_TYPE.REPRESENTATION, IdUtils.getRepresentationId(aipID, representationID), role);
   }
 
   public static LinkingIdentifier getLinkingIdentifier(String aipID, String representationID, List<String> filePath,
     String fileID, String role) {
-    return getLinkingIdentifier(LinkingObjectType.FILE, IdUtils.getFileId(aipID, representationID, filePath, fileID),
-      role);
+    return getLinkingIdentifier(RODA_TYPE.FILE, IdUtils.getFileId(aipID, representationID, filePath, fileID), role);
   }
 
-  private static LinkingIdentifier getLinkingIdentifier(LinkingObjectType type, String uuid, String role) {
+  private static LinkingIdentifier getLinkingIdentifier(RODA_TYPE type, String uuid, String role) {
     LinkingIdentifier li = new LinkingIdentifier();
     li.setValue(LinkingObjectUtils.getLinkingIdentifierId(type, uuid));
     li.setType("URN");

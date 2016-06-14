@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.RODA_TYPE;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.LinkingObjectUtils;
-import org.roda.core.data.v2.LinkingObjectUtils.LinkingObjectType;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
@@ -336,15 +336,15 @@ public class ShowPreservationEvent extends Composite {
 
     if (object.getType().equalsIgnoreCase("URN")) {
       String idValue = object.getValue();
-      LinkingObjectType type = LinkingObjectUtils.getLinkingIdentifierType(idValue);
+      RODA_TYPE type = LinkingObjectUtils.getLinkingIdentifierType(idValue);
 
-      if (type == LinkingObjectType.TRANSFERRED_RESOURCE) {
+      if (type == RODA_TYPE.TRANSFERRED_RESOURCE) {
         addTransferredResourcePanel(bundle, layout, idValue);
-      } else if (type == LinkingObjectType.FILE) {
+      } else if (type == RODA_TYPE.FILE) {
         addFilePanel(bundle, layout, idValue);
-      } else if (type == LinkingObjectType.REPRESENTATION) {
+      } else if (type == RODA_TYPE.REPRESENTATION) {
         addRepresentationPanel(bundle, layout, idValue);
-      } else if (type == LinkingObjectType.AIP) {
+      } else if (type == RODA_TYPE.AIP) {
         addAipPanel(bundle, layout, idValue);
       } else {
         // TODO send warning

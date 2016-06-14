@@ -604,11 +604,8 @@ public final class RodaConstants {
   /*
    * PREMIS
    */
-  public static final String PREMIS_IDENTIFIER_TYPE_LOCAL = "local";
-  public static final String PREMIS_FILE_SUFFIX = ".file.premis.xml";
-  public static final String PREMIS_EVENT_SUFFIX = ".event.premis.xml";
-  public static final String PREMIS_REPRESENTATION_SUFFIX = ".representation.premis.xml";
-  public static final String PREMIS_AGENT_SUFFIX = ".agent.premis.xml";
+  public static final String PREMIS_IDENTIFIER_TYPE_URN = "URN";
+  public static final String PREMIS_SUFFIX = ".xml";
 
   /*
    * Other Preservation metadata
@@ -738,5 +735,17 @@ public final class RodaConstants {
   public static final String VERIFICATION_EMAIL_TEMPLATE = "emailverification_html.vm";
   public static final String RECOVER_LOGIN_EMAIL_TEMPLATE = "recoverlogin_html.vm";
   public static final String NOTIFY_PRODUCER_EMAIL_TEMPLATE = "notifyproducer_html.vm";
+  
+  
+  /* URN Constants */
+  public static final String URN_BASE = "urn";
+  public static final String URN_RODA = "roda";
+  public static final String URN_PREMIS = "premis";
+  public static final String URN_OTHER = "other";
+  public static final String URN_SEPARATOR = ":";
+  public static final String URN_TYPE = "URN";
+  public enum RODA_TYPE {
+    AIP,REPRESENTATION,FILE,TRANSFERRED_RESOURCE;
+  }
 
 }

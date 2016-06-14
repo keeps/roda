@@ -423,8 +423,7 @@ public class Browser extends RodaCoreService {
 
   }
 
-  public static StreamResponse listAipPreservationMetadata(RodaUser user, String aipId, String start, String limit,
-    String acceptFormat)
+  public static StreamResponse listAipPreservationMetadata(RodaUser user, String aipId, String acceptFormat)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     Date startDate = new Date();
 
@@ -437,13 +436,12 @@ public class Browser extends RodaCoreService {
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
     // delegate
-    StreamResponse aipPreservationMetadataList = BrowserHelper.aipsAipIdPreservationMetadataGet(aipId, start, limit);
+    StreamResponse aipPreservationMetadataList = BrowserHelper.aipsAipIdPreservationMetadataGet(aipId);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
     registerAction(user, BROWSER_COMPONENT, "listAipPreservationMetadata", aipId, duration,
-      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_QUERY_KEY_START, start,
-      RodaConstants.API_QUERY_KEY_LIMIT, limit);
+      RodaConstants.API_PATH_PARAM_AIP_ID, aipId);
 
     return aipPreservationMetadataList;
   }

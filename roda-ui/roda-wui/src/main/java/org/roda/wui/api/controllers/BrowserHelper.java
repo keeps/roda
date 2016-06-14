@@ -58,6 +58,7 @@ import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.common.RodaConstants.RODA_TYPE;
 import org.roda.core.data.descriptionLevels.DescriptionLevel;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -69,7 +70,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.LinkingObjectUtils;
-import org.roda.core.data.v2.LinkingObjectUtils.LinkingObjectType;
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.common.Pair;
@@ -610,7 +610,7 @@ public class BrowserHelper {
 
   // FIXME 20160406 hsilva: representation preservation metadata is not being
   // included in the response "package"
-  public static StreamResponse aipsAipIdPreservationMetadataGet(String aipId, String start, String limit)
+  public static StreamResponse aipsAipIdPreservationMetadataGet(String aipId)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
 
     List<Representation> representations = null;
@@ -619,10 +619,6 @@ public class BrowserHelper {
       ModelService model = RodaCoreFactory.getModelService();
       StorageService storage = RodaCoreFactory.getStorageService();
       representations = model.retrieveAIP(aipId).getRepresentations();
-      Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
-      int startInt = pagingParams.getFirst();
-      int limitInt = pagingParams.getSecond();
-      int counter = 0;
       List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
       boolean includeRepresentations = true;
       preservationFiles = model.listPreservationMetadata(aipId, includeRepresentations);
@@ -630,42 +626,36 @@ public class BrowserHelper {
       for (OptionalWithCause<PreservationMetadata> oPreservationFile : preservationFiles) {
         if (oPreservationFile.isPresent()) {
           PreservationMetadata preservationFile = oPreservationFile.get();
-          if (counter >= startInt && (counter <= limitInt || limitInt == -1)) {
-            StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(preservationFile);
+          StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(preservationFile);
 
-            Binary binary = storage.getBinary(storagePath);
+          Binary binary = storage.getBinary(storagePath);
 
-            ZipEntryInfo info = new ZipEntryInfo(FSUtils.getStoragePathAsString(storagePath, true),
-              binary.getContent());
-            zipEntries.add(info);
+          ZipEntryInfo info = new ZipEntryInfo(FSUtils.getStoragePathAsString(storagePath, true), binary.getContent());
+          zipEntries.add(info);
 
-            if (preservationFile.getType() == PreservationMetadataType.EVENT) {
-              try {
-                List<LinkingIdentifier> agentIDS = PremisV3Utils.extractAgentsFromEvent(binary);
-                if (!agentIDS.isEmpty()) {
-                  for (LinkingIdentifier li : agentIDS) {
-                    String agentID = li.getValue();
-                    if (!agents.containsKey(agentID)) {
-                      StoragePath agentPath = ModelUtils.getPreservationMetadataStoragePath(agentID,
-                        PreservationMetadataType.AGENT);
-                      Binary agentBinary = storage.getBinary(agentPath);
-                      info = new ZipEntryInfo(
-                        FSUtils.getStoragePathAsString(DefaultStoragePath.parse(preservationFile.getAipId()), false,
-                          agentPath, true),
-                        agentBinary.getContent());
-                      agents.put(agentID, info);
-                    }
+          if (preservationFile.getType() == PreservationMetadataType.EVENT) {
+            try {
+              List<LinkingIdentifier> agentIDS = PremisV3Utils.extractAgentsFromEvent(binary);
+              if (!agentIDS.isEmpty()) {
+                for (LinkingIdentifier li : agentIDS) {
+                  String agentID = li.getValue();
+                  if (!agents.containsKey(agentID)) {
+                    StoragePath agentPath = ModelUtils.getPreservationMetadataStoragePath(agentID,
+                      PreservationMetadataType.AGENT);
+                    Binary agentBinary = storage.getBinary(agentPath);
+                    info = new ZipEntryInfo(
+                      FSUtils.getStoragePathAsString(DefaultStoragePath.parse(preservationFile.getAipId()), false,
+                        agentPath, true),
+                      agentBinary.getContent());
+                    agents.put(agentID, info);
                   }
                 }
-              } catch (ValidationException | GenericException e) {
-
               }
+            } catch (ValidationException | GenericException e) {
+
             }
-          } else {
-            break;
           }
 
-          counter++;
         } else {
           LOGGER.error("Cannot get AIP preservation metadata", oPreservationFile.getCause());
         }
@@ -738,7 +728,7 @@ public class BrowserHelper {
                 add = true;
               }
               counterEvent++;
-            } else if (preservationFile.getType().equals(PreservationMetadataType.OBJECT_FILE)) {
+            } else if (preservationFile.getType().equals(PreservationMetadataType.FILE)) {
               if (counterFile >= pagingParamsFile.getFirst()
                 && (counterFile <= pagingParamsFile.getSecond() || pagingParamsFile.getSecond() == -1)) {
                 add = true;
@@ -798,11 +788,11 @@ public class BrowserHelper {
       ContentPayload payload = new FSPathContentPayload(file);
       boolean notify = true;
       if (create) {
-        model.createPreservationMetadata(PreservationMetadataType.OBJECT_FILE, aipId, representationId,
-          fileDirectoryPath, fileId, payload, notify);
+        model.createPreservationMetadata(PreservationMetadataType.FILE, aipId, representationId, fileDirectoryPath,
+          fileId, payload, notify);
       } else {
-        PreservationMetadataType type = PreservationMetadataType.OBJECT_FILE;
-        String id = IdUtils.getPreservationMetadataId(type, aipId, representationId, fileDirectoryPath, fileId);
+        PreservationMetadataType type = PreservationMetadataType.FILE;
+        String id = IdUtils.getPreservationId(type, aipId, representationId, fileDirectoryPath, fileId);
         model.updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, payload, notify);
       }
     } catch (IOException e) {
@@ -822,8 +812,8 @@ public class BrowserHelper {
     String fileId, String preservationId)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     boolean notify = true;
-    RodaCoreFactory.getModelService().deletePreservationMetadata(PreservationMetadataType.OBJECT_FILE, aipId,
-      representationId, preservationId, notify);
+    RodaCoreFactory.getModelService().deletePreservationMetadata(PreservationMetadataType.FILE, aipId, representationId,
+      preservationId, notify);
   }
 
   public static IndexedAIP moveInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, RodaUser user)
@@ -1360,21 +1350,21 @@ public class BrowserHelper {
 
     for (LinkingIdentifier identifier : allLinkingIdentifiers) {
       String idValue = identifier.getValue();
-      LinkingObjectType linkingType = LinkingObjectUtils.getLinkingIdentifierType(idValue);
+      RODA_TYPE linkingType = LinkingObjectUtils.getLinkingIdentifierType(idValue);
 
       try {
-        if (LinkingObjectType.AIP.equals(linkingType)) {
+        if (RODA_TYPE.AIP.equals(linkingType)) {
           String uuid = LinkingObjectUtils.getAipIdFromLinkingId(idValue);
           IndexedAIP aip = retrieve(IndexedAIP.class, uuid);
           aips.put(idValue, aip);
-        } else if (LinkingObjectType.REPRESENTATION.equals(linkingType)) {
+        } else if (RODA_TYPE.REPRESENTATION.equals(linkingType)) {
           String uuid = LinkingObjectUtils.getRepresentationIdFromLinkingId(idValue);
           IndexedRepresentation rep = retrieve(IndexedRepresentation.class, uuid);
           representations.put(idValue, rep);
-        } else if (LinkingObjectType.FILE.equals(linkingType)) {
+        } else if (RODA_TYPE.FILE.equals(linkingType)) {
           IndexedFile file = retrieve(IndexedFile.class, LinkingObjectUtils.getFileIdFromLinkingId(idValue));
           files.put(idValue, file);
-        } else if (LinkingObjectType.TRANSFERRED_RESOURCE.equals(linkingType)) {
+        } else if (RODA_TYPE.TRANSFERRED_RESOURCE.equals(linkingType)) {
           String id = LinkingObjectUtils.getTransferredResourceIdFromLinkingId(idValue);
           String uuid = UUID.nameUUIDFromBytes(id.getBytes()).toString();
           TransferredResource tr = retrieve(TransferredResource.class, uuid);
@@ -1901,7 +1891,7 @@ public class BrowserHelper {
         model.updateAIPState(aip);
 
         // create preservation event
-        String id = UUID.randomUUID().toString();
+        String id = IdUtils.createPreservationMetadataId(PreservationMetadataType.EVENT);
         PreservationEventType type = PreservationEventType.ACCESSION;
         String preservationEventDescription = AutoAcceptSIPPlugin.DESCRIPTION;
         List<LinkingIdentifier> sources = new ArrayList<>();

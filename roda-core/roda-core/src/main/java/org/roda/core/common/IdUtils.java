@@ -10,6 +10,7 @@ package org.roda.core.common;
 import java.util.List;
 import java.util.UUID;
 
+import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
@@ -53,15 +54,6 @@ public final class IdUtils {
     return getFileId(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId());
   }
 
-  public static String getPreservationMetadataId(PreservationMetadataType type, String aipId, String representationId) {
-    return type + ":" + getFileId(aipId, representationId, null, null, type.toString(), ID_SEPARATOR);
-  }
-
-  public static String getPreservationMetadataId(PreservationMetadataType type, String aipId, String representationId,
-    List<String> fileDirectoryPath, String fileId) {
-    return type + ":" + getFileId(aipId, representationId, fileDirectoryPath, fileId, type.toString(), ID_SEPARATOR);
-  }
-
   public static String getOtherMetadataId(String type, String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId) {
     return getFileId(aipId, representationId, fileDirectoryPath, fileId, type, ID_SEPARATOR);
@@ -74,15 +66,10 @@ public final class IdUtils {
   private static String getFileId(String aipId, String representationId, List<String> fileDirectoryPath, String fileId,
     String type, String separator) {
     StringBuilder idBuilder = new StringBuilder();
-
-    if (type != null) {
-      idBuilder.append(type);
-    }
     addNonNullStringToBuilder(idBuilder, aipId, separator);
     addNonNullStringToBuilder(idBuilder, representationId, separator);
     addNonNullStringToBuilder(idBuilder, fileDirectoryPath, separator);
     addNonNullStringToBuilder(idBuilder, fileId, separator);
-
     return idBuilder.toString();
   }
 
@@ -111,11 +98,24 @@ public final class IdUtils {
   }
 
   public static String getPluginAgentId(String pluginClassName, String version) {
-    return pluginClassName + "@" + version;
+    return URNUtils.createRodaPreservationURN(PreservationMetadataType.AGENT,pluginClassName + "@" + version);
   }
   
   public static String getUserAgentId(String username) {
-    return username;
+    return URNUtils.createRodaPreservationURN(PreservationMetadataType.AGENT,username);
   }
 
+  public static String createPreservationMetadataId(PreservationMetadataType type) {
+    return URNUtils.createRodaPreservationURN(type, UUID.randomUUID().toString());
+  }
+  
+  public static String getRepresentationPreservationId(String aipId, String representationId) {
+    return getPreservationId(PreservationMetadataType.REPRESENTATION, aipId, representationId, null, null);
+  }
+
+  public static String getPreservationId(PreservationMetadataType type, String aipId, String representationId,
+    List<String> fileDirectoryPath, String fileId) {
+    return URNUtils.createRodaPreservationURN(type, UUID.nameUUIDFromBytes(getFileId(aipId, representationId, fileDirectoryPath, fileId, null, ID_SEPARATOR).getBytes()).toString());
+  }
+  
 }

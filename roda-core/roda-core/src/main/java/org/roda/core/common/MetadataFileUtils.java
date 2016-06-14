@@ -22,7 +22,6 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.tika.metadata.Metadata;
 import org.jdom2.Element;
 import org.jdom2.IllegalDataException;
@@ -37,6 +36,8 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import com.google.common.xml.XmlEscapers;
 
 import gov.loc.repository.bagit.BagInfoTxt;
 
@@ -54,8 +55,8 @@ public class MetadataFileUtils {
         if (values != null && values.length > 0) {
           for (String value : values) {
             Element child = new Element("field");
-            child.setAttribute("name", StringEscapeUtils.escapeXml11(name));
-            child.addContent(StringEscapeUtils.escapeXml11(value));
+            child.setAttribute("name", escapeAttribute(name));
+            child.addContent(escapeContent(value));
             root.addContent(child);
           }
 
@@ -80,8 +81,8 @@ public class MetadataFileUtils {
       for (Map.Entry<String, String> entry : bagInfoTxt.entrySet()) {
         if (!entry.getKey().equalsIgnoreCase("parent")) {
           Element child = new Element("field");
-          child.setAttribute("name", StringEscapeUtils.escapeXml11(entry.getKey()));
-          child.addContent(StringEscapeUtils.escapeXml11(entry.getValue()));
+          child.setAttribute("name", escapeAttribute(entry.getKey()));
+          child.addContent(escapeContent(entry.getValue()));
           root.addContent(child);
         }
       }
@@ -102,7 +103,7 @@ public class MetadataFileUtils {
       org.jdom2.Document doc = new org.jdom2.Document();
       Element child = new Element("field");
       child.setAttribute("name", "title");
-      child.addContent(StringEscapeUtils.escapeXml11(transferredResource.getName()));
+      child.addContent(escapeContent(transferredResource.getName()));
       root.addContent(child);
       doc.setRootElement(root);
       XMLOutputter outter = new XMLOutputter();
@@ -138,5 +139,15 @@ public class MetadataFileUtils {
     }
     return otherProperties;
   }
+  
+  private static String escapeAttribute(String value){
+    return XmlEscapers.xmlAttributeEscaper().escape(value);
+  }
+  
+  private static String escapeContent(String value){
+    return XmlEscapers.xmlContentEscaper().escape(value);
+  }
+  
+  
 
 }
