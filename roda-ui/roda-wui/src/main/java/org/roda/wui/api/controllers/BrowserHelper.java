@@ -108,6 +108,7 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.validation.ValidationException;
+import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
@@ -877,8 +878,12 @@ public class BrowserHelper {
     throws GenericException, ValidationException, AuthorizationDeniedException, RequestNotValidException,
     AlreadyExistsException, NotFoundException {
 
-    ValidationUtils.validateDescriptiveBinary(descriptiveMetadataPayload, descriptiveMetadataType,
+    ValidationReport report = ValidationUtils.validateDescriptiveBinary(descriptiveMetadataPayload, descriptiveMetadataType,
       descriptiveMetadataVersion, false);
+    
+    if (!report.isValid()) {
+      throw new ValidationException(report);
+    }
 
     return RodaCoreFactory.getModelService().createDescriptiveMetadata(aipId, descriptiveMetadataId,
       descriptiveMetadataPayload, descriptiveMetadataType, descriptiveMetadataVersion);
@@ -889,8 +894,12 @@ public class BrowserHelper {
     String message) throws GenericException, AuthorizationDeniedException, ValidationException,
     RequestNotValidException, NotFoundException {
 
-    ValidationUtils.validateDescriptiveBinary(descriptiveMetadataPayload, descriptiveMetadataType,
-      descriptiveMetadataVersion, false);
+    ValidationReport report = ValidationUtils.validateDescriptiveBinary(descriptiveMetadataPayload,
+      descriptiveMetadataType, descriptiveMetadataVersion, false);
+
+    if (!report.isValid()) {
+      throw new ValidationException(report);
+    }
 
     return RodaCoreFactory.getModelService().updateDescriptiveMetadata(aipId, descriptiveMetadataId,
       descriptiveMetadataPayload, descriptiveMetadataType, descriptiveMetadataVersion, message);

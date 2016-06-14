@@ -18,6 +18,7 @@ import java.util.Map;
 
 import javax.xml.transform.TransformerException;
 
+import org.apache.commons.io.input.BOMInputStream;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
@@ -80,7 +81,7 @@ public final class HTMLUtils {
   private static String binaryToHtml(Binary binary, String metadataType, String metadataVersion,
     Map<String, Object> stylesheetOpt) throws GenericException {
     try {
-      Reader reader = new InputStreamReader(binary.getContent().createInputStream());
+      Reader reader = new InputStreamReader(new BOMInputStream(binary.getContent().createInputStream()));
       return fileToHtml(reader, metadataType, metadataVersion, stylesheetOpt);
     } catch (TransformerException | IOException e) {
       LOGGER.error("Error transforming binary into HTML (type=" + metadataType + ")", e);

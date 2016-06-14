@@ -52,7 +52,7 @@
 					<g:Button addStyleNames="btn btn-plus" ui:field="createFolder">
 						<ui:text from='{messages.ingestTransferButtonCreateFolder}' />
 					</g:Button>
-					<g:Button addStyleNames="btn btn-ban" ui:field="remove">
+					<g:Button addStyleNames="btn btn-danger btn-ban" ui:field="remove">
 						<ui:text from='{messages.ingestTransferButtonRemoveWholeFolder}' />
 					</g:Button>
 				</g:FlowPanel>
