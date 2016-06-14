@@ -38,6 +38,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -626,7 +627,7 @@ public class SolrUtils {
 
       inputStream = binary.getContent().createInputStream();
 
-      Reader descMetadataReader = new InputStreamReader(inputStream);
+      Reader descMetadataReader = new InputStreamReader(new BOMInputStream(inputStream));
 
       // TODO support the use of scripts for non-xml transformers
       Reader xsltReader = new InputStreamReader(transformerStream);
