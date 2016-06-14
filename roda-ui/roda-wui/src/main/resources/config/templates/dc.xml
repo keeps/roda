@@ -3,14 +3,14 @@
 <simpledc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	  xsi:noNamespaceSchemaLocation="../schemas/dc.xsd">
 
-	<title>{{title order='2' auto-generate='title' label="{'en': 'Title'}" xpath="//*:title"}}</title>
-	<identifier>{{id order='1' auto-generate='id' label="{'en': 'ID'}" xpath="//*:identifier"}}</identifier>
-	<creator>{{creator label="{'en': 'Creator'}" xpath="//*:creator"}}</creator>
-	<date>{{dateInitial order='3' type='date' label="{'en': 'Initial date'}" xpath="//*:date[1]"}}</date>
-	<date>{{dateFinal order='4' type='date' label="{'en': 'Final date'}" xpath="//*:date[2]"}}</date>
-	<description>{{description type='text-area' label="{'en': 'Description'}" xpath="//*:description"}}</description>
-	<publisher>{{producer label="{'en': 'Producer'}" xpath="//*:publisher"}}</publisher>
-	<rights>{{rights label="{'en': 'Rights'}" xpath="//*:rights"}}</rights>
-	<language>{{language auto-generate='language' label="{'en': 'Language'}" xpath="//*:language"}}</language>
+	<title>{{title order='2' auto-generate='title' label="{'en': 'Title'}" xpath="//*:title/string()"}}</title>
+	<identifier>{{id order='1' auto-generate='id' label="{'en': 'ID'}" xpath="//*:identifier/string()"}}</identifier>
+	<creator>{{creator label="{'en': 'Creator'}" xpath="//*:creator/string()"}}</creator>
+	<date>{{dateInitial order='3' type='date' label="{'en': 'Initial date'}" xpath="//*:date[1]/string()"}}</date>
+	<date>{{dateFinal order='4' type='date' label="{'en': 'Final date'}" xpath="//*:date[2]/string()"}}</date>
+	<description>{{description type='text-area' label="{'en': 'Description'}" xpath="//*:description/string()"}}</description>
+	<publisher>{{producer label="{'en': 'Producer'}" xpath="//*:publisher/string()"}}</publisher>
+	<rights>{{rights label="{'en': 'Rights'}" xpath="//*:rights/string()"}}</rights>
+	<language>{{language auto-generate='language' label="{'en': 'Language'}" xpath="//*:language/string()"}}</language>
 
 </simpledc>

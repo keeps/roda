@@ -12,11 +12,17 @@ import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.TreeSet;
 
-import net.sf.saxon.s9api.*;
-import net.sf.saxon.xpath.XPathFactoryImpl;
-import org.apache.xpath.NodeSet;
+import javax.xml.transform.stream.StreamSource;
+
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.client.browse.MetadataValue;
@@ -25,14 +31,14 @@ import org.slf4j.LoggerFactory;
 
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
+import net.sf.saxon.s9api.DocumentBuilder;
+import net.sf.saxon.s9api.Processor;
+import net.sf.saxon.s9api.XPathCompiler;
+import net.sf.saxon.s9api.XPathSelector;
+import net.sf.saxon.s9api.XdmItem;
+import net.sf.saxon.s9api.XdmNode;
+import net.sf.saxon.s9api.XdmValue;
 
 public class ServerTools {
   private static final Logger LOGGER = LoggerFactory.getLogger(ServerTools.class);
@@ -187,7 +193,7 @@ public class ServerTools {
     return result;
   }
 
-  public static List<String> applyXpath(String xml, String xpathString){
+  public static List<String> applyXpath(String xml, String xpathString) {
     List<String> result = new ArrayList<>();
     try {
       Processor proc = new Processor(false);
@@ -206,7 +212,7 @@ public class ServerTools {
       XdmValue nodes = selector.evaluate();
 
       for (XdmItem item : nodes) {
-        result.add(item.getStringValue());
+        result.add(item.toString());
       }
 
     } catch (Exception e) {

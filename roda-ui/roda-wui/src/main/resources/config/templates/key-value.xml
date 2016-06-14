@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <metadata>
-	<field name="id">{{id auto-generate="id" label="{'en': 'ID'}" xpath="//*:field[@name='id']"}}</field>
-	<field name="title">{{title label="{'en': 'Title'}" auto-generate="title" xpath="//*:field[@name='title']"}}</field>
-	<field name="producer">{{user label="{'en': 'Producer'}" xpath="//*:field[@name='producer']"}}</field>
-	<field name="date">{{date type="date" label="{'en': 'Date'}" auto-generate="now" xpath="//*:field[@name='date']"}}</field>
+	<field name="id">{{id auto-generate="id" label="{'en': 'ID'}" xpath="//*:field[@name='id']/string()"}}</field>
+	<field name="title">{{title label="{'en': 'Title'}" auto-generate="title" xpath="//*:field[@name='title']/string()"}}</field>
+	<field name="producer">{{user label="{'en': 'Producer'}" xpath="//*:field[@name='producer']/string()"}}</field>
+	<field name="date">{{date type="date" label="{'en': 'Date'}" auto-generate="now" xpath="//*:field[@name='date']/string()"}}</field>
 </metadata>

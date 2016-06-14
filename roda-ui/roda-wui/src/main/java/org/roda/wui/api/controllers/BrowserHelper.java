@@ -323,7 +323,7 @@ public class BrowserHelper {
             } else {
               value = String.join(" / ", allValues);
             }
-            mv.set("value", value);
+            mv.set("value", value.trim());
           }
         }
         // Identity check. Test if the original XML is equal to the result of

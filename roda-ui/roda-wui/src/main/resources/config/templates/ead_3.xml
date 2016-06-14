@@ -2,21 +2,21 @@
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://ead3.archivists.org/schema/ ../schemas/ead3.xsd">
 	<control>
-		<recordid>{{id order=1 auto-generate='id' label="{'en': 'ID'}" xpath="//*:recordid ##%## //*:unitid"}}</recordid>
+		<recordid>{{id order=1 auto-generate='id' label="{'en': 'ID'}" xpath="//*:recordid/string() ##%## //*:unitid/string()"}}</recordid>
 		<filedesc>
 			<titlestmt>
-				<titleproper>{{title order='2' auto-generate='title' label="{'en': 'Title'}" xpath="//*:titleproper ##%## //*:unittitle"}}</titleproper>
+				<titleproper>{{title order='2' auto-generate='title' label="{'en': 'Title'}" xpath="//*:titleproper/string() ##%## //*:unittitle/string()"}}</titleproper>
 			</titlestmt>
 		</filedesc>
 		<maintenancestatus value="new"/>
 		<maintenanceagency>
-			<agencyname>{{producer label="{'en': 'Producer'}" xpath="//*:agencyname ##%## //*:origination[@label='producer']/*:corpname/*:part"}}</agencyname>
+			<agencyname>{{producer label="{'en': 'Producer'}" xpath="//*:agencyname/string() ##%## //*:origination[@label='producer']/*:corpname/*:part/string()"}}</agencyname>
 		</maintenanceagency>
 
 		<maintenancehistory>
 			<maintenanceevent>
 				<eventtype value="created"/>
-				<eventdatetime standarddatetime='{{descDate order="3" type="date" auto-generate="now" label="{\"en\": \"Description date\"}" xpath="//*:eventdatetime/@standardtime ##%## //*:eventdatetime"}}'>{{descDate}}
+				<eventdatetime standarddatetime='{{descDate order="3" type="date" auto-generate="now" label="{\"en\": \"Description date\"}" xpath="//*:eventdatetime/@standardtime/string() ##%## //*:eventdatetime/string()"}}'>{{descDate}}
 				</eventdatetime>
 				<agenttype value="machine"/>
 				<agent>RODA version 2</agent>
@@ -26,15 +26,15 @@
 	</control>
 
 	<archdesc
-		level='{{level order="6" type="list" list="[\"fonds\",\"subfonds\",\"series\",\"subseries\",\"file\",\"item\"]" auto-generate="level" label="{\"en\": \"Description level\"}" xpath="//*:archdesc/@level"}}'>
+		level='{{level order="6" type="list" list="[\"fonds\",\"subfonds\",\"series\",\"subseries\",\"file\",\"item\"]" auto-generate="level" label="{\"en\": \"Description level\"}" xpath="//*:archdesc/@level/string()"}}'>
 		<did>
 			<unitid>{{id}}</unitid>
 			<unittitle>{{title}}</unittitle>
 
 			<unitdatestructured calendar="gregorian">
 				<daterange>
-					<fromdate standarddate='{{dateInitial order="4" type="date" label="{\"en\": \"Initial date\"}" xpath="//*:fromdate/@standarddate ##%## //*:fromdate"}}'>{{dateInitial}}</fromdate>
-					<todate standarddate='{{dateFinal order="5" type="date" label="{\"en\": \"Final date\"}" xpath="//*:todate/@standarddate ##%## //*:todate"}}'>{{dateFinal}}</todate>
+					<fromdate standarddate='{{dateInitial order="4" type="date" label="{\"en\": \"Initial date\"}" xpath="//*:fromdate/@standarddate/string() ##%## //*:fromdate/string()"}}'>{{dateInitial}}</fromdate>
+					<todate standarddate='{{dateFinal order="5" type="date" label="{\"en\": \"Final date\"}" xpath="//*:todate/@standarddate/string() ##%## //*:todate/string()"}}'>{{dateFinal}}</todate>
 				</daterange>
 			</unitdatestructured>
 
@@ -46,22 +46,22 @@
 
 			<origination label="creator">
 				<persname>
-					<part>{{creator label="{'en': 'Creator'}" xpath="//*:origination[@label='producer']/*:corpname/*:part"}}</part>
+					<part>{{creator label="{'en': 'Creator'}" xpath="//*:origination[@label='producer']/*:corpname/*:part/string()"}}</part>
 				</persname>
 			</origination>
 
 			<langmaterial>
-				<language>{{language auto-generate='language' label="{'en': 'Language'}" xpath="//*:language"}}</language>
+				<language>{{language auto-generate='language' label="{'en': 'Language'}" xpath="//*:language/string()"}}</language>
 			</langmaterial>
 
 		</did>
 
 		<scopecontent>
-			<p>{{description type='text-area' label="{'en': 'Description'}" xpath="//*:scopecontent/*:p"}}</p>
+			<p>{{description type='text-area' label="{'en': 'Description'}" xpath="//*:scopecontent/*:p/string()"}}</p>
 		</scopecontent>
 
 		<userestrict>
-			<p>{{rights label="{'en': 'Rights'}" xpath="//*:userestrict/*:p"}}</p>
+			<p>{{rights label="{'en': 'Rights'}" xpath="//*:userestrict/*:p/string()"}}</p>
 		</userestrict>
 	</archdesc>
 
