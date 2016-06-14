@@ -15,8 +15,18 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.MissingResourceException;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.WebApplicationException;
@@ -256,54 +266,65 @@ public class BrowserHelper {
       // Get the metadata file
       DescriptiveMetadata metadata = RodaCoreFactory.getModelService().retrieveDescriptiveMetadata(aip.getId(),
         descriptiveMetadataId);
-      Binary binary = RodaCoreFactory.getModelService().retrieveDescriptiveMetadataBinary(aip.getId(), descriptiveMetadataId);
+      Binary binary = RodaCoreFactory.getModelService().retrieveDescriptiveMetadataBinary(aip.getId(),
+        descriptiveMetadataId);
       inputStream = binary.getContent().createInputStream();
       String xml = IOUtils.toString(inputStream, "UTF-8");
 
       // Get the supported metadata type with the same type and version
       // We need this to try to get get the values for the form
       SupportedMetadataTypeBundle metadataTypeBundle = null;
-      List<SupportedMetadataTypeBundle> supportedMetadataTypeBundles = BrowserHelper.getSupportedMetadata(user, aip, Locale.getDefault());
+      List<SupportedMetadataTypeBundle> supportedMetadataTypeBundles = BrowserHelper.getSupportedMetadata(user, aip,
+        Locale.getDefault());
       for (SupportedMetadataTypeBundle typeBundle : supportedMetadataTypeBundles) {
-        if(typeBundle.getType() != null && typeBundle.getType().equalsIgnoreCase(metadata.getType())){
-          if(typeBundle.getVersion() == metadata.getVersion() || (typeBundle.getVersion() != null && typeBundle.getVersion().equalsIgnoreCase(metadata.getVersion()))){
+        if (typeBundle.getType() != null && typeBundle.getType().equalsIgnoreCase(metadata.getType())) {
+          if (typeBundle.getVersion() == metadata.getVersion()
+            || (typeBundle.getVersion() != null && typeBundle.getVersion().equalsIgnoreCase(metadata.getVersion()))) {
             metadataTypeBundle = typeBundle;
             break;
           }
         }
       }
 
+      boolean complete = false;
       // Get the values using XPath
       TreeSet<MetadataValue> values = null;
       String template = null;
-      if(metadataTypeBundle != null){
+
+      if (metadataTypeBundle != null) {
         values = metadataTypeBundle.getValues();
         template = metadataTypeBundle.getTemplate();
         for (MetadataValue mv : values) {
+          // clear the auto-generated values
+          mv.set("value", null);
           String xpathRaw = mv.get("xpath");
-          if(xpathRaw != null && xpathRaw.length() > 0){
+          if (xpathRaw != null && xpathRaw.length() > 0) {
             String[] xpaths = xpathRaw.split("##%##");
-            String value = "";
-            Set<String> allValues = new HashSet<>();
+            String value;
+            List<String> allValues = new ArrayList<>();
             for (String xpath : xpaths) {
-              List<String> result = ServerTools.applyXpath(xml, xpath);
-              // if any of the values is different, concatenate all values in a string, otherwise return the value
-              boolean allEqual = result.stream().allMatch(s -> s.trim().equals(result.get(0).trim()));
-              if(allEqual && !result.isEmpty()){
-                value = result.get(0);
-              }else {
-                allValues.addAll(result);
-              }
+              allValues.addAll(ServerTools.applyXpath(xml, xpath));
             }
-            if(value.equals("")){
-              value += String.join(" / ", allValues);
+            // if any of the values is different, concatenate all values in a
+            // string, otherwise return the value
+            boolean allEqual = allValues.stream().allMatch(s -> s.trim().equals(allValues.get(0).trim()));
+            if (allEqual && !allValues.isEmpty()) {
+              value = allValues.get(0);
+            } else {
+              value = String.join(" / ", allValues);
             }
             mv.set("value", value);
           }
         }
+        // Identity check. Test if the original XML is equal to the result of
+        // applying the extracted values to the template
+        metadataTypeBundle.setValues(values);
+        String templateWithValues = getDescriptiveMetadataPreview(metadataTypeBundle);
+        complete = templateWithValues.equals(xml);
       }
 
-      ret = new DescriptiveMetadataEditBundle(descriptiveMetadataId, metadata.getType(), metadata.getVersion(), xml, template, values, true);
+      ret = new DescriptiveMetadataEditBundle(descriptiveMetadataId, metadata.getType(), metadata.getVersion(), xml,
+        template, values, complete);
     } catch (IOException e) {
       throw new GenericException("Error getting descriptive metadata edit bundle: " + e.getMessage());
     } finally {
@@ -1974,7 +1995,7 @@ public class BrowserHelper {
     }
   }
 
-  public static String getDescriptiveMetadataPreview(String aipId, SupportedMetadataTypeBundle bundle) {
+  public static String getDescriptiveMetadataPreview(SupportedMetadataTypeBundle bundle) {
     String rawTemplate = bundle.getTemplate();
     String result = null;
     try {
@@ -1991,11 +2012,11 @@ public class BrowserHelper {
       Set<MetadataValue> values = bundle.getValues();
       if (values != null) {
         values.forEach(metadataValue -> {
-          String val = (String) metadataValue.get("value");
+          String val = metadataValue.get("value");
           if (val != null) {
             val = val.replaceAll("\\s", "");
             if (!"".equals(val)) {
-              data.put(metadataValue.getId(), (String) metadataValue.get("value"));
+              data.put(metadataValue.getId(), metadataValue.get("value"));
             }
           }
         });

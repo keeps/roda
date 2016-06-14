@@ -1542,7 +1542,7 @@ public class Browser extends RodaCoreService {
     UserUtility.checkRoles(user, BROWSE_ROLE);
 
     // delegate
-    String payload = BrowserHelper.getDescriptiveMetadataPreview(aipId, bundle);
+    String payload = BrowserHelper.getDescriptiveMetadataPreview(bundle);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();

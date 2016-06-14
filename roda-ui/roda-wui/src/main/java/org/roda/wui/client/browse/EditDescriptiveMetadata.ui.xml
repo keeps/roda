@@ -1,30 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
-	xmlns:u="urn:import:org.roda.wui.management.user.client">
+	     xmlns:g="urn:import:com.google.gwt.user.client.ui"
+>
 
-	<ui:with field='constants' type='config.i18n.client.UserManagementConstants' />
-	<ui:with field='messages' type='config.i18n.client.UserManagementMessages' />
+	<ui:with field='constants' type='config.i18n.client.UserManagementConstants'/>
+	<ui:with field='messages' type='config.i18n.client.UserManagementMessages'/>
 
 	<ui:style>
-	
+
 	</ui:style>
 
 	<g:FlowPanel styleName="wui-browse-metadata-descriptive-versions"
-		addStyleNames="wrapper skip_padding">
+		     addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
 				<g:Label styleName="h1">Edit descriptive metadata</g:Label>
 				<g:Label addStyleNames="form-label">
 					Type
 				</g:Label>
-				<g:ListBox ui:field="type" addStyleNames="form-listbox" />
+				<g:ListBox ui:field="type" addStyleNames="form-listbox"/>
 				<g:Label addStyleNames="form-label">
 					File name
 				</g:Label>
-				<g:TextBox ui:field="id" addStyleNames="form-textbox" />
+				<g:TextBox ui:field="id" addStyleNames="form-textbox"/>
+				<g:Label ui:field="formCompleteDanger" addStyleNames="label-danger">
+					The version created from the form is not exactly the same as the original file. Please verify that there was no data loss.
+				</g:Label>
 				<g:Label ui:field="formOrXMLLabel">
 					Form
 				</g:Label>
@@ -37,7 +39,7 @@
 					<g:FlowPanel ui:field="formOrXML" addStyleNames="panel-body"/>
 				</g:FlowPanel>
 
-				<g:HTML visible="false" ui:field="errors" addStyleNames="metadata-edit-errors" />
+				<g:HTML visible="false" ui:field="errors" addStyleNames="metadata-edit-errors"/>
 
 			</g:FlowPanel>
 

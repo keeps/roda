@@ -10,17 +10,8 @@
  */
 package org.roda.wui.client.browse;
 
-import java.util.Date;
 import java.util.List;
 
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.json.client.*;
-import com.google.gwt.user.client.ui.*;
-import com.google.gwt.user.datepicker.client.DateBox;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationIssue;
@@ -39,6 +30,16 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.TextArea;
+import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.BrowseMessages;
 
@@ -116,6 +117,9 @@ public class EditDescriptiveMetadata extends Composite {
   Label formOrXMLLabel;
 
   @UiField
+  Label formCompleteDanger;
+
+  @UiField
   FocusPanel showXml;
 
   @UiField
@@ -143,16 +147,17 @@ public class EditDescriptiveMetadata extends Composite {
     this.aipId = aipId;
     this.bundle = bundle;
 
-    supportedBundle = new SupportedMetadataTypeBundle(bundle.getType(), bundle.getVersion(), bundle.getId(), bundle.getRawTemplate(), bundle.getValues());
+    supportedBundle = new SupportedMetadataTypeBundle(bundle.getType(), bundle.getVersion(), bundle.getId(),
+      bundle.getRawTemplate(), bundle.getValues());
 
     initWidget(uiBinder.createAndBindUi(this));
     metadataXML = new TextArea();
     metadataXML.addStyleName("form-textbox metadata-edit-area metadata-form-textbox");
 
     id.setText(bundle.getId());
-    //.setText(bundle.getXml());
-
     id.setEnabled(false);
+
+    formCompleteDanger.setVisible(!bundle.isComplete());
 
     BrowserService.Util.getInstance().getSupportedMetadata(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
       new AsyncCallback<List<SupportedMetadataTypeBundle>>() {
@@ -204,7 +209,6 @@ public class EditDescriptiveMetadata extends Composite {
           }
         }
       });
-
   }
 
   private void createForm(SupportedMetadataTypeBundle bundle) {
@@ -238,23 +242,23 @@ public class EditDescriptiveMetadata extends Composite {
         // if the user changed the metadata text
         if (metadataTextFromForm != null && !metadataXML.getText().equals(metadataTextFromForm)) {
           Dialogs.showConfirmDialog(messages.confirmChangeToFormTitle(), messages.confirmChangeToFormMessage(),
-              messages.dialogCancel(), messages.dialogYes(), new AsyncCallback<Boolean>() {
-                @Override
-                public void onFailure(Throwable throwable) {
-                  Toast.showError(throwable.getClass().getName(), throwable.getMessage());
-                }
+            messages.dialogCancel(), messages.dialogYes(), new AsyncCallback<Boolean>() {
+              @Override
+              public void onFailure(Throwable throwable) {
+                Toast.showError(throwable.getClass().getName(), throwable.getMessage());
+              }
 
-                @Override
-                public void onSuccess(Boolean aBoolean) {
-                  if (aBoolean) {
-                    formOrXML.clear();
-                    createForm(supportedBundle);
-                    formOrXMLLabel.setText("Form");
-                  } else {
-                    setInXML(!inXML);
-                  }
+              @Override
+              public void onSuccess(Boolean aBoolean) {
+                if (aBoolean) {
+                  formOrXML.clear();
+                  createForm(supportedBundle);
+                  formOrXMLLabel.setText("Form");
+                } else {
+                  setInXML(!inXML);
                 }
-              });
+              }
+            });
         } else {
           formOrXML.clear();
           createForm(supportedBundle);
@@ -274,32 +278,8 @@ public class EditDescriptiveMetadata extends Composite {
   }
 
   private void updateMetadataXML() {
-    BrowserService.Util.getInstance().getDescriptiveMetadataPreview(aipId, supportedBundle, new AsyncCallback<String>() {
-      @Override
-      public void onFailure(Throwable caught) {
-        Toast.showError(caught.getClass().getName(), caught.getMessage());
-      }
-
-      @Override
-      public void onSuccess(String preview) {
-        formOrXML.clear();
-        metadataXML.setText(preview);
-        formOrXML.add(metadataXML);
-        formOrXMLLabel.setText("Template preview");
-        metadataTextFromForm = preview;
-      }
-    });
-  }
-
-  @UiHandler("buttonApply")
-  void buttonApplyHandler(ClickEvent e) {
-    String xmlText = metadataXML.getText();
-    boolean hasOverridenTheForm = inXML && !xmlText.equals(metadataTextFromForm);
-    if(hasOverridenTheForm){
-      updateMetadataOnServer(xmlText);
-    }else{
-      // Get the resulting XML using the data from the form
-      BrowserService.Util.getInstance().getDescriptiveMetadataPreview(aipId, supportedBundle, new AsyncCallback<String>() {
+    BrowserService.Util.getInstance().getDescriptiveMetadataPreview(aipId, supportedBundle,
+      new AsyncCallback<String>() {
         @Override
         public void onFailure(Throwable caught) {
           Toast.showError(caught.getClass().getName(), caught.getMessage());
@@ -307,24 +287,50 @@ public class EditDescriptiveMetadata extends Composite {
 
         @Override
         public void onSuccess(String preview) {
-          updateMetadataOnServer(preview);
+          formOrXML.clear();
+          metadataXML.setText(preview);
+          formOrXML.add(metadataXML);
+          formOrXMLLabel.setText("Template preview");
+          metadataTextFromForm = preview;
         }
       });
+  }
+
+  @UiHandler("buttonApply")
+  void buttonApplyHandler(ClickEvent e) {
+    String xmlText = metadataXML.getText();
+    boolean hasOverridenTheForm = inXML && !xmlText.equals(metadataTextFromForm);
+    if (hasOverridenTheForm) {
+      updateMetadataOnServer(xmlText);
+    } else {
+      // Get the resulting XML using the data from the form
+      BrowserService.Util.getInstance().getDescriptiveMetadataPreview(aipId, supportedBundle,
+        new AsyncCallback<String>() {
+          @Override
+          public void onFailure(Throwable caught) {
+            Toast.showError(caught.getClass().getName(), caught.getMessage());
+          }
+
+          @Override
+          public void onSuccess(String preview) {
+            updateMetadataOnServer(preview);
+          }
+        });
     }
   }
 
-  private void updateMetadataOnServer(String content){
+  private void updateMetadataOnServer(String content) {
     String typeText = type.getSelectedValue();
     String version = null;
 
     if (typeText.contains(RodaConstants.METADATA_VERSION_SEPARATOR)) {
       version = typeText.substring(typeText.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1,
-          typeText.length());
+        typeText.length());
       typeText = typeText.substring(0, typeText.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));
     }
 
     DescriptiveMetadataEditBundle updatedBundle = new DescriptiveMetadataEditBundle(bundle.getId(), typeText, version,
-        content);
+      content);
 
     BrowserService.Util.getInstance().updateDescriptiveMetadataFile(aipId, updatedBundle, new AsyncCallback<Void>() {
 

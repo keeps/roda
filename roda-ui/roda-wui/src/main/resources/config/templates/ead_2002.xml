@@ -8,8 +8,7 @@
 		</eadid>
 		<filedesc>
 			<titlestmt>
-				<titleproper>{{title order='2' auto-generate='title' label="{'en': 'Title'}" xpath="//*:titleproper ##%## //*:unittitle"}}
-				</titleproper>
+				<titleproper>{{title order='2' auto-generate='title' label="{'en': 'Title'}" xpath="//*:titleproper ##%## //*:unittitle"}}</titleproper>
 			</titlestmt>
 		</filedesc>
 
