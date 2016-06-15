@@ -210,9 +210,11 @@ public class ShowFormat extends Composite {
     if (websiteList != null) {
       for (String website : websiteList) {
         if(isValidUrl(website)){
-          Anchor anchor = new Anchor(website, website);
+          Anchor anchor = new Anchor(website,
+            false,
+            website,
+            "_blank");
           HTML br = new HTML();
-          br.setHTML("<br/>");
           formatWebsiteValue.add(anchor);
           formatWebsiteValue.add(br);
         }else{
