@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.RODA_TYPE;
 import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.ip.TransferredResource;
@@ -29,8 +30,8 @@ public final class LinkingObjectUtils {
   }
 
   public static RODA_TYPE getLinkingIdentifierType(String value) {
-    if (value.contains(":")) {
-      return RODA_TYPE.valueOf(value.split(":")[2].toUpperCase());
+    if (value.contains(RodaConstants.URN_SEPARATOR)) {
+      return RODA_TYPE.valueOf(value.split(RodaConstants.URN_SEPARATOR)[2].toUpperCase());
     } else {
       return null;
     }

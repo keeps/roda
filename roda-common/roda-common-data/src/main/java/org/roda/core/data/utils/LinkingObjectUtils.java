@@ -33,7 +33,7 @@ public final class LinkingObjectUtils {
 
   public static String getLinkingObjectPath(String value) {
     return URNUtils.getLinkingObjectPath(value);
-   
+
   }
 
   public static String getFileIdFromLinkingId(String linkingId) {
