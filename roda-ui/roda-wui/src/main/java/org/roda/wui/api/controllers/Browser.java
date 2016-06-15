@@ -1555,7 +1555,7 @@ public class Browser extends RodaCoreService {
   }
 
   public static String createDescriptiveMetadataPreview(RodaUser user, String aipId, SupportedMetadataTypeBundle bundle)
-    throws AuthorizationDeniedException {
+    throws AuthorizationDeniedException, GenericException {
     Date startDate = new Date();
 
     // check permissions

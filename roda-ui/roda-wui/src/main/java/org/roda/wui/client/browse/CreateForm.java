@@ -58,20 +58,26 @@ public class CreateForm {
       String loc = LocaleInfo.getCurrentLocale().getLocaleName();
       try {
         JSONObject jsonObject = JSONParser.parseLenient(rawLabel).isObject();
-        JSONString jsonString = jsonObject.get(loc).isString();
+        JSONValue jsonValue = jsonObject.get(loc);
+        if (jsonValue != null) {
+          JSONString jsonString = jsonObject.get(loc).isString();
 
-        if (jsonString != null) {
-          result = jsonString.stringValue();
+          if (jsonString != null) {
+            result = jsonString.stringValue();
+          }
+        } else {
+          // label for the desired language doesn't exist
+          // do nothing
         }
       } catch (JSONException e) {
-        // do nothing, the JSON was malformed or the label for the desired
-        // language doesn't exist
+        // The JSON was malformed
+        // do nothing
       }
     }
     return result;
   }
 
-  private static void  addTextField(FlowPanel panel, final FlowPanel layout, final MetadataValue mv) {
+  private static void addTextField(FlowPanel panel, final FlowPanel layout, final MetadataValue mv) {
     // Top label
     Label mvLabel = new Label(getFieldLabel(mv));
     mvLabel.addStyleName("form-label");
@@ -183,7 +189,7 @@ public class CreateForm {
     panel.add(layout);
   }
 
-  private static void addDatePicker(FlowPanel panel,final FlowPanel layout, final MetadataValue mv) {
+  private static void addDatePicker(FlowPanel panel, final FlowPanel layout, final MetadataValue mv) {
     // Top label
     final DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat("yyyy-MM-dd");
     Label mvLabel = new Label(getFieldLabel(mv));

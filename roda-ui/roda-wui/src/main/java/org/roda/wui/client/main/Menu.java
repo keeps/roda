@@ -334,10 +334,11 @@ public class Menu extends Composite {
   private void setLanguageMenu() {
     String locale = LocaleInfo.getCurrentLocale().getLocaleName();
 
+    // TODO get this from configuration
     Map<String, String> supportedLanguages = new HashMap<String, String>();
     supportedLanguages.put("en", messages.lang_en());
     supportedLanguages.put("pt_PT", messages.lang_pt());
-    supportedLanguages.put("cs_CZ", messages.lang_cz());
+    
 
     languagesMenu.clearItems();
 

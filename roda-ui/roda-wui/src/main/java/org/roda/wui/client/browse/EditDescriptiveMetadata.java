@@ -299,10 +299,12 @@ public class EditDescriptiveMetadata extends Composite {
       }
     } else {
       formOrXML.clear();
-      if (bundle != null)
+      if (bundle != null) {
         metadataXML.setText(bundle.getRawTemplate());
-      else
+      }
+      else {
         metadataXML.setText("");
+      }
       formOrXML.add(metadataXML);
       formOrXMLLabel.setText("Template preview");
       showXml.setVisible(false);

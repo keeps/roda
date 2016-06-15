@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
+import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -41,6 +42,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.Messages;
 import org.roda.core.common.PremisV3Utils;
+import org.roda.core.common.RodaUtils;
 import org.roda.core.common.UserUtility;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
@@ -933,9 +935,9 @@ public class BrowserHelper {
     throws GenericException, ValidationException, AuthorizationDeniedException, RequestNotValidException,
     AlreadyExistsException, NotFoundException {
 
-    ValidationReport report = ValidationUtils.validateDescriptiveBinary(descriptiveMetadataPayload, descriptiveMetadataType,
-      descriptiveMetadataVersion, false);
-    
+    ValidationReport report = ValidationUtils.validateDescriptiveBinary(descriptiveMetadataPayload,
+      descriptiveMetadataType, descriptiveMetadataVersion, false);
+
     if (!report.isValid()) {
       throw new ValidationException(report);
     }
@@ -1994,7 +1996,7 @@ public class BrowserHelper {
     }
   }
 
-  public static String getDescriptiveMetadataPreview(SupportedMetadataTypeBundle bundle) {
+  public static String getDescriptiveMetadataPreview(SupportedMetadataTypeBundle bundle) throws GenericException {
     String rawTemplate = bundle.getTemplate();
     String result = null;
     try {
@@ -2021,8 +2023,9 @@ public class BrowserHelper {
         });
       }
       result = tmpl.apply(data);
-    } catch (Exception e) {
-      e.printStackTrace();
+      result = RodaUtils.indentXML(result);
+    } catch (IOException | TransformerException e) {
+      throw new GenericException(e);
     }
     return result;
   }

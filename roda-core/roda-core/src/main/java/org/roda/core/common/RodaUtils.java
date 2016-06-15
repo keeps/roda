@@ -12,6 +12,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -147,11 +149,34 @@ public class RodaUtils {
   public static void indentXML(Reader input, Writer output) throws TransformerException {
     Transformer transformer = TransformerFactory.newInstance().newTransformer();
     transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+    transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+    
     StreamSource source = new StreamSource(input);
     StreamResult result = new StreamResult(output);
     transformer.transform(source, result);
   }
+
+  public static String indentXML(String xml) throws TransformerException {
+    Reader input = new StringReader(xml);
+    Writer output = new StringWriter();
+    indentXML(input, output);
+    return output.toString();
+  }
   
+  
+  public static void main(String[] args) {
+    String test ="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<ead xmlns=\"urn:isbn:1-931666-22-9\">\n\n\n\t\n<test><nested/></test></ead>";
+    System.out.println("BEFORE");
+    System.out.println(test);
+    System.out.println("TRANSFORMER");
+    try {
+      System.out.println(indentXML(test));
+    } catch (TransformerException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    
+  }
 
   public static long getPathSize(Path startPath) throws IOException {
     final AtomicLong size = new AtomicLong(0);
