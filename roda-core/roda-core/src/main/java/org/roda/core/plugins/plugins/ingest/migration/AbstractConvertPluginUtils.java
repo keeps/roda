@@ -30,14 +30,16 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPluginUtils;
 import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPluginUtils;
 import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPluginUtils;
+import org.roda.core.storage.StorageService;
 import org.xml.sax.SAXException;
 
 public class AbstractConvertPluginUtils {
 
   public static <T extends Serializable> void reIndexingRepresentationAfterConversion(Plugin<T> plugin,
-    IndexService index, ModelService model, String aipId, String representationId) throws RequestNotValidException,
-    GenericException, NotFoundException, AuthorizationDeniedException, PluginException, AlreadyExistsException,
-    SAXException, TikaException, ValidationException, InvalidParameterException, XmlException, IOException {
+    IndexService index, ModelService model, StorageService storage, String aipId, String representationId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, PluginException,
+    AlreadyExistsException, SAXException, TikaException, ValidationException, InvalidParameterException, XmlException,
+    IOException {
 
     AIP aip = model.retrieveAIP(aipId);
     Representation representation = model.retrieveRepresentation(aipId, representationId);
@@ -45,7 +47,8 @@ public class AbstractConvertPluginUtils {
     List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
     PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aip, representationId, algorithms);
     SiegfriedPluginUtils.runSiegfriedOnRepresentation(plugin, index, model, aip, representation);
-    TikaFullTextPluginUtils.runTikaFullTextOnRepresentation(null, index, model, aip, representation, true, true);
+    TikaFullTextPluginUtils.runTikaFullTextOnRepresentation(null, index, model, storage, aip, representation, true,
+      true);
   }
 
 }

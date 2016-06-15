@@ -146,7 +146,7 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
         try {
           for (Representation representation : aip.getRepresentations()) {
             LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
-            reportItem = TikaFullTextPluginUtils.runTikaFullTextOnRepresentation(reportItem, index, model, aip,
+            reportItem = TikaFullTextPluginUtils.runTikaFullTextOnRepresentation(reportItem, index, model, storage, aip,
               representation, doFeatureExtraction, doFulltextExtraction);
             model.notifyRepresentationUpdated(representation);
           }
