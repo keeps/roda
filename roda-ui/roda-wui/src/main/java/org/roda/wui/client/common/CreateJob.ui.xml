@@ -48,7 +48,7 @@
 					<g:Button addStyleNames="btn btn-play" ui:field="buttonCreate">
 						<ui:text from='{messages.createJobCreateTitle}' />
 					</g:Button>
-					<g:Button addStyleNames="btn btn-times-circle" ui:field="buttonCancel">
+					<g:Button addStyleNames="btn btn-default btn-times-circle" ui:field="buttonCancel">
 						<ui:text from='{messages.createJobCancelTitle}' />
 					</g:Button>
 				</g:FlowPanel>

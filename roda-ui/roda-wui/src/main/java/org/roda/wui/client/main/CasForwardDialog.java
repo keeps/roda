@@ -51,8 +51,7 @@ public class CasForwardDialog extends WUIWindow {
 
     forwardToCas.addStyleName("btn");
     forwardToCas.addStyleName("btn-play");
-    cancel.addStyleName("btn");
-    cancel.addStyleName("btn-times-circle");
+    cancel.addStyleName("btn btn-link btn-times-circle");
 
     setWidget(warning);
     addToBottom(cancel);
