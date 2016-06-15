@@ -29,7 +29,7 @@ public interface BrowseMessages extends Messages {
 
   String moveNoSuchObject(String message);
 
-  String ofWordMessage();
+  String of();
 
   /******* TITLES ******************************************/
 
@@ -1192,6 +1192,12 @@ public interface BrowseMessages extends Messages {
 
   String loginRecoverPassword();
 
+  String fillUsernameAndPasswordMessage();
+
+  String wrongUsernameAndPasswordMessage();
+
+  String systemCurrentlyUnavailableMessage();
+
   /*** More Search ***/
 
   String searchDescriptionLevels();
@@ -2108,13 +2114,10 @@ public interface BrowseMessages extends Messages {
   @Key("lang.cz")
   String lang_cz();
 
-
   /************* Metadata creation ****************/
 
-  @DefaultMessage("View metadata form")
   String confirmChangeToFormTitle();
 
-  @DefaultMessage("Are you sure you want to view the metadata form? All the changes made to the file will be lost.")
   String confirmChangeToFormMessage();
 
 }

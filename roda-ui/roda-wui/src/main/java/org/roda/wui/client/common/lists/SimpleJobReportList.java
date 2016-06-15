@@ -166,7 +166,7 @@ public class SimpleJobReportList extends BasicAsyncTableCell<Report> {
       public String getValue(Report report) {
         String value = "";
         if (report != null) {
-          value = report.getStepsCompleted() + " " + messages.ofWordMessage() + " " + report.getTotalSteps() + " ("
+          value = report.getStepsCompleted() + " " + messages.of() + " " + report.getTotalSteps() + " ("
             + report.getCompletionPercentage() + "%)";
         }
 

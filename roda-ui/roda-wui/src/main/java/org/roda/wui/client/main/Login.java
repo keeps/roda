@@ -39,6 +39,8 @@ import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
+import config.i18n.client.BrowseMessages;
+
 /**
  * @author Luis Faria
  * 
@@ -76,6 +78,7 @@ public class Login extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   private static Login instance = null;
 
@@ -165,7 +168,7 @@ public class Login extends Composite {
 
     // TODO strings
     if (usernameText.trim().length() == 0 || passwordText.trim().length() == 0) {
-      error.setText("Please fill the username and password");
+      error.setText(messages.fillUsernameAndPasswordMessage());
     } else {
 
       UserLogin.getInstance().login(usernameText, passwordText, new AsyncCallback<RodaUser>() {
@@ -173,9 +176,9 @@ public class Login extends Composite {
         @Override
         public void onFailure(Throwable caught) {
           if (caught instanceof AuthenticationDeniedException) {
-            error.setText("Wrong username or password");
+            error.setText(messages.wrongUsernameAndPasswordMessage());
           } else {
-            error.setText("System currently unavailable");
+            error.setText(messages.systemCurrentlyUnavailableMessage());
           }
         }
 
