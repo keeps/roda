@@ -1419,14 +1419,19 @@ public class SolrUtils {
       doc.addField(RodaConstants.MEMBERS_ROLES_ALL, new ArrayList<String>(member.getAllRoles()));
     }
 
+    // Add user specific
+
     return doc;
   }
 
   private static RODAMember solrDocumentToRodaMember(SolrDocument doc) {
-    final String id = objectToString(doc.get(RodaConstants.MEMBERS_ID));
+    final String id = objectToString(doc.get(RodaConstants.MEMBERS_ID), null);
     final boolean isActive = objectToBoolean(doc.get(RodaConstants.MEMBERS_IS_ACTIVE), Boolean.FALSE);
     final boolean isUser = objectToBoolean(doc.get(RodaConstants.MEMBERS_IS_USER), Boolean.FALSE);
-    final String name = objectToString(doc.get(RodaConstants.MEMBERS_NAME));
+    final String name = objectToString(doc.get(RodaConstants.MEMBERS_NAME), null);
+    final String fullName = objectToString(doc.get(RodaConstants.MEMBERS_FULLNAME), null);
+
+    final String email = objectToString(doc.get(RodaConstants.MEMBERS_EMAIL), null);
     final Set<String> groups = new HashSet<String>();
     List<String> possibleGroups = objectToListString(doc.get(RodaConstants.MEMBERS_GROUPS_ALL));
     groups.addAll(possibleGroups);
@@ -1436,11 +1441,14 @@ public class SolrUtils {
     if (isUser) {
       RodaUser user = new RodaUser();
       user.setId(id);
+      user.setName(name);
+      user.setEmail(email);
+
       user.setActive(isActive);
       user.setAllGroups(groups);
       user.setAllRoles(roles);
       user.setActive(isActive);
-      user.setName(name);
+
       return user;
     } else {
       RodaGroup group = new RodaGroup();
@@ -1460,6 +1468,9 @@ public class SolrUtils {
     doc.addField(RodaConstants.MEMBERS_IS_ACTIVE, user.isActive());
     doc.addField(RodaConstants.MEMBERS_IS_USER, user.isUser());
     doc.addField(RodaConstants.MEMBERS_NAME, user.getName());
+    doc.addField(RodaConstants.MEMBERS_FULLNAME, user.getFullName());
+    doc.addField(RodaConstants.MEMBERS_EMAIL, user.getEmail());
+
     if (user.getAllGroups() != null) {
       doc.addField(RodaConstants.MEMBERS_GROUPS_ALL, new ArrayList<String>(user.getAllGroups()));
     }

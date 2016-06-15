@@ -342,11 +342,13 @@ public final class RodaConstants {
   // MEMBER: USER or GROUP
   public static final String MEMBERS_ID = "id";
   public static final String MEMBERS_NAME = "name";
-  // public static final String MEMBERS_FULLNAME = "fullName";
+  public static final String MEMBERS_FULLNAME = "fullName";
   public static final String MEMBERS_IS_ACTIVE = "isActive";
   public static final String MEMBERS_IS_USER = "isUser";
   public static final String MEMBERS_GROUPS_ALL = "groupsAll";
   public static final String MEMBERS_ROLES_ALL = "rolesAll";
+  
+  public static final String MEMBERS_EMAIL = "email";
 
   public static final String TRANSFERRED_RESOURCE_ID = "id";
   public static final String TRANSFERRED_RESOURCE_UUID = "uuid";
@@ -735,8 +737,7 @@ public final class RodaConstants {
   public static final String VERIFICATION_EMAIL_TEMPLATE = "emailverification_html.vm";
   public static final String RECOVER_LOGIN_EMAIL_TEMPLATE = "recoverlogin_html.vm";
   public static final String NOTIFY_PRODUCER_EMAIL_TEMPLATE = "notifyproducer_html.vm";
-  
-  
+
   /* URN Constants */
   public static final String URN_BASE = "urn";
   public static final String URN_RODA = "roda";
@@ -744,8 +745,9 @@ public final class RodaConstants {
   public static final String URN_OTHER = "other";
   public static final String URN_SEPARATOR = ":";
   public static final String URN_TYPE = "URN";
+
   public enum RODA_TYPE {
-    AIP,REPRESENTATION,FILE,TRANSFERRED_RESOURCE;
+    AIP, REPRESENTATION, FILE, TRANSFERRED_RESOURCE;
   }
 
 }

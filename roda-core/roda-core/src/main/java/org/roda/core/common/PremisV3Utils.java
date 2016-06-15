@@ -54,6 +54,8 @@ import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.user.RODAMember;
+import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -361,7 +363,6 @@ public class PremisV3Utils {
     if (agentIds != null) {
       for (String agentId : agentIds) {
         LinkingAgentIdentifierComplexType agentIdentifier = ect.addNewLinkingAgentIdentifier();
-        // FIXME lfaria 20160523: put agent identifier type in constant
         agentIdentifier.setLinkingAgentIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
         agentIdentifier.setLinkingAgentIdentifierValue(agentId);
       }
@@ -421,8 +422,8 @@ public class PremisV3Utils {
     Representation representation = Representation.Factory.newInstance();
     ObjectIdentifierComplexType oict = representation.addNewObjectIdentifier();
     oict.setObjectIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
-    String identifier = IdUtils.getPreservationId(PreservationMetadataType.REPRESENTATION, aipID,
-      representationId,null,null);
+    String identifier = IdUtils.getPreservationId(PreservationMetadataType.REPRESENTATION, aipID, representationId,
+      null, null);
     oict.setObjectIdentifierValue(identifier);
     representation.addNewPreservationLevel().setPreservationLevelValue(getStringPlusAuthority(""));
     return representation;
@@ -818,16 +819,22 @@ public class PremisV3Utils {
 
     if (StringUtils.isNotBlank(username)) {
       RODAMember member = index.retrieve(RODAMember.class, username);
+
       String id = IdUtils.getUserAgentId(username);
       ContentPayload agentPayload;
 
-      // TODO set agent extension
       String extension = "";
       String note = "";
+      if (member instanceof RodaUser) {
+        RodaUser user = (RodaUser) member;
+        note = user.getEmail();
+      }
+
       String version = "";
       agentPayload = PremisV3Utils.createPremisAgentBinary(id, member.getFullName(), PreservationAgentType.PERSON,
         extension, note, version);
       pm = model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload, notify);
+
     }
 
     return pm;
