@@ -28,6 +28,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -89,7 +90,10 @@ public class ShowFormat extends Composite {
   Label formatDefinitionKey, formatDefinitionValue;
 
   @UiField
-  Label formatCategory;
+  Label formatCategoryKey;
+
+  @UiField
+  FlowPanel formatCategoryValue;
 
   @UiField
   Label formatLatestVersionKey, formatLatestVersionValue;
@@ -110,7 +114,10 @@ public class ShowFormat extends Composite {
   Label formatIsOpenFormat;
 
   @UiField
-  Label formatWebsiteKey, formatWebsiteValue;
+  Label formatWebsiteKey;
+
+  @UiField
+  FlowPanel formatWebsiteValue;
 
   @UiField
   Label formatProvenanceInformationKey, formatProvenanceInformationValue;
@@ -168,7 +175,17 @@ public class ShowFormat extends Composite {
     formatDefinitionValue.setText(format.getDefinition());
     formatDefinitionKey.setVisible(StringUtils.isNotBlank(format.getDefinition()));
 
-    formatCategory.setText(format.getCategory());
+    List<String> categoryList = format.getCategories();
+    formatCategoryValue.setVisible(categoryList != null && !categoryList.isEmpty());
+    formatCategoryKey.setVisible(categoryList != null && !categoryList.isEmpty());
+
+    if (categoryList != null) {
+      for (String category : categoryList) {
+        HTML parPanel = new HTML();
+        parPanel.setHTML(messages.formatListItems(category));
+        formatCategoryValue.add(parPanel);
+      }
+    }
 
     formatLatestVersionValue.setText(format.getLatestVersion());
     formatLatestVersionKey.setVisible(StringUtils.isNotBlank(format.getLatestVersion()));
@@ -186,8 +203,25 @@ public class ShowFormat extends Composite {
     formatStandardValue.setText(format.getStandard());
     formatStandardKey.setVisible(StringUtils.isNotBlank(format.getStandard()));
 
-    formatWebsiteValue.setText(format.getWebsite());
-    formatWebsiteKey.setVisible(StringUtils.isNotBlank(format.getWebsite()));
+    List<String> websiteList = format.getWebsites();
+    formatWebsiteValue.setVisible(websiteList != null && !websiteList.isEmpty());
+    formatWebsiteKey.setVisible(websiteList != null && !websiteList.isEmpty());
+
+    if (websiteList != null) {
+      for (String website : websiteList) {
+        if(isValidUrl(website)){
+          Anchor anchor = new Anchor(website, website);
+          HTML br = new HTML();
+          br.setHTML("<br/>");
+          formatWebsiteValue.add(anchor);
+          formatWebsiteValue.add(br);
+        }else{
+          HTML parPanel = new HTML();
+          parPanel.setHTML(messages.formatListItems(website));
+          formatCategoryValue.add(parPanel);
+        }
+      }
+    }
 
     formatProvenanceInformationValue.setText(format.getProvenanceInformation());
     formatProvenanceInformationKey.setVisible(StringUtils.isNotBlank(format.getProvenanceInformation()));
@@ -240,6 +274,12 @@ public class ShowFormat extends Composite {
       }
     }
   }
+
+  // Java method
+  public native boolean isValidUrl(String url) /*-{
+		var pattern = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+		return pattern.test(url);
+  }-*/;
 
   void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
 

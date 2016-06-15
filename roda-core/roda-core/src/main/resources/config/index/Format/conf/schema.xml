@@ -106,15 +106,17 @@
    -->   
    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="name" type="text_general" indexed="true" stored="true" required="true" multiValued="false" />
+   <field name="name_sort" type="string" indexed="true" stored="false" required="false" multiValued="false" />
    <field name="definition" type="text_general" indexed="true" stored="true" required="false" multiValued="false" /> 
-   <field name="category" type="text_general" indexed="true" stored="true" required="true" multiValued="false" />
+   <field name="category" type="text_general" indexed="true" stored="true" required="false" multiValued="true" />
+   <field name="category_sort" type="string" indexed="true" stored="false" required="false" multiValued="false" />
    <field name="latestVersion" type="string" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="popularity" type="int" indexed="true" stored="true" required="true" multiValued="false" />
+   <field name="popularity" type="int" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="developer" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="initialRelease" type="tdate" indexed="true" stored="true" required="true" multiValued="false" /> 
+   <field name="initialRelease" type="tdate" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="standard" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="isOpenFormat" type="boolean" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="website" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="website" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <field name="provenanceInformation" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    
    <field name="extensions" type="string" indexed="true" stored="true" required="false" multiValued="true" />

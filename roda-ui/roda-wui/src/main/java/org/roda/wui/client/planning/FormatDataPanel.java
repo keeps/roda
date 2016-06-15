@@ -53,7 +53,7 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
   TextArea definition;
 
   @UiField
-  TextBox category;
+  IncrementalList category;
 
   @UiField
   TextBox latestVersion;
@@ -74,7 +74,7 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
   CheckBox isOpenFormat;
 
   @UiField
-  TextBox website;
+  IncrementalList website;
 
   @UiField
   TextArea provenanceInformation;
@@ -148,7 +148,6 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
     definition.addChangeHandler(changeHandler);
     definition.addKeyUpHandler(keyUpHandler);
     category.addChangeHandler(changeHandler);
-    category.addKeyUpHandler(keyUpHandler);
 
     latestVersion.addChangeHandler(changeHandler);
     popularity.addChangeHandler(changeHandler);
@@ -193,13 +192,6 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
       initialRelease.removeStyleName("isWrong");
     }
 
-    if (category.getText().length() == 0) {
-      valid = false;
-      category.addStyleName("isWrong");
-    } else {
-      category.removeStyleName("isWrong");
-    }
-
     try {
       Integer.parseInt(popularity.getText());
       popularity.removeStyleName("isWrong");
@@ -215,14 +207,14 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
   public void setFormat(Format format) {
     this.name.setText(format.getName());
     this.definition.setText(format.getDefinition());
-    this.category.setText(format.getCategory());
+    this.category.setTextBoxList(format.getCategories());
     this.latestVersion.setText(format.getLatestVersion());
     this.popularity.setValue(format.getPopularity());
     this.developer.setText(format.getDeveloper());
     this.initialRelease.setValue(format.getInitialRelease());
     this.standard.setText(format.getStandard());
     this.isOpenFormat.setValue(format.isOpenFormat());
-    this.website.setText(format.getWebsite());
+    this.website.setTextBoxList(format.getWebsites());
     this.provenanceInformation.setText(format.getProvenanceInformation());
 
     this.extensions.setTextBoxList(format.getExtensions());
@@ -236,14 +228,14 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
     Format format = new Format();
     format.setName(name.getText());
     format.setDefinition(definition.getText());
-    format.setCategory(category.getText());
+    format.setCategories(category.getTextBoxesValue());
     format.setLatestVersion(latestVersion.getText());
     format.setPopularity(popularity.getValue());
     format.setDeveloper(developer.getText());
     format.setInitialRelease(initialRelease.getValue());
     format.setStandard(standard.getText());
     format.setOpenFormat(isOpenFormat.getValue());
-    format.setWebsite(website.getText());
+    format.setWebsites(website.getTextBoxesValue());
     format.setProvenanceInformation(provenanceInformation.getText());
 
     format.setExtensions(extensions.getTextBoxesValue());
@@ -257,12 +249,12 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
   public void clear() {
     name.setText("");
     definition.setText("");
-    category.setText("");
+    category.clearTextBoxes();
     latestVersion.setText("");
     popularity.setValue(null);
     developer.setText("");
     standard.setText("");
-    website.setText("");
+    website.clearTextBoxes();
     provenanceInformation.setText("");
 
     extensions.clearTextBoxes();

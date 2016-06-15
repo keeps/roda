@@ -29,14 +29,14 @@ public class Format extends NamedIndexedModel implements IsIndexed, Serializable
   private String id = null;
   private String name = null;
   private String definition = null;
-  private String category = null;
+  private List<String> categories = null;
   private String latestVersion = null;
   private int popularity = 0;
   private String developer = null;
   private Date initialRelease = null;
   private String standard = null;
   private boolean isOpenFormat = true;
-  private String website = null;
+  private List<String> websites = null;
   private String provenanceInformation = null;
 
   private List<String> extensions = new ArrayList<String>();
@@ -46,20 +46,19 @@ public class Format extends NamedIndexedModel implements IsIndexed, Serializable
 
   public Format() {
     super();
-    this.initialRelease = new Date();
   }
 
   public Format(Format format) {
     super(format.getId(), format.getName());
     this.definition = format.getDefinition();
-    this.category = format.getCategory();
+    this.categories = format.getCategories();
     this.latestVersion = format.getLatestVersion();
     this.popularity = format.getPopularity();
     this.developer = format.getDeveloper();
     this.initialRelease = format.getInitialRelease();
     this.standard = format.getStandard();
     this.isOpenFormat = format.isOpenFormat();
-    this.website = format.getWebsite();
+    this.websites = format.getWebsites();
     this.provenanceInformation = format.getProvenanceInformation();
 
     this.extensions = new ArrayList<String>(format.getExtensions());
@@ -90,14 +89,6 @@ public class Format extends NamedIndexedModel implements IsIndexed, Serializable
 
   public void setDefinition(String definition) {
     this.definition = definition;
-  }
-
-  public String getCategory() {
-    return category;
-  }
-
-  public void setCategory(String category) {
-    this.category = category;
   }
 
   public String getLatestVersion() {
@@ -148,14 +139,6 @@ public class Format extends NamedIndexedModel implements IsIndexed, Serializable
     this.isOpenFormat = isOpenFormat;
   }
 
-  public String getWebsite() {
-    return website;
-  }
-
-  public void setWebsite(String website) {
-    this.website = website;
-  }
-
   public String getProvenanceInformation() {
     return provenanceInformation;
   }
@@ -198,11 +181,27 @@ public class Format extends NamedIndexedModel implements IsIndexed, Serializable
 
   @Override
   public String toString() {
-    return "Format [id=" + super.getId() + ", name=" + super.getName() + ", definition=" + definition + ", category="
-      + category + ", latestVersion=" + latestVersion + ", popularity=" + popularity + ", developer=" + developer
+    return "Format [id=" + id + ", name=" + name + ", definition=" + definition + ", categories=" + categories
+      + ", latestVersion=" + latestVersion + ", popularity=" + popularity + ", developer=" + developer
       + ", initialRelease=" + initialRelease + ", standard=" + standard + ", isOpenFormat=" + isOpenFormat
-      + ", website=" + website + ", provenanceInformation=" + provenanceInformation + ", extensions=" + extensions
+      + ", websites=" + websites + ", provenanceInformation=" + provenanceInformation + ", extensions=" + extensions
       + ", mimetypes=" + mimetypes + ", pronoms=" + pronoms + ", utis=" + utis + "]";
+  }
+
+  public List<String> getCategories() {
+    return categories;
+  }
+
+  public void setCategories(List<String> categories) {
+    this.categories = categories;
+  }
+
+  public List<String> getWebsites() {
+    return websites;
+  }
+
+  public void setWebsites(List<String> websites) {
+    this.websites = websites;
   }
 
   @JsonIgnore

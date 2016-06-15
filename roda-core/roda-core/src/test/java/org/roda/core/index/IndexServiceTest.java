@@ -698,14 +698,14 @@ public class IndexServiceTest {
       Format format = new Format();
       format.setName("Portable Document Format");
       format.setDefinition("PDF definition");
-      format.setCategory("Page Layout Files");
+      format.setCategories(Arrays.asList("Page Layout Files"));
       format.setLatestVersion("1.7");
       format.setPopularity(4);
       format.setDeveloper("Adobe Systems");
       format.setInitialRelease(new Date());
       format.setStandard("ISO 32000-1");
       format.setOpenFormat(true);
-      format.setWebsite("https://www.adobe.com/devnet/pdf/pdf_reference_archive.html");
+      format.setWebsites(Arrays.asList("https://www.adobe.com/devnet/pdf/pdf_reference_archive.html"));
       format.setProvenanceInformation("https://en.wikipedia.org/wiki/Portable_Document_Format");
 
       List<String> extensions = new ArrayList<String>();

@@ -25,7 +25,7 @@
 				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatDefinition}' /></g:Label>
 				<g:TextArea ui:field="definition" addStyleNames="form-textbox" />
 				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatCategory}' /></g:Label>
-				<g:TextBox ui:field="category" addStyleNames="form-textbox" />
+				<l:IncrementalList ui:field="category"></l:IncrementalList>
 				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatLatestVersion}' /></g:Label>
 				<g:TextBox ui:field="latestVersion" addStyleNames="form-textbox form-textbox-small" />
 				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatPopularity}' /></g:Label>
@@ -41,7 +41,7 @@
 					<g:CheckBox ui:field="isOpenFormat" addStyleNames="form-checkbox" />
 				</g:FlowPanel>
 				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatWebsite}' /></g:Label>
-				<g:TextBox ui:field="website" addStyleNames="form-textbox" />
+				<l:IncrementalList ui:field="website"></l:IncrementalList>
 				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatProvenanceInformation}' /></g:Label>
 				<g:TextArea ui:field="provenanceInformation" addStyleNames="form-textbox" />
 				

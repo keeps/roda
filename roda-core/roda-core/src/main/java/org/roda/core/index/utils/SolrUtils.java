@@ -1908,15 +1908,17 @@ public class SolrUtils {
 
     doc.addField(RodaConstants.FORMAT_ID, format.getId());
     doc.addField(RodaConstants.FORMAT_NAME, format.getName());
+    doc.addField(RodaConstants.FORMAT_NAME_SORT, format.getName());
     doc.addField(RodaConstants.FORMAT_DEFINITION, format.getDefinition());
-    doc.addField(RodaConstants.FORMAT_CATEGORY, format.getCategory());
+    doc.addField(RodaConstants.FORMAT_CATEGORY, format.getCategories());
+    doc.addField(RodaConstants.FORMAT_CATEGORY_SORT, (format.getCategories()!=null && format.getCategories().size()>0)? format.getCategories().get(0):null);
     doc.addField(RodaConstants.FORMAT_LATEST_VERSION, format.getLatestVersion());
     doc.addField(RodaConstants.FORMAT_POPULARITY, format.getPopularity());
     doc.addField(RodaConstants.FORMAT_DEVELOPER, format.getDeveloper());
     doc.addField(RodaConstants.FORMAT_INITIAL_RELEASE, format.getInitialRelease());
     doc.addField(RodaConstants.FORMAT_STANDARD, format.getStandard());
     doc.addField(RodaConstants.FORMAT_IS_OPEN_FORMAT, format.isOpenFormat());
-    doc.addField(RodaConstants.FORMAT_WEBSITE, format.getWebsite());
+    doc.addField(RodaConstants.FORMAT_WEBSITE, format.getWebsites());
     doc.addField(RodaConstants.FORMAT_PROVENANCE_INFORMATION, format.getProvenanceInformation());
     doc.addField(RodaConstants.FORMAT_EXTENSIONS, format.getExtensions());
     doc.addField(RodaConstants.FORMAT_MIMETYPES, format.getMimetypes());
@@ -1932,14 +1934,14 @@ public class SolrUtils {
     format.setId(objectToString(doc.get(RodaConstants.FORMAT_ID)));
     format.setName(objectToString(doc.get(RodaConstants.FORMAT_NAME)));
     format.setDefinition(objectToString(doc.get(RodaConstants.FORMAT_DEFINITION)));
-    format.setCategory(objectToString(doc.get(RodaConstants.FORMAT_CATEGORY)));
+    format.setCategories(objectToListString(doc.get(RodaConstants.FORMAT_CATEGORY)));
     format.setLatestVersion(objectToString(doc.get(RodaConstants.FORMAT_LATEST_VERSION)));
     format.setPopularity(objectToInteger(doc.get(RodaConstants.FORMAT_POPULARITY), 3));
     format.setDeveloper(objectToString(doc.get(RodaConstants.FORMAT_DEVELOPER)));
     format.setInitialRelease(objectToDate(doc.get(RodaConstants.FORMAT_INITIAL_RELEASE)));
     format.setStandard(objectToString(doc.get(RodaConstants.FORMAT_STANDARD)));
     format.setOpenFormat(objectToBoolean(doc.get(RodaConstants.FORMAT_IS_OPEN_FORMAT), Boolean.FALSE));
-    format.setWebsite(objectToString(doc.get(RodaConstants.FORMAT_WEBSITE)));
+    format.setWebsites(objectToListString(doc.get(RodaConstants.FORMAT_WEBSITE)));
     format.setProvenanceInformation(objectToString(doc.get(RodaConstants.FORMAT_PROVENANCE_INFORMATION)));
     format.setExtensions(objectToListString(doc.get(RodaConstants.FORMAT_EXTENSIONS)));
     format.setMimetypes(objectToListString(doc.get(RodaConstants.FORMAT_MIMETYPES)));

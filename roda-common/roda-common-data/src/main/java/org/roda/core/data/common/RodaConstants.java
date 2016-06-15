@@ -563,8 +563,10 @@ public final class RodaConstants {
   /* Formats */
   public static final String FORMAT_ID = "id";
   public static final String FORMAT_NAME = "name";
+  public static final String FORMAT_NAME_SORT = "name_sort";
   public static final String FORMAT_DEFINITION = "definition";
   public static final String FORMAT_CATEGORY = "category";
+  public static final String FORMAT_CATEGORY_SORT = "category_sort";
   public static final String FORMAT_LATEST_VERSION = "latestVersion";
   public static final String FORMAT_POPULARITY = "popularity";
   public static final String FORMAT_DEVELOPER = "developer";

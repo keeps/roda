@@ -72,7 +72,7 @@ public class FormatList extends BasicAsyncTableCell<Format> {
 
       @Override
       public String getValue(Format format) {
-        return format != null ? format.getCategory() : null;
+        return (format != null && format.getCategories()!=null && format.getCategories().size()>0) ? format.getCategories().get(0) : null;
       }
     };
 
@@ -94,8 +94,8 @@ public class FormatList extends BasicAsyncTableCell<Format> {
     Filter filter = getFilter();
 
     Map<Column<Format, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<Format, ?>, List<String>>();
-    columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.FORMAT_NAME));
-    columnSortingKeyMap.put(categoryColumn, Arrays.asList(RodaConstants.FORMAT_CATEGORY));
+    columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.FORMAT_NAME_SORT));
+    columnSortingKeyMap.put(categoryColumn, Arrays.asList(RodaConstants.FORMAT_CATEGORY_SORT));
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
