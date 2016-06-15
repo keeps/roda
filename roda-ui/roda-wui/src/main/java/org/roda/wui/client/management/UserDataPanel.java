@@ -51,6 +51,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.DateBox;
 import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 
+import config.i18n.client.ClientGeneratedMessages;
 import config.i18n.client.ClientMessages;
 
 /**
@@ -65,6 +66,8 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
+  private static ClientGeneratedMessages generatedMessages = (ClientGeneratedMessages) GWT
+    .create(ClientGeneratedMessages.class);
 
   @UiField
   TextBox username;
@@ -185,7 +188,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     int i = 0;
     String message = "";
     do {
-      message = messages.nationalityList(i++);
+      message = generatedMessages.nationalityList(i++);
       if (!message.isEmpty()) {
         nationalityList.add(message);
       }
@@ -199,7 +202,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
     i = 0;
     do {
-      message = messages.countryList(i++);
+      message = generatedMessages.countryList(i++);
       if (!message.isEmpty()) {
         countryList.add(message);
       }

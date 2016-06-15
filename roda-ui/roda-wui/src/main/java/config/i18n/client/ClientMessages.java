@@ -1532,15 +1532,11 @@ public interface ClientMessages extends Messages {
 
   String nationality();
 
-  String nationalityList(@Select int index);
-
   String address();
 
   String postalCodeAndLocality();
 
   String country();
-
-  String countryList(@Select int index);
 
   String nif();
 
