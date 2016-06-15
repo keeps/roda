@@ -13,7 +13,7 @@ package org.roda.wui.common.client.widgets;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.ListBox;
 
-import config.i18n.client.BrowseMessages;
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
@@ -40,7 +40,7 @@ public class MonthPicker extends ListBox {
     FEBRUARY
   }
 
-  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
+  private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   // private GWTLogger logger = new GWTLogger(GWT.getTypeName(this));
 

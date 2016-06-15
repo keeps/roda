@@ -27,7 +27,7 @@ import java.util.ResourceBundle.Control;
 import org.apache.commons.io.IOUtils;
 
 public class Messages {
-  private static final String MESSAGES_BUNDLE = "Messages";
+  private static final String MESSAGES_BUNDLE = "ServerMessages";
   private ResourceBundle resourceBundle;
   private Map<String, Map<String, Object>> translationsCache;
 
@@ -65,7 +65,7 @@ public class Messages {
     if (translationsCache.get(prefix) != null) {
       return (Map<String, T>) translationsCache.get(prefix);
     }
-    
+
     Map<String, T> map = new HashMap<String, T>();
     Enumeration<String> keys = resourceBundle.getKeys();
     String fullPrefix = prefix + ".";

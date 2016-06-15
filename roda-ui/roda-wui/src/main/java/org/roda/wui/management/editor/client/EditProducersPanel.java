@@ -35,7 +35,7 @@ import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.BrowseMessages;
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
@@ -43,7 +43,7 @@ import config.i18n.client.BrowseMessages;
  */
 public class EditProducersPanel extends Composite {
 
-  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
+  private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
 

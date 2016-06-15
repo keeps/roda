@@ -6,7 +6,7 @@
 	xmlns:u="urn:import:org.roda.wui.management.user.client" xmlns:p="urn:import:org.roda.wui.client.ingest.process"
 	xmlns:lists="urn:import:org.roda.wui.client.common.lists">
 
-	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
+	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<ui:style>
 	.reportTitle {

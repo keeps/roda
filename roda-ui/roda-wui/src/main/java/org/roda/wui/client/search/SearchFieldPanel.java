@@ -36,10 +36,10 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.datepicker.client.DateBox;
 import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 
-import config.i18n.client.BrowseMessages;
+import config.i18n.client.ClientMessages;
 
 public class SearchFieldPanel extends Composite {
-  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());

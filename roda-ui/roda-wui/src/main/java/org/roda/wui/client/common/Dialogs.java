@@ -25,11 +25,11 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 
-import config.i18n.client.BrowseMessages;
+import config.i18n.client.ClientMessages;
 
 public class Dialogs {
 
-  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   public static void showConfirmDialog(String title, String message, String cancelButtonText, String confirmButtonText,
     final AsyncCallback<Boolean> callback) {

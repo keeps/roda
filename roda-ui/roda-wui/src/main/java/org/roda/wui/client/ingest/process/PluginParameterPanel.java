@@ -44,10 +44,10 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.TextBox;
 
-import config.i18n.client.BrowseMessages;
+import config.i18n.client.ClientMessages;
 
 public class PluginParameterPanel extends Composite {
-  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   private final PluginParameter parameter;

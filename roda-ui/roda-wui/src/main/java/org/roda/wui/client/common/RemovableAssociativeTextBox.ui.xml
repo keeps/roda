@@ -9,7 +9,7 @@
 	<ui:style>
 	</ui:style>
 
-	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
+	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<g:FlowPanel>
 		<g:Label addStyleNames="label associative-label" ui:field="itemName"></g:Label>

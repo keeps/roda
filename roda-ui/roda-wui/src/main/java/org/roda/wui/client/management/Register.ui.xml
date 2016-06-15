@@ -5,7 +5,7 @@
 	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
 	xmlns:u="urn:import:org.roda.wui.client.management">
 
-	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
+	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">

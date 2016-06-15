@@ -34,7 +34,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.view.client.ProvidesKey;
 
-import config.i18n.client.BrowseMessages;
+import config.i18n.client.ClientMessages;
 
 public class SimpleRodaMemberList extends BasicAsyncTableCell<RODAMember> {
 
@@ -43,7 +43,7 @@ public class SimpleRodaMemberList extends BasicAsyncTableCell<RODAMember> {
   @SuppressWarnings("unused")
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private Column<RODAMember, SafeHtml> typeColumn;
   private TextColumn<RODAMember> idColumn;

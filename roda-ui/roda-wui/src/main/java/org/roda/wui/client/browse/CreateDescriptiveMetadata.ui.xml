@@ -4,7 +4,7 @@
 	     xmlns:g="urn:import:com.google.gwt.user.client.ui"
 >
 
-	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
+	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 
 	<ui:style>

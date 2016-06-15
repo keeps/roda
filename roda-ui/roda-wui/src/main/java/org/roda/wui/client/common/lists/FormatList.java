@@ -31,7 +31,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.view.client.ProvidesKey;
 
-import config.i18n.client.BrowseMessages;
+import config.i18n.client.ClientMessages;
 
 /**
  * 
@@ -43,7 +43,7 @@ public class FormatList extends BasicAsyncTableCell<Format> {
   private static final int PAGE_SIZE = 20;
 
   // private final ClientLogger logger = new ClientLogger(getClass().getName());
-  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private TextColumn<Format> nameColumn;
   private TextColumn<Format> categoryColumn;

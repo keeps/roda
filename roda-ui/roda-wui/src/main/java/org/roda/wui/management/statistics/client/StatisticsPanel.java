@@ -26,7 +26,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.ui.Composite;
 
-import config.i18n.client.BrowseMessages;
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
@@ -79,7 +79,7 @@ public abstract class StatisticsPanel extends Composite {
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
-  protected BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
+  protected ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   // variables
   private final String title;

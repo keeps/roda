@@ -54,7 +54,7 @@ import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.BrowseMessages;
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
@@ -64,7 +64,7 @@ public class Menu extends Composite {
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
+  private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 

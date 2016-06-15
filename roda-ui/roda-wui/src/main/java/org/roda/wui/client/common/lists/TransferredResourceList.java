@@ -37,7 +37,7 @@ import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-import config.i18n.client.BrowseMessages;
+import config.i18n.client.ClientMessages;
 
 /**
  * 
@@ -47,7 +47,7 @@ import config.i18n.client.BrowseMessages;
 public class TransferredResourceList extends BasicAsyncTableCell<TransferredResource> {
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
-  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private Column<TransferredResource, SafeHtml> isFileColumn;
   private TextColumn<TransferredResource> nameColumn;

@@ -39,7 +39,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.BrowseMessages;
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
@@ -49,7 +49,7 @@ public class Main extends Composite implements EntryPoint {
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
+  private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   public void onModuleLoad() {
 

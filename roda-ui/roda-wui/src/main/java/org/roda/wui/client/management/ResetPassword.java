@@ -43,7 +43,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.BrowseMessages;
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
@@ -106,7 +106,7 @@ public class ResetPassword extends Composite {
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
+  private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   @UiField
   FlowPanel recoverPanel;

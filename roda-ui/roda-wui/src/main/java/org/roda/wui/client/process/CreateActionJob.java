@@ -44,7 +44,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ListBox;
 
-import config.i18n.client.BrowseMessages;
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
@@ -56,7 +56,7 @@ public class CreateActionJob extends CreateJob<IsIndexed> {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static PluginType[] pluginTypes = {PluginType.AIP_TO_AIP, PluginType.MISC};
 
-  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   public CreateActionJob() {
     super(IsIndexed.class, Arrays.asList(pluginTypes));

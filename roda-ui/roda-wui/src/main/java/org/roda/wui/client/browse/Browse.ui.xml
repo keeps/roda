@@ -11,7 +11,7 @@
 	}
 	</ui:style>
 
-	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
+	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<g:FlowPanel styleName="browse" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">

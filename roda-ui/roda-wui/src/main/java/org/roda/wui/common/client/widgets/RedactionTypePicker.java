@@ -13,7 +13,7 @@ package org.roda.wui.common.client.widgets;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.ListBox;
 
-import config.i18n.client.BrowseMessages;
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
@@ -29,7 +29,7 @@ public class RedactionTypePicker extends ListBox {
     INPUT, OUTPUT
   }
 
-  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
+  private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   /**
    * Create a new RedactionType picker

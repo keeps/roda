@@ -13,7 +13,7 @@ package org.roda.wui.common.client.widgets;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.ListBox;
 
-import config.i18n.client.BrowseMessages;
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
@@ -32,7 +32,7 @@ public class IDTypePicker extends ListBox {
   private static String ATTRIBUTE_ALTRENDER_SIMPLE_ID = "id";
   private static String ATTRIBUTE_ALTRENDER_FULL_ID = "full_id";
 
-  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
+  private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   /**
    * Create a new id picker

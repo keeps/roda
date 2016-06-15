@@ -6,7 +6,7 @@
 	xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
 	xmlns:common="urn:import:org.roda.wui.client.common" xmlns:lists="urn:import:org.roda.wui.client.common.lists">
 
-	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
+	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<ui:style>
 	

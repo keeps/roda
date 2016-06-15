@@ -21,7 +21,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
 
-import config.i18n.client.BrowseMessages;
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
@@ -59,7 +59,7 @@ public class Toast extends PopupPanel {
     ERROR_MESSAGE, INFO
   }
 
-  private static final BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
+  private static final ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   private final int slotNumber;
 

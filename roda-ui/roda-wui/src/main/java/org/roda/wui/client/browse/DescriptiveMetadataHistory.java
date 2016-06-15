@@ -52,7 +52,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.BrowseMessages;
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
@@ -110,7 +110,7 @@ public class DescriptiveMetadataHistory extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   // private ClientLogger logger = new ClientLogger(getClass().getName());
-  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private final String aipId;
   private final String descriptiveMetadataId;

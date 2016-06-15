@@ -35,11 +35,11 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.DefaultSelectionEventManager;
 
-import config.i18n.client.BrowseMessages;
+import config.i18n.client.ClientMessages;
 
 public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
 
-  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private Column<LogEntry, Date> dateColumn;
   private TextColumn<LogEntry> actionComponentColumn;

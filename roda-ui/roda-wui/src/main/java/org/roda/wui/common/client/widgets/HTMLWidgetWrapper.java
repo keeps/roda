@@ -21,7 +21,7 @@ import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HTML;
 
-import config.i18n.client.BrowseMessages;
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Luís Faria
@@ -29,7 +29,7 @@ import config.i18n.client.BrowseMessages;
  */
 public class HTMLWidgetWrapper extends HTML {
 
-  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   public HTMLWidgetWrapper(String resourceId) {

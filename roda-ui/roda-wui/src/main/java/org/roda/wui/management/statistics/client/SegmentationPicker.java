@@ -21,7 +21,7 @@ import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SourcesChangeEvents;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.BrowseMessages;
+import config.i18n.client.ClientMessages;
 
 /**
  * Picker for time segmentation
@@ -33,7 +33,7 @@ public class SegmentationPicker extends Composite implements SourcesChangeEvents
   private static final String RADIO_GROUP = "SEGMENTATION";
 
   // layout
-  private BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
+  private ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   private final HorizontalPanel layout;
   private final List<RadioButton> options;

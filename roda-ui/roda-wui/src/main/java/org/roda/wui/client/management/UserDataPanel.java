@@ -51,7 +51,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.DateBox;
 import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 
-import config.i18n.client.BrowseMessages;
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
@@ -64,7 +64,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
+  private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   @UiField
   TextBox username;

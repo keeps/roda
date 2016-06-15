@@ -31,12 +31,12 @@ import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-import config.i18n.client.BrowseMessages;
+import config.i18n.client.ClientMessages;
 
 public class RiskIncidenceList extends BasicAsyncTableCell<RiskIncidence> {
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
-  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private TextColumn<RiskIncidence> objectColumn;
   private TextColumn<RiskIncidence> objectTypeColumn;

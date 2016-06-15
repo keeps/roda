@@ -42,12 +42,12 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.BrowseMessages;
+import config.i18n.client.ClientMessages;
 
 public class SearchPanel extends Composite implements HasValueChangeHandlers<String> {
   private static final String FILTER_ICON = "<i class='fa fa-filter' aria-hidden='true'></i>";
 
-  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private static final Binder binder = GWT.create(Binder.class);
 

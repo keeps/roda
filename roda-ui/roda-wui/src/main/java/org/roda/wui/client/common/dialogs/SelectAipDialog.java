@@ -15,11 +15,11 @@ import org.roda.wui.client.common.lists.AIPList;
 
 import com.google.gwt.core.client.GWT;
 
-import config.i18n.client.BrowseMessages;
+import config.i18n.client.ClientMessages;
 
 public class SelectAipDialog extends DefaultSelectDialog<IndexedAIP, Void> {
 
-  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private static final Filter DEFAULT_FILTER_AIP = new Filter(
     new BasicSearchFilterParameter(RodaConstants.AIP_SEARCH, "*"));

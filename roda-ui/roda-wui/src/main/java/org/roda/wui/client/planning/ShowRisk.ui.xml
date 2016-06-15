@@ -6,7 +6,7 @@
 	xmlns:u="urn:import:org.roda.wui.management.user.client" xmlns:s="urn:import:com.google.gwt.safehtml.shared"
 	xmlns:p="urn:import:org.roda.wui.client.planning">
 
-	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
+	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<ui:style>
 

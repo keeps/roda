@@ -26,7 +26,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.BrowseMessages;
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
@@ -35,7 +35,7 @@ import config.i18n.client.BrowseMessages;
 public abstract class AlphabetSortedList extends DockPanel {
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
-  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
+  private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   private static int BLOCK_SIZE = 30;
 

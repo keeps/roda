@@ -21,7 +21,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HasVerticalAlignment.VerticalAlignmentConstant;
 
-import config.i18n.client.BrowseMessages;
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
@@ -34,7 +34,7 @@ public abstract class StatisticTab extends Composite {
 
   protected static final StatisticFunction DELTA = new StatisticFunction(StatisticFunction.FunctionType.DELTA);
 
-  protected BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
+  protected ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   private boolean initialized;
   protected Segmentation segmentation;

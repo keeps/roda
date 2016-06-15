@@ -23,7 +23,7 @@ import com.google.gwt.safehtml.shared.SafeHtml;
  * @author Luis Faria
  * 
  */
-public interface BrowseMessages extends Messages {
+public interface ClientMessages extends Messages {
 
   String moveIllegalOperation(String message);
 
