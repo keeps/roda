@@ -39,9 +39,12 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.GenericException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
+
+import net.sf.saxon.lib.SaxonOutputKeys;
 
 public class RodaUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(RodaUtils.class);
@@ -149,33 +152,23 @@ public class RodaUtils {
   public static void indentXML(Reader input, Writer output) throws TransformerException {
     Transformer transformer = TransformerFactory.newInstance().newTransformer();
     transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+    transformer.setOutputProperty(SaxonOutputKeys.INDENT_SPACES, "4");
     transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-    
+
     StreamSource source = new StreamSource(input);
     StreamResult result = new StreamResult(output);
     transformer.transform(source, result);
   }
 
-  public static String indentXML(String xml) throws TransformerException {
+  public static String indentXML(String xml) throws GenericException {
     Reader input = new StringReader(xml);
     Writer output = new StringWriter();
-    indentXML(input, output);
-    return output.toString();
-  }
-  
-  
-  public static void main(String[] args) {
-    String test ="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<ead xmlns=\"urn:isbn:1-931666-22-9\">\n\n\n\t\n<test><nested/></test></ead>";
-    System.out.println("BEFORE");
-    System.out.println(test);
-    System.out.println("TRANSFORMER");
     try {
-      System.out.println(indentXML(test));
+      indentXML(input, output);
     } catch (TransformerException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      return xml;
     }
-    
+    return output.toString();
   }
 
   public static long getPathSize(Path startPath) throws IOException {

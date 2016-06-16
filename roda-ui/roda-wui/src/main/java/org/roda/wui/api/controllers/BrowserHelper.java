@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
-import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -308,7 +307,7 @@ public class BrowserHelper {
         template = metadataTypeBundle.getTemplate();
         for (MetadataValue mv : values) {
           // clear the auto-generated values
-          mv.set("value", null);
+          // mv.set("value", null);
           String xpathRaw = mv.get("xpath");
           if (xpathRaw != null && xpathRaw.length() > 0) {
             String[] xpaths = xpathRaw.split("##%##");
@@ -2002,11 +2001,8 @@ public class BrowserHelper {
     try {
       Handlebars handlebars = new Handlebars();
       Map<String, String> data = new HashMap<>();
-      handlebars.registerHelperMissing((o, options) -> {
-        if (data.containsKey(options.helperName)) {
-          return data.get(options.helperName);
-        }
-        return "";
+      handlebars.registerHelper("field", (o, options) -> {
+        return options.fn();
       });
       Template tmpl = handlebars.compileInline(rawTemplate);
 
@@ -2017,14 +2013,14 @@ public class BrowserHelper {
           if (val != null) {
             val = val.replaceAll("\\s", "");
             if (!"".equals(val)) {
-              data.put(metadataValue.getId(), metadataValue.get("value"));
+              data.put(metadataValue.get("name"), metadataValue.get("value"));
             }
           }
         });
       }
       result = tmpl.apply(data);
       result = RodaUtils.indentXML(result);
-    } catch (IOException | TransformerException e) {
+    } catch (IOException e) {
       throw new GenericException(e);
     }
     return result;

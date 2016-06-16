@@ -139,20 +139,24 @@ public class ServerTools {
 
     Template tmpl;
     try {
-      handlebars.helpers().clear();
-      handlebars.registerHelperMissing((context, options) -> {
-        String tagID = options.helperName;
-        if (context != null && !addedTags.contains(tagID)) {
-          HashMap<String, String> newHash = new HashMap<>();
-          for (String hashKey : options.hash.keySet()) {
-            String hashValue = options.hash.get(hashKey).toString();
-            newHash.put(hashKey, hashValue);
+      handlebars.registerHelper("field", (context, options) -> {
+        if (options.hash.containsKey("name")) {
+          String tagID = (String) options.hash.get("name");
+          if (context != null && !addedTags.contains(tagID)) {
+            HashMap<String, String> newHash = new HashMap<>();
+            for (String hashKey : options.hash.keySet()) {
+              String hashValue = options.hash.get(hashKey).toString();
+              newHash.put(hashKey, hashValue);
+            }
+            values.add(new MetadataValue(tagID, new HashMap<>(newHash)));
+            addedTags.add(tagID);
           }
-          values.add(new MetadataValue(tagID, new HashMap<>(newHash)));
-          addedTags.add(tagID);
         }
         return options.fn();
       });
+      // Prevent errors from unknown helpers
+      handlebars.registerHelperMissing((o, options) -> options.fn());
+
       tmpl = handlebars.compileInline(content);
       tmpl.apply(new HashMap<>());
     } catch (IOException e) {
