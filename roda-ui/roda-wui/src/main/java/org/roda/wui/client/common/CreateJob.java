@@ -172,6 +172,7 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
     boolean isEmpty = updateObjectList();
     configurePlugins(isEmpty, selected.getSelectedClass());
 
+    workflowCategoryList.addStyleName("form-listbox-job");
     workflowList.addChangeHandler(new ChangeHandler() {
 
       @Override
@@ -207,6 +208,7 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
 
                 CheckBox box = new CheckBox();
                 box.setText(category);
+                box.addStyleName("form-checkbox-job");
 
                 box.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 

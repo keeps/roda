@@ -19,6 +19,7 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.user.client.ui.HTML;
 
 import config.i18n.client.ClientMessages;
@@ -37,7 +38,8 @@ public class HTMLWidgetWrapper extends HTML {
       resourceId = resourceId.substring(0, resourceId.length() - 5);
     }
 
-    String localizedResourceId = resourceId + "_" + messages.locale() + ".html";
+    String locale = LocaleInfo.getCurrentLocale().getLocaleName();
+    String localizedResourceId = resourceId + "_" + locale + ".html";
     String defaultResourceId = resourceId + ".html";
 
     RequestBuilder request = new RequestBuilder(RequestBuilder.GET,

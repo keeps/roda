@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
+import org.roda.core.data.v2.jobs.Report.PluginState;
 
 import com.google.gwt.i18n.client.Messages;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -1296,8 +1297,6 @@ public interface ClientMessages extends Messages {
 
   /** Common Constants **/
 
-  String locale();
-
   // Alphabet Sorted List
 
   String AlphabetSortedListAll();
@@ -2117,5 +2116,15 @@ public interface ClientMessages extends Messages {
   String confirmChangeToFormMessage();
 
   String identityError();
+
+  /************* TO BE ORGANIZED *************************/
+  
+  String aipLevel();
+
+  String editDescriptionMetadataWarning();
+
+  String pluginStateMessage(@Select PluginState state);
+
+  String isAcknowledged(@Select String isAcknowledged);
 
 }

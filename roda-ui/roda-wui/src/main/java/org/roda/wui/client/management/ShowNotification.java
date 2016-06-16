@@ -136,7 +136,8 @@ public class ShowNotification extends Composite {
     notificationSentOn
       .setText(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM).format(notification.getSentOn()));
     notificationFromUser.setText(notification.getFromUser());
-    notificationIsAcknowledged.setText(Boolean.toString(notification.isAcknowledged()));
+    notificationIsAcknowledged
+      .setText(messages.isAcknowledged(Boolean.toString(notification.isAcknowledged()).toLowerCase()));
     acknowledgedUsersKey.setVisible(false);
     notAcknowledgedUsersKey.setVisible(false);
 

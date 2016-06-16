@@ -196,6 +196,7 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
             String role = (String) rodaProperties.get(key);
             String description;
             try {
+              GWT.log("'" + role + "'");
               description = messages.role(role.replace('.', '_'));
             } catch (MissingResourceException e) {
               description = role + " (needs translation)";

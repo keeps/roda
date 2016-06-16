@@ -15,6 +15,7 @@ import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.ReportService;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ClickListener;
@@ -56,11 +57,13 @@ public class ReportWindow extends WUIWindow {
 
     close = new WUIButton(messages.reportWindowClose(), WUIButton.Left.ROUND, WUIButton.Right.CROSS);
 
+    String locale = LocaleInfo.getCurrentLocale().getLocaleName();
+
     printPDF.addClickListener(new ClickListener() {
 
       public void onClick(Widget sender) {
-        Window.open(GWT.getModuleBaseURL() + "ReportDownload?type=REPORT&output=PDF&locale=" + messages.locale()
-          + "&id=" + ReportWindow.this.reportId, "_blank", "");
+        Window.open(GWT.getModuleBaseURL() + "ReportDownload?type=REPORT&output=PDF&locale=" + locale + "&id="
+          + ReportWindow.this.reportId, "_blank", "");
       }
 
     });
@@ -68,8 +71,8 @@ public class ReportWindow extends WUIWindow {
     printCSV.addClickListener(new ClickListener() {
 
       public void onClick(Widget sender) {
-        Window.open(GWT.getModuleBaseURL() + "ReportDownload?type=REPORT&output=CSV&locale=" + messages.locale()
-          + "&id=" + ReportWindow.this.reportId, "_blank", "");
+        Window.open(GWT.getModuleBaseURL() + "ReportDownload?type=REPORT&output=CSV&locale=" + locale + "&id="
+          + ReportWindow.this.reportId, "_blank", "");
       }
 
     });

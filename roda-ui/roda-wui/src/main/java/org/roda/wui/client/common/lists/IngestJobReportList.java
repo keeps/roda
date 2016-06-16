@@ -21,6 +21,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.wui.client.browse.BrowserService;
 
 import com.google.gwt.cell.client.DateCell;
@@ -143,16 +144,16 @@ public class IngestJobReportList extends BasicAsyncTableCell<Report> {
           switch (report.getPluginState()) {
             case SUCCESS:
               ret = SafeHtmlUtils.fromSafeConstant(
-                "<span class='label-success'>" + report.getPluginState().toString().toLowerCase() + "</span>");
+                "<span class='label-success'>" + messages.pluginStateMessage(PluginState.SUCCESS) + "</span>");
               break;
             case RUNNING:
               ret = SafeHtmlUtils.fromSafeConstant(
-                "<span class='label-default'>" + report.getPluginState().toString().toLowerCase() + "</span>");
+                "<span class='label-default'>" + messages.pluginStateMessage(PluginState.RUNNING) + "</span>");
               break;
             case FAILURE:
             default:
               ret = SafeHtmlUtils.fromSafeConstant(
-                "<span class='label-danger'>" + report.getPluginState().toString().toLowerCase() + "</span>");
+                "<span class='label-danger'>" + messages.pluginStateMessage(PluginState.FAILURE) + "</span>");
               break;
           }
         }

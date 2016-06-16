@@ -77,14 +77,17 @@ public class HtmlSnippetUtils {
     SafeHtml pluginStateHTML;
     switch (pluginState) {
       case SUCCESS:
-        pluginStateHTML = SafeHtmlUtils.fromSafeConstant("<span class='label-success'>" + pluginState + "</span>");
+        pluginStateHTML = SafeHtmlUtils
+          .fromSafeConstant("<span class='label-success'>" + messages.pluginStateMessage(pluginState) + "</span>");
         break;
       case RUNNING:
-        pluginStateHTML = SafeHtmlUtils.fromSafeConstant("<span class='label-default'>" + pluginState + "</span>");
+        pluginStateHTML = SafeHtmlUtils
+          .fromSafeConstant("<span class='label-default'>" + messages.pluginStateMessage(pluginState) + "</span>");
         break;
       case FAILURE:
       default:
-        pluginStateHTML = SafeHtmlUtils.fromSafeConstant("<span class='label-danger'>" + pluginState + "</span>");
+        pluginStateHTML = SafeHtmlUtils
+          .fromSafeConstant("<span class='label-danger'>" + messages.pluginStateMessage(pluginState) + "</span>");
         break;
     }
     return pluginStateHTML;
