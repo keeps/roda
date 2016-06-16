@@ -1,3 +1,6 @@
+{{~field name="id" 		auto-generate="id" label="{'en': 'ID'}" xpath="//ead:unitid/string()"~}}
+{{~field name="title" 	auto-generate="title" label="{'en': 'Title'}" xpath="//ead:unittitle/string()"~}}
+{{~field name="date" auto-generate="now" type="date" label="{\"en\": \"Date\"}" xpath="//ead:date/string() ##%## //ead:unitdate/string()"~}}
 <?xml version="1.0" encoding="utf-8" ?>
 <ead:ead xmlns:ead="urn:isbn:1-931666-22-9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	 xsi:schemaLocation="urn:isbn:1-931666-22-9 ../schemas/ead.xsd http://www.w3.org/1999/xlink ../schemas/xlink.xsd">
@@ -10,14 +13,14 @@
 		</ead:filedesc>
 		<ead:profiledesc>
 			<ead:creation>
-				<ead:date normal='{{date auto-generate="now" type="date" label="{\"en\": \"Date\"}"}} xpath="//ead:date/string() ##%## //ead:unitdate/string()"'/>
+				<ead:date normal='{{date}}"'/>
 			</ead:creation>
 		</ead:profiledesc>
 	</ead:eadheader>
 	<ead:archdesc level="item">
 		<ead:did>
-			<ead:unitid repositorycode="PT-RODA">{{id auto-generate="id" label="{'en': 'ID'}" xpath="//ead:unitid/string()"}}</ead:unitid>
-			<ead:unittitle>{{title auto-generate="title" label="{'en': 'Title'}" xpath="//ead:unittitle/string()"}}</ead:unittitle>
+			<ead:unitid repositorycode="PT-RODA">{{id}}</ead:unitid>
+			<ead:unittitle>{{title}}</ead:unittitle>
 			<ead:unitdate normal="{{date}}"/>
 		</ead:did>
 	</ead:archdesc>

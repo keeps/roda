@@ -1,16 +1,23 @@
+{{~field name="title"		order='2' auto-generate='title' label="{'en': 'Title'}" xpath="//*:title/string()"}}
+{{~field name="id" 			order='1' auto-generate='id' label="{'en': 'ID'}" xpath="//*:identifier/string()"}}
+{{~field name="creator" 	label="{'en': 'Creator'}" xpath="//*:creator/string()"}}
+{{~field name="dateInitial" order='3' type='date' label="{'en': 'Initial date'}" xpath="//*:date[1]/string()"}}
+{{~field name="dateFinal" 	order='4' type='date' label="{'en': 'Final date'}" xpath="//*:date[2]/string()"}}
+{{~field name="description" type='text-area' label="{'en': 'Description'}" xpath="//*:description/string()"}}
+{{~field name="producer" 	label="{'en': 'Producer'}" xpath="//*:publisher/string()"}}
+{{~field name="rights" 		label="{'en': 'Rights'}" xpath="//*:rights/string()"}}
+{{~field name="language" 	auto-generate='language' label="{'en': 'Language'}" xpath="//*:language/string()"~}}
 <?xml version="1.0"?>
 
 <simpledc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	  xsi:noNamespaceSchemaLocation="../schemas/dc.xsd">
-
-	<title>{{title order='2' auto-generate='title' label="{'en': 'Title'}" xpath="//*:title/string()"}}</title>
-	<identifier>{{id order='1' auto-generate='id' label="{'en': 'ID'}" xpath="//*:identifier/string()"}}</identifier>
-	<creator>{{creator label="{'en': 'Creator'}" xpath="//*:creator/string()"}}</creator>
-	<date>{{dateInitial order='3' type='date' label="{'en': 'Initial date'}" xpath="//*:date[1]/string()"}}</date>
-	<date>{{dateFinal order='4' type='date' label="{'en': 'Final date'}" xpath="//*:date[2]/string()"}}</date>
-	<description>{{description type='text-area' label="{'en': 'Description'}" xpath="//*:description/string()"}}</description>
-	<publisher>{{producer label="{'en': 'Producer'}" xpath="//*:publisher/string()"}}</publisher>
-	<rights>{{rights label="{'en': 'Rights'}" xpath="//*:rights/string()"}}</rights>
-	<language>{{language auto-generate='language' label="{'en': 'Language'}" xpath="//*:language/string()"}}</language>
-
+	<title>{{title}}</title>
+	<identifier>{{id}}</identifier>
+	<creator>{{creator}}</creator>
+	<date>{{dateInitial}}</date>
+	<date>{{dateFinal}}</date>
+	<description>{{description}}</description>
+	<publisher>{{producer}}</publisher>
+	<rights>{{rights}}</rights>
+	<language>{{language}}</language>
 </simpledc>
