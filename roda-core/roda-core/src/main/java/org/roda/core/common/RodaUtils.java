@@ -44,8 +44,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
-import net.sf.saxon.lib.SaxonOutputKeys;
-
 public class RodaUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(RodaUtils.class);
 
@@ -152,7 +150,6 @@ public class RodaUtils {
   public static void indentXML(Reader input, Writer output) throws TransformerException {
     Transformer transformer = TransformerFactory.newInstance().newTransformer();
     transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-    transformer.setOutputProperty(SaxonOutputKeys.INDENT_SPACES, "4");
     transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 
     StreamSource source = new StreamSource(input);
@@ -166,6 +163,7 @@ public class RodaUtils {
     try {
       indentXML(input, output);
     } catch (TransformerException e) {
+      LOGGER.warn("Could not indent XML", e);
       return xml;
     }
     return output.toString();
