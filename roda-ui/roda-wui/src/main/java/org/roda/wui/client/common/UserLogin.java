@@ -26,6 +26,7 @@ import org.roda.wui.common.client.tools.CachedAsynRequest;
 import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.UriUtils;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -139,7 +140,8 @@ public class UserLogin {
       hash = hash.substring(1);
       hash = UriUtils.encode(hash);
     }
-    Window.open("/login?service=" + currentURL + "&hash=" + hash, "_self", "");
+    String locale = LocaleInfo.getCurrentLocale().getLocaleName();
+    Window.open("/login?service=" + currentURL + "&hash=" + hash + "&locale=" + locale, "_self", "");
   }
 
   public void login(String username, String password, final AsyncCallback<RodaUser> callback) {
@@ -165,7 +167,8 @@ public class UserLogin {
    */
   public void logout() {
     String currentURL = Window.Location.getHref().replaceAll("#", "%23");
-    Window.open("/logout?service=" + currentURL, "_self", "");
+    String locale = LocaleInfo.getCurrentLocale().getLocaleName();
+    Window.open("/logout?service=" + currentURL + "&locale=" + locale, "_self", "");
     getUserRequest.clearCache();
   }
 

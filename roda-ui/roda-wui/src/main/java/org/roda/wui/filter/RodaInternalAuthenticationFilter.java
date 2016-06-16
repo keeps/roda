@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.roda.core.common.UserUtility;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.tools.Tools;
 import org.slf4j.Logger;
@@ -46,20 +47,39 @@ public class RodaInternalAuthenticationFilter implements Filter {
     String requestURI = httpRequest.getRequestURI();
     String service = httpRequest.getParameter("service");
     String hash = httpRequest.getParameter("hash");
+    String locale = httpRequest.getParameter("locale");
 
-    LOGGER.debug("URL: {} ; Request URI: {} ; Service: {} ; Hash: {}", url, requestURI, service, hash);
+    LOGGER.debug("URL: {} ; Request URI: {} ; Service: {} ; Hash: {}, Locale: {}", url, requestURI, service, hash,
+      locale);
 
     if (requestURI.equals("/login")) {
-      String redirect = "/#login";
+      StringBuilder b = new StringBuilder();
+      b.append("/");
 
-      if (hash != null) {
-        redirect += Tools.HISTORY_SEP + hash;
+      if (StringUtils.isNotBlank(locale)) {
+        b.append("?locale=").append(locale);
       }
 
-      httpResponse.sendRedirect(redirect);
+      b.append("#login");
+
+      if (StringUtils.isNotBlank(hash)) {
+        b.append(Tools.HISTORY_SEP).append(hash);
+      }
+
+      httpResponse.sendRedirect(b.toString());
     } else if (requestURI.equals("/logout")) {
       UserUtility.logout(httpRequest);
-      httpResponse.sendRedirect("/#" + Welcome.RESOLVER.getHistoryToken());
+
+      StringBuilder b = new StringBuilder();
+      b.append("/");
+
+      if (StringUtils.isNotBlank(locale)) {
+        b.append("?locale=").append(locale);
+      }
+
+      b.append("#").append(Welcome.RESOLVER.getHistoryToken());
+
+      httpResponse.sendRedirect(b.toString());
 
     } else {
       chain.doFilter(request, response);
