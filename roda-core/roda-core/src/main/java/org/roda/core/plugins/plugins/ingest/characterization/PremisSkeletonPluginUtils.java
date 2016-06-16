@@ -63,7 +63,6 @@ public class PremisSkeletonPluginUtils {
     }
     IOUtils.closeQuietly(allFiles);
 
-    LOGGER.error("REPRESENTATION ID: " + representationId);
     ContentPayload representationPayload = PremisV3Utils.representationToBinary(representation);
     model.createPreservationMetadata(PreservationMetadataType.REPRESENTATION, aip.getId(), representationId,
       representationPayload, notifyInSteps);
