@@ -25,9 +25,7 @@
 				</g:Label>
 				<g:TextBox ui:field="id" addStyleNames="form-textbox" />
 				<g:Label ui:field="formCompleteDanger" addStyleNames="label-danger">
-					The
-					version created from the form is not exactly the same as the
-					original file. Please verify that there was no data loss.
+					<ui:text from='{messages.identityError}' />
 				</g:Label>
 				<g:Label ui:field="formOrXMLLabel" />
 				<g:FocusPanel ui:field="showXml" styleName="toolbarLink">

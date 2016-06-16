@@ -2110,10 +2110,12 @@ public interface ClientMessages extends Messages {
   @Key("lang.cz")
   String lang_cz();
 
-  /************* Metadata creation ****************/
+  /************* Metadata creation and edition ****************/
 
   String confirmChangeToFormTitle();
 
   String confirmChangeToFormMessage();
+
+  String identityError();
 
 }

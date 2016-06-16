@@ -220,7 +220,7 @@ public class ServerTools {
       }
 
     } catch (Exception e) {
-      System.out.println(e.getLocalizedMessage());
+      LOGGER.error("Error applying XPath", e);
     }
     return result;
   }
