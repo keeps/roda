@@ -11,6 +11,7 @@
 	<extend-property name="locale" values="pt_PT" />
 	<set-property-fallback name="locale" value="en"/>
 	<set-configuration-property name="locale.useragent" value="Y"/>
+	<set-configuration-property name="locale.searchorder" value="queryparam,cookie,meta,useragent"/>
 
 	<!-- Inherit required libraries -->
 	<inherits name="com.bytebybyte.gwt.fontawesome.FontAwesomeLib" />

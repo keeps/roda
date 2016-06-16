@@ -731,6 +731,8 @@ public final class RodaConstants {
   public static final String SEARCH_FIELD_TYPE_SUGGEST = "suggest";
 
   public static final String METADATA_VERSION_SEPARATOR = "_";
+  public static final String METADATA_TEMPLATE_FOLDER = "templates";
+  public static final String METADATA_TEMPLATE_EXTENSION = ".xml.hbs";
 
   public static final String DEFAULT_DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 

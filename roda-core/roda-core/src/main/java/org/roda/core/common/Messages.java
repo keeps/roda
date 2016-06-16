@@ -60,7 +60,7 @@ public class Messages {
    * 
    * prefix will be replaced by "i18n." for simplicity purposes
    */
-  public <T> Map<String, T> getTranslations(String prefix, Class<T> valueClass, boolean replacePrefixFromKey) {
+  public <T extends Object> Map<String, T> getTranslations(String prefix, Class<T> valueClass, boolean replacePrefixFromKey) {
     // try cache first
     if (translationsCache.get(prefix) != null) {
       return (Map<String, T>) translationsCache.get(prefix);

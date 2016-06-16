@@ -45,9 +45,16 @@ public final class HTMLUtils {
 
   public static String descriptiveMetadataToHtml(Binary binary, String descriptiveMetadataType,
     String descriptiveMetadataVersion, final Locale locale) throws GenericException {
-    Messages messages = RodaCoreFactory.getI18NMessages(locale);
 
+    Map<String, Object> translations = getTranslations(descriptiveMetadataType, descriptiveMetadataVersion, locale);
+
+    return binaryToHtml(binary, descriptiveMetadataType, descriptiveMetadataVersion, translations);
+  }
+
+  public static Map<String, Object> getTranslations(String descriptiveMetadataType, String descriptiveMetadataVersion,
+    final Locale locale) {
     Map<String, Object> translations = null;
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
     if (descriptiveMetadataType != null) {
       String lowerCaseDescriptiveMetadataType = descriptiveMetadataType.toLowerCase();
       if (descriptiveMetadataVersion != null) {
@@ -67,8 +74,7 @@ public final class HTMLUtils {
     } else {
       translations = new HashMap<>();
     }
-
-    return binaryToHtml(binary, descriptiveMetadataType, descriptiveMetadataVersion, translations);
+    return translations;
   }
 
   public static String preservationObjectToHtml(Binary binary, final Locale locale) throws GenericException {

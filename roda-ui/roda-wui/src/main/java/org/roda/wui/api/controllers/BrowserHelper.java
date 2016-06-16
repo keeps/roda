@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -1265,12 +1266,13 @@ public class BrowserHelper {
           key += "." + version;
         }
         String label = messages.getTranslation(key, type);
-        InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream("templates/"
-          + ((version != null) ? type + RodaConstants.METADATA_VERSION_SEPARATOR + version : type) + ".xml");
+        InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(RodaConstants.METADATA_TEMPLATE_FOLDER
+          + "/" + ((version != null) ? type + RodaConstants.METADATA_VERSION_SEPARATOR + version : type)
+          + RodaConstants.METADATA_TEMPLATE_EXTENSION);
 
         String template = null;
         try {
-          template = IOUtils.toString(templateStream, "UTF-8");
+          template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
         } catch (IOException e) {
           LOGGER.error("Error getting the template from the stream", e);
         }
