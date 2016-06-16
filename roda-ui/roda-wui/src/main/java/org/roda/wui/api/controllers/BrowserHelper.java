@@ -275,9 +275,6 @@ public class BrowserHelper {
     DescriptiveMetadataEditBundle ret;
     InputStream inputStream = null;
     try {
-      // Get the metadata file
-      DescriptiveMetadata metadata = RodaCoreFactory.getModelService().retrieveDescriptiveMetadata(aip.getId(),
-        descriptiveMetadataId);
       Binary binary = RodaCoreFactory.getModelService().retrieveDescriptiveMetadataBinary(aip.getId(),
         descriptiveMetadataId);
       inputStream = binary.getContent().createInputStream();
@@ -332,7 +329,12 @@ public class BrowserHelper {
         // applying the extracted values to the template
         metadataTypeBundle.setValues(values);
         String templateWithValues = getDescriptiveMetadataPreview(metadataTypeBundle);
-        complete = templateWithValues.equals(xml);
+        templateWithValues = cleanXMLForCompare(templateWithValues);
+        String xmlTemp = cleanXMLForCompare(xml);
+        System.out.println("---- Template With Values ----\n" + templateWithValues);
+        System.out.println("---- XML ----\n" + xmlTemp);
+        System.out.println("------------- Compare -------------\n" + StringUtils.difference(templateWithValues, xmlTemp));
+        complete = templateWithValues.equals(xmlTemp);
       }
 
       ret = new DescriptiveMetadataEditBundle(descriptiveMetadataId, type, version, xml, template, values, complete);
@@ -343,6 +345,14 @@ public class BrowserHelper {
     }
 
     return ret;
+  }
+
+  private static String cleanXMLForCompare(String st){
+    st = st.replaceAll("xsi:schemaLocation=\\s*[\"|'].*[\"|']", "");
+    st = st.replaceAll("xmlns:xsi=\\s*[\"|'].*[\"|']", "");
+    st = st.replaceAll("\\n|\\r|\\s", "");
+    st = st.toUpperCase();
+    return st;
   }
 
   protected static List<IndexedAIP> getAncestors(IndexedAIP aip) throws GenericException, NotFoundException {
