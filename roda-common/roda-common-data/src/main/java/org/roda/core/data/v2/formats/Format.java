@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlRootElement(name = "format")
-@JsonInclude(JsonInclude.Include.ALWAYS)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Format extends NamedIndexedModel implements IsIndexed, Serializable {
 
   private static final long serialVersionUID = 7178184202935641440L;
@@ -31,7 +31,7 @@ public class Format extends NamedIndexedModel implements IsIndexed, Serializable
   private String definition = null;
   private List<String> categories = null;
   private String latestVersion = null;
-  private int popularity = 0;
+  private Integer popularity;
   private String developer = null;
   private Date initialRelease = null;
   private String standard = null;
@@ -99,11 +99,11 @@ public class Format extends NamedIndexedModel implements IsIndexed, Serializable
     this.latestVersion = latestVersion;
   }
 
-  public int getPopularity() {
+  public Integer getPopularity() {
     return popularity;
   }
 
-  public void setPopularity(int popularity) {
+  public void setPopularity(Integer popularity) {
     this.popularity = popularity;
   }
 

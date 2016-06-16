@@ -47,8 +47,8 @@
 								<g:Label styleName="value" ui:field="formatDeveloperValue" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label"><ui:text from='{messages.formatInitialRelease}' /></g:Label>
-								<g:Label styleName="value" ui:field="formatInitialRelease" />
+								<g:Label styleName="label" ui:field="formatInitialReleaseKey"><ui:text from='{messages.formatInitialRelease}' /></g:Label>
+								<g:Label styleName="value" ui:field="formatInitialReleaseValue" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
 								<g:Label styleName="label" ui:field="formatStandardKey"><ui:text from='{messages.formatStandard}' /></g:Label>

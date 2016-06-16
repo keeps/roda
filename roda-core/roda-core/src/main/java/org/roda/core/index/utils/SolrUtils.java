@@ -1913,7 +1913,9 @@ public class SolrUtils {
     doc.addField(RodaConstants.FORMAT_CATEGORY, format.getCategories());
     doc.addField(RodaConstants.FORMAT_CATEGORY_SORT, (format.getCategories()!=null && format.getCategories().size()>0)? format.getCategories().get(0):null);
     doc.addField(RodaConstants.FORMAT_LATEST_VERSION, format.getLatestVersion());
-    doc.addField(RodaConstants.FORMAT_POPULARITY, format.getPopularity());
+    if(format.getPopularity()!=null){
+      doc.addField(RodaConstants.FORMAT_POPULARITY, format.getPopularity());
+    }
     doc.addField(RodaConstants.FORMAT_DEVELOPER, format.getDeveloper());
     doc.addField(RodaConstants.FORMAT_INITIAL_RELEASE, format.getInitialRelease());
     doc.addField(RodaConstants.FORMAT_STANDARD, format.getStandard());
@@ -1936,7 +1938,7 @@ public class SolrUtils {
     format.setDefinition(objectToString(doc.get(RodaConstants.FORMAT_DEFINITION)));
     format.setCategories(objectToListString(doc.get(RodaConstants.FORMAT_CATEGORY)));
     format.setLatestVersion(objectToString(doc.get(RodaConstants.FORMAT_LATEST_VERSION)));
-    format.setPopularity(objectToInteger(doc.get(RodaConstants.FORMAT_POPULARITY), 3));
+    format.setPopularity(objectToInteger(doc.get(RodaConstants.FORMAT_POPULARITY), null));
     format.setDeveloper(objectToString(doc.get(RodaConstants.FORMAT_DEVELOPER)));
     format.setInitialRelease(objectToDate(doc.get(RodaConstants.FORMAT_INITIAL_RELEASE)));
     format.setStandard(objectToString(doc.get(RodaConstants.FORMAT_STANDARD)));

@@ -105,7 +105,7 @@ public class ShowFormat extends Composite {
   Label formatDeveloperKey, formatDeveloperValue;
 
   @UiField
-  Label formatInitialRelease;
+  Label formatInitialReleaseKey, formatInitialReleaseValue;
 
   @UiField
   Label formatStandardKey, formatStandardValue;
@@ -190,14 +190,18 @@ public class ShowFormat extends Composite {
     formatLatestVersionValue.setText(format.getLatestVersion());
     formatLatestVersionKey.setVisible(StringUtils.isNotBlank(format.getLatestVersion()));
 
-    formatPopularityValue.setText(Integer.toString(format.getPopularity()));
-    formatPopularityKey.setVisible(StringUtils.isNotBlank(Integer.toString(format.getPopularity())));
+    formatPopularityValue.setText(format.getPopularity() != null ? Integer.toString(format.getPopularity()) : "");
+    formatPopularityKey.setVisible(format.getPopularity() != null);
+    formatPopularityValue.setVisible(format.getPopularity() != null);
 
     formatDeveloperValue.setText(format.getDeveloper());
     formatDeveloperKey.setVisible(StringUtils.isNotBlank(format.getDeveloper()));
 
-    formatInitialRelease
-      .setText(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_FULL).format(format.getInitialRelease()));
+    formatInitialReleaseValue.setText(format.getInitialRelease() != null
+      ? DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_FULL).format(format.getInitialRelease()) : "");
+    formatInitialReleaseKey.setVisible(format.getInitialRelease() != null);
+    formatInitialReleaseValue.setVisible(format.getInitialRelease() != null);
+
     formatIsOpenFormat.setText(Boolean.toString(format.isOpenFormat()));
 
     formatStandardValue.setText(format.getStandard());
@@ -209,15 +213,12 @@ public class ShowFormat extends Composite {
 
     if (websiteList != null) {
       for (String website : websiteList) {
-        if(isValidUrl(website)){
-          Anchor anchor = new Anchor(website,
-            false,
-            website,
-            "_blank");
+        if (isValidUrl(website)) {
+          Anchor anchor = new Anchor(website, false, website, "_blank");
           HTML br = new HTML();
           formatWebsiteValue.add(anchor);
           formatWebsiteValue.add(br);
-        }else{
+        } else {
           HTML parPanel = new HTML();
           parPanel.setHTML(messages.formatListItems(website));
           formatCategoryValue.add(parPanel);
