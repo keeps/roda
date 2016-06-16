@@ -1,18 +1,19 @@
 {{~field name="descDate"    order="3" type="date" auto-generate="now" label="{\"en\": \"Description date\", \"pt_PT\": \"Data da descrição\"}"~}}
 {{~field name="eadheader"   hidden="true" xpath="/*:ead/*:eadheader"~}}
 {{~field name="level"       type="list" list="[\"fonds\",\"subfonds\",\"series\",\"subseries\",\"file\",\"item\", \"otherlevel\"]" auto-generate="level" order="6" label="{\"en\": \"Description level\", \"pt_PT\": \"Nível descritivo\"}" xpath="//*:archdesc/@level/string()"~}}
+{{~field name="otherlevel"  label="{\"en\": \"Other level\", \"pt_PT\": \"Outro nível\"}" xpath="/*:ead/*:archdesc/@otherlevel/string()"~}}
 {{~field name="physdesc"    hidden="true" xpath="/*:ead/*:archdesc/*:did/*:physdesc"~}}
 {{~field name="repository"  hidden="true" xpath="/*:ead/*:archdesc/*:did/*:repository"~}}
 {{~field name="title"       order='2' auto-generate='title' label="{'en': 'Title', 'pt_PT': 'Título'}" xpath="/*:ead/*:archdesc/*:did/*:unittitle/string()"~}}
 {{~field name="id"          order="1" auto-generate="id" label="{'en': 'Identifier', 'pt_PT': 'Identificador'}" xpath="/*:ead/*:archdesc/*:did/*:unitid/string()"~}}
-{{~field name="dateInitial" order="4" type="date" label="{\"en\": \"Initial date\", \"pt_PT\": \"Data de início\"}" xpath="tokenize(//*:unitdate/@normal/string(), \"/\")[1]"~}}
-{{~field name="dateFinal"   order="5" type="date" label="{\"en\": \"Final date\", \"pt_PT\": \"Data de fim\"}" xpath="tokenize(//*:unitdate/@normal/string(), \"/\")[2]"~}}
-{{~field name="producer"    label="{'en': 'Producer', 'pt_PT': 'Produtor'}" xpath="//*:origination[@label='producer']/string()"~}}
-{{~field name="creator"     label="{'en': 'Creator', 'pt_PT': 'Autor'}" xpath="//*:origination[@label='creator']/string()"~}}
-{{~field name="language"    auto-generate='language' label="{'en': 'Language', 'pt_PT': 'Idioma'}" xpath="//*:langmaterial/string()"~}}
+{{~field name="dateInitial" order="4" type="date" label="{\"en\": \"Initial date\", \"pt_PT\": \"Data de início\"}" xpath="tokenize(/*:ead/*:archdesc/*:did/*:unitdate/@normal/string(), \"/\")[1]"~}}
+{{~field name="dateFinal"   order="5" type="date" label="{\"en\": \"Final date\", \"pt_PT\": \"Data de fim\"}" xpath="tokenize(/*:ead/*:archdesc/*:did/*:unitdate/@normal/string(), \"/\")[2]"~}}
+{{~field name="producer"    label="{'en': 'Producer', 'pt_PT': 'Produtor'}" xpath="/*:ead/*:archdesc/*:did/*:origination[@label='producer']/string()"~}}
+{{~field name="creator"     label="{'en': 'Creator', 'pt_PT': 'Autor'}" xpath="/*:ead/*:archdesc/*:did/*:origination[@label='creator']/string()"~}}
+{{~field name="language"    auto-generate='language' label="{'en': 'Language', 'pt_PT': 'Idioma'}" xpath="/*:ead/*:archdesc/*:did/*:langmaterial/string()"~}}
 {{~field name="dsc"         hidden="true" xpath="/*:ead/*:archdesc/*:dsc"~}}
-{{~field name="description" type='textarea' label="{'en': 'Description', 'pt_PT': 'Descrição'}" xpath="//*:scopecontent/*:p/string()"~}}
-{{~field name="rights"      label="{'en': 'Rights', 'pt_PT': 'Condições de reprodução'}" xpath="//*:userestrict/*:p/string()"~}}
+{{~field name="description" type='textarea' label="{'en': 'Description', 'pt_PT': 'Descrição'}" xpath="/*:ead/*:archdesc/*:scopecontent/*:p/string()"~}}
+{{~field name="rights"      label="{'en': 'Rights', 'pt_PT': 'Condições de reprodução'}" xpath="/*:ead/*:archdesc/*:userestrict/*:p/string()"~}}
 <?xml version="1.0" encoding="utf-8"?>
 <ead
 	xmlns="urn:isbn:1-931666-22-9"
@@ -58,11 +59,15 @@
 			<langmaterial>{{language}}</langmaterial>
 		</did>
 		{{{dsc}}}
-		<scopecontent>
-			<p>{{description}}</p>
-		</scopecontent>
-		<userestrict>
-			<p>{{rights}}</p>
-		</userestrict>
+        {{~#if description~}}
+            <scopecontent>
+                <p>{{description}}</p>
+            </scopecontent>
+        {{~/if~}}
+        {{~#if rights~}}
+            <userestrict>
+            <p>{{~rights~}}</p>
+            </userestrict>
+        {{~/if~}}
 	</archdesc>
 </ead>

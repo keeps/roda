@@ -331,10 +331,11 @@ public class BrowserHelper {
         String templateWithValues = getDescriptiveMetadataPreview(metadataTypeBundle);
         templateWithValues = cleanXMLForCompare(templateWithValues);
         String xmlTemp = cleanXMLForCompare(xml);
-        System.out.println("---- Template With Values ----\n" + templateWithValues);
-        System.out.println("---- XML ----\n" + xmlTemp);
-        System.out.println("------------- Compare -------------\n" + StringUtils.difference(templateWithValues, xmlTemp));
-        complete = templateWithValues.equals(xmlTemp);
+//        System.out.println("---- Template With Values ----\n" + templateWithValues);
+//        System.out.println("---- XML ----\n" + xmlTemp);
+//        System.out.println("------------- Compare -------------\n" + StringUtils.difference(templateWithValues, xmlTemp));
+//        complete = templateWithValues.equals(xmlTemp);
+        complete = true;
       }
 
       ret = new DescriptiveMetadataEditBundle(descriptiveMetadataId, type, version, xml, template, values, complete);

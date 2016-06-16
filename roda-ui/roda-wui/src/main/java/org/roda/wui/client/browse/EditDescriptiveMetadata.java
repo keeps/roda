@@ -265,7 +265,7 @@ public class EditDescriptiveMetadata extends Composite {
   }
 
   private void updateFormOrXML() {
-    formCompleteDanger.setVisible(!bundle.isComplete());
+//    formCompleteDanger.setVisible(!bundle.isComplete());
     if (bundle != null && bundle.getValues() != null) {
       showXml.setVisible(true);
       if (inXML) {
