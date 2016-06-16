@@ -37,7 +37,7 @@
 		</profiledesc>
 	</eadheader>
 	{{~/if~}}
-	<archdesc level='{{level}}' otherlevel="{{otherlevel}}">
+	<archdesc level='{{level}}' {{#if otherlevel}}otherlevel="{{otherlevel}}"{{/if}}>
 		<did>
 			{{{physdesc}}}
 			{{{repository}}}
