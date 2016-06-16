@@ -2115,7 +2115,6 @@ public interface ClientMessages extends Messages {
 
   String confirmChangeToFormMessage();
 
-  String identityError();
 
   /************* TO BE ORGANIZED *************************/
   
