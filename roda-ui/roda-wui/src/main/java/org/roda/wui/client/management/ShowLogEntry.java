@@ -15,6 +15,7 @@ import java.util.List;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 
@@ -87,34 +88,31 @@ public class ShowLogEntry extends Composite {
   private static ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
-  Label logId;
+  Label logIdLabel, logIdValue;
 
   @UiField
-  Label logComponent;
+  Label logComponentLabel,logComponentValue;
 
   @UiField
-  Label logMethod;
+  Label logMethodLabel,logMethodValue;
 
   @UiField
-  Label logAddress;
+  Label logAddressLabel,logAddressValue;
 
   @UiField
-  Label logDatetime;
+  Label logDatetimeLabel,logDatetimeValue;
 
   @UiField
-  Label logRelatedObjectLabel;
+  Label logRelatedObjectLabel, logRelatedObjectValue;
 
   @UiField
-  Label logRelatedObject;
-
-  @UiField
-  Label logUsername;
+  Label logUsernameLabel,logUsernameValue;
 
   @UiField
   Label logParametersLabel;
-
+  
   @UiField
-  FlowPanel logParameters;
+  FlowPanel logParametersValue;
 
   @UiField
   Button buttonCancel;
@@ -126,25 +124,48 @@ public class ShowLogEntry extends Composite {
   public ShowLogEntry(LogEntry logEntry) {
     initWidget(uiBinder.createAndBindUi(this));
 
-    logId.setText(logEntry.getId());
-    logComponent.setText(logEntry.getActionComponent());
-    logMethod.setText(logEntry.getActionMethod());
-    logAddress.setText(logEntry.getAddress());
-    logDatetime.setText(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_FULL).format(logEntry.getDatetime()));
-    logRelatedObjectLabel.setVisible(logEntry.getRelatedObjectID() != null && !logEntry.getRelatedObjectID().isEmpty());
-    logRelatedObject.setText(logEntry.getRelatedObjectID());
-    logUsername.setText(logEntry.getUsername());
+    logIdValue.setText(logEntry.getId());
+    logIdLabel.setVisible(StringUtils.isNotBlank(logEntry.getId()));
+    logIdValue.setVisible(StringUtils.isNotBlank(logEntry.getId()));
+    
+    logComponentValue.setText(logEntry.getActionComponent());
+    logComponentLabel.setVisible(StringUtils.isNotBlank(logEntry.getActionComponent()));
+    logComponentValue.setVisible(StringUtils.isNotBlank(logEntry.getActionComponent()));
+
+    logMethodValue.setText(logEntry.getActionMethod());
+    logMethodLabel.setVisible(StringUtils.isNotBlank(logEntry.getActionMethod()));
+    logMethodValue.setVisible(StringUtils.isNotBlank(logEntry.getActionMethod()));
+    
+    logAddressValue.setText(logEntry.getAddress());
+    logAddressLabel.setVisible(StringUtils.isNotBlank(logEntry.getAddress()));
+    logAddressValue.setVisible(StringUtils.isNotBlank(logEntry.getAddress()));
+
+    logDatetimeValue.setText(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_FULL).format(logEntry.getDatetime()));
+    logDatetimeLabel.setVisible(logEntry.getDatetime()!=null);
+    logDatetimeValue.setVisible(logEntry.getDatetime()!=null);
+
+    logRelatedObjectValue.setText(logEntry.getRelatedObjectID());
+    logRelatedObjectLabel.setVisible(StringUtils.isNotBlank(logEntry.getRelatedObjectID()));
+    logRelatedObjectValue.setVisible(StringUtils.isNotBlank(logEntry.getRelatedObjectID()));
+
+
+    logUsernameValue.setText(logEntry.getUsername());
+    logUsernameLabel.setVisible(StringUtils.isNotBlank(logEntry.getUsername()));
+    logUsernameValue.setVisible(StringUtils.isNotBlank(logEntry.getUsername()));
 
     List<LogEntryParameter> parameters = logEntry.getParameters();
 
-    logParametersLabel.setVisible(parameters != null && !parameters.isEmpty());
-
-    if (parameters != null) {
+    if (parameters != null && parameters.size()>0) {
       for (LogEntryParameter par : parameters) {
         HTML parPanel = new HTML();
         parPanel.setHTML(messages.logParameter(par.getName(), par.getValue()));
-        logParameters.add(parPanel);
+        logParametersValue.add(parPanel);
       }
+      logParametersLabel.setVisible(true);
+      logParametersValue.setVisible(true);
+    }else{
+      logParametersLabel.setVisible(false);
+      logParametersValue.setVisible(false);
     }
 
   }

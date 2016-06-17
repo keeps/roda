@@ -21,40 +21,40 @@
 								<ui:text from='{messages.showLogEntryTitle}' />
 							</g:Label>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label"><ui:text from='{messages.logEntryIdentifier}' /></g:Label>
-								<g:Label styleName="value" ui:field="logId" />
+								<g:Label styleName="label" ui:field="logIdLabel"><ui:text from='{messages.logEntryIdentifier}' /></g:Label>
+								<g:Label styleName="value" ui:field="logIdValue" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label"><ui:text from='{messages.logEntryComponent}' /></g:Label>
-								<g:Label styleName="value" ui:field="logComponent" />
+								<g:Label styleName="label" ui:field="logComponentLabel"><ui:text from='{messages.logEntryComponent}' /></g:Label>
+								<g:Label styleName="value" ui:field="logComponentValue" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label"><ui:text from='{messages.logEntryMethod}' /></g:Label>
-								<g:Label styleName="value" ui:field="logMethod" />
+								<g:Label styleName="label" ui:field="logMethodLabel"><ui:text from='{messages.logEntryMethod}' /></g:Label>
+								<g:Label styleName="value" ui:field="logMethodValue" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label"><ui:text from='{messages.logEntryAddress}' /></g:Label>
-								<g:Label styleName="value" ui:field="logAddress" />
+								<g:Label styleName="label" ui:field="logAddressLabel"><ui:text from='{messages.logEntryAddress}' /></g:Label>
+								<g:Label styleName="value" ui:field="logAddressValue" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label"><ui:text from='{messages.logEntryDatetime}' /></g:Label>
-								<g:Label styleName="value" ui:field="logDatetime" />
+								<g:Label styleName="label" ui:field="logDatetimeLabel"><ui:text from='{messages.logEntryDatetime}' /></g:Label>
+								<g:Label styleName="value" ui:field="logDatetimeValue" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
 								<g:Label styleName="label" ui:field="logRelatedObjectLabel">
 									<ui:text from='{messages.logEntryRelatedObject}' />
 								</g:Label>
-								<g:Label styleName="value" ui:field="logRelatedObject" />
+								<g:Label styleName="value" ui:field="logRelatedObjectValue" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label"><ui:text from='{messages.logEntryUsername}' /></g:Label>
-								<g:Label styleName="value" ui:field="logUsername" />
+								<g:Label styleName="label" ui:field="logUsernameLabel"><ui:text from='{messages.logEntryUsername}' /></g:Label>
+								<g:Label styleName="value" ui:field="logUsernameValue" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
 								<g:Label styleName="label" ui:field="logParametersLabel">
 									<ui:text from='{messages.logEntryParameters}' />
 								</g:Label>
-								<g:FlowPanel styleName="value" ui:field="logParameters" />
+								<g:FlowPanel styleName="value" ui:field="logParametersValue" />
 							</g:FlowPanel>
 						</g:FlowPanel>
 					</g:FlowPanel>
