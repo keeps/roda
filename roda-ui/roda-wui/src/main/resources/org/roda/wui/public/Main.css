@@ -2911,12 +2911,17 @@ td.datePickerMonth, td.datePickerYear {
     padding-left: 20px;
     padding-right: 10px;
     min-width: 175px;
+    position: relative;
 }
 
 .searchInputListBox .dropdown-label:after {
     line-height: 4rem;
     font-size: 20px;
     position: absolute;
+    right: 0px;
+    width: 40px;
+    text-align: center;
+    padding: 0;
 }
 
 .searchInputListBoxPopup .dropdown-item:hover {
