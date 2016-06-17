@@ -2124,4 +2124,16 @@ public interface ClientMessages extends Messages {
 
   String severityMessages(@Select SEVERITY_LEVEL level);
 
+  String preservationEventAgentIdentifier();
+
+  String preservationEventAgentType();
+
+  String preservationEventAgentVersion();
+
+  String preservationEventAgentNote();
+
+  String preservationEventAgentRoles();
+
+  String preservationEventAgentExtension();
+
 }

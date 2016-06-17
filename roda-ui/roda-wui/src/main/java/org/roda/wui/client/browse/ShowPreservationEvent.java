@@ -38,6 +38,7 @@ import org.roda.wui.common.client.widgets.Toast;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -281,18 +282,27 @@ public class ShowPreservationEvent extends Composite {
       heading.add(idValue);
     }
 
+    if (StringUtils.isNotBlank(agent.getId())) {
+      Label idLabel = new Label(messages.preservationEventAgentIdentifier());
+      idLabel.addStyleName("label");
+      Label idValue = new Label(agent.getId());
+      idValue.addStyleName("value");
+      body.add(idLabel);
+      body.add(idValue);
+    }
+
     if (!agentId.getRoles().isEmpty()) {
-      Label rolesLabel = new Label("Roles");
+      Label rolesLabel = new Label(messages.preservationEventAgentRoles());
       rolesLabel.addStyleName("label");
       // TODO humanize list
-      Label typeValue = new Label(Tools.join(agentId.getRoles(), ", "));
-      typeValue.addStyleName("value");
+      Label rolesValue = new Label(Tools.join(agentId.getRoles(), ", "));
+      rolesValue.addStyleName("value");
       body.add(rolesLabel);
-      body.add(typeValue);
+      body.add(rolesValue);
     }
 
     if (StringUtils.isNotBlank(agent.getType())) {
-      Label typeLabel = new Label("Type");
+      Label typeLabel = new Label(messages.preservationEventAgentType());
       typeLabel.addStyleName("label");
       Label typeValue = new Label(agent.getType());
       typeValue.addStyleName("value");
@@ -301,7 +311,7 @@ public class ShowPreservationEvent extends Composite {
     }
 
     if (StringUtils.isNotBlank(agent.getVersion())) {
-      Label versionLabel = new Label("Version");
+      Label versionLabel = new Label(messages.preservationEventAgentVersion());
       versionLabel.addStyleName("label");
       Label versionValue = new Label(agent.getVersion());
       versionValue.addStyleName("value");
@@ -310,7 +320,7 @@ public class ShowPreservationEvent extends Composite {
     }
 
     if (StringUtils.isNotBlank(agent.getNote())) {
-      Label noteLabel = new Label("Note");
+      Label noteLabel = new Label(messages.preservationEventAgentNote());
       noteLabel.addStyleName("label");
       Label noteValue = new Label(agent.getNote());
       noteValue.addStyleName("value");
@@ -319,7 +329,7 @@ public class ShowPreservationEvent extends Composite {
     }
 
     if (StringUtils.isNotBlank(agent.getExtension())) {
-      Label extensionLabel = new Label("Extension");
+      Label extensionLabel = new Label(messages.preservationEventAgentExtension());
       extensionLabel.addStyleName("label");
       Label extensionValue = new Label(agent.getExtension());
       extensionValue.addStyleName("value");

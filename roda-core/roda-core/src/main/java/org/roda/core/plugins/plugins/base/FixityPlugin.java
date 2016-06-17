@@ -195,7 +195,10 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
       PluginHelper.updateJobInformation(this, jobPluginInfo);
     } catch (JobException e) {
       LOGGER.error("Could not update Job information");
+    } catch (Exception e) {
+
     }
+
     return report;
   }
 
