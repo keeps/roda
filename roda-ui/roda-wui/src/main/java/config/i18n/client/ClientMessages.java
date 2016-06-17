@@ -676,20 +676,7 @@ public interface ClientMessages extends Messages {
 
   /************* Humanize ****************/
 
-  String durationDHMSDay(@PluralCount int days);
-
-  String durationDHMSHour(@PluralCount int hours);
-
-  String durationDHMSMinutes(@PluralCount int minutes);
-
-  String durationDHMSSeconds(@PluralCount int seconds);
-
-  String durationDHMSLessThanASecond();
-
-  String durationDHMSSeparator();
-
-  String durationDHMSSecondSeparator();
-
+  
   String durationDHMSShortDays(int days, int hours, int minutes, int seconds);
 
   String durationDHMSShortHours(int hours, int minutes, int seconds);
@@ -697,6 +684,14 @@ public interface ClientMessages extends Messages {
   String durationDHMSShortMinutes(int minutes, int seconds);
 
   String durationDHMSShortSeconds(int seconds);
+  
+  String durationDHMSLongDays(int days, int hours, int minutes, int seconds);
+
+  String durationDHMSLongHours(int hours, int minutes, int seconds);
+
+  String durationDHMSLongMinutes(int minutes, int seconds);
+
+  String durationDHMSLongSeconds(int seconds);
 
   String objectPermission(@Select PermissionType permissionType);
 

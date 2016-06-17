@@ -40,6 +40,7 @@ import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.Humanize.DHMSFormat;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -282,7 +283,7 @@ public class ShowJob extends Composite {
     }
 
     // set duration
-    duration.setText(Humanize.durationInDHMS(job.getStartDate(), job.getEndDate()));
+    duration.setText(Humanize.durationInDHMS(job.getStartDate(), job.getEndDate(), DHMSFormat.LONG));
 
     // set state
     status.setHTML(HtmlSnippetUtils.getJobStateHtml(job));

@@ -23,6 +23,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.common.client.tools.Humanize;
+import org.roda.wui.common.client.tools.Humanize.DHMSFormat;
 
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.SafeHtmlCell;
@@ -107,7 +108,7 @@ public class JobList extends BasicAsyncTableCell<Job> {
           return null;
         }
         Date end = job.getEndDate() != null ? job.getEndDate() : getDate();
-        return Humanize.durationInShortDHMS(job.getStartDate(), end);
+        return Humanize.durationInDHMS(job.getStartDate(), end, DHMSFormat.SHORT);
       }
     };
 
