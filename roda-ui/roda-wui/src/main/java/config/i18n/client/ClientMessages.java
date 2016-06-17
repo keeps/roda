@@ -822,6 +822,10 @@ public interface ClientMessages extends Messages {
   String formatRemoveSuccessMessage(Long size);
 
   String formatListItems(String item);
+  
+  String formatIsOpenFormat();
+  
+  String formatIsNotOpenFormat();
 
   /************* Common Messages ****************/
 

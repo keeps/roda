@@ -36,6 +36,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
+import akka.contrib.pattern.ReliableProxy.Message;
 import config.i18n.client.ClientMessages;
 
 /**
@@ -202,7 +203,7 @@ public class ShowFormat extends Composite {
     formatInitialReleaseKey.setVisible(format.getInitialRelease() != null);
     formatInitialReleaseValue.setVisible(format.getInitialRelease() != null);
 
-    formatIsOpenFormat.setText(Boolean.toString(format.isOpenFormat()));
+    formatIsOpenFormat.setText(format.isOpenFormat()?messages.formatIsOpenFormat():messages.formatIsNotOpenFormat());
 
     formatStandardValue.setText(format.getStandard());
     formatStandardKey.setVisible(StringUtils.isNotBlank(format.getStandard()));
