@@ -1032,6 +1032,10 @@ public interface ClientMessages extends Messages {
 
   String riskObjects();
 
+  String riskMitigationProbability(@Select String probability);
+
+  String riskMitigationImpact(@Select String impact);
+
   /*** AGents ***/
 
   String agentName();

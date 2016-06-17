@@ -243,14 +243,18 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
           int severityLowLimit = terms.getSeverityLowLimit();
           int severityHighLimit = terms.getSeverityHighLimit();
 
-          riskPreMitigationProbability.setText(terms.getPreMitigationProbability());
-          riskPreMitigationImpact.setText(terms.getPreMitigationImpact());
+          riskPreMitigationProbability
+            .setText(messages.riskMitigationProbability(terms.getPreMitigationProbability().replace(' ', '_')));
+          riskPreMitigationImpact
+            .setText(messages.riskMitigationImpact(terms.getPreMitigationImpact().replace(' ', '_')));
 
           riskPreMitigationSeverity
             .setHTML(HtmlSnippetUtils.getSeverityDefinition(preSeverity, severityLowLimit, severityHighLimit));
 
-          riskPosMitigationProbability.setText(terms.getPosMitigationProbability());
-          riskPosMitigationImpact.setText(terms.getPosMitigationImpact());
+          riskPosMitigationProbability
+            .setText(messages.riskMitigationProbability(terms.getPosMitigationProbability().replace(' ', '_')));
+          riskPosMitigationImpact
+            .setText(messages.riskMitigationImpact(terms.getPosMitigationImpact().replace(' ', '_')));
 
           riskPosMitigationKey.setVisible(true);
           riskPosMitigationProbabilityKey.setVisible(true);

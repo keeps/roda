@@ -191,15 +191,15 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     List<String> probabilities = mitigationProperties.getProbabilities();
     probabilitiesSize = probabilities.size();
     for (int i = probabilitiesSize - 1; i >= 0; i--) {
-      posMitigationProbability.addItem(probabilities.get(i));
-      preMitigationProbability.addItem(probabilities.get(i));
+      posMitigationProbability.addItem(messages.riskMitigationProbability(probabilities.get(i)));
+      preMitigationProbability.addItem(messages.riskMitigationProbability(probabilities.get(i)));
     }
 
     List<String> impacts = mitigationProperties.getImpacts();
     impactsSize = impacts.size();
     for (int i = impactsSize - 1; i >= 0; i--) {
-      posMitigationImpact.addItem(impacts.get(i));
-      preMitigationImpact.addItem(impacts.get(i));
+      posMitigationImpact.addItem(messages.riskMitigationImpact(impacts.get(i)));
+      preMitigationImpact.addItem(messages.riskMitigationImpact(impacts.get(i)));
     }
 
     preMitigationProbability.setSelectedIndex(probabilitiesSize - 1);
