@@ -21,6 +21,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.SafeHtmlCell;
@@ -109,15 +110,7 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
       public SafeHtml getValue(IndexedRisk risk) {
         SafeHtml ret = null;
         if (risk != null) {
-          String severity = risk.getPosMitigationSeverityLevel().toString();
-
-          if (severity.equals(messages.showLowSeverity())) {
-            ret = SafeHtmlUtils.fromSafeConstant("<span class='label-success'>" + severity + "</span>");
-          } else if (severity.equals(messages.showModerateSeverity())) {
-            ret = SafeHtmlUtils.fromSafeConstant("<span class='label-warning'>" + severity + "</span>");
-          } else {
-            ret = SafeHtmlUtils.fromSafeConstant("<span class='label-danger'>" + severity + "</span>");
-          }
+          ret = HtmlSnippetUtils.getSeverityDefinition(risk.getPosMitigationSeverityLevel());
         }
 
         return ret;

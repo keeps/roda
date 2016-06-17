@@ -24,7 +24,7 @@ public class Risk extends NamedIndexedModel implements Serializable {
   private static final long serialVersionUID = -585753367605901060L;
 
   public static enum SEVERITY_LEVEL {
-    Low, Moderate, High;
+    LOW, MODERATE, HIGH;
   }
 
   private String description = null;

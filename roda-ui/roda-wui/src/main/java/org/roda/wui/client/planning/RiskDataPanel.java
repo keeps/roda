@@ -20,6 +20,7 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
+import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.search.SearchSuggestBox;
 import org.roda.wui.common.client.ClientLogger;
 
@@ -33,8 +34,6 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -244,7 +243,8 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
         preMitigationSeverityKey.setVisible(true);
         preMitigationSeverityValue.setVisible(true);
         int severity = probability * impact;
-        preMitigationSeverityValue.setHTML(getSeverityDefinition(severity, severityLowLimit, severityHighLimit));
+        preMitigationSeverityValue
+          .setHTML(HtmlSnippetUtils.getSeverityDefinition(severity, severityLowLimit, severityHighLimit));
 
         RiskDataPanel.this.onChange();
       }
@@ -261,7 +261,8 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
         posMitigationSeverityKey.setVisible(true);
         posMitigationSeverityValue.setVisible(true);
         int severity = probability * impact;
-        posMitigationSeverityValue.setHTML(getSeverityDefinition(severity, severityLowLimit, severityHighLimit));
+        posMitigationSeverityValue
+          .setHTML(HtmlSnippetUtils.getSeverityDefinition(severity, severityLowLimit, severityHighLimit));
 
         RiskDataPanel.this.onChange();
       }
@@ -317,7 +318,8 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     if (!editmode) {
       posMitigationSeverityKey.setVisible(false);
       posMitigationSeverityValue.setVisible(false);
-      preMitigationSeverityValue.setHTML(getSeverityDefinition(0, severityLowLimit, severityHighLimit));
+      preMitigationSeverityValue
+        .setHTML(HtmlSnippetUtils.getSeverityDefinition(0, severityLowLimit, severityHighLimit));
       this.id.setVisible(false);
     } else {
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISKS, risk.getId()));
@@ -388,7 +390,8 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     this.preMitigationSeverityKey.setVisible(true);
     this.preMitigationSeverityValue.setVisible(true);
     int preSeverity = risk.getPreMitigationSeverity();
-    this.preMitigationSeverityValue.setHTML(getSeverityDefinition(preSeverity, severityLowLimit, severityHighLimit));
+    this.preMitigationSeverityValue
+      .setHTML(HtmlSnippetUtils.getSeverityDefinition(preSeverity, severityLowLimit, severityHighLimit));
 
     int probability = getIndex(risk.getPosMitigationProbability(), probabilitiesSize);
     int impact = getIndex(risk.getPosMitigationImpact(), impactsSize);
@@ -401,7 +404,8 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
       this.posMitigationSeverityKey.setVisible(true);
       this.posMitigationSeverityValue.setVisible(true);
       int posSeverity = risk.getPosMitigationSeverity();
-      this.posMitigationSeverityValue.setHTML(getSeverityDefinition(posSeverity, severityLowLimit, severityHighLimit));
+      this.posMitigationSeverityValue
+        .setHTML(HtmlSnippetUtils.getSeverityDefinition(posSeverity, severityLowLimit, severityHighLimit));
     } else {
       this.posMitigationSeverityKey.setVisible(false);
       this.posMitigationSeverityValue.setVisible(false);
@@ -435,7 +439,8 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     risk.setPreMitigationProbability(preProbability);
     risk.setPreMitigationImpact(preImpact);
     risk.setPreMitigationSeverity(preSeverity);
-    risk.setPreMitigationSeverityLevel(getSeverityLevel(preSeverity, severityLowLimit, severityHighLimit));
+    risk.setPreMitigationSeverityLevel(
+      HtmlSnippetUtils.getSeverityLevel(preSeverity, severityLowLimit, severityHighLimit));
     risk.setPreMitigationNotes(preMitigationNotes.getText());
 
     int posProbability = getIndex(posMitigationProbability.getSelectedIndex(), probabilitiesSize);
@@ -445,11 +450,13 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     risk.setPosMitigationImpact(posImpact);
     if (posProbability == 0 && posImpact == 0) {
       risk.setPosMitigationSeverity(preSeverity);
-      risk.setPosMitigationSeverityLevel(getSeverityLevel(preSeverity, severityLowLimit, severityHighLimit));
+      risk.setPosMitigationSeverityLevel(
+        HtmlSnippetUtils.getSeverityLevel(preSeverity, severityLowLimit, severityHighLimit));
     } else {
       int posSeverity = posProbability * posImpact;
       risk.setPosMitigationSeverity(posSeverity);
-      risk.setPosMitigationSeverityLevel(getSeverityLevel(posSeverity, severityLowLimit, severityHighLimit));
+      risk.setPosMitigationSeverityLevel(
+        HtmlSnippetUtils.getSeverityLevel(posSeverity, severityLowLimit, severityHighLimit));
     }
     risk.setPosMitigationNotes(posMitigationNotes.getText());
 
@@ -484,27 +491,6 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     mitigationOwner.setValue("");
     mitigationRelatedEventIdentifierType.setText("");
     mitigationRelatedEventIdentifierValue.setText("");
-  }
-
-  private String getSeverityLevel(int severity, int lowLimit, int highLimit) {
-    if (severity < lowLimit) {
-      return messages.showLowSeverity();
-    } else if (severity < highLimit) {
-      return messages.showModerateSeverity();
-    } else {
-      return messages.showHighSeverity();
-    }
-  }
-
-  private SafeHtml getSeverityDefinition(int severity, int lowLimit, int highLimit) {
-    if (severity < lowLimit) {
-      return SafeHtmlUtils.fromSafeConstant("<span class='label-success'>" + messages.showLowSeverity() + "</span>");
-    } else if (severity < highLimit) {
-      return SafeHtmlUtils
-        .fromSafeConstant("<span class='label-warning'>" + messages.showModerateSeverity() + "</span>");
-    } else {
-      return SafeHtmlUtils.fromSafeConstant("<span class='label-danger'>" + messages.showHighSeverity() + "</span>");
-    }
   }
 
   private int getIndex(int mitigationField, int fieldsSize) {

@@ -22,6 +22,7 @@ import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.ViewRepresentation;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
+import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Tools;
@@ -33,8 +34,6 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -248,7 +247,7 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
           riskPreMitigationImpact.setText(terms.getPreMitigationImpact());
 
           riskPreMitigationSeverity
-            .setHTML(RiskShowPanel.this.getSeverityDefinition(preSeverity, severityLowLimit, severityHighLimit));
+            .setHTML(HtmlSnippetUtils.getSeverityDefinition(preSeverity, severityLowLimit, severityHighLimit));
 
           riskPosMitigationProbability.setText(terms.getPosMitigationProbability());
           riskPosMitigationImpact.setText(terms.getPosMitigationImpact());
@@ -261,7 +260,7 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
           riskPosMitigationSeverityKey.setVisible(true);
           riskPosMitigationSeverity.setVisible(true);
           riskPosMitigationSeverity
-            .setHTML(RiskShowPanel.this.getSeverityDefinition(posSeverity, severityLowLimit, severityHighLimit));
+            .setHTML(HtmlSnippetUtils.getSeverityDefinition(posSeverity, severityLowLimit, severityHighLimit));
         }
       });
 
@@ -366,17 +365,6 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
     riskMitigationRelatedEventIdentifierTypeValue.setText("");
     riskMitigationRelatedEventIdentifierValueKey.setVisible(false);
     riskMitigationRelatedEventIdentifierValueValue.setText("");
-  }
-
-  private SafeHtml getSeverityDefinition(int severity, int lowLimit, int highLimit) {
-    if (severity < lowLimit) {
-      return SafeHtmlUtils.fromSafeConstant("<span class='label-success'>" + messages.showLowSeverity() + "</span>");
-    } else if (severity < highLimit) {
-      return SafeHtmlUtils
-        .fromSafeConstant("<span class='label-warning'>" + messages.showModerateSeverity() + "</span>");
-    } else {
-      return SafeHtmlUtils.fromSafeConstant("<span class='label-danger'>" + messages.showHighSeverity() + "</span>");
-    }
   }
 
   @Override

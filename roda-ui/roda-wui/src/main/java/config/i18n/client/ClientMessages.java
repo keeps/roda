@@ -16,6 +16,7 @@ import java.util.List;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
 
 import com.google.gwt.i18n.client.Messages;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -676,7 +677,6 @@ public interface ClientMessages extends Messages {
 
   /************* Humanize ****************/
 
-  
   String durationDHMSShortDays(int days, int hours, int minutes, int seconds);
 
   String durationDHMSShortHours(int hours, int minutes, int seconds);
@@ -684,7 +684,7 @@ public interface ClientMessages extends Messages {
   String durationDHMSShortMinutes(int minutes, int seconds);
 
   String durationDHMSShortSeconds(int seconds);
-  
+
   String durationDHMSLongDays(int days, int hours, int minutes, int seconds);
 
   String durationDHMSLongHours(int hours, int minutes, int seconds);
@@ -757,11 +757,7 @@ public interface ClientMessages extends Messages {
 
   String riskHistoryLabel(String versionKey, Date createdDate);
 
-  String showLowSeverity();
-
-  String showModerateSeverity();
-
-  String showHighSeverity();
+  String severityLevel(@Select SEVERITY_LEVEL level);
 
   String getRisksDialogName();
 
@@ -2110,9 +2106,8 @@ public interface ClientMessages extends Messages {
 
   String confirmChangeToFormMessage();
 
-
   /************* TO BE ORGANIZED *************************/
-  
+
   String aipLevel();
 
   String editDescriptionMetadataWarning();

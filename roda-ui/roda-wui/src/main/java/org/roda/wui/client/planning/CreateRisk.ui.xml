@@ -22,10 +22,10 @@
 						<ui:text from='{messages.sidebarActionsTitle}' />
 					</g:Label>
 					<g:Button addStyleNames="btn btn-play" ui:field="buttonApply">
-						<ui:text from='{messages.createButton}' />
+						<ui:text from='{messages.saveButton}' />
 					</g:Button>
-					<g:Button addStyleNames="btn btn-times-circle" ui:field="buttonCancel">
-						<ui:text from='{messages.editButton}' />
+					<g:Button addStyleNames="btn btn-default btn-times-circle" ui:field="buttonCancel">
+						<ui:text from='{messages.cancelButton}' />
 					</g:Button>
 				</g:FlowPanel>
 			</g:FlowPanel>

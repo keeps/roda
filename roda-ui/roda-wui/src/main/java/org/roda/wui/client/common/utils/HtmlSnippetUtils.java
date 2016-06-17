@@ -11,6 +11,7 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -91,6 +92,39 @@ public class HtmlSnippetUtils {
         break;
     }
     return pluginStateHTML;
+  }
+
+  public static SEVERITY_LEVEL getSeverityLevel(int severity, int lowLimit, int highLimit) {
+    if (severity < lowLimit) {
+      return SEVERITY_LEVEL.LOW;
+    } else if (severity < highLimit) {
+      return SEVERITY_LEVEL.MODERATE;
+    } else {
+      return SEVERITY_LEVEL.HIGH;
+    }
+  }
+
+  public static SafeHtml getSeverityDefinition(SEVERITY_LEVEL level) {
+    SafeHtml ret;
+    switch (level) {
+      case LOW:
+        ret = SafeHtmlUtils
+          .fromSafeConstant("<span class='label-success'>" + messages.severityLevel(level) + "</span>");
+        break;
+      case MODERATE:
+        ret = SafeHtmlUtils
+          .fromSafeConstant("<span class='label-warning'>" + messages.severityLevel(level) + "</span>");
+        break;
+      case HIGH:
+      default:
+        ret = SafeHtmlUtils.fromSafeConstant("<span class='label-danger'>" + messages.severityLevel(level) + "</span>");
+        break;
+    }
+    return ret;
+  }
+
+  public static SafeHtml getSeverityDefinition(int severity, int lowLimit, int highLimit) {
+    return getSeverityDefinition(getSeverityLevel(severity, lowLimit, highLimit));
   }
 
 }
