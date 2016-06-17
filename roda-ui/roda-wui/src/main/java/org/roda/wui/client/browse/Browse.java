@@ -816,7 +816,7 @@ public class Browse extends Composite {
           });
 
       } else {
-        Dialogs.showInformationDialog(messages.selectAnItemTitle(), messages.selectAnItemDescription(),
+        Dialogs.showInformationDialog(messages.selectAnItemTitle(), messages.selectAnItemToRemoveDescription(),
           messages.dialogOk());
       }
     } else {
@@ -929,7 +929,7 @@ public class Browse extends Composite {
           }
         });
       } else {
-        Dialogs.showInformationDialog(messages.selectAnItemTitle(), messages.selectAnItemDescription(),
+        Dialogs.showInformationDialog(messages.selectAnItemTitle(), messages.selectAnItemToMoveDescription(),
           messages.dialogOk());
       }
     } else {
