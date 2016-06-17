@@ -282,12 +282,12 @@ public class ShowPreservationEvent extends Composite {
     }
 
     if (!agentId.getRoles().isEmpty()) {
-      Label typeLabel = new Label("Roles");
-      typeLabel.addStyleName("label");
+      Label rolesLabel = new Label("Roles");
+      rolesLabel.addStyleName("label");
       // TODO humanize list
       Label typeValue = new Label(Tools.join(agentId.getRoles(), ", "));
       typeValue.addStyleName("value");
-      body.add(typeLabel);
+      body.add(rolesLabel);
       body.add(typeValue);
     }
 

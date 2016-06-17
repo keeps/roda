@@ -81,7 +81,7 @@ public class SimpleRodaMemberList extends BasicAsyncTableCell<RODAMember> {
 
       @Override
       public String getValue(RODAMember member) {
-        return member != null ? member.getName() : null;
+        return member != null ? member.getFullName() : null;
       }
     };
 
@@ -92,7 +92,7 @@ public class SimpleRodaMemberList extends BasicAsyncTableCell<RODAMember> {
     // TODO externalize strings into constants
     addColumn(typeColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-user'></i>"), false, false, 2);
     addColumn(idColumn, messages.userIdentifier(), true, false);
-    addColumn(nameColumn, messages.userName(), true, false);
+    addColumn(nameColumn, messages.userFullName(), true, false);
 
     addStyleName("my-list-rodamember");
   }

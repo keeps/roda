@@ -894,7 +894,7 @@ public interface ClientMessages extends Messages {
 
   String userIdentifier();
 
-  String userName();
+  String userFullName();
 
   /*** Show job and report ****/
 

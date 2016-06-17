@@ -2916,6 +2916,7 @@ td.datePickerMonth, td.datePickerYear {
 .searchInputListBox .dropdown-label:after {
     line-height: 4rem;
     font-size: 20px;
+    position: absolute;
 }
 
 .searchInputListBoxPopup .dropdown-item:hover {

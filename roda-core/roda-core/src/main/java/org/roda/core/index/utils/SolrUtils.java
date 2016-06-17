@@ -1419,7 +1419,15 @@ public class SolrUtils {
       doc.addField(RodaConstants.MEMBERS_ROLES_ALL, new ArrayList<String>(member.getAllRoles()));
     }
 
-    // Add user specific
+    if (StringUtils.isNotBlank(member.getFullName())) {
+      doc.addField(RodaConstants.MEMBERS_FULLNAME, member.getFullName());
+    }
+
+    // Add user specific fields
+    if (member instanceof RodaUser) {
+      RodaUser user = (RodaUser) member;
+      doc.addField(RodaConstants.MEMBERS_EMAIL, user.getEmail());
+    }
 
     return doc;
   }
@@ -1442,6 +1450,7 @@ public class SolrUtils {
       RodaUser user = new RodaUser();
       user.setId(id);
       user.setName(name);
+      user.setFullName(fullName);
       user.setEmail(email);
 
       user.setActive(isActive);
@@ -1458,6 +1467,7 @@ public class SolrUtils {
       group.setAllRoles(roles);
       group.setActive(isActive);
       group.setName(name);
+      group.setFullName(fullName);
       return group;
     }
   }
@@ -1911,9 +1921,10 @@ public class SolrUtils {
     doc.addField(RodaConstants.FORMAT_NAME_SORT, format.getName());
     doc.addField(RodaConstants.FORMAT_DEFINITION, format.getDefinition());
     doc.addField(RodaConstants.FORMAT_CATEGORY, format.getCategories());
-    doc.addField(RodaConstants.FORMAT_CATEGORY_SORT, (format.getCategories()!=null && format.getCategories().size()>0)? format.getCategories().get(0):null);
+    doc.addField(RodaConstants.FORMAT_CATEGORY_SORT,
+      (format.getCategories() != null && format.getCategories().size() > 0) ? format.getCategories().get(0) : null);
     doc.addField(RodaConstants.FORMAT_LATEST_VERSION, format.getLatestVersion());
-    if(format.getPopularity()!=null){
+    if (format.getPopularity() != null) {
       doc.addField(RodaConstants.FORMAT_POPULARITY, format.getPopularity());
     }
     doc.addField(RodaConstants.FORMAT_DEVELOPER, format.getDeveloper());

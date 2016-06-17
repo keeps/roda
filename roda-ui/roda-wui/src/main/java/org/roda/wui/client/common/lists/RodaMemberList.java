@@ -44,8 +44,8 @@ public class RodaMemberList extends BasicAsyncTableCell<RODAMember> {
 
   private Column<RODAMember, SafeHtml> activeColumn;
   private Column<RODAMember, SafeHtml> typeColumn;
-  private TextColumn<RODAMember> idColumn;
   private TextColumn<RODAMember> nameColumn;
+  private TextColumn<RODAMember> fullNameColumn;
   private TextColumn<RODAMember> groupsColumn;
 
   public RodaMemberList() {
@@ -68,19 +68,19 @@ public class RodaMemberList extends BasicAsyncTableCell<RODAMember> {
       }
     };
 
-    idColumn = new TextColumn<RODAMember>() {
-
-      @Override
-      public String getValue(RODAMember member) {
-        return member != null ? member.getId() : null;
-      }
-    };
-
     nameColumn = new TextColumn<RODAMember>() {
 
       @Override
       public String getValue(RODAMember member) {
         return member != null ? member.getName() : null;
+      }
+    };
+
+    fullNameColumn = new TextColumn<RODAMember>() {
+
+      @Override
+      public String getValue(RODAMember member) {
+        return member != null ? member.getFullName() : null;
       }
     };
 
@@ -102,14 +102,13 @@ public class RodaMemberList extends BasicAsyncTableCell<RODAMember> {
     };
 
     typeColumn.setSortable(true);
-    idColumn.setSortable(true);
+    nameColumn.setSortable(true);
     nameColumn.setSortable(true);
     activeColumn.setSortable(true);
 
-    // TODO externalize strings into constants
     addColumn(typeColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-user'></i>"), false, false, 3);
-    addColumn(idColumn, messages.userIdentifier(), true, false);
-    addColumn(nameColumn, messages.userName(), true, false);
+    addColumn(nameColumn, messages.userIdentifier(), true, false);
+    addColumn(fullNameColumn, messages.userFullName(), true, false);
     addColumn(groupsColumn, messages.userGroups(), true, false);
     addColumn(activeColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-check-circle'></i>"), false, false, 2);
 
@@ -125,8 +124,8 @@ public class RodaMemberList extends BasicAsyncTableCell<RODAMember> {
     Map<Column<RODAMember, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<RODAMember, ?>, List<String>>();
     columnSortingKeyMap.put(activeColumn, Arrays.asList(RodaConstants.MEMBERS_IS_ACTIVE));
     columnSortingKeyMap.put(typeColumn, Arrays.asList(RodaConstants.MEMBERS_IS_USER));
-    columnSortingKeyMap.put(idColumn, Arrays.asList(RodaConstants.MEMBERS_ID));
     columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.MEMBERS_NAME));
+    columnSortingKeyMap.put(fullNameColumn, Arrays.asList(RodaConstants.MEMBERS_FULLNAME));
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 

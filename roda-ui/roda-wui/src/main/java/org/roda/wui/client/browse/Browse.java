@@ -550,7 +550,7 @@ public class Browse extends Composite {
     // Set button visibility
     createItem.setVisible(true);
     moveItem.setVisible(true);
-    editPermissions.setVisible(true);
+    editPermissions.setVisible(false);
     remove.setVisible(true);
 
     downloadSection.setVisible(false);

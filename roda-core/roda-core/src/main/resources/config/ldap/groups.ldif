@@ -22,7 +22,7 @@ objectClass: top
 objectClass: groupOfUniqueNames
 cn: producers
 uniqueMember: cn=administrators,ou=groups,dc=roda,dc=org
-ou: Produtores
+ou: Producers
 shadowInactive: 0
 
 dn: cn=archivists,ou=groups,dc=roda,dc=org
