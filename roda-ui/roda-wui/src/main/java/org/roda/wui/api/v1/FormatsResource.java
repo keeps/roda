@@ -68,7 +68,7 @@ public class FormatsResource {
     // delegate action to controller
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
     boolean justActive = false;
-    IndexResult<Format> listFormatsIndexResult = org.roda.wui.api.controllers.Browser.find(Format.class, Filter.NONE,
+    IndexResult<Format> listFormatsIndexResult = org.roda.wui.api.controllers.Browser.find(Format.class, Filter.ALL,
       Sorter.NONE, new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())), Facets.NONE, user,
       justActive);
 

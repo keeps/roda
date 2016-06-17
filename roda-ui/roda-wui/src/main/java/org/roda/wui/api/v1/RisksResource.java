@@ -69,7 +69,7 @@ public class RisksResource {
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
     boolean justActive = false;
     IndexResult<IndexedRisk> listRisksIndexResult = org.roda.wui.api.controllers.Browser.find(IndexedRisk.class,
-      Filter.NONE, Sorter.NONE, new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())),
+      Filter.ALL, Sorter.NONE, new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())),
       Facets.NONE, user, justActive);
 
     // transform controller method output

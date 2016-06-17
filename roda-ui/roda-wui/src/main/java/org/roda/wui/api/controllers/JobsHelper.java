@@ -96,7 +96,7 @@ public class JobsHelper {
 
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
     boolean justActive = false;
-    IndexResult<Job> listJobsIndexResult = org.roda.wui.api.controllers.Browser.find(Job.class, Filter.NONE,
+    IndexResult<Job> listJobsIndexResult = org.roda.wui.api.controllers.Browser.find(Job.class, Filter.ALL,
       Sorter.NONE, new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())), Facets.NONE, user,
       justActive);
 

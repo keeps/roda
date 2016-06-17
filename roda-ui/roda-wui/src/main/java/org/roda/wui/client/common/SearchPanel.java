@@ -143,47 +143,50 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
     if (showSearchAdvancedDisclosureButton) {
       searchPanel.addStyleName("searchPanelAdvanced");
     }
-
-    searchPreFilters.setVisible(!defaultFilter.getParameters().isEmpty());
+    
     drawSearchPreFilters();
   }
 
   private void drawSearchPreFilters() {
     searchPreFilters.clear();
 
-    for (FilterParameter parameter : defaultFilter.getParameters()) {
+    searchPreFilters.setVisible(defaultFilter != null && !defaultFilter.getParameters().isEmpty());
+    
+    if (defaultFilter != null) {
+      for (FilterParameter parameter : defaultFilter.getParameters()) {
 
-      HTML html = null;
+        HTML html = null;
 
-      if (parameter instanceof SimpleFilterParameter) {
-        SimpleFilterParameter p = (SimpleFilterParameter) parameter;
-        html = new HTML(messages.searchPreFilterSimpleFilterParameter(messages.searchPreFilterName(p.getName()),
-          messages.searchPreFilterValue(p.getValue())));
-      } else if (parameter instanceof BasicSearchFilterParameter) {
-        BasicSearchFilterParameter p = (BasicSearchFilterParameter) parameter;
-        // TODO put '*' in some constant, see Search
-        if (!"*".equals(p.getValue())) {
-          html = new HTML(messages.searchPreFilterBasicSearchFilterParameter(messages.searchPreFilterName(p.getName()),
+        if (parameter instanceof SimpleFilterParameter) {
+          SimpleFilterParameter p = (SimpleFilterParameter) parameter;
+          html = new HTML(messages.searchPreFilterSimpleFilterParameter(messages.searchPreFilterName(p.getName()),
             messages.searchPreFilterValue(p.getValue())));
+        } else if (parameter instanceof BasicSearchFilterParameter) {
+          BasicSearchFilterParameter p = (BasicSearchFilterParameter) parameter;
+          // TODO put '*' in some constant, see Search
+          if (!"*".equals(p.getValue())) {
+            html = new HTML(messages.searchPreFilterBasicSearchFilterParameter(
+              messages.searchPreFilterName(p.getName()), messages.searchPreFilterValue(p.getValue())));
+          }
+        } else if (parameter instanceof NotSimpleFilterParameter) {
+          NotSimpleFilterParameter p = (NotSimpleFilterParameter) parameter;
+          html = new HTML(messages.searchPreFilterNotSimpleFilterParameter(messages.searchPreFilterName(p.getName()),
+            messages.searchPreFilterValue(p.getValue())));
+        } else if (parameter instanceof EmptyKeyFilterParameter) {
+          EmptyKeyFilterParameter p = (EmptyKeyFilterParameter) parameter;
+          html = new HTML(messages.searchPreFilterEmptyKeyFilterParameter(messages.searchPreFilterName(p.getName())));
+        } else {
+          html = new HTML(SafeHtmlUtils.fromString(parameter.getClass().getSimpleName()));
         }
-      } else if (parameter instanceof NotSimpleFilterParameter) {
-        NotSimpleFilterParameter p = (NotSimpleFilterParameter) parameter;
-        html = new HTML(messages.searchPreFilterNotSimpleFilterParameter(messages.searchPreFilterName(p.getName()),
-          messages.searchPreFilterValue(p.getValue())));
-      } else if (parameter instanceof EmptyKeyFilterParameter) {
-        EmptyKeyFilterParameter p = (EmptyKeyFilterParameter) parameter;
-        html = new HTML(messages.searchPreFilterEmptyKeyFilterParameter(messages.searchPreFilterName(p.getName())));
-      } else {
-        html = new HTML(SafeHtmlUtils.fromString(parameter.getClass().getSimpleName()));
-      }
 
-      if (html != null) {
-        HTML header = new HTML(SafeHtmlUtils.fromSafeConstant(FILTER_ICON));
-        header.addStyleName("inline gray");
-        searchPreFilters.add(header);
+        if (html != null) {
+          HTML header = new HTML(SafeHtmlUtils.fromSafeConstant(FILTER_ICON));
+          header.addStyleName("inline gray");
+          searchPreFilters.add(header);
 
-        html.addStyleName("xsmall gray inline nowrap");
-        searchPreFilters.add(html);
+          html.addStyleName("xsmall gray inline nowrap");
+          searchPreFilters.add(html);
+        }
       }
     }
   }
@@ -215,13 +218,13 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
 
     Filter filter;
     if (defaultFilterIncremental) {
-      filter = new Filter(defaultFilter);
+      filter = defaultFilter != null ? new Filter(defaultFilter) : new Filter();
       filter.add(parameters);
-      searchPreFilters.setVisible(defaultFilter.getParameters().size() > 0);
+      searchPreFilters.setVisible(filter != null && filter.getParameters().size() > 0);
       GWT.log("Incremental filter: " + filter);
     } else if (parameters.size() == 0) {
       filter = defaultFilter;
-      searchPreFilters.setVisible(defaultFilter.getParameters().size() > 0);
+      searchPreFilters.setVisible(filter != null && filter.getParameters().size() > 0);
       GWT.log("Default filter: " + filter);
     } else {
       filter = new Filter(parameters);

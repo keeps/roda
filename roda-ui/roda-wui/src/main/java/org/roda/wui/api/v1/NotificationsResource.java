@@ -68,7 +68,7 @@ public class NotificationsResource {
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
     boolean justActive = false;
     IndexResult<Notification> listNotificationsIndexResult = org.roda.wui.api.controllers.Browser.find(
-      Notification.class, Filter.NONE, Sorter.NONE, new Sublist(pagingParams.getFirst(), pagingParams.getSecond()),
+      Notification.class, Filter.ALL, Sorter.NONE, new Sublist(pagingParams.getFirst(), pagingParams.getSecond()),
       Facets.NONE, user, justActive);
 
     // transform controller method output

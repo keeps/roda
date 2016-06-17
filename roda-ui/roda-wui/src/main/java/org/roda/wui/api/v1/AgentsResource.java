@@ -71,7 +71,7 @@ public class AgentsResource {
     // TODO add show just active to API
     boolean justActive = true;
     IndexResult<IndexedPreservationAgent> listAgentsIndexResult = org.roda.wui.api.controllers.Browser.find(
-      IndexedPreservationAgent.class, Filter.NONE, Sorter.NONE,
+      IndexedPreservationAgent.class, Filter.ALL, Sorter.NONE,
       new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), Facets.NONE, user, justActive);
 
     return Response.ok(listAgentsIndexResult.getResults(), mediaType).build();

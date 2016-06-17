@@ -331,10 +331,12 @@ public class BrowserHelper {
         String templateWithValues = getDescriptiveMetadataPreview(metadataTypeBundle);
         templateWithValues = cleanXMLForCompare(templateWithValues);
         String xmlTemp = cleanXMLForCompare(xml);
-//        System.out.println("---- Template With Values ----\n" + templateWithValues);
-//        System.out.println("---- XML ----\n" + xmlTemp);
-//        System.out.println("------------- Compare -------------\n" + StringUtils.difference(templateWithValues, xmlTemp));
-//        complete = templateWithValues.equals(xmlTemp);
+        // System.out.println("---- Template With Values ----\n" +
+        // templateWithValues);
+        // System.out.println("---- XML ----\n" + xmlTemp);
+        // System.out.println("------------- Compare -------------\n" +
+        // StringUtils.difference(templateWithValues, xmlTemp));
+        // complete = templateWithValues.equals(xmlTemp);
         complete = true;
       }
 
@@ -348,7 +350,7 @@ public class BrowserHelper {
     return ret;
   }
 
-  private static String cleanXMLForCompare(String st){
+  private static String cleanXMLForCompare(String st) {
     st = st.replaceAll("xsi:schemaLocation=\\s*[\"|'].*[\"|']", "");
     st = st.replaceAll("xmlns:xsi=\\s*[\"|'].*[\"|']", "");
     st = st.replaceAll("\\n|\\r|\\s", "");
@@ -1827,7 +1829,7 @@ public class BrowserHelper {
   }
 
   public static void updateRiskCounters() throws GenericException, RequestNotValidException, NotFoundException {
-    IndexResult<RiskIncidence> find = RodaCoreFactory.getIndexService().find(RiskIncidence.class, Filter.NONE,
+    IndexResult<RiskIncidence> find = RodaCoreFactory.getIndexService().find(RiskIncidence.class, Filter.ALL,
       Sorter.NONE, new Sublist(0, 0), new Facets(new SimpleFacetParameter(RodaConstants.RISK_INCIDENCE_RISKS)));
 
     boolean findFlag = true;
@@ -2010,31 +2012,35 @@ public class BrowserHelper {
 
   public static String getDescriptiveMetadataPreview(SupportedMetadataTypeBundle bundle) throws GenericException {
     String rawTemplate = bundle.getTemplate();
-    String result = null;
-    try {
-      Handlebars handlebars = new Handlebars();
-      Map<String, String> data = new HashMap<>();
-      handlebars.registerHelper("field", (o, options) -> {
-        return options.fn();
-      });
-      Template tmpl = handlebars.compileInline(rawTemplate);
-
-      Set<MetadataValue> values = bundle.getValues();
-      if (values != null) {
-        values.forEach(metadataValue -> {
-          String val = metadataValue.get("value");
-          if (val != null) {
-            val = val.replaceAll("\\s", "");
-            if (!"".equals(val)) {
-              data.put(metadataValue.get("name"), metadataValue.get("value"));
-            }
-          }
+    String result;
+    if (StringUtils.isNotBlank(rawTemplate)) {
+      try {
+        Handlebars handlebars = new Handlebars();
+        Map<String, String> data = new HashMap<>();
+        handlebars.registerHelper("field", (o, options) -> {
+          return options.fn();
         });
+        Template tmpl = handlebars.compileInline(rawTemplate);
+
+        Set<MetadataValue> values = bundle.getValues();
+        if (values != null) {
+          values.forEach(metadataValue -> {
+            String val = metadataValue.get("value");
+            if (val != null) {
+              val = val.replaceAll("\\s", "");
+              if (!"".equals(val)) {
+                data.put(metadataValue.get("name"), metadataValue.get("value"));
+              }
+            }
+          });
+        }
+        result = tmpl.apply(data);
+        result = RodaUtils.indentXML(result);
+      } catch (IOException e) {
+        throw new GenericException(e);
       }
-      result = tmpl.apply(data);
-      result = RodaUtils.indentXML(result);
-    } catch (IOException e) {
-      throw new GenericException(e);
+    } else {
+      result = rawTemplate;
     }
     return result;
   }
