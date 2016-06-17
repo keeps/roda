@@ -2126,8 +2126,6 @@ public interface ClientMessages extends Messages {
 
   String isAcknowledged(@Select String isAcknowledged);
 
-  String severityMessages(@Select SEVERITY_LEVEL level);
-
   String preservationEventAgentIdentifier();
 
   String preservationEventAgentType();
