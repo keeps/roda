@@ -95,10 +95,15 @@ public class ReindexAIPPlugin extends AbstractPlugin<AIP> {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      for (AIP aip : list) {
-        LOGGER.debug("Reindexing AIP {}", aip.getId());
-        index.reindexAIP(aip);
-        jobPluginInfo.incrementObjectsProcessedWithSuccess();
+      try {
+        for (AIP aip : list) {
+          LOGGER.debug("Reindexing AIP {}", aip.getId());
+          index.reindexAIP(aip);
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        }
+      } catch (ClassCastException e) {
+        LOGGER.error("Objects are not AIPs");
+        jobPluginInfo.incrementObjectsProcessedWithFailure(list.size());
       }
 
       jobPluginInfo.finalizeInfo();

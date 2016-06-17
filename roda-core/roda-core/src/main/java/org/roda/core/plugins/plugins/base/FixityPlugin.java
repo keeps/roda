@@ -93,110 +93,117 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      for (AIP aip : list) {
-        boolean aipFailed = false;
+      try {
+        for (AIP aip : list) {
+          boolean aipFailed = false;
 
-        for (Representation r : aip.getRepresentations()) {
-          LOGGER.debug("Checking fixity for files in representation " + r.getId() + " of AIP " + aip.getId());
+          for (Representation r : aip.getRepresentations()) {
+            LOGGER.debug("Checking fixity for files in representation " + r.getId() + " of AIP " + aip.getId());
 
-          try {
-            List<String> passedFiles = new ArrayList<String>();
-            List<String> failedFiles = new ArrayList<String>();
-            boolean recursive = true;
-            CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(), r.getId(),
-              recursive);
+            try {
+              List<String> passedFiles = new ArrayList<String>();
+              List<String> failedFiles = new ArrayList<String>();
+              boolean recursive = true;
+              CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(), r.getId(),
+                recursive);
 
-            for (OptionalWithCause<File> oFile : allFiles) {
-              if (oFile.isPresent()) {
-                File file = oFile.get();
+              for (OptionalWithCause<File> oFile : allFiles) {
+                if (oFile.isPresent()) {
+                  File file = oFile.get();
 
-                if (!file.isDirectory()) {
-                  StoragePath storagePath = ModelUtils.getFileStoragePath(file);
-                  Binary currentFileBinary = storage.getBinary(storagePath);
-                  Binary premisFile = model.retrievePreservationFile(file);
-                  List<Fixity> fixities = PremisV3Utils.extractFixities(premisFile);
+                  if (!file.isDirectory()) {
+                    StoragePath storagePath = ModelUtils.getFileStoragePath(file);
+                    Binary currentFileBinary = storage.getBinary(storagePath);
+                    Binary premisFile = model.retrievePreservationFile(file);
+                    List<Fixity> fixities = PremisV3Utils.extractFixities(premisFile);
 
-                  if (fixities != null) {
-                    boolean passedFixity = true;
+                    if (fixities != null) {
+                      boolean passedFixity = true;
 
-                    // get all necessary hash algorithms
-                    Set<String> algorithms = new HashSet<>();
-                    for (Fixity f : fixities) {
-                      algorithms.add(f.getMessageDigestAlgorithm());
-                    }
-
-                    // calculate hashes
-                    try {
-                      Map<String, String> checksums = FileUtility
-                        .checksums(currentFileBinary.getContent().createInputStream(), algorithms);
-
+                      // get all necessary hash algorithms
+                      Set<String> algorithms = new HashSet<>();
                       for (Fixity f : fixities) {
-                        String checksum = checksums.get(f.getMessageDigest());
-
-                        if (!f.getMessageDigest().trim().equalsIgnoreCase(checksum.trim())) {
-                          passedFixity = false;
-                          break;
-                        }
+                        algorithms.add(f.getMessageDigestAlgorithm());
                       }
-                    } catch (NoSuchAlgorithmException e) {
-                      passedFixity = false;
-                      // TODO add exception to plugin report
-                      LOGGER.debug("Could not check fixity", e);
+
+                      // calculate hashes
+                      try {
+                        Map<String, String> checksums = FileUtility
+                          .checksums(currentFileBinary.getContent().createInputStream(), algorithms);
+
+                        for (Fixity f : fixities) {
+                          String checksum = checksums.get(f.getMessageDigestAlgorithm());
+
+                          if (!f.getMessageDigest().trim().equalsIgnoreCase(checksum.trim())) {
+                            passedFixity = false;
+                            break;
+                          }
+                        }
+                      } catch (NoSuchAlgorithmException e) {
+                        passedFixity = false;
+                        // TODO add exception to plugin report
+                        LOGGER.debug("Could not check fixity", e);
+                      }
+
+                      if (passedFixity) {
+                        // TODO support file path
+                        passedFiles.add(file.getId());
+                      } else {
+                        failedFiles.add(file.getId());
+                        aipFailed = true;
+
+                        PluginHelper.createRiskIfNotExists(model, riskId, getClass());
+                        model.addRiskIncidence(riskId, file.getAipId(), file.getRepresentationId(), file.getPath(),
+                          file.getId());
+                      }
                     }
 
-                    if (passedFixity) {
-                      // TODO support file path
-                      passedFiles.add(file.getId());
-                    } else {
-                      failedFiles.add(file.getId());
-                      aipFailed = true;
-
-                      PluginHelper.createRiskIfNotExists(model, riskId, getClass());
-                      model.addRiskIncidence(riskId, file.getAipId(), file.getRepresentationId(), file.getPath(),
-                        file.getId());
-                    }
+                  } else {
+                    LOGGER.warn("Cannot process File ", oFile.getCause());
                   }
-
-                } else {
-                  LOGGER.warn("Cannot process File ", oFile.getCause());
                 }
               }
+
+              IOUtils.closeQuietly(allFiles);
+              model.notifyAIPUpdated(aip.getId());
+            } catch (IOException | RODAException | XmlException e) {
+              LOGGER.error("Error processing Representation " + r.getId() + " - " + e.getMessage(), e);
+            }
+          }
+
+          try {
+            Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
+
+            if (aipFailed) {
+              reportItem.setPluginState(PluginState.FAILURE)
+                .setPluginDetails("Fixity checking did not run successfully");
+              jobPluginInfo.incrementObjectsProcessedWithFailure();
+              PluginHelper.createPluginEvent(this, aip.getId(), model, index, PluginState.FAILURE, "", true);
+            } else {
+              reportItem.setPluginState(PluginState.SUCCESS).setPluginDetails("Fixity checking ran successfully");
+              jobPluginInfo.incrementObjectsProcessedWithSuccess();
+              PluginHelper.createPluginEvent(this, aip.getId(), model, index, PluginState.SUCCESS, "", true);
             }
 
-            IOUtils.closeQuietly(allFiles);
-            model.notifyAIPUpdated(aip.getId());
-          } catch (IOException | RODAException | XmlException e) {
-            LOGGER.error("Error processing Representation " + r.getId() + " - " + e.getMessage(), e);
-          }
-        }
-
-        try {
-          Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
-
-          if (aipFailed) {
-            reportItem.setPluginState(PluginState.FAILURE).setPluginDetails("Fixity checking did not run successfully");
-            jobPluginInfo.incrementObjectsProcessedWithFailure();
-            PluginHelper.createPluginEvent(this, aip.getId(), model, index, PluginState.FAILURE, "", true);
-          } else {
-            reportItem.setPluginState(PluginState.SUCCESS).setPluginDetails("Fixity checking ran successfully");
-            jobPluginInfo.incrementObjectsProcessedWithSuccess();
-            PluginHelper.createPluginEvent(this, aip.getId(), model, index, PluginState.SUCCESS, "", true);
+            report.addReport(reportItem);
+            PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+          } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
+            | ValidationException | AlreadyExistsException e) {
+            LOGGER.error("Could not create a Fixity Plugin event");
           }
 
-          report.addReport(reportItem);
-          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
-        } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
-          | ValidationException | AlreadyExistsException e) {
-          LOGGER.error("Could not create a Fixity Plugin event");
         }
+      } catch (ClassCastException e) {
+        LOGGER.error("Objects are not AIPs");
+        jobPluginInfo.incrementObjectsProcessedWithFailure(list.size());
       }
 
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException e) {
-      LOGGER.error("Could not update Job information");
-    } catch (Exception e) {
+    } catch (
 
+    JobException e) {
+      LOGGER.error("Could not update Job information");
     }
 
     return report;

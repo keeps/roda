@@ -102,9 +102,19 @@ public class JobStats implements Serializable {
     this.sourceObjectsBeingProcessed -= 1;
   }
 
+  public void incrementObjectsProcessedWithFailure(int count) {
+    this.sourceObjectsProcessedWithFailure += count;
+    this.sourceObjectsBeingProcessed -= count;
+  }
+
   public void incrementObjectsProcessedWithSuccess() {
     this.sourceObjectsProcessedWithSuccess += 1;
     this.sourceObjectsBeingProcessed -= 1;
+  }
+
+  public void incrementObjectsProcessedWithSuccess(int count) {
+    this.sourceObjectsProcessedWithSuccess += count;
+    this.sourceObjectsBeingProcessed -= count;
   }
 
   public void incrementOutcomeObjectsWithManualIntervention() {

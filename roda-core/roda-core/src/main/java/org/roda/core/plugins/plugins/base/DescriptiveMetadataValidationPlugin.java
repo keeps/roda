@@ -120,37 +120,43 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      for (AIP aip : list) {
-        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
-        PluginState state = PluginState.SUCCESS;
+      try {
+        for (AIP aip : list) {
+          Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class,
+            AIPState.INGEST_PROCESSING);
+          PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+          PluginState state = PluginState.SUCCESS;
 
-        try {
-          LOGGER.debug("Validating AIP {}", aip.getId());
-          ValidationReport report = ValidationUtils.isAIPMetadataValid(forceDescriptiveMetadataType,
-            validateDescriptiveMetadata, metadataType, metadataVersion, validatePremis, model, aip.getId());
-          reports.add(report);
-          if (report.isValid()) {
-            reportItem.setPluginState(state);
-          } else {
+          try {
+            LOGGER.debug("Validating AIP {}", aip.getId());
+            ValidationReport report = ValidationUtils.isAIPMetadataValid(forceDescriptiveMetadataType,
+              validateDescriptiveMetadata, metadataType, metadataVersion, validatePremis, model, aip.getId());
+            reports.add(report);
+            if (report.isValid()) {
+              reportItem.setPluginState(state);
+            } else {
+              state = PluginState.FAILURE;
+              reportItem.setPluginState(state).setHtmlPluginDetails(true).setPluginDetails(report.toHtml(false, false));
+            }
+          } catch (RODAException mse) {
             state = PluginState.FAILURE;
-            reportItem.setPluginState(state).setHtmlPluginDetails(true).setPluginDetails(report.toHtml(false, false));
+            LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage(), mse);
           }
-        } catch (RODAException mse) {
-          state = PluginState.FAILURE;
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage(), mse);
-        }
 
-        try {
-          boolean notify = true;
-          createEvent(aip, model, index, reportItem.getPluginState(), notify);
-          jobPluginInfo.incrementObjectsProcessed(state);
+          try {
+            boolean notify = true;
+            createEvent(aip, model, index, reportItem.getPluginState(), notify);
+            jobPluginInfo.incrementObjectsProcessed(state);
 
-          pluginReport.addReport(reportItem);
-          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
-        } catch (Throwable e) {
-          LOGGER.error("Error updating job report", e);
+            pluginReport.addReport(reportItem);
+            PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+          } catch (Throwable e) {
+            LOGGER.error("Error updating job report", e);
+          }
         }
+      } catch (ClassCastException e) {
+        LOGGER.error("Objects are not AIPs");
+        jobPluginInfo.incrementObjectsProcessedWithFailure(list.size());
       }
 
       jobPluginInfo.finalizeInfo();

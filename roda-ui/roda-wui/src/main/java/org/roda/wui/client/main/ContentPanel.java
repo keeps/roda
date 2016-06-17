@@ -168,10 +168,10 @@ public class ContentPanel extends SimplePanel {
     String tokenI18N = "";
     boolean resolved = false;
     List<String> tokens = historyTokens;
-    while (!resolved && tokens.size() > 0) {
 
-      tokenI18N = messages.title(Tools.join(tokens, "_")).toUpperCase();
-      resolved = true;
+    while (!resolved && tokens.size() > 0) {
+      String token = Tools.join(tokens, "_");
+      tokenI18N = messages.title(token).toUpperCase();
 
       if (tokenI18N.isEmpty()) {
         tokens = Tools.removeLast(tokens);
@@ -180,6 +180,7 @@ public class ContentPanel extends SimplePanel {
       }
 
     }
+
     if (!resolved) {
       tokenI18N = historyTokens.get(historyTokens.size() - 1).toUpperCase();
     }

@@ -375,8 +375,10 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
         reportItem.setPluginState(reportState);
 
         if (ignoreFiles) {
-          reportItem.setHtmlPluginDetails(true)
-            .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
+          reportItem.setHtmlPluginDetails(true);
+          if (!validationReport.getIssues().isEmpty()) {
+            reportItem.setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
+          }
         }
 
         report.addReport(reportItem);

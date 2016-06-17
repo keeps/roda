@@ -98,41 +98,47 @@ public class PremisSkeletonPlugin extends AbstractPlugin<AIP> {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      for (AIP aip : list) {
-        LOGGER.debug("Processing AIP {}", aip.getId());
-        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+      try {
+        for (AIP aip : list) {
+          LOGGER.debug("Processing AIP {}", aip.getId());
+          Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class,
+            AIPState.INGEST_PROCESSING);
+          PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
 
-        try {
-          for (Representation representation : aip.getRepresentations()) {
-            LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
-            List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
-            PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aip, representation.getId(),
-              algorithms);
-            model.notifyRepresentationUpdated(representation);
-          }
-
-          jobPluginInfo.incrementObjectsProcessedWithSuccess();
-          reportItem.setPluginState(PluginState.SUCCESS);
-        } catch (RODAException | XmlException | IOException e) {
-          LOGGER.error("Error processing AIP " + aip.getId(), e);
-
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
-          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
-        }
-
-        if (createsPluginEvent) {
           try {
-            boolean notify = true;
-            PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(), "", notify);
-          } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
-            | AuthorizationDeniedException | AlreadyExistsException e) {
-            LOGGER.error("Error creating event: " + e.getMessage(), e);
-          }
-        }
+            for (Representation representation : aip.getRepresentations()) {
+              LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
+              List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
+              PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aip, representation.getId(),
+                algorithms);
+              model.notifyRepresentationUpdated(representation);
+            }
 
-        report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+            jobPluginInfo.incrementObjectsProcessedWithSuccess();
+            reportItem.setPluginState(PluginState.SUCCESS);
+          } catch (RODAException | XmlException | IOException e) {
+            LOGGER.error("Error processing AIP " + aip.getId(), e);
+
+            jobPluginInfo.incrementObjectsProcessedWithFailure();
+            reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
+          }
+
+          if (createsPluginEvent) {
+            try {
+              boolean notify = true;
+              PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(), "", notify);
+            } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
+              | AuthorizationDeniedException | AlreadyExistsException e) {
+              LOGGER.error("Error creating event: " + e.getMessage(), e);
+            }
+          }
+
+          report.addReport(reportItem);
+          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+        }
+      } catch (ClassCastException e) {
+        LOGGER.error("Objects are not AIPs");
+        jobPluginInfo.incrementObjectsProcessedWithFailure(list.size());
       }
 
       jobPluginInfo.finalizeInfo();

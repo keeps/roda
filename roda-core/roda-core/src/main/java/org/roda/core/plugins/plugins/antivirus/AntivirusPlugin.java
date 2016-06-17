@@ -113,52 +113,59 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      for (AIP aip : list) {
-        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
-        PluginState reportState = PluginState.SUCCESS;
+      try {
+        for (AIP aip : list) {
+          Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class,
+            AIPState.INGEST_PROCESSING);
+          PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+          PluginState reportState = PluginState.SUCCESS;
 
-        VirusCheckResult virusCheckResult = null;
-        Exception exception = null;
-        DirectResourceAccess directAccess = null;
-        try {
-          LOGGER.debug("Checking if AIP {} is clean of virus", aip.getId());
-          StoragePath aipPath = ModelUtils.getAIPStoragePath(aip.getId());
+          VirusCheckResult virusCheckResult = null;
+          Exception exception = null;
+          DirectResourceAccess directAccess = null;
+          try {
+            LOGGER.debug("Checking if AIP {} is clean of virus", aip.getId());
+            StoragePath aipPath = ModelUtils.getAIPStoragePath(aip.getId());
 
-          directAccess = storage.getDirectAccess(aipPath);
-          virusCheckResult = getAntiVirus().checkForVirus(directAccess.getPath());
+            directAccess = storage.getDirectAccess(aipPath);
+            virusCheckResult = getAntiVirus().checkForVirus(directAccess.getPath());
 
-          reportState = virusCheckResult.isClean() ? PluginState.SUCCESS : PluginState.FAILURE;
-          reportItem.setPluginState(reportState).setPluginDetails(virusCheckResult.getReport());
+            reportState = virusCheckResult.isClean() ? PluginState.SUCCESS : PluginState.FAILURE;
+            reportItem.setPluginState(reportState).setPluginDetails(virusCheckResult.getReport());
 
-          LOGGER.debug("Done with checking if AIP {} has virus. Is clean of virus: {}", aip.getId(),
-            virusCheckResult.isClean());
-        } catch (Exception e) {
-          reportState = PluginState.FAILURE;
-          reportItem.setPluginState(reportState).setPluginDetails(e.getMessage());
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
+            LOGGER.debug("Done with checking if AIP {} has virus. Is clean of virus: {}", aip.getId(),
+              virusCheckResult.isClean());
+          } catch (Exception e) {
+            reportState = PluginState.FAILURE;
+            reportItem.setPluginState(reportState).setPluginDetails(e.getMessage());
+            jobPluginInfo.incrementObjectsProcessedWithFailure();
 
-          exception = e;
-          LOGGER.error("Error processing AIP " + aip.getId(), e);
-        } catch (Throwable e) {
-          LOGGER.error("Error processing AIP " + aip.getId(), e);
-          throw new PluginException(e);
-        } finally {
-          IOUtils.closeQuietly(directAccess);
+            exception = e;
+            LOGGER.error("Error processing AIP " + aip.getId(), e);
+          } catch (Throwable e) {
+            LOGGER.error("Error processing AIP " + aip.getId(), e);
+            throw new PluginException(e);
+          } finally {
+            IOUtils.closeQuietly(directAccess);
+          }
+
+          // FIXME 20160314 hsilva: perhaps the following code should be put
+          // inside the above finally block, because if an error occurs the
+          // event
+          // creation will never happen
+          try {
+            jobPluginInfo.incrementObjectsProcessed(reportState);
+            boolean notify = true;
+            createEvent(virusCheckResult, exception, reportItem.getPluginState(), aip, model, index, notify);
+            report.addReport(reportItem);
+            PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+          } catch (Throwable e) {
+            LOGGER.error("Error updating event and job", e);
+          }
         }
-
-        // FIXME 20160314 hsilva: perhaps the following code should be put
-        // inside the above finally block, because if an error occurs the event
-        // creation will never happen
-        try {
-          jobPluginInfo.incrementObjectsProcessed(reportState);
-          boolean notify = true;
-          createEvent(virusCheckResult, exception, reportItem.getPluginState(), aip, model, index, notify);
-          report.addReport(reportItem);
-          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
-        } catch (Throwable e) {
-          LOGGER.error("Error updating event and job", e);
-        }
+      } catch (ClassCastException e) {
+        LOGGER.error("Objects are not AIPs");
+        jobPluginInfo.incrementObjectsProcessedWithFailure(list.size());
       }
 
       jobPluginInfo.finalizeInfo();
