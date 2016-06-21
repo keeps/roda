@@ -33,6 +33,8 @@ import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.validation.ValidationIssue;
+import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
@@ -104,15 +106,16 @@ public class ReindexJobPlugin extends AbstractPlugin<Job> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<Job> list)
     throws PluginException {
 
-    Report report = PluginHelper.initPluginReport(this).setOutcomeObjectId(UUID.randomUUID().toString());
+    String reportId = UUID.randomUUID().toString();
+    Report report = PluginHelper.initPluginReport(this).setOutcomeObjectId(reportId);
     report.setPluginState(PluginState.SUCCESS);
 
     try {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      report = indexJobs(index, storage, report);
-      report = indexJobsReports(index, storage, report);
+      report = indexJobs(model, index, storage, report, jobPluginInfo, reportId);
+      indexJobsReports(index, storage);
 
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
@@ -124,71 +127,82 @@ public class ReindexJobPlugin extends AbstractPlugin<Job> {
     return report;
   }
 
-  private Report indexJobs(IndexService index, StorageService storage, Report report) {
+  private Report indexJobs(ModelService model, IndexService index, StorageService storage, Report report,
+    SimpleJobPluginInfo jobPluginInfo, String reportId) {
     CloseableIterable<Resource> listResourcesUnderDirectory = null;
+
     try {
       boolean recursive = false;
       listResourcesUnderDirectory = storage.listResourcesUnderDirectory(ModelUtils.getJobContainerPath(), recursive);
+    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
+      LOGGER.error("", e);
+    }
 
+    int jobCounter = 0;
+    ValidationReport validationReport = new ValidationReport();
+
+    if (listResourcesUnderDirectory != null) {
       for (Resource resource : listResourcesUnderDirectory) {
+        jobCounter++;
+
         try {
           Binary binary = storage.getBinary(resource.getStoragePath());
           InputStream inputStream = binary.getContent().createInputStream();
           Job objectFromJson = JsonUtils.getObjectFromJson(inputStream, Job.class);
           IOUtils.closeQuietly(inputStream);
           index.reindexJob(objectFromJson);
-
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
         } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
           | IOException e) {
-          // Report reportItem = PluginHelper.initPluginReportItem(this, "",
-          // Report.class);
-          // reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage())
-          // .setTitle(resource.getStoragePath().toString());
-          // report.addReport(reportItem);
-          report.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
+          LOGGER.error("", e);
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+          report.setPluginState(PluginState.FAILURE);
+
+          ValidationIssue issue = new ValidationIssue();
+          issue.setMessage(e.getMessage());
+          validationReport.addIssue(issue);
         }
       }
-
-    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
-      LOGGER.error("", e);
-    } finally {
-      IOUtils.closeQuietly(listResourcesUnderDirectory);
     }
 
+    if (validationReport.getIssues().size() > 0) {
+      report.setHtmlPluginDetails(true);
+      report.setPluginDetails(validationReport.toHtml(false, false, false, "Error list"));
+    }
+
+    jobPluginInfo.setSourceObjectsCount(jobCounter);
+    IOUtils.closeQuietly(listResourcesUnderDirectory);
     return report;
   }
 
-  private Report indexJobsReports(IndexService index, StorageService storage, Report report) {
+  private void indexJobsReports(IndexService index, StorageService storage) {
     CloseableIterable<Resource> listResourcesUnderDirectory = null;
     try {
       boolean recursive = true;
       listResourcesUnderDirectory = storage.listResourcesUnderDirectory(ModelUtils.getJobReportContainerPath(),
         recursive);
-
-      for (Resource resource : listResourcesUnderDirectory) {
-        if (!resource.isDirectory()) {
-          Binary binary = storage.getBinary(resource.getStoragePath());
-          InputStream inputStream = binary.getContent().createInputStream();
-          Report objectFromJson = JsonUtils.getObjectFromJson(inputStream, Report.class);
-          IOUtils.closeQuietly(inputStream);
-          index.reindexJobReport(objectFromJson);
-        }
-      }
-
-    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
-      | IOException e) {
-      // Report reportItem = PluginHelper.initPluginReportItem(this, "",
-      // Report.class);
-      // reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
-      // report.addReport(reportItem);
-
-      report.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
+    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
       LOGGER.error("", e);
-    } finally {
-      IOUtils.closeQuietly(listResourcesUnderDirectory);
     }
 
-    return report;
+    if (listResourcesUnderDirectory != null) {
+      for (Resource resource : listResourcesUnderDirectory) {
+        if (!resource.isDirectory()) {
+          try {
+            Binary binary = storage.getBinary(resource.getStoragePath());
+            InputStream inputStream = binary.getContent().createInputStream();
+            Report objectFromJson = JsonUtils.getObjectFromJson(inputStream, Report.class);
+            IOUtils.closeQuietly(inputStream);
+            index.reindexJobReport(objectFromJson);
+          } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
+            | IOException e) {
+            LOGGER.error("", e);
+          }
+        }
+      }
+    }
+
+    IOUtils.closeQuietly(listResourcesUnderDirectory);
   }
 
   @Override

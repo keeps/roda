@@ -57,6 +57,12 @@ public class SimpleJobPluginInfo extends JobPluginInfo {
       sourceObjectsCount += pluginInfo.getSourceObjectsCount();
     }
 
+    // FIXME 20160621: temporary strategy to avoid random percentages (division
+    // by 0)
+    if (taskObjectsCount == 0) {
+      percentage = 1;
+    }
+
     SimpleJobPluginInfo infoUpdated = new SimpleJobPluginInfo();
     infoUpdated.setCompletionPercentage(Math.round((percentage * 100)));
     infoUpdated.setSourceObjectsCount(sourceObjectsCount);

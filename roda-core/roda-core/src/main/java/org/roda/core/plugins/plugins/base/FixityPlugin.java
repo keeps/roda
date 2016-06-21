@@ -194,7 +194,7 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
 
         }
       } catch (ClassCastException e) {
-        LOGGER.error("Objects are not AIPs");
+        LOGGER.error("Trying to execute an AIP-only plugin with other objects");
         jobPluginInfo.incrementObjectsProcessedWithFailure(list.size());
       }
 

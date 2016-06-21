@@ -14,6 +14,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrClient;
@@ -197,7 +198,7 @@ public class IndexService {
         observer.preservationMetadataCreated(opm.get());
       }
       IOUtils.closeQuietly(iterable);
-    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
+    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | NoSuchElementException e) {
       LOGGER.error("Could not reindex preservation agents");
     }
   }

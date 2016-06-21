@@ -143,7 +143,7 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
           PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
         }
       } catch (ClassCastException e) {
-        LOGGER.error("Objects are not AIPs");
+        LOGGER.error("Trying to execute an AIP-only plugin with other objects");
         jobPluginInfo.incrementObjectsProcessedWithFailure(list.size());
       }
 

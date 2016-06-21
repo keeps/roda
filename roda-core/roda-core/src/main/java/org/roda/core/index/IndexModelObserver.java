@@ -138,7 +138,6 @@ public class IndexModelObserver implements ModelObserver {
           PreservationMetadata pm = opm.get();
           if (pm.getType().equals(PreservationMetadataType.EVENT)) {
             try {
-              LOGGER.error("PM: "+pm);
               indexPreservationEvent(pm);
             } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException
               | AuthorizationDeniedException e) {

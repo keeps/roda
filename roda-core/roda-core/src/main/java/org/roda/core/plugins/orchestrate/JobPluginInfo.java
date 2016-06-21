@@ -30,6 +30,7 @@ public abstract class JobPluginInfo extends JobStats implements JobPluginInfoInt
     setDone(true);
     setSourceObjectsBeingProcessed(0);
     setSourceObjectsWaitingToBeProcessed(0);
+    setCompletionPercentage(100);
   }
 
 }
