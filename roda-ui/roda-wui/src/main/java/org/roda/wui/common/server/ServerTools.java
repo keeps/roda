@@ -129,11 +129,11 @@ public class ServerTools {
     return isURL;
   }
 
-  public static TreeSet<MetadataValue> transform(String content) {
+  public static Set<MetadataValue> transform(String content) {
     if (content == null)
       return null;
 
-    TreeSet<MetadataValue> values = new TreeSet<>();
+    Set<MetadataValue> values = new TreeSet<>();
     Set<String> addedTags = new HashSet<>();
     Handlebars handlebars = new Handlebars();
 

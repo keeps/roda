@@ -12,9 +12,8 @@ package org.roda.wui.client.browse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
-import java.util.TreeSet;
+import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.SelectedItemsList;
@@ -31,15 +30,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.json.client.JSONArray;
-import com.google.gwt.json.client.JSONException;
-import com.google.gwt.json.client.JSONObject;
-import com.google.gwt.json.client.JSONParser;
-import com.google.gwt.json.client.JSONString;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -56,7 +47,6 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.user.datepicker.client.DateBox;
 
 import config.i18n.client.ClientMessages;
 
@@ -220,7 +210,7 @@ public class CreateDescriptiveMetadata extends Composite {
 
   }
 
-  private void createForm(SupportedMetadataTypeBundle bundle){
+  private void createForm(SupportedMetadataTypeBundle bundle) {
     formOrXML.clear();
     CreateForm.create(formOrXML, bundle);
   }
@@ -312,7 +302,7 @@ public class CreateDescriptiveMetadata extends Composite {
     boolean hasOverridenTheForm = inXML && !xmlText.equals(metadataTextFromForm);
 
     if (idText.length() > 0) {
-      TreeSet<MetadataValue> values = null;
+      Set<MetadataValue> values = null;
       // we only send the values map if the user hasn't overriden the form by
       // modifying the XML directly
       if (!hasOverridenTheForm) {

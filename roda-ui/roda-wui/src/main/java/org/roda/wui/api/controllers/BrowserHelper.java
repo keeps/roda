@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.MissingResourceException;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -297,7 +296,7 @@ public class BrowserHelper {
 
       boolean complete = false;
       // Get the values using XPath
-      TreeSet<MetadataValue> values = null;
+      Set<MetadataValue> values = null;
       String template = null;
 
       if (metadataTypeBundle != null) {
@@ -331,6 +330,7 @@ public class BrowserHelper {
         String templateWithValues = getDescriptiveMetadataPreview(metadataTypeBundle);
         templateWithValues = cleanXMLForCompare(templateWithValues);
         String xmlTemp = cleanXMLForCompare(xml);
+        // TODO use the Clean XML for comparison or skip this step
         // System.out.println("---- Template With Values ----\n" +
         // templateWithValues);
         // System.out.println("---- XML ----\n" + xmlTemp);
@@ -1284,20 +1284,22 @@ public class BrowserHelper {
           + RodaConstants.METADATA_TEMPLATE_EXTENSION);
 
         String template = null;
-        try {
-          template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-          LOGGER.error("Error getting the template from the stream", e);
-        }
-
-        TreeSet<MetadataValue> values = ServerTools.transform(template);
-        for (MetadataValue mv : values) {
-          String generator = mv.get("auto-generate");
-          if (generator != null && generator.length() > 0) {
-            String value = ServerTools.autoGenerateValue(aip, user, generator);
-            if (value != null) {
-              mv.set("value", value);
+        Set<MetadataValue> values = null;
+        if (templateStream != null) {
+          try {
+            template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
+            values = ServerTools.transform(template);
+            for (MetadataValue mv : values) {
+              String generator = mv.get("auto-generate");
+              if (generator != null && generator.length() > 0) {
+                String value = ServerTools.autoGenerateValue(aip, user, generator);
+                if (value != null) {
+                  mv.set("value", value);
+                }
+              }
             }
+          } catch (IOException e) {
+            LOGGER.error("Error getting the template from the stream", e);
           }
         }
 
