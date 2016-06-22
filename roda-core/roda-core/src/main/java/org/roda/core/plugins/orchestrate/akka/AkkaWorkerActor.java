@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import akka.actor.UntypedActor;
 
 public class AkkaWorkerActor extends UntypedActor {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger LOGGER = LoggerFactory.getLogger(AkkaWorkerActor.class);
 
   private final IndexService index;
   private final ModelService model;
@@ -36,15 +36,13 @@ public class AkkaWorkerActor extends UntypedActor {
       Plugin<?> plugin = message.getPlugin();
       try {
         plugin.execute(index, model, storage, message.getList());
-        getSender().tell("", getSelf());
-        // getSender().tell(returnMessage, getSelf());
-      } catch (Throwable e) {
-        logger.error("Error executing action!", e);
-        getSender().tell("", getSelf());
-        // getSender().tell(returnMessage, getSelf());
-        throw e;
+        getSender().tell(new Messages.PluginExecuteIsDone(plugin, false), getSelf());
+      } catch (Exception e) {
+        LOGGER.error("Error executing plugin.execute()", e);
+        getSender().tell(new Messages.PluginExecuteIsDone(plugin, true), getSelf());
       }
     } else {
+      LOGGER.error("Received a message that it doesn't know how to process (" + msg.getClass().getName() + ")...");
       unhandled(msg);
     }
   }

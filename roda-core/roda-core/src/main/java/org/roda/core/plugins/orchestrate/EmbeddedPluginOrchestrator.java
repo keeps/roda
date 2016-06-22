@@ -388,7 +388,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void setInitialJobInfo(String jobId, Object object) {
+  public void setInitialJobStateInfo(String jobId, Object object) {
     // TODO Auto-generated method stub
 
   }

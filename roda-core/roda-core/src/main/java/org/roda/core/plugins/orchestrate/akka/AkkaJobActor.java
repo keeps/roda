@@ -54,41 +54,44 @@ public class AkkaJobActor extends UntypedActor {
       PluginHelper.setPluginParameters(plugin, job);
 
       String jobId = job.getId();
-      ActorRef jobInfoActor = getContext().actorOf(Props.create(AkkaJobInfoActor.class, plugin), jobId);
-      RodaCoreFactory.getPluginOrchestrator().setInitialJobInfo(jobId, jobInfoActor);
+      ActorRef jobStateInfoActor = getContext().actorOf(Props.create(AkkaJobStateInfoActor.class, plugin), jobId);
+      RodaCoreFactory.getPluginOrchestrator().setInitialJobStateInfo(jobId, jobStateInfoActor);
 
-      jobInfoActor.tell(new Messages.JobStateUpdated(plugin, JOB_STATE.STARTED), ActorRef.noSender());
+      jobStateInfoActor.tell(new Messages.JobStateUpdated(plugin, JOB_STATE.STARTED), ActorRef.noSender());
 
       try {
         if (job.getSourceObjects() instanceof SelectedItemsAll<?>) {
-          runOnAll(job, plugin);
+          runOnAll(job, plugin, jobStateInfoActor);
         } else if (job.getSourceObjects() instanceof SelectedItemsNone<?>) {
-          RodaCoreFactory.getPluginOrchestrator().runPlugin(plugin);
+          RodaCoreFactory.getPluginOrchestrator().runPlugin(jobStateInfoActor, plugin);
         } else if (job.getSourceObjects() instanceof SelectedItemsList<?>) {
-          runFromList(job, plugin);
+          runFromList(job, plugin, jobStateInfoActor);
         } else if (job.getSourceObjects() instanceof SelectedItemsFilter<?>) {
-          runFromFilter(job, plugin);
+          runFromFilter(job, plugin, jobStateInfoActor);
         }
       } catch (Exception e) {
-        jobInfoActor.tell(new Messages.JobStateUpdated(plugin, JOB_STATE.FAILED_TO_COMPLETE, e), ActorRef.noSender());
+        jobStateInfoActor.tell(new Messages.JobStateUpdated(plugin, JOB_STATE.FAILED_TO_COMPLETE, e),
+          ActorRef.noSender());
       }
 
     } else {
-      LOGGER.error(AkkaJobActor.class.getName() + " received a message that it doesn't know how to process...");
+      LOGGER.error("Received a message that it doesn't know how to process (" + msg.getClass().getName() + ")...");
+      unhandled(msg);
     }
   }
 
-  private void runOnAll(Job job, Plugin<?> plugin) throws GenericException {
+  private void runOnAll(Job job, Plugin<?> plugin, ActorRef jobStateInfoActor) throws GenericException {
     // get class
     Class<Serializable> sourceObjectsClass = JobsHelper
       .getSelectedClassFromString(job.getSourceObjects().getSelectedClass());
 
     if (AIP.class.getCanonicalName().equals(sourceObjectsClass.getCanonicalName())) {
-      RodaCoreFactory.getPluginOrchestrator().runPluginOnAllAIPs((Plugin<AIP>) plugin);
+      RodaCoreFactory.getPluginOrchestrator().runPluginOnAllAIPs(jobStateInfoActor, (Plugin<AIP>) plugin);
     } else if (Representation.class.getCanonicalName().equals(sourceObjectsClass.getCanonicalName())) {
-      RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations((Plugin<Representation>) plugin);
+      RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(jobStateInfoActor,
+        (Plugin<Representation>) plugin);
     } else if (File.class.getCanonicalName().equals(sourceObjectsClass.getCanonicalName())) {
-      RodaCoreFactory.getPluginOrchestrator().runPluginOnAllFiles((Plugin<File>) plugin);
+      RodaCoreFactory.getPluginOrchestrator().runPluginOnAllFiles(jobStateInfoActor, (Plugin<File>) plugin);
     } else {
       LOGGER.error("Error executing job on unknown source objects class '{}'", sourceObjectsClass.getCanonicalName());
       throw new GenericException(
@@ -96,25 +99,26 @@ public class AkkaJobActor extends UntypedActor {
     }
   }
 
-  private void runFromList(Job job, Plugin<?> plugin) throws GenericException {
+  private void runFromList(Job job, Plugin<?> plugin, ActorRef jobStateInfoActor) throws GenericException {
     // get class
     Class<Serializable> sourceObjectsClass = JobsHelper
       .getSelectedClassFromString(job.getSourceObjects().getSelectedClass());
 
     if (AIP.class.getCanonicalName().equals(sourceObjectsClass.getCanonicalName())) {
-      RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin,
+      RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(jobStateInfoActor, (Plugin<AIP>) plugin,
         ((SelectedItemsList<IndexedAIP>) job.getSourceObjects()).getIds(), true);
     } else if (IndexedAIP.class.getCanonicalName().equals(sourceObjectsClass.getCanonicalName())) {
-      RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin,
+      RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(jobStateInfoActor, (Plugin<AIP>) plugin,
         ((SelectedItemsList<IndexedAIP>) job.getSourceObjects()).getIds(), false);
     } else if (IndexedRepresentation.class.getCanonicalName().equals(sourceObjectsClass.getCanonicalName())) {
-      RodaCoreFactory.getPluginOrchestrator().runPluginOnRepresentations((Plugin<Representation>) plugin,
-        ((SelectedItemsList<IndexedRepresentation>) job.getSourceObjects()).getIds());
+      RodaCoreFactory.getPluginOrchestrator().runPluginOnRepresentations(jobStateInfoActor,
+        (Plugin<Representation>) plugin, ((SelectedItemsList<IndexedRepresentation>) job.getSourceObjects()).getIds());
     } else if (IndexedFile.class.getCanonicalName().equals(sourceObjectsClass.getCanonicalName())) {
-      RodaCoreFactory.getPluginOrchestrator().runPluginOnFiles((Plugin<File>) plugin,
+      RodaCoreFactory.getPluginOrchestrator().runPluginOnFiles(jobStateInfoActor, (Plugin<File>) plugin,
         ((SelectedItemsList<IndexedFile>) job.getSourceObjects()).getIds());
     } else if (TransferredResource.class.getCanonicalName().equals(sourceObjectsClass.getCanonicalName())) {
-      RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources((Plugin<TransferredResource>) plugin,
+      RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(jobStateInfoActor,
+        (Plugin<TransferredResource>) plugin,
         ((SelectedItemsList<TransferredResource>) job.getSourceObjects()).getIds());
     } else {
       LOGGER.error("Error executing job on unknown source objects class '{}'", sourceObjectsClass.getCanonicalName());
@@ -123,7 +127,8 @@ public class AkkaJobActor extends UntypedActor {
     }
   }
 
-  private void runFromFilter(Job job, Plugin<?> plugin) throws GenericException, RequestNotValidException {
+  private void runFromFilter(Job job, Plugin<?> plugin, ActorRef jobStateInfoActor)
+    throws GenericException, RequestNotValidException {
     // cast
     SelectedItemsFilter<?> selectedItems = (SelectedItemsFilter<?>) job.getSourceObjects();
 
@@ -136,8 +141,8 @@ public class AkkaJobActor extends UntypedActor {
     PluginHelper.updateJobObjectsCount(plugin, RodaCoreFactory.getModelService(), objectsCount);
 
     // execute
-    RodaCoreFactory.getPluginOrchestrator().runPluginFromIndex(sourceObjectsClass, selectedItems.getFilter(),
-      (Plugin) plugin);
+    RodaCoreFactory.getPluginOrchestrator().runPluginFromIndex(jobStateInfoActor, sourceObjectsClass,
+      selectedItems.getFilter(), (Plugin) plugin);
   }
 
   private SupervisorStrategy strategy = new OneForOneStrategy(false, DeciderBuilder.matchAny(e -> {

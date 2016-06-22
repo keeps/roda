@@ -129,7 +129,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public <T extends IsIndexed> void runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin) {
+  public <T extends IsIndexed> void runPluginFromIndex(Object context, Class<T> classToActOn, Filter filter,
+    Plugin<T> plugin) {
     try {
       LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
       int blockSize = JobsHelper.getBlockSize();
@@ -156,7 +157,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void runPluginOnAIPs(Plugin<AIP> plugin, List<String> uuids, boolean retrieveFromModel) {
+  public void runPluginOnAIPs(Object context, Plugin<AIP> plugin, List<String> uuids, boolean retrieveFromModel) {
     try {
       LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
       int blockSize = JobsHelper.getBlockSize();
@@ -189,7 +190,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void runPluginOnRepresentations(Plugin<Representation> plugin, List<String> uuids) {
+  public void runPluginOnRepresentations(Object context, Plugin<Representation> plugin, List<String> uuids) {
     try {
       LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
       int blockSize = JobsHelper.getBlockSize();
@@ -221,7 +222,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void runPluginOnFiles(Plugin<File> plugin, List<String> uuids) {
+  public void runPluginOnFiles(Object context, Plugin<File> plugin, List<String> uuids) {
     try {
       LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
       int blockSize = JobsHelper.getBlockSize();
@@ -254,7 +255,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void runPluginOnAllAIPs(Plugin<AIP> plugin) {
+  public void runPluginOnAllAIPs(Object context, Plugin<AIP> plugin) {
     try {
       LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
       int blockSize = JobsHelper.getBlockSize();
@@ -294,7 +295,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void runPluginOnAllRepresentations(Plugin<Representation> plugin) {
+  public void runPluginOnAllRepresentations(Object context, Plugin<Representation> plugin) {
     try {
       LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
       int blockSize = JobsHelper.getBlockSize();
@@ -337,7 +338,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void runPluginOnAllFiles(Plugin<File> plugin) {
+  public void runPluginOnAllFiles(Object context, Plugin<File> plugin) {
     try {
       LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
       int blockSize = JobsHelper.getBlockSize();
@@ -396,7 +397,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void runPluginOnTransferredResources(Plugin<TransferredResource> plugin, List<String> uuids) {
+  public void runPluginOnTransferredResources(Object context, Plugin<TransferredResource> plugin, List<String> uuids) {
     try {
       LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
       int blockSize = JobsHelper.getBlockSize();
@@ -429,7 +430,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public <T extends Serializable> void runPlugin(Plugin<T> plugin) {
+  public <T extends Serializable> void runPlugin(Object context, Plugin<T> plugin) {
     try {
       LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
 
@@ -476,14 +477,14 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     // keep track of each job/plugin relation
     String jobId = PluginHelper.getJobId(innerPlugin);
     if (jobId != null && runningJobs.get(jobId) != null) {
-      ActorRef jobInfoActor = runningJobs.get(jobId);
+      ActorRef jobStateInfoActor = runningJobs.get(jobId);
       if (PluginType.INGEST == plugin.getType()) {
         IngestJobPluginInfo jobPluginInfo = new IngestJobPluginInfo();
-        initJobPluginInfo(innerPlugin, jobId, jobInfoActor, jobPluginInfo, objectsCount);
+        initJobPluginInfo(innerPlugin, jobId, jobStateInfoActor, jobPluginInfo, objectsCount);
         innerPlugin.injectJobPluginInfo(jobPluginInfo);
       } else if (PluginType.MISC == plugin.getType() || PluginType.AIP_TO_AIP == plugin.getType()) {
         SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo();
-        initJobPluginInfo(innerPlugin, jobId, jobInfoActor, jobPluginInfo, objectsCount);
+        initJobPluginInfo(innerPlugin, jobId, jobStateInfoActor, jobPluginInfo, objectsCount);
         innerPlugin.injectJobPluginInfo(jobPluginInfo);
       }
     }
@@ -603,7 +604,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void setInitialJobInfo(String jobId, Object object) {
+  public void setInitialJobStateInfo(String jobId, Object object) {
     runningJobs.put(jobId, (ActorRef) object);
   }
 

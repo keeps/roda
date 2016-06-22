@@ -36,9 +36,9 @@ public class Messages {
   public static final class JobStateUpdated implements Serializable {
     private static final long serialVersionUID = 1946036502369851214L;
 
-    public Plugin<?> plugin;
-    public JOB_STATE state;
-    public Optional<String> stateDatails;
+    private Plugin<?> plugin;
+    private JOB_STATE state;
+    private Optional<String> stateDatails;
 
     public JobStateUpdated(Plugin<?> plugin, JOB_STATE state) {
       this.plugin = plugin;
@@ -56,6 +56,18 @@ public class Messages {
       this.plugin = plugin;
       this.state = state;
       this.stateDatails = Optional.ofNullable(throwable.getClass().getName() + ": " + throwable.getMessage());
+    }
+
+    public Plugin<?> getPlugin() {
+      return plugin;
+    }
+
+    public JOB_STATE getState() {
+      return state;
+    }
+
+    public Optional<String> getStateDatails() {
+      return stateDatails;
     }
 
     @Override
@@ -90,6 +102,45 @@ public class Messages {
 
     public void setPlugin(Plugin<T> plugin) {
       this.plugin = plugin;
+    }
+
+    @Override
+    public String toString() {
+      return "PluginToBeExecuted [list=" + list + ", plugin=" + plugin + "]";
+    }
+
+  }
+
+  public static class PluginExecuteIsDone implements Serializable {
+    private static final long serialVersionUID = -8701179264086005994L;
+
+    private Plugin<?> plugin;
+    private boolean withError;
+
+    public PluginExecuteIsDone(Plugin<?> plugin, boolean withError) {
+      this.plugin = plugin;
+      this.withError = withError;
+    }
+
+    public Plugin<?> getPlugin() {
+      return plugin;
+    }
+
+    public void setPlugin(Plugin<?> plugin) {
+      this.plugin = plugin;
+    }
+
+    public boolean isWithError() {
+      return withError;
+    }
+
+    public void setWithError(boolean withError) {
+      this.withError = withError;
+    }
+
+    @Override
+    public String toString() {
+      return "PluginExecuteIsDone [plugin=" + plugin + ", withError=" + withError + "]";
     }
   }
 }

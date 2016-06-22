@@ -19,13 +19,13 @@ import org.slf4j.LoggerFactory;
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 
-public class AkkaJobInfoActor extends UntypedActor {
-  private static final Logger LOGGER = LoggerFactory.getLogger(AkkaJobInfoActor.class);
+public class AkkaJobStateInfoActor extends UntypedActor {
+  private static final Logger LOGGER = LoggerFactory.getLogger(AkkaJobStateInfoActor.class);
 
   private JobInfo jobInfo;
   private Plugin<?> plugin;
 
-  public AkkaJobInfoActor(Plugin<?> plugin) {
+  public AkkaJobStateInfoActor(Plugin<?> plugin) {
     jobInfo = new JobInfo();
     this.plugin = plugin;
   }
@@ -34,31 +34,47 @@ public class AkkaJobInfoActor extends UntypedActor {
   public void onReceive(Object msg) throws Exception {
     if (msg instanceof Messages.JobInfoUpdated) {
       Messages.JobInfoUpdated message = (Messages.JobInfoUpdated) msg;
-      boolean isJobPluginDone = message.jobPluginInfo.isDone();
+      // boolean isJobPluginDone = message.jobPluginInfo.isDone();
       jobInfo.put(message.plugin, message.jobPluginInfo);
       JobPluginInfo infoUpdated = message.jobPluginInfo.processJobPluginInformation(message.plugin, jobInfo);
       jobInfo.setObjectsCount(infoUpdated.getSourceObjectsCount());
       PluginHelper.updateJobInformation(message.plugin, RodaCoreFactory.getModelService(), infoUpdated);
-      if (isJobPluginDone) {
-        message.plugin.afterBlockExecute(RodaCoreFactory.getIndexService(), RodaCoreFactory.getModelService(),
-          RodaCoreFactory.getStorageService());
-      }
+      // if (isJobPluginDone) {
+      // message.plugin.afterBlockExecute(RodaCoreFactory.getIndexService(),
+      // RodaCoreFactory.getModelService(),
+      // RodaCoreFactory.getStorageService());
+      // }
+      // if (jobInfo.isDone()) {
+      // plugin.afterAllExecute(RodaCoreFactory.getIndexService(),
+      // RodaCoreFactory.getModelService(),
+      // RodaCoreFactory.getStorageService());
+      // getSelf().tell(new Messages.JobStateUpdated(plugin,
+      // JOB_STATE.COMPLETED), ActorRef.noSender());
+      // }
+    } else if (msg instanceof Messages.PluginExecuteIsDone) {
+      Messages.PluginExecuteIsDone message = (Messages.PluginExecuteIsDone) msg;
+      JobPluginInfo jobPluginInfo = jobInfo.getJobInfo().get(message.getPlugin());
+      jobPluginInfo.setDone(true);
+
+      message.getPlugin().afterBlockExecute(RodaCoreFactory.getIndexService(), RodaCoreFactory.getModelService(),
+        RodaCoreFactory.getStorageService());
+
       if (jobInfo.isDone()) {
         plugin.afterAllExecute(RodaCoreFactory.getIndexService(), RodaCoreFactory.getModelService(),
           RodaCoreFactory.getStorageService());
         getSelf().tell(new Messages.JobStateUpdated(plugin, JOB_STATE.COMPLETED), ActorRef.noSender());
       }
+
     } else if (msg instanceof Messages.JobStateUpdated) {
       Messages.JobStateUpdated message = (Messages.JobStateUpdated) msg;
-      Plugin<?> p = message.plugin == null ? plugin : message.plugin;
-      PluginHelper.updateJobState(p, RodaCoreFactory.getModelService(), message.state, message.stateDatails);
-      if (message.state == JOB_STATE.COMPLETED) {
+      Plugin<?> p = message.getPlugin() == null ? plugin : message.getPlugin();
+      PluginHelper.updateJobState(p, RodaCoreFactory.getModelService(), message.getState(), message.getStateDatails());
+      if (message.getState() == JOB_STATE.COMPLETED) {
         getContext().stop(getSelf());
       }
     } else {
-      // FIXME 20160609 hsilva: throw exception so the parent put job in the
-      // failed to complete state
-      LOGGER.error(AkkaJobInfoActor.class.getName() + " received a message that it doesn't know how to process...");
+      LOGGER.error("Received a message that it doesn't know how to process (" + msg.getClass().getName() + ")...");
+      unhandled(msg);
     }
   }
 

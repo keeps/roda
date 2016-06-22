@@ -29,23 +29,24 @@ public interface PluginOrchestrator {
 
   public void shutdown();
 
-  public <T extends IsIndexed> void runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin);
+  public <T extends IsIndexed> void runPluginFromIndex(Object context, Class<T> classToActOn, Filter filter,
+    Plugin<T> plugin);
 
-  public void runPluginOnAIPs(Plugin<AIP> plugin, List<String> uuids, boolean retrieveFromModel);
+  public void runPluginOnAIPs(Object context, Plugin<AIP> plugin, List<String> uuids, boolean retrieveFromModel);
 
-  public void runPluginOnRepresentations(Plugin<Representation> plugin, List<String> uuids);
+  public void runPluginOnRepresentations(Object context, Plugin<Representation> plugin, List<String> uuids);
 
-  public void runPluginOnFiles(Plugin<File> plugin, List<String> uuids);
+  public void runPluginOnFiles(Object context, Plugin<File> plugin, List<String> uuids);
 
-  public void runPluginOnAllAIPs(Plugin<AIP> plugin);
+  public void runPluginOnAllAIPs(Object context, Plugin<AIP> plugin);
 
-  public void runPluginOnAllRepresentations(Plugin<Representation> plugin);
+  public void runPluginOnAllRepresentations(Object context, Plugin<Representation> plugin);
 
-  public void runPluginOnAllFiles(Plugin<File> plugin);
+  public void runPluginOnAllFiles(Object context, Plugin<File> plugin);
 
-  public void runPluginOnTransferredResources(Plugin<TransferredResource> plugin, List<String> uuids);
+  public void runPluginOnTransferredResources(Object context, Plugin<TransferredResource> plugin, List<String> uuids);
 
-  public <T extends Serializable> void runPlugin(Plugin<T> plugin);
+  public <T extends Serializable> void runPlugin(Object context, Plugin<T> plugin);
 
   /*
    * Job related methods
@@ -62,7 +63,7 @@ public interface PluginOrchestrator {
 
   // FIXME 20160602 hsilva: rename this (in akka case this will receive the
   // ActorRef for the actor holding JobInfo
-  public void setInitialJobInfo(String jobId, Object object);
+  public void setInitialJobStateInfo(String jobId, Object object);
 
   public <T extends Serializable> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo)
     throws JobException;
