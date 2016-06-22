@@ -1842,6 +1842,7 @@ public class BrowserHelper {
     while (findFlag) {
       IndexResult<IndexedRisk> findAll = RodaCoreFactory.getIndexService().find(IndexedRisk.class, filter, Sorter.NONE,
         new Sublist(initialIndex, initialIndex + interval));
+
       for (IndexedRisk risk : findAll.getResults()) {
         allRisks.add(risk.getId());
       }

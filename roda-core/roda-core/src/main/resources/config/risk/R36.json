@@ -1,6 +1,6 @@
 {       
 	"category": "Physical environment; Hardware, software or communications equipment and facilities",
-	"id": "FixityPlugin-1",
+	"id": "R36",
 	"name": "Unidentified security compromise, vulnerability or information degradation",
 	"description": "Security exploitation or vulnerability occurs and is not monitored or identified by repository staff. ",
 	"notes": "\n- Are mechanisms in place to identify all system access attempts?\n- Are mechanisms in place to determine when and how changes to stored content have taken place?\n- Are system logs regularly analysed to seek evidence of security breaches or attempted breaches? ",
@@ -10,13 +10,13 @@
 	"preMitigationProbability": 4 ,
 	"preMitigationImpact": 3,
 	"preMitigationSeverity": 12,
-	"preMitigationSeverityLevel": "Moderate",
+	"preMitigationSeverityLevel": "MODERATE",
 	"identifiedBy":"Drambora version 1",
 	"mitigationOwnerType": "Human",                
 	"posMitigationProbability": 0,
 	"posMitigationImpact": 0,
 	"posMitigationSeverity": 12,  
-	"posMitigationSeverityLevel": "Moderate",
+	"posMitigationSeverityLevel": "MODERATE",
 	"identifiedOn": "1459465200000",
 	"mitigationRelatedEventIdentifierType": "",
 	"mitigationRelatedEventIdentifierValue": ""      

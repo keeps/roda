@@ -163,12 +163,11 @@ public class RiskRegister extends Composite {
    */
 
   public RiskRegister() {
-    Filter filter = null;
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.RISK_CATEGORY),
       new SimpleFacetParameter(RodaConstants.RISK_POS_MITIGATION_SEVERITY_LEVEL),
       new SimpleFacetParameter(RodaConstants.RISK_MITIGATION_OWNER));
 
-    riskList = new RiskList(filter, facets, messages.risksTitle(), true);
+    riskList = new RiskList(null, facets, messages.risksTitle(), true);
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.RISK_SEARCH, messages.riskRegisterSearchPlaceHolder(),
       false, false);

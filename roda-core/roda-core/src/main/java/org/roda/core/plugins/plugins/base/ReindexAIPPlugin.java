@@ -43,7 +43,7 @@ public class ReindexAIPPlugin extends AbstractPlugin<AIP> {
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "Clear indexes", PluginParameterType.BOOLEAN,
-        "false", false, false, "Clear all the AIP indexes before reindexing them."));
+        "true", false, false, "Clear all the AIP indexes before reindexing them."));
   }
 
   @Override

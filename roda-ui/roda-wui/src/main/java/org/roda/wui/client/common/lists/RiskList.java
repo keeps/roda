@@ -148,6 +148,10 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
     AsyncCallback<IndexResult<IndexedRisk>> callback) {
 
     Filter filter = getFilter();
+    // if (filter == Filter.NONE) {
+    // // search not yet ready, deliver empty result
+    // callback.onSuccess(null);
+    // } else {
 
     Map<Column<IndexedRisk, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedRisk, ?>, List<String>>();
     columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.RISK_NAME));
@@ -161,6 +165,8 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
 
     BrowserService.Util.getInstance().find(IndexedRisk.class.getName(), filter, sorter, sublist, getFacets(),
       LocaleInfo.getCurrentLocale().getLocaleName(), getJustActive(), callback);
+    // }
+
   }
 
   @Override

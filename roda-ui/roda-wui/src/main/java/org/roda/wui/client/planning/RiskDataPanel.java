@@ -135,6 +135,9 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
   TextBox mitigationRelatedEventIdentifierValue;
 
   @UiField
+  Label incidenceListLabel;
+
+  @UiField
   FlowPanel incidenceListPanel;
 
   @SuppressWarnings("unused")
@@ -321,6 +324,7 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
       preMitigationSeverityValue
         .setHTML(HtmlSnippetUtils.getSeverityDefinition(0, severityLowLimit, severityHighLimit));
       this.id.setVisible(false);
+      incidenceListLabel.setVisible(false);
     } else {
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISKS, risk.getId()));
       incidenceList = new RiskIncidenceList(filter, null, messages.riskIncidences(), true);

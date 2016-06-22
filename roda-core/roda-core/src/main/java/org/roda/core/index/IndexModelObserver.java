@@ -834,6 +834,7 @@ public class IndexModelObserver implements ModelObserver {
         LOGGER.warn("Commit did not run as expected");
       }
     }
+
   }
 
   public void riskDeleted(String riskId, boolean commit) {

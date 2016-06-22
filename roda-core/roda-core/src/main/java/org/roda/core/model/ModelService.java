@@ -806,17 +806,17 @@ public class ModelService extends ModelObservable {
 
   public Binary retrievePreservationRepresentation(String aipId, String representationId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    String urn = IdUtils.getPreservationId(PreservationMetadataType.REPRESENTATION, aipId, representationId, null, null);
-    StoragePath path = ModelUtils.getPreservationMetadataStoragePath(urn,
-      PreservationMetadataType.REPRESENTATION, aipId, representationId);
+    String urn = IdUtils.getPreservationId(PreservationMetadataType.REPRESENTATION, aipId, representationId, null,
+      null);
+    StoragePath path = ModelUtils.getPreservationMetadataStoragePath(urn, PreservationMetadataType.REPRESENTATION,
+      aipId, representationId);
     return storage.getBinary(path);
   }
 
   public Binary retrievePreservationFile(String aipId, String representationId, List<String> fileDirectoryPath,
     String fileId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
-    return retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId,
-      PreservationMetadataType.FILE);
+    return retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId, PreservationMetadataType.FILE);
   }
 
   public Binary retrievePreservationFile(String aipId, String representationId, List<String> fileDirectoryPath,
@@ -852,8 +852,7 @@ public class ModelService extends ModelObservable {
     String representationId, List<String> fileDirectoryPath, String fileId, ContentPayload payload, boolean notify)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
     AlreadyExistsException {
-    String identifier = IdUtils.getFileId(aipId, representationId,
-      fileDirectoryPath, fileId);
+    String identifier = IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId);
     String urn = URNUtils.createRodaPreservationURN(type, identifier);
     return createPreservationMetadata(type, urn, aipId, representationId, fileDirectoryPath, fileId, payload, notify);
   }
@@ -1615,6 +1614,16 @@ public class ModelService extends ModelObservable {
       IOUtils.closeQuietly(inputStream);
     }
     return ret;
+  }
+
+  public CloseableIterable<OptionalWithCause<Risk>> listRisks()
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    final boolean recursive = false;
+
+    final CloseableIterable<Resource> resourcesIterable = storage
+      .listResourcesUnderContainer(ModelUtils.getRiskContainerPath(), recursive);
+
+    return ResourceParseUtils.convert(getStorage(), resourcesIterable, Risk.class);
   }
 
   public BinaryVersion retrieveVersion(String id, String versionId)

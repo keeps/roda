@@ -185,8 +185,8 @@ public class IngestJobReportList extends BasicAsyncTableCell<Report> {
     // TODO externalize strings into constants
     addColumn(sourceObjectColumn, messages.showSIPExtended(), true, false);
     addColumn(outcomeObjectColumn, messages.showAIPExtended(), true, false);
-    addColumn(updatedDateColumn, messages.reportLastRunTask(), true, false, 11);
-    addColumn(lastPluginRunColumn, messages.reportLastUpdatedAt(), true, false);
+    addColumn(updatedDateColumn, messages.reportLastUpdatedAt(), true, false, 11);
+    addColumn(lastPluginRunColumn, messages.reportLastRunTask(), true, false);
     addColumn(lastPluginRunStateColumn, messages.reportStatus(), true, false, 8);
     addColumn(completionStatusColumn, messages.reportProgress(), true, false, 8);
 
