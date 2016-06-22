@@ -230,7 +230,7 @@ public class Browse extends Composite {
     String summary = messages.listOfItems();
     boolean selectable = true;
 
-    aipList = new AIPList(Filter.NONE, justActive, Facets.NONE, summary, selectable);
+    aipList = new AIPList(Filter.NULL, justActive, Facets.NONE, summary, selectable);
     initWidget(uiBinder.createAndBindUi(this));
 
     browseDescription.add(new HTMLWidgetWrapper("BrowseDescription.html"));

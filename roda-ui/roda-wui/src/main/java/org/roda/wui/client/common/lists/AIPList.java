@@ -127,7 +127,7 @@ public class AIPList extends BasicAsyncTableCell<IndexedAIP> {
     AsyncCallback<IndexResult<IndexedAIP>> callback) {
 
     Filter filter = getFilter();
-    if (filter == Filter.NONE) {
+    if (filter == Filter.NULL) {
       // search not yet ready, deliver empty result
       callback.onSuccess(null);
     } else {

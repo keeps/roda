@@ -16,12 +16,13 @@ import java.util.List;
  * sets or lists, to filter the elements in the set or list.
  * 
  * @author Rui Castro
+ * @author Luis Faria <lfaria@keep.pt>
  */
 public class Filter implements Serializable {
   private static final long serialVersionUID = -5544859696646804386L;
 
   public static final Filter ALL = new Filter();
-  public static final Filter NONE = null;
+  public static final Filter NULL = null;
 
   private List<FilterParameter> parameters = new ArrayList<FilterParameter>();
 
