@@ -150,7 +150,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin from index", e);
-      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, Optional.ofNullable(e.getMessage()));
+      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
     }
 
   }
@@ -183,7 +183,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on AIPs", e);
-      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, Optional.ofNullable(e.getMessage()));
+      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
     }
 
   }
@@ -216,7 +216,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on Representations", e);
-      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, Optional.ofNullable(e.getMessage()));
+      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
     }
   }
 
@@ -248,7 +248,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on Files", e);
-      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, Optional.ofNullable(e.getMessage()));
+      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
     }
 
   }
@@ -288,7 +288,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on all AIPs", e);
-      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, Optional.ofNullable(e.getMessage()));
+      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
     }
 
   }
@@ -331,7 +331,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on all representations", e);
-      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, Optional.ofNullable(e.getMessage()));
+      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
     }
 
   }
@@ -390,7 +390,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on all files", e);
-      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, Optional.ofNullable(e.getMessage()));
+      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
     }
 
   }
@@ -424,7 +424,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on transferred resources", e);
-      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, Optional.ofNullable(e.getMessage()));
+      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
     }
   }
 
@@ -441,7 +441,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin", e);
-      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, Optional.ofNullable(e.getMessage()));
+      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
     }
   }
 

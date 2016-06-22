@@ -246,6 +246,10 @@ public final class PluginHelper {
     RodaCoreFactory.getPluginOrchestrator().updateJobState(plugin, state, stateDetails);
   }
 
+  public static <T extends Serializable> void updateJobState(Plugin<T> plugin, JOB_STATE state, Throwable throwable) {
+    updateJobState(plugin, state, Optional.ofNullable(throwable.getClass().getName() + ": " + throwable.getMessage()));
+  }
+
   /**
    * Updates the job status for a particular plugin instance
    */

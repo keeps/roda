@@ -40,10 +40,22 @@ public class Messages {
     public JOB_STATE state;
     public Optional<String> stateDatails;
 
+    public JobStateUpdated(Plugin<?> plugin, JOB_STATE state) {
+      this.plugin = plugin;
+      this.state = state;
+      this.stateDatails = Optional.empty();
+    }
+
     public JobStateUpdated(Plugin<?> plugin, JOB_STATE state, Optional<String> stateDatails) {
       this.plugin = plugin;
       this.state = state;
       this.stateDatails = stateDatails;
+    }
+
+    public JobStateUpdated(Plugin<?> plugin, JOB_STATE state, Throwable throwable) {
+      this.plugin = plugin;
+      this.state = state;
+      this.stateDatails = Optional.ofNullable(throwable.getClass().getName() + ": " + throwable.getMessage());
     }
 
     @Override

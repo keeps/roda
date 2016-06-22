@@ -8,7 +8,6 @@
 package org.roda.core.plugins.orchestrate.akka;
 
 import java.io.Serializable;
-import java.util.Optional;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.GenericException;
@@ -58,7 +57,7 @@ public class AkkaJobActor extends UntypedActor {
       ActorRef jobInfoActor = getContext().actorOf(Props.create(AkkaJobInfoActor.class, plugin), jobId);
       RodaCoreFactory.getPluginOrchestrator().setInitialJobInfo(jobId, jobInfoActor);
 
-      jobInfoActor.tell(new Messages.JobStateUpdated(plugin, JOB_STATE.STARTED, Optional.empty()), ActorRef.noSender());
+      jobInfoActor.tell(new Messages.JobStateUpdated(plugin, JOB_STATE.STARTED), ActorRef.noSender());
 
       try {
         if (job.getSourceObjects() instanceof SelectedItemsAll<?>) {
@@ -71,9 +70,7 @@ public class AkkaJobActor extends UntypedActor {
           runFromFilter(job, plugin);
         }
       } catch (Exception e) {
-        jobInfoActor.tell(
-          new Messages.JobStateUpdated(plugin, JOB_STATE.FAILED_TO_COMPLETE, Optional.ofNullable(e.getMessage())),
-          ActorRef.noSender());
+        jobInfoActor.tell(new Messages.JobStateUpdated(plugin, JOB_STATE.FAILED_TO_COMPLETE, e), ActorRef.noSender());
       }
 
     } else {
@@ -145,8 +142,7 @@ public class AkkaJobActor extends UntypedActor {
 
   private SupervisorStrategy strategy = new OneForOneStrategy(false, DeciderBuilder.matchAny(e -> {
     for (ActorRef actorRef : getContext().getChildren()) {
-      actorRef.tell(new Messages.JobStateUpdated(null, JOB_STATE.FAILED_TO_COMPLETE,
-        Optional.ofNullable(e.getClass().getName() + ": " + e.getMessage())), ActorRef.noSender());
+      actorRef.tell(new Messages.JobStateUpdated(null, JOB_STATE.FAILED_TO_COMPLETE, e), ActorRef.noSender());
     }
     return SupervisorStrategy.resume();
   }).build());
