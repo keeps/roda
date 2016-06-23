@@ -818,20 +818,25 @@ public class PremisV3Utils {
     PreservationMetadata pm = null;
 
     if (StringUtils.isNotBlank(username)) {
-      RODAMember member = index.retrieve(RODAMember.class, username);
 
       String id = IdUtils.getUserAgentId(username);
-      ContentPayload agentPayload;
-
+      String fullName = "";
       String extension = "";
       String note = "";
-      if (member instanceof RodaUser) {
-        RodaUser user = (RodaUser) member;
-        note = user.getEmail();
+      String version = "";
+
+      try {
+        RODAMember member = index.retrieve(RODAMember.class, username);
+        fullName = member.getFullName();
+        if (member instanceof RodaUser) {
+          RodaUser user = (RodaUser) member;
+          note = user.getEmail();
+        }
+      } catch (NotFoundException e) {
+        LOGGER.warn("Could not find user and add its details to the PREMIS agent", e);
       }
 
-      String version = "";
-      agentPayload = PremisV3Utils.createPremisAgentBinary(id, member.getFullName(), PreservationAgentType.PERSON,
+      ContentPayload agentPayload = PremisV3Utils.createPremisAgentBinary(id, fullName, PreservationAgentType.PERSON,
         extension, note, version);
       pm = model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload, notify);
 
@@ -840,18 +845,4 @@ public class PremisV3Utils {
     return pm;
   }
 
-  // /**
-  // * @deprecated
-  // */
-  // @Deprecated
-  // public static IndexedPreservationAgent getPreservationUserAgent(Plugin<?>
-  // plugin, ModelService model,
-  // IndexService index) throws NotFoundException, GenericException {
-  // Job job = PluginHelper.getJobFromIndex(plugin, index);
-  // String id = job.getUsername();
-  // IndexedPreservationAgent agent = new IndexedPreservationAgent();
-  // agent.setId(id);
-  // agent.setName(plugin.getName());
-  // return agent;
-  // }
 }

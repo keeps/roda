@@ -18,6 +18,7 @@ import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.preingest.PreIngest;
@@ -27,7 +28,6 @@ import org.roda.wui.client.management.NotificationRegister;
 import org.roda.wui.client.management.Profile;
 import org.roda.wui.client.management.Register;
 import org.roda.wui.client.management.UserLog;
-import org.roda.wui.client.planning.AgentRegister;
 import org.roda.wui.client.planning.FormatRegister;
 import org.roda.wui.client.planning.Planning;
 import org.roda.wui.client.planning.RiskRegister;
@@ -217,9 +217,6 @@ public class Menu extends Composite {
   }
 
   private void updateVisibles(RodaUser user) {
-    // FIXME 20160518 hsilva: this should not be info & it should be more
-    // efficient(avoid string concatenation)
-    logger.info("Updating menu visibility for user " + user);
 
     leftMenu.clearItems();
     leftMenuItemCount = 0;
@@ -334,11 +331,19 @@ public class Menu extends Composite {
   private void setLanguageMenu() {
     String locale = LocaleInfo.getCurrentLocale().getLocaleName();
 
-    // TODO get this from configuration
+    // Getting supported languages and their display name
     Map<String, String> supportedLanguages = new HashMap<String, String>();
-    supportedLanguages.put("en", messages.lang_en());
-    supportedLanguages.put("pt_PT", messages.lang_pt());
-    
+    for (String localeName : LocaleInfo.getAvailableLocaleNames()) {
+      if (!"default".equals(localeName)) {
+
+        String languageDisplayName = messages.lang(localeName);
+        if (StringUtils.isBlank(languageDisplayName)) {
+          languageDisplayName = LocaleInfo.getLocaleNativeDisplayName(localeName);
+        }
+
+        supportedLanguages.put(localeName, languageDisplayName);
+      }
+    }
 
     languagesMenu.clearItems();
 

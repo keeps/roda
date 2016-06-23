@@ -2101,14 +2101,7 @@ public interface ClientMessages extends Messages {
 
   /**** Language Switcher ****/
 
-  @Key("lang.en")
-  String lang_en();
-
-  @Key("lang.pt")
-  String lang_pt();
-
-  @Key("lang.cz")
-  String lang_cz();
+  String lang(@Select String localeName);
 
   /************* Metadata creation and edition ****************/
 
