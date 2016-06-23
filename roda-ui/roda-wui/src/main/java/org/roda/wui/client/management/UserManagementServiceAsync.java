@@ -41,11 +41,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  */
 public interface UserManagementServiceAsync {
 
-  public void getMemberCount(Filter filter, AsyncCallback<Long> callback);
-
-  void findMembers(Filter filter, Sorter sorter, Sublist sublist, Facets facets, String localeString,
-    AsyncCallback<IndexResult<RODAMember>> callback);
-
   /**
    * Get a group
    *

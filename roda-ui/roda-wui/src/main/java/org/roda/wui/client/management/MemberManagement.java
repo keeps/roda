@@ -73,6 +73,8 @@ public class MemberManagement extends Composite {
   public static MemberManagement getInstance() {
     if (instance == null) {
       instance = new MemberManagement();
+    } else {
+      instance.refresh();
     }
     return instance;
   }
@@ -114,7 +116,7 @@ public class MemberManagement extends Composite {
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.MEMBERS_IS_ACTIVE),
       new SimpleFacetParameter(RodaConstants.MEMBERS_IS_USER),
       new SimpleFacetParameter(RodaConstants.MEMBERS_GROUPS_ALL));
-    // TODO externalize string
+
     list = new RodaMemberList(filter, facets, messages.usersAndGroupsTitle(), false);
     facetIsActive = new FlowPanel();
     facetIsUser = new FlowPanel();
@@ -144,9 +146,12 @@ public class MemberManagement extends Composite {
     });
   }
 
+  private void refresh() {
+    list.refresh();
+  }
+
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 0) {
-      list.refresh();
       callback.onSuccess(this);
     } else if (historyTokens.size() == 1) {
       if (historyTokens.get(0).equals(CreateUser.RESOLVER.getHistoryToken())) {

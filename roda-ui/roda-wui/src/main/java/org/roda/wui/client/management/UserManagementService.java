@@ -30,7 +30,6 @@ import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
-import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
 
@@ -67,12 +66,6 @@ public interface UserManagementService extends RemoteService {
       return instance;
     }
   }
-
-  public Long getMemberCount(Filter filter)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException;
-
-  public IndexResult<RODAMember> findMembers(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
-    String localeString) throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 
   /**
    * Get a group

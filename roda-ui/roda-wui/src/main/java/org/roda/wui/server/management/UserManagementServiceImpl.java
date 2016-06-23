@@ -68,21 +68,6 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public Long getMemberCount(Filter filter)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
-    return UserManagement.countMembers(user, filter);
-  }
-
-  @Override
-  public IndexResult<RODAMember> findMembers(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
-    String localeString) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
-    IndexResult<RODAMember> result = UserManagement.findMembers(user, filter, sorter, sublist, facets);
-    return I18nUtility.translate(result, RODAMember.class, localeString);
-  }
-
-  @Override
   public Group getGroup(String groupname) throws AuthorizationDeniedException, GenericException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return UserManagement.retrieveGroup(user, groupname);

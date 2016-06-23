@@ -19,7 +19,7 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.user.RODAMember;
-import org.roda.wui.client.management.UserManagementService;
+import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
@@ -110,8 +110,8 @@ public class SimpleRodaMemberList extends BasicAsyncTableCell<RODAMember> {
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
-    UserManagementService.Util.getInstance().findMembers(filter, sorter, sublist, getFacets(),
-      LocaleInfo.getCurrentLocale().getLocaleName(), callback);
+    BrowserService.Util.getInstance().find(RODAMember.class.getName(), filter, sorter, sublist, getFacets(),
+      LocaleInfo.getCurrentLocale().getLocaleName(), getJustActive(), callback);
   }
 
   @Override
