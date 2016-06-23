@@ -38,7 +38,6 @@ import org.roda.wui.common.client.widgets.Toast;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -96,8 +95,6 @@ public class ShowPreservationEvent extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
-  @SuppressWarnings("unused")
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   @UiField
@@ -238,11 +235,13 @@ public class ShowPreservationEvent extends Composite {
       || StringUtils.isNotBlank(event.getEventOutcomeDetailExtension()));
 
     String eventOutcome = event.getEventOutcome();
-    eventOutcomeLabel.setText(eventOutcome.toLowerCase());
+    eventOutcomeLabel.setText(eventOutcome.toLowerCase().replace('_', ' '));
     if (PluginState.SUCCESS.toString().equalsIgnoreCase(eventOutcome)) {
       eventOutcomeLabel.setStyleName("label-success");
     } else if (PluginState.FAILURE.toString().equalsIgnoreCase(eventOutcome)) {
       eventOutcomeLabel.setStyleName("label-danger");
+    } else if (PluginState.PARTIAL_SUCCESS.toString().equalsIgnoreCase(eventOutcome)) {
+      eventOutcomeLabel.setStyleName("label-warning");
     }
 
     if (StringUtils.isNotBlank(event.getEventOutcomeDetailNote())) {

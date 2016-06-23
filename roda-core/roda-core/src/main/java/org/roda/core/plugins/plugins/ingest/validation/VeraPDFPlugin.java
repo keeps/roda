@@ -178,6 +178,7 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
         PluginState pluginResultState = PluginState.SUCCESS;
         PluginState reportState = PluginState.SUCCESS;
         ValidationReport validationReport = new ValidationReport();
+        boolean hasNonPdfFiles = false;
 
         for (Representation representation : aip.getRepresentations()) {
           List<String> resourceList = new ArrayList<String>();
@@ -236,6 +237,7 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
                       validationReport.addIssue(issue);
                     } else {
                       pluginResultState = PluginState.FAILURE;
+                      hasNonPdfFiles = true;
                     }
                   }
                 }
@@ -262,13 +264,18 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
         jobPluginInfo.incrementObjectsProcessed(reportState);
         reportItem.setPluginState(reportState);
 
-        if (ignoreFiles) {
+        if (ignoreFiles && validationReport.getIssues().size() > 0) {
           reportItem.setHtmlPluginDetails(true)
             .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
         }
 
+        if (hasNonPdfFiles) {
+          reportItem.setPluginDetails("Non PDF files were not ignored");
+        }
+
         report.addReport(reportItem);
         PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+        PluginHelper.updateJobInformation(this, jobPluginInfo);
       }
 
       jobPluginInfo.finalizeInfo();
@@ -299,6 +306,7 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
         StringBuilder details = new StringBuilder();
         AIP aip = model.retrieveAIP(representation.getAipId());
         ValidationReport validationReport = new ValidationReport();
+        boolean hasNonPdfFiles = false;
 
         try {
           LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
@@ -349,6 +357,7 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
                     validationReport.addIssue(issue);
                   } else {
                     reportState = PluginState.FAILURE;
+                    hasNonPdfFiles = true;
                   }
                 }
               }
@@ -374,15 +383,18 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
         jobPluginInfo.incrementObjectsProcessed(reportState);
         reportItem.setPluginState(reportState);
 
-        if (ignoreFiles) {
-          reportItem.setHtmlPluginDetails(true);
-          if (!validationReport.getIssues().isEmpty()) {
-            reportItem.setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
-          }
+        if (ignoreFiles && !validationReport.getIssues().isEmpty()) {
+          reportItem.setHtmlPluginDetails(true)
+            .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
+        }
+
+        if (hasNonPdfFiles) {
+          reportItem.setPluginDetails("Non PDF files were not ignored");
         }
 
         report.addReport(reportItem);
         PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+        PluginHelper.updateJobInformation(this, jobPluginInfo);
       }
 
       jobPluginInfo.finalizeInfo();
@@ -453,6 +465,7 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
                 reportItem.setPluginDetails("This file was ignored.");
               } else {
                 pluginResultState = PluginState.FAILURE;
+                reportItem.setPluginDetails("This file was not ignored.");
               }
             }
           }
@@ -466,6 +479,7 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
           reportItem.setPluginState(reportState);
           report.addReport(reportItem);
           PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+          PluginHelper.updateJobInformation(this, jobPluginInfo);
         }
       } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
         | IOException | IllegalArgumentException | JAXBException | VeraPDFException e) {

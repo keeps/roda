@@ -13,5 +13,16 @@
 	</parent>
 	<modules>
 		<!--<module>misc/roda-plugin-misc-fixity</module>-->
+		<module>fixity_check/roda-plugin-fixity-check</module>
+		<module>characterization/roda-plugin-characterization-premisskeleton</module>
+		<module>characterization/roda-plugin-characterization-siegfried</module>
+		<module>characterization/roda-plugin-characterization-tika</module>
+		<module>format_validation/roda-plugin-format_validation-descriptive_metadata</module>
+		<module>format_validation/roda-plugin-format_validation-verapdf</module>
+		<module>format_validation/roda-plugin-format_validation-digital_signature</module>
+		<module>format_validation/roda-plugin-format_validation-antivirus</module>
+		<module>format_conversion/roda-plugin-format_conversion-imagemagick</module>
+		<module>reindex/roda-plugin-reindex-aip</module>
+		<module>risk_management/roda-plugin-risk_management-riskjob</module>
 	</modules>
 </project>

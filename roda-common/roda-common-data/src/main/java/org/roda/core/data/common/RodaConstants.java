@@ -347,7 +347,7 @@ public final class RodaConstants {
   public static final String MEMBERS_IS_USER = "isUser";
   public static final String MEMBERS_GROUPS_ALL = "groupsAll";
   public static final String MEMBERS_ROLES_ALL = "rolesAll";
-  
+
   public static final String MEMBERS_EMAIL = "email";
 
   public static final String TRANSFERRED_RESOURCE_ID = "id";
@@ -431,7 +431,7 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_REPORTING_CLASS = "parameter.reporting_class";
 
   public static final String PLUGIN_CATEGORY_FORMAT_CONVERSION = "format_conversion";
-  public static final String PLUGIN_CATEGORY_CHARACTERISATION = "characterisation";
+  public static final String PLUGIN_CATEGORY_CHARACTERIZATION = "characterization";
   public static final String PLUGIN_CATEGORY_FORMAT_VALIDATION = "format_validation";
   public static final String PLUGIN_CATEGORY_RISK_MANAGEMENT = "risk_management";
   public static final String PLUGIN_CATEGORY_FEATURE_EXTRACTION = "feature_extraction";

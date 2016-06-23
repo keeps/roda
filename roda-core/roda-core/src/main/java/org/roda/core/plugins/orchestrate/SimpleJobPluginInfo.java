@@ -47,9 +47,10 @@ public class SimpleJobPluginInfo extends JobPluginInfo {
     for (JobPluginInfo jpi : jobInfos.values()) {
       SimpleJobPluginInfo pluginInfo = (SimpleJobPluginInfo) jpi;
 
-      float pluginPercentage = pluginInfo.isDone() ? 1 : 0;
-      float pluginWeight = ((float) pluginInfo.getSourceObjectsCount()) / taskObjectsCount;
-      percentage += (pluginPercentage * pluginWeight);
+      // float pluginPercentage = pluginInfo.isDone() ? 1 : 0;
+      // float pluginWeight = ((float) pluginInfo.getSourceObjectsCount()) /
+      // taskObjectsCount;
+      // percentage += (pluginPercentage * pluginWeight);
 
       sourceObjectsProcessedWithSuccess += pluginInfo.getSourceObjectsProcessedWithSuccess();
       sourceObjectsProcessedWithFailure += pluginInfo.getSourceObjectsProcessedWithFailure();
@@ -57,14 +58,10 @@ public class SimpleJobPluginInfo extends JobPluginInfo {
       sourceObjectsCount += pluginInfo.getSourceObjectsCount();
     }
 
-    // FIXME 20160621: temporary strategy to avoid random percentages (division
-    // by 0)
-    if (taskObjectsCount == 0) {
-      percentage = 1;
-    }
-
     SimpleJobPluginInfo infoUpdated = new SimpleJobPluginInfo();
-    infoUpdated.setCompletionPercentage(Math.round((percentage * 100)));
+    int newPercentage = Math
+      .round((((sourceObjectsProcessedWithSuccess + sourceObjectsProcessedWithFailure) * 100) / sourceObjectsCount));
+    infoUpdated.setCompletionPercentage(newPercentage);
     infoUpdated.setSourceObjectsCount(sourceObjectsCount);
     infoUpdated.setSourceObjectsBeingProcessed(sourceObjectsBeingProcessed);
     infoUpdated.setSourceObjectsProcessedWithSuccess(sourceObjectsProcessedWithSuccess);

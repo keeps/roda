@@ -167,7 +167,7 @@ public class RiskRegister extends Composite {
       new SimpleFacetParameter(RodaConstants.RISK_POS_MITIGATION_SEVERITY_LEVEL),
       new SimpleFacetParameter(RodaConstants.RISK_MITIGATION_OWNER));
 
-    riskList = new RiskList(null, facets, messages.risksTitle(), true);
+    riskList = new RiskList(Filter.NULL, facets, messages.risksTitle(), true);
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.RISK_SEARCH, messages.riskRegisterSearchPlaceHolder(),
       false, false);
@@ -248,7 +248,7 @@ public class RiskRegister extends Composite {
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 0) {
       riskRegisterTitle.setText(messages.riskRegisterTitle());
-      riskList.setFilter(null);
+      riskList.setFilter(Filter.ALL);
       riskList.refresh();
       riskRegisterSubtitle.setVisible(false);
       callback.onSuccess(this);

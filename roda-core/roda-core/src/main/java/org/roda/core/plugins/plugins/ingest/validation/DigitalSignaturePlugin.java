@@ -205,6 +205,7 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
         Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
         PluginState reportState = PluginState.SUCCESS;
         ValidationReport validationReport = new ValidationReport();
+        boolean hasNonPdfFiles = false;
 
         try {
           for (Representation representation : aip.getRepresentations()) {
@@ -307,6 +308,7 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
                       validationReport.addIssue(issue);
                     } else {
                       reportState = PluginState.FAILURE;
+                      hasNonPdfFiles = true;
                     }
 
                   }
@@ -337,9 +339,13 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
           jobPluginInfo.incrementObjectsProcessed(reportState);
           reportItem.setPluginState(reportState);
 
-          if (ignoreFiles) {
+          if (ignoreFiles && validationReport.getIssues().size() > 0) {
             reportItem.setHtmlPluginDetails(true)
               .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
+          }
+
+          if (hasNonPdfFiles) {
+            reportItem.setPluginDetails("Non PDF files were not ignored");
           }
 
         } catch (Throwable e) {
@@ -388,6 +394,7 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
           Representation.class, AIPState.INGEST_PROCESSING);
         PluginState reportState = PluginState.SUCCESS;
         ValidationReport validationReport = new ValidationReport();
+        boolean hasNonPdfFiles = false;
 
         try {
           LOGGER.debug("Processing representation {}", representation);
@@ -478,6 +485,7 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
                     validationReport.addIssue(issue);
                   } else {
                     reportState = PluginState.FAILURE;
+                    hasNonPdfFiles = true;
                   }
                 }
               }
@@ -508,6 +516,10 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
           if (ignoreFiles) {
             reportItem.setHtmlPluginDetails(true)
               .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
+          }
+
+          if (hasNonPdfFiles) {
+            reportItem.setPluginDetails("Non PDF files were not ignored");
           }
 
         } catch (Throwable e) {
@@ -644,6 +656,7 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
                 reportItem.setPluginDetails("This file was ignored.");
               } else {
                 reportState = PluginState.FAILURE;
+                reportItem.setPluginDetails("This file was not ignored.");
               }
             }
           }

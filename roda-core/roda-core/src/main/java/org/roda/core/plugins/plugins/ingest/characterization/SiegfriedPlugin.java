@@ -223,7 +223,7 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CHARACTERISATION);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CHARACTERIZATION);
   }
 
 }

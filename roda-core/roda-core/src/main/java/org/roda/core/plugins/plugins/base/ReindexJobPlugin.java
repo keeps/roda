@@ -159,7 +159,7 @@ public class ReindexJobPlugin extends AbstractPlugin<Job> {
           report.setPluginState(PluginState.FAILURE);
 
           ValidationIssue issue = new ValidationIssue();
-          issue.setMessage(e.getMessage());
+          issue.setMessage(e.getMessage() + " on: " + resource.getStoragePath());
           validationReport.addIssue(issue);
         }
       }

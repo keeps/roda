@@ -144,7 +144,7 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
             AIPState.INGEST_PROCESSING);
           PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
           LOGGER.debug("Processing AIP {}", aip.getId());
-          Exception ex = null;
+          String outcomeDetailExtension = "";
           try {
             for (Representation representation : aip.getRepresentations()) {
               LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
@@ -156,7 +156,7 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
             jobPluginInfo.incrementObjectsProcessedWithSuccess();
             reportItem.setPluginState(PluginState.SUCCESS);
           } catch (Exception e) {
-            ex = e;
+            outcomeDetailExtension = e.getMessage();
             LOGGER.error("Error running Tika on AIP " + aip.getId() + ": " + e.getMessage());
             if (reportItem != null) {
               String details = reportItem.getPluginDetails();
@@ -164,14 +164,12 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
                 details = "";
               }
               details += e.getMessage();
-              reportItem.setPluginDetails(details);
+              reportItem.setPluginDetails(details).setPluginState(PluginState.FAILURE);
             } else {
               LOGGER.error("Error running Apache Tika", e);
             }
 
             jobPluginInfo.incrementObjectsProcessedWithFailure();
-            reportItem.setPluginState(PluginState.FAILURE)
-              .setPluginDetails("Error running Tika on AIP " + aip.getId() + ": " + e.getMessage());
           }
 
           report.addReport(reportItem);
@@ -180,10 +178,6 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
           if (createsPluginEvent) {
             try {
               boolean notify = true;
-              String outcomeDetailExtension = "";
-              if (ex != null) {
-                outcomeDetailExtension = ex.getMessage();
-              }
               PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(),
                 outcomeDetailExtension, notify);
             } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
@@ -274,7 +268,7 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_FEATURE_EXTRACTION);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CHARACTERIZATION);
   }
 
 }

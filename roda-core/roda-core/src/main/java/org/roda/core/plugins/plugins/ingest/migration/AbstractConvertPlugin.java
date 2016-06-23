@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -85,8 +84,9 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
         true, false, "Output file format to be converted."));
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES, "Ignore non PDF files",
-        PluginParameterType.BOOLEAN, "true", false, false, "Ignore files that are not recognised as PDF"));
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES, "Ignore other files",
+        PluginParameterType.BOOLEAN, "true", false, false,
+        "Ignore files that have a different format from the indicated."));
   }
 
   protected AbstractConvertPlugin() {
@@ -201,6 +201,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
         boolean notify = true;
         PluginState reportState = PluginState.SUCCESS;
         ValidationReport validationReport = new ValidationReport();
+        boolean hasNonPdfFiles = false;
 
         for (Representation representation : aip.getRepresentations()) {
           List<File> alteredFiles = new ArrayList<File>();
@@ -211,7 +212,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
           // FIXME 20160516 hsilva: see how to set initial
           // initialOutcomeObjectState
           Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
-            newRepresentationID, Representation.class, AIPState.ACTIVE);
+            IdUtils.getRepresentationId(representation), Representation.class, AIPState.ACTIVE);
 
           try {
             LOGGER.debug("Processing representation {}", representation);
@@ -256,8 +257,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
                         LOGGER.debug("Creating a new representation {} on AIP {}", newRepresentationID, aip.getId());
                         boolean original = false;
                         newRepresentations.add(newRepresentationID);
-                        // TODO the concrete plugin should
-                        // define the
+                        // TODO the concrete plugin should define the
                         // representation type
                         String newRepresentationType = representation.getType();
                         model.createRepresentation(aip.getId(), newRepresentationID, original, newRepresentationType,
@@ -297,11 +297,12 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
 
                     if (ignoreFiles) {
                       ValidationIssue issue = new ValidationIssue();
-                      issue.setMessage(
-                        StringUtils.join(Arrays.asList(representation.getId(), file.getPath(), file.getId()), '/'));
+                      issue.setMessage(ModelUtils.getFileStoragePath(file).toString());
                       validationReport.addIssue(issue);
                     } else {
-                      reportState = PluginState.FAILURE;
+                      pluginResultState = PluginState.FAILURE;
+                      reportState = pluginResultState;
+                      hasNonPdfFiles = true;
                     }
                   }
                 }
@@ -309,13 +310,17 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
                 LOGGER.error("Cannot process AIP representation file", oFile.getCause());
               }
             }
-            IOUtils.closeQuietly(allFiles);
 
+            IOUtils.closeQuietly(allFiles);
             reportItem.setPluginState(pluginResultState);
 
-            if (ignoreFiles) {
+            if (ignoreFiles && validationReport.getIssues().size() > 0) {
               reportItem.setHtmlPluginDetails(true)
                 .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
+            }
+
+            if (hasNonPdfFiles) {
+              reportItem.setPluginDetails("Certain files were not ignored");
             }
 
             // add unchanged files to the new representation if created
@@ -382,6 +387,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
         Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
           Representation.class, AIPState.ACTIVE);
         ValidationReport validationReport = new ValidationReport();
+        boolean hasNonPdfFiles = false;
 
         try {
           LOGGER.debug("Processing representation {}", representation);
@@ -423,8 +429,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
                       LOGGER.debug("Creating a new representation {} on AIP {}", newRepresentationID, aipId);
                       boolean original = false;
                       newRepresentations.add(newRepresentationID);
-                      // TODO the concrete plugin should
-                      // define the
+                      // TODO the concrete plugin should define the
                       // representation type
                       String newRepresentationType = representation.getType();
                       model.createRepresentation(aipId, newRepresentationID, original, newRepresentationType, notify);
@@ -465,6 +470,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
                     validationReport.addIssue(issue);
                   } else {
                     pluginResultState = PluginState.FAILURE;
+                    hasNonPdfFiles = true;
                   }
                 }
               }
@@ -479,6 +485,10 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
           if (ignoreFiles) {
             reportItem.setHtmlPluginDetails(true)
               .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
+          }
+
+          if (hasNonPdfFiles) {
+            reportItem.setPluginDetails("Certain files were not ignored");
           }
 
           report.addReport(reportItem);
@@ -619,6 +629,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
                 reportItem.setPluginDetails("This file was ignored.");
               } else {
                 pluginResultState = PluginState.FAILURE;
+                reportItem.setPluginDetails("This file was not ignored.");
               }
             }
           }

@@ -148,24 +148,24 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
     AsyncCallback<IndexResult<IndexedRisk>> callback) {
 
     Filter filter = getFilter();
-    // if (filter == Filter.NONE) {
-    // // search not yet ready, deliver empty result
-    // callback.onSuccess(null);
-    // } else {
+    if (filter == Filter.NULL) {
+      // search not yet ready, deliver empty result
+      callback.onSuccess(null);
+    } else {
 
-    Map<Column<IndexedRisk, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedRisk, ?>, List<String>>();
-    columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.RISK_NAME));
-    columnSortingKeyMap.put(identifiedOnColumn, Arrays.asList(RodaConstants.RISK_IDENTIFIED_ON));
-    columnSortingKeyMap.put(categoryColumn, Arrays.asList(RodaConstants.RISK_CATEGORY));
-    columnSortingKeyMap.put(ownerColumn, Arrays.asList(RodaConstants.RISK_MITIGATION_OWNER));
-    columnSortingKeyMap.put(severityColumn, Arrays.asList(RodaConstants.RISK_POS_MITIGATION_SEVERITY));
-    columnSortingKeyMap.put(objectCounterColumn, Arrays.asList(RodaConstants.RISK_OBJECTS_SIZE));
+      Map<Column<IndexedRisk, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedRisk, ?>, List<String>>();
+      columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.RISK_NAME));
+      columnSortingKeyMap.put(identifiedOnColumn, Arrays.asList(RodaConstants.RISK_IDENTIFIED_ON));
+      columnSortingKeyMap.put(categoryColumn, Arrays.asList(RodaConstants.RISK_CATEGORY));
+      columnSortingKeyMap.put(ownerColumn, Arrays.asList(RodaConstants.RISK_MITIGATION_OWNER));
+      columnSortingKeyMap.put(severityColumn, Arrays.asList(RodaConstants.RISK_POS_MITIGATION_SEVERITY));
+      columnSortingKeyMap.put(objectCounterColumn, Arrays.asList(RodaConstants.RISK_OBJECTS_SIZE));
 
-    Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
+      Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
-    BrowserService.Util.getInstance().find(IndexedRisk.class.getName(), filter, sorter, sublist, getFacets(),
-      LocaleInfo.getCurrentLocale().getLocaleName(), getJustActive(), callback);
-    // }
+      BrowserService.Util.getInstance().find(IndexedRisk.class.getName(), filter, sorter, sublist, getFacets(),
+        LocaleInfo.getCurrentLocale().getLocaleName(), getJustActive(), callback);
+    }
 
   }
 
