@@ -20,14 +20,21 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
+import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.UserUtility;
+import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.ExportType;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.formats.Format;
@@ -40,7 +47,9 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.plugins.plugins.base.ActionLogCleanerPlugin;
 import org.roda.core.plugins.plugins.base.ExportAIPPlugin;
 import org.roda.core.plugins.plugins.base.ReindexAIPPlugin;
@@ -72,7 +81,7 @@ public class ManagementTasksResource extends RodaCoreService {
   @POST
   @Path("/index/reindex")
   public Response executeIndexReindexTask(
-    @ApiParam(value = "", allowableValues = "aip,job,risk,riskincidence,agent,format,notification,actionlogs,transferred_resources", defaultValue = "aip") @QueryParam("entity") String entity,
+    @ApiParam(value = "", allowableValues = "aip,job,risk,riskincidence,agent,format,notification,actionlogs,transferred_resources,users_and_groups", defaultValue = "aip") @QueryParam("entity") String entity,
     @QueryParam("params") List<String> params) throws AuthorizationDeniedException {
     Date startDate = new Date();
 
@@ -155,6 +164,8 @@ public class ManagementTasksResource extends RodaCoreService {
       response = createJobToReindexTransferredResources(user, startDate, params);
     } else if ("actionlogs".equals(entity)) {
       response = createJobToReindexActionlogs(user, startDate, params);
+    } else if ("users_and_groups".equals(entity)) {
+      response = reindexUsersAndGroups(user, startDate, params);
     }
     return Response.ok().entity(response).build();
   }
@@ -349,6 +360,30 @@ public class ManagementTasksResource extends RodaCoreService {
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
       | JobAlreadyStartedException e) {
       LOGGER.error("Error creating reindex Action logs job", e);
+    }
+    return response;
+  }
+
+  private ApiResponseMessage reindexUsersAndGroups(RodaUser user, Date startDate, List<String> params) {
+    ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
+    try {
+      for (User ldapUser : UserUtility.getLdapUtility().getUsers(new Filter())) {
+        LOGGER.debug("User to be indexed: {}", ldapUser);
+        RodaCoreFactory.getModelService().addUser(ldapUser, false, true);
+      }
+      for (Group ldapGroup : UserUtility.getLdapUtility().getGroups(new Filter())) {
+        LOGGER.debug("Group to be indexed: {}", ldapGroup);
+        RodaCoreFactory.getModelService().addGroup(ldapGroup, false, true);
+      }
+
+      response.setMessage("Ended users and groups reindex");
+      // register action
+      long duration = new Date().getTime() - startDate.getTime();
+      registerAction(user, "ManagementTasks", "reindex users and groups", null, duration);
+    } catch (NotFoundException | GenericException | AlreadyExistsException | EmailAlreadyExistsException
+      | UserAlreadyExistsException | IllegalOperationException | LdapUtilityException e) {
+      response.setMessage("Error reindexing users and groups: " + e.getMessage());
+      LOGGER.error("Error reindexing users and groups", e);
     }
     return response;
   }
