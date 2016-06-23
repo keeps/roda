@@ -146,6 +146,7 @@ public class ReindexRodaEntityPlugin<T extends Serializable> extends AbstractPlu
   public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
     // do nothing
+    LOGGER.debug("Doing nothing in beforeBlockExecute");
     return null;
   }
 
@@ -153,6 +154,7 @@ public class ReindexRodaEntityPlugin<T extends Serializable> extends AbstractPlu
   public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
     // do nothing
+    LOGGER.debug("Doing nothing in afterBlockExecute");
     return null;
   }
 

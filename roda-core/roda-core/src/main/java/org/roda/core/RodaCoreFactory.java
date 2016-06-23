@@ -9,7 +9,6 @@ package org.roda.core;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -33,7 +32,6 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -82,47 +80,29 @@ import org.roda.core.data.common.RodaConstants.SolrType;
 import org.roda.core.data.common.RodaConstants.StorageType;
 import org.roda.core.data.descriptionLevels.DescriptionLevelManager;
 import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IllegalOperationException;
-import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
-import org.roda.core.data.v2.agents.Agent;
-import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
-import org.roda.core.data.v2.notifications.Notification;
-import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
-import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginManager;
 import org.roda.core.plugins.PluginManagerException;
 import org.roda.core.plugins.PluginOrchestrator;
 import org.roda.core.plugins.orchestrate.AkkaDistributedPluginOrchestrator;
 import org.roda.core.plugins.orchestrate.AkkaEmbeddedPluginOrchestrator;
 import org.roda.core.plugins.orchestrate.akka.distributed.AkkaDistributedPluginWorker;
-import org.roda.core.plugins.plugins.antivirus.AntivirusPlugin;
-import org.roda.core.plugins.plugins.base.FixityPlugin;
-import org.roda.core.plugins.plugins.base.ReindexAIPPlugin;
-import org.roda.core.plugins.plugins.base.ReindexActionLogPlugin;
-import org.roda.core.plugins.plugins.base.ReindexJobPlugin;
-import org.roda.core.plugins.plugins.base.ReindexRodaEntityPlugin;
-import org.roda.core.plugins.plugins.base.ReindexTransferredResourcePlugin;
-import org.roda.core.plugins.plugins.base.RemoveOrphansPlugin;
-import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fedora.FedoraStorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -1141,74 +1121,11 @@ public class RodaCoreFactory {
   /*
    * Command-line accessible functionalities
    */
-  public static void runReindexAipsPlugin() {
-    Plugin<AIP> reindexPlugin = new ReindexAIPPlugin();
-    Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "true");
-    try {
-      reindexPlugin.setParameterValues(parameters);
-    } catch (InvalidParameterException e) {
-    }
-    getPluginOrchestrator().runPluginOnAllAIPs(reindexPlugin);
-  }
-
-  public static void runReindexJobPlugin() {
-    ReindexJobPlugin plugin = new ReindexJobPlugin();
-    getPluginOrchestrator().runPlugin(plugin);
-  }
-
-  public static <T extends Serializable> void runReindexRodaEntityPlugin(Class<T> clazz) {
-    ReindexRodaEntityPlugin<T> plugin = new ReindexRodaEntityPlugin<T>();
-    Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "true");
-    parameters.put(RodaConstants.PLUGIN_PARAMS_CLASS_CANONICAL_NAME, clazz.getCanonicalName());
-    try {
-      plugin.setParameterValues(parameters);
-      getPluginOrchestrator().runPlugin(plugin);
-    } catch (InvalidParameterException e) {
-      LOGGER.error("Error while running reindex RODA entity plugin", e);
-    }
-  }
-
-  public static void runReindexTransferredResourcesPlugin() {
-    ReindexTransferredResourcePlugin plugin = new ReindexTransferredResourcePlugin();
-    getPluginOrchestrator().runPlugin(plugin);
-  }
-
-  public static void runReindexActionLogPlugin() {
-    ReindexActionLogPlugin plugin = new ReindexActionLogPlugin();
-    getPluginOrchestrator().runPlugin(plugin);
-  }
-
-  public static void runReindexAipsPlugin(List<String> aipIds) {
-    Plugin<AIP> reindexPlugin = new ReindexAIPPlugin();
-    getPluginOrchestrator().runPluginOnAIPs(reindexPlugin, aipIds, true);
-  }
 
   public static void runReindex(List<String> args) {
     String entity = args.get(2);
     if (StringUtils.isNotBlank(entity)) {
-      if ("aip".equalsIgnoreCase(entity)) {
-        if (args.size() >= 3) {
-          runReindexAipsPlugin(args.subList(2, args.size()));
-        } else {
-          runReindexAipsPlugin();
-        }
-      } else if ("job".equalsIgnoreCase(entity)) {
-        runReindexJobPlugin();
-      } else if ("risk".equalsIgnoreCase(entity)) {
-        runReindexRodaEntityPlugin(Risk.class);
-      } else if ("agent".equalsIgnoreCase(entity)) {
-        runReindexRodaEntityPlugin(Agent.class);
-      } else if ("format".equalsIgnoreCase(entity)) {
-        runReindexRodaEntityPlugin(Format.class);
-      } else if ("notification".equalsIgnoreCase(entity)) {
-        runReindexRodaEntityPlugin(Notification.class);
-      } else if ("transferred_resources".equalsIgnoreCase(entity)) {
-        runReindexTransferredResourcesPlugin();
-      } else if ("actionlogs".equalsIgnoreCase(entity)) {
-        runReindexActionLogPlugin();
-      } else if ("users_and_groups".equalsIgnoreCase(entity)) {
+      if ("users_and_groups".equalsIgnoreCase(entity)) {
         try {
           createUsersAndGroupsFromLDAP();
         } catch (EmailAlreadyExistsException | UserAlreadyExistsException | IllegalOperationException
@@ -1217,32 +1134,6 @@ public class RodaCoreFactory {
         }
       }
     }
-  }
-
-  public static void runRemoveOrphansPlugin(String parentId) {
-    try {
-      Filter filter = new Filter(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
-      RemoveOrphansPlugin removeOrphansPlugin = new RemoveOrphansPlugin();
-      removeOrphansPlugin.setNewParent(model.retrieveAIP(parentId));
-      getPluginOrchestrator().runPluginFromIndex(IndexedAIP.class, filter, removeOrphansPlugin);
-    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      LOGGER.error("Error running remove orphans plugin", e);
-    }
-  }
-
-  private static void runFixityPlugin() {
-    Plugin<AIP> fixityPlugin = new FixityPlugin();
-    getPluginOrchestrator().runPluginOnAllAIPs(fixityPlugin);
-  }
-
-  private static void runAntivirusPlugin() {
-    Plugin<AIP> antivirusPlugin = new AntivirusPlugin();
-    getPluginOrchestrator().runPluginOnAllAIPs(antivirusPlugin);
-  }
-
-  private static void runPremisSkeletonPlugin() {
-    Plugin<AIP> premisSkeletonPlugin = new PremisSkeletonPlugin();
-    getPluginOrchestrator().runPluginOnAllAIPs(premisSkeletonPlugin);
   }
 
   private static void runSolrQuery(List<String> args) {
@@ -1320,16 +1211,19 @@ public class RodaCoreFactory {
   }
 
   private static void printMainUsage() {
-    System.err.println("WARNING: if using Apache Solr embedded, the index related commands");
-    System.err.println("cannot be run with RODA running (i.e. deployed in Tomcat for example)");
-    System.err.println("Syntax:");
-    System.err.println(
-      "java -jar x.jar index reindex aip|job|risk|agent|format|notification|transferred_resources|actionlogs|users_and_groups");
-    System.err.println("java -jar x.jar index list users|groups|sips|file");
-    System.err.println("java -jar x.jar orphans [newParentID]");
-    System.err.println("java -jar x.jar fixity");
-    System.err.println("java -jar x.jar antivirus");
-    System.err.println("java -jar x.jar premisskeleton");
+    // System.err.println("WARNING: if using Apache Solr embedded, the index
+    // related commands");
+    // System.err.println("cannot be run with RODA running (i.e. deployed in
+    // Tomcat for example)");
+    // System.err.println("Syntax:");
+    // System.err.println(
+    // "java -jar x.jar index reindex
+    // aip|job|risk|agent|format|notification|transferred_resources|actionlogs|users_and_groups");
+    // System.err.println("java -jar x.jar index list users|groups|sips|file");
+    // System.err.println("java -jar x.jar orphans [newParentID]");
+    // System.err.println("java -jar x.jar fixity");
+    // System.err.println("java -jar x.jar antivirus");
+    // System.err.println("java -jar x.jar premisskeleton");
   }
 
   private static void mainMasterTasks(List<String> args) throws GenericException, RequestNotValidException {
@@ -1352,14 +1246,6 @@ public class RodaCoreFactory {
       } else if ("reindex".equals(args.get(1))) {
         runReindex(args);
       }
-    } else if ("orphans".equals(args.get(0)) && args.size() == 2 && StringUtils.isNotBlank(args.get(1))) {
-      runRemoveOrphansPlugin(args.get(1));
-    } else if ("fixity".equals(args.get(0))) {
-      runFixityPlugin();
-    } else if ("antivirus".equals(args.get(0))) {
-      runAntivirusPlugin();
-    } else if ("premisskeleton".equals(args.get(0))) {
-      runPremisSkeletonPlugin();
     } else {
       printMainUsage();
     }

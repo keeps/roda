@@ -174,7 +174,8 @@ public class InternalConvertPluginsTest {
     transferredResources = createCorpora(corporaId);
 
     Assert.assertEquals(1, transferredResources.size());
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(plugin,
+    // FIXME 20160623 hsilva: passing by null just to make code compiling
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(null, plugin,
       transferredResources.stream().map(tr -> tr.getUUID()).collect(Collectors.toList()));
 
     // TODO wait for job to finish
@@ -224,7 +225,8 @@ public class InternalConvertPluginsTest {
     parameters.put("outputFormat", "tiff");
     plugin.setParameterValues(parameters);
 
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(plugin);
+    // FIXME 20160623 hsilva: passing by null just to make code compiling
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null, plugin);
 
     aip = model.retrieveAIP(aip.getId());
     Assert.assertEquals(2, aip.getRepresentations().size());
@@ -270,7 +272,7 @@ public class InternalConvertPluginsTest {
     parameters.put("outputFormat", "ogg");
     plugin.setParameterValues(parameters);
 
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(plugin);
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null, plugin);
 
     aip = model.retrieveAIP(aip.getId());
     Assert.assertEquals(2, aip.getRepresentations().size());
@@ -317,7 +319,7 @@ public class InternalConvertPluginsTest {
     parameters.put("outputArguments", "-pix_fmt rgb24");
     plugin.setParameterValues(parameters);
 
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(plugin);
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null, plugin);
 
     aip = model.retrieveAIP(aip.getId());
     Assert.assertEquals(2, aip.getRepresentations().size());
@@ -363,7 +365,8 @@ public class InternalConvertPluginsTest {
     parameters.put("outputFormat", "pdf");
     plugin.setParameterValues(parameters);
 
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(plugin);
+    // FIXME 20160623 hsilva: passing by null just to make code compiling
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null, plugin);
 
     aip = model.retrieveAIP(aip.getId());
     Assert.assertEquals(2, aip.getRepresentations().size());
@@ -410,7 +413,8 @@ public class InternalConvertPluginsTest {
     parameters.put("commandArguments", "-sDEVICE=pdfwrite");
     plugin.setParameterValues(parameters);
 
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(plugin);
+    // FIXME 20160623 hsilva: passing by null just to make code compiling
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null, plugin);
 
     aip = model.retrieveAIP(aip.getId());
     Assert.assertEquals(2, aip.getRepresentations().size());
@@ -456,7 +460,8 @@ public class InternalConvertPluginsTest {
     parameters.put("outputFormat", "pdf");
     plugin.setParameterValues(parameters);
 
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(plugin);
+    // FIXME 20160623 hsilva: passing by null just to make code compiling
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null, plugin);
     aip = model.retrieveAIP(aip.getId());
     Assert.assertEquals(2, aip.getRepresentations().size());
 
@@ -495,7 +500,8 @@ public class InternalConvertPluginsTest {
     parameters.put("outputFormat", "ogg");
     plugin.setParameterValues(parameters);
 
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(plugin);
+    // FIXME 20160623 hsilva: passing by null just to make code compiling
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null, plugin);
     aip = model.retrieveAIP(aip.getId());
     Assert.assertEquals(2, aip.getRepresentations().size());
     String editedRepresentationId = aip.getRepresentations().get(1).getId();
@@ -507,7 +513,8 @@ public class InternalConvertPluginsTest {
     parameters2.put("outputFormat", "tiff");
     plugin2.setParameterValues(parameters2);
 
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(plugin2);
+    // FIXME 20160623 hsilva: passing by null just to make code compiling
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null, plugin2);
     aip = model.retrieveAIP(aip.getId());
     Assert.assertEquals(4, aip.getRepresentations().size());
 
@@ -557,7 +564,8 @@ public class InternalConvertPluginsTest {
     parameters.put("commandArguments", "/usr/bin/convert -regard-warnings {input_file} {output_file}");
     plugin.setParameterValues(parameters);
 
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(plugin);
+    // FIXME 20160623 hsilva: passing by null just to make code compiling
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null, plugin);
     aip = model.retrieveAIP(aip.getId());
     Assert.assertEquals(2, aip.getRepresentations().size());
 
@@ -603,7 +611,8 @@ public class InternalConvertPluginsTest {
     parameters.put("doStrip", "True");
     plugin.setParameterValues(parameters);
 
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(plugin);
+    // FIXME 20160623 hsilva: passing by null just to make code compiling
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null, plugin);
 
     aip = model.retrieveAIP(aip.getId());
     Assert.assertEquals(2, aip.getRepresentations().size());
@@ -646,7 +655,8 @@ public class InternalConvertPluginsTest {
     plugin.setParameterValues(parameters);
 
     DigitalSignatureDIPPluginUtils.setKeystorePath(corporaPath.toString() + "/Certification/keystore.jks");
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(plugin);
+    // FIXME 20160623 hsilva: passing by null just to make code compiling
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null, plugin);
 
     aip = model.retrieveAIP(aip.getId());
     CloseableIterable<OptionalWithCause<File>> allNewFiles = model.listFilesUnder(aip.getId(),
@@ -671,18 +681,21 @@ public class InternalConvertPluginsTest {
     parameters.put("hasFeatures", "False");
     plugin.setParameterValues(parameters);
 
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllAIPs(plugin);
+    // FIXME 20160623 hsilva: passing by null just to make code compiling
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllAIPs(null, plugin);
     // Report report0 = reports.get(0).getReports().get(0);
     // if (!PluginState.PARTIAL_SUCCESS.equals(report0.getPluginState())) {
     // Assert.fail("Report not a partial success: " + report0);
     // }
 
     Plugin<Representation> plugin2 = new PdfToPdfaPlugin<Representation>();
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(plugin2);
+    // FIXME 20160623 hsilva: passing by null just to make code compiling
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null, plugin2);
 
     Plugin<AIP> plugin3 = new VeraPDFPlugin();
     plugin3.setParameterValues(parameters);
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllAIPs(plugin3);
+    // FIXME 20160623 hsilva: passing by null just to make code compiling
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllAIPs(null, plugin3);
     // Report report1 = reports.get(0).getReports().get(1);
     // if (!PluginState.SUCCESS.equals(report1.getPluginState())) {
     // Assert.fail("Report failed: " + report1);

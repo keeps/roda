@@ -57,7 +57,7 @@ public class AkkaJobActor extends UntypedActor {
       ActorRef jobStateInfoActor = getContext().actorOf(Props.create(AkkaJobStateInfoActor.class, plugin), jobId);
       RodaCoreFactory.getPluginOrchestrator().setInitialJobStateInfo(jobId, jobStateInfoActor);
 
-      jobStateInfoActor.tell(new Messages.JobStateUpdated(plugin, JOB_STATE.STARTED), ActorRef.noSender());
+      jobStateInfoActor.tell(new Messages.JobStateUpdated(plugin, JOB_STATE.STARTED), getSelf());
 
       try {
         if (job.getSourceObjects() instanceof SelectedItemsAll<?>) {
@@ -70,8 +70,7 @@ public class AkkaJobActor extends UntypedActor {
           runFromFilter(job, plugin, jobStateInfoActor);
         }
       } catch (Exception e) {
-        jobStateInfoActor.tell(new Messages.JobStateUpdated(plugin, JOB_STATE.FAILED_TO_COMPLETE, e),
-          ActorRef.noSender());
+        jobStateInfoActor.tell(new Messages.JobStateUpdated(plugin, JOB_STATE.FAILED_TO_COMPLETE, e), getSelf());
       }
 
     } else {

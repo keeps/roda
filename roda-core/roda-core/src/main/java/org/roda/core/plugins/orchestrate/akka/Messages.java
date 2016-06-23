@@ -77,23 +77,13 @@ public class Messages {
 
   }
 
-  public static class PluginToBeExecuted<T extends Serializable> implements Serializable {
+  private static class PluginMethodIsReady<T extends Serializable> implements Serializable {
     private static final long serialVersionUID = -5214600055070295410L;
 
-    private List<T> list;
     private Plugin<T> plugin;
 
-    public PluginToBeExecuted(List<T> list, Plugin<T> plugin) {
-      this.list = list;
+    public PluginMethodIsReady(Plugin<T> plugin) {
       this.plugin = plugin;
-    }
-
-    public List<T> getList() {
-      return list;
-    }
-
-    public void setList(List<T> list) {
-      this.list = list;
     }
 
     public Plugin<T> getPlugin() {
@@ -106,18 +96,55 @@ public class Messages {
 
     @Override
     public String toString() {
-      return "PluginToBeExecuted [list=" + list + ", plugin=" + plugin + "]";
+      return "PluginMethodIsReady [plugin=" + plugin + "]";
     }
 
   }
 
-  public static class PluginExecuteIsDone implements Serializable {
+  public static class PluginExecuteIsReady<T extends Serializable> extends PluginMethodIsReady<T> {
+    private static final long serialVersionUID = 1821489252490235130L;
+
+    private List<T> list;
+
+    public PluginExecuteIsReady(List<T> list, Plugin<T> plugin) {
+      super(plugin);
+      this.list = list;
+    }
+
+    public List<T> getList() {
+      return list;
+    }
+
+    public void setList(List<T> list) {
+      this.list = list;
+    }
+
+    @Override
+    public String toString() {
+      return "PluginExecuteIsReady [list=" + list + ", plugin=" + getPlugin() + "]";
+    }
+  }
+
+  public static class PluginAfterAllExecuteIsReady<T extends Serializable> extends PluginMethodIsReady<T> {
+    private static final long serialVersionUID = 1821489252490235130L;
+
+    public PluginAfterAllExecuteIsReady(Plugin<T> plugin) {
+      super(plugin);
+    }
+
+    @Override
+    public String toString() {
+      return "PluginAfterAllExecuteIsReady [plugin=" + getPlugin() + "]";
+    }
+  }
+
+  private static class PluginMethodIsDone implements Serializable {
     private static final long serialVersionUID = -8701179264086005994L;
 
     private Plugin<?> plugin;
     private boolean withError;
 
-    public PluginExecuteIsDone(Plugin<?> plugin, boolean withError) {
+    public PluginMethodIsDone(Plugin<?> plugin, boolean withError) {
       this.plugin = plugin;
       this.withError = withError;
     }
@@ -140,7 +167,33 @@ public class Messages {
 
     @Override
     public String toString() {
-      return "PluginExecuteIsDone [plugin=" + plugin + ", withError=" + withError + "]";
+      return "PluginMethodIsDone [plugin=" + plugin + ", withError=" + withError + "]";
+    }
+  }
+
+  public static class PluginExecuteIsDone extends PluginMethodIsDone {
+    private static final long serialVersionUID = -5136014936634139026L;
+
+    public PluginExecuteIsDone(Plugin<?> plugin, boolean withError) {
+      super(plugin, withError);
+    }
+
+    @Override
+    public String toString() {
+      return "PluginExecuteIsDone [getPlugin()=" + getPlugin() + ", isWithError()=" + isWithError() + "]";
+    }
+  }
+
+  public static class PluginAfterAllExecuteIsDone extends PluginMethodIsDone {
+    private static final long serialVersionUID = -5136014936634139026L;
+
+    public PluginAfterAllExecuteIsDone(Plugin<?> plugin, boolean withError) {
+      super(plugin, withError);
+    }
+
+    @Override
+    public String toString() {
+      return "PluginAfterAllExecuteIsDone [getPlugin()=" + getPlugin() + ", isWithError()=" + isWithError() + "]";
     }
   }
 }

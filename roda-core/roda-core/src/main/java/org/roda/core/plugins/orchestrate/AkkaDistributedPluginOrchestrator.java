@@ -148,55 +148,56 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
   }
 
   @Override
-  public <T extends IsIndexed> void runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin) {
+  public <T extends IsIndexed> void runPluginFromIndex(Object context, Class<T> classToActOn, Filter filter,
+    Plugin<T> plugin) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public void runPluginOnAIPs(Plugin<AIP> plugin, List<String> uuids, boolean retrieveFromModel) {
+  public void runPluginOnAIPs(Object context, Plugin<AIP> plugin, List<String> uuids, boolean retrieveFromModel) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public void runPluginOnRepresentations(Plugin<Representation> plugin, List<String> uuids) {
+  public void runPluginOnRepresentations(Object context, Plugin<Representation> plugin, List<String> uuids) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public void runPluginOnFiles(Plugin<File> plugin, List<String> uuids) {
+  public void runPluginOnFiles(Object context, Plugin<File> plugin, List<String> uuids) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public void runPluginOnAllAIPs(Plugin<AIP> plugin) {
+  public void runPluginOnAllAIPs(Object context, Plugin<AIP> plugin) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public void runPluginOnAllRepresentations(Plugin<Representation> plugin) {
+  public void runPluginOnAllRepresentations(Object context, Plugin<Representation> plugin) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public void runPluginOnAllFiles(Plugin<File> plugin) {
+  public void runPluginOnAllFiles(Object context, Plugin<File> plugin) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public void runPluginOnTransferredResources(Plugin<TransferredResource> plugin, List<String> uuids) {
+  public void runPluginOnTransferredResources(Object context, Plugin<TransferredResource> plugin, List<String> uuids) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public <T extends Serializable> void runPlugin(Plugin<T> plugin) {
+  public <T extends Serializable> void runPlugin(Object context, Plugin<T> plugin) {
     // TODO Auto-generated method stub
 
   }
@@ -226,6 +227,12 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
   }
 
   @Override
+  public void setInitialJobStateInfo(String jobId, Object object) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
   public <T extends Serializable> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo)
     throws JobException {
     // TODO Auto-generated method stub
@@ -235,12 +242,6 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
   @Override
   public <T extends Serializable> void updateJobState(Plugin<T> plugin, JOB_STATE state,
     Optional<String> stateDetails) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void setInitialJobStateInfo(String jobId, Object object) {
     // TODO Auto-generated method stub
 
   }

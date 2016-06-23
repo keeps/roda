@@ -94,7 +94,8 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public <T extends IsIndexed> void runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin) {
+  public <T extends IsIndexed> void runPluginFromIndex(Object context, Class<T> classToActOn, Filter filter,
+    Plugin<T> plugin) {
     try {
       plugin.beforeBlockExecute(index, model, storage);
       IndexResult<T> find;
@@ -146,7 +147,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void runPluginOnAIPs(Plugin<AIP> plugin, List<String> ids, boolean retrieveFromModel) {
+  public void runPluginOnAIPs(Object context, Plugin<AIP> plugin, List<String> ids, boolean retrieveFromModel) {
     try {
       plugin.beforeBlockExecute(index, model, storage);
       Iterator<String> iter = ids.iterator();
@@ -178,7 +179,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void runPluginOnAllAIPs(Plugin<AIP> plugin) {
+  public void runPluginOnAllAIPs(Object context, Plugin<AIP> plugin) {
     try {
       plugin.beforeBlockExecute(index, model, storage);
       CloseableIterable<OptionalWithCause<AIP>> aips = model.listAIPs();
@@ -216,7 +217,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void runPluginOnAllRepresentations(Plugin<Representation> plugin) {
+  public void runPluginOnAllRepresentations(Object context, Plugin<Representation> plugin) {
     try {
       plugin.beforeBlockExecute(index, model, storage);
       CloseableIterable<OptionalWithCause<AIP>> aips = model.listAIPs();
@@ -256,7 +257,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void runPluginOnAllFiles(Plugin<File> plugin) {
+  public void runPluginOnAllFiles(Object context, Plugin<File> plugin) {
     try {
       plugin.beforeBlockExecute(index, model, storage);
       CloseableIterable<OptionalWithCause<AIP>> aips = model.listAIPs();
@@ -311,7 +312,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void runPluginOnTransferredResources(Plugin<TransferredResource> plugin, List<String> uuids) {
+  public void runPluginOnTransferredResources(Object context, Plugin<TransferredResource> plugin, List<String> uuids) {
     try {
       plugin.beforeBlockExecute(index, model, storage);
 
@@ -340,7 +341,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public <T extends Serializable> void runPlugin(Plugin<T> plugin) {
+  public <T extends Serializable> void runPlugin(Object context, Plugin<T> plugin) {
     // TODO Auto-generated method stub
 
   }
@@ -371,12 +372,12 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void runPluginOnRepresentations(Plugin<Representation> plugin, List<String> ids) {
+  public void runPluginOnRepresentations(Object context, Plugin<Representation> plugin, List<String> ids) {
     // TODO Auto-generated method stub
   }
 
   @Override
-  public void runPluginOnFiles(Plugin<File> plugin, List<String> ids) {
+  public void runPluginOnFiles(Object context, Plugin<File> plugin, List<String> ids) {
     // TODO Auto-generated method stub
   }
 

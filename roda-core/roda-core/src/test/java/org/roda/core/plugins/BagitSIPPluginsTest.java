@@ -154,7 +154,8 @@ public class BagitSIPPluginsTest {
     TransferredResource transferredResource = createCorpora();
     Assert.assertNotNull(transferredResource);
 
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(plugin,
+    // FIXME 20160623 hsilva: passing by null just to make code compiling
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(null, plugin,
       Arrays.asList(transferredResource.getUUID()));
     // assertReports(reports);
 
