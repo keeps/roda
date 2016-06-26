@@ -10,8 +10,9 @@
 	<!-- I18N -->
 	<extend-property name="locale" values="en" />
 	<extend-property name="locale" values="pt_PT" />
+	<extend-property name="locale" values="es_CL" />
 	<set-property-fallback name="locale" value="en"/>
-	
+
 	<set-configuration-property name="locale.useragent" value="Y"/>
 	<set-configuration-property name="locale.searchorder" value="queryparam,cookie,meta,useragent"/>
 
