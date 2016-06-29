@@ -16,6 +16,7 @@ import org.roda.core.plugins.plugins.PluginHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 
 public class AkkaJobStateInfoActor extends UntypedActor {
@@ -31,17 +32,30 @@ public class AkkaJobStateInfoActor extends UntypedActor {
 
   @Override
   public void onReceive(Object msg) throws Exception {
-    if (msg instanceof Messages.JobInfoUpdated) {
+    if (msg instanceof Messages.JobStateUpdated) {
+      handleJobStateUpdated(msg);
+    } else if (msg instanceof Messages.JobInfoUpdated) {
       handleJobInfoUpdated(msg);
+    } else if (msg instanceof Messages.PluginBeforeBlockExecuteIsDone) {
+      handleBeforeBlockExecuteIsDone(msg);
     } else if (msg instanceof Messages.PluginExecuteIsDone) {
       handleExecuteIsDone(msg);
-    } else if (msg instanceof Messages.PluginAfterAllExecuteIsReady) {
-      handleAfterAllExecuteIsReady();
-    } else if (msg instanceof Messages.JobStateUpdated) {
-      handleJobStateUpdated(msg);
+    } else if (msg instanceof Messages.PluginAfterBlockExecuteIsDone) {
+      handleAfterBlockExecuteIsDone(msg);
+    } else if (msg instanceof Messages.PluginAfterAllExecuteIsDone) {
+      handleAfterAllExecuteIsDone(msg);
     } else {
       LOGGER.error("Received a message that it doesn't know how to process (" + msg.getClass().getName() + ")...");
       unhandled(msg);
+    }
+  }
+
+  private void handleJobStateUpdated(Object msg) {
+    Messages.JobStateUpdated message = (Messages.JobStateUpdated) msg;
+    Plugin<?> p = message.getPlugin() == null ? plugin : message.getPlugin();
+    PluginHelper.updateJobState(p, RodaCoreFactory.getModelService(), message.getState(), message.getStateDatails());
+    if (message.getState() == JOB_STATE.COMPLETED) {
+      getContext().stop(getSelf());
     }
   }
 
@@ -53,41 +67,31 @@ public class AkkaJobStateInfoActor extends UntypedActor {
     PluginHelper.updateJobInformation(message.plugin, RodaCoreFactory.getModelService(), infoUpdated);
   }
 
+  private void handleBeforeBlockExecuteIsDone(Object msg) {
+    Messages.PluginBeforeBlockExecuteIsDone message = (Messages.PluginBeforeBlockExecuteIsDone) msg;
+    ActorRef sender = getSender();
+    ActorRef self = getSelf();
+    sender.tell(new Messages.PluginExecuteIsReady(message.getPlugin(), message.getList()), self);
+  }
+
   private void handleExecuteIsDone(Object msg) {
     Messages.PluginExecuteIsDone message = (Messages.PluginExecuteIsDone) msg;
+    getSender().tell(new Messages.PluginAfterBlockExecuteIsReady<>(message.getPlugin()), getSelf());
+  }
+
+  private void handleAfterBlockExecuteIsDone(Object msg) {
+    Messages.PluginAfterBlockExecuteIsDone message = (Messages.PluginAfterBlockExecuteIsDone) msg;
     JobPluginInfo jobPluginInfo = jobInfo.getJobInfo().get(message.getPlugin());
     jobPluginInfo.setDone(true);
     jobInfo.put(message.getPlugin(), jobPluginInfo);
-    try {
-      message.getPlugin().afterBlockExecute(RodaCoreFactory.getIndexService(), RodaCoreFactory.getModelService(),
-        RodaCoreFactory.getStorageService());
-    } catch (Exception e) {
-      LOGGER.error("Error executing plugin.afterBlockExecute", e);
-    }
 
     if (jobInfo.isDone()) {
-      getSelf().tell(new Messages.PluginAfterAllExecuteIsReady(message.getPlugin()), getSelf());
+      getSender().tell(new Messages.PluginAfterAllExecuteIsReady(message.getPlugin()), getSelf());
     }
   }
 
-  private void handleAfterAllExecuteIsReady() {
-    try {
-      plugin.afterAllExecute(RodaCoreFactory.getIndexService(), RodaCoreFactory.getModelService(),
-        RodaCoreFactory.getStorageService());
-      getSelf().tell(new Messages.JobStateUpdated(plugin, JOB_STATE.COMPLETED), getSelf());
-    } catch (Exception e) {
-      LOGGER.error("Error executing plugin.afterAllExecute", e);
-      getSelf().tell(new Messages.JobStateUpdated(plugin, JOB_STATE.FAILED_TO_COMPLETE, e), getSelf());
-    }
-  }
-
-  private void handleJobStateUpdated(Object msg) {
-    Messages.JobStateUpdated message = (Messages.JobStateUpdated) msg;
-    Plugin<?> p = message.getPlugin() == null ? plugin : message.getPlugin();
-    PluginHelper.updateJobState(p, RodaCoreFactory.getModelService(), message.getState(), message.getStateDatails());
-    if (message.getState() == JOB_STATE.COMPLETED) {
-      getContext().stop(getSelf());
-    }
+  private void handleAfterAllExecuteIsDone(Object msg) {
+    getSelf().tell(new Messages.JobStateUpdated(plugin, JOB_STATE.COMPLETED), getSelf());
   }
 
 }

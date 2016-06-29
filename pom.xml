@@ -140,10 +140,10 @@
 		<jena.version>2.13.0</jena.version>
 		<solr.version>5.5.1</solr.version>
 		<tika.version>1.11</tika.version>
-		<akka.version>2.4.5</akka.version>
+		<akka.version>2.4.7</akka.version>
 		<httpcomponents.version>4.5.2</httpcomponents.version>
 		<poi.version>3.13</poi.version>
-		<commons_ip.version>1.0.0-alpha13</commons_ip.version>
+		<commons_ip.version>1.0.0-alpha14</commons_ip.version>
 		<roda_community_url>http://roda-community.org</roda_community_url>
 	</properties>
 	<profiles>
