@@ -241,10 +241,16 @@ public class RodaCoreFactory {
         addConfiguration("roda-core.properties");
         addConfiguration("roda-core-formats.properties");
         LOGGER.debug("Finished loading roda-core.properties & roda-core-formats.properties");
-        
-        //initialize working directory
-        workingDirectoryPath = Paths.get(getRodaConfiguration().getString("core.workingdirectory"));
-        workingDirectoryPath.toFile().mkdirs();
+
+        // initialize working directory
+        workingDirectoryPath = Paths
+          .get(getRodaConfiguration().getString("core.workingdirectory", getSystemProperty("java.io.tmpdir", "tmp")));
+        try {
+          Files.createDirectories(rodaHomePath);
+        } catch (IOException e) {
+          throw new RuntimeException(
+            "Unable to create RODA WORKING DIRECTORY " + workingDirectoryPath + ". Aborting...", e);
+        }
 
         // instantiate storage and model service
         instantiateStorageAndModel();
@@ -310,7 +316,8 @@ public class RodaCoreFactory {
     logPath = dataPath.resolve(RodaConstants.CORE_LOG_FOLDER);
     storagePath = dataPath.resolve(RodaConstants.CORE_STORAGE_FOLDER);
     indexDataPath = dataPath.resolve(RodaConstants.CORE_INDEX_FOLDER);
-    // FIXME the following block should be invoked/injected from RodaWuiServlet
+    // FIXME the following block should be invoked/injected from
+    // RodaWuiServlet
     // (and avoid any cyclic dependency)
     themePath = configPath.resolve(RodaConstants.CORE_THEME_FOLDER);
     exampleThemePath = configPath.resolve(RodaConstants.CORE_EXAMPLE_THEME_FOLDER);
@@ -357,7 +364,8 @@ public class RodaCoreFactory {
     essentialDirectories.add(logPath);
     essentialDirectories.add(storagePath);
     essentialDirectories.add(indexDataPath);
-    // FIXME the following block should be invoked/injected from RodaWuiServlet
+    // FIXME the following block should be invoked/injected from
+    // RodaWuiServlet
     // (and avoid any cyclic dependency)
     essentialDirectories.add(themePath);
 
@@ -385,7 +393,8 @@ public class RodaCoreFactory {
       LOGGER.error("Unable to create " + exampleConfigPath, e);
     }
 
-    // FIXME the following block should be invoked/injected from RodaWuiServlet
+    // FIXME the following block should be invoked/injected from
+    // RodaWuiServlet
     // (and avoid any cyclic dependency)
     try {
       try {
@@ -604,7 +613,8 @@ public class RodaCoreFactory {
   }
 
   private static void instantiateNodeSpecificObjects(NodeType nodeType) {
-    // FIXME 20160531 hsilva: this should be moved to somewhere closely to Akka
+    // FIXME 20160531 hsilva: this should be moved to somewhere closely to
+    // Akka
     // instantiation code
     loadAkkaConfiguration();
     if (nodeType == NodeType.MASTER) {
@@ -842,9 +852,9 @@ public class RodaCoreFactory {
   public static Path getConfigPath() {
     return configPath;
   }
-  
-  public static Path getWorkingDirectory(){
-	  return workingDirectoryPath;
+
+  public static Path getWorkingDirectory() {
+    return workingDirectoryPath;
   }
 
   public static Path getThemePath() {
@@ -1228,7 +1238,8 @@ public class RodaCoreFactory {
     // System.err.println(
     // "java -jar x.jar index reindex
     // aip|job|risk|agent|format|notification|transferred_resources|actionlogs|users_and_groups");
-    // System.err.println("java -jar x.jar index list users|groups|sips|file");
+    // System.err.println("java -jar x.jar index list
+    // users|groups|sips|file");
     // System.err.println("java -jar x.jar orphans [newParentID]");
     // System.err.println("java -jar x.jar fixity");
     // System.err.println("java -jar x.jar antivirus");
