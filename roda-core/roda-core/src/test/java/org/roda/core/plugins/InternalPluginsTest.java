@@ -77,17 +77,14 @@ import org.roda.core.plugins.plugins.ingest.AutoAcceptSIPPlugin;
 import org.roda.core.plugins.plugins.ingest.TransferredResourceToAIPPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPlugin;
-import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.util.DateParser;
 import org.w3c.util.InvalidDateException;
 
-import gov.loc.premis.v3.CreatingApplicationComplexType;
 import gov.loc.premis.v3.EventComplexType;
 import gov.loc.premis.v3.FormatComplexType;
 import gov.loc.premis.v3.FormatRegistryComplexType;
@@ -488,71 +485,89 @@ public class InternalPluginsTest {
 
   }
 
-  @Test
-  public void testApacheTika() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,
-    InvalidDateException, SolrServerException {
-    AIP aip = ingestCorpora();
-
-    Plugin<AIP> premisSkeletonPlugin = new PremisSkeletonPlugin();
-    Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
-    premisSkeletonPlugin.setParameterValues(parameters);
-
-    List<String> aipIdList = Arrays.asList(aip.getId());
-    // FIXME 20160623 hsilva: passing by null just to make code compiling
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(null, premisSkeletonPlugin, aipIdList, false);
-
-    Plugin<AIP> plugin = new TikaFullTextPlugin();
-    Map<String, String> parameters2 = new HashMap<>();
-    parameters2.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
-    parameters2.put(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS, FAKE_REPORTING_CLASS);
-    parameters2.put(RodaConstants.PLUGIN_PARAMS_DO_FULLTEXT_EXTRACTION, Boolean.TRUE.toString());
-    parameters2.put(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION, Boolean.TRUE.toString());
-    plugin.setParameterValues(parameters2);
-
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(null, plugin, aipIdList, false);
-    // ReportAssertUtils.assertReports(reports, aipIdList);
-
-    Job job = new Job();
-    RodaCoreFactory.getPluginOrchestrator().executeJob(job);
-
-    aip = model.retrieveAIP(aip.getId());
-
-    // Files with Apache Tika output each tika run creates 2 files
-    Assert.assertEquals(2 * CORPORA_FILES_COUNT,
-      Iterables.size(model.listOtherMetadata(aip.getId(), RodaConstants.OTHER_METADATA_TYPE_APACHE_TIKA, true)));
-
-    Binary om = model.retrieveOtherMetadataBinary(aip.getId(), aip.getRepresentations().get(0).getId(),
-      Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT, TikaFullTextPlugin.FILE_SUFFIX_FULLTEXT,
-      RodaConstants.OTHER_METADATA_TYPE_APACHE_TIKA);
-
-    Assert.assertNotNull(om);
-
-    Binary fpo_bin = model.retrievePreservationFile(aip.getId(), aip.getRepresentations().get(0).getId(),
-      new ArrayList<>(), CORPORA_PDF);
-
-    gov.loc.premis.v3.File fpo = PremisV3Utils.binaryToFile(fpo_bin.getContent(), true);
-
-    ObjectCharacteristicsComplexType characteristics = fpo.getObjectCharacteristicsArray(0);
-
-    Assert.assertEquals(1, characteristics.getCreatingApplicationArray().length);
-
-    CreatingApplicationComplexType creatingApplication = characteristics.getCreatingApplicationArray(0);
-    Assert.assertEquals("Microsoft Office Word", creatingApplication.getCreatingApplicationName().getStringValue());
-    Assert.assertEquals("15.0000", creatingApplication.getCreatingApplicationVersion());
-    Assert.assertEquals(DateParser.parse("2016-02-10T15:52:00Z"),
-      DateParser.parse(creatingApplication.getDateCreatedByApplication().toString()));
-
-    index.commit(IndexedFile.class);
-
-    Filter filter = new Filter();
-    filter.add(new SimpleFilterParameter(RodaConstants.FILE_FULLTEXT, "Test"));
-    filter.add(new SimpleFilterParameter(RodaConstants.FILE_UUID,
-      IdUtils.getFileId(aip.getId(), aip.getRepresentations().get(0).getId(), new ArrayList<>(), CORPORA_PDF)));
-
-    IndexResult<IndexedFile> files = index.find(IndexedFile.class, filter, null, new Sublist(0, 10));
-    Assert.assertEquals(1, files.getTotalCount());
-  }
+  // @Test
+  // public void testApacheTika() throws RODAException,
+  // FileAlreadyExistsException, InterruptedException, IOException,
+  // InvalidDateException, SolrServerException {
+  // AIP aip = ingestCorpora();
+  //
+  // Plugin<AIP> premisSkeletonPlugin = new PremisSkeletonPlugin();
+  // Map<String, String> parameters = new HashMap<>();
+  // parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
+  // premisSkeletonPlugin.setParameterValues(parameters);
+  //
+  // List<String> aipIdList = Arrays.asList(aip.getId());
+  // // FIXME 20160623 hsilva: passing by null just to make code compiling
+  // RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(null,
+  // premisSkeletonPlugin, aipIdList, false);
+  //
+  // Plugin<AIP> plugin = new TikaFullTextPlugin();
+  // Map<String, String> parameters2 = new HashMap<>();
+  // parameters2.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
+  // parameters2.put(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS,
+  // FAKE_REPORTING_CLASS);
+  // parameters2.put(RodaConstants.PLUGIN_PARAMS_DO_FULLTEXT_EXTRACTION,
+  // Boolean.TRUE.toString());
+  // parameters2.put(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION,
+  // Boolean.TRUE.toString());
+  // plugin.setParameterValues(parameters2);
+  //
+  // RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(null, plugin,
+  // aipIdList, false);
+  // // ReportAssertUtils.assertReports(reports, aipIdList);
+  //
+  // Job job = new Job();
+  // RodaCoreFactory.getPluginOrchestrator().executeJob(job);
+  //
+  // aip = model.retrieveAIP(aip.getId());
+  //
+  // // Files with Apache Tika output each tika run creates 2 files
+  // Assert.assertEquals(2 * CORPORA_FILES_COUNT,
+  // Iterables.size(model.listOtherMetadata(aip.getId(),
+  // RodaConstants.OTHER_METADATA_TYPE_APACHE_TIKA, true)));
+  //
+  // Binary om = model.retrieveOtherMetadataBinary(aip.getId(),
+  // aip.getRepresentations().get(0).getId(),
+  // Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT,
+  // TikaFullTextPlugin.FILE_SUFFIX_FULLTEXT,
+  // RodaConstants.OTHER_METADATA_TYPE_APACHE_TIKA);
+  //
+  // Assert.assertNotNull(om);
+  //
+  // Binary fpo_bin = model.retrievePreservationFile(aip.getId(),
+  // aip.getRepresentations().get(0).getId(),
+  // new ArrayList<>(), CORPORA_PDF);
+  //
+  // gov.loc.premis.v3.File fpo =
+  // PremisV3Utils.binaryToFile(fpo_bin.getContent(), true);
+  //
+  // ObjectCharacteristicsComplexType characteristics =
+  // fpo.getObjectCharacteristicsArray(0);
+  //
+  // Assert.assertEquals(1,
+  // characteristics.getCreatingApplicationArray().length);
+  //
+  // CreatingApplicationComplexType creatingApplication =
+  // characteristics.getCreatingApplicationArray(0);
+  // Assert.assertEquals("Microsoft Office Word",
+  // creatingApplication.getCreatingApplicationName().getStringValue());
+  // Assert.assertEquals("15.0000",
+  // creatingApplication.getCreatingApplicationVersion());
+  // Assert.assertEquals(DateParser.parse("2016-02-10T15:52:00Z"),
+  // DateParser.parse(creatingApplication.getDateCreatedByApplication().toString()));
+  //
+  // index.commit(IndexedFile.class);
+  //
+  // Filter filter = new Filter();
+  // filter.add(new SimpleFilterParameter(RodaConstants.FILE_FULLTEXT, "Test"));
+  // filter.add(new SimpleFilterParameter(RodaConstants.FILE_UUID,
+  // IdUtils.getFileId(aip.getId(), aip.getRepresentations().get(0).getId(), new
+  // ArrayList<>(), CORPORA_PDF)));
+  //
+  // IndexResult<IndexedFile> files = index.find(IndexedFile.class, filter,
+  // null, new Sublist(0, 10));
+  // Assert.assertEquals(1, files.getTotalCount());
+  // }
 
   @Test
   public void testAutoAccept() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,

@@ -30,6 +30,17 @@
 							</includes>
 						</configuration>
 					</plugin>
+					<plugin>
+					  <groupId>org.apache.maven.plugins</groupId>
+					  <artifactId>maven-jar-plugin</artifactId>
+					  <executions>
+					    <execution>
+					      <goals>
+					        <goal>test-jar</goal>
+					      </goals>
+					    </execution>
+					  </executions>
+					</plugin>
 				</plugins>
 			</build>
 		</profile>
@@ -182,7 +193,6 @@
 			<artifactId>httpclient</artifactId>
 		</dependency>
 		<!-- FEDORA CLIENT - end -->
-
 		<dependency>
 			<groupId>org.yaml</groupId>
 			<artifactId>snakeyaml</artifactId>
@@ -511,20 +521,8 @@
 		<!-- Plugins related dependencies - start -->
 		<!-- XXX droid and jhove dependencies are troublemakers -->
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-compress</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>gov.loc</groupId>
 			<artifactId>bagit</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>edu.harvard.hul.ois</groupId>
-			<artifactId>fits</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>edu.harvard.hul.ois</groupId>
-			<artifactId>ots-schemas</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.tika</groupId>
@@ -547,46 +545,7 @@
 		<dependency>
 			<groupId>org.apache.tika</groupId>
 			<artifactId>tika-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.openpreservation.jhove</groupId>
-			<artifactId>jhove-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.openpreservation.jhove</groupId>
-			<artifactId>jhove-modules</artifactId>
-		</dependency>
-		<!-- VERAPDF -->
-		<dependency>
-			<artifactId>gui</artifactId>
-			<groupId>org.verapdf</groupId>
-		</dependency>
-		<dependency>
-			<groupId>org.ghost4j</groupId>
-			<artifactId>ghost4j</artifactId>
-		</dependency>
-		<!-- JODCONVERTER -->
-		<dependency>
-			<groupId>com.artofsolving</groupId>
-			<artifactId>jodconverter</artifactId>
-		</dependency>
-		<!-- BOUNCYCASTLE -->
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcprov-jdk15on</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcmail-jdk15on</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.itextpdf</groupId>
-			<artifactId>itextpdf</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.santuario</groupId>
-			<artifactId>xmlsec</artifactId>
-		</dependency>
+		</dependency>	
 		<!-- Plugins related dependencies - end -->
 		<dependency>
 			<groupId>com.github.spullara.mustache.java</groupId>

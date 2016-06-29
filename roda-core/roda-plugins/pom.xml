@@ -12,17 +12,27 @@
 		<relativePath>../..</relativePath>
 	</parent>
 	<modules>
-		<!--<module>misc/roda-plugin-misc-fixity</module>-->
-		<module>fixity_check/roda-plugin-fixity-check</module>
-		<module>characterization/roda-plugin-characterization-premisskeleton</module>
-		<module>characterization/roda-plugin-characterization-siegfried</module>
+		<module>roda-plugin-common</module>
+
+		<module>conversion/roda-plugin-conversion-imagemagick</module> 
+		<module>conversion/roda-plugin-conversion-pdftopdfa</module>
+		<module>conversion/roda-plugin-conversion-ghostscript</module>
+		<module>conversion/roda-plugin-conversion-unoconv</module> 
+		<module>conversion/roda-plugin-conversion-sox</module>
+		<module>conversion/roda-plugin-conversion-avconv</module> 
+		<module>conversion/roda-plugin-conversion-command</module> 
+
+		<module>validation/roda-plugin-validation-verapdf</module>
+		<module>validation/roda-plugin-validation-digital_signature</module>
+		<module>validation/roda-plugin-validation-digital_signature_dip</module>
+
 		<module>characterization/roda-plugin-characterization-tika</module>
-		<module>format_validation/roda-plugin-format_validation-descriptive_metadata</module>
-		<module>format_validation/roda-plugin-format_validation-verapdf</module>
-		<module>format_validation/roda-plugin-format_validation-digital_signature</module>
-		<module>format_validation/roda-plugin-format_validation-antivirus</module>
-		<module>format_conversion/roda-plugin-format_conversion-imagemagick</module>
-		<module>reindex/roda-plugin-reindex-aip</module>
-		<module>risk_management/roda-plugin-risk_management-riskjob</module>
+		<module>characterization/roda-plugin-characterization-droid</module>
+		<module>characterization/roda-plugin-characterization-exiftool</module>
+		<module>characterization/roda-plugin-characterization-ffprobe</module>
+		<module>characterization/roda-plugin-characterization-fits</module>
+		<module>characterization/roda-plugin-characterization-jhove</module>
+		<module>characterization/roda-plugin-characterization-jpylyzer</module>
+		<module>characterization/roda-plugin-characterization-mediainfo</module>
 	</modules>
 </project>

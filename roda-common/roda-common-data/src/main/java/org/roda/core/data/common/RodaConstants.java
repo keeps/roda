@@ -8,7 +8,9 @@
 package org.roda.core.data.common;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public final class RodaConstants {
 
@@ -430,18 +432,32 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_OUTPUT_FORMAT = "parameter.output_format";
   public static final String PLUGIN_PARAMS_COMMAND_ARGUMENTS = "parameter.command_arguments";
   public static final String PLUGIN_PARAMS_REPORTING_CLASS = "parameter.reporting_class";
+  public static final String PLUGIN_PARAMS_HAS_COMPRESSION = "parameter.has_compression";
 
-  public static final String PLUGIN_CATEGORY_FORMAT_CONVERSION = "format_conversion";
+  public static final String PLUGIN_CLASS_DIGITAL_SIGNATURE = "org.roda.core.plugins.plugins.validation.DigitalSignaturePlugin";
+  public static final String PLUGIN_CLASS_VERAPDF = "org.roda.core.plugins.plugins.validation.VeraPDFPlugin";
+  public static final String PLUGIN_CLASS_TIKA_FULLTEXT = "org.roda.core.plugins.plugins.characterization.TikaFullTextPlugin";
+
+  public static final Map<String, String> PLUGIN_PARAMETER_TO_CLASS = new HashMap<>();
+  static {
+    PLUGIN_PARAMETER_TO_CLASS.put(PLUGIN_PARAMS_DO_DIGITAL_SIGNATURE_VALIDATION, PLUGIN_CLASS_DIGITAL_SIGNATURE);
+    PLUGIN_PARAMETER_TO_CLASS.put(PLUGIN_PARAMS_DO_VERAPDF_CHECK, PLUGIN_CLASS_VERAPDF);
+    PLUGIN_PARAMETER_TO_CLASS.put(PLUGIN_PARAMS_DO_FEATURE_EXTRACTION, PLUGIN_CLASS_TIKA_FULLTEXT);
+    PLUGIN_PARAMETER_TO_CLASS.put(PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION, PLUGIN_CLASS_TIKA_FULLTEXT);
+  }
+
+  public static final String PLUGIN_CATEGORY_CONVERSION = "conversion";
   public static final String PLUGIN_CATEGORY_CHARACTERIZATION = "characterization";
-  public static final String PLUGIN_CATEGORY_FORMAT_VALIDATION = "format_validation";
+  public static final String PLUGIN_CATEGORY_VALIDATION = "validation";
   public static final String PLUGIN_CATEGORY_RISK_MANAGEMENT = "risk_management";
   public static final String PLUGIN_CATEGORY_FEATURE_EXTRACTION = "feature_extraction";
-  public static final String PLUGIN_CATEGORY_FORMAT_IDENTIFICATION = "format_identification";
+  public static final String PLUGIN_CATEGORY_IDENTIFICATION = "identification";
   public static final String PLUGIN_CATEGORY_INGEST = "ingest";
   public static final String PLUGIN_CATEGORY_FIXITY_CHECK = "fixity_check";
   public static final String PLUGIN_CATEGORY_REINDEX = "reindex";
   public static final String PLUGIN_CATEGORY_REPLICATION = "replication";
 
+  public static final String PLUGIN_CATEGORY_MISC = "misc";
   public static final String PLUGIN_CATEGORY_NOT_LISTABLE = "not_listable";
 
   /* Job Report */
@@ -742,6 +758,10 @@ public final class RodaConstants {
   public static final String VERIFICATION_EMAIL_TEMPLATE = "emailverification_html.vm";
   public static final String RECOVER_LOGIN_EMAIL_TEMPLATE = "recoverlogin_html.vm";
   public static final String NOTIFY_PRODUCER_EMAIL_TEMPLATE = "notifyproducer_html.vm";
+
+  /* Tika Constants */
+  public static final String TIKA_FILE_SUFFIX_FULLTEXT = ".fulltext.txt";
+  public static final String TIKA_FILE_SUFFIX_METADATA = ".metadata.xml";
 
   /* URN Constants */
   public static final String URN_BASE = "urn";

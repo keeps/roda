@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<event xmlns="http://www.loc.gov/premis/v3" xmlns:xlin="http://www.w3.org/1999/xlink">
+  <eventIdentifier>
+    <eventIdentifierType>local</eventIdentifierType>
+    <eventIdentifierValue>f5187ac4-5cd2-45eb-a390-11a0c7084ddd</eventIdentifierValue>
+  </eventIdentifier>
+  <eventType>format identification</eventType>
+  <eventDateTime>2016-02-24T18:11:24.33Z</eventDateTime>
+  <eventDetail>Identified the object's file formats and versions using Siegfried.</eventDetail>
+  <eventOutcomeInformation>
+    <eventOutcome>SUCCESS</eventOutcome>
+    <eventOutcomeDetail>
+      <eventOutcomeDetailNote>File formats were identified and recorded in PREMIS objects.</eventOutcomeDetailNote>
+    </eventOutcomeDetail>
+  </eventOutcomeInformation>
+  <linkingAgentIdentifier xlin:type="simple">
+    <linkingAgentIdentifierType>local</linkingAgentIdentifierType>
+    <linkingAgentIdentifierValue>org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPlugin@1.4.4</linkingAgentIdentifierValue>
+  </linkingAgentIdentifier>
+</event>

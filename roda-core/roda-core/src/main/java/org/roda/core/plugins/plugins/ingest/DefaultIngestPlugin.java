@@ -50,9 +50,6 @@ import org.roda.core.plugins.plugins.antivirus.AntivirusPlugin;
 import org.roda.core.plugins.plugins.base.DescriptiveMetadataValidationPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPlugin;
-import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
-import org.roda.core.plugins.plugins.ingest.validation.DigitalSignaturePlugin;
-import org.roda.core.plugins.plugins.ingest.validation.VeraPDFPlugin;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,6 +91,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
+
     totalSteps = calculateEfectiveTotalSteps();
     getParameterValues().put(RodaConstants.PLUGIN_PARAMS_TOTAL_STEPS, getTotalSteps() + "");
     Boolean createSubmission = RodaCoreFactory.getRodaConfiguration()
@@ -202,11 +200,9 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_VERAPDF_CHECK))) {
         Map<String, String> params = new HashMap<String, String>();
         params.put("profile", "1b");
-        params.put("hasFeatures", "False");
-        params.put("maxKbytes", "20000");
         pluginReport = doVeraPDFCheck(index, model, storage, aips, params);
         jobPluginInfo = mergeReports(jobPluginInfo, pluginReport);
-        aips = recalculateAIPsList(model, resources, aips, jobPluginInfo, true);
+        aips = recalculateAIPsList(model, resources, aips, jobPluginInfo, false);
         PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
       }
 
@@ -444,10 +440,8 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
           transferredResourceId);
         transferredResourcesToRemoveFromjobPluginInfo.add(transferredResourceId);
         // FIXME 20160502 hsilva: more should be done because jobPluginInfo in
-        // some of
-        // the AIPs state that it went ok, so all jobPluginInfo of this
-        // transferred
-        // resource should be updated to state the failure
+        // some of the AIPs state that it went ok, so all jobPluginInfo of this
+        // transferred resource should be updated to state the failure
       } else {
         newAips.addAll(transferredResourceAips);
       }
@@ -542,7 +536,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
   private Report doVeraPDFCheck(IndexService index, ModelService model, StorageService storage, List<AIP> aips,
     Map<String, String> params) {
-    return executePlugin(index, model, storage, aips, VeraPDFPlugin.class.getName(), params);
+    return executePlugin(index, model, storage, aips, RodaConstants.PLUGIN_CLASS_VERAPDF, params);
   }
 
   private Report doDescriptiveMetadataValidation(IndexService index, ModelService model, StorageService storage,
@@ -562,12 +556,12 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
   private Report doDigitalSignatureValidation(IndexService index, ModelService model, StorageService storage,
     List<AIP> aips) {
-    return executePlugin(index, model, storage, aips, DigitalSignaturePlugin.class.getName());
+    return executePlugin(index, model, storage, aips, RodaConstants.PLUGIN_CLASS_DIGITAL_SIGNATURE);
   }
 
   private Report doFeatureAndFullTextExtraction(IndexService index, ModelService model, StorageService storage,
     List<AIP> aips, Map<String, String> params) {
-    return executePlugin(index, model, storage, aips, TikaFullTextPlugin.class.getName(), params);
+    return executePlugin(index, model, storage, aips, RodaConstants.PLUGIN_CLASS_TIKA_FULLTEXT, params);
   }
 
   private Report doAutoAccept(IndexService index, ModelService model, StorageService storage, List<AIP> aips) {

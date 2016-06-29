@@ -84,7 +84,7 @@ public class TikaFullTextPluginUtils {
 
             if (doFulltextExtraction) {
               model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(),
-                TikaFullTextPlugin.FILE_SUFFIX_FULLTEXT, RodaConstants.OTHER_METADATA_TYPE_APACHE_TIKA, payload,
+                RodaConstants.TIKA_FILE_SUFFIX_FULLTEXT, RodaConstants.OTHER_METADATA_TYPE_APACHE_TIKA, payload,
                 notify);
             }
 
@@ -99,7 +99,7 @@ public class TikaFullTextPluginUtils {
               String metadataAsString = MetadataFileUtils.generateMetadataFile(metadata);
               ContentPayload metadataAsPayload = new StringContentPayload(metadataAsString);
               model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(),
-                TikaFullTextPlugin.FILE_SUFFIX_METADATA, RodaConstants.OTHER_METADATA_TYPE_APACHE_TIKA,
+                RodaConstants.TIKA_FILE_SUFFIX_METADATA, RodaConstants.OTHER_METADATA_TYPE_APACHE_TIKA,
                 metadataAsPayload, notify);
 
               // update PREMIS

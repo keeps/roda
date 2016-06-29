@@ -208,14 +208,13 @@ public class PluginManager {
   }
 
   private void loadPlugins() {
+    // load "external" RODA plugins, i.e., those available in the plugins folder
+    loadExternalPlugins();
+
     // load internal RODA plugins
     if (!internalPluginStarted) {
       loadInternalPlugins();
     }
-
-    // load "external" RODA plugins, i.e., those available in the plugins folder
-    loadExternalPlugins();
-
   }
 
   private void loadExternalPlugins() {

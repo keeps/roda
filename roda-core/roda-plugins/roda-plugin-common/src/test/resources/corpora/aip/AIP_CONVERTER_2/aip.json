@@ -1,0 +1,15 @@
+{
+  "parentId": null,
+  "state": "ACTIVE",
+  "type": "MIXED",
+  "permissions": {},
+  "descriptiveMetadata": [{
+    "id": "metadata.xml",
+    "type": "key-value"
+  }],
+  "representations": [{
+    "id": "50b2c085-ce4a-44d1-8279-d99086400349",
+    "original": true,
+    "type": "MIXED"
+  }]
+}

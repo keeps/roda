@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<event xmlns="http://www.loc.gov/premis/v3">
+  <eventIdentifier>
+    <eventIdentifierType>local</eventIdentifierType>
+    <eventIdentifierValue>1affc8e5-bc2d-40b0-9d61-83af70c90914</eventIdentifierValue>
+  </eventIdentifier>
+  <eventType>wellformedness check</eventType>
+  <eventDateTime>2016-03-03T16:12:41.66Z</eventDateTime>
+  <eventDetailInformation>
+    <eventDetail>Checked whether the descriptive metadata is included in the SIP and if this metadata is valid according to the established policy.</eventDetail>
+  </eventDetailInformation>
+  <eventOutcomeInformation>
+    <eventOutcome>SUCCESS</eventOutcome>
+    <eventOutcomeDetail>
+      <eventOutcomeDetailNote>Descriptive metadata is well formed and complete.</eventOutcomeDetailNote>
+    </eventOutcomeDetail>
+  </eventOutcomeInformation>
+  <linkingAgentIdentifier>
+    <linkingAgentIdentifierType>simple</linkingAgentIdentifierType>
+    <linkingAgentIdentifierValue>org.roda.core.plugins.plugins.base.AIPValidationPlugin@1.0</linkingAgentIdentifierValue>
+  </linkingAgentIdentifier>
+  <linkingObjectIdentifier>
+    <linkingObjectIdentifierType>URN</linkingObjectIdentifierType>
+    <linkingObjectIdentifierValue>AIP:3afc2d22-3064-4566-9357-e40313d378c9</linkingObjectIdentifierValue>
+    <linkingObjectRole>source</linkingObjectRole>
+  </linkingObjectIdentifier>
+</event>

@@ -21,6 +21,11 @@ public class ValidationIssue implements Serializable {
     super();
   }
 
+  public ValidationIssue(String message) {
+    super();
+    setMessage(message);
+  }
+
   public String getMessage() {
     return message;
   }

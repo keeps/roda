@@ -418,7 +418,16 @@ public final class PluginHelper {
   public static <T extends Serializable> boolean verifyIfStepShouldBePerformed(Plugin<T> plugin,
     PluginParameter pluginParameter) {
     String paramValue = getStringFromParameters(plugin, pluginParameter);
-    return Boolean.parseBoolean(paramValue);
+    boolean perform = Boolean.parseBoolean(paramValue);
+
+    if (perform) {
+      String parameterClass = RodaConstants.PLUGIN_PARAMETER_TO_CLASS.get(pluginParameter.getId());
+      if (parameterClass != null && RodaCoreFactory.getPluginManager().getPlugin(parameterClass) == null) {
+        perform = false;
+      }
+    }
+
+    return perform;
   }
 
   public static <T extends Serializable> String computeParentId(Plugin<T> plugin, IndexService index,

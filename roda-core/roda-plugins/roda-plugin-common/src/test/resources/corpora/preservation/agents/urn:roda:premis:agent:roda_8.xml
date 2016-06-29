@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<agent xmlns="http://www.loc.gov/premis/v3">
+  <agentIdentifier>
+    <agentIdentifierType>URN</agentIdentifierType>
+    <agentIdentifierValue>urn:roda:premis:agent:roda_8</agentIdentifierValue>
+  </agentIdentifier>
+  <agentName>Ingest/Create AIP/1.0</agentName>
+  <agentType>software:ingest_task</agentType>
+</agent>

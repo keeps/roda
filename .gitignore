@@ -9,3 +9,4 @@ roda-installer/roda-installer_v*
 roda-core/roda-core/velocity.log.1
 .idea/
 *.iml
+independent_plugin_script.sh

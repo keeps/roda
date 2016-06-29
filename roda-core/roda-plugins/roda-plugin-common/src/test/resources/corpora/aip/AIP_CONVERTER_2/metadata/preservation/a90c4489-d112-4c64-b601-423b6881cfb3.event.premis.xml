@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<event xmlns="http://www.loc.gov/premis/v3" xmlns:xlin="http://www.w3.org/1999/xlink">
+  <eventIdentifier>
+    <eventIdentifierType>local</eventIdentifierType>
+    <eventIdentifierValue>a90c4489-d112-4c64-b601-423b6881cfb3</eventIdentifierValue>
+  </eventIdentifier>
+  <eventType>virus check</eventType>
+  <eventDateTime>2016-02-19T16:22:04.66Z</eventDateTime>
+  <eventDetailInformation>
+  <eventDetail>All the files from the SIP were verified against an antivirus.</eventDetail>
+  </eventDetailInformation>
+  <eventOutcomeInformation>
+    <eventOutcome>success</eventOutcome>
+    <eventOutcomeDetail>
+      <eventOutcomeDetailNote>----------- SCAN SUMMARY -----------
+Known viruses: 4267749
+Engine version: 0.98.7
+Scanned directories: 6
+Scanned files: 10
+Infected files: 0
+Data scanned: 3.35 MB
+Data read: 1.40 MB (ratio 2.40:1)
+Time: 13.849 sec (0 m 13 s)</eventOutcomeDetailNote>
+    </eventOutcomeDetail>
+  </eventOutcomeInformation>
+  <linkingAgentIdentifier xlin:type="simple">
+    <linkingAgentIdentifierType>local</linkingAgentIdentifierType>
+    <linkingAgentIdentifierValue>org.roda.core.plugins.plugins.antivirus.AntivirusPlugin@1.0</linkingAgentIdentifierValue>
+  </linkingAgentIdentifier>
+  <linkingObjectIdentifier>
+    <linkingObjectIdentifierType>source</linkingObjectIdentifierType>
+    <linkingObjectIdentifierValue>bb5260c6-b249-48b9-bf79-a6e24f74245a</linkingObjectIdentifierValue>
+  </linkingObjectIdentifier>
+</event>

@@ -1,0 +1,20 @@
+{
+  "parentId": null,
+  "state": "ACTIVE",
+  "type": "MIXED",
+  "permissions": {},
+  "descriptiveMetadata": [{
+    "id": "ead_unknown.xml",
+    "type": "ead",
+    "version": "unknown"
+  }],
+  "representations": [{
+    "id": "representation_1",
+    "original": true,
+    "type": "MIXED"
+  }, {
+    "id": "representation_2",
+    "original": false,
+    "type": "MIXED"
+  }]
+}

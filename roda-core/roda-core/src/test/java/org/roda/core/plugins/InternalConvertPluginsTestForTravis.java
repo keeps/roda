@@ -13,7 +13,6 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,15 +20,12 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.jena.ext.com.google.common.collect.Iterables;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.roda.common.certification.PDFSignatureUtils;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -53,29 +49,12 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
-import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
-import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.plugins.ingest.TransferredResourceToAIPPlugin;
-import org.roda.core.plugins.plugins.ingest.migration.AvconvConvertPlugin;
-import org.roda.core.plugins.plugins.ingest.migration.GeneralCommandConvertPlugin;
-import org.roda.core.plugins.plugins.ingest.migration.GhostScriptConvertPlugin;
-import org.roda.core.plugins.plugins.ingest.migration.ImageMagickConvertPlugin;
-import org.roda.core.plugins.plugins.ingest.migration.PdfToPdfaPlugin;
-import org.roda.core.plugins.plugins.ingest.migration.SoxConvertPlugin;
-import org.roda.core.plugins.plugins.ingest.migration.UnoconvConvertPlugin;
-import org.roda.core.plugins.plugins.ingest.validation.DigitalSignatureDIPPlugin;
-import org.roda.core.plugins.plugins.ingest.validation.DigitalSignatureDIPPluginUtils;
-import org.roda.core.plugins.plugins.ingest.validation.DigitalSignaturePlugin;
-import org.roda.core.plugins.plugins.ingest.validation.VeraPDFPlugin;
-import org.roda.core.storage.Binary;
-import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -205,495 +184,590 @@ public class InternalConvertPluginsTestForTravis {
     Assert.assertEquals(numberOfConvertableFiles, reusableAllFiles.size());
   }
 
-  @Test
-  public void testImageMagickPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
-    IOException, SolrServerException, IsStillUpdatingException {
-    AIP aip = ingestCorpora(0);
-
-    CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
-      aip.getRepresentations().get(0).getId(), true);
-    List<File> reusableAllFiles = new ArrayList<>();
-    Iterables.addAll(reusableAllFiles,
-      Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
-
-    Plugin<Representation> plugin = new ImageMagickConvertPlugin<Representation>();
-    Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
-    parameters.put("outputFormat", "tiff");
-    plugin.setParameterValues(parameters);
-
-    // FIXME 20160623 hsilva: passing by null just to make code compiling
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null, plugin);
-
-    aip = model.retrieveAIP(aip.getId());
-    Assert.assertEquals(2, aip.getRepresentations().size());
-
-    CloseableIterable<OptionalWithCause<File>> newAllFiles = model.listFilesUnder(aip.getId(),
-      aip.getRepresentations().get(1).getId(), true);
-    List<File> newReusableAllFiles = new ArrayList<>();
-    Iterables.addAll(newReusableAllFiles, Lists.newArrayList(newAllFiles).stream().filter(f -> f.isPresent())
-      .map(f -> f.get()).collect(Collectors.toList()));
-
-    Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
-
-    int changedCounter = 0;
-
-    for (File f : reusableAllFiles) {
-      if (f.getId().matches(".*[.](jpg|png)$")) {
-        changedCounter++;
-        String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
-        Assert.assertEquals(1, newReusableAllFiles.stream().filter(o -> o.getId().equals(filename + ".tiff")).count());
-      }
-    }
-
-    List<File> changedFiles = newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]tiff$"))
-      .collect(Collectors.toList());
-
-    Assert.assertEquals(changedCounter, changedFiles.size());
-  }
-
-  @Test
-  public void testSoxPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,
-    SolrServerException, IsStillUpdatingException {
-    AIP aip = ingestCorpora(0);
-
-    CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
-      aip.getRepresentations().get(0).getId(), true);
-    List<File> reusableAllFiles = new ArrayList<>();
-    Iterables.addAll(reusableAllFiles,
-      Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
-
-    Plugin<Representation> plugin = new SoxConvertPlugin<Representation>();
-    Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
-    parameters.put("outputFormat", "ogg");
-    plugin.setParameterValues(parameters);
-
-    // FIXME 20160623 hsilva: passing by null just to make code compiling
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null, plugin);
-
-    aip = model.retrieveAIP(aip.getId());
-    Assert.assertEquals(2, aip.getRepresentations().size());
-
-    CloseableIterable<OptionalWithCause<File>> newAllFiles = model.listFilesUnder(aip.getId(),
-      aip.getRepresentations().get(1).getId(), true);
-    List<File> newReusableAllFiles = new ArrayList<>();
-    Iterables.addAll(newReusableAllFiles, Lists.newArrayList(newAllFiles).stream().filter(f -> f.isPresent())
-      .map(f -> f.get()).collect(Collectors.toList()));
-
-    Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
-
-    int changedCounter = 0;
-
-    for (File f : reusableAllFiles) {
-      if (f.getId().matches(".*[.](mp3)$")) {
-        changedCounter++;
-        String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
-        Assert.assertEquals(1, newReusableAllFiles.stream().filter(o -> o.getId().equals(filename + ".ogg")).count());
-      }
-    }
-
-    List<File> changedFiles = newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]ogg$"))
-      .collect(Collectors.toList());
-
-    Assert.assertEquals(changedCounter, changedFiles.size());
-  }
-
-  @Test
-  public void testAvconvPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,
-    SolrServerException, IsStillUpdatingException {
-    AIP aip = ingestCorpora(0);
-
-    CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
-      aip.getRepresentations().get(0).getId(), true);
-    List<File> reusableAllFiles = new ArrayList<>();
-    Iterables.addAll(reusableAllFiles,
-      Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
-
-    Plugin<Representation> plugin = new AvconvConvertPlugin<Representation>();
-    Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
-    parameters.put("outputFormat", "gif");
-    parameters.put("outputArguments", "-pix_fmt rgb24");
-    plugin.setParameterValues(parameters);
-
-    // FIXME 20160623 hsilva: passing by null just to make code compiling
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null, plugin);
-
-    aip = model.retrieveAIP(aip.getId());
-    Assert.assertEquals(2, aip.getRepresentations().size());
-
-    CloseableIterable<OptionalWithCause<File>> newAllFiles = model.listFilesUnder(aip.getId(),
-      aip.getRepresentations().get(1).getId(), true);
-    List<File> newReusableAllFiles = new ArrayList<>();
-    Iterables.addAll(newReusableAllFiles, Lists.newArrayList(newAllFiles).stream().filter(f -> f.isPresent())
-      .map(f -> f.get()).collect(Collectors.toList()));
-
-    Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
-
-    int changedCounter = 0;
-
-    for (File f : reusableAllFiles) {
-      if (f.getId().matches(".*[.](3g2|avi)$")) {
-        changedCounter++;
-        String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
-        Assert.assertEquals(1, newReusableAllFiles.stream().filter(o -> o.getId().equals(filename + ".gif")).count());
-      }
-    }
-
-    List<File> changedFiles = newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]gif$"))
-      .collect(Collectors.toList());
-
-    Assert.assertEquals(changedCounter, changedFiles.size());
-  }
-
-  @Ignore
-  public void testUnoconvPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,
-    SolrServerException, IsStillUpdatingException {
-    AIP aip = ingestCorpora(0);
-
-    CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
-      aip.getRepresentations().get(0).getId(), true);
-    List<File> reusableAllFiles = new ArrayList<>();
-    Iterables.addAll(reusableAllFiles,
-      Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
-
-    Plugin<Representation> plugin = new UnoconvConvertPlugin<Representation>();
-    Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
-    parameters.put("outputFormat", "pdf");
-    plugin.setParameterValues(parameters);
-
-    // FIXME 20160623 hsilva: passing by null just to make code compiling
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null, plugin);
-
-    aip = model.retrieveAIP(aip.getId());
-    Assert.assertEquals(2, aip.getRepresentations().size());
-
-    CloseableIterable<OptionalWithCause<File>> newAllFiles = model.listFilesUnder(aip.getId(),
-      aip.getRepresentations().get(1).getId(), true);
-    List<File> newReusableAllFiles = new ArrayList<>();
-    Iterables.addAll(newReusableAllFiles, Lists.newArrayList(newAllFiles).stream().filter(f -> f.isPresent())
-      .map(f -> f.get()).collect(Collectors.toList()));
-
-    Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
-
-    int changedCounter = 0;
-
-    for (File f : reusableAllFiles) {
-      if (f.getId().matches(".*[.](pdf|docx|txt|xls|odp|ppt|pptx|doc|rtf|xlsx|ods|odt|xml)$")) {
-        changedCounter++;
-        String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
-        Assert.assertEquals(1, newReusableAllFiles.stream().filter(o -> o.getId().equals(filename + ".pdf")).count());
-      }
-    }
-
-    List<File> changedFiles = newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]pdf$"))
-      .collect(Collectors.toList());
-
-    Assert.assertEquals(changedCounter, changedFiles.size());
-  }
-
-  @Test
-  public void testGhostScriptPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
-    IOException, SolrServerException, IsStillUpdatingException {
-    AIP aip = ingestCorpora(0);
-
-    CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
-      aip.getRepresentations().get(0).getId(), true);
-    List<File> reusableAllFiles = new ArrayList<>();
-    Iterables.addAll(reusableAllFiles,
-      Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
-
-    Plugin<Representation> plugin = new GhostScriptConvertPlugin<Representation>();
-    Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
-    parameters.put("outputFormat", "pdf");
-    parameters.put("commandArguments", "-sDEVICE=pdfwrite");
-    plugin.setParameterValues(parameters);
-
-    // FIXME 20160623 hsilva: passing by null just to make code compiling
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null, plugin);
-
-    aip = model.retrieveAIP(aip.getId());
-    Assert.assertEquals(2, aip.getRepresentations().size());
-
-    CloseableIterable<OptionalWithCause<File>> newAllFiles = model.listFilesUnder(aip.getId(),
-      aip.getRepresentations().get(1).getId(), true);
-    List<File> newReusableAllFiles = new ArrayList<>();
-    Iterables.addAll(newReusableAllFiles, Lists.newArrayList(newAllFiles).stream().filter(f -> f.isPresent())
-      .map(f -> f.get()).collect(Collectors.toList()));
-
-    Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
-
-    int changedCounter = 0;
-
-    for (File f : reusableAllFiles) {
-      if (f.getId().matches(".*[.](pdf)$")) {
-        changedCounter++;
-        String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
-        Assert.assertEquals(1, newReusableAllFiles.stream().filter(o -> o.getId().equals(filename + ".pdf")).count());
-      }
-    }
-
-    List<File> changedFiles = newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]pdf$"))
-      .collect(Collectors.toList());
-
-    Assert.assertEquals(changedCounter, changedFiles.size());
-  }
-
-  @Test
-  public void testPdfToPdfaPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,
-    SolrServerException, IsStillUpdatingException {
-    AIP aip = ingestCorpora(0);
-
-    CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
-      aip.getRepresentations().get(0).getId(), true);
-    List<File> reusableAllFiles = new ArrayList<>();
-    Iterables.addAll(reusableAllFiles,
-      Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
-
-    Plugin<Representation> plugin = new PdfToPdfaPlugin<Representation>();
-    Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
-    parameters.put("outputFormat", "pdf");
-    plugin.setParameterValues(parameters);
-
-    // FIXME 20160623 hsilva: passing by null just to make code compiling
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null, plugin);
-    aip = model.retrieveAIP(aip.getId());
-    Assert.assertEquals(2, aip.getRepresentations().size());
-
-    CloseableIterable<OptionalWithCause<File>> newAllFiles = model.listFilesUnder(aip.getId(),
-      aip.getRepresentations().get(1).getId(), true);
-    List<File> newReusableAllFiles = new ArrayList<>();
-    Iterables.addAll(newReusableAllFiles, Lists.newArrayList(newAllFiles).stream().filter(f -> f.isPresent())
-      .map(f -> f.get()).collect(Collectors.toList()));
-    Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
-
-    for (File f : reusableAllFiles) {
-      if (f.getId().matches(".*[.](pdf)$")) {
-        String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
-        Assert.assertEquals(1, newReusableAllFiles.stream().filter(o -> o.getId().equals(filename + ".pdf")).count());
-      }
-    }
-  }
-
-  @Test
-  public void testMultipleRepresentations() throws FileAlreadyExistsException, RequestNotValidException,
-    NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
-    InvalidParameterException, InterruptedException, IOException, SolrServerException, IsStillUpdatingException {
-
-    AIP aip = ingestCorpora(0);
-
-    CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
-      aip.getRepresentations().get(0).getId(), true);
-    List<File> reusableAllFiles = new ArrayList<>();
-    Iterables.addAll(reusableAllFiles,
-      Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
-
-    Plugin<Representation> plugin = new SoxConvertPlugin<Representation>();
-    Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
-    parameters.put("outputFormat", "ogg");
-    plugin.setParameterValues(parameters);
-
-    // FIXME 20160623 hsilva: passing by null just to make code compiling
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null, plugin);
-    aip = model.retrieveAIP(aip.getId());
-    Assert.assertEquals(2, aip.getRepresentations().size());
-    String editedRepresentationId = aip.getRepresentations().get(1).getId();
-
-    Plugin<Representation> plugin2 = new ImageMagickConvertPlugin<Representation>();
-    Map<String, String> parameters2 = new HashMap<>();
-    parameters2.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
-    parameters2.put("outputFormat", "tiff");
-    plugin2.setParameterValues(parameters2);
-
-    // FIXME 20160623 hsilva: passing by null just to make code compiling
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null, plugin2);
-    aip = model.retrieveAIP(aip.getId());
-    Assert.assertEquals(4, aip.getRepresentations().size());
-
-    Assert.assertEquals(1,
-      aip.getRepresentations().stream().filter(o -> o.getId().equals(editedRepresentationId)).count());
-
-    CloseableIterable<OptionalWithCause<File>> newAllFiles = model.listFilesUnder(aip.getId(),
-      aip.getRepresentations().get(3).getId(), true);
-    List<File> newReusableAllFiles = new ArrayList<>();
-    Iterables.addAll(newReusableAllFiles, Lists.newArrayList(newAllFiles).stream().filter(f -> f.isPresent())
-      .map(f -> f.get()).collect(Collectors.toList()));
-
-    Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
-
-    int changedCounter = 0;
-
-    for (File f : reusableAllFiles) {
-      if (f.getId().matches(".*[.](jpg|png|mp3)$")) {
-        changedCounter++;
-        String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
-        Assert.assertEquals(1, newReusableAllFiles.stream()
-          .filter(o -> o.getId().equals(filename + ".tiff") || o.getId().equals(filename + ".ogg")).count());
-      }
-    }
-
-    Assert.assertEquals(changedCounter,
-      newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.](tiff|ogg)$")).count());
-
-  }
-
-  @Test
-  public void testGeneralCommandPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
-    IOException, SolrServerException, IsStillUpdatingException {
-    AIP aip = ingestCorpora(0);
-
-    CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
-      aip.getRepresentations().get(0).getId(), true);
-    List<File> reusableAllFiles = new ArrayList<>();
-    Iterables.addAll(reusableAllFiles,
-      Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
-
-    Plugin<Representation> plugin = new GeneralCommandConvertPlugin<Representation>();
-    Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
-    parameters.put("inputFormat", "png");
-    parameters.put("outputFormat", "tiff");
-    parameters.put("commandArguments", "/usr/bin/convert -regard-warnings {input_file} {output_file}");
-    plugin.setParameterValues(parameters);
-
-    // FIXME 20160623 hsilva: passing by null just to make code compiling
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null, plugin);
-    aip = model.retrieveAIP(aip.getId());
-    Assert.assertEquals(2, aip.getRepresentations().size());
-
-    CloseableIterable<OptionalWithCause<File>> newAllFiles = model.listFilesUnder(aip.getId(),
-      aip.getRepresentations().get(1).getId(), true);
-    List<File> newReusableAllFiles = new ArrayList<>();
-    Iterables.addAll(newReusableAllFiles, Lists.newArrayList(newAllFiles).stream().filter(f -> f.isPresent())
-      .map(f -> f.get()).collect(Collectors.toList()));
-
-    Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
-
-    int changedCounter = 0;
-
-    for (File f : reusableAllFiles) {
-      if (f.getId().matches(".*[.](png)$")) {
-        changedCounter++;
-        String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
-        Assert.assertEquals(1, newReusableAllFiles.stream().filter(o -> o.getId().equals(filename + ".tiff")).count());
-      }
-    }
-
-    Assert.assertEquals(changedCounter,
-      newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]tiff$")).count());
-  }
-
-  @Test
-  public void testDigitalSignaturePlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
-    IOException, NoSuchAlgorithmException, SolrServerException, IsStillUpdatingException {
-    AIP aip = ingestCorpora(1);
-    String oldRepresentationId = aip.getRepresentations().get(0).getId();
-
-    CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
-      aip.getRepresentations().get(0).getId(), true);
-    List<File> reusableAllFiles = new ArrayList<>();
-    Iterables.addAll(reusableAllFiles,
-      Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
-
-    Plugin<Representation> plugin = new DigitalSignaturePlugin();
-    Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
-    parameters.put("doVerify", "True");
-    parameters.put("doExtract", "True");
-    parameters.put("doStrip", "True");
-    plugin.setParameterValues(parameters);
-
-    // FIXME 20160623 hsilva: passing by null just to make code compiling
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null, plugin);
-
-    aip = model.retrieveAIP(aip.getId());
-    Assert.assertEquals(2, aip.getRepresentations().size());
-
-    CloseableIterable<OptionalWithCause<File>> newFiles = model.listFilesUnder(aip.getId(),
-      aip.getRepresentations().get(1).getId(), true);
-    List<File> newReusableFiles = new ArrayList<>();
-    Iterables.addAll(newReusableFiles,
-      Lists.newArrayList(newFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
-
-    for (File f : reusableAllFiles) {
-      if (f.getId().matches(".*[.](pdf)$")) {
-        String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
-        Assert.assertEquals(1, newReusableFiles.stream().filter(o -> o.getId().equals(f.getId())).count());
-
-        Binary binary = model.retrieveOtherMetadataBinary(aip.getId(), oldRepresentationId, f.getPath(), filename,
-          ".xml", "DigitalSignature");
-
-        Assert.assertTrue(binary.getSizeInBytes() > 0);
-      }
-    }
-  }
-
-  @Ignore
-  @Test
-  public void testDigitalSignatureDIPPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
-    IOException, SolrServerException, IsStillUpdatingException {
-    AIP aip = ingestCorpora(2);
-    CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
-      aip.getRepresentations().get(0).getId(), true);
-    OptionalWithCause<File> file = allFiles.iterator().next();
-
-    StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file.get());
-    DirectResourceAccess directAccess = model.getStorage().getDirectAccess(fileStoragePath);
-    Assert.assertEquals(0, PDFSignatureUtils.countSignaturesPDF(directAccess.getPath()));
-    IOUtils.closeQuietly(directAccess);
-
-    Plugin<Representation> plugin = new DigitalSignatureDIPPlugin();
-    Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
-    plugin.setParameterValues(parameters);
-
-    DigitalSignatureDIPPluginUtils.setKeystorePath(corporaPath.toString() + "/Certification/keystore.jks");
-    // FIXME 20160623 hsilva: passing by null just to make code compiling
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null, plugin);
-
-    aip = model.retrieveAIP(aip.getId());
-    CloseableIterable<OptionalWithCause<File>> allNewFiles = model.listFilesUnder(aip.getId(),
-      aip.getRepresentations().get(1).getId(), true);
-    OptionalWithCause<File> newFile = allNewFiles.iterator().next();
-
-    StoragePath newFileStoragePath = ModelUtils.getFileStoragePath(newFile.get());
-    DirectResourceAccess newDirectAccess = model.getStorage().getDirectAccess(newFileStoragePath);
-    Assert.assertEquals(1, PDFSignatureUtils.countSignaturesPDF(newDirectAccess.getPath()));
-    IOUtils.closeQuietly(newDirectAccess);
-  }
-
-  @Test
-  public void testVeraPDFPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,
-    SolrServerException, IsStillUpdatingException {
-    ingestCorpora(2);
-
-    Plugin<AIP> plugin = new VeraPDFPlugin();
-    Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
-    parameters.put("profile", "1b");
-    parameters.put("hasFeatures", "False");
-    plugin.setParameterValues(parameters);
-
-    // FIXME 20160623 hsilva: passing by null just to make code compiling
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllAIPs(null, plugin);
-    // Assert.assertEquals("PARTIAL_SUCCESS",
-    // reports.get(0).getReports().get(0).getPluginState().toString());
-
-    Plugin<Representation> plugin2 = new PdfToPdfaPlugin<Representation>();
-    // FIXME 20160623 hsilva: passing by null just to make code compiling
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null, plugin2);
-
-    Plugin<AIP> plugin3 = new VeraPDFPlugin();
-    plugin3.setParameterValues(parameters);
-    // FIXME 20160623 hsilva: passing by null just to make code compiling
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllAIPs(null, plugin3);
-    // Assert.assertEquals("SUCCESS",
-    // reports.get(0).getReports().get(1).getPluginState().toString());
-
-  }
+  // @Test
+  // public void testImageMagickPlugin() throws RODAException,
+  // FileAlreadyExistsException, InterruptedException,
+  // IOException, SolrServerException, IsStillUpdatingException {
+  // AIP aip = ingestCorpora(0);
+  //
+  // CloseableIterable<OptionalWithCause<File>> allFiles =
+  // model.listFilesUnder(aip.getId(),
+  // aip.getRepresentations().get(0).getId(), true);
+  // List<File> reusableAllFiles = new ArrayList<>();
+  // Iterables.addAll(reusableAllFiles,
+  // Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f ->
+  // f.get()).collect(Collectors.toList()));
+  //
+  // Plugin<Representation> plugin = new
+  // ImageMagickConvertPlugin<Representation>();
+  // Map<String, String> parameters = new HashMap<>();
+  // parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
+  // parameters.put("outputFormat", "tiff");
+  // plugin.setParameterValues(parameters);
+  //
+  // // FIXME 20160623 hsilva: passing by null just to make code compiling
+  // RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null,
+  // plugin);
+  //
+  // aip = model.retrieveAIP(aip.getId());
+  // Assert.assertEquals(2, aip.getRepresentations().size());
+  //
+  // CloseableIterable<OptionalWithCause<File>> newAllFiles =
+  // model.listFilesUnder(aip.getId(),
+  // aip.getRepresentations().get(1).getId(), true);
+  // List<File> newReusableAllFiles = new ArrayList<>();
+  // Iterables.addAll(newReusableAllFiles,
+  // Lists.newArrayList(newAllFiles).stream().filter(f -> f.isPresent())
+  // .map(f -> f.get()).collect(Collectors.toList()));
+  //
+  // Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
+  //
+  // int changedCounter = 0;
+  //
+  // for (File f : reusableAllFiles) {
+  // if (f.getId().matches(".*[.](jpg|png)$")) {
+  // changedCounter++;
+  // String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
+  // Assert.assertEquals(1, newReusableAllFiles.stream().filter(o ->
+  // o.getId().equals(filename + ".tiff")).count());
+  // }
+  // }
+  //
+  // List<File> changedFiles = newReusableAllFiles.stream().filter(o ->
+  // o.getId().matches(".*[.]tiff$"))
+  // .collect(Collectors.toList());
+  //
+  // Assert.assertEquals(changedCounter, changedFiles.size());
+  // }
+
+  // @Test
+  // public void testSoxPlugin() throws RODAException,
+  // FileAlreadyExistsException, InterruptedException, IOException,
+  // SolrServerException, IsStillUpdatingException {
+  // AIP aip = ingestCorpora(0);
+  //
+  // CloseableIterable<OptionalWithCause<File>> allFiles =
+  // model.listFilesUnder(aip.getId(),
+  // aip.getRepresentations().get(0).getId(), true);
+  // List<File> reusableAllFiles = new ArrayList<>();
+  // Iterables.addAll(reusableAllFiles,
+  // Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f ->
+  // f.get()).collect(Collectors.toList()));
+  //
+  // Plugin<Representation> plugin = new SoxConvertPlugin<Representation>();
+  // Map<String, String> parameters = new HashMap<>();
+  // parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
+  // parameters.put("outputFormat", "ogg");
+  // plugin.setParameterValues(parameters);
+  //
+  // // FIXME 20160623 hsilva: passing by null just to make code compiling
+  // RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null,
+  // plugin);
+  //
+  // aip = model.retrieveAIP(aip.getId());
+  // Assert.assertEquals(2, aip.getRepresentations().size());
+  //
+  // CloseableIterable<OptionalWithCause<File>> newAllFiles =
+  // model.listFilesUnder(aip.getId(),
+  // aip.getRepresentations().get(1).getId(), true);
+  // List<File> newReusableAllFiles = new ArrayList<>();
+  // Iterables.addAll(newReusableAllFiles,
+  // Lists.newArrayList(newAllFiles).stream().filter(f -> f.isPresent())
+  // .map(f -> f.get()).collect(Collectors.toList()));
+  //
+  // Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
+  //
+  // int changedCounter = 0;
+  //
+  // for (File f : reusableAllFiles) {
+  // if (f.getId().matches(".*[.](mp3)$")) {
+  // changedCounter++;
+  // String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
+  // Assert.assertEquals(1, newReusableAllFiles.stream().filter(o ->
+  // o.getId().equals(filename + ".ogg")).count());
+  // }
+  // }
+  //
+  // List<File> changedFiles = newReusableAllFiles.stream().filter(o ->
+  // o.getId().matches(".*[.]ogg$"))
+  // .collect(Collectors.toList());
+  //
+  // Assert.assertEquals(changedCounter, changedFiles.size());
+  // }
+
+  // @Test
+  // public void testAvconvPlugin() throws RODAException,
+  // FileAlreadyExistsException, InterruptedException, IOException,
+  // SolrServerException, IsStillUpdatingException {
+  // AIP aip = ingestCorpora(0);
+  //
+  // CloseableIterable<OptionalWithCause<File>> allFiles =
+  // model.listFilesUnder(aip.getId(),
+  // aip.getRepresentations().get(0).getId(), true);
+  // List<File> reusableAllFiles = new ArrayList<>();
+  // Iterables.addAll(reusableAllFiles,
+  // Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f ->
+  // f.get()).collect(Collectors.toList()));
+  //
+  // Plugin<Representation> plugin = new AvconvConvertPlugin<Representation>();
+  // Map<String, String> parameters = new HashMap<>();
+  // parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
+  // parameters.put("outputFormat", "gif");
+  // parameters.put("outputArguments", "-pix_fmt rgb24");
+  // plugin.setParameterValues(parameters);
+  //
+  // // FIXME 20160623 hsilva: passing by null just to make code compiling
+  // RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null,
+  // plugin);
+  //
+  // aip = model.retrieveAIP(aip.getId());
+  // Assert.assertEquals(2, aip.getRepresentations().size());
+  //
+  // CloseableIterable<OptionalWithCause<File>> newAllFiles =
+  // model.listFilesUnder(aip.getId(),
+  // aip.getRepresentations().get(1).getId(), true);
+  // List<File> newReusableAllFiles = new ArrayList<>();
+  // Iterables.addAll(newReusableAllFiles,
+  // Lists.newArrayList(newAllFiles).stream().filter(f -> f.isPresent())
+  // .map(f -> f.get()).collect(Collectors.toList()));
+  //
+  // Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
+  //
+  // int changedCounter = 0;
+  //
+  // for (File f : reusableAllFiles) {
+  // if (f.getId().matches(".*[.](3g2|avi)$")) {
+  // changedCounter++;
+  // String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
+  // Assert.assertEquals(1, newReusableAllFiles.stream().filter(o ->
+  // o.getId().equals(filename + ".gif")).count());
+  // }
+  // }
+  //
+  // List<File> changedFiles = newReusableAllFiles.stream().filter(o ->
+  // o.getId().matches(".*[.]gif$"))
+  // .collect(Collectors.toList());
+  //
+  // Assert.assertEquals(changedCounter, changedFiles.size());
+  // }
+
+  // @Ignore
+  // public void testUnoconvPlugin() throws RODAException,
+  // FileAlreadyExistsException, InterruptedException, IOException,
+  // SolrServerException, IsStillUpdatingException {
+  // AIP aip = ingestCorpora(0);
+  //
+  // CloseableIterable<OptionalWithCause<File>> allFiles =
+  // model.listFilesUnder(aip.getId(),
+  // aip.getRepresentations().get(0).getId(), true);
+  // List<File> reusableAllFiles = new ArrayList<>();
+  // Iterables.addAll(reusableAllFiles,
+  // Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f ->
+  // f.get()).collect(Collectors.toList()));
+  //
+  // Plugin<Representation> plugin = new UnoconvConvertPlugin<Representation>();
+  // Map<String, String> parameters = new HashMap<>();
+  // parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
+  // parameters.put("outputFormat", "pdf");
+  // plugin.setParameterValues(parameters);
+  //
+  // // FIXME 20160623 hsilva: passing by null just to make code compiling
+  // RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null,
+  // plugin);
+  //
+  // aip = model.retrieveAIP(aip.getId());
+  // Assert.assertEquals(2, aip.getRepresentations().size());
+  //
+  // CloseableIterable<OptionalWithCause<File>> newAllFiles =
+  // model.listFilesUnder(aip.getId(),
+  // aip.getRepresentations().get(1).getId(), true);
+  // List<File> newReusableAllFiles = new ArrayList<>();
+  // Iterables.addAll(newReusableAllFiles,
+  // Lists.newArrayList(newAllFiles).stream().filter(f -> f.isPresent())
+  // .map(f -> f.get()).collect(Collectors.toList()));
+  //
+  // Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
+  //
+  // int changedCounter = 0;
+  //
+  // for (File f : reusableAllFiles) {
+  // if
+  // (f.getId().matches(".*[.](pdf|docx|txt|xls|odp|ppt|pptx|doc|rtf|xlsx|ods|odt|xml)$"))
+  // {
+  // changedCounter++;
+  // String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
+  // Assert.assertEquals(1, newReusableAllFiles.stream().filter(o ->
+  // o.getId().equals(filename + ".pdf")).count());
+  // }
+  // }
+  //
+  // List<File> changedFiles = newReusableAllFiles.stream().filter(o ->
+  // o.getId().matches(".*[.]pdf$"))
+  // .collect(Collectors.toList());
+  //
+  // Assert.assertEquals(changedCounter, changedFiles.size());
+  // }
+
+  // @Test
+  // public void testGhostScriptPlugin() throws RODAException,
+  // FileAlreadyExistsException, InterruptedException,
+  // IOException, SolrServerException, IsStillUpdatingException {
+  // AIP aip = ingestCorpora(0);
+  //
+  // CloseableIterable<OptionalWithCause<File>> allFiles =
+  // model.listFilesUnder(aip.getId(),
+  // aip.getRepresentations().get(0).getId(), true);
+  // List<File> reusableAllFiles = new ArrayList<>();
+  // Iterables.addAll(reusableAllFiles,
+  // Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f ->
+  // f.get()).collect(Collectors.toList()));
+  //
+  // Plugin<Representation> plugin = new
+  // GhostScriptConvertPlugin<Representation>();
+  // Map<String, String> parameters = new HashMap<>();
+  // parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
+  // parameters.put("outputFormat", "pdf");
+  // parameters.put("commandArguments", "-sDEVICE=pdfwrite");
+  // plugin.setParameterValues(parameters);
+  //
+  // // FIXME 20160623 hsilva: passing by null just to make code compiling
+  // RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null,
+  // plugin);
+  //
+  // aip = model.retrieveAIP(aip.getId());
+  // Assert.assertEquals(2, aip.getRepresentations().size());
+  //
+  // CloseableIterable<OptionalWithCause<File>> newAllFiles =
+  // model.listFilesUnder(aip.getId(),
+  // aip.getRepresentations().get(1).getId(), true);
+  // List<File> newReusableAllFiles = new ArrayList<>();
+  // Iterables.addAll(newReusableAllFiles,
+  // Lists.newArrayList(newAllFiles).stream().filter(f -> f.isPresent())
+  // .map(f -> f.get()).collect(Collectors.toList()));
+  //
+  // Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
+  //
+  // int changedCounter = 0;
+  //
+  // for (File f : reusableAllFiles) {
+  // if (f.getId().matches(".*[.](pdf)$")) {
+  // changedCounter++;
+  // String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
+  // Assert.assertEquals(1, newReusableAllFiles.stream().filter(o ->
+  // o.getId().equals(filename + ".pdf")).count());
+  // }
+  // }
+  //
+  // List<File> changedFiles = newReusableAllFiles.stream().filter(o ->
+  // o.getId().matches(".*[.]pdf$"))
+  // .collect(Collectors.toList());
+  //
+  // Assert.assertEquals(changedCounter, changedFiles.size());
+  // }
+
+  // @Test
+  // public void testPdfToPdfaPlugin() throws RODAException,
+  // FileAlreadyExistsException, InterruptedException, IOException,
+  // SolrServerException, IsStillUpdatingException {
+  // AIP aip = ingestCorpora(0);
+  //
+  // CloseableIterable<OptionalWithCause<File>> allFiles =
+  // model.listFilesUnder(aip.getId(),
+  // aip.getRepresentations().get(0).getId(), true);
+  // List<File> reusableAllFiles = new ArrayList<>();
+  // Iterables.addAll(reusableAllFiles,
+  // Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f ->
+  // f.get()).collect(Collectors.toList()));
+  //
+  // Plugin<Representation> plugin = new PdfToPdfaPlugin<Representation>();
+  // Map<String, String> parameters = new HashMap<>();
+  // parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
+  // parameters.put("outputFormat", "pdf");
+  // plugin.setParameterValues(parameters);
+  //
+  // // FIXME 20160623 hsilva: passing by null just to make code compiling
+  // RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null,
+  // plugin);
+  // aip = model.retrieveAIP(aip.getId());
+  // Assert.assertEquals(2, aip.getRepresentations().size());
+  //
+  // CloseableIterable<OptionalWithCause<File>> newAllFiles =
+  // model.listFilesUnder(aip.getId(),
+  // aip.getRepresentations().get(1).getId(), true);
+  // List<File> newReusableAllFiles = new ArrayList<>();
+  // Iterables.addAll(newReusableAllFiles,
+  // Lists.newArrayList(newAllFiles).stream().filter(f -> f.isPresent())
+  // .map(f -> f.get()).collect(Collectors.toList()));
+  // Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
+  //
+  // for (File f : reusableAllFiles) {
+  // if (f.getId().matches(".*[.](pdf)$")) {
+  // String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
+  // Assert.assertEquals(1, newReusableAllFiles.stream().filter(o ->
+  // o.getId().equals(filename + ".pdf")).count());
+  // }
+  // }
+  // }
+
+  // @Test
+  // public void testMultipleRepresentations() throws
+  // FileAlreadyExistsException, RequestNotValidException,
+  // NotFoundException, GenericException, AlreadyExistsException,
+  // AuthorizationDeniedException,
+  // InvalidParameterException, InterruptedException, IOException,
+  // SolrServerException, IsStillUpdatingException {
+  //
+  // AIP aip = ingestCorpora(0);
+  //
+  // CloseableIterable<OptionalWithCause<File>> allFiles =
+  // model.listFilesUnder(aip.getId(),
+  // aip.getRepresentations().get(0).getId(), true);
+  // List<File> reusableAllFiles = new ArrayList<>();
+  // Iterables.addAll(reusableAllFiles,
+  // Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f ->
+  // f.get()).collect(Collectors.toList()));
+  //
+  // Plugin<Representation> plugin = new SoxConvertPlugin<Representation>();
+  // Map<String, String> parameters = new HashMap<>();
+  // parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
+  // parameters.put("outputFormat", "ogg");
+  // plugin.setParameterValues(parameters);
+  //
+  // // FIXME 20160623 hsilva: passing by null just to make code compiling
+  // RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null,
+  // plugin);
+  // aip = model.retrieveAIP(aip.getId());
+  // Assert.assertEquals(2, aip.getRepresentations().size());
+  // String editedRepresentationId = aip.getRepresentations().get(1).getId();
+  //
+  // Plugin<Representation> plugin2 = new
+  // ImageMagickConvertPlugin<Representation>();
+  // Map<String, String> parameters2 = new HashMap<>();
+  // parameters2.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
+  // parameters2.put("outputFormat", "tiff");
+  // plugin2.setParameterValues(parameters2);
+  //
+  // // FIXME 20160623 hsilva: passing by null just to make code compiling
+  // RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null,
+  // plugin2);
+  // aip = model.retrieveAIP(aip.getId());
+  // Assert.assertEquals(4, aip.getRepresentations().size());
+  //
+  // Assert.assertEquals(1,
+  // aip.getRepresentations().stream().filter(o ->
+  // o.getId().equals(editedRepresentationId)).count());
+  //
+  // CloseableIterable<OptionalWithCause<File>> newAllFiles =
+  // model.listFilesUnder(aip.getId(),
+  // aip.getRepresentations().get(3).getId(), true);
+  // List<File> newReusableAllFiles = new ArrayList<>();
+  // Iterables.addAll(newReusableAllFiles,
+  // Lists.newArrayList(newAllFiles).stream().filter(f -> f.isPresent())
+  // .map(f -> f.get()).collect(Collectors.toList()));
+  //
+  // Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
+  //
+  // int changedCounter = 0;
+  //
+  // for (File f : reusableAllFiles) {
+  // if (f.getId().matches(".*[.](jpg|png|mp3)$")) {
+  // changedCounter++;
+  // String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
+  // Assert.assertEquals(1, newReusableAllFiles.stream()
+  // .filter(o -> o.getId().equals(filename + ".tiff") ||
+  // o.getId().equals(filename + ".ogg")).count());
+  // }
+  // }
+  //
+  // Assert.assertEquals(changedCounter,
+  // newReusableAllFiles.stream().filter(o ->
+  // o.getId().matches(".*[.](tiff|ogg)$")).count());
+  //
+  // }
+
+  // @Test
+  // public void testGeneralCommandPlugin() throws RODAException,
+  // FileAlreadyExistsException, InterruptedException,
+  // IOException, SolrServerException, IsStillUpdatingException {
+  // AIP aip = ingestCorpora(0);
+  //
+  // CloseableIterable<OptionalWithCause<File>> allFiles =
+  // model.listFilesUnder(aip.getId(),
+  // aip.getRepresentations().get(0).getId(), true);
+  // List<File> reusableAllFiles = new ArrayList<>();
+  // Iterables.addAll(reusableAllFiles,
+  // Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f ->
+  // f.get()).collect(Collectors.toList()));
+  //
+  // Plugin<Representation> plugin = new
+  // GeneralCommandConvertPlugin<Representation>();
+  // Map<String, String> parameters = new HashMap<>();
+  // parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
+  // parameters.put("inputFormat", "png");
+  // parameters.put("outputFormat", "tiff");
+  // parameters.put("commandArguments", "/usr/bin/convert -regard-warnings
+  // {input_file} {output_file}");
+  // plugin.setParameterValues(parameters);
+  //
+  // // FIXME 20160623 hsilva: passing by null just to make code compiling
+  // RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null,
+  // plugin);
+  // aip = model.retrieveAIP(aip.getId());
+  // Assert.assertEquals(2, aip.getRepresentations().size());
+  //
+  // CloseableIterable<OptionalWithCause<File>> newAllFiles =
+  // model.listFilesUnder(aip.getId(),
+  // aip.getRepresentations().get(1).getId(), true);
+  // List<File> newReusableAllFiles = new ArrayList<>();
+  // Iterables.addAll(newReusableAllFiles,
+  // Lists.newArrayList(newAllFiles).stream().filter(f -> f.isPresent())
+  // .map(f -> f.get()).collect(Collectors.toList()));
+  //
+  // Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
+  //
+  // int changedCounter = 0;
+  //
+  // for (File f : reusableAllFiles) {
+  // if (f.getId().matches(".*[.](png)$")) {
+  // changedCounter++;
+  // String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
+  // Assert.assertEquals(1, newReusableAllFiles.stream().filter(o ->
+  // o.getId().equals(filename + ".tiff")).count());
+  // }
+  // }
+  //
+  // Assert.assertEquals(changedCounter,
+  // newReusableAllFiles.stream().filter(o ->
+  // o.getId().matches(".*[.]tiff$")).count());
+  // }
+
+  // @Test
+  // public void testDigitalSignaturePlugin() throws RODAException,
+  // FileAlreadyExistsException, InterruptedException,
+  // IOException, NoSuchAlgorithmException, SolrServerException,
+  // IsStillUpdatingException {
+  // AIP aip = ingestCorpora(1);
+  // String oldRepresentationId = aip.getRepresentations().get(0).getId();
+  //
+  // CloseableIterable<OptionalWithCause<File>> allFiles =
+  // model.listFilesUnder(aip.getId(),
+  // aip.getRepresentations().get(0).getId(), true);
+  // List<File> reusableAllFiles = new ArrayList<>();
+  // Iterables.addAll(reusableAllFiles,
+  // Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f ->
+  // f.get()).collect(Collectors.toList()));
+  //
+  // Plugin<Representation> plugin = new DigitalSignaturePlugin();
+  // Map<String, String> parameters = new HashMap<>();
+  // parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
+  // parameters.put("doVerify", "True");
+  // parameters.put("doExtract", "True");
+  // parameters.put("doStrip", "True");
+  // plugin.setParameterValues(parameters);
+  //
+  // // FIXME 20160623 hsilva: passing by null just to make code compiling
+  // RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null,
+  // plugin);
+  //
+  // aip = model.retrieveAIP(aip.getId());
+  // Assert.assertEquals(2, aip.getRepresentations().size());
+  //
+  // CloseableIterable<OptionalWithCause<File>> newFiles =
+  // model.listFilesUnder(aip.getId(),
+  // aip.getRepresentations().get(1).getId(), true);
+  // List<File> newReusableFiles = new ArrayList<>();
+  // Iterables.addAll(newReusableFiles,
+  // Lists.newArrayList(newFiles).stream().filter(f -> f.isPresent()).map(f ->
+  // f.get()).collect(Collectors.toList()));
+  //
+  // for (File f : reusableAllFiles) {
+  // if (f.getId().matches(".*[.](pdf)$")) {
+  // String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
+  // Assert.assertEquals(1, newReusableFiles.stream().filter(o ->
+  // o.getId().equals(f.getId())).count());
+  //
+  // Binary binary = model.retrieveOtherMetadataBinary(aip.getId(),
+  // oldRepresentationId, f.getPath(), filename,
+  // ".xml", "DigitalSignature");
+  //
+  // Assert.assertTrue(binary.getSizeInBytes() > 0);
+  // }
+  // }
+  // }
+
+  // @Ignore
+  // @Test
+  // public void testDigitalSignatureDIPPlugin() throws RODAException,
+  // FileAlreadyExistsException, InterruptedException,
+  // IOException, SolrServerException, IsStillUpdatingException {
+  // AIP aip = ingestCorpora(2);
+  // CloseableIterable<OptionalWithCause<File>> allFiles =
+  // model.listFilesUnder(aip.getId(),
+  // aip.getRepresentations().get(0).getId(), true);
+  // OptionalWithCause<File> file = allFiles.iterator().next();
+  //
+  // StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file.get());
+  // DirectResourceAccess directAccess =
+  // model.getStorage().getDirectAccess(fileStoragePath);
+  // Assert.assertEquals(0,
+  // PDFSignatureUtils.countSignaturesPDF(directAccess.getPath()));
+  // IOUtils.closeQuietly(directAccess);
+  //
+  // Plugin<Representation> plugin = new DigitalSignatureDIPPlugin();
+  // Map<String, String> parameters = new HashMap<>();
+  // parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
+  // plugin.setParameterValues(parameters);
+  //
+  // DigitalSignatureDIPPluginUtils.setKeystorePath(corporaPath.toString() +
+  // "/Certification/keystore.jks");
+  // // FIXME 20160623 hsilva: passing by null just to make code compiling
+  // RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null,
+  // plugin);
+  //
+  // aip = model.retrieveAIP(aip.getId());
+  // CloseableIterable<OptionalWithCause<File>> allNewFiles =
+  // model.listFilesUnder(aip.getId(),
+  // aip.getRepresentations().get(1).getId(), true);
+  // OptionalWithCause<File> newFile = allNewFiles.iterator().next();
+  //
+  // StoragePath newFileStoragePath =
+  // ModelUtils.getFileStoragePath(newFile.get());
+  // DirectResourceAccess newDirectAccess =
+  // model.getStorage().getDirectAccess(newFileStoragePath);
+  // Assert.assertEquals(1,
+  // PDFSignatureUtils.countSignaturesPDF(newDirectAccess.getPath()));
+  // IOUtils.closeQuietly(newDirectAccess);
+  // }
+
+  // @Test
+  // public void testVeraPDFPlugin() throws RODAException,
+  // FileAlreadyExistsException, InterruptedException, IOException,
+  // SolrServerException, IsStillUpdatingException {
+  // ingestCorpora(2);
+  //
+  // Plugin<AIP> plugin = new VeraPDFPlugin();
+  // Map<String, String> parameters = new HashMap<>();
+  // parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
+  // parameters.put("profile", "1b");
+  // parameters.put("hasFeatures", "False");
+  // plugin.setParameterValues(parameters);
+  //
+  // // FIXME 20160623 hsilva: passing by null just to make code compiling
+  // RodaCoreFactory.getPluginOrchestrator().runPluginOnAllAIPs(null, plugin);
+  // // Assert.assertEquals("PARTIAL_SUCCESS",
+  // // reports.get(0).getReports().get(0).getPluginState().toString());
+  //
+  // Plugin<Representation> plugin2 = new PdfToPdfaPlugin<Representation>();
+  // // FIXME 20160623 hsilva: passing by null just to make code compiling
+  // RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null,
+  // plugin2);
+  //
+  // Plugin<AIP> plugin3 = new VeraPDFPlugin();
+  // plugin3.setParameterValues(parameters);
+  // // FIXME 20160623 hsilva: passing by null just to make code compiling
+  // RodaCoreFactory.getPluginOrchestrator().runPluginOnAllAIPs(null, plugin3);
+  // // Assert.assertEquals("SUCCESS",
+  // // reports.get(0).getReports().get(1).getPluginState().toString());
+  //
+  // }
 }

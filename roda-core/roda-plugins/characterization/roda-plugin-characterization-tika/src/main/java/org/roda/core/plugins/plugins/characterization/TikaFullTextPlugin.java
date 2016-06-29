@@ -46,9 +46,6 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TikaFullTextPlugin.class);
 
-  public static final String FILE_SUFFIX_FULLTEXT = ".fulltext.txt";
-  public static final String FILE_SUFFIX_METADATA = ".metadata.xml";
-
   private boolean createsPluginEvent = true;
   private boolean doFeatureExtraction = true;
   private boolean doFulltextExtraction = false;

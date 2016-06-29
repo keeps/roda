@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<prem:object xsi:type="prem:representation" xmlns:prem="http://www.loc.gov/premis/v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <prem:objectIdentifier>
+    <prem:objectIdentifierType>RODAObjectPID</prem:objectIdentifierType>
+    <prem:objectIdentifierValue>roda:396</prem:objectIdentifierValue>
+  </prem:objectIdentifier>
+  <prem:preservationLevel>
+    <prem:preservationLevelValue>full</prem:preservationLevelValue>
+    <prem:preservationLevelDateAssigned>2013-09-17T10:53:55Z</prem:preservationLevelDateAssigned>
+  </prem:preservationLevel>
+  <prem:relationship>
+    <prem:relationshipType>structural</prem:relationshipType>
+    <prem:relationshipSubType>has root</prem:relationshipSubType>
+    <prem:relatedObjectIdentifier>
+      <prem:relatedObjectIdentifierType>RODAObjectDatastreamID</prem:relatedObjectIdentifierType>
+      <prem:relatedObjectIdentifierValue>F0</prem:relatedObjectIdentifierValue>
+      <prem:relatedObjectSequence>0</prem:relatedObjectSequence>
+    </prem:relatedObjectIdentifier>
+  </prem:relationship>
+  <prem:relationship>
+    <prem:relationshipType>structural</prem:relationshipType>
+    <prem:relationshipSubType>has part</prem:relationshipSubType>
+    <prem:relatedObjectIdentifier>
+      <prem:relatedObjectIdentifierType>RODAObjectDatastreamID</prem:relatedObjectIdentifierType>
+      <prem:relatedObjectIdentifierValue>F1</prem:relatedObjectIdentifierValue>
+      <prem:relatedObjectSequence>1</prem:relatedObjectSequence>
+    </prem:relatedObjectIdentifier>
+  </prem:relationship>
+</prem:object>

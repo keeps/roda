@@ -67,7 +67,6 @@ import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
-import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.Directory;
 import org.roda.core.storage.StorageService;
@@ -304,7 +303,7 @@ public class IndexModelObserver implements ModelObserver {
     InputStream inputStream = null;
     try {
       Binary fulltextBinary = model.retrieveOtherMetadataBinary(file.getAipId(), file.getRepresentationId(),
-        file.getPath(), file.getId(), TikaFullTextPlugin.FILE_SUFFIX_FULLTEXT,
+        file.getPath(), file.getId(), RodaConstants.TIKA_FILE_SUFFIX_FULLTEXT,
         RodaConstants.OTHER_METADATA_TYPE_APACHE_TIKA);
       if (fulltextBinary.getSizeInBytes() < RodaCoreFactory.getRodaConfigurationAsInt(TEN_MB_IN_BYTES,
         "core.index.fulltext_threshold_in_bytes")) {
@@ -646,7 +645,7 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public void otherMetadataCreated(OtherMetadata otherMetadataBinary) {
     if (RodaConstants.OTHER_METADATA_TYPE_APACHE_TIKA.equalsIgnoreCase(otherMetadataBinary.getType())
-      && TikaFullTextPlugin.FILE_SUFFIX_METADATA.equalsIgnoreCase(otherMetadataBinary.getFileSuffix())) {
+      && RodaConstants.TIKA_FILE_SUFFIX_METADATA.equalsIgnoreCase(otherMetadataBinary.getFileSuffix())) {
       try {
         SolrInputDocument solrFile = SolrUtils.addOtherPropertiesToIndexedFile("tika_", otherMetadataBinary, model,
           index);
