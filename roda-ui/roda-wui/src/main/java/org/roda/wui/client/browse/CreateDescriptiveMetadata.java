@@ -22,6 +22,7 @@ import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationIssue;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
@@ -184,7 +185,7 @@ public class CreateDescriptiveMetadata extends Composite {
 
         @Override
         public void onFailure(Throwable caught) {
-          Toast.showError(caught.getClass().getName(), caught.getMessage());
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
         }
 
         @Override
@@ -241,8 +242,8 @@ public class CreateDescriptiveMetadata extends Composite {
           Dialogs.showConfirmDialog(messages.confirmChangeToFormTitle(), messages.confirmChangeToFormMessage(),
             messages.dialogCancel(), messages.dialogYes(), new AsyncCallback<Boolean>() {
               @Override
-              public void onFailure(Throwable throwable) {
-                Toast.showError(throwable.getClass().getName(), throwable.getMessage());
+              public void onFailure(Throwable caught) {
+                AsyncCallbackUtils.defaultFailureTreatment(caught);
               }
 
               @Override
@@ -278,7 +279,7 @@ public class CreateDescriptiveMetadata extends Composite {
     BrowserService.Util.getInstance().getDescriptiveMetadataPreview(aipId, selectedBundle, new AsyncCallback<String>() {
       @Override
       public void onFailure(Throwable caught) {
-        Toast.showError(caught.getClass().getName(), caught.getMessage());
+        AsyncCallbackUtils.defaultFailureTreatment(caught);
       }
 
       @Override
@@ -319,8 +320,7 @@ public class CreateDescriptiveMetadata extends Composite {
             ValidationException e = (ValidationException) caught;
             updateErrors(e);
           } else {
-            // TODO show error
-            Toast.showError(caught.getMessage());
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
           }
           buttonApply.setEnabled(true);
         }
@@ -367,7 +367,7 @@ public class CreateDescriptiveMetadata extends Composite {
 
         @Override
         public void onFailure(Throwable caught) {
-          Toast.showError(caught.getClass().getName(), caught.getMessage());
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
         }
 
         @Override

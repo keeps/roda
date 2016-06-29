@@ -27,12 +27,12 @@ import org.roda.wui.client.common.CreateJob;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.JobList;
 import org.roda.wui.client.ingest.process.ShowJob;
+import org.roda.wui.client.management.Management;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
-import org.roda.wui.management.client.Management;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;

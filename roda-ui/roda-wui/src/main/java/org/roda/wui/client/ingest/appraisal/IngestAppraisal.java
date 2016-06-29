@@ -40,6 +40,7 @@ import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener
 import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.SearchFileList;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.ListboxUtils;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.search.SearchField;
@@ -222,7 +223,7 @@ public class IngestAppraisal extends Composite {
       new AsyncCallback<List<SearchField>>() {
         @Override
         public void onFailure(Throwable caught) {
-          GWT.log("Error getting search fields", caught);
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
         }
 
         @Override

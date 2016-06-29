@@ -202,7 +202,7 @@ public class DescriptiveMetadataHistory extends Composite {
 
       @Override
       public void onFailure(Throwable caught) {
-        Toast.showError(caught);
+        AsyncCallbackUtils.defaultFailureTreatment(caught);
       }
 
       @Override

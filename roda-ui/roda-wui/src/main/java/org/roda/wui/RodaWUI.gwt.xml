@@ -20,7 +20,8 @@
 	<inherits name="com.bytebybyte.gwt.fontawesome.FontAwesomeLib" />
 
 	<!-- Inherit sub-projects -->
-	<inherits name="org.roda.wui.management.Management" />
+	<!-- TODO: Remove the Common sub-module -->
+	<inherits name='org.roda.wui.common.Common' />
 
 	<!-- <inherits name='com.google.gwt.user.theme.standard.Standard' /> -->
 	<!-- <inherits name="com.google.gwt.user.theme.chrome.Chrome" /> -->

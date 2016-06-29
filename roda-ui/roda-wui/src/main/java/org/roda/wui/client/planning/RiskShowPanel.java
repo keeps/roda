@@ -22,6 +22,7 @@ import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.ViewRepresentation;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
@@ -168,6 +169,7 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
 
                 @Override
                 public void onFailure(Throwable caught) {
+                  AsyncCallbackUtils.defaultFailureTreatment(caught);
                   Tools.newHistory(Browse.RESOLVER, selected.getAipId());
                 }
 
@@ -186,6 +188,7 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
 
               @Override
               public void onFailure(Throwable caught) {
+                AsyncCallbackUtils.defaultFailureTreatment(caught);
                 Tools.newHistory(Browse.RESOLVER, selected.getAipId());
               }
 

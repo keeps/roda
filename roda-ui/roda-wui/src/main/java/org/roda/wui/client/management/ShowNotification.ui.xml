@@ -2,13 +2,12 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
-	xmlns:u="urn:import:org.roda.wui.management.user.client">
+	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<ui:style>
-
+	
 	</ui:style>
 
 	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
@@ -17,38 +16,56 @@
 				<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
 					<g:FlowPanel addStyleNames="row full_width no_padding">
 						<g:FlowPanel addStyleNames="wui-data-panel">
-							<g:Label styleName="h1"><ui:text from='{messages.notificationTitle}' /></g:Label>
+							<g:Label styleName="h1">
+								<ui:text from='{messages.notificationTitle}' />
+							</g:Label>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label"><ui:text from='{messages.notificationIdentifier}' /></g:Label>
+								<g:Label styleName="label">
+									<ui:text from='{messages.notificationIdentifier}' />
+								</g:Label>
 								<g:Label styleName="value" ui:field="notificationId" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label"><ui:text from='{messages.notificationSubject}' /></g:Label>
+								<g:Label styleName="label">
+									<ui:text from='{messages.notificationSubject}' />
+								</g:Label>
 								<g:Label styleName="value" ui:field="notificationSubject" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label"><ui:text from='{messages.notificationBody}' /></g:Label>
+								<g:Label styleName="label">
+									<ui:text from='{messages.notificationBody}' />
+								</g:Label>
 								<g:HTML styleName="value" ui:field="notificationBody" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label"><ui:text from='{messages.notificationSentOn}' /></g:Label>
+								<g:Label styleName="label">
+									<ui:text from='{messages.notificationSentOn}' />
+								</g:Label>
 								<g:Label styleName="value" ui:field="notificationSentOn" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label"><ui:text from='{messages.notificationFromUser}' /></g:Label>
+								<g:Label styleName="label">
+									<ui:text from='{messages.notificationFromUser}' />
+								</g:Label>
 								<g:Label styleName="value" ui:field="notificationFromUser" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label"><ui:text from='{messages.notificationIsAcknowledged}' /></g:Label>
+								<g:Label styleName="label">
+									<ui:text from='{messages.notificationIsAcknowledged}' />
+								</g:Label>
 								<g:Label styleName="value" ui:field="notificationIsAcknowledged" />
 							</g:FlowPanel>
-							
-							<g:FlowPanel styleName="field">				
-								<g:Label styleName="label" ui:field="acknowledgedUsersKey"><ui:text from='{messages.notificationAcknowledgedUsers}' /></g:Label>
+
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="acknowledgedUsersKey">
+									<ui:text from='{messages.notificationAcknowledgedUsers}' />
+								</g:Label>
 								<g:HTML styleName="value" ui:field="acknowledgedUsersValue" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="notAcknowledgedUsersKey"><ui:text from='{messages.notificationNotAcknowledgedUsers}' /></g:Label>
+								<g:Label styleName="label" ui:field="notAcknowledgedUsersKey">
+									<ui:text from='{messages.notificationNotAcknowledgedUsers}' />
+								</g:Label>
 								<g:HTML styleName="value" ui:field="notAcknowledgedUsersValue" />
 							</g:FlowPanel>
 						</g:FlowPanel>

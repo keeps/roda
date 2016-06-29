@@ -8,23 +8,18 @@
 /**
  * 
  */
-package org.roda.wui.management.client;
+package org.roda.wui.client.management;
 
 import java.util.Arrays;
 import java.util.List;
 
 import org.roda.wui.client.common.CreateJob;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.management.MemberManagement;
-import org.roda.wui.client.management.NotificationRegister;
-import org.roda.wui.client.management.UserLog;
 import org.roda.wui.client.process.ActionProcess;
 import org.roda.wui.common.client.BadHistoryTokenException;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
-import org.roda.wui.management.editor.client.MetadataEditor;
-import org.roda.wui.management.statistics.client.Statistics;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -44,8 +39,8 @@ public class Management {
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {MemberManagement.RESOLVER, Statistics.getInstance(),
-        UserLog.RESOLVER, NotificationRegister.RESOLVER, ActionProcess.RESOLVER}, false, callback);
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {MemberManagement.RESOLVER, UserLog.RESOLVER,
+        NotificationRegister.RESOLVER, ActionProcess.RESOLVER}, false, callback);
     }
 
     public List<String> getHistoryPath() {
@@ -102,10 +97,6 @@ public class Management {
     } else {
       if (historyTokens.get(0).equals(MemberManagement.RESOLVER.getHistoryToken())) {
         MemberManagement.RESOLVER.resolve(Tools.tail(historyTokens), callback);
-      } else if (historyTokens.get(0).equals(MetadataEditor.getInstance().getHistoryToken())) {
-        MetadataEditor.getInstance().resolve(Tools.tail(historyTokens), callback);
-      } else if (historyTokens.get(0).equals(Statistics.getInstance().getHistoryToken())) {
-        Statistics.getInstance().resolve(Tools.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(UserLog.RESOLVER.getHistoryToken())) {
         UserLog.getInstance().resolve(Tools.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(NotificationRegister.RESOLVER.getHistoryToken())) {

@@ -87,11 +87,10 @@ public class ShowJob extends Composite {
           public void onFailure(Throwable caught) {
             if (caught instanceof NotFoundException) {
               Toast.showError(messages.notFoundError(), messages.jobNotFound());
+              Tools.newHistory(Process.RESOLVER);
             } else {
-              Toast.showError(caught.getClass().getName(), caught.getMessage());
+              AsyncCallbackUtils.defaultFailureTreatment(caught);
             }
-
-            Tools.newHistory(Process.RESOLVER);
           }
 
           @Override
@@ -395,7 +394,7 @@ public class ShowJob extends Composite {
             aipPanel.clear();
             aipPanel.add(itemTitle);
           } else {
-            Toast.showError(caught.getClass().getName(), caught.getMessage());
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
           }
         }
 

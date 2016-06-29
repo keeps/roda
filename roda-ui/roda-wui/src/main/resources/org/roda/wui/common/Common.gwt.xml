@@ -8,7 +8,7 @@
 	<!-- Inherit translation -->
 	<inherits name="config.i18n.I18N" />
 	<!-- Inherit the necessary libraries -->
-	<inherits name="org.gwtwidgets.WidgetLibrary" />
+	<!--  <inherits name="org.gwtwidgets.WidgetLibrary" /> -->
 	<!-- Specify the cascade stylesheet -->
 	<!-- <stylesheet src="Common.css"/> -->
 

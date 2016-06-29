@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.v2.user.Group;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Tools;
 
@@ -191,6 +192,7 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
 
       @Override
       public void onFailure(Throwable caught) {
+        AsyncCallbackUtils.defaultFailureTreatment(caught);
         Tools.newHistory(MemberManagement.RESOLVER);
       }
     });
@@ -240,6 +242,7 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
 
         @Override
         public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
           Tools.newHistory(MemberManagement.RESOLVER);
         }
       });

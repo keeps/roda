@@ -19,6 +19,7 @@ import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
+import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.LoginStatusListener;
@@ -30,6 +31,8 @@ import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.UriUtils;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
@@ -365,6 +368,24 @@ public class UserLogin {
 
       });
     }
+  }
+  
+  private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
+  
+  public void showSuggestLoginDialog() {
+    Dialogs.showConfirmDialog(messages.loginDialogTitle(), messages.casForwardWarning(), messages.loginDialogCancel(),
+      messages.loginDialogLogin(), new AsyncCallback<Boolean>() {
+
+        @Override
+        public void onSuccess(Boolean result) {
+          UserLogin.getInstance().login();
+        }
+
+        @Override
+        public void onFailure(Throwable caught) {
+          Tools.newHistory(Welcome.RESOLVER);
+        }
+      });
   }
 
 }

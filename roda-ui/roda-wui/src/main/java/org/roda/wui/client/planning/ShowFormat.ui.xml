@@ -2,13 +2,12 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
-	xmlns:u="urn:import:org.roda.wui.management.user.client">
+	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<ui:style>
-
+	
 	</ui:style>
 
 	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
@@ -17,71 +16,105 @@
 				<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
 					<g:FlowPanel addStyleNames="row full_width no_padding">
 						<g:FlowPanel addStyleNames="wui-data-panel">
-							<g:Label styleName="h1"><ui:text from='{messages.showFormatTitle}' /></g:Label>
+							<g:Label styleName="h1">
+								<ui:text from='{messages.showFormatTitle}' />
+							</g:Label>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label"><ui:text from='{messages.formatIdentifier}' /></g:Label>
+								<g:Label styleName="label">
+									<ui:text from='{messages.formatIdentifier}' />
+								</g:Label>
 								<g:Label styleName="value" ui:field="formatId" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label"><ui:text from='{messages.formatName}' /></g:Label>
+								<g:Label styleName="label">
+									<ui:text from='{messages.formatName}' />
+								</g:Label>
 								<g:Label styleName="value" ui:field="formatName" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="formatDefinitionKey"><ui:text from='{messages.formatDefinition}' /></g:Label>
+								<g:Label styleName="label" ui:field="formatDefinitionKey">
+									<ui:text from='{messages.formatDefinition}' />
+								</g:Label>
 								<g:Label styleName="value" ui:field="formatDefinitionValue" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="formatCategoryKey"><ui:text from='{messages.formatCategory}' /></g:Label>
+								<g:Label styleName="label" ui:field="formatCategoryKey">
+									<ui:text from='{messages.formatCategory}' />
+								</g:Label>
 								<g:FlowPanel styleName="value" ui:field="formatCategoryValue" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="formatLatestVersionKey"><ui:text from='{messages.formatLatestVersion}' /></g:Label>
+								<g:Label styleName="label" ui:field="formatLatestVersionKey">
+									<ui:text from='{messages.formatLatestVersion}' />
+								</g:Label>
 								<g:Label styleName="value" ui:field="formatLatestVersionValue" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="formatPopularityKey"><ui:text from='{messages.formatPopularity}' /></g:Label>
+								<g:Label styleName="label" ui:field="formatPopularityKey">
+									<ui:text from='{messages.formatPopularity}' />
+								</g:Label>
 								<g:Label styleName="value" ui:field="formatPopularityValue" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="formatDeveloperKey"><ui:text from='{messages.formatDeveloper}' /></g:Label>
+								<g:Label styleName="label" ui:field="formatDeveloperKey">
+									<ui:text from='{messages.formatDeveloper}' />
+								</g:Label>
 								<g:Label styleName="value" ui:field="formatDeveloperValue" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="formatInitialReleaseKey"><ui:text from='{messages.formatInitialRelease}' /></g:Label>
+								<g:Label styleName="label" ui:field="formatInitialReleaseKey">
+									<ui:text from='{messages.formatInitialRelease}' />
+								</g:Label>
 								<g:Label styleName="value" ui:field="formatInitialReleaseValue" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="formatStandardKey"><ui:text from='{messages.formatStandard}' /></g:Label>
+								<g:Label styleName="label" ui:field="formatStandardKey">
+									<ui:text from='{messages.formatStandard}' />
+								</g:Label>
 								<g:Label styleName="value" ui:field="formatStandardValue" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label"><ui:text from='{messages.formatOpen}' /></g:Label>
+								<g:Label styleName="label">
+									<ui:text from='{messages.formatOpen}' />
+								</g:Label>
 								<g:Label styleName="value" ui:field="formatIsOpenFormat" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="formatWebsiteKey"><ui:text from='{messages.formatWebsite}' /></g:Label>
+								<g:Label styleName="label" ui:field="formatWebsiteKey">
+									<ui:text from='{messages.formatWebsite}' />
+								</g:Label>
 								<g:FlowPanel styleName="value" ui:field="formatWebsiteValue" />
 							</g:FlowPanel>
-							
+
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="formatProvenanceInformationKey"><ui:text from='{messages.formatProvenanceInformation}' /></g:Label>
+								<g:Label styleName="label" ui:field="formatProvenanceInformationKey">
+									<ui:text from='{messages.formatProvenanceInformation}' />
+								</g:Label>
 								<g:Label styleName="value" ui:field="formatProvenanceInformationValue" />
 							</g:FlowPanel>
-							
+
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="formatExtensionsKey"><ui:text from='{messages.formatExtensions}' /></g:Label>
+								<g:Label styleName="label" ui:field="formatExtensionsKey">
+									<ui:text from='{messages.formatExtensions}' />
+								</g:Label>
 								<g:FlowPanel styleName="value" ui:field="formatExtensionsValue" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="formatMimetypesKey"><ui:text from='{messages.formatMimetypes}' /></g:Label>
+								<g:Label styleName="label" ui:field="formatMimetypesKey">
+									<ui:text from='{messages.formatMimetypes}' />
+								</g:Label>
 								<g:FlowPanel styleName="value" ui:field="formatMimetypesValue" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="formatPronomsKey"><ui:text from='{messages.formatPronoms}' /></g:Label>
+								<g:Label styleName="label" ui:field="formatPronomsKey">
+									<ui:text from='{messages.formatPronoms}' />
+								</g:Label>
 								<g:FlowPanel styleName="value" ui:field="formatPronomsValue" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="formatUtisKey"><ui:text from='{messages.formatUtis}' /></g:Label>
+								<g:Label styleName="label" ui:field="formatUtisKey">
+									<ui:text from='{messages.formatUtis}' />
+								</g:Label>
 								<g:FlowPanel styleName="value" ui:field="formatUtisValue" />
 							</g:FlowPanel>
 						</g:FlowPanel>

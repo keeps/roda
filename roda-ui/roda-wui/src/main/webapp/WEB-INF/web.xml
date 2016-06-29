@@ -151,11 +151,7 @@
 		<servlet-class>
 			org.roda.wui.server.browse.BrowserServiceImpl</servlet-class>
 	</servlet>
-	<servlet>
-		<servlet-name>StatisticsService</servlet-name>
-		<servlet-class>
-			org.roda.wui.management.statistics.server.StatisticsServiceImpl</servlet-class>
-	</servlet>
+
 
 	<servlet-mapping>
 		<servlet-name>ClientLogger</servlet-name>
@@ -177,10 +173,6 @@
 		<servlet-name>BrowserService</servlet-name>
 		<url-pattern>/org.roda.wui.RodaWUI/browserservice</url-pattern>
 	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>StatisticsService</servlet-name>
-		<url-pattern>/org.roda.wui.RodaWUI/StatisticsService</url-pattern>
-	</servlet-mapping>
 
 
 
@@ -197,20 +189,6 @@
 	<servlet-mapping>
 		<servlet-name>Cache</servlet-name>
 		<url-pattern>/Cache/*</url-pattern>
-	</servlet-mapping>
-	
-	<servlet>
-		<description>
-		</description>
-		<display-name>Munin</display-name>
-		<servlet-name>Munin</servlet-name>
-		<servlet-class>
-			org.roda.wui.management.statistics.server.Munin</servlet-class>
-	</servlet>
-
-	<servlet-mapping>
-		<servlet-name>Munin</servlet-name>
-		<url-pattern>/org.roda.wui.RodaWUI/Munin/*</url-pattern>
 	</servlet-mapping>
 	
 	<!-- Welcome file -->

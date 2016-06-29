@@ -18,6 +18,7 @@ import java.util.Set;
 
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Tools;
 
@@ -413,6 +414,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
       @Override
       public void onFailure(Throwable caught) {
+        AsyncCallbackUtils.defaultFailureTreatment(caught);
         Tools.newHistory(MemberManagement.RESOLVER);
       }
     });

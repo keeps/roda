@@ -181,18 +181,6 @@
 			<artifactId>commons-httpclient</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.xmlgraphics</groupId>
-			<artifactId>fop</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.rednels</groupId>
-			<artifactId>ofcgwt</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.netthreads</groupId>
-			<artifactId>gwt-simile-timeline-dev</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-servlet</artifactId>
 		</dependency>

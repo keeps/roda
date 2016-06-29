@@ -733,7 +733,7 @@ public interface ClientMessages extends Messages {
 
   String riskRegisterSearchPlaceHolder();
 
-  String showObjectsRiskCounter(@PluralCount int counter);
+  String showObjectsRiskCounter(@PluralCount @Optional int counter);
 
   String createRiskFailure(String message);
 

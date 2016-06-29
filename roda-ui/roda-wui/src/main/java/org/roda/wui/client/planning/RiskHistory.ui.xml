@@ -3,7 +3,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
-	xmlns:u="urn:import:org.roda.wui.management.user.client" xmlns:p="urn:import:org.roda.wui.client.planning">
+	xmlns:p="urn:import:org.roda.wui.client.planning">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
@@ -15,7 +15,9 @@
 		addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1"><ui:text from='{messages.riskHistoryTitle}' /></g:Label>
+				<g:Label styleName="h1">
+					<ui:text from='{messages.riskHistoryTitle}' />
+				</g:Label>
 				<g:ListBox ui:field="list" />
 				<p:RiskShowPanel ui:field="oldRisk" />
 
@@ -29,7 +31,9 @@
 					<g:Button addStyleNames="btn btn-play" ui:field="buttonRevert">
 						<ui:text from='{messages.revertButton}' />
 					</g:Button>
-					<g:Button addStyleNames="btn btn-ban" ui:field="buttonRemove"><ui:text from='{messages.removeButton}' /></g:Button>
+					<g:Button addStyleNames="btn btn-ban" ui:field="buttonRemove">
+						<ui:text from='{messages.removeButton}' />
+					</g:Button>
 					<g:Button addStyleNames="btn btn-times-circle" ui:field="buttonCancel">
 						<ui:text from='{messages.cancelButton}' />
 					</g:Button>

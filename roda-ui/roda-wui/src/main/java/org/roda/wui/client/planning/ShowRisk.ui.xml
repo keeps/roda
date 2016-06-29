@@ -3,13 +3,12 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
-	xmlns:u="urn:import:org.roda.wui.management.user.client" xmlns:s="urn:import:com.google.gwt.safehtml.shared"
-	xmlns:p="urn:import:org.roda.wui.client.planning">
+	xmlns:s="urn:import:com.google.gwt.safehtml.shared" xmlns:p="urn:import:org.roda.wui.client.planning">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<ui:style>
-
+	
 	</ui:style>
 
 

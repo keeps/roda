@@ -21,6 +21,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.PreservationEventList;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.common.client.HistoryResolver;
@@ -152,6 +153,7 @@ public class PreservationEvents extends Composite {
 
         @Override
         public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
           Tools.newHistory(Browse.RESOLVER);
         }
 

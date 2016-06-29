@@ -15,7 +15,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.wui.client.browse.Browse;
+import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.ingest.Ingest;
+import org.roda.wui.client.management.Management;
 import org.roda.wui.client.management.Profile;
 import org.roda.wui.client.management.RecoverLogin;
 import org.roda.wui.client.management.Register;
@@ -29,7 +32,6 @@ import org.roda.wui.common.client.BadHistoryTokenException;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
-import org.roda.wui.management.client.Management;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
@@ -116,14 +118,12 @@ public class ContentPanel extends SimplePanel {
         resolver.isCurrentUserPermitted(new AsyncCallback<Boolean>() {
 
           public void onFailure(Throwable caught) {
-            logger.error("Error resolving permissions", caught);
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
           }
 
           public void onSuccess(Boolean permitted) {
             if (!permitted.booleanValue()) {
-              String windowLocation = Window.Location.getHref();
-              CasForwardDialog cfd = new CasForwardDialog(windowLocation);
-              cfd.show();
+              UserLogin.getInstance().showSuggestLoginDialog();
             } else {
               resolver.resolve(Tools.tail(historyTokens), new AsyncCallback<Widget>() {
 
@@ -133,6 +133,8 @@ public class ContentPanel extends SimplePanel {
                     if (currWidget == null) {
                       Tools.newHistory(Welcome.RESOLVER);
                     }
+                  } else {
+                    AsyncCallbackUtils.defaultFailureTreatment(caught);
                   }
                 }
 

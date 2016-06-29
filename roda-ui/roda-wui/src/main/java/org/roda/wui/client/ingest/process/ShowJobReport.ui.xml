@@ -3,8 +3,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
-	xmlns:u="urn:import:org.roda.wui.management.user.client" xmlns:p="urn:import:org.roda.wui.client.ingest.process"
-	xmlns:lists="urn:import:org.roda.wui.client.common.lists">
+	xmlns:p="urn:import:org.roda.wui.client.ingest.process" xmlns:lists="urn:import:org.roda.wui.client.common.lists">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
@@ -21,7 +20,9 @@
 				<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
 					<g:FlowPanel addStyleNames="row full_width no_padding">
 						<g:FlowPanel addStyleNames="wui-data-panel">
-							<g:Label styleName="h1"><ui:text from='{messages.reportTitle}' /></g:Label>
+							<g:Label styleName="h1">
+								<ui:text from='{messages.reportTitle}' />
+							</g:Label>
 							<g:FlowPanel styleName="field">
 								<g:Label addStyleNames="label">
 									<ui:text from='{messages.reportJob}' />
@@ -30,11 +31,11 @@
 								<g:Anchor ui:field="job" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label addStyleNames="label" ui:field="objectLabel"/>
+								<g:Label addStyleNames="label" ui:field="objectLabel" />
 								<g:Anchor ui:field="objectId" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label addStyleNames="label" ui:field="aipLabel"/>
+								<g:Label addStyleNames="label" ui:field="aipLabel" />
 								<g:Anchor ui:field="aip" addStyleNames="inline" />
 								<g:HTML ui:field="aipState" addStyleNames="inline small" />
 							</g:FlowPanel>

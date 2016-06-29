@@ -13,6 +13,7 @@ import java.util.List;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.preingest.PreIngest;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
@@ -132,14 +133,14 @@ public class Ingest {
     UserLogin.getRodaProperty("roda.in.installer.url", new AsyncCallback<String>() {
 
       public void onFailure(Throwable caught) {
-        logger.error("Error getting RODA-in", caught);
+        AsyncCallbackUtils.defaultFailureTreatment(caught);
       }
 
       public void onSuccess(final String rodaInUrl) {
         UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaUser>() {
 
           public void onFailure(Throwable caught) {
-            logger.error("Error getting RODA-in", caught);
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
           }
 
           public void onSuccess(RodaUser user) {

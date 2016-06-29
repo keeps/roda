@@ -1,9 +1,0 @@
-<module>
-	<!-- Inherit the core Web Toolkit stuff.                  -->
-	<inherits name='com.google.gwt.user.User' />
-
-	<!-- Inherit sub-modules                  -->
-	<inherits name='org.roda.wui.management.editor.MetadataEditor' />
-	<inherits name='org.roda.wui.management.statistics.Statistics' />
-
-</module>
