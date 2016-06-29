@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.wui.client.browse.Browse;
+import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.ingest.Ingest;
@@ -129,7 +130,8 @@ public class ContentPanel extends SimplePanel {
 
                 public void onFailure(Throwable caught) {
                   if (caught instanceof BadHistoryTokenException) {
-                    Window.alert(messages.pageNotFound(caught.getMessage()));
+                    Dialogs.showInformationDialog(messages.notFoundError(), messages.pageNotFound(caught.getMessage()),
+                      messages.dialogOk());
                     if (currWidget == null) {
                       Tools.newHistory(Welcome.RESOLVER);
                     }
@@ -156,7 +158,8 @@ public class ContentPanel extends SimplePanel {
       }
     }
     if (!foundit) {
-      Window.alert(messages.pageNotFound(historyTokens.get(0)));
+      Dialogs.showInformationDialog(messages.notFoundError(), messages.pageNotFound(historyTokens.get(0)),
+        messages.dialogOk());
       if (currWidget == null) {
         Tools.newHistory(Welcome.RESOLVER);
       } else {
