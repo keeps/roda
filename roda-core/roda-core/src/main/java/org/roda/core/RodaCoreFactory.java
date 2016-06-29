@@ -135,6 +135,7 @@ public class RodaCoreFactory {
   private static Path dataPath;
   private static Path logPath;
   private static Path configPath;
+  private static Path workingDirectoryPath;
   private static Path exampleConfigPath;
   private static Path themePath;
   private static Path exampleThemePath;
@@ -240,6 +241,10 @@ public class RodaCoreFactory {
         addConfiguration("roda-core.properties");
         addConfiguration("roda-core-formats.properties");
         LOGGER.debug("Finished loading roda-core.properties & roda-core-formats.properties");
+        
+        //initialize working directory
+        workingDirectoryPath = Paths.get(getRodaConfiguration().getString("core.workingdirectory"));
+        workingDirectoryPath.toFile().mkdirs();
 
         // instantiate storage and model service
         instantiateStorageAndModel();
@@ -836,6 +841,10 @@ public class RodaCoreFactory {
 
   public static Path getConfigPath() {
     return configPath;
+  }
+  
+  public static Path getWorkingDirectory(){
+	  return workingDirectoryPath;
   }
 
   public static Path getThemePath() {

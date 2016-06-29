@@ -506,6 +506,25 @@ public class PremisV3Utils {
     IOUtils.closeQuietly(inputStream);
     return fixities;
   }
+  
+  public static String extractFixity(Binary premisFile, String fixityType) throws IOException, GenericException, XmlException {
+	  String fixityValue = null;
+	  InputStream inputStream = premisFile.getContent().createInputStream();
+	    gov.loc.premis.v3.File f = binaryToFile(inputStream);
+	    if (f.getObjectCharacteristicsArray() != null && f.getObjectCharacteristicsArray().length > 0) {
+	      ObjectCharacteristicsComplexType occt = f.getObjectCharacteristicsArray(0);
+	      if (occt.getFixityArray() != null && occt.getFixityArray().length > 0) {
+	        for (FixityComplexType fct : occt.getFixityArray()) {
+	        	if(fct.getMessageDigestAlgorithm().getStringValue().equalsIgnoreCase(fixityType)){
+	        		fixityValue = fct.getMessageDigest();
+	        		break;
+	        	}
+	        }
+	      }
+	    }
+	    IOUtils.closeQuietly(inputStream);
+	    return fixityValue;
+	}
 
   public static gov.loc.premis.v3.Representation binaryToRepresentation(InputStream binaryInputStream)
     throws XmlException, IOException, GenericException {

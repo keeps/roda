@@ -10,6 +10,7 @@ package org.roda.core.model.utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.List;
 
@@ -210,7 +211,7 @@ public class ResourceParseUtils {
     InputStream inputStream = null;
     try {
       inputStream = binary.getContent().createInputStream();
-      json = IOUtils.toString(inputStream);
+      json = IOUtils.toString(inputStream, Charset.forName(RodaConstants.DEFAULT_ENCODING));
       aip = JsonUtils.getObjectFromJson(json, AIP.class);
     } catch (IOException | GenericException e) {
       throw new GenericException("Could not parse AIP metadata of " + aipId + " at " + metadataStoragePath, e);
