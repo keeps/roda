@@ -7,12 +7,14 @@
  */
 package org.roda.core.util;
 
+import org.roda.core.data.exceptions.RODAException;
+
 /**
  * Thrown to indicate that a system command finished with an error code.
  * 
  * @author Rui Castro
  */
-public class CommandException extends Exception {
+public class CommandException extends RODAException {
   private static final long serialVersionUID = 1017228066365011437L;
 
   private int exitCode = 0;

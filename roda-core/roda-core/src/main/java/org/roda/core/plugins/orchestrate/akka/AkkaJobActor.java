@@ -50,12 +50,13 @@ public class AkkaJobActor extends UntypedActor {
   public void onReceive(Object msg) throws Exception {
     if (msg instanceof Job) {
       Job job = (Job) msg;
-      Plugin<?> plugin = (Plugin<?>) RodaCoreFactory.getPluginManager().getPlugin(job.getPlugin());
+      Plugin<?> plugin = (Plugin<?>) RodaCoreFactory.getPluginManager().getPlugin(job.getPlugin(),
+        job.getSourceObjects().getSelectedClass());
       PluginHelper.setPluginParameters(plugin, job);
 
       String jobId = job.getId();
       ActorRef jobStateInfoActor = getContext().actorOf(Props.create(AkkaJobStateInfoActor.class, plugin), jobId);
-      RodaCoreFactory.getPluginOrchestrator().setInitialJobStateInfo(jobId, jobStateInfoActor);
+      RodaCoreFactory.getPluginOrchestrator().setJobContextInformation(jobId, jobStateInfoActor);
 
       jobStateInfoActor.tell(new Messages.JobStateUpdated(plugin, JOB_STATE.STARTED), getSelf());
 

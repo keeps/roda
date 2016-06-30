@@ -7,7 +7,6 @@
  */
 package org.roda.core.plugins;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,15 +14,27 @@ import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants.PreservationAgentType;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 
-public abstract class AbstractPlugin<T extends Serializable> implements Plugin<T> {
+public abstract class AbstractPlugin<T extends IsRODAObject> implements Plugin<T> {
 
-  private List<PluginParameter> pluginParameters = new ArrayList<PluginParameter>();
+  private List<PluginParameter> parameters = new ArrayList<PluginParameter>();
   private Map<String, String> parameterValues = new HashMap<String, String>();
   private String version = null;
   private JobPluginInfo jobPluginInfo;
+  private Class<T> objectClass;
+
+  public Plugin<T> injectObjectClass(Class<T> objectClass) {
+    this.objectClass = objectClass;
+    return this;
+  }
+
+  @Override
+  public Class<T> getObjectClass() {
+    return objectClass;
+  }
 
   @Override
   public void injectJobPluginInfo(JobPluginInfo jobPluginInfo) {
@@ -31,7 +42,7 @@ public abstract class AbstractPlugin<T extends Serializable> implements Plugin<T
   }
 
   @Override
-  public <T extends JobPluginInfo> T getJobPluginInfo(Class<T> jobPluginInfoClass) {
+  public <T1 extends JobPluginInfo> T1 getJobPluginInfo(Class<T1> jobPluginInfoClass) {
     return jobPluginInfoClass.cast(jobPluginInfo);
   }
 
@@ -42,7 +53,7 @@ public abstract class AbstractPlugin<T extends Serializable> implements Plugin<T
 
   @Override
   public List<PluginParameter> getParameters() {
-    return pluginParameters;
+    return parameters;
   }
 
   @Override

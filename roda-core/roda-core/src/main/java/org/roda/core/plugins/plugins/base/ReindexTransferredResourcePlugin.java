@@ -32,8 +32,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ReindexTransferredResourcePlugin extends AbstractPlugin<TransferredResource> {
-
   private static final Logger LOGGER = LoggerFactory.getLogger(ReindexTransferredResourcePlugin.class);
+
   private String folderUUID = null;
 
   @Override
@@ -90,20 +90,6 @@ public class ReindexTransferredResourcePlugin extends AbstractPlugin<Transferred
 
   @Override
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    // do nothing
-    return null;
-  }
-
-  @Override
-  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    // do nothing
-    return null;
-  }
-
-  @Override
-  public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
     // do nothing
     return null;

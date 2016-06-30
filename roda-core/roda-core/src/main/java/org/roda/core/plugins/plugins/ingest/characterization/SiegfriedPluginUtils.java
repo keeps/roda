@@ -8,7 +8,6 @@
 package org.roda.core.plugins.plugins.ingest.characterization;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,6 +28,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
@@ -100,7 +100,7 @@ public class SiegfriedPluginUtils {
     return version;
   }
 
-  public static <T extends Serializable> void runSiegfriedOnRepresentation(Plugin<T> plugin, IndexService index,
+  public static <T extends IsRODAObject> void runSiegfriedOnRepresentation(Plugin<T> plugin, IndexService index,
     ModelService model, AIP aip, Representation representation) throws GenericException, RequestNotValidException,
     AlreadyExistsException, NotFoundException, AuthorizationDeniedException, PluginException {
 
@@ -168,8 +168,8 @@ public class SiegfriedPluginUtils {
               PremisV3Utils.updateFileFormat(premisFile, format, version, pronom, mime);
 
               PreservationMetadataType type = PreservationMetadataType.FILE;
-              String id = IdUtils.getPreservationId(type, aip.getId(), representation.getId(),
-                fileDirectoryPath, fileId);
+              String id = IdUtils.getPreservationId(type, aip.getId(), representation.getId(), fileDirectoryPath,
+                fileId);
 
               ContentPayload premisFilePayload = PremisV3Utils.fileToBinary(premisFile);
               model.updatePreservationMetadata(id, type, aip.getId(), representation.getId(), fileDirectoryPath, fileId,

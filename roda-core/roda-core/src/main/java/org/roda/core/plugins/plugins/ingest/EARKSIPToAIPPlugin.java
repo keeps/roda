@@ -89,13 +89,6 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
   }
 
   @Override
-  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-
-    return null;
-  }
-
-  @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<TransferredResource> list)
     throws PluginException {
     Report report = PluginHelper.initPluginReport(this);
@@ -170,13 +163,6 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
         }
       }
     }
-  }
-
-  @Override
-  public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-
-    return null;
   }
 
   @Override

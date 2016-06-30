@@ -7,11 +7,11 @@
  */
 package org.roda.core.data.v2.risks;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.NamedIndexedModel;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlRootElement(name = "risk")
 @JsonInclude(JsonInclude.Include.ALWAYS)
-public class Risk extends NamedIndexedModel implements Serializable {
+public class Risk extends NamedIndexedModel implements IsRODAObject {
 
   private static final long serialVersionUID = -585753367605901060L;
 

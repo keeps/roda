@@ -40,12 +40,6 @@ public class JobsHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(JobsHelper.class);
 
   protected static void validateAndSetCreateJobInformation(RodaUser user, Job job) throws RequestNotValidException {
-    // FIXME 20160530 hsilva: how to validate this now?
-    // if (!ORCHESTRATOR_METHODS.contains(job.getOrchestratorMethod())) {
-    // throw new RequestNotValidException("Invalid orchestrator method '" +
-    // job.getOrchestratorMethod() + "'");
-    // }
-
     validateJobPluginInformation(job);
 
     // always set a new UUID (even if job already brings one)
@@ -59,8 +53,10 @@ public class JobsHelper {
   }
 
   private static void validateJobPluginInformation(Job job) throws RequestNotValidException {
-    Plugin<?> plugin = RodaCoreFactory.getPluginManager().getPlugin(job.getPlugin());
+    Plugin<?> plugin = RodaCoreFactory.getPluginManager().getPlugin(job.getPlugin(),
+      job.getSourceObjects().getSelectedClass());
     if (plugin != null) {
+      // validate parameters
       try {
         plugin.setParameterValues(job.getPluginParameters());
         if (!plugin.areParameterValuesValid()) {
@@ -69,6 +65,14 @@ public class JobsHelper {
         job.setPluginType(plugin.getType());
       } catch (InvalidParameterException e) {
         throw new RequestNotValidException("Invalid plugin parameters");
+      }
+
+      // validate plugin class & objects class
+      String pluginClass = plugin.getObjectClass().getName();
+      String objectsClass = job.getSourceObjects().getSelectedClass();
+      if (!pluginClass.equals(objectsClass)) {
+        throw new RequestNotValidException("Plugin class and objects class do not match (plugin class: " + pluginClass
+          + "; objects class: " + objectsClass + ")");
       }
     } else {
       throw new RequestNotValidException("No plugin was found with the id '" + job.getPlugin() + "'");
@@ -81,7 +85,8 @@ public class JobsHelper {
     // serialize job to file & index it
     RodaCoreFactory.getModelService().createJob(updatedJob);
 
-    // ask plugin orchestrator to execute the job
+    // ask plugin orchestrator to execute the job (which will be executed
+    // asynchronously)
     RodaCoreFactory.getPluginOrchestrator().executeJob(updatedJob);
 
     // force commit
@@ -96,9 +101,8 @@ public class JobsHelper {
 
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
     boolean justActive = false;
-    IndexResult<Job> listJobsIndexResult = org.roda.wui.api.controllers.Browser.find(Job.class, Filter.ALL,
-      Sorter.NONE, new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())), Facets.NONE, user,
-      justActive);
+    IndexResult<Job> listJobsIndexResult = org.roda.wui.api.controllers.Browser.find(Job.class, Filter.ALL, Sorter.NONE,
+      new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())), Facets.NONE, user, justActive);
 
     for (Job job : listJobsIndexResult.getResults()) {
       jobs.addJob(job);

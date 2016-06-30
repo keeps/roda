@@ -7,11 +7,11 @@
  */
 package org.roda.core.data.v2.ip;
 
-import java.io.Serializable;
+import org.roda.core.data.v2.IsRODAObject;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class Representation implements Serializable {
+public class Representation implements IsRODAObject {
 
   private static final long serialVersionUID = 3658011895150894795L;
 

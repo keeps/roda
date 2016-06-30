@@ -92,20 +92,6 @@ public class RemoveOrphansPlugin extends AbstractPlugin<IndexedAIP> {
   }
 
   @Override
-  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    // do nothing
-    return null;
-  }
-
-  @Override
-  public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    // do nothing
-    return null;
-  }
-
-  @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     // do nothing
     return null;

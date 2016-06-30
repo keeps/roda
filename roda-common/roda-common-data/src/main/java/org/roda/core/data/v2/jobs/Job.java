@@ -15,6 +15,7 @@ import java.util.Map;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsList;
@@ -60,7 +61,7 @@ public class Job implements IsIndexed, Serializable {
   private Map<String, String> pluginParameters = new HashMap<String, String>();
 
   // objects to act upon (All, None, List, Filter, etc.)
-  private SelectedItems<?> sourceObjects = null;
+  private SelectedItems<? extends IsRODAObject> sourceObjects = null;
   private String outcomeObjectsClass = "";
 
   public Job() {

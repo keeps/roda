@@ -7,7 +7,6 @@
  */
 package org.roda.core.plugins.plugins.common;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,10 +14,11 @@ import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 
-public abstract class CommandConvertPlugin<T extends Serializable> extends AbstractConvertPlugin<T> {
+public abstract class CommandConvertPlugin<T extends IsRODAObject> extends AbstractConvertPlugin<T> {
 
   private String commandArguments;
 

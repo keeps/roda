@@ -53,6 +53,7 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
   private boolean doEmbeddedSignature;
 
   public DigitalSignatureDIPPlugin() {
+    super();
     doEmbeddedSignature = Boolean
       .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("core", "signature", "doEmbeddedSignature"));
   }
@@ -211,18 +212,6 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
     }
 
     return report;
-  }
-
-  @Override
-  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    return new Report();
-  }
-
-  @Override
-  public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    return new Report();
   }
 
   @Override

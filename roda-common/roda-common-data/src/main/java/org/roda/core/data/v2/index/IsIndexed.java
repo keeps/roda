@@ -7,9 +7,9 @@
  */
 package org.roda.core.data.v2.index;
 
-import java.io.Serializable;
+import org.roda.core.data.v2.IsRODAObject;
 
-public interface IsIndexed extends Serializable {
+public interface IsIndexed extends IsRODAObject {
 
   public String getUUID();
 

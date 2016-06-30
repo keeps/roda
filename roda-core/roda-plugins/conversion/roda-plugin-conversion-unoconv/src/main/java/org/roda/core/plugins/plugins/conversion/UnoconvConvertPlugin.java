@@ -8,7 +8,6 @@
 package org.roda.core.plugins.plugins.conversion;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -16,6 +15,7 @@ import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -27,9 +27,12 @@ import org.roda.core.storage.StorageService;
 import org.roda.core.util.CommandException;
 import org.slf4j.LoggerFactory;
 
-public class UnoconvConvertPlugin<T extends Serializable> extends CommandConvertPlugin<T> {
-
+public class UnoconvConvertPlugin<T extends IsRODAObject> extends CommandConvertPlugin<T> {
   private static final String TOOLNAME = "unoconvconvert";
+
+  public UnoconvConvertPlugin() {
+    super();
+  }
 
   @Override
   public String getName() {

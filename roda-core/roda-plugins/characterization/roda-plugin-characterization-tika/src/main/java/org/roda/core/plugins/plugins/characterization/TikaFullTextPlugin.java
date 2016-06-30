@@ -43,7 +43,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
-
   private static final Logger LOGGER = LoggerFactory.getLogger(TikaFullTextPlugin.class);
 
   private boolean createsPluginEvent = true;
@@ -195,18 +194,6 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
     }
 
     return report;
-  }
-
-  @Override
-  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    return null;
-  }
-
-  @Override
-  public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    return null;
   }
 
   @Override

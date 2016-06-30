@@ -9,7 +9,6 @@ package org.roda.core.plugins.plugins.validation;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -36,6 +35,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
@@ -67,7 +67,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.verapdf.core.VeraPDFException;
 
-public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
+public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(VeraPDFPlugin.class);
   private String profile;
   private boolean ignoreFiles = true;
@@ -86,6 +86,7 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
   }
 
   public VeraPDFPlugin() {
+    super();
     profile = "1b";
     hasFeatures = Boolean
       .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "verapdf", "hasFeatures"));
@@ -547,18 +548,6 @@ public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
       LOGGER.error("Error creating event: " + e.getMessage(), e);
     }
 
-  }
-
-  @Override
-  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    return null;
-  }
-
-  @Override
-  public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    return null;
   }
 
   @Override

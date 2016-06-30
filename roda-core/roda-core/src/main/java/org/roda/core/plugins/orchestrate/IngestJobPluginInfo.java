@@ -7,7 +7,6 @@
  */
 package org.roda.core.plugins.orchestrate;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +14,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.plugins.Plugin;
 
@@ -70,7 +70,7 @@ public class IngestJobPluginInfo extends JobPluginInfo {
     this.setOutcomeObjectsWithManualIntervention(ingestJobPluginInfo.getOutcomeObjectsWithManualIntervention());
   }
 
-  public <T extends Serializable> JobPluginInfo processJobPluginInformation(Plugin<T> plugin, JobInfo jobInfo) {
+  public <T extends IsRODAObject> JobPluginInfo processJobPluginInformation(Plugin<T> plugin, JobInfo jobInfo) {
     int taskObjectsCount = jobInfo.getObjectsCount();
     Map<Plugin<?>, JobPluginInfo> jobInfos = jobInfo.getJobInfo();
     // update information in the map<plugin, pluginInfo>

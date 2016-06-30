@@ -7,11 +7,10 @@
  */
 package org.roda.core.plugins.orchestrate;
 
-import java.io.Serializable;
-
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.plugins.Plugin;
 
 public interface JobPluginInfoInterface {
 
-  <T extends Serializable> JobPluginInfo processJobPluginInformation(Plugin<T> plugin, JobInfo jobInfo);
+  <T extends IsRODAObject> JobPluginInfo processJobPluginInformation(Plugin<T> plugin, JobInfo jobInfo);
 }

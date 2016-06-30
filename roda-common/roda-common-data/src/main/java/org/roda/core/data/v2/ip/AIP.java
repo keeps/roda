@@ -7,15 +7,15 @@
  */
 package org.roda.core.data.v2.ip;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class AIP implements Serializable {
+public class AIP implements IsRODAObject {
 
   private static final long serialVersionUID = 430629679119752757L;
 

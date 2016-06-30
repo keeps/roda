@@ -8,7 +8,6 @@
 package org.roda.core.plugins.plugins;
 
 import java.io.InputStream;
-import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -35,6 +34,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LinkingObjectUtils;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
@@ -75,41 +75,41 @@ public final class PluginHelper {
   /***************** Job report related *****************/
   /******************************************************/
 
-  public static <T extends Serializable> Report initPluginReport(Plugin<T> plugin) {
+  public static <T extends IsRODAObject> Report initPluginReport(Plugin<T> plugin) {
     return initPluginReportItem(plugin, "", "");
   }
 
-  public static <T extends Serializable> Report initPluginReportItem(Plugin<T> plugin,
+  public static <T extends IsRODAObject> Report initPluginReportItem(Plugin<T> plugin,
     TransferredResource transferredResource) {
     return initPluginReportItem(plugin, "", transferredResource.getUUID())
       .setSourceObjectClass(TransferredResource.class.getCanonicalName())
       .setOutcomeObjectClass(AIP.class.getCanonicalName()).setOutcomeObjectState(AIPState.INGEST_PROCESSING);
   }
 
-  public static <T extends Serializable> Report initPluginReportItem(Plugin<T> plugin, String outcomeObjectId,
+  public static <T extends IsRODAObject> Report initPluginReportItem(Plugin<T> plugin, String outcomeObjectId,
     AIPState initialOutcomeObjectState) {
     return initPluginReportItem(plugin, outcomeObjectId, "").setOutcomeObjectState(initialOutcomeObjectState);
   }
 
-  public static <T extends Serializable> Report initPluginReportItem(Plugin<T> plugin, String objectId,
+  public static <T extends IsRODAObject> Report initPluginReportItem(Plugin<T> plugin, String objectId,
     Class<?> clazz) {
     return initPluginReportItem(plugin, objectId, objectId).setSourceObjectClass(clazz.getCanonicalName())
       .setOutcomeObjectClass(clazz.getCanonicalName());
   }
 
-  public static <T extends Serializable> Report initPluginReportItem(Plugin<T> plugin, String objectId, Class<?> clazz,
+  public static <T extends IsRODAObject> Report initPluginReportItem(Plugin<T> plugin, String objectId, Class<?> clazz,
     AIPState initialOutcomeObjectState) {
     return initPluginReportItem(plugin, objectId, objectId).setSourceObjectClass(clazz.getCanonicalName())
       .setOutcomeObjectClass(clazz.getCanonicalName()).setOutcomeObjectState(initialOutcomeObjectState);
   }
 
-  public static <T extends Serializable> Report initPluginReportItem(Plugin<T> plugin, String sourceObjectId,
+  public static <T extends IsRODAObject> Report initPluginReportItem(Plugin<T> plugin, String sourceObjectId,
     String outcomeObjectId, Class<?> clazz, AIPState initialOutcomeObjectState) {
     return initPluginReportItem(plugin, outcomeObjectId, sourceObjectId).setSourceObjectClass(clazz.getCanonicalName())
       .setOutcomeObjectClass(clazz.getCanonicalName()).setOutcomeObjectState(initialOutcomeObjectState);
   }
 
-  public static <T extends Serializable> Report initPluginReportItem(Plugin<T> plugin, String outcomeObjectId,
+  public static <T extends IsRODAObject> Report initPluginReportItem(Plugin<T> plugin, String outcomeObjectId,
     String sourceObjectId) {
     String jobId = getJobId(plugin);
     Report reportItem = new Report();
@@ -133,7 +133,7 @@ public final class PluginHelper {
     return reportItem;
   }
 
-  public static <T extends Serializable> void createJobReport(Plugin<T> plugin, ModelService model, Report reportItem) {
+  public static <T extends IsRODAObject> void createJobReport(Plugin<T> plugin, ModelService model, Report reportItem) {
     String jobId = getJobId(plugin);
     Report report = new Report(reportItem);
     String reportPartialId = reportItem.getOutcomeObjectId();
@@ -159,7 +159,7 @@ public final class PluginHelper {
     }
   }
 
-  public static <T extends Serializable> void updateJobReportState(Plugin<T> plugin, ModelService model, String aipId,
+  public static <T extends IsRODAObject> void updateJobReportState(Plugin<T> plugin, ModelService model, String aipId,
     AIPState newState) {
     try {
       String jobId = getJobId(plugin);
@@ -171,7 +171,7 @@ public final class PluginHelper {
     }
   }
 
-  public static <T extends Serializable> void updatePartialJobReport(Plugin<T> plugin, ModelService model,
+  public static <T extends IsRODAObject> void updatePartialJobReport(Plugin<T> plugin, ModelService model,
     IndexService index, Report reportItem, boolean replaceLastReportItemIfTheSame) {
     String jobId = getJobId(plugin);
     try {
@@ -208,7 +208,7 @@ public final class PluginHelper {
 
   /***************** Job related *****************/
   /***********************************************/
-  public static <T extends Serializable> String getJobId(Plugin<T> plugin) {
+  public static <T extends IsRODAObject> String getJobId(Plugin<T> plugin) {
     return plugin.getParameterValues().get(RodaConstants.PLUGIN_PARAMS_JOB_ID);
   }
 
@@ -216,7 +216,7 @@ public final class PluginHelper {
    * 20160329 hsilva: use this method only to get job information that most
    * certainly won't change in time (e.g. username, etc.)
    */
-  public static <T extends Serializable> Job getJobFromIndex(Plugin<T> plugin, IndexService index)
+  public static <T extends IsRODAObject> Job getJobFromIndex(Plugin<T> plugin, IndexService index)
     throws NotFoundException, GenericException {
     String jobID = getJobId(plugin);
     if (jobID != null) {
@@ -227,7 +227,7 @@ public final class PluginHelper {
 
   }
 
-  public static <T extends Serializable> Job getJobFromModel(Plugin<T> plugin, ModelService model)
+  public static <T extends IsRODAObject> Job getJobFromModel(Plugin<T> plugin, ModelService model)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     String jobId = getJobId(plugin);
     if (jobId != null) {
@@ -241,19 +241,19 @@ public final class PluginHelper {
   /**
    * Updates the job state
    */
-  public static <T extends Serializable> void updateJobState(Plugin<T> plugin, JOB_STATE state,
+  public static <T extends IsRODAObject> void updateJobState(Plugin<T> plugin, JOB_STATE state,
     Optional<String> stateDetails) {
     RodaCoreFactory.getPluginOrchestrator().updateJobState(plugin, state, stateDetails);
   }
 
-  public static <T extends Serializable> void updateJobState(Plugin<T> plugin, JOB_STATE state, Throwable throwable) {
+  public static <T extends IsRODAObject> void updateJobState(Plugin<T> plugin, JOB_STATE state, Throwable throwable) {
     updateJobState(plugin, state, Optional.ofNullable(throwable.getClass().getName() + ": " + throwable.getMessage()));
   }
 
   /**
    * Updates the job status for a particular plugin instance
    */
-  public static <T extends Serializable> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo)
+  public static <T extends IsRODAObject> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo)
     throws JobException {
 
     Map<String, String> parameterValues = plugin.getParameterValues();
@@ -265,7 +265,7 @@ public final class PluginHelper {
     }
   }
 
-  public static <T extends Serializable> SimpleJobPluginInfo getInitialJobInformation(Plugin<T> plugin,
+  public static <T extends IsRODAObject> SimpleJobPluginInfo getInitialJobInformation(Plugin<T> plugin,
     int sourceObjectsCount) throws JobException {
     SimpleJobPluginInfo jobPluginInfo = plugin.getJobPluginInfo(SimpleJobPluginInfo.class);
     if (jobPluginInfo != null) {
@@ -276,7 +276,7 @@ public final class PluginHelper {
     }
   }
 
-  public static <T extends Serializable, T1 extends JobPluginInfo> T1 getInitialJobInformation(Plugin<T> plugin,
+  public static <T extends IsRODAObject, T1 extends JobPluginInfo> T1 getInitialJobInformation(Plugin<T> plugin,
     Class<T1> jobPluginInfoClass) throws JobException {
     T1 jobPluginInfo = plugin.getJobPluginInfo(jobPluginInfoClass);
     if (jobPluginInfo != null) {
@@ -292,7 +292,7 @@ public final class PluginHelper {
    * 20160531 hsilva:Only orchestrators/orchestrators related classes should
    * invoke this method
    */
-  public static <T extends Serializable> void updateJobState(Plugin<T> plugin, ModelService model, JOB_STATE state,
+  public static <T extends IsRODAObject> void updateJobState(Plugin<T> plugin, ModelService model, JOB_STATE state,
     Optional<String> stateDetails) {
     try {
       Job job = PluginHelper.getJobFromModel(plugin, model);
@@ -314,7 +314,7 @@ public final class PluginHelper {
    * 20160531 hsilva:Only orchestrators/orchestrators related classes should
    * invoke this method
    */
-  public static <T extends Serializable> void updateJobObjectsCount(Plugin<T> plugin, ModelService model,
+  public static <T extends IsRODAObject> void updateJobObjectsCount(Plugin<T> plugin, ModelService model,
     Long objectsCount) {
     try {
       Job job = PluginHelper.getJobFromModel(plugin, model);
@@ -331,7 +331,7 @@ public final class PluginHelper {
    * 20160531 hsilva:Only orchestrators/orchestrators related classes should
    * invoke this method
    */
-  public static <T extends Serializable> void updateJobInformation(Plugin<T> plugin, ModelService model,
+  public static <T extends IsRODAObject> void updateJobInformation(Plugin<T> plugin, ModelService model,
     JobPluginInfo jobPluginInfo) {
 
     // update job
@@ -374,7 +374,7 @@ public final class PluginHelper {
 
   /***************** Plugin parameters related *****************/
   /*************************************************************/
-  public static <T extends Serializable> void setPluginParameters(Plugin<T> plugin, Job job) {
+  public static <T extends IsRODAObject> void setPluginParameters(Plugin<T> plugin, Job job) {
     Map<String, String> parameters = new HashMap<String, String>(job.getPluginParameters());
     parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, job.getId());
     try {
@@ -384,25 +384,25 @@ public final class PluginHelper {
     }
   }
 
-  public static <T extends Serializable> boolean getBooleanFromParameters(Plugin<T> plugin,
+  public static <T extends IsRODAObject> boolean getBooleanFromParameters(Plugin<T> plugin,
     PluginParameter pluginParameter) {
     return verifyIfStepShouldBePerformed(plugin, pluginParameter);
   }
 
-  public static <T extends Serializable> String getStringFromParameters(Plugin<T> plugin,
+  public static <T extends IsRODAObject> String getStringFromParameters(Plugin<T> plugin,
     PluginParameter pluginParameter) {
     return plugin.getParameterValues().getOrDefault(pluginParameter.getId(), pluginParameter.getDefaultValue());
   }
 
-  private static <T extends Serializable> String getParentIdFromParameters(Plugin<T> plugin) {
+  private static <T extends IsRODAObject> String getParentIdFromParameters(Plugin<T> plugin) {
     return plugin.getParameterValues().get(RodaConstants.PLUGIN_PARAMS_PARENT_ID);
   }
 
-  private static <T extends Serializable> boolean getForceParentIdFromParameters(Plugin<T> plugin) {
+  private static <T extends IsRODAObject> boolean getForceParentIdFromParameters(Plugin<T> plugin) {
     return new Boolean(plugin.getParameterValues().get(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID));
   }
 
-  public static <T extends Serializable> int getTotalStepsFromParameters(Plugin<T> plugin) {
+  public static <T extends IsRODAObject> int getTotalStepsFromParameters(Plugin<T> plugin) {
     int totalSteps = 1;
     String totalStepsString = plugin.getParameterValues().get(RodaConstants.PLUGIN_PARAMS_TOTAL_STEPS);
     if (totalStepsString != null) {
@@ -415,7 +415,7 @@ public final class PluginHelper {
     return totalSteps;
   }
 
-  public static <T extends Serializable> boolean verifyIfStepShouldBePerformed(Plugin<T> plugin,
+  public static <T extends IsRODAObject> boolean verifyIfStepShouldBePerformed(Plugin<T> plugin,
     PluginParameter pluginParameter) {
     String paramValue = getStringFromParameters(plugin, pluginParameter);
     boolean perform = Boolean.parseBoolean(paramValue);
@@ -430,7 +430,7 @@ public final class PluginHelper {
     return perform;
   }
 
-  public static <T extends Serializable> String computeParentId(Plugin<T> plugin, IndexService index,
+  public static <T extends IsRODAObject> String computeParentId(Plugin<T> plugin, IndexService index,
     String sipParentId) {
     String parentId = sipParentId;
     String jobDefinedParentId = getParentIdFromParameters(plugin);
@@ -508,7 +508,7 @@ public final class PluginHelper {
   /**
    * For SIP > AIP
    */
-  public static <T extends Serializable> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
+  public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
     ModelService model, IndexService index, TransferredResource source, PluginState outcome,
     String outcomeDetailExtension, boolean notify, Date eventDate) throws RequestNotValidException, NotFoundException,
     GenericException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
@@ -521,7 +521,7 @@ public final class PluginHelper {
       outcomeDetailExtension, notify, eventDate);
   }
 
-  public static <T extends Serializable> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
+  public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
     ModelService model, IndexService index, TransferredResource source, PluginState outcome,
     String outcomeDetailExtension, boolean notify) throws RequestNotValidException, NotFoundException, GenericException,
     AuthorizationDeniedException, ValidationException, AlreadyExistsException {
@@ -531,7 +531,7 @@ public final class PluginHelper {
   /**
    * For AIP as source only
    */
-  public static <T extends Serializable> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
+  public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
     ModelService model, IndexService index, PluginState outcome, String outcomeDetailExtension, boolean notify)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
     ValidationException, AlreadyExistsException {
@@ -542,7 +542,7 @@ public final class PluginHelper {
       outcomeDetailExtension, notify, new Date());
   }
 
-  public static <T extends Serializable> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
+  public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
     ModelService model, IndexService index, PluginState outcome, String outcomeDetailExtension, boolean notify,
     Date eventDate) throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
     ValidationException, AlreadyExistsException {
@@ -556,7 +556,7 @@ public final class PluginHelper {
   /**
    * For AIP
    */
-  public static <T extends Serializable> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
+  public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
     ModelService model, IndexService index, List<LinkingIdentifier> sources, List<LinkingIdentifier> targets,
     PluginState outcome, String outcomeDetailExtension, boolean notify) throws RequestNotValidException,
     NotFoundException, GenericException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
@@ -567,7 +567,7 @@ public final class PluginHelper {
   /**
    * For REPRESENTATION
    */
-  public static <T extends Serializable> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
+  public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
     String representationID, ModelService model, IndexService index, List<LinkingIdentifier> sources,
     List<LinkingIdentifier> targets, PluginState outcome, String outcomeDetailExtension, boolean notify)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
@@ -579,7 +579,7 @@ public final class PluginHelper {
   /**
    * For FILE
    */
-  public static <T extends Serializable> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
+  public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
     String representationID, List<String> filePath, String fileID, ModelService model, IndexService index,
     List<LinkingIdentifier> sources, List<LinkingIdentifier> outcomes, PluginState outcome,
     String outcomeDetailExtension, boolean notify) throws RequestNotValidException, NotFoundException, GenericException,
@@ -588,7 +588,7 @@ public final class PluginHelper {
       outcome, outcomeDetailExtension, notify, new Date());
   }
 
-  private static <T extends Serializable> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
+  private static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
     String representationID, List<String> filePath, String fileID, ModelService model, IndexService index,
     List<LinkingIdentifier> sources, List<LinkingIdentifier> outcomes, PluginState outcome,
     String outcomeDetailExtension, boolean notify, Date startDate) throws RequestNotValidException, NotFoundException,

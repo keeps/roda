@@ -7,7 +7,6 @@
  */
 package org.roda.core.plugins.plugins.validation;
 
-import java.io.Serializable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -31,6 +30,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
@@ -64,9 +64,9 @@ import org.roda.core.storage.fs.FSPathContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlugin<T> {
-
+public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   private static Logger LOGGER = LoggerFactory.getLogger(DigitalSignaturePlugin.class);
+
   private boolean doVerify;
   private boolean doExtract;
   private boolean doStrip;
@@ -96,6 +96,7 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
   }
 
   public DigitalSignaturePlugin() {
+    super();
     doVerify = true;
     doExtract = false;
     doStrip = false;
@@ -772,18 +773,6 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
       }
     }
     return fileFormat;
-  }
-
-  @Override
-  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    return new Report();
-  }
-
-  @Override
-  public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    return new Report();
   }
 
   @Override

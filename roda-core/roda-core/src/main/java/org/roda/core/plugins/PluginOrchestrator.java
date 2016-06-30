@@ -7,13 +7,13 @@
  */
 package org.roda.core.plugins;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.JobException;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
@@ -46,28 +46,38 @@ public interface PluginOrchestrator {
 
   public void runPluginOnTransferredResources(Object context, Plugin<TransferredResource> plugin, List<String> uuids);
 
-  public <T extends Serializable> void runPlugin(Object context, Plugin<T> plugin);
+  public <T extends IsRODAObject> void runPlugin(Object context, Plugin<T> plugin);
 
   /*
    * Job related methods
    * _________________________________________________________________________________________________________________
    */
-  /** 201603 hsilva: this method should be async */
+  /** 201603 hsilva: this method is async */
   public void executeJob(Job job) throws JobAlreadyStartedException;
 
+  /**
+   * 20160701 hsilva: not quite sure if this will continue to exist (e.g. in
+   * Akka this is difficult to implement)
+   */
   public void stopJob(Job job);
 
+  /**
+   * 20160701 hsilva: not quite sure if this will continue to exist as it isn't
+   * used
+   */
   public void startJobsInTheStateCreated();
 
+  /** 201607 hsilva: this method is sync */
   public void cleanUnfinishedJobs();
 
-  // FIXME 20160602 hsilva: rename this (in akka case this will receive the
-  // ActorRef for the actor holding JobInfo
-  public void setInitialJobStateInfo(String jobId, Object object);
+  /** 201607 hsilva: this method is sync */
+  public void setJobContextInformation(String jobId, Object object);
 
-  public <T extends Serializable> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo)
+  /** 201607 hsilva: this method is async */
+  public <T extends IsRODAObject> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo)
     throws JobException;
 
-  public <T extends Serializable> void updateJobState(Plugin<T> plugin, JOB_STATE state, Optional<String> stateDetails);
+  /** 201607 hsilva: this method is async */
+  public <T extends IsRODAObject> void updateJobState(Plugin<T> plugin, JOB_STATE state, Optional<String> stateDetails);
 
 }

@@ -10,8 +10,6 @@ package org.roda.core.plugins.plugins.base;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -52,8 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class InventoryReportPlugin extends AbstractPlugin<AIP> {
-
-  public Charset charset = StandardCharsets.UTF_8;
+  private static final Logger LOGGER = LoggerFactory.getLogger(InventoryReportPlugin.class);
 
   public static final String EXPORT_CSV_TEMP_FOLDER = "CSV";
   public static final String CSV_FILE_FIELDS = "parameter.csv.file.fields";
@@ -89,8 +86,6 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
   public static final String CSV_DEFAULT_OUTPUT = "/tmp/output.csv";
   public static final String CSV_DEFAULT_HEADERS = "true";
   public static final String CSV_DEFAULT_OTHER_METADATA = "tika,siegfried";
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(InventoryReportPlugin.class);
 
   private List<String> fields = null;
   private Path output;
@@ -346,19 +341,5 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
   @Override
   public List<String> getCategories() {
     return new ArrayList<String>();
-  }
-
-  @Override
-  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    // TODO Auto-generated method stub
-    return null;
   }
 }

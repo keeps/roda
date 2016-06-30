@@ -35,10 +35,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(AutoAcceptSIPPlugin.class);
+
   public static final String FAILURE_MESSAGE = "Failed to add the AIP to the repository's inventory.";
   public static final String SUCCESS_MESSAGE = "The AIP was successfully added to the repository's inventory.";
   public static final String DESCRIPTION = "Added package to the inventory. After this point, the responsibility for the digital content’s preservation is passed on to the repository.";
-  private static final Logger LOGGER = LoggerFactory.getLogger(AutoAcceptSIPPlugin.class);
 
   @Override
   public void init() throws PluginException {
@@ -112,20 +113,6 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
     }
 
     return report;
-  }
-
-  @Override
-  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    // do nothing
-    return null;
-  }
-
-  @Override
-  public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    // do nothing
-    return null;
   }
 
   @Override

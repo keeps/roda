@@ -7,10 +7,11 @@
  */
 package org.roda.core.data.v2.ip;
 
-import java.io.Serializable;
 import java.util.List;
 
-public class File implements Serializable {
+import org.roda.core.data.v2.IsRODAObject;
+
+public class File implements IsRODAObject {
 
   private static final long serialVersionUID = 3303019735787641534L;
 

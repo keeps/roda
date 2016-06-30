@@ -8,7 +8,6 @@
 package org.roda.core.plugins.plugins.common;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,6 +32,7 @@ import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
@@ -65,8 +65,7 @@ import org.roda.core.util.CommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractConvertPlugin<T extends Serializable> extends AbstractPlugin<T> {
-
+public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   private static Logger LOGGER = LoggerFactory.getLogger(AbstractConvertPlugin.class);
 
   private String inputFormat;
@@ -90,6 +89,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
   }
 
   protected AbstractConvertPlugin() {
+    super();
     inputFormat = "";
     outputFormat = "";
   }

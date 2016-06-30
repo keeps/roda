@@ -22,7 +22,10 @@ import org.roda.core.data.exceptions.RODAException;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 
-public class RESTClientUtility {
+public final class RESTClientUtility {
+
+  private RESTClientUtility() {
+  }
 
   public static <T extends Serializable> T sendPostRequest(T element, Class<T> elementClass, String url,
     String resource, String username, String password) throws RODAException {

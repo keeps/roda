@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.plugins.Plugin;
 
 public class JobInfo implements Serializable {
@@ -67,15 +68,15 @@ public class JobInfo implements Serializable {
     return done;
   }
 
-  public <T extends Serializable> void put(Plugin<T> innerPlugin, JobPluginInfo jobPluginInfo) {
+  public <T extends IsRODAObject> void put(Plugin<T> innerPlugin, JobPluginInfo jobPluginInfo) {
     pluginsInfo.put(innerPlugin, jobPluginInfo);
   }
 
-  public <T extends Serializable> void setStarted(Plugin<T> innerPlugin) {
+  public <T extends IsRODAObject> void setStarted(Plugin<T> innerPlugin) {
     pluginsDone.put(innerPlugin, false);
   }
 
-  public <T extends Serializable> void setDone(Plugin<T> innerPlugin) {
+  public <T extends IsRODAObject> void setDone(Plugin<T> innerPlugin) {
     pluginsDone.put(innerPlugin, true);
   }
 

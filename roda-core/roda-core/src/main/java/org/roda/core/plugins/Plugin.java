@@ -7,13 +7,13 @@
  */
 package org.roda.core.plugins;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants.PreservationAgentType;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -29,7 +29,7 @@ import org.roda.core.storage.StorageService;
  * @author Luis Faria<lfaria@keep.p>
  * @author Hélder Silva <hsilva@keep.pt>
  */
-public interface Plugin<T extends Serializable> {
+public interface Plugin<T extends IsRODAObject> {
 
   /**
    * Returns the name of this {@link Plugin}.
@@ -160,6 +160,10 @@ public interface Plugin<T extends Serializable> {
    */
   public void init() throws PluginException;
 
+  public Plugin<T> injectObjectClass(Class<T> objectClass);
+
+  public Class<T> getObjectClass();
+
   /**
    * Method to be invoked by the PluginOrchestrator to inject the job plugin
    * info to be used by the plugin
@@ -169,7 +173,7 @@ public interface Plugin<T extends Serializable> {
   /**
    * Method retrieve job plugin info of a certain class
    */
-  public <T extends JobPluginInfo> T getJobPluginInfo(Class<T> jobPluginInfoClass);
+  public <T1 extends JobPluginInfo> T1 getJobPluginInfo(Class<T1> jobPluginInfoClass);
 
   /**
    * Method executed by {@link PluginOrchestrator} before splitting the workload
@@ -180,14 +184,6 @@ public interface Plugin<T extends Serializable> {
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException;
 
   /**
-   * Method executed by a worker before starting its work ( {@link #execute})
-   * 
-   * @throws PluginException
-   */
-  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException;
-
-  /**
    * Executes the {@link Plugin}.
    * 
    * @return a {@link Report} of the actions performed.
@@ -195,14 +191,6 @@ public interface Plugin<T extends Serializable> {
    * @throws PluginException
    */
   public Report execute(IndexService index, ModelService model, StorageService storage, List<T> list)
-    throws PluginException;
-
-  /**
-   * Method executed by a worker after doing its work ( {@link #execute})
-   * 
-   * @throws PluginException
-   */
-  public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException;
 
   /**

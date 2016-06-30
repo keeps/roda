@@ -8,7 +8,6 @@
 package org.roda.core.plugins.plugins.conversion;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -26,7 +26,11 @@ import org.roda.core.plugins.plugins.common.CommandConvertPlugin;
 import org.roda.core.storage.StorageService;
 import org.roda.core.util.CommandException;
 
-public class GeneralCommandConvertPlugin<T extends Serializable> extends CommandConvertPlugin<T> {
+public class GeneralCommandConvertPlugin<T extends IsRODAObject> extends CommandConvertPlugin<T> {
+
+  public GeneralCommandConvertPlugin() {
+    super();
+  }
 
   @Override
   public String getName() {

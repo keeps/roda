@@ -8,7 +8,6 @@
 package org.roda.core.plugins.plugins.conversion;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -17,6 +16,7 @@ import java.util.Map;
 
 import org.ghost4j.GhostscriptException;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -28,11 +28,11 @@ import org.roda.core.storage.StorageService;
 import org.roda.core.util.CommandException;
 import org.verapdf.core.VeraPDFException;
 
-public class PdfToPdfaPlugin<T extends Serializable> extends AbstractConvertPlugin<T> {
-
+public class PdfToPdfaPlugin<T extends IsRODAObject> extends AbstractConvertPlugin<T> {
   private static final String TOOLNAME = "pdftopdfa";
 
   public PdfToPdfaPlugin() {
+    super();
     super.setInputFormat("pdf");
     super.setOutputFormat("pdf");
   }

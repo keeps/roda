@@ -121,14 +121,6 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   }
 
   @Override
-  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    // do nothing
-    LOGGER.debug("Doing nothing in beforeBlockExecute");
-    return null;
-  }
-
-  @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<TransferredResource> resources) throws PluginException {
     try {
@@ -273,14 +265,6 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   }
 
   @Override
-  public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    // do nothing
-    LOGGER.debug("Doing nothing in afterBlockExecute");
-    return null;
-  }
-
-  @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     LOGGER.debug("Doing stuff in afterAllExecute");
     try {
@@ -301,7 +285,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       getPluginParameter(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS).getDefaultValue());
 
     Plugin<TransferredResource> plugin = (Plugin<TransferredResource>) RodaCoreFactory.getPluginManager()
-      .getPlugin(pluginClassName);
+      .getPlugin(pluginClassName, TransferredResource.class);
     try {
       plugin.setParameterValues(getParameterValues());
       report = plugin.execute(index, model, storage, transferredResources);
@@ -576,7 +560,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   private Report executePlugin(IndexService index, ModelService model, StorageService storage, List<AIP> aips,
     String pluginClassName, Map<String, String> params) {
     Report report = null;
-    Plugin<AIP> plugin = (Plugin<AIP>) RodaCoreFactory.getPluginManager().getPlugin(pluginClassName);
+    Plugin<AIP> plugin = RodaCoreFactory.getPluginManager().getPlugin(pluginClassName, AIP.class);
     Map<String, String> mergedParams = new HashMap<String, String>(getParameterValues());
     if (params != null) {
       mergedParams.putAll(params);
@@ -622,7 +606,8 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     String sipToAipClass = getParameterValues()
       .getOrDefault(getPluginParameter(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS).getId(), "");
     if (StringUtils.isNotBlank(sipToAipClass)) {
-      Plugin<?> plugin = RodaCoreFactory.getPluginManager().getPlugin(sipToAipClass);
+      Plugin<TransferredResource> plugin = RodaCoreFactory.getPluginManager().getPlugin(sipToAipClass,
+        TransferredResource.class);
       if (plugin == null || plugin.getType() != PluginType.SIP_TO_AIP) {
         areValid = areValid && false;
       }

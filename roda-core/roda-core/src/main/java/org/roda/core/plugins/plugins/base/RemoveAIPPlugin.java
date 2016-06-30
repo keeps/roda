@@ -33,8 +33,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RemoveAIPPlugin extends AbstractPlugin<AIP> {
-
   private static final Logger LOGGER = LoggerFactory.getLogger(RemoveAIPPlugin.class);
+
   public static final String ONLY_REPRESENTATIONS = "onlyRepresentations";
   private boolean onlyRepresentations = false;
 
@@ -99,18 +99,6 @@ public class RemoveAIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    return new Report();
-  }
-
-  @Override
-  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    return new Report();
-  }
-
-  @Override
-  public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
     return new Report();
   }

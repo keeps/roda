@@ -93,13 +93,6 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
   }
 
   @Override
-  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    // do nothing
-    return null;
-  }
-
-  @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<TransferredResource> list)
     throws PluginException {
     Report report = PluginHelper.initPluginReport(this);
@@ -172,13 +165,6 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
 
     }
     return report;
-  }
-
-  @Override
-  public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    // do nothing
-    return null;
   }
 
   @Override

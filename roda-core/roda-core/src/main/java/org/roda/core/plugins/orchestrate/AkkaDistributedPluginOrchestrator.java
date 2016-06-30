@@ -7,7 +7,6 @@
  */
 package org.roda.core.plugins.orchestrate;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -15,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.JobException;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
@@ -197,7 +197,7 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
   }
 
   @Override
-  public <T extends Serializable> void runPlugin(Object context, Plugin<T> plugin) {
+  public <T extends IsRODAObject> void runPlugin(Object context, Plugin<T> plugin) {
     // TODO Auto-generated method stub
 
   }
@@ -227,20 +227,20 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
   }
 
   @Override
-  public void setInitialJobStateInfo(String jobId, Object object) {
+  public void setJobContextInformation(String jobId, Object object) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public <T extends Serializable> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo)
+  public <T extends IsRODAObject> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo)
     throws JobException {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public <T extends Serializable> void updateJobState(Plugin<T> plugin, JOB_STATE state,
+  public <T extends IsRODAObject> void updateJobState(Plugin<T> plugin, JOB_STATE state,
     Optional<String> stateDetails) {
     // TODO Auto-generated method stub
 

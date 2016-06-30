@@ -33,6 +33,7 @@ import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -54,16 +55,19 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Hélder Silva <hsilva@keep.pt>
  */
-public class RiskJobPlugin extends AbstractPlugin<Serializable> {
+public class RiskJobPlugin extends AbstractPlugin<Risk> {
   private static final Logger LOGGER = LoggerFactory.getLogger(RiskJobPlugin.class);
 
   private static String riskIds = null;
-
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_ID,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_RISK_ID, "Risks", PluginParameterType.RISK_ID, "", false, false,
         "Add the risks that will be associated with the objects above."));
+  }
+
+  public RiskJobPlugin() {
+    super();
   }
 
   @Override
@@ -100,24 +104,9 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
   }
 
   @Override
-  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
+  public Report execute(IndexService index, ModelService model, StorageService storage, List<Risk> resources)
     throws PluginException {
-    // do nothing
-    return null;
-  }
-
-  @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<Serializable> resources)
-    throws PluginException {
-    Report report = executePlugin(index, model, storage, resources);
-    return report;
-  }
-
-  @Override
-  public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    // do nothing
-    return null;
+    return executePlugin(index, model, storage, resources);
   }
 
   @Override
@@ -286,7 +275,7 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
   }
 
   @Override
-  public Plugin<Serializable> cloneMe() {
+  public Plugin<Risk> cloneMe() {
     return new RiskJobPlugin();
   }
 

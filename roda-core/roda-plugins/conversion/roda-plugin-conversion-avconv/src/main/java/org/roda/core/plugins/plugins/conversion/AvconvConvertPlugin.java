@@ -15,7 +15,6 @@ R * The contents of this file are subject to the license and copyright
 package org.roda.core.plugins.plugins.conversion;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -24,6 +23,7 @@ import java.util.Map;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -35,7 +35,7 @@ import org.roda.core.storage.StorageService;
 import org.roda.core.util.CommandException;
 import org.slf4j.LoggerFactory;
 
-public class AvconvConvertPlugin<T extends Serializable> extends CommandConvertPlugin<T> {
+public class AvconvConvertPlugin<T extends IsRODAObject> extends CommandConvertPlugin<T> {
 
   private String outputArguments;
   private static final String TOOLNAME = "avconvconvert";

@@ -8,7 +8,6 @@
 package org.roda.core.plugins.orchestrate;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -29,6 +28,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -97,7 +97,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   public <T extends IsIndexed> void runPluginFromIndex(Object context, Class<T> classToActOn, Filter filter,
     Plugin<T> plugin) {
     try {
-      plugin.beforeBlockExecute(index, model, storage);
+
       IndexResult<T> find;
       int offset = 0;
       do {
@@ -109,15 +109,14 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       } while (find.getTotalCount() > find.getOffset() + find.getLimit());
 
       finishedSubmit();
-      plugin.afterBlockExecute(index, model, storage);
 
-    } catch (PluginException | GenericException | RequestNotValidException e) {
+    } catch (GenericException | RequestNotValidException e) {
       // TODO this exception handling should be reviewed
       LOGGER.error("Error running plugin from index", e);
     }
   }
 
-  private <T extends Serializable> void submitPlugin(List<T> list, Plugin<T> plugin) {
+  private <T extends IsRODAObject> void submitPlugin(List<T> list, Plugin<T> plugin) {
     executorService.submit(new Runnable() {
 
       @Override
@@ -149,7 +148,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public void runPluginOnAIPs(Object context, Plugin<AIP> plugin, List<String> ids, boolean retrieveFromModel) {
     try {
-      plugin.beforeBlockExecute(index, model, storage);
+
       Iterator<String> iter = ids.iterator();
       String aipId;
 
@@ -169,10 +168,8 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       }
 
       finishedSubmit();
-      plugin.afterBlockExecute(index, model, storage);
 
-    } catch (PluginException | RequestNotValidException | NotFoundException | GenericException
-      | AuthorizationDeniedException e) {
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       // TODO review this exception handling
       LOGGER.error("Error running plugin on AIPs: " + ids, e);
     }
@@ -181,7 +178,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public void runPluginOnAllAIPs(Object context, Plugin<AIP> plugin) {
     try {
-      plugin.beforeBlockExecute(index, model, storage);
+
       CloseableIterable<OptionalWithCause<AIP>> aips = model.listAIPs();
       Iterator<OptionalWithCause<AIP>> iter = aips.iterator();
 
@@ -207,9 +204,8 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       aips.close();
 
       finishedSubmit();
-      plugin.afterBlockExecute(index, model, storage);
 
-    } catch (IOException | PluginException | RequestNotValidException | GenericException | NotFoundException
+    } catch (IOException | RequestNotValidException | GenericException | NotFoundException
       | AuthorizationDeniedException e) {
       // TODO review this exception handling
       LOGGER.error("Error running plugin on all AIPs", e);
@@ -219,7 +215,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public void runPluginOnAllRepresentations(Object context, Plugin<Representation> plugin) {
     try {
-      plugin.beforeBlockExecute(index, model, storage);
+
       CloseableIterable<OptionalWithCause<AIP>> aips = model.listAIPs();
       Iterator<OptionalWithCause<AIP>> aipIter = aips.iterator();
 
@@ -247,9 +243,8 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       aips.close();
 
       finishedSubmit();
-      plugin.afterBlockExecute(index, model, storage);
 
-    } catch (IOException | PluginException | RequestNotValidException | GenericException | NotFoundException
+    } catch (IOException | RequestNotValidException | GenericException | NotFoundException
       | AuthorizationDeniedException e) {
       // TODO review this exception handling
       LOGGER.error("Error running plugin on all representations", e);
@@ -259,7 +254,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public void runPluginOnAllFiles(Object context, Plugin<File> plugin) {
     try {
-      plugin.beforeBlockExecute(index, model, storage);
+
       CloseableIterable<OptionalWithCause<AIP>> aips = model.listAIPs();
       Iterator<OptionalWithCause<AIP>> aipIter = aips.iterator();
 
@@ -302,9 +297,8 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       aips.close();
 
       finishedSubmit();
-      plugin.afterBlockExecute(index, model, storage);
 
-    } catch (IOException | PluginException | RequestNotValidException | GenericException | NotFoundException
+    } catch (IOException | RequestNotValidException | GenericException | NotFoundException
       | AuthorizationDeniedException e) {
       // TODO review this exception handling
       LOGGER.error("Error running plugin on all files", e);
@@ -314,7 +308,6 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public void runPluginOnTransferredResources(Object context, Plugin<TransferredResource> plugin, List<String> uuids) {
     try {
-      plugin.beforeBlockExecute(index, model, storage);
 
       List<TransferredResource> resources = JobsHelper.getTransferredResources(index, uuids);
 
@@ -332,7 +325,6 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       }
 
       finishedSubmit();
-      plugin.afterBlockExecute(index, model, storage);
 
     } catch (Exception e) {
       // TODO review this exception handling
@@ -341,7 +333,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public <T extends Serializable> void runPlugin(Object context, Plugin<T> plugin) {
+  public <T extends IsRODAObject> void runPlugin(Object context, Plugin<T> plugin) {
     // TODO Auto-generated method stub
 
   }
@@ -357,7 +349,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public <T extends Serializable> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo) {
+  public <T extends IsRODAObject> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo) {
     // TODO Auto-generated method stub
   }
 
@@ -382,14 +374,14 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public <T extends Serializable> void updateJobState(Plugin<T> plugin, JOB_STATE state,
+  public <T extends IsRODAObject> void updateJobState(Plugin<T> plugin, JOB_STATE state,
     Optional<String> stateDetails) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public void setInitialJobStateInfo(String jobId, Object object) {
+  public void setJobContextInformation(String jobId, Object object) {
     // TODO Auto-generated method stub
 
   }

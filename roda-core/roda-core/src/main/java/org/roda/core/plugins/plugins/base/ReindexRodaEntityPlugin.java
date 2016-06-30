@@ -9,7 +9,6 @@ package org.roda.core.plugins.plugins.base;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +23,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -40,9 +40,9 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ReindexRodaEntityPlugin<T extends Serializable> extends AbstractPlugin<T> {
-
+public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(ReindexRodaEntityPlugin.class);
+
   private boolean clearIndexes = true;
   private boolean recursiveListing = false;
   private Class<T> clazz = null;
@@ -140,22 +140,6 @@ public class ReindexRodaEntityPlugin<T extends Serializable> extends AbstractPlu
     }
 
     return new Report();
-  }
-
-  @Override
-  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    // do nothing
-    LOGGER.debug("Doing nothing in beforeBlockExecute");
-    return null;
-  }
-
-  @Override
-  public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    // do nothing
-    LOGGER.debug("Doing nothing in afterBlockExecute");
-    return null;
   }
 
   @Override

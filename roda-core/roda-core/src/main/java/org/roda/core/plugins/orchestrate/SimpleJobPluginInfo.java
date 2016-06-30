@@ -7,9 +7,9 @@
  */
 package org.roda.core.plugins.orchestrate;
 
-import java.io.Serializable;
 import java.util.Map;
 
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.plugins.Plugin;
 
 public class SimpleJobPluginInfo extends JobPluginInfo {
@@ -29,7 +29,7 @@ public class SimpleJobPluginInfo extends JobPluginInfo {
   }
 
   @Override
-  public <T extends Serializable> JobPluginInfo processJobPluginInformation(Plugin<T> plugin, JobInfo jobInfo) {
+  public <T extends IsRODAObject> JobPluginInfo processJobPluginInformation(Plugin<T> plugin, JobInfo jobInfo) {
     int taskObjectsCount = jobInfo.getObjectsCount();
     Map<Plugin<?>, JobPluginInfo> jobInfos = jobInfo.getJobInfo();
     // update information in the map<plugin, pluginInfo>

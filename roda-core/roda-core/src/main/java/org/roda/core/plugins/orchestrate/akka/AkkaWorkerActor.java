@@ -31,29 +31,13 @@ public class AkkaWorkerActor extends UntypedActor {
 
   @Override
   public void onReceive(Object msg) throws Exception {
-    if (msg instanceof Messages.PluginBeforeBlockExecuteIsReady) {
-      handlePluginBeforeBlockExecuteIsReady(msg);
-    } else if (msg instanceof Messages.PluginExecuteIsReady) {
+    if (msg instanceof Messages.PluginExecuteIsReady) {
       handlePluginExecuteIsReady(msg);
-    } else if (msg instanceof Messages.PluginAfterBlockExecuteIsReady) {
-      handlePluginAfterBlockExecuteIsReady(msg);
     } else if (msg instanceof Messages.PluginAfterAllExecuteIsReady) {
       handlePluginAfterAllExecuteIsReady(msg);
     } else {
       LOGGER.error("Received a message that it doesn't know how to process (" + msg.getClass().getName() + ")...");
       unhandled(msg);
-    }
-  }
-
-  private void handlePluginBeforeBlockExecuteIsReady(Object msg) {
-    Messages.PluginBeforeBlockExecuteIsReady message = (Messages.PluginBeforeBlockExecuteIsReady) msg;
-    Plugin<?> plugin = message.getPlugin();
-    try {
-      plugin.beforeBlockExecute(index, model, storage);
-      getSender().tell(new Messages.PluginBeforeBlockExecuteIsDone(plugin, false, message.getList()), getSelf());
-    } catch (Exception e) {
-      LOGGER.error("Error executing plugin.beforeBlockExecute()", e);
-      getSender().tell(new Messages.PluginBeforeBlockExecuteIsDone(plugin, true, message.getList()), getSelf());
     }
   }
 
@@ -66,18 +50,6 @@ public class AkkaWorkerActor extends UntypedActor {
     } catch (Exception e) {
       LOGGER.error("Error executing plugin.execute()", e);
       getSender().tell(new Messages.PluginExecuteIsDone(plugin, true), getSelf());
-    }
-  }
-
-  private void handlePluginAfterBlockExecuteIsReady(Object msg) {
-    Messages.PluginAfterBlockExecuteIsReady message = (Messages.PluginAfterBlockExecuteIsReady) msg;
-    Plugin<?> plugin = message.getPlugin();
-    try {
-      plugin.afterBlockExecute(index, model, storage);
-      getSender().tell(new Messages.PluginAfterBlockExecuteIsDone(plugin, false), getSelf());
-    } catch (Exception e) {
-      LOGGER.error("Error executing plugin.afterBlockExecute()", e);
-      getSender().tell(new Messages.PluginAfterBlockExecuteIsDone(plugin, true), getSelf());
     }
   }
 

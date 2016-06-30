@@ -35,14 +35,12 @@ public class AkkaJobStateInfoActor extends UntypedActor {
       handleJobStateUpdated(msg);
     } else if (msg instanceof Messages.JobInfoUpdated) {
       handleJobInfoUpdated(msg);
+    } else if (msg instanceof Messages.PluginInitEnded) {
+      handlePluginInitEnded(msg);
     } else if (msg instanceof Messages.JobInitEnded) {
       handleJobInitEnded(msg);
-    } else if (msg instanceof Messages.PluginBeforeBlockExecuteIsDone) {
-      handleBeforeBlockExecuteIsDone(msg);
     } else if (msg instanceof Messages.PluginExecuteIsDone) {
       handleExecuteIsDone(msg);
-    } else if (msg instanceof Messages.PluginAfterBlockExecuteIsDone) {
-      handleAfterBlockExecuteIsDone(msg);
     } else if (msg instanceof Messages.PluginAfterAllExecuteIsDone) {
       handleAfterAllExecuteIsDone(msg);
     } else {
@@ -68,6 +66,11 @@ public class AkkaJobStateInfoActor extends UntypedActor {
     PluginHelper.updateJobInformation(message.plugin, RodaCoreFactory.getModelService(), infoUpdated);
   }
 
+  private void handlePluginInitEnded(Object msg) {
+    Messages.PluginInitEnded message = (Messages.PluginInitEnded) msg;
+    jobInfo.setStarted(message.getPlugin());
+  }
+
   private void handleJobInitEnded(Object msg) {
     jobInfo.setInitEnded(true);
     // INFO 20160630 hsilva: the following test is needed because messages can
@@ -77,19 +80,9 @@ public class AkkaJobStateInfoActor extends UntypedActor {
     }
   }
 
-  private void handleBeforeBlockExecuteIsDone(Object msg) {
-    Messages.PluginBeforeBlockExecuteIsDone message = (Messages.PluginBeforeBlockExecuteIsDone) msg;
-    jobInfo.setStarted(message.getPlugin());
-    getSender().tell(new Messages.PluginExecuteIsReady(message.getPlugin(), message.getList()), getSelf());
-  }
-
   private void handleExecuteIsDone(Object msg) {
     Messages.PluginExecuteIsDone message = (Messages.PluginExecuteIsDone) msg;
-    getSender().tell(new Messages.PluginAfterBlockExecuteIsReady<>(message.getPlugin()), getSelf());
-  }
 
-  private void handleAfterBlockExecuteIsDone(Object msg) {
-    Messages.PluginAfterBlockExecuteIsDone message = (Messages.PluginAfterBlockExecuteIsDone) msg;
     jobInfo.setDone(message.getPlugin());
     if (jobInfo.isDone() && jobInfo.isInitEnded()) {
       getSender().tell(new Messages.PluginAfterAllExecuteIsReady(plugin), getSelf());
