@@ -93,4 +93,7 @@ To start developing for RODA check the [Developer guide](https://github.com/keep
 3. [How to set up the development environment](https://github.com/keeps/roda/wiki/Developer-guide#-how-to-set-up-the-development-environment)
 4. [How to contribute](https://github.com/keeps/roda/wiki/Developer-guide#-how-to-contribute)
 
+
+Translations are not maintained by [Transifex ](https://www.transifex.com/roda-1/roda2) and updated using the [Transifex Client](http://docs.transifex.com/client/). After installing the client and setting up your `~/.transifexrc` use `tx push -s` to when you have new source translations to push to server, and `tx pull -a` to update the translation on your local installation. 
+
 [![Build Status](https://travis-ci.org/keeps/roda.png?branch=master)](https://travis-ci.org/keeps/roda)
