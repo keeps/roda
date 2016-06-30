@@ -18,14 +18,16 @@ public class JobInfo implements Serializable {
   private static final long serialVersionUID = 5962481824986980596L;
 
   private Map<Plugin<?>, JobPluginInfo> pluginsInfo;
+  private Map<Plugin<?>, Boolean> pluginsDone;
   private int objectsCount;
-  private boolean hasTimeoutOccurred;
+  private boolean initEnded;
   private boolean done;
 
   public JobInfo() {
     pluginsInfo = new HashMap<>();
+    pluginsDone = new HashMap<>();
     objectsCount = 0;
-    hasTimeoutOccurred = false;
+    initEnded = false;
     done = false;
   }
 
@@ -45,32 +47,36 @@ public class JobInfo implements Serializable {
     this.objectsCount = objectsCount;
   }
 
-  public boolean isHasTimeoutOccurred() {
-    return hasTimeoutOccurred;
+  public boolean isInitEnded() {
+    return initEnded;
   }
 
-  public void setHasTimeoutOccurred(boolean hasTimeoutOccurred) {
-    this.hasTimeoutOccurred = hasTimeoutOccurred;
+  public void setInitEnded(boolean initEnded) {
+    this.initEnded = initEnded;
   }
 
   public boolean isDone() {
-    return done;
-  }
-
-  public void setDone(boolean done) {
-    this.done = done;
-  }
-
-  public <T extends Serializable> void put(Plugin<T> innerPlugin, JobPluginInfo jobPluginInfo) {
-    pluginsInfo.put(innerPlugin, jobPluginInfo);
     boolean isDone = true;
-    for (Entry<Plugin<?>, JobPluginInfo> jpi : pluginsInfo.entrySet()) {
-      if (!jpi.getValue().isDone()) {
+    for (Entry<Plugin<?>, Boolean> entry : pluginsDone.entrySet()) {
+      if (!entry.getValue()) {
         isDone = false;
         break;
       }
     }
     done = isDone;
+    return done;
+  }
+
+  public <T extends Serializable> void put(Plugin<T> innerPlugin, JobPluginInfo jobPluginInfo) {
+    pluginsInfo.put(innerPlugin, jobPluginInfo);
+  }
+
+  public <T extends Serializable> void setStarted(Plugin<T> innerPlugin) {
+    pluginsDone.put(innerPlugin, false);
+  }
+
+  public <T extends Serializable> void setDone(Plugin<T> innerPlugin) {
+    pluginsDone.put(innerPlugin, true);
   }
 
   @Override

@@ -16,7 +16,6 @@ import org.roda.core.plugins.plugins.PluginHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 
 public class AkkaJobStateInfoActor extends UntypedActor {
@@ -36,6 +35,8 @@ public class AkkaJobStateInfoActor extends UntypedActor {
       handleJobStateUpdated(msg);
     } else if (msg instanceof Messages.JobInfoUpdated) {
       handleJobInfoUpdated(msg);
+    } else if (msg instanceof Messages.JobInitEnded) {
+      handleJobInitEnded(msg);
     } else if (msg instanceof Messages.PluginBeforeBlockExecuteIsDone) {
       handleBeforeBlockExecuteIsDone(msg);
     } else if (msg instanceof Messages.PluginExecuteIsDone) {
@@ -54,7 +55,7 @@ public class AkkaJobStateInfoActor extends UntypedActor {
     Messages.JobStateUpdated message = (Messages.JobStateUpdated) msg;
     Plugin<?> p = message.getPlugin() == null ? plugin : message.getPlugin();
     PluginHelper.updateJobState(p, RodaCoreFactory.getModelService(), message.getState(), message.getStateDatails());
-    if (message.getState() == JOB_STATE.COMPLETED) {
+    if (JOB_STATE.FAILED_TO_COMPLETE == message.getState() || JOB_STATE.COMPLETED == message.getState()) {
       getContext().stop(getSelf());
     }
   }
@@ -67,11 +68,19 @@ public class AkkaJobStateInfoActor extends UntypedActor {
     PluginHelper.updateJobInformation(message.plugin, RodaCoreFactory.getModelService(), infoUpdated);
   }
 
+  private void handleJobInitEnded(Object msg) {
+    jobInfo.setInitEnded(true);
+    // INFO 20160630 hsilva: the following test is needed because messages can
+    // be out of order and a plugin might already arrived to the end
+    if (jobInfo.isDone()) {
+      getSender().tell(new Messages.PluginAfterAllExecuteIsReady(plugin), getSelf());
+    }
+  }
+
   private void handleBeforeBlockExecuteIsDone(Object msg) {
     Messages.PluginBeforeBlockExecuteIsDone message = (Messages.PluginBeforeBlockExecuteIsDone) msg;
-    ActorRef sender = getSender();
-    ActorRef self = getSelf();
-    sender.tell(new Messages.PluginExecuteIsReady(message.getPlugin(), message.getList()), self);
+    jobInfo.setStarted(message.getPlugin());
+    getSender().tell(new Messages.PluginExecuteIsReady(message.getPlugin(), message.getList()), getSelf());
   }
 
   private void handleExecuteIsDone(Object msg) {
@@ -81,12 +90,9 @@ public class AkkaJobStateInfoActor extends UntypedActor {
 
   private void handleAfterBlockExecuteIsDone(Object msg) {
     Messages.PluginAfterBlockExecuteIsDone message = (Messages.PluginAfterBlockExecuteIsDone) msg;
-    JobPluginInfo jobPluginInfo = jobInfo.getJobInfo().get(message.getPlugin());
-    jobPluginInfo.setDone(true);
-    jobInfo.put(message.getPlugin(), jobPluginInfo);
-
-    if (jobInfo.isDone()) {
-      getSender().tell(new Messages.PluginAfterAllExecuteIsReady(message.getPlugin()), getSelf());
+    jobInfo.setDone(message.getPlugin());
+    if (jobInfo.isDone() && jobInfo.isInitEnded()) {
+      getSender().tell(new Messages.PluginAfterAllExecuteIsReady(plugin), getSelf());
     }
   }
 

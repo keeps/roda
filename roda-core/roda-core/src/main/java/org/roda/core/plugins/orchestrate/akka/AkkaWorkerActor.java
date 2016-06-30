@@ -14,7 +14,6 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 
 public class AkkaWorkerActor extends UntypedActor {
@@ -49,15 +48,12 @@ public class AkkaWorkerActor extends UntypedActor {
   private void handlePluginBeforeBlockExecuteIsReady(Object msg) {
     Messages.PluginBeforeBlockExecuteIsReady message = (Messages.PluginBeforeBlockExecuteIsReady) msg;
     Plugin<?> plugin = message.getPlugin();
-    ActorRef sender = getSender();
-    ActorRef self = getSelf();
-    ActorRef parent = getContext().parent();
     try {
       plugin.beforeBlockExecute(index, model, storage);
-      sender.tell(new Messages.PluginBeforeBlockExecuteIsDone(plugin, false, message.getList()), parent);
+      getSender().tell(new Messages.PluginBeforeBlockExecuteIsDone(plugin, false, message.getList()), getSelf());
     } catch (Exception e) {
       LOGGER.error("Error executing plugin.beforeBlockExecute()", e);
-      sender.tell(new Messages.PluginBeforeBlockExecuteIsDone(plugin, true, message.getList()), parent);
+      getSender().tell(new Messages.PluginBeforeBlockExecuteIsDone(plugin, true, message.getList()), getSelf());
     }
   }
 

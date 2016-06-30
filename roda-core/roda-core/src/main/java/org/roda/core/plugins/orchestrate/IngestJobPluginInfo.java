@@ -87,10 +87,13 @@ public class IngestJobPluginInfo extends JobPluginInfo {
     int sourceObjectsProcessedWithSuccess = 0;
     int sourceObjectsProcessedWithFailure = 0;
     int outcomeObjectsWithManualIntervention = 0;
-    for (JobPluginInfoInterface jpi : jobInfos.values()) {
+    for (JobPluginInfo jpi : jobInfos.values()) {
       IngestJobPluginInfo pluginInfo = (IngestJobPluginInfo) jpi;
       if (pluginInfo.getTotalSteps() > 0) {
-        float pluginPercentage = isDone() ? 1 : ((float) pluginInfo.getStepsCompleted()) / pluginInfo.getTotalSteps();
+        float pluginPercentage = jpi.getCompletionPercentage();
+        if (pluginPercentage != 100 && pluginInfo.getStepsCompleted() != 0 && pluginInfo.getTotalSteps() != 0) {
+          pluginPercentage = ((float) pluginInfo.getStepsCompleted()) / pluginInfo.getTotalSteps();
+        }
         float pluginWeight = ((float) pluginInfo.getSourceObjectsCount()) / taskObjectsCount;
         percentage += (pluginPercentage * pluginWeight);
 

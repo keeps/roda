@@ -78,6 +78,20 @@ public class Messages {
 
   }
 
+  public static final class JobInitEnded implements Serializable {
+    private static final long serialVersionUID = 5040958276243865900L;
+
+    public JobInitEnded() {
+
+    }
+
+    @Override
+    public String toString() {
+      return "JobInitEnded []";
+    }
+
+  }
+
   /*-------------------- PLUGIN STATE TRANSITIONS RELATED STATIC CLASSES --------------------*/
 
   private static class PluginMethodIsReady<T extends Serializable> implements Serializable {
