@@ -26,6 +26,7 @@ import java.util.UUID;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.InvalidParameterException;
@@ -56,6 +57,20 @@ public class FileExportPlugin extends AbstractPlugin<File> {
   public static final String CSV_FILE_OUTPUT = "parameter.csv.file.output";
   public static final String CSV_FILE_HEADERS = "parameter.csv.file.headers";
 
+  public static final String CSV_FIELD_SIP_ID = "sipId";
+  public static final String CSV_FIELD_AIP_ID = "aipId";
+  public static final String CSV_FIELD_REPRESENTATION_ID = "representationId";
+  public static final String CSV_FIELD_FILE_PATH = "filePath";
+  public static final String CSV_FIELD_FILE_ID = "fileId";
+  public static final String CSV_FIELD_ISDIRECTORY = "isDirectory";
+
+  public static final String CSV_FIELD_CHECKSUM_SHA1 = "SHA-1";
+  public static final String CSV_FIELD_CHECKSUM_SHA256 = "SHA-256";
+  public static final String CSV_FIELD_CHECKSUM_MD5 = "MD5";
+
+  public static final List<String> CHECKSUM_ALGORITHMS = Arrays.asList(CSV_FIELD_CHECKSUM_MD5, CSV_FIELD_CHECKSUM_SHA1,
+    CSV_FIELD_CHECKSUM_SHA256);
+
   private static final Logger LOGGER = LoggerFactory.getLogger(FileExportPlugin.class);
 
   private List<String> fields = null;
@@ -65,10 +80,13 @@ public class FileExportPlugin extends AbstractPlugin<File> {
 
   // TODO -> add plugin parameter type "LIST"...
   static {
-    pluginParameters.put(CSV_FILE_FIELDS, new PluginParameter(CSV_FILE_FIELDS, "CSV Fields", PluginParameterType.STRING,
-      "file id", true, false, "List of fields to export"));
+    pluginParameters.put(CSV_FILE_FIELDS,
+      new PluginParameter(CSV_FILE_FIELDS, "CSV Fields", PluginParameterType.STRING,
+        StringUtils.join(Arrays.asList(CSV_FIELD_SIP_ID, CSV_FIELD_AIP_ID, CSV_FIELD_REPRESENTATION_ID,
+          CSV_FIELD_FILE_PATH, CSV_FIELD_FILE_ID, CSV_FIELD_ISDIRECTORY, CSV_FIELD_CHECKSUM_SHA256), ","),
+        true, false, "List of fields to export"));
     pluginParameters.put(CSV_FILE_OUTPUT, new PluginParameter(CSV_FILE_OUTPUT, "CSV output path",
-      PluginParameterType.STRING, "/home/hsilva/Desktop/.csv", true, false, "Path where the CSV file is created."));
+      PluginParameterType.STRING, "/tmp/output.csv", true, false, "Path where the CSV file is created."));
     pluginParameters.put(CSV_FILE_HEADERS, new PluginParameter(CSV_FILE_HEADERS, "CSV headers",
       PluginParameterType.BOOLEAN, "true", true, false, "Output CSV headers."));
   }

@@ -35,6 +35,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -824,4 +825,8 @@ public final class FSUtils {
     }
   }
 
+  
+  public static String asString(List<String> path){
+    return StringUtils.join(path,SEPARATOR);
+  }
 }

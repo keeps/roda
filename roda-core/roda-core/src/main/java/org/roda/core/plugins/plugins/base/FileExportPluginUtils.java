@@ -14,17 +14,17 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlbeans.XmlException;
 import org.roda.core.common.PremisV3Utils;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.metadata.Fixity;
 import org.roda.core.model.ModelService;
+import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,33 +49,39 @@ public class FileExportPluginUtils {
 
     List<String> fileInfo = new ArrayList<String>();
     List<Fixity> fixities = null;
-
     for (String fieldName : fields) {
-      if (fieldName.equalsIgnoreCase("file id")) {
-        fileInfo.add(file.getId());
-      } else if (fieldName.equalsIgnoreCase("path")) {
-        fileInfo.add(StringUtils.join(file.getPath(), RodaConstants.FILE_STORAGEPATH));
-      } else if (fieldName.equalsIgnoreCase("sip id")) {
+      if (fieldName.equalsIgnoreCase(FileExportPlugin.CSV_FIELD_SIP_ID)) {
         try {
-          fileInfo.add(model.retrieveAIP(file.getAipId()).getIngestSIPId());
+          AIP aip = model.retrieveAIP(file.getAipId());
+          fileInfo.add(aip.getIngestSIPId());
         } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
           fileInfo.add("");
         }
-      } else if (fieldName.equalsIgnoreCase("sha-1") || fieldName.equalsIgnoreCase("sha-256")) {
+      } else if (fieldName.equalsIgnoreCase(FileExportPlugin.CSV_FIELD_AIP_ID)) {
+        fileInfo.add(file.getAipId());
+      } else if (fieldName.equalsIgnoreCase(FileExportPlugin.CSV_FIELD_REPRESENTATION_ID)) {
+        fileInfo.add(file.getRepresentationId());
+      } else if (fieldName.equalsIgnoreCase(FileExportPlugin.CSV_FIELD_FILE_PATH)) {
+        fileInfo.add(FSUtils.asString(file.getPath()));
+      } else if (fieldName.equalsIgnoreCase(FileExportPlugin.CSV_FIELD_FILE_ID)) {
+        fileInfo.add(file.getId());
+      } else if (fieldName.equalsIgnoreCase(FileExportPlugin.CSV_FIELD_ISDIRECTORY)) {
+        fileInfo.add(String.valueOf(file.isDirectory()));
+      } else if (FileExportPlugin.CHECKSUM_ALGORITHMS.contains(fieldName.toUpperCase())) {
         if (!file.isDirectory()) {
           if (fixities == null) {
             try {
               fixities = PremisV3Utils.extractFixities(model.retrievePreservationFile(file));
-              fileInfo.add(getFixity(fieldName, fixities));
             } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException
               | XmlException | IOException e) {
-              fileInfo.add("");
             }
           }
-
+          if (fixities != null) {
+            fileInfo.add(getFixity(fieldName, fixities));
+          } else {
+            fileInfo.add("");
+          }
         }
-      } else if (fieldName.equalsIgnoreCase("isDirectory")) {
-        fileInfo.add(String.valueOf(file.isDirectory()));
       } else {
         fileInfo.add("");
       }
