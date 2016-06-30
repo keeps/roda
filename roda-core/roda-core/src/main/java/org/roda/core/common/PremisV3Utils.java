@@ -706,8 +706,12 @@ public class PremisV3Utils {
         if (occt.getFormatArray() != null && occt.getFormatArray().length > 0) {
           FormatComplexType fct = occt.getFormatArray(0);
           if (fct.getFormatDesignation() != null) {
-            doc.addField(RodaConstants.FILE_FILEFORMAT, fct.getFormatDesignation().getFormatName().getStringValue());
-            doc.addField(RodaConstants.FILE_FORMAT_VERSION, fct.getFormatDesignation().getFormatVersion());
+            if(StringUtils.isNotBlank(fct.getFormatDesignation().getFormatName().getStringValue())){
+              doc.addField(RodaConstants.FILE_FILEFORMAT, fct.getFormatDesignation().getFormatName().getStringValue());
+            }
+            if(StringUtils.isNotBlank(fct.getFormatDesignation().getFormatVersion())){
+              doc.addField(RodaConstants.FILE_FORMAT_VERSION, fct.getFormatDesignation().getFormatVersion());
+            }
           }
 
           FormatRegistryComplexType pronomRegistry = getFormatRegistry(premisFile,

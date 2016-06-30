@@ -243,14 +243,8 @@ public class RodaCoreFactory {
         LOGGER.debug("Finished loading roda-core.properties & roda-core-formats.properties");
 
         // initialize working directory
-        workingDirectoryPath = Paths
-          .get(getRodaConfiguration().getString("core.workingdirectory", getSystemProperty("java.io.tmpdir", "tmp")));
-        try {
-          Files.createDirectories(rodaHomePath);
-        } catch (IOException e) {
-          throw new RuntimeException(
-            "Unable to create RODA WORKING DIRECTORY " + workingDirectoryPath + ". Aborting...", e);
-        }
+        initializeWorkingDirectory();
+        
 
         // instantiate storage and model service
         instantiateStorageAndModel();
@@ -284,6 +278,18 @@ public class RodaCoreFactory {
       }
 
     }
+  }
+
+  private static void initializeWorkingDirectory() {
+    try {
+      workingDirectoryPath = Paths
+        .get(getRodaConfiguration().getString("core.workingdirectory", getSystemProperty("java.io.tmpdir", "tmp")));
+      Files.createDirectories(rodaHomePath);
+    } catch (IOException e) {
+      throw new RuntimeException(
+        "Unable to create RODA WORKING DIRECTORY " + workingDirectoryPath + ". Aborting...", e);
+    }
+    
   }
 
   private static Path determineRodaHomePath() {
