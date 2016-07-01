@@ -47,7 +47,6 @@ import org.roda.core.common.Messages;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.UserUtility;
-import org.roda.core.common.XMLUtility;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.common.tools.ZipEntryInfo;
@@ -145,7 +144,7 @@ import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
 import org.roda.wui.common.HTMLUtils;
 import org.roda.wui.common.server.ServerTools;
-import org.roda.wui.common.server.XMLSimilarityIgnoreElements;
+import org.roda.wui.server.common.XMLSimilarityIgnoreElements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -301,7 +300,7 @@ public class BrowserHelper {
         }
       }
 
-      boolean similar = false, identical = false;
+      boolean similar = false;
       // Get the values using XPath
       Set<MetadataValue> values = null;
       String template = null;
@@ -343,20 +342,12 @@ public class BrowserHelper {
 
           Diff xmlDiff = new Diff(xml, templateWithValues);
           xmlDiff.overrideDifferenceListener(new XMLSimilarityIgnoreElements("schemaLocation"));
-          similar = xmlDiff.similar();
-          identical = xmlDiff.identical();
-          DetailedDiff detDiff = new DetailedDiff(xmlDiff);
-          List differences = detDiff.getAllDifferences();
-          for (Object object : differences) {
-            Difference difference = (Difference)object;
-            System.out.println(difference);
-            System.out.println("***********************");
-          }
+          similar = xmlDiff.identical() || xmlDiff.similar();
         } catch (SAXException e) {
         }
       }
 
-      ret = new DescriptiveMetadataEditBundle(descriptiveMetadataId, type, version, xml, template, values, identical, similar);
+      ret = new DescriptiveMetadataEditBundle(descriptiveMetadataId, type, version, xml, template, values, similar);
     } catch (IOException e) {
       throw new GenericException("Error getting descriptive metadata edit bundle: " + e.getMessage());
     } finally {

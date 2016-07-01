@@ -1,4 +1,4 @@
-package org.roda.wui.common.server;
+package org.roda.wui.server.common;
 
 import org.custommonkey.xmlunit.Difference;
 import org.custommonkey.xmlunit.DifferenceConstants;

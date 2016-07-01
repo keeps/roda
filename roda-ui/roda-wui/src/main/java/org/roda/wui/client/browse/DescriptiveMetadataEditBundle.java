@@ -20,14 +20,14 @@ public class DescriptiveMetadataEditBundle implements Serializable {
   private String version;
   private String rawTemplate;
   private Set<MetadataValue> values;
-  private boolean identical, similar;
+  private boolean similar;
 
   public DescriptiveMetadataEditBundle() {
     super();
   }
 
   public DescriptiveMetadataEditBundle(String id, String type, String version, String xml, String rawTemplate,
-    Set<MetadataValue> values, boolean identical, boolean similar) {
+    Set<MetadataValue> values, boolean similar) {
     super();
     this.id = id;
     this.type = type;
@@ -35,7 +35,6 @@ public class DescriptiveMetadataEditBundle implements Serializable {
     this.version = version;
     this.rawTemplate = rawTemplate;
     this.values = values;
-    this.identical = identical;
     this.similar = similar;
   }
 
@@ -93,14 +92,6 @@ public class DescriptiveMetadataEditBundle implements Serializable {
 
   public void setValues(Set<MetadataValue> values) {
     this.values = values;
-  }
-
-  public boolean isIdentical() {
-    return identical;
-  }
-
-  public void setIdentical(boolean identical) {
-    this.identical = identical;
   }
 
   public boolean isSimilar() {

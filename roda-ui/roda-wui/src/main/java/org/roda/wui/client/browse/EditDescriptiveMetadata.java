@@ -120,9 +120,6 @@ public class EditDescriptiveMetadata extends Composite {
   Label formOrXMLLabel;
 
   @UiField
-  Label formIdenticalDanger;
-
-  @UiField
   Label formSimilarDanger;
 
   @UiField
@@ -269,12 +266,9 @@ public class EditDescriptiveMetadata extends Composite {
   }
 
   private void updateFormOrXML() {
-    if(!bundle.isIdentical()){
-      if(!bundle.isSimilar())
-        formIdenticalDanger.setVisible(true);
-      else formSimilarDanger.setVisible(true);
+    if(!bundle.isSimilar()){
+      formSimilarDanger.setVisible(true);
     }else{
-      formIdenticalDanger.setVisible(false);
       formSimilarDanger.setVisible(false);
     }
 
