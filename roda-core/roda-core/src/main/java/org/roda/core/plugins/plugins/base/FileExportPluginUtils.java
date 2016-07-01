@@ -74,6 +74,7 @@ public class FileExportPluginUtils {
               fixities = PremisV3Utils.extractFixities(model.retrievePreservationFile(file));
             } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException
               | XmlException | IOException e) {
+              LOGGER.error("Error extracting fixities from premis file.",e);
             }
           }
           if (fixities != null) {
