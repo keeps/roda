@@ -16,8 +16,10 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,10 +30,11 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobException;
-import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -48,7 +51,7 @@ import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FileExportPlugin extends AbstractPlugin<File> {
+public class InventoryReportPlugin extends AbstractPlugin<AIP> {
 
   public Charset charset = StandardCharsets.UTF_8;
 
@@ -56,6 +59,9 @@ public class FileExportPlugin extends AbstractPlugin<File> {
   public static final String CSV_FILE_FIELDS = "parameter.csv.file.fields";
   public static final String CSV_FILE_OUTPUT = "parameter.csv.file.output";
   public static final String CSV_FILE_HEADERS = "parameter.csv.file.headers";
+  public static final String CSV_FILE_OUTPUT_DATA = "parameter.csv.file.output.data";
+  public static final String CSV_FILE_OUTPUT_DESCRIPTIVE = "parameter.csv.file.output.descriptive";
+  public static final String CSV_FILE_OTHER_METADATA_TYPES = "parameter.csv.file.output.other";
 
   public static final String CSV_FIELD_SIP_ID = "sipId";
   public static final String CSV_FIELD_AIP_ID = "aipId";
@@ -68,20 +74,30 @@ public class FileExportPlugin extends AbstractPlugin<File> {
   public static final String CSV_FIELD_CHECKSUM_SHA256 = "SHA-256";
   public static final String CSV_FIELD_CHECKSUM_MD5 = "MD5";
 
+  public static final String CSV_FILE_TYPE = "type";
+
+  public enum CSV_LINE_TYPE {
+    DATA, METADATA_DESCRIPTIVE, METADATA_OTHER
+  }
+
   public static final List<String> CHECKSUM_ALGORITHMS = Arrays.asList(CSV_FIELD_CHECKSUM_MD5, CSV_FIELD_CHECKSUM_SHA1,
     CSV_FIELD_CHECKSUM_SHA256);
 
-  public static final String CSV_DEFAULT_FIELDS = StringUtils
-    .join(Arrays.asList(CSV_FIELD_SIP_ID, CSV_FIELD_AIP_ID, CSV_FIELD_REPRESENTATION_ID, CSV_FIELD_FILE_PATH,
-      CSV_FIELD_FILE_ID, CSV_FIELD_ISDIRECTORY, CSV_FIELD_CHECKSUM_SHA256), ",");
+  public static final String CSV_DEFAULT_FIELDS = StringUtils.join(Arrays.asList(CSV_FIELD_SIP_ID, CSV_FIELD_AIP_ID,
+    CSV_FIELD_REPRESENTATION_ID, CSV_FIELD_FILE_PATH, CSV_FIELD_FILE_ID, CSV_FIELD_ISDIRECTORY, CSV_FILE_TYPE,
+    CSV_FIELD_CHECKSUM_SHA256, CSV_FIELD_CHECKSUM_MD5, CSV_FIELD_CHECKSUM_SHA1), ",");
   public static final String CSV_DEFAULT_OUTPUT = "/tmp/output.csv";
   public static final String CSV_DEFAULT_HEADERS = "true";
+  public static final String CSV_DEFAULT_OTHER_METADATA = "tika,siegfried";
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(FileExportPlugin.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(InventoryReportPlugin.class);
 
   private List<String> fields = null;
   private Path output;
   private boolean enableHeaders;
+  private boolean outputDataInformation;
+  private boolean outputDescriptiveMetadataInformation;
+  private List<String> otherMetadataTypes;
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
 
   // TODO -> add plugin parameter type "LIST"...
@@ -92,6 +108,14 @@ public class FileExportPlugin extends AbstractPlugin<File> {
       PluginParameterType.STRING, CSV_DEFAULT_OUTPUT, true, false, "Path where the CSV file is created."));
     pluginParameters.put(CSV_FILE_HEADERS, new PluginParameter(CSV_FILE_HEADERS, "CSV headers",
       PluginParameterType.BOOLEAN, CSV_DEFAULT_HEADERS, true, false, "Output CSV headers."));
+    pluginParameters.put(CSV_FILE_OUTPUT_DATA, new PluginParameter(CSV_FILE_OUTPUT_DATA, "Output data information",
+      PluginParameterType.BOOLEAN, CSV_DEFAULT_HEADERS, true, false, "Output CSV headers."));
+    pluginParameters.put(CSV_FILE_OUTPUT_DESCRIPTIVE,
+      new PluginParameter(CSV_FILE_OUTPUT_DESCRIPTIVE, "Output descriptive metadata information",
+        PluginParameterType.BOOLEAN, CSV_DEFAULT_HEADERS, true, false, "Output descriptive metadata information."));
+    pluginParameters.put(CSV_FILE_OTHER_METADATA_TYPES,
+      new PluginParameter(CSV_FILE_OTHER_METADATA_TYPES, "Other metadata types", PluginParameterType.STRING,
+        CSV_DEFAULT_OTHER_METADATA, true, false, "Other metadata types."));
   }
 
   @Override
@@ -106,12 +130,12 @@ public class FileExportPlugin extends AbstractPlugin<File> {
 
   @Override
   public String getName() {
-    return "Export file metadata to CSV";
+    return "Inventory report";
   }
 
   @Override
   public String getDescription() {
-    return "Export a list of files metadata to a CSV file";
+    return "CSV report with the inventory of all files in data and metadata";
   }
 
   @Override
@@ -123,8 +147,15 @@ public class FileExportPlugin extends AbstractPlugin<File> {
   public List<PluginParameter> getParameters() {
     ArrayList<PluginParameter> parameters = new ArrayList<PluginParameter>();
     parameters.add(pluginParameters.get(CSV_FILE_FIELDS));
-    parameters.add(pluginParameters.get(CSV_FILE_OUTPUT));
+    PluginParameter outputPluginParameter = pluginParameters.get(CSV_FILE_OUTPUT);
+    SimpleDateFormat df = new SimpleDateFormat(RodaConstants.DEFAULT_DATETIME_FORMAT);
+    String reportName = "csv_report_" + df.format(new Date()) + ".csv";
+    outputPluginParameter.setDefaultValue(RodaCoreFactory.getReportsDirectory().resolve(reportName).toString());
+    parameters.add(outputPluginParameter);
     parameters.add(pluginParameters.get(CSV_FILE_HEADERS));
+    parameters.add(pluginParameters.get(CSV_FILE_OUTPUT_DATA));
+    parameters.add(pluginParameters.get(CSV_FILE_OUTPUT_DESCRIPTIVE));
+    parameters.add(pluginParameters.get(CSV_FILE_OTHER_METADATA_TYPES));
     return parameters;
   }
 
@@ -139,18 +170,38 @@ public class FileExportPlugin extends AbstractPlugin<File> {
       }
     }
     if (parameters.containsKey(CSV_FILE_OUTPUT)) {
-      output = Paths.get(parameters.get(CSV_FILE_OUTPUT));
+      try {
+        output = Paths.get(parameters.get(CSV_FILE_OUTPUT));
+        Path parent = output.getParent();
+        Files.createDirectories(parent);
+      } catch (IOException e) {
+        LOGGER.error("Error creating output parent folder.", e);
+      }
     }
     if (parameters.containsKey(CSV_FILE_HEADERS)) {
       enableHeaders = Boolean.parseBoolean(parameters.get(CSV_FILE_HEADERS));
     }
+    if (parameters.containsKey(CSV_FILE_OUTPUT_DATA)) {
+      outputDataInformation = Boolean.parseBoolean(parameters.get(CSV_FILE_OUTPUT_DATA));
+    }
+    if (parameters.containsKey(CSV_FILE_OUTPUT_DESCRIPTIVE)) {
+      outputDescriptiveMetadataInformation = Boolean.parseBoolean(parameters.get(CSV_FILE_OUTPUT_DESCRIPTIVE));
+    }
+    if (parameters.containsKey(CSV_FILE_OTHER_METADATA_TYPES)) {
+      String otherMetadataSTR = parameters.get(CSV_FILE_OTHER_METADATA_TYPES);
+      if (otherMetadataSTR != null && !otherMetadataSTR.trim().equalsIgnoreCase("")) {
+        otherMetadataTypes = new ArrayList<String>();
+        otherMetadataTypes.addAll(Arrays.asList(otherMetadataSTR.split(",")));
+      }
+    }
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<File> list)
+  public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
-    String firstFileId = list.get(0).getId();
-    LOGGER.debug("(1st: {}) Exporting to CSV a total of {} files", firstFileId, list.size());
+    String firstAIPId = list.get(0).getId();
+    // LOGGER.debug("(1st: {}) Exporting to CSV a total of {} files",
+    // firstAIPId, list.size());
     BufferedWriter fileWriter = null;
     CSVPrinter csvFilePrinter = null;
     try {
@@ -162,14 +213,32 @@ public class FileExportPlugin extends AbstractPlugin<File> {
       CSVFormat csvFileFormat = CSVFormat.DEFAULT.withRecordSeparator("\n");
       fileWriter = Files.newBufferedWriter(csvTempFile);
       csvFilePrinter = new CSVPrinter(fileWriter, csvFileFormat);
-      for (File file : list) {
-        List<String> fileMetadata = FileExportPluginUtils.retrieveFileInfo(fields, file, model);
-        csvFilePrinter.printRecord(fileMetadata);
+      for (AIP aip : list) {
+        if (outputDataInformation && aip.getRepresentations() != null) {
+          List<List<String>> dataInformation = InventoryReportPluginUtils.getDataInformation(fields, aip, model,
+            storage);
+          csvFilePrinter.printRecords(dataInformation);
+        }
+        if (outputDescriptiveMetadataInformation && aip.getDescriptiveMetadata() != null) {
+          List<List<String>> dataInformation = InventoryReportPluginUtils.getDescriptiveMetadataInformation(fields, aip,
+            model, storage);
+          csvFilePrinter.printRecords(dataInformation);
+        }
+        if (otherMetadataTypes != null && otherMetadataTypes.size() > 0) {
+          for (String otherMetadataType : otherMetadataTypes) {
+            List<List<String>> otherMetadataInformation = InventoryReportPluginUtils.getOtherMetadataInformation(fields,
+              otherMetadataType, aip, model, storage);
+            csvFilePrinter.printRecords(otherMetadataInformation);
+          }
+        }
+        // if(outputOtherMetadataInformation && aip.getOtherMetadata()!=null){
+        //
+        // }
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
       }
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
-      LOGGER.debug("(1st: {}) Done exporting to CSV a total of {} files", firstFileId, list.size());
+      LOGGER.debug("(1st: {}) Done exporting to CSV a total of {} files", firstAIPId, list.size());
     } catch (JobException e) {
       LOGGER.error("Could not update Job information");
     } catch (IOException e) {
@@ -191,13 +260,20 @@ public class FileExportPlugin extends AbstractPlugin<File> {
     } catch (IOException e) {
       LOGGER.error("Error while creating plugin working dir", e);
     }
-
+    try {
+      Path reportsFolder = RodaCoreFactory.getRodaHomePath().resolve(RodaConstants.CORE_REPORT_FOLDER);
+      if (Files.exists(reportsFolder)) {
+        Files.createDirectories(reportsFolder);
+      }
+    } catch (IOException e) {
+      LOGGER.error("Error while creating report dir", e);
+    }
     return new Report();
   }
 
   private Path getJobCSVTempFolder() {
     Path wd = RodaCoreFactory.getWorkingDirectory();
-    Path csvExportTempFolder = wd.resolve(FileExportPlugin.EXPORT_CSV_TEMP_FOLDER);
+    Path csvExportTempFolder = wd.resolve(InventoryReportPlugin.EXPORT_CSV_TEMP_FOLDER);
     Path jobCSVTempFolder = csvExportTempFolder.resolve(PluginHelper.getJobId(this));
     return jobCSVTempFolder;
   }
@@ -222,7 +298,7 @@ public class FileExportPlugin extends AbstractPlugin<File> {
         LOGGER.error("Error while merging partial CSVs: " + ex.getMessage(), ex);
       }
       try {
-        FileExportPluginUtils.mergeFiles(partials, output);
+        InventoryReportPluginUtils.mergeFiles(partials, output);
         FSUtils.deletePathQuietly(csvTempFolder);
       } catch (IOException e) {
         LOGGER.error("Error while merging partial CSVs: " + e.getMessage(), e);
@@ -232,8 +308,8 @@ public class FileExportPlugin extends AbstractPlugin<File> {
   }
 
   @Override
-  public Plugin<File> cloneMe() {
-    return new FileExportPlugin();
+  public Plugin<AIP> cloneMe() {
+    return new InventoryReportPlugin();
   }
 
   @Override

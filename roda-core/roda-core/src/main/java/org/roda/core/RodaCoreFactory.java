@@ -136,6 +136,7 @@ public class RodaCoreFactory {
   private static Path logPath;
   private static Path configPath;
   private static Path workingDirectoryPath;
+  private static Path reportDirectoryPath;
   private static Path exampleConfigPath;
   private static Path themePath;
   private static Path exampleThemePath;
@@ -244,7 +245,9 @@ public class RodaCoreFactory {
 
         // initialize working directory
         initializeWorkingDirectory();
-        
+
+        // initialize reports directory
+        initializeReportsDirectory();
 
         // instantiate storage and model service
         instantiateStorageAndModel();
@@ -284,12 +287,22 @@ public class RodaCoreFactory {
     try {
       workingDirectoryPath = Paths
         .get(getRodaConfiguration().getString("core.workingdirectory", getSystemProperty("java.io.tmpdir", "tmp")));
-      Files.createDirectories(rodaHomePath);
+      Files.createDirectories(workingDirectoryPath);
     } catch (IOException e) {
-      throw new RuntimeException(
-        "Unable to create RODA WORKING DIRECTORY " + workingDirectoryPath + ". Aborting...", e);
+      throw new RuntimeException("Unable to create RODA WORKING DIRECTORY " + workingDirectoryPath + ". Aborting...",
+        e);
     }
-    
+
+  }
+
+  private static void initializeReportsDirectory() {
+    try {
+      reportDirectoryPath = getRodaHomePath().resolve(RodaConstants.CORE_REPORT_FOLDER);
+      Files.createDirectories(reportDirectoryPath);
+    } catch (IOException e) {
+      throw new RuntimeException("Unable to create RODA Reports DIRECTORY " + reportDirectoryPath + ". Aborting...", e);
+    }
+
   }
 
   private static Path determineRodaHomePath() {
@@ -861,6 +874,10 @@ public class RodaCoreFactory {
 
   public static Path getWorkingDirectory() {
     return workingDirectoryPath;
+  }
+
+  public static Path getReportsDirectory() {
+    return reportDirectoryPath;
   }
 
   public static Path getThemePath() {
