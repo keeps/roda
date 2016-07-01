@@ -71,6 +71,12 @@ public class FileExportPlugin extends AbstractPlugin<File> {
   public static final List<String> CHECKSUM_ALGORITHMS = Arrays.asList(CSV_FIELD_CHECKSUM_MD5, CSV_FIELD_CHECKSUM_SHA1,
     CSV_FIELD_CHECKSUM_SHA256);
 
+  public static final String CSV_DEFAULT_FIELDS = StringUtils
+    .join(Arrays.asList(CSV_FIELD_SIP_ID, CSV_FIELD_AIP_ID, CSV_FIELD_REPRESENTATION_ID, CSV_FIELD_FILE_PATH,
+      CSV_FIELD_FILE_ID, CSV_FIELD_ISDIRECTORY, CSV_FIELD_CHECKSUM_SHA256), ",");
+  public static final String CSV_DEFAULT_OUTPUT = "/tmp/output.csv";
+  public static final String CSV_DEFAULT_HEADERS = "true";
+
   private static final Logger LOGGER = LoggerFactory.getLogger(FileExportPlugin.class);
 
   private List<String> fields = null;
@@ -80,15 +86,12 @@ public class FileExportPlugin extends AbstractPlugin<File> {
 
   // TODO -> add plugin parameter type "LIST"...
   static {
-    pluginParameters.put(CSV_FILE_FIELDS,
-      new PluginParameter(CSV_FILE_FIELDS, "CSV Fields", PluginParameterType.STRING,
-        StringUtils.join(Arrays.asList(CSV_FIELD_SIP_ID, CSV_FIELD_AIP_ID, CSV_FIELD_REPRESENTATION_ID,
-          CSV_FIELD_FILE_PATH, CSV_FIELD_FILE_ID, CSV_FIELD_ISDIRECTORY, CSV_FIELD_CHECKSUM_SHA256), ","),
-        true, false, "List of fields to export"));
+    pluginParameters.put(CSV_FILE_FIELDS, new PluginParameter(CSV_FILE_FIELDS, "CSV Fields", PluginParameterType.STRING,
+      CSV_DEFAULT_FIELDS, true, false, "List of fields to export"));
     pluginParameters.put(CSV_FILE_OUTPUT, new PluginParameter(CSV_FILE_OUTPUT, "CSV output path",
-      PluginParameterType.STRING, "/tmp/output.csv", true, false, "Path where the CSV file is created."));
+      PluginParameterType.STRING, CSV_DEFAULT_OUTPUT, true, false, "Path where the CSV file is created."));
     pluginParameters.put(CSV_FILE_HEADERS, new PluginParameter(CSV_FILE_HEADERS, "CSV headers",
-      PluginParameterType.BOOLEAN, "true", true, false, "Output CSV headers."));
+      PluginParameterType.BOOLEAN, CSV_DEFAULT_HEADERS, true, false, "Output CSV headers."));
   }
 
   @Override
@@ -159,9 +162,7 @@ public class FileExportPlugin extends AbstractPlugin<File> {
       CSVFormat csvFileFormat = CSVFormat.DEFAULT.withRecordSeparator("\n");
       fileWriter = Files.newBufferedWriter(csvTempFile);
       csvFilePrinter = new CSVPrinter(fileWriter, csvFileFormat);
-      LOGGER.debug("(1st: {}) Going to iterate through {} files", firstFileId, list.size());
       for (File file : list) {
-        LOGGER.debug("(1st: {}) Processing file {}", firstFileId, file);
         List<String> fileMetadata = FileExportPluginUtils.retrieveFileInfo(fields, file, model);
         csvFilePrinter.printRecord(fileMetadata);
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
