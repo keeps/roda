@@ -36,6 +36,10 @@ import javax.ws.rs.core.StreamingOutput;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.util.Base64;
+import org.custommonkey.xmlunit.DetailedDiff;
+import org.custommonkey.xmlunit.Diff;
+import org.custommonkey.xmlunit.Difference;
+import org.custommonkey.xmlunit.XMLUnit;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
@@ -43,6 +47,7 @@ import org.roda.core.common.Messages;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.UserUtility;
+import org.roda.core.common.XMLUtility;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.common.tools.ZipEntryInfo;
@@ -140,6 +145,7 @@ import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
 import org.roda.wui.common.HTMLUtils;
 import org.roda.wui.common.server.ServerTools;
+import org.roda.wui.common.server.XMLSimilarityIgnoreElements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -149,6 +155,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
+import org.xml.sax.SAXException;
 
 /**
  * @author Luis Faria <lfaria@keep.pt>
@@ -294,7 +301,7 @@ public class BrowserHelper {
         }
       }
 
-      boolean complete = false;
+      boolean similar = false, identical = false;
       // Get the values using XPath
       Set<MetadataValue> values = null;
       String template = null;
@@ -328,19 +335,28 @@ public class BrowserHelper {
         // applying the extracted values to the template
         metadataTypeBundle.setValues(values);
         String templateWithValues = getDescriptiveMetadataPreview(metadataTypeBundle);
-        templateWithValues = cleanXMLForCompare(templateWithValues);
-        String xmlTemp = cleanXMLForCompare(xml);
-        // TODO use the Clean XML for comparison or skip this step
-        // System.out.println("---- Template With Values ----\n" +
-        // templateWithValues);
-        // System.out.println("---- XML ----\n" + xmlTemp);
-        // System.out.println("------------- Compare -------------\n" +
-        // StringUtils.difference(templateWithValues, xmlTemp));
-        // complete = templateWithValues.equals(xmlTemp);
-        complete = true;
+        try {
+          XMLUnit.setIgnoreComments(true);
+          XMLUnit.setIgnoreWhitespace(true);
+          XMLUnit.setIgnoreAttributeOrder(true);
+          XMLUnit.setCompareUnmatched(false);
+
+          Diff xmlDiff = new Diff(xml, templateWithValues);
+          xmlDiff.overrideDifferenceListener(new XMLSimilarityIgnoreElements("schemaLocation"));
+          similar = xmlDiff.similar();
+          identical = xmlDiff.identical();
+          DetailedDiff detDiff = new DetailedDiff(xmlDiff);
+          List differences = detDiff.getAllDifferences();
+          for (Object object : differences) {
+            Difference difference = (Difference)object;
+            System.out.println(difference);
+            System.out.println("***********************");
+          }
+        } catch (SAXException e) {
+        }
       }
 
-      ret = new DescriptiveMetadataEditBundle(descriptiveMetadataId, type, version, xml, template, values, complete);
+      ret = new DescriptiveMetadataEditBundle(descriptiveMetadataId, type, version, xml, template, values, identical, similar);
     } catch (IOException e) {
       throw new GenericException("Error getting descriptive metadata edit bundle: " + e.getMessage());
     } finally {
@@ -348,14 +364,6 @@ public class BrowserHelper {
     }
 
     return ret;
-  }
-
-  private static String cleanXMLForCompare(String st) {
-    st = st.replaceAll("xsi:schemaLocation=\\s*[\"|'].*[\"|']", "");
-    st = st.replaceAll("xmlns:xsi=\\s*[\"|'].*[\"|']", "");
-    st = st.replaceAll("\\n|\\r|\\s", "");
-    st = st.toUpperCase();
-    return st;
   }
 
   protected static List<IndexedAIP> getAncestors(IndexedAIP aip) throws GenericException, NotFoundException {

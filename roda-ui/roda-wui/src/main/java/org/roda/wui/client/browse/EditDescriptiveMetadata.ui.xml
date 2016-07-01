@@ -24,7 +24,10 @@
 					<ui:text from='{messages.metadataFilename}' />
 				</g:Label>
 				<g:TextBox ui:field="id" addStyleNames="form-textbox" />
-				<g:Label ui:field="formCompleteDanger" visible="false" addStyleNames="label-danger">
+				<g:Label ui:field="formIdenticalDanger" visible="false" addStyleNames="label-danger">
+					<ui:text from='{messages.editDescriptionMetadataWarning}' />
+				</g:Label>
+				<g:Label ui:field="formSimilarDanger" visible="false" addStyleNames="label-warning">
 					<ui:text from='{messages.editDescriptionMetadataWarning}' />
 				</g:Label>
 				<g:Label ui:field="formOrXMLLabel" />
