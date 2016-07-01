@@ -1885,7 +1885,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .browseItemMetadata .gwt-TabBarItem {
-    background: white;
+    background: transparent;
     border: none;
     margin: 0;
     cursor: pointer;

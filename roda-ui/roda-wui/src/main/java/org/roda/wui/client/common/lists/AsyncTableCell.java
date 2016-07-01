@@ -24,6 +24,7 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsFilter;
 import org.roda.core.data.v2.index.SelectedItemsList;
+import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.widgets.MyCellTableResources;
 import org.roda.wui.common.client.widgets.wcag.AccessibleCellTable;
@@ -130,8 +131,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     display = new AccessibleCellTable<T>(getInitialPageSize(),
       (MyCellTableResources) GWT.create(MyCellTableResources.class), getKeyProvider(), summary);
     display.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.DISABLED);
-    display.setLoadingIndicator(new HTML(SafeHtmlUtils.fromSafeConstant(
-      "<div class='spinner'><div class='double-bounce1'></div><div class='double-bounce2'></div></div>")));
+    display.setLoadingIndicator(new HTML(HtmlSnippetUtils.LOADING));
 
     configure(display);
 

@@ -24,6 +24,9 @@ public class HtmlSnippetUtils {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
+  public static final SafeHtml LOADING = SafeHtmlUtils.fromSafeConstant(
+    "<div class='spinner'><div class='double-bounce1'></div><div class='double-bounce2'></div></div>");
+
   public static SafeHtml getJobStateHtml(Job job) {
     SafeHtml ret = null;
     if (job != null) {
