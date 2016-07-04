@@ -21,6 +21,7 @@ import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -125,13 +126,16 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
       if (sip.getValidationReport().isValid()) {
         String parentId = PluginHelper.computeParentId(this, index, sip.getAncestors().get(0));
 
-        AIP aip = null;
+        AIP aip;
         if(sip.getStatus() == IPEnums.IPStatus.UPDATE){
           IndexResult<IndexedAIP> result = index.find(IndexedAIP.class, new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, sip.getId())), Sorter.NONE, new Sublist(0,1));
           if(result.getTotalCount() == 1) {
             // Retrieve the AIP
             IndexedAIP indexedAIP = result.getResults().get(0);
             aip = EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP.getId(), earkSIPPath, model, sip.getId(), reportItem.getJobId(), parentId);
+          }else{
+            // Fail to update since there's no AIP
+            throw new NotFoundException("Unable to find AIP created with SIP ID: " + sip.getId());
           }
         }else{
           // Create a new AIP
