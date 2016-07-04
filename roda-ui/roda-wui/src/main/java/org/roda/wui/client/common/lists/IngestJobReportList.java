@@ -167,8 +167,8 @@ public class IngestJobReportList extends BasicAsyncTableCell<Report> {
       public String getValue(Report report) {
         String value = "";
         if (report != null) {
-          value = report.getStepsCompleted() + " of " + report.getTotalSteps() + " (" + report.getCompletionPercentage()
-            + "%)";
+          value = report.getStepsCompleted() + " " + messages.of() + " " + report.getTotalSteps() + " ("
+            + report.getCompletionPercentage() + "%)";
         }
 
         return value;

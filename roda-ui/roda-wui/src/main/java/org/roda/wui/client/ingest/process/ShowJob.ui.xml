@@ -65,7 +65,14 @@
 							<g:FlowPanel styleName="field">
 
 							</g:FlowPanel>
-
+							
+							<g:FlowPanel styleName="field" ui:field="selectedListPanel">
+								<g:Label addStyleNames="label">
+									<ui:text from='{messages.showJobSourceObjects}' />
+								</g:Label>
+								<g:FlowPanel ui:field="selectedList" />
+							</g:FlowPanel>
+							
 							<g:FlowPanel styleName="field">
 								<g:Label addStyleNames="label">
 									<ui:text from='{messages.jobPlugin}' />
@@ -76,11 +83,14 @@
 								</g:FlowPanel>
 							</g:FlowPanel>
 
-							<g:Label addStyleNames="h4" ui:field="reportsLabel">
-								<ui:text from='{messages.jobProcessed}' />
-							</g:Label>
-							<lists:IngestJobReportList ui:field="jobReports" />
-							<lists:SimpleJobReportList ui:field="simpleJobReports" />
+							<g:FlowPanel styleName="field" ui:field="reportListPanel">
+								<g:Label addStyleNames="h4" ui:field="reportsLabel">
+									<ui:text from='{messages.jobProcessed}' />
+								</g:Label>
+								<lists:IngestJobReportList ui:field="ingestJobReports" />
+								<lists:SimpleJobReportList ui:field="simpleJobReports" />
+							</g:FlowPanel>
+
 						</g:FlowPanel>
 					</g:FlowPanel>
 				</g:FlowPanel>

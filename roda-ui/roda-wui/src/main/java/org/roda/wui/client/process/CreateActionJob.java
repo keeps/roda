@@ -71,12 +71,12 @@ public class CreateActionJob extends CreateJob<IsIndexed> {
     boolean isEmpty = false;
 
     if (selected != null) {
+      getTargetPanel().clear();
+
       if (selected instanceof SelectedItemsList) {
         List<String> ids = ((SelectedItemsList<?>) selected).getIds();
 
         if (ids.size() == 0) {
-          getTargetPanel().clear();
-
           final ListBox list = new ListBox();
           list.addItem(messages.allIntellectualEntities(), AIP.class.getCanonicalName());
           list.addItem(messages.allRepresentations(), Representation.class.getCanonicalName());
@@ -108,7 +108,6 @@ public class CreateActionJob extends CreateJob<IsIndexed> {
         if (IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
           Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.AIP_ID, ids));
           AIPList list = new AIPList(filter, justActive, null, messages.aipsTitle(), selectable, 10, 10);
-          getTargetPanel().clear();
           getTargetPanel().add(list);
           setJobSelectedDescription(messages.createJobSelectedAIP());
         }
@@ -117,7 +116,6 @@ public class CreateActionJob extends CreateJob<IsIndexed> {
           Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.REPRESENTATION_UUID, ids));
           RepresentationList list = new RepresentationList(filter, justActive, null, messages.representationsTitle(),
             selectable, 10, 10);
-          getTargetPanel().clear();
           getTargetPanel().add(list);
           setJobSelectedDescription(messages.createJobSelectedRepresentation());
         }
@@ -125,7 +123,6 @@ public class CreateActionJob extends CreateJob<IsIndexed> {
         if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
           Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.FILE_UUID, ids));
           SimpleFileList list = new SimpleFileList(filter, justActive, null, messages.filesTitle(), selectable, 10, 10);
-          getTargetPanel().clear();
           getTargetPanel().add(list);
           setJobSelectedDescription(messages.createJobSelectedFile());
         }
@@ -135,7 +132,6 @@ public class CreateActionJob extends CreateJob<IsIndexed> {
 
         if (IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
           AIPList list = new AIPList(filter, justActive, null, messages.aipsTitle(), selectable, 10, 10);
-          getTargetPanel().clear();
           getTargetPanel().add(list);
           setJobSelectedDescription(messages.createJobSelectedAIP());
         }
@@ -143,14 +139,12 @@ public class CreateActionJob extends CreateJob<IsIndexed> {
         if (IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
           RepresentationList list = new RepresentationList(filter, justActive, null, messages.representationsTitle(),
             selectable, 10, 10);
-          getTargetPanel().clear();
           getTargetPanel().add(list);
           setJobSelectedDescription(messages.createJobSelectedRepresentation());
         }
 
         if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
           SimpleFileList list = new SimpleFileList(filter, justActive, null, messages.filesTitle(), selectable, 10, 10);
-          getTargetPanel().clear();
           getTargetPanel().add(list);
           setJobSelectedDescription(messages.createJobSelectedFile());
         }

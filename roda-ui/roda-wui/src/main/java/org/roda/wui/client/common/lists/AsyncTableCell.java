@@ -488,7 +488,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     resultsPager.nextPage();
   }
 
-  public void prevousPage() {
+  public void previousPage() {
     resultsPager.previousPage();
   }
 

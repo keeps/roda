@@ -445,6 +445,7 @@ public interface ClientMessages extends Messages {
   String processNewMissingMandatoryInfoDialogMessage(List<String> missingPluginNames);
 
   /************* Ingest process show ****************/
+
   String showJobStatusCreated();
 
   String showJobStatusStarted();
@@ -478,6 +479,8 @@ public interface ClientMessages extends Messages {
   String showFileExtended();
 
   String showTransferredResourceExtended();
+
+  String showJobSourceObjects();
 
   /************* Browse ****************/
   String browseLoading();
@@ -822,9 +825,9 @@ public interface ClientMessages extends Messages {
   String formatRemoveSuccessMessage(Long size);
 
   String formatListItems(String item);
-  
+
   String formatIsOpenFormat();
-  
+
   String formatIsNotOpenFormat();
 
   /************* Common Messages ****************/
@@ -1175,7 +1178,7 @@ public interface ClientMessages extends Messages {
   String selectAnItemTitle();
 
   String selectAnItemToRemoveDescription();
-  
+
   String selectAnItemToMoveDescription();
 
   /***** Job processes ****/

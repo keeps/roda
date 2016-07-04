@@ -15,10 +15,22 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.SelectedItems;
+import org.roda.core.data.v2.index.SelectedItemsAll;
+import org.roda.core.data.v2.index.SelectedItemsFilter;
+import org.roda.core.data.v2.index.SelectedItemsList;
+import org.roda.core.data.v2.index.SelectedItemsNone;
+import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.PluginInfo;
@@ -28,8 +40,12 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.IngestJobReportList;
+import org.roda.wui.client.common.lists.RepresentationList;
+import org.roda.wui.client.common.lists.SimpleFileList;
 import org.roda.wui.client.common.lists.SimpleJobReportList;
+import org.roda.wui.client.common.lists.TransferredResourceList;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
@@ -39,12 +55,14 @@ import org.roda.wui.client.process.Process;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Humanize;
-import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.tools.Humanize.DHMSFormat;
+import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -160,6 +178,12 @@ public class ShowJob extends Composite {
   HTML status;
 
   @UiField
+  FlowPanel selectedListPanel;
+
+  @UiField
+  FlowPanel selectedList;
+
+  @UiField
   Label plugin;
 
   @UiField
@@ -169,10 +193,13 @@ public class ShowJob extends Composite {
   FlowPanel pluginOptions;
 
   @UiField
+  FlowPanel reportListPanel;
+
+  @UiField
   Label reportsLabel;
 
   @UiField(provided = true)
-  IngestJobReportList jobReports;
+  IngestJobReportList ingestJobReports;
 
   @UiField(provided = true)
   SimpleJobReportList simpleJobReports;
@@ -187,9 +214,8 @@ public class ShowJob extends Composite {
     this.pluginsInfo = pluginsInfo;
     boolean isIngest = false;
 
-    // TODO get better name for job report list
     if (job.getPluginType().equals(PluginType.INGEST)) {
-      jobReports = new IngestJobReportList(
+      ingestJobReports = new IngestJobReportList(
         new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId())), null,
         messages.reportList(), pluginsInfo, false);
       simpleJobReports = new SimpleJobReportList();
@@ -198,45 +224,69 @@ public class ShowJob extends Composite {
       simpleJobReports = new SimpleJobReportList(
         new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId())), null,
         messages.reportList(), pluginsInfo, false);
-      jobReports = new IngestJobReportList();
+      ingestJobReports = new IngestJobReportList();
     }
 
     initWidget(uiBinder.createAndBindUi(this));
     simpleJobReports.setVisible(!isIngest);
-    jobReports.setVisible(isIngest);
+    ingestJobReports.setVisible(isIngest);
+    reportListPanel.setVisible(false);
 
     name.setText(job.getName());
     creator.setText(job.getUsername());
     dateStarted.setText(dateTimeFormat.format(job.getStartDate()));
     update();
 
+    SelectedItems selected = job.getSourceObjects();
+
     if (isIngest) {
+
+      ingestJobReports.addValueChangeHandler(new ValueChangeHandler<IndexResult<Report>>() {
+        @Override
+        public void onValueChange(ValueChangeEvent<IndexResult<Report>> event) {
+          reportListPanel.setVisible(event.getValue().getTotalCount() > 0);
+        }
+      });
+
       if (isJobRunning()) {
-        jobReports.autoUpdate(PERIOD_MILLIS);
+        ingestJobReports.autoUpdate(PERIOD_MILLIS);
       }
 
-      jobReports.getSelectionModel().addSelectionChangeHandler(new Handler() {
-
+      ingestJobReports.getSelectionModel().addSelectionChangeHandler(new Handler() {
         @Override
         public void onSelectionChange(SelectionChangeEvent event) {
-          Report jobReport = jobReports.getSelectionModel().getSelectedObject();
+          Report jobReport = ingestJobReports.getSelectionModel().getSelectedObject();
           GWT.log("new history: " + ShowJobReport.RESOLVER.getHistoryPath() + "/" + jobReport.getId());
           Tools.newHistory(ShowJobReport.RESOLVER, jobReport.getId());
         }
       });
+
+      selectedListPanel.setVisible(true);
+      showIngestSourceObjects(selected);
+
     } else {
+
+      simpleJobReports.addValueChangeHandler(new ValueChangeHandler<IndexResult<Report>>() {
+        @Override
+        public void onValueChange(ValueChangeEvent<IndexResult<Report>> event) {
+          reportListPanel.setVisible(event.getValue().getTotalCount() > 0);
+        }
+      });
+
       if (isJobRunning()) {
         simpleJobReports.autoUpdate(PERIOD_MILLIS);
       }
 
       simpleJobReports.getSelectionModel().addSelectionChangeHandler(new Handler() {
-
         @Override
         public void onSelectionChange(SelectionChangeEvent event) {
           Report jobReport = simpleJobReports.getSelectionModel().getSelectedObject();
           Tools.newHistory(ShowJobReport.RESOLVER, jobReport.getId());
         }
       });
+
+      selectedListPanel.setVisible(true);
+      showActionSourceObjects(selected);
     }
 
     PluginInfo pluginInfo = pluginsInfo.get(job.getPlugin());
@@ -271,6 +321,104 @@ public class ShowJob extends Composite {
     return job != null && !JOB_STATE.COMPLETED.equals(job.getState())
       && !JOB_STATE.FAILED_DURING_CREATION.equals(job.getState())
       && !JOB_STATE.FAILED_TO_COMPLETE.equals(job.getState());
+  }
+
+  private void showIngestSourceObjects(SelectedItems selected) {
+    if (selected != null) {
+      if (selected instanceof SelectedItemsList) {
+        List<String> ids = ((SelectedItemsList) selected).getIds();
+        Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_UUID, ids));
+        TransferredResourceList list = new TransferredResourceList(filter, null, messages.transferredResourcesTitle(),
+          false, 10, 10);
+        selectedList.clear();
+        selectedList.add(list);
+      } else if (selected instanceof SelectedItemsFilter) {
+        Filter filter = ((SelectedItemsFilter) selected).getFilter();
+        TransferredResourceList list = new TransferredResourceList(filter, null, messages.transferredResourcesTitle(),
+          false, 10, 10);
+        selectedList.clear();
+        selectedList.add(list);
+      } else {
+        selectedListPanel.setVisible(false);
+      }
+    }
+  }
+
+  private void showActionSourceObjects(SelectedItems selected) {
+    if (selected != null) {
+      boolean selectable = false;
+      boolean justActive = true;
+      selectedList.clear();
+
+      if (selected instanceof SelectedItemsList) {
+        List<String> ids = ((SelectedItemsList<?>) selected).getIds();
+
+        if (ids.size() == 0) {
+          selectedListPanel.setVisible(false);
+        }
+
+        if (IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
+          Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.AIP_ID, ids));
+          AIPList list = new AIPList(filter, justActive, null, messages.aipsTitle(), selectable, 10, 10);
+          selectedList.add(list);
+        }
+
+        if (IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
+          Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.REPRESENTATION_UUID, ids));
+          RepresentationList list = new RepresentationList(filter, justActive, null, messages.representationsTitle(),
+            selectable, 10, 10);
+          selectedList.add(list);
+        }
+
+        if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
+          Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.FILE_UUID, ids));
+          SimpleFileList list = new SimpleFileList(filter, justActive, null, messages.filesTitle(), selectable, 10, 10);
+          selectedList.add(list);
+        }
+
+      } else if (selected instanceof SelectedItemsFilter) {
+        Filter filter = ((SelectedItemsFilter<?>) selected).getFilter();
+
+        if (IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
+          AIPList list = new AIPList(filter, justActive, null, messages.aipsTitle(), selectable, 10, 10);
+          selectedList.add(list);
+        }
+
+        if (IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
+          RepresentationList list = new RepresentationList(filter, justActive, null, messages.representationsTitle(),
+            selectable, 10, 10);
+          selectedList.add(list);
+        }
+
+        if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
+          SimpleFileList list = new SimpleFileList(filter, justActive, null, messages.filesTitle(), selectable, 10, 10);
+          selectedList.add(list);
+        }
+
+      } else if (selected instanceof SelectedItemsAll || selected instanceof SelectedItemsNone) {
+        Label objectLabel = new Label();
+        objectLabel.addStyleName("value");
+
+        if (AIP.class.getName().equals(selected.getSelectedClass())
+          || IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
+          objectLabel.setText(messages.allIntellectualEntities());
+        }
+
+        if (Representation.class.getName().equals(selected.getSelectedClass())
+          || IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
+          objectLabel.setText(messages.allRepresentations());
+        }
+
+        if (File.class.getName().equals(selected.getSelectedClass())
+          || IndexedFile.class.getName().equals(selected.getSelectedClass())) {
+          objectLabel.setText(messages.allFiles());
+        }
+
+        selectedList.add(objectLabel);
+      } else {
+        selectedListPanel.setVisible(false);
+      }
+    }
   }
 
   private void update() {
