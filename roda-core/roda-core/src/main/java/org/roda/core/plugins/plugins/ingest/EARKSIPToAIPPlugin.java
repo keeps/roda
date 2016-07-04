@@ -13,10 +13,17 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.jute.Index;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.SimpleFilterParameter;
+import org.roda.core.data.adapter.sort.Sorter;
+import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -29,6 +36,7 @@ import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda_project.commons_ip.model.SIP;
 import org.roda_project.commons_ip.model.impl.eark.EARKSIP;
+import org.roda_project.commons_ip.utils.IPEnums;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,20 +123,31 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
       reportItem.setSourceObjectOriginalId(sip.getId());
 
       if (sip.getValidationReport().isValid()) {
-        String parentId = PluginHelper.computeParentId(this, index, sip.getParentID());
-        AIP aipCreated = EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, earkSIPPath, model, storage, sip.getId(),
-          reportItem.getJobId(), parentId);
+        String parentId = PluginHelper.computeParentId(this, index, sip.getAncestors().get(0));
 
-        PluginHelper.createSubmission(model, createSubmission, earkSIPPath, aipCreated.getId());
-
-        createUnpackingEventSuccess(model, index, transferredResource, aipCreated, UNPACK_DESCRIPTION);
-        reportItem.setOutcomeObjectId(aipCreated.getId()).setPluginState(PluginState.SUCCESS);
-
-        if (sip.getParentID() != null && aipCreated.getParentId() == null) {
-          reportItem.setPluginDetails(String.format("Parent with id '%s' not found", sip.getParentID()));
+        AIP aip = null;
+        if(sip.getStatus() == IPEnums.IPStatus.UPDATE){
+          IndexResult<IndexedAIP> result = index.find(IndexedAIP.class, new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, sip.getId())), Sorter.NONE, new Sublist(0,1));
+          if(result.getTotalCount() == 1) {
+            // Retrieve the AIP
+            IndexedAIP indexedAIP = result.getResults().get(0);
+            aip = EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP.getId(), earkSIPPath, model, sip.getId(), reportItem.getJobId(), parentId);
+          }
+        }else{
+          // Create a new AIP
+          aip = EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, earkSIPPath, model, storage, sip.getId(), reportItem.getJobId(), parentId);
         }
-        createWellformedEventSuccess(model, index, transferredResource, aipCreated);
-        LOGGER.debug("Done with converting {} to AIP {}", earkSIPPath, aipCreated.getId());
+
+        PluginHelper.createSubmission(model, createSubmission, earkSIPPath, aip.getId());
+
+        createUnpackingEventSuccess(model, index, transferredResource, aip, UNPACK_DESCRIPTION);
+        reportItem.setOutcomeObjectId(aip.getId()).setPluginState(PluginState.SUCCESS);
+
+        if (sip.getAncestors() != null && aip.getParentId() == null) {
+          reportItem.setPluginDetails(String.format("Parent with id '%s' not found", sip.getAncestors().get(0)));
+        }
+        createWellformedEventSuccess(model, index, transferredResource, aip);
+        LOGGER.debug("Done with converting {} to AIP {}", earkSIPPath, aip.getId());
       } else {
         reportItem.setPluginState(PluginState.FAILURE).setHtmlPluginDetails(true)
           .setPluginDetails(sip.getValidationReport().toHtml(true, true, true, false, false));

@@ -902,7 +902,7 @@ public class ModelService extends ModelObservable {
     super.notifyPreservationMetadataCreated(preservationMetadata);
   }
 
-  public void updatePreservationMetadata(String id, PreservationMetadataType type, String aipId,
+  public PreservationMetadata updatePreservationMetadata(String id, PreservationMetadataType type, String aipId,
     String representationId, List<String> fileDirectoryPath, String fileId, ContentPayload payload, boolean notify)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     PreservationMetadata pm = new PreservationMetadata();
@@ -919,6 +919,7 @@ public class ModelService extends ModelObservable {
     if (notify) {
       notifyPreservationMetadataUpdated(pm);
     }
+    return pm;
   }
 
   public void deletePreservationMetadata(PreservationMetadataType type, String aipId, String representationId,
