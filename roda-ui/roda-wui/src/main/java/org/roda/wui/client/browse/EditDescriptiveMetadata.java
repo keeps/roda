@@ -266,13 +266,12 @@ public class EditDescriptiveMetadata extends Composite {
   }
 
   private void updateFormOrXML() {
-    if(!bundle.isSimilar()){
-      formSimilarDanger.setVisible(true);
-    }else{
-      formSimilarDanger.setVisible(false);
-    }
-
-    if (bundle != null && bundle.getValues() != null) {
+    if (bundle != null && bundle.getValues() != null && !bundle.getValues().isEmpty()) {
+      if(!bundle.isSimilar()){
+        formSimilarDanger.setVisible(true);
+      }else{
+        formSimilarDanger.setVisible(false);
+      }
       showXml.setVisible(true);
       if (inXML) {
         updateMetadataXML();
@@ -304,15 +303,17 @@ public class EditDescriptiveMetadata extends Composite {
         }
       }
     } else {
+      formSimilarDanger.setVisible(false);
       formOrXML.clear();
       if (bundle != null) {
-        metadataXML.setText(bundle.getRawTemplate());
+        metadataXML.setText(bundle.getXml());
       } else {
         metadataXML.setText("");
       }
       formOrXML.add(metadataXML);
       formOrXMLLabel.setText("Template preview");
       showXml.setVisible(false);
+      metadataTextFromForm = null;
     }
   }
 
@@ -338,7 +339,7 @@ public class EditDescriptiveMetadata extends Composite {
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
     String xmlText = metadataXML.getText();
-    boolean hasOverridenTheForm = inXML && !xmlText.equals(metadataTextFromForm);
+    boolean hasOverridenTheForm = (inXML && !xmlText.equals(metadataTextFromForm)) || metadataTextFromForm == null;
     if (hasOverridenTheForm) {
       updateMetadataOnServer(xmlText);
     } else {

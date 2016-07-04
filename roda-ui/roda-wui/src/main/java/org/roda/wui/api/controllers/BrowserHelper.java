@@ -306,42 +306,44 @@ public class BrowserHelper {
       if (metadataTypeBundle != null) {
         values = metadataTypeBundle.getValues();
         template = metadataTypeBundle.getTemplate();
-        for (MetadataValue mv : values) {
-          // clear the auto-generated values
-          // mv.set("value", null);
-          String xpathRaw = mv.get("xpath");
-          if (xpathRaw != null && xpathRaw.length() > 0) {
-            String[] xpaths = xpathRaw.split("##%##");
-            String value;
-            List<String> allValues = new ArrayList<>();
-            for (String xpath : xpaths) {
-              allValues.addAll(ServerTools.applyXpath(xml, xpath));
+        if(values != null) {
+          for (MetadataValue mv : values) {
+            // clear the auto-generated values
+            // mv.set("value", null);
+            String xpathRaw = mv.get("xpath");
+            if (xpathRaw != null && xpathRaw.length() > 0) {
+              String[] xpaths = xpathRaw.split("##%##");
+              String value;
+              List<String> allValues = new ArrayList<>();
+              for (String xpath : xpaths) {
+                allValues.addAll(ServerTools.applyXpath(xml, xpath));
+              }
+              // if any of the values is different, concatenate all values in a
+              // string, otherwise return the value
+              boolean allEqual = allValues.stream().allMatch(s -> s.trim().equals(allValues.get(0).trim()));
+              if (allEqual && !allValues.isEmpty()) {
+                value = allValues.get(0);
+              } else {
+                value = String.join(" / ", allValues);
+              }
+              mv.set("value", value.trim());
             }
-            // if any of the values is different, concatenate all values in a
-            // string, otherwise return the value
-            boolean allEqual = allValues.stream().allMatch(s -> s.trim().equals(allValues.get(0).trim()));
-            if (allEqual && !allValues.isEmpty()) {
-              value = allValues.get(0);
-            } else {
-              value = String.join(" / ", allValues);
-            }
-            mv.set("value", value.trim());
           }
-        }
-        // Identity check. Test if the original XML is equal to the result of
-        // applying the extracted values to the template
-        metadataTypeBundle.setValues(values);
-        String templateWithValues = getDescriptiveMetadataPreview(metadataTypeBundle);
-        try {
-          XMLUnit.setIgnoreComments(true);
-          XMLUnit.setIgnoreWhitespace(true);
-          XMLUnit.setIgnoreAttributeOrder(true);
-          XMLUnit.setCompareUnmatched(false);
+          // Identity check. Test if the original XML is equal to the result of
+          // applying the extracted values to the template
+          metadataTypeBundle.setValues(values);
+          String templateWithValues = getDescriptiveMetadataPreview(metadataTypeBundle);
+          try {
+            XMLUnit.setIgnoreComments(true);
+            XMLUnit.setIgnoreWhitespace(true);
+            XMLUnit.setIgnoreAttributeOrder(true);
+            XMLUnit.setCompareUnmatched(false);
 
-          Diff xmlDiff = new Diff(xml, templateWithValues);
-          xmlDiff.overrideDifferenceListener(new XMLSimilarityIgnoreElements("schemaLocation"));
-          similar = xmlDiff.identical() || xmlDiff.similar();
-        } catch (SAXException e) {
+            Diff xmlDiff = new Diff(xml, templateWithValues);
+            xmlDiff.overrideDifferenceListener(new XMLSimilarityIgnoreElements("schemaLocation"));
+            similar = xmlDiff.identical() || xmlDiff.similar();
+          } catch (SAXException e) {
+          }
         }
       }
 
