@@ -69,7 +69,7 @@
 	xmlns="urn:isbn:1-931666-22-9" xmlns:xlink="http://www.w3.org/1999/xlink"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema">
 	<xs:import namespace="http://www.w3.org/1999/xlink"
-		schemaLocation="http://www.loc.gov/standards/xlink/xlink.xsd"/>
+		schemaLocation="xlink.xsd"/>
 	<xs:attributeGroup name="am.date.normal">
 		<xs:attribute name="normal">
 			<xs:simpleType>
