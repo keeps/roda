@@ -26,6 +26,7 @@ public abstract class AbstractPlugin<T extends IsRODAObject> implements Plugin<T
   private JobPluginInfo jobPluginInfo;
   private Class<T> objectClass;
 
+  @Override
   public Plugin<T> injectObjectClass(Class<T> objectClass) {
     this.objectClass = objectClass;
     return this;

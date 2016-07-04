@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.jute.Index;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
@@ -117,22 +116,28 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
       reportItem.setSourceObjectOriginalId(sip.getId());
 
       if (sip.getValidationReport().isValid()) {
-        String parentId = PluginHelper.computeParentId(this, index, sip.getAncestors().get(0));
+        // FIXME 20160706 hsilva: process the whole list of ancestors
+        String sipParentId = sip.getAncestors().isEmpty() ? "" : sip.getAncestors().get(0);
+        String computedParentId = PluginHelper.computeParentId(this, index, sipParentId);
 
         AIP aip;
-        if(sip.getStatus() == IPEnums.IPStatus.UPDATE){
-          IndexResult<IndexedAIP> result = index.find(IndexedAIP.class, new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, sip.getId())), Sorter.NONE, new Sublist(0,1));
-          if(result.getTotalCount() == 1) {
+        if (sip.getStatus() == IPEnums.IPStatus.UPDATE) {
+          IndexResult<IndexedAIP> result = index.find(IndexedAIP.class,
+            new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, sip.getId())), Sorter.NONE,
+            new Sublist(0, 1));
+          if (result.getTotalCount() == 1) {
             // Retrieve the AIP
             IndexedAIP indexedAIP = result.getResults().get(0);
-            aip = EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP.getId(), earkSIPPath, model, storage, sip.getId(), reportItem.getJobId(), parentId);
-          }else{
+            aip = EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP.getId(), earkSIPPath, model, storage,
+              sip.getId(), reportItem.getJobId(), computedParentId);
+          } else {
             // Fail to update since there's no AIP
             throw new NotFoundException("Unable to find AIP created with SIP ID: " + sip.getId());
           }
-        }else{
+        } else {
           // Create a new AIP
-          aip = EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, earkSIPPath, model, storage, sip.getId(), reportItem.getJobId(), parentId);
+          aip = EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, earkSIPPath, model, storage, sip.getId(),
+            reportItem.getJobId(), computedParentId);
         }
 
         PluginHelper.createSubmission(model, createSubmission, earkSIPPath, aip.getId());
@@ -141,7 +146,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
         reportItem.setOutcomeObjectId(aip.getId()).setPluginState(PluginState.SUCCESS);
 
         if (sip.getAncestors() != null && aip.getParentId() == null) {
-          reportItem.setPluginDetails(String.format("Parent with id '%s' not found", sip.getAncestors().get(0)));
+          reportItem.setPluginDetails(String.format("Parent with id '%s' not found", sipParentId));
         }
         createWellformedEventSuccess(model, index, transferredResource, aip);
         LOGGER.debug("Done with converting {} to AIP {}", earkSIPPath, aip.getId());

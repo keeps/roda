@@ -260,8 +260,8 @@ public class InternalPluginsTest {
 
     // 20160426 hsilva: we have to get the plugin from PluginManager to obtain
     // the correct version of the concrete antivirus being used
-    Plugin<AIP> plugin = (Plugin<AIP>) RodaCoreFactory.getPluginManager()
-      .getPlugin(AntivirusPlugin.class.getCanonicalName());
+    Plugin<AIP> plugin = RodaCoreFactory.getPluginManager().getPlugin(AntivirusPlugin.class.getCanonicalName(),
+      AIP.class.getName());
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
     plugin.setParameterValues(parameters);

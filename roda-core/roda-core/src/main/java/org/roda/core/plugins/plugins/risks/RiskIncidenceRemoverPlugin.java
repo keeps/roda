@@ -42,10 +42,6 @@ public class RiskIncidenceRemoverPlugin extends AbstractPlugin<AIP> {
 
   private static String riskIds;
 
-  public RiskIncidenceRemoverPlugin() {
-    super();
-  }
-
   @Override
   public void init() throws PluginException {
     // do nothing

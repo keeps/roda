@@ -105,7 +105,7 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
           DescriptiveMetadataValidationPlugin.getStaticName(), PluginParameterType.BOOLEAN, "true", true, true,
           DescriptiveMetadataValidationPlugin.getStaticDescription()));
 
-      Plugin<?> plugin = RodaCoreFactory.getPluginManager().getPlugin(RodaConstants.PLUGIN_CLASS_VERAPDF);
+      Plugin<?> plugin = RodaCoreFactory.getPluginManager().getPlugin(RodaConstants.PLUGIN_CLASS_VERAPDF, "");
       if (plugin != null) {
         pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_VERAPDF_CHECK,
           new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_VERAPDF_CHECK, plugin.getName(),
@@ -127,7 +127,7 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
         new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FILE_FORMAT_IDENTIFICATION, SiegfriedPlugin.getStaticName(),
           PluginParameterType.BOOLEAN, "true", true, false, SiegfriedPlugin.getStaticDescription()));
 
-      plugin = RodaCoreFactory.getPluginManager().getPlugin(RodaConstants.PLUGIN_CLASS_TIKA_FULLTEXT);
+      plugin = RodaCoreFactory.getPluginManager().getPlugin(RodaConstants.PLUGIN_CLASS_TIKA_FULLTEXT, "");
       if (plugin != null) {
         pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION,
           new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION, "Feature extraction",
@@ -140,7 +140,7 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
         deactivatedPlugins.add(RodaConstants.PLUGIN_CLASS_TIKA_FULLTEXT);
       }
 
-      plugin = RodaCoreFactory.getPluginManager().getPlugin(RodaConstants.PLUGIN_CLASS_DIGITAL_SIGNATURE);
+      plugin = RodaCoreFactory.getPluginManager().getPlugin(RodaConstants.PLUGIN_CLASS_DIGITAL_SIGNATURE, "");
       if (plugin != null) {
         pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_DIGITAL_SIGNATURE_VALIDATION,
           new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_DIGITAL_SIGNATURE_VALIDATION, plugin.getName(),

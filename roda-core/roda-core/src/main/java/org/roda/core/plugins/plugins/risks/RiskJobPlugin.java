@@ -66,10 +66,6 @@ public class RiskJobPlugin extends AbstractPlugin<Risk> {
         "Add the risks that will be associated with the objects above."));
   }
 
-  public RiskJobPlugin() {
-    super();
-  }
-
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);

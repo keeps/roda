@@ -422,7 +422,8 @@ public final class PluginHelper {
 
     if (perform) {
       String parameterClass = RodaConstants.PLUGIN_PARAMETER_TO_CLASS.get(pluginParameter.getId());
-      if (parameterClass != null && RodaCoreFactory.getPluginManager().getPlugin(parameterClass) == null) {
+      if (parameterClass != null
+        && RodaCoreFactory.getPluginManager().getPlugin(parameterClass, plugin.getObjectClass()) == null) {
         perform = false;
       }
     }
