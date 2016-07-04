@@ -96,14 +96,28 @@
 			</div>
 		</xsl:if>
 		<xsl:if test="normalize-space(@level)!=''">
-			<div class="field">
-				<div class="label">
-					<xsl:value-of select="$i18n.level" />
-				</div>
-				<div class="value">
-					<xsl:value-of select="@level" />
-				</div>
-			</div>
+			<xsl:choose>
+				<xsl:when test="@level = 'otherlevel'">
+					<div class="field">
+						<div class="label">
+							<xsl:value-of select="$i18n.level" />
+						</div>
+						<div class="value">
+							<xsl:value-of select="@otherlevel" />
+						</div>
+					</div>
+				</xsl:when>
+				<xsl:otherwise>
+					<div class="field">
+						<div class="label">
+							<xsl:value-of select="$i18n.level" />
+						</div>
+						<div class="value">
+							<xsl:value-of select="@level" />
+						</div>
+					</div>
+				</xsl:otherwise>
+			</xsl:choose>
 		</xsl:if>
 		<!-- HANDLE DATE BETTER??? -->
 		<xsl:if test="normalize-space(ead:did/ead:unitdate/text())!=''">

@@ -12,9 +12,18 @@
 	</xsl:template>
 	<xsl:template match="ead:archdesc">
 		<xsl:if test="@level">
-			<field name="level">
-				<xsl:value-of select="@level" />
-			</field>
+			<xsl:choose>
+				<xsl:when test="@level = 'otherlevel'">
+					<field name="level">
+						<xsl:value-of select="@otherlevel" />
+					</field>
+				</xsl:when>
+				<xsl:otherwise>
+					<field name="level">
+						<xsl:value-of select="@level" />
+					</field>
+				</xsl:otherwise>
+			</xsl:choose>
 		</xsl:if>
 		<xsl:if test="ead:did/ead:unittitle/text()">
 			<field name="title">
