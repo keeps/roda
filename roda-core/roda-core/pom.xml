@@ -226,10 +226,10 @@
 			<groupId>org.apache.solr</groupId>
 			<artifactId>solr-core</artifactId>
 			<exclusions>
-				<!-- 20160218 hsilva: this is needed for apache tika parsers, so commenting 
+				<!-- 20160218 hsilva: this is needed for apache tika parsers, so commenting
 					out -->
-				<!-- <exclusion> <artifactId>asm</artifactId> <groupId>org.ow2.asm</groupId> 
-					</exclusion> <exclusion> <artifactId>asm-commons</artifactId> <groupId>org.ow2.asm</groupId> 
+				<!-- <exclusion> <artifactId>asm</artifactId> <groupId>org.ow2.asm</groupId>
+					</exclusion> <exclusion> <artifactId>asm-commons</artifactId> <groupId>org.ow2.asm</groupId>
 					</exclusion> -->
 				<exclusion>
 					<artifactId>*</artifactId>
@@ -470,7 +470,7 @@
 			<version>2.7.13</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- XXX 20160107 this dependency was added when upgrading fedora to version 
+		<!-- XXX 20160107 this dependency was added when upgrading fedora to version
 			4.4, otherwise roda unit tests fail -->
 		<dependency>
 			<groupId>org.apache.jena</groupId>
@@ -545,7 +545,7 @@
 		<dependency>
 			<groupId>org.apache.tika</groupId>
 			<artifactId>tika-core</artifactId>
-		</dependency>	
+		</dependency>
 		<!-- Plugins related dependencies - end -->
 		<dependency>
 			<groupId>com.github.spullara.mustache.java</groupId>
