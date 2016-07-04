@@ -2102,9 +2102,6 @@ public interface ClientMessages extends Messages {
 
   String users_state_inactive();
 
-  /**** Language Switcher ****/
-
-  String lang(@Select String localeName);
 
   /************* Metadata creation and edition ****************/
 

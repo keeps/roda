@@ -18,7 +18,6 @@ import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.preingest.PreIngest;
@@ -266,7 +265,10 @@ public class Menu extends Composite {
       // messages.title("settings"), "menu-item-label", settingsMenu, null));
       rightMenu.addItem(customMenuItem("fa fa-user", user.getName(), "menu-item-label", userMenu, null));
     }
-    rightMenu.addItem(customMenuItem("fa fa-globe", selectedLanguage, "menu-item-label", languagesMenu, null));
+
+    MenuItem languageMenuItem = customMenuItem("fa fa-globe", selectedLanguage, "menu-item-label", languagesMenu, null);
+    languageMenuItem.addStyleName("menu-item-language");
+    rightMenu.addItem(languageMenuItem);
   }
 
   private MenuItem customMenuItem(String icon, String label, String styleNames, MenuBar subMenu,
@@ -333,15 +335,10 @@ public class Menu extends Composite {
 
     // Getting supported languages and their display name
     Map<String, String> supportedLanguages = new HashMap<String, String>();
+
     for (String localeName : LocaleInfo.getAvailableLocaleNames()) {
       if (!"default".equals(localeName)) {
-
-        String languageDisplayName = messages.lang(localeName);
-        if (StringUtils.isBlank(languageDisplayName)) {
-          languageDisplayName = LocaleInfo.getLocaleNativeDisplayName(localeName);
-        }
-
-        supportedLanguages.put(localeName, languageDisplayName);
+        supportedLanguages.put(localeName, LocaleInfo.getLocaleNativeDisplayName(localeName));
       }
     }
 
@@ -357,6 +354,7 @@ public class Menu extends Composite {
 
         MenuItem languageMenuItem = new MenuItem(b.toSafeHtml());
         languageMenuItem.addStyleName("menu-item-language-selected");
+        languageMenuItem.addStyleName("menu-item-language");
         languagesMenu.addItem(languageMenuItem);
         selectedLanguage = supportedLanguages.get(key);
       } else {
@@ -369,6 +367,7 @@ public class Menu extends Composite {
             }
           });
         languagesMenu.addItem(languageMenuItem);
+        languageMenuItem.addStyleName("menu-item-language");
       }
     }
   }

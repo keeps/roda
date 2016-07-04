@@ -1517,6 +1517,10 @@ td.datePickerMonth, td.datePickerYear {
     display: none;
 }
 
+.menu-item-language {
+	text-transform: capitalize;
+}
+
 .menu-item-language-selected .fa {
     right: 10px;
     position: absolute;
