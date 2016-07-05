@@ -36,9 +36,7 @@ import javax.ws.rs.core.StreamingOutput;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.util.Base64;
-import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.Difference;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.core.RodaCoreFactory;
@@ -147,6 +145,7 @@ import org.roda.wui.common.server.ServerTools;
 import org.roda.wui.server.common.XMLSimilarityIgnoreElements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -154,7 +153,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
-import org.xml.sax.SAXException;
 
 /**
  * @author Luis Faria <lfaria@keep.pt>
@@ -1260,8 +1258,8 @@ public class BrowserHelper {
   public static List<SupportedMetadataTypeBundle> getSupportedMetadata(RodaUser user, IndexedAIP aip, Locale locale)
     throws GenericException {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
-    String[] types = RodaCoreFactory.getRodaConfiguration()
-      .getString(RodaConstants.UI_BROWSER_METADATA_DESCRIPTIVE_TYPES).split(", ?");
+    List<String> types = RodaUtils
+      .copyList(RodaCoreFactory.getRodaConfiguration().getList(RodaConstants.UI_BROWSER_METADATA_DESCRIPTIVE_TYPES));
 
     List<SupportedMetadataTypeBundle> supportedMetadata = new ArrayList<>();
 

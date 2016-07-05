@@ -15,8 +15,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 
+import org.apache.commons.configuration.Configuration;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
+import org.roda.core.common.RodaUtils;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
@@ -224,36 +226,35 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public List<SearchField> getSearchFields(String localeString) throws GenericException {
     List<SearchField> searchFields = new ArrayList<SearchField>();
-    String fieldsNamesString = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields");
-    if (fieldsNamesString != null) {
-      Messages messages = RodaCoreFactory.getI18NMessages(new Locale(localeString));
-      String[] fields = fieldsNamesString.split(",");
-      for (String field : fields) {
-        SearchField searchField = new SearchField();
+    List<String> fields = RodaUtils.copyList(RodaCoreFactory.getRodaConfiguration().getList("ui.search.fields"));
 
-        String fieldsNames = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "fields");
-        String fieldType = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "type");
-        String fieldLabelI18N = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "i18n");
-        boolean fieldFixed = Boolean
-          .valueOf(RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "fixed"));
+    Messages messages = RodaCoreFactory.getI18NMessages(new Locale(localeString));
+    for (String field : fields) {
+      SearchField searchField = new SearchField();
 
-        if (fieldsNames != null && fieldType != null && fieldLabelI18N != null) {
-          List<String> fieldsNamesList = Arrays.asList(fieldsNames.split(","));
+      String fieldsNames = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "fields");
+      String fieldType = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "type");
+      String fieldLabelI18N = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "i18n");
+      boolean fieldFixed = Boolean
+        .valueOf(RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "fixed"));
 
-          searchField.setId(field);
-          searchField.setSearchFields(fieldsNamesList);
-          searchField.setType(fieldType);
-          try {
-            searchField.setLabel(messages.getTranslation(fieldLabelI18N));
-          } catch (MissingResourceException e) {
-            searchField.setLabel(fieldLabelI18N);
-          }
-          searchField.setFixed(fieldFixed);
+      if (fieldsNames != null && fieldType != null && fieldLabelI18N != null) {
+        List<String> fieldsNamesList = Arrays.asList(fieldsNames.split(","));
 
-          searchFields.add(searchField);
+        searchField.setId(field);
+        searchField.setSearchFields(fieldsNamesList);
+        searchField.setType(fieldType);
+        try {
+          searchField.setLabel(messages.getTranslation(fieldLabelI18N));
+        } catch (MissingResourceException e) {
+          searchField.setLabel(fieldLabelI18N);
         }
+        searchField.setFixed(fieldFixed);
+
+        searchFields.add(searchField);
       }
     }
+
     return searchFields;
   }
 
@@ -409,33 +410,28 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   public Viewers getViewersProperties() {
     Viewers viewers = new Viewers();
-    String viewersString = RodaCoreFactory.getRodaConfigurationAsString("ui", "viewers");
-    if (viewersString != null) {
-      String[] viewersSupported = viewersString.split(",");
-      for (String type : viewersSupported) {
-        String fieldPronoms = RodaCoreFactory.getRodaConfigurationAsString("ui", "viewers", type, "pronoms");
-        String fieldMimetypes = RodaCoreFactory.getRodaConfigurationAsString("ui", "viewers", type, "mimetypes");
-        String fieldExtensions = RodaCoreFactory.getRodaConfigurationAsString("ui", "viewers", type, "extensions");
+    Configuration rodaConfig = RodaCoreFactory.getRodaConfiguration();
+    List<String> viewersSupported = RodaUtils.copyList(rodaConfig.getList("ui.viewers"));
 
-        if (fieldPronoms != null && !fieldPronoms.isEmpty()) {
-          for (String pronom : Arrays.asList(fieldPronoms.split(","))) {
-            viewers.addPronom(pronom, type);
-          }
-        }
+    for (String type : viewersSupported) {
+      List<String> fieldPronoms = RodaUtils.copyList(rodaConfig.getList("ui.viewers." + type + ".pronoms"));
+      List<String> fieldMimetypes = RodaUtils.copyList(rodaConfig.getList("ui.viewers." + type + ".mimetypes"));
+      List<String> fieldExtensions = RodaUtils.copyList(rodaConfig.getList("ui.viewers." + type + ".extensions"));
 
-        if (fieldMimetypes != null && !fieldMimetypes.isEmpty()) {
-          for (String mimetype : Arrays.asList(fieldMimetypes.split(","))) {
-            viewers.addMimetype(mimetype, type);
-          }
-        }
-
-        if (fieldExtensions != null && !fieldExtensions.isEmpty()) {
-          for (String extension : Arrays.asList(fieldExtensions.split(","))) {
-            viewers.addExtension(extension, type);
-          }
-        }
+      for (String pronom : fieldPronoms) {
+        viewers.addPronom(pronom, type);
       }
+
+      for (String mimetype : fieldMimetypes) {
+        viewers.addMimetype(mimetype, type);
+      }
+
+      for (String extension : fieldExtensions) {
+        viewers.addExtension(extension, type);
+      }
+
     }
+
     return viewers;
   }
 
