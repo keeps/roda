@@ -10,29 +10,6 @@
 		<artifactId>roda-plugins</artifactId>
 		<version>2.0.0-SNAPSHOT</version>
 	</parent>
-	<profiles>
-		<profile>
-			<id>default</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-					  <groupId>org.apache.maven.plugins</groupId>
-					  <artifactId>maven-jar-plugin</artifactId>
-					  <executions>
-					    <execution>
-					      <goals>
-					        <goal>test-jar</goal>
-					      </goals>
-					    </execution>
-					  </executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 	<dependencies>
 		<dependency>
 			<groupId>org.roda-project</groupId>
@@ -41,8 +18,6 @@
 		<dependency>
 			<groupId>org.roda-project</groupId>
 			<artifactId>roda-core</artifactId>
-			<version>2.0.0-SNAPSHOT</version>
-			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
