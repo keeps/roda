@@ -132,7 +132,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
           if(result.getTotalCount() == 1) {
             // Retrieve the AIP
             IndexedAIP indexedAIP = result.getResults().get(0);
-            aip = EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP.getId(), earkSIPPath, model, sip.getId(), reportItem.getJobId(), parentId);
+            aip = EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP.getId(), earkSIPPath, model, storage, sip.getId(), reportItem.getJobId(), parentId);
           }else{
             // Fail to update since there's no AIP
             throw new NotFoundException("Unable to find AIP created with SIP ID: " + sip.getId());

@@ -21,9 +21,12 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
@@ -56,7 +59,7 @@ public class EARKSIPToAIPPluginUtils {
 
     // process IPRepresentation information
     for (IPRepresentation representation : sip.getRepresentations()) {
-      processIPRepresentationInformation(model, representation, aip.getId(), notify, false);
+      processIPRepresentationInformation(model, representation, aip.getId(), storage, notify, false);
     }
 
     // FIXME 20160516 hsilva: put SIP inside the AIP
@@ -67,7 +70,7 @@ public class EARKSIPToAIPPluginUtils {
 
   }
 
-  public static AIP earkSIPToAIPUpdate(SIP sip, String aipId, Path sipPath, ModelService model, String ingestSIPId,
+  public static AIP earkSIPToAIPUpdate(SIP sip, String aipId, Path sipPath, ModelService model, StorageService storage, String ingestSIPId,
                                        String ingestJobId, String parentId) throws IOException, MigrationException, RequestNotValidException,
           NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException, ValidationException {
     boolean notify = false;
@@ -77,7 +80,7 @@ public class EARKSIPToAIPPluginUtils {
 
     // process IPRepresentation information
     for (IPRepresentation representation : sip.getRepresentations()) {
-      processIPRepresentationInformation(model, representation, aipId, notify, true);
+      processIPRepresentationInformation(model, representation, aipId, storage, notify, true);
     }
 
     // FIXME 20160516 hsilva: put SIP inside the AIP
@@ -176,7 +179,7 @@ public class EARKSIPToAIPPluginUtils {
   }
 
   private static void processIPRepresentationInformation(ModelService model, IPRepresentation sr, String aipId,
-    boolean notify, boolean update) throws RequestNotValidException, GenericException, AlreadyExistsException,
+    StorageService storage, boolean notify, boolean update) throws RequestNotValidException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, NotFoundException {
     boolean original = true;
     String representationType = IngestHelper.getType(sr);
@@ -195,7 +198,6 @@ public class EARKSIPToAIPPluginUtils {
       // XXX 20160504 hsilva: there's no "space" in the model to accommodate this
       // information
 
-    try {
       // process representation preservation metadata
       processPreservationMetadata(model, sr.getPreservationMetadata(), aipId, Optional.ofNullable(representation.getId()),
               notify);
@@ -205,7 +207,15 @@ public class EARKSIPToAIPPluginUtils {
         List<String> directoryPath = file.getRelativeFolders();
         String fileId = file.getFileName();
         ContentPayload payload = new FSPathContentPayload(file.getPath());
-        model.createFile(aipId, representation.getId(), directoryPath, fileId, payload, notify);
+        try {
+          model.createFile(aipId, representation.getId(), directoryPath, fileId, payload, notify);
+        } catch (AlreadyExistsException e) {
+          if(update) {
+            StoragePath filePath = ModelUtils.getFileStoragePath(aipId, representation.getId(), directoryPath, fileId);
+            final Binary binary = storage.getBinary(filePath);
+            model.updateFile(aipId, representation.getId(), directoryPath, fileId, binary, true, notify);
+          }else throw e;
+        }
       }
 
       // process representation documentation
@@ -213,8 +223,5 @@ public class EARKSIPToAIPPluginUtils {
 
       // process representation schemas
       processSchemas(model, sr.getSchemas(), aipId, representation.getId(), notify, false);
-    } catch (AlreadyExistsException e) {
-      // apereira: Do nothing for now
-    }
   }
 }
