@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.Iterator;
@@ -97,7 +98,13 @@ public class ZipUtility {
    */
   public static List<File> extractFilesFromZIP(File zipFilename, File outputDir, boolean filesWithAbsolutePath)
     throws IOException {
-    ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(zipFilename));
+    return extractFilesFromInputStream(new FileInputStream(zipFilename), outputDir, filesWithAbsolutePath);
+
+  }
+
+  private static List<File> extractFilesFromInputStream(InputStream inputStream, File outputDir,
+    boolean filesWithAbsolutePath) throws IOException {
+    ZipInputStream zipInputStream = new ZipInputStream(inputStream);
     // JarInputStream jarInputStream = new JarInputStream(new
     // FileInputStream(
     // zipFilename));
@@ -175,7 +182,6 @@ public class ZipUtility {
 
       return extractedFiles;
     }
-
   }
 
   /**
@@ -330,5 +336,10 @@ public class ZipUtility {
     } finally {
       out.close();
     }
+  }
+
+  public static List<File> extractFilesFromInputStream(InputStream inputStream, Path outputDir) throws IOException {
+    return extractFilesFromInputStream(inputStream, outputDir.toFile(), false);
+
   }
 }

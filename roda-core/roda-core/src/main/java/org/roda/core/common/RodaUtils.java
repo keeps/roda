@@ -30,11 +30,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
@@ -42,7 +45,12 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.XMLReaderFactory;
 import org.yaml.snakeyaml.Yaml;
+
 
 public class RodaUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(RodaUtils.class);
@@ -128,8 +136,9 @@ public class RodaUtils {
 
   public static void applyStylesheet(Reader xsltReader, Reader fileReader, Map<String, Object> parameters,
     Writer result) throws IOException, TransformerException {
-
+    
     TransformerFactory factory = new net.sf.saxon.TransformerFactoryImpl();
+    factory.setURIResolver(new RodaURIResolver());
     Source xsltSource = new StreamSource(xsltReader);
     Transformer transformer = factory.newTransformer(xsltSource);
     for (Entry<String, Object> parameter : parameters.entrySet()) {
@@ -143,8 +152,15 @@ public class RodaUtils {
         LOGGER.error("Unknown object class for passing by to xslt: " + parameter.getValue().getClass());
       }
     }
-    Source text = new StreamSource(fileReader);
-    transformer.transform(text, new StreamResult(result));
+    try{
+      XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+      xmlReader.setEntityResolver(new RodaEntityResolver());
+      InputSource source = new InputSource(fileReader);
+      Source text = new SAXSource(xmlReader,source  );
+      transformer.transform(text, new StreamResult(result));
+    }catch(SAXException se){
+      LOGGER.error(se.getMessage(),se);
+    }
   }
 
   public static void indentXML(Reader input, Writer output) throws TransformerException {
