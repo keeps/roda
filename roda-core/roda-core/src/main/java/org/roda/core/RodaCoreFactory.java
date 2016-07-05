@@ -428,10 +428,16 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void copyFilesFromClasspath(String classpathPrefix, Path destionationDirectory,
+  private static void copyFilesFromClasspath(String classpathPrefix, Path destinationDirectory,
     boolean removeClasspathPrefixFromFinalPath) {
+
+    LOGGER.info("Copy files from classpath prefix={}, destination={}, removePrefix={}", classpathPrefix,
+      destinationDirectory, removeClasspathPrefixFromFinalPath);
+
     List<ClassLoader> classLoadersList = new LinkedList<ClassLoader>();
     classLoadersList.add(ClasspathHelper.contextClassLoader());
+
+    LOGGER.info("Classloader list: {}", classLoadersList);
 
     Set<String> resources = new Reflections(
       new ConfigurationBuilder().filterInputsBy(new FilterBuilder().include(FilterBuilder.prefix(classpathPrefix)))
@@ -439,13 +445,15 @@ public class RodaCoreFactory {
         .setUrls(ClasspathHelper.forClassLoader(classLoadersList.toArray(new ClassLoader[5]))))
           .getResources(Pattern.compile(".*"));
 
+    LOGGER.info("Resources: {}", resources);
+
     for (String resource : resources) {
       InputStream originStream = RodaCoreFactory.class.getClassLoader().getResourceAsStream(resource);
       Path destinyPath;
       if (removeClasspathPrefixFromFinalPath) {
-        destinyPath = destionationDirectory.resolve(resource.replaceFirst(classpathPrefix, ""));
+        destinyPath = destinationDirectory.resolve(resource.replaceFirst(classpathPrefix, ""));
       } else {
-        destinyPath = destionationDirectory.resolve(resource);
+        destinyPath = destinationDirectory.resolve(resource);
       }
 
       try {
@@ -462,8 +470,8 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void copyFilesFromClasspath(String classpathPrefix, Path destionationDirectory) {
-    copyFilesFromClasspath(classpathPrefix, destionationDirectory, false);
+  private static void copyFilesFromClasspath(String classpathPrefix, Path destinationDirectory) {
+    copyFilesFromClasspath(classpathPrefix, destinationDirectory, false);
   }
 
   private static void instantiatePluginManager() {
@@ -563,19 +571,12 @@ public class RodaCoreFactory {
       index = new IndexService(solr, model);
     } else if (nodeType == NodeType.TEST && TEST_DEPLOY_SOLR) {
       try {
-        URL solrConfigURL = RodaCoreFactory.class
-          .getResource("/" + RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER + "/solr.xml");
-        Path solrConfigPath = Paths.get(solrConfigURL.toURI());
-        Files.copy(solrConfigPath, indexDataPath.resolve("solr.xml"));
-        Path aipSchema = indexDataPath.resolve(RodaConstants.CORE_AIP_FOLDER);
-        Files.createDirectories(aipSchema);
-        Files.createFile(aipSchema.resolve("core.properties"));
-
-        Path solrHome = Paths.get(RodaCoreFactory.class
-          .getResource("/" + RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER + "/").toURI());
+        Path tempConfig = Files.createTempDirectory(RodaConstants.CORE_INDEX_FOLDER);
+        copyFilesFromClasspath(RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER + "/",
+          tempConfig);
 
         // instantiate solr
-        solr = instantiateSolr(solrHome);
+        solr = instantiateSolr(tempConfig);
 
         // instantiate index related object
         index = new IndexService(solr, model);

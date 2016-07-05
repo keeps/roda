@@ -156,6 +156,7 @@
 				<module>roda-common</module>
 				<module>roda-core/roda-core</module>
 				<module>roda-core/roda-plugins</module>
+				<module>roda-core/roda-core-tests</module>
 				<module>roda-ui</module>
 			</modules>
 		</profile>
@@ -166,6 +167,7 @@
 				<module>roda-cas</module>
 				<module>roda-core/roda-core</module>
 				<module>roda-core/roda-plugins</module>
+				<module>roda-core/roda-core-tests</module>
 				<module>roda-ui</module>
 			</modules>
 		</profile>
@@ -174,6 +176,7 @@
 			<modules>
 				<module>roda-common</module>
 				<module>roda-core/roda-core</module>
+				<module>roda-core/roda-core-tests</module>
 				<module>roda-ui/roda-wui</module>
 				<module>roda-cas</module>
 			</modules>
@@ -183,6 +186,7 @@
 			<modules>
 				<module>roda-common</module>
 				<module>roda-core/roda-core</module>
+				<module>roda-core/roda-core-tests</module>
 				<module>roda-ui/roda-wui</module>
 			</modules>
 		</profile>
@@ -191,6 +195,7 @@
 			<modules>
 				<module>roda-common</module>
 				<module>roda-core/roda-core</module>
+				<module>roda-core/roda-core-tests</module>
 			</modules>
 		</profile>
 		<!-- <profile> -->
@@ -764,15 +769,20 @@
 			</dependency>
 			<dependency>
 				<groupId>org.roda-project</groupId>
-				<artifactId>roda-core</artifactId>
+				<artifactId>roda-core-tests</artifactId>
 				<version>2.0.0-SNAPSHOT</version>
-				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.roda-project</groupId>
 				<artifactId>roda-plugin-common</artifactId>
 				<version>2.0.0-SNAPSHOT</version>
-			</dependency>		
+			</dependency>
+			<dependency>
+				<groupId>org.roda-project</groupId>
+				<artifactId>roda-plugin-common-tests</artifactId>
+				<version>2.0.0-SNAPSHOT</version>
+			</dependency>
+					
 			<!-- RODA own modules dependencies - end -->
 			<dependency>
 				<groupId>stax</groupId>

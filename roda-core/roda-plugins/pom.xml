@@ -3,7 +3,6 @@
 	<modelVersion>4.0.0</modelVersion>
 	<name>roda-plugins</name>
 	<artifactId>roda-plugins</artifactId>
-	<version>2.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<parent>
 		<groupId>org.roda-project</groupId>
@@ -13,6 +12,7 @@
 	</parent>
 	<modules>
 		<module>roda-plugin-common</module>
+		<module>roda-plugin-common-tests</module>
 
 		<module>conversion/roda-plugin-conversion-imagemagick</module> 
 		<module>conversion/roda-plugin-conversion-pdftopdfa</module>

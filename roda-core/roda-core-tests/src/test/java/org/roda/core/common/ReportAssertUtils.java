@@ -15,7 +15,6 @@ import org.junit.Assert;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 
-
 public class ReportAssertUtils {
   public static void assertReports(List<Report> reports, List<String> outcomeObjectIds) {
     assertReports(reports, outcomeObjectIds, null);

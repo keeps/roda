@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.apache.jena.ext.com.google.common.collect.Iterables;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.After;
 import org.junit.Assert;
@@ -58,6 +57,8 @@ import org.roda.core.plugins.plugins.ingest.TransferredResourceToAIPPlugin;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Iterables;
 
 import jersey.repackaged.com.google.common.collect.Lists;
 

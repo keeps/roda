@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.jena.ext.com.google.common.collect.Iterables;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.xmlbeans.XmlException;
 import org.hamcrest.Matchers;
@@ -84,6 +83,8 @@ import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.util.InvalidDateException;
+
+import com.google.common.collect.Iterables;
 
 import gov.loc.premis.v3.EventComplexType;
 import gov.loc.premis.v3.FormatComplexType;

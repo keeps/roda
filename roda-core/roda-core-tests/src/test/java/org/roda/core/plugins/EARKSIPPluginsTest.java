@@ -18,9 +18,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.apache.jena.ext.com.google.common.collect.Iterables;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -39,31 +39,39 @@ import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.SelectedItemsNone;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceTest;
-import org.roda.core.plugins.plugins.ingest.BagitToAIPPlugin;
+import org.roda.core.plugins.plugins.ingest.EARKSIPToAIPPlugin;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Iterables;
+
 import jersey.repackaged.com.google.common.collect.Lists;
 
-public class BagitSIPPluginsTest {
+public class EARKSIPPluginsTest {
+  private static final Logger LOGGER = LoggerFactory.getLogger(EARKSIPPluginsTest.class);
+
+  private static final String FAKE_JOB_ID = "NONE";
 
   private static final int CORPORA_FILES_COUNT = 4;
   private static final int CORPORA_FOLDERS_COUNT = 2;
@@ -71,7 +79,7 @@ public class BagitSIPPluginsTest {
   private static final String CORPORA_TEST1 = "test1";
   private static final String CORPORA_TEST1_TXT = "test1.txt";
   private static final int GENERATED_FILE_SIZE = 100;
-  private static final int AUTO_COMMIT_TIMEOUT = 2000;
+  private static final int AUTO_COMMIT_TIMEOUT = 2500;
   private static Path basePath;
   private static Path logPath;
 
@@ -80,8 +88,6 @@ public class BagitSIPPluginsTest {
 
   private static Path corporaPath;
   private static StorageService corporaService;
-
-  private static final Logger logger = LoggerFactory.getLogger(ModelServiceTest.class);
 
   @Before
   public void setUp() throws Exception {
@@ -100,11 +106,18 @@ public class BagitSIPPluginsTest {
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
 
-    URL corporaURL = BagitSIPPluginsTest.class.getResource("/corpora");
+    URL corporaURL = EARKSIPPluginsTest.class.getResource("/corpora");
     corporaPath = Paths.get(corporaURL.toURI());
     corporaService = new FileStorageService(corporaPath);
 
-    logger.info("Running internal plugins tests under storage {}", basePath);
+    LOGGER.info("Running E-ARK SIP plugins tests under storage {}", basePath);
+
+    Job fakeJob = new Job();
+    fakeJob.setId(FAKE_JOB_ID);
+    fakeJob.setPluginType(PluginType.MISC);
+    fakeJob.setSourceObjects(SelectedItemsNone.create());
+    model.createJob(fakeJob);
+    index.commit(Job.class);
   }
 
   @After
@@ -114,25 +127,23 @@ public class BagitSIPPluginsTest {
   }
 
   private TransferredResource createCorpora() throws InterruptedException, IOException, FileAlreadyExistsException,
-    NotFoundException, GenericException, RequestNotValidException {
+    NotFoundException, GenericException, RequestNotValidException, IsStillUpdatingException {
     TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
 
-    Path sip = corporaPath.resolve(CorporaConstants.SIP_FOLDER).resolve(CorporaConstants.BAGIT_SIP);
+    Path sip = corporaPath.resolve(CorporaConstants.SIP_FOLDER).resolve(CorporaConstants.EARK_SIP);
 
-    TransferredResource transferredResourceCreated = f.createFile(null, CorporaConstants.BAGIT_SIP,
-      Files.newInputStream(sip));
+    f.createFile(null, CorporaConstants.EARK_SIP, Files.newInputStream(sip));
 
-    // TODO check if 4 times is the expected
-    // Mockito.verify(observer, Mockito.times(4));
-
+    f.updateAllTransferredResources(null, true);
     index.commit(TransferredResource.class);
 
     TransferredResource transferredResource = index.retrieve(TransferredResource.class,
-      transferredResourceCreated.getUUID());
+      UUID.nameUUIDFromBytes(CorporaConstants.EARK_SIP.getBytes()).toString());
     return transferredResource;
   }
 
   private void assertReports(List<Report> reports) {
+    Assert.assertNotNull(reports);
     for (Report report : reports) {
       Assert.assertThat(report.getReports().get(0).getPluginState(), Matchers.is(PluginState.SUCCESS));
     }
@@ -140,14 +151,14 @@ public class BagitSIPPluginsTest {
 
   private AIP ingestCorpora() throws RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException,
-    FileAlreadyExistsException, SolrServerException {
+    FileAlreadyExistsException, SolrServerException, IsStillUpdatingException {
     String parentId = null;
     String aipType = RodaConstants.AIP_TYPE_MIXED;
-
     AIP root = model.createAIP(parentId, aipType, new Permissions());
 
-    Plugin<TransferredResource> plugin = new BagitToAIPPlugin();
+    Plugin<TransferredResource> plugin = new EARKSIPToAIPPlugin();
     Map<String, String> parameters = new HashMap<>();
+    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
     plugin.setParameterValues(parameters);
 
@@ -158,6 +169,8 @@ public class BagitSIPPluginsTest {
     RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(null, plugin,
       Arrays.asList(transferredResource.getUUID()));
     // assertReports(reports);
+
+    index.commitAIPs();
 
     IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
       new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10));
@@ -170,7 +183,8 @@ public class BagitSIPPluginsTest {
   }
 
   @Test
-  public void testIngestBagitSIP() throws IOException, InterruptedException, RODAException, SolrServerException {
+  public void testIngestEARKSIP()
+    throws IOException, InterruptedException, RODAException, SolrServerException, IsStillUpdatingException {
     AIP aip = ingestCorpora();
     Assert.assertEquals(1, aip.getRepresentations().size());
 
