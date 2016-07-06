@@ -1,3 +1,4 @@
 /target/
-transaction.log
-velocity.log
+transaction.log*
+velocity.log*
+

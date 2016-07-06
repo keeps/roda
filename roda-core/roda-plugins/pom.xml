@@ -11,6 +11,9 @@
 		<version>2.0.0-SNAPSHOT</version>
 		<relativePath>../..</relativePath>
 	</parent>
+	<properties>
+		<tika.version>1.11</tika.version>
+	</properties>
 	<modules>
 		<module>roda-plugin-common</module>
 		<module>roda-plugin-common-tests</module>
@@ -38,10 +41,49 @@
 	</modules>
 	<dependencyManagement>
 		<dependencies>
+			<!-- FITS Plugin -->
+			<dependency>
+				<groupId>edu.harvard.hul.ois</groupId>
+				<artifactId>fits</artifactId>
+				<version>0.8.10</version>
+			</dependency>
 			<dependency>
 				<groupId>org.jdom</groupId>
 				<artifactId>jdom</artifactId>
 				<version>1.1.3</version>
+			</dependency>
+			<!-- JHOVE Plugin -->
+			<dependency>
+				<groupId>org.openpreservation.jhove</groupId>
+				<artifactId>jhove-core</artifactId>
+				<version>1.12.28</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openpreservation.jhove</groupId>
+				<artifactId>jhove-modules</artifactId>
+				<version>1.12.28</version>
+			</dependency>
+			<!-- TIKA Plugin -->
+			<dependency>
+				<groupId>org.apache.tika</groupId>
+				<artifactId>tika-core</artifactId>
+				<version>${tika.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.tika</groupId>
+				<artifactId>tika-parsers</artifactId>
+				<version>${tika.version}</version>
+			</dependency>
+			<!-- VeraPDF, DigitalSignature and PDFtoPDFA Plugins -->
+			<dependency>
+				<artifactId>gui</artifactId>
+				<groupId>org.verapdf</groupId>
+				<version>0.8.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.ghost4j</groupId>
+				<artifactId>ghost4j</artifactId>
+				<version>1.0.0</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

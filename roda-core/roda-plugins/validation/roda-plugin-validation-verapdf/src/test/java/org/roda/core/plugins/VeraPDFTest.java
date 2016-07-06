@@ -14,7 +14,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.plugins.plugins.validation.VeraPDFPlugin;
 
-public class VeraPdfTest extends AbstractConvertTest {
+public class VeraPDFTest extends AbstractConvertTest {
 
   @Test
   public void testVeraPDFPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,

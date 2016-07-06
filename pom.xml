@@ -139,7 +139,6 @@
 		<grizzly.version>2.3.16</grizzly.version>
 		<jena.version>2.13.0</jena.version>
 		<solr.version>5.5.1</solr.version>
-		<tika.version>1.11</tika.version>
 		<akka.version>2.4.7</akka.version>
 		<httpcomponents.version>4.5.2</httpcomponents.version>
 		<poi.version>3.13</poi.version>
@@ -1013,58 +1012,17 @@
 				<version>4.12.0</version>
 			</dependency>
 			<dependency>
-				<groupId>org.apache.tika</groupId>
-				<artifactId>tika-core</artifactId>
-				<version>${tika.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.tika</groupId>
-				<artifactId>tika-parsers</artifactId>
-				<version>${tika.version}</version>
-			</dependency>
-			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-compress</artifactId>
 				<version>1.11</version>
 			</dependency>
-			<dependency>
-				<groupId>org.openpreservation.jhove</groupId>
-				<artifactId>jhove-core</artifactId>
-				<version>1.12.28</version>
-			</dependency>
-			<dependency>
-				<groupId>org.openpreservation.jhove</groupId>
-				<artifactId>jhove-modules</artifactId>
-				<version>1.12.28</version>
-			</dependency>
-			<dependency>
-				<groupId>edu.harvard.hul.ois</groupId>
-				<artifactId>fits</artifactId>
-				<version>0.8.10</version>
-			</dependency>
-			<!-- VERAPDF (repackaged with package names relocation) -->
-			<dependency>
-				<artifactId>gui</artifactId>
-				<groupId>org.verapdf</groupId>
-				<version>0.8.0</version>
-			</dependency>
-			<dependency>
-				<groupId>org.ghost4j</groupId>
-				<artifactId>ghost4j</artifactId>
-				<version>1.0.0</version>
-			</dependency>
-			<!-- JOD CONVERTER -->
-			<dependency>
-				<groupId>com.artofsolving</groupId>
-				<artifactId>jodconverter</artifactId>
-				<version>2.2.1</version>
-			</dependency>
-
+			<!-- JOD CONVERTER -->		
 			<dependency>
 				<groupId>xalan</groupId>
 				<artifactId>xalan</artifactId>
 				<version>2.7.1</version>
 			</dependency>
+
 			<!-- Actions related dependencies - end -->
 			<!-- Akka related dependencies - start -->
 			<dependency>
