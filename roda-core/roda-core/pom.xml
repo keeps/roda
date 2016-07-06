@@ -311,8 +311,8 @@
 		<!-- </dependency> -->
 		<!-- Plugins related dependencies - end -->
 		<dependency>
-			<groupId>com.github.spullara.mustache.java</groupId>
-			<artifactId>compiler</artifactId>
+			<groupId>com.github.jknack</groupId>
+			<artifactId>handlebars</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.reflections</groupId>

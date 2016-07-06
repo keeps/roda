@@ -28,6 +28,8 @@ import java.util.UUID;
 
 import javax.mail.MessagingException;
 
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Template;
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ConfigurableEmailUtility;
@@ -91,9 +93,6 @@ import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.github.mustachejava.DefaultMustacheFactory;
-import com.github.mustachejava.MustacheFactory;
 
 /**
  * Class that "relates" Model & Storage
@@ -2028,7 +2027,7 @@ public class ModelService extends ModelObservable {
         scopes.put("recipient", RodaConstants.NOTIFICATION_VARIOUS_RECIPIENT_USERS);
       }
 
-      notification.setBody(executeMustache(template, templateName, scopes));
+      notification.setBody(executeHandlebars(template, templateName, scopes));
       scopes.remove("recipient");
 
       ConfigurableEmailUtility emailUtility = new ConfigurableEmailUtility(notification.getFromUser(),
@@ -2081,19 +2080,19 @@ public class ModelService extends ModelObservable {
       // do nothing
     }
 
-    return executeMustache(template, templateName, scopes);
+    return executeHandlebars(template, templateName, scopes);
   }
 
-  private String executeMustache(String template, String templateName, Map<String, Object> scopes) {
-    Writer writer = new StringWriter();
-    MustacheFactory mf = new DefaultMustacheFactory();
-    StringReader reader = new StringReader(template);
-    com.github.mustachejava.Mustache mustache = mf.compile(reader, templateName);
-    mustache.execute(writer, scopes);
-    String modifiedTemplate = writer.toString();
-    IOUtils.closeQuietly(reader);
-    IOUtils.closeQuietly(writer);
-    return modifiedTemplate;
+  private String executeHandlebars(String template, String templateName, Map<String, Object> scopes) {
+    Handlebars handlebars = new Handlebars();
+    String result = "";
+    try {
+      Template templ = handlebars.compileInline(template);
+      result = templ.apply(scopes);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return result;
   }
 
   public void updateNotification(Notification notification) throws GenericException {
