@@ -212,4 +212,9 @@ public class FFProbePlugin extends AbstractPlugin<AIP> {
   public List<String> getCategories() {
     return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CHARACTERIZATION);
   }
+
+  @Override
+  public List<Class<AIP>> getObjectClasses() {
+    return Arrays.asList(AIP.class);
+  }
 }

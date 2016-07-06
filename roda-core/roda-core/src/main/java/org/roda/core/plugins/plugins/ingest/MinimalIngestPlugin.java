@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
@@ -110,6 +111,11 @@ public class MinimalIngestPlugin extends DefaultIngestPlugin {
   @Override
   public List<String> getCategories() {
     return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_INGEST);
+  }
+
+  @Override
+  public List<Class<TransferredResource>> getObjectClasses() {
+    return Arrays.asList(TransferredResource.class);
   }
 
 }

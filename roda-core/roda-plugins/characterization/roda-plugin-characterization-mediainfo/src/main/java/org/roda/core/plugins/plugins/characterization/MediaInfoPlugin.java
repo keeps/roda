@@ -139,9 +139,8 @@ public class MediaInfoPlugin extends AbstractPlugin<AIP> {
                 model.createOtherMetadata(aip.getId(), representation.getId(), directoryPath, fileId, ".xml",
                   RodaConstants.OTHER_METADATA_TYPE_MEDIAINFO, payload, inotify);
               }
-            } catch (RODAException | IOException | XPathExpressionException
-              | ParserConfigurationException | SAXException | TransformerFactoryConfigurationError
-              | TransformerException e) {
+            } catch (RODAException | IOException | XPathExpressionException | ParserConfigurationException
+              | SAXException | TransformerFactoryConfigurationError | TransformerException e) {
               LOGGER.error("Error processing AIP {}: {}", aip.getId(), e.getMessage());
               reportState = PluginState.FAILURE;
               validationReport.addIssue(new ValidationIssue(e.getMessage()));
@@ -273,6 +272,11 @@ public class MediaInfoPlugin extends AbstractPlugin<AIP> {
   @Override
   public List<String> getCategories() {
     return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CHARACTERIZATION);
+  }
+
+  @Override
+  public List<Class<AIP>> getObjectClasses() {
+    return Arrays.asList(AIP.class);
   }
 
 }

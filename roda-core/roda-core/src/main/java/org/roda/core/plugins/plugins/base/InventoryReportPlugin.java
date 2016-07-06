@@ -342,4 +342,9 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
   public List<String> getCategories() {
     return new ArrayList<String>();
   }
+
+  @Override
+  public List<Class<AIP>> getObjectClasses() {
+    return Arrays.asList(AIP.class);
+  }
 }

@@ -160,9 +160,7 @@ public interface Plugin<T extends IsRODAObject> {
    */
   public void init() throws PluginException;
 
-  public Plugin<T> injectObjectClass(Class<T> objectClass);
-
-  public Class<T> getObjectClass();
+  public List<Class<T>> getObjectClasses();
 
   /**
    * Method to be invoked by the PluginOrchestrator to inject the job plugin

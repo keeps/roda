@@ -304,4 +304,9 @@ public class RiskJobPlugin extends AbstractPlugin<Risk> {
   public List<String> getCategories() {
     return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_RISK_MANAGEMENT);
   }
+
+  @Override
+  public List<Class<Risk>> getObjectClasses() {
+    return Arrays.asList(Risk.class);
+  }
 }

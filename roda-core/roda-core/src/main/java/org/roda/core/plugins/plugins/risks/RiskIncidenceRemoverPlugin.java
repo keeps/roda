@@ -168,4 +168,9 @@ public class RiskIncidenceRemoverPlugin extends AbstractPlugin<AIP> {
   public List<String> getCategories() {
     return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
   }
+
+  @Override
+  public List<Class<AIP>> getObjectClasses() {
+    return Arrays.asList(AIP.class);
+  }
 }

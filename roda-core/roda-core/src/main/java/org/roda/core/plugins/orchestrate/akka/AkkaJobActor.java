@@ -12,6 +12,7 @@ import java.io.Serializable;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItemsAll;
 import org.roda.core.data.v2.index.SelectedItemsFilter;
@@ -50,8 +51,7 @@ public class AkkaJobActor extends UntypedActor {
   public void onReceive(Object msg) throws Exception {
     if (msg instanceof Job) {
       Job job = (Job) msg;
-      Plugin<?> plugin = (Plugin<?>) RodaCoreFactory.getPluginManager().getPlugin(job.getPlugin(),
-        job.getSourceObjects().getSelectedClass());
+      Plugin<? extends IsRODAObject> plugin = RodaCoreFactory.getPluginManager().getPlugin(job.getPlugin());
       PluginHelper.setPluginParameters(plugin, job);
 
       String jobId = job.getId();

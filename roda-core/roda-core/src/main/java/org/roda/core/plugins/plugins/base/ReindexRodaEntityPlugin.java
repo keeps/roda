@@ -9,6 +9,7 @@ package org.roda.core.plugins.plugins.base;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -24,9 +25,13 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.agents.Agent;
+import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
@@ -193,6 +198,16 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
   @Override
   public List<String> getCategories() {
     return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
+  }
+
+  @Override
+  public List<Class<T>> getObjectClasses() {
+    List<Class<? extends IsRODAObject>> list = new ArrayList<>();
+    list.add(Agent.class);
+    list.add(Format.class);
+    list.add(Notification.class);
+    list.add(Risk.class);
+    return (List) list;
   }
 
 }

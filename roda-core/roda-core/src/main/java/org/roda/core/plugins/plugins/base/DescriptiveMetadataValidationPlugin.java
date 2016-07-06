@@ -229,4 +229,9 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
   public List<String> getCategories() {
     return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_VALIDATION);
   }
+
+  @Override
+  public List<Class<AIP>> getObjectClasses() {
+    return Arrays.asList(AIP.class);
+  }
 }

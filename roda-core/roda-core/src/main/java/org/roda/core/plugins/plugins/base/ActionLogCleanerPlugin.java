@@ -20,6 +20,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
@@ -153,6 +154,11 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<LogEntry> {
   @Override
   public List<String> getCategories() {
     return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
+  }
+
+  @Override
+  public List<Class<LogEntry>> getObjectClasses() {
+    return Arrays.asList(LogEntry.class);
   }
 
 }

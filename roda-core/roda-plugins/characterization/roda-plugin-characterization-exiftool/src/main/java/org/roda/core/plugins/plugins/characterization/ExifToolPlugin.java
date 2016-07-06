@@ -221,4 +221,8 @@ public class ExifToolPlugin extends AbstractPlugin<AIP> {
     return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CHARACTERIZATION);
   }
 
+  @Override
+  public List<Class<AIP>> getObjectClasses() {
+    return Arrays.asList(AIP.class);
+  }
 }

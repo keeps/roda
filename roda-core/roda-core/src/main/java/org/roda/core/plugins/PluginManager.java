@@ -36,9 +36,6 @@ import org.roda.core.util.ClassLoaderUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.classmate.ResolvedType;
-import com.fasterxml.classmate.TypeResolver;
-
 /**
  * This is the RODA plugin manager. It is responsible for loading {@link Plugin}
  * s.
@@ -138,13 +135,12 @@ public class PluginManager {
    * @return a {@link Plugin} or <code>null</code> if the specified classname if
    *         not a {@link Plugin}.
    */
-  private Plugin<? extends IsRODAObject> getPlugin(String pluginID) {
+  public Plugin<? extends IsRODAObject> getPlugin(String pluginID) {
     Plugin<? extends IsRODAObject> plugin = null;
 
     Plugin<? extends IsRODAObject> cachedInternalPlugin = internalPluginChache.get(pluginID);
     if (cachedInternalPlugin != null) {
       plugin = cachedInternalPlugin.cloneMe();
-      determineAndInjectPluginObjectClass(cachedInternalPlugin, plugin);
     }
 
     boolean internalPluginTakesPrecedence = RodaCoreFactory.getRodaConfiguration()
@@ -152,49 +148,9 @@ public class PluginManager {
     Plugin<? extends IsRODAObject> cachedExternalPlugin = externalPluginChache.get(pluginID);
     if ((plugin == null || !internalPluginTakesPrecedence) && cachedExternalPlugin != null) {
       plugin = cachedExternalPlugin.cloneMe();
-      determineAndInjectPluginObjectClass(cachedExternalPlugin, plugin);
     }
 
     return plugin;
-  }
-
-  private void determineAndInjectPluginObjectClass(Plugin<? extends IsRODAObject> cachedPlugin,
-    Plugin<? extends IsRODAObject> newPluginInstance) {
-    if (cachedPlugin.getObjectClass() != null) {
-      newPluginInstance.injectObjectClass((Class) cachedPlugin.getObjectClass());
-    } else {
-      List<ResolvedType> typeParametersFor = new TypeResolver().resolve(newPluginInstance.getClass())
-        .typeParametersFor(AbstractPlugin.class);
-      ResolvedType resolvedType = typeParametersFor.get(0);
-      Class<?> erasedType = resolvedType.getErasedType();
-      if (IsRODAObject.class.isAssignableFrom(erasedType)) {
-        cachedPlugin.injectObjectClass((Class) erasedType);
-        newPluginInstance.injectObjectClass((Class) erasedType);
-      }
-    }
-  }
-
-  public <T extends IsRODAObject> Plugin<T> getPlugin(String pluginID, String pluginObjectsClassName) {
-    Plugin<? extends IsRODAObject> plugin = getPlugin(pluginID);
-    if (plugin != null) {
-      if (plugin.getObjectClass() != null) {
-        LOGGER.warn(
-          "Asking for a Plugin with a certain objects class but the plugin has its own (plugin<{}> vs. asked<{}>)",
-          plugin.getObjectClass().getName(), pluginObjectsClassName);
-      } else {
-        try {
-          Class<?> pluginObjectsClass = Class.forName(pluginObjectsClassName);
-          if (IsRODAObject.class.isAssignableFrom(pluginObjectsClass)) {
-            return ((Plugin<T>) plugin).injectObjectClass((Class<T>) pluginObjectsClass);
-          }
-        } catch (ClassNotFoundException e) {
-          LOGGER.error(
-            "Unable to load class for returning new plugin instance of that Object type. Returning a generic one (without injecting Object Class)",
-            e);
-        }
-      }
-    }
-    return (Plugin<T>) plugin;
   }
 
   public <T extends IsRODAObject> Plugin<T> getPlugin(String pluginID, Class<T> pluginClass) {

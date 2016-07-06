@@ -267,4 +267,9 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
     return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
   }
 
+  @Override
+  public List<Class<Representation>> getObjectClasses() {
+    return Arrays.asList(Representation.class);
+  }
+
 }

@@ -24,18 +24,6 @@ public abstract class AbstractPlugin<T extends IsRODAObject> implements Plugin<T
   private Map<String, String> parameterValues = new HashMap<String, String>();
   private String version = null;
   private JobPluginInfo jobPluginInfo;
-  private Class<T> objectClass;
-
-  @Override
-  public Plugin<T> injectObjectClass(Class<T> objectClass) {
-    this.objectClass = objectClass;
-    return this;
-  }
-
-  @Override
-  public Class<T> getObjectClass() {
-    return objectClass;
-  }
 
   @Override
   public void injectJobPluginInfo(JobPluginInfo jobPluginInfo) {

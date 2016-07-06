@@ -840,4 +840,13 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
     return mimetypeToExtension;
   }
 
+  @Override
+  public List<Class<T>> getObjectClasses() {
+    List<Class<? extends IsRODAObject>> list = new ArrayList<>();
+    list.add(AIP.class);
+    list.add(Representation.class);
+    list.add(File.class);
+    return (List) list;
+  }
+
 }

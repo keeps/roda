@@ -169,7 +169,6 @@ public class FITSPlugin extends AbstractPlugin<AIP> {
     return report;
   }
 
-
   @Override
   public Plugin<AIP> cloneMe() {
     return new FITSPlugin();
@@ -222,6 +221,11 @@ public class FITSPlugin extends AbstractPlugin<AIP> {
   @Override
   public List<String> getCategories() {
     return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CHARACTERIZATION);
+  }
+
+  @Override
+  public List<Class<AIP>> getObjectClasses() {
+    return Arrays.asList(AIP.class);
   }
 
 }

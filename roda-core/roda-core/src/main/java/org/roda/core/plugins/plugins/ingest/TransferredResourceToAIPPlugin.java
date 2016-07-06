@@ -232,4 +232,9 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
     return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
   }
 
+  @Override
+  public List<Class<TransferredResource>> getObjectClasses() {
+    return Arrays.asList(TransferredResource.class);
+  }
+
 }

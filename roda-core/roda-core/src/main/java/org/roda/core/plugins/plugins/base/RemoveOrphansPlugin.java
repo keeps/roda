@@ -138,4 +138,9 @@ public class RemoveOrphansPlugin extends AbstractPlugin<IndexedAIP> {
     return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
   }
 
+  @Override
+  public List<Class<IndexedAIP>> getObjectClasses() {
+    return Arrays.asList(IndexedAIP.class);
+  }
+
 }

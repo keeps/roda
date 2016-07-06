@@ -196,4 +196,9 @@ public class ReindexAIPPlugin extends AbstractPlugin<AIP> {
   public List<String> getCategories() {
     return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_REINDEX);
   }
+
+  @Override
+  public List<Class<AIP>> getObjectClasses() {
+    return Arrays.asList(AIP.class);
+  }
 }

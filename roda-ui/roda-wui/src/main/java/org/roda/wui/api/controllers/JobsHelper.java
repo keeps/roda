@@ -7,6 +7,7 @@
  */
 package org.roda.wui.api.controllers;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.roda.core.RodaCoreFactory;
@@ -22,8 +23,10 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.SelectedItemsNone;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -53,8 +56,7 @@ public class JobsHelper {
   }
 
   private static void validateJobPluginInformation(Job job) throws RequestNotValidException {
-    Plugin<?> plugin = RodaCoreFactory.getPluginManager().getPlugin(job.getPlugin(),
-      job.getSourceObjects().getSelectedClass());
+    Plugin<? extends IsRODAObject> plugin = RodaCoreFactory.getPluginManager().getPlugin(job.getPlugin());
     if (plugin != null) {
       // validate parameters
       try {
@@ -67,15 +69,29 @@ public class JobsHelper {
         throw new RequestNotValidException("Invalid plugin parameters");
       }
 
-      // validate plugin class & objects class
-      String pluginClass = plugin.getObjectClass().getName();
-      String objectsClass = job.getSourceObjects().getSelectedClass();
-      if (!pluginClass.equals(objectsClass)) {
-        throw new RequestNotValidException("Plugin class and objects class do not match (plugin class: " + pluginClass
-          + "; objects class: " + objectsClass + ")");
-      }
+      validatePluginObjectsClasses(job, plugin);
     } else {
       throw new RequestNotValidException("No plugin was found with the id '" + job.getPlugin() + "'");
+    }
+  }
+
+  private static void validatePluginObjectsClasses(Job job, Plugin<? extends IsRODAObject> plugin)
+    throws RequestNotValidException {
+    if (!(job.getSourceObjects() instanceof SelectedItemsNone)) {
+      // validate plugin class & objects class
+      List<?> pluginObjectClasses = plugin.getObjectClasses();
+      String objectsClassName = job.getSourceObjects().getSelectedClass();
+      Class<?> objectsClass;
+      try {
+        objectsClass = Class.forName(objectsClassName);
+      } catch (ClassNotFoundException e) {
+        throw new RequestNotValidException("Plugin class and objects class do not match (plugin classes: "
+          + pluginObjectClasses + "; objects class: " + objectsClassName + ")");
+      }
+      if (!pluginObjectClasses.contains(objectsClass)) {
+        throw new RequestNotValidException("Plugin class and objects class do not match (plugin classes: "
+          + pluginObjectClasses + "; objects class: " + objectsClass + ")");
+      }
     }
   }
 
