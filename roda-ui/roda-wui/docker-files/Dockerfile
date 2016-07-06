@@ -12,10 +12,8 @@ COPY clamd.conf /etc/clamav/clamd.conf
 RUN mkdir -p /var/run/clamav && chown clamav /var/run/clamav && freshclam
 
 # Install web application
-ADD /roda-wui-* /usr/local/tomcat/webapps/ROOT.war
-RUN rm -rf /usr/local/tomcat/webapps/ROOT && \
-    unzip -q /usr/local/tomcat/webapps/ROOT.war -d /usr/local/tomcat/webapps/ROOT && \
-    rm /usr/local/tomcat/webapps/ROOT.war
+RUN rm -rf /usr/local/tomcat/webapps/ROOT
+ADD /ROOT /usr/local/tomcat/webapps/ROOT
 
 # Fix configuration
 RUN unzip -q /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/roda-core-*.jar config/roda-core.properties && \
