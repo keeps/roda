@@ -41,3 +41,18 @@
 2016-07-05 17:49:32,254 [main] INFO  com.arjuna.ats.arjuna - ARJUNA012170: TransactionStatusManager started on port 54372 and host 127.0.0.1 with service com.arjuna.ats.arjuna.recovery.ActionStatusService
 2016-07-05 17:50:30,099 [Thread-2] WARN  com.arjuna.ats.arjuna - ARJUNA012284: ShadowingStore::remove_state() - access problems on 0:ffff7f000101:edc0:577be51c:0 and /Recovery/TransactionStatusManager
 2016-07-05 17:50:30,134 [Thread-2] WARN  com.arjuna.ats.arjuna - ARJUNA012265: ShadowingStore::remove_state() - state 0:ffff7f000101:edc0:577be51c:0 does not exist for type /Recovery/TransactionStatusManager
+2016-07-06 10:24:26,244 [main] INFO  com.arjuna.ats.arjuna - ARJUNA012163: Starting service com.arjuna.ats.arjuna.recovery.ActionStatusService on port 34090
+2016-07-06 10:24:26,251 [main] INFO  com.arjuna.ats.arjuna - ARJUNA012337: TransactionStatusManagerItem host: 127.0.0.1 port: 34090
+2016-07-06 10:24:26,253 [main] INFO  com.arjuna.ats.arjuna - ARJUNA012170: TransactionStatusManager started on port 34090 and host 127.0.0.1 with service com.arjuna.ats.arjuna.recovery.ActionStatusService
+2016-07-06 10:24:53,205 [Thread-2] WARN  com.arjuna.ats.arjuna - ARJUNA012284: ShadowingStore::remove_state() - access problems on 0:ffff7f000101:8be9:577cce4a:0 and /Recovery/TransactionStatusManager
+2016-07-06 10:24:53,209 [Thread-2] WARN  com.arjuna.ats.arjuna - ARJUNA012265: ShadowingStore::remove_state() - state 0:ffff7f000101:8be9:577cce4a:0 does not exist for type /Recovery/TransactionStatusManager
+2016-07-06 10:31:35,930 [main] INFO  com.arjuna.ats.arjuna - ARJUNA012163: Starting service com.arjuna.ats.arjuna.recovery.ActionStatusService on port 36448
+2016-07-06 10:31:35,934 [main] INFO  com.arjuna.ats.arjuna - ARJUNA012337: TransactionStatusManagerItem host: 127.0.0.1 port: 36448
+2016-07-06 10:31:35,939 [main] INFO  com.arjuna.ats.arjuna - ARJUNA012170: TransactionStatusManager started on port 36448 and host 127.0.0.1 with service com.arjuna.ats.arjuna.recovery.ActionStatusService
+2016-07-06 10:32:03,032 [Thread-2] WARN  com.arjuna.ats.arjuna - ARJUNA012284: ShadowingStore::remove_state() - access problems on 0:ffff7f000101:8ed4:577ccff7:0 and /Recovery/TransactionStatusManager
+2016-07-06 10:32:03,034 [Thread-2] WARN  com.arjuna.ats.arjuna - ARJUNA012265: ShadowingStore::remove_state() - state 0:ffff7f000101:8ed4:577ccff7:0 does not exist for type /Recovery/TransactionStatusManager
+2016-07-06 10:33:51,412 [main] INFO  com.arjuna.ats.arjuna - ARJUNA012163: Starting service com.arjuna.ats.arjuna.recovery.ActionStatusService on port 42088
+2016-07-06 10:33:51,416 [main] INFO  com.arjuna.ats.arjuna - ARJUNA012337: TransactionStatusManagerItem host: 127.0.0.1 port: 42088
+2016-07-06 10:33:51,421 [main] INFO  com.arjuna.ats.arjuna - ARJUNA012170: TransactionStatusManager started on port 42088 and host 127.0.0.1 with service com.arjuna.ats.arjuna.recovery.ActionStatusService
+2016-07-06 10:34:18,199 [Thread-2] WARN  com.arjuna.ats.arjuna - ARJUNA012284: ShadowingStore::remove_state() - access problems on 0:ffff7f000101:b336:577cd07f:0 and /Recovery/TransactionStatusManager
+2016-07-06 10:34:18,211 [Thread-2] WARN  com.arjuna.ats.arjuna - ARJUNA012265: ShadowingStore::remove_state() - state 0:ffff7f000101:b336:577cd07f:0 does not exist for type /Recovery/TransactionStatusManager

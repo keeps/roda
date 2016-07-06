@@ -431,21 +431,18 @@ public class RodaCoreFactory {
   private static void copyFilesFromClasspath(String classpathPrefix, Path destinationDirectory,
     boolean removeClasspathPrefixFromFinalPath) {
 
-    LOGGER.info("Copy files from classpath prefix={}, destination={}, removePrefix={}", classpathPrefix,
-      destinationDirectory, removeClasspathPrefixFromFinalPath);
-
     List<ClassLoader> classLoadersList = new LinkedList<ClassLoader>();
     classLoadersList.add(ClasspathHelper.contextClassLoader());
 
-    LOGGER.info("Classloader list: {}", classLoadersList);
-
-    Set<String> resources = new Reflections(
+    Reflections reflections = new Reflections(
       new ConfigurationBuilder().filterInputsBy(new FilterBuilder().include(FilterBuilder.prefix(classpathPrefix)))
         .setScanners(new ResourcesScanner())
-        .setUrls(ClasspathHelper.forClassLoader(classLoadersList.toArray(new ClassLoader[5]))))
-          .getResources(Pattern.compile(".*"));
+        .setUrls(ClasspathHelper.forClassLoader(classLoadersList.toArray(new ClassLoader[] {}))));
 
-    LOGGER.info("Resources: {}", resources);
+    Set<String> resources = reflections.getResources(Pattern.compile(".*"));
+
+    LOGGER.info("Copy files from classpath prefix={}, destination={}, removePrefix={}, #resources={}", classpathPrefix,
+      destinationDirectory, removeClasspathPrefixFromFinalPath, resources.size());
 
     for (String resource : resources) {
       InputStream originStream = RodaCoreFactory.class.getClassLoader().getResourceAsStream(resource);
@@ -573,7 +570,7 @@ public class RodaCoreFactory {
       try {
         Path tempConfig = Files.createTempDirectory(RodaConstants.CORE_INDEX_FOLDER);
         copyFilesFromClasspath(RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER + "/",
-          tempConfig);
+          tempConfig, true);
 
         // instantiate solr
         solr = instantiateSolr(tempConfig);

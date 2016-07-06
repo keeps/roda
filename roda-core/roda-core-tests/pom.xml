@@ -28,6 +28,8 @@
 								<!-- DO NOT RUN ANY: e.g. -DrunSuite -->
 								<include>**/${runSuite}</include>
 							</includes>
+							<useSystemClassLoader>true</useSystemClassLoader>
+							<useManifestOnlyJar>false</useManifestOnlyJar>
 						</configuration>
 					</plugin>
 				</plugins>
@@ -239,6 +241,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		
+
 	</dependencies>
 </project>
