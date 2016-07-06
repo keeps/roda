@@ -85,7 +85,7 @@ public class EARKSIPToAIPPluginUtils {
 
     // FIXME 20160516 hsilva: put SIP inside the AIP
 
-    model.notifyAIPCreated(aipId);
+    model.notifyAIPUpdated(aipId);
 
     return model.retrieveAIP(aipId);
 

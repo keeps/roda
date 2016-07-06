@@ -13,12 +13,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+<<<<<<< HEAD
+=======
+import org.apache.jute.Index;
+import org.apache.poi.hpsf.IllegalPropertySetDataException;
+>>>>>>> Updates commmons-ip version. Throws exception when the IP Status is unkown.
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.index.IndexResult;
@@ -121,11 +127,10 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
         String computedParentId = PluginHelper.computeParentId(this, index, sipParentId);
 
         AIP aip;
-        if (sip.getStatus() == IPEnums.IPStatus.UPDATE) {
-          IndexResult<IndexedAIP> result = index.find(IndexedAIP.class,
-            new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, sip.getId())), Sorter.NONE,
-            new Sublist(0, 1));
-          if (result.getTotalCount() == 1) {
+
+        if(IPEnums.IPStatus.UPDATE == sip.getStatus()){
+          IndexResult<IndexedAIP> result = index.find(IndexedAIP.class, new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, sip.getId())), Sorter.NONE, new Sublist(0,1));
+          if(result.getTotalCount() == 1) {
             // Retrieve the AIP
             IndexedAIP indexedAIP = result.getResults().get(0);
             aip = EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP.getId(), earkSIPPath, model, storage,
@@ -134,10 +139,11 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
             // Fail to update since there's no AIP
             throw new NotFoundException("Unable to find AIP created with SIP ID: " + sip.getId());
           }
-        } else {
+        }else if (IPEnums.IPStatus.NEW == sip.getStatus()){
           // Create a new AIP
-          aip = EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, earkSIPPath, model, storage, sip.getId(),
-            reportItem.getJobId(), computedParentId);
+          aip = EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, earkSIPPath, model, storage, sip.getId(), reportItem.getJobId(), computedParentId);
+        }else {
+          throw new GenericException("Unknown IP Status: " + sip.getStatus());
         }
 
         PluginHelper.createSubmission(model, createSubmission, earkSIPPath, aip.getId());
