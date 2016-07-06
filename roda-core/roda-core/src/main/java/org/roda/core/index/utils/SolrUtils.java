@@ -586,7 +586,7 @@ public class SolrUtils {
 
   }
 
-  public static SolrInputDocument getDescriptiveMetataFields(Binary binary, String metadataType, String metadataVersion)
+  public static SolrInputDocument getDescriptiveMetadataFields(Binary binary, String metadataType, String metadataVersion)
     throws GenericException {
     SolrInputDocument doc;
     InputStream inputStream;
@@ -1158,7 +1158,7 @@ public class SolrUtils {
         StoragePath storagePath = ModelUtils.getDescriptiveMetadataPath(aip.getId(), metadata.getId());
         Binary binary = model.getStorage().getBinary(storagePath);
         try {
-          SolrInputDocument fields = getDescriptiveMetataFields(binary, metadata.getType(), metadata.getVersion());
+          SolrInputDocument fields = getDescriptiveMetadataFields(binary, metadata.getType(), metadata.getVersion());
           for (SolrInputField field : fields) {
             if (NON_REPEATABLE_FIELDS.contains(field.getName())) {
               boolean added = usedNonRepeatableFields.add(field.getName());
