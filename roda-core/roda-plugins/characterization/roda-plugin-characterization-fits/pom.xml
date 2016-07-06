@@ -31,18 +31,18 @@
 					</archive>
 					<appendAssemblyId>false</appendAssemblyId>
 					<descriptorRefs>
-					   	<descriptorRef>jar-with-dependencies</descriptorRef>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
-			  	</configuration>
-			  	<executions>
-			    	<execution>
-				      	<id>make-assembly</id>
-				      	<phase>package</phase>
-				      	<goals>
-				        	<goal>single</goal>
-				      	</goals>
-			    	</execution>
-			  </executions>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
@@ -54,6 +54,10 @@
 		<dependency>
 			<groupId>edu.harvard.hul.ois</groupId>
 			<artifactId>fits</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jdom</groupId>
+			<artifactId>jdom</artifactId>
 		</dependency>
 	</dependencies>
 </project>
