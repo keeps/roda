@@ -748,16 +748,6 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
     }
   }
 
-  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    return new Report();
-  }
-
-  public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    return new Report();
-  }
-
   @Override
   public PreservationEventType getPreservationEventType() {
     return PreservationEventType.MIGRATION;

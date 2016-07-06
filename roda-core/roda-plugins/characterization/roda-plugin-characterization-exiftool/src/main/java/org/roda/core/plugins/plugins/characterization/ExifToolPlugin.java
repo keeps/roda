@@ -126,7 +126,7 @@ public class ExifToolPlugin extends AbstractPlugin<AIP> {
               }
 
               FSUtils.deletePath(metadata);
-            } catch (RODAException | IOException | CommandException e) {
+            } catch (RODAException | IOException e) {
               LOGGER.error("Error processing AIP {}: {}", aip.getId(), e.getMessage());
               reportState = PluginState.FAILURE;
               validationReport.addIssue(new ValidationIssue(e.getMessage()));
@@ -165,20 +165,6 @@ public class ExifToolPlugin extends AbstractPlugin<AIP> {
     }
 
     return report;
-  }
-
-  @Override
-  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-
-    return null;
-  }
-
-  @Override
-  public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-
-    return null;
   }
 
   @Override

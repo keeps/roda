@@ -139,7 +139,7 @@ public class MediaInfoPlugin extends AbstractPlugin<AIP> {
                 model.createOtherMetadata(aip.getId(), representation.getId(), directoryPath, fileId, ".xml",
                   RodaConstants.OTHER_METADATA_TYPE_MEDIAINFO, payload, inotify);
               }
-            } catch (RODAException | IOException | CommandException | XPathExpressionException
+            } catch (RODAException | IOException | XPathExpressionException
               | ParserConfigurationException | SAXException | TransformerFactoryConfigurationError
               | TransformerException e) {
               LOGGER.error("Error processing AIP {}: {}", aip.getId(), e.getMessage());
@@ -219,20 +219,6 @@ public class MediaInfoPlugin extends AbstractPlugin<AIP> {
     Document doc = db.parse(is);
     NodeList nodes = doc.getElementsByTagName("Complete_name");
     return nodes.item(0).getTextContent();
-  }
-
-  @Override
-  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-
-    return null;
-  }
-
-  @Override
-  public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-
-    return null;
   }
 
   @Override

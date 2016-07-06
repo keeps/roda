@@ -169,19 +169,6 @@ public class FITSPlugin extends AbstractPlugin<AIP> {
     return report;
   }
 
-  @Override
-  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-
-    return null;
-  }
-
-  @Override
-  public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-
-    return null;
-  }
 
   @Override
   public Plugin<AIP> cloneMe() {
