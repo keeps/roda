@@ -32,7 +32,6 @@ import org.roda.core.storage.InputStreamContentPayload.ProvidesInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.drew.metadata.MetadataException;
 
 /**
  * This is an utility class for metadata helpers.

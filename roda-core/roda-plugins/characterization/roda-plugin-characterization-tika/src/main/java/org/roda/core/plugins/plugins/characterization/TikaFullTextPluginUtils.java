@@ -16,6 +16,10 @@ import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.Tika;
 import org.apache.tika.metadata.Metadata;
+import org.jdom2.Element;
+import org.jdom2.IllegalDataException;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.MetadataFileUtils;
 import org.roda.core.common.PremisV3Utils;
@@ -96,7 +100,7 @@ public class TikaFullTextPluginUtils {
 
           try {
             if (doFeatureExtraction && metadata != null && metadata.size() > 0) {
-              String metadataAsString = MetadataFileUtils.generateMetadataFile(metadata);
+              String metadataAsString = generateMetadataFile(metadata);
               ContentPayload metadataAsPayload = new StringContentPayload(metadataAsString);
               model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(),
                 RodaConstants.TIKA_FILE_SUFFIX_METADATA, RodaConstants.OTHER_METADATA_TYPE_APACHE_TIKA,
@@ -137,6 +141,35 @@ public class TikaFullTextPluginUtils {
     }
     IOUtils.closeQuietly(allFiles);
     return reportItem;
+  }
+
+  private static String generateMetadataFile(Metadata metadata) throws IOException {
+    try {
+      String[] names = metadata.names();
+      Element root = new Element("metadata");
+      org.jdom2.Document doc = new org.jdom2.Document();
+
+      for (String name : names) {
+        String[] values = metadata.getValues(name);
+        if (values != null && values.length > 0) {
+          for (String value : values) {
+            Element child = new Element("field");
+            child.setAttribute("name", MetadataFileUtils.escapeAttribute(name));
+            child.addContent(MetadataFileUtils.escapeContent(value));
+            root.addContent(child);
+          }
+
+        }
+      }
+      doc.setRootElement(root);
+      XMLOutputter outter = new XMLOutputter();
+      outter.setFormat(Format.getPrettyFormat());
+      outter.outputString(doc);
+      return outter.outputString(doc);
+    } catch (IllegalDataException e) {
+      LOGGER.debug("Error generating Tika metadata file {}", e.getMessage());
+      return "";
+    }
   }
 
 }

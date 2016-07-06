@@ -24,7 +24,7 @@ import java.security.cert.CertificateException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.pdfbox.io.IOUtils;
+import org.apache.commons.io.IOUtils;
 import org.bouncycastle.cms.CMSException;
 import org.roda.common.certification.ODFSignatureUtils;
 import org.roda.common.certification.OOXMLSignatureUtils;

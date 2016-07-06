@@ -22,7 +22,6 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.apache.tika.metadata.Metadata;
 import org.jdom2.Element;
 import org.jdom2.IllegalDataException;
 import org.jdom2.output.Format;
@@ -43,35 +42,6 @@ import gov.loc.repository.bagit.BagInfoTxt;
 
 public class MetadataFileUtils {
   private static Logger LOGGER = LoggerFactory.getLogger(MetadataFileUtils.class);
-
-  public static String generateMetadataFile(Metadata metadata) throws IOException {
-    try {
-      String[] names = metadata.names();
-      Element root = new Element("metadata");
-      org.jdom2.Document doc = new org.jdom2.Document();
-
-      for (String name : names) {
-        String[] values = metadata.getValues(name);
-        if (values != null && values.length > 0) {
-          for (String value : values) {
-            Element child = new Element("field");
-            child.setAttribute("name", escapeAttribute(name));
-            child.addContent(escapeContent(value));
-            root.addContent(child);
-          }
-
-        }
-      }
-      doc.setRootElement(root);
-      XMLOutputter outter = new XMLOutputter();
-      outter.setFormat(Format.getPrettyFormat());
-      outter.outputString(doc);
-      return outter.outputString(doc);
-    } catch (IllegalDataException e) {
-      LOGGER.debug("Error generating Tika metadata file {}", e.getMessage());
-      return "";
-    }
-  }
 
   public static String generateMetadataFile(BagInfoTxt bagInfoTxt) throws IOException {
     try {
@@ -139,15 +109,13 @@ public class MetadataFileUtils {
     }
     return otherProperties;
   }
-  
-  public static String escapeAttribute(String value){
+
+  public static String escapeAttribute(String value) {
     return XmlEscapers.xmlAttributeEscaper().escape(value);
   }
-  
-  public static String escapeContent(String value){
+
+  public static String escapeContent(String value) {
     return XmlEscapers.xmlContentEscaper().escape(value);
   }
-  
-  
 
 }

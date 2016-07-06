@@ -190,6 +190,14 @@
 					<artifactId>*</artifactId>
 					<groupId>org.eclipse.jetty</groupId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.apache.hadoop</groupId>
+					<artifactId>hadoop-hdfs</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.hadoop</groupId>
+					<artifactId>hadoop-common</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -242,10 +250,6 @@
 			<groupId>org.apache.directory.server</groupId>
 			<artifactId>apacheds-all-shaded</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>net.sf.ehcache</groupId>
-			<artifactId>ehcache</artifactId>
-		</dependency>
 		<!-- / FEDORA TESTING GEAR -->
 		<!-- Akka related dependencies - start -->
 		<dependency>
@@ -287,28 +291,28 @@
 			<groupId>gov.loc</groupId>
 			<artifactId>bagit</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.tika</groupId>
-			<artifactId>tika-parsers</artifactId>
-			<exclusions>
-				<exclusion>
-					<artifactId>bcmail-jdk15on</artifactId>
-					<groupId>org.bouncycastle</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>bcpkix-jdk15on</artifactId>
-					<groupId>org.bouncycastle</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>bcprov-jdk15on</artifactId>
-					<groupId>org.bouncycastle</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.tika</groupId>
-			<artifactId>tika-core</artifactId>
-		</dependency>
+		<!-- <dependency> -->
+		<!-- <groupId>org.apache.tika</groupId> -->
+		<!-- <artifactId>tika-parsers</artifactId> -->
+		<!-- <exclusions> -->
+		<!-- <exclusion> -->
+		<!-- <artifactId>bcmail-jdk15on</artifactId> -->
+		<!-- <groupId>org.bouncycastle</groupId> -->
+		<!-- </exclusion> -->
+		<!-- <exclusion> -->
+		<!-- <artifactId>bcpkix-jdk15on</artifactId> -->
+		<!-- <groupId>org.bouncycastle</groupId> -->
+		<!-- </exclusion> -->
+		<!-- <exclusion> -->
+		<!-- <artifactId>bcprov-jdk15on</artifactId> -->
+		<!-- <groupId>org.bouncycastle</groupId> -->
+		<!-- </exclusion> -->
+		<!-- </exclusions> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.apache.tika</groupId> -->
+		<!-- <artifactId>tika-core</artifactId> -->
+		<!-- </dependency> -->
 		<!-- Plugins related dependencies - end -->
 		<dependency>
 			<groupId>com.github.spullara.mustache.java</groupId>
@@ -325,6 +329,14 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-csv</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jdom</groupId>
+			<artifactId>jdom2</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
 		</dependency>
 	</dependencies>
 </project>
