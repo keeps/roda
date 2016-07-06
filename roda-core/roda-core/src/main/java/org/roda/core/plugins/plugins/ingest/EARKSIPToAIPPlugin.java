@@ -9,36 +9,49 @@ package org.roda.core.plugins.plugins.ingest;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-<<<<<<< HEAD
-=======
+
+import org.apache.directory.api.ldap.aci.Permission;
 import org.apache.jute.Index;
 import org.apache.poi.hpsf.IllegalPropertySetDataException;
->>>>>>> Updates commmons-ip version. Throws exception when the IP Status is unkown.
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.Directory;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.StorageServiceUtils;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda_project.commons_ip.model.SIP;
 import org.roda_project.commons_ip.model.impl.eark.EARKSIP;
@@ -120,10 +133,10 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
     try {
       sip = EARKSIP.parse(earkSIPPath, RodaCoreFactory.getWorkingDirectory());
       reportItem.setSourceObjectOriginalId(sip.getId());
+      createAncestors(sip, index, model, storage);
 
       if (sip.getValidationReport().isValid()) {
-        // FIXME 20160706 hsilva: process the whole list of ancestors
-        String sipParentId = sip.getAncestors().isEmpty() ? "" : sip.getAncestors().get(0);
+        String sipParentId = sip.getAncestors() != null && sip.getAncestors().isEmpty() ? "" : sip.getAncestors().get(0);
         String computedParentId = PluginHelper.computeParentId(this, index, sipParentId);
 
         AIP aip;
@@ -151,7 +164,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
         createUnpackingEventSuccess(model, index, transferredResource, aip, UNPACK_DESCRIPTION);
         reportItem.setOutcomeObjectId(aip.getId()).setPluginState(PluginState.SUCCESS);
 
-        if (sip.getAncestors() != null && aip.getParentId() == null) {
+        if (sip.getAncestors() != null && !sip.getAncestors().isEmpty() && aip.getParentId() == null) {
           reportItem.setPluginDetails(String.format("Parent with id '%s' not found", sipParentId));
         }
         createWellformedEventSuccess(model, index, transferredResource, aip);
@@ -172,6 +185,39 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
         if (!sip.getBasePath().toAbsolutePath().toString().startsWith(transferredResourcesAbsolutePath.toString())) {
           FSUtils.deletePathQuietly(sip.getBasePath());
         }
+      }
+    }
+  }
+
+  private void createAncestors(SIP sip, IndexService index, ModelService model, StorageService storage)
+          throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException, AlreadyExistsException, ValidationException {
+    List<String> ancestors = new ArrayList<>(sip.getAncestors());
+    if(ancestors.isEmpty())
+      return;
+    // Reverse list so that the top ancestors come first
+    Collections.reverse(ancestors);
+    String parent = null;
+
+    for (String ancestor : ancestors) {
+      try {
+        model.retrieveAIP(ancestor);
+        parent = ancestor;
+      } catch (NotFoundException e) {
+        Job currentJob = PluginHelper.getJobFromIndex(this, index);
+        if(currentJob == null){
+          throw new GenericException("Job is null");
+        }
+        String username = currentJob.getUsername();
+        Permissions permissions = new Permissions();
+
+        permissions.setUserPermissions(username, new HashSet<>(Arrays.asList(
+                Permissions.PermissionType.CREATE,
+                Permissions.PermissionType.READ,
+                Permissions.PermissionType.UPDATE,
+                Permissions.PermissionType.DELETE,
+                Permissions.PermissionType.GRANT)));
+        model.createAIP(ancestor, parent, "", permissions, true);
+        parent = ancestor;
       }
     }
   }
