@@ -1813,6 +1813,11 @@ public class SolrUtils {
     doc.addField(RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_VALUE,
       risk.getMitigationRelatedEventIdentifierValue());
 
+    doc.addField(RodaConstants.RISK_CREATED_ON, risk.getCreatedOn());
+    doc.addField(RodaConstants.RISK_CREATED_BY, risk.getCreatedBy());
+    doc.addField(RodaConstants.RISK_UPDATED_ON, risk.getUpdatedOn());
+    doc.addField(RodaConstants.RISK_UPDATED_BY, risk.getUpdatedBy());
+
     if (risk instanceof IndexedRisk) {
       doc.addField(RodaConstants.RISK_OBJECTS_SIZE, ((IndexedRisk) risk).getObjectsSize());
     } else {
@@ -1854,6 +1859,11 @@ public class SolrUtils {
       objectToString(doc.get(RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_TYPE)));
     risk.setMitigationRelatedEventIdentifierValue(
       objectToString(doc.get(RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_VALUE)));
+
+    risk.setCreatedOn(objectToDate(doc.get(RodaConstants.RISK_CREATED_ON)));
+    risk.setCreatedBy(objectToString(doc.get(RodaConstants.RISK_CREATED_BY)));
+    risk.setUpdatedOn(objectToDate(doc.get(RodaConstants.RISK_UPDATED_ON)));
+    risk.setUpdatedBy(objectToString(doc.get(RodaConstants.RISK_UPDATED_BY)));
 
     risk.setObjectsSize(objectToInteger(doc.get(RodaConstants.RISK_OBJECTS_SIZE), 0));
     return risk;

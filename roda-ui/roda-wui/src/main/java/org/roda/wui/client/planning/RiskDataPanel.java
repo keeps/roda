@@ -471,7 +471,6 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     risk.setMitigationRelatedEventIdentifierValue(mitigationRelatedEventIdentifierValue.getText());
 
     risk.setObjectsSize(this.riskCounter);
-
     return risk;
   }
 

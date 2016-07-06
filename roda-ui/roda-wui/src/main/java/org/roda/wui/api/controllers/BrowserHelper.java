@@ -306,7 +306,7 @@ public class BrowserHelper {
       if (metadataTypeBundle != null) {
         values = metadataTypeBundle.getValues();
         template = metadataTypeBundle.getTemplate();
-        if(values != null) {
+        if (values != null) {
           for (MetadataValue mv : values) {
             // clear the auto-generated values
             // mv.set("value", null);
@@ -1472,14 +1472,18 @@ public class BrowserHelper {
 
   }
 
-  public static Risk addRisk(Risk risk, boolean commit) throws GenericException, RequestNotValidException {
+  public static Risk addRisk(Risk risk, RodaUser user, boolean commit)
+    throws GenericException, RequestNotValidException {
+    risk.setCreatedBy(user.getName());
+    risk.setUpdatedBy(user.getName());
     Risk createdRisk = RodaCoreFactory.getModelService().createRisk(risk, commit);
     RodaCoreFactory.getIndexService().commit(IndexedRisk.class);
     return createdRisk;
   }
 
-  public static void modifyRisk(Risk risk, String message, boolean commit)
+  public static void modifyRisk(Risk risk, RodaUser user, String message, boolean commit)
     throws GenericException, RequestNotValidException {
+    risk.setUpdatedBy(user.getName());
     RodaCoreFactory.getModelService().updateRisk(risk, message, commit);
     RodaCoreFactory.getIndexService().commit(IndexedRisk.class);
   }

@@ -51,6 +51,11 @@ public class Risk extends NamedIndexedModel implements IsRODAObject {
   private String mitigationRelatedEventIdentifierType = null;
   private String mitigationRelatedEventIdentifierValue = null;
 
+  private Date createdOn = null;
+  private String createdBy = null;
+  private Date updatedOn = null;
+  private String updatedBy = null;
+
   public Risk() {
     super();
     this.identifiedOn = new Date();
@@ -267,6 +272,38 @@ public class Risk extends NamedIndexedModel implements IsRODAObject {
     this.mitigationRelatedEventIdentifierValue = mitigationRelatedEventIdentifierValue;
   }
 
+  public Date getCreatedOn() {
+    return createdOn;
+  }
+
+  public void setCreatedOn(Date createdOn) {
+    this.createdOn = createdOn;
+  }
+
+  public String getCreatedBy() {
+    return createdBy;
+  }
+
+  public void setCreatedBy(String createdBy) {
+    this.createdBy = createdBy;
+  }
+
+  public Date getUpdatedOn() {
+    return updatedOn;
+  }
+
+  public void setUpdatedOn(Date updatedOn) {
+    this.updatedOn = updatedOn;
+  }
+
+  public String getUpdatedBy() {
+    return updatedBy;
+  }
+
+  public void setUpdatedBy(String updatedBy) {
+    this.updatedBy = updatedBy;
+  }
+
   @Override
   public String toString() {
     return "Risk [id=" + super.getId() + ", name=" + super.getName() + ", description=" + description
@@ -278,7 +315,8 @@ public class Risk extends NamedIndexedModel implements IsRODAObject {
       + posMitigationNotes + ", mitigationStrategy=" + mitigationStrategy + ", mitigationOwnerType="
       + mitigationOwnerType + ", mitigationOwner=" + mitigationOwner + ", mitigationRelatedEventIdentifierType="
       + mitigationRelatedEventIdentifierType + ", mitigationRelatedEventIdentifierValue="
-      + mitigationRelatedEventIdentifierValue + "]";
+      + mitigationRelatedEventIdentifierValue + ", createdOn=" + createdOn + ", createdBy=" + createdBy + ", updatedOn="
+      + updatedOn + ", updatedBy=" + updatedBy + "]";
   }
 
   @JsonIgnore

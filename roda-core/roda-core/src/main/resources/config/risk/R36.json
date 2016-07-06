@@ -19,5 +19,9 @@
 	"posMitigationSeverityLevel": "MODERATE",
 	"identifiedOn": "1459465200000",
 	"mitigationRelatedEventIdentifierType": "",
-	"mitigationRelatedEventIdentifierValue": ""      
+	"mitigationRelatedEventIdentifierValue": "",
+	"createdOn": "1459465200000",
+	"createdBy": "admin",
+	"updatedOn": "1459465200000",
+	"updatedBy": "admin",  
 }

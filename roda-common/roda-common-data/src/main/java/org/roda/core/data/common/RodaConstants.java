@@ -538,6 +538,11 @@ public final class RodaConstants {
   public static final String RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_VALUE = "mitigationRelatedEventIdentifierValue";
   public static final String RISK_OBJECTS_SIZE = "objectsSize";
 
+  public static final String RISK_CREATED_ON = "createdOn";
+  public static final String RISK_CREATED_BY = "createdBy";
+  public static final String RISK_UPDATED_ON = "updatedOn";
+  public static final String RISK_UPDATED_BY = "updatedBy";
+
   public static final String RISK_FILE_EXTENSION = ".json";
   public static final String RISK_SEARCH = "search";
 

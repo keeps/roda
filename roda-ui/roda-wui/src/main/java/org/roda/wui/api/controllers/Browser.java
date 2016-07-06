@@ -1084,7 +1084,7 @@ public class Browser extends RodaCoreService {
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
 
     // delegate
-    BrowserHelper.modifyRisk(risk, message, false);
+    BrowserHelper.modifyRisk(risk, user, message, false);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
@@ -1129,7 +1129,7 @@ public class Browser extends RodaCoreService {
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
 
     // delegate
-    Risk ret = BrowserHelper.addRisk(risk, true);
+    Risk ret = BrowserHelper.addRisk(risk, user, true);
 
     // register action
     long duration = new Date().getTime() - start.getTime();

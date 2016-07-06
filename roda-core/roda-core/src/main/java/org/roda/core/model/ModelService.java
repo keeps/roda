@@ -1552,6 +1552,10 @@ public class ModelService extends ModelObservable {
       if (risk.getId() == null) {
         risk.setId(UUID.randomUUID().toString());
       }
+
+      risk.setCreatedOn(new Date());
+      risk.setUpdatedOn(new Date());
+
       String riskAsJson = JsonUtils.getJsonFromObject(risk);
       StoragePath riskPath = ModelUtils.getRiskStoragePath(risk.getId());
       storage.createBinary(riskPath, new StringContentPayload(riskAsJson), false);
@@ -1566,6 +1570,8 @@ public class ModelService extends ModelObservable {
 
   public void updateRisk(Risk risk, String message, boolean commit) throws GenericException {
     try {
+      risk.setUpdatedOn(new Date());
+
       String riskAsJson = JsonUtils.getJsonFromObject(risk);
       StoragePath riskPath = ModelUtils.getRiskStoragePath(risk.getId());
 
