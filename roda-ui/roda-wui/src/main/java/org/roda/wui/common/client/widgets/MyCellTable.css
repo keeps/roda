@@ -50,20 +50,21 @@
 	border-color: #f8f8f8;
 }
 
-.cellTableHoveredRow {
-	background: #eee;
-}
-
-.cellTableHoveredRowCell {
-	border-color: #eee;
-}
-
 .cellTableSelectedRow {
 	background: #5bbeff;
 }
 
 .cellTableSelectedRowCell {
 	border-color: #5bbeff;
+}
+
+.cellTableHoveredRow {
+	background: #eee;
+	color: black;
+}
+
+.cellTableHoveredRowCell {
+	border-color: #eee;
 }
 
 @external .cellTableFadeOut;

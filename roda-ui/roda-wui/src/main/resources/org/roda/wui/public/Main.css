@@ -3527,17 +3527,16 @@ td.datePickerMonth, td.datePickerYear {
     margin-bottom: 2px;
 }
 
-.viewRepresentation .my-files-table .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableOddRow {
-    background: white;
-    border: none;
-}
-
 .viewRepresentation .my-files-table .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableOddRowCell {
     border: 2px solid white;
 }
 
 .viewRepresentation .my-files-table .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableHoveredRow {
     background: #eee;
+}
+
+.viewRepresentation .my-files-table .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableSelectedRow .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableOddRowCell {
+    border: 2px solid #5bbeff;
 }
 
 .viewRepresentation .my-files-table .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableHoveredRow .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableOddRowCell {
