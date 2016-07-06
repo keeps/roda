@@ -171,6 +171,16 @@
 			</modules>
 		</profile>
 		<profile>
+			<id>core</id>
+			<modules>
+				<module>roda-common</module>
+				<module>roda-core/roda-core</module>
+				<module>roda-core/roda-core-tests</module>
+				<module>roda-core/roda-plugins/roda-plugin-common</module>
+				<module>roda-core/roda-plugins/roda-plugin-common-tests</module>
+			</modules>
+		</profile>
+		<profile>
 			<id>wui-with-cas</id>
 			<modules>
 				<module>roda-common</module>
@@ -1016,7 +1026,7 @@
 				<artifactId>commons-compress</artifactId>
 				<version>1.11</version>
 			</dependency>
-			<!-- JOD CONVERTER -->		
+			<!-- JOD CONVERTER -->
 			<dependency>
 				<groupId>xalan</groupId>
 				<artifactId>xalan</artifactId>
