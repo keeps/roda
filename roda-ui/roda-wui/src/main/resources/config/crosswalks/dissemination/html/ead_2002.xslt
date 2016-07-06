@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xsl:stylesheet  [
+	<!ENTITY crarr  "&#13;">
+	<!ENTITY crarr  "&#xD;">
+]>
 <xsl:stylesheet version="2.0"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ead="urn:isbn:1-931666-22-9"
 	exclude-result-prefixes="ead">
@@ -6,6 +10,7 @@
 		omit-xml-declaration="yes" />
 
 	<xsl:param name="i18n.title" />
+	<xsl:param name="i18n.titletype" />
 	<xsl:param name="i18n.level" />
 	<xsl:param name="i18n.initialdate" />
 	<xsl:param name="i18n.finaldate" />
@@ -65,6 +70,16 @@
 				</div>
 				<div class="value">
 					<xsl:value-of select="ead:did/ead:unittitle/text()" />
+				</div>
+			</div>
+		</xsl:if>
+		<xsl:if test="ead:did/ead:unittitle/@type">
+			<div class="field">
+				<div class="label">
+					<xsl:value-of select="$i18n.titletype" />
+				</div>
+				<div class="value">
+					<xsl:value-of select="ead:did/ead:unittitle/@type" />
 				</div>
 			</div>
 		</xsl:if>
@@ -651,7 +666,7 @@
 					<xsl:value-of select="$i18n.description" />
 				</div>
 				<div class="value">
-					<xsl:value-of select="ead:scopecontent/ead:p/text()" />
+					<xsl:value-of select="ead:scopecontent/ead:p/text()"/>
 				</div>
 			</div>
 		</xsl:if>

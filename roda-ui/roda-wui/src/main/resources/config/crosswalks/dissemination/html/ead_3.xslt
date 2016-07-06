@@ -6,6 +6,7 @@
 		omit-xml-declaration="yes" />
 
 	<xsl:param name="i18n.title" />
+	<xsl:param name="i18n.titletype" />
 	<xsl:param name="i18n.level" />
 	<xsl:param name="i18n.initialdate" />
 	<xsl:param name="i18n.finaldate" />
@@ -92,6 +93,16 @@
 				</div>
 				<div class="value">
 					<xsl:value-of select="ead:did/ead:unittitle/text()" />
+				</div>
+			</div>
+		</xsl:if>
+		<xsl:if test="ead:did/ead:unittitle/@type">
+			<div class="field">
+				<div class="label">
+					<xsl:value-of select="$i18n.titletype" />
+				</div>
+				<div class="value">
+					<xsl:value-of select="ead:did/ead:unittitle/@type" />
 				</div>
 			</div>
 		</xsl:if>
