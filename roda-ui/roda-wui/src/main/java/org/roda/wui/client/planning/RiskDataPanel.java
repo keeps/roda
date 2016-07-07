@@ -155,6 +155,9 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
   private int riskCounter;
   private RiskIncidenceList incidenceList;
 
+  private Date createdOn;
+  private String createdBy;
+
   /**
    * Create a new user data panel
    *
@@ -421,11 +424,14 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     this.mitigationRelatedEventIdentifierType.setText(risk.getMitigationRelatedEventIdentifierType());
     this.mitigationRelatedEventIdentifierValue.setText(risk.getMitigationRelatedEventIdentifierValue());
 
+    this.createdOn = risk.getCreatedOn();
+    this.createdBy = risk.getCreatedBy();
+
     this.riskCounter = risk.getObjectsSize();
   }
 
-  public IndexedRisk getRisk() {
-    IndexedRisk risk = new IndexedRisk();
+  public Risk getRisk() {
+    Risk risk = new Risk();
     if (idBox.isVisible() && idBox.getText() != null && !idBox.getText().equals("")) {
       risk.setId(idBox.getText());
     }
@@ -470,7 +476,12 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     risk.setMitigationRelatedEventIdentifierType(mitigationRelatedEventIdentifierType.getText());
     risk.setMitigationRelatedEventIdentifierValue(mitigationRelatedEventIdentifierValue.getText());
 
-    risk.setObjectsSize(this.riskCounter);
+    if (editmode) {
+      risk.setCreatedOn(createdOn);
+      risk.setCreatedBy(createdBy);
+    }
+
+    // risk.setObjectsSize(this.riskCounter);
     return risk;
   }
 

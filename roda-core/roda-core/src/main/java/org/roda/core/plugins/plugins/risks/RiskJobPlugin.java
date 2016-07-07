@@ -24,16 +24,19 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
-import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -55,7 +58,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Hélder Silva <hsilva@keep.pt>
  */
-public class RiskJobPlugin extends AbstractPlugin<Risk> {
+public class RiskJobPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(RiskJobPlugin.class);
 
   private static String riskIds = null;
@@ -100,7 +103,7 @@ public class RiskJobPlugin extends AbstractPlugin<Risk> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<Risk> resources)
+  public Report execute(IndexService index, ModelService model, StorageService storage, List<T> resources)
     throws PluginException {
     return executePlugin(index, model, storage, resources);
   }
@@ -271,7 +274,7 @@ public class RiskJobPlugin extends AbstractPlugin<Risk> {
   }
 
   @Override
-  public Plugin<Risk> cloneMe() {
+  public Plugin<T> cloneMe() {
     return new RiskJobPlugin();
   }
 
@@ -306,7 +309,11 @@ public class RiskJobPlugin extends AbstractPlugin<Risk> {
   }
 
   @Override
-  public List<Class<Risk>> getObjectClasses() {
-    return Arrays.asList(Risk.class);
+  public List<Class<T>> getObjectClasses() {
+    List<Class<? extends IsRODAObject>> list = new ArrayList<>();
+    list.add(IndexedAIP.class);
+    list.add(IndexedRepresentation.class);
+    list.add(IndexedFile.class);
+    return (List) list;
   }
 }

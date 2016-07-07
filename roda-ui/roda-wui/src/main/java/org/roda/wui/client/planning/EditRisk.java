@@ -81,7 +81,7 @@ public class EditRisk extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  private IndexedRisk risk;
+  private Risk risk;
   private static ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField

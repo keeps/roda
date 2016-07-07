@@ -586,8 +586,8 @@ public class SolrUtils {
 
   }
 
-  public static SolrInputDocument getDescriptiveMetadataFields(Binary binary, String metadataType, String metadataVersion)
-    throws GenericException {
+  public static SolrInputDocument getDescriptiveMetadataFields(Binary binary, String metadataType,
+    String metadataVersion) throws GenericException {
     SolrInputDocument doc;
     InputStream inputStream;
     String xsltFilename = null;
