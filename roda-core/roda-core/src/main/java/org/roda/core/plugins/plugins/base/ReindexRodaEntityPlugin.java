@@ -32,6 +32,7 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
@@ -112,7 +113,7 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
         if (!resource.isDirectory()) {
           Binary binary = (Binary) resource;
           InputStream inputStream = binary.getContent().createInputStream();
-          String jsonString = IOUtils.toString(inputStream);
+          String jsonString = IOUtils.toString(inputStream, RodaConstants.DEFAULT_ENCODING);
           T object = JsonUtils.getObjectFromJson(jsonString, clazz);
           IOUtils.closeQuietly(inputStream);
           index.reindex(clazz, object);
@@ -207,6 +208,7 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
     list.add(Format.class);
     list.add(Notification.class);
     list.add(Risk.class);
+    list.add(RiskIncidence.class);
     return (List) list;
   }
 

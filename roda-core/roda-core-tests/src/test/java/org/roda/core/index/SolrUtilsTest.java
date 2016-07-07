@@ -12,8 +12,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -24,9 +26,11 @@ import org.apache.solr.client.solrj.SolrQuery.SortClause;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
 import org.hamcrest.Matchers;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.roda.core.CorporaConstants;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import org.roda.core.data.adapter.filter.DateIntervalFilterParameter;
 import org.roda.core.data.adapter.filter.DateRangeFilterParameter;
@@ -58,6 +62,20 @@ public class SolrUtilsTest {
     URL corporaURL = IndexServiceTest.class.getResource("/corpora");
     Path corporaPath = Paths.get(corporaURL.toURI());
     corporaService = new FileStorageService(corporaPath);
+  }
+
+  @Before
+  public void init() throws IOException, GenericException {
+    Path basePath = Files.createTempDirectory(getClass().getSimpleName());
+    System.setProperty("roda.home", basePath.toString());
+
+    boolean deploySolr = false;
+    boolean deployLdap = false;
+    boolean deployFolderMonitor = false;
+    boolean deployOrchestrator = false;
+    boolean deployPluginManager = false;
+    RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
+      deployPluginManager);
   }
 
   @Test

@@ -109,7 +109,7 @@ public class ModelServiceTest {
 
   @Before
   public void init() throws IOException, GenericException {
-    basePath = Files.createTempDirectory("modelTests");
+    basePath = Files.createTempDirectory(getClass().getSimpleName());
     System.setProperty("roda.home", basePath.toString());
 
     boolean deploySolr = false;
