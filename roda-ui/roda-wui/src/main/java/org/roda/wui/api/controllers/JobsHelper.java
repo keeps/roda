@@ -103,7 +103,7 @@ public class JobsHelper {
 
     // ask plugin orchestrator to execute the job (which will be executed
     // asynchronously)
-    RodaCoreFactory.getPluginOrchestrator().executeJob(updatedJob);
+    RodaCoreFactory.getPluginOrchestrator().executeJob(updatedJob, true);
 
     // force commit
     RodaCoreFactory.getIndexService().commit(Job.class);
@@ -133,7 +133,7 @@ public class JobsHelper {
     Job job = RodaCoreFactory.getModelService().retrieveJob(jobId);
 
     // ask plugin orchestrator to execute the job
-    RodaCoreFactory.getPluginOrchestrator().executeJob(job);
+    RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
 
     return job;
   }

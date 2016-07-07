@@ -16,6 +16,7 @@ import org.roda.core.plugins.plugins.PluginHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 
 public class AkkaJobStateInfoActor extends UntypedActor {
@@ -23,10 +24,12 @@ public class AkkaJobStateInfoActor extends UntypedActor {
 
   private JobInfo jobInfo;
   private Plugin<?> plugin;
+  private ActorRef jobCreator;
 
-  public AkkaJobStateInfoActor(Plugin<?> plugin) {
+  public AkkaJobStateInfoActor(Plugin<?> plugin, ActorRef jobCreator) {
     jobInfo = new JobInfo();
     this.plugin = plugin;
+    this.jobCreator = jobCreator;
   }
 
   @Override
@@ -54,6 +57,7 @@ public class AkkaJobStateInfoActor extends UntypedActor {
     Plugin<?> p = message.getPlugin() == null ? plugin : message.getPlugin();
     PluginHelper.updateJobState(p, RodaCoreFactory.getModelService(), message.getState(), message.getStateDatails());
     if (JOB_STATE.FAILED_TO_COMPLETE == message.getState() || JOB_STATE.COMPLETED == message.getState()) {
+      jobCreator.tell("Done", getSelf());
       getContext().stop(getSelf());
     }
   }

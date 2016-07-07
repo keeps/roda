@@ -52,8 +52,8 @@ public interface PluginOrchestrator {
    * Job related methods
    * _________________________________________________________________________________________________________________
    */
-  /** 201603 hsilva: this method is async */
-  public void executeJob(Job job) throws JobAlreadyStartedException;
+  /** 201603 hsilva: only tests should invoke this method synchronously */
+  public void executeJob(Job job, boolean async) throws JobAlreadyStartedException;
 
   /**
    * 20160701 hsilva: not quite sure if this will continue to exist (e.g. in

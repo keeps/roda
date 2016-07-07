@@ -203,7 +203,7 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
   }
 
   @Override
-  public void executeJob(Job job) throws JobAlreadyStartedException {
+  public void executeJob(Job job, boolean async) throws JobAlreadyStartedException {
     // TODO Auto-generated method stub
 
   }

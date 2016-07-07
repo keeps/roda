@@ -11,9 +11,11 @@ import java.util.List;
 import java.util.UUID;
 
 import org.roda.core.data.utils.URNUtils;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.plugins.Plugin;
 
 public final class IdUtils {
   private static final String ID_SEPARATOR = "-";
@@ -97,25 +99,32 @@ public final class IdUtils {
     return prefix + ID_SEPARATOR + suffix;
   }
 
-  public static String getPluginAgentId(String pluginClassName, String version) {
-    return URNUtils.createRodaPreservationURN(PreservationMetadataType.AGENT,pluginClassName + "@" + version);
+  public static <T extends IsRODAObject> String getPluginAgentId(Plugin<T> plugin) {
+    return getPluginAgentId(plugin.getClass().getName(), plugin.getVersion());
   }
-  
+
+  public static String getPluginAgentId(String pluginClassName, String version) {
+    return URNUtils.createRodaPreservationURN(PreservationMetadataType.AGENT, pluginClassName + "@" + version);
+  }
+
   public static String getUserAgentId(String username) {
-    return URNUtils.createRodaPreservationURN(PreservationMetadataType.AGENT,username);
+    return URNUtils.createRodaPreservationURN(PreservationMetadataType.AGENT, username);
   }
 
   public static String createPreservationMetadataId(PreservationMetadataType type) {
     return URNUtils.createRodaPreservationURN(type, UUID.randomUUID().toString());
   }
-  
+
   public static String getRepresentationPreservationId(String aipId, String representationId) {
     return getPreservationId(PreservationMetadataType.REPRESENTATION, aipId, representationId, null, null);
   }
 
   public static String getPreservationId(PreservationMetadataType type, String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId) {
-    return URNUtils.createRodaPreservationURN(type, UUID.nameUUIDFromBytes(getFileId(aipId, representationId, fileDirectoryPath, fileId, null, ID_SEPARATOR).getBytes()).toString());
+    return URNUtils.createRodaPreservationURN(type,
+      UUID
+        .nameUUIDFromBytes(getFileId(aipId, representationId, fileDirectoryPath, fileId, null, ID_SEPARATOR).getBytes())
+        .toString());
   }
-  
+
 }

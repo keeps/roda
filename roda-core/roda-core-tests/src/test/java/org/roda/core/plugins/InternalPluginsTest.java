@@ -38,6 +38,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.TestsHelper;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -54,8 +55,10 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.index.SelectedItemsNone;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
@@ -126,7 +129,7 @@ public class InternalPluginsTest {
     System.setProperty("roda.home", basePath.toString());
 
     boolean deploySolr = true;
-    boolean deployLdap = false;
+    boolean deployLdap = true;
     boolean deployFolderMonitor = true;
     boolean deployOrchestrator = true;
     boolean deployPluginManager = true;
@@ -207,23 +210,13 @@ public class InternalPluginsTest {
     String aipType = RodaConstants.AIP_TYPE_MIXED;
     AIP root = model.createAIP(parentId, aipType, new Permissions());
 
-    Plugin<TransferredResource> plugin = new TransferredResourceToAIPPlugin();
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
-    plugin.setParameterValues(parameters);
-
     TransferredResource transferredResource = createCorpora();
     Assert.assertNotNull(transferredResource);
 
-    List<String> transferredResourcesUUIDs = Arrays.asList(transferredResource.getUUID());
-    // FIXME 20160623 hsilva: passing by null just to make code compiling
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(null, plugin, transferredResourcesUUIDs);
-    // ReportAssertUtils.assertReports(reports, null,
-    // transferredResourcesUUIDs);
-
-    // TODO wait for job to finish
-    Thread.sleep(1000);
+    TestsHelper.executeJob(TransferredResourceToAIPPlugin.class, parameters, PluginType.SIP_TO_AIP,
+      SelectedItemsList.create(TransferredResource.class, transferredResource.getUUID()));
 
     index.commitAIPs();
 
@@ -254,29 +247,18 @@ public class InternalPluginsTest {
   }
 
   @Test
-  public void testVirusCheck()
-    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException, SolrServerException {
+  public void testVirusCheck() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,
+    SolrServerException, XmlException {
     AIP aip = ingestCorpora();
 
-    // 20160426 hsilva: we have to get the plugin from PluginManager to obtain
-    // the correct version of the concrete antivirus being used
-    Plugin<AIP> plugin = RodaCoreFactory.getPluginManager().getPlugin(AntivirusPlugin.class.getCanonicalName(),
-      AIP.class);
-    Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
-    plugin.setParameterValues(parameters);
-
-    List<String> aipIdList = Arrays.asList(aip.getId());
-    // FIXME 20160623 hsilva: passing by null just to make code compiling
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(null, plugin, aipIdList, false);
-    // ReportAssertUtils.assertReports(reports, aipIdList);
-
-    // TODO wait for job to finish
-    Thread.sleep(1000);
+    TestsHelper.executeJob(AntivirusPlugin.class, PluginType.AIP_TO_AIP,
+      SelectedItemsList.create(AIP.class, aip.getId()));
 
     aip = model.retrieveAIP(aip.getId());
 
-    String agentID = plugin.getClass().getName() + "@" + plugin.getVersion();
+    Plugin<? extends IsRODAObject> plugin = RodaCoreFactory.getPluginManager()
+      .getPlugin(AntivirusPlugin.class.getName());
+    String agentID = IdUtils.getPluginAgentId(plugin);
     boolean found = false;
     CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadataList = model
       .listPreservationMetadata(aip.getId(), true);
@@ -284,24 +266,20 @@ public class InternalPluginsTest {
       if (opm.isPresent()) {
         PreservationMetadata pm = opm.get();
         if (pm.getType().equals(PreservationMetadataType.EVENT)) {
-          try {
-            EventComplexType event = PremisV3Utils
-              .binaryToEvent(model.retrievePreservationEvent(pm.getAipId(), pm.getRepresentationId(), pm.getId())
-                .getContent().createInputStream());
-            if (event.getLinkingAgentIdentifierArray() != null && event.getLinkingAgentIdentifierArray().length > 0) {
-              for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifierArray()) {
-                if (laict.getLinkingAgentIdentifierValue() != null
-                  && laict.getLinkingAgentIdentifierValue().equalsIgnoreCase(agentID)) {
-                  found = true;
-                  break;
-                }
-              }
-              if (found) {
+          EventComplexType event = PremisV3Utils
+            .binaryToEvent(model.retrievePreservationEvent(pm.getAipId(), pm.getRepresentationId(), pm.getId())
+              .getContent().createInputStream());
+          if (event.getLinkingAgentIdentifierArray() != null && event.getLinkingAgentIdentifierArray().length > 0) {
+            for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifierArray()) {
+              if (laict.getLinkingAgentIdentifierValue() != null
+                && laict.getLinkingAgentIdentifierValue().equalsIgnoreCase(agentID)) {
+                found = true;
                 break;
               }
             }
-          } catch (XmlException | IOException e) {
-
+            if (found) {
+              break;
+            }
           }
         }
       }
@@ -325,18 +303,8 @@ public class InternalPluginsTest {
     throws RODAException, FileAlreadyExistsException, InterruptedException, IOException, SolrServerException {
     AIP aip = ingestCorpora();
 
-    Plugin<AIP> plugin = new PremisSkeletonPlugin();
-    Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
-    plugin.setParameterValues(parameters);
-
-    List<String> aipIdList = Arrays.asList(aip.getId());
-    // FIXME 20160623 hsilva: passing by null just to make code compiling
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(null, plugin, aipIdList, false);
-    // ReportAssertUtils.assertReports(reports, aipIdList);
-
-    // TODO wait for job to finish
-    Thread.sleep(1000);
+    TestsHelper.executeJob(PremisSkeletonPlugin.class, PluginType.AIP_TO_AIP,
+      SelectedItemsList.create(AIP.class, aip.getId()));
 
     aip = model.retrieveAIP(aip.getId());
 
@@ -375,30 +343,19 @@ public class InternalPluginsTest {
   }
 
   @Test
-  public void testSiegfried()
-    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException, SolrServerException {
+  public void testSiegfried() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,
+    SolrServerException, XmlException {
     AIP aip = ingestCorpora();
 
-    Plugin<AIP> premisSkeletonPlugin = new PremisSkeletonPlugin();
+    // ensure PREMIS objects are created
+    TestsHelper.executeJob(PremisSkeletonPlugin.class, PluginType.AIP_TO_AIP,
+      SelectedItemsList.create(AIP.class, aip.getId()));
+
+    // run siegfried
     Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
-    premisSkeletonPlugin.setParameterValues(parameters);
-
-    List<String> aipIdList = Arrays.asList(aip.getId());
-    // FIXME 20160623 hsilva: passing by null just to make code compiling
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(null, premisSkeletonPlugin, aipIdList, false);
-
-    Plugin<AIP> plugin = new SiegfriedPlugin();
-    Map<String, String> parameters2 = new HashMap<>();
-    parameters2.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
-    parameters2.put(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS, FAKE_REPORTING_CLASS);
-    plugin.setParameterValues(parameters2);
-
-    // FIXME 20160623 hsilva: passing by null just to make code compiling
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(null, plugin, aipIdList, false);
-    // ReportAssertUtils.assertReports(reports, aipIdList);
-    // TODO wait for job to finish
-    Thread.sleep(1000);
+    parameters.put(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS, FAKE_REPORTING_CLASS);
+    TestsHelper.executeJob(SiegfriedPlugin.class, parameters, PluginType.AIP_TO_AIP,
+      SelectedItemsList.create(AIP.class, aip.getId()));
 
     aip = model.retrieveAIP(aip.getId());
 
@@ -443,7 +400,10 @@ public class InternalPluginsTest {
       mimetype.substring(0, 1));
     Assert.assertThat(suggest, Matchers.contains(mimetype));
 
-    String agentID = plugin.getClass().getName() + "@" + plugin.getVersion();
+    Plugin<? extends IsRODAObject> plugin = RodaCoreFactory.getPluginManager()
+      .getPlugin(SiegfriedPlugin.class.getName());
+    String agentID = IdUtils.getPluginAgentId(plugin);
+
     boolean found = false;
     CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadataList = model
       .listPreservationMetadata(aip.getId(), true);
@@ -451,24 +411,20 @@ public class InternalPluginsTest {
       if (opm.isPresent()) {
         PreservationMetadata pm = opm.get();
         if (pm.getType().equals(PreservationMetadataType.EVENT)) {
-          try {
-            EventComplexType event = PremisV3Utils
-              .binaryToEvent(model.retrievePreservationEvent(pm.getAipId(), pm.getRepresentationId(), pm.getId())
-                .getContent().createInputStream());
-            if (event.getLinkingAgentIdentifierArray() != null && event.getLinkingAgentIdentifierArray().length > 0) {
-              for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifierArray()) {
-                if (laict.getLinkingAgentIdentifierValue() != null
-                  && laict.getLinkingAgentIdentifierValue().equalsIgnoreCase(agentID)) {
-                  found = true;
-                  break;
-                }
-              }
-              if (found) {
+          EventComplexType event = PremisV3Utils
+            .binaryToEvent(model.retrievePreservationEvent(pm.getAipId(), pm.getRepresentationId(), pm.getId())
+              .getContent().createInputStream());
+          if (event.getLinkingAgentIdentifierArray() != null && event.getLinkingAgentIdentifierArray().length > 0) {
+            for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifierArray()) {
+              if (laict.getLinkingAgentIdentifierValue() != null
+                && laict.getLinkingAgentIdentifierValue().equalsIgnoreCase(agentID)) {
+                found = true;
                 break;
               }
             }
-          } catch (XmlException | IOException e) {
-
+            if (found) {
+              break;
+            }
           }
         }
       }
@@ -486,103 +442,13 @@ public class InternalPluginsTest {
 
   }
 
-  // @Test
-  // public void testApacheTika() throws RODAException,
-  // FileAlreadyExistsException, InterruptedException, IOException,
-  // InvalidDateException, SolrServerException {
-  // AIP aip = ingestCorpora();
-  //
-  // Plugin<AIP> premisSkeletonPlugin = new PremisSkeletonPlugin();
-  // Map<String, String> parameters = new HashMap<>();
-  // parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
-  // premisSkeletonPlugin.setParameterValues(parameters);
-  //
-  // List<String> aipIdList = Arrays.asList(aip.getId());
-  // // FIXME 20160623 hsilva: passing by null just to make code compiling
-  // RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(null,
-  // premisSkeletonPlugin, aipIdList, false);
-  //
-  // Plugin<AIP> plugin = new TikaFullTextPlugin();
-  // Map<String, String> parameters2 = new HashMap<>();
-  // parameters2.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
-  // parameters2.put(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS,
-  // FAKE_REPORTING_CLASS);
-  // parameters2.put(RodaConstants.PLUGIN_PARAMS_DO_FULLTEXT_EXTRACTION,
-  // Boolean.TRUE.toString());
-  // parameters2.put(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION,
-  // Boolean.TRUE.toString());
-  // plugin.setParameterValues(parameters2);
-  //
-  // RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(null, plugin,
-  // aipIdList, false);
-  // // ReportAssertUtils.assertReports(reports, aipIdList);
-  //
-  // Job job = new Job();
-  // RodaCoreFactory.getPluginOrchestrator().executeJob(job);
-  //
-  // aip = model.retrieveAIP(aip.getId());
-  //
-  // // Files with Apache Tika output each tika run creates 2 files
-  // Assert.assertEquals(2 * CORPORA_FILES_COUNT,
-  // Iterables.size(model.listOtherMetadata(aip.getId(),
-  // RodaConstants.OTHER_METADATA_TYPE_APACHE_TIKA, true)));
-  //
-  // Binary om = model.retrieveOtherMetadataBinary(aip.getId(),
-  // aip.getRepresentations().get(0).getId(),
-  // Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT,
-  // TikaFullTextPlugin.FILE_SUFFIX_FULLTEXT,
-  // RodaConstants.OTHER_METADATA_TYPE_APACHE_TIKA);
-  //
-  // Assert.assertNotNull(om);
-  //
-  // Binary fpo_bin = model.retrievePreservationFile(aip.getId(),
-  // aip.getRepresentations().get(0).getId(),
-  // new ArrayList<>(), CORPORA_PDF);
-  //
-  // gov.loc.premis.v3.File fpo =
-  // PremisV3Utils.binaryToFile(fpo_bin.getContent(), true);
-  //
-  // ObjectCharacteristicsComplexType characteristics =
-  // fpo.getObjectCharacteristicsArray(0);
-  //
-  // Assert.assertEquals(1,
-  // characteristics.getCreatingApplicationArray().length);
-  //
-  // CreatingApplicationComplexType creatingApplication =
-  // characteristics.getCreatingApplicationArray(0);
-  // Assert.assertEquals("Microsoft Office Word",
-  // creatingApplication.getCreatingApplicationName().getStringValue());
-  // Assert.assertEquals("15.0000",
-  // creatingApplication.getCreatingApplicationVersion());
-  // Assert.assertEquals(DateParser.parse("2016-02-10T15:52:00Z"),
-  // DateParser.parse(creatingApplication.getDateCreatedByApplication().toString()));
-  //
-  // index.commit(IndexedFile.class);
-  //
-  // Filter filter = new Filter();
-  // filter.add(new SimpleFilterParameter(RodaConstants.FILE_FULLTEXT, "Test"));
-  // filter.add(new SimpleFilterParameter(RodaConstants.FILE_UUID,
-  // IdUtils.getFileId(aip.getId(), aip.getRepresentations().get(0).getId(), new
-  // ArrayList<>(), CORPORA_PDF)));
-  //
-  // IndexResult<IndexedFile> files = index.find(IndexedFile.class, filter,
-  // null, new Sublist(0, 10));
-  // Assert.assertEquals(1, files.getTotalCount());
-  // }
-
   @Test
   public void testAutoAccept() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,
     InvalidDateException, SolrServerException {
     AIP aip = ingestCorpora();
 
-    Plugin<AIP> autoAcceptPlugin = new AutoAcceptSIPPlugin();
-    Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
-    autoAcceptPlugin.setParameterValues(parameters);
-
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(null, autoAcceptPlugin, Arrays.asList(aip.getId()), false);
-    // TODO wait for job to finish
-    Thread.sleep(1000);
+    TestsHelper.executeJob(AutoAcceptSIPPlugin.class, PluginType.AIP_TO_AIP,
+      SelectedItemsList.create(AIP.class, aip.getId()));
 
     aip = model.retrieveAIP(aip.getId());
 

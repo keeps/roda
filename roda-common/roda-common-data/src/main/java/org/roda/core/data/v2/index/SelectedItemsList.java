@@ -11,11 +11,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class SelectedItemsList<T extends IsIndexed> implements SelectedItems<T> {
+import org.roda.core.data.v2.IsRODAObject;
+
+public class SelectedItemsList<T extends IsRODAObject> implements SelectedItems<T> {
 
   private static final long serialVersionUID = -5364779540199737165L;
 
-  public static <T extends IsIndexed> SelectedItemsList<T> create(Class<T> classToCreate, String... ids) {
+  public static <T extends IsRODAObject> SelectedItemsList<T> create(Class<T> classToCreate, String... ids) {
     return new SelectedItemsList<>(Arrays.asList(ids), classToCreate.getName());
   }
 

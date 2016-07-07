@@ -62,8 +62,12 @@ import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.actor.Terminated;
 import akka.dispatch.OnComplete;
+import akka.pattern.Patterns;
 import akka.routing.RoundRobinPool;
+import akka.util.Timeout;
+import scala.concurrent.Await;
 import scala.concurrent.Future;
+import scala.concurrent.duration.Duration;
 
 /*
  * 20160520 hsilva: use kamon to obtain metrics about akka, Graphite & Grafana for collecting and dashboard (http://kamon.io/integrations/akka/overview/ & 
@@ -545,14 +549,24 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void executeJob(Job job) throws JobAlreadyStartedException {
+  public void executeJob(Job job, boolean async) throws JobAlreadyStartedException {
     LOGGER.info("Adding job '{}' ({}) to be executed", job.getName(), job.getId());
 
     if (runningJobs.containsKey(job.getId())) {
       LOGGER.info("Job '{}' ({}) is already queued to be executed", job.getName(), job.getId());
       throw new JobAlreadyStartedException();
     } else {
-      jobWorkersRouter.tell(job, ActorRef.noSender());
+      if (async) {
+        jobWorkersRouter.tell(job, ActorRef.noSender());
+      } else {
+        Timeout timeout = new Timeout(Duration.create(10, "minutes"));
+        Future<Object> future = Patterns.ask(jobWorkersRouter, job, timeout);
+        try {
+          Await.result(future, timeout.duration());
+        } catch (Exception e) {
+          LOGGER.error("Error executing job synchronously", e);
+        }
+      }
       LOGGER.info("Success adding job '{}' ({}) to be executed", job.getName(), job.getId());
     }
 
@@ -589,7 +603,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     if (!jobsToBeStarted.isEmpty()) {
       for (Job job : jobsToBeStarted) {
         try {
-          executeJob(model.retrieveJob(job.getId()));
+          executeJob(model.retrieveJob(job.getId()), true);
         } catch (JobAlreadyStartedException | RequestNotValidException | GenericException | NotFoundException
           | AuthorizationDeniedException e) {
           LOGGER.error("Unable to get Job", e);

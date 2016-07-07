@@ -339,7 +339,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void executeJob(Job job) throws JobAlreadyStartedException {
+  public void executeJob(Job job, boolean async) throws JobAlreadyStartedException {
     // TODO
   }
 
