@@ -17,14 +17,13 @@ import org.roda.core.index.PermissionsTest;
 import org.roda.core.index.SolrUtilsTest;
 import org.roda.core.model.ModelServiceTest;
 import org.roda.core.plugins.EARKSIPPluginsTest;
-import org.roda.core.plugins.InternalConvertPluginsTest;
 import org.roda.core.plugins.InternalPluginsTest;
 import org.roda.core.storage.fedora.FedoraStorageServiceTest;
 import org.roda.core.storage.fs.FileStorageServiceTest;
 
 @RunWith(Suite.class)
-@SuiteClasses({MetadataFileUtilsEscapeTest.class,JsonUtilsTest.class, IndexServiceTest.class, ModelServiceTest.class, FileStorageServiceTest.class,
-  FedoraStorageServiceTest.class, SolrUtilsTest.class, InternalPluginsTest.class, InternalConvertPluginsTest.class,
+@SuiteClasses({MetadataFileUtilsEscapeTest.class, JsonUtilsTest.class, IndexServiceTest.class, ModelServiceTest.class,
+  FileStorageServiceTest.class, FedoraStorageServiceTest.class, SolrUtilsTest.class, InternalPluginsTest.class,
   EARKSIPPluginsTest.class, PermissionsTest.class})
 public class AllTestsPlusExtra {
 

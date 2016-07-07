@@ -585,6 +585,11 @@ public class IndexServiceTest {
       risk.setMitigationRelatedEventIdentifierType("Mitigation REI type");
       risk.setMitigationRelatedEventIdentifierValue("Mitigation REI value");
 
+      risk.setCreatedOn(new Date());
+      risk.setCreatedBy("admin");
+      risk.setUpdatedOn(new Date());
+      risk.setUpdatedBy("admin");
+
       model.createRisk(risk, false);
       index.commit(IndexedRisk.class);
 

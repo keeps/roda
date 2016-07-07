@@ -14,7 +14,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.TestsHelper;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
 import org.roda.core.data.adapter.filter.Filter;
@@ -43,11 +43,13 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.index.IndexService;
@@ -147,18 +149,14 @@ public class BagitSIPPluginsTest {
 
     AIP root = model.createAIP(parentId, aipType, new Permissions());
 
-    Plugin<TransferredResource> plugin = new BagitToAIPPlugin();
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
-    plugin.setParameterValues(parameters);
 
     TransferredResource transferredResource = createCorpora();
     Assert.assertNotNull(transferredResource);
 
-    // FIXME 20160623 hsilva: passing by null just to make code compiling
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(null, plugin,
-      Arrays.asList(transferredResource.getUUID()));
-    // assertReports(reports);
+    TestsHelper.executeJob(BagitToAIPPlugin.class, parameters, PluginType.SIP_TO_AIP,
+      SelectedItemsList.create(TransferredResource.class, transferredResource.getUUID()));
 
     IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
       new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10));
