@@ -62,6 +62,7 @@ import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.UserUtility;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.monitor.TransferUpdateStatus;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
 import org.roda.core.common.validation.ResourceResolver;
@@ -80,6 +81,7 @@ import org.roda.core.data.common.RodaConstants.SolrType;
 import org.roda.core.data.common.RodaConstants.StorageType;
 import org.roda.core.data.descriptionLevels.DescriptionLevelManager;
 import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IllegalOperationException;
@@ -103,6 +105,8 @@ import org.roda.core.plugins.PluginOrchestrator;
 import org.roda.core.plugins.orchestrate.AkkaDistributedPluginOrchestrator;
 import org.roda.core.plugins.orchestrate.AkkaEmbeddedPluginOrchestrator;
 import org.roda.core.plugins.orchestrate.akka.distributed.AkkaDistributedPluginWorker;
+import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fedora.FedoraStorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -267,6 +271,9 @@ public class RodaCoreFactory {
         instantiateNodeSpecificObjects(nodeType);
         LOGGER.debug("Finished instantiating node specific objects");
 
+        instantiateDefaultObjects();
+        LOGGER.debug("Finished instantiating default objects");
+
         instantiated = true;
 
       } catch (ConfigurationException e) {
@@ -406,6 +413,33 @@ public class RodaCoreFactory {
       instantiatedWithoutErrors = false;
     }
 
+  }
+
+  private static void instantiateDefaultObjects() {
+    try {
+      CloseableIterable<Resource> resources = storage.listResourcesUnderContainer(DefaultStoragePath.parse(""), true);
+      Iterator<Resource> resourceIterator = resources.iterator();
+      boolean hasFileResources = false;
+
+      while (resourceIterator.hasNext() && !hasFileResources) {
+        Resource resource = resourceIterator.next();
+        if (!resource.isDirectory()) {
+          hasFileResources = true;
+        }
+      }
+
+      IOUtils.closeQuietly(resources);
+      if (!hasFileResources) {
+        copyFilesFromClasspath(RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_DEFAULT_FOLDER + "/",
+          rodaHomePath, true);
+
+        index.reindexRisks(storage);
+        index.reindexFormats(storage);
+        // index other default values HERE
+      }
+    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
+      LOGGER.error("Cannot load default objects", e);
+    }
   }
 
   private static void copyFilesFromClasspath(String classpathPrefix, Path destinationDirectory,

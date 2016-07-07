@@ -9,6 +9,7 @@ package org.roda.core.index;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -41,6 +42,7 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -53,9 +55,11 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Resource;
+import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -215,6 +219,29 @@ public class IndexService {
     observer.riskCreatedOrUpdated(risk, false);
   }
 
+  public void reindexRisks(StorageService storage) {
+    try {
+      StoragePath containerPath = ModelUtils.getContainerPath(Risk.class);
+      CloseableIterable<Resource> listResourcesUnderDirectory = storage.listResourcesUnderContainer(containerPath,
+        false);
+
+      for (Resource resource : listResourcesUnderDirectory) {
+        if (!resource.isDirectory()) {
+          Binary binary = (Binary) resource;
+          InputStream inputStream = binary.getContent().createInputStream();
+          String jsonString = IOUtils.toString(inputStream, RodaConstants.DEFAULT_ENCODING);
+          Risk object = JsonUtils.getObjectFromJson(jsonString, Risk.class);
+          IOUtils.closeQuietly(inputStream);
+          reindexRisk(object);
+        }
+      }
+    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
+      | IOException e) {
+      LOGGER.error("Error reindexing risks");
+    }
+
+  }
+
   public void reindexRiskIncidence(RiskIncidence riskIncidence) {
     observer.riskIncidenceCreatedOrUpdated(riskIncidence, false);
   }
@@ -225,6 +252,29 @@ public class IndexService {
 
   public void reindexFormat(Format format) {
     observer.formatCreatedOrUpdated(format, false);
+  }
+
+  public void reindexFormats(StorageService storage) {
+    try {
+      StoragePath containerPath = ModelUtils.getContainerPath(Format.class);
+      CloseableIterable<Resource> listResourcesUnderDirectory = storage.listResourcesUnderContainer(containerPath,
+        false);
+
+      for (Resource resource : listResourcesUnderDirectory) {
+        if (!resource.isDirectory()) {
+          Binary binary = (Binary) resource;
+          InputStream inputStream = binary.getContent().createInputStream();
+          String jsonString = IOUtils.toString(inputStream, RodaConstants.DEFAULT_ENCODING);
+          Format object = JsonUtils.getObjectFromJson(jsonString, Format.class);
+          IOUtils.closeQuietly(inputStream);
+          reindexFormat(object);
+        }
+      }
+    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
+      | IOException e) {
+      LOGGER.error("Error reindexing formats");
+    }
+
   }
 
   public void reindexNotification(Notification notification) {
