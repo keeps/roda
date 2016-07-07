@@ -145,7 +145,7 @@ public class SiegfriedPluginUtils {
             String pronom = null;
             String mime = null;
 
-            if (plugin.getVersion().startsWith("1.5")) {
+            if (plugin.getVersion().startsWith("1.5") || plugin.getVersion().startsWith("1.6")) {
               if (match.getString("ns").equalsIgnoreCase("pronom")) {
                 format = match.getString("format");
                 version = match.getString("version");
