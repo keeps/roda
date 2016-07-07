@@ -353,7 +353,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public void transferScanRequestUpdate(String transferredResourceUUID) throws IsStillUpdatingException {
-    Browser.updateAllTransferredResources(transferredResourceUUID, true);
+    try {
+      Browser.updateAllTransferredResources(transferredResourceUUID, true);
+    } catch (RuntimeException e) {
+      LOGGER.error("Error running transferred resources scanner");
+    }
   }
 
   @Override

@@ -68,6 +68,7 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
       } else {
         path = basePath;
       }
+
       LOGGER.info("Start indexing transferred resources {}", path);
       Files.walkFileTree(path, opts, Integer.MAX_VALUE, new FileVisitor<Path>() {
 
@@ -143,7 +144,7 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
       LOGGER.info("End indexing Transferred Resources");
       LOGGER.info("Time elapsed: {} seconds", ((System.currentTimeMillis() - start) / 1000));
       RodaCoreFactory.setTransferredResourcesScannerUpdateStatus(false);
-    } catch (IOException | GenericException | RequestNotValidException e) {
+    } catch (IOException | GenericException | RequestNotValidException | RuntimeException e) {
       LOGGER.error("Error reindexing Transferred Resources", e);
     }
   }

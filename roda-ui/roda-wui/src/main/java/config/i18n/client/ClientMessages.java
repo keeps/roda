@@ -195,6 +195,8 @@ public interface ClientMessages extends Messages {
 
   String updatedFilesUnderFolder();
 
+  String updateIsBeginning();
+
   String riskRefreshDone();
 
   String processCreated();
@@ -2101,7 +2103,6 @@ public interface ClientMessages extends Messages {
   String users_state_active();
 
   String users_state_inactive();
-
 
   /************* Metadata creation and edition ****************/
 

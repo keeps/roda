@@ -394,6 +394,8 @@ public class IngestTransfer extends Composite {
   void buttonRefreshHandler(ClickEvent e) {
     String uuid = resource != null ? resource.getUUID() : null;
     refresh.setEnabled(false);
+
+    Toast.showInfo(messages.dialogRefresh(), messages.updateIsBeginning());
     BrowserService.Util.getInstance().transferScanRequestUpdate(uuid, new AsyncCallback<Void>() {
 
       @Override
