@@ -72,9 +72,6 @@ public class Browser extends RodaCoreService {
   private static final String AIP_PARAM = "aip";
 
   private static final String BROWSER_COMPONENT = "Browser";
-  private static final String ADMINISTRATION_METADATA_EDITOR_ROLE = "administration.metadata_editor";
-  private static final String INGEST_TRANSFER_ROLE = "ingest.transfer";
-  private static final String BROWSE_ROLE = "browse";
 
   private static final String TRANSFERRED_RESOURCE_ID_PARAM = "transferredResourceId";
 
@@ -100,7 +97,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
@@ -121,7 +118,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
@@ -143,7 +140,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
@@ -164,7 +161,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
@@ -187,7 +184,7 @@ public class Browser extends RodaCoreService {
 
     // check user permissions
     // TODO check permissions for each class
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     IndexResult<T> ret = BrowserHelper.find(classToReturn, filter, sorter, sublist, facets, user, justActive);
@@ -207,7 +204,7 @@ public class Browser extends RodaCoreService {
 
     // check user permissions
     // TODO check permissions for each class
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     Long count = BrowserHelper.count(classToReturn, filter, user);
@@ -225,7 +222,8 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+
     // TODO check object level permissions
 
     // delegate
@@ -248,7 +246,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     // TODO check object level permissions
 
     // delegate
@@ -263,7 +261,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     // TODO object level permissions
 
     // delegate
@@ -281,7 +279,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
     // delegate
@@ -309,7 +307,7 @@ public class Browser extends RodaCoreService {
     IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class, representationUUID);
 
     // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, representation.getAipId());
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
@@ -331,7 +329,7 @@ public class Browser extends RodaCoreService {
     IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class, representationUUID);
 
     // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, representation.getAipId());
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
@@ -355,7 +353,7 @@ public class Browser extends RodaCoreService {
     BrowserHelper.validateListAipDescriptiveMetadataParams(acceptFormat);
 
     // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
@@ -380,7 +378,7 @@ public class Browser extends RodaCoreService {
     BrowserHelper.validateGetAipDescritiveMetadataParams(acceptFormat);
 
     // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
@@ -406,7 +404,7 @@ public class Browser extends RodaCoreService {
     BrowserHelper.validateGetAipDescritiveMetadataParams(acceptFormat);
 
     // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
@@ -431,7 +429,7 @@ public class Browser extends RodaCoreService {
     BrowserHelper.validateListAipPreservationMetadataParams(acceptFormat);
 
     // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
@@ -456,7 +454,7 @@ public class Browser extends RodaCoreService {
     BrowserHelper.validateGetAipRepresentationPreservationMetadataParams(acceptFormat, language);
 
     // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
@@ -480,7 +478,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
@@ -505,7 +503,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
 
@@ -527,7 +525,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
 
@@ -548,7 +546,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.DELETE);
 
@@ -576,7 +574,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     UserUtility.checkObjectPermissions(user, selected, PermissionType.UPDATE);
 
     if (parentId != null) {
@@ -600,7 +598,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     Permissions permissions = new Permissions();
 
     if (parentId != null) {
@@ -636,7 +634,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     String parentId = BrowserHelper.removeAIP(aips, user);
@@ -653,7 +651,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
 
@@ -675,7 +673,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
 
@@ -697,7 +695,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.DELETE);
 
@@ -715,7 +713,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
@@ -735,7 +733,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.DELETE);
 
@@ -754,7 +752,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     IndexedFile file = BrowserHelper.retrieve(IndexedFile.class, fileUUID);
     // TODO check permissions from indexed file
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, file.getAipId());
@@ -778,7 +776,7 @@ public class Browser extends RodaCoreService {
     BrowserHelper.validateGetAipRepresentationFileParams(acceptFormat);
 
     // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     IndexedFile file = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class, fileUuid);
     // TODO get permissions from indexed file
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, file.getAipId());
@@ -803,7 +801,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
 
@@ -826,7 +824,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
 
@@ -847,7 +845,7 @@ public class Browser extends RodaCoreService {
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     Date startDate = new Date();
     // check user permissions
-    UserUtility.checkRoles(user, INGEST_TRANSFER_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     UserUtility.checkTransferredResourceAccess(user, Arrays.asList(parentUUID));
 
@@ -874,7 +872,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, INGEST_TRANSFER_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     BrowserHelper.removeTransferredResources(selected, user);
@@ -890,7 +888,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, INGEST_TRANSFER_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     UserUtility.checkTransferredResourceAccess(user, Arrays.asList(parentUUID));
 
@@ -919,7 +917,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     StreamResponse classificationPlan = BrowserHelper.getClassificationPlan(type, user);
@@ -974,7 +972,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, INGEST_TRANSFER_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     StreamResponse response = BrowserHelper
       .getTransferredResource(BrowserHelper.retrieve(TransferredResource.class, resourceId));
@@ -992,7 +990,7 @@ public class Browser extends RodaCoreService {
 
     // TODO maybe update permissions...
     // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     // IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     // UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
 
@@ -1016,7 +1014,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
 
@@ -1038,7 +1036,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.DELETE);
 
@@ -1060,7 +1058,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
 
@@ -1081,7 +1079,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     BrowserHelper.modifyRisk(risk, user, message, false);
@@ -1096,7 +1094,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     BrowserHelper.modifyFormat(format, false);
@@ -1111,7 +1109,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     BrowserHelper.modifyAgent(agent, false);
@@ -1126,7 +1124,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     Risk ret = BrowserHelper.addRisk(risk, user, true);
@@ -1142,7 +1140,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     Format ret = BrowserHelper.addFormat(format, false);
@@ -1158,7 +1156,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     Agent ret = BrowserHelper.addAgent(agent, false);
@@ -1174,7 +1172,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     List<Format> ret = BrowserHelper.retrieveFormats(agentId);
@@ -1190,7 +1188,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     List<Agent> ret = BrowserHelper.retrieveRequiredAgents(agentId);
@@ -1206,7 +1204,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     BrowserHelper.revertRiskVersion(riskId, versionId, message);
@@ -1239,7 +1237,7 @@ public class Browser extends RodaCoreService {
     BrowserHelper.validateExportAipParams(acceptFormat);
 
     // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     UserUtility.checkObjectPermissions(user, selected, PermissionType.READ);
 
@@ -1261,7 +1259,7 @@ public class Browser extends RodaCoreService {
     BrowserHelper.validateGetAipParams(acceptFormat);
 
     // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     IndexedAIP indexedAIP = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, indexedAIP, PermissionType.READ);
 
@@ -1280,7 +1278,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
     IndexedAIP indexedAIP = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, indexedAIP, PermissionType.READ);
 
@@ -1299,7 +1297,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     BrowserHelper.removeRiskVersion(riskId, versionId);
@@ -1315,7 +1313,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     RiskVersionsBundle ret = BrowserHelper.retrieveRiskVersions(riskId);
@@ -1331,7 +1329,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     boolean ret = BrowserHelper.hasRiskVersions(id);
@@ -1347,7 +1345,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     Risk ret = BrowserHelper.retrieveRiskVersion(riskId, selectedVersion);
@@ -1365,7 +1363,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     RiskMitigationBundle ret = BrowserHelper.retrieveShowMitigationTerms(preMitigationProbability, preMitigationImpact,
@@ -1383,7 +1381,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     List<String> ret = BrowserHelper.retrieveShowMitigationTerms();
@@ -1399,7 +1397,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     MitigationPropertiesBundle ret = BrowserHelper.retrieveAllMitigationProperties();
@@ -1416,7 +1414,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     BrowserHelper.deleteRisk(user, selected);
@@ -1431,7 +1429,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     BrowserHelper.deleteAgent(user, selected);
@@ -1446,7 +1444,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     BrowserHelper.deleteFormat(user, selected);
@@ -1461,7 +1459,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     List<String> riskList = BrowserHelper.getRiskOnAIP(aipId);
@@ -1477,7 +1475,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     BrowserHelper.deleteRiskIncidences(user, id, incidences);
@@ -1492,7 +1490,7 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     BrowserHelper.updateRiskCounters();
@@ -1508,7 +1506,7 @@ public class Browser extends RodaCoreService {
 
     // check user permissions
     // TODO define appraisal role
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     BrowserHelper.appraisal(user, selected, accept, rejectReason);
@@ -1525,7 +1523,7 @@ public class Browser extends RodaCoreService {
 
     // check user permissions
     // TODO define appraisal role
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     IndexedRepresentation ret = BrowserHelper.getRepresentationFromId(user, representationId);
@@ -1543,7 +1541,7 @@ public class Browser extends RodaCoreService {
 
     // check user permissions
     // TODO define appraisal role
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     IndexedFile ret = BrowserHelper.getFileFromId(user, fileId);
@@ -1559,7 +1557,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     String payload = BrowserHelper.getDescriptiveMetadataPreview(bundle);
