@@ -197,6 +197,8 @@ public class CreateForm {
 
     // Field
     final DateBox mvDate = new DateBox();
+    mvDate.getDatePicker().setYearAndMonthDropdownVisible(true);
+    mvDate.getDatePicker().setYearArrowsVisible(true);
     mvDate.addStyleName("form-textbox");
     mvDate.setFormat(new DateBox.DefaultFormat() {
       @Override

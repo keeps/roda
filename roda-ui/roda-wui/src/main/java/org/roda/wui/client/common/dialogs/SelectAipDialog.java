@@ -7,6 +7,7 @@
  */
 package org.roda.wui.client.common.dialogs;
 
+import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.common.RodaConstants;
@@ -24,15 +25,17 @@ public class SelectAipDialog extends DefaultSelectDialog<IndexedAIP, Void> {
   private static final Filter DEFAULT_FILTER_AIP = new Filter(
     new BasicSearchFilterParameter(RodaConstants.AIP_SEARCH, "*"));
 
-  private static final Boolean SHOW_INACTIVE = Boolean.FALSE;
+  private static final Boolean DEFAULT_JUST_ACTIVE = Boolean.TRUE;
+  private static final Facets DEFAULT_FACETS = null;
+  private static final Boolean SELECTABLE = Boolean.FALSE;
 
   public SelectAipDialog(String title) {
-    this(title, DEFAULT_FILTER_AIP, SHOW_INACTIVE);
+    this(title, DEFAULT_FILTER_AIP, DEFAULT_JUST_ACTIVE);
   }
 
   public SelectAipDialog(String title, Filter filter, boolean justActive) {
     super(title, filter, RodaConstants.AIP_SEARCH,
-      new AIPList(filter, justActive, null, messages.selectAipSearchResults(), false));
+      new AIPList(filter, justActive, DEFAULT_FACETS, messages.selectAipSearchResults(), SELECTABLE));
 
   }
 }

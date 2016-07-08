@@ -92,18 +92,21 @@ public class SearchFieldPanel extends Composite {
 
     inputDateBox = new DateBox();
     inputDateBox.setFormat(dateFormat);
+    inputDateBox.getDatePicker().setYearAndMonthDropdownVisible(true);
     inputDateBox.getDatePicker().setYearArrowsVisible(true);
     inputDateBox.setFireNullValues(true);
     inputDateBox.getElement().setPropertyString("placeholder", messages.searchFieldDatePlaceHolder());
 
     inputDateBoxFrom = new DateBox();
     inputDateBoxFrom.setFormat(dateFormat);
+    inputDateBox.getDatePicker().setYearAndMonthDropdownVisible(true);
     inputDateBoxFrom.getDatePicker().setYearArrowsVisible(true);
     inputDateBoxFrom.setFireNullValues(true);
     inputDateBoxFrom.getElement().setPropertyString("placeholder", messages.searchFieldDateFromPlaceHolder());
 
     inputDateBoxTo = new DateBox();
     inputDateBoxTo.setFormat(dateFormat);
+    inputDateBox.getDatePicker().setYearAndMonthDropdownVisible(true);
     inputDateBoxTo.getDatePicker().setYearArrowsVisible(true);
     inputDateBoxTo.setFireNullValues(true);
     inputDateBoxTo.getElement().setPropertyString("placeholder", messages.searchFieldDateToPlaceHolder());
@@ -325,7 +328,7 @@ public class SearchFieldPanel extends Composite {
   private boolean valid(SearchSuggestBox<?> input) {
     return (!input.getValue().isEmpty());
   }
-  
+
   private boolean valid(CheckBox input) {
     return input.getValue();
   }

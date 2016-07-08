@@ -102,7 +102,7 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
 
   // private ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private SelectedItems selected = null;
+  private SelectedItems<?> selected = null;
   private List<PluginInfo> plugins = null;
   private PluginInfo selectedPlugin = null;
   private String selectedClass = null;
@@ -227,7 +227,7 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
                             for (int i = 0; i < workflowCategoryList.getWidgetCount(); i++) {
                               CheckBox checkbox = (CheckBox) workflowCategoryList.getWidget(i);
 
-                              if (checkbox.isChecked()) {
+                              if (checkbox.getValue()) {
                                 if (categories.contains(checkbox.getText())
                                   && !categories.contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)) {
                                   workflowList.addItem(
@@ -332,11 +332,11 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
 
   public abstract void cancel();
 
-  public SelectedItems getSelected() {
+  public SelectedItems<?> getSelected() {
     return selected;
   }
 
-  public void setSelected(SelectedItems selected) {
+  public void setSelected(SelectedItems<?> selected) {
     this.selected = selected;
   }
 
