@@ -89,6 +89,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.RoleAlreadyExistsException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -831,11 +832,36 @@ public class RodaCoreFactory {
         ldap.startServer(ldapUtility, ldapPort);
       }
 
+      createRoles(rodaConfig, ldapUtility);
+
     } catch (Exception e) {
       LOGGER.error("Error starting up embedded ApacheDS", e);
       instantiatedWithoutErrors = false;
     }
 
+  }
+
+  /**
+   * For each role in roda-roles.properties create the role in LDAP if it don't exist already.
+   * @param rodaConfig roda configuration
+   * @param ldapUtility LDAP utility class.
+     */
+  private static void createRoles(Configuration rodaConfig, LdapUtility ldapUtility) {
+    final Iterator<String> keys = rodaConfig.getKeys("core.roles");
+    final List<String> roles = new ArrayList<>();
+    while (keys.hasNext()) {
+      roles.addAll(Arrays.asList(rodaConfig.getStringArray(keys.next())));
+    }
+    for (final String role : roles) {
+      try {
+        ldapUtility.addRole(role);
+        LOGGER.info("Created LDAP role " + role);
+      } catch (RoleAlreadyExistsException e) {
+        LOGGER.debug("Role " + role + " already exists.", e);
+      } catch (LdapUtilityException e) {
+        LOGGER.warn("Unexpected error creating role " + role + " - " + e.getMessage(), e);
+      }
+    }
   }
 
   private static void indexUsersAndGroupsFromLDAP()

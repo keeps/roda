@@ -17,7 +17,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
 import javax.naming.AuthenticationException;
 import javax.naming.Context;
 import javax.naming.InvalidNameException;
@@ -36,7 +35,6 @@ import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapName;
-
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
@@ -46,6 +44,7 @@ import org.roda.core.data.exceptions.GroupAlreadyExistsException;
 import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.InvalidTokenException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RoleAlreadyExistsException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RodaUser;
@@ -69,6 +68,7 @@ public class LdapUtility {
   private static final String AUTHENTICATION_SIMPLE = "simple";
   private static final String SHADOW_INACTIVE = "shadowInactive";
   private static final String UNIQUE_MEMBER = "uniqueMember";
+  private static final String ROLE_OCCUPANT = "roleOccupant";
 
   /**
    * LDAP server host
@@ -486,7 +486,7 @@ public class LdapUtility {
    * 
    * @return the modified {@link User}.
    * 
-   * @throws NoSuchUserException
+   * @throws NotFoundException
    *           if the {@link User} being modified doesn't exist.
    * @throws EmailAlreadyExistsException
    *           if the specified email is already used by another user.
@@ -531,7 +531,7 @@ public class LdapUtility {
    * @param username
    * @param password
    * 
-   * @throws NoSuchUserException
+   * @throws NotFoundException
    *           if specified {@link User} doesn't exist.
    * @throws IllegalOperationException
    *           if the user is one of the protected users.
@@ -561,7 +561,7 @@ public class LdapUtility {
    * 
    * @return the modified {@link User}.
    * 
-   * @throws NoSuchUserException
+   * @throws NotFoundException
    *           if the Use being modified doesn't exist.
    * @throws EmailAlreadyExistsException
    *           if the specified email is already used by another user.
@@ -637,7 +637,7 @@ public class LdapUtility {
    *          the name of the user to deactivate.
    * 
    * 
-   * @throws NoSuchUserException
+   * @throws NotFoundException
    * @throws IllegalOperationException
    * @throws LdapUtilityException
    * 
@@ -867,7 +867,7 @@ public class LdapUtility {
    * 
    * @return the modified {@link Group}.
    * 
-   * @throws NoSuchGroupException
+   * @throws NotFoundException
    *           if the group with being modified doesn't exist.
    * @throws IllegalOperationException
    * @throws LdapUtilityException
@@ -1181,7 +1181,7 @@ public class LdapUtility {
    * 
    * @return the {@link User} whose email has been confirmed.
    * 
-   * @throws NoSuchUserException
+   * @throws NotFoundException
    *           if the username and email don't exist.
    * @throws IllegalArgumentException
    *           if username and email are <code>null</code>.
@@ -1278,7 +1278,7 @@ public class LdapUtility {
    * 
    * @return the {@link User} with the password reset token and expiration date.
    * 
-   * @throws NoSuchUserException
+   * @throws NotFoundException
    *           if username or email doesn't correspond to any registered
    *           {@link User}.
    * @throws IllegalOperationException
@@ -1342,7 +1342,7 @@ public class LdapUtility {
    * 
    * @return the modified {@link User}.
    * 
-   * @throws NoSuchUserException
+   * @throws NotFoundException
    *           if a {@link User} with the same name already exists.
    * @throws InvalidTokenException
    *           if the specified token doesn't exist, has already expired or it
@@ -1442,6 +1442,53 @@ public class LdapUtility {
   }
 
   /**
+   * Adds a new role.
+   *
+   * @param roleName
+   *          the role to add.
+   * @throws RoleAlreadyExistsException
+   *           if a role with the same name already exists.
+   * @throws LdapUtilityException
+   *           if something goes wrong with the creation of the new group.
+   */
+  public void addRole(String roleName) throws RoleAlreadyExistsException, LdapUtilityException {
+
+    try {
+      // Create initial context
+      DirContext ctxRoot = getLDAPAdminDirContext(ldapRootDN);
+
+      Attributes attributes = new BasicAttributes();
+
+      Attribute objectClass = new BasicAttribute("objectclass");
+      objectClass.add("organizationalRole");
+      objectClass.add("top");
+
+      attributes.put(objectClass);
+      attributes.put("cn", roleName);
+
+      Attribute attributeRoleOccupant = new BasicAttribute(ROLE_OCCUPANT);
+
+      // Add admin to all roles
+      attributeRoleOccupant.add(ldapAdminDN);
+
+      attributes.put(attributeRoleOccupant);
+
+      ctxRoot.bind(getRoleDN(roleName), null, attributes);
+
+      // Close the context when we're done
+      ctxRoot.close();
+
+    } catch (NameAlreadyBoundException e) {
+      LOGGER.debug("Role " + roleName + " already exists.", e);
+      throw new RoleAlreadyExistsException("Role " + roleName + " already exists.", e);
+    } catch (NamingException e) {
+      LOGGER.debug("Error adding role " + roleName, e);
+      throw new LdapUtilityException("Error adding role " + roleName, e);
+    }
+
+  }
+
+  /**
    * Returns the roles assigned to a given group.
    * 
    * @param groupName
@@ -1510,7 +1557,7 @@ public class LdapUtility {
    *          the name of the group to change the groups.
    * @param groups
    *          a list of groups that this group should belongs.
-   * @throws NoSuchGroupException
+   * @throws NotFoundException
    *           if the specified Group doesn't exist.
    * @throws LdapUtilityException
    */
@@ -2057,7 +2104,7 @@ public class LdapUtility {
    *          use <code>null</code>.
    * @param modifyRolesAndGroups
    * 
-   * @throws NoSuchUserException
+   * @throws NotFoundException
    *           if the {@link User} being modified doesn't exist.
    * @throws EmailAlreadyExistsException
    *           if the specified email is already used by another user.
@@ -2561,7 +2608,7 @@ public class LdapUtility {
    * @param username
    * @param password
    * 
-   * @throws NoSuchUserException
+   * @throws NotFoundException
    *           if specified {@link User} doesn't exist.
    * @throws LdapUtilityException
    */
@@ -2594,7 +2641,7 @@ public class LdapUtility {
    * Returns a user UID (Unique ID) from it's DN (Distinguished Name). Ex: for
    * <i>DN=uid=xpto,ou=people,dc=roda,dc=org</i> returns <i>rcastro</i>.
    * 
-   * @param roleDN
+   * @param userDN
    * @return a {@link java.lang.String} with the UID.
    * @throws InvalidNameException
    */
@@ -2611,7 +2658,7 @@ public class LdapUtility {
    * <i>DN=cn=administrators,ou=groups,dc=roda,dc=org</i> returns
    * <i>administrators</i>.
    * 
-   * @param roleDN
+   * @param groupDN
    * @return a {@link java.lang.String} with the CN.
    * @throws InvalidNameException
    */
