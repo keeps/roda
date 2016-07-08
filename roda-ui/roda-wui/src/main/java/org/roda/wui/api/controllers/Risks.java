@@ -30,7 +30,6 @@ import org.roda.wui.common.RodaCoreService;
 public class Risks extends RodaCoreService {
 
   private static final String RISKS_COMPONENT = "Risks";
-  private static final String INGEST_SUBMIT_ROLE = "ingest.submit";
 
   private Risks() {
     super();
@@ -46,7 +45,7 @@ public class Risks extends RodaCoreService {
     Date startDate = new Date();
 
     // FIXME check user permissions
-    UserUtility.checkRoles(user, INGEST_SUBMIT_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     RodaCoreFactory.getModelService().createRisk(risk, false);
 
@@ -61,8 +60,8 @@ public class Risks extends RodaCoreService {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Date startDate = new Date();
 
-    // check user permissions
-    // FIXME
+    // FIXME check user permissions
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     RodaCoreFactory.getModelService().deleteRisk(riskId, false);
@@ -73,6 +72,7 @@ public class Risks extends RodaCoreService {
   }
 
   public static List<IndexedRisk> retrieveRisks(IndexResult<IndexedRisk> listRisksIndexResult) {
+    // TODO: this method should also checkRoles? If so, a RodaUser is needed.
     List<IndexedRisk> risks = new ArrayList<IndexedRisk>();
     for (IndexedRisk risk : listRisksIndexResult.getResults()) {
       risks.add(risk);
