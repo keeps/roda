@@ -300,7 +300,7 @@ public final class PluginHelper {
       if (stateDetails.isPresent()) {
         job.setStateDetails(stateDetails.get());
       }
-      if (job.getState() == JOB_STATE.COMPLETED) {
+      if (job.getState() == JOB_STATE.COMPLETED || job.getState() == JOB_STATE.FAILED_TO_COMPLETE) {
         job.setEndDate(new Date());
       }
 
