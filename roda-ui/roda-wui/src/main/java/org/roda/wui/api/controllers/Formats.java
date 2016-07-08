@@ -29,7 +29,6 @@ import org.roda.wui.common.RodaCoreService;
 public class Formats extends RodaCoreService {
 
   private static final String FORMATS_COMPONENT = "Formats";
-  private static final String INGEST_SUBMIT_ROLE = "ingest.submit";
 
   private Formats() {
     super();
@@ -45,7 +44,7 @@ public class Formats extends RodaCoreService {
     Date startDate = new Date();
 
     // FIXME check user permissions
-    UserUtility.checkRoles(user, INGEST_SUBMIT_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     RodaCoreFactory.getModelService().createFormat(format, false);
 
@@ -60,8 +59,8 @@ public class Formats extends RodaCoreService {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Date startDate = new Date();
 
-    // check user permissions
-    // FIXME
+    // FIXME check user permissions
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     RodaCoreFactory.getModelService().deleteFormat(formatId, false);
