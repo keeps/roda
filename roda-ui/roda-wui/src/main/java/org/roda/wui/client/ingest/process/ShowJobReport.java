@@ -30,8 +30,8 @@ import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.process.IngestProcess;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Humanize;
-import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.tools.Humanize.DHMSFormat;
+import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -113,16 +113,16 @@ public class ShowJobReport extends Composite {
   @UiField
   Anchor job;
   @UiField
-  Label aipLabel;
+  Label outcomeObjectLabel;
   @UiField
-  Anchor aip;
+  Anchor outcomeObject;
   @UiField
-  HTML aipState;
+  HTML outcomeObjectState;
 
   @UiField
-  Label objectLabel;
+  Label sourceObjectLabel;
   @UiField
-  Anchor objectId;
+  Anchor sourceObject;
   @UiField
   Label dateCreated;
   @UiField
@@ -152,20 +152,20 @@ public class ShowJobReport extends Composite {
 
     boolean hasSource = true;
     if (!jobReport.getSourceObjectOriginalId().isEmpty() || !jobReport.getSourceObjectId().isEmpty()) {
-      objectId.setText(!"".equals(jobReport.getSourceObjectOriginalId()) ? jobReport.getSourceObjectOriginalId()
+      sourceObject.setText(!"".equals(jobReport.getSourceObjectOriginalId()) ? jobReport.getSourceObjectOriginalId()
         : jobReport.getSourceObjectId());
 
       if (TransferredResource.class.getCanonicalName().equals(jobReport.getSourceObjectClass())) {
-        objectId.setHref(Tools.createHistoryHashLink(IngestTransfer.RESOLVER, jobReport.getSourceObjectId()));
-        objectLabel.setText(messages.showSIPExtended());
+        sourceObject.setHref(Tools.createHistoryHashLink(IngestTransfer.RESOLVER, jobReport.getSourceObjectId()));
+        sourceObjectLabel.setText(messages.showSIPExtended());
 
       } else if (AIP.class.getCanonicalName().equals(jobReport.getSourceObjectClass())) {
-        objectId.setHref(Tools.createHistoryHashLink(Browse.RESOLVER, objectId.getText()));
-        objectLabel.setText(messages.showAIPExtended());
+        sourceObject.setHref(Tools.createHistoryHashLink(Browse.RESOLVER, sourceObject.getText()));
+        sourceObjectLabel.setText(messages.showAIPExtended());
 
       } else if (Representation.class.getCanonicalName().equals(jobReport.getSourceObjectClass())) {
-        BrowserService.Util.getInstance().retrieve(IndexedRepresentation.class.getCanonicalName(), objectId.getText(),
-          new AsyncCallback<IndexedRepresentation>() {
+        BrowserService.Util.getInstance().retrieve(IndexedRepresentation.class.getCanonicalName(),
+          sourceObject.getText(), new AsyncCallback<IndexedRepresentation>() {
 
             @Override
             public void onFailure(Throwable caught) {
@@ -175,15 +175,15 @@ public class ShowJobReport extends Composite {
             @Override
             public void onSuccess(IndexedRepresentation result) {
               if (result != null) {
-                objectLabel.setText(messages.showRepresentationExtended());
-                objectId.setHref(Tools.createHistoryHashLink(Browse.RESOLVER,
+                sourceObjectLabel.setText(messages.showRepresentationExtended());
+                sourceObject.setHref(Tools.createHistoryHashLink(Browse.RESOLVER,
                   ViewRepresentation.RESOLVER.getHistoryToken(), result.getAipId(), result.getUUID()));
               }
             }
           });
 
       } else if (File.class.getCanonicalName().equals(jobReport.getSourceObjectClass())) {
-        BrowserService.Util.getInstance().retrieve(IndexedFile.class.getCanonicalName(), objectId.getText(),
+        BrowserService.Util.getInstance().retrieve(IndexedFile.class.getCanonicalName(), sourceObject.getText(),
           new AsyncCallback<IndexedFile>() {
 
             @Override
@@ -194,8 +194,8 @@ public class ShowJobReport extends Composite {
             @Override
             public void onSuccess(IndexedFile result) {
               if (result != null) {
-                objectLabel.setText(messages.showFileExtended());
-                objectId
+                sourceObjectLabel.setText(messages.showFileExtended());
+                sourceObject
                   .setHref(Tools.createHistoryHashLink(Browse.RESOLVER, ViewRepresentation.RESOLVER.getHistoryToken(),
                     result.getAipId(), result.getRepresentationUUID(), result.getUUID()));
               }
@@ -206,16 +206,16 @@ public class ShowJobReport extends Composite {
       hasSource = false;
     }
 
-    objectLabel.setVisible(hasSource);
-    objectId.setVisible(hasSource);
+    sourceObjectLabel.setVisible(hasSource);
+    sourceObject.setVisible(hasSource);
 
     if (jobReport.getOutcomeObjectId() != null) {
-      aip.setText(jobReport.getOutcomeObjectId());
-      aipState.setHTML(HtmlSnippetUtils.getAIPStateHTML(jobReport.getOutcomeObjectState()));
+      outcomeObject.setText(jobReport.getOutcomeObjectId());
+      outcomeObjectState.setHTML(HtmlSnippetUtils.getAIPStateHTML(jobReport.getOutcomeObjectState()));
 
       if (AIP.class.getCanonicalName().equals(jobReport.getOutcomeObjectClass())) {
-        aip.setHref(Tools.createHistoryHashLink(Browse.RESOLVER, jobReport.getOutcomeObjectId()));
-        aipLabel.setText(messages.showAIPExtended());
+        outcomeObject.setHref(Tools.createHistoryHashLink(Browse.RESOLVER, jobReport.getOutcomeObjectId()));
+        outcomeObjectLabel.setText(messages.showAIPExtended());
 
       } else if (Representation.class.getCanonicalName().equals(jobReport.getOutcomeObjectClass())) {
         BrowserService.Util.getInstance().retrieve(IndexedRepresentation.class.getCanonicalName(),
@@ -229,9 +229,9 @@ public class ShowJobReport extends Composite {
             @Override
             public void onSuccess(IndexedRepresentation result) {
               if (result != null) {
-                aipLabel.setText(messages.showRepresentationExtended());
-                aip.setHref(Tools.createHistoryHashLink(Browse.RESOLVER, ViewRepresentation.RESOLVER.getHistoryToken(),
-                  result.getAipId(), result.getUUID()));
+                outcomeObjectLabel.setText(messages.showRepresentationExtended());
+                outcomeObject.setHref(Tools.createHistoryHashLink(Browse.RESOLVER,
+                  ViewRepresentation.RESOLVER.getHistoryToken(), result.getAipId(), result.getUUID()));
               }
             }
           });
@@ -248,21 +248,22 @@ public class ShowJobReport extends Composite {
             @Override
             public void onSuccess(IndexedFile result) {
               if (result != null) {
-                aipLabel.setText(messages.showFileExtended());
-                aip.setHref(Tools.createHistoryHashLink(Browse.RESOLVER, ViewRepresentation.RESOLVER.getHistoryToken(),
-                  result.getAipId(), result.getRepresentationUUID(), result.getUUID()));
+                outcomeObjectLabel.setText(messages.showFileExtended());
+                outcomeObject
+                  .setHref(Tools.createHistoryHashLink(Browse.RESOLVER, ViewRepresentation.RESOLVER.getHistoryToken(),
+                    result.getAipId(), result.getRepresentationUUID(), result.getUUID()));
               }
             }
           });
       } else {
-        aip.setVisible(false);
-        aipState.setVisible(false);
-        aipLabel.setVisible(false);
+        outcomeObject.setVisible(false);
+        outcomeObjectState.setVisible(false);
+        outcomeObjectLabel.setVisible(false);
       }
     } else {
       // TODO show better message
-      aip.setText("No AIP created");
-      aipState.setText("");
+      outcomeObject.setText("No AIP created");
+      outcomeObjectState.setText("");
     }
 
     DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT);

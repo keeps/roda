@@ -27,17 +27,16 @@
 								<g:Label addStyleNames="label">
 									<ui:text from='{messages.reportJob}' />
 								</g:Label>
-								<!-- <g:Label ui:field="job" /> -->
 								<g:Anchor ui:field="job" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label addStyleNames="label" ui:field="objectLabel" />
-								<g:Anchor ui:field="objectId" />
+								<g:Label addStyleNames="label" ui:field="sourceObjectLabel" />
+								<g:Anchor ui:field="sourceObject" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label addStyleNames="label" ui:field="aipLabel" />
-								<g:Anchor ui:field="aip" addStyleNames="inline" />
-								<g:HTML ui:field="aipState" addStyleNames="inline small" />
+								<g:Label addStyleNames="label" ui:field="outcomeObjectLabel" />
+								<g:Anchor ui:field="outcomeObject" addStyleNames="inline" />
+								<g:HTML ui:field="outcomeObjectState" addStyleNames="inline small" />
 							</g:FlowPanel>
 
 							<g:FlowPanel styleName="field">
