@@ -392,7 +392,7 @@ public class PluginManager {
 
       LOGGER.debug("Searching for plugins...");
 
-      blacklistedPlugins = RodaCoreFactory.getRodaConfigurationAsList("core", "plugins", "backlist");
+      blacklistedPlugins = RodaCoreFactory.getRodaConfigurationAsList("core", "plugins", "blacklist");
 
       loadPlugins();
 

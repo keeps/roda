@@ -26,6 +26,7 @@ import org.roda.wui.client.browse.ViewRepresentation;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.process.IngestProcess;
 import org.roda.wui.common.client.HistoryResolver;
@@ -209,7 +210,7 @@ public class ShowJobReport extends Composite {
     sourceObjectLabel.setVisible(hasSource);
     sourceObject.setVisible(hasSource);
 
-    if (jobReport.getOutcomeObjectId() != null) {
+    if (StringUtils.isNotBlank(jobReport.getOutcomeObjectId())) {
       outcomeObject.setText(jobReport.getOutcomeObjectId());
       outcomeObjectState.setHTML(HtmlSnippetUtils.getAIPStateHTML(jobReport.getOutcomeObjectState()));
 
@@ -261,9 +262,9 @@ public class ShowJobReport extends Composite {
         outcomeObjectLabel.setVisible(false);
       }
     } else {
-      // TODO show better message
-      outcomeObject.setText("No AIP created");
-      outcomeObjectState.setText("");
+      outcomeObject.setVisible(false);
+      outcomeObjectState.setVisible(false);
+      outcomeObjectLabel.setVisible(false);
     }
 
     DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT);

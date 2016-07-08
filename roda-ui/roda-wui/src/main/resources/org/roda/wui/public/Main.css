@@ -105,6 +105,12 @@ h6, .h6 {
     margin-bottom: 1rem;
 }
 
+.field ul {
+    list-style: inherit;
+    padding-left: 2rem;
+    color: rgb(88, 89, 91);
+}
+
 .errormessage {
     margin-top: 0.5rem;
 }

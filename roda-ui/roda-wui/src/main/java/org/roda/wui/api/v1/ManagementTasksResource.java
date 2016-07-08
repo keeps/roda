@@ -414,7 +414,7 @@ public class ManagementTasksResource extends RodaCoreService {
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
     Job job = new Job();
     job.setName("Management Task | Reindex 'AIPs' job").setPlugin(ReindexAIPPlugin.class.getCanonicalName())
-      .setSourceObjects(new SelectedItemsList(params, IndexedAIP.class.getName()));
+      .setSourceObjects(SelectedItemsList.create(AIP.class, params));
     try {
       Job jobCreated = Jobs.createJob(user, job);
       response.setMessage("Reindex job created (" + jobCreated + ")");

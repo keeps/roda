@@ -1472,8 +1472,8 @@ public class ModelService extends ModelObservable {
     try {
       inputStream = binary.getContent().createInputStream();
       ret = JsonUtils.getObjectFromJson(inputStream, Job.class);
-    } catch (IOException e) {
-      throw new GenericException("Error reading job", e);
+    } catch (IOException | GenericException e) {
+      throw new GenericException("Error reading job: " + jobId, e);
     } finally {
       IOUtils.closeQuietly(inputStream);
     }
