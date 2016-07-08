@@ -7,10 +7,7 @@
  */
 package org.roda.wui.api.controllers;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -18,7 +15,6 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.agents.Agent;
-import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.common.RodaCoreService;
 
@@ -29,7 +25,6 @@ import org.roda.wui.common.RodaCoreService;
 public class Agents extends RodaCoreService {
 
   private static final String AGENTS_COMPONENT = "Agents";
-  private static final String INGEST_SUBMIT_ROLE = "ingest.submit";
 
   private Agents() {
     super();
@@ -45,7 +40,7 @@ public class Agents extends RodaCoreService {
     Date startDate = new Date();
 
     // FIXME check user permissions
-    UserUtility.checkRoles(user, INGEST_SUBMIT_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     RodaCoreFactory.getModelService().createAgent(agent, false);
 
@@ -60,8 +55,8 @@ public class Agents extends RodaCoreService {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Date startDate = new Date();
 
-    // check user permissions
-    // FIXME
+    // FIXME check user permissions
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     RodaCoreFactory.getModelService().deleteAgent(agentId, false);
