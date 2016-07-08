@@ -26,7 +26,6 @@ import org.roda.wui.common.RodaCoreService;
 public class Jobs extends RodaCoreService {
 
   private static final String JOBS_COMPONENT = "Jobs";
-  private static final String INGEST_SUBMIT_ROLE = "ingest.submit";
 
   private Jobs() {
     super();
@@ -45,7 +44,7 @@ public class Jobs extends RodaCoreService {
     JobsHelper.validateAndSetCreateJobInformation(user, job);
 
     // check user permissions
-    UserUtility.checkRoles(user, INGEST_SUBMIT_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     Job updatedJob = JobsHelper.createJob(job);
@@ -61,8 +60,8 @@ public class Jobs extends RodaCoreService {
     NotFoundException, AuthorizationDeniedException, JobAlreadyStartedException {
     Date startDate = new Date();
 
-    // check user permissions
-    // FIXME
+    // FIXME check user permissions
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     Job job = JobsHelper.startJob(jobId);
@@ -78,8 +77,8 @@ public class Jobs extends RodaCoreService {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Date startDate = new Date();
 
-    // check user permissions
-    // FIXME
+    // FIXME check user permissions
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     JobsHelper.stopJob(jobId);
@@ -93,8 +92,8 @@ public class Jobs extends RodaCoreService {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Date startDate = new Date();
 
-    // check user permissions
-    // FIXME
+    // FIXME check user permissions
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     JobsHelper.deleteJob(jobId);
