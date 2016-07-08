@@ -30,7 +30,6 @@ import org.roda.wui.common.RodaCoreService;
 public class Notifications extends RodaCoreService {
 
   private static final String NOTIFICATIONS_COMPONENT = "Notifications";
-  private static final String INGEST_SUBMIT_ROLE = "ingest.submit";
 
   private Notifications() {
     super();
@@ -46,7 +45,7 @@ public class Notifications extends RodaCoreService {
     Date startDate = new Date();
 
     // FIXME check user permissions
-    UserUtility.checkRoles(user, INGEST_SUBMIT_ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     RodaCoreFactory.getModelService().createNotification(notification, "test-email-template",
       new HashMap<String, Object>());
@@ -62,8 +61,8 @@ public class Notifications extends RodaCoreService {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Date startDate = new Date();
 
-    // check user permissions
-    // FIXME
+    // FIXME check user permissions
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     RodaCoreFactory.getModelService().deleteNotification(notificationId);
@@ -75,6 +74,7 @@ public class Notifications extends RodaCoreService {
   }
 
   public static List<Notification> retrieveNotifications(IndexResult<Notification> listNotificationsIndexResult) {
+    // TODO: this method should also checkRoles? If so, a RodaUser is needed.
     List<Notification> notifications = new ArrayList<Notification>();
     for (Notification notification : listNotificationsIndexResult.getResults()) {
       notifications.add(notification);
@@ -86,8 +86,8 @@ public class Notifications extends RodaCoreService {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Date startDate = new Date();
 
-    // check user permissions
-    // FIXME
+    // FIXME check user permissions
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     RodaCoreFactory.getModelService().acknowledgeNotification(notificationId, token, email);
