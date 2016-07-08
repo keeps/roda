@@ -3,7 +3,6 @@ package org.roda.core.plugins;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -19,6 +18,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.TestsHelper;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
@@ -32,12 +32,11 @@ import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.SelectedItemsNone;
+import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -47,9 +46,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AbstractConvertTest {
-
-  private static final String FAKE_JOB_ID = "NONE";
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractConvertTest.class);
+
   private static Path basePath;
   private static ModelService model;
   private static IndexService index;
@@ -58,12 +56,10 @@ public class AbstractConvertTest {
 
   @Before
   public void setUp() throws Exception {
-
-    basePath = Files.createTempDirectory("indexTests");
-    System.setProperty("roda.home", basePath.toString());
+    basePath = TestsHelper.createBaseTempDir(this.getClass(), true);
 
     boolean deploySolr = true;
-    boolean deployLdap = false;
+    boolean deployLdap = true;
     boolean deployFolderMonitor = true;
     boolean deployOrchestrator = true;
     boolean deployPluginManager = true;
@@ -76,13 +72,6 @@ public class AbstractConvertTest {
     corporaPath = Paths.get(corporaURL.toURI());
 
     LOGGER.info("Running internal convert plugins tests under storage {}", basePath);
-
-    Job fakeJob = new Job();
-    fakeJob.setId(FAKE_JOB_ID);
-    fakeJob.setPluginType(PluginType.MISC);
-    fakeJob.setSourceObjects(SelectedItemsNone.create());
-    model.createJob(fakeJob);
-    index.commit(Job.class);
   }
 
   @After
@@ -127,22 +116,17 @@ public class AbstractConvertTest {
     String aipType = RodaConstants.AIP_TYPE_MIXED;
     AIP root = model.createAIP(parentId, aipType, new Permissions());
 
-    Plugin<TransferredResource> plugin = new TransferredResourceToAIPPlugin();
     Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
-    plugin.setParameterValues(parameters);
 
     List<TransferredResource> transferredResources = new ArrayList<TransferredResource>();
     transferredResources = createCorpora(corporaId);
 
     Assert.assertEquals(1, transferredResources.size());
-    // FIXME 20160623 hsilva: passing by null just to make code compiling
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(null, plugin,
-      transferredResources.stream().map(tr -> tr.getUUID()).collect(Collectors.toList()));
 
-    // TODO wait for job to finish
-    Thread.sleep(1000);
+    TestsHelper.executeJob(TransferredResourceToAIPPlugin.class, parameters, PluginType.SIP_TO_AIP,
+      SelectedItemsList.create(TransferredResource.class,
+        transferredResources.stream().map(tr -> tr.getUUID()).collect(Collectors.toList())));
 
     index.commitAIPs();
 
@@ -152,8 +136,7 @@ public class AbstractConvertTest {
     Assert.assertEquals(1L, find.getTotalCount());
     IndexedAIP indexedAIP = find.getResults().get(0);
 
-    AIP aip = model.retrieveAIP(indexedAIP.getId());
-    return aip;
+    return model.retrieveAIP(indexedAIP.getId());
   }
 
   public ModelService getModel() {
@@ -162,10 +145,6 @@ public class AbstractConvertTest {
 
   public int getNumberOfConvertableFiles() {
     return numberOfConvertableFiles;
-  }
-
-  public String getFakeJobId() {
-    return FAKE_JOB_ID;
   }
 
   public Path getCorporaPath() {

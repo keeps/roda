@@ -11,15 +11,16 @@ import java.util.stream.Collectors;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.Assert;
 import org.junit.Test;
-import org.roda.core.RodaCoreFactory;
+import org.roda.core.TestsHelper;
 import org.roda.core.common.iterables.CloseableIterable;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.common.OptionalWithCause;
+import org.roda.core.data.v2.index.SelectedItemsAll;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.plugins.plugins.conversion.ImageMagickConvertPlugin;
 
 import com.google.common.collect.Iterables;
@@ -39,14 +40,11 @@ public class ImageMagickTest extends AbstractConvertTest {
     Iterables.addAll(reusableAllFiles,
       Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
 
-    Plugin<Representation> plugin = new ImageMagickConvertPlugin<Representation>();
     Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, getFakeJobId());
     parameters.put("outputFormat", "tiff");
-    plugin.setParameterValues(parameters);
 
-    // FIXME 20160623 hsilva: passing by null just to make code compiling
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null, plugin);
+    TestsHelper.executeJob(ImageMagickConvertPlugin.class, parameters, PluginType.MISC,
+      SelectedItemsAll.create(Representation.class));
 
     aip = getModel().retrieveAIP(aip.getId());
     Assert.assertEquals(2, aip.getRepresentations().size());

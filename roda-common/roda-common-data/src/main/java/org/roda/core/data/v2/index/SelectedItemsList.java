@@ -17,12 +17,12 @@ public class SelectedItemsList<T extends IsRODAObject> implements SelectedItems<
 
   private static final long serialVersionUID = -5364779540199737165L;
 
-  public static <T extends IsRODAObject> SelectedItemsList<T> create(Class<T> classToCreate, String... ids) {
-    return new SelectedItemsList<T>(Arrays.asList(ids), classToCreate.getName());
+  public static <T extends IsRODAObject> SelectedItemsList<T> create(Class<T> classToCreate, List<String> ids) {
+    return new SelectedItemsList<>(ids, classToCreate.getName());
   }
 
-  public static <T extends IsRODAObject> SelectedItemsList<T> create(Class<T> classToCreate, List<String> ids) {
-    return new SelectedItemsList<T>(ids, classToCreate.getName());
+  public static <T extends IsRODAObject> SelectedItemsList<T> create(Class<T> classToCreate, String... ids) {
+    return new SelectedItemsList<T>(Arrays.asList(ids), classToCreate.getName());
   }
 
   private List<String> ids;
