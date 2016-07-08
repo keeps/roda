@@ -13,7 +13,6 @@ package org.roda.wui.common.client.widgets;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.RestUtils;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -22,15 +21,12 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.user.client.ui.HTML;
 
-import config.i18n.client.ClientMessages;
-
 /**
  * @author Luís Faria
  * 
  */
 public class HTMLWidgetWrapper extends HTML {
 
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   public HTMLWidgetWrapper(String resourceId) {

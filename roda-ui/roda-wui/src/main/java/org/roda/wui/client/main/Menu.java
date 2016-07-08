@@ -34,6 +34,7 @@ import org.roda.wui.client.planning.RiskRegister;
 import org.roda.wui.client.process.ActionProcess;
 import org.roda.wui.client.process.IngestProcess;
 import org.roda.wui.client.search.Search;
+import org.roda.wui.client.welcome.Help;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
@@ -100,6 +101,8 @@ public class Menu extends Composite {
   // private MenuItem planning_agents;
   private MenuItem planning_format;
 
+  private final MenuItem help;
+
   private final MenuBar userMenu;
 
   private final MenuBar languagesMenu;
@@ -118,10 +121,8 @@ public class Menu extends Composite {
     about = customMenuItem("fa fa-home", messages.title("about"), "menu-item-label", null,
       createCommand(Welcome.RESOLVER.getHistoryPath()));
 
-    dissemination_browse = new MenuItem(messages.title("dissemination_browse"),
-      createCommand(Browse.RESOLVER.getHistoryPath()));
-    dissemination_searchBasic = new MenuItem(messages.title("dissemination_search_basic"),
-      createCommand(Search.RESOLVER.getHistoryPath()));
+    dissemination_browse = new MenuItem(messages.title("browse"), createCommand(Browse.RESOLVER.getHistoryPath()));
+    dissemination_searchBasic = new MenuItem(messages.title("search"), createCommand(Search.RESOLVER.getHistoryPath()));
 
     ingestMenu = new MenuBar(true);
     ingest_pre = ingestMenu.addItem(messages.title("ingest_preIngest"),
@@ -158,6 +159,8 @@ public class Menu extends Composite {
     // createCommand(AgentRegister.RESOLVER.getHistoryPath()));
     planning_format = planningMenu.addItem(messages.title("planning_format"),
       createCommand(FormatRegister.RESOLVER.getHistoryPath()));
+
+    help = new MenuItem(messages.title("help"), createCommand(Help.RESOLVER.getHistoryPath()));
 
     userMenu = new MenuBar(true);
     userMenu.addItem(messages.loginProfile(), createCommand(Profile.RESOLVER.getHistoryPath()));
@@ -253,6 +256,9 @@ public class Menu extends Composite {
     // updateResolverSubItemVisibility(Planning.RESOLVER, planning_agents);
     updateResolverSubItemVisibility(Planning.RESOLVER, planning_format);
     updateResolverTopItemVisibility(Planning.RESOLVER, new MenuItem(messages.title("planning"), planningMenu), 5);
+
+    // Help
+    updateResolverTopItemVisibility(Help.RESOLVER, help, 6);
 
     // User
     if (user.isGuest()) {
