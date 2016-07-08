@@ -15,7 +15,6 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -26,6 +25,7 @@ import org.apache.solr.client.solrj.SolrQuery.SortClause;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
 import org.hamcrest.Matchers;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -45,6 +45,7 @@ import org.roda.core.data.adapter.sort.SortParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.index.utils.SolrUtils;
@@ -66,9 +67,6 @@ public class SolrUtilsTest {
 
   @Before
   public void init() throws IOException, GenericException {
-    Path basePath = Files.createTempDirectory(getClass().getSimpleName());
-    System.setProperty("roda.home", basePath.toString());
-
     boolean deploySolr = false;
     boolean deployLdap = false;
     boolean deployFolderMonitor = false;
@@ -76,6 +74,11 @@ public class SolrUtilsTest {
     boolean deployPluginManager = false;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
       deployPluginManager);
+  }
+
+  @After
+  public void cleanup() throws NotFoundException, GenericException, IOException {
+    RodaCoreFactory.shutdown();
   }
 
   @Test

@@ -1,5 +1,10 @@
 package org.roda.core;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.FileAttribute;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -20,6 +25,24 @@ import org.roda.core.plugins.Plugin;
 public final class TestsHelper {
   private TestsHelper() {
 
+  }
+
+  public static <T extends Serializable> Path createBaseTempDir(Class testClass, boolean setAsRODAHomeSystemProperty,
+    FileAttribute<?>... attributes) throws IOException {
+    Path baseTempDir = Files.createTempDirectory("_" + testClass.getSimpleName(), attributes);
+    if (setAsRODAHomeSystemProperty) {
+      System.setProperty("roda.home", baseTempDir.toString());
+    }
+    return baseTempDir;
+  }
+
+  public static <T extends Serializable> Path createBaseTempDir(Class testClass, boolean setAsRODAHome)
+    throws IOException {
+    Path baseTempDir = Files.createTempDirectory("_" + testClass.getSimpleName());
+    if (setAsRODAHome) {
+      System.setProperty("roda.home", baseTempDir.toString());
+    }
+    return baseTempDir;
   }
 
   public static <T extends IsRODAObject, T1 extends Plugin<T>> Job executeJob(Class<T1> plugin, PluginType pluginType,

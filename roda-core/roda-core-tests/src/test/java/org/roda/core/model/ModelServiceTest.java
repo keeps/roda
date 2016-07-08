@@ -41,6 +41,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.TestsHelper;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
@@ -109,8 +110,7 @@ public class ModelServiceTest {
 
   @Before
   public void init() throws IOException, GenericException {
-    basePath = Files.createTempDirectory(getClass().getSimpleName());
-    System.setProperty("roda.home", basePath.toString());
+    basePath = TestsHelper.createBaseTempDir(getClass(), true);
 
     boolean deploySolr = false;
     boolean deployLdap = false;
@@ -126,7 +126,8 @@ public class ModelServiceTest {
   }
 
   @After
-  public void cleanup() throws NotFoundException, GenericException {
+  public void cleanup() throws NotFoundException, GenericException, IOException {
+    RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
   }
 

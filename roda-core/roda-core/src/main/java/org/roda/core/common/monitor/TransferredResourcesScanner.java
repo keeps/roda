@@ -121,7 +121,7 @@ public class TransferredResourcesScanner {
     return ret;
   }
 
-  public static TransferredResource createTransferredResource(Path resourcePath, BasicFileAttributes attr, long size,
+  protected static TransferredResource createTransferredResource(Path resourcePath, BasicFileAttributes attr, long size,
     Path basePath, Date lastScanDate) {
     Path relativeToBase = basePath.relativize(resourcePath);
     TransferredResource tr = new TransferredResource();

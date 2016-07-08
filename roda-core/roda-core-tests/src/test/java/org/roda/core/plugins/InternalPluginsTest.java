@@ -11,11 +11,8 @@ import static org.junit.Assert.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
@@ -59,7 +56,6 @@ import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.SelectedItemsList;
-import org.roda.core.data.v2.index.SelectedItemsNone;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
@@ -70,7 +66,6 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
-import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -80,9 +75,7 @@ import org.roda.core.plugins.plugins.ingest.TransferredResourceToAIPPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPlugin;
 import org.roda.core.storage.Binary;
-import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
-import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.util.InvalidDateException;
@@ -98,7 +91,6 @@ import gov.loc.premis.v3.Representation;
 import jersey.repackaged.com.google.common.collect.Lists;
 
 public class InternalPluginsTest {
-  private static final String FAKE_JOB_ID = "NONE";
   private static final String FAKE_REPORTING_CLASS = "NONE";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(InternalPluginsTest.class);
@@ -111,22 +103,16 @@ public class InternalPluginsTest {
   private static final int GENERATED_FILE_SIZE = 100;
 
   private static Path basePath;
-  private static Path logPath;
 
   private static ModelService model;
   private static IndexService index;
 
-  private static Path corporaPath;
-  private static StorageService corporaService;
-
   @Before
   public void setUp() throws Exception {
-
-    basePath = Files.createTempDirectory("indexTests",
+    basePath = TestsHelper.createBaseTempDir(getClass(), true,
       PosixFilePermissions
         .asFileAttribute(new HashSet<>(Arrays.asList(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE,
           PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OTHERS_READ, PosixFilePermission.OTHERS_EXECUTE))));
-    System.setProperty("roda.home", basePath.toString());
 
     boolean deploySolr = true;
     boolean deployLdap = true;
@@ -135,22 +121,10 @@ public class InternalPluginsTest {
     boolean deployPluginManager = true;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
       deployPluginManager);
-    logPath = RodaCoreFactory.getLogPath();
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
 
-    URL corporaURL = InternalPluginsTest.class.getResource("/corpora");
-    corporaPath = Paths.get(corporaURL.toURI());
-    corporaService = new FileStorageService(corporaPath);
-
     LOGGER.info("Running internal plugins tests under storage {}", basePath);
-
-    Job fakeJob = new Job();
-    fakeJob.setId(FAKE_JOB_ID);
-    fakeJob.setPluginType(PluginType.MISC);
-    fakeJob.setSourceObjects(SelectedItemsNone.create());
-    model.createJob(fakeJob);
-    index.commit(Job.class);
   }
 
   @After
@@ -166,12 +140,6 @@ public class InternalPluginsTest {
   private TransferredResource createCorpora() throws InterruptedException, IOException, FileAlreadyExistsException,
     NotFoundException, GenericException, RequestNotValidException {
     TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
-
-    // Path corpora = corporaPath.resolve(RodaConstants.STORAGE_CONTAINER_AIP)
-    // .resolve(CorporaConstants.SOURCE_AIP_REP_WITH_SUBFOLDERS).resolve(RodaConstants.STORAGE_DIRECTORY_DATA)
-    // .resolve(CorporaConstants.REPRESENTATION_1_ID);
-    //
-    // FSUtils.copy(corpora, f.getBasePath().resolve("test"), true);
 
     String parentUUID = f.createFolder(null, "test").getUUID();
     String test1UUID = f.createFolder(parentUUID, CORPORA_TEST1).getUUID();

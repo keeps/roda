@@ -112,7 +112,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
     TransferredResource transferredResource, Path earkSIPPath, boolean createSubmission, Report reportItem) {
     SIP sip = null;
     try {
-      sip = EARKSIP.parse(earkSIPPath);
+      sip = EARKSIP.parse(earkSIPPath, RodaCoreFactory.getWorkingDirectory());
       reportItem.setSourceObjectOriginalId(sip.getId());
 
       if (sip.getValidationReport().isValid()) {

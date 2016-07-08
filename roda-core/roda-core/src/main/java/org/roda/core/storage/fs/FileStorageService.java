@@ -56,7 +56,7 @@ public class FileStorageService implements StorageService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FileStorageService.class);
 
-  private static final String HISTORY_SUFFIX = "-history";
+  public static final String HISTORY_SUFFIX = "-history";
   private static final String HISTORY_DATA_FOLDER = "data";
   private static final String HISTORY_METADATA_FOLDER = "metadata";
 

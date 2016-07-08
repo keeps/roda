@@ -10,7 +10,6 @@ package org.roda.core.index;
 import static org.junit.Assert.assertEquals;
 
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
@@ -21,6 +20,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.TestsHelper;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.index.IndexResult;
@@ -41,7 +41,6 @@ import org.slf4j.LoggerFactory;
 public class PermissionsTest {
 
   private static Path basePath;
-  private static Path logPath;
   private static ModelService model;
   private static IndexService index;
 
@@ -52,9 +51,7 @@ public class PermissionsTest {
 
   @BeforeClass
   public static void setUp() throws Exception {
-
-    basePath = Files.createTempDirectory("indexTests");
-    System.setProperty("roda.home", basePath.toString());
+    basePath = TestsHelper.createBaseTempDir(PermissionsTest.class, true);
 
     boolean deploySolr = true;
     boolean deployLdap = true;
@@ -64,7 +61,6 @@ public class PermissionsTest {
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
       deployPluginManager);
 
-    logPath = RodaCoreFactory.getLogPath();
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
 

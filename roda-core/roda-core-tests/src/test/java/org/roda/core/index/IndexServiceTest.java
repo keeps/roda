@@ -14,7 +14,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
@@ -36,6 +35,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.TestsHelper;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
@@ -94,9 +94,7 @@ public class IndexServiceTest {
 
   @BeforeClass
   public static void setUp() throws Exception {
-
-    basePath = Files.createTempDirectory("indexTests");
-    System.setProperty("roda.home", basePath.toString());
+    basePath = TestsHelper.createBaseTempDir(IndexServiceTest.class, true);
 
     boolean deploySolr = true;
     boolean deployLdap = true;

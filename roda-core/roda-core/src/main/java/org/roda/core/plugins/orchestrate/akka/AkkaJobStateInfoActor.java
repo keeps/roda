@@ -8,6 +8,9 @@
 package org.roda.core.plugins.orchestrate.akka;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.JobInfo;
@@ -55,6 +58,12 @@ public class AkkaJobStateInfoActor extends UntypedActor {
   private void handleJobStateUpdated(Object msg) {
     Messages.JobStateUpdated message = (Messages.JobStateUpdated) msg;
     Plugin<?> p = message.getPlugin() == null ? plugin : message.getPlugin();
+    try {
+      Job job = PluginHelper.getJobFromIndex(message.getPlugin(), RodaCoreFactory.getIndexService());
+      LOGGER.info("Setting job '{}' ({}) state to {}", job.getName(), job.getId(), message.getState());
+    } catch (NotFoundException | GenericException e) {
+      LOGGER.error("Unable to get Job from index to log its state change", e);
+    }
     PluginHelper.updateJobState(p, RodaCoreFactory.getModelService(), message.getState(), message.getStateDatails());
     if (JOB_STATE.FAILED_TO_COMPLETE == message.getState() || JOB_STATE.COMPLETED == message.getState()) {
       jobCreator.tell("Done", getSelf());

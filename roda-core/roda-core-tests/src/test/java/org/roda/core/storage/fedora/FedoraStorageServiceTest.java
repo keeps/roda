@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.nio.file.Paths;
 import java.util.Iterator;
-import java.util.List;
 
 import javax.ws.rs.core.Response.Status;
 

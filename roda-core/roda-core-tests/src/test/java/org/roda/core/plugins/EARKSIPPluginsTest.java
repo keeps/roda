@@ -21,11 +21,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.solr.client.solrj.SolrServerException;
-import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
@@ -47,22 +45,16 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.SelectedItemsList;
-import org.roda.core.data.v2.index.SelectedItemsNone;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
-import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.plugins.ingest.EARKSIPToAIPPlugin;
-import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
-import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,29 +65,18 @@ import jersey.repackaged.com.google.common.collect.Lists;
 public class EARKSIPPluginsTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(EARKSIPPluginsTest.class);
 
-  private static final String FAKE_JOB_ID = "NONE";
-
   private static final int CORPORA_FILES_COUNT = 4;
   private static final int CORPORA_FOLDERS_COUNT = 2;
-  private static final String CORPORA_PDF = "test.docx";
-  private static final String CORPORA_TEST1 = "test1";
-  private static final String CORPORA_TEST1_TXT = "test1.txt";
-  private static final int GENERATED_FILE_SIZE = 100;
-  private static final int AUTO_COMMIT_TIMEOUT = 2500;
   private static Path basePath;
-  private static Path logPath;
 
   private static ModelService model;
   private static IndexService index;
 
   private static Path corporaPath;
-  private static StorageService corporaService;
 
   @Before
   public void setUp() throws Exception {
-
-    basePath = Files.createTempDirectory("indexTests");
-    System.setProperty("roda.home", basePath.toString());
+    basePath = TestsHelper.createBaseTempDir(getClass(), true);
 
     boolean deploySolr = true;
     boolean deployLdap = true;
@@ -104,22 +85,13 @@ public class EARKSIPPluginsTest {
     boolean deployPluginManager = true;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
       deployPluginManager);
-    logPath = RodaCoreFactory.getLogPath();
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
 
     URL corporaURL = EARKSIPPluginsTest.class.getResource("/corpora");
     corporaPath = Paths.get(corporaURL.toURI());
-    corporaService = new FileStorageService(corporaPath);
 
     LOGGER.info("Running E-ARK SIP plugins tests under storage {}", basePath);
-
-    Job fakeJob = new Job();
-    fakeJob.setId(FAKE_JOB_ID);
-    fakeJob.setPluginType(PluginType.MISC);
-    fakeJob.setSourceObjects(SelectedItemsNone.create());
-    model.createJob(fakeJob);
-    index.commit(Job.class);
   }
 
   @After
@@ -142,13 +114,6 @@ public class EARKSIPPluginsTest {
     TransferredResource transferredResource = index.retrieve(TransferredResource.class,
       UUID.nameUUIDFromBytes(CorporaConstants.EARK_SIP.getBytes()).toString());
     return transferredResource;
-  }
-
-  private void assertReports(List<Report> reports) {
-    Assert.assertNotNull(reports);
-    for (Report report : reports) {
-      Assert.assertThat(report.getReports().get(0).getPluginState(), Matchers.is(PluginState.SUCCESS));
-    }
   }
 
   private AIP ingestCorpora() throws RequestNotValidException, NotFoundException, GenericException,
@@ -179,9 +144,7 @@ public class EARKSIPPluginsTest {
     return aip;
   }
 
-  // FIXME 20160707 hsilva: its taking too long
   @Test
-  @Ignore
   public void testIngestEARKSIP()
     throws IOException, InterruptedException, RODAException, SolrServerException, IsStillUpdatingException {
     AIP aip = ingestCorpora();

@@ -551,7 +551,7 @@ public class RodaCoreFactory {
       Path solrHome = configPath.resolve(RodaConstants.CORE_INDEX_FOLDER);
       if (!Files.exists(solrHome) || FEATURE_OVERRIDE_INDEX_CONFIGS) {
         try {
-          Path tempConfig = Files.createTempDirectory(RodaConstants.CORE_INDEX_FOLDER);
+          Path tempConfig = Files.createTempDirectory(getWorkingDirectory(), RodaConstants.CORE_INDEX_FOLDER);
           copyFilesFromClasspath(RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER + "/",
             tempConfig);
           solrHome = tempConfig.resolve(RodaConstants.CORE_CONFIG_FOLDER).resolve(RodaConstants.CORE_INDEX_FOLDER);
@@ -569,7 +569,7 @@ public class RodaCoreFactory {
       index = new IndexService(solr, model);
     } else if (nodeType == NodeType.TEST && TEST_DEPLOY_SOLR) {
       try {
-        Path tempConfig = Files.createTempDirectory(RodaConstants.CORE_INDEX_FOLDER);
+        Path tempConfig = Files.createTempDirectory(getWorkingDirectory(), RodaConstants.CORE_INDEX_FOLDER);
         copyFilesFromClasspath(RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER + "/",
           tempConfig, true);
 
@@ -670,7 +670,7 @@ public class RodaCoreFactory {
     startApacheDS();
 
     try {
-      startTransferredResourcesScanner();
+      instantiateTransferredResourcesScanner();
     } catch (Exception e) {
       LOGGER.error("Error starting Transferred Resources Scanner: " + e.getMessage(), e);
     }
@@ -691,7 +691,7 @@ public class RodaCoreFactory {
 
     if (TEST_DEPLOY_SCANNER) {
       try {
-        startTransferredResourcesScanner();
+        instantiateTransferredResourcesScanner();
       } catch (Exception e) {
         LOGGER.error("Error starting Transferred Resources Scanner: " + e.getMessage(), e);
       }
@@ -738,6 +738,8 @@ public class RodaCoreFactory {
         if (TEST_DEPLOY_ORCHESTRATOR) {
           pluginOrchestrator.shutdown();
         }
+        // final cleanup
+        FSUtils.deletePathQuietly(workingDirectoryPath);
       }
 
     }
@@ -794,7 +796,7 @@ public class RodaCoreFactory {
     }
   }
 
-  public static void startTransferredResourcesScanner() throws Exception {
+  public static void instantiateTransferredResourcesScanner() throws Exception {
 
     String transferredResourcesFolder = getRodaConfiguration().getString("transferredResources.folder",
       RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER);

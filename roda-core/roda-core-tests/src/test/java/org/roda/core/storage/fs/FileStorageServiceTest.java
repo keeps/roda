@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.roda.core.TestsHelper;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
@@ -44,18 +45,19 @@ import org.slf4j.LoggerFactory;
 public class FileStorageServiceTest extends AbstractStorageServiceTest<FileStorageService> {
   private static final Logger LOGGER = LoggerFactory.getLogger(FileStorageServiceTest.class);
 
-  private static Path basePathForTests;
+  private static Path basePath;
   private static FileStorageService storage;
 
   @BeforeClass
   public static void setUp() throws IOException, GenericException {
-    basePathForTests = Files.createTempDirectory("fsTests");
-    storage = new FileStorageService(basePathForTests);
+    basePath = TestsHelper.createBaseTempDir(FileStorageServiceTest.class, true);
+    storage = new FileStorageService(basePath);
   }
 
   @AfterClass
   public static void tearDown() throws NotFoundException, GenericException {
-    FSUtils.deletePath(basePathForTests);
+    FSUtils.deletePath(basePath);
+    FSUtils.deletePath(basePath.getParent().resolve(basePath.getFileName() + FileStorageService.HISTORY_SUFFIX));
   }
 
   @Test
@@ -122,7 +124,7 @@ public class FileStorageServiceTest extends AbstractStorageServiceTest<FileStora
     LOGGER.trace("Cleanning up");
     try {
       // recursively delete directory
-      Files.walkFileTree(basePathForTests, new SimpleFileVisitor<Path>() {
+      Files.walkFileTree(basePath, new SimpleFileVisitor<Path>() {
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
           Files.delete(file);
@@ -137,7 +139,7 @@ public class FileStorageServiceTest extends AbstractStorageServiceTest<FileStora
 
       });
       // re-create directory
-      Files.createDirectory(basePathForTests);
+      Files.createDirectory(basePath);
     } catch (IOException e) {
       LOGGER.error("Could not clean up", e);
     }
