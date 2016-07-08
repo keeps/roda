@@ -395,7 +395,8 @@ public class RodaCoreFactory {
         }
       } catch (IOException e) {
         LOGGER.error("Unable to create " + path + ". Aborting...", e);
-        throw new RuntimeException("Unable to create " + path + ". Aborting...", e);
+        // throw new RuntimeException("Unable to create " + path + ".
+        // Aborting...", e);
       }
     }
 
