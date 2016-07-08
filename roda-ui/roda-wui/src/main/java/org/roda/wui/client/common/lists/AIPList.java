@@ -42,12 +42,15 @@ import config.i18n.client.ClientMessages;
 
 public class AIPList extends BasicAsyncTableCell<IndexedAIP> {
 
+  private static final SafeHtml HAS_REPRESENTATIONS_ICON = SafeHtmlUtils
+    .fromSafeConstant("<i class='fa fa-paperclip' title='Has representations' aria-hidden='true'></i>");
   private final ClientLogger logger = new ClientLogger(getClass().getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private Column<IndexedAIP, SafeHtml> levelColumn;
   private TextColumn<IndexedAIP> titleColumn;
   private TextColumn<IndexedAIP> datesColumn;
+  private Column<IndexedAIP, SafeHtml> hasRepresentationsColumn;
 
   public AIPList() {
     this(null, false, null, null, false);
@@ -96,15 +99,34 @@ public class AIPList extends BasicAsyncTableCell<IndexedAIP> {
       }
     };
 
+    hasRepresentationsColumn = new Column<IndexedAIP, SafeHtml>(new SafeHtmlCell()) {
+      @Override
+      public SafeHtml getValue(IndexedAIP aip) {
+        SafeHtml ret;
+        if (aip == null) {
+          logger.error("Trying to display a NULL item");
+          ret = null;
+        } else if (aip.getHasRepresentations()) {
+          // TODO set title and aria
+          ret = HAS_REPRESENTATIONS_ICON;
+        } else {
+          ret = null;
+        }
+        return ret;
+      }
+    };
+
     levelColumn.setSortable(true);
     titleColumn.setSortable(true);
     datesColumn.setSortable(true);
+    hasRepresentationsColumn.setSortable(true);
 
     // TODO externalize strings into constants
     display.addColumn(levelColumn,
       SafeHtmlUtils.fromSafeConstant("<i class='fa fa-tag'></i>&nbsp;" + messages.aipLevel()));
     display.addColumn(titleColumn, messages.aipGenericTitle());
     display.addColumn(datesColumn, messages.aipDates());
+    display.addColumn(hasRepresentationsColumn, HAS_REPRESENTATIONS_ICON);
 
     Label emptyInfo = new Label(messages.noItemsToDisplay());
     display.setEmptyTableWidget(emptyInfo);
@@ -114,6 +136,7 @@ public class AIPList extends BasicAsyncTableCell<IndexedAIP> {
 
     display.setColumnWidth(levelColumn, 5.0, Unit.EM);
     display.setColumnWidth(datesColumn, 13.0, Unit.EM);
+    display.setColumnWidth(hasRepresentationsColumn, 3.0, Unit.EM);
 
     levelColumn.setCellStyleNames("nowrap");
     datesColumn.setCellStyleNames("nowrap");
@@ -136,6 +159,7 @@ public class AIPList extends BasicAsyncTableCell<IndexedAIP> {
       columnSortingKeyMap.put(levelColumn, Arrays.asList(RodaConstants.AIP_LEVEL));
       columnSortingKeyMap.put(titleColumn, Arrays.asList(RodaConstants.AIP_TITLE_SORT));
       columnSortingKeyMap.put(datesColumn, Arrays.asList(RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_DATE_FINAL));
+      columnSortingKeyMap.put(hasRepresentationsColumn, Arrays.asList(RodaConstants.AIP_HAS_REPRESENTATIONS));
 
       Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 

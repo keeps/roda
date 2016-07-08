@@ -40,6 +40,7 @@ public class IndexedAIP implements IsIndexed {
   private Long numberOfSubmissionFiles;
   private Long numberOfDocumentationFiles;
   private Long numberOfSchemaFiles;
+  private Boolean hasRepresentations;
 
   private String ingestSIPId;
   private String ingestJobId;
@@ -60,7 +61,8 @@ public class IndexedAIP implements IsIndexed {
   public IndexedAIP(IndexedAIP other) {
     this(other.getId(), other.getState(), other.getLevel(), other.getTitle(), other.getDateInitial(),
       other.getDateFinal(), other.getDescription(), other.getParentID(), other.getAncestors(), other.getPermissions(),
-      other.getNumberOfSubmissionFiles(), other.getNumberOfDocumentationFiles(), other.getNumberOfSchemaFiles());
+      other.getNumberOfSubmissionFiles(), other.getNumberOfDocumentationFiles(), other.getNumberOfSchemaFiles(),
+      other.getHasRepresentations());
   }
 
   /**
@@ -81,7 +83,7 @@ public class IndexedAIP implements IsIndexed {
    */
   public IndexedAIP(String id, AIPState state, String level, String title, Date dateInitial, Date dateFinal,
     String description, String parentID, List<String> ancestors, Permissions permissions, Long numberOfSubmissionFiles,
-    Long numberOfDocumentationFiles, Long numberOfSchemaFiles) {
+    Long numberOfDocumentationFiles, Long numberOfSchemaFiles, Boolean hasRepresentations) {
     super();
     this.id = id;
     this.state = state;
@@ -96,6 +98,7 @@ public class IndexedAIP implements IsIndexed {
     this.numberOfSubmissionFiles = numberOfSubmissionFiles;
     this.numberOfDocumentationFiles = numberOfDocumentationFiles;
     this.numberOfSchemaFiles = numberOfSchemaFiles;
+    this.hasRepresentations = hasRepresentations;
   }
 
   public Long getNumberOfSubmissionFiles() {
@@ -271,6 +274,14 @@ public class IndexedAIP implements IsIndexed {
     return this;
   }
 
+  public Boolean getHasRepresentations() {
+    return hasRepresentations;
+  }
+
+  public void setHasRepresentations(Boolean hasRepresentations) {
+    this.hasRepresentations = hasRepresentations;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -279,6 +290,7 @@ public class IndexedAIP implements IsIndexed {
     result = prime * result + ((dateFinal == null) ? 0 : dateFinal.hashCode());
     result = prime * result + ((dateInitial == null) ? 0 : dateInitial.hashCode());
     result = prime * result + ((description == null) ? 0 : description.hashCode());
+    result = prime * result + ((hasRepresentations == null) ? 0 : hasRepresentations.hashCode());
     result = prime * result + ((id == null) ? 0 : id.hashCode());
     result = prime * result + ((ingestJobId == null) ? 0 : ingestJobId.hashCode());
     result = prime * result + ((ingestSIPId == null) ? 0 : ingestSIPId.hashCode());
@@ -295,128 +307,105 @@ public class IndexedAIP implements IsIndexed {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) {
+    if (this == obj)
       return true;
-    }
-    if (obj == null) {
+    if (obj == null)
       return false;
-    }
-    if (!(obj instanceof IndexedAIP)) {
+    if (getClass() != obj.getClass())
       return false;
-    }
     IndexedAIP other = (IndexedAIP) obj;
     if (ancestors == null) {
-      if (other.ancestors != null) {
+      if (other.ancestors != null)
         return false;
-      }
-    } else if (!ancestors.equals(other.ancestors)) {
+    } else if (!ancestors.equals(other.ancestors))
       return false;
-    }
     if (dateFinal == null) {
-      if (other.dateFinal != null) {
+      if (other.dateFinal != null)
         return false;
-      }
-    } else if (!dateFinal.equals(other.dateFinal)) {
+    } else if (!dateFinal.equals(other.dateFinal))
       return false;
-    }
     if (dateInitial == null) {
-      if (other.dateInitial != null) {
+      if (other.dateInitial != null)
         return false;
-      }
-    } else if (!dateInitial.equals(other.dateInitial)) {
+    } else if (!dateInitial.equals(other.dateInitial))
       return false;
-    }
     if (description == null) {
-      if (other.description != null) {
+      if (other.description != null)
         return false;
-      }
-    } else if (!description.equals(other.description)) {
+    } else if (!description.equals(other.description))
       return false;
-    }
+    if (hasRepresentations == null) {
+      if (other.hasRepresentations != null)
+        return false;
+    } else if (!hasRepresentations.equals(other.hasRepresentations))
+      return false;
     if (id == null) {
-      if (other.id != null) {
+      if (other.id != null)
         return false;
-      }
-    } else if (!id.equals(other.id)) {
+    } else if (!id.equals(other.id))
       return false;
-    }
     if (ingestJobId == null) {
-      if (other.ingestJobId != null) {
+      if (other.ingestJobId != null)
         return false;
-      }
-    } else if (!ingestJobId.equals(other.ingestJobId)) {
+    } else if (!ingestJobId.equals(other.ingestJobId))
       return false;
-    }
     if (ingestSIPId == null) {
-      if (other.ingestSIPId != null) {
+      if (other.ingestSIPId != null)
         return false;
-      }
-    } else if (!ingestSIPId.equals(other.ingestSIPId)) {
+    } else if (!ingestSIPId.equals(other.ingestSIPId))
       return false;
-    }
     if (level == null) {
-      if (other.level != null) {
+      if (other.level != null)
         return false;
-      }
-    } else if (!level.equals(other.level)) {
+    } else if (!level.equals(other.level))
       return false;
-    }
     if (numberOfDocumentationFiles == null) {
-      if (other.numberOfDocumentationFiles != null) {
+      if (other.numberOfDocumentationFiles != null)
         return false;
-      }
-    } else if (!numberOfDocumentationFiles.equals(other.numberOfDocumentationFiles)) {
+    } else if (!numberOfDocumentationFiles.equals(other.numberOfDocumentationFiles))
       return false;
-    }
     if (numberOfSchemaFiles == null) {
-      if (other.numberOfSchemaFiles != null) {
+      if (other.numberOfSchemaFiles != null)
         return false;
-      }
-    } else if (!numberOfSchemaFiles.equals(other.numberOfSchemaFiles)) {
+    } else if (!numberOfSchemaFiles.equals(other.numberOfSchemaFiles))
       return false;
-    }
     if (numberOfSubmissionFiles == null) {
-      if (other.numberOfSubmissionFiles != null) {
+      if (other.numberOfSubmissionFiles != null)
         return false;
-      }
-    } else if (!numberOfSubmissionFiles.equals(other.numberOfSubmissionFiles)) {
+    } else if (!numberOfSubmissionFiles.equals(other.numberOfSubmissionFiles))
       return false;
-    }
     if (parentID == null) {
-      if (other.parentID != null) {
+      if (other.parentID != null)
         return false;
-      }
-    } else if (!parentID.equals(other.parentID)) {
+    } else if (!parentID.equals(other.parentID))
       return false;
-    }
     if (permissions == null) {
-      if (other.permissions != null) {
+      if (other.permissions != null)
         return false;
-      }
-    } else if (!permissions.equals(other.permissions)) {
+    } else if (!permissions.equals(other.permissions))
       return false;
-    }
-    if (state != other.state) {
+    if (state != other.state)
       return false;
-    }
     if (title == null) {
-      if (other.title != null) {
+      if (other.title != null)
         return false;
-      }
-    } else if (!title.equals(other.title)) {
+    } else if (!title.equals(other.title))
       return false;
-    }
     return true;
   }
 
   @Override
   public String toString() {
-    return "IndexedAIP [id=" + id + ", state=" + state + ", level=" + level + ", title=" + title + ", dateInitial="
-      + dateInitial + ", dateFinal=" + dateFinal + ", description=" + description + ", parentID=" + parentID
-      + ", ancestors=" + ancestors + ", permissions=" + permissions + ", numberOfSubmissionFiles="
-      + numberOfSubmissionFiles + ", numberOfDocumentationFiles=" + numberOfDocumentationFiles
-      + ", numberOfSchemaFiles=" + numberOfSchemaFiles + ", ingestSIPId=" + ingestSIPId + ", ingestJobId=" + ingestJobId
-      + "]";
+    StringBuilder builder = new StringBuilder();
+    builder.append("IndexedAIP [id=").append(id).append(", state=").append(state).append(", level=").append(level)
+      .append(", title=").append(title).append(", dateInitial=").append(dateInitial).append(", dateFinal=")
+      .append(dateFinal).append(", description=").append(description).append(", parentID=").append(parentID)
+      .append(", ancestors=").append(ancestors).append(", permissions=").append(permissions)
+      .append(", numberOfSubmissionFiles=").append(numberOfSubmissionFiles).append(", numberOfDocumentationFiles=")
+      .append(numberOfDocumentationFiles).append(", numberOfSchemaFiles=").append(numberOfSchemaFiles)
+      .append(", hasRepresentations=").append(hasRepresentations).append(", ingestSIPId=").append(ingestSIPId)
+      .append(", ingestJobId=").append(ingestJobId).append("]");
+    return builder.toString();
   }
 
   @Override

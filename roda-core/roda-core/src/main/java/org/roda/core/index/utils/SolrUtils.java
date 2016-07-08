@@ -1098,10 +1098,10 @@ public class SolrUtils {
    */
 
   public static IndexedAIP solrDocumentToIndexedAIP(SolrDocument doc) {
-    final String id = objectToString(doc.get(RodaConstants.AIP_ID));
+    final String id = objectToString(doc.get(RodaConstants.AIP_ID), null);
     final AIPState state = AIPState
       .valueOf(objectToString(doc.get(RodaConstants.STATE), AIPState.getDefault().toString()));
-    final String parentId = objectToString(doc.get(RodaConstants.AIP_PARENT_ID));
+    final String parentId = objectToString(doc.get(RodaConstants.AIP_PARENT_ID), null);
     final String ingestSIPId = objectToString(doc.get(RodaConstants.INGEST_SIP_ID), "");
     final String ingestJobId = objectToString(doc.get(RodaConstants.INGEST_JOB_ID), "");
     final List<String> ancestors = objectToListString(doc.get(RodaConstants.AIP_ANCESTORS));
@@ -1114,13 +1114,15 @@ public class SolrUtils {
     final Long numberOfDocumentationFiles = objectToLong(doc.get(RodaConstants.AIP_NUMBER_OF_DOCUMENTATION_FILES), 0L);
     final Long numberOfSchemaFiles = objectToLong(doc.get(RodaConstants.AIP_NUMBER_OF_SCHEMA_FILES), 0L);
 
+    final Boolean hasRepresentations = objectToBoolean(doc.get(RodaConstants.AIP_HAS_REPRESENTATIONS), Boolean.FALSE);
+
     Permissions permissions = getPermissions(doc);
     final String level = levels.isEmpty() ? null : levels.get(0);
     final String title = titles.isEmpty() ? null : titles.get(0);
     final String description = descriptions.isEmpty() ? null : descriptions.get(0);
 
     return new IndexedAIP(id, state, level, title, dateInitial, dateFinal, description, parentId, ancestors,
-      permissions, numberOfSubmissionFiles, numberOfDocumentationFiles, numberOfSchemaFiles).setIngestSIPId(ingestSIPId)
+      permissions, numberOfSubmissionFiles, numberOfDocumentationFiles, numberOfSchemaFiles, hasRepresentations).setIngestSIPId(ingestSIPId)
         .setIngestJobId(ingestJobId);
   }
 
