@@ -138,8 +138,6 @@ public class RodaCoreFactory {
   private static Path workingDirectoryPath;
   private static Path reportDirectoryPath;
   private static Path exampleConfigPath;
-  private static Path themePath;
-  private static Path exampleThemePath;
 
   private static StorageService storage;
   private static ModelService model;
@@ -335,11 +333,6 @@ public class RodaCoreFactory {
     logPath = dataPath.resolve(RodaConstants.CORE_LOG_FOLDER);
     storagePath = dataPath.resolve(RodaConstants.CORE_STORAGE_FOLDER);
     indexDataPath = dataPath.resolve(RodaConstants.CORE_INDEX_FOLDER);
-    // FIXME the following block should be invoked/injected from
-    // RodaWuiServlet
-    // (and avoid any cyclic dependency)
-    themePath = configPath.resolve(RodaConstants.CORE_THEME_FOLDER);
-    exampleThemePath = configPath.resolve(RodaConstants.CORE_EXAMPLE_THEME_FOLDER);
 
     // configure logback
     if (nodeType != NodeType.TEST) {
@@ -386,7 +379,7 @@ public class RodaCoreFactory {
     // FIXME the following block should be invoked/injected from
     // RodaWuiServlet
     // (and avoid any cyclic dependency)
-    essentialDirectories.add(themePath);
+    essentialDirectories.add(exampleConfigPath);
 
     for (Path path : essentialDirectories) {
       try {
@@ -413,20 +406,6 @@ public class RodaCoreFactory {
       LOGGER.error("Unable to create " + exampleConfigPath, e);
     }
 
-    // FIXME the following block should be invoked/injected from
-    // RodaWuiServlet
-    // (and avoid any cyclic dependency)
-    try {
-      try {
-        FSUtils.deletePath(exampleThemePath);
-      } catch (NotFoundException e) {
-        // do nothing and carry on
-      }
-      Files.createDirectories(exampleThemePath);
-      copyFilesFromClasspath(RodaConstants.THEME_RESOURCES_PATH.replaceFirst("/", ""), exampleThemePath, true);
-    } catch (GenericException | IOException e) {
-      LOGGER.error("Unable to create " + exampleThemePath, e);
-    }
   }
 
   private static void copyFilesFromClasspath(String classpathPrefix, Path destinationDirectory,
@@ -881,10 +860,6 @@ public class RodaCoreFactory {
     return reportDirectoryPath;
   }
 
-  public static Path getThemePath() {
-    return themePath;
-  }
-
   public static Path getDataPath() {
     return dataPath;
   }
@@ -943,7 +918,8 @@ public class RodaCoreFactory {
   public static URL getConfigurationFile(String configurationFile) {
     Path config = RodaCoreFactory.getConfigPath().resolve(configurationFile);
     URL configUri;
-    if (Files.exists(config)) {
+    if (Files.exists(config) && !Files.isDirectory(config)
+      && config.toAbsolutePath().startsWith(getConfigPath().toAbsolutePath().toString())) {
       try {
         configUri = config.toUri().toURL();
       } catch (MalformedURLException e) {
@@ -965,10 +941,11 @@ public class RodaCoreFactory {
   }
 
   public static InputStream getConfigurationFileAsStream(String configurationFile) {
-    Path config = RodaCoreFactory.getConfigPath().resolve(configurationFile);
+    Path config = getConfigPath().resolve(configurationFile);
     InputStream inputStream = null;
     try {
-      if (Files.exists(config)) {
+      if (Files.exists(config) && !Files.isDirectory(config)
+        && config.toAbsolutePath().startsWith(getConfigPath().toAbsolutePath().toString())) {
         inputStream = Files.newInputStream(config);
         LOGGER.trace("Loading configuration from file {}", config);
       }

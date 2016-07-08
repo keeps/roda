@@ -94,7 +94,6 @@ public final class RodaConstants {
   public static final String CORE_SCHEMAS_FOLDER = "schemas";
   public static final String CORE_LDAP_FOLDER = "ldap";
   public static final String CORE_THEME_FOLDER = "theme";
-  public static final String CORE_EXAMPLE_THEME_FOLDER = "example-theme";
   public static final String CORE_RISK_FOLDER = "risk";
   public static final String CORE_AGENT_FOLDER = "agent";
   public static final String CORE_FORMAT_FOLDER = "format";
@@ -739,7 +738,6 @@ public final class RodaConstants {
   /*
    * WUI related
    */
-  public static final String THEME_RESOURCES_PATH = "/org/roda/wui/public/theme/";
 
   public static final String SEARCH_LIST_BOX_ITEMS = "items";
   public static final String SEARCH_LIST_BOX_REPRESENTATIONS = "representations";

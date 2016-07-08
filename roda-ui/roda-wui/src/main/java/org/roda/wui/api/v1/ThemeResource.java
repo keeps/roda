@@ -8,6 +8,7 @@
 package org.roda.wui.api.v1;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 
 import javax.ws.rs.GET;
@@ -21,6 +22,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.wui.api.controllers.Theme;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.slf4j.Logger;
@@ -43,28 +45,24 @@ public class ThemeResource {
   @GET
   public Response getResource(
     @ApiParam(value = "The resource id", required = true) @QueryParam("resourceId") String resourceId,
-    @ApiParam(value = "The default resource id", required = false) @QueryParam("defaultResourceId") String defaultResourceId,
+    @ApiParam(value = "The default resource id", required = false) @QueryParam("defaultResourceId") String fallbackResourceId,
     @ApiParam(value = "If the resource is served inline", required = false) @QueryParam("inline") boolean inline,
     @Context Request req) throws IOException, NotFoundException {
 
-    if (!Theme.exists(resourceId) && defaultResourceId != null) {
-      resourceId = defaultResourceId;
-    }
+    Pair<String, InputStream> themeResource = Theme.getThemeResource(resourceId, fallbackResourceId);
 
-    boolean externalFile = Theme.validExternalFile(resourceId);
-    boolean internalFile = Theme.validInternalFile(resourceId);
-
-    if (externalFile || internalFile) {
+    if (themeResource.getSecond() != null) {
       CacheControl cc = new CacheControl();
       cc.setMaxAge(CACHE_CONTROL_MAX_AGE);
       cc.setPrivate(true);
 
-      Date lastModifiedDate = Theme.getLastModifiedDate(resourceId, externalFile);
+      Date lastModifiedDate = Theme.getLastModifiedDate(themeResource.getFirst());
       EntityTag etag = new EntityTag(Long.toString(lastModifiedDate.getTime()));
       ResponseBuilder builder = req.evaluatePreconditions(etag);
 
       if (builder == null) {
-        return ApiUtils.okResponse(Theme.getResource(resourceId), cc, etag, inline);
+
+        return ApiUtils.okResponse(Theme.getThemeResourceStreamResponse(themeResource), cc, etag, inline);
       } else {
         return builder.cacheControl(cc).tag(etag).build();
       }
