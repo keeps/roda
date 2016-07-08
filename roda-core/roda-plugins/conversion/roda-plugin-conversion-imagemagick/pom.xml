@@ -36,8 +36,8 @@
 			<artifactId>roda-plugin-common</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.roda-project</groupId>
-			<artifactId>roda-plugin-common-tests</artifactId>
+			<artifactId>roda-core-tests</artifactId>
+			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

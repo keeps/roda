@@ -16,7 +16,6 @@
 	</properties>
 	<modules>
 		<module>roda-plugin-common</module>
-		<module>roda-plugin-common-tests</module>
 
 		<module>conversion/roda-plugin-conversion-imagemagick</module>
 		<module>conversion/roda-plugin-conversion-pdftopdfa</module>
@@ -28,7 +27,6 @@
 
 		<module>validation/roda-plugin-validation-verapdf</module>
 		<module>validation/roda-plugin-validation-digital_signature</module>
-		<module>validation/roda-plugin-validation-digital_signature_dip</module>
 
 		<module>characterization/roda-plugin-characterization-tika</module>
 		<module>characterization/roda-plugin-characterization-droid</module>

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<agent xmlns="http://www.loc.gov/premis/v3">
-  <agentIdentifier>
-    <agentIdentifierType>RODAObjectPID</agentIdentifierType>
-    <agentIdentifierValue>roda:1080</agentIdentifierValue>
-  </agentIdentifier>
-  <agentName>Converter/JPEG to TIFF/1.0 - pt.gov.dgarq.roda.migrator.services.DW2Tiff/1.0 - ImageMagick 6.6.9-7</agentName>
-  <agentType>software:migrator</agentType>
-</agent>

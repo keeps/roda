@@ -16,7 +16,9 @@ package org.roda.core.plugins.plugins.conversion;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +26,8 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -39,6 +43,13 @@ public class AvconvConvertPlugin<T extends IsRODAObject> extends CommandConvertP
 
   private String outputArguments;
   private static final String TOOLNAME = "avconvconvert";
+
+  private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
+  static {
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OUTPUT_ARGUMENTS,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_OUTPUT_ARGUMENTS, "Output command arguments",
+        PluginParameterType.STRING, "", true, true, "Output command arguments to modify the output type"));
+  }
 
   public AvconvConvertPlugin() {
     super();
@@ -79,9 +90,17 @@ public class AvconvConvertPlugin<T extends IsRODAObject> extends CommandConvertP
   }
 
   @Override
+  public List<PluginParameter> getParameters() {
+    List<PluginParameter> params = new ArrayList<PluginParameter>();
+    params.addAll(super.getParameters());
+    params.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_OUTPUT_ARGUMENTS));
+    return params;
+  }
+
+  @Override
   public Map<String, String> getParameterValues() {
     Map<String, String> params = super.getParameterValues();
-    params.put("outputArguments", outputArguments);
+    params.put(RodaConstants.PLUGIN_PARAMS_OUTPUT_ARGUMENTS, outputArguments);
     return params;
   }
 
@@ -90,8 +109,8 @@ public class AvconvConvertPlugin<T extends IsRODAObject> extends CommandConvertP
     super.setParameterValues(parameters);
 
     // avconv output command arguments
-    if (parameters.containsKey("outputArguments")) {
-      setOutputArguments(parameters.get("outputArguments"));
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_OUTPUT_ARGUMENTS)) {
+      setOutputArguments(parameters.get(RodaConstants.PLUGIN_PARAMS_OUTPUT_ARGUMENTS));
     }
   }
 

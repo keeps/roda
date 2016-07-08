@@ -9,9 +9,6 @@ package org.roda.core.model;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,8 +25,6 @@ import java.util.UUID;
 
 import javax.mail.MessagingException;
 
-import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.Template;
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ConfigurableEmailUtility;
@@ -93,6 +88,9 @@ import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Template;
 
 /**
  * Class that "relates" Model & Storage
@@ -257,8 +255,9 @@ public class ModelService extends ModelObservable {
     return aip;
   }
 
-  public AIP createAIP(String aipId, String parentId, String type, Permissions permissions, boolean notify) throws RequestNotValidException,
-          NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException{
+  public AIP createAIP(String aipId, String parentId, String type, Permissions permissions, boolean notify)
+    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException {
     AIPState state = AIPState.ACTIVE;
     Directory aipDir = storage.createDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId));
 
@@ -289,7 +288,6 @@ public class ModelService extends ModelObservable {
   public AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, boolean notify)
     throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException {
-
 
     Directory directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
     String id = directory.getStoragePath().getName();

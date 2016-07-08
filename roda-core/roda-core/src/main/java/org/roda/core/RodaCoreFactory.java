@@ -271,7 +271,7 @@ public class RodaCoreFactory {
         instantiateNodeSpecificObjects(nodeType);
         LOGGER.debug("Finished instantiating node specific objects");
 
-        instantiateDefaultObjects();
+        // instantiateDefaultObjects();
         LOGGER.debug("Finished instantiating default objects");
 
         instantiated = true;
@@ -651,6 +651,7 @@ public class RodaCoreFactory {
     // FIXME 20160531 hsilva: this should be moved to somewhere closely to
     // Akka instantiation code
     loadAkkaConfiguration();
+
     if (nodeType == NodeType.MASTER) {
       instantiateMasterNodeSpecificObjects();
     } else if (nodeType == NodeType.WORKER) {
