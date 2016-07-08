@@ -42,8 +42,6 @@ import org.roda.wui.common.RodaCoreService;
 
 public class UserManagement extends RodaCoreService {
 
-  private static final String ROLE = "administration.user";
-
   private UserManagement() {
     super();
   }
@@ -53,7 +51,7 @@ public class UserManagement extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     Long count = UserManagementHelper.countLogEntries(filter);
@@ -70,7 +68,7 @@ public class UserManagement extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     IndexResult<LogEntry> ret = UserManagementHelper.findLogEntries(filter, sorter, sublist, facets);
@@ -87,7 +85,7 @@ public class UserManagement extends RodaCoreService {
     throws GenericException, AuthorizationDeniedException, NotFoundException {
     Date start = new Date();
     // check user permissions
-    UserUtility.checkRoles(user, ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     LogEntry ret = UserManagementHelper.retrieveLogEntry(logEntryId);
@@ -104,7 +102,7 @@ public class UserManagement extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     Long count = UserManagementHelper.countMembers(filter);
@@ -121,7 +119,7 @@ public class UserManagement extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     IndexResult<RODAMember> ret = UserManagementHelper.findMembers(filter, sorter, sublist, facets);
@@ -139,7 +137,7 @@ public class UserManagement extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     User ret = UserManagementHelper.retrieveUser(username);
@@ -156,7 +154,7 @@ public class UserManagement extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     RodaUser ret = UserManagementHelper.retrieveRodaUser(username);
@@ -173,7 +171,7 @@ public class UserManagement extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     Group ret = UserManagementHelper.retrieveGroup(groupname);
@@ -189,7 +187,7 @@ public class UserManagement extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     List<Group> ret = UserManagementHelper.listAllGroups();
@@ -219,7 +217,7 @@ public class UserManagement extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     User ret = UserManagementHelper.addUser(newUser, password);
@@ -241,7 +239,7 @@ public class UserManagement extends RodaCoreService {
     }
 
     // check user permissions
-    UserUtility.checkRoles(user, ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     UserManagementHelper.modifyUser(modifiedUser, password);
@@ -256,7 +254,7 @@ public class UserManagement extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     UserManagementHelper.modifyUser(modifiedUser, password);
@@ -270,7 +268,7 @@ public class UserManagement extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     UserManagementHelper.removeUser(username);
 
@@ -284,7 +282,7 @@ public class UserManagement extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     UserManagementHelper.addGroup(group);
@@ -299,7 +297,7 @@ public class UserManagement extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     UserManagementHelper.modifyGroup(group);
@@ -314,7 +312,7 @@ public class UserManagement extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ROLE);
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     UserManagementHelper.removeGroup(groupname);
 
@@ -322,6 +320,8 @@ public class UserManagement extends RodaCoreService {
     long duration = new Date().getTime() - start.getTime();
     registerAction(user, "UserManagement", "removeGroup", null, duration, "groupname", groupname);
   }
+
+  // TODO: methods bellow this line should also checkRoles? If so, a RodaUser is needed.
 
   public static void sendEmailVerification(String servletPath, String username)
     throws GenericException, NotFoundException {
