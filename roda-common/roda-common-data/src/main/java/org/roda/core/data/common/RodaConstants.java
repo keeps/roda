@@ -103,6 +103,9 @@ public final class RodaConstants {
   public static final String CORE_CERTIFICATES_FOLDER = "certificates";
   public static final String CORE_REPORT_FOLDER = "reports";
 
+  public static final String CORE_CROSSWALKS_INGEST = "crosswalks/ingest/";
+  public static final String CORE_CROSSWALKS_INGEST_OTHER = "crosswalks/ingest/other/";
+
   public static final String DEFAULT_NODE_HOSTNAME = "localhost";
   public static final String DEFAULT_NODE_PORT = "2551";
 

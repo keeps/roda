@@ -37,6 +37,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
@@ -589,57 +590,12 @@ public class SolrUtils {
   public static SolrInputDocument getDescriptiveMetadataFields(Binary binary, String metadataType,
     String metadataVersion) throws GenericException {
     SolrInputDocument doc;
-    InputStream inputStream;
-    String xsltFilename = null;
-    InputStream transformerStream = null;
+
+    Reader transformationResult = RodaUtils.applyMetadataStylesheet(binary, RodaConstants.CORE_CROSSWALKS_INGEST,
+      metadataType, metadataVersion);
 
     try {
-
-      // get xslt from metadata type and version if defined
-      if (metadataType != null) {
-        String lowerCaseMetadataType = metadataType.toLowerCase();
-        if (metadataVersion != null) {
-          String lowerCaseMetadataTypeWithVersion = lowerCaseMetadataType + RodaConstants.METADATA_VERSION_SEPARATOR
-            + metadataVersion;
-          // FIXME 20160314 hsilva: replace hardcoded path by constant or method
-          // (to support both filesystem in win/linux and classpath)
-          transformerStream = RodaCoreFactory
-            .getConfigurationFileAsStream("crosswalks/ingest/" + lowerCaseMetadataTypeWithVersion + ".xslt");
-        }
-        if (transformerStream == null) {
-          transformerStream = RodaCoreFactory
-            .getConfigurationFileAsStream("crosswalks/ingest/" + lowerCaseMetadataType + ".xslt");
-        }
-      }
-
-      // get xslt from filename
-      if (transformerStream == null) {
-        String filename = FilenameUtils.removeExtension(binary.getStoragePath().getName());
-        if (filename != null) {
-          filename = filename.toLowerCase();
-          transformerStream = RodaCoreFactory.getConfigurationFileAsStream("crosswalks/ingest/" + filename + ".xslt");
-        }
-      }
-      // fallback
-      if (transformerStream == null) {
-        transformerStream = RodaCoreFactory.getConfigurationFileAsStream("crosswalks/ingest/" + "plain.xslt");
-      }
-
-      inputStream = binary.getContent().createInputStream();
-
-      Reader descMetadataReader = new InputStreamReader(new BOMInputStream(inputStream));
-
-      // TODO support the use of scripts for non-xml transformers
-      Reader xsltReader = new InputStreamReader(transformerStream);
-      CharArrayWriter transformerResult = new CharArrayWriter();
-      Map<String, Object> stylesheetOpt = new HashMap<String, Object>();
-      stylesheetOpt.put("prefix", RodaConstants.INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX);
-      RodaUtils.applyStylesheet(xsltReader, descMetadataReader, stylesheetOpt, transformerResult);
-      descMetadataReader.close();
-
       XMLLoader loader = new XMLLoader();
-      LOGGER.trace("Transformed desc. metadata:\n{}", transformerResult);
-      CharArrayReader transformationResult = new CharArrayReader(transformerResult.toCharArray());
       XMLStreamReader parser = XMLInputFactory.newInstance().createXMLStreamReader(transformationResult);
 
       boolean parsing = true;
@@ -656,17 +612,12 @@ public class SolrUtils {
             doc = loader.readDoc(parser);
           }
         }
-
       }
-      transformationResult.close();
 
-    } catch (IOException | TransformerException | XMLStreamException |
-
-      FactoryConfigurationError e)
-
-    {
-      throw new GenericException(
-        "Could not process descriptive metadata binary " + binary.getStoragePath() + " using xslt " + xsltFilename, e);
+    } catch (XMLStreamException | FactoryConfigurationError e) {
+      throw new GenericException("Could not process descriptive metadata binary " + binary.getStoragePath(), e);
+    } finally {
+      IOUtils.closeQuietly(transformationResult);
     }
     return validateDescriptiveMetadataFields(doc);
   }
@@ -1122,8 +1073,8 @@ public class SolrUtils {
     final String description = descriptions.isEmpty() ? null : descriptions.get(0);
 
     return new IndexedAIP(id, state, level, title, dateInitial, dateFinal, description, parentId, ancestors,
-      permissions, numberOfSubmissionFiles, numberOfDocumentationFiles, numberOfSchemaFiles, hasRepresentations).setIngestSIPId(ingestSIPId)
-        .setIngestJobId(ingestJobId);
+      permissions, numberOfSubmissionFiles, numberOfDocumentationFiles, numberOfSchemaFiles, hasRepresentations)
+        .setIngestSIPId(ingestSIPId).setIngestJobId(ingestJobId);
   }
 
   public static SolrInputDocument aipToSolrInputDocument(AIP aip, ModelService model, boolean safemode)
@@ -2227,6 +2178,7 @@ public class SolrUtils {
   public static SolrInputDocument premisToSolr(PreservationMetadataType preservationMetadataType, AIP aip,
     String representationID, String fileID, Binary binary) throws GenericException {
     SolrInputDocument doc;
+
     InputStream inputStream;
     try {
       inputStream = binary.getContent().createInputStream();
