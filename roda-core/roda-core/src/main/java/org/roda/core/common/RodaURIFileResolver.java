@@ -25,12 +25,19 @@ class RodaURIResolver implements URIResolver {
 
     @Override
     public ByteArrayInputStream load(String href) throws Exception {
-      InputStream in = RodaCoreFactory
-        .getConfigurationFileAsStream(RodaConstants.CROSSWALKS_DISSEMINATION_OTHER_PATH + "/" + href);
-      ByteArrayOutputStream out = new ByteArrayOutputStream();
-      IOUtils.copy(in, out);
+      InputStream in = null;
+      ByteArrayOutputStream out = null;
+      try {
+        in = RodaCoreFactory
+          .getConfigurationFileAsStream(RodaConstants.CROSSWALKS_DISSEMINATION_OTHER_PATH + "/" + href);
+        out = new ByteArrayOutputStream();
+        IOUtils.copy(in, out);
 
-      return new ByteArrayInputStream(out.toByteArray());
+        return new ByteArrayInputStream(out.toByteArray());
+      } finally {
+        IOUtils.closeQuietly(in);
+        IOUtils.closeQuietly(out);
+      }
     }
 
   };
@@ -38,12 +45,12 @@ class RodaURIResolver implements URIResolver {
     .expireAfterWrite(1, TimeUnit.MINUTES).build(loader);
 
   @Override
-  public Source resolve(String href, String base) throws TransformerException {   
+  public Source resolve(String href, String base) throws TransformerException {
     try {
       ByteArrayInputStream in = cache.get(href);
       return new StreamSource(in);
     } catch (ExecutionException e) {
-      throw new TransformerException("Could not load URI: "+href, e);
+      throw new TransformerException("Could not load URI: " + href, e);
     }
   }
 }
