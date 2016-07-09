@@ -848,7 +848,7 @@ public class RodaCoreFactory {
      */
   private static void createRoles(Configuration rodaConfig, LdapUtility ldapUtility) {
     final Iterator<String> keys = rodaConfig.getKeys("core.roles");
-    final List<String> roles = new ArrayList<>();
+    final Set<String> roles = new HashSet<>();
     while (keys.hasNext()) {
       roles.addAll(Arrays.asList(rodaConfig.getStringArray(keys.next())));
     }
