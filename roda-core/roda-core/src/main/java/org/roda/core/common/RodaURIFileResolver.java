@@ -29,7 +29,7 @@ class RodaURIResolver implements URIResolver {
       ByteArrayOutputStream out = null;
       try {
         in = RodaCoreFactory
-          .getConfigurationFileAsStream(RodaConstants.CROSSWALKS_DISSEMINATION_OTHER_PATH + "/" + href);
+          .getConfigurationFileAsStream(RodaConstants.CROSSWALKS_DISSEMINATION_OTHER_PATH + href);
         out = new ByteArrayOutputStream();
         IOUtils.copy(in, out);
 

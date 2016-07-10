@@ -7,26 +7,17 @@
  */
 package org.roda.core.common;
 
-import java.io.ByteArrayInputStream;
-import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -55,7 +46,6 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RodaUser;
-import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -63,7 +53,6 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
-import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.FileUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -149,41 +138,7 @@ public class PremisV3Utils {
     return premisV2;
   }
 
-  public static Binary updatePremisToV3IfNeeded(Binary binary) throws IOException, SAXException, TransformerException,
-    RequestNotValidException, NotFoundException, GenericException {
-    if (isPremisV2(binary)) {
-      LOGGER.debug("Binary {} is Premis V2... Needs updated...", binary.getStoragePath());
-      return updatePremisV2toV3(binary);
-    } else {
-      return binary;
-    }
-
-  }
-
-  private static Binary updatePremisV2toV3(Binary binary)
-    throws IOException, TransformerException, RequestNotValidException, NotFoundException, GenericException {
-    InputStream transformerStream = null;
-    InputStream bais = null;
-
-    Reader reader = null;
-    try {
-      reader = new InputStreamReader(binary.getContent().createInputStream());
-      Map<String, Object> stylesheetOpt = new HashMap<String, Object>();
-      transformerStream = RodaCoreFactory.getConfigurationFileAsStream("crosswalks/migration/v2Tov3.xslt");
-      Reader xsltReader = new InputStreamReader(transformerStream);
-      CharArrayWriter transformerResult = new CharArrayWriter();
-      RodaUtils.applyStylesheet(xsltReader, reader, stylesheetOpt, transformerResult);
-      Path p = Files.createTempFile("preservation", ".tmp");
-      bais = new ByteArrayInputStream(transformerResult.toString().getBytes("UTF-8"));
-      Files.copy(bais, p, StandardCopyOption.REPLACE_EXISTING);
-
-      return (Binary) FSUtils.convertPathToResource(p.getParent(), p);
-    } finally {
-      IOUtils.closeQuietly(transformerStream);
-      IOUtils.closeQuietly(bais);
-      IOUtils.closeQuietly(reader);
-    }
-  }
+  
 
   private static class RodaErrorHandler extends DefaultHandler {
     List<SAXParseException> errors;

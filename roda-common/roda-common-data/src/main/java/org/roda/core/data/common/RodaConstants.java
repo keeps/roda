@@ -56,8 +56,8 @@ public final class RodaConstants {
     YEAR, MONTH, DAY, HOUR, MINUTE, SECOND, MILLISECOND
   }
 
-  public static final String CROSSWALKS_DISSEMINATION_HTML_PATH = "crosswalks/dissemination/html";
-  public static final String CROSSWALKS_DISSEMINATION_OTHER_PATH = "crosswalks/other";
+  public static final String CROSSWALKS_DISSEMINATION_HTML_PATH = "crosswalks/dissemination/html/";
+  public static final String CROSSWALKS_DISSEMINATION_OTHER_PATH = "crosswalks/other/";
   public static final String UI_BROWSER_METADATA_DESCRIPTIVE_TYPES = "ui.browser.metadata.descriptive.types";
   public static final String I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX = "ui.browse.metadata.descriptive.type.";
   public static final String I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX = "crosswalks.dissemination.html.";
@@ -105,6 +105,9 @@ public final class RodaConstants {
 
   public static final String CORE_CROSSWALKS_INGEST = "crosswalks/ingest/";
   public static final String CORE_CROSSWALKS_INGEST_OTHER = "crosswalks/ingest/other/";
+  
+  public static final String PREMIS_METADATA_TYPE = "premis";
+  public static final String PREMIS_METADATA_VERSION = "3";
 
   public static final String DEFAULT_NODE_HOSTNAME = "localhost";
   public static final String DEFAULT_NODE_PORT = "2551";

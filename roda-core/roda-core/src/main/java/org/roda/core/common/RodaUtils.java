@@ -39,7 +39,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXSource;
@@ -52,7 +51,6 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.v2.common.Pair;
 import org.roda.core.storage.Binary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +63,15 @@ import org.yaml.snakeyaml.Yaml;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+
+import net.sf.saxon.s9api.Processor;
+import net.sf.saxon.s9api.QName;
+import net.sf.saxon.s9api.SaxonApiException;
+import net.sf.saxon.s9api.XdmAtomicValue;
+import net.sf.saxon.s9api.XdmValue;
+import net.sf.saxon.s9api.XsltCompiler;
+import net.sf.saxon.s9api.XsltExecutable;
+import net.sf.saxon.s9api.XsltTransformer;
 
 public class RodaUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(RodaUtils.class);
@@ -148,23 +155,15 @@ public class RodaUtils {
    *             {@link #applyIngestStylesheet(Binary, String, String)}
    */
   @Deprecated
-  public static void applyStylesheet(Reader xsltReader, Reader fileReader, Map<String, Object> parameters,
+  public static void applyStylesheet(Reader xsltReader, Reader fileReader, Map<String, String> parameters,
     Writer result) throws IOException, TransformerException {
 
     TransformerFactory factory = new net.sf.saxon.TransformerFactoryImpl();
     factory.setURIResolver(new RodaURIResolver());
     Source xsltSource = new StreamSource(xsltReader);
     Transformer transformer = factory.newTransformer(xsltSource);
-    for (Entry<String, Object> parameter : parameters.entrySet()) {
-      if (parameter.getValue() instanceof String) {
-        transformer.setParameter(parameter.getKey(), (String) parameter.getValue());
-      } else if (parameter.getValue() instanceof List<?>) {
-        transformer.setParameter(parameter.getKey(), (List<String>) parameter.getValue());
-      } else if (parameter.getValue() instanceof Integer) {
-        transformer.setParameter(parameter.getKey(), Integer.class.cast(parameter.getValue()));
-      } else {
-        LOGGER.error("Unknown object class for passing by to xslt: " + parameter.getValue().getClass());
-      }
+    for (Entry<String, String> parameter : parameters.entrySet()) {
+      transformer.setParameter(parameter.getKey(), (String) parameter.getValue());
     }
     try {
       XMLReader xmlReader = XMLReaderFactory.createXMLReader();
@@ -177,11 +176,13 @@ public class RodaUtils {
     }
   }
 
-  private static LoadingCache<Triple<String, String, String>, Transformer> CACHE = CacheBuilder.newBuilder()
-    .expireAfterWrite(1, TimeUnit.MINUTES).build(new CacheLoader<Triple<String, String, String>, Transformer>() {
+  private static Processor PROCESSOR = new Processor(false);
+
+  private static LoadingCache<Triple<String, String, String>, XsltExecutable> CACHE = CacheBuilder.newBuilder()
+    .expireAfterWrite(1, TimeUnit.MINUTES).build(new CacheLoader<Triple<String, String, String>, XsltExecutable>() {
 
       @Override
-      public Transformer load(Triple<String, String, String> key) throws Exception {
+      public XsltExecutable load(Triple<String, String, String> key) throws Exception {
         String basePath = key.getLeft();
         String metadataType = key.getMiddle();
         String metadataVersion = key.getRight();
@@ -191,7 +192,7 @@ public class RodaUtils {
     });
 
   public static Reader applyMetadataStylesheet(Binary binary, String basePath, String metadataType,
-    String metadataVersion) throws GenericException {
+    String metadataVersion, Map<String, String> parameters) throws GenericException {
     Reader descMetadataReader = null;
 
     try {
@@ -202,14 +203,25 @@ public class RodaUtils {
       InputSource source = new InputSource(descMetadataReader);
       Source text = new SAXSource(xmlReader, source);
 
-      Transformer transformer = CACHE.get(Triple.of(basePath, metadataType, metadataVersion));
+      XsltExecutable xsltExecutable = CACHE.get(Triple.of(basePath, metadataType, metadataVersion));
+
+      XsltTransformer transformer = xsltExecutable.load();
       CharArrayWriter transformerResult = new CharArrayWriter();
 
-      transformer.transform(text, new StreamResult(transformerResult));
+      transformer.setSource(text);
+      transformer.setDestination(PROCESSOR.newSerializer(transformerResult));
+
+      for (Entry<String, String> parameter : parameters.entrySet()) {
+        QName qName = new QName(parameter.getKey());
+        XdmValue xdmValue = new XdmAtomicValue(parameter.getValue());
+        transformer.setParameter(qName, xdmValue);
+      }
+
+      transformer.transform();
 
       return new CharArrayReader(transformerResult.toCharArray());
 
-    } catch (IOException | SAXException | ExecutionException | TransformerException e) {
+    } catch (IOException | SAXException | ExecutionException | SaxonApiException e) {
       throw new GenericException("Could not process descriptive metadata binary " + binary.getStoragePath()
         + " metadata type " + metadataType + " and version " + metadataVersion, e);
     } finally {
@@ -217,8 +229,8 @@ public class RodaUtils {
     }
   }
 
-  protected static Transformer createMetadataTranformer(String basePath, String metadataType, String metadataVersion)
-    throws TransformerConfigurationException {
+  protected static XsltExecutable createMetadataTranformer(String basePath, String metadataType, String metadataVersion)
+    throws SaxonApiException, GenericException {
     InputStream transformerStream = null;
 
     try {
@@ -242,28 +254,16 @@ public class RodaUtils {
         transformerStream = RodaCoreFactory.getConfigurationFileAsStream(basePath + "plain.xslt");
       }
 
-      Reader xsltReader = new InputStreamReader(transformerStream);
-
-      Map<String, Object> parameters = new HashMap<String, Object>();
-      parameters.put("prefix", RodaConstants.INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX);
-
-      // Load transformer
-      TransformerFactory factory = new net.sf.saxon.TransformerFactoryImpl();
-      factory.setURIResolver(new RodaURIResolver());
-      Source xsltSource = new StreamSource(xsltReader);
-      Transformer transformer = factory.newTransformer(xsltSource);
-      for (Entry<String, Object> parameter : parameters.entrySet()) {
-        if (parameter.getValue() instanceof String) {
-          transformer.setParameter(parameter.getKey(), (String) parameter.getValue());
-        } else if (parameter.getValue() instanceof List<?>) {
-          transformer.setParameter(parameter.getKey(), (List<?>) parameter.getValue());
-        } else if (parameter.getValue() instanceof Integer) {
-          transformer.setParameter(parameter.getKey(), Integer.class.cast(parameter.getValue()));
-        } else {
-          LOGGER.error("Unknown object class for passing by to xslt: " + parameter.getValue().getClass());
-        }
+      if (transformerStream == null) {
+        throw new GenericException("Could not find stylesheet nor fallback at basePath=" + basePath + ", metadataType="
+          + metadataType + ", metadataVersion=" + metadataVersion);
       }
-      return transformer;
+
+      XsltCompiler compiler = PROCESSOR.newXsltCompiler();
+      compiler.setURIResolver(new RodaURIResolver());
+      // compiler.setSchemaAware(false);
+      return compiler.compile(new StreamSource(transformerStream));
+
     } finally {
       IOUtils.closeQuietly(transformerStream);
     }

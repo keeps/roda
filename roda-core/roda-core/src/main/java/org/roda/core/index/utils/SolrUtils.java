@@ -7,11 +7,7 @@
  */
 package org.roda.core.index.utils;
 
-import java.io.CharArrayReader;
-import java.io.CharArrayWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Serializable;
 import java.text.ParseException;
@@ -33,12 +29,9 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -55,7 +48,6 @@ import org.apache.solr.common.SolrInputField;
 import org.apache.solr.common.params.FacetParams;
 import org.apache.solr.common.util.DateUtil;
 import org.apache.solr.handler.loader.XMLLoader;
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.MetadataFileUtils;
 import org.roda.core.common.PremisV3Utils;
@@ -591,8 +583,10 @@ public class SolrUtils {
     String metadataVersion) throws GenericException {
     SolrInputDocument doc;
 
+    Map<String, String> parameters = new HashMap<String, String>();
+    parameters.put("prefix", RodaConstants.INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX);
     Reader transformationResult = RodaUtils.applyMetadataStylesheet(binary, RodaConstants.CORE_CROSSWALKS_INGEST,
-      metadataType, metadataVersion);
+      metadataType, metadataVersion, parameters);
 
     try {
       XMLLoader loader = new XMLLoader();
@@ -2177,41 +2171,29 @@ public class SolrUtils {
 
   public static SolrInputDocument premisToSolr(PreservationMetadataType preservationMetadataType, AIP aip,
     String representationID, String fileID, Binary binary) throws GenericException {
+
     SolrInputDocument doc;
 
-    InputStream inputStream;
+    Map<String, String> stylesheetOpt = new HashMap<String, String>();
+    if (aip != null) {
+      stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_AIP_ID, aip.getId());
+      if (representationID != null) {
+        stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_ID, representationID);
+        stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID,
+          IdUtils.getRepresentationId(aip.getId(), representationID));
+      }
+    }
+
+    if (fileID != null) {
+      stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_FILE_ID, fileID);
+    }
+
     try {
-      inputStream = binary.getContent().createInputStream();
-
-      Reader descMetadataReader = new InputStreamReader(inputStream);
-
-      // FIXME 20160314 hsilva: replace hardcoded path by constant or method (to
-      // support both filesystem in win/linux and classpath)
-      InputStream transformerStream = RodaCoreFactory
-        .getConfigurationFileAsStream("crosswalks/ingest/other/premis.xslt");
-      // TODO support the use of scripts for non-xml transformers
-      Reader xsltReader = new InputStreamReader(transformerStream);
-      CharArrayWriter transformerResult = new CharArrayWriter();
-      Map<String, Object> stylesheetOpt = new HashMap<String, Object>();
-      if (aip != null) {
-        stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_AIP_ID, aip.getId());
-        if (representationID != null) {
-          stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_ID, representationID);
-          stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID,
-            IdUtils.getRepresentationId(aip.getId(), representationID));
-        }
-      }
-
-      if (fileID != null) {
-        stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_FILE_ID, fileID);
-      }
-      RodaUtils.applyStylesheet(xsltReader, descMetadataReader, stylesheetOpt, transformerResult);
-      descMetadataReader.close();
+      Reader reader = RodaUtils.applyMetadataStylesheet(binary, RodaConstants.CORE_CROSSWALKS_INGEST_OTHER,
+        RodaConstants.PREMIS_METADATA_TYPE, RodaConstants.PREMIS_METADATA_VERSION, stylesheetOpt);
 
       XMLLoader loader = new XMLLoader();
-      LOGGER.trace("Transformed premis metadata:\n{}", transformerResult);
-      CharArrayReader transformationResult = new CharArrayReader(transformerResult.toCharArray());
-      XMLStreamReader parser = XMLInputFactory.newInstance().createXMLStreamReader(transformationResult);
+      XMLStreamReader parser = XMLInputFactory.newInstance().createXMLStreamReader(reader);
 
       boolean parsing = true;
       doc = null;
@@ -2229,11 +2211,10 @@ public class SolrUtils {
         }
 
       }
-      transformationResult.close();
+      IOUtils.closeQuietly(reader);
 
-    } catch (IOException | TransformerException | XMLStreamException | FactoryConfigurationError e) {
-      throw new GenericException("Could not process descriptive metadata binary " + binary.getStoragePath()
-        + " using xslt " + "crosswalks/ingest/other/premis.xslt", e);
+    } catch (XMLStreamException | FactoryConfigurationError e) {
+      throw new GenericException("Could not process PREMIS " + binary.getStoragePath(), e);
     }
 
     if (preservationMetadataType == PreservationMetadataType.EVENT) {
