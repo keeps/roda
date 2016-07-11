@@ -60,7 +60,7 @@ public class Jobs extends RodaCoreService {
     NotFoundException, AuthorizationDeniedException, JobAlreadyStartedException {
     Date startDate = new Date();
 
-    // FIXME check user permissions
+    // check user permissions
     UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
@@ -77,7 +77,7 @@ public class Jobs extends RodaCoreService {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Date startDate = new Date();
 
-    // FIXME check user permissions
+    // check user permissions
     UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
@@ -92,7 +92,7 @@ public class Jobs extends RodaCoreService {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Date startDate = new Date();
 
-    // FIXME check user permissions
+    // check user permissions
     UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
