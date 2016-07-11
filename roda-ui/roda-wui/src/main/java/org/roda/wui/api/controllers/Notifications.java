@@ -44,7 +44,7 @@ public class Notifications extends RodaCoreService {
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     Date startDate = new Date();
 
-    // FIXME check user permissions
+    // check user permissions
     UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     RodaCoreFactory.getModelService().createNotification(notification, "test-email-template",
@@ -61,7 +61,7 @@ public class Notifications extends RodaCoreService {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Date startDate = new Date();
 
-    // FIXME check user permissions
+    // check user permissions
     UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
@@ -86,7 +86,7 @@ public class Notifications extends RodaCoreService {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Date startDate = new Date();
 
-    // FIXME check user permissions
+    // check user permissions
     UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
