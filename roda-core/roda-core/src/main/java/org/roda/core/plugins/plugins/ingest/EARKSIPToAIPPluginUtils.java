@@ -44,7 +44,7 @@ public class EARKSIPToAIPPluginUtils {
 
   public static AIP earkSIPToAIP(SIP sip, Path sipPath, ModelService model, StorageService storage, String ingestSIPId,
     String ingestJobId, String parentId) throws IOException, MigrationException, RequestNotValidException,
-          NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException, ValidationException {
+    NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException, ValidationException {
 
     AIPState state = AIPState.INGEST_PROCESSING;
     Permissions permissions = new Permissions();
@@ -62,17 +62,16 @@ public class EARKSIPToAIPPluginUtils {
       processIPRepresentationInformation(model, representation, aip.getId(), storage, notify, false);
     }
 
-    // FIXME 20160516 hsilva: put SIP inside the AIP
-
     model.notifyAIPCreated(aip.getId());
 
     return model.retrieveAIP(aip.getId());
 
   }
 
-  public static AIP earkSIPToAIPUpdate(SIP sip, String aipId, Path sipPath, ModelService model, StorageService storage, String ingestSIPId,
-                                       String ingestJobId, String parentId) throws IOException, MigrationException, RequestNotValidException,
-          NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException, ValidationException {
+  public static AIP earkSIPToAIPUpdate(SIP sip, String aipId, Path sipPath, ModelService model, StorageService storage,
+    String ingestSIPId, String ingestJobId, String parentId)
+    throws IOException, MigrationException, RequestNotValidException, NotFoundException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException, ValidationException {
     boolean notify = false;
 
     // process IP information
@@ -83,8 +82,6 @@ public class EARKSIPToAIPPluginUtils {
       processIPRepresentationInformation(model, representation, aipId, storage, notify, true);
     }
 
-    // FIXME 20160516 hsilva: put SIP inside the AIP
-
     model.notifyAIPUpdated(aipId);
 
     return model.retrieveAIP(aipId);
@@ -92,8 +89,8 @@ public class EARKSIPToAIPPluginUtils {
   }
 
   private static void processIPInformation(ModelService model, SIP sip, String aipId, boolean notify, boolean update)
-          throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
-          NotFoundException, ValidationException {
+    throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
+    NotFoundException, ValidationException {
     // process descriptive metadata
     processDescriptiveMetadata(model, aipId, sip.getDescriptiveMetadata(), notify, update);
 
@@ -109,8 +106,8 @@ public class EARKSIPToAIPPluginUtils {
   }
 
   private static void processDescriptiveMetadata(ModelService model, String aipId,
-    List<IPDescriptiveMetadata> descriptiveMetadata, boolean notify, boolean update) throws RequestNotValidException, GenericException,
-          AlreadyExistsException, AuthorizationDeniedException, NotFoundException, ValidationException {
+    List<IPDescriptiveMetadata> descriptiveMetadata, boolean notify, boolean update) throws RequestNotValidException,
+    GenericException, AlreadyExistsException, AuthorizationDeniedException, NotFoundException, ValidationException {
     for (IPDescriptiveMetadata dm : descriptiveMetadata) {
       String descriptiveMetadataId = dm.getMetadata().getFileName().toString();
       ContentPayload payload = new FSPathContentPayload(dm.getMetadata().getPath());
@@ -118,10 +115,12 @@ public class EARKSIPToAIPPluginUtils {
       String metadataVersion = dm.getMetadataVersion();
       try {
         model.createDescriptiveMetadata(aipId, descriptiveMetadataId, payload, metadataType, metadataVersion, notify);
-      }  catch (AlreadyExistsException e) {
-        if(update)
-          model.updateDescriptiveMetadata(aipId, descriptiveMetadataId, payload, metadataType, metadataVersion, "Update from SIP");
-        else throw e;
+      } catch (AlreadyExistsException e) {
+        if (update)
+          model.updateDescriptiveMetadata(aipId, descriptiveMetadataId, payload, metadataType, metadataVersion,
+            "Update from SIP");
+        else
+          throw e;
       }
     }
   }
@@ -144,8 +143,8 @@ public class EARKSIPToAIPPluginUtils {
   }
 
   private static void processDocumentation(ModelService model, List<IPFile> documentation, String aipId,
-    String representationId, boolean notify, boolean update) throws RequestNotValidException, GenericException, AlreadyExistsException,
-    AuthorizationDeniedException, NotFoundException {
+    String representationId, boolean notify, boolean update) throws RequestNotValidException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
     for (IPFile doc : documentation) {
       List<String> directoryPath = doc.getRelativeFolders();
       String fileId = doc.getFileName();
@@ -154,7 +153,7 @@ public class EARKSIPToAIPPluginUtils {
         model.createDocumentation(aipId, representationId, directoryPath, fileId, payload);
       } catch (AlreadyExistsException e) {
         // Tolerate duplicate documentation when updating
-        if(!update)
+        if (!update)
           throw e;
       }
     }
@@ -172,56 +171,58 @@ public class EARKSIPToAIPPluginUtils {
         model.createSchema(aipId, representationId, directoryPath, fileId, payload);
       } catch (AlreadyExistsException e) {
         // Tolerate duplicate schemas when updating
-        if(!update)
+        if (!update)
           throw e;
       }
     }
   }
 
   private static void processIPRepresentationInformation(ModelService model, IPRepresentation sr, String aipId,
-    StorageService storage, boolean notify, boolean update) throws RequestNotValidException, GenericException, AlreadyExistsException,
-    AuthorizationDeniedException, NotFoundException {
+    StorageService storage, boolean notify, boolean update) throws RequestNotValidException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
     boolean original = true;
     String representationType = IngestHelper.getType(sr);
 
     Representation representation = null;
-    if(update) {
+    if (update) {
       try {
         representation = model.retrieveRepresentation(aipId, sr.getObjectID());
-      } catch (NotFoundException e) {}
+      } catch (NotFoundException e) {
+      }
     }
     // Either we're not updating or the retrieve failed
-    if(representation == null){
+    if (representation == null) {
       representation = model.createRepresentation(aipId, sr.getObjectID(), original, representationType, notify);
     }
-      // process representation descriptive metadata
-      // XXX 20160504 hsilva: there's no "space" in the model to accommodate this
-      // information
+    // process representation descriptive metadata
+    // XXX 20160504 hsilva: there's no "space" in the model to accommodate this
+    // information
 
-      // process representation preservation metadata
-      processPreservationMetadata(model, sr.getPreservationMetadata(), aipId, Optional.ofNullable(representation.getId()),
-              notify);
+    // process representation preservation metadata
+    processPreservationMetadata(model, sr.getPreservationMetadata(), aipId, Optional.ofNullable(representation.getId()),
+      notify);
 
-      // process representation files
-      for (IPFile file : sr.getData()) {
-        List<String> directoryPath = file.getRelativeFolders();
-        String fileId = file.getFileName();
-        ContentPayload payload = new FSPathContentPayload(file.getPath());
-        try {
-          model.createFile(aipId, representation.getId(), directoryPath, fileId, payload, notify);
-        } catch (AlreadyExistsException e) {
-          if(update) {
-            StoragePath filePath = ModelUtils.getFileStoragePath(aipId, representation.getId(), directoryPath, fileId);
-            final Binary binary = storage.getBinary(filePath);
-            model.updateFile(aipId, representation.getId(), directoryPath, fileId, binary, true, notify);
-          }else throw e;
-        }
+    // process representation files
+    for (IPFile file : sr.getData()) {
+      List<String> directoryPath = file.getRelativeFolders();
+      String fileId = file.getFileName();
+      ContentPayload payload = new FSPathContentPayload(file.getPath());
+      try {
+        model.createFile(aipId, representation.getId(), directoryPath, fileId, payload, notify);
+      } catch (AlreadyExistsException e) {
+        if (update) {
+          StoragePath filePath = ModelUtils.getFileStoragePath(aipId, representation.getId(), directoryPath, fileId);
+          final Binary binary = storage.getBinary(filePath);
+          model.updateFile(aipId, representation.getId(), directoryPath, fileId, binary, true, notify);
+        } else
+          throw e;
       }
+    }
 
-      // process representation documentation
-      processDocumentation(model, sr.getDocumentation(), aipId, representation.getId(), notify, false);
+    // process representation documentation
+    processDocumentation(model, sr.getDocumentation(), aipId, representation.getId(), notify, false);
 
-      // process representation schemas
-      processSchemas(model, sr.getSchemas(), aipId, representation.getId(), notify, false);
+    // process representation schemas
+    processSchemas(model, sr.getSchemas(), aipId, representation.getId(), notify, false);
   }
 }

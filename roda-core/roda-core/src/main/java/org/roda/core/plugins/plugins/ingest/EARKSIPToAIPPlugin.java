@@ -16,10 +16,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-
-import org.apache.directory.api.ldap.aci.Permission;
-import org.apache.jute.Index;
-import org.apache.poi.hpsf.IllegalPropertySetDataException;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
@@ -34,10 +30,8 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
@@ -48,10 +42,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
-import org.roda.core.storage.DefaultStoragePath;
-import org.roda.core.storage.Directory;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceUtils;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda_project.commons_ip.model.SIP;
 import org.roda_project.commons_ip.model.impl.eark.EARKSIP;
@@ -136,14 +127,17 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
       createAncestors(sip, index, model, storage);
 
       if (sip.getValidationReport().isValid()) {
-        String sipParentId = sip.getAncestors() != null && sip.getAncestors().isEmpty() ? "" : sip.getAncestors().get(0);
+        String sipParentId = sip.getAncestors() != null && sip.getAncestors().isEmpty() ? ""
+          : sip.getAncestors().get(0);
         String computedParentId = PluginHelper.computeParentId(this, index, sipParentId);
 
         AIP aip;
 
-        if(IPEnums.IPStatus.UPDATE == sip.getStatus()){
-          IndexResult<IndexedAIP> result = index.find(IndexedAIP.class, new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, sip.getId())), Sorter.NONE, new Sublist(0,1));
-          if(result.getTotalCount() == 1) {
+        if (IPEnums.IPStatus.UPDATE == sip.getStatus()) {
+          IndexResult<IndexedAIP> result = index.find(IndexedAIP.class,
+            new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, sip.getId())), Sorter.NONE,
+            new Sublist(0, 1));
+          if (result.getTotalCount() == 1) {
             // Retrieve the AIP
             IndexedAIP indexedAIP = result.getResults().get(0);
             aip = EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP.getId(), earkSIPPath, model, storage,
@@ -152,13 +146,15 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
             // Fail to update since there's no AIP
             throw new NotFoundException("Unable to find AIP created with SIP ID: " + sip.getId());
           }
-        }else if (IPEnums.IPStatus.NEW == sip.getStatus()){
+        } else if (IPEnums.IPStatus.NEW == sip.getStatus()) {
           // Create a new AIP
-          aip = EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, earkSIPPath, model, storage, sip.getId(), reportItem.getJobId(), computedParentId);
-        }else {
+          aip = EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, earkSIPPath, model, storage, sip.getId(),
+            reportItem.getJobId(), computedParentId);
+        } else {
           throw new GenericException("Unknown IP Status: " + sip.getStatus());
         }
 
+        // put SIP inside the created AIP (if it is supposed to do so)
         PluginHelper.createSubmission(model, createSubmission, earkSIPPath, aip.getId());
 
         createUnpackingEventSuccess(model, index, transferredResource, aip, UNPACK_DESCRIPTION);
@@ -190,9 +186,10 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
   }
 
   private void createAncestors(SIP sip, IndexService index, ModelService model, StorageService storage)
-          throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException, AlreadyExistsException, ValidationException {
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException,
+    AlreadyExistsException, ValidationException {
     List<String> ancestors = new ArrayList<>(sip.getAncestors());
-    if(ancestors.isEmpty())
+    if (ancestors.isEmpty())
       return;
     // Reverse list so that the top ancestors come first
     Collections.reverse(ancestors);
@@ -204,18 +201,15 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
         parent = ancestor;
       } catch (NotFoundException e) {
         Job currentJob = PluginHelper.getJobFromIndex(this, index);
-        if(currentJob == null){
+        if (currentJob == null) {
           throw new GenericException("Job is null");
         }
         String username = currentJob.getUsername();
         Permissions permissions = new Permissions();
 
-        permissions.setUserPermissions(username, new HashSet<>(Arrays.asList(
-                Permissions.PermissionType.CREATE,
-                Permissions.PermissionType.READ,
-                Permissions.PermissionType.UPDATE,
-                Permissions.PermissionType.DELETE,
-                Permissions.PermissionType.GRANT)));
+        permissions.setUserPermissions(username,
+          new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
+            Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE, Permissions.PermissionType.GRANT)));
         model.createAIP(ancestor, parent, "", permissions, true);
         parent = ancestor;
       }

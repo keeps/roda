@@ -126,6 +126,7 @@ public class RodaCoreFactory {
   private static final Logger LOGGER = LoggerFactory.getLogger(RodaCoreFactory.class);
 
   private static boolean instantiated = false;
+  private static boolean instantiatedWithoutErrors = true;
   private static NodeType nodeType;
 
   // Core related objects
@@ -270,14 +271,21 @@ public class RodaCoreFactory {
 
       } catch (ConfigurationException e) {
         LOGGER.error("Error loading roda properties", e);
+        instantiatedWithoutErrors = false;
       } catch (URISyntaxException e) {
         LOGGER.error("Error instantiating solr/index model", e);
+        instantiatedWithoutErrors = false;
       } catch (GenericException e) {
         LOGGER.error("Error instantiating storage model", e);
+        instantiatedWithoutErrors = false;
       } catch (Exception e) {
         LOGGER.error("Error instantiating " + RodaCoreFactory.class.getSimpleName(), e);
+        instantiatedWithoutErrors = false;
       }
 
+      // last log message that state if system was loaded without errors or not
+      LOGGER.info("RODA Core loading completed {}", (instantiatedWithoutErrors ? "with success!"
+        : "with some errors!!! See logs because these errors might cause instability in the system."));
     }
   }
 
@@ -355,11 +363,6 @@ public class RodaCoreFactory {
   }
 
   private static void instantiateEssentialDirectories() {
-    // make sure all essential directories exist
-    ensureAllEssentialDirectoriesExist();
-  }
-
-  public static void ensureAllEssentialDirectoriesExist() {
     List<Path> essentialDirectories = new ArrayList<Path>();
     essentialDirectories.add(configPath);
     essentialDirectories.add(configPath.resolve(RodaConstants.CORE_CROSSWALKS_FOLDER));
@@ -376,9 +379,6 @@ public class RodaCoreFactory {
     essentialDirectories.add(logPath);
     essentialDirectories.add(storagePath);
     essentialDirectories.add(indexDataPath);
-    // FIXME the following block should be invoked/injected from
-    // RodaWuiServlet
-    // (and avoid any cyclic dependency)
     essentialDirectories.add(exampleConfigPath);
 
     for (Path path : essentialDirectories) {
@@ -387,9 +387,8 @@ public class RodaCoreFactory {
           Files.createDirectories(path);
         }
       } catch (IOException e) {
-        LOGGER.error("Unable to create " + path + ". Aborting...", e);
-        // throw new RuntimeException("Unable to create " + path + ".
-        // Aborting...", e);
+        LOGGER.error("Unable to create " + path, e);
+        instantiatedWithoutErrors = false;
       }
     }
 
@@ -404,6 +403,7 @@ public class RodaCoreFactory {
       copyFilesFromClasspath(RodaConstants.CORE_CONFIG_FOLDER + "/", exampleConfigPath, true);
     } catch (GenericException | IOException e) {
       LOGGER.error("Unable to create " + exampleConfigPath, e);
+      instantiatedWithoutErrors = false;
     }
 
   }
@@ -441,6 +441,7 @@ public class RodaCoreFactory {
       } catch (IOException e) {
         LOGGER.error("Error copying file from classpath: {} to {} (reason: {})", originStream, destinyPath,
           e.getMessage());
+        instantiatedWithoutErrors = false;
       } finally {
         IOUtils.closeQuietly(originStream);
       }
@@ -457,6 +458,7 @@ public class RodaCoreFactory {
         pluginManager = PluginManager.getDefaultPluginManager(getConfigPath(), getPluginsPath());
       } catch (PluginManagerException e) {
         LOGGER.error("Error instantiating PluginManager", e);
+        instantiatedWithoutErrors = false;
       }
     }
   }
@@ -474,6 +476,7 @@ public class RodaCoreFactory {
       descriptionLevelManager = new DescriptionLevelManager(descriptionLevelConfiguration);
     } catch (RequestNotValidException e) {
       LOGGER.error("Error loading description levels", e);
+      instantiatedWithoutErrors = false;
     }
   }
 
@@ -537,7 +540,7 @@ public class RodaCoreFactory {
           LOGGER.info("Using SOLR home: {}", solrHome);
         } catch (IOException e) {
           LOGGER.error("Error creating temporary SOLR home", e);
-          // TODO throw exception?
+          instantiatedWithoutErrors = false;
         }
       }
 
@@ -559,6 +562,7 @@ public class RodaCoreFactory {
         index = new IndexService(solr, model);
       } catch (IOException e) {
         LOGGER.error("Unable to instantiate Solr in TEST mode", e);
+        instantiatedWithoutErrors = false;
       }
     }
   }
@@ -611,8 +615,7 @@ public class RodaCoreFactory {
 
   private static void instantiateNodeSpecificObjects(NodeType nodeType) {
     // FIXME 20160531 hsilva: this should be moved to somewhere closely to
-    // Akka
-    // instantiation code
+    // Akka instantiation code
     loadAkkaConfiguration();
     if (nodeType == NodeType.MASTER) {
       instantiateMasterNodeSpecificObjects();
@@ -622,6 +625,7 @@ public class RodaCoreFactory {
       instantiateTestNodeSpecificObjects();
     } else {
       LOGGER.error("Unknown node type '{}'", nodeType);
+      instantiatedWithoutErrors = false;
     }
   }
 
@@ -648,11 +652,7 @@ public class RodaCoreFactory {
 
     startApacheDS();
 
-    try {
-      instantiateTransferredResourcesScanner();
-    } catch (Exception e) {
-      LOGGER.error("Error starting Transferred Resources Scanner: " + e.getMessage(), e);
-    }
+    instantiateTransferredResourcesScanner();
   }
 
   private static void instantiateWorkerNodeSpecificObjects() {
@@ -669,11 +669,7 @@ public class RodaCoreFactory {
     }
 
     if (TEST_DEPLOY_SCANNER) {
-      try {
-        instantiateTransferredResourcesScanner();
-      } catch (Exception e) {
-        LOGGER.error("Error starting Transferred Resources Scanner: " + e.getMessage(), e);
-      }
+      instantiateTransferredResourcesScanner();
     }
 
     if (TEST_DEPLOY_ORCHESTRATOR) {
@@ -758,6 +754,7 @@ public class RodaCoreFactory {
 
     } catch (Exception e) {
       LOGGER.error("Error starting up embedded ApacheDS", e);
+      instantiatedWithoutErrors = false;
     }
 
   }
@@ -775,17 +772,20 @@ public class RodaCoreFactory {
     }
   }
 
-  public static void instantiateTransferredResourcesScanner() throws Exception {
+  public static void instantiateTransferredResourcesScanner() {
+    try {
+      String transferredResourcesFolder = getRodaConfiguration().getString("transferredResources.folder",
+        RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER);
+      Path transferredResourcesFolderPath = dataPath.resolve(transferredResourcesFolder);
+      if (!Files.exists(transferredResourcesFolderPath)) {
+        Files.createDirectories(transferredResourcesFolderPath);
+      }
 
-    String transferredResourcesFolder = getRodaConfiguration().getString("transferredResources.folder",
-      RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER);
-    Path transferredResourcesFolderPath = dataPath.resolve(transferredResourcesFolder);
-    if (!Files.exists(transferredResourcesFolderPath)) {
-      Files.createDirectories(transferredResourcesFolderPath);
+      transferredResourcesScanner = new TransferredResourcesScanner(transferredResourcesFolderPath, getIndexService());
+    } catch (Exception e) {
+      LOGGER.error("Error starting Transferred Resources Scanner: " + e.getMessage(), e);
+      instantiatedWithoutErrors = false;
     }
-
-    transferredResourcesScanner = new TransferredResourcesScanner(transferredResourcesFolderPath, getIndexService());
-
   }
 
   public static boolean getTransferredResourcesScannerUpdateStatus() {
