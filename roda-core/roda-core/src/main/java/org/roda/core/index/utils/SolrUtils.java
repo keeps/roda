@@ -352,10 +352,10 @@ public class SolrUtils {
     } else if (resultClass.equals(Report.class)) {
       indexName = RodaConstants.INDEX_JOB_REPORT;
     } else if (resultClass.equals(User.class)) {
-      LOGGER.warn("Use {} instead of {}", RODAMember.class.getCanonicalName(), User.class.getCanonicalName());
+      LOGGER.warn("Use {} instead of {}", RODAMember.class.getName(), User.class.getName());
       indexName = RodaConstants.INDEX_MEMBERS;
     } else if (resultClass.equals(Group.class)) {
-      LOGGER.warn("Use {} instead of {}", RODAMember.class.getCanonicalName(), Group.class.getCanonicalName());
+      LOGGER.warn("Use {} instead of {}", RODAMember.class.getName(), Group.class.getName());
       indexName = RodaConstants.INDEX_MEMBERS;
     } else if (resultClass.equals(RODAMember.class)) {
       indexName = RodaConstants.INDEX_MEMBERS;

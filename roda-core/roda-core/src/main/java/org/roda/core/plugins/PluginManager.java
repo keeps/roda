@@ -18,6 +18,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,6 +31,12 @@ import java.util.jar.Manifest;
 import org.reflections.Reflections;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.util.ClassLoaderUtility;
@@ -56,6 +63,8 @@ public class PluginManager {
   private Map<String, Plugin<? extends IsRODAObject>> internalPluginChache = new HashMap<String, Plugin<?>>();
   private Map<String, Plugin<? extends IsRODAObject>> externalPluginChache = new HashMap<String, Plugin<?>>();
   private Map<PluginType, List<PluginInfo>> pluginInfoPerType = new HashMap<PluginType, List<PluginInfo>>();
+  private Map<String, Set<Class>> pluginObjectClasses = new HashMap<String, Set<Class>>();
+  private Map<Class, List<PluginInfo>> pluginInfoPerObjectClass = new HashMap<Class, List<PluginInfo>>();
   private boolean internalPluginStarted = false;
   private List<String> blacklistedPlugins;
 
@@ -123,6 +132,26 @@ public class PluginManager {
     }
 
     return pluginsInfo;
+  }
+
+  public Map<String, Set<Class>> getPluginObjectClasses() {
+    return pluginObjectClasses;
+  }
+
+  public <T extends IsRODAObject> Set<Class> getPluginObjectClasses(String pluginID) {
+    return pluginObjectClasses.get(pluginID);
+  }
+
+  public <T extends IsRODAObject> Set<Class> getPluginObjectClasses(Plugin<T> plugin) {
+    return pluginObjectClasses.get(plugin.getClass().getName());
+  }
+
+  public Map<Class, List<PluginInfo>> getPluginInfoPerObjectClass() {
+    return pluginInfoPerObjectClass;
+  }
+
+  public List<PluginInfo> getPluginInfoPerObjectClass(Class clazz) {
+    return pluginInfoPerObjectClass.get(clazz);
   }
 
   /**
@@ -207,8 +236,8 @@ public class PluginManager {
   }
 
   private <T extends IsRODAObject> PluginInfo getPluginInfo(Plugin<T> plugin) {
-    return new PluginInfo(plugin.getClass().getCanonicalName(), plugin.getName(), plugin.getVersion(),
-      plugin.getDescription(), plugin.getType(), plugin.getCategories(), plugin.getParameters());
+    return new PluginInfo(plugin.getClass().getName(), plugin.getName(), plugin.getVersion(), plugin.getDescription(),
+      plugin.getType(), plugin.getCategories(), plugin.getParameters());
   }
 
   private void loadPlugins() {
@@ -255,7 +284,7 @@ public class PluginManager {
 
                 plugin.init();
                 externalPluginChache.put(plugin.getClass().getName(), plugin);
-                addPluginToPluginTypeMapping(plugin);
+                processAndCachePluginInformation(plugin);
                 LOGGER.debug("Plugin started {} (version {})", plugin.getName(), plugin.getVersion());
 
               } else {
@@ -294,21 +323,21 @@ public class PluginManager {
       if (!Modifier.isAbstract(plugin.getModifiers()) && !blacklistedPlugins.contains(name)) {
         Plugin<? extends IsRODAObject> p;
         try {
-          p = (Plugin<?>) ClassLoaderUtility.createObject(plugin.getCanonicalName());
+          p = (Plugin<?>) ClassLoaderUtility.createObject(plugin.getName());
           p.init();
           internalPluginChache.put(plugin.getName(), p);
-          addPluginToPluginTypeMapping(p);
+          processAndCachePluginInformation(p);
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | PluginException
           | RuntimeException e) {
-          LOGGER.error("Unable to instantiate plugin '{}'. {}", plugin.getCanonicalName(), e);
+          LOGGER.error("Unable to instantiate plugin '{}'. {}", plugin.getName(), e);
         }
       }
     }
     internalPluginStarted = true;
   }
 
-  private <T extends IsRODAObject> void addPluginToPluginTypeMapping(Plugin<T> plugin) {
-    PluginInfo pluginInfo = getPluginInfo(plugin.getClass().getCanonicalName());
+  private <T extends IsRODAObject> void processAndCachePluginInformation(Plugin<T> plugin) {
+    PluginInfo pluginInfo = getPluginInfo(plugin.getClass().getName());
     PluginType pluginType = plugin.getType();
     if (pluginInfoPerType.get(pluginType) == null) {
       List<PluginInfo> list = new ArrayList<>();
@@ -316,6 +345,36 @@ public class PluginManager {
       pluginInfoPerType.put(pluginType, list);
     } else if (!pluginInfoPerType.get(pluginType).contains(pluginInfo)) {
       pluginInfoPerType.get(pluginType).add(pluginInfo);
+    }
+
+    // cache plugin > objectClasses
+    Set<Class> objectClasses = new HashSet<>(plugin.getObjectClasses());
+    if (objectClasses.contains(AIP.class)) {
+      objectClasses.add(IndexedAIP.class);
+    } else if (objectClasses.contains(IndexedAIP.class)) {
+      objectClasses.add(AIP.class);
+    }
+    if (objectClasses.contains(Representation.class)) {
+      objectClasses.add(IndexedRepresentation.class);
+    } else if (objectClasses.contains(IndexedRepresentation.class)) {
+      objectClasses.add(Representation.class);
+    }
+    if (objectClasses.contains(File.class)) {
+      objectClasses.add(IndexedFile.class);
+    } else if (objectClasses.contains(IndexedFile.class)) {
+      objectClasses.add(File.class);
+    }
+    pluginObjectClasses.put(plugin.getClass().getName(), objectClasses);
+
+    // cache objectClass > plugininfos
+    for (Class class1 : getPluginObjectClasses(plugin)) {
+      if (pluginInfoPerObjectClass.get(class1) == null) {
+        List<PluginInfo> list = new ArrayList<>();
+        list.add(pluginInfo);
+        pluginInfoPerObjectClass.put(class1, list);
+      } else {
+        pluginInfoPerObjectClass.get(class1).add(pluginInfo);
+      }
     }
 
   }

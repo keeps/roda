@@ -141,7 +141,7 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
   Button buttonCancel;
 
   public CreateJob(Class<T> classToReceive, final List<PluginType> pluginType) {
-    if (classToReceive.getCanonicalName().equals(TransferredResource.class.getCanonicalName())) {
+    if (classToReceive.getName().equals(TransferredResource.class.getName())) {
       this.selected = IngestTransfer.getInstance().getSelected();
     } else {
       this.selected = Search.getInstance().getSelected();

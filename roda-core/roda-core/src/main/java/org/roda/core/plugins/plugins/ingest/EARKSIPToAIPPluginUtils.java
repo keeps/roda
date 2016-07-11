@@ -94,6 +94,9 @@ public class EARKSIPToAIPPluginUtils {
     // process descriptive metadata
     processDescriptiveMetadata(model, aipId, sip.getDescriptiveMetadata(), notify, update);
 
+    // process other metadata
+    processOtherMetadata(model, sip.getOtherMetadata(), aipId, Optional.empty(), notify, update);
+
     // process preservation metadata
     processPreservationMetadata(model, sip.getPreservationMetadata(), aipId, Optional.empty(), notify);
 
@@ -123,6 +126,20 @@ public class EARKSIPToAIPPluginUtils {
           throw e;
       }
     }
+  }
+
+  private static void processOtherMetadata(ModelService model, List<IPMetadata> otherMetadata, String aipId,
+    Optional<String> representationId, boolean notify, boolean update) throws GenericException, NotFoundException,
+    RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
+
+    for (IPMetadata pm : otherMetadata) {
+      IPFile file = pm.getMetadata();
+      ContentPayload fileContentPayload = new FSPathContentPayload(file.getPath());
+
+      model.createOtherMetadata(aipId, representationId.orElse(null), file.getRelativeFolders(), file.getFileName(), "",
+        "", fileContentPayload, notify);
+    }
+
   }
 
   private static void processPreservationMetadata(ModelService model, List<IPMetadata> preservationMetadata,
@@ -197,6 +214,10 @@ public class EARKSIPToAIPPluginUtils {
     // process representation descriptive metadata
     // XXX 20160504 hsilva: there's no "space" in the model to accommodate this
     // information
+
+    // process other metadata
+    processOtherMetadata(model, sr.getOtherMetadata(), aipId, Optional.ofNullable(representation.getId()), notify,
+      update);
 
     // process representation preservation metadata
     processPreservationMetadata(model, sr.getPreservationMetadata(), aipId, Optional.ofNullable(representation.getId()),

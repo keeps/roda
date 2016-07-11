@@ -42,7 +42,7 @@ public class RodaExceptionMapper implements ExceptionMapper<RODAException> {
     Response response;
     String message = e.getClass().getSimpleName() + ": " + e.getMessage();
     if (e.getCause() != null) {
-      message += ", caused by " + e.getCause().getClass().getCanonicalName() + ": " + e.getCause().getMessage();
+      message += ", caused by " + e.getCause().getClass().getName() + ": " + e.getCause().getMessage();
     }
     if (e instanceof AuthorizationDeniedException) {
       response = Response.status(Status.UNAUTHORIZED).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, message))

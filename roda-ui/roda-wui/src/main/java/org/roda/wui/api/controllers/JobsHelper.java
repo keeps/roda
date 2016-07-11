@@ -7,7 +7,7 @@
  */
 package org.roda.wui.api.controllers;
 
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.roda.core.RodaCoreFactory;
@@ -79,7 +79,7 @@ public class JobsHelper {
     throws RequestNotValidException {
     if (!(job.getSourceObjects() instanceof SelectedItemsNone)) {
       // validate plugin class & objects class
-      List<?> pluginObjectClasses = plugin.getObjectClasses();
+      Set<?> pluginObjectClasses = RodaCoreFactory.getPluginManager().getPluginObjectClasses(plugin);
       String objectsClassName = job.getSourceObjects().getSelectedClass();
       Class<?> objectsClass;
       try {

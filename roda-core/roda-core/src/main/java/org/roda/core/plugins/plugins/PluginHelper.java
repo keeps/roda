@@ -82,8 +82,8 @@ public final class PluginHelper {
   public static <T extends IsRODAObject> Report initPluginReportItem(Plugin<T> plugin,
     TransferredResource transferredResource) {
     return initPluginReportItem(plugin, "", transferredResource.getUUID())
-      .setSourceObjectClass(TransferredResource.class.getCanonicalName())
-      .setOutcomeObjectClass(AIP.class.getCanonicalName()).setOutcomeObjectState(AIPState.INGEST_PROCESSING);
+      .setSourceObjectClass(TransferredResource.class.getName()).setOutcomeObjectClass(AIP.class.getName())
+      .setOutcomeObjectState(AIPState.INGEST_PROCESSING);
   }
 
   public static <T extends IsRODAObject> Report initPluginReportItem(Plugin<T> plugin, String outcomeObjectId,
@@ -93,20 +93,20 @@ public final class PluginHelper {
 
   public static <T extends IsRODAObject> Report initPluginReportItem(Plugin<T> plugin, String objectId,
     Class<?> clazz) {
-    return initPluginReportItem(plugin, objectId, objectId).setSourceObjectClass(clazz.getCanonicalName())
-      .setOutcomeObjectClass(clazz.getCanonicalName());
+    return initPluginReportItem(plugin, objectId, objectId).setSourceObjectClass(clazz.getName())
+      .setOutcomeObjectClass(clazz.getName());
   }
 
   public static <T extends IsRODAObject> Report initPluginReportItem(Plugin<T> plugin, String objectId, Class<?> clazz,
     AIPState initialOutcomeObjectState) {
-    return initPluginReportItem(plugin, objectId, objectId).setSourceObjectClass(clazz.getCanonicalName())
-      .setOutcomeObjectClass(clazz.getCanonicalName()).setOutcomeObjectState(initialOutcomeObjectState);
+    return initPluginReportItem(plugin, objectId, objectId).setSourceObjectClass(clazz.getName())
+      .setOutcomeObjectClass(clazz.getName()).setOutcomeObjectState(initialOutcomeObjectState);
   }
 
   public static <T extends IsRODAObject> Report initPluginReportItem(Plugin<T> plugin, String sourceObjectId,
     String outcomeObjectId, Class<?> clazz, AIPState initialOutcomeObjectState) {
-    return initPluginReportItem(plugin, outcomeObjectId, sourceObjectId).setSourceObjectClass(clazz.getCanonicalName())
-      .setOutcomeObjectClass(clazz.getCanonicalName()).setOutcomeObjectState(initialOutcomeObjectState);
+    return initPluginReportItem(plugin, outcomeObjectId, sourceObjectId).setSourceObjectClass(clazz.getName())
+      .setOutcomeObjectClass(clazz.getName()).setOutcomeObjectState(initialOutcomeObjectState);
   }
 
   public static <T extends IsRODAObject> Report initPluginReportItem(Plugin<T> plugin, String outcomeObjectId,
@@ -125,7 +125,7 @@ public final class PluginHelper {
     reportItem.setSourceObjectId(sourceObjectId);
     reportItem.setOutcomeObjectId(outcomeObjectId);
     reportItem.setTitle(plugin.getName());
-    reportItem.setPlugin(plugin.getClass().getCanonicalName());
+    reportItem.setPlugin(plugin.getClass().getName());
     reportItem.setPluginVersion(plugin.getVersion());
     reportItem.setDateCreated(new Date());
     reportItem.setTotalSteps(getTotalStepsFromParameters(plugin));
@@ -259,8 +259,8 @@ public final class PluginHelper {
     Map<String, String> parameterValues = plugin.getParameterValues();
 
     if (!parameterValues.containsKey(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS)
-      || (parameterValues.containsKey(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS) && parameterValues
-        .get(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS).equals(plugin.getClass().getCanonicalName()))) {
+      || (parameterValues.containsKey(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS)
+        && parameterValues.get(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS).equals(plugin.getClass().getName()))) {
       RodaCoreFactory.getPluginOrchestrator().updateJobInformation(plugin, jobPluginInfo);
     }
   }
@@ -485,8 +485,8 @@ public final class PluginHelper {
   private static <T extends AbstractPlugin> void createDefaultRisk(ModelService model, String riskId,
     Class<T> pluginClass) throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException {
-    String configurationFile = RodaCoreFactory.getRodaConfigurationAsString("core.plugins.risk",
-      pluginClass.getCanonicalName(), "path");
+    String configurationFile = RodaCoreFactory.getRodaConfigurationAsString("core.plugins.risk", pluginClass.getName(),
+      "path");
 
     if (configurationFile != null) {
       InputStream inputStream = RodaCoreFactory.getConfigurationFileAsStream(configurationFile);

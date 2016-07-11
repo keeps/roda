@@ -515,8 +515,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   private <T extends IsRODAObject> Plugin<T> getNewPluginInstanceAndInitJobPluginInfo(Plugin<T> plugin,
     Class<T> pluginClass, int objectsCount) throws InvalidParameterException, PluginException {
-    Plugin<T> innerPlugin = RodaCoreFactory.getPluginManager().getPlugin(plugin.getClass().getCanonicalName(),
-      pluginClass);
+    Plugin<T> innerPlugin = RodaCoreFactory.getPluginManager().getPlugin(plugin.getClass().getName(), pluginClass);
     innerPlugin.setParameterValues(plugin.getParameterValues());
 
     // keep track of each job/plugin relation

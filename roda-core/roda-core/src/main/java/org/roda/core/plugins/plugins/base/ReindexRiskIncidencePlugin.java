@@ -18,6 +18,7 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.OptionalWithCause;
@@ -32,6 +33,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -80,6 +82,9 @@ public class ReindexRiskIncidencePlugin extends AbstractPlugin<AIP> {
     throws PluginException {
 
     try {
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+
       for (AIP aip : list) {
         LOGGER.debug("Reindexing incidences of AIP {}", aip.getId());
         try {
@@ -114,11 +119,16 @@ public class ReindexRiskIncidencePlugin extends AbstractPlugin<AIP> {
 
           IOUtils.closeQuietly(allFiles);
         }
+        jobPluginInfo.incrementObjectsProcessedWithSuccess();
       }
 
       index.commit(RiskIncidence.class);
 
-    } catch (GenericException | AuthorizationDeniedException | RequestNotValidException | NotFoundException e) {
+      jobPluginInfo.finalizeInfo();
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+
+    } catch (GenericException | AuthorizationDeniedException | RequestNotValidException | NotFoundException
+      | JobException e) {
       LOGGER.error("Could not reindex risk incidences");
     }
 

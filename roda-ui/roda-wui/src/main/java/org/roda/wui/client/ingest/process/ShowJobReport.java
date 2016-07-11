@@ -156,16 +156,16 @@ public class ShowJobReport extends Composite {
       sourceObject.setText(!"".equals(jobReport.getSourceObjectOriginalId()) ? jobReport.getSourceObjectOriginalId()
         : jobReport.getSourceObjectId());
 
-      if (TransferredResource.class.getCanonicalName().equals(jobReport.getSourceObjectClass())) {
+      if (TransferredResource.class.getName().equals(jobReport.getSourceObjectClass())) {
         sourceObject.setHref(Tools.createHistoryHashLink(IngestTransfer.RESOLVER, jobReport.getSourceObjectId()));
         sourceObjectLabel.setText(messages.showSIPExtended());
 
-      } else if (AIP.class.getCanonicalName().equals(jobReport.getSourceObjectClass())) {
+      } else if (AIP.class.getName().equals(jobReport.getSourceObjectClass())) {
         sourceObject.setHref(Tools.createHistoryHashLink(Browse.RESOLVER, sourceObject.getText()));
         sourceObjectLabel.setText(messages.showAIPExtended());
 
-      } else if (Representation.class.getCanonicalName().equals(jobReport.getSourceObjectClass())) {
-        BrowserService.Util.getInstance().retrieve(IndexedRepresentation.class.getCanonicalName(),
+      } else if (Representation.class.getName().equals(jobReport.getSourceObjectClass())) {
+        BrowserService.Util.getInstance().retrieve(IndexedRepresentation.class.getName(),
           sourceObject.getText(), new AsyncCallback<IndexedRepresentation>() {
 
             @Override
@@ -183,8 +183,8 @@ public class ShowJobReport extends Composite {
             }
           });
 
-      } else if (File.class.getCanonicalName().equals(jobReport.getSourceObjectClass())) {
-        BrowserService.Util.getInstance().retrieve(IndexedFile.class.getCanonicalName(), sourceObject.getText(),
+      } else if (File.class.getName().equals(jobReport.getSourceObjectClass())) {
+        BrowserService.Util.getInstance().retrieve(IndexedFile.class.getName(), sourceObject.getText(),
           new AsyncCallback<IndexedFile>() {
 
             @Override
@@ -214,12 +214,12 @@ public class ShowJobReport extends Composite {
       outcomeObject.setText(jobReport.getOutcomeObjectId());
       outcomeObjectState.setHTML(HtmlSnippetUtils.getAIPStateHTML(jobReport.getOutcomeObjectState()));
 
-      if (AIP.class.getCanonicalName().equals(jobReport.getOutcomeObjectClass())) {
+      if (AIP.class.getName().equals(jobReport.getOutcomeObjectClass())) {
         outcomeObject.setHref(Tools.createHistoryHashLink(Browse.RESOLVER, jobReport.getOutcomeObjectId()));
         outcomeObjectLabel.setText(messages.showAIPExtended());
 
-      } else if (Representation.class.getCanonicalName().equals(jobReport.getOutcomeObjectClass())) {
-        BrowserService.Util.getInstance().retrieve(IndexedRepresentation.class.getCanonicalName(),
+      } else if (Representation.class.getName().equals(jobReport.getOutcomeObjectClass())) {
+        BrowserService.Util.getInstance().retrieve(IndexedRepresentation.class.getName(),
           jobReport.getOutcomeObjectId(), new AsyncCallback<IndexedRepresentation>() {
 
             @Override
@@ -237,8 +237,8 @@ public class ShowJobReport extends Composite {
             }
           });
 
-      } else if (File.class.getCanonicalName().equals(jobReport.getOutcomeObjectClass())) {
-        BrowserService.Util.getInstance().retrieve(IndexedFile.class.getCanonicalName(), jobReport.getOutcomeObjectId(),
+      } else if (File.class.getName().equals(jobReport.getOutcomeObjectClass())) {
+        BrowserService.Util.getInstance().retrieve(IndexedFile.class.getName(), jobReport.getOutcomeObjectId(),
           new AsyncCallback<IndexedFile>() {
 
             @Override

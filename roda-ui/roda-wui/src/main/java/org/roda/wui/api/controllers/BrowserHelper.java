@@ -1768,9 +1768,9 @@ public class BrowserHelper {
 
     Job job = new Job();
     job.setName(RiskIncidenceRemoverPlugin.getStaticName() + " " + job.getStartDate());
-    job.setPlugin(RiskIncidenceRemoverPlugin.class.getCanonicalName());
+    job.setPlugin(RiskIncidenceRemoverPlugin.class.getName());
     job.setPluginParameters(parameters);
-    job.setSourceObjects(new SelectedItemsAll<>(AIP.class.getCanonicalName()));
+    job.setSourceObjects(new SelectedItemsAll<>(AIP.class.getName()));
 
     Jobs.createJob(user, job);
   }

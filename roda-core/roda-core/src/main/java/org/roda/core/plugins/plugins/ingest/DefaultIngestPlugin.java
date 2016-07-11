@@ -97,7 +97,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     Boolean createSubmission = RodaCoreFactory.getRodaConfiguration()
       .getBoolean("core.ingest.sip2aip.create_submission", false);
     getParameterValues().put(RodaConstants.PLUGIN_PARAMS_CREATE_SUBMISSION, createSubmission.toString());
-    getParameterValues().put(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS, getClass().getCanonicalName());
+    getParameterValues().put(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS, getClass().getName());
   }
 
   public abstract PluginParameter getPluginParameter(String pluginParameterId);
@@ -301,7 +301,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     Map<String, String> aipIdToTransferredResourceId = jobPluginInfo.getAipIdToTransferredResourceId();
     if (plugin != null) {
       for (Report reportItem : plugin.getReports()) {
-        if (TransferredResource.class.getCanonicalName().equals(reportItem.getSourceObjectClass())) {
+        if (TransferredResource.class.getName().equals(reportItem.getSourceObjectClass())) {
           Report report = new Report();
           report.addReport(reportItem);
           report.setId(reportItem.getId());

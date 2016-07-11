@@ -7,7 +7,6 @@
  */
 package org.roda.core.plugins.orchestrate;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -15,6 +14,7 @@ import java.util.List;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
@@ -163,11 +163,11 @@ public final class JobsHelper {
     return filesToReturn;
   }
 
-  public static Class<Serializable> getSelectedClassFromString(String selectedClass) throws GenericException {
+  public static Class<IsRODAObject> getSelectedClassFromString(String selectedClass) throws GenericException {
     try {
       Class<?> clazz = Class.forName(selectedClass);
-      if (clazz instanceof Serializable) {
-        return (Class<Serializable>) clazz;
+      if (IsRODAObject.class.isAssignableFrom(clazz)) {
+        return (Class<IsRODAObject>) clazz;
       } else {
         throw new GenericException("Error while getting class from string");
       }
@@ -179,9 +179,8 @@ public final class JobsHelper {
   public static Class<IsIndexed> getIsIndexedSelectedClassFromString(String selectedClass) throws GenericException {
     try {
       Class<?> clazz = Class.forName(selectedClass);
-      if (clazz instanceof Serializable) {
+      if (IsIndexed.class.isAssignableFrom(clazz)) {
         try {
-          // IsIndexed.class.cast(clazz);
           return (Class<IsIndexed>) clazz;
         } catch (ClassCastException e) {
           LOGGER.error("Error while casting class to IsIndexed", e);

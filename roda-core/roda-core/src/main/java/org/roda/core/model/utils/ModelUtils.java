@@ -7,7 +7,6 @@
  */
 package org.roda.core.model.utils;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,6 +22,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
@@ -566,8 +566,8 @@ public final class ModelUtils {
   public static StoragePath getOtherMetadataStoragePath(String aipId, String representationId,
     List<String> directoryPath, String fileName, String fileSuffix, String type) throws RequestNotValidException {
 
-    if (StringUtils.isBlank(fileSuffix)) {
-      throw new RequestNotValidException("File suffix cannot be empty");
+    if (fileSuffix == null) {
+      throw new RequestNotValidException("File suffix cannot be null");
     }
 
     if (StringUtils.isBlank(type)) {
@@ -600,7 +600,7 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(path);
   }
 
-  public static <T extends Serializable> StoragePath getContainerPath(Class<T> clazz) throws RequestNotValidException {
+  public static <T extends IsRODAObject> StoragePath getContainerPath(Class<T> clazz) throws RequestNotValidException {
     if (clazz.equals(Agent.class)) {
       return getAgentContainerPath();
     } else if (clazz.equals(Format.class)) {
@@ -610,7 +610,7 @@ public final class ModelUtils {
     } else if (clazz.equals(Risk.class)) {
       return getRiskContainerPath();
     } else {
-      throw new RequestNotValidException("Unknown class for getting container path: " + clazz.getCanonicalName());
+      throw new RequestNotValidException("Unknown class for getting container path: " + clazz.getName());
     }
   }
 

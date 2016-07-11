@@ -9,7 +9,9 @@ package org.roda.core.data.v2.jobs;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * This class contains information about a plugin.
@@ -35,6 +37,8 @@ public class PluginInfo implements Serializable {
   private List<String> categories = null;
 
   private List<PluginParameter> parameters = new ArrayList<PluginParameter>();
+
+  private Set<Class> objectClasses = new HashSet<>();
 
   /**
    * Constructs a new {@link PluginInfo}.

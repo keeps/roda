@@ -78,9 +78,9 @@ public class CreateActionJob extends CreateJob<IsIndexed> {
 
         if (ids.size() == 0) {
           final ListBox list = new ListBox();
-          list.addItem(messages.allIntellectualEntities(), AIP.class.getCanonicalName());
-          list.addItem(messages.allRepresentations(), Representation.class.getCanonicalName());
-          list.addItem(messages.allFiles(), File.class.getCanonicalName());
+          list.addItem(messages.allIntellectualEntities(), AIP.class.getName());
+          list.addItem(messages.allRepresentations(), Representation.class.getName());
+          list.addItem(messages.allFiles(), File.class.getName());
           list.addItem(messages.selectItems(), "select");
 
           list.addStyleName("form-selectbox");

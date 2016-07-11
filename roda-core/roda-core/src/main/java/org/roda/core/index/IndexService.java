@@ -243,7 +243,7 @@ public class IndexService {
     } else if (RiskIncidence.class.equals(objectClass)) {
       reindexRiskIncidence(RiskIncidence.class.cast(object));
     } else {
-      LOGGER.error("Error trying to reindex an unconfigured object class: {}", objectClass.getCanonicalName());
+      LOGGER.error("Error trying to reindex an unconfigured object class: {}", objectClass.getName());
     }
   }
 
