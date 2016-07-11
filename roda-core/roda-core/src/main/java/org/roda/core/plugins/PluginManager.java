@@ -337,15 +337,6 @@ public class PluginManager {
   }
 
   private <T extends IsRODAObject> void processAndCachePluginInformation(Plugin<T> plugin) {
-    PluginInfo pluginInfo = getPluginInfo(plugin.getClass().getName());
-    PluginType pluginType = plugin.getType();
-    if (pluginInfoPerType.get(pluginType) == null) {
-      List<PluginInfo> list = new ArrayList<>();
-      list.add(pluginInfo);
-      pluginInfoPerType.put(pluginType, list);
-    } else if (!pluginInfoPerType.get(pluginType).contains(pluginInfo)) {
-      pluginInfoPerType.get(pluginType).add(pluginInfo);
-    }
 
     // cache plugin > objectClasses
     Set<Class> objectClasses = new HashSet<>(plugin.getObjectClasses());
@@ -365,6 +356,18 @@ public class PluginManager {
       objectClasses.add(File.class);
     }
     pluginObjectClasses.put(plugin.getClass().getName(), objectClasses);
+
+    // cache plugintype > plugininfos
+    PluginInfo pluginInfo = getPluginInfo(plugin.getClass().getName());
+    // pluginInfo.setObjectClasses(objectClasses);
+    PluginType pluginType = plugin.getType();
+    if (pluginInfoPerType.get(pluginType) == null) {
+      List<PluginInfo> list = new ArrayList<>();
+      list.add(pluginInfo);
+      pluginInfoPerType.put(pluginType, list);
+    } else if (!pluginInfoPerType.get(pluginType).contains(pluginInfo)) {
+      pluginInfoPerType.get(pluginType).add(pluginInfo);
+    }
 
     // cache objectClass > plugininfos
     for (Class class1 : getPluginObjectClasses(plugin)) {

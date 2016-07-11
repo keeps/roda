@@ -75,5 +75,8 @@ Misc
 * Updating all RODA maven modules
 	$> mvn versions:set -DnewVersion=2.0.0-alpha7 -Pall
 
+* Deploy certain artifacts to artifactory (e.g. core artifacts)
+   $> mvn clean package -Dmaven.test.skip -Pcore
+
 * Reverting previous command (to set all RODA maven modules)
 	$> mvn versions:revert -Pall

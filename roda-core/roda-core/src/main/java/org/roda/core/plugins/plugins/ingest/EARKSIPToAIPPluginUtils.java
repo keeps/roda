@@ -137,7 +137,7 @@ public class EARKSIPToAIPPluginUtils {
       ContentPayload fileContentPayload = new FSPathContentPayload(file.getPath());
 
       model.createOtherMetadata(aipId, representationId.orElse(null), file.getRelativeFolders(), file.getFileName(), "",
-        "", fileContentPayload, notify);
+        pm.getMetadataType().asString(), fileContentPayload, notify);
     }
 
   }

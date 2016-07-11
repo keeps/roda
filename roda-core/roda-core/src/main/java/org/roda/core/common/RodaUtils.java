@@ -151,10 +151,8 @@ public class RodaUtils {
   }
 
   /**
-   * @deprecated use instead
-   *             {@link #applyIngestStylesheet(Binary, String, String)}
+   * INFO 20160711 this method does not cache stylesheet related resources
    */
-  @Deprecated
   public static void applyStylesheet(Reader xsltReader, Reader fileReader, Map<String, String> parameters,
     Writer result) throws IOException, TransformerException {
 
