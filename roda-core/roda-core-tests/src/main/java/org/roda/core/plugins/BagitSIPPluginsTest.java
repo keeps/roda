@@ -7,23 +7,21 @@
  */
 package org.roda.core.plugins;
 
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeMethod;
-import org.testng.AssertJUnit;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.solr.client.solrj.SolrServerException;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
@@ -37,60 +35,80 @@ import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.SelectedItemsAll;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
-import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.plugins.plugins.conversion.ImageMagickConvertPlugin;
-import org.roda.core.plugins.plugins.ingest.TransferredResourceToAIPPlugin;
+import org.roda.core.model.ModelServiceTest;
+import org.roda.core.plugins.plugins.ingest.BagitToAIPPlugin;
+import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
+import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.AssertJUnit;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import com.google.common.collect.Iterables;
 
 import jersey.repackaged.com.google.common.collect.Lists;
 
-public class ImageMagickTest {
-  private static final Logger LOGGER = LoggerFactory.getLogger(ImageMagickTest.class);
+public class BagitSIPPluginsTest {
 
+  private static final int CORPORA_FILES_COUNT = 4;
+  private static final int CORPORA_FOLDERS_COUNT = 2;
+  private static final String CORPORA_PDF = "test.docx";
+  private static final String CORPORA_TEST1 = "test1";
+  private static final String CORPORA_TEST1_TXT = "test1.txt";
+  private static final int GENERATED_FILE_SIZE = 100;
+  private static final int AUTO_COMMIT_TIMEOUT = 2000;
   private static Path basePath;
+  private static Path logPath;
+
   private static ModelService model;
   private static IndexService index;
-  private static int numberOfConvertableFiles = 17;
+
   private static Path corporaPath;
+  private static StorageService corporaService;
+
+  private static final Logger logger = LoggerFactory.getLogger(ModelServiceTest.class);
 
   @BeforeMethod
   public void setUp() throws Exception {
-    basePath = TestsHelper.createBaseTempDir(this.getClass(), true);
+
+    basePath = Files.createTempDirectory("indexTests");
+    System.setProperty("roda.home", basePath.toString());
 
     boolean deploySolr = true;
-    boolean deployLdap = true;
+    boolean deployLdap = false;
     boolean deployFolderMonitor = true;
     boolean deployOrchestrator = true;
     boolean deployPluginManager = true;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
       deployPluginManager);
+    logPath = RodaCoreFactory.getLogPath();
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
 
-    URL corporaURL = getClass().getResource("/corpora");
+    URL corporaURL = BagitSIPPluginsTest.class.getResource("/corpora");
     corporaPath = Paths.get(corporaURL.toURI());
+    corporaService = new FileStorageService(corporaPath);
 
-    LOGGER.info("Running internal convert plugins tests under storage {}", basePath);
+    logger.info("Running internal plugins tests under storage {}", basePath);
   }
 
   @AfterMethod
@@ -99,47 +117,47 @@ public class ImageMagickTest {
     FSUtils.deletePath(basePath);
   }
 
-  public List<TransferredResource> createCorpora() throws InterruptedException, IOException, FileAlreadyExistsException,
-    NotFoundException, GenericException, AlreadyExistsException, SolrServerException, IsStillUpdatingException {
+  private TransferredResource createCorpora() throws InterruptedException, IOException, FileAlreadyExistsException,
+    NotFoundException, GenericException, RequestNotValidException {
     TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
 
-    List<TransferredResource> resources = new ArrayList<TransferredResource>();
+    Path sip = corporaPath.resolve(CorporaConstants.SIP_FOLDER).resolve(CorporaConstants.BAGIT_SIP);
 
-    Path corpora = corporaPath.resolve(RodaConstants.STORAGE_CONTAINER_AIP)
-      .resolve(CorporaConstants.SOURCE_AIP_CONVERTER_1).resolve(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS)
-      .resolve(CorporaConstants.REPRESENTATION_CONVERTER_ID_1).resolve(RodaConstants.STORAGE_DIRECTORY_DATA);
+    TransferredResource transferredResourceCreated = f.createFile(null, CorporaConstants.BAGIT_SIP,
+      Files.newInputStream(sip));
 
-    String transferredResourceId = "testt";
-    FSUtils.copy(corpora, f.getBasePath().resolve(transferredResourceId), true);
+    // TODO check if 4 times is the expected
+    // Mockito.verify(observer, Mockito.times(4));
 
-    f.updateAllTransferredResources(null, true);
     index.commit(TransferredResource.class);
 
-    resources.add(
-      index.retrieve(TransferredResource.class, UUID.nameUUIDFromBytes(transferredResourceId.getBytes()).toString()));
-    return resources;
+    TransferredResource transferredResource = index.retrieve(TransferredResource.class,
+      transferredResourceCreated.getUUID());
+    return transferredResource;
   }
 
-  public AIP ingestCorpora() throws RequestNotValidException, NotFoundException, GenericException,
+  private void assertReports(List<Report> reports) {
+    for (Report report : reports) {
+      MatcherAssert.assertThat(report.getReports().get(0).getPluginState(), Matchers.is(PluginState.SUCCESS));
+    }
+  }
+
+  private AIP ingestCorpora() throws RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException,
-    FileAlreadyExistsException, SolrServerException, IsStillUpdatingException {
+    FileAlreadyExistsException, SolrServerException {
     String parentId = null;
     String aipType = RodaConstants.AIP_TYPE_MIXED;
+
     AIP root = model.createAIP(parentId, aipType, new Permissions());
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
 
-    List<TransferredResource> transferredResources = new ArrayList<TransferredResource>();
-    transferredResources = createCorpora();
+    TransferredResource transferredResource = createCorpora();
+    AssertJUnit.assertNotNull(transferredResource);
 
-    AssertJUnit.assertEquals(1, transferredResources.size());
-
-    TestsHelper.executeJob(TransferredResourceToAIPPlugin.class, parameters, PluginType.SIP_TO_AIP,
-      SelectedItemsList.create(TransferredResource.class,
-        transferredResources.stream().map(tr -> tr.getUUID()).collect(Collectors.toList())));
-
-    index.commitAIPs();
+    TestsHelper.executeJob(BagitToAIPPlugin.class, parameters, PluginType.SIP_TO_AIP,
+      SelectedItemsList.create(TransferredResource.class, transferredResource.getUUID()));
 
     IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
       new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10));
@@ -147,13 +165,14 @@ public class ImageMagickTest {
     AssertJUnit.assertEquals(1L, find.getTotalCount());
     IndexedAIP indexedAIP = find.getResults().get(0);
 
-    return model.retrieveAIP(indexedAIP.getId());
+    AIP aip = model.retrieveAIP(indexedAIP.getId());
+    return aip;
   }
 
   @Test
-  public void testImageMagickPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
-    IOException, SolrServerException, IsStillUpdatingException {
+  public void testIngestBagitSIP() throws IOException, InterruptedException, RODAException, SolrServerException {
     AIP aip = ingestCorpora();
+    AssertJUnit.assertEquals(1, aip.getRepresentations().size());
 
     CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
       aip.getRepresentations().get(0).getId(), true);
@@ -161,37 +180,8 @@ public class ImageMagickTest {
     Iterables.addAll(reusableAllFiles,
       Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
 
-    Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT, "tiff");
-
-    TestsHelper.executeJob(ImageMagickConvertPlugin.class, parameters, PluginType.AIP_TO_AIP,
-      SelectedItemsAll.create(Representation.class));
-
-    aip = model.retrieveAIP(aip.getId());
-    AssertJUnit.assertEquals(2, aip.getRepresentations().size());
-
-    CloseableIterable<OptionalWithCause<File>> newAllFiles = model.listFilesUnder(aip.getId(),
-      aip.getRepresentations().get(1).getId(), true);
-    List<File> newReusableAllFiles = new ArrayList<>();
-    Iterables.addAll(newReusableAllFiles, Lists.newArrayList(newAllFiles).stream().filter(f -> f.isPresent())
-      .map(f -> f.get()).collect(Collectors.toList()));
-
-    AssertJUnit.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
-
-    int changedCounter = 0;
-
-    for (File f : reusableAllFiles) {
-      if (f.getId().matches(".*[.](jpg|png)$")) {
-        changedCounter++;
-        String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
-        AssertJUnit.assertEquals(1, newReusableAllFiles.stream().filter(o -> o.getId().equals(filename + ".tiff")).count());
-      }
-    }
-
-    List<File> changedFiles = newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]tiff$"))
-      .collect(Collectors.toList());
-
-    AssertJUnit.assertEquals(changedCounter, changedFiles.size());
+    // All folders and files
+    AssertJUnit.assertEquals(CORPORA_FOLDERS_COUNT + CORPORA_FILES_COUNT, reusableAllFiles.size());
   }
 
 }

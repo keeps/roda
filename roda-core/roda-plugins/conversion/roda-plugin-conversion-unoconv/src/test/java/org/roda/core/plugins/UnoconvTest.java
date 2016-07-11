@@ -7,6 +7,10 @@
  */
 package org.roda.core.plugins;
 
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.AssertJUnit;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.FileAlreadyExistsException;
@@ -20,10 +24,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.solr.client.solrj.SolrServerException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
@@ -73,7 +73,7 @@ public class UnoconvTest {
   private static int numberOfConvertableFiles = 17;
   private static Path corporaPath;
 
-  @Before
+  @BeforeMethod
   public void setUp() throws Exception {
     basePath = TestsHelper.createBaseTempDir(this.getClass(), true);
 
@@ -93,7 +93,7 @@ public class UnoconvTest {
     LOGGER.info("Running internal convert plugins tests under storage {}", basePath);
   }
 
-  @After
+  @AfterMethod
   public void tearDown() throws Exception {
     RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
@@ -133,7 +133,7 @@ public class UnoconvTest {
     List<TransferredResource> transferredResources = new ArrayList<TransferredResource>();
     transferredResources = createCorpora();
 
-    Assert.assertEquals(1, transferredResources.size());
+    AssertJUnit.assertEquals(1, transferredResources.size());
 
     TestsHelper.executeJob(TransferredResourceToAIPPlugin.class, parameters, PluginType.SIP_TO_AIP,
       SelectedItemsList.create(TransferredResource.class,
@@ -144,7 +144,7 @@ public class UnoconvTest {
     IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
       new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10));
 
-    Assert.assertEquals(1L, find.getTotalCount());
+    AssertJUnit.assertEquals(1L, find.getTotalCount());
     IndexedAIP indexedAIP = find.getResults().get(0);
 
     return model.retrieveAIP(indexedAIP.getId());
@@ -168,7 +168,7 @@ public class UnoconvTest {
       SelectedItemsAll.create(Representation.class));
 
     aip = model.retrieveAIP(aip.getId());
-    Assert.assertEquals(2, aip.getRepresentations().size());
+    AssertJUnit.assertEquals(2, aip.getRepresentations().size());
 
     CloseableIterable<OptionalWithCause<File>> newAllFiles = model.listFilesUnder(aip.getId(),
       aip.getRepresentations().get(1).getId(), true);
@@ -176,7 +176,7 @@ public class UnoconvTest {
     Iterables.addAll(newReusableAllFiles, Lists.newArrayList(newAllFiles).stream().filter(f -> f.isPresent())
       .map(f -> f.get()).collect(Collectors.toList()));
 
-    Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
+    AssertJUnit.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
 
     int changedCounter = 0;
 
@@ -184,14 +184,14 @@ public class UnoconvTest {
       if (f.getId().matches(".*[.](pdf|docx|txt|xls|odp|ppt|pptx|doc|rtf|xlsx|ods|odt|xml)$")) {
         changedCounter++;
         String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
-        Assert.assertEquals(1, newReusableAllFiles.stream().filter(o -> o.getId().equals(filename + ".pdf")).count());
+        AssertJUnit.assertEquals(1, newReusableAllFiles.stream().filter(o -> o.getId().equals(filename + ".pdf")).count());
       }
     }
 
     List<File> changedFiles = newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]pdf$"))
       .collect(Collectors.toList());
 
-    Assert.assertEquals(changedCounter, changedFiles.size());
+    AssertJUnit.assertEquals(changedCounter, changedFiles.size());
   }
 
 }

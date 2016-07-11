@@ -1,0 +1,301 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/keeps/roda
+ */
+package org.roda.core.common.monitor;
+
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertTrue;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Random;
+import java.util.UUID;
+
+import org.apache.commons.io.FileUtils;
+import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.index.IndexService;
+import org.roda.core.model.ModelService;
+import org.roda.core.plugins.InternalPluginsTest;
+import org.roda.core.storage.StorageService;
+import org.roda.core.storage.fs.FSUtils;
+import org.roda.core.storage.fs.FileStorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+public class MonitorIndexTest {
+  private static final int AUTO_COMMIT_TIMEOUT = 5000;
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(MonitorIndexTest.class);
+
+  private static Path basePath;
+  private static Path logPath;
+  private static ModelService model;
+  private static IndexService index;
+
+  private static Path corporaPath;
+  private static StorageService corporaService;
+
+  private static int fileCounter;
+
+  @BeforeClass
+  public static void setUp() throws Exception {
+
+    basePath = Files.createTempDirectory("indexTests");
+    System.setProperty("roda.home", basePath.toString());
+
+    boolean deploySolr = true;
+    boolean deployLdap = false;
+    boolean deployFolderMonitor = true;
+    boolean deployOrchestrator = true;
+    boolean deployPluginManager = true;
+    RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
+      deployPluginManager);
+    logPath = RodaCoreFactory.getLogPath();
+    model = RodaCoreFactory.getModelService();
+    index = RodaCoreFactory.getIndexService();
+
+    URL corporaURL = InternalPluginsTest.class.getResource("/corpora");
+    corporaPath = Paths.get(corporaURL.toURI());
+    corporaService = new FileStorageService(corporaPath);
+
+    fileCounter = 0;
+
+    LOGGER.info("Running folder monitor tests under storage {}", basePath);
+  }
+
+  @AfterClass
+  public static void tearDown() throws Exception {
+    RodaCoreFactory.shutdown();
+    FSUtils.deletePath(basePath);
+  }
+
+  @Test
+  public void testUpdate() throws Exception {
+    String transferredResourcesFolder = RodaCoreFactory.getRodaConfiguration().getString("transferredResources.folder",
+      RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER);
+    Path sips = RodaCoreFactory.getDataPath().resolve(transferredResourcesFolder);
+    TransferredResourcesScanner monitor = new TransferredResourcesScanner(sips, index);
+    populate(sips);
+    monitor.updateAllTransferredResources(null, true);
+
+    int folderToIndex = -1;
+    IndexResult<TransferredResource> transferredResources = index.find(TransferredResource.class, null, null,
+      new Sublist(0, fileCounter));
+    int result1 = transferredResources.getResults().size();
+    assertTrue(result1 > 0);
+
+    for (int i = 0; i < result1; i++) {
+      TransferredResource tr = transferredResources.getResults().get(i);
+
+      if (!tr.isFile()) {
+        folderToIndex = i;
+      }
+    }
+
+    TransferredResource resource = transferredResources.getResults().get(folderToIndex);
+    Path parent = Paths.get(resource.getFullPath());
+    Path p = Files.createFile(parent.resolve(UUID.randomUUID().toString() + ".txt"));
+    Files.write(p, "NUNCAMAISACABA".getBytes());
+
+    monitor.updateAllTransferredResources(resource.getUUID(), true);
+
+    IndexResult<TransferredResource> transferredResources2 = index.find(TransferredResource.class, null, null,
+      new Sublist(0, fileCounter + 1));
+    int result2 = transferredResources2.getResults().size();
+    assertTrue(result2 == result1 + 1);
+  }
+
+  @Test
+  public void testRemoveFile() throws Exception {
+    String transferredResourcesFolder = RodaCoreFactory.getRodaConfiguration().getString("transferredResources.folder",
+      RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER);
+    Path sips = RodaCoreFactory.getDataPath().resolve(transferredResourcesFolder);
+    TransferredResourcesScanner monitor = new TransferredResourcesScanner(sips, index);
+    populate(sips);
+    monitor.updateAllTransferredResources(null, true);
+
+    int toRemove1 = -1;
+    int toRemove2 = -1;
+    IndexResult<TransferredResource> transferredResources = index.find(TransferredResource.class, null, null,
+      new Sublist(0, fileCounter));
+    int resultBeforeRemoves = transferredResources.getResults().size();
+
+    for (int i = 0; i < resultBeforeRemoves; i++) {
+      TransferredResource tr = transferredResources.getResults().get(i);
+
+      if (tr.isFile() && toRemove1 == -1) {
+        toRemove1 = i;
+        continue;
+      }
+
+      if (tr.isFile() && toRemove1 != -1) {
+        toRemove2 = i;
+      }
+    }
+
+    TransferredResource resource = transferredResources.getResults().get(toRemove1);
+    File firstFileRemoved = new File(resource.getFullPath());
+    firstFileRemoved.delete();
+
+    TransferredResource resource2 = transferredResources.getResults().get(toRemove2);
+    File secondFileRemoved = new File(resource2.getFullPath());
+    secondFileRemoved.delete();
+
+    monitor.updateAllTransferredResources(null, true);
+
+    IndexResult<TransferredResource> transferredResources2 = index.find(TransferredResource.class, null, null,
+      new Sublist(0, fileCounter));
+    int resultAfterRemoves = transferredResources2.getResults().size();
+
+    assertEquals(resultBeforeRemoves, resultAfterRemoves + 2);
+  }
+
+  @Test
+  public void testRemoveFolder() throws Exception {
+    String transferredResourcesFolder = RodaCoreFactory.getRodaConfiguration().getString("transferredResources.folder",
+      RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER);
+    Path sips = RodaCoreFactory.getDataPath().resolve(transferredResourcesFolder);
+    TransferredResourcesScanner monitor = new TransferredResourcesScanner(sips, index);
+    populate(sips);
+    monitor.updateAllTransferredResources(null, true);
+
+    int toRemove = -1;
+    IndexResult<TransferredResource> transferredResources = index.find(TransferredResource.class, null, null,
+      new Sublist(0, fileCounter));
+    int resultBeforeRemoves = transferredResources.getResults().size();
+
+    for (int i = 0; i < resultBeforeRemoves; i++) {
+      TransferredResource tr = transferredResources.getResults().get(i);
+
+      if (!tr.isFile() && toRemove == -1) {
+        toRemove = i;
+      }
+    }
+
+    TransferredResource resource = transferredResources.getResults().get(toRemove);
+    FileUtils.deleteDirectory(new File(resource.getFullPath()));
+
+    monitor.updateAllTransferredResources(null, true);
+
+    IndexResult<TransferredResource> transferredResources2 = index.find(TransferredResource.class, null, null,
+      new Sublist(0, fileCounter));
+    int resultAfterRemoves = transferredResources2.getResults().size();
+    assertTrue(resultBeforeRemoves > resultAfterRemoves);
+  }
+
+  @Test
+  public void testRemoveFileOnSpecificFolder() throws Exception {
+    String transferredResourcesFolder = RodaCoreFactory.getRodaConfiguration().getString("transferredResources.folder",
+      RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER);
+    Path sips = RodaCoreFactory.getDataPath().resolve(transferredResourcesFolder);
+    TransferredResourcesScanner monitor = new TransferredResourcesScanner(sips, index);
+    populate(sips);
+
+    monitor.updateAllTransferredResources(null, true);
+
+    int toRemove = -1;
+    String folder = "";
+    int folderIndex = -1;
+    IndexResult<TransferredResource> transferredResources = index.find(TransferredResource.class, null, null,
+      new Sublist(0, fileCounter));
+    int resultBeforeRemoves = transferredResources.getResults().size();
+
+    for (int i = 0; i < resultBeforeRemoves; i++) {
+      TransferredResource tr = transferredResources.getResults().get(i);
+
+      if (!tr.isFile() && folderIndex == -1) {
+        folder = tr.getRelativePath();
+        folderIndex = i;
+        break;
+      }
+    }
+
+    for (int i = 0; i < resultBeforeRemoves; i++) {
+      TransferredResource tr = transferredResources.getResults().get(i);
+
+      if (tr.isFile() && toRemove == -1 && tr.getAncestorsPaths().contains(folder)) {
+        toRemove = i;
+      }
+    }
+
+    TransferredResource resource = transferredResources.getResults().get(toRemove);
+    File fileRemoved = new File(resource.getFullPath());
+    fileRemoved.delete();
+
+    TransferredResource transferredResourceFolder = transferredResources.getResults().get(folderIndex);
+    monitor.updateAllTransferredResources(transferredResourceFolder.getUUID(), true);
+
+    IndexResult<TransferredResource> transferredResources2 = index.find(TransferredResource.class, null, null,
+      new Sublist(0, fileCounter));
+    int resultAfterRemoves = transferredResources2.getResults().size();
+
+    assertEquals(resultBeforeRemoves, resultAfterRemoves + 1);
+  }
+
+  public static void populate(Path basePath) throws IOException {
+    Random randomno = new Random();
+    int numberOfItemsByLevel = nextIntInRange(2, 3, randomno);
+    int numberOfLevels = nextIntInRange(2, 3, randomno);
+    populate(basePath, numberOfItemsByLevel, numberOfLevels, 0, randomno);
+  }
+
+  private static void populate(Path path, int numberOfItemsByLevel, int numberOfLevels, int currentLevel,
+    Random randomno) throws IOException {
+    currentLevel++;
+    for (int i = 0; i < numberOfItemsByLevel; i++) {
+      Path p = null;
+      if (i % 2 == 0) {
+        if (currentLevel > 1) {
+          p = Files.createFile(path.resolve(UUID.randomUUID().toString() + ".txt"));
+          Files.write(p, "NUNCAMAISACABA".getBytes());
+          fileCounter++;
+        }
+      } else {
+        p = Files.createDirectory(path.resolve(UUID.randomUUID().toString()));
+        fileCounter++;
+        if (currentLevel <= numberOfLevels) {
+          populate(p, numberOfItemsByLevel, numberOfLevels, currentLevel, randomno);
+        } else {
+          if (currentLevel > 1) {
+            for (int j = 0; j < numberOfItemsByLevel; j++) {
+              Path temp = Files.createFile(p.resolve(UUID.randomUUID().toString() + ".txt"));
+              Files.write(temp, "NUNCAMAISACABA".getBytes());
+              fileCounter++;
+            }
+          }
+        }
+      }
+    }
+
+  }
+
+  static int nextIntInRange(int min, int max, Random rng) {
+    if (min > max) {
+      throw new IllegalArgumentException("Cannot draw random int from invalid range [" + min + ", " + max + "].");
+    }
+    int diff = max - min;
+    if (diff >= 0 && diff != Integer.MAX_VALUE) {
+      return (min + rng.nextInt(diff + 1));
+    }
+    int i;
+    do {
+      i = rng.nextInt();
+    } while (i < min || i > max);
+    return i;
+  }
+}

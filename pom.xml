@@ -80,6 +80,11 @@
 			<name>opf-dev (jhove)</name>
 			<url>http://artifactory.opf-labs.org/artifactory/opf-dev</url>
 		</repository>
+		<repository>
+			<id>jcenter</id>
+			<name>bintray</name>
+			<url>http://jcenter.bintray.com</url>
+		</repository>
 	</repositories>
 	<ciManagement>
 		<system>Jenkins</system>
@@ -613,10 +618,9 @@
 				<version>1.0.0</version>
 			</dependency>
 			<dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-				<version>4.12</version>
-				<scope>test</scope>
+				<groupId>org.testng</groupId>
+				<artifactId>testng</artifactId>
+				<version>6.9.12</version>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>

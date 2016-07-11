@@ -9,9 +9,11 @@ package org.roda.core;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -665,8 +667,18 @@ public class RodaCoreFactory {
   }
 
   private static void loadAkkaConfiguration() {
-    akkaConfig = ConfigFactory
-      .load(RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_ORCHESTRATOR_FOLDER + "/application.conf");
+    InputStream originStream = RodaCoreFactory.class.getClassLoader().getResourceAsStream(
+      RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_ORCHESTRATOR_FOLDER + "/application.conf");
+
+    try {
+      String configAsString = IOUtils.toString(originStream, Charset.forName("UTF-8"));
+      akkaConfig = ConfigFactory.parseString(configAsString);
+    } catch (IOException e) {
+      LOGGER.error("Could not load Akka configuration", e);
+    } finally {
+      IOUtils.closeQuietly(originStream);
+    }
+
   }
 
   public static Config getAkkaConfiguration() {

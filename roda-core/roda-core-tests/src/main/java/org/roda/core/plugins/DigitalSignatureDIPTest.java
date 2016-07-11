@@ -1,10 +1,3 @@
-/**
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE file at the root of the source
- * tree and available online at
- *
- * https://github.com/keeps/roda
- */
 package org.roda.core.plugins;
 
 import org.testng.annotations.AfterMethod;
@@ -23,7 +16,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.roda.common.certification.PDFSignatureUtils;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
@@ -43,29 +38,28 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.SelectedItemsAll;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.plugins.plugins.conversion.ImageMagickConvertPlugin;
+import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.plugins.ingest.TransferredResourceToAIPPlugin;
+import org.roda.core.plugins.plugins.validation.DigitalSignatureDIPPlugin;
+import org.roda.core.plugins.plugins.validation.DigitalSignatureDIPPluginUtils;
+import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Iterables;
-
-import jersey.repackaged.com.google.common.collect.Lists;
-
-public class ImageMagickTest {
-  private static final Logger LOGGER = LoggerFactory.getLogger(ImageMagickTest.class);
+public class DigitalSignatureDIPTest {
+  private static final Logger LOGGER = LoggerFactory.getLogger(DigitalSignatureDIPTest.class);
 
   private static Path basePath;
   private static ModelService model;
@@ -106,8 +100,8 @@ public class ImageMagickTest {
     List<TransferredResource> resources = new ArrayList<TransferredResource>();
 
     Path corpora = corporaPath.resolve(RodaConstants.STORAGE_CONTAINER_AIP)
-      .resolve(CorporaConstants.SOURCE_AIP_CONVERTER_1).resolve(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS)
-      .resolve(CorporaConstants.REPRESENTATION_CONVERTER_ID_1).resolve(RodaConstants.STORAGE_DIRECTORY_DATA);
+      .resolve(CorporaConstants.SOURCE_AIP_CONVERTER_3).resolve(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS)
+      .resolve(CorporaConstants.REPRESENTATION_CONVERTER_ID_3).resolve(RodaConstants.STORAGE_DIRECTORY_DATA);
 
     String transferredResourceId = "testt";
     FSUtils.copy(corpora, f.getBasePath().resolve(transferredResourceId), true);
@@ -151,47 +145,35 @@ public class ImageMagickTest {
   }
 
   @Test
-  public void testImageMagickPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
+  public void testDigitalSignatureDIPPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
     IOException, SolrServerException, IsStillUpdatingException {
     AIP aip = ingestCorpora();
-
     CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
       aip.getRepresentations().get(0).getId(), true);
-    List<File> reusableAllFiles = new ArrayList<>();
-    Iterables.addAll(reusableAllFiles,
-      Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
+    OptionalWithCause<File> file = allFiles.iterator().next();
 
+    StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file.get());
+    DirectResourceAccess directAccess = model.getStorage().getDirectAccess(fileStoragePath);
+    AssertJUnit.assertEquals(0, PDFSignatureUtils.countSignaturesPDF(directAccess.getPath()));
+    IOUtils.closeQuietly(directAccess);
+
+    Plugin<Representation> plugin = new DigitalSignatureDIPPlugin();
     Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT, "tiff");
+    plugin.setParameterValues(parameters);
 
-    TestsHelper.executeJob(ImageMagickConvertPlugin.class, parameters, PluginType.AIP_TO_AIP,
-      SelectedItemsAll.create(Representation.class));
+    DigitalSignatureDIPPluginUtils.setKeystorePath(corporaPath.toString() + "/Certification/keystore.jks");
+    // FIXME 20160623 hsilva: passing by null just to make code compiling
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null, plugin);
 
     aip = model.retrieveAIP(aip.getId());
-    AssertJUnit.assertEquals(2, aip.getRepresentations().size());
-
-    CloseableIterable<OptionalWithCause<File>> newAllFiles = model.listFilesUnder(aip.getId(),
+    CloseableIterable<OptionalWithCause<File>> allNewFiles = model.listFilesUnder(aip.getId(),
       aip.getRepresentations().get(1).getId(), true);
-    List<File> newReusableAllFiles = new ArrayList<>();
-    Iterables.addAll(newReusableAllFiles, Lists.newArrayList(newAllFiles).stream().filter(f -> f.isPresent())
-      .map(f -> f.get()).collect(Collectors.toList()));
+    OptionalWithCause<File> newFile = allNewFiles.iterator().next();
 
-    AssertJUnit.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
-
-    int changedCounter = 0;
-
-    for (File f : reusableAllFiles) {
-      if (f.getId().matches(".*[.](jpg|png)$")) {
-        changedCounter++;
-        String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
-        AssertJUnit.assertEquals(1, newReusableAllFiles.stream().filter(o -> o.getId().equals(filename + ".tiff")).count());
-      }
-    }
-
-    List<File> changedFiles = newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]tiff$"))
-      .collect(Collectors.toList());
-
-    AssertJUnit.assertEquals(changedCounter, changedFiles.size());
+    StoragePath newFileStoragePath = ModelUtils.getFileStoragePath(newFile.get());
+    DirectResourceAccess newDirectAccess = model.getStorage().getDirectAccess(newFileStoragePath);
+    AssertJUnit.assertEquals(1, PDFSignatureUtils.countSignaturesPDF(newDirectAccess.getPath()));
+    IOUtils.closeQuietly(newDirectAccess);
   }
 
 }
