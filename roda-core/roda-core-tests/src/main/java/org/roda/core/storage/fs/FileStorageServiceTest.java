@@ -117,7 +117,7 @@ public class FileStorageServiceTest extends AbstractStorageServiceTest<FileStora
 
   @Override
   public void cleanUp() {
-    LOGGER.trace("Cleanning up");
+    LOGGER.debug("Cleanning up");
     try {
       // recursively delete directory
       Files.walkFileTree(basePath, new SimpleFileVisitor<Path>() {

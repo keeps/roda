@@ -10,6 +10,7 @@ RUN curl -s https://bintray.com/user/downloadSubjectPublicKey?username=bintray |
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY clamd.conf /etc/clamav/clamd.conf
 RUN mkdir -p /var/run/clamav && chown clamav /var/run/clamav && freshclam
+RUN sf -update
 
 # Install web application
 RUN rm -rf /usr/local/tomcat/webapps/ROOT

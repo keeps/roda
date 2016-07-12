@@ -47,6 +47,7 @@ import jersey.repackaged.com.google.common.collect.Iterables;
  *
  * @param <T>
  *          the storage service implementation
+ * 
  */
 @Test(groups = {"all", "travis"})
 public abstract class AbstractStorageServiceTest<T extends StorageService> {
@@ -72,7 +73,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
 
     // 1) empty list of containers
     Iterator<Container> iterator = getStorage().listContainers().iterator();
-    assertFalse(iterator.hasNext());
+    assertThat("Storage starts with empty list of containers", !iterator.hasNext());
 
     // 2) container list with one element (which implies creating one
     // container)
@@ -422,7 +423,6 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     getStorage().deleteContainer(containerStoragePath);
   }
 
-  @Test
   public void testBinaryContent(Binary binary, ContentPayload providedPayload) throws IOException, GenericException {
     // check if content is the same
     assertTrue(IOUtils.contentEquals(providedPayload.createInputStream(), binary.getContent().createInputStream()));
