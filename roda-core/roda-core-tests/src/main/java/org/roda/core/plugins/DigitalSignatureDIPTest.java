@@ -34,6 +34,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.SelectedItemsAll;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
@@ -158,13 +159,11 @@ public class DigitalSignatureDIPTest {
     AssertJUnit.assertEquals(0, PDFSignatureUtils.countSignaturesPDF(directAccess.getPath()));
     IOUtils.closeQuietly(directAccess);
 
-    Plugin<Representation> plugin = new DigitalSignatureDIPPlugin();
     Map<String, String> parameters = new HashMap<>();
-    plugin.setParameterValues(parameters);
-
     DigitalSignatureDIPPluginUtils.setKeystorePath(corporaPath.toString() + "/Certification/keystore.jks");
-    // FIXME 20160623 hsilva: passing by null just to make code compiling
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(null, plugin);
+
+    TestsHelper.executeJob(DigitalSignatureDIPPlugin.class, parameters, PluginType.AIP_TO_AIP,
+      SelectedItemsAll.create(Representation.class));
 
     aip = model.retrieveAIP(aip.getId());
     CloseableIterable<OptionalWithCause<File>> allNewFiles = model.listFilesUnder(aip.getId(),

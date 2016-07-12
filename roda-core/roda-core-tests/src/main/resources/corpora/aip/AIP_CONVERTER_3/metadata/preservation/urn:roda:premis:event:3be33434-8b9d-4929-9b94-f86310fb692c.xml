@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<event xmlns="http://www.loc.gov/premis/v3">
+  <eventIdentifier>
+    <eventIdentifierType>local</eventIdentifierType>
+    <eventIdentifierValue>3be33434-8b9d-4929-9b94-f86310fb692c</eventIdentifierValue>
+  </eventIdentifier>
+  <eventType>message digest calculation</eventType>
+  <eventDateTime>2016-03-03T16:12:41.27Z</eventDateTime>
+  <eventDetailInformation>
+    <eventDetail>Created base PREMIS objects with file original name and file fixity information (SHA-256).</eventDetail>
+  </eventDetailInformation>
+  <eventOutcomeInformation>
+    <eventOutcome>SUCCESS</eventOutcome>
+    <eventOutcomeDetail>
+      <eventOutcomeDetailNote>PREMIS objects were successfully created.</eventOutcomeDetailNote>
+    </eventOutcomeDetail>
+  </eventOutcomeInformation>
+  <linkingAgentIdentifier>
+    <linkingAgentIdentifierType>simple</linkingAgentIdentifierType>
+    <linkingAgentIdentifierValue>org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin@1.0</linkingAgentIdentifierValue>
+  </linkingAgentIdentifier>
+  <linkingObjectIdentifier>
+    <linkingObjectIdentifierType>URN</linkingObjectIdentifierType>
+    <linkingObjectIdentifierValue>REPRESENTATION:3afc2d22-3064-4566-9357-e40313d378c9/d53a24ed-f157-42cf-a45a-a2ac87e8b61d</linkingObjectIdentifierValue>
+    <linkingObjectRole>source</linkingObjectRole>
+  </linkingObjectIdentifier>
+</event>

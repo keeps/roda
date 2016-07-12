@@ -64,7 +64,7 @@ import com.google.common.collect.Iterables;
 
 import jersey.repackaged.com.google.common.collect.Lists;
 
-@Test(groups = {"all", "travis", "test1"})
+@Test(groups = {"all", "travis"})
 public class SoxTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(SoxTest.class);
 
