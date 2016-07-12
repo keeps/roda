@@ -167,6 +167,8 @@ public class JavascriptUtils {
         fail:function(e, data){
             // Something has gone wrong!
             data.context.addClass('error');
+            data.context[0].setAttribute("data-toggle", "tooltip");
+            data.context[0].setAttribute("title", data.jqXHR.responseJSON.message);
             $wnd.console.log("data"+data+" error thrown: "+data.errorThrown);
         },
     });
@@ -176,6 +178,20 @@ public class JavascriptUtils {
     $wnd.jQuery(document).on('drop dragover', function (e) {
         e.preventDefault();
     });
+
+        function getMethods(obj) {
+            var result = [];
+            for (var id in obj) {
+                try {
+                    if (typeof(obj[id]) == "function") {
+                        result.push(id + ": " + obj[id].toString());
+                    }
+                } catch (err) {
+                    result.push(id + ": inaccessible");
+                }
+            }
+            return result;
+        }
 
     // Helper function that formats the file sizes
     function formatFileSize(bytes) {

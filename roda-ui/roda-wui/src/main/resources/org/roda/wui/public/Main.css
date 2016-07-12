@@ -3888,11 +3888,14 @@ td.datePickerMonth, td.datePickerYear {
     cursor: pointer;
     content: "\f00c";
     color: #24c279;
+    -webkit-animation: none;
+    -moz-animation: none;
+    animation:none;
 }
 
 #upload-list li.working span:after {
     content: "\f1ce";
-    color: #ffdc0c;
+    color: #f4d03f;
     -webkit-animation:spin 3s linear infinite;
     -moz-animation:spin 3s linear infinite;
     animation:spin 3s linear infinite;
@@ -3902,9 +3905,20 @@ td.datePickerMonth, td.datePickerYear {
 @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
 
 #upload-list li.error p {
-    content: "\f00d";
     color: #D20707;
 }
+
+#upload-list li.error span:after {
+    content: "\f071";
+    color: #D20707;
+    -webkit-animation: none;
+    -moz-animation: none;
+    animation:none;
+}
+#upload-list li.error:before {
+    content: "";
+}
+
 
 /**********************************************
 				INGEST PROCESS NEW
