@@ -8,9 +8,10 @@
 package org.roda.core.plugins.plugins.base;
 
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,10 +25,13 @@ import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -36,6 +40,7 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
@@ -46,11 +51,25 @@ import org.slf4j.LoggerFactory;
 public class ExportAIPPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(ExportAIPPlugin.class);
 
-  public static final String EXPORT_FOLDER_PARAMETER = "outputFolder";
-  public static final String EXPORT_TYPE = "exportType";
+  public static final String PLUGIN_PARAM_EXPORT_FOLDER_PARAMETER = "outputFolder";
+  public static final String PLUGIN_PARAM_EXPORT_TYPE = "exportType";
+  public static final String PLUGIN_PARAM_EXPORT_REMOVE_IF_ALREADY_EXISTS = "removeIfAlreadyExists";
 
   private String outputFolder;
   private ExportType exportType;
+  private boolean removeIfAlreadyExists;
+
+  private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
+  static {
+    pluginParameters.put(PLUGIN_PARAM_EXPORT_FOLDER_PARAMETER,
+      new PluginParameter(PLUGIN_PARAM_EXPORT_FOLDER_PARAMETER, "Output folder", PluginParameterType.STRING,
+        "/home/sleroux/output", true, false, "Folder where the exported AIP will be sent."));
+    pluginParameters.put(PLUGIN_PARAM_EXPORT_TYPE, new PluginParameter(PLUGIN_PARAM_EXPORT_TYPE, "Type of export",
+      PluginParameterType.STRING, "FOLDER", true, false, "Type of exportation (MULTI_ZIP, FOLDER)"));
+    pluginParameters.put(PLUGIN_PARAM_EXPORT_REMOVE_IF_ALREADY_EXISTS,
+      new PluginParameter(PLUGIN_PARAM_EXPORT_REMOVE_IF_ALREADY_EXISTS, "Remove if already exists",
+        PluginParameterType.BOOLEAN, "true", true, false, "Remove if already exists"));
+  }
 
   @Override
   public void init() throws PluginException {
@@ -78,17 +97,30 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
+  public List<PluginParameter> getParameters() {
+    ArrayList<PluginParameter> parameters = new ArrayList<PluginParameter>();
+    parameters.add(pluginParameters.get(PLUGIN_PARAM_EXPORT_FOLDER_PARAMETER));
+    parameters.add(pluginParameters.get(PLUGIN_PARAM_EXPORT_TYPE));
+    parameters.add(pluginParameters.get(PLUGIN_PARAM_EXPORT_REMOVE_IF_ALREADY_EXISTS));
+    return parameters;
+  }
+
+  @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
-    if (parameters.containsKey(EXPORT_FOLDER_PARAMETER)) {
-      outputFolder = parameters.get(EXPORT_FOLDER_PARAMETER);
+    if (parameters.containsKey(PLUGIN_PARAM_EXPORT_FOLDER_PARAMETER)) {
+      outputFolder = parameters.get(PLUGIN_PARAM_EXPORT_FOLDER_PARAMETER);
     }
-    if (parameters.containsKey(EXPORT_TYPE)) {
+    if (parameters.containsKey(PLUGIN_PARAM_EXPORT_REMOVE_IF_ALREADY_EXISTS)) {
+      removeIfAlreadyExists = Boolean
+        .parseBoolean(getParameterValues().get(PLUGIN_PARAM_EXPORT_REMOVE_IF_ALREADY_EXISTS));
+    }
+    if (parameters.containsKey(PLUGIN_PARAM_EXPORT_TYPE)) {
       try {
-        exportType = ExportType.valueOf(parameters.get(EXPORT_TYPE));
+        exportType = ExportType.valueOf(parameters.get(PLUGIN_PARAM_EXPORT_TYPE));
       } catch (Exception e) {
         LOGGER.error(e.getMessage(), e);
-        exportType = ExportType.SINGLE_ZIP;
+        exportType = ExportType.FOLDER;
       }
     }
   }
@@ -96,43 +128,67 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> aips)
     throws PluginException {
-    Report report = PluginHelper.initPluginReport(this);
     FileOutputStream fos = null;
     // FIXME 20160418 hsilva: change all java.io to nio based code
-    // FIXME 20160419 hsilva: when exporting single ZIP, name the file something
-    // uniq, e.g. using job id as prefix
     try {
-      if (exportType == ExportType.SINGLE_ZIP) {
-        List<ZipEntryInfo> zipEntries = ModelUtils.zipAIP(aips);
-        java.io.File outputFolderFile = new java.io.File(outputFolder);
-        fos = new FileOutputStream(new java.io.File(outputFolderFile, "aips.zip"));
-        ZipTools.zip(zipEntries, fos);
-      } else if (exportType == ExportType.MULTI_ZIP) {
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, aips.size());
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+
+      if (exportType == ExportType.MULTI_ZIP) {
         for (AIP aip : aips) {
-          List<ZipEntryInfo> zipEntries = ModelUtils.aipToZipEntry(aip);
-          java.io.File outputFolderFile = new java.io.File(outputFolder);
-          fos = new FileOutputStream(new java.io.File(outputFolderFile, aip.getId() + ".zip"));
-          ZipTools.zip(zipEntries, fos);
+          LOGGER.debug("Exporting AIP {}", aip.getId());
+          try {
+            List<ZipEntryInfo> zipEntries = ModelUtils.aipToZipEntry(aip);
+            java.io.File outputFolderFile = new java.io.File(outputFolder);
+            java.io.File zip = new java.io.File(outputFolderFile, aip.getId() + ".zip");
+            if (zip.exists() && removeIfAlreadyExists) {
+              zip.delete();
+            }
+            fos = new FileOutputStream(zip);
+            ZipTools.zip(zipEntries, fos);
+            jobPluginInfo.incrementObjectsProcessedWithSuccess();
+          } catch (Exception e) {
+            LOGGER.error("Error exporting AIP " + aip.getId() + ": " + e.getMessage());
+            jobPluginInfo.incrementObjectsProcessedWithFailure();
+          }
         }
+        jobPluginInfo.finalizeInfo();
+        PluginHelper.updateJobInformation(this, jobPluginInfo);
       } else if (exportType == ExportType.FOLDER) {
         FileStorageService localStorage = new FileStorageService(Paths.get(outputFolder));
         for (AIP aip : aips) {
+          LOGGER.debug("Exporting AIP {}", aip.getId());
+          StoragePath aipPath = ModelUtils.getAIPStoragePath(aip.getId());
           try {
-            StoragePath aipPath = ModelUtils.getAIPStoragePath(aip.getId());
             localStorage.copy(storage, aipPath, DefaultStoragePath.parse(aip.getId()));
+            jobPluginInfo.incrementObjectsProcessedWithSuccess();
           } catch (AlreadyExistsException e) {
-            LOGGER.error("Already exist {}", aip.getId());
+            if (removeIfAlreadyExists) {
+              try {
+                localStorage.deleteResource(DefaultStoragePath.parse(aip.getId()));
+                localStorage.copy(storage, aipPath, DefaultStoragePath.parse(aip.getId()));
+                jobPluginInfo.incrementObjectsProcessedWithSuccess();
+              } catch (AlreadyExistsException e2) {
+                jobPluginInfo.incrementObjectsProcessedWithFailure();
+              }
+            } else {
+              LOGGER.error("Already exist {}", aip.getId());
+              jobPluginInfo.incrementObjectsProcessedWithFailure();
+            }
           }
         }
+        jobPluginInfo.finalizeInfo();
+        PluginHelper.updateJobInformation(this, jobPluginInfo);
       }
 
-      return report;
-    } catch (AuthorizationDeniedException | RequestNotValidException | GenericException | NotFoundException
-      | IOException e) {
+    } catch (AuthorizationDeniedException | RequestNotValidException | GenericException | NotFoundException e) {
       throw new PluginException(e.getMessage(), e);
+    } catch (JobException e) {
+      LOGGER.error("Could not update Job information");
     } finally {
       IOUtils.closeQuietly(fos);
     }
+    return PluginHelper.initPluginReport(this);
   }
 
   @Override

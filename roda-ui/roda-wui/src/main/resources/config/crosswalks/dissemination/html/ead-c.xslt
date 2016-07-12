@@ -33,6 +33,7 @@
 	<xsl:param name="i18n.accruals" />
 	<xsl:param name="i18n.physicalcharacteristicsandtechnicalrequirements" />
 	<xsl:param name="i18n.accessrestrictions" />
+	<xsl:param name="i18n.altformavail" />
 	<xsl:param name="i18n.reproductionrestrictions" />
 	<xsl:param name="i18n.relatedmaterials" />
 	<xsl:param name="i18n.otherfindaids" />
@@ -589,7 +590,7 @@
 				<div class="label">
 					<xsl:value-of select="$i18n.description" />
 				</div>
-				<div class="value">
+				<div class="value prewrap">
 					<xsl:value-of select="eadc:scopecontent/eadc:p/text()" />
 				</div>
 			</div>
@@ -679,6 +680,16 @@
 				</div>
 				<div class="value">
 					<xsl:value-of select="eadc:accessrestrict/eadc:p/text()" />
+				</div>
+			</div>
+		</xsl:if>
+		<xsl:if test="eadc:altformavail/ead:p/text()">
+			<div class="field">
+				<div class="label">
+					<xsl:value-of select="$i18n.altformavail" />
+				</div>
+				<div class="value">
+					<xsl:value-of select="eadc:altformavail/eadc:p/text()" />
 				</div>
 			</div>
 		</xsl:if>

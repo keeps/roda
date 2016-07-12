@@ -725,7 +725,7 @@ public final class RodaConstants {
   }
 
   public enum ExportType {
-    SINGLE_ZIP, MULTI_ZIP, FOLDER;
+    MULTI_ZIP, FOLDER;
   }
 
   public enum PreservationAgentType {

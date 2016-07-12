@@ -734,6 +734,10 @@ pre code {
     white-space: nowrap;
 }
 
+.prewrap{
+    white-space: pre-wrap;
+}
+
 .text-align-right {
     text-align: right !important;
 }

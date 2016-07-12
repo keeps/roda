@@ -200,7 +200,7 @@ public class RodaUtils {
       xmlReader.setEntityResolver(new RodaEntityResolver());
       InputSource source = new InputSource(descMetadataReader);
       Source text = new SAXSource(xmlReader, source);
-
+      
       XsltExecutable xsltExecutable = CACHE.get(Triple.of(basePath, metadataType, metadataVersion));
 
       XsltTransformer transformer = xsltExecutable.load();

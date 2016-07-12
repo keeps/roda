@@ -16,10 +16,10 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -27,6 +27,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -34,9 +35,6 @@ import org.slf4j.LoggerFactory;
 
 public class RemoveAIPPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(RemoveAIPPlugin.class);
-
-  public static final String ONLY_REPRESENTATIONS = "onlyRepresentations";
-  private boolean onlyRepresentations = false;
 
   @Override
   public void init() throws PluginException {
@@ -66,35 +64,29 @@ public class RemoveAIPPlugin extends AbstractPlugin<AIP> {
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
-    onlyRepresentations = false;
-    if (parameters != null) {
-      if (parameters.containsKey(ONLY_REPRESENTATIONS)) {
-        if ("true".equalsIgnoreCase(parameters.get(ONLY_REPRESENTATIONS))) {
-          onlyRepresentations = true;
-        }
-      }
-    }
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
+  public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> aips)
     throws PluginException {
-    for (AIP aip : list) {
-      LOGGER.debug("Removing AIP {}", aip.getId());
-      try {
-        if (onlyRepresentations) {
-          for (Representation representation : aip.getRepresentations()) {
-            model.deleteRepresentation(aip.getId(), representation.getId());
-          }
-        } else {
+    try {
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, aips.size());
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+      for (AIP aip : aips) {
+        try {
+          LOGGER.debug("Removing AIP {}", aip.getId());
           model.deleteAIP(aip.getId());
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
         }
-      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-        LOGGER.error("Error while deleting AIP/Representation", e);
       }
+      jobPluginInfo.finalizeInfo();
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+    } catch (JobException e) {
+      LOGGER.error("Could not update Job information");
     }
-    Report report = PluginHelper.initPluginReport(this);
-    return report;
+    return PluginHelper.initPluginReport(this);
   }
 
   @Override

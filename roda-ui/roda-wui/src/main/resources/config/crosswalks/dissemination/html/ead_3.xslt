@@ -33,13 +33,15 @@
 	<xsl:param name="i18n.accruals" />
 	<xsl:param name="i18n.physicalcharacteristicsandtechnicalrequirements" />
 	<xsl:param name="i18n.accessrestrictions" />
+	<xsl:param name="i18n.altformavail" />
 	<xsl:param name="i18n.reproductionrestrictions" />
 	<xsl:param name="i18n.relatedmaterials" />
 	<xsl:param name="i18n.otherfindaids" />
+	<xsl:param name="i18n.userestrict" />
 	<xsl:param name="i18n.notes" />
+	<xsl:param name="i18n.originalsloc" />
 	<xsl:param name="i18n.bibliography" />
 	<xsl:param name="i18n.unitdate" />
-	
 	<xsl:param name="i18n.control.recordid"  />
 	<xsl:param name="i18n.control.otherrecordid" />
 	<xsl:param name="i18n.control.maintenancestatus" />
@@ -644,7 +646,7 @@
 				<div class="label">
 					<xsl:value-of select="$i18n.custodialhistory" />
 				</div>
-				<div class="value">
+				<div class="value prewrap">
 					<xsl:value-of select="ead:custodhist/ead:p/text()" />
 				</div>
 			</div>
@@ -664,7 +666,7 @@
 				<div class="label">
 					<xsl:value-of select="$i18n.description" />
 				</div>
-				<div class="value">
+				<div class="value prewrap">
 					<xsl:value-of select="ead:scopecontent/ead:p/text()" />
 				</div>
 			</div>
@@ -757,6 +759,16 @@
 				</div>
 			</div>
 		</xsl:if>
+		<xsl:if test="normalize-space(ead:altformavail/ead:p/text())!=''">
+			<div class="field">
+				<div class="label">
+					<xsl:value-of select="$i18n.altformavail" />
+				</div>
+				<div class="value">
+					<xsl:value-of select="ead:altformavail/ead:p/text()" />
+				</div>
+			</div>
+		</xsl:if>
 		<xsl:if test="normalize-space(ead:userrestrict/ead:p/text())!=''">
 			<div class="field">
 				<div class="label">
@@ -782,8 +794,18 @@
 				<div class="label">
 					<xsl:value-of select="$i18n.otherfindaids" />
 				</div>
-				<div class="value">
+				<div class="value prewrap">
 					<xsl:value-of select="ead:otherfindingaid/ead:p/text()" />
+				</div>
+			</div>
+		</xsl:if>
+		<xsl:if test="ead:userestrict/ead:p/text()">
+			<div class="field">
+				<div class="label">
+					<xsl:value-of select="$i18n.userestrict" />
+				</div>
+				<div class="value">
+					<xsl:value-of select="ead:userestrict/ead:p/text()" />
 				</div>
 			</div>
 		</xsl:if>
@@ -792,11 +814,23 @@
 				<div class="label">
 					<xsl:value-of select="$i18n.notes" />
 				</div>
-				<div class="value">
+				<div class="value prewrap">
 					<xsl:value-of select="ead:note/ead:p/text()" />
 				</div>
 			</div>
 		</xsl:if>
+		
+		<xsl:if test="normalize-space(ead:originalsloc/ead:p/text())!=''">
+			<div class="field">
+				<div class="label">
+					<xsl:value-of select="$i18n.originalsloc" />
+				</div>
+				<div class="value prewrap">
+					<xsl:value-of select="ead:originalsloc/ead:p/text()" />
+				</div>
+			</div>
+		</xsl:if>
+		
 		<xsl:if test="normalize-space(ead:bibliography/ead:p/text())!=''">
 			<div class="field">
 				<div class="label">

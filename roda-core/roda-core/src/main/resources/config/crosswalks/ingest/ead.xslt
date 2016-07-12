@@ -30,6 +30,16 @@
 				<xsl:value-of select="ead:did/ead:unittitle/text()" />
 			</field>
 		</xsl:if>
+		<xsl:if test="ead:did/ead:unitid/@repositorycode">
+			<field name="repositoryCode_ss">
+				<xsl:value-of select="ead:did/ead:unitid/@repositorycode" />
+			</field>
+		</xsl:if>
+		<xsl:if test="ead:did/ead:unitid/text()">
+			<field name="unitId_ss">
+				<xsl:value-of select="ead:did/ead:unitid/text()" />
+			</field>
+		</xsl:if>
 		<xsl:if test="ead:scopecontent/ead:p/text()">
 			<field name="description">
 				<xsl:value-of select="ead:scopecontent/ead:p/text()" />

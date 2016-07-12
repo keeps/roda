@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
@@ -43,8 +42,8 @@ import org.roda.core.data.v2.index.SelectedItemsAll;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.index.SelectedItemsNone;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.Group;
@@ -58,6 +57,7 @@ import org.roda.core.plugins.plugins.base.ReindexJobPlugin;
 import org.roda.core.plugins.plugins.base.ReindexRiskIncidencePlugin;
 import org.roda.core.plugins.plugins.base.ReindexRodaEntityPlugin;
 import org.roda.core.plugins.plugins.base.ReindexTransferredResourcePlugin;
+import org.roda.core.plugins.plugins.base.RemoveAIPPlugin;
 import org.roda.wui.api.controllers.Jobs;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.common.RodaCoreService;
@@ -117,29 +117,6 @@ public class ManagementTasksResource extends RodaCoreService {
     return Response.ok().entity(createJobForRunningActionlogCleaner(user, daysToKeep, startDate)).build();
   }
 
-  @POST
-  @Path("/model/exportAIPs")
-  public Response exportAIPs(
-    @ApiParam(value = "Folder where to put the export", defaultValue = "") @QueryParam("outputFolder") @DefaultValue("") String outputFolder,
-    @ApiParam(value = "Selected items (serialized as json using 'JsonUtils.getJsonFromObject()')", defaultValue = "") @QueryParam("selected") @DefaultValue("") String selected,
-    @ApiParam(value = "Export type", allowableValues = "SINGLE_ZIP,MULTI_ZIP,FOLDER", defaultValue = "SINGLE_ZIP", required = true) @DefaultValue("SINGLE_ZIP") @QueryParam("type") ExportType type)
-    throws AuthorizationDeniedException {
-    Date startDate = new Date();
-
-    // get user & check permissions
-    RodaUser user = UserUtility.getApiUser(request);
-    // FIXME see if this is the proper way to ensure that the user can execute
-    // this task
-    if (!user.getAllGroups().contains("administrators")) {
-      throw new AuthorizationDeniedException(
-        "User \"" + user.getId() + "\" doesn't have permission the execute the requested task!");
-    }
-
-    ApiResponseMessage response = createJobToExportAIPs(user, startDate, outputFolder, selected, type);
-
-    return Response.ok().entity(response).build();
-  }
-
   private Response executeReindex(RodaUser user, Date startDate, String entity, List<String> params) {
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
     if ("aip".equals(entity)) {
@@ -171,7 +148,7 @@ public class ManagementTasksResource extends RodaCoreService {
   }
 
   private ApiResponseMessage createJobToExportAIPs(RodaUser user, Date startDate, String outputFolder, String selected,
-    ExportType type) {
+    ExportType type, String removeIfAlreadyExists) {
     ApiResponseMessage response;
     response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
     try {
@@ -180,17 +157,41 @@ public class ManagementTasksResource extends RodaCoreService {
       job.setName("Management Task | Export 'AIPs' job").setPlugin(ExportAIPPlugin.class.getName())
         .setSourceObjects(selectedItems);
       Map<String, String> parameters = new HashMap<String, String>();
-      parameters.put(ExportAIPPlugin.EXPORT_FOLDER_PARAMETER, outputFolder);
-      parameters.put(ExportAIPPlugin.EXPORT_TYPE, type.toString());
+      parameters.put(ExportAIPPlugin.PLUGIN_PARAM_EXPORT_FOLDER_PARAMETER, outputFolder);
+      parameters.put(ExportAIPPlugin.PLUGIN_PARAM_EXPORT_TYPE, type.toString());
+      parameters.put(ExportAIPPlugin.PLUGIN_PARAM_EXPORT_REMOVE_IF_ALREADY_EXISTS, removeIfAlreadyExists);
       job.setPluginParameters(parameters);
       Job jobCreated = Jobs.createJob(user, job);
       response.setMessage("Export AIPs job created (" + jobCreated + ")");
       // register action
       long duration = new Date().getTime() - startDate.getTime();
-      registerAction(user, "ManagementTasks", "export aips", null, duration);
+      registerAction(user, "ManagementTasks", "remove aips", null, duration, LOG_ENTRY_STATE.SUCCESS, "selected",
+        selected);
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
       | JobAlreadyStartedException e) {
       LOGGER.error("Error creating export AIPs job", e);
+    }
+    return response;
+  }
+
+  private ApiResponseMessage createJobToRemoveAIPs(RodaUser user, Date startDate, String selected) {
+    ApiResponseMessage response;
+    response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
+    try {
+      Job job = new Job();
+      SelectedItems selectedItems = JsonUtils.getObjectFromJson(selected, SelectedItems.class);
+      job.setName("Management Task | Remove 'AIPs' job").setPlugin(RemoveAIPPlugin.class.getName())
+        .setSourceObjects(selectedItems);
+      Map<String, String> parameters = new HashMap<String, String>();
+      job.setPluginParameters(parameters);
+      Job jobCreated = Jobs.createJob(user, job);
+      response.setMessage("Remove AIPs job created (" + jobCreated + ")");
+      long duration = new Date().getTime() - startDate.getTime();
+      registerAction(user, "ManagementTasks", "remove aips", null, duration, LOG_ENTRY_STATE.SUCCESS, "selected",
+        selected);
+    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
+      | JobAlreadyStartedException e) {
+      LOGGER.error("Error creating remove AIPs job", e);
     }
     return response;
   }
@@ -322,8 +323,7 @@ public class ManagementTasksResource extends RodaCoreService {
     List<String> params) {
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
     Job job = new Job().setName("Management Task | Reindex 'TransferredResources' job")
-      .setSourceObjects(SelectedItemsNone.create())
-      .setPlugin(ReindexTransferredResourcePlugin.class.getName());
+      .setSourceObjects(SelectedItemsNone.create()).setPlugin(ReindexTransferredResourcePlugin.class.getName());
     if (!params.isEmpty()) {
       Map<String, String> pluginParameters = new HashMap<>();
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_STRING_VALUE, params.get(0));
@@ -392,8 +392,7 @@ public class ManagementTasksResource extends RodaCoreService {
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
     Job job = new Job();
     job.setName("Management Task | Reindex 'all AIPs' job")
-      .setSourceObjects(new SelectedItemsAll<>(AIP.class.getName()))
-      .setPlugin(ReindexAIPPlugin.class.getName());
+      .setSourceObjects(new SelectedItemsAll<>(AIP.class.getName())).setPlugin(ReindexAIPPlugin.class.getName());
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "true");
     job.setPluginParameters(pluginParameters);
@@ -451,5 +450,4 @@ public class ManagementTasksResource extends RodaCoreService {
 
     return response;
   }
-
 }

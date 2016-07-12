@@ -30,9 +30,39 @@
 				<xsl:value-of select="ead:did/ead:unittitle/text()" />
 			</field>
 		</xsl:if>
+		<xsl:if test="normalize-space(ead:did/ead:unitid/@repositorycode)!=''">
+			<field name="repositoryCode_ss">
+				<xsl:value-of select="ead:did/ead:unitid/@repositorycode" />
+			</field>
+		</xsl:if>
+		<xsl:if test="normalize-space(ead:did/ead:unitid/text())!=''">
+			<field name="unitId_ss">
+				<xsl:value-of select="ead:did/ead:unitid/text()" />
+			</field>
+		</xsl:if>
 		<xsl:if test="ead:scopecontent/ead:p/text()">
 			<field name="description">
 				<xsl:value-of select="ead:scopecontent/ead:p/text()" />
+			</field>
+		</xsl:if>
+		<xsl:if test="ead:accessrestrict/ead:p/text()">
+			<field name="accessrestrict_ss">
+				<xsl:value-of select="ead:accessrestrict/ead:p/text()" />
+			</field>
+		</xsl:if>
+		<xsl:if test="ead:altformavail/ead:p/text()">
+			<field name="altformavail_ss">
+				<xsl:value-of select="ead:altformavail/ead:p/text()" />
+			</field>
+		</xsl:if>
+		<xsl:if test="ead:userestrict/ead:p/text()">
+			<field name="userestrict_ss">
+				<xsl:value-of select="ead:userestrict/ead:p/text()" />
+			</field>
+		</xsl:if>
+		<xsl:if test="ead:originalsloc/ead:p/text()">
+			<field name="originalsloc_ss">
+				<xsl:value-of select="ead:originalsloc/ead:p/text()" />
 			</field>
 		</xsl:if>
 		<xsl:if test="ead:did/ead:unitdate/@normal">

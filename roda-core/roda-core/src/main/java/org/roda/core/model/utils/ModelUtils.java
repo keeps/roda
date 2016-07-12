@@ -42,6 +42,7 @@ import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
@@ -750,11 +751,12 @@ public final class ModelUtils {
     return res;
   }
 
-  public static List<ZipEntryInfo> zipAIP(List<AIP> aips)
+  public static List<ZipEntryInfo> zipAIP(List<AIP> aips, SimpleJobPluginInfo jobPluginInfo)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
     for (AIP aip : aips) {
       zipEntries.addAll(aipToZipEntry(aip));
+      jobPluginInfo.incrementObjectsProcessedWithSuccess();
     }
     return zipEntries;
   }
