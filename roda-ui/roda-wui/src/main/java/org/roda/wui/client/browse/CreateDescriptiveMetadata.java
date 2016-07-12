@@ -297,8 +297,9 @@ public class CreateDescriptiveMetadata extends Composite {
   void buttonApplyHandler(ClickEvent e) {
     buttonApply.setEnabled(false);
     String idText = id.getText();
-    String typeText = selectedBundle.getType();
-    String typeVersion = selectedBundle.getVersion();
+    String typeText = selectedBundle != null ? selectedBundle.getType() : messages.otherItem(); //Other
+    String typeVersion = selectedBundle != null ? selectedBundle.getVersion() : "";
+    String template = selectedBundle != null ? selectedBundle.getTemplate() : null;
     String xmlText = metadataXML.getText();
     boolean hasOverridenTheForm = inXML && !xmlText.equals(metadataTextFromForm);
 
@@ -306,11 +307,11 @@ public class CreateDescriptiveMetadata extends Composite {
       Set<MetadataValue> values = null;
       // we only send the values map if the user hasn't overriden the form by
       // modifying the XML directly
-      if (!hasOverridenTheForm) {
+      if (!hasOverridenTheForm && selectedBundle != null) {
         values = selectedBundle.getValues();
       }
       DescriptiveMetadataEditBundle newBundle = new DescriptiveMetadataEditBundle(idText, typeText, typeVersion,
-        xmlText, selectedBundle.getTemplate(), values, true);
+        xmlText, template, values, true);
 
       BrowserService.Util.getInstance().createDescriptiveMetadataFile(aipId, newBundle, new AsyncCallback<Void>() {
 

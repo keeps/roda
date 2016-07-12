@@ -321,6 +321,7 @@ public class EditDescriptiveMetadata extends Composite {
         }
       }
     } else {
+      inXML = true;
       formSimilarDanger.setVisible(false);
       formOrXML.clear();
       if (bundle != null) {
@@ -405,7 +406,7 @@ public class EditDescriptiveMetadata extends Composite {
 
   private void updateMetadataOnServer(String content) {
     String typeText = type.getSelectedValue();
-    String version = null;
+    String version = "";
 
     if (typeText.contains(RodaConstants.METADATA_VERSION_SEPARATOR)) {
       version = typeText.substring(typeText.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1,
