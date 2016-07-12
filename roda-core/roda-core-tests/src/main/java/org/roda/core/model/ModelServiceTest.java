@@ -83,6 +83,7 @@ import jersey.repackaged.com.google.common.collect.Lists;
  * @see ModelService
  */
 // @PrepareForTest({})
+@Test(groups = {"all", "travis"})
 public class ModelServiceTest {
 
   private static Path basePath;

@@ -7,16 +7,17 @@
  */
 package org.roda.core.common;
 
-import org.testng.annotations.Test;
-import org.testng.Assert;
-import org.testng.AssertJUnit;
 import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.jobs.Report;
+import org.testng.Assert;
+import org.testng.AssertJUnit;
+import org.testng.annotations.Test;
 
+@Test(groups = {"all", "travis"})
 public class JsonUtilsTest {
 
   @Test

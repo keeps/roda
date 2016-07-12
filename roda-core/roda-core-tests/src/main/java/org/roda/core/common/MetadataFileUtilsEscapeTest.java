@@ -7,17 +7,13 @@
  */
 package org.roda.core.common;
 
-import org.testng.annotations.Test;
-import org.testng.AssertJUnit;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -25,8 +21,12 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 import org.roda.core.data.exceptions.GenericException;
+import org.testng.AssertJUnit;
+import org.testng.annotations.Test;
 
+@Test(groups = {"all", "travis"})
 public class MetadataFileUtilsEscapeTest {
+
   @Test
   public void testEscape() throws GenericException {
     int total = (int) Math.pow(2, 20);
@@ -56,7 +56,6 @@ public class MetadataFileUtilsEscapeTest {
     } catch (Exception e) {
       AssertJUnit.fail();
     }
-    
 
     // without escape, the SaxReader must throw an exception...
     try {

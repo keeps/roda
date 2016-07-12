@@ -149,6 +149,7 @@
 		<poi.version>3.13</poi.version>
 		<commons_ip.version>1.0.0-alpha15.2</commons_ip.version>
 		<roda_community_url>http://roda-community.org</roda_community_url>
+		<testng.groups>all-tests</testng.groups>
 	</properties>
 	<profiles>
 		<profile>

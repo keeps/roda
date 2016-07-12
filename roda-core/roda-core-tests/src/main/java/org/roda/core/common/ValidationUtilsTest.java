@@ -40,6 +40,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+@Test(groups = {"all", "travis"})
 public class ValidationUtilsTest {
   private static Path basePath;
   private static Path indexPath;

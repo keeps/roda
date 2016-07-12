@@ -37,6 +37,7 @@ import org.testng.annotations.Test;
  * @see FileStorageService
  */
 // @PrepareForTest({FSUtils.class})
+@Test(groups = {"all", "travis"})
 public class FileStorageServiceTest extends AbstractStorageServiceTest<FileStorageService> {
   private static final Logger LOGGER = LoggerFactory.getLogger(FileStorageServiceTest.class);
 

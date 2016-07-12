@@ -72,7 +72,8 @@ public class FormatList extends BasicAsyncTableCell<Format> {
 
       @Override
       public String getValue(Format format) {
-        return (format != null && format.getCategories()!=null && format.getCategories().size()>0) ? format.getCategories().get(0) : null;
+        return (format != null && format.getCategories() != null && format.getCategories().size() > 0)
+          ? format.getCategories().get(0) : null;
       }
     };
 
@@ -92,16 +93,21 @@ public class FormatList extends BasicAsyncTableCell<Format> {
   protected void getData(Sublist sublist, ColumnSortList columnSortList, AsyncCallback<IndexResult<Format>> callback) {
 
     Filter filter = getFilter();
+    if (filter == Filter.NULL) {
+      // search not yet ready, deliver empty result
+      callback.onSuccess(null);
+    } else {
 
-    Map<Column<Format, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<Format, ?>, List<String>>();
-    columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.FORMAT_NAME_SORT));
-    columnSortingKeyMap.put(categoryColumn, Arrays.asList(RodaConstants.FORMAT_CATEGORY_SORT));
+      Map<Column<Format, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<Format, ?>, List<String>>();
+      columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.FORMAT_NAME_SORT));
+      columnSortingKeyMap.put(categoryColumn, Arrays.asList(RodaConstants.FORMAT_CATEGORY_SORT));
 
-    Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
+      Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
-    boolean justActive = false;
-    BrowserService.Util.getInstance().find(Format.class.getName(), filter, sorter, sublist, getFacets(),
-      LocaleInfo.getCurrentLocale().getLocaleName(), justActive, callback);
+      boolean justActive = false;
+      BrowserService.Util.getInstance().find(Format.class.getName(), filter, sorter, sublist, getFacets(),
+        LocaleInfo.getCurrentLocale().getLocaleName(), justActive, callback);
+    }
   }
 
   @Override

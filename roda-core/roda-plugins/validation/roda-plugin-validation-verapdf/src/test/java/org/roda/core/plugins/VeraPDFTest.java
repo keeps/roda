@@ -20,10 +20,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.solr.client.solrj.SolrServerException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
@@ -57,7 +53,12 @@ import org.roda.core.plugins.plugins.validation.VeraPDFPlugin;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.AssertJUnit;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
+@Test(groups = {"all", "travis"})
 public class VeraPDFTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(VeraPDFTest.class);
 
@@ -66,7 +67,7 @@ public class VeraPDFTest {
   private static IndexService index;
   private static Path corporaPath;
 
-  @Before
+  @BeforeMethod
   public void setUp() throws Exception {
     basePath = TestsHelper.createBaseTempDir(this.getClass(), true);
 
@@ -86,7 +87,7 @@ public class VeraPDFTest {
     LOGGER.info("Running internal convert plugins tests under storage {}", basePath);
   }
 
-  @After
+  @AfterMethod
   public void tearDown() throws Exception {
     RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
@@ -126,7 +127,7 @@ public class VeraPDFTest {
     List<TransferredResource> transferredResources = new ArrayList<TransferredResource>();
     transferredResources = createCorpora();
 
-    Assert.assertEquals(1, transferredResources.size());
+    AssertJUnit.assertEquals(1, transferredResources.size());
 
     TestsHelper.executeJob(TransferredResourceToAIPPlugin.class, parameters, PluginType.SIP_TO_AIP,
       SelectedItemsList.create(TransferredResource.class,
@@ -137,7 +138,7 @@ public class VeraPDFTest {
     IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
       new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10));
 
-    Assert.assertEquals(1L, find.getTotalCount());
+    AssertJUnit.assertEquals(1L, find.getTotalCount());
     IndexedAIP indexedAIP = find.getResults().get(0);
 
     return model.retrieveAIP(indexedAIP.getId());
@@ -155,7 +156,7 @@ public class VeraPDFTest {
       SelectedItemsAll.create(Representation.class));
 
     if (job.getJobStats().getSourceObjectsProcessedWithFailure() == 0) {
-      Assert.fail("Report should have ended with failures");
+      AssertJUnit.fail("Report should have ended with failures");
     }
 
     // Plugin<Representation> plugin2 = new PdfToPdfaPlugin<Representation>();

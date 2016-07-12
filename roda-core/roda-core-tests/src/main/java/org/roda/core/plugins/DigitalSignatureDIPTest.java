@@ -1,9 +1,5 @@
 package org.roda.core.plugins;
 
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeMethod;
-import org.testng.AssertJUnit;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.FileAlreadyExistsException;
@@ -57,7 +53,12 @@ import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.AssertJUnit;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
+@Test(groups = {"all"})
 public class DigitalSignatureDIPTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalSignatureDIPTest.class);
 

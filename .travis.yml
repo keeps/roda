@@ -25,4 +25,4 @@ before_script:
   - sudo apt-get install libreoffice libreoffice-script-provider-python -y
   - sudo apt-get install unoconv -y
   - sudo apt-get --only-upgrade install cpio libgcrypt11 libnss3 libreoffice-pdfimport multiarch-support -y
-script: mvn -Dtestng.tests="travis-ci" verify
+script: mvn -Dtestng.groups="travis" verify

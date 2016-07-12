@@ -48,6 +48,7 @@ import jersey.repackaged.com.google.common.collect.Iterables;
  * @param <T>
  *          the storage service implementation
  */
+@Test(groups = {"all", "travis"})
 public abstract class AbstractStorageServiceTest<T extends StorageService> {
 
   /**

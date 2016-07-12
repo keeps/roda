@@ -44,6 +44,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 // @RunWith(SpringJUnit4ClassRunner.class)
+@Test(groups = {"all", "travis"})
 @ContextConfiguration("/fcrepo/spring-test/test-container.xml")
 public class FedoraStorageServiceTest extends AbstractStorageServiceTest<FedoraStorageService> {
   private static final Logger LOGGER = LoggerFactory.getLogger(FedoraStorageServiceTest.class);

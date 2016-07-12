@@ -137,10 +137,8 @@ public class FormatRegister extends Composite {
    * @param user
    */
   public FormatRegister() {
-    Filter filter = null;
     Facets facets = null;
-
-    formatList = new FormatList(filter, facets, messages.formatsTitle(), true);
+    formatList = new FormatList(Filter.NULL, facets, messages.formatsTitle(), true);
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.FORMAT_SEARCH,
       messages.formatRegisterSearchPlaceHolder(), false, false);

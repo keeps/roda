@@ -64,6 +64,7 @@ import com.google.common.collect.Iterables;
 
 import jersey.repackaged.com.google.common.collect.Lists;
 
+@Test(groups = {"all"})
 public class UnoconvTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(UnoconvTest.class);
 
@@ -150,7 +151,7 @@ public class UnoconvTest {
     return model.retrieveAIP(indexedAIP.getId());
   }
 
-  @Test(groups = {"not-in-travis"})
+  @Test
   public void testUnoconvPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,
     SolrServerException, IsStillUpdatingException {
     AIP aip = ingestCorpora();

@@ -91,16 +91,21 @@ public class AgentList extends BasicAsyncTableCell<Agent> {
   protected void getData(Sublist sublist, ColumnSortList columnSortList, AsyncCallback<IndexResult<Agent>> callback) {
 
     Filter filter = getFilter();
+    if (filter == Filter.NULL) {
+      // search not yet ready, deliver empty result
+      callback.onSuccess(null);
+    } else {
 
-    Map<Column<Agent, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<Agent, ?>, List<String>>();
-    columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.AGENT_NAME));
-    columnSortingKeyMap.put(typeColumn, Arrays.asList(RodaConstants.AGENT_TYPE));
+      Map<Column<Agent, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<Agent, ?>, List<String>>();
+      columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.AGENT_NAME));
+      columnSortingKeyMap.put(typeColumn, Arrays.asList(RodaConstants.AGENT_TYPE));
 
-    Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
+      Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
-    boolean justActive = false;
-    BrowserService.Util.getInstance().find(Agent.class.getName(), filter, sorter, sublist, getFacets(),
-      LocaleInfo.getCurrentLocale().getLocaleName(), justActive, callback);
+      boolean justActive = false;
+      BrowserService.Util.getInstance().find(Agent.class.getName(), filter, sorter, sublist, getFacets(),
+        LocaleInfo.getCurrentLocale().getLocaleName(), justActive, callback);
+    }
   }
 
   @Override

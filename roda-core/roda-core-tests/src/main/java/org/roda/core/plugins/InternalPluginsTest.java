@@ -89,6 +89,7 @@ import gov.loc.premis.v3.ObjectCharacteristicsComplexType;
 import gov.loc.premis.v3.Representation;
 import jersey.repackaged.com.google.common.collect.Lists;
 
+@Test(groups = {"all", "travis"})
 public class InternalPluginsTest {
   private static final String FAKE_REPORTING_CLASS = "NONE";
 

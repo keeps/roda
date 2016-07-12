@@ -67,6 +67,7 @@ import com.google.common.collect.Iterables;
 
 import jersey.repackaged.com.google.common.collect.Lists;
 
+@Test(groups = {"all", "travis"})
 public class BagitSIPPluginsTest {
 
   private static final int CORPORA_FILES_COUNT = 4;

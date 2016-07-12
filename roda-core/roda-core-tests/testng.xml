@@ -1,23 +1,9 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
   
 <suite name="AllTests" verbose="1" >
-  <test name="all">
-  	<groups>
-    	<run></run>
-	</groups>
+  <test name="default">
 	<packages>
-		<package name="org.roda.core.*" />
+	  	<package name="org.roda.core.*"/>
 	</packages>
   </test>
-  
-  <test name="travis-ci">
-  	<groups>
-    	<run><exclude name="not-in-travis"/></run>
-	</groups>
-	<packages>
-		<package name="org.roda.core.*" />
-		<package name="org.roda.core.plugins.*" />
-	</packages>
-  </test>
-  
 </suite>

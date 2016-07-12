@@ -20,10 +20,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.solr.client.solrj.SolrServerException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
@@ -59,11 +55,16 @@ import org.roda.core.plugins.plugins.ingest.TransferredResourceToAIPPlugin;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.AssertJUnit;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import com.google.common.collect.Iterables;
 
 import jersey.repackaged.com.google.common.collect.Lists;
 
+@Test(groups = {"all", "travis"})
 public class PdfToPdfaTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(PdfToPdfaTest.class);
 
@@ -73,7 +74,7 @@ public class PdfToPdfaTest {
   private static int numberOfConvertableFiles = 17;
   private static Path corporaPath;
 
-  @Before
+  @BeforeMethod
   public void setUp() throws Exception {
     basePath = TestsHelper.createBaseTempDir(this.getClass(), true);
 
@@ -93,7 +94,7 @@ public class PdfToPdfaTest {
     LOGGER.info("Running internal convert plugins tests under storage {}", basePath);
   }
 
-  @After
+  @AfterMethod
   public void tearDown() throws Exception {
     RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
@@ -134,7 +135,7 @@ public class PdfToPdfaTest {
     List<TransferredResource> transferredResources = new ArrayList<TransferredResource>();
     transferredResources = createCorpora();
 
-    Assert.assertEquals(1, transferredResources.size());
+    AssertJUnit.assertEquals(1, transferredResources.size());
 
     TestsHelper.executeJob(TransferredResourceToAIPPlugin.class, parameters, PluginType.SIP_TO_AIP,
       SelectedItemsList.create(TransferredResource.class,
@@ -145,7 +146,7 @@ public class PdfToPdfaTest {
     IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
       new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10));
 
-    Assert.assertEquals(1L, find.getTotalCount());
+    AssertJUnit.assertEquals(1L, find.getTotalCount());
     IndexedAIP indexedAIP = find.getResults().get(0);
 
     return model.retrieveAIP(indexedAIP.getId());
@@ -169,19 +170,20 @@ public class PdfToPdfaTest {
       SelectedItemsAll.create(Representation.class));
 
     aip = model.retrieveAIP(aip.getId());
-    Assert.assertEquals(2, aip.getRepresentations().size());
+    AssertJUnit.assertEquals(2, aip.getRepresentations().size());
 
     CloseableIterable<OptionalWithCause<File>> newAllFiles = model.listFilesUnder(aip.getId(),
       aip.getRepresentations().get(1).getId(), true);
     List<File> newReusableAllFiles = new ArrayList<>();
     Iterables.addAll(newReusableAllFiles, Lists.newArrayList(newAllFiles).stream().filter(f -> f.isPresent())
       .map(f -> f.get()).collect(Collectors.toList()));
-    Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
+    AssertJUnit.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
 
     for (File f : reusableAllFiles) {
       if (f.getId().matches(".*[.](pdf)$")) {
         String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
-        Assert.assertEquals(1, newReusableAllFiles.stream().filter(o -> o.getId().equals(filename + ".pdf")).count());
+        AssertJUnit.assertEquals(1,
+          newReusableAllFiles.stream().filter(o -> o.getId().equals(filename + ".pdf")).count());
       }
     }
   }

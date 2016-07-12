@@ -7,10 +7,6 @@
  */
 package org.roda.core.plugins;
 
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeMethod;
-import org.testng.AssertJUnit;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.FileAlreadyExistsException;
@@ -59,11 +55,16 @@ import org.roda.core.plugins.plugins.ingest.TransferredResourceToAIPPlugin;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.AssertJUnit;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import com.google.common.collect.Iterables;
 
 import jersey.repackaged.com.google.common.collect.Lists;
 
+@Test(groups = {"all", "travis"})
 public class AvconvTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(AvconvTest.class);
 
@@ -185,7 +186,8 @@ public class AvconvTest {
       if (f.getId().matches(".*[.](3g2|avi)$")) {
         changedCounter++;
         String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
-        AssertJUnit.assertEquals(1, newReusableAllFiles.stream().filter(o -> o.getId().equals(filename + ".gif")).count());
+        AssertJUnit.assertEquals(1,
+          newReusableAllFiles.stream().filter(o -> o.getId().equals(filename + ".gif")).count());
       }
     }
 

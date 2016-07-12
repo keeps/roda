@@ -9,8 +9,7 @@ package org.roda.core.storage;
 
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertTrue;
-import org.testng.annotations.Test;
-import org.testng.Assert;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +22,10 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
+@Test(groups = {"all", "travis"})
 public class StorageTestUtils {
 
   public static StoragePath generateRandomContainerStoragePath() throws RequestNotValidException {
@@ -68,7 +70,7 @@ public class StorageTestUtils {
   @Test
   public static void testEntityEqualRecursively(StorageService sourceStorage, StoragePath sourceEntityStoragePath,
     StorageService targetStorage, StoragePath targetEntityStoragePath)
-      throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException, IOException {
+    throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException, IOException {
 
     assertEquals(sourceEntityStoragePath.isFromAContainer(), targetEntityStoragePath.isFromAContainer());
 
