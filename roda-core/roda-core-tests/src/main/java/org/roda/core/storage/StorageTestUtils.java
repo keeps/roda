@@ -25,7 +25,6 @@ import org.roda.core.data.v2.ip.StoragePath;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-@Test(groups = {"all", "travis"})
 public class StorageTestUtils {
 
   public static StoragePath generateRandomContainerStoragePath() throws RequestNotValidException {

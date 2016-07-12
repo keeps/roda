@@ -108,7 +108,7 @@ public class ValidationUtilsTest {
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
     final DescriptiveMetadata descMetadata = model.retrieveDescriptiveMetadata(aipId,
       CorporaConstants.DESCRIPTIVE_METADATA_ID);
-    assertEquals(ValidationUtils.isDescriptiveMetadataValid(model, descMetadata, true), true);
+    assertEquals(ValidationUtils.isDescriptiveMetadataValid(model, descMetadata, true).isValid(), true);
   }
 
   @Test(enabled = false)

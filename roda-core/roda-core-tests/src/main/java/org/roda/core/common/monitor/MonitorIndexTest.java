@@ -248,7 +248,7 @@ public class MonitorIndexTest {
     assertEquals(resultBeforeRemoves, resultAfterRemoves + 1);
   }
 
-  public static void populate(Path basePath) throws IOException {
+  private static void populate(Path basePath) throws IOException {
     Random randomno = new Random();
     int numberOfItemsByLevel = nextIntInRange(2, 3, randomno);
     int numberOfLevels = nextIntInRange(2, 3, randomno);
