@@ -2066,7 +2066,7 @@ td.datePickerMonth, td.datePickerYear {
 .metadata-edit-area {
     height: 300px;
     max-width: 100%;
-    padding: 10px;
+    padding: 0;
     margin: 0;
 }
 
@@ -2083,6 +2083,13 @@ td.datePickerMonth, td.datePickerYear {
 .metadata-edit-errors .error {
     margin-bottom: 5px;
     display: block;
+}
+
+
+.panelDescriptiveMetadata {
+    margin-bottom: 0;
+    background-color: transparent;
+    padding-left: 0;
 }
 
 .content .metadata-form-textbox {

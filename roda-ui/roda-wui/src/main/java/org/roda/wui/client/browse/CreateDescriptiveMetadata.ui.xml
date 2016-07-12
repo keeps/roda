@@ -36,7 +36,7 @@
 						</g:HTML>
 					</g:FlowPanel>
 				</g:FocusPanel>
-				<g:FlowPanel addStyleNames="panel">
+				<g:FlowPanel addStyleNames="panel panelDescriptiveMetadata">
 					<g:FlowPanel ui:field="formOrXML" addStyleNames="panel-body"/>
 				</g:FlowPanel>
 
