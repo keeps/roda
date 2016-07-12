@@ -157,6 +157,7 @@ public class RodaCoreFactory {
   private static boolean TEST_DEPLOY_SCANNER = true;
   private static boolean TEST_DEPLOY_ORCHESTRATOR = true;
   private static boolean TEST_DEPLOY_PLUGIN_MANAGER = true;
+  private static boolean TEST_DEPLOY_DEFAULT_RESOURCES = true;
 
   // Orchestrator related objects
   private static PluginManager pluginManager;
@@ -211,12 +212,13 @@ public class RodaCoreFactory {
   }
 
   public static void instantiateTest(boolean deploySolr, boolean deployLdap, boolean deployTransferredResourcesScanner,
-    boolean deployOrchestrator, boolean deployPluginManager) {
+    boolean deployOrchestrator, boolean deployPluginManager, boolean deployDefaultResources) {
     TEST_DEPLOY_SOLR = deploySolr;
     TEST_DEPLOY_LDAP = deployLdap;
     TEST_DEPLOY_SCANNER = deployTransferredResourcesScanner;
     TEST_DEPLOY_ORCHESTRATOR = deployOrchestrator;
     TEST_DEPLOY_PLUGIN_MANAGER = deployPluginManager;
+    TEST_DEPLOY_DEFAULT_RESOURCES = deployDefaultResources;
     instantiated = false;
     instantiate(NodeType.TEST);
   }
@@ -410,34 +412,37 @@ public class RodaCoreFactory {
   }
 
   private static void instantiateDefaultObjects() {
-    try {
-      CloseableIterable<Resource> resources = storage.listResourcesUnderContainer(DefaultStoragePath.parse(""), true);
-      Iterator<Resource> resourceIterator = resources.iterator();
-      boolean hasFileResources = false;
+    if (TEST_DEPLOY_DEFAULT_RESOURCES) {
+      try {
+        CloseableIterable<Resource> resources = storage.listResourcesUnderContainer(DefaultStoragePath.parse(""), true);
+        Iterator<Resource> resourceIterator = resources.iterator();
+        boolean hasFileResources = false;
 
-      while (resourceIterator.hasNext() && !hasFileResources) {
-        Resource resource = resourceIterator.next();
-        if (!resource.isDirectory()) {
-          hasFileResources = true;
+        while (resourceIterator.hasNext() && !hasFileResources) {
+          Resource resource = resourceIterator.next();
+          if (!resource.isDirectory()) {
+            hasFileResources = true;
+          }
         }
+        IOUtils.closeQuietly(resources);
+
+        if (!hasFileResources) {
+          copyFilesFromClasspath(RodaConstants.CORE_DEFAULT_FOLDER + "/", rodaHomePath, true);
+
+          // 20160712 hsilva: it needs to be this way as the resources are
+          // copied
+          // to the file system and storage can be of a different type (e.g.
+          // fedora)
+          FileStorageService fileStorageService = new FileStorageService(storagePath);
+
+          index.reindexRisks(fileStorageService);
+          index.reindexFormats(fileStorageService);
+          index.reindexAIPs();
+          // index other default values HERE
+        }
+      } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
+        LOGGER.error("Cannot load default objects", e);
       }
-      IOUtils.closeQuietly(resources);
-
-      if (!hasFileResources) {
-        copyFilesFromClasspath(RodaConstants.CORE_DEFAULT_FOLDER + "/", rodaHomePath, true);
-
-        // 20160712 hsilva: it needs to be this way as the resources are copied
-        // to the file system and storage can be of a different type (e.g.
-        // fedora)
-        FileStorageService fileStorageService = new FileStorageService(storagePath);
-
-        index.reindexRisks(fileStorageService);
-        index.reindexFormats(fileStorageService);
-        index.reindexAIPs();
-        // index other default values HERE
-      }
-    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
-      LOGGER.error("Cannot load default objects", e);
     }
   }
 

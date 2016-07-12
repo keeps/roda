@@ -76,8 +76,9 @@ public class VeraPDFTest {
     boolean deployFolderMonitor = true;
     boolean deployOrchestrator = true;
     boolean deployPluginManager = true;
+    boolean deployDefaultResources = false;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
-      deployPluginManager);
+      deployPluginManager, deployDefaultResources);
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
 

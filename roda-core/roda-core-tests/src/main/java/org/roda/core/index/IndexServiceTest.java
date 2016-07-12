@@ -103,8 +103,9 @@ public class IndexServiceTest {
     boolean deployFolderMonitor = false;
     boolean deployOrchestrator = false;
     boolean deployPluginManager = false;
+    boolean deployDefaultResources = false;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
-      deployPluginManager);
+      deployPluginManager, deployDefaultResources);
 
     logPath = RodaCoreFactory.getLogPath();
     model = RodaCoreFactory.getModelService();
