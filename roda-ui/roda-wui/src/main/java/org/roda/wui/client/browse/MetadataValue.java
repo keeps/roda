@@ -87,6 +87,14 @@ public class MetadataValue implements Comparable, Serializable {
     return result;
   }
 
+  protected MetadataValue clone() {
+    HashMap<String, String> newOptions = new HashMap<>();
+    for(String key: options.keySet()){
+      newOptions.put(key, options.get(key));
+    }
+    return new MetadataValue(this.id, newOptions);
+  }
+
   @Override
   public int compareTo(Object o) {
     if (o == this) {

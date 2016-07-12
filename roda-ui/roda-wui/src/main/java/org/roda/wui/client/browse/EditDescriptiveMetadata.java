@@ -10,6 +10,8 @@
  */
 package org.roda.wui.client.browse;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
@@ -117,13 +119,16 @@ public class EditDescriptiveMetadata extends Composite {
   ListBox type;
 
   @UiField
-  Label formOrXMLLabel;
-
-  @UiField
   Label formSimilarDanger;
 
   @UiField
   FocusPanel showXml;
+
+  @UiField
+  HTML showXmlIconXML;
+
+  @UiField
+  HTML showXmlIconForm;
 
   @UiField
   FlowPanel formOrXML;
@@ -150,8 +155,15 @@ public class EditDescriptiveMetadata extends Composite {
     this.aipId = aipId;
     this.bundle = bundleParam;
 
+    // Create new Set of MetadataValues so we can keep the original
+    HashSet<MetadataValue> newValues = null;
+    if(bundle.getValues() != null){
+      newValues = new HashSet<MetadataValue>();
+      for(MetadataValue mv: bundle.getValues())
+        newValues.add(mv.clone());
+    }
     supportedBundle = new SupportedMetadataTypeBundle(bundle.getType(), bundle.getVersion(), bundle.getId(),
-      bundle.getRawTemplate(), bundle.getValues());
+            bundle.getRawTemplate(), newValues);
 
     initWidget(uiBinder.createAndBindUi(this));
     metadataXML = new TextArea();
@@ -183,8 +195,15 @@ public class EditDescriptiveMetadata extends Composite {
             @Override
             public void onSuccess(DescriptiveMetadataEditBundle editBundle) {
               bundle = editBundle;
+              // Create new Set of MetadataValues so we can keep the original
+              HashSet<MetadataValue> newValues = null;
+              if(bundle.getValues() != null){
+                newValues = new HashSet<MetadataValue>();
+                for(MetadataValue mv: bundle.getValues())
+                  newValues.add(mv.clone());
+              }
               supportedBundle = new SupportedMetadataTypeBundle(bundle.getType(), bundle.getVersion(), bundle.getId(),
-                bundle.getRawTemplate(), bundle.getValues());
+                bundle.getRawTemplate(), newValues);
               updateFormOrXML();
             }
           });
@@ -245,17 +264,18 @@ public class EditDescriptiveMetadata extends Composite {
 
   private void createForm(SupportedMetadataTypeBundle bundle) {
     formOrXML.clear();
+    metadataXML.setText(this.bundle.getXml());
     CreateForm.create(formOrXML, bundle);
   }
 
   public void setInXML(boolean inXML) {
     this.inXML = inXML;
     if (inXML) {
-      showXml.removeStyleName("toolbarLink-selected");
-      formOrXML.addStyleName("metadata-edit-area-wrapper");
+      showXmlIconXML.setVisible(false);
+      showXmlIconForm.setVisible(true);
     } else {
-      showXml.addStyleName("toolbarLink-selected");
-      formOrXML.removeStyleName("metadata-edit-area-wrapper");
+      showXmlIconXML.setVisible(true);
+      showXmlIconForm.setVisible(false);
     }
   }
 
@@ -290,7 +310,6 @@ public class EditDescriptiveMetadata extends Composite {
                 if (aBoolean) {
                   formOrXML.clear();
                   createForm(supportedBundle);
-                  formOrXMLLabel.setText("Form");
                 } else {
                   setInXML(!inXML);
                 }
@@ -299,7 +318,6 @@ public class EditDescriptiveMetadata extends Composite {
         } else {
           formOrXML.clear();
           createForm(supportedBundle);
-          formOrXMLLabel.setText("Form");
         }
       }
     } else {
@@ -311,13 +329,35 @@ public class EditDescriptiveMetadata extends Composite {
         metadataXML.setText("");
       }
       formOrXML.add(metadataXML);
-      formOrXMLLabel.setText("Template preview");
       showXml.setVisible(false);
       metadataTextFromForm = null;
     }
   }
 
+  private boolean hasModifiedForm(){
+    HashMap<String, MetadataValue> formMap = new HashMap<>();
+    for(MetadataValue mv: supportedBundle.getValues()){
+      formMap.put(mv.getId(),mv);
+    }
+    HashMap<String, MetadataValue> bundleMap = new HashMap<>();
+    for(MetadataValue mv: bundle.getValues()) {
+      bundleMap.put(mv.getId(), mv);
+    }
+    for(String key: formMap.keySet()){
+      MetadataValue mvForm = formMap.get(key);
+      String formValue = mvForm != null ? formMap.get(key).get("value") : "";
+      MetadataValue mvBundle = bundleMap.get(key);
+      String bundleValue = mvBundle != null ? bundleMap.get(key).get("value") : "";
+
+      if(!formValue.equals(bundleValue))
+        return true;
+    }
+    return false;
+  }
+
   private void updateMetadataXML() {
+    if(hasModifiedForm()){
+      // Apply the form values to the template (server)
     BrowserService.Util.getInstance().getDescriptiveMetadataPreview(aipId, supportedBundle,
       new AsyncCallback<String>() {
         @Override
@@ -330,17 +370,21 @@ public class EditDescriptiveMetadata extends Composite {
           formOrXML.clear();
           metadataXML.setText(preview);
           formOrXML.add(metadataXML);
-          formOrXMLLabel.setText("Template preview");
           metadataTextFromForm = preview;
         }
       });
+    }else{
+      formOrXML.clear();
+      metadataXML.setText(bundle.getXml());
+      formOrXML.add(metadataXML);
+      metadataTextFromForm = bundle.getXml();
+    }
   }
 
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
     String xmlText = metadataXML.getText();
-    boolean hasOverridenTheForm = (inXML && !xmlText.equals(metadataTextFromForm)) || metadataTextFromForm == null;
-    if (hasOverridenTheForm) {
+    if (inXML) {
       updateMetadataOnServer(xmlText);
     } else {
       // Get the resulting XML using the data from the form
