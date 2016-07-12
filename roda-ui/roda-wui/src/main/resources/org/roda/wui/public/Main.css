@@ -85,11 +85,23 @@ h6, .h6 {
     letter-spacing: 0;
 }
 
+ul {
+	list-style: inherit;
+    padding-left: 2rem;
+}
+
 .label {
     font-size: 1.5rem;
     font-weight: 300;
     color: #999;
 }
+
+.col_card {
+	background: #eee; 
+	padding: 0 2em;
+}
+
+
 
 .associative-label {
     display: inline;
@@ -106,8 +118,6 @@ h6, .h6 {
 }
 
 .field ul {
-    list-style: inherit;
-    padding-left: 2rem;
     color: rgb(88, 89, 91);
 }
 
@@ -330,6 +340,12 @@ pre > code {
     word-break: break-all;
     word-break: break-word;
 }
+
+pre code {
+    max-height: 15em;
+}
+
+
 
 .code-pre {
     display: block;
@@ -745,6 +761,11 @@ pre > code {
 .panel-heading + .panel-body {
     padding-top: 0;
 }
+
+.panel-body .fieldTextBox, .panel-body .form-textbox, .panel-body .plugin-options-parameter {
+	border: none;
+}
+
 
 .panel-footer {
     padding: 10px 15px;
@@ -2256,10 +2277,6 @@ td.datePickerMonth, td.datePickerYear {
 
 .content > .field .field-value {
     font-size: 1.2rem;
-}
-
-.browseItemMetadata code {
-    max-height: 300px;
 }
 
 .event .header {
@@ -4850,6 +4867,8 @@ td.datePickerMonth, td.datePickerYear {
     padding: 5px;
     margin-bottom: 0;
 }
+
+
 
 /**********************************************
 				SUGGEST BOX

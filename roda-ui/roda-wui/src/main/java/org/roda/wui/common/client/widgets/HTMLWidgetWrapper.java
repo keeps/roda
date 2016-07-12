@@ -10,6 +10,7 @@
  */
 package org.roda.wui.common.client.widgets;
 
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.RestUtils;
 
@@ -19,6 +20,7 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTML;
 
 /**
@@ -30,6 +32,21 @@ public class HTMLWidgetWrapper extends HTML {
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   public HTMLWidgetWrapper(String resourceId) {
+    this(resourceId, new AsyncCallback<Void>() {
+
+      @Override
+      public void onFailure(Throwable caught) {
+        // do nothing
+      }
+
+      @Override
+      public void onSuccess(Void result) {
+        // do nothing
+      }
+    });
+  }
+
+  public HTMLWidgetWrapper(String resourceId, final AsyncCallback<Void> callback) {
     if (resourceId.endsWith(".html")) {
       resourceId = resourceId.substring(0, resourceId.length() - 5);
     }
@@ -48,14 +65,17 @@ public class HTMLWidgetWrapper extends HTML {
         public void onResponseReceived(Request request, Response response) {
           if (response.getStatusCode() == 200) {
             HTMLWidgetWrapper.this.setHTML(response.getText());
+            callback.onSuccess(null);
           } else {
             logger.error("Error sending request");
+            callback.onFailure(new GenericException("Error sending request"));
           }
         }
 
         @Override
         public void onError(Request request, Throwable exception) {
           logger.error("Error sending request", exception);
+          callback.onFailure(exception);
         }
       });
     } catch (RequestException exception) {

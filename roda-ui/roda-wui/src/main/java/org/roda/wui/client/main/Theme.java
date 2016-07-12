@@ -13,9 +13,11 @@ package org.roda.wui.client.main;
 import java.util.Arrays;
 import java.util.List;
 
+import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
@@ -69,8 +71,20 @@ public class Theme extends Composite {
   private HTMLWidgetWrapper layout;
 
   private Theme(String htmlPage) {
-    layout = new HTMLWidgetWrapper(htmlPage);
+    layout = new HTMLWidgetWrapper(htmlPage, new AsyncCallback<Void>() {
+
+      @Override
+      public void onFailure(Throwable caught) {
+        Toast.showError(caught);
+      }
+
+      @Override
+      public void onSuccess(Void result) {
+        JavascriptUtils.runHighlighter();    
+      }
+    });
     layout.addStyleName("wui-home");
     initWidget(layout);
   }
+  
 }
