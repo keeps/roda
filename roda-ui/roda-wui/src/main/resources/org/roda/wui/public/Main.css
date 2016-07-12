@@ -3894,11 +3894,12 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 #upload-list li.working span:after {
-    content: "\f00d";
-    color: #d11f49;
+    content: "\f10c";
+    color: #ffdc0c;
 }
 
 #upload-list li.error p {
+    content: "\f00d";
     color: #D20707;
 }
 
