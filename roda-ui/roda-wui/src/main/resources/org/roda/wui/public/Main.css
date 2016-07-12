@@ -90,6 +90,11 @@ ul {
     padding-left: 2rem;
 }
 
+.footer ul {
+	list-style: none;
+	padding-left: 0;
+}
+
 .label {
     font-size: 1.5rem;
     font-weight: 300;
