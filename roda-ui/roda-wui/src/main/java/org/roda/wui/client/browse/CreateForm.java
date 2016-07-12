@@ -30,7 +30,7 @@ public class CreateForm {
         continue;
 
       FlowPanel layout = new FlowPanel();
-      layout.addStyleName("plugin-options-parameter");
+      layout.addStyleName("metadata-form-field");
       String controlType = mv.get("type");
       if (controlType == null) {
         addTextField(panel, layout, mv);

@@ -2085,11 +2085,21 @@ td.datePickerMonth, td.datePickerYear {
     display: block;
 }
 
-
 .panelDescriptiveMetadata {
     margin-bottom: 0;
     background-color: transparent;
     padding-left: 0;
+}
+
+.metadata-form-field:first-child {
+    border: none;
+    padding: 0;
+}
+
+.metadata-form-field {
+    border-top: 1px solid #eee;
+    padding-top: 10px;
+    padding-bottom: 5px;
 }
 
 .content .metadata-form-textbox {
