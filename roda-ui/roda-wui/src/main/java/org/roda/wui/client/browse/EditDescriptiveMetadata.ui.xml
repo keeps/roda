@@ -13,9 +13,11 @@
 		addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1">
-					<ui:text from='{messages.editDescriptiveMetadataTitle}' />
-				</g:Label>
+				<g:HTML>
+					<h1>
+						<ui:text from='{messages.editDescriptiveMetadataTitle}' />
+					</h1>
+				</g:HTML>
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.metadataType}' />
 				</g:Label>
@@ -24,20 +26,27 @@
 					<ui:text from='{messages.metadataFilename}' />
 				</g:Label>
 				<g:TextBox ui:field="id" addStyleNames="form-textbox" />
-				<g:Label ui:field="formSimilarDanger" visible="false" addStyleNames="label-danger">
+
+				<g:Label styleName="form-label">
+					<ui:text from='{messages.editDescriptiveMetadataFormLabel}' />
+				</g:Label>
+
+				<g:Label ui:field="formSimilarDanger" visible="false"
+					addStyleNames="label-danger">
 					<ui:text from='{messages.editDescriptionMetadataWarning}' />
 				</g:Label>
-				<g:FocusPanel ui:field="showXml" styleName="toolbarLink">
-					<g:FlowPanel>
-						<g:HTML ui:field="showXmlIconXML">
-							<i class="fa fa-code"></i>
-						</g:HTML>
-						<g:HTML ui:field="showXmlIconForm" visible="false">
-							<i class="fa fa-list"></i>
-						</g:HTML>
-					</g:FlowPanel>
-				</g:FocusPanel>
+
 				<g:FlowPanel addStyleNames="panel panelDescriptiveMetadata">
+					<g:FocusPanel ui:field="showXml" styleName="toolbarLink">
+						<g:FlowPanel>
+							<g:HTML ui:field="showXmlIconXML">
+								<i class="fa fa-code"></i>
+							</g:HTML>
+							<g:HTML ui:field="showXmlIconForm" visible="false">
+								<i class="fa fa-list"></i>
+							</g:HTML>
+						</g:FlowPanel>
+					</g:FocusPanel>
 					<g:FlowPanel ui:field="formOrXML" addStyleNames="panel-body" />
 				</g:FlowPanel>
 
@@ -56,7 +65,8 @@
 					<g:Button addStyleNames="btn btn-danger btn-ban" ui:field="buttonRemove">
 						<ui:text from='{messages.removeButton}' />
 					</g:Button>
-					<g:Button addStyleNames="btn btn-default btn-times-circle" ui:field="buttonCancel">
+					<g:Button addStyleNames="btn btn-default btn-times-circle"
+						ui:field="buttonCancel">
 						<ui:text from='{messages.cancelButton}' />
 					</g:Button>
 

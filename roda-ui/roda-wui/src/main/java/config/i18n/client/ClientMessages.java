@@ -79,8 +79,6 @@ public interface ClientMessages extends Messages {
 
   String newDescriptiveMetadataTitle();
 
-  String editDescriptiveMetadataTitle();
-
   String historyDescriptiveMetadataTitle();
 
   String catalogueTitle();
@@ -2109,12 +2107,17 @@ public interface ClientMessages extends Messages {
   String confirmChangeToFormTitle();
 
   String confirmChangeToFormMessage();
+  
+  String editDescriptiveMetadataTitle();
+  
+  String editDescriptionMetadataWarning();
+  
+  String editDescriptiveMetadataFormLabel();
+
 
   /************* TO BE ORGANIZED *************************/
 
   String aipLevel();
-
-  String editDescriptionMetadataWarning();
 
   String pluginStateMessage(@Select PluginState state);
 

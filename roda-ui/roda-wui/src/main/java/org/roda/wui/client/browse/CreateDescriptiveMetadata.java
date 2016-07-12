@@ -43,7 +43,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
@@ -116,9 +115,6 @@ public class CreateDescriptiveMetadata extends Composite {
 
   @UiField
   ListBox type;
-
-  @UiField
-  Label formOrXMLLabel;
 
   @UiField
   FocusPanel showXml;
@@ -259,7 +255,6 @@ public class CreateDescriptiveMetadata extends Composite {
                 if (aBoolean) {
                   formOrXML.clear();
                   createForm(selectedBundle);
-                  formOrXMLLabel.setText("Form");
                 } else {
                   setInXML(!inXML);
                 }
@@ -268,7 +263,6 @@ public class CreateDescriptiveMetadata extends Composite {
         } else {
           formOrXML.clear();
           createForm(selectedBundle);
-          formOrXMLLabel.setText("Form");
         }
       }
     } else {
@@ -278,7 +272,6 @@ public class CreateDescriptiveMetadata extends Composite {
       else
         metadataXML.setText("");
       formOrXML.add(metadataXML);
-      formOrXMLLabel.setText("Template preview");
       showXml.setVisible(false);
     }
   }
@@ -295,7 +288,6 @@ public class CreateDescriptiveMetadata extends Composite {
         formOrXML.clear();
         metadataXML.setText(preview);
         formOrXML.add(metadataXML);
-        formOrXMLLabel.setText("Template preview");
         metadataTextFromForm = preview;
       }
     });

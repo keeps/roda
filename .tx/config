@@ -16,148 +16,162 @@ source_lang = en
 type = UNICODEPROPERTIES
 
 [roda2.welcomehtml]
-file_filter = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/Welcome_<lang>.html
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/Welcome_<lang>.html
 minimum_perc = 50
-source_file = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/Welcome.html
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/Welcome.html
 source_lang = en
 type = HTML
 
 [roda2.community_helphtml]
-file_filter = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/Community_help_<lang>.html
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/Community_help_<lang>.html
 minimum_perc = 50
-source_file = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/Community_help.html
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/Community_help.html
 source_lang = en
 type = HTML
 
 [roda2.formatregisterdescriptionhtml]
-file_filter = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/FormatRegisterDescription_<lang>.html
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/FormatRegisterDescription_<lang>.html
 minimum_perc = 50
-source_file = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/FormatRegisterDescription.html
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/FormatRegisterDescription.html
 source_lang = en
 type = HTML
 
 [roda2.architecturehtml]
-file_filter = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/Architecture_<lang>.html
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/Architecture_<lang>.html
 minimum_perc = 50
-source_file = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/Architecture.html
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/Architecture.html
 source_lang = en
 type = HTML
 
 [roda2.membermanagementdescriptionhtml]
-file_filter = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/MemberManagementDescription_<lang>.html
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/MemberManagementDescription_<lang>.html
 minimum_perc = 50
-source_file = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/MemberManagementDescription.html
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/MemberManagementDescription.html
 source_lang = en
 type = HTML
 
 [roda2.browsedescriptionhtml]
-file_filter = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/BrowseDescription_<lang>.html
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/BrowseDescription_<lang>.html
 minimum_perc = 50
-source_file = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/BrowseDescription.html
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/BrowseDescription.html
 source_lang = en
 type = HTML
 
 [roda2.standardshtml]
-file_filter = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/Standards_<lang>.html
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/Standards_<lang>.html
 minimum_perc = 50
-source_file = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/Standards.html
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/Standards.html
 source_lang = en
 type = HTML
 
 [roda2.licensehtml]
-file_filter = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/License_<lang>.html
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/License_<lang>.html
 minimum_perc = 50
-source_file = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/License.html
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/License.html
 source_lang = en
 type = HTML
 
 [roda2.ingestappraisaldescriptionhtml]
-file_filter = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/IngestAppraisalDescription_<lang>.html
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/IngestAppraisalDescription_<lang>.html
 minimum_perc = 50
-source_file = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/IngestAppraisalDescription.html
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/IngestAppraisalDescription.html
 source_lang = en
 type = HTML
 
 [roda2.searchdescriptionhtml]
-file_filter = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/SearchDescription_<lang>.html
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/SearchDescription_<lang>.html
 minimum_perc = 50
-source_file = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/SearchDescription.html
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/SearchDescription.html
 source_lang = en
 type = HTML
 
 [roda2.publicationshtml]
-file_filter = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/Publications_<lang>.html
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/Publications_<lang>.html
 minimum_perc = 50
-source_file = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/Publications.html
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/Publications.html
 source_lang = en
 type = HTML
 
 [roda2.riskregisterdescriptionhtml]
-file_filter = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/RiskRegisterDescription_<lang>.html
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/RiskRegisterDescription_<lang>.html
 minimum_perc = 50
-source_file = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/RiskRegisterDescription.html
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/RiskRegisterDescription.html
 source_lang = en
 type = HTML
 
 [roda2.userlogdescriptionhtml]
-file_filter = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/UserLogDescription_<lang>.html
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/UserLogDescription_<lang>.html
 minimum_perc = 50
-source_file = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/UserLogDescription.html
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/UserLogDescription.html
 source_lang = en
 type = HTML
 
 [roda2.agentregisterdescriptionhtml]
-file_filter = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/AgentRegisterDescription_<lang>.html
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/AgentRegisterDescription_<lang>.html
 minimum_perc = 50
-source_file = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/AgentRegisterDescription.html
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/AgentRegisterDescription.html
 source_lang = en
 type = HTML
 
 [roda2.preingesthtml]
-file_filter = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/PreIngest_<lang>.html
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/PreIngest_<lang>.html
 minimum_perc = 50
-source_file = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/PreIngest.html
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/PreIngest.html
 source_lang = en
 type = HTML
 
 [roda2.cookiespolicyhtml]
-file_filter = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/CookiesPolicy_<lang>.html
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/CookiesPolicy_<lang>.html
 minimum_perc = 50
-source_file = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/CookiesPolicy.html
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/CookiesPolicy.html
 source_lang = en
 type = HTML
 
 [roda2.what_is_rodahtml]
-file_filter = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/What_is_RODA_<lang>.html
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/What_is_RODA_<lang>.html
 minimum_perc = 50
-source_file = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/What_is_RODA.html
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/What_is_RODA.html
 source_lang = en
 type = HTML
 
 [roda2.ingesttransferdescriptionhtml]
-file_filter = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/IngestTransferDescription_<lang>.html
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/IngestTransferDescription_<lang>.html
 minimum_perc = 50
-source_file = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/IngestTransferDescription.html
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/IngestTransferDescription.html
 source_lang = en
 type = HTML
 
 [roda2.notificationdescriptionhtml]
-file_filter = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/NotificationDescription_<lang>.html
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/NotificationDescription_<lang>.html
 minimum_perc = 50
-source_file = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/NotificationDescription.html
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/NotificationDescription.html
 source_lang = en
 type = HTML
 
 [roda2.footerhtml]
-file_filter = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/Footer_<lang>.html
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/Footer_<lang>.html
 minimum_perc = 50
-source_file = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/Footer.html
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/Footer.html
 source_lang = en
 type = HTML
 
 [roda2.ingestprocessdescriptionhtml]
-file_filter = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/IngestProcessDescription_<lang>.html
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/IngestProcessDescription_<lang>.html
 minimum_perc = 50
-source_file = roda-ui/roda-wui/src/main/resources/org/roda/wui/public/theme/IngestProcessDescription.html
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/IngestProcessDescription.html
+source_lang = en
+type = HTML
+
+[roda2.helphtml]
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/Help_<lang>.html
+minimum_perc = 50
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/Help.html
+source_lang = en
+type = HTML
+
+[roda2.installingnewdescriptivemetadataFormatshtml]
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/InstallingNewDescriptiveMetadataFormats_<lang>.html
+minimum_perc = 50
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/InstallingNewDescriptiveMetadataFormats.html
 source_lang = en
 type = HTML

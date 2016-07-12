@@ -382,7 +382,7 @@ pre code {
 }
 
 .form-label {
-
+	margin-top: 5px;
 }
 
 .form-integerbox {
@@ -765,10 +765,6 @@ pre code {
 
 .panel-heading + .panel-body {
     padding-top: 0;
-}
-
-.panel-body .fieldTextBox, .panel-body .form-textbox, .panel-body .plugin-options-parameter {
-	border: none;
 }
 
 
@@ -2095,17 +2091,16 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .metadata-form-field {
-    border-top: 1px solid #eee;
     padding-top: 10px;
     padding-bottom: 5px;
 }
 
 .content .metadata-form-textbox {
-    border-left: transparent;
+    border-left: none;
 }
 
 .metadata-form-field .form-textbox {
-    border-left: transparent;
+    border-left: none;
 }
 
 .selectableAipList-selectedLabel {
