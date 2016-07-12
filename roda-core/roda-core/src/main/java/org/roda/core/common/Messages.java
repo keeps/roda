@@ -25,6 +25,7 @@ import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
 
 import org.apache.commons.io.IOUtils;
+import org.roda.core.data.common.RodaConstants;
 
 public class Messages {
   private static final String MESSAGES_BUNDLE = "ServerMessages";
@@ -60,7 +61,8 @@ public class Messages {
    * 
    * prefix will be replaced by "i18n." for simplicity purposes
    */
-  public <T extends Object> Map<String, T> getTranslations(String prefix, Class<T> valueClass, boolean replacePrefixFromKey) {
+  public <T extends Object> Map<String, T> getTranslations(String prefix, Class<T> valueClass,
+    boolean replacePrefixFromKey) {
     // try cache first
     if (translationsCache.get(prefix) != null) {
       return (Map<String, T>) translationsCache.get(prefix);
@@ -96,6 +98,17 @@ public class Messages {
       return TTL_DONT_CACHE;
     }
 
+    public Locale getFallbackLocale(String baseName, Locale locale) {
+      if (baseName == null) {
+        throw new NullPointerException();
+      }
+      // 20160712 hsilva: the following line is needed otherwise default locale
+      // is used and this can be incoherent with other parts of the code where
+      // the default locale is ENGLISH
+      Locale defaultLocale = Locale.ENGLISH;
+      return locale.equals(defaultLocale) ? null : defaultLocale;
+    }
+
     @Override
     public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader, boolean reload)
       throws IllegalAccessException, InstantiationException, IOException {
@@ -118,7 +131,7 @@ public class Messages {
         } else {
           is = this.getClass().getResourceAsStream(CONFIG_I18N_PATH + bundleName);
         }
-        reader = new InputStreamReader(is, Charset.forName("UTF-8"));
+        reader = new InputStreamReader(is, Charset.forName(RodaConstants.DEFAULT_ENCODING));
         bundle = new PropertyResourceBundle(reader);
       } finally {
         IOUtils.closeQuietly(reader);
