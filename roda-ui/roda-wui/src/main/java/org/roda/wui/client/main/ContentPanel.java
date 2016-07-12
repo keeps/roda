@@ -103,7 +103,7 @@ public class ContentPanel extends SimplePanel {
     resolvers.add(ResetPassword.RESOLVER);
     resolvers.add(VerifyEmail.RESOLVER);
     resolvers.add(Process.RESOLVER);
-    
+
     // Help
     resolvers.add(Help.RESOLVER);
   }
@@ -191,11 +191,25 @@ public class ContentPanel extends SimplePanel {
     }
 
     if (!resolved) {
-      tokenI18N = historyTokens.get(historyTokens.size() - 1).toUpperCase();
+      String lastToken = historyTokens.get(historyTokens.size() - 1);
+      
+      // TODO generalize suffix approach
+      if (lastToken.endsWith(".html")) {
+        lastToken = lastToken.substring(0, lastToken.length() - ".html".length());
+      }
+
+      // transform camel case to spaces
+      lastToken = lastToken.replaceAll("([A-Z])", " $1");
+      
+      // upper-case
+      lastToken = lastToken.toUpperCase();
+            
+      tokenI18N = lastToken;
     }
 
     // title.setText(tokenI18N);
     Window.setTitle(messages.windowTitle(tokenI18N));
   }
+
 
 }
