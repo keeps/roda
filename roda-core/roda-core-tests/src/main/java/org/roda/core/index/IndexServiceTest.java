@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.hamcrest.Matchers;
+import org.hamcrest.collection.IsCollectionWithSize;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
@@ -356,7 +357,7 @@ public class IndexServiceTest {
     IndexResult<IndexedAIP> findDescriptiveMetadata = index.find(IndexedAIP.class, filter, null, new Sublist(), null);
 
     assertNotNull(findDescriptiveMetadata);
-    assertThat(findDescriptiveMetadata.getResults(), Matchers.hasSize(1));
+    assertThat(findDescriptiveMetadata.getResults(), IsCollectionWithSize.hasSize(1));
 
     // cleanup
     model.deleteAIP(aipId);
@@ -697,8 +698,7 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testFormatIndex() {
-    try {
+  public void testFormatIndex() throws RODAException {
       Format format = new Format();
       format.setName("Portable Document Format");
       format.setDefinition("PDF definition");
@@ -755,9 +755,6 @@ public class IndexServiceTest {
 
       model.deleteFormat(format.getId(), false);
 
-    } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
-      assertTrue(false);
-    }
   }
 
   @Test

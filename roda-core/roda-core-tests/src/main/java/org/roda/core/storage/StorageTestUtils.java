@@ -67,7 +67,6 @@ public class StorageTestUtils {
     }
   }
 
-  @Test
   public static void testEntityEqualRecursively(StorageService sourceStorage, StoragePath sourceEntityStoragePath,
     StorageService targetStorage, StoragePath targetEntityStoragePath)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException, IOException {

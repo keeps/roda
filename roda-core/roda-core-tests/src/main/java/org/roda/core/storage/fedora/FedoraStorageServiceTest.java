@@ -164,6 +164,16 @@ public class FedoraStorageServiceTest extends AbstractTestNGSpringContextTests {
       // cleanup
       getStorage().deleteContainer(containerStoragePath);
     }
+    
+    @Test(enabled = false)
+    public void testMoveBinaryToSameStorage() throws RODAException, IOException {
+      super.testMoveBinaryToSameStorage();
+    }
+    
+    @Test(enabled = false)
+    public void testBinaryVersions() throws RODAException, IOException{
+      super.testBinaryVersions();
+    }
 
   }
 
