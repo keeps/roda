@@ -28,9 +28,6 @@ import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
@@ -275,7 +272,7 @@ public class RiskJobPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
   @Override
   public Plugin<T> cloneMe() {
-    return new RiskJobPlugin();
+    return new RiskJobPlugin<T>();
   }
 
   @Override
@@ -311,9 +308,9 @@ public class RiskJobPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   @Override
   public List<Class<T>> getObjectClasses() {
     List<Class<? extends IsRODAObject>> list = new ArrayList<>();
-    list.add(IndexedAIP.class);
-    list.add(IndexedRepresentation.class);
-    list.add(IndexedFile.class);
+    list.add(AIP.class);
+    list.add(Representation.class);
+    list.add(File.class);
     return (List) list;
   }
 }

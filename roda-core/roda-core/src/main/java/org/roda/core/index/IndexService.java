@@ -32,6 +32,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
@@ -220,28 +221,12 @@ public class IndexService {
   }
 
   public void reindexRisks(StorageService storage) {
-    CloseableIterable<Resource> listResourcesUnderDirectory = null;
     try {
-      StoragePath containerPath = ModelUtils.getContainerPath(Risk.class);
-      listResourcesUnderDirectory = storage.listResourcesUnderContainer(containerPath, false);
-
-      for (Resource resource : listResourcesUnderDirectory) {
-        if (!resource.isDirectory()) {
-          Binary binary = (Binary) resource;
-          InputStream inputStream = binary.getContent().createInputStream();
-          String jsonString = IOUtils.toString(inputStream, RodaConstants.DEFAULT_ENCODING);
-          Risk object = JsonUtils.getObjectFromJson(jsonString, Risk.class);
-          IOUtils.closeQuietly(inputStream);
-          reindexRisk(object);
-        }
-      }
+      reindex(storage, Risk.class);
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
       | IOException e) {
       LOGGER.error("Error reindexing risks");
-    } finally {
-      IOUtils.closeQuietly(listResourcesUnderDirectory);
     }
-
   }
 
   public void reindexRiskIncidence(RiskIncidence riskIncidence) {
@@ -257,10 +242,19 @@ public class IndexService {
   }
 
   public void reindexFormats(StorageService storage) {
-    CloseableIterable<Resource> listResourcesUnderDirectory = null;
-
     try {
-      StoragePath containerPath = ModelUtils.getContainerPath(Format.class);
+      reindex(storage, Format.class);
+    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
+      | IOException e) {
+      LOGGER.error("Error reindexing formats");
+    }
+  }
+
+  private <T extends IsRODAObject> void reindex(StorageService storage, Class<T> objectClass)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException, IOException {
+    CloseableIterable<Resource> listResourcesUnderDirectory = null;
+    try {
+      StoragePath containerPath = ModelUtils.getContainerPath(objectClass);
       listResourcesUnderDirectory = storage.listResourcesUnderContainer(containerPath, false);
 
       for (Resource resource : listResourcesUnderDirectory) {
@@ -268,18 +262,14 @@ public class IndexService {
           Binary binary = (Binary) resource;
           InputStream inputStream = binary.getContent().createInputStream();
           String jsonString = IOUtils.toString(inputStream, RodaConstants.DEFAULT_ENCODING);
-          Format object = JsonUtils.getObjectFromJson(jsonString, Format.class);
+          T object = JsonUtils.getObjectFromJson(jsonString, objectClass);
           IOUtils.closeQuietly(inputStream);
-          reindexFormat(object);
+          reindex(objectClass, object);
         }
       }
-    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
-      | IOException e) {
-      LOGGER.error("Error reindexing formats");
     } finally {
       IOUtils.closeQuietly(listResourcesUnderDirectory);
     }
-
   }
 
   public void reindexNotification(Notification notification) {

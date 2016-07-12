@@ -13,6 +13,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -259,6 +260,8 @@ public class PluginManager {
           jarFiles.add(jarFile);
           jarURLs.add(jarFile.toUri().toURL());
         }
+      } catch (NoSuchFileException e) {
+        // do nothing as folder does not exist
       }
 
       for (Path jarFile : jarFiles) {
@@ -359,7 +362,7 @@ public class PluginManager {
 
     // cache plugintype > plugininfos
     PluginInfo pluginInfo = getPluginInfo(plugin.getClass().getName());
-    // pluginInfo.setObjectClasses(objectClasses);
+    objectClasses.stream().forEach(objectClass -> pluginInfo.addObjectClass(objectClass.getName()));
     PluginType pluginType = plugin.getType();
     if (pluginInfoPerType.get(pluginType) == null) {
       List<PluginInfo> list = new ArrayList<>();

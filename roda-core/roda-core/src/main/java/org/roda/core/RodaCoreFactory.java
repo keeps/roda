@@ -9,7 +9,6 @@ package org.roda.core;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -23,6 +22,7 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -169,8 +169,7 @@ public class RodaCoreFactory {
 
   // ApacheDS related objects
   private static ApacheDS ldap;
-  private static Path rodaApacheDsConfigDirectory = null;
-  private static Path rodaApacheDsDataDirectory = null;
+  private static Path rodaApacheDSDataDirectory = null;
 
   // TransferredResources related objects
   private static TransferredResourcesScanner transferredResourcesScanner;
@@ -273,7 +272,7 @@ public class RodaCoreFactory {
         instantiateNodeSpecificObjects(nodeType);
         LOGGER.debug("Finished instantiating node specific objects");
 
-        // instantiateDefaultObjects();
+        instantiateDefaultObjects();
         LOGGER.debug("Finished instantiating default objects");
 
         instantiated = true;
@@ -374,15 +373,6 @@ public class RodaCoreFactory {
   private static void instantiateEssentialDirectories() {
     List<Path> essentialDirectories = new ArrayList<Path>();
     essentialDirectories.add(configPath);
-    essentialDirectories.add(configPath.resolve(RodaConstants.CORE_CROSSWALKS_FOLDER));
-    essentialDirectories
-      .add(configPath.resolve(RodaConstants.CORE_CROSSWALKS_FOLDER).resolve(RodaConstants.CORE_INGEST_FOLDER));
-    essentialDirectories.add(configPath.resolve(RodaConstants.CORE_CROSSWALKS_FOLDER)
-      .resolve(RodaConstants.CORE_DISSEMINATION_FOLDER).resolve(RodaConstants.CORE_HTML_FOLDER));
-    essentialDirectories.add(configPath.resolve(RodaConstants.CORE_I18N_FOLDER));
-    essentialDirectories.add(configPath.resolve(RodaConstants.CORE_LDAP_FOLDER));
-    essentialDirectories.add(configPath.resolve(RodaConstants.CORE_PLUGINS_FOLDER));
-    essentialDirectories.add(configPath.resolve(RodaConstants.CORE_SCHEMAS_FOLDER));
     essentialDirectories.add(rodaHomePath.resolve(RodaConstants.CORE_LOG_FOLDER));
     essentialDirectories.add(dataPath);
     essentialDirectories.add(logPath);
@@ -409,7 +399,9 @@ public class RodaCoreFactory {
         // do nothing and carry on
       }
       Files.createDirectories(exampleConfigPath);
-      copyFilesFromClasspath(RodaConstants.CORE_CONFIG_FOLDER + "/", exampleConfigPath, true);
+      copyFilesFromClasspath(RodaConstants.CORE_CONFIG_FOLDER + "/", exampleConfigPath, true,
+        Arrays.asList(RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_LDAP_FOLDER,
+          RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER));
     } catch (GenericException | IOException e) {
       LOGGER.error("Unable to create " + exampleConfigPath, e);
       instantiatedWithoutErrors = false;
@@ -429,14 +421,18 @@ public class RodaCoreFactory {
           hasFileResources = true;
         }
       }
-
       IOUtils.closeQuietly(resources);
-      if (!hasFileResources) {
-        copyFilesFromClasspath(RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_DEFAULT_FOLDER + "/",
-          rodaHomePath, true);
 
-        index.reindexRisks(storage);
-        index.reindexFormats(storage);
+      if (!hasFileResources) {
+        copyFilesFromClasspath(RodaConstants.CORE_DEFAULT_FOLDER + "/", rodaHomePath, true);
+
+        // 20160712 hsilva: it needs to be this way as the resources are copied
+        // to the file system and storage can be of a different type (e.g.
+        // fedora)
+        FileStorageService fileStorageService = new FileStorageService(storagePath);
+
+        index.reindexRisks(fileStorageService);
+        index.reindexFormats(fileStorageService);
         // index other default values HERE
       }
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
@@ -446,6 +442,12 @@ public class RodaCoreFactory {
 
   private static void copyFilesFromClasspath(String classpathPrefix, Path destinationDirectory,
     boolean removeClasspathPrefixFromFinalPath) {
+    copyFilesFromClasspath(classpathPrefix, destinationDirectory, removeClasspathPrefixFromFinalPath,
+      Collections.EMPTY_LIST);
+  }
+
+  private static void copyFilesFromClasspath(String classpathPrefix, Path destinationDirectory,
+    boolean removeClasspathPrefixFromFinalPath, List<String> excludePaths) {
 
     List<ClassLoader> classLoadersList = new LinkedList<ClassLoader>();
     classLoadersList.add(ClasspathHelper.contextClassLoader());
@@ -457,10 +459,21 @@ public class RodaCoreFactory {
 
     Set<String> resources = reflections.getResources(Pattern.compile(".*"));
 
-    LOGGER.info("Copy files from classpath prefix={}, destination={}, removePrefix={}, #resources={}", classpathPrefix,
-      destinationDirectory, removeClasspathPrefixFromFinalPath, resources.size());
+    LOGGER.info("Copy files from classpath prefix={}, destination={}, removePrefix={}, excludePaths={}, #resources={}",
+      classpathPrefix, destinationDirectory, removeClasspathPrefixFromFinalPath, excludePaths, resources.size());
 
     for (String resource : resources) {
+      boolean exclude = false;
+      for (String excludePath : excludePaths) {
+        if (resource.startsWith(excludePath)) {
+          exclude = true;
+          break;
+        }
+      }
+      if (exclude) {
+        continue;
+      }
+
       InputStream originStream = RodaCoreFactory.class.getClassLoader().getResourceAsStream(resource);
       Path destinyPath;
       if (removeClasspathPrefixFromFinalPath) {
@@ -671,7 +684,7 @@ public class RodaCoreFactory {
       RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_ORCHESTRATOR_FOLDER + "/application.conf");
 
     try {
-      String configAsString = IOUtils.toString(originStream, Charset.forName("UTF-8"));
+      String configAsString = IOUtils.toString(originStream, Charset.forName(RodaConstants.DEFAULT_ENCODING));
       akkaConfig = ConfigFactory.parseString(configAsString);
     } catch (IOException e) {
       LOGGER.error("Could not load Akka configuration", e);
@@ -769,8 +782,7 @@ public class RodaCoreFactory {
 
   public static void startApacheDS() {
     ldap = new ApacheDS();
-    rodaApacheDsConfigDirectory = RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_LDAP_FOLDER);
-    rodaApacheDsDataDirectory = RodaCoreFactory.getDataPath().resolve(RodaConstants.CORE_LDAP_FOLDER);
+    rodaApacheDSDataDirectory = RodaCoreFactory.getDataPath().resolve(RodaConstants.CORE_LDAP_FOLDER);
 
     try {
       Configuration rodaConfig = RodaCoreFactory.getRodaConfiguration();
@@ -789,13 +801,17 @@ public class RodaCoreFactory {
       LdapUtility ldapUtility = new LdapUtility(ldapHost, ldapPort, ldapPeopleDN, ldapGroupsDN, ldapRolesDN,
         ldapAdminDN, ldapAdminPassword, ldapPasswordDigestAlgorithm, ldapProtectedUsers, ldapProtectedGroups);
 
-      if (!Files.exists(rodaApacheDsDataDirectory)) {
-        Files.createDirectories(rodaApacheDsDataDirectory);
-        ldap.initDirectoryService(rodaApacheDsConfigDirectory, rodaApacheDsDataDirectory, ldapAdminPassword);
+      if (!Files.exists(rodaApacheDSDataDirectory)) {
+        Files.createDirectories(rodaApacheDSDataDirectory);
+        List<InputStream> ldifs = new ArrayList<>();
+        ldifs.add(RodaCoreFactory.getConfigurationFileAsStream(RodaConstants.CORE_LDAP_FOLDER + "/users.ldif"));
+        ldifs.add(RodaCoreFactory.getConfigurationFileAsStream(RodaConstants.CORE_LDAP_FOLDER + "/groups.ldif"));
+        ldifs.add(RodaCoreFactory.getConfigurationFileAsStream(RodaConstants.CORE_LDAP_FOLDER + "/roles.ldif"));
+        ldap.initDirectoryService(rodaApacheDSDataDirectory, ldapAdminPassword, ldifs);
         ldap.startServer(ldapUtility, ldapPort);
-        createUsersAndGroupsFromLDAP();
+        indexUsersAndGroupsFromLDAP();
       } else {
-        ldap.instantiateDirectoryService(rodaApacheDsDataDirectory);
+        ldap.instantiateDirectoryService(rodaApacheDSDataDirectory);
         ldap.startServer(ldapUtility, ldapPort);
       }
 
@@ -806,7 +822,7 @@ public class RodaCoreFactory {
 
   }
 
-  private static void createUsersAndGroupsFromLDAP()
+  private static void indexUsersAndGroupsFromLDAP()
     throws LdapUtilityException, GenericException, EmailAlreadyExistsException, UserAlreadyExistsException,
     IllegalOperationException, NotFoundException, AlreadyExistsException {
     for (User user : UserUtility.getLdapUtility().getUsers(new Filter())) {
@@ -1194,7 +1210,7 @@ public class RodaCoreFactory {
     if (StringUtils.isNotBlank(entity)) {
       if ("users_and_groups".equalsIgnoreCase(entity)) {
         try {
-          createUsersAndGroupsFromLDAP();
+          indexUsersAndGroupsFromLDAP();
         } catch (EmailAlreadyExistsException | UserAlreadyExistsException | IllegalOperationException
           | LdapUtilityException | GenericException | NotFoundException | AlreadyExistsException e) {
           LOGGER.error("Unable to reindex users & groups from LDAP.", e);

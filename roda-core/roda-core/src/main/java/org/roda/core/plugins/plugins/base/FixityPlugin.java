@@ -29,12 +29,10 @@ import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.Fixity;
@@ -267,9 +265,6 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<Class<AIP>> getObjectClasses() {
-    List<Class<? extends IsRODAObject>> list = new ArrayList<>();
-    list.add(IndexedAIP.class);
-    list.add(AIP.class);
-    return (List) list;
+    return Arrays.asList(AIP.class);
   }
 }

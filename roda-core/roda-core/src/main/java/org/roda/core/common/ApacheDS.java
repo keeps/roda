@@ -43,7 +43,6 @@ import org.apache.directory.server.protocol.shared.transport.TcpTransport;
 import org.apache.directory.server.xdbm.Index;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.roda.core.util.FileUtility;
 
 // FIXME this should be moved to a more meaningful maven module
 public class ApacheDS {
@@ -157,7 +156,7 @@ public class ApacheDS {
    * @throws Exception
    *           if there were some problems while initializing the system
    */
-  public void initDirectoryService(Path configDirectory, Path dataDirectory, String adminPassword) throws Exception {
+  public void initDirectoryService(Path dataDirectory, String adminPassword, List<InputStream> ldifs) throws Exception {
     // Initialize the LDAP service
     JdbmPartition rodaPartition = instantiateDirectoryService(dataDirectory);
 
@@ -182,9 +181,9 @@ public class ApacheDS {
       modifyRequestImpl.replace("userPassword", adminPassword);
       service.getAdminSession().modify(modifyRequestImpl);
 
-      applyLdif(FileUtility.getConfigurationFile(configDirectory, "ldap/users.ldif"));
-      applyLdif(FileUtility.getConfigurationFile(configDirectory, "ldap/groups.ldif"));
-      applyLdif(FileUtility.getConfigurationFile(configDirectory, "ldap/roles.ldif"));
+      for (InputStream ldif : ldifs) {
+        applyLdif(ldif);
+      }
     }
   }
 
@@ -262,7 +261,7 @@ public class ApacheDS {
     LdifReader entries = new LdifReader(ldifFileInputstream);
     for (LdifEntry ldifEntry : entries) {
       DefaultEntry newEntry = new DefaultEntry(service.getSchemaManager(), ldifEntry.getEntry());
-      LOGGER.debug("ldif entry: " + newEntry);
+      LOGGER.debug("LDIF entry: {}", newEntry);
       service.getAdminSession().add(newEntry);
     }
     entries.close();
