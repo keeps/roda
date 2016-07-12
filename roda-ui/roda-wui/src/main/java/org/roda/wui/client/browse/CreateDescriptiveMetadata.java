@@ -124,6 +124,12 @@ public class CreateDescriptiveMetadata extends Composite {
   FocusPanel showXml;
 
   @UiField
+  HTML showXmlIconXML;
+
+  @UiField
+  HTML showXmlIconForm;
+
+  @UiField
   FlowPanel formOrXML;
 
   @UiField
@@ -216,12 +222,14 @@ public class CreateDescriptiveMetadata extends Composite {
     CreateForm.create(formOrXML, bundle);
   }
 
-  public void setInXML(boolean inHTML) {
-    this.inXML = inHTML;
-    if (inHTML) {
-      showXml.removeStyleName("toolbarLink-selected");
+  public void setInXML(boolean inXML) {
+    this.inXML = inXML;
+    if (inXML) {
+      showXmlIconXML.setVisible(false);
+      showXmlIconForm.setVisible(true);
     } else {
-      showXml.addStyleName("toolbarLink-selected");
+      showXmlIconXML.setVisible(true);
+      showXmlIconForm.setVisible(false);
     }
   }
 

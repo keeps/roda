@@ -27,9 +27,14 @@
 				<g:TextBox ui:field="id" addStyleNames="form-textbox"/>
 				<g:Label ui:field="formOrXMLLabel"/>
 				<g:FocusPanel ui:field="showXml" styleName="toolbarLink">
-					<g:HTML>
-						<i class="fa fa-code"></i>
-					</g:HTML>
+					<g:FlowPanel>
+						<g:HTML ui:field="showXmlIconXML">
+							<i class="fa fa-code"></i>
+						</g:HTML>
+						<g:HTML ui:field="showXmlIconForm" visible="false">
+							<i class="fa fa-list"></i>
+						</g:HTML>
+					</g:FlowPanel>
 				</g:FocusPanel>
 				<g:FlowPanel addStyleNames="panel">
 					<g:FlowPanel ui:field="formOrXML" addStyleNames="panel-body"/>
