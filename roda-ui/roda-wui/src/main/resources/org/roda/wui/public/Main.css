@@ -2087,8 +2087,6 @@ td.datePickerMonth, td.datePickerYear {
 
 .panelDescriptiveMetadata {
     margin-bottom: 0;
-    background-color: transparent;
-    padding-left: 0;
 }
 
 .metadata-form-field:first-child {
@@ -2103,6 +2101,10 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .content .metadata-form-textbox {
+    border-left: transparent;
+}
+
+.metadata-form-field .form-textbox {
     border-left: transparent;
 }
 
