@@ -1,10 +1,23 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
   
 <suite name="AllTests" verbose="1" >
-  <test name="DefaultTests">
-    <classes>
-      <class name="org.roda.core.common.JsonUtilsTest"/>
-      <class name="org.roda.core.index.IndexServiceTest"/>
-    </classes>
+  <test name="all">
+  	<groups>
+    	<run></run>
+	</groups>
+	<packages>
+		<package name="org.roda.core.*" />
+	</packages>
   </test>
+  
+  <test name="travis-ci">
+  	<groups>
+    	<run><exclude name="not-in-travis"/></run>
+	</groups>
+	<packages>
+		<package name="org.roda.core.*" />
+		<package name="org.roda.core.plugins.*" />
+	</packages>
+  </test>
+  
 </suite>

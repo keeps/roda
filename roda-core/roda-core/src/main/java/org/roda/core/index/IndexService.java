@@ -220,10 +220,10 @@ public class IndexService {
   }
 
   public void reindexRisks(StorageService storage) {
+    CloseableIterable<Resource> listResourcesUnderDirectory = null;
     try {
       StoragePath containerPath = ModelUtils.getContainerPath(Risk.class);
-      CloseableIterable<Resource> listResourcesUnderDirectory = storage.listResourcesUnderContainer(containerPath,
-        false);
+      listResourcesUnderDirectory = storage.listResourcesUnderContainer(containerPath, false);
 
       for (Resource resource : listResourcesUnderDirectory) {
         if (!resource.isDirectory()) {
@@ -238,6 +238,8 @@ public class IndexService {
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
       | IOException e) {
       LOGGER.error("Error reindexing risks");
+    } finally {
+      IOUtils.closeQuietly(listResourcesUnderDirectory);
     }
 
   }
@@ -255,10 +257,11 @@ public class IndexService {
   }
 
   public void reindexFormats(StorageService storage) {
+    CloseableIterable<Resource> listResourcesUnderDirectory = null;
+
     try {
       StoragePath containerPath = ModelUtils.getContainerPath(Format.class);
-      CloseableIterable<Resource> listResourcesUnderDirectory = storage.listResourcesUnderContainer(containerPath,
-        false);
+      listResourcesUnderDirectory = storage.listResourcesUnderContainer(containerPath, false);
 
       for (Resource resource : listResourcesUnderDirectory) {
         if (!resource.isDirectory()) {
@@ -273,6 +276,8 @@ public class IndexService {
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
       | IOException e) {
       LOGGER.error("Error reindexing formats");
+    } finally {
+      IOUtils.closeQuietly(listResourcesUnderDirectory);
     }
 
   }

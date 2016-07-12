@@ -1,4 +1,5 @@
 /target/
 transaction.log*
 velocity.log*
+/test-output/
 /bin/

@@ -24,11 +24,6 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-surefire-plugin</artifactId>
 						<configuration>
-							<includes>
-								<!-- DEFAULT: e.g. -DrunSuite=AllTests.class -->
-								<!-- DO NOT RUN ANY: e.g. -DrunSuite -->
-								<include>**/${runSuite}</include>
-							</includes>
 							<useSystemClassLoader>true</useSystemClassLoader>
 							<useManifestOnlyJar>false</useManifestOnlyJar>
 						</configuration>
@@ -40,7 +35,6 @@
 	<properties>
 		<!-- XXX fedora tests really need jersey 2.12 -->
 		<jersey.version>2.12</jersey.version>
-		<runSuite>AllTests.class</runSuite>
 	</properties>
 	<dependencies>
 		<dependency>

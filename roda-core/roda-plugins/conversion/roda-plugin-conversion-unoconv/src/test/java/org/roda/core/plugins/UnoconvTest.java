@@ -7,10 +7,6 @@
  */
 package org.roda.core.plugins;
 
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeMethod;
-import org.testng.AssertJUnit;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.FileAlreadyExistsException;
@@ -59,6 +55,10 @@ import org.roda.core.plugins.plugins.ingest.TransferredResourceToAIPPlugin;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.AssertJUnit;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import com.google.common.collect.Iterables;
 
@@ -150,7 +150,7 @@ public class UnoconvTest {
     return model.retrieveAIP(indexedAIP.getId());
   }
 
-  @Test
+  @Test(groups = {"not-in-travis"})
   public void testUnoconvPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,
     SolrServerException, IsStillUpdatingException {
     AIP aip = ingestCorpora();
@@ -184,7 +184,8 @@ public class UnoconvTest {
       if (f.getId().matches(".*[.](pdf|docx|txt|xls|odp|ppt|pptx|doc|rtf|xlsx|ods|odt|xml)$")) {
         changedCounter++;
         String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
-        AssertJUnit.assertEquals(1, newReusableAllFiles.stream().filter(o -> o.getId().equals(filename + ".pdf")).count());
+        AssertJUnit.assertEquals(1,
+          newReusableAllFiles.stream().filter(o -> o.getId().equals(filename + ".pdf")).count());
       }
     }
 
