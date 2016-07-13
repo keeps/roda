@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-@Test(enabled=false)
+@Test(enabled = false)
 public class FedoraStorageServiceTestDelegate extends AbstractStorageServiceTest<FedoraStorageService> {
 
   public static int determineOpenDoorAndSetFedoraProperty(int defaultDoor) {
@@ -84,6 +84,71 @@ public class FedoraStorageServiceTestDelegate extends AbstractStorageServiceTest
     } catch (IOException e) {
       Assert.fail(e.getMessage());
     }
+  }
+
+  @Test(enabled = false)
+  public void testListContainer() throws RODAException {
+    super.testListContainer();
+  }
+
+  @Test(enabled = false)
+  public void testCreateGetDeleteContainer() throws RODAException {
+    super.testCreateGetDeleteContainer();
+  }
+
+  @Test(enabled = false)
+  public void testGetContainerThatDoesntExist() throws RODAException {
+    super.testGetContainerThatDoesntExist();
+  }
+
+  @Test(enabled = false)
+  public void testGetContainerThatIsActuallyADirectory() throws RODAException {
+    super.testGetContainerThatIsActuallyADirectory();
+  }
+
+  @Test(enabled = false)
+  public void testGetContainerThatIsActuallyABinary() throws RODAException {
+    super.testGetContainerThatIsActuallyABinary();
+  }
+
+  @Test(enabled = false)
+  public void testDeleteContainerThatDoesntExist() throws RODAException {
+    super.testDeleteContainerThatDoesntExist();
+  }
+
+  @Test(enabled = false)
+  public void testDeleteNonEmptyContaienr() throws RODAException {
+    super.testDeleteNonEmptyContaienr();
+  }
+
+  @Test(enabled = false)
+  public void testListResourcesUnderContainer() throws RODAException {
+    super.testListResourcesUnderContainer();
+  }
+
+  @Test(enabled = false)
+  public void testCreateGetDeleteDirectory() throws RODAException {
+    super.testCreateGetDeleteDirectory();
+  }
+
+  @Test(enabled = false)
+  public void testGetDirectoryThatDoesntExist() throws RODAException {
+    super.testGetDirectoryThatDoesntExist();
+  }
+
+  @Test(enabled = false)
+  public void testGetDirectoryThatIsActuallyABinary() throws RODAException {
+    super.testGetDirectoryThatIsActuallyABinary();
+  }
+
+  @Test(enabled = false)
+  public void testGetDirectoryThatIsActuallyAContainer() throws RODAException {
+    super.testGetDirectoryThatIsActuallyAContainer();
+  }
+
+  @Test(enabled = false)
+  public void testListResourcesUnderDirectory() throws RODAException, IOException {
+    super.testListResourcesUnderDirectory();
   }
 
   @Override
@@ -158,6 +223,66 @@ public class FedoraStorageServiceTestDelegate extends AbstractStorageServiceTest
     Assert.assertEquals(4, counter);
     // cleanup
     getStorage().deleteContainer(containerStoragePath);
+  }
+
+  @Test(enabled = false)
+  public void testCreateGetDeleteBinaryAsReference() throws RODAException, IOException {
+    super.testCreateGetDeleteBinaryAsReference();
+  }
+
+  @Test(enabled = false)
+  public void testUpdateBinaryContent() throws RODAException, IOException {
+    super.testUpdateBinaryContent();
+  }
+
+  @Test(enabled = false)
+  public void testUpdateBinaryThatDoesntExist() throws RODAException, IOException {
+    super.testUpdateBinaryThatDoesntExist();
+  }
+
+  @Test(enabled = false)
+  public void testGetBinaryThatDoesntExist() throws RODAException {
+    super.testGetBinaryThatDoesntExist();
+  }
+
+  @Test(enabled = false)
+  public void testGetBinaryThatIsActuallyADirectory() throws RODAException {
+    super.testGetBinaryThatIsActuallyADirectory();
+  }
+
+  @Test(enabled = false)
+  public void testGetBinaryThatIsActuallyAContainer() throws RODAException {
+    super.testGetBinaryThatIsActuallyAContainer();
+  }
+
+  @Test(enabled = false)
+  public void testDeleteNonEmptyDirectory() throws RODAException {
+    super.testDeleteNonEmptyDirectory();
+  }
+
+  @Test(enabled = false)
+  public void testCopyContainerToSameStorage() throws RODAException, IOException {
+    super.testCopyContainerToSameStorage();
+  }
+
+  @Test(enabled = false)
+  public void testCopyDirectoryToSameStorage() throws RODAException, IOException {
+    super.testCopyDirectoryToSameStorage();
+  }
+
+  @Test(enabled = false)
+  public void testCopyBinaryToSameStorage() throws RODAException, IOException {
+    super.testCopyBinaryToSameStorage();
+  }
+
+  @Test(enabled = false)
+  public void testMoveContainerToSameStorage() throws RODAException, IOException {
+    super.testMoveContainerToSameStorage();
+  }
+
+  @Test(enabled = false)
+  public void testMoveDirectoryToSameStorage() throws RODAException, IOException {
+    super.testMoveDirectoryToSameStorage();
   }
 
   @Test(enabled = false)
