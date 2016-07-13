@@ -1,22 +1,23 @@
-{{~field name="descDate"    order="3" type="date" auto-generate="now" label="{\"en\": \"Description date\", \"pt_PT\": \"Data da descrição\"}"~}}
-{{~field name="eadheader"   hidden="true" xpath="/*:ead/*:eadheader"~}}
-{{~field name="level"       hidden="false" xpath="//*:archdesc/@level/string()"~}}
-{{~field name="otherlevel"  type="list" list="[\"Fundo\",\"Subfundo\",\"..\",\"Produtor\"]" auto-generate="level" order="6" label="{\"en\": \"Other level\", \"pt_PT\": \"Outro nível\"}" xpath="/*:ead/*:archdesc/@otherlevel/string()"~}}
-{{~field name="physdesc"    hidden="true" xpath="/*:ead/*:archdesc/*:did/*:physdesc"~}}
-{{~field name="repository"  hidden="true" xpath="/*:ead/*:archdesc/*:did/*:repository"~}}
-{{~field name="title"       order='2' auto-generate='title' label="{'en': 'Title', 'pt_PT': 'Título'}" xpath="/*:ead/*:archdesc/*:did/*:unittitle/string()"~}}
-{{~field name="id"          order="1" auto-generate="id" label="{'en': 'Identifier', 'pt_PT': 'Identificador'}" xpath="/*:ead/*:archdesc/*:did/*:unitid/string()"~}}
-{{~field name="countryCode" hidden="true" xpath="/*:ead/*:archdesc/*:did/*:unitid/@countrycode/string()"~}}
-{{~field name="repositoryCode" hidden="true" xpath="/*:ead/*:archdesc/*:did/*:unitid/@repositorycode/string()"~}}
-{{~field name="titleType"   hidden="true" xpath="/*:ead/*:archdesc/*:did/*:unittitle/@type/string()"~}}
-{{~field name="dateInitial" order="4" type="date" label="{\"en\": \"Initial date\", \"pt_PT\": \"Data de início\"}" xpath="tokenize(/*:ead/*:archdesc/*:did/*:unitdate/@normal/string(), \"/\")[1]"~}}
-{{~field name="dateFinal"   order="5" type="date" label="{\"en\": \"Final date\", \"pt_PT\": \"Data de fim\"}" xpath="tokenize(/*:ead/*:archdesc/*:did/*:unitdate/@normal/string(), \"/\")[2]"~}}
-{{~field name="producer"    label="{'en': 'Producer', 'pt_PT': 'Produtor'}" xpath="/*:ead/*:archdesc/*:did/*:origination[@label='producer']/string()"~}}
-{{~field name="creator"     label="{'en': 'Creator', 'pt_PT': 'Autor'}" xpath="/*:ead/*:archdesc/*:did/*:origination[@label='creator']/string()"~}}
-{{~field name="language"    auto-generate='language' label="{'en': 'Language', 'pt_PT': 'Idioma'}" xpath="/*:ead/*:archdesc/*:did/*:langmaterial/string()"~}}
-{{~field name="dsc"         hidden="true" xpath="/*:ead/*:archdesc/*:dsc"~}}
-{{~field name="description" type='textarea' label="{'en': 'Description', 'pt_PT': 'Descrição'}" xpath="/*:ead/*:archdesc/*:scopecontent/*:p/string()"~}}
-{{~field name="rights"      label="{'en': 'Rights', 'pt_PT': 'Condições de reprodução'}" xpath="/*:ead/*:archdesc/*:userestrict/*:p/string()"~}}
+{{~field name="descDate"        order="1"   type="date" auto-generate="now" label="{\"en\": \"Description date\", \"pt_PT\": \"Data da descrição\"}"~}}
+{{~field name="id"              order="2"   auto-generate="id" label="{'en': 'Identifier', 'pt_PT': 'Identificador'}" xpath="/*:ead/*:archdesc/*:did/*:unitid/string()"~}}
+{{~field name="title"           order='3'   auto-generate='title' label="{'en': 'Title', 'pt_PT': 'Título'}" xpath="/*:ead/*:archdesc/*:did/*:unittitle/string()"~}}
+{{~field name="dateInitial"     order="4"   type="date" label="{\"en\": \"Initial date\", \"pt_PT\": \"Data de início\"}" xpath="tokenize(/*:ead/*:archdesc/*:did/*:unitdate/@normal/string(), \"/\")[1]"~}}
+{{~field name="dateFinal"       order="5"   type="date" label="{\"en\": \"Final date\", \"pt_PT\": \"Data de fim\"}" xpath="tokenize(/*:ead/*:archdesc/*:did/*:unitdate/@normal/string(), \"/\")[2]"~}}
+{{~field name="otherlevel"      order="6"   type="list" list="[\"Produtor\",\"Fundo\",\"Subfundo\",\"Subsubfundo\",\"Secção\",\"Subsecção\",\"Série\",\"Subsérie\",\"Subsubsérie\",\"Unidade de instalação\",\"Documento composto\",\"Documento\"]" auto-generate="level" label="{\"en\": \"Description level\", \"pt_PT\": \"Nível de descrição\"}" xpath="/*:ead/*:archdesc/@otherlevel/string()"~}}
+{{~field name="language"        order="7"   auto-generate='language' label="{'en': 'Language', 'pt_PT': 'Idioma'}" xpath="/*:ead/*:archdesc/*:did/*:langmaterial/string()"~}}
+{{~field name="rights"          order="8"   type='list' list="[\"Livre\", \"Restrito\"]" label="{'en': 'Rights', 'pt_PT': 'Condições de reprodução'}" xpath="/*:ead/*:archdesc/*:userestrict/*:p[1]/string()"~}}
+{{~field name="embarbo"         order="9"   type='text' value='1 ano' label="{'en': 'Embargo time', 'pt_PT': 'Tempo de embarbo'}" xpath="/*:ead/*:archdesc/*:userestrict/*:p[2]/string()"~}}
+{{~field name="description"     order="10"  type='textarea' label="{'en': 'Description', 'pt_PT': 'Descrição'}" xpath="/*:ead/*:archdesc/*:scopecontent/*:p/string()"~}}
+{{~field name="repository"      order="11"  label="{'en': 'Repository', 'pt_PT': 'Repositório'}" xpath="/*:ead/*:archdesc/*:did/*:repository/*:corpname/string()"~}}
+{{~field name="creator"         label="{'en': 'Creator', 'pt_PT': 'Autor'}" xpath="/*:ead/*:archdesc/*:did/*:origination[@label='creator']/string()"~}}
+{{~field name="producer"        label="{'en': 'Producer', 'pt_PT': 'Produtor'}" xpath="/*:ead/*:archdesc/*:did/*:origination[@label='producer']/string()"~}}
+{{~field name="eadheader"       hidden="true" xpath="/*:ead/*:eadheader"~}}
+{{~field name="physdesc"        hidden="true" xpath="/*:ead/*:archdesc/*:did/*:physdesc"~}}
+{{~field name="repository"      hidden="true" xpath="/*:ead/*:archdesc/*:did/*:repository"~}}
+{{~field name="countryCode"     hidden="true" xpath="/*:ead/*:archdesc/*:did/*:unitid/@countrycode/string()"~}}
+{{~field name="repositoryCode"  hidden="true" xpath="/*:ead/*:archdesc/*:did/*:unitid/@repositorycode/string()"~}}
+{{~field name="titleType"       hidden="true" xpath="/*:ead/*:archdesc/*:did/*:unittitle/@type/string()"~}}
+{{~field name="dsc"             hidden="true" xpath="/*:ead/*:archdesc/*:dsc"~}}
 <?xml version="1.0" encoding="utf-8"?>
 <ead
 	xmlns="urn:isbn:1-931666-22-9"
@@ -60,6 +61,11 @@
             {{~#if producer~}}<origination label="producer">{{producer}}</origination>{{~/if~}}
             {{~#if creator~}}<origination label="creator">{{creator}}</origination>{{~/if~}}
             {{~#if language~}}<langmaterial>{{language}}</langmaterial>{{~/if~}}
+            {{~#if repository~}}
+                <repository>
+                    <corpname>{{repository}}</corpname>
+                </repository>
+            {{~/if~}}
 		</did>
 		{{{dsc}}}
         {{~#if description~}}
@@ -70,6 +76,9 @@
         {{~#if rights~}}
             <userestrict>
             <p>{{~rights~}}</p>
+                {{~#if embargo~}}
+                    <p>{{embargoTime}}</p>
+                {{~/if~}}
             </userestrict>
         {{~/if~}}
 	</archdesc>
