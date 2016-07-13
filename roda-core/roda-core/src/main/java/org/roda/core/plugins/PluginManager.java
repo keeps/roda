@@ -155,6 +155,14 @@ public class PluginManager {
     return pluginInfoPerObjectClass.get(clazz);
   }
 
+  public List<PluginInfo> getPluginInfoPerObjectClass(String className) {
+    try {
+      return pluginInfoPerObjectClass.get(Class.forName(className));
+    } catch (ClassNotFoundException e) {
+      return new ArrayList<>();
+    }
+  }
+
   /**
    * Returns an instance of the {@link Plugin} with the specified ID
    * (classname).

@@ -47,6 +47,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -167,8 +168,10 @@ public class AvconvTest {
     parameters.put(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT, "gif");
     parameters.put(RodaConstants.PLUGIN_PARAMS_OUTPUT_ARGUMENTS, "-pix_fmt rgb24");
 
-    TestsHelper.executeJob(AvconvConvertPlugin.class, parameters, PluginType.AIP_TO_AIP,
+    Job job = TestsHelper.executeJob(AvconvConvertPlugin.class, parameters, PluginType.AIP_TO_AIP,
       SelectedItemsAll.create(Representation.class));
+
+    TestsHelper.testJobReports(index, job);
 
     aip = model.retrieveAIP(aip.getId());
     AssertJUnit.assertEquals(2, aip.getRepresentations().size());

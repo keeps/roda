@@ -251,8 +251,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
                       ContentPayload payload = new FSPathContentPayload(pluginResult);
 
-                      // create a new representation if it
-                      // does not exist
+                      // create a new representation if it does not exist
                       if (!newRepresentations.contains(newRepresentationID)) {
                         LOGGER.debug("Creating a new representation {} on AIP {}", newRepresentationID, aip.getId());
                         boolean original = false;
@@ -493,9 +492,6 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
           // add unchanged files to the new representation
           if (!alteredFiles.isEmpty()) {
             createNewFilesOnRepresentation(storage, model, unchangedFiles, newRepresentationID, notify);
-
-            // AbstractConvertPluginUtils.reIndexingRepresentationAfterConversion(this,
-            // index, model, storage, aipId, newRepresentationID);
           }
 
         } catch (RuntimeException | NotFoundException | GenericException | RequestNotValidException

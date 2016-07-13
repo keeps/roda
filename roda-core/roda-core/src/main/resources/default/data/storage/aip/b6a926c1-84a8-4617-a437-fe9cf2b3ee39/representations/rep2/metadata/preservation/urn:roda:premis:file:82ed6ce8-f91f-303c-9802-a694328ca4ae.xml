@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<v3:object xsi:type="v3:file" xmlns:v3="http://www.loc.gov/premis/v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <v3:objectIdentifier>
+    <v3:objectIdentifierType>URN</v3:objectIdentifierType>
+    <v3:objectIdentifierValue>urn:roda:premis:file:82ed6ce8-f91f-303c-9802-a694328ca4ae</v3:objectIdentifierValue>
+  </v3:objectIdentifier>
+  <v3:preservationLevel>
+    <v3:preservationLevelValue>full</v3:preservationLevelValue>
+  </v3:preservationLevel>
+  <v3:objectCharacteristics>
+    <v3:fixity>
+      <v3:messageDigestAlgorithm>SHA-256</v3:messageDigestAlgorithm>
+      <v3:messageDigest>A35A62AF308F8FC1F71EBAECC4D57FE635852A3B0AB884C4DD4CEB7CF598435A</v3:messageDigest>
+      <v3:messageDigestOriginator>RODA</v3:messageDigestOriginator>
+    </v3:fixity>
+    <v3:size>2380209</v3:size>
+    <v3:format>
+      <v3:formatDesignation>
+        <v3:formatName>Microsoft Powerpoint for Windows</v3:formatName>
+        <v3:formatVersion>2007 onwards</v3:formatVersion>
+      </v3:formatDesignation>
+    </v3:format>
+    <v3:format>
+      <v3:formatRegistry>
+        <v3:formatRegistryName>pronom</v3:formatRegistryName>
+        <v3:formatRegistryKey>fmt/215</v3:formatRegistryKey>
+      </v3:formatRegistry>
+    </v3:format>
+    <v3:format>
+      <v3:formatRegistry>
+        <v3:formatRegistryName>mime</v3:formatRegistryName>
+        <v3:formatRegistryKey>application/vnd.openxmlformats-officedocument.presentationml.presentation</v3:formatRegistryKey>
+      </v3:formatRegistry>
+    </v3:format>
+  </v3:objectCharacteristics>
+  <v3:originalName>Curadoria Digital 2016 - RODA-in.pptx</v3:originalName>
+  <v3:storage>
+    <v3:contentLocation>
+      <v3:contentLocationType/>
+      <v3:contentLocationValue/>
+    </v3:contentLocation>
+  </v3:storage>
+</v3:object>

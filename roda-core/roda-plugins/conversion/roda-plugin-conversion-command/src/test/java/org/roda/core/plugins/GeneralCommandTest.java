@@ -47,6 +47,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -169,7 +170,7 @@ public class GeneralCommandTest {
     parameters.put(RodaConstants.PLUGIN_PARAMS_COMMAND_ARGUMENTS,
       "/usr/bin/convert -regard-warnings {input_file} {output_file}");
 
-    TestsHelper.executeJob(GeneralCommandConvertPlugin.class, parameters, PluginType.AIP_TO_AIP,
+    Job job = TestsHelper.executeJob(GeneralCommandConvertPlugin.class, parameters, PluginType.AIP_TO_AIP,
       SelectedItemsAll.create(Representation.class));
 
     aip = model.retrieveAIP(aip.getId());

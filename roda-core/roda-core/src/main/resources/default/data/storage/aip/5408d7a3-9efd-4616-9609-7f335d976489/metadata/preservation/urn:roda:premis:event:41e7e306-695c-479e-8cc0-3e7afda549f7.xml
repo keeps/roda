@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<event xmlns="http://www.loc.gov/premis/v3">
+  <eventIdentifier>
+    <eventIdentifierType>URN</eventIdentifierType>
+    <eventIdentifierValue>urn:roda:premis:event:41e7e306-695c-479e-8cc0-3e7afda549f7</eventIdentifierValue>
+  </eventIdentifier>
+  <eventType>accession</eventType>
+  <eventDateTime>2016-07-13T14:07:09.76Z</eventDateTime>
+  <eventDetailInformation>
+    <eventDetail>Added package to the inventory. After this point, the responsibility for the digital content’s preservation is passed on to the repository.</eventDetail>
+  </eventDetailInformation>
+  <eventOutcomeInformation>
+    <eventOutcome>SUCCESS</eventOutcome>
+    <eventOutcomeDetail>
+      <eventOutcomeDetailNote>The AIP was successfully added to the repository's inventory.</eventOutcomeDetailNote>
+    </eventOutcomeDetail>
+  </eventOutcomeInformation>
+  <linkingAgentIdentifier>
+    <linkingAgentIdentifierType>URN</linkingAgentIdentifierType>
+    <linkingAgentIdentifierValue>urn:roda:premis:agent:org.roda.core.plugins.plugins.ingest.AutoAcceptSIPPlugin@1.0</linkingAgentIdentifierValue>
+  </linkingAgentIdentifier>
+  <linkingAgentIdentifier>
+    <linkingAgentIdentifierType>URN</linkingAgentIdentifierType>
+    <linkingAgentIdentifierValue>urn:roda:premis:agent:admin</linkingAgentIdentifierValue>
+  </linkingAgentIdentifier>
+  <linkingObjectIdentifier>
+    <linkingObjectIdentifierType>URN</linkingObjectIdentifierType>
+    <linkingObjectIdentifierValue>urn:roda:aip:5408d7a3-9efd-4616-9609-7f335d976489</linkingObjectIdentifierValue>
+    <linkingObjectRole>outcome</linkingObjectRole>
+  </linkingObjectIdentifier>
+</event>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<event xmlns="http://www.loc.gov/premis/v3">
+  <eventIdentifier>
+    <eventIdentifierType>URN</eventIdentifierType>
+    <eventIdentifierValue>urn:roda:premis:event:bf6b545b-c675-45af-9a92-31ce63a2b974</eventIdentifierValue>
+  </eventIdentifier>
+  <eventType>unpacking</eventType>
+  <eventDateTime>2016-07-13T14:06:40.59Z</eventDateTime>
+  <eventDetailInformation>
+    <eventDetail>Extracted objects from package in E-ARK SIP format.</eventDetail>
+  </eventDetailInformation>
+  <eventOutcomeInformation>
+    <eventOutcome>SUCCESS</eventOutcome>
+    <eventOutcomeDetail>
+      <eventOutcomeDetailNote>The SIP has been successfully unpacked.</eventOutcomeDetailNote>
+    </eventOutcomeDetail>
+  </eventOutcomeInformation>
+  <linkingAgentIdentifier>
+    <linkingAgentIdentifierType>URN</linkingAgentIdentifierType>
+    <linkingAgentIdentifierValue>urn:roda:premis:agent:org.roda.core.plugins.plugins.ingest.EARKSIPToAIPPlugin@1.0</linkingAgentIdentifierValue>
+  </linkingAgentIdentifier>
+  <linkingAgentIdentifier>
+    <linkingAgentIdentifierType>URN</linkingAgentIdentifierType>
+    <linkingAgentIdentifierValue>urn:roda:premis:agent:admin</linkingAgentIdentifierValue>
+  </linkingAgentIdentifier>
+  <linkingObjectIdentifier>
+    <linkingObjectIdentifierType>URN</linkingObjectIdentifierType>
+    <linkingObjectIdentifierValue>urn:roda:transferred_resource:curadoria digital 2016 - dbptk - idc0c47c9c-d807-4ee2-90f2-3a5a07b90015.zip</linkingObjectIdentifierValue>
+    <linkingObjectRole>source</linkingObjectRole>
+  </linkingObjectIdentifier>
+  <linkingObjectIdentifier>
+    <linkingObjectIdentifierType>URN</linkingObjectIdentifierType>
+    <linkingObjectIdentifierValue>urn:roda:aip:bf34344c-2e3e-46d9-8cbd-1b55cf47ad19</linkingObjectIdentifierValue>
+    <linkingObjectRole>outcome</linkingObjectRole>
+  </linkingObjectIdentifier>
+</event>

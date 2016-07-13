@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<event xmlns="http://www.loc.gov/premis/v3">
+  <eventIdentifier>
+    <eventIdentifierType>URN</eventIdentifierType>
+    <eventIdentifierValue>urn:roda:premis:event:ee9653b2-fb0e-4c52-ac10-b23d74599410</eventIdentifierValue>
+  </eventIdentifier>
+  <eventType>wellformedness check</eventType>
+  <eventDateTime>2016-07-13T14:07:29.91Z</eventDateTime>
+  <eventDetailInformation>
+    <eventDetail>Checked that the received SIP is well formed, complete and that no unexpected files were included.</eventDetail>
+  </eventDetailInformation>
+  <eventOutcomeInformation>
+    <eventOutcome>SUCCESS</eventOutcome>
+    <eventOutcomeDetail>
+      <eventOutcomeDetailNote>The SIP was well formed and complete.</eventOutcomeDetailNote>
+    </eventOutcomeDetail>
+  </eventOutcomeInformation>
+  <linkingAgentIdentifier>
+    <linkingAgentIdentifierType>URN</linkingAgentIdentifierType>
+    <linkingAgentIdentifierValue>urn:roda:premis:agent:org.roda.core.plugins.plugins.ingest.EARKSIPToAIPPlugin@1.0</linkingAgentIdentifierValue>
+  </linkingAgentIdentifier>
+  <linkingAgentIdentifier>
+    <linkingAgentIdentifierType>URN</linkingAgentIdentifierType>
+    <linkingAgentIdentifierValue>urn:roda:premis:agent:admin</linkingAgentIdentifierValue>
+  </linkingAgentIdentifier>
+  <linkingObjectIdentifier>
+    <linkingObjectIdentifierType>URN</linkingObjectIdentifierType>
+    <linkingObjectIdentifierValue>urn:roda:transferred_resource:curadoria digital 2016 - roda-in - idafd8d780-e559-4933-bdeb-82db17e4634f.zip</linkingObjectIdentifierValue>
+    <linkingObjectRole>source</linkingObjectRole>
+  </linkingObjectIdentifier>
+  <linkingObjectIdentifier>
+    <linkingObjectIdentifierType>URN</linkingObjectIdentifierType>
+    <linkingObjectIdentifierValue>urn:roda:aip:b6a926c1-84a8-4617-a437-fe9cf2b3ee39</linkingObjectIdentifierValue>
+    <linkingObjectRole>outcome</linkingObjectRole>
+  </linkingObjectIdentifier>
+</event>

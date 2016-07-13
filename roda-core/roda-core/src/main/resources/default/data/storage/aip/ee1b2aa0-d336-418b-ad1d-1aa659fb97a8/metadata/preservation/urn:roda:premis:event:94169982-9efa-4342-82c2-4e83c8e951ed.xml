@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<event xmlns="http://www.loc.gov/premis/v3">
+  <eventIdentifier>
+    <eventIdentifierType>URN</eventIdentifierType>
+    <eventIdentifierValue>urn:roda:premis:event:94169982-9efa-4342-82c2-4e83c8e951ed</eventIdentifierValue>
+  </eventIdentifier>
+  <eventType>message digest calculation</eventType>
+  <eventDateTime>2016-07-13T14:06:13.84Z</eventDateTime>
+  <eventDetailInformation>
+    <eventDetail>Created base PREMIS objects with file original name and file fixity information (SHA-256).</eventDetail>
+  </eventDetailInformation>
+  <eventOutcomeInformation>
+    <eventOutcome>SUCCESS</eventOutcome>
+    <eventOutcomeDetail>
+      <eventOutcomeDetailNote>PREMIS objects were successfully created.</eventOutcomeDetailNote>
+    </eventOutcomeDetail>
+  </eventOutcomeInformation>
+  <linkingAgentIdentifier>
+    <linkingAgentIdentifierType>URN</linkingAgentIdentifierType>
+    <linkingAgentIdentifierValue>urn:roda:premis:agent:org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin@1.0</linkingAgentIdentifierValue>
+  </linkingAgentIdentifier>
+  <linkingAgentIdentifier>
+    <linkingAgentIdentifierType>URN</linkingAgentIdentifierType>
+    <linkingAgentIdentifierValue>urn:roda:premis:agent:admin</linkingAgentIdentifierValue>
+  </linkingAgentIdentifier>
+  <linkingObjectIdentifier>
+    <linkingObjectIdentifierType>URN</linkingObjectIdentifierType>
+    <linkingObjectIdentifierValue>urn:roda:aip:ee1b2aa0-d336-418b-ad1d-1aa659fb97a8</linkingObjectIdentifierValue>
+    <linkingObjectRole>outcome</linkingObjectRole>
+  </linkingObjectIdentifier>
+</event>

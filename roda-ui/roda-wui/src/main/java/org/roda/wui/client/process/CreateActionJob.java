@@ -82,6 +82,7 @@ public class CreateActionJob extends CreateJob<IsIndexed> {
           list.addItem(messages.allRepresentations(), Representation.class.getName());
           list.addItem(messages.allFiles(), File.class.getName());
           list.addItem(messages.selectItems(), "select");
+          list.addItem(messages.noInputObjects(), Void.class.getName());
 
           list.addStyleName("form-selectbox");
           list.addStyleName("form-textbox-small");

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<event xmlns="http://www.loc.gov/premis/v3">
+  <eventIdentifier>
+    <eventIdentifierType>URN</eventIdentifierType>
+    <eventIdentifierValue>urn:roda:premis:event:12c7b9f8-13e5-48b3-adbd-ccc243e374f4</eventIdentifierValue>
+  </eventIdentifier>
+  <eventType>ingest start</eventType>
+  <eventDateTime>2016-07-13T14:06:39.77Z</eventDateTime>
+  <eventDetailInformation>
+    <eventDetail>The ingest process has started.</eventDetail>
+  </eventDetailInformation>
+  <eventOutcomeInformation>
+    <eventOutcome>SUCCESS</eventOutcome>
+    <eventOutcomeDetail>
+      <eventOutcomeDetailNote>The ingest process has started.</eventOutcomeDetailNote>
+    </eventOutcomeDetail>
+  </eventOutcomeInformation>
+  <linkingAgentIdentifier>
+    <linkingAgentIdentifierType>URN</linkingAgentIdentifierType>
+    <linkingAgentIdentifierValue>urn:roda:premis:agent:org.roda.core.plugins.plugins.ingest.ConfigurableIngestPlugin@1.0</linkingAgentIdentifierValue>
+  </linkingAgentIdentifier>
+  <linkingAgentIdentifier>
+    <linkingAgentIdentifierType>URN</linkingAgentIdentifierType>
+    <linkingAgentIdentifierValue>urn:roda:premis:agent:admin</linkingAgentIdentifierValue>
+  </linkingAgentIdentifier>
+  <linkingObjectIdentifier>
+    <linkingObjectIdentifierType>URN</linkingObjectIdentifierType>
+    <linkingObjectIdentifierValue>urn:roda:transferred_resource:curadoria digital 2016 - dbptk - idc0c47c9c-d807-4ee2-90f2-3a5a07b90015.zip</linkingObjectIdentifierValue>
+    <linkingObjectRole>source</linkingObjectRole>
+  </linkingObjectIdentifier>
+  <linkingObjectIdentifier>
+    <linkingObjectIdentifierType>URN</linkingObjectIdentifierType>
+    <linkingObjectIdentifierValue>urn:roda:aip:bf34344c-2e3e-46d9-8cbd-1b55cf47ad19</linkingObjectIdentifierValue>
+    <linkingObjectRole>outcome</linkingObjectRole>
+  </linkingObjectIdentifier>
+</event>

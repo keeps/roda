@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<event xmlns="http://www.loc.gov/premis/v3">
+  <eventIdentifier>
+    <eventIdentifierType>URN</eventIdentifierType>
+    <eventIdentifierValue>urn:roda:premis:event:ad552858-9d8c-48a9-9436-7f8f66770fee</eventIdentifierValue>
+  </eventIdentifier>
+  <eventType>authorization check</eventType>
+  <eventDateTime>2016-07-13T14:07:09.69Z</eventDateTime>
+  <eventDetailInformation>
+    <eventDetail>Producer permissions have been checked to ensure that he has sufficient authorization to store the AIP under the desired node of the classification scheme.</eventDetail>
+  </eventDetailInformation>
+  <eventOutcomeInformation>
+    <eventOutcome>SUCCESS</eventOutcome>
+    <eventOutcomeDetail>
+      <eventOutcomeDetailNote>The producer has enough permissions to deposit the AIP under the designated node of the classification scheme
+Done with checking producer authorization for AIP 5408d7a3-9efd-4616-9609-7f335d976489</eventOutcomeDetailNote>
+    </eventOutcomeDetail>
+  </eventOutcomeInformation>
+  <linkingAgentIdentifier>
+    <linkingAgentIdentifierType>URN</linkingAgentIdentifierType>
+    <linkingAgentIdentifierValue>urn:roda:premis:agent:org.roda.core.plugins.plugins.ingest.VerifyProducerAuthorizationPlugin@1.0</linkingAgentIdentifierValue>
+  </linkingAgentIdentifier>
+  <linkingAgentIdentifier>
+    <linkingAgentIdentifierType>URN</linkingAgentIdentifierType>
+    <linkingAgentIdentifierValue>urn:roda:premis:agent:admin</linkingAgentIdentifierValue>
+  </linkingAgentIdentifier>
+  <linkingObjectIdentifier>
+    <linkingObjectIdentifierType>URN</linkingObjectIdentifierType>
+    <linkingObjectIdentifierValue>urn:roda:aip:5408d7a3-9efd-4616-9609-7f335d976489</linkingObjectIdentifierValue>
+    <linkingObjectRole>outcome</linkingObjectRole>
+  </linkingObjectIdentifier>
+</event>

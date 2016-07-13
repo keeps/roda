@@ -233,6 +233,8 @@ public interface ClientMessages extends Messages {
 
   String selectItems();
 
+  String noInputObjects();
+
   String inspectTransferredResource();
 
   String identifierNotFound();
@@ -2107,13 +2109,12 @@ public interface ClientMessages extends Messages {
   String confirmChangeToFormTitle();
 
   String confirmChangeToFormMessage();
-  
-  String editDescriptiveMetadataTitle();
-  
-  String editDescriptionMetadataWarning();
-  
-  String editDescriptiveMetadataFormLabel();
 
+  String editDescriptiveMetadataTitle();
+
+  String editDescriptionMetadataWarning();
+
+  String editDescriptiveMetadataFormLabel();
 
   /************* TO BE ORGANIZED *************************/
 

@@ -53,12 +53,9 @@ public class GeneralCommandConvertPlugin<T extends IsRODAObject> extends Command
   }
 
   @Override
-  public String executePlugin(Path inputPath, Path outputPath, String fileFormat) {
-    try {
-      return GeneralCommandConvertPluginUtils.executeGeneralCommand(inputPath, outputPath, super.getCommandArguments());
-    } catch (IOException | CommandException e) {
-      return null;
-    }
+  public String executePlugin(Path inputPath, Path outputPath, String fileFormat)
+    throws CommandException, UnsupportedOperationException, IOException {
+    return GeneralCommandConvertPluginUtils.executeGeneralCommand(inputPath, outputPath, super.getCommandArguments());
   }
 
   @Override

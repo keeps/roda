@@ -27,7 +27,7 @@ import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
-import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
@@ -50,7 +50,7 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ReindexJobPlugin extends AbstractPlugin<Job> {
+public class ReindexJobPlugin extends AbstractPlugin<Void> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ReindexJobPlugin.class);
   private boolean clearIndexes = true;
@@ -104,7 +104,7 @@ public class ReindexJobPlugin extends AbstractPlugin<Job> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<Job> list)
+  public Report execute(IndexService index, ModelService model, StorageService storage, List<Void> list)
     throws PluginException {
 
     String reportId = UUID.randomUUID().toString();
@@ -236,7 +236,7 @@ public class ReindexJobPlugin extends AbstractPlugin<Job> {
   }
 
   @Override
-  public Plugin<Job> cloneMe() {
+  public Plugin<Void> cloneMe() {
     return new ReindexJobPlugin();
   }
 
@@ -277,7 +277,7 @@ public class ReindexJobPlugin extends AbstractPlugin<Job> {
   }
 
   @Override
-  public List<Class<Job>> getObjectClasses() {
-    return Arrays.asList(Job.class);
+  public List<Class<Void>> getObjectClasses() {
+    return Arrays.asList(Void.class);
   }
 }

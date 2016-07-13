@@ -238,6 +238,11 @@ public class Report implements Serializable, IsIndexed {
     return this;
   }
 
+  public Report addPluginDetails(String pluginDetails) {
+    this.pluginDetails += pluginDetails;
+    return this;
+  }
+
   public boolean isHtmlPluginDetails() {
     return htmlPluginDetails;
   }

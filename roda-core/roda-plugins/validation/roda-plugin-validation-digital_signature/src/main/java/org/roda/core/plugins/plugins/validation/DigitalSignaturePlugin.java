@@ -237,6 +237,8 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
                   String fileMimetype = ifile.getFileFormat().getMimeType();
                   String filePronom = ifile.getFileFormat().getPronom();
                   String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
+                  String fileInfoPath = StringUtils.join(Arrays.asList(aip.getId(), representation.getId(),
+                    StringUtils.join(file.getPath(), '/'), file.getId()), '/');
 
                   if (((filePronom != null && pronomToExtension.containsKey(filePronom))
                     || (fileMimetype != null && getMimetypeToExtension().containsKey(fileMimetype))
@@ -256,6 +258,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
 
                       if (!verification.equals("Passed") && verificationAffectsOnOutcome) {
                         reportState = PluginState.FAILURE;
+                        reportItem.addPluginDetails(" Signature validation failed on " + fileInfoPath + ".");
                       }
                     }
 
@@ -296,6 +299,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
                         LOGGER.debug("Process failed on file {} of representation {} from AIP {}", file.getId(),
                           representation.getId(), aip.getId());
                         reportState = PluginState.FAILURE;
+                        reportItem.addPluginDetails(" Signature validation stripping on " + fileInfoPath + ".");
                       }
                     }
                     IOUtils.closeQuietly(directAccess);
@@ -304,9 +308,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
                     unchangedFiles.add(file);
 
                     if (ignoreFiles) {
-                      ValidationIssue issue = new ValidationIssue(
-                        StringUtils.join(Arrays.asList(representation.getId(), file.getPath(), file.getId()), '/'));
-                      validationReport.addIssue(issue);
+                      validationReport.addIssue(new ValidationIssue(fileInfoPath));
                     } else {
                       reportState = PluginState.FAILURE;
                       hasNonPdfFiles = true;
@@ -340,13 +342,15 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
           jobPluginInfo.incrementObjectsProcessed(reportState);
           reportItem.setPluginState(reportState);
 
-          if (ignoreFiles && validationReport.getIssues().size() > 0) {
-            reportItem.setHtmlPluginDetails(true)
-              .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
-          }
+          if (!reportState.equals(PluginState.FAILURE)) {
+            if (ignoreFiles && validationReport.getIssues().size() > 0) {
+              reportItem.setHtmlPluginDetails(true)
+                .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
+            }
 
-          if (hasNonPdfFiles) {
-            reportItem.setPluginDetails("Non PDF files were not ignored");
+            if (hasNonPdfFiles) {
+              reportItem.setPluginDetails("Non PDF files were not ignored");
+            }
           }
 
         } catch (Throwable e) {
@@ -414,6 +418,8 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
                 String fileMimetype = ifile.getFileFormat().getMimeType();
                 String filePronom = ifile.getFileFormat().getPronom();
                 String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
+                String fileInfoPath = StringUtils.join(
+                  Arrays.asList(representation.getId(), StringUtils.join(file.getPath(), '/'), file.getId()), '/');
 
                 if (((filePronom != null && pronomToExtension.containsKey(filePronom))
                   || (fileMimetype != null && getMimetypeToExtension().containsKey(fileMimetype))
@@ -433,6 +439,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
 
                     if (!verification.equals("Passed") && verificationAffectsOnOutcome) {
                       reportState = PluginState.FAILURE;
+                      reportItem.addPluginDetails(" Signature validation failed on " + fileInfoPath + ".");
                     }
                   }
 
@@ -475,6 +482,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
                       LOGGER.debug("Process failed on file {} of representation {} from AIP {}", file.getId(),
                         representation.getId(), aipId);
                       reportState = PluginState.FAILURE;
+                      reportItem.addPluginDetails(" Signature validation stripping on " + fileInfoPath + ".");
                     }
                   }
                   IOUtils.closeQuietly(directAccess);
@@ -482,7 +490,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
                   unchangedFiles.add(file);
 
                   if (ignoreFiles) {
-                    validationReport.addIssue(new ValidationIssue(file.getId()));
+                    validationReport.addIssue(new ValidationIssue(fileInfoPath));
                   } else {
                     reportState = PluginState.FAILURE;
                     hasNonPdfFiles = true;
@@ -513,13 +521,15 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
           reportItem.setPluginState(reportState);
           jobPluginInfo.incrementObjectsProcessed(reportState);
 
-          if (ignoreFiles) {
-            reportItem.setHtmlPluginDetails(true)
-              .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
-          }
+          if (!reportState.equals(PluginState.FAILURE)) {
+            if (ignoreFiles) {
+              reportItem.setHtmlPluginDetails(true)
+                .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
+            }
 
-          if (hasNonPdfFiles) {
-            reportItem.setPluginDetails("Non PDF files were not ignored");
+            if (hasNonPdfFiles) {
+              reportItem.setPluginDetails("Non PDF files were not ignored");
+            }
           }
 
         } catch (Throwable e) {
@@ -598,6 +608,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
 
                 if (!verification.equals("Passed") && verificationAffectsOnOutcome) {
                   reportState = PluginState.FAILURE;
+                  reportItem.addPluginDetails("Signature validation failed on " + file.getId() + ".");
                 }
               }
 
@@ -645,19 +656,20 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
 
                   reportState = PluginState.FAILURE;
                   reportItem.setPluginState(reportState)
-                    .setPluginDetails("Convert process failed on file " + file.getId() + " of representation "
-                      + file.getRepresentationId() + " from AIP " + file.getAipId());
+                    .addPluginDetails(" Signature validation stripping on " + file.getId() + ".");
                 }
               }
               IOUtils.closeQuietly(directAccess);
             } else {
               unchangedFiles.add(file);
 
-              if (ignoreFiles) {
-                reportItem.setPluginDetails("This file was ignored.");
-              } else {
-                reportState = PluginState.FAILURE;
-                reportItem.setPluginDetails("This file was not ignored.");
+              if (!reportState.equals(PluginState.FAILURE)) {
+                if (ignoreFiles) {
+                  reportItem.setPluginDetails("This file was ignored.");
+                } else {
+                  reportState = PluginState.FAILURE;
+                  reportItem.setPluginDetails("This file was not ignored.");
+                }
               }
             }
           }

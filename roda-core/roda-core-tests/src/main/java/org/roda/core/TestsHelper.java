@@ -7,28 +7,38 @@
  */
 package org.roda.core;
 
-import org.testng.AssertJUnit;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileAttribute;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.Is;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.SimpleFilterParameter;
+import org.roda.core.data.adapter.sort.Sorter;
+import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.index.IndexService;
 import org.roda.core.plugins.Plugin;
+import org.testng.AssertJUnit;
 
 public final class TestsHelper {
   private TestsHelper() {
@@ -83,4 +93,35 @@ public final class TestsHelper {
     return jobUpdated;
 
   }
+
+  public static List<Report> testJobReports(IndexService index, Job job)
+    throws GenericException, RequestNotValidException {
+    return testJobReports(index, job, 10);
+  }
+
+  public static List<Report> testJobReports(IndexService index, Job job, int maxObjects)
+    throws GenericException, RequestNotValidException {
+
+    index.commit(Job.class);
+    index.commit(Report.class);
+
+    IndexResult<Report> indexReports = index.find(Report.class,
+      new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId())), Sorter.NONE,
+      new Sublist(0, maxObjects));
+
+    List<Report> reports = indexReports.getResults();
+
+    for (Report report : reports) {
+      for (Report childReport : report.getReports()) {
+        if (childReport.getPluginState().equals(PluginState.FAILURE)
+          || childReport.getPluginState().equals(PluginState.PARTIAL_SUCCESS)) {
+          String details = childReport.getPluginDetails();
+          AssertJUnit.fail(details);
+        }
+      }
+    }
+
+    return reports;
+  }
+
 }

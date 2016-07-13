@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<v3:object xsi:type="v3:file" xmlns:v3="http://www.loc.gov/premis/v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <v3:objectIdentifier>
+    <v3:objectIdentifierType>URN</v3:objectIdentifierType>
+    <v3:objectIdentifierValue>urn:roda:premis:file:0b1f6d19-71e9-3abd-b7c2-dcc3c7935bf1</v3:objectIdentifierValue>
+  </v3:objectIdentifier>
+  <v3:preservationLevel>
+    <v3:preservationLevelValue>full</v3:preservationLevelValue>
+  </v3:preservationLevel>
+  <v3:objectCharacteristics>
+    <v3:fixity>
+      <v3:messageDigestAlgorithm>SHA-256</v3:messageDigestAlgorithm>
+      <v3:messageDigest>39DB2DF3762DFEE99646F1D5396380D1C0C1EE58B1A8718EFECCC16B908CC836</v3:messageDigest>
+      <v3:messageDigestOriginator>RODA</v3:messageDigestOriginator>
+    </v3:fixity>
+    <v3:size>1641863</v3:size>
+    <v3:format>
+      <v3:formatDesignation>
+        <v3:formatName>Acrobat PDF 1.5 - Portable Document Format</v3:formatName>
+        <v3:formatVersion>1.5</v3:formatVersion>
+      </v3:formatDesignation>
+    </v3:format>
+    <v3:format>
+      <v3:formatRegistry>
+        <v3:formatRegistryName>pronom</v3:formatRegistryName>
+        <v3:formatRegistryKey>fmt/19</v3:formatRegistryKey>
+      </v3:formatRegistry>
+    </v3:format>
+    <v3:format>
+      <v3:formatRegistry>
+        <v3:formatRegistryName>mime</v3:formatRegistryName>
+        <v3:formatRegistryKey>application/pdf</v3:formatRegistryKey>
+      </v3:formatRegistry>
+    </v3:format>
+  </v3:objectCharacteristics>
+  <v3:originalName>Curadoria Digital 2016 - RODA-in.pdf</v3:originalName>
+  <v3:storage>
+    <v3:contentLocation>
+      <v3:contentLocationType/>
+      <v3:contentLocationValue/>
+    </v3:contentLocation>
+  </v3:storage>
+</v3:object>

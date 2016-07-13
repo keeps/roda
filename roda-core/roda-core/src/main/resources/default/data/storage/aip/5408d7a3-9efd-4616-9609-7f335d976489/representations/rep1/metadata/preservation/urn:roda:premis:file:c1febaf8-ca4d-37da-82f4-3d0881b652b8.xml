@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<v3:object xsi:type="v3:file" xmlns:v3="http://www.loc.gov/premis/v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <v3:objectIdentifier>
+    <v3:objectIdentifierType>URN</v3:objectIdentifierType>
+    <v3:objectIdentifierValue>urn:roda:premis:file:c1febaf8-ca4d-37da-82f4-3d0881b652b8</v3:objectIdentifierValue>
+  </v3:objectIdentifier>
+  <v3:preservationLevel>
+    <v3:preservationLevelValue>full</v3:preservationLevelValue>
+  </v3:preservationLevel>
+  <v3:objectCharacteristics>
+    <v3:fixity>
+      <v3:messageDigestAlgorithm>SHA-256</v3:messageDigestAlgorithm>
+      <v3:messageDigest>E927BE605C121C108D5C87D519FBA570CBE83450AAF98C1C374BCF3187CB8C5F</v3:messageDigest>
+      <v3:messageDigestOriginator>RODA</v3:messageDigestOriginator>
+    </v3:fixity>
+    <v3:size>3112289</v3:size>
+    <v3:format>
+      <v3:formatDesignation>
+        <v3:formatName>Acrobat PDF 1.5 - Portable Document Format</v3:formatName>
+        <v3:formatVersion>1.5</v3:formatVersion>
+      </v3:formatDesignation>
+    </v3:format>
+    <v3:format>
+      <v3:formatRegistry>
+        <v3:formatRegistryName>pronom</v3:formatRegistryName>
+        <v3:formatRegistryKey>fmt/19</v3:formatRegistryKey>
+      </v3:formatRegistry>
+    </v3:format>
+    <v3:format>
+      <v3:formatRegistry>
+        <v3:formatRegistryName>mime</v3:formatRegistryName>
+        <v3:formatRegistryKey>application/pdf</v3:formatRegistryKey>
+      </v3:formatRegistry>
+    </v3:format>
+  </v3:objectCharacteristics>
+  <v3:originalName>SCAPE_MS63_KEEPS-V1.0.pdf</v3:originalName>
+  <v3:storage>
+    <v3:contentLocation>
+      <v3:contentLocationType/>
+      <v3:contentLocationValue/>
+    </v3:contentLocation>
+  </v3:storage>
+</v3:object>

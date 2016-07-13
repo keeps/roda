@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<event xmlns="http://www.loc.gov/premis/v3">
+  <eventIdentifier>
+    <eventIdentifierType>URN</eventIdentifierType>
+    <eventIdentifierValue>urn:roda:premis:event:c3803adf-2b54-43a4-8059-21847818e9dc</eventIdentifierValue>
+  </eventIdentifier>
+  <eventType>virus check</eventType>
+  <eventDateTime>2016-07-13T14:07:08.95Z</eventDateTime>
+  <eventDetailInformation>
+    <eventDetail>Scanned package for malicious programs using ClamAV.</eventDetail>
+  </eventDetailInformation>
+  <eventOutcomeInformation>
+    <eventOutcome>SUCCESS</eventOutcome>
+    <eventOutcomeDetail>
+      <eventOutcomeDetailNote>The package does not contain any known malicious programs.
+/home/nvieira/.roda/data/storage/aip/5408d7a3-9efd-4616-9609-7f335d976489: OK
+
+----------- SCAN SUMMARY -----------
+Infected files: 0
+Time: 0.493 sec (0 m 0 s)</eventOutcomeDetailNote>
+    </eventOutcomeDetail>
+  </eventOutcomeInformation>
+  <linkingAgentIdentifier>
+    <linkingAgentIdentifierType>URN</linkingAgentIdentifierType>
+    <linkingAgentIdentifierValue>urn:roda:premis:agent:org.roda.core.plugins.plugins.antivirus.AntivirusPlugin@ClamAV 0.98.7/21895/Wed Jul 13 11:48:11 2016</linkingAgentIdentifierValue>
+  </linkingAgentIdentifier>
+  <linkingAgentIdentifier>
+    <linkingAgentIdentifierType>URN</linkingAgentIdentifierType>
+    <linkingAgentIdentifierValue>urn:roda:premis:agent:admin</linkingAgentIdentifierValue>
+  </linkingAgentIdentifier>
+  <linkingObjectIdentifier>
+    <linkingObjectIdentifierType>URN</linkingObjectIdentifierType>
+    <linkingObjectIdentifierValue>urn:roda:aip:5408d7a3-9efd-4616-9609-7f335d976489</linkingObjectIdentifierValue>
+    <linkingObjectRole>outcome</linkingObjectRole>
+  </linkingObjectIdentifier>
+</event>

@@ -165,8 +165,8 @@ public class ShowJobReport extends Composite {
         sourceObjectLabel.setText(messages.showAIPExtended());
 
       } else if (Representation.class.getName().equals(jobReport.getSourceObjectClass())) {
-        BrowserService.Util.getInstance().retrieve(IndexedRepresentation.class.getName(),
-          sourceObject.getText(), new AsyncCallback<IndexedRepresentation>() {
+        BrowserService.Util.getInstance().retrieve(IndexedRepresentation.class.getName(), sourceObject.getText(),
+          new AsyncCallback<IndexedRepresentation>() {
 
             @Override
             public void onFailure(Throwable caught) {

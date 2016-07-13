@@ -642,7 +642,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   private SelectedItems getAllItemsByClass(String selectedClass) {
-    if (selectedClass == null) {
+    if (selectedClass == null || Void.class.getName().equals(selectedClass)) {
       return new SelectedItemsNone<>();
     } else {
       return new SelectedItemsAll<>(selectedClass);
