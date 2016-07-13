@@ -73,7 +73,7 @@ public class RisksResource {
       Facets.NONE, user, justActive);
 
     // transform controller method output
-    List<IndexedRisk> risks = org.roda.wui.api.controllers.Risks.retrieveRisks(listRisksIndexResult);
+    List<IndexedRisk> risks = org.roda.wui.api.controllers.Risks.retrieveRisks(user, listRisksIndexResult);
 
     return Response.ok(risks, mediaType).build();
   }

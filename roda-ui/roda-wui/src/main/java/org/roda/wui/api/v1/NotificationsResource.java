@@ -73,7 +73,7 @@ public class NotificationsResource {
 
     // transform controller method output
     List<Notification> notifications = org.roda.wui.api.controllers.Notifications
-      .retrieveNotifications(listNotificationsIndexResult);
+      .retrieveNotifications(user, listNotificationsIndexResult);
 
     return Response.ok(notifications, mediaType).build();
   }

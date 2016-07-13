@@ -71,8 +71,12 @@ public class Risks extends RodaCoreService {
     registerAction(user, RISKS_COMPONENT, "deleteRisk", null, duration, "riskId", riskId);
   }
 
-  public static List<IndexedRisk> retrieveRisks(IndexResult<IndexedRisk> listRisksIndexResult) {
-    // TODO: this method should also checkRoles? If so, a RodaUser is needed.
+  public static List<IndexedRisk> retrieveRisks(RodaUser user, IndexResult<IndexedRisk> listRisksIndexResult)
+    throws AuthorizationDeniedException {
+
+    // check user permissions
+    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+
     List<IndexedRisk> risks = new ArrayList<IndexedRisk>();
     for (IndexedRisk risk : listRisksIndexResult.getResults()) {
       risks.add(risk);

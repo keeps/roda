@@ -44,7 +44,7 @@ public class Formats extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    UserUtility.checkRoles(user, new Object() {}.getClass().getEnclosingMethod());
 
     RodaCoreFactory.getModelService().createFormat(format, false);
 
@@ -60,7 +60,7 @@ public class Formats extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    UserUtility.checkRoles(user, new Object() {}.getClass().getEnclosingMethod());
 
     // delegate
     RodaCoreFactory.getModelService().deleteFormat(formatId, false);
@@ -70,8 +70,12 @@ public class Formats extends RodaCoreService {
     registerAction(user, FORMATS_COMPONENT, "deleteFormat", null, duration, "formatId", formatId);
   }
 
-  public static List<Format> retrieveFormats(IndexResult<Format> listFormatsIndexResult) {
-    // TODO: this method should also checkRoles? If so, a RodaUser is needed.
+  public static List<Format> retrieveFormats(RodaUser user, IndexResult<Format> listFormatsIndexResult)
+    throws AuthorizationDeniedException {
+
+    // check user permissions
+    UserUtility.checkRoles(user, new Object() {}.getClass().getEnclosingMethod());
+
     List<Format> formats = new ArrayList<Format>();
     for (Format format : listFormatsIndexResult.getResults()) {
       formats.add(format);
