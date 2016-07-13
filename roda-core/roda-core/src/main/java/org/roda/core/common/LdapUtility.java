@@ -1479,11 +1479,9 @@ public class LdapUtility {
       ctxRoot.close();
 
     } catch (NameAlreadyBoundException e) {
-      LOGGER.debug("Role " + roleName + " already exists.", e);
       throw new RoleAlreadyExistsException("Role " + roleName + " already exists.", e);
     } catch (NamingException e) {
-      LOGGER.debug("Error adding role " + roleName, e);
-      throw new LdapUtilityException("Error adding role " + roleName, e);
+      throw new LdapUtilityException("Error adding role '" + roleName + "'", e);
     }
 
   }

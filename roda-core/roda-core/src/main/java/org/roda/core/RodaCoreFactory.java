@@ -842,11 +842,17 @@ public class RodaCoreFactory {
   }
 
   /**
-   * For each role in roda-roles.properties create the role in LDAP if it don't exist already.
-   * @param rodaConfig roda configuration
-   * @param ldapUtility LDAP utility class.
-     */
-  private static void createRoles(Configuration rodaConfig, LdapUtility ldapUtility) {
+   * For each role in roda-roles.properties create the role in LDAP if it don't
+   * exist already.
+   * 
+   * @param rodaConfig
+   *          roda configuration
+   * @param ldapUtility
+   *          LDAP utility class.
+   * @throws GenericException
+   *           if something unexpected happens creating roles.
+   */
+  private static void createRoles(Configuration rodaConfig, LdapUtility ldapUtility) throws GenericException {
     final Iterator<String> keys = rodaConfig.getKeys("core.roles");
     final Set<String> roles = new HashSet<>();
     while (keys.hasNext()) {
@@ -855,11 +861,11 @@ public class RodaCoreFactory {
     for (final String role : roles) {
       try {
         ldapUtility.addRole(role);
-        LOGGER.info("Created LDAP role " + role);
+        LOGGER.info("Created LDAP role {}", role);
       } catch (RoleAlreadyExistsException e) {
-        LOGGER.debug("Role " + role + " already exists.", e);
+        LOGGER.info("Role {} already exists.", role);
       } catch (LdapUtilityException e) {
-        LOGGER.warn("Unexpected error creating role " + role + " - " + e.getMessage(), e);
+        throw new GenericException("Error creating role '" + role + "'", e);
       }
     }
   }
