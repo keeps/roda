@@ -8,9 +8,10 @@ before_script:
   - echo "deb http://dl.bintray.com/siegfried/debian wheezy main" | sudo tee -a /etc/apt/sources.list
   - sudo apt-get update -qq
   - sudo apt-get install siegfried -y
+  - sf -update
   # Install Clam Anti Virus
   - sudo apt-get install clamav clamav-daemon -y
-  - sudo freshclam 
+  - sudo freshclam
   # Install Avconv
   - sudo apt-get install libav-tools -y
   # Install ImageMagick
