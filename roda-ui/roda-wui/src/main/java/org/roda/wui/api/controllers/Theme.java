@@ -31,7 +31,6 @@ import org.roda.wui.common.RodaCoreService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// TODO: the methods in this class should also checkRoles? If so, a RodaUser is needed.
 public class Theme extends RodaCoreService {
 
   @SuppressWarnings("unused")
