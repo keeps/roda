@@ -1277,6 +1277,7 @@ public class BrowserHelper {
         if (version != null) {
           key += "." + version;
         }
+
         String label = messages.getTranslation(key, type);
         InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(RodaConstants.METADATA_TEMPLATE_FOLDER
           + "/" + ((version != null) ? type + RodaConstants.METADATA_VERSION_SEPARATOR + version : type)
