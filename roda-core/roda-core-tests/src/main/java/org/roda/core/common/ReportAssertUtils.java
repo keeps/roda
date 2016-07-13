@@ -7,7 +7,6 @@
  */
 package org.roda.core.common;
 
-import org.testng.AssertJUnit;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -15,6 +14,7 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.testng.AssertJUnit;
 
 public class ReportAssertUtils {
   public static void assertReports(List<Report> reports, List<String> outcomeObjectIds) {

@@ -238,7 +238,7 @@ public class RodaCoreFactory {
         LOGGER.debug("RODA HOME is {}", rodaHomePath);
 
         // instantiate essential directories
-        instantiateEssentialDirectories();
+        instantiateEssentialDirectories(nodeType);
         LOGGER.debug("Finished instantiating essential directories");
 
         // load core configurations
@@ -372,7 +372,7 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void instantiateEssentialDirectories() {
+  private static void instantiateEssentialDirectories(NodeType nodeType) {
     List<Path> essentialDirectories = new ArrayList<Path>();
     essentialDirectories.add(configPath);
     essentialDirectories.add(rodaHomePath.resolve(RodaConstants.CORE_LOG_FOLDER));
@@ -393,20 +393,22 @@ public class RodaCoreFactory {
       }
     }
 
-    // copy configs folder from classpath to example folder
-    try {
+    if (!nodeType.equals(NodeType.TEST)) {
+      // copy configs folder from classpath to example folder
       try {
-        FSUtils.deletePath(exampleConfigPath);
-      } catch (NotFoundException e) {
-        // do nothing and carry on
+        try {
+          FSUtils.deletePath(exampleConfigPath);
+        } catch (NotFoundException e) {
+          // do nothing and carry on
+        }
+        Files.createDirectories(exampleConfigPath);
+        copyFilesFromClasspath(RodaConstants.CORE_CONFIG_FOLDER + "/", exampleConfigPath, true,
+          Arrays.asList(RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_LDAP_FOLDER,
+            RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER));
+      } catch (GenericException | IOException e) {
+        LOGGER.error("Unable to create " + exampleConfigPath, e);
+        instantiatedWithoutErrors = false;
       }
-      Files.createDirectories(exampleConfigPath);
-      copyFilesFromClasspath(RodaConstants.CORE_CONFIG_FOLDER + "/", exampleConfigPath, true,
-        Arrays.asList(RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_LDAP_FOLDER,
-          RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER));
-    } catch (GenericException | IOException e) {
-      LOGGER.error("Unable to create " + exampleConfigPath, e);
-      instantiatedWithoutErrors = false;
     }
 
   }

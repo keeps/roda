@@ -149,7 +149,7 @@
 		<poi.version>3.13</poi.version>
 		<commons_ip.version>1.0.0-alpha15.2</commons_ip.version>
 		<roda_community_url>http://roda-community.org</roda_community_url>
-		<testng.groups>all-tests</testng.groups>
+		<testng.groups>all</testng.groups>
 	</properties>
 	<profiles>
 		<profile>
@@ -938,8 +938,13 @@
 				<version>9.6.0-7</version>
 			</dependency>
 			<dependency>
+			    <groupId>org.hamcrest</groupId>
+			    <artifactId>hamcrest-core</artifactId>
+			    <version>1.3</version>
+			  </dependency>
+			<dependency>
 				<groupId>org.mockito</groupId>
-				<artifactId>mockito-all</artifactId>
+				<artifactId>mockito-core</artifactId>
 				<version>1.10.19</version>
 				<scope>test</scope>
 			</dependency>

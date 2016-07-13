@@ -7,7 +7,6 @@
  */
 package org.roda.core.index;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNotNull;
 import static org.testng.AssertJUnit.assertTrue;
@@ -28,6 +27,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.roda.core.CorporaConstants;
@@ -77,8 +77,8 @@ import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 @Test(groups = {"all", "travis"})
@@ -94,7 +94,7 @@ public class IndexServiceTest {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IndexServiceTest.class);
 
-  @BeforeClass
+  @BeforeMethod
   public static void setUp() throws Exception {
     basePath = TestsHelper.createBaseTempDir(IndexServiceTest.class, true);
 
@@ -118,7 +118,7 @@ public class IndexServiceTest {
     LOGGER.debug("Running index tests under storage {}", basePath);
   }
 
-  @AfterClass
+  @AfterMethod
   public static void tearDown() throws Exception {
     RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
@@ -201,7 +201,7 @@ public class IndexServiceTest {
     }
 
     List<String> representationIds = aip.getRepresentations().stream().map(r -> r.getId()).collect(Collectors.toList());
-    assertThat(sro_IDs, Matchers.contains(representationIds.toArray()));
+    MatcherAssert.assertThat(sro_IDs, Matchers.contains(representationIds.toArray()));
 
     /*
      * filterMimetype.add(new SimpleFilterParameter(RodaConstants.SRFM_MIMETYPE,
@@ -339,7 +339,7 @@ public class IndexServiceTest {
 
     IndexedAIP aip = index.retrieve(IndexedAIP.class, CorporaConstants.OTHER_AIP_ID);
     List<IndexedAIP> ancestors = index.getAncestors(aip);
-    assertThat(ancestors,
+    MatcherAssert.assertThat(ancestors,
       Matchers.hasItem(Matchers.<IndexedAIP> hasProperty("id", Matchers.equalTo(CorporaConstants.SOURCE_AIP_ID))));
   }
 
@@ -352,13 +352,15 @@ public class IndexServiceTest {
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
+    index.commitAIPs();
+
     Filter filter = new Filter();
     filter.add(new SimpleFilterParameter(RodaConstants.AIP_LEVEL, "fonds"));
     filter.add(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
     IndexResult<IndexedAIP> findDescriptiveMetadata = index.find(IndexedAIP.class, filter, null, new Sublist(), null);
 
     assertNotNull(findDescriptiveMetadata);
-    assertThat(findDescriptiveMetadata.getResults(), IsCollectionWithSize.hasSize(1));
+    MatcherAssert.assertThat(findDescriptiveMetadata.getResults(), IsCollectionWithSize.hasSize(1));
 
     // cleanup
     model.deleteAIP(aipId);
@@ -389,11 +391,11 @@ public class IndexServiceTest {
 
     Filter filterDescription = new Filter();
     filterDescription.add(new SimpleFilterParameter(RodaConstants.LOG_ID, "ID"));
-    assertThat(index.count(LogEntry.class, filterDescription), Matchers.is(1L));
+    MatcherAssert.assertThat(index.count(LogEntry.class, filterDescription), Matchers.is(1L));
 
     Filter filterDescription2 = new Filter();
     filterDescription2.add(new SimpleFilterParameter(RodaConstants.LOG_ID, "ID2"));
-    assertThat(index.count(LogEntry.class, filterDescription2), Matchers.is(0L));
+    MatcherAssert.assertThat(index.count(LogEntry.class, filterDescription2), Matchers.is(0L));
   }
 
   @Test
@@ -462,16 +464,18 @@ public class IndexServiceTest {
     Filter f1 = new Filter();
     f1.add(new SimpleFilterParameter(RodaConstants.LOG_ACTION_COMPONENT, "ACTION:0"));
     IndexResult<LogEntry> entries1 = index.find(LogEntry.class, f1, null, new Sublist(0, 10), null);
-    assertThat(entries1.getTotalCount(), Matchers.is(1L));
+    MatcherAssert.assertThat(entries1.getTotalCount(), Matchers.is(1L));
     Filter f2 = new Filter();
     f2.add(new SimpleFilterParameter(RodaConstants.LOG_ADDRESS, "ADDRESS"));
     IndexResult<LogEntry> entries2 = index.find(LogEntry.class, f2, null, new Sublist(0, 10), null);
-    assertThat(entries2.getTotalCount(), Matchers.is(number));
+    MatcherAssert.assertThat(entries2.getTotalCount(), Matchers.is(number));
   }
 
   @Test
   public void testReindexAIP() throws ParseException, RequestNotValidException, GenericException,
     AuthorizationDeniedException, AlreadyExistsException, NotFoundException, ValidationException {
+    index.clearIndex(RodaConstants.INDEX_AIP);
+
     for (int i = 0; i < 10; i++) {
       final String aipId = UUID.randomUUID().toString();
       model.createAIP(aipId, corporaService,
@@ -479,7 +483,6 @@ public class IndexServiceTest {
     }
 
     index.reindexAIPs();
-
     long count = index.count(IndexedAIP.class, new Filter());
     assertEquals(10L, count);
 
@@ -526,12 +529,12 @@ public class IndexServiceTest {
     Filter filterUSER1 = new Filter();
     filterUSER1.add(new SimpleFilterParameter(RodaConstants.MEMBERS_NAME, "NAMEUSER0"));
     filterUSER1.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, "true"));
-    assertThat(index.count(RODAMember.class, filterUSER1), Matchers.is(1L));
+    MatcherAssert.assertThat(index.count(RODAMember.class, filterUSER1), Matchers.is(1L));
 
     Filter filterGroup = new Filter();
     filterGroup.add(new SimpleFilterParameter(RodaConstants.MEMBERS_NAME, "NAMEGROUP1"));
     filterGroup.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, "false"));
-    assertThat(index.count(RODAMember.class, filterGroup), Matchers.is(1L));
+    MatcherAssert.assertThat(index.count(RODAMember.class, filterGroup), Matchers.is(1L));
 
   }
 
@@ -700,61 +703,61 @@ public class IndexServiceTest {
 
   @Test
   public void testFormatIndex() throws RODAException {
-      Format format = new Format();
-      format.setName("Portable Document Format");
-      format.setDefinition("PDF definition");
-      format.setCategories(Arrays.asList("Page Layout Files"));
-      format.setLatestVersion("1.7");
-      format.setPopularity(4);
-      format.setDeveloper("Adobe Systems");
-      format.setInitialRelease(new Date());
-      format.setStandard("ISO 32000-1");
-      format.setOpenFormat(true);
-      format.setWebsites(Arrays.asList("https://www.adobe.com/devnet/pdf/pdf_reference_archive.html"));
-      format.setProvenanceInformation("https://en.wikipedia.org/wiki/Portable_Document_Format");
+    Format format = new Format();
+    format.setName("Portable Document Format");
+    format.setDefinition("PDF definition");
+    format.setCategories(Arrays.asList("Page Layout Files"));
+    format.setLatestVersion("1.7");
+    format.setPopularity(4);
+    format.setDeveloper("Adobe Systems");
+    format.setInitialRelease(new Date());
+    format.setStandard("ISO 32000-1");
+    format.setOpenFormat(true);
+    format.setWebsites(Arrays.asList("https://www.adobe.com/devnet/pdf/pdf_reference_archive.html"));
+    format.setProvenanceInformation("https://en.wikipedia.org/wiki/Portable_Document_Format");
 
-      List<String> extensions = new ArrayList<String>();
-      extensions.add(".pdf");
-      format.setExtensions(extensions);
+    List<String> extensions = new ArrayList<String>();
+    extensions.add(".pdf");
+    format.setExtensions(extensions);
 
-      List<String> mimetypes = new ArrayList<String>();
-      mimetypes.add("application/pdf");
-      format.setMimetypes(mimetypes);
+    List<String> mimetypes = new ArrayList<String>();
+    mimetypes.add("application/pdf");
+    format.setMimetypes(mimetypes);
 
-      List<String> pronoms = new ArrayList<String>();
-      pronoms.add("fmt/100");
-      format.setPronoms(pronoms);
+    List<String> pronoms = new ArrayList<String>();
+    pronoms.add("fmt/100");
+    format.setPronoms(pronoms);
 
-      List<String> utis = new ArrayList<String>();
-      utis.add("com.adobe.pdf");
-      format.setUtis(utis);
+    List<String> utis = new ArrayList<String>();
+    utis.add("com.adobe.pdf");
+    format.setUtis(utis);
 
-      model.createFormat(format, false);
+    model.createFormat(format, false);
 
-      index.commit(Format.class);
+    index.commit(Format.class);
 
-      Format format2 = model.retrieveFormat(format.getId());
-      assertNotNull(format2);
-      assertEquals(format.getId(), format2.getId());
-      assertEquals(format.getName(), format2.getName());
+    Format format2 = model.retrieveFormat(format.getId());
+    assertNotNull(format2);
+    assertEquals(format.getId(), format2.getId());
+    assertEquals(format.getName(), format2.getName());
 
-      IndexResult<Format> find = index.find(Format.class, null, null, new Sublist(0, 10));
-      assertEquals(1, find.getTotalCount());
+    IndexResult<Format> find = index.find(Format.class, null, null, new Sublist(0, 10));
+    assertEquals(1, find.getTotalCount());
 
-      Format format3 = index.retrieve(Format.class, format.getId());
-      assertNotNull(format3);
-      assertEquals(format.getId(), format3.getId());
-      assertEquals(format.getName(), format3.getName());
+    Format format3 = index.retrieve(Format.class, format.getId());
+    assertNotNull(format3);
+    assertEquals(format.getId(), format3.getId());
+    assertEquals(format.getName(), format3.getName());
 
-      format3.setName("Format New Name");
-      model.updateFormat(format3, false);
+    format3.setName("Format New Name");
+    model.updateFormat(format3, false);
 
-      Format format4 = index.retrieve(Format.class, format.getId());
-      assertNotNull(format4);
-      assertEquals(format.getId(), format4.getId());
-      assertEquals(format4.getName(), "Format New Name");
+    Format format4 = index.retrieve(Format.class, format.getId());
+    assertNotNull(format4);
+    assertEquals(format.getId(), format4.getId());
+    assertEquals(format4.getName(), "Format New Name");
 
-      model.deleteFormat(format.getId(), false);
+    model.deleteFormat(format.getId(), false);
 
   }
 

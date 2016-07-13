@@ -35,7 +35,7 @@
 					<useSystemClassLoader>true</useSystemClassLoader>
 					<useManifestOnlyJar>false</useManifestOnlyJar>
 					<suiteXmlFiles>
-	                    <suiteXmlFile>../../../roda-core-tests/testng.xml</suiteXmlFile>
+	                    <suiteXmlFile>testng.xml</suiteXmlFile>
 	                </suiteXmlFiles>
 	                <groups>${testng.groups}</groups>
 				</configuration>
