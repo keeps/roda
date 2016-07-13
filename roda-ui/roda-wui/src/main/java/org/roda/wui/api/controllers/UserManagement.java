@@ -321,7 +321,9 @@ public class UserManagement extends RodaCoreService {
     registerAction(user, "UserManagement", "removeGroup", null, duration, "groupname", groupname);
   }
 
-  // TODO: methods bellow this line should also checkRoles? If so, a RodaUser is needed.
+  // TODO: Methods bellow this line should also checkRoles? If so, a RodaUser is needed.
+  // TODO: The methods that call these methods don't have a RodaUser either.
+  // TODO: From where should the RodaUser come from?
 
   public static void sendEmailVerification(String servletPath, String username)
     throws GenericException, NotFoundException {

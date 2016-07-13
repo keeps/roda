@@ -45,7 +45,7 @@ public class Notifications extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    UserUtility.checkRoles(user, new Object() {}.getClass().getEnclosingMethod());
 
     RodaCoreFactory.getModelService().createNotification(notification, "test-email-template",
       new HashMap<String, Object>());
@@ -62,7 +62,7 @@ public class Notifications extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    UserUtility.checkRoles(user, new Object() {}.getClass().getEnclosingMethod());
 
     // delegate
     RodaCoreFactory.getModelService().deleteNotification(notificationId);
@@ -73,8 +73,12 @@ public class Notifications extends RodaCoreService {
       notificationId);
   }
 
-  public static List<Notification> retrieveNotifications(IndexResult<Notification> listNotificationsIndexResult) {
-    // TODO: this method should also checkRoles? If so, a RodaUser is needed.
+  public static List<Notification> retrieveNotifications(RodaUser user,
+    IndexResult<Notification> listNotificationsIndexResult) throws AuthorizationDeniedException {
+
+    // check user permissions
+    UserUtility.checkRoles(user, new Object() {}.getClass().getEnclosingMethod());
+
     List<Notification> notifications = new ArrayList<Notification>();
     for (Notification notification : listNotificationsIndexResult.getResults()) {
       notifications.add(notification);
@@ -87,7 +91,7 @@ public class Notifications extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    UserUtility.checkRoles(user, new Object() {}.getClass().getEnclosingMethod());
 
     // delegate
     RodaCoreFactory.getModelService().acknowledgeNotification(notificationId, token, email);

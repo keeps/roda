@@ -73,7 +73,7 @@ public class FormatsResource {
       justActive);
 
     // transform controller method output
-    List<Format> formats = org.roda.wui.api.controllers.Formats.retrieveFormats(listFormatsIndexResult);
+    List<Format> formats = org.roda.wui.api.controllers.Formats.retrieveFormats(user, listFormatsIndexResult);
 
     return Response.ok(formats, mediaType).build();
   }
