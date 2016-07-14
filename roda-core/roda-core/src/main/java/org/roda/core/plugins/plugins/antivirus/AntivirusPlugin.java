@@ -52,9 +52,9 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
       "core.plugins.internal.virus_check.antiVirusClassname", "org.roda.core.plugins.plugins.antivirus.ClamAntiVirus");
 
     try {
-      LOGGER.info("Loading antivirus class {}", antiVirusClassName);
+      LOGGER.debug("Loading antivirus class {}", antiVirusClassName);
       setAntiVirus((AntiVirus) Class.forName(antiVirusClassName).newInstance());
-      LOGGER.info("Using antivirus {}", getAntiVirus().getClass().getName());
+      LOGGER.debug("Using antivirus {}", getAntiVirus().getClass().getName());
     } catch (ClassNotFoundException e) {
       LOGGER.warn("Antivirus class {} not found - {}", antiVirusClassName, e.getMessage());
     } catch (InstantiationException e) {
@@ -67,10 +67,10 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
 
     if (getAntiVirus() == null) {
       setAntiVirus(new AVGAntiVirus());
-      LOGGER.info("Using default antivirus {}", getAntiVirus().getClass().getName());
+      LOGGER.warn("Using default antivirus {}", getAntiVirus().getClass().getName());
     }
 
-    LOGGER.info("init OK");
+    LOGGER.debug("init OK");
   }
 
   @Override
