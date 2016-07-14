@@ -26,8 +26,6 @@ public class Format extends NamedIndexedModel implements IsIndexed, Serializable
 
   private static final long serialVersionUID = 7178184202935641440L;
 
-  private String id = null;
-  private String name = null;
   private String definition = null;
   private List<String> categories = null;
   private String latestVersion = null;
@@ -65,22 +63,6 @@ public class Format extends NamedIndexedModel implements IsIndexed, Serializable
     this.mimetypes = new ArrayList<String>(format.getMimetypes());
     this.pronoms = new ArrayList<String>(format.getPronoms());
     this.utis = new ArrayList<String>(format.getUtis());
-  }
-
-  public String getId() {
-    return super.getId();
-  }
-
-  public void setId(String id) {
-    super.setId(id);
-  }
-
-  public String getName() {
-    return super.getName();
-  }
-
-  public void setName(String name) {
-    super.setName(name);
   }
 
   public String getDefinition() {
@@ -181,7 +163,7 @@ public class Format extends NamedIndexedModel implements IsIndexed, Serializable
 
   @Override
   public String toString() {
-    return "Format [id=" + id + ", name=" + name + ", definition=" + definition + ", categories=" + categories
+    return "Format [id=" + getId() + ", name=" + getName() + ", definition=" + definition + ", categories=" + categories
       + ", latestVersion=" + latestVersion + ", popularity=" + popularity + ", developer=" + developer
       + ", initialRelease=" + initialRelease + ", standard=" + standard + ", isOpenFormat=" + isOpenFormat
       + ", websites=" + websites + ", provenanceInformation=" + provenanceInformation + ", extensions=" + extensions

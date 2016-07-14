@@ -440,7 +440,7 @@ public class RodaCoreFactory {
           index.reindexRisks(fileStorageService);
           index.reindexFormats(fileStorageService);
           index.reindexAIPs();
-          // index other default values HERE
+          // reindex other default objects HERE
         }
       } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
         LOGGER.error("Cannot load default objects", e);
@@ -484,10 +484,16 @@ public class RodaCoreFactory {
 
       InputStream originStream = RodaCoreFactory.class.getClassLoader().getResourceAsStream(resource);
       Path destinyPath;
+
+      String resourceFileName = resource;
+
+      // Removing ":" escape
+      resourceFileName = resourceFileName.replace("::", ":");
+
       if (removeClasspathPrefixFromFinalPath) {
-        destinyPath = destinationDirectory.resolve(resource.replaceFirst(classpathPrefix, ""));
+        destinyPath = destinationDirectory.resolve(resourceFileName.replaceFirst(classpathPrefix, ""));
       } else {
-        destinyPath = destinationDirectory.resolve(resource);
+        destinyPath = destinationDirectory.resolve(resourceFileName);
       }
 
       try {

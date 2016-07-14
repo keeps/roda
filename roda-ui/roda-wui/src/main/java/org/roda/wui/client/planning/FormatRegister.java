@@ -212,6 +212,7 @@ public class FormatRegister extends Composite {
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 0) {
       formatList.refresh();
+      formatList.setFilter(Filter.ALL);
       callback.onSuccess(this);
     } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(ShowFormat.RESOLVER.getHistoryToken())) {
       ShowFormat.RESOLVER.resolve(Tools.tail(historyTokens), callback);

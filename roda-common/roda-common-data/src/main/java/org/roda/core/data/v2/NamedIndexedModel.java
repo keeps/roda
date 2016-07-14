@@ -16,7 +16,7 @@ public abstract class NamedIndexedModel implements Serializable {
   private String id;
   private String name;
 
-  protected NamedIndexedModel() {
+  public NamedIndexedModel() {
     super();
     this.id = null;
     this.name = null;

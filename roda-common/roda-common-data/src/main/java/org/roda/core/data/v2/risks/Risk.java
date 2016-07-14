@@ -88,22 +88,6 @@ public class Risk extends NamedIndexedModel implements IsRODAObject {
     this.mitigationRelatedEventIdentifierValue = risk.getMitigationRelatedEventIdentifierValue();
   }
 
-  public String getId() {
-    return super.getId();
-  }
-
-  public void setId(String id) {
-    super.setId(id);
-  }
-
-  public String getName() {
-    return super.getName();
-  }
-
-  public void setName(String name) {
-    super.setName(name);
-  }
-
   public String getDescription() {
     return description;
   }
@@ -306,14 +290,14 @@ public class Risk extends NamedIndexedModel implements IsRODAObject {
 
   @Override
   public String toString() {
-    return "Risk [id=" + super.getId() + ", name=" + super.getName() + ", description=" + description
-      + ", identifiedOn=" + identifiedOn + ", identifiedBy=" + identifiedBy + ", category=" + category + ", notes="
-      + notes + ", preMitigationProbability=" + preMitigationProbability + ", preMitigationImpact="
-      + preMitigationImpact + ", preMitigationSeverity=" + preMitigationSeverity + ", preMitigationNotes="
-      + preMitigationNotes + ", posMitigationProbability=" + posMitigationProbability + ", posMitigationImpact="
-      + posMitigationImpact + ", posMitigationSeverity=" + posMitigationSeverity + ", posMitigationNotes="
-      + posMitigationNotes + ", mitigationStrategy=" + mitigationStrategy + ", mitigationOwnerType="
-      + mitigationOwnerType + ", mitigationOwner=" + mitigationOwner + ", mitigationRelatedEventIdentifierType="
+    return "Risk [id=" + getId() + ", name=" + getName() + ", description=" + description + ", identifiedOn="
+      + identifiedOn + ", identifiedBy=" + identifiedBy + ", category=" + category + ", notes=" + notes
+      + ", preMitigationProbability=" + preMitigationProbability + ", preMitigationImpact=" + preMitigationImpact
+      + ", preMitigationSeverity=" + preMitigationSeverity + ", preMitigationNotes=" + preMitigationNotes
+      + ", posMitigationProbability=" + posMitigationProbability + ", posMitigationImpact=" + posMitigationImpact
+      + ", posMitigationSeverity=" + posMitigationSeverity + ", posMitigationNotes=" + posMitigationNotes
+      + ", mitigationStrategy=" + mitigationStrategy + ", mitigationOwnerType=" + mitigationOwnerType
+      + ", mitigationOwner=" + mitigationOwner + ", mitigationRelatedEventIdentifierType="
       + mitigationRelatedEventIdentifierType + ", mitigationRelatedEventIdentifierValue="
       + mitigationRelatedEventIdentifierValue + ", createdOn=" + createdOn + ", createdBy=" + createdBy + ", updatedOn="
       + updatedOn + ", updatedBy=" + updatedBy + "]";

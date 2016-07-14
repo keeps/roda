@@ -204,6 +204,8 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
                   String fileMimetype = ifile.getFileFormat().getMimeType();
                   String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1,
                     ifile.getId().length());
+                  String fileInfoPath = StringUtils.join(Arrays.asList(aip.getId(), representation.getId(),
+                    StringUtils.join(file.getPath(), '/'), file.getId()), '/');
 
                   if ("pdf".equalsIgnoreCase(fileFormat) || "application/pdf".equals(fileMimetype)) {
                     LOGGER.debug("Running veraPDF validator on {}", file.getId());
@@ -241,6 +243,11 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
                       hasNonPdfFiles = true;
                     }
                   }
+
+                  if (!pluginResultState.equals(PluginState.SUCCESS)) {
+                    reportItem.addPluginDetails(" VeraPDF validation failed on " + fileInfoPath + ".");
+                  }
+
                 }
               } else {
                 LOGGER.error("Cannot process AIP representation file", oFile.getCause());
@@ -256,6 +263,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
             LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
             pluginResultState = PluginState.FAILURE;
             reportState = PluginState.FAILURE;
+            reportItem.addPluginDetails(" VeraPDF validation execution failed.");
           } finally {
             LOGGER.debug("Creating veraPDF event for the representation {}", representation.getId());
             createEvent(resourceList, aip, representation.getId(), model, index, pluginResultState, details);
@@ -265,13 +273,15 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
         jobPluginInfo.incrementObjectsProcessed(reportState);
         reportItem.setPluginState(reportState);
 
-        if (ignoreFiles && !validationReport.getIssues().isEmpty()) {
-          reportItem.setHtmlPluginDetails(true)
-            .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
-        }
+        if (!reportState.equals(PluginState.FAILURE)) {
+          if (ignoreFiles && !validationReport.getIssues().isEmpty()) {
+            reportItem.setHtmlPluginDetails(true)
+              .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
+          }
 
-        if (hasNonPdfFiles) {
-          reportItem.setPluginDetails("Non PDF files were not ignored");
+          if (hasNonPdfFiles) {
+            reportItem.setPluginDetails("Non PDF files were not ignored");
+          }
         }
 
         report.addReport(reportItem);
@@ -325,6 +335,8 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
                 IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
                 String fileMimetype = ifile.getFileFormat().getMimeType();
                 String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1, ifile.getId().length());
+                String fileInfoPath = StringUtils.join(
+                  Arrays.asList(representation.getId(), StringUtils.join(file.getPath(), '/'), file.getId()), '/');
 
                 if ("pdf".equalsIgnoreCase(fileFormat) || "application/pdf".equals(fileMimetype)) {
                   LOGGER.debug("Running veraPDF validator on {}", file.getId());
@@ -360,6 +372,10 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
                     hasNonPdfFiles = true;
                   }
                 }
+
+                if (!pluginResultState.equals(PluginState.SUCCESS)) {
+                  reportItem.addPluginDetails(" VeraPDF validation failed on " + fileInfoPath + ".");
+                }
               }
             } else {
               LOGGER.error("Cannot process AIP representation file", oFile.getCause());
@@ -383,13 +399,15 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
         jobPluginInfo.incrementObjectsProcessed(reportState);
         reportItem.setPluginState(reportState);
 
-        if (ignoreFiles && !validationReport.getIssues().isEmpty()) {
-          reportItem.setHtmlPluginDetails(true)
-            .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
-        }
+        if (!reportState.equals(PluginState.FAILURE)) {
+          if (ignoreFiles && !validationReport.getIssues().isEmpty()) {
+            reportItem.setHtmlPluginDetails(true)
+              .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
+          }
 
-        if (hasNonPdfFiles) {
-          reportItem.setPluginDetails("Non PDF files were not ignored");
+          if (hasNonPdfFiles) {
+            reportItem.setPluginDetails("Non PDF files were not ignored");
+          }
         }
 
         report.addReport(reportItem);
@@ -460,13 +478,19 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
                 pluginResultState = PluginState.PARTIAL_SUCCESS;
               }
 
+              if (!pluginResultState.equals(PluginState.SUCCESS)) {
+                reportItem.addPluginDetails(" VeraPDF validation failed on " + file.getId() + ".");
+              }
+
               IOUtils.closeQuietly(directAccess);
             } else {
-              if (ignoreFiles) {
-                reportItem.setPluginDetails("This file was ignored.");
-              } else {
-                pluginResultState = PluginState.FAILURE;
-                reportItem.setPluginDetails("This file was not ignored.");
+              if (!reportState.equals(PluginState.FAILURE)) {
+                if (ignoreFiles) {
+                  reportItem.setPluginDetails("This file was ignored.");
+                } else {
+                  pluginResultState = PluginState.FAILURE;
+                  reportItem.setPluginDetails("This file was not ignored.");
+                }
               }
             }
           }

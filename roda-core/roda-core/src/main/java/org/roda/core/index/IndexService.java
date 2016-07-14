@@ -223,7 +223,7 @@ public class IndexService {
   public void reindexRisks(StorageService storage) {
     try {
       reindex(storage, Risk.class);
-    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
+    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
       | IOException e) {
       LOGGER.error("Error reindexing risks");
     }
@@ -244,14 +244,14 @@ public class IndexService {
   public void reindexFormats(StorageService storage) {
     try {
       reindex(storage, Format.class);
-    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
+    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
       | IOException e) {
       LOGGER.error("Error reindexing formats");
     }
   }
 
-  private <T extends IsRODAObject> void reindex(StorageService storage, Class<T> objectClass)
-    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException, IOException {
+  public <T extends IsRODAObject> void reindex(StorageService storage, Class<T> objectClass)
+    throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException, IOException {
     CloseableIterable<Resource> listResourcesUnderDirectory = null;
     try {
       StoragePath containerPath = ModelUtils.getContainerPath(objectClass);

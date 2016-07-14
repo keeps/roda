@@ -135,20 +135,25 @@ public class NotificationList extends BasicAsyncTableCell<Notification> {
     AsyncCallback<IndexResult<Notification>> callback) {
 
     Filter filter = getFilter();
+    if (filter == Filter.NULL) {
+      // search not yet ready, deliver empty result
+      callback.onSuccess(null);
+    } else {
 
-    Map<Column<Notification, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<Notification, ?>, List<String>>();
-    columnSortingKeyMap.put(fromUser, Arrays.asList(RodaConstants.NOTIFICATION_FROM_USER));
-    // columnSortingKeyMap.put(recipientUser,
-    // Arrays.asList(RodaConstants.MESSAGE_RECIPIENT_USERS));
-    columnSortingKeyMap.put(sentOn, Arrays.asList(RodaConstants.NOTIFICATION_SENT_ON));
-    columnSortingKeyMap.put(subject, Arrays.asList(RodaConstants.NOTIFICATION_SUBJECT));
-    columnSortingKeyMap.put(acknowledged, Arrays.asList(RodaConstants.NOTIFICATION_IS_ACKNOWLEDGED));
+      Map<Column<Notification, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<Notification, ?>, List<String>>();
+      columnSortingKeyMap.put(fromUser, Arrays.asList(RodaConstants.NOTIFICATION_FROM_USER));
+      // columnSortingKeyMap.put(recipientUser,
+      // Arrays.asList(RodaConstants.MESSAGE_RECIPIENT_USERS));
+      columnSortingKeyMap.put(sentOn, Arrays.asList(RodaConstants.NOTIFICATION_SENT_ON));
+      columnSortingKeyMap.put(subject, Arrays.asList(RodaConstants.NOTIFICATION_SUBJECT));
+      columnSortingKeyMap.put(acknowledged, Arrays.asList(RodaConstants.NOTIFICATION_IS_ACKNOWLEDGED));
 
-    Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
+      Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
-    boolean justActive = false;
-    BrowserService.Util.getInstance().find(Notification.class.getName(), filter, sorter, sublist, getFacets(),
-      LocaleInfo.getCurrentLocale().getLocaleName(), justActive, callback);
+      boolean justActive = false;
+      BrowserService.Util.getInstance().find(Notification.class.getName(), filter, sorter, sublist, getFacets(),
+        LocaleInfo.getCurrentLocale().getLocaleName(), justActive, callback);
+    }
 
   }
 

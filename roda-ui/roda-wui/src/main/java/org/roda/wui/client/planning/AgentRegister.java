@@ -212,6 +212,7 @@ public class AgentRegister extends Composite {
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 0) {
       agentList.refresh();
+      agentList.setFilter(Filter.ALL);
       callback.onSuccess(this);
     } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(ShowAgent.RESOLVER.getHistoryToken())) {
       ShowAgent.RESOLVER.resolve(Tools.tail(historyTokens), callback);

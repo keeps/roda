@@ -74,22 +74,6 @@ public class Agent extends NamedIndexedModel implements IsIndexed, Serializable 
     this.agentsRequired = new ArrayList<String>(agent.getAgentsRequired());
   }
 
-  public String getId() {
-    return super.getId();
-  }
-
-  public void setId(String id) {
-    super.setId(id);
-  }
-
-  public String getName() {
-    return super.getName();
-  }
-
-  public void setName(String name) {
-    super.setName(name);
-  }
-
   public String getType() {
     return type;
   }
@@ -236,12 +220,12 @@ public class Agent extends NamedIndexedModel implements IsIndexed, Serializable 
 
   @Override
   public String toString() {
-    return "Agent [id=" + super.getId() + ", name=" + super.getName() + ", type=" + type + ", description="
-      + description + ", category=" + category + ", version=" + version + ", license=" + license + ", popularity="
-      + popularity + ", developer=" + developer + ", initialRelease=" + initialRelease + ", website=" + website
-      + ", download=" + download + ", provenanceInformation=" + provenanceInformation + ", platforms=" + platforms
-      + ", extensions=" + extensions + ", mimetypes=" + mimetypes + ", pronoms=" + pronoms + ", utis=" + utis
-      + ", formatIds=" + formatIds + ", agentsRequired=" + agentsRequired + "]";
+    return "Agent [id=" + getId() + ", name=" + getName() + ", type=" + type + ", description=" + description
+      + ", category=" + category + ", version=" + version + ", license=" + license + ", popularity=" + popularity
+      + ", developer=" + developer + ", initialRelease=" + initialRelease + ", website=" + website + ", download="
+      + download + ", provenanceInformation=" + provenanceInformation + ", platforms=" + platforms + ", extensions="
+      + extensions + ", mimetypes=" + mimetypes + ", pronoms=" + pronoms + ", utis=" + utis + ", formatIds=" + formatIds
+      + ", agentsRequired=" + agentsRequired + "]";
   }
 
   @JsonIgnore

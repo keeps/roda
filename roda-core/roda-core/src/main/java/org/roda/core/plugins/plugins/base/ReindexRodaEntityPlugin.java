@@ -8,14 +8,11 @@
 package org.roda.core.plugins.plugins.base;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
-import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -23,11 +20,9 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.formats.Format;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.notifications.Notification;
@@ -36,12 +31,9 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.storage.Binary;
-import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,32 +95,15 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
   public Report execute(IndexService index, ModelService model, StorageService storage, List<T> list)
     throws PluginException {
 
-    CloseableIterable<Resource> listResourcesUnderDirectory = null;
+    LOGGER.debug("Reindexing Roda {}", clazz.getSimpleName());
     try {
-      StoragePath containerPath = ModelUtils.getContainerPath(clazz);
-      listResourcesUnderDirectory = storage.listResourcesUnderContainer(containerPath, recursiveListing);
-      LOGGER.debug("Reindexing Roda entities under {}", containerPath);
-
-      for (Resource resource : listResourcesUnderDirectory) {
-        if (!resource.isDirectory()) {
-          Binary binary = (Binary) resource;
-          InputStream inputStream = binary.getContent().createInputStream();
-          String jsonString = IOUtils.toString(inputStream, RodaConstants.DEFAULT_ENCODING);
-          T object = JsonUtils.getObjectFromJson(jsonString, clazz);
-          IOUtils.closeQuietly(inputStream);
-          index.reindex(clazz, object);
-        }
-      }
-
+      index.reindex(storage, clazz);
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
       | IOException e) {
-      LOGGER.error("Error reindexing Roda entity", e);
-    } finally {
-      IOUtils.closeQuietly(listResourcesUnderDirectory);
+      LOGGER.error("Error reindexing {}", clazz.getSimpleName());
     }
 
     return new Report();
-
   }
 
   @Override

@@ -128,10 +128,9 @@ public class NotificationRegister extends Composite {
    * @param user
    */
   public NotificationRegister() {
-    Filter filter = null;
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.NOTIFICATION_RECIPIENT_USERS),
       new SimpleFacetParameter(RodaConstants.NOTIFICATION_IS_ACKNOWLEDGED));
-    notificationList = new NotificationList(filter, facets, messages.notificationsTitle(), false);
+    notificationList = new NotificationList(Filter.NULL, facets, messages.notificationsTitle(), false);
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.NOTIFICATION_SEARCH,
       messages.messageSearchPlaceHolder(), false, false);
@@ -198,6 +197,7 @@ public class NotificationRegister extends Composite {
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 0) {
       notificationList.refresh();
+      notificationList.setFilter(Filter.ALL);
       callback.onSuccess(this);
     } else if (historyTokens.size() > 1 && ShowNotification.RESOLVER.getHistoryToken().equals(historyTokens.get(0))) {
       ShowNotification.RESOLVER.resolve(Tools.tail(historyTokens), callback);
