@@ -25,6 +25,9 @@ public class UserLoginHelper {
     throws GenericException, AuthenticationDeniedException {
     try {
       RodaUser user = UserUtility.getLdapUtility().getAuthenticatedUser(username, password);
+      if (!user.isActive()) {
+        throw new AuthenticationDeniedException("User is not active.");
+      }
       user.setIpAddress(request.getRemoteAddr());
       UserUtility.setUser(request, new RodaSimpleUser(user.getId(), user.getName(), user.getEmail(), user.isGuest()));
       return user;
