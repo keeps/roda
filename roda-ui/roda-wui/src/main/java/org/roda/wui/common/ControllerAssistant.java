@@ -15,7 +15,7 @@ public class ControllerAssistant {
   }
 
   public void checkRoles(RodaUser user) throws AuthorizationDeniedException {
-    UserUtility.checkRoles(user, this);
+    UserUtility.checkRoles(user, this.getClass());
   }
 
   public void registerAction(RodaUser user, String aipId, Object... parameters) {
