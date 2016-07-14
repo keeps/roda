@@ -391,6 +391,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
           pluginResultState = PluginState.FAILURE;
           reportState = PluginState.FAILURE;
+          reportItem.setPluginDetails(e.getMessage());
         } finally {
           LOGGER.debug("Creating veraPDF event for the representation {}", representation.getId());
           createEvent(resourceList, aip, representation.getId(), model, index, pluginResultState, details);
@@ -434,16 +435,18 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      try {
-        for (File file : list) {
+      for (File file : list) {
+        Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class,
+          AIPState.INGEST_PROCESSING);
+        PluginState reportState = PluginState.SUCCESS;
+
+        try {
           List<String> resourceList = new ArrayList<String>();
           // FIXME 20160516 hsilva: see how to set initial
           // initialOutcomeObjectState
-          Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class,
-            AIPState.INGEST_PROCESSING);
           PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
           PluginState pluginResultState = PluginState.SUCCESS;
-          PluginState reportState = PluginState.SUCCESS;
+
           StringBuilder details = new StringBuilder();
           AIP aip = model.retrieveAIP(file.getAipId());
 
@@ -501,15 +504,19 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
           createEvent(resourceList, aip, file.getRepresentationId(), model, index, pluginResultState, details);
           jobPluginInfo.incrementObjectsProcessed(reportState);
+
+        } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
+          | IOException | IllegalArgumentException | JAXBException | VeraPDFException e) {
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+          LOGGER.error("Could not run VeraPDF successfully");
+          reportState = PluginState.FAILURE;
+          reportItem.setPluginDetails(e.getMessage());
+        } finally {
           reportItem.setPluginState(reportState);
           report.addReport(reportItem);
           PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
           PluginHelper.updateJobInformation(this, jobPluginInfo);
         }
-      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
-        | IOException | IllegalArgumentException | JAXBException | VeraPDFException e) {
-        jobPluginInfo.incrementObjectsProcessedWithFailure();
-        LOGGER.error("Could not run VeraPDF successfully");
       }
 
       jobPluginInfo.finalizeInfo();

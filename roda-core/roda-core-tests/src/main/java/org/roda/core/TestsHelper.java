@@ -29,7 +29,6 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
-import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.jobs.Job;
@@ -95,12 +94,12 @@ public final class TestsHelper {
 
   }
 
-  public static Pair<Integer, Integer> testJobReports(IndexService index, Job job)
+  public static List<Report> testJobReports(IndexService index, Job job)
     throws GenericException, RequestNotValidException {
     return testJobReports(index, job, 10);
   }
 
-  public static Pair<Integer, Integer> testJobReports(IndexService index, Job job, int maxObjects)
+  public static List<Report> testJobReports(IndexService index, Job job, int maxObjects)
     throws GenericException, RequestNotValidException {
 
     index.commit(Job.class);
@@ -122,7 +121,7 @@ public final class TestsHelper {
       }
     }
 
-    return new Pair<Integer, Integer>();
+    return reports;
   }
 
 }
