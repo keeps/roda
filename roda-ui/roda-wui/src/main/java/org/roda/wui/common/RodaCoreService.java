@@ -20,17 +20,18 @@ import org.roda.core.data.v2.user.RodaUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// FIXME 20160714 hsilva: to be removed and code moved to ControllerAssistant
 public abstract class RodaCoreService {
   private static final Logger LOGGER = LoggerFactory.getLogger(RodaCoreService.class);
 
-  protected static void registerAction(RodaUser user, String actionComponent, String actionMethod, String aipId,
+  public static void registerAction(RodaUser user, String actionComponent, String actionMethod, String aipId,
     long duration, Object... parameters) {
 
     LogEntry logEntry = createLogEntry(user, actionComponent, actionMethod, aipId, duration, parameters);
     registerAction(logEntry);
   }
 
-  protected static void registerAction(LogEntry logEntry) {
+  private static void registerAction(LogEntry logEntry) {
     try {
       RodaCoreFactory.getModelService().addLogEntry(logEntry, RodaCoreFactory.getLogPath());
     } catch (RODAException e) {
@@ -42,7 +43,7 @@ public abstract class RodaCoreService {
     long duration, Object... parameters) {
     LogEntry logEntry = null;
     List<LogEntryParameter> logParameters = new ArrayList<LogEntryParameter>();
-    if (parameters != null) {
+    if (parameters != null && parameters.length != 0) {
       if ((parameters.length % 2) != 0) {
 
         LOGGER.warn("registerAction(" + actionComponent + "/" + actionMethod

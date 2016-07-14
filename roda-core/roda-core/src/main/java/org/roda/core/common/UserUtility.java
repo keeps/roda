@@ -7,6 +7,7 @@
  */
 package org.roda.core.common;
 
+import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -19,8 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
@@ -28,16 +27,13 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsFilter;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
-import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RodaSimpleUser;
 import org.roda.core.data.v2.user.RodaUser;
-import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.utils.ModelUtils;
 import org.slf4j.Logger;
@@ -134,6 +130,13 @@ public class UserUtility {
 
   public static void checkRoles(RodaUser user, String... rolesToCheck) throws AuthorizationDeniedException {
     checkRoles(user, Arrays.asList(rolesToCheck));
+  }
+
+  public static void checkRoles(RodaUser user, Object object) throws AuthorizationDeniedException {
+    Method method = object.getClass().getEnclosingMethod();
+    final String configKey = "core.roles." + method.getDeclaringClass().getName() + "." + method.getName();
+    final List<String> roles = RodaCoreFactory.getRodaConfigurationAsList(configKey);
+    checkRoles(user, roles);
   }
 
   public static RodaUser getFullUser(RodaSimpleUser rsu) throws LdapUtilityException {
