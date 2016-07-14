@@ -17,6 +17,10 @@ import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.testng.AssertJUnit;
 
 public class ReportAssertUtils {
+  public static void assertReports(List<Report> reports) {
+    assertReports(reports, null, null);
+  }
+
   public static void assertReports(List<Report> reports, List<String> outcomeObjectIds) {
     assertReports(reports, outcomeObjectIds, null);
   }

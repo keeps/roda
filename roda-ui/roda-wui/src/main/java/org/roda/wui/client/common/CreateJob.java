@@ -106,6 +106,8 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
   private List<PluginInfo> plugins = null;
   private PluginInfo selectedPlugin = null;
   private String selectedClass = null;
+  private ListBox list;
+  private boolean isIngest;
 
   @UiField
   TextBox name;
@@ -143,8 +145,10 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
   public CreateJob(Class<T> classToReceive, final List<PluginType> pluginType) {
     if (classToReceive.getName().equals(TransferredResource.class.getName())) {
       this.selected = IngestTransfer.getInstance().getSelected();
+      isIngest = true;
     } else {
       this.selected = Search.getInstance().getSelected();
+      isIngest = false;
     }
 
     initWidget(uiBinder.createAndBindUi(this));
@@ -381,4 +385,7 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
     this.selectedClass = selectedClass;
   }
 
+  public void setListBox(ListBox listBox) {
+    list = listBox;
+  }
 }

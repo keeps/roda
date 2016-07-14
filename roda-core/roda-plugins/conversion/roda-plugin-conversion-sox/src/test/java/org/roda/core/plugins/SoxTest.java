@@ -170,7 +170,7 @@ public class SoxTest {
     Job job = TestsHelper.executeJob(SoxConvertPlugin.class, parameters, PluginType.AIP_TO_AIP,
       SelectedItemsAll.create(Representation.class));
 
-    TestsHelper.testJobReports(index, job);
+    TestsHelper.getJobReports(index, job);
 
     aip = model.retrieveAIP(aip.getId());
     AssertJUnit.assertEquals(2, aip.getRepresentations().size());

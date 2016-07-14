@@ -215,4 +215,8 @@ public class PluginInfo implements Serializable {
     this.objectClasses.add(objectClass);
   }
 
+  public void hasObjectClass(String objectClass) {
+    this.objectClasses.contains(objectClass);
+  }
+
 }

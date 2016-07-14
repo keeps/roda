@@ -16,6 +16,7 @@ import java.util.List;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsFilter;
