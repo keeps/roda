@@ -97,6 +97,9 @@ public class CreateActionJob extends CreateJob<IsIndexed> {
                 Tools.newHistory(Search.RESOLVER);
               } else {
                 setSelectedClass(list.getSelectedValue());
+                getWorkflowList().clear();
+                getCategoryList().clear();
+                configurePlugins(list.getSelectedValue());
               }
             }
 

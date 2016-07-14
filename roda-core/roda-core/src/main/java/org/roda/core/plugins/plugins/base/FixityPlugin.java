@@ -57,7 +57,7 @@ import org.slf4j.LoggerFactory;
 public class FixityPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(FixityPlugin.class);
 
-  private static String riskId = "R36";
+  private static String riskId = "urn:fixityplugin:r1";
 
   @Override
   public void init() {

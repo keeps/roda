@@ -17,6 +17,8 @@ import java.util.List;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
+import org.roda.core.data.v2.index.SelectedItemsList;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -100,14 +102,10 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  // private ClientLogger logger = new ClientLogger(getClass().getName());
-
   private SelectedItems<?> selected = null;
   private List<PluginInfo> plugins = null;
   private PluginInfo selectedPlugin = null;
-  private String selectedClass = null;
-  private ListBox list;
-  private boolean isIngest;
+  private String listSelectedClass = AIP.class.getName();
 
   @UiField
   TextBox name;
@@ -145,10 +143,8 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
   public CreateJob(Class<T> classToReceive, final List<PluginType> pluginType) {
     if (classToReceive.getName().equals(TransferredResource.class.getName())) {
       this.selected = IngestTransfer.getInstance().getSelected();
-      isIngest = true;
     } else {
       this.selected = Search.getInstance().getSelected();
-      isIngest = false;
     }
 
     initWidget(uiBinder.createAndBindUi(this));
@@ -173,8 +169,8 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
     name.setText(messages.processNewDefaultName(new Date()));
     workflowOptions.setPlugins(plugins);
 
-    boolean isEmpty = updateObjectList();
-    configurePlugins(isEmpty, selected.getSelectedClass());
+    updateObjectList();
+    configurePlugins(selected.getSelectedClass());
 
     workflowCategoryList.addStyleName("form-listbox-job");
     workflowList.addChangeHandler(new ChangeHandler() {
@@ -192,9 +188,9 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
 
   public abstract boolean updateObjectList();
 
-  protected void configurePlugins(boolean isEmpty, String selectedClass) {
+  public void configurePlugins(final String selectedClass) {
     // TODO filter pluginInfos considering the empty or selected type
-    GWT.log(plugins.toString());
+    // GWT.log(plugins.toString());
     List<String> categoriesOnListBox = new ArrayList<String>();
 
     if (plugins != null) {
@@ -208,7 +204,9 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
           if (pluginCategories != null) {
             for (String category : pluginCategories) {
               if (!categoriesOnListBox.contains(category)
-                && !category.equals(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)) {
+                && !category.equals(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)
+                && ((!isSelectedEmpty() && pluginInfo.hasObjectClass(selectedClass))
+                  || (isSelectedEmpty() && pluginInfo.hasObjectClass(listSelectedClass)))) {
 
                 CheckBox box = new CheckBox();
                 box.setText(category);
@@ -232,19 +230,24 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
                               CheckBox checkbox = (CheckBox) workflowCategoryList.getWidget(i);
 
                               if (checkbox.getValue()) {
+                                noChecks = false;
+
                                 if (categories.contains(checkbox.getText())
-                                  && !categories.contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)) {
+                                  && !categories.contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)
+                                  && ((!isSelectedEmpty() && pluginInfo.hasObjectClass(selectedClass))
+                                    || (isSelectedEmpty() && pluginInfo.hasObjectClass(listSelectedClass)))) {
                                   workflowList.addItem(
                                     messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()),
                                     pluginInfo.getId());
                                 }
 
-                                noChecks = false;
                               }
                             }
 
                             if (noChecks) {
-                              if (!pluginInfo.getCategories().contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)) {
+                              if (!pluginInfo.getCategories().contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)
+                                && ((!isSelectedEmpty() && pluginInfo.hasObjectClass(selectedClass))
+                                  || (isSelectedEmpty() && pluginInfo.hasObjectClass(listSelectedClass)))) {
                                 workflowList.addItem(
                                   messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()),
                                   pluginInfo.getId());
@@ -269,7 +272,9 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
               }
             }
 
-            if (!pluginCategories.contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)) {
+            if (!pluginCategories.contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)
+              && ((!isSelectedEmpty() && pluginInfo.hasObjectClass(selectedClass))
+                || (isSelectedEmpty() && pluginInfo.hasObjectClass(listSelectedClass)))) {
               workflowList.addItem(messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()),
                 pluginInfo.getId());
             }
@@ -364,6 +369,10 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
     return this.name;
   }
 
+  public ListBox getWorkflowList() {
+    return workflowList;
+  }
+
   public PluginOptionsPanel getWorkflowOptions() {
     return this.workflowOptions;
   }
@@ -378,14 +387,22 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
   }
 
   public String getSelectedClass() {
-    return selectedClass;
+    return listSelectedClass;
   }
 
   public void setSelectedClass(String selectedClass) {
-    this.selectedClass = selectedClass;
+    this.listSelectedClass = selectedClass;
   }
 
-  public void setListBox(ListBox listBox) {
-    list = listBox;
+  public FlowPanel getCategoryList() {
+    return workflowCategoryList;
   }
+
+  public boolean isSelectedEmpty() {
+    if (selected instanceof SelectedItemsList) {
+      return (((SelectedItemsList) selected).getIds().isEmpty());
+    }
+    return false;
+  }
+
 }
