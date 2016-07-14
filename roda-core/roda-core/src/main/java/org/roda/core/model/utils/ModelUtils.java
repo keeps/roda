@@ -98,12 +98,12 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(getAIPPreservationMetadataPath(aipId));
   }
 
-  private static List<String> getAIPOtherMetadataPath(String aipId) {
-    return build(getAIPMetadataPath(aipId), RodaConstants.STORAGE_DIRECTORY_OTHER);
+  private static List<String> getAIPOtherMetadataPath(String aipId, String type) {
+    return build(getAIPMetadataPath(aipId), RodaConstants.STORAGE_DIRECTORY_OTHER, type);
   }
 
   public static StoragePath getAIPOtherMetadataStoragePath(String aipId, String type) throws RequestNotValidException {
-    return DefaultStoragePath.parse(getAIPOtherMetadataPath(aipId));
+    return DefaultStoragePath.parse(getAIPOtherMetadataPath(aipId, type));
   }
 
   private static List<String> getSubmissionPath(String aipId) {
@@ -164,7 +164,6 @@ public final class ModelUtils {
   }
 
   private static List<String> getRepresentationDataPath(String aipId, String representationId) {
-    // TODO check in AIP metadata if representation overrides data folder
     return build(getRepresentationPath(aipId, representationId), RodaConstants.STORAGE_DIRECTORY_DATA);
   }
 
@@ -173,14 +172,12 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(getRepresentationDataPath(aipId, representationId));
   }
 
-  public static StoragePath getDescriptiveMetadataPath(String aipId, String descriptiveMetadataBinaryId)
+  public static StoragePath getDescriptiveMetadataStoragePath(String aipId, String descriptiveMetadataBinaryId)
     throws RequestNotValidException {
-    List<String> path = build(getAIPMetadataPath(aipId), RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE,
-      descriptiveMetadataBinaryId);
-    return DefaultStoragePath.parse(path);
+    return getDescriptiveMetadataStoragePath(aipId, null, descriptiveMetadataBinaryId);
   }
 
-  public static StoragePath getDescriptiveMetadataPath(String aipId, String representationId,
+  public static StoragePath getDescriptiveMetadataStoragePath(String aipId, String representationId,
     String descriptiveMetadataBinaryId) throws RequestNotValidException {
     List<String> path = build(getRepresentationPath(aipId, representationId), RodaConstants.STORAGE_DIRECTORY_METADATA,
       RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE, descriptiveMetadataBinaryId);
@@ -189,8 +186,8 @@ public final class ModelUtils {
 
   public static StoragePath getDescriptiveMetadataStoragePath(DescriptiveMetadata descriptiveMetadata)
     throws RequestNotValidException {
-    // TODO check if descriptive metadata is from a representation
-    return getDescriptiveMetadataPath(descriptiveMetadata.getAipId(), descriptiveMetadata.getId());
+    return getDescriptiveMetadataStoragePath(descriptiveMetadata.getAipId(), descriptiveMetadata.getRepresentationId(),
+      descriptiveMetadata.getId());
   }
 
   private static List<String> getDocumentationPath(String aipId) {
@@ -267,7 +264,7 @@ public final class ModelUtils {
     String container = path.getContainerName();
     List<String> directoryPath = path.getDirectoryPath();
 
-    if (container.equals(RodaConstants.STORAGE_CONTAINER_AIP) && directoryPath.size() > 0) {
+    if (container.equals(RodaConstants.STORAGE_CONTAINER_AIP) && !directoryPath.isEmpty()) {
       return directoryPath.get(0);
     } else {
       return null;
@@ -319,7 +316,7 @@ public final class ModelUtils {
       && directoryPath.get(2).equals(RodaConstants.STORAGE_DIRECTORY_PRESERVATION)) {
       return directoryPath.subList(3, directoryPath.size());
     } else {
-      return null;
+      return new ArrayList<>();
     }
   }
 
@@ -334,7 +331,7 @@ public final class ModelUtils {
       && directoryPath.get(4).equals(RodaConstants.STORAGE_DIRECTORY_PRESERVATION)) {
       return directoryPath.subList(5, directoryPath.size());
     } else {
-      return null;
+      return new ArrayList<>();
     }
   }
 
@@ -406,7 +403,7 @@ public final class ModelUtils {
       && directoryPath.get(4).equals(RodaConstants.STORAGE_DIRECTORY_OTHER)) {
       return directoryPath.subList(6, directoryPath.size());
     } else {
-      return null;
+      return new ArrayList<>();
     }
   }
 

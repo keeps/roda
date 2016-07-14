@@ -162,7 +162,7 @@ public class ModelServiceTest {
     assertEquals(CorporaConstants.DESCRIPTIVE_METADATA_ID, descMetadata.getId());
     assertEquals(CorporaConstants.DESCRIPTIVE_METADATA_TYPE, descMetadata.getType());
 
-    StoragePath descriptiveMetadataPath = ModelUtils.getDescriptiveMetadataPath(descMetadata.getAipId(),
+    StoragePath descriptiveMetadataPath = ModelUtils.getDescriptiveMetadataStoragePath(descMetadata.getAipId(),
       descMetadata.getId());
     final Binary descMetadataBinary = storage.getBinary(descriptiveMetadataPath);
     assertTrue(descMetadataBinary.getSizeInBytes() > 0);
@@ -308,7 +308,7 @@ public class ModelServiceTest {
     assertEquals(CorporaConstants.DESCRIPTIVE_METADATA_TYPE_EAD, descMetadata.getType());
     assertEquals(CorporaConstants.DESCRIPTIVE_METADATA_TYPE_EAD_VERSION3, descMetadata.getVersion());
 
-    StoragePath descriptiveMetadataPath = ModelUtils.getDescriptiveMetadataPath(descMetadata.getAipId(),
+    StoragePath descriptiveMetadataPath = ModelUtils.getDescriptiveMetadataStoragePath(descMetadata.getAipId(),
       descMetadata.getId());
     final Binary descMetadataBinary = storage.getBinary(descriptiveMetadataPath);
     assertTrue(descMetadataBinary.getSizeInBytes() > 0);
@@ -350,7 +350,7 @@ public class ModelServiceTest {
     assertEquals(CorporaConstants.DESCRIPTIVE_METADATA_TYPE_EAD, descMetadata.getType());
     assertEquals(CorporaConstants.DESCRIPTIVE_METADATA_TYPE_EAD_VERSIONUNKNOWN, descMetadata.getVersion());
 
-    StoragePath descriptiveMetadataPath = ModelUtils.getDescriptiveMetadataPath(descMetadata.getAipId(),
+    StoragePath descriptiveMetadataPath = ModelUtils.getDescriptiveMetadataStoragePath(descMetadata.getAipId(),
       descMetadata.getId());
     final Binary descMetadataBinary = storage.getBinary(descriptiveMetadataPath);
     assertTrue(descMetadataBinary.getSizeInBytes() > 0);

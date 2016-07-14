@@ -1102,7 +1102,7 @@ public class SolrUtils {
       Set<String> usedNonRepeatableFields = new HashSet<>();
 
       for (DescriptiveMetadata metadata : aip.getDescriptiveMetadata()) {
-        StoragePath storagePath = ModelUtils.getDescriptiveMetadataPath(aip.getId(), metadata.getId());
+        StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aip.getId(), metadata.getId());
         Binary binary = model.getStorage().getBinary(storagePath);
         try {
           SolrInputDocument fields = getDescriptiveMetadataFields(binary, metadata.getType(), metadata.getVersion());

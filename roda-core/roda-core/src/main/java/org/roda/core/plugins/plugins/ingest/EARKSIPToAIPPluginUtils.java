@@ -92,7 +92,7 @@ public class EARKSIPToAIPPluginUtils {
     throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
     NotFoundException, ValidationException {
     // process descriptive metadata
-    processDescriptiveMetadata(model, aipId, sip.getDescriptiveMetadata(), notify, update);
+    processDescriptiveMetadata(model, aipId, null, sip.getDescriptiveMetadata(), notify, update);
 
     // process other metadata
     processOtherMetadata(model, sip.getOtherMetadata(), aipId, Optional.empty(), notify, update);
@@ -108,7 +108,7 @@ public class EARKSIPToAIPPluginUtils {
 
   }
 
-  private static void processDescriptiveMetadata(ModelService model, String aipId,
+  private static void processDescriptiveMetadata(ModelService model, String aipId, String representationId,
     List<IPDescriptiveMetadata> descriptiveMetadata, boolean notify, boolean update) throws RequestNotValidException,
     GenericException, AlreadyExistsException, AuthorizationDeniedException, NotFoundException, ValidationException {
     for (IPDescriptiveMetadata dm : descriptiveMetadata) {
@@ -117,7 +117,8 @@ public class EARKSIPToAIPPluginUtils {
       String metadataType = IngestHelper.getMetadataType(dm);
       String metadataVersion = dm.getMetadataVersion();
       try {
-        model.createDescriptiveMetadata(aipId, descriptiveMetadataId, payload, metadataType, metadataVersion, notify);
+        model.createDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, payload, metadataType,
+          metadataVersion, notify);
       } catch (AlreadyExistsException e) {
         if (update)
           model.updateDescriptiveMetadata(aipId, descriptiveMetadataId, payload, metadataType, metadataVersion,
@@ -196,7 +197,7 @@ public class EARKSIPToAIPPluginUtils {
 
   private static void processIPRepresentationInformation(ModelService model, IPRepresentation sr, String aipId,
     StorageService storage, boolean notify, boolean update) throws RequestNotValidException, GenericException,
-    AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
+    AlreadyExistsException, AuthorizationDeniedException, NotFoundException, ValidationException {
     boolean original = true;
     String representationType = IngestHelper.getType(sr);
 
@@ -212,8 +213,7 @@ public class EARKSIPToAIPPluginUtils {
       representation = model.createRepresentation(aipId, sr.getObjectID(), original, representationType, notify);
     }
     // process representation descriptive metadata
-    // XXX 20160504 hsilva: there's no "space" in the model to accommodate this
-    // information
+    processDescriptiveMetadata(model, aipId, representation.getId(), sr.getDescriptiveMetadata(), notify, update);
 
     // process other metadata
     processOtherMetadata(model, sr.getOtherMetadata(), aipId, Optional.ofNullable(representation.getId()), notify,

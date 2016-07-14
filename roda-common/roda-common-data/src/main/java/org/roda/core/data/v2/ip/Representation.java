@@ -7,7 +7,11 @@
  */
 package org.roda.core.data.v2.ip;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -23,16 +27,24 @@ public class Representation implements IsRODAObject {
 
   private String type;
 
+  private List<DescriptiveMetadata> descriptiveMetadata;
+
   public Representation() {
     super();
   }
 
   public Representation(String id, String aipId, boolean original, String type) {
+    this(id, aipId, original, type, new ArrayList<DescriptiveMetadata>());
+  }
+
+  public Representation(String id, String aipId, boolean original, String type,
+    List<DescriptiveMetadata> descriptiveMetadata) {
     super();
     this.id = id;
     this.aipId = aipId;
     this.original = original;
     this.type = type;
+    this.descriptiveMetadata = descriptiveMetadata;
   }
 
   public String getId() {
@@ -67,11 +79,24 @@ public class Representation implements IsRODAObject {
     this.type = type;
   }
 
+  public List<DescriptiveMetadata> getDescriptiveMetadata() {
+    return descriptiveMetadata;
+  }
+
+  public void setDescriptiveMetadata(List<DescriptiveMetadata> descriptiveMetadata) {
+    this.descriptiveMetadata = descriptiveMetadata;
+  }
+
+  public void addDescriptiveMetadata(DescriptiveMetadata descriptiveMetadata) {
+    this.descriptiveMetadata.add(descriptiveMetadata);
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((aipId == null) ? 0 : aipId.hashCode());
+    result = prime * result + ((descriptiveMetadata == null) ? 0 : descriptiveMetadata.hashCode());
     result = prime * result + ((id == null) ? 0 : id.hashCode());
     result = prime * result + (original ? 1231 : 1237);
     result = prime * result + ((type == null) ? 0 : type.hashCode());
@@ -84,13 +109,18 @@ public class Representation implements IsRODAObject {
       return true;
     if (obj == null)
       return false;
-    if (getClass() != obj.getClass())
+    if (!(obj instanceof Representation))
       return false;
     Representation other = (Representation) obj;
     if (aipId == null) {
       if (other.aipId != null)
         return false;
     } else if (!aipId.equals(other.aipId))
+      return false;
+    if (descriptiveMetadata == null) {
+      if (other.descriptiveMetadata != null)
+        return false;
+    } else if (!descriptiveMetadata.equals(other.descriptiveMetadata))
       return false;
     if (id == null) {
       if (other.id != null)
@@ -109,7 +139,8 @@ public class Representation implements IsRODAObject {
 
   @Override
   public String toString() {
-    return "Representation [aipId=" + aipId + ", id=" + id + ", original=" + original + ", type=" + type + "]";
+    return "Representation [aipId=" + aipId + ", id=" + id + ", original=" + original + ", type=" + type
+      + ", descriptiveMetadata=" + descriptiveMetadata + "]";
   }
 
 }

@@ -247,7 +247,7 @@ public class BrowserHelper {
 
     try {
       bundle.setHasHistory(!CloseableIterables.isEmpty(model.getStorage()
-        .listBinaryVersions(ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadata.getId()))));
+        .listBinaryVersions(ModelUtils.getDescriptiveMetadataStoragePath(aipId, descriptiveMetadata.getId()))));
     } catch (Throwable t) {
       bundle.setHasHistory(false);
     }
@@ -491,7 +491,7 @@ public class BrowserHelper {
     List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
     for (DescriptiveMetadata dm : metadata) {
       if (counter >= startInt && (counter <= limitInt || limitInt == -1)) {
-        StoragePath storagePath = ModelUtils.getDescriptiveMetadataPath(aipId, dm.getId());
+        StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, dm.getId());
         Binary binary = storage.getBinary(storagePath);
         ZipEntryInfo info = new ZipEntryInfo(storagePath.getName(), binary.getContent());
         zipEntries.add(info);
@@ -574,7 +574,7 @@ public class BrowserHelper {
 
     ModelService model = RodaCoreFactory.getModelService();
 
-    StoragePath storagePath = ModelUtils.getDescriptiveMetadataPath(aipId, metadataId);
+    StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, metadataId);
     BinaryVersion binaryVersion = model.getStorage().getBinaryVersion(storagePath, versionId);
     Binary binary = binaryVersion.getBinary();
 
@@ -946,6 +946,14 @@ public class BrowserHelper {
     String descriptiveMetadataType, String descriptiveMetadataVersion, ContentPayload descriptiveMetadataPayload)
     throws GenericException, ValidationException, AuthorizationDeniedException, RequestNotValidException,
     AlreadyExistsException, NotFoundException {
+    return createDescriptiveMetadataFile(aipId, null, descriptiveMetadataId, descriptiveMetadataType,
+      descriptiveMetadataVersion, descriptiveMetadataPayload);
+  }
+
+  public static DescriptiveMetadata createDescriptiveMetadataFile(String aipId, String representationId,
+    String descriptiveMetadataId, String descriptiveMetadataType, String descriptiveMetadataVersion,
+    ContentPayload descriptiveMetadataPayload) throws GenericException, ValidationException,
+    AuthorizationDeniedException, RequestNotValidException, AlreadyExistsException, NotFoundException {
 
     ValidationReport report = ValidationUtils.validateDescriptiveBinary(descriptiveMetadataPayload,
       descriptiveMetadataType, descriptiveMetadataVersion, false);
@@ -954,7 +962,7 @@ public class BrowserHelper {
       throw new ValidationException(report);
     }
 
-    return RodaCoreFactory.getModelService().createDescriptiveMetadata(aipId, descriptiveMetadataId,
+    return RodaCoreFactory.getModelService().createDescriptiveMetadata(aipId, representationId, descriptiveMetadataId,
       descriptiveMetadataPayload, descriptiveMetadataType, descriptiveMetadataVersion);
   }
 
@@ -1406,7 +1414,7 @@ public class BrowserHelper {
   public static CloseableIterable<BinaryVersion> listDescriptiveMetadataVersions(String aipId,
     String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    StoragePath storagePath = ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadataId);
+    StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, descriptiveMetadataId);
     return RodaCoreFactory.getStorageService().listBinaryVersions(storagePath);
 
   }
@@ -1440,7 +1448,7 @@ public class BrowserHelper {
 
   public static void removeDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId)
     throws NotFoundException, GenericException, RequestNotValidException {
-    StoragePath storagePath = ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadataId);
+    StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, descriptiveMetadataId);
     RodaCoreFactory.getStorageService().deleteBinaryVersion(storagePath, versionId);
   }
 

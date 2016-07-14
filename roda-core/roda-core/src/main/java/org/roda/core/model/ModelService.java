@@ -434,7 +434,14 @@ public class ModelService extends ModelObservable {
   public Binary retrieveDescriptiveMetadataBinary(String aipId, String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
-    StoragePath binaryPath = ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadataId);
+    return retrieveDescriptiveMetadataBinary(aipId, null, descriptiveMetadataId);
+  }
+
+  public Binary retrieveDescriptiveMetadataBinary(String aipId, String representationId, String descriptiveMetadataId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+
+    StoragePath binaryPath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId,
+      descriptiveMetadataId);
     return storage.getBinary(binaryPath);
   }
 
@@ -459,28 +466,54 @@ public class ModelService extends ModelObservable {
   }
 
   public DescriptiveMetadata createDescriptiveMetadata(String aipId, String descriptiveMetadataId,
-    ContentPayload payload, String descriptiveMetadataType, String descriptiveMetadataVersion)
-    throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
-    NotFoundException {
-    return createDescriptiveMetadata(aipId, descriptiveMetadataId, payload, descriptiveMetadataType,
-      descriptiveMetadataVersion, true);
-  }
-
-  public DescriptiveMetadata createDescriptiveMetadata(String aipId, String descriptiveMetadataId,
     ContentPayload payload, String descriptiveMetadataType, String descriptiveMetadataVersion, boolean notify)
     throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
     NotFoundException {
+    return createDescriptiveMetadata(aipId, null, descriptiveMetadataId, payload, descriptiveMetadataType,
+      descriptiveMetadataVersion, notify);
+  }
+
+  public DescriptiveMetadata createDescriptiveMetadata(String aipId, String descriptiveMetadataId,
+    ContentPayload payload, String descriptiveMetadataType, String descriptiveMetadataVersion)
+    throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
+    NotFoundException {
+    return createDescriptiveMetadata(aipId, null, descriptiveMetadataId, payload, descriptiveMetadataType,
+      descriptiveMetadataVersion, true);
+  }
+
+  public DescriptiveMetadata createDescriptiveMetadata(String aipId, String representationId,
+    String descriptiveMetadataId, ContentPayload payload, String descriptiveMetadataType,
+    String descriptiveMetadataVersion) throws RequestNotValidException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException, NotFoundException {
+    return createDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, payload, descriptiveMetadataType,
+      descriptiveMetadataVersion, true);
+  }
+
+  public DescriptiveMetadata createDescriptiveMetadata(String aipId, String representationId,
+    String descriptiveMetadataId, ContentPayload payload, String descriptiveMetadataType,
+    String descriptiveMetadataVersion, boolean notify) throws RequestNotValidException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
     DescriptiveMetadata descriptiveMetadataBinary = null;
 
-    StoragePath binaryPath = ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadataId);
+    StoragePath binaryPath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId,
+      descriptiveMetadataId);
     boolean asReference = false;
 
     storage.createBinary(binaryPath, payload, asReference);
-    descriptiveMetadataBinary = new DescriptiveMetadata(descriptiveMetadataId, aipId, descriptiveMetadataType,
-      descriptiveMetadataVersion);
+    descriptiveMetadataBinary = new DescriptiveMetadata(descriptiveMetadataId, aipId, representationId,
+      descriptiveMetadataType, descriptiveMetadataVersion);
 
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
-    aip.getDescriptiveMetadata().add(descriptiveMetadataBinary);
+    if (representationId == null) {
+      aip.getDescriptiveMetadata().add(descriptiveMetadataBinary);
+    } else {
+      for (Representation representation : aip.getRepresentations()) {
+        if (representation.getId().equals(representationId)) {
+          representation.addDescriptiveMetadata(descriptiveMetadataBinary);
+          break;
+        }
+      }
+    }
     updateAIPMetadata(aip);
 
     if (notify) {
@@ -494,9 +527,18 @@ public class ModelService extends ModelObservable {
     ContentPayload descriptiveMetadataPayload, String descriptiveMetadataType, String descriptiveMetadataVersion,
     String message) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
     ValidationException {
+    return updateDescriptiveMetadata(aipId, null, descriptiveMetadataId, descriptiveMetadataPayload,
+      descriptiveMetadataType, descriptiveMetadataVersion, message);
+  }
+
+  public DescriptiveMetadata updateDescriptiveMetadata(String aipId, String representationId,
+    String descriptiveMetadataId, ContentPayload descriptiveMetadataPayload, String descriptiveMetadataType,
+    String descriptiveMetadataVersion, String message) throws RequestNotValidException, GenericException,
+    NotFoundException, AuthorizationDeniedException, ValidationException {
     DescriptiveMetadata ret = null;
 
-    StoragePath binaryPath = ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadataId);
+    StoragePath binaryPath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId,
+      descriptiveMetadataId);
     boolean asReference = false;
     boolean createIfNotExists = false;
 
@@ -516,7 +558,8 @@ public class ModelService extends ModelObservable {
       ret.setType(descriptiveMetadataType);
       ret.setVersion(descriptiveMetadataVersion);
     } else {
-      ret = new DescriptiveMetadata(descriptiveMetadataId, aipId, descriptiveMetadataType, descriptiveMetadataVersion);
+      ret = new DescriptiveMetadata(descriptiveMetadataId, aipId, representationId, descriptiveMetadataType,
+        descriptiveMetadataVersion);
       descriptiveMetadata.add(ret);
     }
 
@@ -528,7 +571,13 @@ public class ModelService extends ModelObservable {
 
   public void deleteDescriptiveMetadata(String aipId, String descriptiveMetadataId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    StoragePath binaryPath = ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadataId);
+    deleteDescriptiveMetadata(aipId, null, descriptiveMetadataId);
+  }
+
+  public void deleteDescriptiveMetadata(String aipId, String representationId, String descriptiveMetadataId)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    StoragePath binaryPath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId,
+      descriptiveMetadataId);
 
     storage.deleteResource(binaryPath);
 
@@ -549,13 +598,13 @@ public class ModelService extends ModelObservable {
 
   public CloseableIterable<BinaryVersion> listDescriptiveMetadataVersions(String aipId, String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    StoragePath binaryPath = ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadataId);
+    StoragePath binaryPath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, descriptiveMetadataId);
     return storage.listBinaryVersions(binaryPath);
   }
 
   public BinaryVersion revertDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId,
     String message) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    StoragePath binaryPath = ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadataId);
+    StoragePath binaryPath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, descriptiveMetadataId);
 
     BinaryVersion currentVersion = storage.createBinaryVersion(binaryPath, message);
     storage.revertBinaryVersion(binaryPath, versionId);

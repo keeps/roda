@@ -197,9 +197,9 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
     Set<PermissionType> readPermissionToUserGroup = new HashSet<PermissionType>();
 
     for (DescriptiveMetadata descriptiveMetadata : descriptiveMetadataList) {
-      Binary retrieveDescriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aip.getId(),
+      Binary descriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aip.getId(),
         descriptiveMetadata.getId());
-      InputStream createInputStream = retrieveDescriptiveMetadataBinary.getContent().createInputStream();
+      InputStream createInputStream = descriptiveMetadataBinary.getContent().createInputStream();
       String xpath = RodaCoreFactory.getRodaConfigurationAsString("core", "permissions", "xpath");
       String freeAccessTerm = RodaCoreFactory.getRodaConfigurationAsString("core", "permissions", "freeaccess");
 

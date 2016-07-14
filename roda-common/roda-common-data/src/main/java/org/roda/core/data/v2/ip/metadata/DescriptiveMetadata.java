@@ -17,6 +17,7 @@ public class DescriptiveMetadata implements Serializable {
   private String id;
   @JsonIgnore
   private String aipId;
+  private String representationId;
   private String type;
   private String version;
 
@@ -25,9 +26,14 @@ public class DescriptiveMetadata implements Serializable {
   }
 
   public DescriptiveMetadata(String id, String aipId, String type, String version) {
+    this(id, aipId, null, type, version);
+  }
+
+  public DescriptiveMetadata(String id, String aipId, String representationId, String type, String version) {
     super();
     this.id = id;
     this.aipId = aipId;
+    this.representationId = representationId;
     this.type = type;
     this.version = version;
   }
@@ -46,6 +52,14 @@ public class DescriptiveMetadata implements Serializable {
 
   public void setAipId(String aipId) {
     this.aipId = aipId;
+  }
+
+  public String getRepresentationId() {
+    return representationId;
+  }
+
+  public void setRepresentationId(String representationId) {
+    this.representationId = representationId;
   }
 
   public String getType() {
@@ -70,6 +84,7 @@ public class DescriptiveMetadata implements Serializable {
     int result = 1;
     result = prime * result + ((aipId == null) ? 0 : aipId.hashCode());
     result = prime * result + ((id == null) ? 0 : id.hashCode());
+    result = prime * result + ((representationId == null) ? 0 : representationId.hashCode());
     result = prime * result + ((type == null) ? 0 : type.hashCode());
     result = prime * result + ((version == null) ? 0 : version.hashCode());
     return result;
@@ -81,7 +96,7 @@ public class DescriptiveMetadata implements Serializable {
       return true;
     if (obj == null)
       return false;
-    if (getClass() != obj.getClass())
+    if (!(obj instanceof DescriptiveMetadata))
       return false;
     DescriptiveMetadata other = (DescriptiveMetadata) obj;
     if (aipId == null) {
@@ -93,6 +108,11 @@ public class DescriptiveMetadata implements Serializable {
       if (other.id != null)
         return false;
     } else if (!id.equals(other.id))
+      return false;
+    if (representationId == null) {
+      if (other.representationId != null)
+        return false;
+    } else if (!representationId.equals(other.representationId))
       return false;
     if (type == null) {
       if (other.type != null)
@@ -109,7 +129,8 @@ public class DescriptiveMetadata implements Serializable {
 
   @Override
   public String toString() {
-    return "DescriptiveMetadata [id=" + id + ", aipId=" + aipId + ", type=" + type + ", version=" + version + "]";
+    return "DescriptiveMetadata [id=" + id + ", aipId=" + aipId + ", representationId=" + representationId + ", type="
+      + type + ", version=" + version + "]";
   }
 
 }

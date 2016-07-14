@@ -211,7 +211,8 @@ public class ValidationUtils {
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     ValidationReport ret;
     if (metadata != null) {
-      StoragePath storagePath = ModelUtils.getDescriptiveMetadataPath(metadata.getAipId(), metadata.getId());
+      StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(metadata.getAipId(),
+        metadata.getRepresentationId(), metadata.getId());
       Binary binary = model.getStorage().getBinary(storagePath);
       ret = validateDescriptiveBinary(binary.getContent(), metadata.getType(), metadata.getVersion(), failIfNoSchema);
     } else {
