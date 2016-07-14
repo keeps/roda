@@ -1,0 +1,45 @@
+
+            {
+            
+            
+            "category": "Personnel, management and administration procedures; Operations and service delivery",
+            
+                
+        "id": "urn:drambora:r69",
+    
+        "name": "Metadata to information referential integrity is compromised",
+    
+        "description": "Associations between information packages and corresponding metadata are broken, and can no longer be traversed. ",
+    
+        "notes": "- Does repository maintain metadata records associated with archived information?\n- Is it conceivable that metadata records might become divorced from corresponding archived information?\n- How are associations defined and described? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+    
+        "preMitigationNotes": "- Documentation describing the repository’s directory structure, which represents relationships between metadata and corresponding objects, is irretrievably lost ",
+    
+        "mitigationOwner": "Documentation",
+    
+        "mitigationStrategy": "Avoidance strategies:\n- Define, document and review policies and procedures describing the means by which metadata are associated with corresponding information packages and communicate this information widely within the organisation\n- Define and review policies and procedures describing the metadata schema that will be used within the repository’s activities In the event of risk’s execution:\n- Define policy to respond to fracturing of relationship between metadata and information\n- Invoke treatment strategies to alleviate loss of reputation ",
+    
+        "preMitigationProbability": 4 ,
+    
+        "preMitigationImpact": 3,
+    
+        "preMitigationSeverity": 12,
+        "preMitigationSeverityLevel": "MODERATE",
+    
+                "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
+                "mitigationOwnerType": "Human",
+                "createdBy": "admin",
+                "createdOn": 1459465200000,    
+                "updatedBy": "admin",
+                "updatedOn": 1459465200000,
+                
+                "posMitigationProbability": 0,
+                "posMitigationImpact": 0,
+                "posMitigationSeverity": 12,  
+                "posMitigationSeverityLevel": "MODERATE",
+                
+                "identifiedOn": "1459465200000",
+                "mitigationRelatedEventIdentifierType": "",
+                "mitigationRelatedEventIdentifierValue": ""
+            }
+        

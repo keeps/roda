@@ -1,0 +1,45 @@
+
+            {
+            
+            
+            "category": "Personnel, management and administration procedures",
+            
+                
+        "id": "urn:drambora:r23",
+    
+        "name": "Staff skills become obsolete",
+    
+        "description": "Staff members' skills stagnate and are no longer current. ",
+    
+        "notes": "- Does the repository's natural development presuppose that staff will develop new skills and abilities over time?\n- Are training and professional development opportunities made available to staff?\n- Are staff members required to identify and pursue appropriate training activities? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+    
+        "preMitigationNotes": "- Staff are only capable of employing dated preservation strategies and are not trained in or exposed to emerging techniques or technologies ",
+    
+        "mitigationOwner": "Personnel",
+    
+        "mitigationStrategy": "Avoidance strategies:\n- Establish means for staff training, and for staff to employ skills of limited frequent value in test environment\n- Implement staff performance reviews to regularly determine skill levels and training requirements In the event of risk’s execution:\n- Provide training facilities to reverse obsolescence of skills ",
+    
+        "preMitigationProbability": 4 ,
+    
+        "preMitigationImpact": 3,
+    
+        "preMitigationSeverity": 12,
+        "preMitigationSeverityLevel": "MODERATE",
+    
+                "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
+                "mitigationOwnerType": "Human",
+                "createdBy": "admin",
+                "createdOn": 1459465200000,    
+                "updatedBy": "admin",
+                "updatedOn": 1459465200000,
+                
+                "posMitigationProbability": 0,
+                "posMitigationImpact": 0,
+                "posMitigationSeverity": 12,  
+                "posMitigationSeverityLevel": "MODERATE",
+                
+                "identifiedOn": "1459465200000",
+                "mitigationRelatedEventIdentifierType": "",
+                "mitigationRelatedEventIdentifierValue": ""
+            }
+        

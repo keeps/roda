@@ -1,0 +1,45 @@
+
+            {
+            
+            
+            "category": "Operations and service delivery",
+            
+                
+        "id": "urn:drambora:r54",
+    
+        "name": "Loss of authenticity of information",
+    
+        "description": "Repository is incapable of demonstrating that information objects are what they purport to be. ",
+    
+        "notes": "- Does repository commit to the preservation of information authenticity? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+    
+        "preMitigationNotes": "- Repository is unable to demonstrate the authenticity of preserved records that purport to describe government departmental expenditure ",
+    
+        "mitigationOwner": "Preservation",
+    
+        "mitigationStrategy": "Avoidance strategies:\n- Ensure policies and procedures are conceived with due consideration of authenticity requirements\n- Maintain and review policies and procedures to ensure adequate recording of provenance information to demonstrate that archived material represents authentic representation of what was initially deposited or received\n- Ensure software and hardware systems and preservation strategies are capable of preserving authenticity In the event of risk’s execution:\n- Invoke treatment strategies to alleviate loss of reputation or trust ",
+    
+        "preMitigationProbability": 4 ,
+    
+        "preMitigationImpact": 3,
+    
+        "preMitigationSeverity": 12,
+        "preMitigationSeverityLevel": "MODERATE",
+    
+                "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
+                "mitigationOwnerType": "Human",
+                "createdBy": "admin",
+                "createdOn": 1459465200000,    
+                "updatedBy": "admin",
+                "updatedOn": 1459465200000,
+                
+                "posMitigationProbability": 0,
+                "posMitigationImpact": 0,
+                "posMitigationSeverity": 12,  
+                "posMitigationSeverityLevel": "MODERATE",
+                
+                "identifiedOn": "1459465200000",
+                "mitigationRelatedEventIdentifierType": "",
+                "mitigationRelatedEventIdentifierValue": ""
+            }
+        

@@ -1,0 +1,45 @@
+
+            {
+            
+            
+            "category": "Hardware, software or communications equipment andfacilities",
+            
+                
+        "id": "urn:drambora:r30",
+    
+        "name": "Hardware failure or incompatibility",
+    
+        "description": "System hardware is rendered incapable of facilitating current businessobjectives. ",
+    
+        "notes": "- Are policies and procedures in place to monitor the adequacyof hardware technologies amid changing community requirements and external influences?\n- What service level guarantees are offered from third-party hardware service providers?\n- Is a proportion of staff time allocated to determining the ongoing suitability and operational functionality of hardware? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+    
+        "preMitigationNotes": "- Server’s power supply burns out, rendering hardware unusable ",
+    
+        "mitigationOwner": "Technical",
+    
+        "mitigationStrategy": "Avoidance strategies:\n- Allocate a proportion of staff time to monitoring the ongoingsuitability of repository hardware and assessing the potentialvalue of emerging technologies\n- Evaluate effects of system changes prior to their implementation\n- Pre-empt hardware failure with anticipatory investment In the event of risk’s execution:\n- Seek formal assurances or SLAs from hardware suppliers orproviders of third-party hardware services ",
+    
+        "preMitigationProbability": 4 ,
+    
+        "preMitigationImpact": 3,
+    
+        "preMitigationSeverity": 12,
+        "preMitigationSeverityLevel": "MODERATE",
+    
+                "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
+                "mitigationOwnerType": "Human",
+                "createdBy": "admin",
+                "createdOn": 1459465200000,    
+                "updatedBy": "admin",
+                "updatedOn": 1459465200000,
+                
+                "posMitigationProbability": 0,
+                "posMitigationImpact": 0,
+                "posMitigationSeverity": 12,  
+                "posMitigationSeverityLevel": "MODERATE",
+                
+                "identifiedOn": "1459465200000",
+                "mitigationRelatedEventIdentifierType": "",
+                "mitigationRelatedEventIdentifierValue": ""
+            }
+        

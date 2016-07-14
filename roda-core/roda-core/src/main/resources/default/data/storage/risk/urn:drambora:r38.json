@@ -1,0 +1,45 @@
+
+            {
+            
+            
+            "category": "Hardware, software or communications equipment and facilities",
+            
+                
+        "id": "urn:drambora:r38",
+    
+        "name": "Remote or local software intrusion",
+    
+        "description": "Repository suffers software intrusion conducted either from onsite or from a remote location, by bypassing network security provisions. ",
+    
+        "notes": "- Are vulnerabilities conceivably evident within repository's system security?\n- Is it possible that individuals internal or external to the repository might be motivated to compromise system security to acquire or vandalise materials?\n- Are archived materials stored on network accessible computers? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+    
+        "preMitigationNotes": "- Hacker remotely exploits server software security via secure shell tunnelling, executing malicious code on the server ",
+    
+        "mitigationOwner": "Technical",
+    
+        "mitigationStrategy": "- Establish and regularly evaluate policies and procedures for software security in accordance with relevant standards\n- Limit execution of non-essential services\n- Update software with latest security patches\n- Allocate staff time to analyse attempted security compromises and monitor security sources for details of known vulnerabilities\n- Compel users to change passwords frequently In the event of risk’s execution:\n- Rebuild system to ensure there are no residual effects of system compromise ",
+    
+        "preMitigationProbability": 4 ,
+    
+        "preMitigationImpact": 3,
+    
+        "preMitigationSeverity": 12,
+        "preMitigationSeverityLevel": "MODERATE",
+    
+                "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
+                "mitigationOwnerType": "Human",
+                "createdBy": "admin",
+                "createdOn": 1459465200000,    
+                "updatedBy": "admin",
+                "updatedOn": 1459465200000,
+                
+                "posMitigationProbability": 0,
+                "posMitigationImpact": 0,
+                "posMitigationSeverity": 12,  
+                "posMitigationSeverityLevel": "MODERATE",
+                
+                "identifiedOn": "1459465200000",
+                "mitigationRelatedEventIdentifierType": "",
+                "mitigationRelatedEventIdentifierValue": ""
+            }
+        

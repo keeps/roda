@@ -1,0 +1,45 @@
+
+            {
+            
+            
+            "category": "Personnel, management and administration procedures; Operations and service delivery",
+            
+                
+        "id": "urn:drambora:r57",
+    
+        "name": "Loss of non-repudiation of commitments",
+    
+        "description": "Repository is incapable of ensuring that commitments cannot later be denied by either of the parties involved. ",
+    
+        "notes": "- Does repository engage in agreements where obligations are assumed by contracting parties? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+    
+        "preMitigationNotes": "- Repository fails to record details of transactions with contractor who later denies that they have agreed to the information exchanged, and its implied obligations ",
+    
+        "mitigationOwner": "Preservation",
+    
+        "mitigationStrategy": "Avoidance strategies:\n- Maintain and review policies and procedures to ensure contractual commitments are communicated, understood, recorded and agreed upon by both parties. In the event of risk’s execution:\n- Implement policy to define appropriate procedural response, such as seeking legal advice to pursue enforcement of contract ",
+    
+        "preMitigationProbability": 4 ,
+    
+        "preMitigationImpact": 3,
+    
+        "preMitigationSeverity": 12,
+        "preMitigationSeverityLevel": "MODERATE",
+    
+                "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
+                "mitigationOwnerType": "Human",
+                "createdBy": "admin",
+                "createdOn": 1459465200000,    
+                "updatedBy": "admin",
+                "updatedOn": 1459465200000,
+                
+                "posMitigationProbability": 0,
+                "posMitigationImpact": 0,
+                "posMitigationSeverity": 12,  
+                "posMitigationSeverityLevel": "MODERATE",
+                
+                "identifiedOn": "1459465200000",
+                "mitigationRelatedEventIdentifierType": "",
+                "mitigationRelatedEventIdentifierValue": ""
+            }
+        

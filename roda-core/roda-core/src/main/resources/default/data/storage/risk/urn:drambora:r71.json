@@ -1,0 +1,45 @@
+
+            {
+            
+            
+            "category": "Operations and service delivery; Hardware, software or communications equipment and facilities",
+            
+                
+        "id": "urn:drambora:r71",
+    
+        "name": "Non-discoverability of information objects",
+    
+        "description": "Metadata supporting information package discovery are insufficient. ",
+    
+        "notes": "- Does repository make discovery metadata available to a user community, however small that community may be?\n- What degree of flexibility is offered to the user with respect to discovering archived content?\n- What systems are integral to the discovery of information objects? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+    
+        "preMitigationNotes": "- A geophysical data centre records discovery metadata to facilitate searching only by name of data set, but researchers within the community wish to search based on the physical location where the data was acquired and the name of the instrument used ",
+    
+        "mitigationOwner": "Documentation",
+    
+        "mitigationStrategy": "Avoidance strategies:\n- Determine extent of discovery mechanisms and searchable fields in consultation with designated community\n- Communicate full range of available information discovery mechanisms to community In the event of risk’s execution:\n- Introduce alternative means for information discovery based on perceived shortcomings ",
+    
+        "preMitigationProbability": 4 ,
+    
+        "preMitigationImpact": 3,
+    
+        "preMitigationSeverity": 12,
+        "preMitigationSeverityLevel": "MODERATE",
+    
+                "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
+                "mitigationOwnerType": "Human",
+                "createdBy": "admin",
+                "createdOn": 1459465200000,    
+                "updatedBy": "admin",
+                "updatedOn": 1459465200000,
+                
+                "posMitigationProbability": 0,
+                "posMitigationImpact": 0,
+                "posMitigationSeverity": 12,  
+                "posMitigationSeverityLevel": "MODERATE",
+                
+                "identifiedOn": "1459465200000",
+                "mitigationRelatedEventIdentifierType": "",
+                "mitigationRelatedEventIdentifierValue": ""
+            }
+        

@@ -1,0 +1,45 @@
+
+            {
+            
+            
+            "category": "Operations and service delivery",
+            
+                
+        "id": "urn:drambora:r10",
+    
+        "name": "Community feedback not acted upon",
+    
+        "description": "Although feedback is received, it has no influence over repository’s business activities. ",
+    
+        "notes": "- Is a proportion of staff time allocated to responding to community feedback, or reflecting it in changes to operational objectives?\n- Are policies and procedures in place to enable the repository to react within an appropriately timely fashion to the receipt of community feedback?\n- Are operational objectives adaptable to react to community feedback? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+    
+        "preMitigationNotes": "- Repository fails to react to the fact that its user communities are increasingly incapable of using data encoded within the repository’s chosen formats with the software that they principally employ ",
+    
+        "mitigationOwner": "Management",
+    
+        "mitigationStrategy": "Avoidance strategies:\n- Establish policies to acknowledge and react to community feedback In the event of risk’s execution:\n- Acknowledge failure to act with community and retrospectively react to received feedback ",
+    
+        "preMitigationProbability": 4 ,
+    
+        "preMitigationImpact": 3,
+    
+        "preMitigationSeverity": 12,
+        "preMitigationSeverityLevel": "MODERATE",
+    
+                "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
+                "mitigationOwnerType": "Human",
+                "createdBy": "admin",
+                "createdOn": 1459465200000,    
+                "updatedBy": "admin",
+                "updatedOn": 1459465200000,
+                
+                "posMitigationProbability": 0,
+                "posMitigationImpact": 0,
+                "posMitigationSeverity": 12,  
+                "posMitigationSeverityLevel": "MODERATE",
+                
+                "identifiedOn": "1459465200000",
+                "mitigationRelatedEventIdentifierType": "",
+                "mitigationRelatedEventIdentifierValue": ""
+            }
+        

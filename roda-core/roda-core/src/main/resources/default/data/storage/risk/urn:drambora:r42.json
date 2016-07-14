@@ -1,0 +1,45 @@
+
+            {
+            
+            
+            "category": "Physical environment",
+            
+                
+        "id": "urn:drambora:r42",
+    
+        "name": "Destruction or non-availability of repository site",
+    
+        "description": "Repository’s physical premises are destroyed or rendered permanently or temporarily unusable. ",
+    
+        "notes": "- Are the repository's operational activities undertaken within a single physical building or group of buildings within a small geographical area?\n- Are redundant system and storage facilities established? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+    
+        "preMitigationNotes": "- Fire damage\n- Asbestos found within building ",
+    
+        "mitigationOwner": "Technical",
+    
+        "mitigationStrategy": "Avoidance strategies:\n- Maintain, test and revise physical and software system security policies in accordance with relevant standards In the event of risk’s execution:\n- Establish redundant storage facilities capable of becoming operational base ",
+    
+        "preMitigationProbability": 4 ,
+    
+        "preMitigationImpact": 3,
+    
+        "preMitigationSeverity": 12,
+        "preMitigationSeverityLevel": "MODERATE",
+    
+                "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
+                "mitigationOwnerType": "Human",
+                "createdBy": "admin",
+                "createdOn": 1459465200000,    
+                "updatedBy": "admin",
+                "updatedOn": 1459465200000,
+                
+                "posMitigationProbability": 0,
+                "posMitigationImpact": 0,
+                "posMitigationSeverity": 12,  
+                "posMitigationSeverityLevel": "MODERATE",
+                
+                "identifiedOn": "1459465200000",
+                "mitigationRelatedEventIdentifierType": "",
+                "mitigationRelatedEventIdentifierValue": ""
+            }
+        

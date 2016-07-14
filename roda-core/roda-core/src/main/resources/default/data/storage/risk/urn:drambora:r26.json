@@ -1,0 +1,45 @@
+
+            {
+            
+            
+            "category": "Personnel, management and administration procedures",
+            
+                
+        "id": "urn:drambora:r26",
+    
+        "name": "Misallocation of finances",
+    
+        "description": "Repository allocates resources ill-advisedly, representing a poor investment, with benefits not proportional to expenditure. ",
+    
+        "notes": "- Is budgetary management and expenditure within the responsibilities of the repository? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+    
+        "preMitigationNotes": "- Management invest heavily in software that offers functionality far in excess of operational requirements, when cheaper alternatives with limited, but adequate features are available ",
+    
+        "mitigationOwner": "Budgeting",
+    
+        "mitigationStrategy": "Avoidance strategies:\n- Establish policies and budgetary authorisation infrastructure to ensure appropriate use of repository funding In the event of risk’s execution:\n- Revise policies to limit likelihood of subsequent misallocation ",
+    
+        "preMitigationProbability": 4 ,
+    
+        "preMitigationImpact": 3,
+    
+        "preMitigationSeverity": 12,
+        "preMitigationSeverityLevel": "MODERATE",
+    
+                "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
+                "mitigationOwnerType": "Human",
+                "createdBy": "admin",
+                "createdOn": 1459465200000,    
+                "updatedBy": "admin",
+                "updatedOn": 1459465200000,
+                
+                "posMitigationProbability": 0,
+                "posMitigationImpact": 0,
+                "posMitigationSeverity": 12,  
+                "posMitigationSeverityLevel": "MODERATE",
+                
+                "identifiedOn": "1459465200000",
+                "mitigationRelatedEventIdentifierType": "",
+                "mitigationRelatedEventIdentifierValue": ""
+            }
+        

@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -234,6 +235,8 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                   List<String> convertableTo = getConvertableTo();
                   Map<String, List<String>> pronomToExtension = getPronomToExtension();
                   Map<String, List<String>> mimetypeToExtension = getMimetypeToExtension();
+                  String fileInfoPath = StringUtils.join(Arrays.asList(aip.getId(), representation.getId(),
+                    StringUtils.join(file.getPath(), '/'), file.getId()), '/');
 
                   if (doPluginExecute(fileFormat, filePronom, fileMimetype, applicableTo, convertableTo,
                     pronomToExtension, mimetypeToExtension)) {
@@ -281,11 +284,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                       detailExtension += file.getId() + ": " + e.getOutput();
                       pluginResultState = PluginState.PARTIAL_SUCCESS;
                       reportState = pluginResultState;
-
-                      Report fileReportItem = PluginHelper.initPluginReportItem(this, file.getId(), File.class,
-                        AIPState.ACTIVE);
-                      fileReportItem.setPluginState(pluginResultState).setPluginDetails(e.getMessage());
-                      reportItem.addReport(fileReportItem);
+                      reportItem.setPluginState(pluginResultState).addPluginDetails(e.getMessage());
 
                       LOGGER.debug("Conversion ({} to {}) failed on file {} of representation {} from AIP {}",
                         fileFormat, outputFormat, file.getId(), representation.getId(), aip.getId());
@@ -311,9 +310,11 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
             IOUtils.closeQuietly(allFiles);
             reportItem.setPluginState(pluginResultState);
 
-            if (ignoreFiles && validationReport.getIssues().size() > 0) {
-              reportItem.setHtmlPluginDetails(true)
-                .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
+            if (reportState.equals(PluginState.SUCCESS)) {
+              if (ignoreFiles && validationReport.getIssues().size() > 0) {
+                reportItem.setHtmlPluginDetails(true)
+                  .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
+              }
             }
 
             if (hasNonPdfFiles) {
@@ -377,7 +378,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
         List<File> alteredFiles = new ArrayList<File>();
         List<File> newFiles = new ArrayList<File>();
         aipId = representation.getAipId();
-        PluginState pluginResultState = PluginState.SUCCESS;
+        PluginState reportState = PluginState.SUCCESS;
         boolean notify = true;
         // FIXME 20160516 hsilva: see how to set initial
         // initialOutcomeObjectState
@@ -448,12 +449,8 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
                   } catch (CommandException e) {
                     detailExtension += file.getId() + ": " + e.getOutput();
-                    pluginResultState = PluginState.PARTIAL_SUCCESS;
-
-                    Report fileReportItem = PluginHelper.initPluginReportItem(this, file.getId(), File.class,
-                      AIPState.ACTIVE);
-                    fileReportItem.setPluginState(PluginState.PARTIAL_SUCCESS).setPluginDetails(e.getMessage());
-                    reportItem.addReport(fileReportItem);
+                    reportState = PluginState.PARTIAL_SUCCESS;
+                    reportItem.setPluginState(reportState).addPluginDetails(e.getMessage());
 
                     LOGGER.debug("Conversion ({} to {}) failed on file {} of representation {} from AIP {}", fileFormat,
                       outputFormat, file.getId(), representation.getId(), representation.getAipId());
@@ -464,7 +461,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                   if (ignoreFiles) {
                     validationReport.addIssue(new ValidationIssue(file.getId()));
                   } else {
-                    pluginResultState = PluginState.FAILURE;
+                    reportState = PluginState.FAILURE;
                     hasNonPdfFiles = true;
                   }
                 }
@@ -475,11 +472,13 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
           }
           IOUtils.closeQuietly(allFiles);
 
-          reportItem.setPluginState(pluginResultState);
+          reportItem.setPluginState(reportState);
 
-          if (ignoreFiles) {
-            reportItem.setHtmlPluginDetails(true)
-              .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
+          if (reportState.equals(PluginState.SUCCESS)) {
+            if (ignoreFiles) {
+              reportItem.setHtmlPluginDetails(true)
+                .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
+            }
           }
 
           if (hasNonPdfFiles) {
@@ -497,16 +496,16 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
         } catch (RuntimeException | NotFoundException | GenericException | RequestNotValidException
           | AuthorizationDeniedException | IOException | AlreadyExistsException e) {
           LOGGER.error("Error processing Representation " + representation.getId() + ": " + e.getMessage(), e);
-          pluginResultState = PluginState.FAILURE;
+          reportState = PluginState.FAILURE;
 
           reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
           report.addReport(reportItem);
         }
 
-        jobPluginInfo.incrementObjectsProcessed(pluginResultState);
+        jobPluginInfo.incrementObjectsProcessed(reportState);
         LOGGER.debug("Creating convert plugin event for the representation " + representation.getId());
         boolean notifyEvent = false;
-        createEvent(alteredFiles, newFiles, aipId, newRepresentationID, model, index, outputFormat, pluginResultState,
+        createEvent(alteredFiles, newFiles, aipId, newRepresentationID, model, index, outputFormat, reportState,
           detailExtension, notifyEvent);
       }
 

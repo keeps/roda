@@ -1,0 +1,45 @@
+
+            {
+            
+            
+            "category": "Personnel, management and administration procedures; Hardware, software or communications equipment and facilities",
+            
+                
+        "id": "urn:drambora:r47",
+    
+        "name": "Inability to evaluate effectiveness of technical infrastructure and security",
+    
+        "description": "Repository is incapable of effectively determining the extent to which its technical infrastructure and security provisions are capable of facilitating business objectives. ",
+    
+        "notes": "- Does the repository maintain policies and procedures to verify and record attempted security compromises?\n- Does the repository maintain policies and procedures to identify non-authorised or inappropriate system interactions?\n- Does the repository maintain policies and procedures to ensure the ongoing suitability and functionality of hardware and software technologies and storage media?\n- Are mechanisms to determine the effectiveness of technical and security provisions exploited on a regular basis? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+    
+        "preMitigationNotes": "- Repository has no mechanisms to test security provisions or to evaluate the effectiveness of technological infrastructure ",
+    
+        "mitigationOwner": "Management",
+    
+        "mitigationStrategy": "Avoidance strategies:\n- Establish internal means of assessment including risk management\n- Seek relevant external certification in order to demonstrate competence ",
+    
+        "preMitigationProbability": 4 ,
+    
+        "preMitigationImpact": 3,
+    
+        "preMitigationSeverity": 12,
+        "preMitigationSeverityLevel": "MODERATE",
+    
+                "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
+                "mitigationOwnerType": "Human",
+                "createdBy": "admin",
+                "createdOn": 1459465200000,    
+                "updatedBy": "admin",
+                "updatedOn": 1459465200000,
+                
+                "posMitigationProbability": 0,
+                "posMitigationImpact": 0,
+                "posMitigationSeverity": 12,  
+                "posMitigationSeverityLevel": "MODERATE",
+                
+                "identifiedOn": "1459465200000",
+                "mitigationRelatedEventIdentifierType": "",
+                "mitigationRelatedEventIdentifierValue": ""
+            }
+        

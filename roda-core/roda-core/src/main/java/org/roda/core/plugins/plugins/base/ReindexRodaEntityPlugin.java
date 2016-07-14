@@ -100,7 +100,7 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
       index.reindex(storage, clazz);
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
       | IOException e) {
-      LOGGER.error("Error reindexing {}", clazz.getSimpleName());
+      LOGGER.error("Error reindexing {}: ", clazz.getSimpleName(), e);
     }
 
     return new Report();

@@ -347,10 +347,10 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
               reportItem.setHtmlPluginDetails(true)
                 .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
             }
+          }
 
-            if (hasNonPdfFiles) {
-              reportItem.setPluginDetails("Non PDF files were not ignored");
-            }
+          if (hasNonPdfFiles) {
+            reportItem.setPluginDetails("Non PDF files were not ignored");
           }
 
         } catch (Throwable e) {
@@ -526,10 +526,10 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
               reportItem.setHtmlPluginDetails(true)
                 .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
             }
+          }
 
-            if (hasNonPdfFiles) {
-              reportItem.setPluginDetails("Non PDF files were not ignored");
-            }
+          if (hasNonPdfFiles) {
+            reportItem.setPluginDetails("Non PDF files were not ignored");
           }
 
         } catch (Throwable e) {

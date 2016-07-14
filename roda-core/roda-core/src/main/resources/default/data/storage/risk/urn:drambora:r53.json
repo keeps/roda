@@ -1,0 +1,45 @@
+
+            {
+            
+            
+            "category": "Operations and service delivery",
+            
+                
+        "id": "urn:drambora:r53",
+    
+        "name": "Loss of availability of information and/or service",
+    
+        "description": "Repository is unable to provide a comprehensive range of services or access to all of its information holdings for which access ought to be available. ",
+    
+        "notes": "- Does repository commit to defined service levels?\n- Does repository provide assurances of information availability? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+    
+        "preMitigationNotes": "- Repository’s servers fail, rendering a proportion of its collections inaccessible, although contracts stipulate that access should be afforded ",
+    
+        "mitigationOwner": "Preservation",
+    
+        "mitigationStrategy": "Avoidance strategies:\n- Ensure policies and procedures are conceived with due consideration of any service levels that the repository has committed to\n- Ensure software and hardware systems and preservation strategies are capable of meeting service levels In the event of risk’s execution:\n- Invoke treatment strategies to alleviate loss of reputation or trust ",
+    
+        "preMitigationProbability": 4 ,
+    
+        "preMitigationImpact": 3,
+    
+        "preMitigationSeverity": 12,
+        "preMitigationSeverityLevel": "MODERATE",
+    
+                "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
+                "mitigationOwnerType": "Human",
+                "createdBy": "admin",
+                "createdOn": 1459465200000,    
+                "updatedBy": "admin",
+                "updatedOn": 1459465200000,
+                
+                "posMitigationProbability": 0,
+                "posMitigationImpact": 0,
+                "posMitigationSeverity": 12,  
+                "posMitigationSeverityLevel": "MODERATE",
+                
+                "identifiedOn": "1459465200000",
+                "mitigationRelatedEventIdentifierType": "",
+                "mitigationRelatedEventIdentifierValue": ""
+            }
+        

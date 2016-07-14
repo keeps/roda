@@ -1,0 +1,45 @@
+
+            {
+            
+            
+            "category": "Operations and service delivery",
+            
+                
+        "id": "urn:drambora:r52",
+    
+        "name": "Loss of confidentiality of information",
+    
+        "description": "Information protected by confidentiality agreements is made available to communities, in contravention of those agreements. ",
+    
+        "notes": "- Is repository bound by requirements to maintain information confidentiality? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+    
+        "preMitigationNotes": "- Repository authorisation subsystems fail and commercially sensitive information is exposed to a community that is considerably wider than that to whom, according to the relevant deposit agreement, access may be legitimately afforded ",
+    
+        "mitigationOwner": "Preservation",
+    
+        "mitigationStrategy": "Avoidance strategies:\n- Ensure policies and procedures are conceived with due consideration of any confidentiality requirements that the repository is subject to\n- Ensure software and hardware systems and preservation strategies are capable of meeting requirements of policies In the event of risk’s execution:\n- Implement policy to withdraw availability of confidential materials and invoke treatment strategies to alleviate loss of reputation ",
+    
+        "preMitigationProbability": 4 ,
+    
+        "preMitigationImpact": 3,
+    
+        "preMitigationSeverity": 12,
+        "preMitigationSeverityLevel": "MODERATE",
+    
+                "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
+                "mitigationOwnerType": "Human",
+                "createdBy": "admin",
+                "createdOn": 1459465200000,    
+                "updatedBy": "admin",
+                "updatedOn": 1459465200000,
+                
+                "posMitigationProbability": 0,
+                "posMitigationImpact": 0,
+                "posMitigationSeverity": 12,  
+                "posMitigationSeverityLevel": "MODERATE",
+                
+                "identifiedOn": "1459465200000",
+                "mitigationRelatedEventIdentifierType": "",
+                "mitigationRelatedEventIdentifierValue": ""
+            }
+        

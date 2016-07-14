@@ -1,0 +1,45 @@
+
+            {
+            
+            
+            "category": "Personnel, management and administration procedures",
+            
+                
+        "id": "urn:drambora:r24",
+    
+        "name": "Inability to evaluate staff effectiveness or suitability",
+    
+        "description": "Repository is incapable of effectively determining the extent to which staff are capable of achieving business objectives. ",
+    
+        "notes": "- Does the repository maintain policies and procedures to review staff performance? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+    
+        "preMitigationNotes": "- Repository has no record of performance levels of individuals within its staff or means to effectively identify training requirements ",
+    
+        "mitigationOwner": "Management",
+    
+        "mitigationStrategy": "Avoidance strategies:\n- Establish internal means of assessment including risk management\n- Seek relevant external certification in order to demonstrate staff competence\n- Undertake regular staff development reviews ",
+    
+        "preMitigationProbability": 4 ,
+    
+        "preMitigationImpact": 3,
+    
+        "preMitigationSeverity": 12,
+        "preMitigationSeverityLevel": "MODERATE",
+    
+                "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
+                "mitigationOwnerType": "Human",
+                "createdBy": "admin",
+                "createdOn": 1459465200000,    
+                "updatedBy": "admin",
+                "updatedOn": 1459465200000,
+                
+                "posMitigationProbability": 0,
+                "posMitigationImpact": 0,
+                "posMitigationSeverity": 12,  
+                "posMitigationSeverityLevel": "MODERATE",
+                
+                "identifiedOn": "1459465200000",
+                "mitigationRelatedEventIdentifierType": "",
+                "mitigationRelatedEventIdentifierValue": ""
+            }
+        

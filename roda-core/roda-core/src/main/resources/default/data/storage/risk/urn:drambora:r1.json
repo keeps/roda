@@ -1,0 +1,45 @@
+
+            {
+            
+            
+            "category": "Personnel, management and administration procedures",
+            
+                
+        "id": "urn:drambora:r1",
+    
+        "name": "Management failure",
+    
+        "description": "One or more aspect of organisational management is unsuccessful, resulting in a failure to deliver an anticipated or required business outcome. ",
+    
+        "notes": "- Is organisation subject to central management control? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+    
+        "preMitigationNotes": "- Repository management fails to allocate sufficient resources to complete one or more business activities\n- Management’s adopted preservation strategies result in information loss ",
+    
+        "mitigationOwner": "Management",
+    
+        "mitigationStrategy": "Avoidance strategies:\n- Conceive comprehensive management policies and procedures and establish mechanisms for their regular review\n- Establish benchmarks to determine effectiveness of management policies and procedures In the event of risk’s execution:\n- Establish continuity or recovery mechanisms to recover from effects ",
+    
+        "preMitigationProbability": 4 ,
+    
+        "preMitigationImpact": 3,
+    
+        "preMitigationSeverity": 12,
+        "preMitigationSeverityLevel": "MODERATE",
+    
+                "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
+                "mitigationOwnerType": "Human",
+                "createdBy": "admin",
+                "createdOn": 1459465200000,    
+                "updatedBy": "admin",
+                "updatedOn": 1459465200000,
+                
+                "posMitigationProbability": 0,
+                "posMitigationImpact": 0,
+                "posMitigationSeverity": 12,  
+                "posMitigationSeverityLevel": "MODERATE",
+                
+                "identifiedOn": "1459465200000",
+                "mitigationRelatedEventIdentifierType": "",
+                "mitigationRelatedEventIdentifierValue": ""
+            }
+        

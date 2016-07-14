@@ -1,0 +1,45 @@
+
+            {
+            
+            
+            "category": "Hardware, software or communications equipment and facilities",
+            
+                
+        "id": "urn:drambora:r32",
+    
+        "name": "Hardware or software incapable of supporting emerging repository aims",
+    
+        "description": "Technical infrastructure, while adequate for meeting current aims, is incapable of meeting new requirements resulting from organisation’s natural evolution. ",
+    
+        "notes": "- Are additional technical facilities required to facilitate the repository's anticipated development?\n- To what extent is the repository's current service level likely to increase over time? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+    
+        "preMitigationNotes": "- Technical infrastructure is insufficiently scalable to handle an anticipated escalation in number of objects or requests\n- Hardware is incompatible with emerging operation systems ",
+    
+        "mitigationOwner": "Technical",
+    
+        "mitigationStrategy": "Avoidance strategies:\n- Allocate a proportion of staff time to monitoring the scalability and compatibility of repository technologies with respect to emerging organisational aims ",
+    
+        "preMitigationProbability": 4 ,
+    
+        "preMitigationImpact": 3,
+    
+        "preMitigationSeverity": 12,
+        "preMitigationSeverityLevel": "MODERATE",
+    
+                "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
+                "mitigationOwnerType": "Human",
+                "createdBy": "admin",
+                "createdOn": 1459465200000,    
+                "updatedBy": "admin",
+                "updatedOn": 1459465200000,
+                
+                "posMitigationProbability": 0,
+                "posMitigationImpact": 0,
+                "posMitigationSeverity": 12,  
+                "posMitigationSeverityLevel": "MODERATE",
+                
+                "identifiedOn": "1459465200000",
+                "mitigationRelatedEventIdentifierType": "",
+                "mitigationRelatedEventIdentifierValue": ""
+            }
+        

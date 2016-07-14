@@ -1,0 +1,45 @@
+
+            {
+            
+            
+            "category": "Operations and service delivery; Hardware, software or communications equipment and facilities",
+            
+                
+        "id": "urn:drambora:r76",
+    
+        "name": "Authorisation subsystem fails",
+    
+        "description": "Systems to ensure appropriate allocation of system privileges are insufficient, resulting in incorrect rights allocations to users. ",
+    
+        "notes": "- Is the repository compelled by contracts or mandate to define and control multiple levels of end-user access?\n- What systems are necessary to maintain the operation of the repository's authorisation controls? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+    
+        "preMitigationNotes": "- Authorisation system which allocates privileges based on database username look-ups fails because two distinct users are permitted to share the same username string ",
+    
+        "mitigationOwner": "Dissemination",
+    
+        "mitigationStrategy": "Avoidance strategies:\n- Define policies describing authorisation requirements to correspond with conditions expressed in deposit agreements and other regulatory, legislative or contextual provisions\n- Implement appropriate systems to meet authorisation policy requirements\n- Establish sufficiently robust technical infrastructure to satisfy demands of proposed authorisation services In the event of risk’s execution:\n- Determine the shortcoming that led to authorisation failure and subsequently remedy it\n- If system is self-aware of its failure, implement a policy to describe the appropriate reaction; e.g., upon failure restrict all user privileges ",
+    
+        "preMitigationProbability": 4 ,
+    
+        "preMitigationImpact": 3,
+    
+        "preMitigationSeverity": 12,
+        "preMitigationSeverityLevel": "MODERATE",
+    
+                "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
+                "mitigationOwnerType": "Human",
+                "createdBy": "admin",
+                "createdOn": 1459465200000,    
+                "updatedBy": "admin",
+                "updatedOn": 1459465200000,
+                
+                "posMitigationProbability": 0,
+                "posMitigationImpact": 0,
+                "posMitigationSeverity": 12,  
+                "posMitigationSeverityLevel": "MODERATE",
+                
+                "identifiedOn": "1459465200000",
+                "mitigationRelatedEventIdentifierType": "",
+                "mitigationRelatedEventIdentifierValue": ""
+            }
+        

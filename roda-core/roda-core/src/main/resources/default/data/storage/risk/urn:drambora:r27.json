@@ -1,0 +1,45 @@
+
+            {
+            
+            
+            "category": "Personnel, management and administration procedures",
+            
+                
+        "id": "urn:drambora:r27",
+    
+        "name": "Liability for non-adherence to financial law or regulations",
+    
+        "description": "Repository is liable for failing to fulfil its responsibilities with respect to jurisdictional financial responsibilities. ",
+    
+        "notes": "- Is the repository subject to regulation that compels it to manage financial records in a particular fashion?\n- Does the repository solicit the advice of appropriate experts in order to fulfil its financial and accounting responsibilities? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+    
+        "preMitigationNotes": "- Failure to address taxation requirements\n- Failure to conduct compulsory financial auditing ",
+    
+        "mitigationOwner": "Budgeting",
+    
+        "mitigationStrategy": "Avoidance strategies:\n- Monitor financial legislation and regulations in order to ensure that policies and procedures correspond to intrinsic requirements and prohibitions\n- Seek legal and professional financial advice to ensure adequate fulfilment of responsibilities In the event of risk’s execution:\n- Establish policies and procedures to follow in the event of legislative challenge ",
+    
+        "preMitigationProbability": 4 ,
+    
+        "preMitigationImpact": 3,
+    
+        "preMitigationSeverity": 12,
+        "preMitigationSeverityLevel": "MODERATE",
+    
+                "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
+                "mitigationOwnerType": "Human",
+                "createdBy": "admin",
+                "createdOn": 1459465200000,    
+                "updatedBy": "admin",
+                "updatedOn": 1459465200000,
+                
+                "posMitigationProbability": 0,
+                "posMitigationImpact": 0,
+                "posMitigationSeverity": 12,  
+                "posMitigationSeverityLevel": "MODERATE",
+                
+                "identifiedOn": "1459465200000",
+                "mitigationRelatedEventIdentifierType": "",
+                "mitigationRelatedEventIdentifierValue": ""
+            }
+        

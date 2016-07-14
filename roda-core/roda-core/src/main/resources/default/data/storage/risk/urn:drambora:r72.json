@@ -1,0 +1,45 @@
+
+            {
+            
+            
+            "category": "Personnel, management and administration procedures; Operations and service delivery",
+            
+                
+        "id": "urn:drambora:r72",
+    
+        "name": "Ambiguity of understandability definition",
+    
+        "description": "Repository is unable to describe what understandability means with reference to their stakeholder communities’ expectations or requirements. ",
+    
+        "notes": "- Does the repository define understandability with respect to its user communities’ expectations and requirements? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+    
+        "preMitigationNotes": "- Repository preserves information and associated metadata based on a perception of what is required by user communities that is not necessarily representative ",
+    
+        "mitigationOwner": "Documentation",
+    
+        "mitigationStrategy": "Avoidance strategies:\n- Define and regularly review the concept of understandability with respect to community’s expectations, requirements and knowledge base\n- Make understandability definition available to community and solicit their feedback In the event of risk’s execution:\n- Retrospectively introduce policy detailing understandability definition ",
+    
+        "preMitigationProbability": 4 ,
+    
+        "preMitigationImpact": 3,
+    
+        "preMitigationSeverity": 12,
+        "preMitigationSeverityLevel": "MODERATE",
+    
+                "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
+                "mitigationOwnerType": "Human",
+                "createdBy": "admin",
+                "createdOn": 1459465200000,    
+                "updatedBy": "admin",
+                "updatedOn": 1459465200000,
+                
+                "posMitigationProbability": 0,
+                "posMitigationImpact": 0,
+                "posMitigationSeverity": 12,  
+                "posMitigationSeverityLevel": "MODERATE",
+                
+                "identifiedOn": "1459465200000",
+                "mitigationRelatedEventIdentifierType": "",
+                "mitigationRelatedEventIdentifierValue": ""
+            }
+        

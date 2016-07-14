@@ -1,0 +1,45 @@
+
+            {
+            
+            
+            "category": "Operations and service delivery",
+            
+                
+        "id": "urn:drambora:r51",
+    
+        "name": "Archival information cannot be traced to a received package",
+    
+        "description": "An archival object cannot be traced to a corresponding received package or selection of packages. ",
+    
+        "notes": "- Are policies and procedures in place to validate that archived content corresponds with what was originally submitted?\n- Is ingested content subject to transformation to an archival package? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+    
+        "preMitigationNotes": "- Repository cannot identify the origins of an archived package in order to ensure that its integrity has been adequately preserved ",
+    
+        "mitigationOwner": "Ingest",
+    
+        "mitigationStrategy": "Avoidance strategies:\n- Record appropriate provenance information, detailing interactions undertaken during receipt and ingest process In the event of risk’s execution:\n- Maintain policy and procedure to determine whether package is disposed of, returned or retained ",
+    
+        "preMitigationProbability": 4 ,
+    
+        "preMitigationImpact": 3,
+    
+        "preMitigationSeverity": 12,
+        "preMitigationSeverityLevel": "MODERATE",
+    
+                "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
+                "mitigationOwnerType": "Human",
+                "createdBy": "admin",
+                "createdOn": 1459465200000,    
+                "updatedBy": "admin",
+                "updatedOn": 1459465200000,
+                
+                "posMitigationProbability": 0,
+                "posMitigationImpact": 0,
+                "posMitigationSeverity": 12,  
+                "posMitigationSeverityLevel": "MODERATE",
+                
+                "identifiedOn": "1459465200000",
+                "mitigationRelatedEventIdentifierType": "",
+                "mitigationRelatedEventIdentifierValue": ""
+            }
+        

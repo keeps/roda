@@ -1,0 +1,45 @@
+
+            {
+            
+            
+            "category": "Personnel, management and administration procedures",
+            
+                
+        "id": "urn:drambora:r20",
+    
+        "name": "False perception of the extent of repository's success",
+    
+        "description": "Repository’s assessments of success are flawed and indicate a level of performance inconsistent with reality. ",
+    
+        "notes": "- Do the repository's various efforts to determine effectiveness result in inconsistent results?\n- Do repository's evaluation mechanisms offer comprehensive and reliable coverage? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+    
+        "preMitigationNotes": "- Based on flawed end-user survey evidence solicited from just a small subsection of its user community, the repository is satisfied that its efforts are successful, although mechanisms in place are actually insufficient to maintain the understandability, integrity and authenticity of archived information ",
+    
+        "mitigationOwner": "Management",
+    
+        "mitigationStrategy": "Avoidance strategies:\n- Establish internal means of assessment including risk management\n- Seek relevant external certification in order to demonstrate competence ",
+    
+        "preMitigationProbability": 4 ,
+    
+        "preMitigationImpact": 3,
+    
+        "preMitigationSeverity": 12,
+        "preMitigationSeverityLevel": "MODERATE",
+    
+                "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
+                "mitigationOwnerType": "Human",
+                "createdBy": "admin",
+                "createdOn": 1459465200000,    
+                "updatedBy": "admin",
+                "updatedOn": 1459465200000,
+                
+                "posMitigationProbability": 0,
+                "posMitigationImpact": 0,
+                "posMitigationSeverity": 12,  
+                "posMitigationSeverityLevel": "MODERATE",
+                
+                "identifiedOn": "1459465200000",
+                "mitigationRelatedEventIdentifierType": "",
+                "mitigationRelatedEventIdentifierValue": ""
+            }
+        

@@ -1,0 +1,45 @@
+
+            {
+            
+            
+            "category": "Operations and service delivery",
+            
+                
+        "id": "urn:drambora:r12",
+    
+        "name": "Business policies and procedures are unknown",
+    
+        "description": "Fundamentals of why and how repository’s business activities are conducted are undocumented and unknown, or known only by specific individuals. ",
+    
+        "notes": "- Are policies and procedures comprehensively documented?\n- Is documentation widely accessible and understandable throughout the organisation?\n- Is the location of policy and procedure documentation recorded and well known? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+    
+        "preMitigationNotes": "- Policies and procedures associated with each organisational facet are known only to the individuals responsible\n- Policies are documented in Microsoft Word files but stored only on an unshared partition of a workstation hard-disk ",
+    
+        "mitigationOwner": "Management",
+    
+        "mitigationStrategy": "Avoidance strategies:\n- Conceive and document comprehensive policies and procedures\n- Circulate documentation among repository staff and create multiple copies in alternative locations\n- Circulate details of documentation locations ",
+    
+        "preMitigationProbability": 4 ,
+    
+        "preMitigationImpact": 3,
+    
+        "preMitigationSeverity": 12,
+        "preMitigationSeverityLevel": "MODERATE",
+    
+                "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
+                "mitigationOwnerType": "Human",
+                "createdBy": "admin",
+                "createdOn": 1459465200000,    
+                "updatedBy": "admin",
+                "updatedOn": 1459465200000,
+                
+                "posMitigationProbability": 0,
+                "posMitigationImpact": 0,
+                "posMitigationSeverity": 12,  
+                "posMitigationSeverityLevel": "MODERATE",
+                
+                "identifiedOn": "1459465200000",
+                "mitigationRelatedEventIdentifierType": "",
+                "mitigationRelatedEventIdentifierValue": ""
+            }
+        

@@ -1,0 +1,45 @@
+
+            {
+            
+            
+            "category": "Operations and service delivery",
+            
+                
+        "id": "urn:drambora:r8",
+    
+        "name": "Enforced cessation of repository operations",
+    
+        "description": "Repository is forced to cease its business activities. ",
+    
+        "notes": "- Does the mechanism responsible for the repository's establishment include a stated and finite period for its existence before renewal measures must be undertaken?\n- Are mechanisms available to counterbalance periods of financial loss or constraint?\n- Are significant aspects of business activities susceptible to legal challenge?\n- Is there evidence to suggest that the scale of the repository's user community is diminishing over time? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+    
+        "preMitigationNotes": "- Repository’s responsibilities are withdrawn by legislative amendment\n- Repository fails secure renewal of its preservation contract with its primary client and/or funder\n- Repository goes bankrupt or is no longer financially sustainable\n- Repository loses its place in a competitive marketplace ",
+    
+        "mitigationOwner": "Management",
+    
+        "mitigationStrategy": "Avoidance strategies:\n- Seek all available and relevant certifications to demonstrate publicly the repository’s operational effectiveness\n- Promote organisational transparency to reveal suitability and extent of coverage of policies and procedures\n- Aim for excellence in pursuit of organisational objectivesIn the event of risk’s execution:\n- Establish arrangements for succession\n- Establish contingency plans or escrow agreements\n- Establish exit strategy ",
+    
+        "preMitigationProbability": 4 ,
+    
+        "preMitigationImpact": 3,
+    
+        "preMitigationSeverity": 12,
+        "preMitigationSeverityLevel": "MODERATE",
+    
+                "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
+                "mitigationOwnerType": "Human",
+                "createdBy": "admin",
+                "createdOn": 1459465200000,    
+                "updatedBy": "admin",
+                "updatedOn": 1459465200000,
+                
+                "posMitigationProbability": 0,
+                "posMitigationImpact": 0,
+                "posMitigationSeverity": 12,  
+                "posMitigationSeverityLevel": "MODERATE",
+                
+                "identifiedOn": "1459465200000",
+                "mitigationRelatedEventIdentifierType": "",
+                "mitigationRelatedEventIdentifierValue": ""
+            }
+        

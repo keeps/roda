@@ -1,0 +1,45 @@
+
+            {
+            
+            
+            "category": "Operations and service delivery",
+            
+                
+        "id": "urn:drambora:r58",
+    
+        "name": "Loss of information reliability",
+    
+        "description": "Repository is incapable of demonstrating the reliability of its information holdings. ",
+    
+        "notes": "- Does repository commit to preserve reliability of information? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+    
+        "preMitigationNotes": "- Archived information within a meteorological data centre is regarded as being insufficiently reliable to form the basis for scientific research\n- A court of law refuses to admit archived information as evidence on the grounds that it is unreliable ",
+    
+        "mitigationOwner": "Preservation",
+    
+        "mitigationStrategy": "Avoidance strategies:\n- Ensure policies and procedures are conceived with due consideration of reliability requirements\n- Maintain and review policies and procedures to ensure adequate recording and comparison of checksums to demonstrate that archived information has suffered no loss of integrity since its deposit or receipt\n- Maintain and review policies and procedures to ensure adequate recording of provenance information to demonstrate that archived material represents authentic representation of what was initially deposited or received\n- Ensure software and hardware systems and preservation strategies are capable of preserving information reliability In the event of risk’s execution:\n- Invoke treatment strategies to alleviate loss of reputation or trust ",
+    
+        "preMitigationProbability": 4 ,
+    
+        "preMitigationImpact": 3,
+    
+        "preMitigationSeverity": 12,
+        "preMitigationSeverityLevel": "MODERATE",
+    
+                "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
+                "mitigationOwnerType": "Human",
+                "createdBy": "admin",
+                "createdOn": 1459465200000,    
+                "updatedBy": "admin",
+                "updatedOn": 1459465200000,
+                
+                "posMitigationProbability": 0,
+                "posMitigationImpact": 0,
+                "posMitigationSeverity": 12,  
+                "posMitigationSeverityLevel": "MODERATE",
+                
+                "identifiedOn": "1459465200000",
+                "mitigationRelatedEventIdentifierType": "",
+                "mitigationRelatedEventIdentifierValue": ""
+            }
+        
