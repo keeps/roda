@@ -10,7 +10,6 @@ package org.roda.wui.api.controllers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -61,6 +60,7 @@ import org.roda.wui.client.browse.SupportedMetadataTypeBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
 import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
+import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaCoreService;
 
 /**
@@ -70,8 +70,6 @@ import org.roda.wui.common.RodaCoreService;
 public class Browser extends RodaCoreService {
 
   private static final String AIP_PARAM = "aip";
-
-  private static final String BROWSER_COMPONENT = "Browser";
 
   private static final String TRANSFERRED_RESOURCE_ID_PARAM = "transferredResourceId";
 
@@ -94,10 +92,10 @@ public class Browser extends RodaCoreService {
 
   public static BrowseItemBundle getItemBundle(RodaUser user, String aipId, Locale locale)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
@@ -105,9 +103,7 @@ public class Browser extends RodaCoreService {
     BrowseItemBundle itemBundle = BrowserHelper.getItemBundle(aipId, locale);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getItemBundle", aipId, duration, RodaConstants.API_PATH_PARAM_AIP_ID,
-      aipId);
+    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_AIP_ID, aipId);
 
     return itemBundle;
   }
@@ -115,10 +111,10 @@ public class Browser extends RodaCoreService {
   public static DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(RodaUser user, String aipId,
     String metadataId, String type, String version)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
@@ -127,9 +123,8 @@ public class Browser extends RodaCoreService {
       version);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getDescriptiveMetadataEditBundle", aipId, duration,
-      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
+    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+      RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
 
     return bundle;
   }
@@ -137,10 +132,11 @@ public class Browser extends RodaCoreService {
   public static DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(RodaUser user, String aipId,
     String metadataId)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
+
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
@@ -148,9 +144,8 @@ public class Browser extends RodaCoreService {
     DescriptiveMetadataEditBundle bundle = BrowserHelper.getDescriptiveMetadataEditBundle(user, aip, metadataId);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getDescriptiveMetadataEditBundle", aipId, duration,
-      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
+    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+      RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
 
     return bundle;
   }
@@ -158,10 +153,11 @@ public class Browser extends RodaCoreService {
   public static DescriptiveMetadataVersionsBundle getDescriptiveMetadataVersionsBundle(RodaUser user, String aipId,
     String metadataId, Locale locale)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
+
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
@@ -170,9 +166,8 @@ public class Browser extends RodaCoreService {
       locale);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getDescriptiveMetadataEditBundle", aipId, duration,
-      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
+    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+      RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
 
     return bundle;
   }
@@ -180,18 +175,19 @@ public class Browser extends RodaCoreService {
   public static <T extends IsIndexed> IndexResult<T> find(Class<T> classToReturn, Filter filter, Sorter sorter,
     Sublist sublist, Facets facets, RodaUser user, boolean justActive)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
+    controllerAssistant.checkRoles(user);
+
     // TODO check permissions for each class
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     IndexResult<T> ret = BrowserHelper.find(classToReturn, filter, sorter, sublist, facets, user, justActive);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "find", null, duration, "class", classToReturn.getSimpleName(),
+
+    controllerAssistant.registerAction(user, null, "class", classToReturn.getSimpleName(),
       RodaConstants.CONTROLLER_FILTER_PARAM, filter, RodaConstants.CONTROLLER_SORTER_PARAM, sorter,
       RodaConstants.CONTROLLER_SUBLIST_PARAM, sublist);
 
@@ -200,18 +196,18 @@ public class Browser extends RodaCoreService {
 
   public static <T extends IsIndexed> Long count(RodaUser user, Class<T> classToReturn, Filter filter)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
+    controllerAssistant.checkRoles(user);
+
     // TODO check permissions for each class
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
 
     // delegate
     Long count = BrowserHelper.count(classToReturn, filter, user);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "count", null, duration, "class", classToReturn.getSimpleName(),
+    controllerAssistant.registerAction(user, null, "class", classToReturn.getSimpleName(),
       RodaConstants.CONTROLLER_FILTER_PARAM, filter.toString());
 
     return count;
@@ -219,10 +215,10 @@ public class Browser extends RodaCoreService {
 
   public static <T extends IsIndexed> T retrieve(RodaUser user, Class<T> classToReturn, String id)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // TODO check object level permissions
 
@@ -234,60 +230,59 @@ public class Browser extends RodaCoreService {
     if (classToReturn.equals(IndexedAIP.class)) {
       aipId = id;
     }
-
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "retrieve", aipId, duration, "class", classToReturn.getSimpleName());
+    controllerAssistant.registerAction(user, aipId, "class", classToReturn.getSimpleName());
 
     return ret;
   }
 
   public static <T extends IsIndexed> void delete(RodaUser user, Class<T> classToReturn, SelectedItems<T> ids)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
+
     // TODO check object level permissions
 
     // delegate
     BrowserHelper.delete(user, classToReturn, ids);
 
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "delete", null, duration, "class", classToReturn.getSimpleName());
+    // register action
+    controllerAssistant.registerAction(user, null, "class", classToReturn.getSimpleName());
   }
 
   public static <T extends IsIndexed> List<String> suggest(RodaUser user, Class<T> classToReturn, String field,
     String query) throws AuthorizationDeniedException, GenericException, NotFoundException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
+
     // TODO object level permissions
 
     // delegate
     List<String> ret = BrowserHelper.suggest(classToReturn, field, query);
 
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "suggest", null, duration, "class", classToReturn.getSimpleName(), "field",
-      field, "query", query);
+    // register action
+    controllerAssistant.registerAction(user, null, "class", classToReturn.getSimpleName(), "field", field, "query",
+      query);
 
     return ret;
   }
 
   public static List<IndexedAIP> getAncestors(RodaUser user, IndexedAIP aip)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
     // delegate
     List<IndexedAIP> ancestors = BrowserHelper.getAncestors(aip);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getAncestors", aip.getId(), duration, AIP_PARAM, aip.toString());
+    controllerAssistant.registerAction(user, aip.getId(), AIP_PARAM, aip.toString());
 
     return ancestors;
   }
@@ -299,7 +294,7 @@ public class Browser extends RodaCoreService {
    */
   public static StreamResponse getAipRepresentation(RodaUser user, String representationUUID, String acceptFormat)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // validate input
     BrowserHelper.validateGetAipRepresentationParams(acceptFormat);
@@ -307,7 +302,7 @@ public class Browser extends RodaCoreService {
     IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class, representationUUID);
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, representation.getAipId());
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
@@ -315,21 +310,20 @@ public class Browser extends RodaCoreService {
     StreamResponse aipRepresentation = BrowserHelper.getAipRepresentation(representation, acceptFormat);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getAipRepresentation", representation.getAipId(), duration,
-      RodaConstants.REPRESENTATION_ID, representation.getId());
+    controllerAssistant.registerAction(user, representation.getAipId(), RodaConstants.REPRESENTATION_ID,
+      representation.getId());
 
     return aipRepresentation;
   }
 
   public static StreamResponse getAipRepresentationPart(RodaUser user, String representationUUID, String part)
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class, representationUUID);
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, representation.getAipId());
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
@@ -337,9 +331,8 @@ public class Browser extends RodaCoreService {
     StreamResponse aipRepresentation = BrowserHelper.getAipRepresentationPart(representation, part);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getAipRepresentationPart", representation.getAipId(), duration,
-      RodaConstants.REPRESENTATION_ID, representation.getId(), "part", part);
+    controllerAssistant.registerAction(user, representation.getAipId(), RodaConstants.REPRESENTATION_ID,
+      representation.getId(), "part", part);
 
     return aipRepresentation;
   }
@@ -347,13 +340,13 @@ public class Browser extends RodaCoreService {
   public static StreamResponse listAipDescriptiveMetadata(RodaUser user, String aipId, String start, String limit,
     String acceptFormat)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // validate input
     BrowserHelper.validateListAipDescriptiveMetadataParams(acceptFormat);
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
@@ -361,10 +354,8 @@ public class Browser extends RodaCoreService {
     StreamResponse aipDescriptiveMetadataList = BrowserHelper.listAipDescriptiveMetadata(aipId, start, limit);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "listAipDescriptiveMetadata", aipId, duration,
-      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_QUERY_KEY_START, start,
-      RodaConstants.API_QUERY_KEY_LIMIT, limit);
+    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+      RodaConstants.API_QUERY_KEY_START, start, RodaConstants.API_QUERY_KEY_LIMIT, limit);
 
     return aipDescriptiveMetadataList;
   }
@@ -372,13 +363,13 @@ public class Browser extends RodaCoreService {
   public static StreamResponse getAipDescritiveMetadata(RodaUser user, String aipId, String metadataId,
     String acceptFormat, String language) throws AuthorizationDeniedException, GenericException, TransformerException,
     NotFoundException, RequestNotValidException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // validate input
     BrowserHelper.validateGetAipDescritiveMetadataParams(acceptFormat);
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
@@ -387,9 +378,7 @@ public class Browser extends RodaCoreService {
       language);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getAipDescritiveMetadata", aipId, duration,
-      RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
+    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
 
     return aipDescritiveMetadata;
 
@@ -398,13 +387,13 @@ public class Browser extends RodaCoreService {
   public static StreamResponse getAipDescritiveMetadataVersion(RodaUser user, String aipId, String metadataId,
     String versionId, String acceptFormat, String language) throws AuthorizationDeniedException, GenericException,
     TransformerException, NotFoundException, RequestNotValidException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // validate input
     BrowserHelper.validateGetAipDescritiveMetadataParams(acceptFormat);
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
@@ -413,9 +402,7 @@ public class Browser extends RodaCoreService {
       acceptFormat, language);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getAipDescritiveMetadata", aipId, duration,
-      RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
+    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
 
     return aipDescritiveMetadata;
 
@@ -423,13 +410,13 @@ public class Browser extends RodaCoreService {
 
   public static StreamResponse listAipPreservationMetadata(RodaUser user, String aipId, String acceptFormat)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // validate input
     BrowserHelper.validateListAipPreservationMetadataParams(acceptFormat);
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
@@ -437,9 +424,7 @@ public class Browser extends RodaCoreService {
     StreamResponse aipPreservationMetadataList = BrowserHelper.aipsAipIdPreservationMetadataGet(aipId);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "listAipPreservationMetadata", aipId, duration,
-      RodaConstants.API_PATH_PARAM_AIP_ID, aipId);
+    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_AIP_ID, aipId);
 
     return aipPreservationMetadataList;
   }
@@ -448,13 +433,13 @@ public class Browser extends RodaCoreService {
     String representationId, String startAgent, String limitAgent, String startEvent, String limitEvent,
     String startFile, String limitFile, String acceptFormat, String language) throws AuthorizationDeniedException,
     GenericException, TransformerException, NotFoundException, RequestNotValidException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // validate input
     BrowserHelper.validateGetAipRepresentationPreservationMetadataParams(acceptFormat, language);
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
@@ -463,10 +448,9 @@ public class Browser extends RodaCoreService {
       representationId, startAgent, limitAgent, startEvent, limitEvent, startFile, limitFile, acceptFormat, language);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getAipRepresentationPreservationMetadata", aipId, duration,
-      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, "startAgent", startAgent, "limitAgent", limitAgent, "startEvent",
-      startEvent, "limitEvent", limitEvent, "startFile", startFile, "limitFile", limitFile);
+    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_AIP_ID, aipId, "startAgent",
+      startAgent, "limitAgent", limitAgent, "startEvent", startEvent, "limitEvent", limitEvent, "startFile", startFile,
+      "limitFile", limitFile);
 
     return aipRepresentationPreservationMetadata;
 
@@ -475,10 +459,10 @@ public class Browser extends RodaCoreService {
   public static StreamResponse getAipRepresentationPreservationMetadataFile(RodaUser user, String aipId,
     String representationId, String fileId)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
@@ -487,10 +471,8 @@ public class Browser extends RodaCoreService {
       .getAipRepresentationPreservationMetadataFile(aipId, representationId, fileId);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getAipRepresentationPreservationMetadataFile", aipId, duration,
-      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId,
-      RodaConstants.API_PATH_PARAM_FILE_UUID, fileId);
+    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+      RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId, RodaConstants.API_PATH_PARAM_FILE_UUID, fileId);
 
     return aipRepresentationPreservationMetadataFile;
   }
@@ -500,10 +482,10 @@ public class Browser extends RodaCoreService {
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     ValidationException, AlreadyExistsException {
 
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
 
@@ -512,20 +494,18 @@ public class Browser extends RodaCoreService {
       fileId, is, fileDetail, true);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "postAipRepresentationPreservationMetadataFile", aipId, duration,
-      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId);
-
+    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+      RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId);
   }
 
   public static void putAipRepresentationPreservationMetadataFile(RodaUser user, String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId, InputStream is, FormDataContentDisposition fileDetail)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     ValidationException, AlreadyExistsException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
 
@@ -534,19 +514,18 @@ public class Browser extends RodaCoreService {
       fileId, is, fileDetail, false);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "aipsAipIdPreservationMetadataRepresentationIdFileIdPut", aipId, duration,
-      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId);
+    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+      RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId);
 
   }
 
   public static void aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(RodaUser user, String aipId,
     String representationId, String fileId, String preservationId)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.DELETE);
 
@@ -555,10 +534,8 @@ public class Browser extends RodaCoreService {
       preservationId);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "aipsAipIdPreservationMetadataRepresentationIdFileIdDelete", aipId,
-      duration, RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_REPRESENTATION_ID,
-      representationId, RodaConstants.API_PATH_PARAM_FILE_UUID, fileId);
+    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+      RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId, RodaConstants.API_PATH_PARAM_FILE_UUID, fileId);
 
   }
 
@@ -571,10 +548,10 @@ public class Browser extends RodaCoreService {
   public static IndexedAIP moveInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, RodaUser user)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     AlreadyExistsException, ValidationException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
     UserUtility.checkObjectPermissions(user, selected, PermissionType.UPDATE);
 
     if (parentId != null) {
@@ -586,19 +563,17 @@ public class Browser extends RodaCoreService {
     IndexedAIP returnAIP = BrowserHelper.moveInHierarchy(selected, parentId, user);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "moveInHierarchy", parentId, duration, "selected", selected, "toParent",
-      parentId);
+    controllerAssistant.registerAction(user, parentId, "selected", selected, "toParent", parentId);
 
     return returnAIP;
   }
 
   public static AIP createAIP(RodaUser user, String parentId, String type) throws AuthorizationDeniedException,
     GenericException, NotFoundException, RequestNotValidException, AlreadyExistsException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
     Permissions permissions = new Permissions();
 
     if (parentId != null) {
@@ -623,35 +598,34 @@ public class Browser extends RodaCoreService {
     AIP aip = BrowserHelper.createAIP(parentId, type, permissions);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "createAIP", aip.getId(), duration, "parentId", parentId);
+    controllerAssistant.registerAction(user, aip.getId(), "parentId", parentId);
 
     return aip;
   }
 
   public static String removeAIP(RodaUser user, SelectedItems<IndexedAIP> aips)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     String parentId = BrowserHelper.removeAIP(aips, user);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "removeAIP", null, duration, "selected", aips);
+    controllerAssistant.registerAction(user, null, "selected", aips);
+
     return parentId;
   }
 
   public static DescriptiveMetadata createDescriptiveMetadataFile(RodaUser user, String aipId, String metadataId,
     String metadataType, String metadataVersion, ContentPayload metadataPayload) throws AuthorizationDeniedException,
     GenericException, ValidationException, NotFoundException, RequestNotValidException, AlreadyExistsException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
 
@@ -660,9 +634,8 @@ public class Browser extends RodaCoreService {
       metadataVersion, metadataPayload);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "createDescriptiveMetadataFile", aip.getId(), duration,
-      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
+    controllerAssistant.registerAction(user, aip.getId(), RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+      RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
 
     return ret;
   }
@@ -670,10 +643,10 @@ public class Browser extends RodaCoreService {
   public static DescriptiveMetadata updateDescriptiveMetadataFile(RodaUser user, String aipId, String metadataId,
     String metadataType, String metadataVersion, ContentPayload metadataPayload) throws AuthorizationDeniedException,
     GenericException, ValidationException, NotFoundException, RequestNotValidException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
 
@@ -683,19 +656,18 @@ public class Browser extends RodaCoreService {
       metadataVersion, metadataPayload, message);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "editDescriptiveMetadataFile", aipId, duration,
-      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
+    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+      RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
 
     return ret;
   }
 
   public static void removeDescriptiveMetadataFile(RodaUser user, String aipId, String metadataId)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.DELETE);
 
@@ -703,17 +675,16 @@ public class Browser extends RodaCoreService {
     BrowserHelper.removeDescriptiveMetadataFile(aipId, metadataId);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "removeMetadataFile", aip.getId(), duration,
-      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
+    controllerAssistant.registerAction(user, aip.getId(), RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+      RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
   }
 
   public static DescriptiveMetadata retrieveDescriptiveMetadataFile(RodaUser user, String aipId, String metadataId)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
@@ -721,19 +692,18 @@ public class Browser extends RodaCoreService {
     DescriptiveMetadata dm = BrowserHelper.retrieveMetadataFile(aipId, metadataId);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "retrieveMetadataFile", aipId, duration,
-      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
+    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+      RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
 
     return dm;
   }
 
   public static void removeRepresentation(RodaUser user, String aipId, String representationId)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.DELETE);
 
@@ -741,18 +711,16 @@ public class Browser extends RodaCoreService {
     BrowserHelper.removeRepresentation(aipId, representationId);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "removeRepresentation", aip.getId(), duration,
-      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId);
-
+    controllerAssistant.registerAction(user, aip.getId(), RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+      RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId);
   }
 
   public static void removeRepresentationFile(RodaUser user, String fileUUID)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
     IndexedFile file = BrowserHelper.retrieve(IndexedFile.class, fileUUID);
     // TODO check permissions from indexed file
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, file.getAipId());
@@ -762,21 +730,20 @@ public class Browser extends RodaCoreService {
     BrowserHelper.removeRepresentationFile(fileUUID);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "removeRepresentationFile", aip.getId(), duration, RodaConstants.FILE_AIPID,
-      file.getAipId(), RodaConstants.FILE_REPRESENTATION_ID, file.getRepresentationId(), RodaConstants.FILE_PATH,
-      file.getPath(), RodaConstants.FILE_FILEID, file.getId());
+    controllerAssistant.registerAction(user, aip.getId(), RodaConstants.FILE_AIPID, file.getAipId(),
+      RodaConstants.FILE_REPRESENTATION_ID, file.getRepresentationId(), RodaConstants.FILE_PATH, file.getPath(),
+      RodaConstants.FILE_FILEID, file.getId());
   }
 
   public static StreamResponse getAipRepresentationFile(RodaUser user, String fileUuid, String acceptFormat)
     throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // validate input
     BrowserHelper.validateGetAipRepresentationFileParams(acceptFormat);
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
     IndexedFile file = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class, fileUuid);
     // TODO get permissions from indexed file
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, file.getAipId());
@@ -786,10 +753,8 @@ public class Browser extends RodaCoreService {
     StreamResponse aipRepresentationFile = BrowserHelper.getAipRepresentationFile(fileUuid, acceptFormat);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getAipRepresentationFile", file.getAipId(), duration,
-      RodaConstants.FILE_REPRESENTATION_ID, file.getRepresentationId(), RodaConstants.FILE_PATH, file.getPath(),
-      RodaConstants.FILE_FILEID, file.getId());
+    controllerAssistant.registerAction(user, file.getAipId(), RodaConstants.FILE_REPRESENTATION_ID,
+      file.getRepresentationId(), RodaConstants.FILE_PATH, file.getPath(), RodaConstants.FILE_FILEID, file.getId());
 
     return aipRepresentationFile;
   }
@@ -798,10 +763,10 @@ public class Browser extends RodaCoreService {
     String metadataVersion, InputStream is, FormDataContentDisposition fileDetail)
     throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException,
     AlreadyExistsException, ValidationException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
 
@@ -811,20 +776,18 @@ public class Browser extends RodaCoreService {
       is, fileDetail, false);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "putDescriptiveMetadataFile", aipId, duration,
-      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
-
+    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+      RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
   }
 
   public static void postDescriptiveMetadataFile(RodaUser user, String aipId, String metadataId, String metadataType,
     String metadataVersion, InputStream is, FormDataContentDisposition fileDetail)
     throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException,
     AlreadyExistsException, ValidationException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
 
@@ -834,18 +797,16 @@ public class Browser extends RodaCoreService {
       is, fileDetail, true);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "postDescriptiveMetadataFile", aipId, duration,
-      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
-
+    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+      RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
   }
 
   public static TransferredResource createTransferredResourcesFolder(RodaUser user, String parentUUID,
     String folderName, boolean forceCommit)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     UserUtility.checkTransferredResourceAccess(user, Arrays.asList(parentUUID));
 
@@ -855,40 +816,38 @@ public class Browser extends RodaCoreService {
         forceCommit);
 
       // register action
-      long duration = new Date().getTime() - startDate.getTime();
-      registerAction(user, BROWSER_COMPONENT, "createTransferredResourcesFolder", null, duration, PARENT_PARAM,
-        parentUUID, FOLDERNAME_PARAM, folderName, SUCCESS_PARAM, true);
+      controllerAssistant.registerAction(user, null, PARENT_PARAM, parentUUID, FOLDERNAME_PARAM, folderName,
+        SUCCESS_PARAM, true);
       return transferredResource;
     } catch (GenericException e) {
-      long duration = new Date().getTime() - startDate.getTime();
-      registerAction(user, BROWSER_COMPONENT, "createTransferredResourcesFolder", null, duration, PARENT_PARAM,
-        parentUUID, FOLDERNAME_PARAM, folderName, SUCCESS_PARAM, false, ERROR_PARAM, e.getMessage());
+      // register action
+      controllerAssistant.registerAction(user, null, PARENT_PARAM, parentUUID, FOLDERNAME_PARAM, folderName,
+        SUCCESS_PARAM, false, ERROR_PARAM, e.getMessage());
       throw e;
     }
   }
 
   public static void removeTransferredResources(RodaUser user, SelectedItems<TransferredResource> selected)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     BrowserHelper.removeTransferredResources(selected, user);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "removeTransferredResources", null, duration, "selected", selected);
+    controllerAssistant.registerAction(user, null, "selected", selected);
   }
 
   public static TransferredResource createTransferredResourceFile(RodaUser user, String parentUUID, String fileName,
     InputStream inputStream, boolean forceCommit) throws AuthorizationDeniedException, GenericException,
     AlreadyExistsException, RequestNotValidException, NotFoundException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     UserUtility.checkTransferredResourceAccess(user, Arrays.asList(parentUUID));
 
@@ -898,15 +857,14 @@ public class Browser extends RodaCoreService {
         inputStream, forceCommit);
 
       // register action
-      long duration = new Date().getTime() - startDate.getTime();
-      registerAction(user, BROWSER_COMPONENT, "createTransferredResourceFile", null, duration, PATH_PARAM, parentUUID,
-        FILENAME_PARAM, fileName, SUCCESS_PARAM, true);
+      controllerAssistant.registerAction(user, null, PATH_PARAM, parentUUID, FILENAME_PARAM, fileName, SUCCESS_PARAM,
+        true);
 
       return transferredResource;
     } catch (GenericException e) {
-      long duration = new Date().getTime() - startDate.getTime();
-      registerAction(user, BROWSER_COMPONENT, "createTransferredResourceFile", null, duration, PATH_PARAM, parentUUID,
-        FILENAME_PARAM, fileName, SUCCESS_PARAM, false, ERROR_PARAM, e.getMessage());
+      // register action
+      controllerAssistant.registerAction(user, null, PATH_PARAM, parentUUID, FILENAME_PARAM, fileName, SUCCESS_PARAM,
+        false, ERROR_PARAM, e.getMessage());
       throw e;
     }
 
@@ -914,18 +872,16 @@ public class Browser extends RodaCoreService {
 
   public static StreamResponse getClassificationPlan(RodaUser user, String type)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     StreamResponse classificationPlan = BrowserHelper.getClassificationPlan(type, user);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getClassificationPlan", null, duration, CLASSIFICATION_PLAN_TYPE_PARAMETER,
-      type);
+    controllerAssistant.registerAction(user, null, CLASSIFICATION_PLAN_TYPE_PARAMETER, type);
 
     return classificationPlan;
   }
@@ -933,6 +889,11 @@ public class Browser extends RodaCoreService {
   public static TransferredResource createTransferredResource(RodaUser user, String parentUUID, String fileName,
     InputStream inputStream, String name, boolean forceCommit) throws AuthorizationDeniedException, GenericException,
     AlreadyExistsException, RequestNotValidException, NotFoundException {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check permissions
+    controllerAssistant.checkRoles(user);
+
     TransferredResource transferredResource;
     if (name == null) {
       transferredResource = Browser.createTransferredResourceFile(user, parentUUID, fileName, inputStream, forceCommit);
@@ -940,21 +901,33 @@ public class Browser extends RodaCoreService {
       transferredResource = Browser.createTransferredResourcesFolder(user, parentUUID, name, forceCommit);
     }
 
+    // register action
+    // TODO: what params should be registered?
+    controllerAssistant.registerAction(user, null, "parentUUID", parentUUID, "transferredResourceUUID",
+      transferredResource.getUUID());
+
     return transferredResource;
   }
 
   public static boolean getScanUpdateStatus() {
+    // TODO: should this method use ControllerAssistant to checkRoles and
+    // registerAction? Where is RodaUser?
     return BrowserHelper.getScanUpdateStatus();
   }
 
   public static void updateAllTransferredResources(String subFolderUUID, boolean waitToFinish)
     throws IsStillUpdatingException {
+    // TODO: should this method use ControllerAssistant to checkRoles and
+    // registerAction? Where is RodaUser?
     BrowserHelper.runTransferredResourceScan(subFolderUUID, waitToFinish);
   }
 
   public static List<SupportedMetadataTypeBundle> getSupportedMetadata(RodaUser user, String aipId, Locale locale)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check permissions
+    controllerAssistant.checkRoles(user);
 
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
 
@@ -962,35 +935,34 @@ public class Browser extends RodaCoreService {
     List<SupportedMetadataTypeBundle> supportedMetadata = BrowserHelper.getSupportedMetadata(user, aip, locale);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getSupportedMetadata", null, duration, RodaConstants.LOCALE, locale);
+    controllerAssistant.registerAction(user, null, RodaConstants.LOCALE, locale);
+
     return supportedMetadata;
   }
 
   public static StreamResponse getTransferredResource(RodaUser user, String resourceId)
     throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     StreamResponse response = BrowserHelper
       .getTransferredResource(BrowserHelper.retrieve(TransferredResource.class, resourceId));
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getTransferredResource", null, duration, "resourceId", resourceId);
+    controllerAssistant.registerAction(user, null, "resourceId", resourceId);
 
     return response;
   }
 
   public static PreservationEventViewBundle retrievePreservationEventViewBundle(RodaUser user, String eventId)
     throws AuthorizationDeniedException, NotFoundException, GenericException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // TODO maybe update permissions...
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
     // IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     // UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
 
@@ -1001,9 +973,7 @@ public class Browser extends RodaCoreService {
     PreservationEventViewBundle resource = BrowserHelper.retrievePreservationEventViewBundle(eventId);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "retrievePreservationEventViewBundle", null, duration,
-      INDEX_PRESERVATION_EVENT_ID, eventId);
+    controllerAssistant.registerAction(user, null, INDEX_PRESERVATION_EVENT_ID, eventId);
 
     return resource;
   }
@@ -1011,10 +981,10 @@ public class Browser extends RodaCoreService {
   public static void revertDescriptiveMetadataVersion(RodaUser user, String aipId, String descriptiveMetadataId,
     String versionId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
 
@@ -1024,19 +994,18 @@ public class Browser extends RodaCoreService {
     BrowserHelper.revertDescriptiveMetadataVersion(aipId, descriptiveMetadataId, versionId, message);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "revertDescriptiveMetadataVersion", null, duration,
-      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, descriptiveMetadataId,
-      RodaConstants.API_QUERY_PARAM_VERSION, versionId);
+    controllerAssistant.registerAction(user, null, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+      RodaConstants.API_PATH_PARAM_METADATA_ID, descriptiveMetadataId, RodaConstants.API_QUERY_PARAM_VERSION,
+      versionId);
   }
 
   public static void removeDescriptiveMetadataVersion(RodaUser user, String aipId, String descriptiveMetadataId,
     String versionId)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.DELETE);
 
@@ -1047,172 +1016,175 @@ public class Browser extends RodaCoreService {
     BrowserHelper.removeDescriptiveMetadataVersion(aipId, descriptiveMetadataId, versionId);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "removeDescriptiveMetadataVersion", null, duration,
-      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, descriptiveMetadataId,
-      RodaConstants.API_QUERY_PARAM_VERSION, versionId);
+    controllerAssistant.registerAction(user, null, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+      RodaConstants.API_PATH_PARAM_METADATA_ID, descriptiveMetadataId, RodaConstants.API_QUERY_PARAM_VERSION,
+      versionId);
   }
 
   public static void updateAIPPermissions(RodaUser user, String aipId, Permissions permissions, boolean recursive)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
 
     BrowserHelper.updateAIPPermissions(aip, permissions, recursive);
 
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "updateAIPPermissions", null, duration, RodaConstants.API_PATH_PARAM_AIP_ID,
-      aipId, "permissions", permissions);
+    controllerAssistant.registerAction(user, null, RodaConstants.API_PATH_PARAM_AIP_ID, aipId, "permissions",
+      permissions);
   }
 
   public static <T extends IsIndexed> List<String> consolidate(RodaUser user, Class<T> classToReturn,
     SelectedItems<T> selected) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
-    return BrowserHelper.consolidate(user, classToReturn, selected);
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    List<String> result = BrowserHelper.consolidate(user, classToReturn, selected);
+
+    controllerAssistant.registerAction(user, null, "classToReturn", classToReturn, "selectedClass",
+      selected.getSelectedClass());
+
+    return result;
   }
 
   public static void modifyRisk(RodaUser user, Risk risk, String message)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     BrowserHelper.modifyRisk(risk, user, message, false);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "modifyRisk", null, duration, "risk", risk);
+    controllerAssistant.registerAction(user, null, "risk", risk);
   }
 
   public static void modifyFormat(RodaUser user, Format format)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     BrowserHelper.modifyFormat(format, false);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "modifyFormat", null, duration, "format", format);
+    controllerAssistant.registerAction(user, null, "format", format);
   }
 
   public static void modifyAgent(RodaUser user, Agent agent)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     BrowserHelper.modifyAgent(agent, false);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "modifyAgent", null, duration, "agent", agent);
+    controllerAssistant.registerAction(user, null, "agent", agent);
   }
 
   public static Risk addRisk(RodaUser user, Risk risk)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     Risk ret = BrowserHelper.addRisk(risk, user, true);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "addRisk", null, duration, "risk", risk);
+    controllerAssistant.registerAction(user, null, "risk", risk);
+
     return ret;
   }
 
   public static Format addFormat(RodaUser user, Format format)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     Format ret = BrowserHelper.addFormat(format, false);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "addFormat", null, duration, "format", format);
+    controllerAssistant.registerAction(user, null, "format", format);
+
     return ret;
   }
 
   public static Agent addAgent(RodaUser user, Agent agent)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     Agent ret = BrowserHelper.addAgent(agent, false);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "addAgent", null, duration, "agent", agent);
+    controllerAssistant.registerAction(user, null, "agent", agent);
+
     return ret;
   }
 
   public static List<Format> retrieveFormats(RodaUser user, String agentId)
     throws AuthorizationDeniedException, NotFoundException, GenericException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     List<Format> ret = BrowserHelper.retrieveFormats(agentId);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "retrieveFormats", null, duration, "agentId", agentId);
+    controllerAssistant.registerAction(user, null, "agentId", agentId);
+
     return ret;
   }
 
   public static List<Agent> retrieveRequiredAgents(RodaUser user, String agentId)
     throws AuthorizationDeniedException, NotFoundException, GenericException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     List<Agent> ret = BrowserHelper.retrieveRequiredAgents(agentId);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "retrieveRequiredAgents", null, duration, "agentId", agentId);
+    controllerAssistant.registerAction(user, null, "agentId", agentId);
+
     return ret;
   }
 
   public static void revertRiskVersion(RodaUser user, String riskId, String versionId, String message)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IOException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     BrowserHelper.revertRiskVersion(riskId, versionId, message);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "revertRiskVersion", versionId, duration, "riskId", riskId, "versionId",
-      versionId, "message", message);
+    controllerAssistant.registerAction(user, versionId, "riskId", riskId, "versionId", versionId, "message", message);
   }
 
   /**
@@ -1231,13 +1203,13 @@ public class Browser extends RodaCoreService {
    */
   public static StreamResponse exportAIP(RodaUser user, SelectedItems<IndexedAIP> selected, String acceptFormat)
     throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException, IOException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // validate input
     BrowserHelper.validateExportAipParams(acceptFormat);
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     UserUtility.checkObjectPermissions(user, selected, PermissionType.READ);
 
@@ -1245,21 +1217,20 @@ public class Browser extends RodaCoreService {
     StreamResponse aipExport = BrowserHelper.getAIPs(selected, acceptFormat);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "exportAIP", null, duration);
+    controllerAssistant.registerAction(user);
 
     return aipExport;
   }
 
   public static StreamResponse getAIP(RodaUser user, String aipId, String acceptFormat)
     throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // validate input
     BrowserHelper.validateGetAipParams(acceptFormat);
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
     IndexedAIP indexedAIP = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, indexedAIP, PermissionType.READ);
 
@@ -1267,18 +1238,17 @@ public class Browser extends RodaCoreService {
     StreamResponse aip = BrowserHelper.getAIP(indexedAIP, acceptFormat);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getAIP", aipId, duration);
+    controllerAssistant.registerAction(user, aipId);
 
     return aip;
   }
 
   public static StreamResponse getAIPPart(RodaUser user, String aipId, String part)
     throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
     IndexedAIP indexedAIP = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, indexedAIP, PermissionType.READ);
 
@@ -1286,286 +1256,270 @@ public class Browser extends RodaCoreService {
     StreamResponse aip = BrowserHelper.getAIPPart(indexedAIP, part);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getAIPPart", aipId, duration, "part", part);
+    controllerAssistant.registerAction(user, aipId, "part", part);
 
     return aip;
   }
 
   public static void removeRiskVersion(RodaUser user, String riskId, String versionId)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IOException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     BrowserHelper.removeRiskVersion(riskId, versionId);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "removeRiskVersion", versionId, duration, "riskId", riskId, "versionId",
-      versionId);
+    controllerAssistant.registerAction(user, versionId, "riskId", riskId, "versionId", versionId);
   }
 
   public static RiskVersionsBundle retrieveRiskVersions(RodaUser user, String riskId)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IOException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     RiskVersionsBundle ret = BrowserHelper.retrieveRiskVersions(riskId);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "retrieveRiskVersions", null, duration, "riskId", riskId);
+    controllerAssistant.registerAction(user, null, "riskId", riskId);
+
     return ret;
   }
 
   public static boolean hasRiskVersions(RodaUser user, String id)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     boolean ret = BrowserHelper.hasRiskVersions(id);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "hasRiskVersions", null, duration, "riskId", id);
+    controllerAssistant.registerAction(user, null, "riskId", id);
+
     return ret;
   }
 
   public static Risk retrieveRiskVersion(RodaUser user, String riskId, String selectedVersion)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException, IOException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     Risk ret = BrowserHelper.retrieveRiskVersion(riskId, selectedVersion);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "retrieveRiskVersion", null, duration, "riskId", riskId, "selectedVersion",
-      selectedVersion);
+    controllerAssistant.registerAction(user, null, "riskId", riskId, "selectedVersion", selectedVersion);
+
     return ret;
   }
 
   public static RiskMitigationBundle retrieveShowMitigationTerms(RodaUser user, int preMitigationProbability,
     int preMitigationImpact, int posMitigationProbability, int posMitigationImpact)
     throws AuthorizationDeniedException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     RiskMitigationBundle ret = BrowserHelper.retrieveShowMitigationTerms(preMitigationProbability, preMitigationImpact,
       posMitigationProbability, posMitigationImpact);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "retrieveShowMitigationTerms", null, duration, "preMitigationProbability",
-      preMitigationProbability, "preMitigationImpact", preMitigationImpact, "posMitigationProbability",
-      posMitigationProbability, "posMitigationImpact", posMitigationImpact);
+    controllerAssistant.registerAction(user, null, "preMitigationProbability", preMitigationProbability,
+      "preMitigationImpact", preMitigationImpact, "posMitigationProbability", posMitigationProbability,
+      "posMitigationImpact", posMitigationImpact);
+
     return ret;
   }
 
   public static List<String> retrieveMitigationSeverityLimits(RodaUser user) throws AuthorizationDeniedException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     List<String> ret = BrowserHelper.retrieveShowMitigationTerms();
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "retrieveMitigationSeverityLimits", null, duration);
+    controllerAssistant.registerAction(user);
+
     return ret;
   }
 
   public static MitigationPropertiesBundle retrieveAllMitigationProperties(RodaUser user)
     throws AuthorizationDeniedException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     MitigationPropertiesBundle ret = BrowserHelper.retrieveAllMitigationProperties();
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "retrieveAllMitigationProperties", null, duration);
+    controllerAssistant.registerAction(user);
+
     return ret;
   }
 
   public static void deleteRisk(RodaUser user, SelectedItems<IndexedRisk> selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException,
     InvalidParameterException, JobAlreadyStartedException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     BrowserHelper.deleteRisk(user, selected);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "deleteRisk", null, duration, "selected", selected);
+    controllerAssistant.registerAction(user, null, "selected", selected);
   }
 
   public static void deleteAgent(RodaUser user, SelectedItems<Agent> selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     BrowserHelper.deleteAgent(user, selected);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "deleteAgent", null, duration, "selected", selected);
+    controllerAssistant.registerAction(user, null, "selected", selected);
   }
 
   public static void deleteFormat(RodaUser user, SelectedItems<Format> selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     BrowserHelper.deleteFormat(user, selected);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "deleteFormat", null, duration, "selected", selected);
+    controllerAssistant.registerAction(user, null, "selected", selected);
   }
 
   public static List<String> getRiskOnAIP(RodaUser user, String aipId)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     List<String> riskList = BrowserHelper.getRiskOnAIP(aipId);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getRiskOnAIP", null, duration, "aipId", aipId);
+    controllerAssistant.registerAction(user, null, "aipId", aipId);
+
     return riskList;
   }
 
   public static void deleteRiskIncidences(RodaUser user, String id, SelectedItems<RiskIncidence> incidences)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     BrowserHelper.deleteRiskIncidences(user, id, incidences);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "deleteRiskIncidences", null, duration, "incidences", incidences);
+    controllerAssistant.registerAction(user, null, "incidences", incidences);
   }
 
   public static void updateRiskCounters(RodaUser user)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     BrowserHelper.updateRiskCounters();
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "updateRiskCounters", null, duration);
+    controllerAssistant.registerAction(user);
   }
 
   public static void appraisal(RodaUser user, SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    // TODO define appraisal role
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     BrowserHelper.appraisal(user, selected, accept, rejectReason);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "appraisal", null, duration, "selected", selected, "accept", accept,
-      "rejectReason", rejectReason);
+    controllerAssistant.registerAction(user, null, "selected", selected, "accept", accept, "rejectReason",
+      rejectReason);
   }
 
   public static IndexedRepresentation getRepresentationFromId(RodaUser user, String representationId)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    // TODO define appraisal role
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     IndexedRepresentation ret = BrowserHelper.getRepresentationFromId(user, representationId);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getRepresentationFromId", null, duration, "representationId",
-      representationId);
+    controllerAssistant.registerAction(user, null, "representationId", representationId);
+
     return ret;
   }
 
   public static IndexedFile getFileFromId(RodaUser user, String fileId)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    // TODO define appraisal role
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     IndexedFile ret = BrowserHelper.getFileFromId(user, fileId);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getFileFromId", null, duration, "fileId", fileId);
+    controllerAssistant.registerAction(user, null, "fileId", fileId);
+
     return ret;
   }
 
   public static String createDescriptiveMetadataPreview(RodaUser user, String aipId, SupportedMetadataTypeBundle bundle)
     throws AuthorizationDeniedException, GenericException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     String payload = BrowserHelper.getDescriptiveMetadataPreview(bundle);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "createDescriptiveMetadataPreview", null, duration, "template",
-      bundle.getLabel());
+    controllerAssistant.registerAction(user, null, "template", bundle.getLabel());
 
     return payload;
   }

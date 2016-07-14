@@ -133,7 +133,7 @@ public class UserUtility {
   }
 
   public static void checkRoles(RodaUser user, Class<?> invokingMethodInnerClass) throws AuthorizationDeniedException {
-    Method method = invokingMethodInnerClass.getEnclosingMethod();
+    final Method method = invokingMethodInnerClass.getEnclosingMethod();
     final String configKey = "core.roles." + method.getDeclaringClass().getName() + "." + method.getName();
     final List<String> roles = RodaCoreFactory.getRodaConfigurationAsList(configKey);
     checkRoles(user, roles);
