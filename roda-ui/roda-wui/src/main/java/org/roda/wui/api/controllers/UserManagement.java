@@ -10,13 +10,11 @@ package org.roda.wui.api.controllers;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.UserUtility;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
@@ -38,6 +36,7 @@ import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
+import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaCoreService;
 
 public class UserManagement extends RodaCoreService {
@@ -48,183 +47,170 @@ public class UserManagement extends RodaCoreService {
 
   public static Long countLogEntries(RodaUser user, Filter filter)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     Long count = UserManagementHelper.countLogEntries(filter);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "countLogEntries", null, duration, "filter", filter.toString());
+    controllerAssistant.registerAction(user, null, "filter", filter.toString());
 
     return count;
   }
 
   public static IndexResult<LogEntry> findLogEntries(RodaUser user, Filter filter, Sorter sorter, Sublist sublist,
     Facets facets) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     IndexResult<LogEntry> ret = UserManagementHelper.findLogEntries(filter, sorter, sublist, facets);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "findLogEntries", null, duration, "filter", filter, "sorter", sorter,
-      "sublist", sublist);
+    controllerAssistant.registerAction(user, null, "filter", filter, "sorter", sorter, "sublist", sublist);
 
     return ret;
   }
 
   public static LogEntry retrieveLogEntry(RodaUser user, String logEntryId)
     throws GenericException, AuthorizationDeniedException, NotFoundException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     LogEntry ret = UserManagementHelper.retrieveLogEntry(logEntryId);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "retrieveLogEntry", null, duration, "logEntryId", logEntryId);
+    controllerAssistant.registerAction(user, null, "logEntryId", logEntryId);
 
     return ret;
   }
 
   public static Long countMembers(RodaUser user, Filter filter)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     Long count = UserManagementHelper.countMembers(filter);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "countMembers", null, duration, "filter", filter.toString());
+    controllerAssistant.registerAction(user, null, "filter", filter.toString());
 
     return count;
   }
 
   public static IndexResult<RODAMember> findMembers(RodaUser user, Filter filter, Sorter sorter, Sublist sublist,
     Facets facets) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     IndexResult<RODAMember> ret = UserManagementHelper.findMembers(filter, sorter, sublist, facets);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "findMembers", null, duration, "filter", filter, "sorter", sorter, "sublist",
-      sublist);
+    controllerAssistant.registerAction(user, null, "filter", filter, "sorter", sorter, "sublist", sublist);
 
     return ret;
   }
 
   public static User retrieveUser(RodaUser user, String username)
     throws AuthorizationDeniedException, GenericException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     User ret = UserManagementHelper.retrieveUser(username);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "retrieveUser", null, duration, "username", username);
+    controllerAssistant.registerAction(user, null, "username", username);
 
     return ret;
   }
 
   public static RodaUser retrieveRodaUser(RodaUser user, String username)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     RodaUser ret = UserManagementHelper.retrieveRodaUser(username);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "retrieveRodaUser", null, duration, "username", username);
+    controllerAssistant.registerAction(user, null, "username", username);
 
     return ret;
   }
 
   public static Group retrieveGroup(RodaUser user, String groupname)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     Group ret = UserManagementHelper.retrieveGroup(groupname);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "retrieveGroup", null, duration, "groupname", groupname);
+    controllerAssistant.registerAction(user, null, "groupname", groupname);
 
     return ret;
   }
 
   public static List<Group> listAllGroups(RodaUser user) throws AuthorizationDeniedException, GenericException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     List<Group> ret = UserManagementHelper.listAllGroups();
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "listAllGroups", null, duration);
+    controllerAssistant.registerAction(user);
 
     return ret;
   }
 
   public static void registerUser(User user, String password)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // delegate
     UserManagementHelper.registerUser(user, password);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "registerUser", null, duration, "user", user);
+    controllerAssistant.registerAction(user, null, "user", user);
   }
 
   public static User addUser(RodaUser user, User newUser, String password)
     throws AuthorizationDeniedException, NotFoundException, GenericException, EmailAlreadyExistsException,
     UserAlreadyExistsException, IllegalOperationException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     User ret = UserManagementHelper.addUser(newUser, password);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "addUser", null, duration, "user", newUser);
+    controllerAssistant.registerAction(user, null, "user", newUser);
 
     return ret;
   }
@@ -232,102 +218,97 @@ public class UserManagement extends RodaCoreService {
   public static void modifyMyUser(RodaUser user, User modifiedUser, String password)
     throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException,
     IllegalOperationException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     if (!user.getId().equals(modifiedUser.getId())) {
       throw new IllegalOperationException("Trying to modify user information for another user");
     }
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     UserManagementHelper.modifyUser(modifiedUser, password);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "modifyUser", null, duration, "user", modifiedUser);
+    controllerAssistant.registerAction(user, null, "user", modifiedUser);
   }
 
   public static void modifyUser(RodaUser user, User modifiedUser, String password)
     throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     UserManagementHelper.modifyUser(modifiedUser, password);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "modifyUser", null, duration, "user", modifiedUser);
+    controllerAssistant.registerAction(user, null, "user", modifiedUser);
   }
 
   public static void removeUser(RodaUser user, String username) throws AuthorizationDeniedException, GenericException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     UserManagementHelper.removeUser(username);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "removeUser", null, duration, "username", username);
+    controllerAssistant.registerAction(user, null, "username", username);
   }
 
   public static void addGroup(RodaUser user, Group group)
     throws AuthorizationDeniedException, GenericException, AlreadyExistsException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     UserManagementHelper.addGroup(group);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "addGroup", null, duration, "group", group);
+    controllerAssistant.registerAction(user, null, "group", group);
   }
 
   public static void modifyGroup(RodaUser user, Group group)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     UserManagementHelper.modifyGroup(group);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "modifyGroup", null, duration, "group", group);
+    controllerAssistant.registerAction(user, null, "group", group);
   }
 
   public static void removeGroup(RodaUser user, String groupname)
     throws AuthorizationDeniedException, GenericException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     UserManagementHelper.removeGroup(groupname);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "removeGroup", null, duration, "groupname", groupname);
+    controllerAssistant.registerAction(user, null, "groupname", groupname);
   }
 
-  // TODO: Methods bellow this line should also checkRoles? If so, a RodaUser is needed.
+  // TODO: Methods bellow this line should also checkRoles? If so, a RodaUser is
+  // needed.
   // TODO: The methods that call these methods don't have a RodaUser either.
   // TODO: From where should the RodaUser come from?
 
   public static void sendEmailVerification(String servletPath, String username)
     throws GenericException, NotFoundException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     User user = UserManagementHelper.retrieveUser(username);
 
@@ -340,24 +321,22 @@ public class UserManagement extends RodaCoreService {
     sendEmailVerification(servletPath, user);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "resendEmailVerification", null, duration, "user", user);
+    controllerAssistant.registerAction(user, null, "user", user);
   }
 
   public static void confirmUserEmail(String username, String emailConfirmationToken)
     throws InvalidTokenException, NotFoundException, GenericException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     User user = UserManagementHelper.confirmUserEmail(username, null, emailConfirmationToken);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "confirmUserEmail", null, duration, "user", user);
+    controllerAssistant.registerAction(user, null, "user", user);
   }
 
   public static void requestPasswordReset(String servletPath, String usernameOrEmail)
     throws GenericException, NotFoundException, IllegalOperationException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     String username = null;
     String email = null;
@@ -373,19 +352,17 @@ public class UserManagement extends RodaCoreService {
     sendRecoverLoginEmail(servletPath, user);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "requestPasswordReset", null, duration, "user", user);
+    controllerAssistant.registerAction(user, null, "user", user);
   }
 
   public static void resetUserPassword(String username, String password, String resetPasswordToken)
     throws InvalidTokenException, IllegalOperationException, NotFoundException, GenericException {
-    Date start = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     User user = UserManagementHelper.resetUserPassword(username, password, resetPasswordToken);
 
     // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "resetUserPassword", null, duration, "user", user);
+    controllerAssistant.registerAction(user, null, "user", user);
   }
 
   private static void sendEmailVerification(String servletPath, User user) throws GenericException {

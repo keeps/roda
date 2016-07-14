@@ -7,16 +7,14 @@
  */
 package org.roda.wui.api.controllers;
 
-import java.util.Date;
-
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.UserUtility;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.user.RodaUser;
+import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaCoreService;
 
 /**
@@ -24,8 +22,6 @@ import org.roda.wui.common.RodaCoreService;
  * for insert is available)
  */
 public class Agents extends RodaCoreService {
-
-  private static final String AGENTS_COMPONENT = "Agents";
 
   private Agents() {
     super();
@@ -38,33 +34,31 @@ public class Agents extends RodaCoreService {
    */
   public static Agent createAgent(RodaUser user, Agent agent)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     RodaCoreFactory.getModelService().createAgent(agent, false);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, AGENTS_COMPONENT, "createAgent", null, duration, "agent", agent);
+    controllerAssistant.registerAction(user, null, "agent", agent);
 
     return agent;
   }
 
   public static void deleteAgent(RodaUser user, String agentId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    UserUtility.checkRoles(user, new Object(){}.getClass().getEnclosingMethod());
+    controllerAssistant.checkRoles(user);
 
     // delegate
     RodaCoreFactory.getModelService().deleteAgent(agentId, false);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, AGENTS_COMPONENT, "deleteAgent", null, duration, "agentId", agentId);
+    controllerAssistant.registerAction(user, null, "agentId", agentId);
   }
 
 
