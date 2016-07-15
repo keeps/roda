@@ -8,12 +8,10 @@
 package org.roda.wui.api.controllers;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.UserUtility;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -21,6 +19,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.RodaUser;
+import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaCoreService;
 
 /**
@@ -28,9 +27,6 @@ import org.roda.wui.common.RodaCoreService;
  * for insert is available)
  */
 public class Notifications extends RodaCoreService {
-
-  private static final String NOTIFICATIONS_COMPONENT = "Notifications";
-  private static final String INGEST_SUBMIT_ROLE = "ingest.submit";
 
   private Notifications() {
     super();
@@ -43,59 +39,66 @@ public class Notifications extends RodaCoreService {
    */
   public static Notification createNotification(RodaUser user, Notification notification)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
-    // FIXME check user permissions
-    UserUtility.checkRoles(user, INGEST_SUBMIT_ROLE);
+    // check user permissions
+    controllerAssistant.checkRoles(user);
 
     RodaCoreFactory.getModelService().createNotification(notification, "test-email-template",
       new HashMap<String, Object>());
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, NOTIFICATIONS_COMPONENT, "createNotification", null, duration, "notification", notification);
+    controllerAssistant.registerAction(user, null, "notification", notification);
 
     return notification;
   }
 
   public static void deleteNotification(RodaUser user, String notificationId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    // FIXME
+    controllerAssistant.checkRoles(user);
 
     // delegate
     RodaCoreFactory.getModelService().deleteNotification(notificationId);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, NOTIFICATIONS_COMPONENT, "deleteNotification", null, duration, "notificationId",
-      notificationId);
+    controllerAssistant.registerAction(user, null, "notificationId", notificationId);
   }
 
-  public static List<Notification> retrieveNotifications(IndexResult<Notification> listNotificationsIndexResult) {
+  public static List<Notification> retrieveNotifications(RodaUser user,
+    IndexResult<Notification> listNotificationsIndexResult) throws AuthorizationDeniedException {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // TODO: The loop bellow could be replaced by the following line, right?
+    // List<Notification> notification = new ArrayList<>(listNotificationsIndexResult.getResults());
     List<Notification> notifications = new ArrayList<Notification>();
     for (Notification notification : listNotificationsIndexResult.getResults()) {
       notifications.add(notification);
     }
+
+    // register action
+    controllerAssistant.registerAction(user);
+
     return notifications;
   }
 
   public static void acknowledgeNotification(RodaUser user, String notificationId, String token, String email)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    // FIXME
+    controllerAssistant.checkRoles(user);
 
     // delegate
     RodaCoreFactory.getModelService().acknowledgeNotification(notificationId, token, email);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, NOTIFICATIONS_COMPONENT, "acknowledgeNotification", null, duration, "notificationId",
-      notificationId, "token", token);
+    controllerAssistant.registerAction(user, null, "notificationId", notificationId, "token", token);
   }
 
   /*
