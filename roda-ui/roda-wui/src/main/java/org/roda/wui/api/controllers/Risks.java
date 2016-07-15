@@ -8,11 +8,9 @@
 package org.roda.wui.api.controllers;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.UserUtility;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -21,6 +19,7 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.RodaUser;
+import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaCoreService;
 
 /**
@@ -28,9 +27,6 @@ import org.roda.wui.common.RodaCoreService;
  * for insert is available)
  */
 public class Risks extends RodaCoreService {
-
-  private static final String RISKS_COMPONENT = "Risks";
-  private static final String INGEST_SUBMIT_ROLE = "ingest.submit";
 
   private Risks() {
     super();
@@ -43,40 +39,50 @@ public class Risks extends RodaCoreService {
    */
   public static Risk createRisk(RodaUser user, Risk risk)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
-    // FIXME check user permissions
-    UserUtility.checkRoles(user, INGEST_SUBMIT_ROLE);
+    // check user permissions
+    controllerAssistant.checkRoles(user);
 
     RodaCoreFactory.getModelService().createRisk(risk, false);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, RISKS_COMPONENT, "createRisk", null, duration, "risk", risk);
+    controllerAssistant.registerAction(user, null, "risk", risk);
 
     return risk;
   }
 
   public static void deleteRisk(RodaUser user, String riskId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    Date startDate = new Date();
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    // FIXME
+    controllerAssistant.checkRoles(user);
 
     // delegate
     RodaCoreFactory.getModelService().deleteRisk(riskId, false);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, RISKS_COMPONENT, "deleteRisk", null, duration, "riskId", riskId);
+    controllerAssistant.registerAction(user, null, "riskId", riskId);
   }
 
-  public static List<IndexedRisk> retrieveRisks(IndexResult<IndexedRisk> listRisksIndexResult) {
+  public static List<IndexedRisk> retrieveRisks(RodaUser user, IndexResult<IndexedRisk> listRisksIndexResult)
+    throws AuthorizationDeniedException {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // TODO: The loop bellow could be replaced by the following line, right?
+    // List<IndexedRisk> risks = new ArrayList<>(listRisksIndexResult.getResults());
     List<IndexedRisk> risks = new ArrayList<IndexedRisk>();
     for (IndexedRisk risk : listRisksIndexResult.getResults()) {
       risks.add(risk);
     }
+
+    // register action
+    controllerAssistant.registerAction(user);
+
     return risks;
   }
 
