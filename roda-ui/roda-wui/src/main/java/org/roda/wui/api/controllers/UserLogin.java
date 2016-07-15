@@ -7,8 +7,6 @@
  */
 package org.roda.wui.api.controllers;
 
-import java.util.Date;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.roda.core.common.UserUtility;
