@@ -27,7 +27,7 @@ public class Representation implements IsRODAObject {
 
   private String type;
 
-  private List<DescriptiveMetadata> descriptiveMetadata;
+  private List<DescriptiveMetadata> descriptiveMetadata = new ArrayList<>();
 
   public Representation() {
     super();

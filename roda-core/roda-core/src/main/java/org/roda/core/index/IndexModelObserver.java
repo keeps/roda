@@ -484,28 +484,34 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void descriptiveMetadataCreated(DescriptiveMetadata descriptiveMetadata) {
-    try {
-      indexAIP((model.retrieveAIP(descriptiveMetadata.getAipId())));
-    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      LOGGER.error("Error when descriptive metadata created on retrieving the full AIP", e);
+    if (descriptiveMetadata.isFromAIP()) {
+      try {
+        indexAIP((model.retrieveAIP(descriptiveMetadata.getAipId())));
+      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+        LOGGER.error("Error when descriptive metadata created on retrieving the full AIP", e);
+      }
     }
   }
 
   @Override
   public void descriptiveMetadataUpdated(DescriptiveMetadata descriptiveMetadata) {
-    try {
-      indexAIP((model.retrieveAIP(descriptiveMetadata.getAipId())));
-    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      LOGGER.error("Error when descriptive metadata updated on retrieving the full AIP", e);
+    if (descriptiveMetadata.isFromAIP()) {
+      try {
+        indexAIP((model.retrieveAIP(descriptiveMetadata.getAipId())));
+      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+        LOGGER.error("Error when descriptive metadata updated on retrieving the full AIP", e);
+      }
     }
   }
 
   @Override
-  public void descriptiveMetadataDeleted(String aipId, String descriptiveMetadataBinaryId) {
-    try {
-      indexAIP((model.retrieveAIP(aipId)));
-    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      LOGGER.error("Error when descriptive metadata deleted on retrieving the full AIP", e);
+  public void descriptiveMetadataDeleted(String aipId, String representationId, String descriptiveMetadataBinaryId) {
+    if (representationId == null) {
+      try {
+        indexAIP((model.retrieveAIP(aipId)));
+      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+        LOGGER.error("Error when descriptive metadata deleted on retrieving the full AIP", e);
+      }
     }
   }
 

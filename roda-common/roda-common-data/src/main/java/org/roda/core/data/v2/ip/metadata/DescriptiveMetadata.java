@@ -78,6 +78,16 @@ public class DescriptiveMetadata implements Serializable {
     this.version = version;
   }
 
+  @JsonIgnore
+  public boolean isFromAIP() {
+    return representationId == null;
+  }
+
+  @JsonIgnore
+  public boolean isFromRepresentation() {
+    return !isFromAIP();
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;

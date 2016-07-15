@@ -42,7 +42,7 @@ public interface ModelObserver {
 
   public void descriptiveMetadataUpdated(DescriptiveMetadata descriptiveMetadataBinary);
 
-  public void descriptiveMetadataDeleted(String aipId, String descriptiveMetadataBinaryId);
+  public void descriptiveMetadataDeleted(String aipId, String representationId, String descriptiveMetadataBinaryId);
 
   public void representationCreated(Representation representation);
 

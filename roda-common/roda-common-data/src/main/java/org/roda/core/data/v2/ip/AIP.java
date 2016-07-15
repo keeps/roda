@@ -86,6 +86,9 @@ public class AIP implements IsRODAObject {
     if (representations != null) {
       for (Representation representation : representations) {
         representation.setAipId(id);
+        for (DescriptiveMetadata repDm : representation.getDescriptiveMetadata()) {
+          repDm.setAipId(id);
+        }
       }
     }
 
@@ -151,6 +154,19 @@ public class AIP implements IsRODAObject {
   public AIP setIngestJobId(String ingestJobId) {
     this.ingestJobId = ingestJobId;
     return this;
+  }
+
+  public void addDescriptiveMetadata(DescriptiveMetadata descriptiveMetadata) {
+    if (descriptiveMetadata.isFromAIP()) {
+      this.descriptiveMetadata.add(descriptiveMetadata);
+    } else {
+      for (Representation representation : this.representations) {
+        if (representation.getId().equals(descriptiveMetadata.getRepresentationId())) {
+          representation.addDescriptiveMetadata(descriptiveMetadata);
+          break;
+        }
+      }
+    }
   }
 
   @Override

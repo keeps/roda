@@ -120,11 +120,12 @@ public class EARKSIPToAIPPluginUtils {
         model.createDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, payload, metadataType,
           metadataVersion, notify);
       } catch (AlreadyExistsException e) {
-        if (update)
+        if (update) {
           model.updateDescriptiveMetadata(aipId, descriptiveMetadataId, payload, metadataType, metadataVersion,
             "Update from SIP");
-        else
+        } else {
           throw e;
+        }
       }
     }
   }
