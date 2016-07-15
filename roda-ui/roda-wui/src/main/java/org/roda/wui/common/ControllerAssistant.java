@@ -1,6 +1,5 @@
 package org.roda.wui.common;
 
-import java.util.Collections;
 import java.util.Date;
 
 import org.roda.core.common.UserUtility;
@@ -28,7 +27,7 @@ public class ControllerAssistant {
   }
 
   public void registerAction(RodaUser user) {
-    registerAction(user, (String)null);
+    registerAction(user, (String) null);
   }
 
   private String getInvokingMethodName() {
