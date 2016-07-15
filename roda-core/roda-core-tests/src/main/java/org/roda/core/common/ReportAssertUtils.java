@@ -14,6 +14,7 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.testng.Assert;
 import org.testng.AssertJUnit;
 
 public class ReportAssertUtils {
@@ -27,14 +28,14 @@ public class ReportAssertUtils {
 
   public static void assertReports(List<Report> reports, List<String> outcomeObjectIds, List<String> sourceObjectIds) {
     if (outcomeObjectIds != null) {
-      AssertJUnit.assertEquals(outcomeObjectIds.size(), reports.size());
+      Assert.assertEquals(reports.size(), outcomeObjectIds.size());
     } else if (sourceObjectIds != null) {
-      AssertJUnit.assertEquals(sourceObjectIds.size(), reports.size());
+      Assert.assertEquals(reports.size(), sourceObjectIds.size());
     }
 
     for (Report report : reports) {
       if (!PluginState.SUCCESS.equals(report.getPluginState())) {
-        AssertJUnit.fail("Report failure: " + report);
+        Assert.fail("Report failure: " + report);
       }
 
       if (outcomeObjectIds != null && StringUtils.isNotBlank(report.getOutcomeObjectId())) {
