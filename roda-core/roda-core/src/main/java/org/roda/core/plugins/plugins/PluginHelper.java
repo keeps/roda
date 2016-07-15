@@ -472,21 +472,21 @@ public final class PluginHelper {
     }
   }
 
-  public static <T extends AbstractPlugin> void createRiskIfNotExists(ModelService model, String riskId,
+  public static <T extends AbstractPlugin> void createRiskIfNotExists(ModelService model, int riskIndex, String riskId,
     Class<T> pluginClass) throws RequestNotValidException, GenericException, AuthorizationDeniedException,
     AlreadyExistsException, NotFoundException {
     try {
       model.retrieveRisk(riskId);
     } catch (NotFoundException e) {
-      createDefaultRisk(model, riskId, pluginClass);
+      createDefaultRisk(model, riskIndex, riskId, pluginClass);
     }
   }
 
-  private static <T extends AbstractPlugin> void createDefaultRisk(ModelService model, String riskId,
+  private static <T extends AbstractPlugin> void createDefaultRisk(ModelService model, int riskIndex, String riskId,
     Class<T> pluginClass) throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException {
     String configurationFile = RodaCoreFactory.getRodaConfigurationAsString("core.plugins.risk", pluginClass.getName(),
-      "path");
+      "path", "r" + Integer.toString(riskIndex + 1));
 
     if (configurationFile != null) {
       InputStream inputStream = RodaCoreFactory.getConfigurationFileAsStream(configurationFile);

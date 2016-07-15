@@ -104,22 +104,14 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
     // do nothing
   }
 
-  public static String getStaticName() {
+  @Override
+  public String getName() {
     return "PDF/A format validator";
   }
 
   @Override
-  public String getName() {
-    return getStaticName();
-  }
-
-  public static String getStaticDescription() {
-    return "PDF/A format validator using VeraPDF.";
-  }
-
-  @Override
   public String getDescription() {
-    return getStaticDescription();
+    return "PDF/A format validator using VeraPDF.";
   }
 
   @Override

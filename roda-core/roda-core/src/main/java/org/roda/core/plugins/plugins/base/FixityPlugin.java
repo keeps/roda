@@ -57,7 +57,11 @@ import org.slf4j.LoggerFactory;
 public class FixityPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(FixityPlugin.class);
 
-  private static String riskId = "urn:fixityplugin:r1";
+  private static List<String> risks;
+  static {
+    risks = new ArrayList<String>();
+    risks.add("urn:fixityplugin:r1");
+  }
 
   @Override
   public void init() {
@@ -152,9 +156,9 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
                         failedFiles.add(file.getId());
                         aipFailed = true;
 
-                        PluginHelper.createRiskIfNotExists(model, riskId, getClass());
-                        model.addRiskIncidence(riskId, file.getAipId(), file.getRepresentationId(), file.getPath(),
-                          file.getId());
+                        PluginHelper.createRiskIfNotExists(model, 0, risks.get(0), getClass());
+                        model.addRiskIncidence(risks.get(0), file.getAipId(), file.getRepresentationId(),
+                          file.getPath(), file.getId());
                       }
                     }
 

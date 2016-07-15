@@ -118,22 +118,14 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
     // do nothing
   }
 
-  public static String getStaticName() {
+  @Override
+  public String getName() {
     return "Validation of digital signature";
   }
 
   @Override
-  public String getName() {
-    return getStaticName();
-  }
-
-  public static String getStaticDescription() {
-    return "Check if a digital signatures are valid.";
-  }
-
-  @Override
   public String getDescription() {
-    return getStaticDescription();
+    return "Check if a digital signatures are valid.";
   }
 
   @Override
