@@ -28,7 +28,7 @@ public class ControllerAssistant {
   }
 
   public void registerAction(RodaUser user) {
-    registerAction(user, null, Collections.EMPTY_LIST);
+    registerAction(user, (String)null);
   }
 
   private String getInvokingMethodName() {
