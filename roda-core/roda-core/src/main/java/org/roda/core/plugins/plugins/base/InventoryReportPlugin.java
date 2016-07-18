@@ -97,20 +97,20 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
 
   // TODO -> add plugin parameter type "LIST"...
   static {
-    pluginParameters.put(CSV_FILE_FIELDS, new PluginParameter(CSV_FILE_FIELDS, "CSV Fields", PluginParameterType.STRING,
-      CSV_DEFAULT_FIELDS, true, false, "List of fields to export"));
-    pluginParameters.put(CSV_FILE_OUTPUT, new PluginParameter(CSV_FILE_OUTPUT, "CSV output path",
-      PluginParameterType.STRING, CSV_DEFAULT_OUTPUT, true, false, "Path where the CSV file is created."));
-    pluginParameters.put(CSV_FILE_HEADERS, new PluginParameter(CSV_FILE_HEADERS, "CSV headers",
-      PluginParameterType.BOOLEAN, CSV_DEFAULT_HEADERS, true, false, "Output CSV headers."));
-    pluginParameters.put(CSV_FILE_OUTPUT_DATA, new PluginParameter(CSV_FILE_OUTPUT_DATA, "Output data information",
-      PluginParameterType.BOOLEAN, CSV_DEFAULT_HEADERS, true, false, "Output CSV headers."));
+    pluginParameters.put(CSV_FILE_FIELDS, new PluginParameter(CSV_FILE_FIELDS, "Attributes to include in the report", PluginParameterType.STRING,
+      CSV_DEFAULT_FIELDS, true, false, "List of file attributes to include in the inventory export. The example includes all the possible options. Remove attributes as necessary."));
+    pluginParameters.put(CSV_FILE_OUTPUT, new PluginParameter(CSV_FILE_OUTPUT, "Report file path",
+      PluginParameterType.STRING, CSV_DEFAULT_OUTPUT, true, false, "The full path and file name on the server where the inventory report file should be created."));
+    pluginParameters.put(CSV_FILE_HEADERS, new PluginParameter(CSV_FILE_HEADERS, "Include header line",
+      PluginParameterType.BOOLEAN, CSV_DEFAULT_HEADERS, true, false, "Include a header line in the CSV inventory report."));
+    pluginParameters.put(CSV_FILE_OUTPUT_DATA, new PluginParameter(CSV_FILE_OUTPUT_DATA, "Include data files",
+      PluginParameterType.BOOLEAN, CSV_DEFAULT_HEADERS, true, false, "Include in the inventory report information about data files that exist inside AIPs."));
     pluginParameters.put(CSV_FILE_OUTPUT_DESCRIPTIVE,
-      new PluginParameter(CSV_FILE_OUTPUT_DESCRIPTIVE, "Output descriptive metadata information",
-        PluginParameterType.BOOLEAN, CSV_DEFAULT_HEADERS, true, false, "Output descriptive metadata information."));
+      new PluginParameter(CSV_FILE_OUTPUT_DESCRIPTIVE, "Include descriptive metadata files",
+        PluginParameterType.BOOLEAN, CSV_DEFAULT_HEADERS, true, false, "Include in the inventory report information about descriptive metadata files that exist inside AIPs."));
     pluginParameters.put(CSV_FILE_OTHER_METADATA_TYPES,
-      new PluginParameter(CSV_FILE_OTHER_METADATA_TYPES, "Other metadata types", PluginParameterType.STRING,
-        CSV_DEFAULT_OTHER_METADATA, true, false, "Other metadata types."));
+      new PluginParameter(CSV_FILE_OTHER_METADATA_TYPES, "Include other metadata files", PluginParameterType.STRING,
+        CSV_DEFAULT_OTHER_METADATA, true, false, "Include in the inventory report information about other metadata files that exist inside AIPs."));
   }
 
   @Override
@@ -130,7 +130,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getDescription() {
-    return "CSV report with the inventory of all files in data and metadata";
+    return "This action creates a report in CSV format that includes a listing of all files and their attributes that exist in the repository storage (AIPs). The report will be stored in a folder in the server side. To get it, you will need access to the server.";
   }
 
   @Override
@@ -144,7 +144,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
     parameters.add(pluginParameters.get(CSV_FILE_FIELDS));
     PluginParameter outputPluginParameter = pluginParameters.get(CSV_FILE_OUTPUT);
     SimpleDateFormat df = new SimpleDateFormat(RodaConstants.DEFAULT_DATETIME_FORMAT);
-    String reportName = "csv_report_" + df.format(new Date()) + ".csv";
+    String reportName = "inventory_report_" + df.format(new Date()) + ".csv";
     outputPluginParameter.setDefaultValue(RodaCoreFactory.getReportsDirectory().resolve(reportName).toString());
     parameters.add(outputPluginParameter);
     parameters.add(pluginParameters.get(CSV_FILE_HEADERS));

@@ -88,7 +88,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticDescription() {
-    return "Scans a package for malicious programs using ClamAV.";
+    return "Scans an information package for malicious software using the Antivirus application ClamAV.";
   }
 
   @Override

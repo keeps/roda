@@ -32,12 +32,12 @@ public class MinimalIngestPlugin extends DefaultIngestPlugin {
         PluginParameterType.PLUGIN_SIP_TO_AIP, "org.roda.core.plugins.plugins.ingest.EARKSIPToAIPPlugin", true, false,
         "Select the format of the Submission Information Packages to be ingested in this ingest process."));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_PARENT_ID, "Parent Object", PluginParameterType.AIP_ID, "", false,
-        false, "Use the provided parent object if the SIPs does not provide one."));
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_PARENT_ID, "Parent node", PluginParameterType.AIP_ID, "", false,
+        false, "Use the provided parent node if the SIPs does not provide one."));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, "Force parent object",
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, "Force parent node",
         PluginParameterType.BOOLEAN, "false", false, false,
-        "Use the provided parent object even if the SIPs provide one."));
+        "Force the use of the selected parent node even if the SIPs provide information about the desired parent."));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_DESCRIPTIVE_METADATA_VALIDATION,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_DESCRIPTIVE_METADATA_VALIDATION,
         DescriptiveMetadataValidationPlugin.getStaticName(), PluginParameterType.BOOLEAN, "true", true, true,

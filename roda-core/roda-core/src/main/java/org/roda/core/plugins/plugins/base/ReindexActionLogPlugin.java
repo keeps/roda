@@ -66,12 +66,12 @@ public class ReindexActionLogPlugin extends AbstractPlugin<LogEntry> {
 
   @Override
   public String getName() {
-    return "Reindex Action log";
+    return "Reindex actions log";
   }
 
   @Override
   public String getDescription() {
-    return "Cleanup indexes and recreate them from data in storage";
+    return "Reset action log index and recreate it from data existing in the storage.";
   }
 
   @Override

@@ -59,7 +59,7 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getDescription() {
-    return "Removes, from the index, all log entries older than " + deleteOlderThanXDays + " days.";
+    return "Removes from the index all log entries older than " + deleteOlderThanXDays + " days.";
   }
 
   @Override
