@@ -17,6 +17,7 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 
 public class Messages {
+
   /*-------------------- STATE RELATED STATIC CLASSES --------------------*/
   public static final class JobInfoUpdated implements Serializable {
     private static final long serialVersionUID = -6918015956027259760L;
@@ -114,6 +115,19 @@ public class Messages {
     public String toString() {
       return "PluginInitEnded [plugin=" + plugin + "]";
     }
+  }
+
+  public static class JobCleanup implements Serializable {
+    private static final long serialVersionUID = -5175825019027462407L;
+
+    public JobCleanup() {
+    }
+
+    @Override
+    public String toString() {
+      return "JobCleanup []";
+    }
+
   }
 
   /*-------------------- PLUGIN STATE TRANSITIONS RELATED STATIC CLASSES --------------------*/

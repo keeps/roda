@@ -12,9 +12,11 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
+import org.roda.core.index.IndexService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.JobInfo;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
+import org.roda.core.plugins.orchestrate.JobsHelper;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +51,8 @@ public class AkkaJobStateInfoActor extends UntypedActor {
       handleExecuteIsDone(msg);
     } else if (msg instanceof Messages.PluginAfterAllExecuteIsDone) {
       handleAfterAllExecuteIsDone(msg);
+    } else if (msg instanceof Messages.JobCleanup) {
+      handleJobCleanup();
     } else {
       LOGGER.error("Received a message that it doesn't know how to process (" + msg.getClass().getName() + ")...");
       unhandled(msg);
@@ -103,7 +107,20 @@ public class AkkaJobStateInfoActor extends UntypedActor {
   }
 
   private void handleAfterAllExecuteIsDone(Object msg) {
+    getSelf().tell(new Messages.JobCleanup(), getSelf());
     getSelf().tell(new Messages.JobStateUpdated(plugin, JOB_STATE.COMPLETED), getSelf());
+  }
+
+  private void handleJobCleanup() {
+    try {
+      LOGGER.info("Doing Job cleanup - start");
+      IndexService indexService = RodaCoreFactory.getIndexService();
+      Job job = PluginHelper.getJobFromIndex(plugin, indexService);
+      JobsHelper.doJobObjectsCleanup(job, RodaCoreFactory.getModelService(), indexService);
+      LOGGER.info("Doing Job cleanup - end");
+    } catch (NotFoundException | GenericException e) {
+      LOGGER.error("Unable to get Job for doing cleanup", e);
+    }
   }
 
 }

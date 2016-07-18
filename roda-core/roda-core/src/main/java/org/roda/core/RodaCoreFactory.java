@@ -574,7 +574,8 @@ public class RodaCoreFactory {
       }
     } else if (storageType == RodaConstants.StorageType.FILESYSTEM) {
       LOGGER.debug("Going to instantiate Filesystem on '{}'", storagePath);
-      return new FileStorageService(storagePath);
+      String trashDirName = getRodaConfiguration().getString("core.storage.filesystem.trash", "trash");
+      return new FileStorageService(storagePath, trashDirName);
     } else {
       LOGGER.error("Unknown storage service '{}'", storageType.name());
       throw new GenericException();

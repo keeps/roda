@@ -2073,6 +2073,7 @@ public class BrowserHelper {
     throws GenericException, RequestNotValidException, AlreadyExistsException, IsStillUpdatingException {
 
     String resourceRelativePath = "";
+
     Filter filter = new Filter();
     int counter = 1;
 

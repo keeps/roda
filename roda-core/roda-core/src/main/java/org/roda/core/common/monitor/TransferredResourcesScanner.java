@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -124,6 +125,14 @@ public class TransferredResourcesScanner {
     return ret;
   }
 
+  private static String getTransferredResourceUUID(Path relativeToBase) {
+    return UUID.nameUUIDFromBytes(relativeToBase.toString().getBytes()).toString();
+  }
+
+  private static String getTransferredResourceUUID(String relativeToBase) {
+    return UUID.nameUUIDFromBytes(relativeToBase.getBytes()).toString();
+  }
+
   protected static TransferredResource createTransferredResource(Path resourcePath, BasicFileAttributes attr, long size,
     Path basePath, Date lastScanDate) {
     Path relativeToBase = basePath.relativize(resourcePath);
@@ -136,7 +145,7 @@ public class TransferredResourcesScanner {
     tr.setFullPath(resourcePath.toString());
     String id = relativeToBase.toString();
     tr.setId(id);
-    tr.setUUID(UUID.nameUUIDFromBytes(id.getBytes()).toString());
+    tr.setUUID(getTransferredResourceUUID(relativeToBase));
     tr.setName(resourcePath.getFileName().toString());
 
     tr.setRelativePath(relativeToBase.toString());
@@ -219,27 +228,36 @@ public class TransferredResourcesScanner {
     return moveTransferredResource(resources, newRelativePath, replaceExisting, reindexResources, false);
   }
 
+  public Map<String, String> moveTransferredResource(String newRelativePath, List<String> resourcesUUIDs,
+    boolean replaceExisting) throws AlreadyExistsException, GenericException, IsStillUpdatingException {
+    List<TransferredResource> resources = Collections.emptyList();
+    try {
+      resources = index.retrieve(TransferredResource.class, resourcesUUIDs);
+    } catch (NotFoundException e) {
+      // do nothing and pass it an empty list
+    }
+    return moveTransferredResource(resources, newRelativePath, replaceExisting, true, false);
+  }
+
   public Map<String, String> moveTransferredResource(List<TransferredResource> resources, String newRelativePath,
     boolean replaceExisting, boolean reindexResources, boolean areResourcesFromSameFolder)
     throws AlreadyExistsException, GenericException, IsStillUpdatingException {
-    Map<String, String> movingMap = new HashMap<String, String>();
-
+    Map<String, String> oldToNewTransferredResourceIds = new HashMap<String, String>();
     for (TransferredResource resource : resources) {
-      Path resourcePath = basePath.resolve(newRelativePath).resolve(resource.getName());
-      FSUtils.move(Paths.get(resource.getFullPath()), resourcePath, replaceExisting);
+      Path newResourcePath = basePath.resolve(newRelativePath).resolve(resource.getName());
 
-      Path relativeToBase = basePath.relativize(resourcePath);
-      movingMap.put(resource.getUUID(), UUID.nameUUIDFromBytes(relativeToBase.toString().getBytes()).toString());
+      FSUtils.move(Paths.get(resource.getFullPath()), newResourcePath, replaceExisting);
+
+      oldToNewTransferredResourceIds.put(resource.getUUID(),
+        getTransferredResourceUUID(basePath.relativize(newResourcePath)));
     }
 
-    Path relativeToBase = basePath.relativize(basePath.resolve(newRelativePath));
     if (reindexResources) {
       RodaCoreFactory.getTransferredResourcesScanner()
-        .updateAllTransferredResources(UUID.nameUUIDFromBytes(relativeToBase.toString().getBytes()).toString(), true);
+        .updateAllTransferredResources(getTransferredResourceUUID(newRelativePath), true);
       reindexOldResourcesParentsAfterMove(resources, areResourcesFromSameFolder);
     }
-
-    return movingMap;
+    return oldToNewTransferredResourceIds;
   }
 
   public void reindexOldResourcesParentsAfterMove(List<TransferredResource> resources,

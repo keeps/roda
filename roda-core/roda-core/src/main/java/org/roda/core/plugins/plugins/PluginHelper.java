@@ -10,12 +10,14 @@ package org.roda.core.plugins.plugins;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
@@ -29,6 +31,7 @@ import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
@@ -36,6 +39,8 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LinkingObjectUtils;
+import org.roda.core.data.v2.index.SelectedItems;
+import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -57,6 +62,7 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
+import org.roda.core.plugins.orchestrate.IngestJobPluginInfo;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.storage.ContentPayload;
@@ -113,6 +119,7 @@ public final class PluginHelper {
     String sourceObjectId) {
     String jobId = getJobId(plugin);
     Report reportItem = new Report();
+    reportItem.injectLineSeparator(System.lineSeparator());
     String jobReportPartialId = outcomeObjectId;
     // FIXME 20160516 hsilva: this has problems when doing one to many SIP > AIP
     // operation
@@ -127,7 +134,6 @@ public final class PluginHelper {
     reportItem.setTitle(plugin.getName());
     reportItem.setPlugin(plugin.getClass().getName());
     reportItem.setPluginVersion(plugin.getVersion());
-    reportItem.setDateCreated(new Date());
     reportItem.setTotalSteps(getTotalStepsFromParameters(plugin));
 
     return reportItem;
@@ -136,6 +142,7 @@ public final class PluginHelper {
   public static <T extends IsRODAObject> void createJobReport(Plugin<T> plugin, ModelService model, Report reportItem) {
     String jobId = getJobId(plugin);
     Report report = new Report(reportItem);
+    report.injectLineSeparator(System.lineSeparator());
     String reportPartialId = reportItem.getOutcomeObjectId();
     // FIXME 20160516 hsilva: this has problems when doing one to many SIP > AIP
     // operation
@@ -143,7 +150,7 @@ public final class PluginHelper {
       reportPartialId = reportItem.getSourceObjectId();
     }
     reportItem.setId(IdUtils.getJobReportId(jobId, reportPartialId));
-    report.setId(IdUtils.getJobReportId(jobId, reportPartialId));
+    report.setId(reportItem.getId());
     report.setJobId(jobId);
     if (reportItem.getTotalSteps() != 0) {
       report.setTotalSteps(reportItem.getTotalSteps());
@@ -203,7 +210,14 @@ public final class PluginHelper {
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException e) {
       LOGGER.error("Error while updating Job Report", e);
     }
+  }
 
+  private static <T extends IsRODAObject> void updateJobReport(ModelService model, Report report) {
+    try {
+      model.createOrUpdateJobReport(report);
+    } catch (GenericException e) {
+      LOGGER.error("Error while updating Job Report", e);
+    }
   }
 
   /***************** Job related *****************/
@@ -689,6 +703,112 @@ public final class PluginHelper {
       }
     }
     return identifiers;
+  }
+
+  public static <T extends IsRODAObject> void moveSIPs(Plugin<T> plugin, ModelService model,
+    List<TransferredResource> transferredResources, IngestJobPluginInfo jobPluginInfo) {
+    List<String> success = new ArrayList<>();
+    List<String> unsuccess = new ArrayList<>();
+
+    String baseFolder = RodaCoreFactory.getRodaConfiguration().getString("core.ingest.processed.base_folder",
+      "PROCESSED");
+    String successFolder = RodaCoreFactory.getRodaConfiguration()
+      .getString("core.ingest.processed.successfully_ingested", "SUCCESSFULLY_INGESTED");
+    String unsuccessFolder = RodaCoreFactory.getRodaConfiguration()
+      .getString("core.ingest.processed.unsuccessfully_ingested", "UNSUCCESSFULLY_INGESTED");
+    String successPath = Paths.get(baseFolder, successFolder).toString();
+    String unsuccessPath = Paths.get(baseFolder, unsuccessFolder).toString();
+
+    // determine which SIPs will be moved based on 1) if at least one AIP was
+    // created from each SIP; 2) if it was created, in which state it is
+    for (TransferredResource transferredResource : transferredResources) {
+      String transferredResourceId = transferredResource.getUUID();
+      List<String> aipIds = jobPluginInfo.getAipIds(transferredResourceId);
+      if (aipIds != null && !aipIds.isEmpty()) {
+        try {
+          AIPState aipState = model.retrieveAIP(aipIds.get(0)).getState();
+          if (AIPState.ACTIVE == aipState) {
+            success.add(transferredResourceId);
+          } else if (AIPState.UNDER_APPRAISAL != aipState) {
+            unsuccess.add(transferredResourceId);
+          }
+        } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+          LOGGER.error("Error retrieving AIP", e);
+        }
+      } else {
+        // no AIP was generated
+        unsuccess.add(transferredResourceId);
+      }
+    }
+
+    // move SIPs and update reports
+    Map<String, String> successOldToNewTransferredResourceIds = new HashMap<>();
+    Map<String, String> unsuccessOldToNewTransferredResourceIds = new HashMap<>();
+    try {
+      if (!success.isEmpty()) {
+        successOldToNewTransferredResourceIds = RodaCoreFactory.getTransferredResourcesScanner()
+          .moveTransferredResource(successPath, success, true);
+        updateReportsAfterMovingSIPs(model, jobPluginInfo, successOldToNewTransferredResourceIds);
+      }
+    } catch (AlreadyExistsException | GenericException e) {
+      LOGGER.error("Error moving successfully ingested SIPs", e);
+    } catch (IsStillUpdatingException e) {
+      LOGGER.warn("TransferredResources are already being indexed");
+    }
+
+    try {
+      if (!unsuccess.isEmpty()) {
+        unsuccessOldToNewTransferredResourceIds = RodaCoreFactory.getTransferredResourcesScanner()
+          .moveTransferredResource(unsuccessPath, unsuccess, true);
+        updateReportsAfterMovingSIPs(model, jobPluginInfo, unsuccessOldToNewTransferredResourceIds);
+      }
+    } catch (AlreadyExistsException | GenericException e) {
+      LOGGER.error("Error moving unsuccessfully ingested SIPs", e);
+    } catch (IsStillUpdatingException e) {
+      LOGGER.warn("TransferredResources are already being indexed");
+    }
+
+    // update Job (with all new ids)
+    successOldToNewTransferredResourceIds.putAll(unsuccessOldToNewTransferredResourceIds);
+    updateJobAfterMovingSIPs(plugin, model, successOldToNewTransferredResourceIds);
+
+  }
+
+  private static void updateReportsAfterMovingSIPs(ModelService model, IngestJobPluginInfo jobPluginInfo,
+    Map<String, String> oldToNewTransferredResourceIds) {
+    for (Entry<String, String> oldToNewId : oldToNewTransferredResourceIds.entrySet()) {
+      String oldSIPId = oldToNewId.getKey();
+      String newSIPId = oldToNewId.getValue();
+      for (Report report : jobPluginInfo.getReports().get(oldSIPId).values()) {
+        report.setSourceObjectId(newSIPId);
+        if (!report.getReports().isEmpty()) {
+          report.getReports().get(0).setSourceObjectId(newSIPId);
+        }
+
+        // update in model
+        updateJobReport(model, report);
+      }
+    }
+  }
+
+  private static <T extends IsRODAObject> void updateJobAfterMovingSIPs(Plugin<T> plugin, ModelService model,
+    Map<String, String> oldToNewTransferredResourceIds) {
+    try {
+      Job job = getJobFromModel(plugin, model);
+      SelectedItems<?> sourceObjects = job.getSourceObjects();
+      if (sourceObjects instanceof SelectedItemsList) {
+        SelectedItemsList<T> list = (SelectedItemsList<T>) sourceObjects;
+        ArrayList<String> newIds = new ArrayList<String>();
+        for (String oldId : list.getIds()) {
+          newIds.add(oldToNewTransferredResourceIds.get(oldId));
+        }
+        list.setIds(newIds);
+      }
+
+      model.createOrUpdateJob(job);
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      LOGGER.error("Error updating Job", e);
+    }
   }
 
 }

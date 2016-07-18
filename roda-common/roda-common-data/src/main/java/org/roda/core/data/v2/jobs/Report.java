@@ -34,8 +34,8 @@ public class Report implements Serializable, IsIndexed {
   private AIPState outcomeObjectState = AIPState.getDefault();
 
   private String title = "";
-  private Date dateCreated = null;
-  private Date dateUpdated = null;
+  private Date dateCreated;
+  private Date dateUpdated;
   private Integer completionPercentage = 0;
   private Integer stepsCompleted = 0;
   private Integer totalSteps = 0;
@@ -47,8 +47,12 @@ public class Report implements Serializable, IsIndexed {
 
   private List<Report> reports = new ArrayList<Report>();
 
+  private String lineSeparator = "";
+
   public Report() {
     super();
+    dateCreated = new Date();
+    dateUpdated = null;
   }
 
   /**
@@ -74,6 +78,7 @@ public class Report implements Serializable, IsIndexed {
     this.pluginVersion = report.getPluginVersion();
     this.pluginState = report.getPluginState();
     this.pluginDetails = report.getPluginDetails();
+    this.htmlPluginDetails = report.isHtmlPluginDetails();
     this.reports = new ArrayList<Report>();
   }
 
@@ -267,6 +272,8 @@ public class Report implements Serializable, IsIndexed {
     setPlugin(report.getPlugin());
     setPluginVersion(report.getPluginVersion());
     setPluginState(report.getPluginState());
+    setPluginDetails(
+      (!"".equals(getPluginDetails()) ? getPluginDetails() + lineSeparator : "") + report.getPluginDetails());
     setOutcomeObjectState(report.getOutcomeObjectState());
 
     reports.add(report);
@@ -281,6 +288,10 @@ public class Report implements Serializable, IsIndexed {
   public Report setReports(List<Report> reports) {
     this.reports = reports;
     return this;
+  }
+
+  public void injectLineSeparator(String lineSeparator) {
+    this.lineSeparator = lineSeparator;
   }
 
   @Override

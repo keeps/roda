@@ -246,14 +246,16 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         }
       }
 
+      // X) move SIPs to PROCESSED folder???
+      if (PluginHelper.verifyIfStepShouldBePerformed(this,
+        getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT))
+        && RodaCoreFactory.getRodaConfiguration().getBoolean("core.ingest.processed.move_when_autoaccept", true)) {
+        PluginHelper.moveSIPs(this, model, resources, jobPluginInfo);
+      }
+
       // X) final job info update
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
-
-      // delete SIP from transfer
-      // FIXME 20160429 hsilva: actually this will happen in two very distinct
-      // moments and should not be done by a plugin 1) when auto accepting is on
-      // 2) when doing manual acceptance
 
       createIngestEndedEvent(model, index, aips);
 
@@ -302,14 +304,8 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     if (plugin != null) {
       for (Report reportItem : plugin.getReports()) {
         if (TransferredResource.class.getName().equals(reportItem.getSourceObjectClass())) {
-          Report report = new Report();
+          Report report = new Report(reportItem);
           report.addReport(reportItem);
-          report.setId(reportItem.getId());
-          report.setJobId(reportItem.getJobId());
-          report.setSourceObjectClass(reportItem.getSourceObjectClass());
-          report.setOutcomeObjectId(reportItem.getOutcomeObjectId());
-          report.setOutcomeObjectClass(reportItem.getOutcomeObjectClass());
-          report.setOutcomeObjectState(reportItem.getOutcomeObjectState());
           jobPluginInfo.addReport(reportItem.getSourceObjectId(), reportItem.getOutcomeObjectId(), report);
         } else if (StringUtils.isNotBlank(reportItem.getOutcomeObjectId())
           && aipIdToTransferredResourceId.get(reportItem.getOutcomeObjectId()) != null) {

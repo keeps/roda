@@ -124,7 +124,6 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
 
             directAccess = storage.getDirectAccess(aipPath);
             virusCheckResult = getAntiVirus().checkForVirus(directAccess.getPath());
-
             reportState = virusCheckResult.isClean() ? PluginState.SUCCESS : PluginState.FAILURE;
             reportItem.setPluginState(reportState).setPluginDetails(virusCheckResult.getReport());
 

@@ -635,6 +635,9 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
           Job jobToBeCleaned = model.retrieveJob(job.getId());
           JobsHelper.updateJobInTheStateStartedOrCreated(jobToBeCleaned);
           model.createOrUpdateJob(jobToBeCleaned);
+
+          // cleanup job related objects (aips, sips, etc.)
+          JobsHelper.doJobObjectsCleanup(job, RodaCoreFactory.getModelService(), index);
         } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
           LOGGER.error("Unable to get/update Job", e);
         }

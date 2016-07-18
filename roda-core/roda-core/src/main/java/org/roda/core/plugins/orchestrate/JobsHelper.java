@@ -8,18 +8,27 @@
 package org.roda.core.plugins.orchestrate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
+import org.roda.core.data.adapter.filter.SimpleFilterParameter;
+import org.roda.core.data.adapter.sort.Sorter;
+import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -196,6 +205,42 @@ public final class JobsHelper {
     }
 
     throw new GenericException("Error while getting class from string");
+  }
+
+  public static <T extends IsRODAObject> void doJobObjectsCleanup(Job job, ModelService modelService,
+    IndexService indexService) {
+    try {
+      // make sure the index is up to date
+      indexService.commit(IndexedAIP.class);
+      // find all AIPs that should be removed
+      Filter filter = new Filter();
+      filter.add(new SimpleFilterParameter(RodaConstants.INGEST_JOB_ID, job.getId()));
+      filter.add(new OneOfManyFilterParameter(RodaConstants.AIP_STATE,
+        Arrays.asList(AIPState.CREATED.toString(), AIPState.INGEST_PROCESSING.toString())));
+      Sublist sublist = new Sublist();
+
+      IndexResult<IndexedAIP> aipsResult;
+      int offset = 0;
+      do {
+        sublist.setFirstElementIndex(offset);
+        aipsResult = indexService.find(IndexedAIP.class, filter, Sorter.NONE, sublist);
+        offset += aipsResult.getLimit();
+        doJobCleanup(modelService, aipsResult.getResults());
+      } while (aipsResult.getTotalCount() > aipsResult.getOffset() + aipsResult.getLimit());
+    } catch (GenericException | RequestNotValidException e) {
+      LOGGER.error("Error doing Job cleanup", e);
+    }
+  }
+
+  private static void doJobCleanup(ModelService modelService, List<IndexedAIP> results) {
+    for (IndexedAIP indexedAIP : results) {
+      try {
+        LOGGER.info("Job cleanup: deleting AIP {}", indexedAIP.getId());
+        modelService.deleteAIP(indexedAIP.getId());
+      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+        LOGGER.error("Error doing deleting AIP during Job cleanup", e);
+      }
+    }
   }
 
 }

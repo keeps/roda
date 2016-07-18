@@ -36,7 +36,7 @@
 	
 	<logger name="org.roda.core.plugins.orchestrate.akka" additivity="false">
 		<level value="DEBUG" />
-		<appender-ref ref="AKKA" />
+		<appender-ref ref="CORE_FILEOUT" />
 	</logger>
 
 	<logger name="org.roda.core.plugins.PluginManager" additivity="false">
