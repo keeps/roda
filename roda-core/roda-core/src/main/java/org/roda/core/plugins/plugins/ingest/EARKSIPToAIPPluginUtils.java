@@ -85,7 +85,6 @@ public class EARKSIPToAIPPluginUtils {
     model.updateAIP(aip);
 
     return aip;
-
   }
 
   private static void processIPInformation(ModelService model, SIP sip, String aipId, boolean notify, boolean update)

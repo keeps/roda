@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.jute.Index;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
@@ -211,7 +212,11 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
                 new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, ancestor)), Sorter.NONE,
                 new Sublist(0, 1));
         if (result.getTotalCount() == 1) {
-          parent = result.getResults().get(0).getId();
+          IndexedAIP indexedAIP = result.getResults().get(0);
+          AIP aip = model.retrieveAIP(indexedAIP.getId());
+          aip.setParentId(parent);
+          model.updateAIP(aip);
+          parent = aip.getId();
         }else throw new NotFoundException();
       } catch (NotFoundException e) {
         Job currentJob = PluginHelper.getJobFromIndex(this, index);
