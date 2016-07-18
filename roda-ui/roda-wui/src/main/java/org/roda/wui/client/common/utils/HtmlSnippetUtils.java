@@ -35,6 +35,9 @@ public class HtmlSnippetUtils {
         if (job.getJobStats().getSourceObjectsCount() == job.getJobStats().getSourceObjectsProcessedWithSuccess()) {
           ret = SafeHtmlUtils
             .fromSafeConstant("<span class='label-success'>" + messages.showJobStatusCompleted() + "</span>");
+        } else if (job.getJobStats().getSourceObjectsProcessedWithSuccess() > 0) {
+          ret = SafeHtmlUtils
+            .fromSafeConstant("<span class='label-warning'>" + messages.showJobStatusCompleted() + "</span>");
         } else {
           ret = SafeHtmlUtils
             .fromSafeConstant("<span class='label-danger'>" + messages.showJobStatusCompleted() + "</span>");
