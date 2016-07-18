@@ -10,11 +10,14 @@ package org.roda.core.data.v2.ip;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AIP implements IsRODAObject {
 
   private static final long serialVersionUID = 430629679119752757L;
@@ -32,6 +35,8 @@ public class AIP implements IsRODAObject {
 
   private String ingestSIPId = "";
   private String ingestJobId = "";
+
+  private Boolean ghost = null;
 
   public AIP() {
     super();
@@ -92,6 +97,14 @@ public class AIP implements IsRODAObject {
       }
     }
 
+  }
+
+  public Boolean getGhost() {
+    return ghost;
+  }
+
+  public void setGhost(Boolean ghost) {
+    this.ghost = ghost.equals(Boolean.FALSE) ? null : ghost;
   }
 
   public void setParentId(String parentId) {
@@ -170,100 +183,54 @@ public class AIP implements IsRODAObject {
   }
 
   @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    AIP aip = (AIP) o;
+
+    if (id != null ? !id.equals(aip.id) : aip.id != null) return false;
+    if (parentId != null ? !parentId.equals(aip.parentId) : aip.parentId != null) return false;
+    if (type != null ? !type.equals(aip.type) : aip.type != null) return false;
+    if (state != aip.state) return false;
+    if (permissions != null ? !permissions.equals(aip.permissions) : aip.permissions != null) return false;
+    if (descriptiveMetadata != null ? !descriptiveMetadata.equals(aip.descriptiveMetadata) : aip.descriptiveMetadata != null) return false;
+    if (representations != null ? !representations.equals(aip.representations) : aip.representations != null) return false;
+    if (ingestSIPId != null ? !ingestSIPId.equals(aip.ingestSIPId) : aip.ingestSIPId != null) return false;
+    if (ingestJobId != null ? !ingestJobId.equals(aip.ingestJobId) : aip.ingestJobId != null) return false;
+    return ghost != null ? ghost.equals(aip.ghost) : aip.ghost == null;
+
+  }
+
+  @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((descriptiveMetadata == null) ? 0 : descriptiveMetadata.hashCode());
-    result = prime * result + ((id == null) ? 0 : id.hashCode());
-    result = prime * result + ((ingestJobId == null) ? 0 : ingestJobId.hashCode());
-    result = prime * result + ((ingestSIPId == null) ? 0 : ingestSIPId.hashCode());
-    result = prime * result + ((parentId == null) ? 0 : parentId.hashCode());
-    result = prime * result + ((permissions == null) ? 0 : permissions.hashCode());
-    result = prime * result + ((representations == null) ? 0 : representations.hashCode());
-    result = prime * result + ((state == null) ? 0 : state.hashCode());
-    result = prime * result + ((type == null) ? 0 : type.hashCode());
+    int result = id != null ? id.hashCode() : 0;
+    result = 31 * result + (parentId != null ? parentId.hashCode() : 0);
+    result = 31 * result + (type != null ? type.hashCode() : 0);
+    result = 31 * result + (state != null ? state.hashCode() : 0);
+    result = 31 * result + (permissions != null ? permissions.hashCode() : 0);
+    result = 31 * result + (descriptiveMetadata != null ? descriptiveMetadata.hashCode() : 0);
+    result = 31 * result + (representations != null ? representations.hashCode() : 0);
+    result = 31 * result + (ingestSIPId != null ? ingestSIPId.hashCode() : 0);
+    result = 31 * result + (ingestJobId != null ? ingestJobId.hashCode() : 0);
+    result = 31 * result + (ghost != null ? ghost.hashCode() : 0);
     return result;
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (!(obj instanceof AIP)) {
-      return false;
-    }
-    AIP other = (AIP) obj;
-    if (descriptiveMetadata == null) {
-      if (other.descriptiveMetadata != null) {
-        return false;
-      }
-    } else if (!descriptiveMetadata.equals(other.descriptiveMetadata)) {
-      return false;
-    }
-    if (id == null) {
-      if (other.id != null) {
-        return false;
-      }
-    } else if (!id.equals(other.id)) {
-      return false;
-    }
-    if (ingestJobId == null) {
-      if (other.ingestJobId != null) {
-        return false;
-      }
-    } else if (!ingestJobId.equals(other.ingestJobId)) {
-      return false;
-    }
-    if (ingestSIPId == null) {
-      if (other.ingestSIPId != null) {
-        return false;
-      }
-    } else if (!ingestSIPId.equals(other.ingestSIPId)) {
-      return false;
-    }
-    if (parentId == null) {
-      if (other.parentId != null) {
-        return false;
-      }
-    } else if (!parentId.equals(other.parentId)) {
-      return false;
-    }
-    if (permissions == null) {
-      if (other.permissions != null) {
-        return false;
-      }
-    } else if (!permissions.equals(other.permissions)) {
-      return false;
-    }
-    if (representations == null) {
-      if (other.representations != null) {
-        return false;
-      }
-    } else if (!representations.equals(other.representations)) {
-      return false;
-    }
-    if (state != other.state) {
-      return false;
-    }
-    if (type == null) {
-      if (other.type != null) {
-        return false;
-      }
-    } else if (!type.equals(other.type)) {
-      return false;
-    }
-    return true;
-  }
-
-  @Override
   public String toString() {
-    return "AIP [id=" + id + ", parentId=" + parentId + ", type=" + type + ", state=" + state + ", permissions="
-      + permissions + ", descriptiveMetadata=" + descriptiveMetadata + ", representations=" + representations
-      + ", ingestSIPId=" + ingestSIPId + ", ingestJobId=" + ingestJobId + "]";
+    return "AIP{" +
+            "id='" + id + '\'' +
+            ", parentId='" + parentId + '\'' +
+            ", type='" + type + '\'' +
+            ", state=" + state +
+            ", permissions=" + permissions +
+            ", descriptiveMetadata=" + descriptiveMetadata +
+            ", representations=" + representations +
+            ", ingestSIPId='" + ingestSIPId + '\'' +
+            ", ingestJobId='" + ingestJobId + '\'' +
+            ", ghost=" + ghost +
+            '}';
   }
 
 }

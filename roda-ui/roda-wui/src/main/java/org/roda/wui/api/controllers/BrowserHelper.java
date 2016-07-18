@@ -216,9 +216,11 @@ public class BrowserHelper {
     List<DescriptiveMetadata> listDescriptiveMetadataBinaries = model.retrieveAIP(aipId).getDescriptiveMetadata();
     List<DescriptiveMetadataViewBundle> descriptiveMetadataList = new ArrayList<>();
 
-    for (DescriptiveMetadata descriptiveMetadata : listDescriptiveMetadataBinaries) {
-      DescriptiveMetadataViewBundle bundle = getDescriptiveMetadataBundle(aipId, descriptiveMetadata, locale);
-      descriptiveMetadataList.add(bundle);
+    if(listDescriptiveMetadataBinaries != null) { // Can be null when the AIP is a ghost
+      for (DescriptiveMetadata descriptiveMetadata : listDescriptiveMetadataBinaries) {
+        DescriptiveMetadataViewBundle bundle = getDescriptiveMetadataBundle(aipId, descriptiveMetadata, locale);
+        descriptiveMetadataList.add(bundle);
+      }
     }
 
     return descriptiveMetadataList;

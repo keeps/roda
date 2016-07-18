@@ -212,7 +212,8 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
         permissions.setUserPermissions(username,
           new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
             Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE, Permissions.PermissionType.GRANT)));
-        model.createAIP(ancestor, parent, "", permissions, true);
+        boolean isGhost = true;
+        model.createAIP(ancestor, parent, "", permissions, true, isGhost);
         parent = ancestor;
       }
     }
