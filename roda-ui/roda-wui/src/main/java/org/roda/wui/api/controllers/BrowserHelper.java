@@ -2055,4 +2055,18 @@ public class BrowserHelper {
     }
     return result;
   }
+
+  public static void renameTransferredResource(String transferredResourceId, String newName)
+    throws GenericException, RequestNotValidException {
+    Filter filter = new Filter(
+      new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_UUID, transferredResourceId));
+    IndexResult<TransferredResource> resources = RodaCoreFactory.getIndexService().find(TransferredResource.class,
+      filter, Sorter.NONE, new Sublist(0, 1));
+
+    if (!resources.getResults().isEmpty()) {
+      TransferredResource resource = (TransferredResource) resources.getResults().get(0);
+      java.io.File file = new java.io.File(resource.getFullPath());
+      file.renameTo(new java.io.File(resource.getFullPath().replaceAll("/[^/]+$", "/" + newName)));
+    }
+  }
 }

@@ -54,8 +54,8 @@ import org.roda.core.util.FileUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FixityPlugin extends AbstractPlugin<AIP> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(FixityPlugin.class);
+public class FileCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(FileCorruptionRiskAssessmentPlugin.class);
 
   private static List<String> risks;
   static {
@@ -212,7 +212,7 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public Plugin<AIP> cloneMe() {
-    return new FixityPlugin();
+    return new FileCorruptionRiskAssessmentPlugin();
   }
 
   @Override

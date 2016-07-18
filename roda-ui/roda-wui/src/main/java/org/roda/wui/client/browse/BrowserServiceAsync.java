@@ -178,4 +178,6 @@ public interface BrowserServiceAsync {
   void getRepresentationFromId(String representationId, AsyncCallback<IndexedRepresentation> asyncCallback);
 
   void getFileFromId(String fileId, AsyncCallback<IndexedFile> asyncCallback);
+
+  void renameTransferredResource(String transferredResourceId, String newName, AsyncCallback<Void> asyncCallback);
 }

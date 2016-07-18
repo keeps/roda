@@ -239,6 +239,8 @@ public class IngestTransfer extends Composite {
             move.setEnabled(true);
             if (selectedList.getIds().size() == 1) {
               rename.setEnabled(true);
+            } else {
+              rename.setEnabled(false);
             }
           } else {
             rename.setEnabled(false);
@@ -592,6 +594,10 @@ public class IngestTransfer extends Composite {
     return selected;
   }
 
+  public void refreshList() {
+    transferredResourceList.refresh();
+  }
+
   @UiHandler("download")
   public void handleDownload(ClickEvent e) {
     if (resource != null) {
@@ -602,7 +608,7 @@ public class IngestTransfer extends Composite {
 
   @UiHandler("rename")
   void buttonRenameHandler(ClickEvent e) {
-    Toast.showInfo("Warning", "This feature is not yet implemented");
+    RenameSelectDialog dialog = new RenameSelectDialog("Rename", getSelected());
   }
 
   @UiHandler("move")

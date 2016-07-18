@@ -35,27 +35,31 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// TODO: test this plugin
+
 public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(DescriptiveMetadataValidationPlugin.class);
 
   public static final PluginParameter PARAMETER_VALIDATE_DESCRIPTIVE_METADATA = new PluginParameter(
     "parameter.validate_descriptive_metadata", "Validate descriptive metadata", PluginParameterType.BOOLEAN, "true",
-    true, false, "If true, the action will check if the the descriptive metadata is valid according to the schemas installed in the repository.");
+    true, false,
+    "If true, the action will check if the the descriptive metadata is valid according to the schemas installed in the repository.");
 
   public static final PluginParameter PARAMETER_METADATA_TYPE = new PluginParameter("parameter.metadata_type",
-    "Descriptive metadata type", PluginParameterType.METADATA_TYPE, null, false, false,
-    "Descriptive metadata type to be used as fallback or if metadata type is forced.");
+    "Descriptive metadata format", PluginParameterType.METADATA_TYPE, null, false, false,
+    "Descriptive metadata format to be used as fallback if the information package does not specify the metadata format or if the action is set to FORCE.");
 
   public static final PluginParameter PARAMETER_METADATA_VERSION = new PluginParameter("parameter.metadata_version",
     "Descriptive metadata version", PluginParameterType.STRING, null, false, false,
-    "Descriptive metadata version to be used as fallback or if metadata type is forced.");
+    "Descriptive metadata version to be used as fallback if the information package does not specify the metadata version or if the action is set to FORCE.");
 
   public static final PluginParameter PARAMETER_FORCE_DESCRIPTIVE_METADATA_TYPE = new PluginParameter(
-    "parameter.force_type", "Force metadata type in all", PluginParameterType.BOOLEAN, "false", true, false,
-    "If true, bypass current metadata type with metadata type passed as parameter. If false, if metadata type passed as parameter is defined use as fallback, else no fallback");
+    "parameter.force_type", "Force metadata format and version", PluginParameterType.BOOLEAN, "false", true, false,
+    "If true, bypass the metadata format and version set in the information package and use the metadata format and version passed as parameters (see above).");
 
   public static final PluginParameter PARAMETER_VALIDATE_PREMIS = new PluginParameter("parameter.validate_premis",
-    "Validate Premis", PluginParameterType.BOOLEAN, "true", true, false, "Validate Premis");
+    "Validate PREMIS", PluginParameterType.BOOLEAN, "true", true, false,
+    "Validate PREMIS metadata that exists inside the information package.");
 
   @Override
   public void init() throws PluginException {

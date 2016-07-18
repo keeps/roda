@@ -692,4 +692,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     return Browser.getFileFromId(user, fileId);
   }
 
+  @Override
+  public void renameTransferredResource(String transferredResourceId, String newName)
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
+    Browser.renameTransferredResource(user, transferredResourceId, newName);
+  }
+
 }

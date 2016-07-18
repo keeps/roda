@@ -185,6 +185,12 @@ public interface ClientMessages extends Messages {
 
   String rejectSIPQuestion();
 
+  String renameSIPPlaceholder();
+
+  String renameSIPFailed();
+
+  String renameSIPSuccessful();
+
   String allItemsWereAccepted();
 
   String jobNotFound();

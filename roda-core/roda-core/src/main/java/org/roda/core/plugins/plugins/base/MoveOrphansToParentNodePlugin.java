@@ -26,8 +26,8 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RemoveOrphansPlugin extends AbstractPlugin<IndexedAIP> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(RemoveOrphansPlugin.class);
+public class MoveOrphansToParentNodePlugin extends AbstractPlugin<IndexedAIP> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(MoveOrphansToParentNodePlugin.class);
   private AIP newParent;
 
   @Override
@@ -99,7 +99,7 @@ public class RemoveOrphansPlugin extends AbstractPlugin<IndexedAIP> {
 
   @Override
   public Plugin<IndexedAIP> cloneMe() {
-    return new RemoveOrphansPlugin();
+    return new MoveOrphansToParentNodePlugin();
   }
 
   @Override

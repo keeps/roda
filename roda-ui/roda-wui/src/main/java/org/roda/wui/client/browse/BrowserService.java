@@ -262,4 +262,7 @@ public interface BrowserService extends RemoteService {
   IndexedFile getFileFromId(String fileId)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 
+  void renameTransferredResource(String transferredResourceId, String newName)
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException;
+
 }
