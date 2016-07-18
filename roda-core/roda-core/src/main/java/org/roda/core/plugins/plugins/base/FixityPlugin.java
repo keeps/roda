@@ -75,12 +75,12 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "Fixity check";
+    return "File corruption risk assessment";
   }
 
   @Override
   public String getDescription() {
-    return "Computes the fixity check on AIP files";
+    return "Computes the fixity information of files inside an AIP and if this information differs from the information stored in the technical metadata, it creates and assigns that object to a risk in the Risk register.";
   }
 
   @Override

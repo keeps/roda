@@ -61,7 +61,7 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticDescription() {
-    return "Adds package to the inventory without any human appraisal. After this point, the responsibility for the digital content’s preservation is passed on to the repository.";
+    return "Adds information package to the inventory without any human appraisal. After this point, the responsibility for the digital content’s preservation is passed on to the repository.";
   }
 
   @Override

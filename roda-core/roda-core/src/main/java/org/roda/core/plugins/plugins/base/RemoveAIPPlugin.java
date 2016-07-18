@@ -50,12 +50,12 @@ public class RemoveAIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "Remove AIP";
+    return "Remove AIP(s)";
   }
 
   @Override
   public String getDescription() {
-    return "Remove AIPs from the system";
+    return "Permanently remove AIP(s) from the repository storage.";
   }
 
   @Override

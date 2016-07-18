@@ -42,12 +42,12 @@ public class RemoveOrphansPlugin extends AbstractPlugin<IndexedAIP> {
 
   @Override
   public String getName() {
-    return "MoveOrphansToNewParent";
+    return "Move orphan(s) to a parent node";
   }
 
   @Override
   public String getDescription() {
-    return "Moves the orphans AIP (not Fonds) to a new parent";
+    return "Moves orphan AIP(s) (not root level nodes) to a new parent";
   }
 
   @Override
@@ -75,7 +75,7 @@ public class RemoveOrphansPlugin extends AbstractPlugin<IndexedAIP> {
           aip.setParentId(newParent.getId());
           model.updateAIP(aip);
         } else {
-          LOGGER.debug("  AIP doesn't need to be moved... Level: {}", indexedAIP.getLevel());
+          LOGGER.debug("AIP doesn't need to be moved... level: {}", indexedAIP.getLevel());
         }
       } catch (RODAException e) {
         LOGGER.error("Error processing AIP " + indexedAIP.getId() + " (RemoveOrphansAction)", e);

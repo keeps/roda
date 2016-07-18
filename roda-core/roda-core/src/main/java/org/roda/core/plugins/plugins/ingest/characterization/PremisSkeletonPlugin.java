@@ -66,7 +66,7 @@ public class PremisSkeletonPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticDescription() {
-    return "Creates base PREMIS objects with file original name and file fixity information (SHA-256).";
+    return "Creates PREMIS objects with original file name(s) and fixity information using SHA-256 as default.";
   }
 
   @Override

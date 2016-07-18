@@ -57,7 +57,7 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticName() {
-    return "Format identification";
+    return "Format identification (Siegfried)";
   }
 
   @Override
@@ -66,7 +66,7 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticDescription() {
-    return "Identification of the object's file formats and versions using Siegfried.";
+    return "Identification of format and version of files included inside the information package using Siegfried (a signature-based file format identification tool that supports PRONOM and Mimetypes).";
   }
 
   @Override

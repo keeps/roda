@@ -74,12 +74,12 @@ public class ReindexJobPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getName() {
-    return "Reindex Jobs/JobReports";
+    return "Reindex Jobs/Job reports";
   }
 
   @Override
   public String getDescription() {
-    return "Clean-up indexes and re-create them from data in storage";
+    return "Reset Job and Job report index and recreate it from data existing in the storage.";
   }
 
   @Override

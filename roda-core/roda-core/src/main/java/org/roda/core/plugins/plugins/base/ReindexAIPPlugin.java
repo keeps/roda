@@ -58,12 +58,12 @@ public class ReindexAIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "Reindex AIP";
+    return "Reindex AIP(s)";
   }
 
   @Override
   public String getDescription() {
-    return "Cleanup index and recreate it from data in storage";
+    return "Reset AIP(s) index and recreate it from data existing in the storage.";
   }
 
   @Override

@@ -62,7 +62,7 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
 
   @Override
   public String getDescription() {
-    return "Cleanup indexes and recreate them from data in storage";
+    return "Reset entities index and recreate it from data existing in the storage.";
   }
 
   @Override

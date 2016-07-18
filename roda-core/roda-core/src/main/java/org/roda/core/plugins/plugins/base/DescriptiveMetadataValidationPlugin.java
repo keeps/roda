@@ -40,7 +40,7 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
 
   public static final PluginParameter PARAMETER_VALIDATE_DESCRIPTIVE_METADATA = new PluginParameter(
     "parameter.validate_descriptive_metadata", "Validate descriptive metadata", PluginParameterType.BOOLEAN, "true",
-    true, false, "If true the descriptive metadata is validated against existing schemas.");
+    true, false, "If true, the action will check if the the descriptive metadata is valid according to the schemas installed in the repository.");
 
   public static final PluginParameter PARAMETER_METADATA_TYPE = new PluginParameter("parameter.metadata_type",
     "Descriptive metadata type", PluginParameterType.METADATA_TYPE, null, false, false,
@@ -77,7 +77,7 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticDescription() {
-    return "Checks whether the descriptive metadata is included in the SIP and if this metadata is valid according to the established policy.";
+    return "Checks if the descriptive metadata is included in the SIP and if it is valid according to the schemas installed in the repository.";
   }
 
   @Override

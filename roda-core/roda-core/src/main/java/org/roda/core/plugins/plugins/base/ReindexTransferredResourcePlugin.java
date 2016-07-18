@@ -48,12 +48,12 @@ public class ReindexTransferredResourcePlugin extends AbstractPlugin<Transferred
 
   @Override
   public String getName() {
-    return "Reindex TransferredResource";
+    return "Reindex transferred resources folder";
   }
 
   @Override
   public String getDescription() {
-    return "Cleanup index and recreate it from data in storage";
+    return "Reset transferred resources index and recreate it from data existing in the storage.";
   }
 
   @Override

@@ -64,12 +64,12 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "Export AIP";
+    return "Export AIP(s)";
   }
 
   @Override
   public String getDescription() {
-    return "Export AIPs to a Zip file";
+    return "Exports selected AIP(s) to a ZIP file on the server file system.";
   }
 
   @Override
