@@ -77,7 +77,8 @@ public class AIPList extends BasicAsyncTableCell<IndexedAIP> {
           logger.error("Trying to display a NULL item");
           ret = null;
         } else {
-          ret = DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel(), true);
+          String iconLevel = aip.getGhost() ? "ghost" : aip.getLevel();
+          ret = DescriptionLevelUtils.getElementLevelIconSafeHtml(iconLevel, true);
         }
         return ret;
       }

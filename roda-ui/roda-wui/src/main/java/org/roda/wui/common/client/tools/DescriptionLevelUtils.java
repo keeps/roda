@@ -90,6 +90,10 @@ public class DescriptionLevelUtils {
   }
 
   public static SafeHtml getElementLevelIconSafeHtml(String level, boolean showText) {
+    //Shortcut for when the AIP is a ghost
+    if(level.equals("ghost")){
+      return SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-snapchat-ghost\" aria-hidden=\"true\"></i>");
+    }
     final DescriptionLevelInfo levelInfo = DescriptionLevelUtils.getDescriptionLevel(level);
 
     StringBuilder b = new StringBuilder();

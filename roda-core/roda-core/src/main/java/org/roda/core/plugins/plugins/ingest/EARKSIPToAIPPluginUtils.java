@@ -80,9 +80,11 @@ public class EARKSIPToAIPPluginUtils {
       processIPRepresentationInformation(model, representation, aipId, storage, notify, true);
     }
 
-    model.notifyAIPUpdated(aipId);
+    AIP aip = model.retrieveAIP(aipId);
+    aip.setGhost(false);
+    model.updateAIP(aip);
 
-    return model.retrieveAIP(aipId);
+    return aip;
 
   }
 

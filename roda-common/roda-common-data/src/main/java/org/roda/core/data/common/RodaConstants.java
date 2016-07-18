@@ -285,6 +285,8 @@ public final class RodaConstants {
   public static final String AIP_DESCRIPTIVE_METADATA_ID = "descriptiveMetadataId";
   public static final String AIP_REPRESENTATION_ID = "representationId";
   public static final String AIP_HAS_REPRESENTATIONS = "hasRepresentations";
+  public static final String AIP_GHOST = "ghost";
+
   // public static final String AIP_PRESERVATION_OBJECTS_ID =
   // "preservationObjectsId";
   // public static final String AIP_PRESERVATION_EVENTS_ID =

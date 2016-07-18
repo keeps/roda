@@ -1065,6 +1065,7 @@ public class SolrUtils {
     final Long numberOfSchemaFiles = objectToLong(doc.get(RodaConstants.AIP_NUMBER_OF_SCHEMA_FILES), 0L);
 
     final Boolean hasRepresentations = objectToBoolean(doc.get(RodaConstants.AIP_HAS_REPRESENTATIONS), Boolean.FALSE);
+    final Boolean ghost = objectToBoolean(doc.get(RodaConstants.AIP_GHOST), Boolean.FALSE);
 
     Permissions permissions = getPermissions(doc);
     final String level = levels.isEmpty() ? null : levels.get(0);
@@ -1072,7 +1073,7 @@ public class SolrUtils {
     final String description = descriptions.isEmpty() ? null : descriptions.get(0);
 
     return new IndexedAIP(id, state, level, title, dateInitial, dateFinal, description, parentId, ancestors,
-      permissions, numberOfSubmissionFiles, numberOfDocumentationFiles, numberOfSchemaFiles, hasRepresentations)
+      permissions, numberOfSubmissionFiles, numberOfDocumentationFiles, numberOfSchemaFiles, hasRepresentations, ghost)
         .setIngestSIPId(ingestSIPId).setIngestJobId(ingestJobId);
   }
 
@@ -1101,6 +1102,8 @@ public class SolrUtils {
     ret.addField(RodaConstants.AIP_HAS_REPRESENTATIONS, !representationIds.isEmpty());
 
     setPermissions(aip.getPermissions(), ret);
+
+    ret.addField(RodaConstants.AIP_GHOST, aip.getGhost() != null ? aip.getGhost() : false);
 
     if (!safemode) {
       // guarding against repeated fields

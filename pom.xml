@@ -604,7 +604,7 @@
 			<dependency>
 				<groupId>com.bytebybyte.gwt</groupId>
 				<artifactId>fontawesome-lib</artifactId>
-				<version>4.3.0</version>
+				<version>4.6.3</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.activation</groupId>

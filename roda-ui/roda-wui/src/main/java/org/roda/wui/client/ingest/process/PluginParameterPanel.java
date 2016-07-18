@@ -143,7 +143,8 @@ public class PluginParameterPanel extends Composite {
             IndexedAIP aip = event.getValue();
 
             Label itemTitle = new Label();
-            HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(aip.getLevel());
+            String iconLevel = aip.getGhost() ? "ghost" : aip.getLevel();
+            HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(iconLevel);
             itemIconHtmlPanel.addStyleName("itemIcon");
             itemTitle.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
             itemTitle.addStyleName("itemText");

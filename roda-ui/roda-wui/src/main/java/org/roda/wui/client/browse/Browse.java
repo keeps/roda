@@ -419,7 +419,8 @@ public class Browse extends Composite {
       breadcrumb.updatePath(getBreadcrumbsFromAncestors(itemBundle.getAIPAncestors(), aip));
       breadcrumb.setVisible(true);
 
-      HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(aip.getLevel());
+      String iconLevel = aip.getGhost() ? "ghost" : aip.getLevel();
+      HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(iconLevel);
       itemIconHtmlPanel.addStyleName("browseItemIcon-other");
       itemIcon.setWidget(itemIconHtmlPanel);
       itemTitle.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
@@ -600,11 +601,22 @@ public class Browse extends Composite {
   }
 
   private SafeHtml getBreadcrumbLabel(IndexedAIP ancestor) {
-    SafeHtml elementLevelIconSafeHtml = DescriptionLevelUtils.getElementLevelIconSafeHtml(ancestor.getLevel(), false);
-    SafeHtmlBuilder builder = new SafeHtmlBuilder();
-    String label = ancestor.getTitle() != null ? ancestor.getTitle() : ancestor.getId();
-    builder.append(elementLevelIconSafeHtml).append(SafeHtmlUtils.fromString(label));
-    SafeHtml breadcrumbLabel = builder.toSafeHtml();
+    SafeHtml breadcrumbLabel;
+    SafeHtml elementLevelIconSafeHtml;
+    if(ancestor.getGhost()){
+      elementLevelIconSafeHtml = SafeHtmlUtils.fromSafeConstant("<i class='fa fa-snapchat-ghost' aria-hidden='true'></i>");
+      SafeHtmlBuilder builder = new SafeHtmlBuilder();
+      String label = "<i>ghost</i>";
+      builder.append(elementLevelIconSafeHtml).append(SafeHtmlUtils.fromSafeConstant(label));
+      breadcrumbLabel = builder.toSafeHtml();
+    }else {
+      elementLevelIconSafeHtml = DescriptionLevelUtils.getElementLevelIconSafeHtml(ancestor.getLevel(), false);
+      SafeHtmlBuilder builder = new SafeHtmlBuilder();
+      String label = ancestor.getTitle() != null ? ancestor.getTitle() : ancestor.getId();
+      builder.append(elementLevelIconSafeHtml).append(SafeHtmlUtils.fromString(label));
+      breadcrumbLabel = builder.toSafeHtml();
+    }
+
     return breadcrumbLabel;
   }
 
