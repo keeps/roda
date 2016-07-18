@@ -340,7 +340,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<String> getCategories() {
-    return new ArrayList<String>();
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_MANAGEMENT);
   }
 
   @Override

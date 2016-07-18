@@ -172,7 +172,7 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_MANAGEMENT);
   }
 
   @Override

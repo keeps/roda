@@ -46,6 +46,12 @@
 					<g:Button addStyleNames="btn btn-refresh" ui:field="refresh">
 						<ui:text from='{messages.ingestTransferButtonRefresh}' />
 					</g:Button>
+					<g:Button addStyleNames="btn btn-edit" ui:field="rename">
+						<ui:text from='{messages.ingestTransferButtonRename}' />
+					</g:Button>
+					<g:Button addStyleNames="btn btn-edit" ui:field="move">
+						<ui:text from='{messages.ingestTransferButtonMove}' />
+					</g:Button>
 					<g:Button addStyleNames="btn btn-upload" ui:field="uploadFiles">
 						<ui:text from='{messages.ingestTransferButtonUploadFiles}' />
 					</g:Button>
