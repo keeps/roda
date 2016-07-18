@@ -161,9 +161,6 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
                           file.getPath(), file.getId());
                       }
                     }
-
-                  } else {
-                    LOGGER.warn("Cannot process File ", oFile.getCause());
                   }
                 }
               }

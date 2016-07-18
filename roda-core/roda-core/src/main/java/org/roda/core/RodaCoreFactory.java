@@ -146,6 +146,7 @@ public class RodaCoreFactory {
   private static Path workingDirectoryPath;
   private static Path reportDirectoryPath;
   private static Path exampleConfigPath;
+  private static Path defaultPath;
 
   private static StorageService storage;
   private static ModelService model;
@@ -350,6 +351,7 @@ public class RodaCoreFactory {
     // instantiate essential directories
     configPath = rodaHomePath.resolve(RodaConstants.CORE_CONFIG_FOLDER);
     exampleConfigPath = rodaHomePath.resolve(RodaConstants.CORE_EXAMPLE_CONFIG_FOLDER);
+    defaultPath = rodaHomePath.resolve(RodaConstants.CORE_DEFAULT_FOLDER);
     dataPath = rodaHomePath.resolve(RodaConstants.CORE_DATA_FOLDER);
     logPath = dataPath.resolve(RodaConstants.CORE_LOG_FOLDER);
     storagePath = dataPath.resolve(RodaConstants.CORE_STORAGE_FOLDER);
@@ -963,6 +965,10 @@ public class RodaCoreFactory {
     return configPath;
   }
 
+  public static Path getDefaultPath() {
+    return defaultPath;
+  }
+
   public static Path getWorkingDirectory() {
     return workingDirectoryPath;
   }
@@ -1067,6 +1073,26 @@ public class RodaCoreFactory {
       inputStream = RodaCoreFactory.class
         .getResourceAsStream("/" + RodaConstants.CORE_CONFIG_FOLDER + "/" + configurationFile);
       LOGGER.trace("Loading configuration from classpath {}", configurationFile);
+    }
+    return inputStream;
+  }
+
+  public static InputStream getDefaultFileAsStream(String defaultFile) {
+    Path defaultPath = getDefaultPath().resolve(defaultFile);
+    InputStream inputStream = null;
+    try {
+      if (Files.exists(defaultPath) && !Files.isDirectory(defaultPath)
+        && defaultPath.toAbsolutePath().startsWith(getDefaultPath().toAbsolutePath().toString())) {
+        inputStream = Files.newInputStream(defaultPath);
+        LOGGER.trace("Loading default from file {}", defaultPath);
+      }
+    } catch (IOException e) {
+      // do nothing
+    }
+    if (inputStream == null) {
+      inputStream = RodaCoreFactory.class
+        .getResourceAsStream("/" + RodaConstants.CORE_DEFAULT_FOLDER + "/" + defaultFile);
+      LOGGER.trace("Loading default file from classpath {}", defaultFile);
     }
     return inputStream;
   }

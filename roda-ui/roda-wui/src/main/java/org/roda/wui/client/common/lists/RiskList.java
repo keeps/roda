@@ -135,8 +135,8 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
     addColumn(categoryColumn, messages.riskCategory(), false, false);
     addColumn(ownerColumn, messages.riskMitigationOwner(), false, false);
     addColumn(identifiedOnColumn, messages.riskIdentifiedOn(), false, false, 8);
-    addColumn(severityColumn, messages.riskPostMitigationSeverity(), false, false, 8);
-    addColumn(objectCounterColumn, messages.riskObjects(), false, false, 5);
+    addColumn(severityColumn, messages.riskPostMitigationSeverity(), false, false, 7);
+    addColumn(objectCounterColumn, messages.riskObjects(), false, false, 6);
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(severityColumn, false));

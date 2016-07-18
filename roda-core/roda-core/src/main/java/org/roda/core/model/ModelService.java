@@ -10,6 +10,7 @@ package org.roda.core.model;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.DirectoryStream;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -1241,6 +1242,8 @@ public class ModelService extends ModelObservable {
         findOldLogsAndMoveThemToStorage(logDirectory, logFile);
         try {
           Files.createFile(logFile);
+        } catch (FileAlreadyExistsException e) {
+          // do nothing (just caused due to concurrency)
         } catch (IOException e) {
           throw new GenericException("Error creating file to write log into", e);
         }
