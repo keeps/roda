@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaCoreService;
@@ -32,7 +33,7 @@ public class UserLogin extends RodaCoreService {
       user = UserLoginHelper.login(username, password, request);
 
       // register action
-      controllerAssistant.registerAction(user, null, "username", username, "success", true);
+      controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "username", username);
 
       return user;
 
@@ -40,7 +41,7 @@ public class UserLogin extends RodaCoreService {
       user = UserUtility.getGuest();
       user.setIpAddress(request.getRemoteAddr());
       // register action
-      controllerAssistant.registerAction(user, null, "username", username, "success", false);
+      controllerAssistant.registerAction(user, LOG_ENTRY_STATE.FAILURE, "username", username);
       throw (e);
     }
   }

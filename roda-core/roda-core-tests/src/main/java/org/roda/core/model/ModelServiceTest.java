@@ -50,6 +50,7 @@ import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryParameter;
+import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
@@ -844,6 +845,7 @@ public class ModelServiceTest {
     entry.setAddress("Address");
     entry.setId("ID");
     entry.setDatetime(new Date());
+    entry.setState(LOG_ENTRY_STATE.SUCCESS);
     List<LogEntryParameter> parameters = new ArrayList<LogEntryParameter>();
     parameters.add(new LogEntryParameter("NAME1", "VALUE1"));
     parameters.add(new LogEntryParameter("NAME2", "VALUE2"));

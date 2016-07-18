@@ -16,6 +16,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.RodaUser;
@@ -47,7 +48,7 @@ public class Risks extends RodaCoreService {
     RodaCoreFactory.getModelService().createRisk(risk, false);
 
     // register action
-    controllerAssistant.registerAction(user, null, "risk", risk);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "risk", risk);
 
     return risk;
   }
@@ -63,7 +64,7 @@ public class Risks extends RodaCoreService {
     RodaCoreFactory.getModelService().deleteRisk(riskId, false);
 
     // register action
-    controllerAssistant.registerAction(user, null, "riskId", riskId);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "riskId", riskId);
   }
 
   public static List<IndexedRisk> retrieveRisks(RodaUser user, IndexResult<IndexedRisk> listRisksIndexResult)
@@ -74,14 +75,15 @@ public class Risks extends RodaCoreService {
     controllerAssistant.checkRoles(user);
 
     // TODO: The loop bellow could be replaced by the following line, right?
-    // List<IndexedRisk> risks = new ArrayList<>(listRisksIndexResult.getResults());
+    // List<IndexedRisk> risks = new
+    // ArrayList<>(listRisksIndexResult.getResults());
     List<IndexedRisk> risks = new ArrayList<IndexedRisk>();
     for (IndexedRisk risk : listRisksIndexResult.getResults()) {
       risks.add(risk);
     }
 
     // register action
-    controllerAssistant.registerAction(user);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
 
     return risks;
   }

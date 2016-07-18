@@ -31,6 +31,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
@@ -56,7 +57,7 @@ public class UserManagement extends RodaCoreService {
     Long count = UserManagementHelper.countLogEntries(filter);
 
     // register action
-    controllerAssistant.registerAction(user, null, "filter", filter.toString());
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "filter", filter.toString());
 
     return count;
   }
@@ -72,7 +73,8 @@ public class UserManagement extends RodaCoreService {
     IndexResult<LogEntry> ret = UserManagementHelper.findLogEntries(filter, sorter, sublist, facets);
 
     // register action
-    controllerAssistant.registerAction(user, null, "filter", filter, "sorter", sorter, "sublist", sublist);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "filter", filter, "sorter", sorter, "sublist",
+      sublist);
 
     return ret;
   }
@@ -87,7 +89,7 @@ public class UserManagement extends RodaCoreService {
     LogEntry ret = UserManagementHelper.retrieveLogEntry(logEntryId);
 
     // register action
-    controllerAssistant.registerAction(user, null, "logEntryId", logEntryId);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "logEntryId", logEntryId);
 
     return ret;
   }
@@ -103,7 +105,7 @@ public class UserManagement extends RodaCoreService {
     Long count = UserManagementHelper.countMembers(filter);
 
     // register action
-    controllerAssistant.registerAction(user, null, "filter", filter.toString());
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "filter", filter.toString());
 
     return count;
   }
@@ -119,7 +121,8 @@ public class UserManagement extends RodaCoreService {
     IndexResult<RODAMember> ret = UserManagementHelper.findMembers(filter, sorter, sublist, facets);
 
     // register action
-    controllerAssistant.registerAction(user, null, "filter", filter, "sorter", sorter, "sublist", sublist);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "filter", filter, "sorter", sorter, "sublist",
+      sublist);
 
     return ret;
   }
@@ -135,7 +138,7 @@ public class UserManagement extends RodaCoreService {
     User ret = UserManagementHelper.retrieveUser(username);
 
     // register action
-    controllerAssistant.registerAction(user, null, "username", username);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "username", username);
 
     return ret;
   }
@@ -151,7 +154,7 @@ public class UserManagement extends RodaCoreService {
     RodaUser ret = UserManagementHelper.retrieveRodaUser(username);
 
     // register action
-    controllerAssistant.registerAction(user, null, "username", username);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "username", username);
 
     return ret;
   }
@@ -167,7 +170,7 @@ public class UserManagement extends RodaCoreService {
     Group ret = UserManagementHelper.retrieveGroup(groupname);
 
     // register action
-    controllerAssistant.registerAction(user, null, "groupname", groupname);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "groupname", groupname);
 
     return ret;
   }
@@ -182,7 +185,7 @@ public class UserManagement extends RodaCoreService {
     List<Group> ret = UserManagementHelper.listAllGroups();
 
     // register action
-    controllerAssistant.registerAction(user);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
 
     return ret;
   }
@@ -195,7 +198,7 @@ public class UserManagement extends RodaCoreService {
     UserManagementHelper.registerUser(user, password);
 
     // register action
-    controllerAssistant.registerAction(user, null, "user", user);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "user", user);
   }
 
   public static User addUser(RodaUser user, User newUser, String password)
@@ -210,7 +213,7 @@ public class UserManagement extends RodaCoreService {
     User ret = UserManagementHelper.addUser(newUser, password);
 
     // register action
-    controllerAssistant.registerAction(user, null, "user", newUser);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "user", newUser);
 
     return ret;
   }
@@ -231,7 +234,7 @@ public class UserManagement extends RodaCoreService {
     UserManagementHelper.modifyUser(modifiedUser, password);
 
     // register action
-    controllerAssistant.registerAction(user, null, "user", modifiedUser);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "user", modifiedUser);
   }
 
   public static void modifyUser(RodaUser user, User modifiedUser, String password)
@@ -245,7 +248,7 @@ public class UserManagement extends RodaCoreService {
     UserManagementHelper.modifyUser(modifiedUser, password);
 
     // register action
-    controllerAssistant.registerAction(user, null, "user", modifiedUser);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "user", modifiedUser);
   }
 
   public static void removeUser(RodaUser user, String username) throws AuthorizationDeniedException, GenericException {
@@ -257,7 +260,7 @@ public class UserManagement extends RodaCoreService {
     UserManagementHelper.removeUser(username);
 
     // register action
-    controllerAssistant.registerAction(user, null, "username", username);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "username", username);
   }
 
   public static void addGroup(RodaUser user, Group group)
@@ -271,7 +274,7 @@ public class UserManagement extends RodaCoreService {
     UserManagementHelper.addGroup(group);
 
     // register action
-    controllerAssistant.registerAction(user, null, "group", group);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "group", group);
   }
 
   public static void modifyGroup(RodaUser user, Group group)
@@ -285,7 +288,7 @@ public class UserManagement extends RodaCoreService {
     UserManagementHelper.modifyGroup(group);
 
     // register action
-    controllerAssistant.registerAction(user, null, "group", group);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "group", group);
   }
 
   public static void removeGroup(RodaUser user, String groupname)
@@ -298,7 +301,7 @@ public class UserManagement extends RodaCoreService {
     UserManagementHelper.removeGroup(groupname);
 
     // register action
-    controllerAssistant.registerAction(user, null, "groupname", groupname);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "groupname", groupname);
   }
 
   // TODO: Methods bellow this line should also checkRoles? If so, a RodaUser is
@@ -321,7 +324,7 @@ public class UserManagement extends RodaCoreService {
     sendEmailVerification(servletPath, user);
 
     // register action
-    controllerAssistant.registerAction(user, null, "user", user);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "user", user);
   }
 
   public static void confirmUserEmail(String username, String emailConfirmationToken)
@@ -331,7 +334,7 @@ public class UserManagement extends RodaCoreService {
     User user = UserManagementHelper.confirmUserEmail(username, null, emailConfirmationToken);
 
     // register action
-    controllerAssistant.registerAction(user, null, "user", user);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "user", user);
   }
 
   public static void requestPasswordReset(String servletPath, String usernameOrEmail)
@@ -352,7 +355,7 @@ public class UserManagement extends RodaCoreService {
     sendRecoverLoginEmail(servletPath, user);
 
     // register action
-    controllerAssistant.registerAction(user, null, "user", user);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "user", user);
   }
 
   public static void resetUserPassword(String username, String password, String resetPasswordToken)
@@ -362,7 +365,7 @@ public class UserManagement extends RodaCoreService {
     User user = UserManagementHelper.resetUserPassword(username, password, resetPasswordToken);
 
     // register action
-    controllerAssistant.registerAction(user, null, "user", user);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "user", user);
   }
 
   private static void sendEmailVerification(String servletPath, User user) throws GenericException {

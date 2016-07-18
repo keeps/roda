@@ -60,6 +60,7 @@ import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.IndexedRisk;
@@ -381,6 +382,7 @@ public class IndexServiceTest {
     entry.setId("ID");
     entry.setRelatedObjectID("Related");
     entry.setUsername("Username");
+    entry.setState(LOG_ENTRY_STATE.SUCCESS);
     List<LogEntryParameter> parameters = new ArrayList<LogEntryParameter>();
     parameters.add(new LogEntryParameter("NAME1", "VALUE1"));
     parameters.add(new LogEntryParameter("NAME2", "VALUE2"));
@@ -410,6 +412,7 @@ public class IndexServiceTest {
     entry.setId("id");
     entry.setRelatedObjectID("related");
     entry.setUsername("username");
+    entry.setState(LOG_ENTRY_STATE.SUCCESS);
     List<LogEntryParameter> parameters = new ArrayList<LogEntryParameter>();
     parameters.add(new LogEntryParameter("NAME1", "VALUE1"));
     parameters.add(new LogEntryParameter("NAME2", "VALUE2"));
@@ -447,6 +450,7 @@ public class IndexServiceTest {
       entry.setDuration(i);
       entry.setRelatedObjectID("RELATED:" + i);
       entry.setUsername("USER:" + i);
+      entry.setState(LOG_ENTRY_STATE.SUCCESS);
       List<LogEntryParameter> parameters = new ArrayList<LogEntryParameter>();
       parameters.add(new LogEntryParameter("NAME1", "VALUE1"));
       parameters.add(new LogEntryParameter("NAME2", "VALUE2"));

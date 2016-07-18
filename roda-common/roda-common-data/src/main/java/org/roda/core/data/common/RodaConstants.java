@@ -346,6 +346,7 @@ public final class RodaConstants {
   public static final String LOG_RELATED_OBJECT_ID = "relatedObject";
   public static final String LOG_USERNAME = "username";
   public static final String LOG_PARAMETERS = "parameters";
+  public static final String LOG_STATE = "state";
   public static final String LOG_FILE_ID = "fileID";
   public static final String LOG_SEARCH = "search";
 

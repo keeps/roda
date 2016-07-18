@@ -109,6 +109,7 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.IndexedRisk;
@@ -1320,6 +1321,8 @@ public class SolrUtils {
     final String parameters = objectToString(doc.get(RodaConstants.LOG_PARAMETERS));
     final String relatedObjectId = objectToString(doc.get(RodaConstants.LOG_RELATED_OBJECT_ID));
     final String username = objectToString(doc.get(RodaConstants.LOG_USERNAME));
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE
+      .valueOf(objectToString(doc.get(RodaConstants.LOG_STATE), LOG_ENTRY_STATE.UNKNOWN.toString()));
     LogEntry entry = new LogEntry();
     entry.setActionComponent(actionComponent);
     entry.setActionMethod(actionMethod);
@@ -1327,6 +1330,7 @@ public class SolrUtils {
     entry.setDatetime(datetime);
     entry.setDuration(duration);
     entry.setId(id);
+    entry.setState(state);
     try {
       entry.setParameters(JsonUtils.getListFromJson(parameters == null ? "" : parameters, LogEntryParameter.class));
     } catch (GenericException e) {
@@ -1350,6 +1354,8 @@ public class SolrUtils {
     doc.addField(RodaConstants.LOG_PARAMETERS, JsonUtils.getJsonFromObject(logEntry.getParameters()));
     doc.addField(RodaConstants.LOG_RELATED_OBJECT_ID, logEntry.getRelatedObjectID());
     doc.addField(RodaConstants.LOG_USERNAME, logEntry.getUsername());
+    doc.addField(RodaConstants.LOG_STATE, logEntry.getState().toString());
+
     return doc;
   }
 

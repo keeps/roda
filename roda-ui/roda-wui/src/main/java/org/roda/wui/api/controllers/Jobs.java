@@ -13,6 +13,7 @@ import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaCoreService;
@@ -46,7 +47,7 @@ public class Jobs extends RodaCoreService {
     Job updatedJob = JobsHelper.createJob(job);
 
     // register action
-    controllerAssistant.registerAction(user, null, "job", updatedJob);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "job", updatedJob);
 
     return updatedJob;
   }
@@ -62,7 +63,7 @@ public class Jobs extends RodaCoreService {
     Job job = JobsHelper.startJob(jobId);
 
     // register action
-    controllerAssistant.registerAction(user, null, "jobId", jobId);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "jobId", jobId);
 
     return job;
   }
@@ -78,7 +79,7 @@ public class Jobs extends RodaCoreService {
     JobsHelper.stopJob(jobId);
 
     // register action
-    controllerAssistant.registerAction(user, null, "jobId", jobId);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "jobId", jobId);
   }
 
   public static void deleteJob(RodaUser user, String jobId)
@@ -92,7 +93,7 @@ public class Jobs extends RodaCoreService {
     JobsHelper.deleteJob(jobId);
 
     // register action
-    controllerAssistant.registerAction(user, null, "jobId", jobId);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "jobId", jobId);
   }
 
   /*

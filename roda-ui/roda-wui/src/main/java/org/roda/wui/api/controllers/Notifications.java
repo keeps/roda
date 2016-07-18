@@ -17,6 +17,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.common.ControllerAssistant;
@@ -48,7 +49,7 @@ public class Notifications extends RodaCoreService {
       new HashMap<String, Object>());
 
     // register action
-    controllerAssistant.registerAction(user, null, "notification", notification);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "notification", notification);
 
     return notification;
   }
@@ -64,7 +65,7 @@ public class Notifications extends RodaCoreService {
     RodaCoreFactory.getModelService().deleteNotification(notificationId);
 
     // register action
-    controllerAssistant.registerAction(user, null, "notificationId", notificationId);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "notificationId", notificationId);
   }
 
   public static List<Notification> retrieveNotifications(RodaUser user,
@@ -75,14 +76,15 @@ public class Notifications extends RodaCoreService {
     controllerAssistant.checkRoles(user);
 
     // TODO: The loop bellow could be replaced by the following line, right?
-    // List<Notification> notification = new ArrayList<>(listNotificationsIndexResult.getResults());
+    // List<Notification> notification = new
+    // ArrayList<>(listNotificationsIndexResult.getResults());
     List<Notification> notifications = new ArrayList<Notification>();
     for (Notification notification : listNotificationsIndexResult.getResults()) {
       notifications.add(notification);
     }
 
     // register action
-    controllerAssistant.registerAction(user);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
 
     return notifications;
   }
@@ -98,7 +100,7 @@ public class Notifications extends RodaCoreService {
     RodaCoreFactory.getModelService().acknowledgeNotification(notificationId, token, email);
 
     // register action
-    controllerAssistant.registerAction(user, null, "notificationId", notificationId, "token", token);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "notificationId", notificationId, "token", token);
   }
 
   /*

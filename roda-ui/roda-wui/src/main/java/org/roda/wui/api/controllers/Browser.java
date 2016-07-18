@@ -45,6 +45,7 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
+import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
@@ -103,7 +104,8 @@ public class Browser extends RodaCoreService {
     BrowseItemBundle itemBundle = BrowserHelper.getItemBundle(aipId, locale);
 
     // register action
-    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_AIP_ID, aipId);
+    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID,
+      aipId);
 
     return itemBundle;
   }
@@ -123,7 +125,7 @@ public class Browser extends RodaCoreService {
       version);
 
     // register action
-    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
       RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
 
     return bundle;
@@ -144,7 +146,7 @@ public class Browser extends RodaCoreService {
     DescriptiveMetadataEditBundle bundle = BrowserHelper.getDescriptiveMetadataEditBundle(user, aip, metadataId);
 
     // register action
-    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
       RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
 
     return bundle;
@@ -166,7 +168,7 @@ public class Browser extends RodaCoreService {
       locale);
 
     // register action
-    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
       RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
 
     return bundle;
@@ -187,7 +189,7 @@ public class Browser extends RodaCoreService {
 
     // register action
 
-    controllerAssistant.registerAction(user, null, "class", classToReturn.getSimpleName(),
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "class", classToReturn.getSimpleName(),
       RodaConstants.CONTROLLER_FILTER_PARAM, filter, RodaConstants.CONTROLLER_SORTER_PARAM, sorter,
       RodaConstants.CONTROLLER_SUBLIST_PARAM, sublist);
 
@@ -207,7 +209,7 @@ public class Browser extends RodaCoreService {
     Long count = BrowserHelper.count(classToReturn, filter, user);
 
     // register action
-    controllerAssistant.registerAction(user, null, "class", classToReturn.getSimpleName(),
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "class", classToReturn.getSimpleName(),
       RodaConstants.CONTROLLER_FILTER_PARAM, filter.toString());
 
     return count;
@@ -230,7 +232,7 @@ public class Browser extends RodaCoreService {
     if (classToReturn.equals(IndexedAIP.class)) {
       aipId = id;
     }
-    controllerAssistant.registerAction(user, aipId, "class", classToReturn.getSimpleName());
+    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, "class", classToReturn.getSimpleName());
 
     return ret;
   }
@@ -248,7 +250,7 @@ public class Browser extends RodaCoreService {
     BrowserHelper.delete(user, classToReturn, ids);
 
     // register action
-    controllerAssistant.registerAction(user, null, "class", classToReturn.getSimpleName());
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "class", classToReturn.getSimpleName());
   }
 
   public static <T extends IsIndexed> List<String> suggest(RodaUser user, Class<T> classToReturn, String field,
@@ -264,8 +266,8 @@ public class Browser extends RodaCoreService {
     List<String> ret = BrowserHelper.suggest(classToReturn, field, query);
 
     // register action
-    controllerAssistant.registerAction(user, null, "class", classToReturn.getSimpleName(), "field", field, "query",
-      query);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "class", classToReturn.getSimpleName(), "field",
+      field, "query", query);
 
     return ret;
   }
@@ -282,7 +284,7 @@ public class Browser extends RodaCoreService {
     List<IndexedAIP> ancestors = BrowserHelper.getAncestors(aip);
 
     // register action
-    controllerAssistant.registerAction(user, aip.getId(), AIP_PARAM, aip.toString());
+    controllerAssistant.registerAction(user, aip.getId(), LOG_ENTRY_STATE.SUCCESS, AIP_PARAM, aip.toString());
 
     return ancestors;
   }
@@ -310,8 +312,8 @@ public class Browser extends RodaCoreService {
     StreamResponse aipRepresentation = BrowserHelper.getAipRepresentation(representation, acceptFormat);
 
     // register action
-    controllerAssistant.registerAction(user, representation.getAipId(), RodaConstants.REPRESENTATION_ID,
-      representation.getId());
+    controllerAssistant.registerAction(user, representation.getAipId(), LOG_ENTRY_STATE.SUCCESS,
+      RodaConstants.REPRESENTATION_ID, representation.getId());
 
     return aipRepresentation;
   }
@@ -331,8 +333,8 @@ public class Browser extends RodaCoreService {
     StreamResponse aipRepresentation = BrowserHelper.getAipRepresentationPart(representation, part);
 
     // register action
-    controllerAssistant.registerAction(user, representation.getAipId(), RodaConstants.REPRESENTATION_ID,
-      representation.getId(), "part", part);
+    controllerAssistant.registerAction(user, representation.getAipId(), LOG_ENTRY_STATE.SUCCESS,
+      RodaConstants.REPRESENTATION_ID, representation.getId(), "part", part);
 
     return aipRepresentation;
   }
@@ -354,7 +356,7 @@ public class Browser extends RodaCoreService {
     StreamResponse aipDescriptiveMetadataList = BrowserHelper.listAipDescriptiveMetadata(aipId, start, limit);
 
     // register action
-    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
       RodaConstants.API_QUERY_KEY_START, start, RodaConstants.API_QUERY_KEY_LIMIT, limit);
 
     return aipDescriptiveMetadataList;
@@ -378,7 +380,8 @@ public class Browser extends RodaCoreService {
       language);
 
     // register action
-    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
+    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_METADATA_ID,
+      metadataId);
 
     return aipDescritiveMetadata;
 
@@ -402,7 +405,8 @@ public class Browser extends RodaCoreService {
       acceptFormat, language);
 
     // register action
-    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
+    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_METADATA_ID,
+      metadataId);
 
     return aipDescritiveMetadata;
 
@@ -424,7 +428,8 @@ public class Browser extends RodaCoreService {
     StreamResponse aipPreservationMetadataList = BrowserHelper.aipsAipIdPreservationMetadataGet(aipId);
 
     // register action
-    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_AIP_ID, aipId);
+    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID,
+      aipId);
 
     return aipPreservationMetadataList;
   }
@@ -448,9 +453,9 @@ public class Browser extends RodaCoreService {
       representationId, startAgent, limitAgent, startEvent, limitEvent, startFile, limitFile, acceptFormat, language);
 
     // register action
-    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_AIP_ID, aipId, "startAgent",
-      startAgent, "limitAgent", limitAgent, "startEvent", startEvent, "limitEvent", limitEvent, "startFile", startFile,
-      "limitFile", limitFile);
+    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+      "startAgent", startAgent, "limitAgent", limitAgent, "startEvent", startEvent, "limitEvent", limitEvent,
+      "startFile", startFile, "limitFile", limitFile);
 
     return aipRepresentationPreservationMetadata;
 
@@ -471,7 +476,7 @@ public class Browser extends RodaCoreService {
       .getAipRepresentationPreservationMetadataFile(aipId, representationId, fileId);
 
     // register action
-    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
       RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId, RodaConstants.API_PATH_PARAM_FILE_UUID, fileId);
 
     return aipRepresentationPreservationMetadataFile;
@@ -494,7 +499,7 @@ public class Browser extends RodaCoreService {
       fileId, is, fileDetail, true);
 
     // register action
-    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
       RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId);
   }
 
@@ -514,7 +519,7 @@ public class Browser extends RodaCoreService {
       fileId, is, fileDetail, false);
 
     // register action
-    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
       RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId);
 
   }
@@ -534,7 +539,7 @@ public class Browser extends RodaCoreService {
       preservationId);
 
     // register action
-    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
       RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId, RodaConstants.API_PATH_PARAM_FILE_UUID, fileId);
 
   }
@@ -563,7 +568,8 @@ public class Browser extends RodaCoreService {
     IndexedAIP returnAIP = BrowserHelper.moveInHierarchy(selected, parentId, user);
 
     // register action
-    controllerAssistant.registerAction(user, parentId, "selected", selected, "toParent", parentId);
+    controllerAssistant.registerAction(user, parentId, LOG_ENTRY_STATE.SUCCESS, "selected", selected, "toParent",
+      parentId);
 
     return returnAIP;
   }
@@ -598,7 +604,7 @@ public class Browser extends RodaCoreService {
     AIP aip = BrowserHelper.createAIP(parentId, type, permissions);
 
     // register action
-    controllerAssistant.registerAction(user, aip.getId(), "parentId", parentId);
+    controllerAssistant.registerAction(user, aip.getId(), LOG_ENTRY_STATE.SUCCESS, "parentId", parentId);
 
     return aip;
   }
@@ -614,7 +620,7 @@ public class Browser extends RodaCoreService {
     String parentId = BrowserHelper.removeAIP(aips, user);
 
     // register action
-    controllerAssistant.registerAction(user, null, "selected", aips);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "selected", aips);
 
     return parentId;
   }
@@ -634,8 +640,8 @@ public class Browser extends RodaCoreService {
       metadataVersion, metadataPayload);
 
     // register action
-    controllerAssistant.registerAction(user, aip.getId(), RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
-      RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
+    controllerAssistant.registerAction(user, aip.getId(), LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID,
+      aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
 
     return ret;
   }
@@ -656,7 +662,7 @@ public class Browser extends RodaCoreService {
       metadataVersion, metadataPayload, message);
 
     // register action
-    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
       RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
 
     return ret;
@@ -675,8 +681,8 @@ public class Browser extends RodaCoreService {
     BrowserHelper.removeDescriptiveMetadataFile(aipId, metadataId);
 
     // register action
-    controllerAssistant.registerAction(user, aip.getId(), RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
-      RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
+    controllerAssistant.registerAction(user, aip.getId(), LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID,
+      aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
   }
 
   public static DescriptiveMetadata retrieveDescriptiveMetadataFile(RodaUser user, String aipId, String metadataId)
@@ -692,7 +698,7 @@ public class Browser extends RodaCoreService {
     DescriptiveMetadata dm = BrowserHelper.retrieveMetadataFile(aipId, metadataId);
 
     // register action
-    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
       RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
 
     return dm;
@@ -711,8 +717,8 @@ public class Browser extends RodaCoreService {
     BrowserHelper.removeRepresentation(aipId, representationId);
 
     // register action
-    controllerAssistant.registerAction(user, aip.getId(), RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
-      RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId);
+    controllerAssistant.registerAction(user, aip.getId(), LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID,
+      aipId, RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId);
   }
 
   public static void removeRepresentationFile(RodaUser user, String fileUUID)
@@ -730,9 +736,9 @@ public class Browser extends RodaCoreService {
     BrowserHelper.removeRepresentationFile(fileUUID);
 
     // register action
-    controllerAssistant.registerAction(user, aip.getId(), RodaConstants.FILE_AIPID, file.getAipId(),
-      RodaConstants.FILE_REPRESENTATION_ID, file.getRepresentationId(), RodaConstants.FILE_PATH, file.getPath(),
-      RodaConstants.FILE_FILEID, file.getId());
+    controllerAssistant.registerAction(user, aip.getId(), LOG_ENTRY_STATE.SUCCESS, RodaConstants.FILE_AIPID,
+      file.getAipId(), RodaConstants.FILE_REPRESENTATION_ID, file.getRepresentationId(), RodaConstants.FILE_PATH,
+      file.getPath(), RodaConstants.FILE_FILEID, file.getId());
   }
 
   public static StreamResponse getAipRepresentationFile(RodaUser user, String fileUuid, String acceptFormat)
@@ -753,8 +759,9 @@ public class Browser extends RodaCoreService {
     StreamResponse aipRepresentationFile = BrowserHelper.getAipRepresentationFile(fileUuid, acceptFormat);
 
     // register action
-    controllerAssistant.registerAction(user, file.getAipId(), RodaConstants.FILE_REPRESENTATION_ID,
-      file.getRepresentationId(), RodaConstants.FILE_PATH, file.getPath(), RodaConstants.FILE_FILEID, file.getId());
+    controllerAssistant.registerAction(user, file.getAipId(), LOG_ENTRY_STATE.SUCCESS,
+      RodaConstants.FILE_REPRESENTATION_ID, file.getRepresentationId(), RodaConstants.FILE_PATH, file.getPath(),
+      RodaConstants.FILE_FILEID, file.getId());
 
     return aipRepresentationFile;
   }
@@ -776,7 +783,7 @@ public class Browser extends RodaCoreService {
       is, fileDetail, false);
 
     // register action
-    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
       RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
   }
 
@@ -797,7 +804,7 @@ public class Browser extends RodaCoreService {
       is, fileDetail, true);
 
     // register action
-    controllerAssistant.registerAction(user, aipId, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
       RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
   }
 
@@ -816,13 +823,13 @@ public class Browser extends RodaCoreService {
         forceCommit);
 
       // register action
-      controllerAssistant.registerAction(user, null, PARENT_PARAM, parentUUID, FOLDERNAME_PARAM, folderName,
-        SUCCESS_PARAM, true);
+      controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, PARENT_PARAM, parentUUID, FOLDERNAME_PARAM,
+        folderName, SUCCESS_PARAM, true);
       return transferredResource;
     } catch (GenericException e) {
       // register action
-      controllerAssistant.registerAction(user, null, PARENT_PARAM, parentUUID, FOLDERNAME_PARAM, folderName,
-        SUCCESS_PARAM, false, ERROR_PARAM, e.getMessage());
+      controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, PARENT_PARAM, parentUUID, FOLDERNAME_PARAM,
+        folderName, SUCCESS_PARAM, false, ERROR_PARAM, e.getMessage());
       throw e;
     }
   }
@@ -838,7 +845,7 @@ public class Browser extends RodaCoreService {
     BrowserHelper.removeTransferredResources(selected, user);
 
     // register action
-    controllerAssistant.registerAction(user, null, "selected", selected);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "selected", selected);
   }
 
   public static TransferredResource createTransferredResourceFile(RodaUser user, String parentUUID, String fileName,
@@ -857,14 +864,14 @@ public class Browser extends RodaCoreService {
         inputStream, forceCommit);
 
       // register action
-      controllerAssistant.registerAction(user, null, PATH_PARAM, parentUUID, FILENAME_PARAM, fileName, SUCCESS_PARAM,
-        true);
+      controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, PATH_PARAM, parentUUID, FILENAME_PARAM,
+        fileName, SUCCESS_PARAM, true);
 
       return transferredResource;
     } catch (GenericException e) {
       // register action
-      controllerAssistant.registerAction(user, null, PATH_PARAM, parentUUID, FILENAME_PARAM, fileName, SUCCESS_PARAM,
-        false, ERROR_PARAM, e.getMessage());
+      controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, PATH_PARAM, parentUUID, FILENAME_PARAM,
+        fileName, SUCCESS_PARAM, false, ERROR_PARAM, e.getMessage());
       throw e;
     }
 
@@ -881,7 +888,7 @@ public class Browser extends RodaCoreService {
     StreamResponse classificationPlan = BrowserHelper.getClassificationPlan(type, user);
 
     // register action
-    controllerAssistant.registerAction(user, null, CLASSIFICATION_PLAN_TYPE_PARAMETER, type);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, CLASSIFICATION_PLAN_TYPE_PARAMETER, type);
 
     return classificationPlan;
   }
@@ -903,8 +910,8 @@ public class Browser extends RodaCoreService {
 
     // register action
     // TODO: what params should be registered?
-    controllerAssistant.registerAction(user, null, "parentUUID", parentUUID, "transferredResourceUUID",
-      transferredResource.getUUID());
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "parentUUID", parentUUID,
+      "transferredResourceUUID", transferredResource.getUUID());
 
     return transferredResource;
   }
@@ -935,7 +942,7 @@ public class Browser extends RodaCoreService {
     List<SupportedMetadataTypeBundle> supportedMetadata = BrowserHelper.getSupportedMetadata(user, aip, locale);
 
     // register action
-    controllerAssistant.registerAction(user, null, RodaConstants.LOCALE, locale);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.LOCALE, locale);
 
     return supportedMetadata;
   }
@@ -951,7 +958,7 @@ public class Browser extends RodaCoreService {
       .getTransferredResource(BrowserHelper.retrieve(TransferredResource.class, resourceId));
 
     // register action
-    controllerAssistant.registerAction(user, null, "resourceId", resourceId);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "resourceId", resourceId);
 
     return response;
   }
@@ -973,7 +980,7 @@ public class Browser extends RodaCoreService {
     PreservationEventViewBundle resource = BrowserHelper.retrievePreservationEventViewBundle(eventId);
 
     // register action
-    controllerAssistant.registerAction(user, null, INDEX_PRESERVATION_EVENT_ID, eventId);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, INDEX_PRESERVATION_EVENT_ID, eventId);
 
     return resource;
   }
@@ -994,7 +1001,7 @@ public class Browser extends RodaCoreService {
     BrowserHelper.revertDescriptiveMetadataVersion(aipId, descriptiveMetadataId, versionId, message);
 
     // register action
-    controllerAssistant.registerAction(user, null, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
       RodaConstants.API_PATH_PARAM_METADATA_ID, descriptiveMetadataId, RodaConstants.API_QUERY_PARAM_VERSION,
       versionId);
   }
@@ -1016,7 +1023,7 @@ public class Browser extends RodaCoreService {
     BrowserHelper.removeDescriptiveMetadataVersion(aipId, descriptiveMetadataId, versionId);
 
     // register action
-    controllerAssistant.registerAction(user, null, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
       RodaConstants.API_PATH_PARAM_METADATA_ID, descriptiveMetadataId, RodaConstants.API_QUERY_PARAM_VERSION,
       versionId);
   }
@@ -1032,8 +1039,8 @@ public class Browser extends RodaCoreService {
 
     BrowserHelper.updateAIPPermissions(aip, permissions, recursive);
 
-    controllerAssistant.registerAction(user, null, RodaConstants.API_PATH_PARAM_AIP_ID, aipId, "permissions",
-      permissions);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+      "permissions", permissions);
   }
 
   public static <T extends IsIndexed> List<String> consolidate(RodaUser user, Class<T> classToReturn,
@@ -1045,7 +1052,7 @@ public class Browser extends RodaCoreService {
 
     List<String> result = BrowserHelper.consolidate(user, classToReturn, selected);
 
-    controllerAssistant.registerAction(user, null, "classToReturn", classToReturn, "selectedClass",
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "classToReturn", classToReturn, "selectedClass",
       selected.getSelectedClass());
 
     return result;
@@ -1062,7 +1069,7 @@ public class Browser extends RodaCoreService {
     BrowserHelper.modifyRisk(risk, user, message, false);
 
     // register action
-    controllerAssistant.registerAction(user, null, "risk", risk);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "risk", risk);
   }
 
   public static void modifyFormat(RodaUser user, Format format)
@@ -1076,7 +1083,7 @@ public class Browser extends RodaCoreService {
     BrowserHelper.modifyFormat(format, false);
 
     // register action
-    controllerAssistant.registerAction(user, null, "format", format);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "format", format);
   }
 
   public static void modifyAgent(RodaUser user, Agent agent)
@@ -1090,7 +1097,7 @@ public class Browser extends RodaCoreService {
     BrowserHelper.modifyAgent(agent, false);
 
     // register action
-    controllerAssistant.registerAction(user, null, "agent", agent);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "agent", agent);
   }
 
   public static Risk addRisk(RodaUser user, Risk risk)
@@ -1104,7 +1111,7 @@ public class Browser extends RodaCoreService {
     Risk ret = BrowserHelper.addRisk(risk, user, true);
 
     // register action
-    controllerAssistant.registerAction(user, null, "risk", risk);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "risk", risk);
 
     return ret;
   }
@@ -1120,7 +1127,7 @@ public class Browser extends RodaCoreService {
     Format ret = BrowserHelper.addFormat(format, false);
 
     // register action
-    controllerAssistant.registerAction(user, null, "format", format);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "format", format);
 
     return ret;
   }
@@ -1136,7 +1143,7 @@ public class Browser extends RodaCoreService {
     Agent ret = BrowserHelper.addAgent(agent, false);
 
     // register action
-    controllerAssistant.registerAction(user, null, "agent", agent);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "agent", agent);
 
     return ret;
   }
@@ -1152,7 +1159,7 @@ public class Browser extends RodaCoreService {
     List<Format> ret = BrowserHelper.retrieveFormats(agentId);
 
     // register action
-    controllerAssistant.registerAction(user, null, "agentId", agentId);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "agentId", agentId);
 
     return ret;
   }
@@ -1168,7 +1175,7 @@ public class Browser extends RodaCoreService {
     List<Agent> ret = BrowserHelper.retrieveRequiredAgents(agentId);
 
     // register action
-    controllerAssistant.registerAction(user, null, "agentId", agentId);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "agentId", agentId);
 
     return ret;
   }
@@ -1184,7 +1191,8 @@ public class Browser extends RodaCoreService {
     BrowserHelper.revertRiskVersion(riskId, versionId, message);
 
     // register action
-    controllerAssistant.registerAction(user, versionId, "riskId", riskId, "versionId", versionId, "message", message);
+    controllerAssistant.registerAction(user, versionId, LOG_ENTRY_STATE.SUCCESS, "riskId", riskId, "versionId",
+      versionId, "message", message);
   }
 
   /**
@@ -1217,7 +1225,7 @@ public class Browser extends RodaCoreService {
     StreamResponse aipExport = BrowserHelper.getAIPs(selected, acceptFormat);
 
     // register action
-    controllerAssistant.registerAction(user);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
 
     return aipExport;
   }
@@ -1238,7 +1246,7 @@ public class Browser extends RodaCoreService {
     StreamResponse aip = BrowserHelper.getAIP(indexedAIP, acceptFormat);
 
     // register action
-    controllerAssistant.registerAction(user, aipId);
+    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS);
 
     return aip;
   }
@@ -1256,7 +1264,7 @@ public class Browser extends RodaCoreService {
     StreamResponse aip = BrowserHelper.getAIPPart(indexedAIP, part);
 
     // register action
-    controllerAssistant.registerAction(user, aipId, "part", part);
+    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, "part", part);
 
     return aip;
   }
@@ -1272,7 +1280,8 @@ public class Browser extends RodaCoreService {
     BrowserHelper.removeRiskVersion(riskId, versionId);
 
     // register action
-    controllerAssistant.registerAction(user, versionId, "riskId", riskId, "versionId", versionId);
+    controllerAssistant.registerAction(user, versionId, LOG_ENTRY_STATE.SUCCESS, "riskId", riskId, "versionId",
+      versionId);
   }
 
   public static RiskVersionsBundle retrieveRiskVersions(RodaUser user, String riskId)
@@ -1286,7 +1295,7 @@ public class Browser extends RodaCoreService {
     RiskVersionsBundle ret = BrowserHelper.retrieveRiskVersions(riskId);
 
     // register action
-    controllerAssistant.registerAction(user, null, "riskId", riskId);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "riskId", riskId);
 
     return ret;
   }
@@ -1302,7 +1311,7 @@ public class Browser extends RodaCoreService {
     boolean ret = BrowserHelper.hasRiskVersions(id);
 
     // register action
-    controllerAssistant.registerAction(user, null, "riskId", id);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "riskId", id);
 
     return ret;
   }
@@ -1318,7 +1327,8 @@ public class Browser extends RodaCoreService {
     Risk ret = BrowserHelper.retrieveRiskVersion(riskId, selectedVersion);
 
     // register action
-    controllerAssistant.registerAction(user, null, "riskId", riskId, "selectedVersion", selectedVersion);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "riskId", riskId, "selectedVersion",
+      selectedVersion);
 
     return ret;
   }
@@ -1336,9 +1346,9 @@ public class Browser extends RodaCoreService {
       posMitigationProbability, posMitigationImpact);
 
     // register action
-    controllerAssistant.registerAction(user, null, "preMitigationProbability", preMitigationProbability,
-      "preMitigationImpact", preMitigationImpact, "posMitigationProbability", posMitigationProbability,
-      "posMitigationImpact", posMitigationImpact);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "preMitigationProbability",
+      preMitigationProbability, "preMitigationImpact", preMitigationImpact, "posMitigationProbability",
+      posMitigationProbability, "posMitigationImpact", posMitigationImpact);
 
     return ret;
   }
@@ -1353,7 +1363,7 @@ public class Browser extends RodaCoreService {
     List<String> ret = BrowserHelper.retrieveShowMitigationTerms();
 
     // register action
-    controllerAssistant.registerAction(user);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
 
     return ret;
   }
@@ -1369,7 +1379,7 @@ public class Browser extends RodaCoreService {
     MitigationPropertiesBundle ret = BrowserHelper.retrieveAllMitigationProperties();
 
     // register action
-    controllerAssistant.registerAction(user);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
 
     return ret;
   }
@@ -1386,7 +1396,7 @@ public class Browser extends RodaCoreService {
     BrowserHelper.deleteRisk(user, selected);
 
     // register action
-    controllerAssistant.registerAction(user, null, "selected", selected);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "selected", selected);
   }
 
   public static void deleteAgent(RodaUser user, SelectedItems<Agent> selected)
@@ -1400,7 +1410,7 @@ public class Browser extends RodaCoreService {
     BrowserHelper.deleteAgent(user, selected);
 
     // register action
-    controllerAssistant.registerAction(user, null, "selected", selected);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "selected", selected);
   }
 
   public static void deleteFormat(RodaUser user, SelectedItems<Format> selected)
@@ -1414,7 +1424,7 @@ public class Browser extends RodaCoreService {
     BrowserHelper.deleteFormat(user, selected);
 
     // register action
-    controllerAssistant.registerAction(user, null, "selected", selected);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "selected", selected);
   }
 
   public static List<String> getRiskOnAIP(RodaUser user, String aipId)
@@ -1428,7 +1438,7 @@ public class Browser extends RodaCoreService {
     List<String> riskList = BrowserHelper.getRiskOnAIP(aipId);
 
     // register action
-    controllerAssistant.registerAction(user, null, "aipId", aipId);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "aipId", aipId);
 
     return riskList;
   }
@@ -1444,7 +1454,7 @@ public class Browser extends RodaCoreService {
     BrowserHelper.deleteRiskIncidences(user, id, incidences);
 
     // register action
-    controllerAssistant.registerAction(user, null, "incidences", incidences);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "incidences", incidences);
   }
 
   public static void updateRiskCounters(RodaUser user)
@@ -1458,7 +1468,7 @@ public class Browser extends RodaCoreService {
     BrowserHelper.updateRiskCounters();
 
     // register action
-    controllerAssistant.registerAction(user);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
   }
 
   public static void appraisal(RodaUser user, SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
@@ -1472,8 +1482,8 @@ public class Browser extends RodaCoreService {
     BrowserHelper.appraisal(user, selected, accept, rejectReason);
 
     // register action
-    controllerAssistant.registerAction(user, null, "selected", selected, "accept", accept, "rejectReason",
-      rejectReason);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "selected", selected, "accept", accept,
+      "rejectReason", rejectReason);
   }
 
   public static IndexedRepresentation getRepresentationFromId(RodaUser user, String representationId)
@@ -1487,7 +1497,7 @@ public class Browser extends RodaCoreService {
     IndexedRepresentation ret = BrowserHelper.getRepresentationFromId(user, representationId);
 
     // register action
-    controllerAssistant.registerAction(user, null, "representationId", representationId);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "representationId", representationId);
 
     return ret;
   }
@@ -1503,7 +1513,7 @@ public class Browser extends RodaCoreService {
     IndexedFile ret = BrowserHelper.getFileFromId(user, fileId);
 
     // register action
-    controllerAssistant.registerAction(user, null, "fileId", fileId);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "fileId", fileId);
 
     return ret;
   }
@@ -1519,7 +1529,7 @@ public class Browser extends RodaCoreService {
     String payload = BrowserHelper.getDescriptiveMetadataPreview(bundle);
 
     // register action
-    controllerAssistant.registerAction(user, null, "template", bundle.getLabel());
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "template", bundle.getLabel());
 
     return payload;
   }

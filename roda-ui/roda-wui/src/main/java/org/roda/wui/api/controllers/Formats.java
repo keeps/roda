@@ -17,6 +17,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaCoreService;
@@ -46,7 +47,7 @@ public class Formats extends RodaCoreService {
     RodaCoreFactory.getModelService().createFormat(format, false);
 
     // register action
-    controllerAssistant.registerAction(user, null, "format", format);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "format", format);
 
     return format;
   }
@@ -62,7 +63,7 @@ public class Formats extends RodaCoreService {
     RodaCoreFactory.getModelService().deleteFormat(formatId, false);
 
     // register action
-    controllerAssistant.registerAction(user, null, "formatId", formatId);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "formatId", formatId);
   }
 
   public static List<Format> retrieveFormats(RodaUser user, IndexResult<Format> listFormatsIndexResult)
@@ -73,13 +74,14 @@ public class Formats extends RodaCoreService {
     controllerAssistant.checkRoles(user);
 
     // TODO: The loop bellow could be replaced by the following line, right?
-    // List<Format> formats = new ArrayList<>(listFormatsIndexResult.getResults());
+    // List<Format> formats = new
+    // ArrayList<>(listFormatsIndexResult.getResults());
     List<Format> formats = new ArrayList<Format>(listFormatsIndexResult.getResults());
     for (Format format : listFormatsIndexResult.getResults()) {
       formats.add(format);
     }
 
-    controllerAssistant.registerAction(user);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
 
     return formats;
   }

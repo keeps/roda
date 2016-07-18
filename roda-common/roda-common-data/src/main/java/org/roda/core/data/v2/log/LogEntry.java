@@ -21,6 +21,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class LogEntry implements IsIndexed {
   private static final long serialVersionUID = -178083792639806983L;
 
+  public enum LOG_ENTRY_STATE {
+    SUCCESS, UNAUTHORIZED, FAILURE, UNKNOWN
+  }
+
   private String id;
   private String address;
   private Date datetime;
@@ -32,10 +36,13 @@ public class LogEntry implements IsIndexed {
 
   private List<LogEntryParameter> parameters;
 
+  private LOG_ENTRY_STATE state;
+
   /**
    * Constructs an empty {@link LogEntry}.
    */
   public LogEntry() {
+    this.state = LOG_ENTRY_STATE.UNKNOWN;
   }
 
   /**
@@ -47,7 +54,7 @@ public class LogEntry implements IsIndexed {
   public LogEntry(LogEntry logEntry) {
     this(logEntry.getId(), logEntry.getAddress(), logEntry.getDatetime(), logEntry.getUsername(),
       logEntry.getActionComponent(), logEntry.getActionMethod(), logEntry.getParameters(),
-      logEntry.getRelatedObjectID(), logEntry.getDuration());
+      logEntry.getRelatedObjectID(), logEntry.getDuration(), logEntry.getState());
   }
 
   /**
@@ -71,7 +78,8 @@ public class LogEntry implements IsIndexed {
    *          the ID of the object related with this action.
    */
   public LogEntry(String id, String address, Date datetime, String username, String actionComponent,
-    String actionMethod, List<LogEntryParameter> parameters, String relatedObjectID, long duration) {
+    String actionMethod, List<LogEntryParameter> parameters, String relatedObjectID, long duration,
+    LOG_ENTRY_STATE state) {
 
     setId(id);
     setAddress(address);
@@ -82,15 +90,14 @@ public class LogEntry implements IsIndexed {
     setParameters(parameters);
     setRelatedObjectID(relatedObjectID);
     setDuration(duration);
+    setState(state);
   }
 
-  /**
-   * @see Object#toString()
-   */
+  @Override
   public String toString() {
-    return "LogEntry (datetime=" + getDatetime() + ", address=" + getAddress() + ", username=" + getUsername()
-      + ", actionComponent=" + getActionComponent() + ", actionMethod=" + getActionMethod() + ", parameters="
-      + getParameters() + ", relatedObjectID=" + getRelatedObjectID() + ", duration=" + getDuration() + ")";
+    return "LogEntry [id=" + id + ", address=" + address + ", datetime=" + datetime + ", username=" + username
+      + ", actionComponent=" + actionComponent + ", actionMethod=" + actionMethod + ", relatedObjectID="
+      + relatedObjectID + ", duration=" + duration + ", parameters=" + parameters + ", state=" + state + "]";
   }
 
   @Override
@@ -105,81 +112,64 @@ public class LogEntry implements IsIndexed {
     result = prime * result + ((id == null) ? 0 : id.hashCode());
     result = prime * result + ((parameters == null) ? 0 : parameters.hashCode());
     result = prime * result + ((relatedObjectID == null) ? 0 : relatedObjectID.hashCode());
+    result = prime * result + ((state == null) ? 0 : state.hashCode());
     result = prime * result + ((username == null) ? 0 : username.hashCode());
     return result;
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) {
+    if (this == obj)
       return true;
-    }
-    if (obj == null) {
+    if (obj == null)
       return false;
-    }
-    if (!(obj instanceof LogEntry)) {
+    if (!(obj instanceof LogEntry))
       return false;
-    }
     LogEntry other = (LogEntry) obj;
     if (actionComponent == null) {
-      if (other.actionComponent != null) {
+      if (other.actionComponent != null)
         return false;
-      }
-    } else if (!actionComponent.equals(other.actionComponent)) {
+    } else if (!actionComponent.equals(other.actionComponent))
       return false;
-    }
     if (actionMethod == null) {
-      if (other.actionMethod != null) {
+      if (other.actionMethod != null)
         return false;
-      }
-    } else if (!actionMethod.equals(other.actionMethod)) {
+    } else if (!actionMethod.equals(other.actionMethod))
       return false;
-    }
     if (address == null) {
-      if (other.address != null) {
+      if (other.address != null)
         return false;
-      }
-    } else if (!address.equals(other.address)) {
+    } else if (!address.equals(other.address))
       return false;
-    }
     if (datetime == null) {
-      if (other.datetime != null) {
+      if (other.datetime != null)
         return false;
-      }
-    } else if (!datetime.equals(other.datetime)) {
+    } else if (!datetime.equals(other.datetime))
       return false;
-    }
-    if (duration != other.duration) {
+    if (duration != other.duration)
       return false;
-    }
     if (id == null) {
-      if (other.id != null) {
+      if (other.id != null)
         return false;
-      }
-    } else if (!id.equals(other.id)) {
+    } else if (!id.equals(other.id))
       return false;
-    }
     if (parameters == null) {
-      if (other.parameters != null) {
+      if (other.parameters != null)
         return false;
-      }
-    } else if (!parameters.equals(other.parameters)) {
+    } else if (!parameters.equals(other.parameters))
       return false;
-    }
     if (relatedObjectID == null) {
-      if (other.relatedObjectID != null) {
+      if (other.relatedObjectID != null)
         return false;
-      }
-    } else if (!relatedObjectID.equals(other.relatedObjectID)) {
+    } else if (!relatedObjectID.equals(other.relatedObjectID))
       return false;
-    }
+    if (state != other.state)
+      return false;
     if (username == null) {
-      if (other.username != null) {
+      if (other.username != null)
         return false;
-      }
-    } else if (!username.equals(other.username)) {
+    } else if (!username.equals(other.username))
       return false;
-    }
     return true;
   }
 
@@ -315,6 +305,14 @@ public class LogEntry implements IsIndexed {
   @Override
   public String getUUID() {
     return getId();
+  }
+
+  public LOG_ENTRY_STATE getState() {
+    return state;
+  }
+
+  public void setState(LOG_ENTRY_STATE state) {
+    this.state = state;
   }
 
 }

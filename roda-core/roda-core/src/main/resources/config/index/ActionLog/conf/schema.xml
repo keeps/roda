@@ -111,7 +111,8 @@
    <field name="datetime" type="tdate" indexed="true" stored="true" required="false" multiValued="false" />  
    <field name="duration" type="long" indexed="true" stored="true" required="true" multiValued="false" /> 
    <field name="relatedObject" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
-   <field name="username" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
+   <field name="username" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+   <field name="state" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
    <field name="parameters" type="string" indexed="false" stored="true" required="false" multiValued="false" />
    <field name="search" type="text_general" indexed="true" stored="false" multiValued="true" />
    

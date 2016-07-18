@@ -13,6 +13,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.agents.Agent;
+import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaCoreService;
@@ -42,7 +43,7 @@ public class Agents extends RodaCoreService {
     RodaCoreFactory.getModelService().createAgent(agent, false);
 
     // register action
-    controllerAssistant.registerAction(user, null, "agent", agent);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "agent", agent);
 
     return agent;
   }
@@ -58,9 +59,8 @@ public class Agents extends RodaCoreService {
     RodaCoreFactory.getModelService().deleteAgent(agentId, false);
 
     // register action
-    controllerAssistant.registerAction(user, null, "agentId", agentId);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "agentId", agentId);
   }
-
 
   /*
    * ---------------------------------------------------------------------------

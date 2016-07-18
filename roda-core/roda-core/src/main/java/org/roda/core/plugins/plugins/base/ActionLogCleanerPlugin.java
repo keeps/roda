@@ -20,10 +20,9 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
@@ -33,7 +32,7 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ActionLogCleanerPlugin extends AbstractPlugin<LogEntry> {
+public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
   private static final Logger LOGGER = LoggerFactory.getLogger(ActionLogCleanerPlugin.class);
   private int deleteOlderThanXDays = RodaCoreFactory.getRodaConfigurationAsInt(0, "core", "actionlogs",
     "delete_older_than_x_days");
@@ -77,7 +76,7 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<LogEntry> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<LogEntry> entries)
+  public Report execute(IndexService index, ModelService model, StorageService storage, List<Void> entries)
     throws PluginException {
 
     if (deleteOlderThanXDays > 0) {
@@ -116,7 +115,7 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<LogEntry> {
   }
 
   @Override
-  public Plugin<LogEntry> cloneMe() {
+  public Plugin<Void> cloneMe() {
     return new ActionLogCleanerPlugin();
   }
 
@@ -157,8 +156,8 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<LogEntry> {
   }
 
   @Override
-  public List<Class<LogEntry>> getObjectClasses() {
-    return Arrays.asList(LogEntry.class);
+  public List<Class<Void>> getObjectClasses() {
+    return Arrays.asList(Void.class);
   }
 
 }
