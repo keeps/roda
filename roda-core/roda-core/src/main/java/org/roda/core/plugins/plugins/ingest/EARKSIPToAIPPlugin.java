@@ -126,34 +126,42 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
     try {
       sip = EARKSIP.parse(earkSIPPath, RodaCoreFactory.getWorkingDirectory());
       reportItem.setSourceObjectOriginalId(sip.getId());
-      createAncestors(sip, index, model, storage);
+
 
       if (sip.getValidationReport().isValid()) {
-        String sipParentId = sip.getAncestors() != null && sip.getAncestors().isEmpty() ? ""
-          : sip.getAncestors().get(0);
+        String sipParentId = createAncestors(sip, index, model, storage);
         String computedParentId = PluginHelper.computeParentId(this, index, sipParentId);
 
         AIP aip;
 
-        if (IPEnums.IPStatus.UPDATE == sip.getStatus()) {
-          IndexResult<IndexedAIP> result = index.find(IndexedAIP.class,
-            new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, sip.getId())), Sorter.NONE,
-            new Sublist(0, 1));
-          if (result.getTotalCount() == 1) {
-            // Retrieve the AIP
-            IndexedAIP indexedAIP = result.getResults().get(0);
+        IndexResult<IndexedAIP> result = index.find(IndexedAIP.class,
+                new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, sip.getId())), Sorter.NONE,
+                new Sublist(0, 1));
+        IndexedAIP indexedAIP = null;
+        AIP originalAIP = null;
+        if (result.getTotalCount() == 1) {
+          indexedAIP = result.getResults().get(0);
+          originalAIP = model.retrieveAIP(indexedAIP.getId());
+        }
+
+        // Status is UPDATE or the AIP is a ghost
+        if(IPEnums.IPStatus.UPDATE == sip.getStatus() || (originalAIP != null && originalAIP.getGhost())){
+          if(indexedAIP != null) {
+            // Update the AIP
             aip = EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP.getId(), earkSIPPath, model, storage,
-              sip.getId(), reportItem.getJobId(), computedParentId);
-          } else {
+                    sip.getId(), reportItem.getJobId(), computedParentId);
+          }else {
             // Fail to update since there's no AIP
             throw new NotFoundException("Unable to find AIP created with SIP ID: " + sip.getId());
           }
-        } else if (IPEnums.IPStatus.NEW == sip.getStatus()) {
-          // Create a new AIP
-          aip = EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, earkSIPPath, model, storage, sip.getId(),
-            reportItem.getJobId(), computedParentId);
-        } else {
-          throw new GenericException("Unknown IP Status: " + sip.getStatus());
+        }else{
+          if(IPEnums.IPStatus.NEW == sip.getStatus()){
+            // Create a new AIP
+            aip = EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, earkSIPPath, model, storage, sip.getId(),
+                    reportItem.getJobId(), computedParentId);
+          }else {
+            throw new GenericException("Unknown IP Status: " + sip.getStatus());
+          }
         }
 
         // put SIP inside the created AIP (if it is supposed to do so)
@@ -187,20 +195,24 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
     }
   }
 
-  private void createAncestors(SIP sip, IndexService index, ModelService model, StorageService storage)
+  private String createAncestors(SIP sip, IndexService index, ModelService model, StorageService storage)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException,
     AlreadyExistsException, ValidationException {
     List<String> ancestors = new ArrayList<>(sip.getAncestors());
     if (ancestors.isEmpty())
-      return;
+      return null;
     // Reverse list so that the top ancestors come first
     Collections.reverse(ancestors);
     String parent = null;
 
     for (String ancestor : ancestors) {
       try {
-        model.retrieveAIP(ancestor);
-        parent = ancestor;
+        IndexResult<IndexedAIP> result = index.find(IndexedAIP.class,
+                new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, ancestor)), Sorter.NONE,
+                new Sublist(0, 1));
+        if (result.getTotalCount() == 1) {
+          parent = result.getResults().get(0).getId();
+        }else throw new NotFoundException();
       } catch (NotFoundException e) {
         Job currentJob = PluginHelper.getJobFromIndex(this, index);
         if (currentJob == null) {
@@ -213,10 +225,11 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
           new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
             Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE, Permissions.PermissionType.GRANT)));
         boolean isGhost = true;
-        model.createAIP(ancestor, parent, "", permissions, true, isGhost);
-        parent = ancestor;
+        AIP ghostAIP = model.createAIP(parent, "", permissions, true, ancestor, isGhost);
+        parent = ghostAIP.getId();
       }
     }
+    return parent;
   }
 
   @Override
