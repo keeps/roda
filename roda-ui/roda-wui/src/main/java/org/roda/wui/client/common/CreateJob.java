@@ -209,7 +209,8 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
                   || (isSelectedEmpty() && pluginInfo.hasObjectClass(listSelectedClass)))) {
 
                 CheckBox box = new CheckBox();
-                box.setText(category);
+                box.setText(messages.showPluginCategories(category));
+                box.setName(category);
                 box.addStyleName("form-checkbox-job");
 
                 box.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
@@ -232,7 +233,7 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
                               if (checkbox.getValue()) {
                                 noChecks = false;
 
-                                if (categories.contains(checkbox.getText())
+                                if (categories.contains(checkbox.getName())
                                   && !categories.contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)
                                   && ((!isSelectedEmpty() && pluginInfo.hasObjectClass(selectedClass))
                                     || (isSelectedEmpty() && pluginInfo.hasObjectClass(listSelectedClass)))) {

@@ -447,7 +447,8 @@ public interface ClientMessages extends Messages {
 
   String viewRepresentationInfoStoragePath();
 
-  /************* process new ****************/
+  /************* Process new ****************/
+
   String processNewDefaultName(Date date);
 
   String pluginLabel(String name, String version);
@@ -457,6 +458,8 @@ public interface ClientMessages extends Messages {
   String processNewMissingMandatoryInfoDialogTitle();
 
   String processNewMissingMandatoryInfoDialogMessage(List<String> missingPluginNames);
+
+  String showPluginCategories(@Select String category);
 
   /************* Ingest process show ****************/
 
