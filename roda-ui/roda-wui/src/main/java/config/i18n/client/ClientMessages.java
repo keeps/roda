@@ -401,6 +401,8 @@ public interface ClientMessages extends Messages {
 
   String addButton();
 
+  String confirmButton();
+
   String applyAllButton();
 
   /*** View representation ***/
@@ -659,6 +661,10 @@ public interface ClientMessages extends Messages {
   String selectAipSearchResults();
 
   String selectAipSearchPlaceHolder();
+
+  String selectTransferredResourcesSearchResults();
+
+  String renameTransferredResourcesDialogTitle();
 
   /************* Move Item ****************/
 

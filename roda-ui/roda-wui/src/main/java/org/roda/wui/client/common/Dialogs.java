@@ -120,18 +120,28 @@ public class Dialogs {
     dialogBox.show();
   }
 
-  public static void showPromptDialog(String title, String message, final RegExp validator, String cancelButtonText,
-    String confirmButtonText, final AsyncCallback<String> callback) {
+  public static void showPromptDialog(String title, String message, String placeHolder, final RegExp validator,
+    String cancelButtonText, String confirmButtonText, final AsyncCallback<String> callback) {
     final DialogBox dialogBox = new DialogBox(false, true);
     dialogBox.setText(title);
 
     final FlowPanel layout = new FlowPanel();
-    final Label messageLabel = new Label(message);
+
+    if (message != null) {
+      final Label messageLabel = new Label(message);
+      layout.add(messageLabel);
+      messageLabel.addStyleName("wui-dialog-message");
+    }
+
     final TextBox inputBox = new TextBox();
+
+    if (placeHolder != null) {
+      inputBox.getElement().setPropertyString("placeholder", placeHolder);
+    }
+
     final Button cancelButton = new Button(cancelButtonText);
     final Button confirmButton = new Button(confirmButtonText);
 
-    layout.add(messageLabel);
     layout.add(inputBox);
     layout.add(cancelButton);
     layout.add(confirmButton);
@@ -200,7 +210,6 @@ public class Dialogs {
 
     dialogBox.addStyleName("wui-dialog-prompt");
     layout.addStyleName("wui-dialog-layout");
-    messageLabel.addStyleName("wui-dialog-message");
     inputBox.addStyleName("form-textbox wui-dialog-message");
     cancelButton.addStyleName("btn btn-link");
     confirmButton.addStyleName("pull-right btn btn-play");

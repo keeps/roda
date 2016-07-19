@@ -180,4 +180,8 @@ public interface BrowserServiceAsync {
   void getFileFromId(String fileId, AsyncCallback<IndexedFile> asyncCallback);
 
   void renameTransferredResource(String transferredResourceId, String newName, AsyncCallback<Void> asyncCallback);
+
+  void moveTransferredResource(SelectedItems selected, TransferredResource transferredResource,
+    AsyncCallback<Void> asyncCallback);
+
 }

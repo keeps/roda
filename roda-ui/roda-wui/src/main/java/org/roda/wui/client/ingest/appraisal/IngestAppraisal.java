@@ -540,7 +540,7 @@ public class IngestAppraisal extends Composite {
   void buttonRejectHandler(ClickEvent e) {
     final boolean accept = false;
     final SelectedItems<?> selected = getSelected();
-    Dialogs.showPromptDialog(messages.rejectMessage(), messages.rejectSIPQuestion(), RegExp.compile(".+"),
+    Dialogs.showPromptDialog(messages.rejectMessage(), messages.rejectSIPQuestion(), null, RegExp.compile(".+"),
       messages.dialogCancel(), messages.dialogOk(), new AsyncCallback<String>() {
 
         @Override

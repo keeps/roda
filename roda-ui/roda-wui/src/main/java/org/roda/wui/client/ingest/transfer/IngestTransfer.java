@@ -17,6 +17,7 @@ import java.util.List;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.NotSimpleFilterParameter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
@@ -30,6 +31,7 @@ import org.roda.wui.client.common.CreateJob;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.SearchPanel;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.SelectTransferResourceDialog;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.lists.TransferredResourceList;
@@ -455,7 +457,7 @@ public class IngestTransfer extends Composite {
   @UiHandler("createFolder")
   void buttonCreateFolderHandler(ClickEvent e) {
     Dialogs.showPromptDialog(messages.ingestTransferCreateFolderTitle(), messages.ingestTransferCreateFolderMessage(),
-      RegExp.compile(".+"), messages.dialogCancel(), messages.dialogOk(), new AsyncCallback<String>() {
+      null, RegExp.compile(".+"), messages.dialogCancel(), messages.dialogOk(), new AsyncCallback<String>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -608,11 +610,79 @@ public class IngestTransfer extends Composite {
 
   @UiHandler("rename")
   void buttonRenameHandler(ClickEvent e) {
-    RenameSelectDialog dialog = new RenameSelectDialog("Rename", getSelected());
+    String resourceId = null;
+
+    if (getSelected() instanceof SelectedItemsList) {
+      SelectedItemsList resourceList = (SelectedItemsList) getSelected();
+      resourceId = (String) resourceList.getIds().get(0);
+
+      final String transferredResourceId = resourceId;
+
+      Dialogs.showPromptDialog(messages.renameTransferredResourcesDialogTitle(), null, messages.renameSIPPlaceholder(),
+        RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
+
+          @Override
+          public void onFailure(Throwable caught) {
+            Toast.showInfo(messages.dialogFailure(), messages.renameSIPFailed());
+          }
+
+          @Override
+          public void onSuccess(String result) {
+            BrowserService.Util.getInstance().renameTransferredResource(transferredResourceId, result,
+              new AsyncCallback<Void>() {
+
+                @Override
+                public void onFailure(Throwable caught) {
+                  Toast.showInfo(messages.dialogFailure(), messages.renameSIPFailed());
+                }
+
+                @Override
+                public void onSuccess(Void result) {
+                  Toast.showInfo(messages.dialogSuccess(), messages.renameSIPSuccessful());
+                  IngestTransfer.getInstance().refreshList();
+                }
+              });
+          }
+        });
+    }
   }
 
   @UiHandler("move")
   void buttonMoveHandler(ClickEvent e) {
-    Toast.showInfo("Warning", "This feature is not yet implemented");
+    Filter filter = new Filter(
+      new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, Boolean.FALSE.toString()));
+
+    if (getSelected() instanceof SelectedItemsList) {
+      SelectedItemsList selectedList = (SelectedItemsList) getSelected();
+      for (Object id : selectedList.getIds()) {
+        filter.add(new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_UUID, (String) id));
+      }
+    }
+
+    SelectTransferResourceDialog dialog = new SelectTransferResourceDialog(messages.selectParentTitle(), filter);
+    dialog.setEmptyParentButtonVisible(true);
+    dialog.showAndCenter();
+    dialog.addValueChangeHandler(new ValueChangeHandler<TransferredResource>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<TransferredResource> event) {
+        TransferredResource transferredResource = event.getValue();
+
+        BrowserService.Util.getInstance().moveTransferredResource(getSelected(), transferredResource,
+          new AsyncCallback<Void>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+              Toast.showInfo(messages.dialogFailure(), messages.renameSIPFailed());
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+              Toast.showInfo(messages.dialogSuccess(), messages.renameSIPSuccessful());
+              IngestTransfer.getInstance().refreshList();
+            }
+          });
+      }
+    });
   }
 }

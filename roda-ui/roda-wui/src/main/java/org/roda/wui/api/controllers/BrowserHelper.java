@@ -2069,4 +2069,38 @@ public class BrowserHelper {
       file.renameTo(new java.io.File(resource.getFullPath().replaceAll("/[^/]+$", "/" + newName)));
     }
   }
+
+  public static void moveTransferredResource(SelectedItems selected, TransferredResource transferredResource)
+    throws GenericException, RequestNotValidException {
+
+    String transferredResourcesFolder = RodaCoreFactory.getRodaConfiguration().getString("transferredResources.folder",
+      RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER);
+    String resourceFullPath = RodaCoreFactory.getDataPath().resolve(transferredResourcesFolder).toAbsolutePath()
+      .toString();
+
+    Filter filter = new Filter();
+    int counter = 1;
+
+    if (selected instanceof SelectedItemsList) {
+      SelectedItemsList selectedList = (SelectedItemsList) selected;
+      filter.add(new OneOfManyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_UUID, selectedList.getIds()));
+      counter = selectedList.getIds().size();
+    } else if (selected instanceof SelectedItemsFilter) {
+      SelectedItemsFilter selectedFilter = (SelectedItemsFilter) selected;
+      filter = selectedFilter.getFilter();
+      counter = RodaCoreFactory.getIndexService().count(TransferredResource.class, filter).intValue();
+    }
+
+    IndexResult<TransferredResource> resources = RodaCoreFactory.getIndexService().find(TransferredResource.class,
+      filter, Sorter.NONE, new Sublist(0, counter));
+
+    if (transferredResource != null) {
+      resourceFullPath = transferredResource.getFullPath();
+    }
+
+    for (TransferredResource resource : resources.getResults()) {
+      java.io.File file = new java.io.File(resource.getFullPath());
+      file.renameTo(new java.io.File(resourceFullPath + "/" + file.getName()));
+    }
+  }
 }

@@ -921,7 +921,7 @@ public class Browse extends Composite {
               public void onFailure(Throwable caught) {
                 if (caught instanceof NotFoundException) {
                   Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-                } else if(!AsyncCallbackUtils.treatCommonFailures(caught)) {
+                } else if (!AsyncCallbackUtils.treatCommonFailures(caught)) {
                   Toast.showError(messages.moveIllegalOperation(caught.getMessage()));
                 }
               }
@@ -969,7 +969,7 @@ public class Browse extends Composite {
             public void onFailureImpl(Throwable caught) {
               if (caught instanceof NotFoundException) {
                 Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-              } else if(!AsyncCallbackUtils.treatCommonFailures(caught)) {
+              } else if (!AsyncCallbackUtils.treatCommonFailures(caught)) {
                 Toast.showError(messages.moveIllegalOperation(caught.getMessage()));
               }
             }
@@ -1048,7 +1048,7 @@ public class Browse extends Composite {
   void appraisalRejectHandler(ClickEvent e) {
     final boolean accept = false;
     final SelectedItems<IndexedAIP> selected = SelectedItemsList.create(IndexedAIP.class, aipId);
-    Dialogs.showPromptDialog(messages.rejectMessage(), messages.rejectQuestion(), RegExp.compile(".+"),
+    Dialogs.showPromptDialog(messages.rejectMessage(), messages.rejectQuestion(), null, RegExp.compile(".+"),
       messages.dialogCancel(), messages.dialogOk(), new AsyncCallback<String>() {
 
         @Override
