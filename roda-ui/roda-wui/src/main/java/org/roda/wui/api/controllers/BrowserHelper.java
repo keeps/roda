@@ -2057,7 +2057,7 @@ public class BrowserHelper {
   }
 
   public static void renameTransferredResource(String transferredResourceId, String newName)
-    throws GenericException, RequestNotValidException {
+    throws GenericException, RequestNotValidException, AlreadyExistsException {
     Filter filter = new Filter(
       new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_UUID, transferredResourceId));
     IndexResult<TransferredResource> resources = RodaCoreFactory.getIndexService().find(TransferredResource.class,
@@ -2065,13 +2065,12 @@ public class BrowserHelper {
 
     if (!resources.getResults().isEmpty()) {
       TransferredResource resource = (TransferredResource) resources.getResults().get(0);
-      java.io.File file = new java.io.File(resource.getFullPath());
-      file.renameTo(new java.io.File(resource.getFullPath().replaceAll("/[^/]+$", "/" + newName)));
+      RodaCoreFactory.getTransferredResourcesScanner().renameTransferredResource(resource, newName, true);
     }
   }
 
   public static void moveTransferredResource(SelectedItems selected, TransferredResource transferredResource)
-    throws GenericException, RequestNotValidException {
+    throws GenericException, RequestNotValidException, AlreadyExistsException {
 
     String transferredResourcesFolder = RodaCoreFactory.getRodaConfiguration().getString("transferredResources.folder",
       RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER);
@@ -2098,9 +2097,7 @@ public class BrowserHelper {
       resourceFullPath = transferredResource.getFullPath();
     }
 
-    for (TransferredResource resource : resources.getResults()) {
-      java.io.File file = new java.io.File(resource.getFullPath());
-      file.renameTo(new java.io.File(resourceFullPath + "/" + file.getName()));
-    }
+    RodaCoreFactory.getTransferredResourcesScanner().moveTransferredResource(resources.getResults(), resourceFullPath,
+      true);
   }
 }

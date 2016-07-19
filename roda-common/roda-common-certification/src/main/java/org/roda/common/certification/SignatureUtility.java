@@ -70,8 +70,8 @@ public class SignatureUtility {
     this(DEFAULT_PROVIDER);
   }
 
-  protected SignatureUtility(String provider) throws KeyStoreException, NoSuchAlgorithmException,
-    NoSuchProviderException {
+  protected SignatureUtility(String provider)
+    throws KeyStoreException, NoSuchAlgorithmException, NoSuchProviderException {
     this.ks = KeyStore.getInstance(KeyStore.getDefaultType());
     this.provider = provider;
     Security.addProvider(new BouncyCastleProvider());
@@ -90,8 +90,8 @@ public class SignatureUtility {
    * @throws CertificateException
    * @throws IOException
    */
-  public void loadKeyStore(InputStream keystore, char[] password) throws NoSuchAlgorithmException,
-    CertificateException, IOException {
+  public void loadKeyStore(InputStream keystore, char[] password)
+    throws NoSuchAlgorithmException, CertificateException, IOException {
     ks.load(keystore, password);
   }
 
@@ -111,9 +111,9 @@ public class SignatureUtility {
    * @throws CertStoreException
    * @throws NoSuchProviderException
    */
-  public void initSign(String alias, char[] password) throws KeyStoreException, NoSuchAlgorithmException,
-    UnrecoverableKeyException, InvalidAlgorithmParameterException, CertStoreException, CMSException,
-    NoSuchProviderException {
+  public void initSign(String alias, char[] password)
+    throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, InvalidAlgorithmParameterException,
+    CertStoreException, CMSException, NoSuchProviderException {
     PrivateKey pk = (PrivateKey) ks.getKey(alias, password);
     Certificate[] certificateChain = ks.getCertificateChain(alias);
     if (certificateChain != null) {
@@ -142,7 +142,7 @@ public class SignatureUtility {
    */
   public byte[] sign(File file) throws IOException, NoSuchAlgorithmException, NoSuchProviderException, CMSException {
     CMSProcessableFile cmsFile = new CMSProcessableFile(file);
-    CMSSignedData data = signGenerator.generate(cmsFile, provider);
+    CMSSignedData data = signGenerator.generate(cmsFile);
     return data.getEncoded();
   }
 
@@ -159,8 +159,8 @@ public class SignatureUtility {
    * @throws NoSuchProviderException
    * @throws CMSException
    */
-  public void sign(File file, File signature) throws IOException, NoSuchAlgorithmException, NoSuchProviderException,
-    CMSException {
+  public void sign(File file, File signature)
+    throws IOException, NoSuchAlgorithmException, NoSuchProviderException, CMSException {
     if (signature.exists()) {
       signature.delete();
     }
@@ -195,8 +195,8 @@ public class SignatureUtility {
   }
 
   @SuppressWarnings("unchecked")
-  private boolean verifySignatures(CMSSignedData s, byte[] contentDigest) throws NoSuchAlgorithmException,
-    NoSuchProviderException, CMSException, CertStoreException, CertificateException {
+  private boolean verifySignatures(CMSSignedData s, byte[] contentDigest)
+    throws NoSuchAlgorithmException, NoSuchProviderException, CMSException, CertStoreException, CertificateException {
     boolean valid = true;
 
     // CertStore certStore = s.getCertificatesAndCRLs("Collection", provider);

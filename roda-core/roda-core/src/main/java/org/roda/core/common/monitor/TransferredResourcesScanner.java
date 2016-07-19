@@ -25,6 +25,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -200,4 +201,16 @@ public class TransferredResourcesScanner {
     }
   }
 
+  public void renameTransferredResource(TransferredResource resource, String newName, boolean replaceExisting)
+    throws AlreadyExistsException, GenericException {
+    FSUtils.move(Paths.get(resource.getFullPath()),
+      Paths.get(resource.getFullPath().replaceAll("/[^/]+$", "/" + newName)), replaceExisting);
+  }
+
+  public void moveTransferredResource(List<TransferredResource> resources, String newPath, boolean replaceExisting)
+    throws AlreadyExistsException, GenericException {
+    for (TransferredResource resource : resources) {
+      FSUtils.move(Paths.get(resource.getFullPath()), Paths.get(newPath, resource.getName()), replaceExisting);
+    }
+  }
 }

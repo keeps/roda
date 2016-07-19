@@ -263,9 +263,9 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 
   void renameTransferredResource(String transferredResourceId, String newName)
-    throws GenericException, RequestNotValidException, AuthorizationDeniedException;
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException;
 
   void moveTransferredResource(SelectedItems selected, TransferredResource transferredResource)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException;
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, AlreadyExistsException;
 
 }
