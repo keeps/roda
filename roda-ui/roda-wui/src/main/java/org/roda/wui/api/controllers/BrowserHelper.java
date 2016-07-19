@@ -2072,11 +2072,7 @@ public class BrowserHelper {
   public static void moveTransferredResource(SelectedItems selected, TransferredResource transferredResource)
     throws GenericException, RequestNotValidException, AlreadyExistsException {
 
-    String transferredResourcesFolder = RodaCoreFactory.getRodaConfiguration().getString("transferredResources.folder",
-      RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER);
-    String resourceFullPath = RodaCoreFactory.getDataPath().resolve(transferredResourcesFolder).toAbsolutePath()
-      .toString();
-
+    String resourceRelativePath = "";
     Filter filter = new Filter();
     int counter = 1;
 
@@ -2094,10 +2090,10 @@ public class BrowserHelper {
       filter, Sorter.NONE, new Sublist(0, counter));
 
     if (transferredResource != null) {
-      resourceFullPath = transferredResource.getFullPath();
+      resourceRelativePath = transferredResource.getRelativePath();
     }
 
-    RodaCoreFactory.getTransferredResourcesScanner().moveTransferredResource(resources.getResults(), resourceFullPath,
-      true);
+    RodaCoreFactory.getTransferredResourcesScanner().moveTransferredResource(resources.getResults(),
+      resourceRelativePath, true);
   }
 }

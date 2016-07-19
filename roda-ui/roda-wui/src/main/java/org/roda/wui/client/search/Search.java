@@ -22,6 +22,7 @@ import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.FilterParameter;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -31,8 +32,10 @@ import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.ViewRepresentation;
 import org.roda.wui.client.common.CreateJob;
+import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.SearchPanel;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.RepresentationList;
@@ -45,6 +48,7 @@ import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -158,6 +162,9 @@ public class Search extends Composite {
   @UiField
   Button newJobButton;
 
+  @UiField
+  Button moveItem;
+
   ListBox searchAdvancedFieldOptions;
 
   private final Map<String, SearchField> searchFields = new HashMap<String, SearchField>();
@@ -257,6 +264,7 @@ public class Search extends Composite {
     showSearchAdvancedFieldsPanel();
 
     newJobButton.setEnabled(false);
+    moveItem.setEnabled(false);
   }
 
   private void createRepresentationsSearchAdvancedFieldsPanel() {
@@ -387,6 +395,7 @@ public class Search extends Composite {
 
     itemsFacets.setVisible(true);
     filesFacets.setVisible(false);
+    moveItem.setVisible(true);
   }
 
   public void showRepresentationsSearchAdvancedFieldsPanel() {
@@ -403,6 +412,7 @@ public class Search extends Composite {
 
     itemsFacets.setVisible(false);
     filesFacets.setVisible(false);
+    moveItem.setVisible(false);
   }
 
   public void showFilesSearchAdvancedFieldsPanel() {
@@ -419,6 +429,7 @@ public class Search extends Composite {
 
     itemsFacets.setVisible(false);
     filesFacets.setVisible(true);
+    moveItem.setVisible(false);
   }
 
   private void createItemsSearchResultPanel() {
@@ -448,6 +459,7 @@ public class Search extends Composite {
       public void onSelectionChange(SelectedItems<IndexedAIP> selected) {
         boolean empty = SelectedItemsUtils.isEmpty(selected);
         newJobButton.setEnabled(!empty);
+        moveItem.setEnabled(!empty);
       }
     });
 
@@ -517,6 +529,52 @@ public class Search extends Composite {
   @UiHandler("newJobButton")
   void buttonStartIngestHandler(ClickEvent e) {
     Tools.newHistory(CreateJob.RESOLVER, "action");
+  }
+
+  @UiHandler("moveItem")
+  void buttonMoveItemHandler(ClickEvent e) {
+    final SelectedItems<IndexedAIP> selected = (SelectedItems<IndexedAIP>) getSelected();
+
+    // Move all selected
+    Filter filter;
+    boolean showEmptyParentButton;
+
+    filter = new Filter();
+    showEmptyParentButton = false;
+
+    SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter, justActive);
+    selectAipDialog.setEmptyParentButtonVisible(showEmptyParentButton);
+    selectAipDialog.showAndCenter();
+    selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<IndexedAIP> event) {
+        final IndexedAIP parentAIP = event.getValue();
+        final String parentId = (parentAIP != null) ? parentAIP.getId() : null;
+
+        BrowserService.Util.getInstance().moveInHierarchy(selected, parentId, new LoadingAsyncCallback<IndexedAIP>() {
+
+          @Override
+          public void onSuccessImpl(IndexedAIP result) {
+            if (result != null) {
+              Tools.newHistory(Browse.RESOLVER, result.getId());
+            } else {
+              Tools.newHistory(Search.RESOLVER);
+            }
+          }
+
+          @Override
+          public void onFailureImpl(Throwable caught) {
+            if (caught instanceof NotFoundException) {
+              Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+            } else if (!AsyncCallbackUtils.treatCommonFailures(caught)) {
+              Toast.showError(messages.moveIllegalOperation(caught.getMessage()));
+            }
+          }
+        });
+      }
+    });
+
   }
 
   public SelectedItems<?> getSelected() {

@@ -203,14 +203,15 @@ public class TransferredResourcesScanner {
 
   public void renameTransferredResource(TransferredResource resource, String newName, boolean replaceExisting)
     throws AlreadyExistsException, GenericException {
-    FSUtils.move(Paths.get(resource.getFullPath()),
-      Paths.get(resource.getFullPath().replaceAll("/[^/]+$", "/" + newName)), replaceExisting);
+    Path resourcePath = Paths.get(resource.getFullPath());
+    FSUtils.move(resourcePath, resourcePath.getParent().resolve(newName), replaceExisting);
   }
 
-  public void moveTransferredResource(List<TransferredResource> resources, String newPath, boolean replaceExisting)
-    throws AlreadyExistsException, GenericException {
+  public void moveTransferredResource(List<TransferredResource> resources, String newRelativePath,
+    boolean replaceExisting) throws AlreadyExistsException, GenericException {
     for (TransferredResource resource : resources) {
-      FSUtils.move(Paths.get(resource.getFullPath()), Paths.get(newPath, resource.getName()), replaceExisting);
+      FSUtils.move(Paths.get(resource.getFullPath()), basePath.resolve(newRelativePath).resolve(resource.getName()),
+        replaceExisting);
     }
   }
 }

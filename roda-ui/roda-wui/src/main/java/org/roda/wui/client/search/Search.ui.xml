@@ -61,6 +61,9 @@
 					<g:Label addStyleNames="h4">
 						<ui:text from='{messages.sidebarActionsTitle}' />
 					</g:Label>
+					<g:Button addStyleNames="btn btn-edit" ui:field="moveItem">
+						<ui:text from='{messages.moveArchivalPackage}' />
+					</g:Button>
 					<g:Button addStyleNames="btn btn-play" ui:field="newJobButton">
 						<ui:text from='{messages.newProcessPreservation}' />
 					</g:Button>
