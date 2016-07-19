@@ -79,7 +79,13 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
 
       @Override
       public String getValue(LogEntry logEntry) {
-        return logEntry != null ? logEntry.getActionMethod() : null;
+        if (logEntry == null) {
+          return null;
+        }
+
+        String method = logEntry.getActionMethod().substring(0, 1).toUpperCase()
+          + logEntry.getActionMethod().substring(1);
+        return method.replaceAll("([A-Z])", " $1").trim();
       }
     };
 

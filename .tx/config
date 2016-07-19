@@ -85,6 +85,13 @@ source_file = roda-ui/roda-wui/src/main/resources/config/theme/SearchDescription
 source_lang = en
 type = HTML
 
+[roda2.advancedsearchhtml]
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/AdvancedSearch_<lang>.html
+minimum_perc = 50
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/AdvancedSearch.html
+source_lang = en
+type = HTML
+
 [roda2.publicationshtml]
 file_filter = roda-ui/roda-wui/src/main/resources/config/theme/Publications_<lang>.html
 minimum_perc = 50
