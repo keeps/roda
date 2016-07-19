@@ -12,8 +12,11 @@ import java.util.Date;
 import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
@@ -88,7 +91,7 @@ public final class JobsHelper {
         for (String uuid : uuids) {
           try {
             aipsToReturn.add(model.retrieveAIP(uuid));
-          } catch (Throwable e) {
+          } catch (RODAException | RuntimeException e) {
             LOGGER.error("Error while retrieving AIP from model", e);
           }
         }
@@ -100,7 +103,7 @@ public final class JobsHelper {
             aipsToReturn.add(model.retrieveAIP(indexedAIP.getId()));
           }
 
-        } catch (Throwable e) {
+        } catch (RODAException | RuntimeException e) {
           LOGGER.error("Error while retrieving AIP from index", e);
         }
       }
@@ -126,7 +129,7 @@ public final class JobsHelper {
             .add(model.retrieveRepresentation(indexedRepresentation.getAipId(), indexedRepresentation.getId()));
         }
 
-      } catch (Throwable e) {
+      } catch (RODAException | RuntimeException e) {
         LOGGER.error("Error while retrieving representations from index", e);
       }
     }
@@ -151,7 +154,7 @@ public final class JobsHelper {
             indexedFile.getPath(), indexedFile.getId()));
         }
 
-      } catch (Throwable e) {
+      } catch (RODAException | RuntimeException e) {
         LOGGER.error("Error while retrieving files from index", e);
       }
     }

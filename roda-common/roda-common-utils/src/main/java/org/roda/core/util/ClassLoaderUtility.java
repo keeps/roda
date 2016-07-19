@@ -9,10 +9,12 @@ package org.roda.core.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +28,7 @@ public class ClassLoaderUtility {
   private static final Logger LOGGER = LoggerFactory.getLogger(ClassLoaderUtility.class);
 
   // Parameters
-  private static final Class[] PARAMETERS = new Class[] {URL.class};
+  private static final Class<?>[] PARAMETERS = new Class[] {URL.class};
 
   private static final ClassLoader CLASS_LOADER = ClassLoaderUtility.class.getClassLoader();
 
@@ -52,7 +54,7 @@ public class ClassLoaderUtility {
    *           IOException
    */
   public static void addFile(File f) throws IOException {
-    addURL(f.toURL());
+    addURL(f.toURI().toURL());
   }
 
   /**
@@ -75,15 +77,14 @@ public class ClassLoaderUtility {
       }
     }
 
-    Class sysclass = URLClassLoader.class;
+    Class<?> sysclass = URLClassLoader.class;
 
     try {
       Method method = sysclass.getDeclaredMethod("addURL", PARAMETERS);
       method.setAccessible(true);
       method.invoke(sysLoader, new Object[] {url});
-    } catch (Throwable t) {
-      t.printStackTrace();
-      throw new IOException("Error, could not add URL to system classloader");
+    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | RuntimeException e) {
+      throw new IOException("Error, could not add URL to system classloader", e);
     }
   }
 
@@ -107,7 +108,7 @@ public class ClassLoaderUtility {
 
     LOGGER.trace("Loading class " + className + " with ClassLoader " + CLASS_LOADER.getClass().getSimpleName());
 
-    Class clazz = CLASS_LOADER.loadClass(className);
+    Class<?> clazz = CLASS_LOADER.loadClass(className);
 
     return clazz.newInstance();
   }
@@ -133,12 +134,17 @@ public class ClassLoaderUtility {
       throw new IllegalArgumentException("className cannot be null");
     }
 
-    URLClassLoader clazzLoader = new URLClassLoader(urls, CLASS_LOADER);
+    URLClassLoader clazzLoader = null;
+    try {
+      clazzLoader = new URLClassLoader(urls, CLASS_LOADER);
 
-    LOGGER.trace("Loading class " + className + " with ClassLoader " + CLASS_LOADER.getClass().getSimpleName());
+      LOGGER.trace("Loading class " + className + " with ClassLoader " + CLASS_LOADER.getClass().getSimpleName());
 
-    Class clazz = clazzLoader.loadClass(className);
-    return clazz.newInstance();
+      Class<?> clazz = clazzLoader.loadClass(className);
+      return clazz.newInstance();
+    } finally {
+      IOUtils.closeQuietly(clazzLoader);
+    }
   }
 
   /**
@@ -165,15 +171,20 @@ public class ClassLoaderUtility {
 
     ClassLoaderUtility.addFile(filePath);
     filePath = "jar:file://" + filePath + "!/";
-    URL url = new File(filePath).toURL();
+    URL url = new File(filePath).toURI().toURL();
 
-    URLClassLoader clazzLoader = new URLClassLoader(new URL[] {url}, CLASS_LOADER);
+    URLClassLoader clazzLoader = null;
+    try {
+      clazzLoader = new URLClassLoader(new URL[] {url}, CLASS_LOADER);
 
-    LOGGER.trace("Loading class " + className + " with ClassLoader " + CLASS_LOADER.getClass().getSimpleName());
+      LOGGER.trace("Loading class " + className + " with ClassLoader " + CLASS_LOADER.getClass().getSimpleName());
 
-    Class clazz = clazzLoader.loadClass(className);
+      Class<?> clazz = clazzLoader.loadClass(className);
 
-    return clazz.newInstance();
+      return clazz.newInstance();
+    } finally {
+      IOUtils.closeQuietly(clazzLoader);
+    }
   }
 
 }

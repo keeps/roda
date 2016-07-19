@@ -27,6 +27,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
@@ -44,6 +45,7 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
+import org.roda_project.commons_ip.model.ParseException;
 import org.roda_project.commons_ip.model.SIP;
 import org.roda_project.commons_ip.model.impl.eark.EARKSIP;
 import org.roda_project.commons_ip.utils.IPEnums;
@@ -171,7 +173,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
         LOGGER.debug("The SIP {} is not valid", earkSIPPath);
       }
 
-    } catch (Throwable e) {
+    } catch (RODAException | ParseException | RuntimeException e) {
       reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
       LOGGER.error("Error converting " + earkSIPPath + " to AIP", e);
     } finally {

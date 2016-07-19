@@ -19,6 +19,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
@@ -55,14 +56,8 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
       LOGGER.debug("Loading antivirus class {}", antiVirusClassName);
       setAntiVirus((AntiVirus) Class.forName(antiVirusClassName).newInstance());
       LOGGER.debug("Using antivirus {}", getAntiVirus().getClass().getName());
-    } catch (ClassNotFoundException e) {
-      LOGGER.warn("Antivirus class {} not found - {}", antiVirusClassName, e.getMessage());
-    } catch (InstantiationException e) {
-      // not possible to create a new instance of the class
-      LOGGER.warn("Antivirus class {} instantiation exception - {}", antiVirusClassName, e.getMessage());
-    } catch (IllegalAccessException e) {
-      // not possible to create a new instance of the class
-      LOGGER.warn("Antivirus class {} illegal access exception - {}", antiVirusClassName, e.getMessage());
+    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+      LOGGER.warn("Error loading antivirus", e);
     }
 
     if (getAntiVirus() == null) {
@@ -135,16 +130,13 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
 
             LOGGER.debug("Done with checking if AIP {} has virus. Is clean of virus: {}", aip.getId(),
               virusCheckResult.isClean());
-          } catch (Exception e) {
+          } catch (RODAException | RuntimeException e) {
             reportState = PluginState.FAILURE;
             reportItem.setPluginState(reportState).setPluginDetails(e.getMessage());
             jobPluginInfo.incrementObjectsProcessedWithFailure();
 
             exception = e;
             LOGGER.error("Error processing AIP " + aip.getId(), e);
-          } catch (Throwable e) {
-            LOGGER.error("Error processing AIP " + aip.getId(), e);
-            throw new PluginException(e);
           } finally {
             IOUtils.closeQuietly(directAccess);
           }
@@ -159,7 +151,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
             createEvent(virusCheckResult, exception, reportItem.getPluginState(), aip, model, index, notify);
             report.addReport(reportItem);
             PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
-          } catch (Throwable e) {
+          } catch (PluginException | RuntimeException e) {
             LOGGER.error("Error updating event and job", e);
           }
         }

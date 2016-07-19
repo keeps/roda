@@ -107,7 +107,7 @@ public class RodaCasAuthenticationFilter implements Filter {
         chain.doFilter(request, response);
       }
 
-    } catch (Throwable t) {
+    } catch (RuntimeException t) {
       logger.error(t.getMessage(), t);
     }
   }

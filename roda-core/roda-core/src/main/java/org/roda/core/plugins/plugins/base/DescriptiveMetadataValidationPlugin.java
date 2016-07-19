@@ -150,7 +150,7 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
 
             pluginReport.addReport(reportItem);
             PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
-          } catch (Throwable e) {
+          } catch (PluginException | RuntimeException e) {
             LOGGER.error("Error updating job report", e);
           }
         }

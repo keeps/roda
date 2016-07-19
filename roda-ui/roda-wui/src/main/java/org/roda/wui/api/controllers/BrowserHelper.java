@@ -70,6 +70,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.LinkingObjectUtils;
@@ -248,7 +249,7 @@ public class BrowserHelper {
     try {
       bundle.setHasHistory(!CloseableIterables.isEmpty(model.getStorage()
         .listBinaryVersions(ModelUtils.getDescriptiveMetadataStoragePath(aipId, descriptiveMetadata.getId()))));
-    } catch (Throwable t) {
+    } catch (RODAException | RuntimeException t) {
       bundle.setHasHistory(false);
     }
     return bundle;
@@ -833,29 +834,24 @@ public class BrowserHelper {
   public static IndexedAIP moveInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, RodaUser user)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
     AlreadyExistsException, ValidationException {
-    try {
-      List<String> aipIds = consolidate(user, IndexedAIP.class, selected);
+    List<String> aipIds = consolidate(user, IndexedAIP.class, selected);
 
-      ModelService model = RodaCoreFactory.getModelService();
+    ModelService model = RodaCoreFactory.getModelService();
 
-      for (String aipId : aipIds) {
-        // XXX this method could be improved by moving all at once in the model
-        if (!aipId.equals(parentId)) {
-          // laxing check of ancestry so a big list can be moved to one of the
-          // siblings
-          LOGGER.debug("Moving AIP " + aipId + " under " + parentId);
-          model.moveAIP(aipId, parentId);
-        }
+    for (String aipId : aipIds) {
+      // XXX this method could be improved by moving all at once in the model
+      if (!aipId.equals(parentId)) {
+        // laxing check of ancestry so a big list can be moved to one of the
+        // siblings
+        LOGGER.debug("Moving AIP " + aipId + " under " + parentId);
+        model.moveAIP(aipId, parentId);
       }
-
-      IndexService index = RodaCoreFactory.getIndexService();
-      index.commit(IndexedAIP.class);
-
-      return index.retrieve(IndexedAIP.class, parentId);
-    } catch (Throwable e) {
-      LOGGER.error("Error moving in hierarchy", e);
-      return null;
     }
+
+    IndexService index = RodaCoreFactory.getIndexService();
+    index.commit(IndexedAIP.class);
+
+    return index.retrieve(IndexedAIP.class, parentId);
   }
 
   public static AIP createAIP(String parentAipId, String type, Permissions permissions) throws GenericException,

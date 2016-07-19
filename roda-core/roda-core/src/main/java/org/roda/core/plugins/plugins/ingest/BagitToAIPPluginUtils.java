@@ -7,12 +7,12 @@
  */
 package org.roda.core.plugins.plugins.ingest;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.io.IOUtils;
 import org.roda.core.common.MetadataFileUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -42,8 +42,8 @@ public class BagitToAIPPluginUtils {
   private static final String BAGIT_FILE_PATH_SEPARATOR = "/";
 
   public static AIP bagitToAip(Bag bag, Path bagitPath, ModelService model, String metadataFilename, String ingestSIPId,
-    String ingestJobId, String parentId) throws BagitNotValidException, IOException, RequestNotValidException,
-    NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
+    String ingestJobId, String parentId) throws RequestNotValidException, NotFoundException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException {
 
     BagInfoTxt bagInfoTxt = bag.getBagInfoTxt();
     String metadataAsString = MetadataFileUtils.generateMetadataFile(bagInfoTxt);
@@ -81,7 +81,7 @@ public class BagitToAIPPluginUtils {
         }
       }
     }
-    bag.close();
+    IOUtils.closeQuietly(bag);
 
     // FIXME 20160516 hsilva: put SIP inside the AIP
 

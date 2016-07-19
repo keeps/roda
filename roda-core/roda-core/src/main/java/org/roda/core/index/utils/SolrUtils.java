@@ -75,6 +75,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.NotSupportedException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.agents.Agent;
@@ -242,7 +243,7 @@ public class SolrUtils {
       ret = queryResponseToIndexResult(response, classToRetrieve, facets);
     } catch (SolrServerException | IOException e) {
       throw new GenericException("Could not query index", e);
-    } catch (Throwable e) {
+    } catch (RuntimeException e) {
       throw new GenericException("Unexpected exception while querying index", e);
     }
 
@@ -1117,10 +1118,7 @@ public class SolrUtils {
               ret.addField(field.getName(), field.getValue(), field.getBoost());
             }
           }
-        } catch (GenericException ise) {
-          // TODO index the index errors for later processing
-          LOGGER.warn("Error processing descriptive metadata: {}", metadata);
-        } catch (Throwable e) {
+        } catch (Exception e) {
           LOGGER.error("Error processing descriptive metadata: " + metadata, e);
         }
       }
@@ -1495,7 +1493,7 @@ public class SolrUtils {
         ids.add(JsonUtils.getObjectFromJson(source, LinkingIdentifier.class));
       }
       ipe.setSourcesObjectIds(ids);
-    } catch (Throwable e) {
+    } catch (GenericException | RuntimeException e) {
       LOGGER.error("Error setting event linking source: " + e.getMessage(), e);
     }
     try {
@@ -1504,7 +1502,7 @@ public class SolrUtils {
         ids.add(JsonUtils.getObjectFromJson(outcome, LinkingIdentifier.class));
       }
       ipe.setOutcomeObjectIds(ids);
-    } catch (Throwable e) {
+    } catch (GenericException | RuntimeException e) {
       LOGGER.error("Error setting event linking outcome: " + e.getMessage(), e);
     }
     try {
@@ -1513,7 +1511,7 @@ public class SolrUtils {
         ids.add(JsonUtils.getObjectFromJson(agent, LinkingIdentifier.class));
       }
       ipe.setLinkingAgentIds(ids);
-    } catch (Throwable e) {
+    } catch (GenericException | RuntimeException e) {
       LOGGER.error("Error setting event linking agents: " + e.getMessage(), e);
     }
     return ipe;

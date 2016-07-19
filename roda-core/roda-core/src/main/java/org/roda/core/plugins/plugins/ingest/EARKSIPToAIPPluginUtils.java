@@ -43,8 +43,8 @@ public class EARKSIPToAIPPluginUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(EARKSIPToAIPPluginUtils.class);
 
   public static AIP earkSIPToAIP(SIP sip, Path sipPath, ModelService model, StorageService storage, String ingestSIPId,
-    String ingestJobId, String parentId) throws IOException, MigrationException, RequestNotValidException,
-    NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException, ValidationException {
+    String ingestJobId, String parentId) throws RequestNotValidException, NotFoundException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException, ValidationException {
 
     AIPState state = AIPState.INGEST_PROCESSING;
     Permissions permissions = new Permissions();
@@ -69,9 +69,8 @@ public class EARKSIPToAIPPluginUtils {
   }
 
   public static AIP earkSIPToAIPUpdate(SIP sip, String aipId, Path sipPath, ModelService model, StorageService storage,
-    String ingestSIPId, String ingestJobId, String parentId)
-    throws IOException, MigrationException, RequestNotValidException, NotFoundException, GenericException,
-    AlreadyExistsException, AuthorizationDeniedException, ValidationException {
+    String ingestSIPId, String ingestJobId, String parentId) throws RequestNotValidException, NotFoundException,
+    GenericException, AlreadyExistsException, AuthorizationDeniedException, ValidationException {
     boolean notify = false;
 
     // process IP information

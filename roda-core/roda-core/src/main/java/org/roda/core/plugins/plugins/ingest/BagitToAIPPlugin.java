@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Report;
@@ -93,27 +94,27 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
         BagFactory bagFactory = new BagFactory();
         Bag bag = bagFactory.createBag(bagitPath.toFile());
         SimpleResult result = bag.verifyPayloadManifests();
-        if (!result.isSuccess()) {
-          throw new BagitNotValidException(result.getMessages() + "");
+        if (result.isSuccess()) {
+          String parentId = PluginHelper.computeParentId(this, index, bag.getBagInfoTxt().get("parent"));
+
+          AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bag, bagitPath, model, "metadata.xml",
+            transferredResource.getName(), reportItem.getJobId(), parentId);
+
+          PluginHelper.createSubmission(model, createSubmission, bagitPath, aipCreated.getId());
+
+          createUnpackingEventSuccess(model, index, transferredResource, aipCreated, UNPACK_DESCRIPTION);
+          reportItem.setOutcomeObjectId(aipCreated.getId()).setPluginState(PluginState.SUCCESS);
+
+          if (aipCreated.getParentId() == null) {
+            reportItem.setPluginDetails(String.format("Parent with id '%s' not found", parentId));
+          }
+
+          createWellformedEventSuccess(model, index, transferredResource, aipCreated);
+          LOGGER.debug("Done with converting {} to AIP {}", bagitPath, aipCreated.getId());
+        } else {
+          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(result.getMessages() + "");
         }
-
-        String parentId = PluginHelper.computeParentId(this, index, bag.getBagInfoTxt().get("parent"));
-
-        AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bag, bagitPath, model, "metadata.xml",
-          transferredResource.getName(), reportItem.getJobId(), parentId);
-
-        PluginHelper.createSubmission(model, createSubmission, bagitPath, aipCreated.getId());
-
-        createUnpackingEventSuccess(model, index, transferredResource, aipCreated, UNPACK_DESCRIPTION);
-        reportItem.setOutcomeObjectId(aipCreated.getId()).setPluginState(PluginState.SUCCESS);
-
-        if (aipCreated.getParentId() == null) {
-          reportItem.setPluginDetails(String.format("Parent with id '%s' not found", parentId));
-        }
-
-        createWellformedEventSuccess(model, index, transferredResource, aipCreated);
-        LOGGER.debug("Done with converting {} to AIP {}", bagitPath, aipCreated.getId());
-      } catch (Throwable e) {
+      } catch (RODAException | RuntimeException e) {
         reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
 
         LOGGER.error("Error converting " + bagitPath + " to AIP", e);

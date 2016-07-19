@@ -80,7 +80,7 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
         // PluginHelper.createPluginEvent(this, aipID, model, index, sources,
         // targets, outcome, outcomeDetailExtension, notify)
 
-      } catch (Throwable e) {
+      } catch (RuntimeException e) {
         reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
         LOGGER.error("Error removing transferred resource " + transferredResource.getFullPath(), e);
       }

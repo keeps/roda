@@ -154,7 +154,7 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
 
         createWellformedEventSuccess(model, index, transferredResource, aip);
         LOGGER.debug("Done with converting {} to AIP {}", transferredResourcePath, aip.getId());
-      } catch (Throwable e) {
+      } catch (RODAException | IOException | RuntimeException e) {
         LOGGER.error("Error converting " + transferredResource.getId() + " to AIP", e);
         reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
 

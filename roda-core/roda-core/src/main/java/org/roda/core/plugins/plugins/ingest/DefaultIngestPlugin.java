@@ -569,7 +569,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     try {
       plugin.setParameterValues(mergedParams);
       report = plugin.execute(index, model, storage, aips);
-    } catch (Throwable e) {
+    } catch (InvalidParameterException | PluginException | RuntimeException e) {
       LOGGER.error("Error executing plug-in", e);
     }
 

@@ -7,6 +7,7 @@
  */
 package org.roda.core.plugins.plugins.validation;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
@@ -345,7 +347,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
             reportItem.setPluginDetails("Non PDF files were not ignored");
           }
 
-        } catch (Throwable e) {
+        } catch (RODAException | IOException | RuntimeException e) {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
           reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
           jobPluginInfo.incrementObjectsProcessedWithFailure();

@@ -26,6 +26,7 @@ import org.jdom2.Element;
 import org.jdom2.IllegalDataException;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
@@ -43,7 +44,7 @@ import gov.loc.repository.bagit.BagInfoTxt;
 public class MetadataFileUtils {
   private static Logger LOGGER = LoggerFactory.getLogger(MetadataFileUtils.class);
 
-  public static String generateMetadataFile(BagInfoTxt bagInfoTxt) throws IOException {
+  public static String generateMetadataFile(BagInfoTxt bagInfoTxt) throws GenericException {
     try {
       Element root = new Element("metadata");
       org.jdom2.Document doc = new org.jdom2.Document();
@@ -62,8 +63,7 @@ public class MetadataFileUtils {
       outter.outputString(doc);
       return outter.outputString(doc);
     } catch (IllegalDataException e) {
-      LOGGER.debug("Error generating Bagit metadata file {}", e.getMessage());
-      return "";
+      throw new GenericException(e);
     }
   }
 

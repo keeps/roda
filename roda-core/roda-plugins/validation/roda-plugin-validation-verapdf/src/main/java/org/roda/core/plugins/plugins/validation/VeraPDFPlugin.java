@@ -34,6 +34,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
@@ -251,7 +252,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
               reportState = PluginState.FAILURE;
             }
 
-          } catch (Throwable e) {
+          } catch (RODAException | IOException | VeraPDFException | JAXBException | RuntimeException e) {
             LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
             pluginResultState = PluginState.FAILURE;
             reportState = PluginState.FAILURE;
@@ -380,7 +381,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
             reportState = PluginState.FAILURE;
           }
 
-        } catch (Throwable e) {
+        } catch (RODAException | IOException | VeraPDFException | JAXBException | RuntimeException e) {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
           pluginResultState = PluginState.FAILURE;
           reportState = PluginState.FAILURE;
@@ -553,7 +554,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
       outcomeDetails = noteStringBuilder.toString();
 
-    } catch (Throwable e) {
+    } catch (RuntimeException e) {
       pluginState = PluginState.FAILURE;
       outcomeDetails = e.getMessage();
       LOGGER.error("Error executing VeraPDF plugin: " + e.getMessage(), e);
