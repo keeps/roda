@@ -956,11 +956,14 @@ public class SolrUtils {
 
     // TODO find a better way to define admin super powers
     if (user != null && !user.getName().equals("admin")) {
+      fq.append("(");
       String usersKey = RodaConstants.INDEX_PERMISSION_USERS_PREFIX + PermissionType.READ;
       appendExactMatch(fq, usersKey, user.getId(), true, false);
 
       String groupsKey = RodaConstants.INDEX_PERMISSION_GROUPS_PREFIX + PermissionType.READ;
       appendValuesUsingOROperator(fq, groupsKey, new ArrayList<>(user.getAllGroups()), true);
+      
+      fq.append(")");
     }
 
     if (justActive) {

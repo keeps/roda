@@ -91,12 +91,12 @@
 	background: linear-gradient(-90deg,#f8f8f8 30%,rgba(255,255,255,0) 100%);
 }
 
-.cellTableHoveredRowCell.cellTableFadeOut:after {
-	background: linear-gradient(-90deg,#eee 30%,rgba(255,255,255,0) 100%);
-}
-
 .cellTableSelectedRowCell.cellTableFadeOut:after {
 	background: linear-gradient(-90deg,#5bbeff 30%,rgba(255,255,255,0) 100%);
+}
+
+.cellTableHoveredRowCell.cellTableFadeOut:after {
+	background: linear-gradient(-90deg,#eee 30%,rgba(255,255,255,0) 100%);
 }
 
 
