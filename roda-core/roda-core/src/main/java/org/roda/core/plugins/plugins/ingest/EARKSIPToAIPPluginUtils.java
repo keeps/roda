@@ -41,9 +41,9 @@ import org.slf4j.LoggerFactory;
 public class EARKSIPToAIPPluginUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(EARKSIPToAIPPluginUtils.class);
 
-  public static AIP earkSIPToAIP(SIP sip, Path sipPath, ModelService model, StorageService storage, String ingestSIPId,
+  public static AIP earkSIPToAIP(SIP sip, String username, Permissions fullPermissions, ModelService model, StorageService storage, String ingestSIPId,
     String ingestJobId, String parentId) throws RequestNotValidException, NotFoundException, GenericException,
-    AlreadyExistsException, AuthorizationDeniedException, ValidationException {
+    AlreadyExistsException, AuthorizationDeniedException, ValidationException, IOException {
 
     AIPState state = AIPState.INGEST_PROCESSING;
     Permissions permissions = new Permissions();
@@ -63,7 +63,15 @@ public class EARKSIPToAIPPluginUtils {
 
     model.notifyAIPCreated(aip.getId());
 
-    return model.retrieveAIP(aip.getId());
+    AIP createdAIP = model.retrieveAIP(aip.getId());
+
+    // Set Permissions
+    Permissions readPermissions = PermissionUtils.grantReadPermissionToUserGroup(model, createdAIP, aip.getPermissions());
+    Permissions finalPermissions = PermissionUtils.grantAllPermissions(username, readPermissions, fullPermissions);
+    aip.setPermissions(finalPermissions);
+    model.updateAIPPermissions(aip);
+
+    return createdAIP;
 
   }
 

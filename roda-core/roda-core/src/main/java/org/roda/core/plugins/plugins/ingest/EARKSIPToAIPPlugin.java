@@ -7,6 +7,7 @@
  */
 package org.roda.core.plugins.plugins.ingest;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -128,7 +129,6 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
       sip = EARKSIP.parse(earkSIPPath, RodaCoreFactory.getWorkingDirectory());
       reportItem.setSourceObjectOriginalId(sip.getId());
 
-
       if (sip.getValidationReport().isValid()) {
         String sipParentId = createAncestors(sip, index, model, storage);
         String computedParentId = PluginHelper.computeParentId(this, index, sipParentId);
@@ -157,8 +157,18 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
           }
         }else{
           if(IPEnums.IPStatus.NEW == sip.getStatus()){
-            // Create a new AIP
-            aip = EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, earkSIPPath, model, storage, sip.getId(),
+            Job currentJob = PluginHelper.getJobFromIndex(this, index);
+            if (currentJob == null) {
+              throw new GenericException("Job is null");
+            }
+            String username = currentJob.getUsername();
+            Permissions fullPermissions = new Permissions();
+
+            fullPermissions.setUserPermissions(username,
+                    new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
+                            Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE, Permissions.PermissionType.GRANT)));
+            // Create the permissions object for the user that created the job
+            aip = EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, username, fullPermissions, model, storage, sip.getId(),
                     reportItem.getJobId(), computedParentId);
           }else {
             throw new GenericException("Unknown IP Status: " + sip.getStatus());
@@ -182,7 +192,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
         LOGGER.debug("The SIP {} is not valid", earkSIPPath);
       }
 
-    } catch (RODAException | ParseException | RuntimeException e) {
+    } catch (RODAException | ParseException | RuntimeException| IOException e) {
       reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
       LOGGER.error("Error converting " + earkSIPPath + " to AIP", e);
     } finally {

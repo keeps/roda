@@ -135,10 +135,6 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
   private void processAIPPermissions(IndexService index, ModelService model, Job currentJob, AIP aip,
     Report reportItem) {
     try {
-
-      Permissions permissions = aip.getPermissions();
-      permissions = grantReadPermissionToUserGroup(model, aip, permissions);
-
       AIP parentAIP = null;
       String jobCreatorUsername = currentJob.getUsername();
       if (aip.getParentId() != null) {
@@ -147,10 +143,8 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
           Set<PermissionType> userPermissions = parentAIP.getPermissions().getUserPermissions(jobCreatorUsername);
           LOGGER.trace("Checking if user '{}' has permissions on parent AIP '{}' ({})", jobCreatorUsername,
             parentAIP.getId(), userPermissions);
-          if (userPermissions.contains(PermissionType.CREATE)) {
-            LOGGER.debug("User '{}' has CREATE permission on parent AIP...Granting user permission to this aip",
-              jobCreatorUsername);
-            permissions = grantAllPermissions(jobCreatorUsername, permissions, parentAIP.getPermissions());
+          if (!userPermissions.contains(PermissionType.CREATE)) {
+            LOGGER.debug("User '{}' has CREATE permission on parent AIP.", jobCreatorUsername);
           } else {
             LOGGER.debug("User '{}' doesn't have CREATE permission on parent... Error...", jobCreatorUsername);
             reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(NO_PERMISSION_TO_CREATE_UNDER_AIP);
@@ -165,18 +159,13 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
         RODAMember member = index.retrieve(RODAMember.class, jobCreatorUsername);
         if (member.getAllRoles().contains(CREATE_TOP_LEVEL_AIP_PERMISSION)) {
           LOGGER
-            .debug("User have CREATE_TOP_LEVEL_AIP_PERMISSION permission... Granting user permission to this aip...");
-          permissions = grantPermissionToUser(jobCreatorUsername, permissions);
+            .debug("User have CREATE_TOP_LEVEL_AIP_PERMISSION permission.");
         } else {
           reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(NO_CREATE_TOP_LEVEL_AIP_PERMISSION);
           LOGGER.debug("User doesn't have CREATE_TOP_LEVEL_AIP_PERMISSION permission...");
         }
       }
-
-      aip.setPermissions(permissions);
-      model.updateAIPPermissions(aip);
-    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException
-      | IOException e) {
+    } catch (GenericException | RequestNotValidException | NotFoundException e) {
       reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
     }
   }
@@ -189,52 +178,6 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
       LOGGER.error("Error retrieving Job from index", e);
     }
     return currentJob;
-  }
-
-  private Permissions grantReadPermissionToUserGroup(ModelService model, AIP aip, Permissions permissions)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, IOException {
-    List<DescriptiveMetadata> descriptiveMetadataList = aip.getDescriptiveMetadata();
-    Set<PermissionType> readPermissionToUserGroup = new HashSet<PermissionType>();
-
-    for (DescriptiveMetadata descriptiveMetadata : descriptiveMetadataList) {
-      Binary descriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aip.getId(),
-        descriptiveMetadata.getId());
-      InputStream createInputStream = descriptiveMetadataBinary.getContent().createInputStream();
-      String xpath = RodaCoreFactory.getRodaConfigurationAsString("core", "permissions", "xpath");
-      String freeAccessTerm = RodaCoreFactory.getRodaConfigurationAsString("core", "permissions", "freeaccess");
-
-      String useRestrict = XMLUtility.getString(createInputStream, xpath);
-      if (useRestrict.equals(freeAccessTerm)) {
-        readPermissionToUserGroup.add(PermissionType.READ);
-        permissions.setGroupPermissions(RodaConstants.OBJECT_PERMISSIONS_USER_GROUP, readPermissionToUserGroup);
-        hasFreeAccess = true;
-      }
-    }
-
-    return permissions;
-  }
-
-  private Permissions grantAllPermissions(String username, Permissions permissions, Permissions parentPermissions)
-    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
-    permissions = grantPermissionToUser(username, permissions);
-
-    for (String name : parentPermissions.getUsernames()) {
-      permissions.setUserPermissions(name, parentPermissions.getUserPermissions(name));
-    }
-
-    for (String name : parentPermissions.getGroupnames()) {
-      permissions.setGroupPermissions(name, parentPermissions.getGroupPermissions(name));
-    }
-
-    return permissions;
-  }
-
-  private Permissions grantPermissionToUser(String username, Permissions permissions)
-    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
-    Set<PermissionType> allPermissions = Stream.of(PermissionType.CREATE, PermissionType.DELETE, PermissionType.GRANT,
-      PermissionType.READ, PermissionType.UPDATE).collect(Collectors.toSet());
-    permissions.setUserPermissions(username, allPermissions);
-    return permissions;
   }
 
   @Override

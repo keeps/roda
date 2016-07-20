@@ -18,6 +18,10 @@ import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.SimpleFilterParameter;
+import org.roda.core.data.adapter.sort.Sorter;
+import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -27,8 +31,11 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobStats;
@@ -271,11 +278,56 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     LOGGER.debug("Doing stuff in afterAllExecute");
     try {
       sendNotification(model);
+      index.commitAIPs();
+      fixParents(index, model);
     } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
       LOGGER.error("Could not send ingest notification");
     }
 
     return null;
+  }
+
+  private void fixParents (IndexService index, ModelService model) throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException{
+    index.execute(IndexedAIP.class,
+      new Filter(new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.TRUE.toString())),
+      ghost -> {
+        // if there are AIPs that have the same sip id
+        IndexResult<IndexedAIP> result = index.find(IndexedAIP.class,
+                new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, ghost.getIngestSIPId()),
+                        new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.FALSE.toString())),
+                Sorter.NONE, new Sublist(0, 1));
+
+        if(result.getTotalCount() > 1){
+          //error
+        } else if(result.getTotalCount() == 1){
+          IndexedAIP newParentIAIP = result.getResults().get(0);
+          index.execute(IndexedAIP.class,
+                  new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, ghost.getId())),
+                  child -> {
+                    try {
+                      model.moveAIP(child.getId(), newParentIAIP.getId());
+                    } catch (NotFoundException e) {
+                      LOGGER.debug("Can't move child. It wasn't found.", e);
+                    }
+                  });
+          try {
+            // Move the AIP to the ghost's parent
+            model.moveAIP(newParentIAIP.getId(), ghost.getParentID());
+            model.deleteAIP(ghost.getId());
+          } catch (NotFoundException e) {
+            LOGGER.debug("Can't delete ghost. It wasn't found.", e);
+          }
+        }else if(result.getTotalCount() == 0){
+
+        }
+
+        index.commitAIPs();
+        // if result total count > 1 then error
+        // if result total count == 1 then move all children and delete ghost
+        // if result total count == 0 then check if there are other ghosts with the same sip id and from the same job, move all of this ghost children
+
+
+      });
   }
 
   private Report transformTransferredResourceIntoAnAIP(IndexService index, ModelService model, StorageService storage,
