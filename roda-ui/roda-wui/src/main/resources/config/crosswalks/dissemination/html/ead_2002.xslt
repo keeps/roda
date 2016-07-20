@@ -568,14 +568,14 @@
 					<xsl:value-of select="$i18n.languages" />
 				</div>
 				<xsl:for-each select="ead:did/ead:langmaterial">
-					<xsl:if test="normalize-space(text())!=''">
+					<xsl:if test="normalize-space(string-join(text(),''))!=''">
 						<div class="value">
 							<xsl:value-of select="text()" />
 						</div>
 					</xsl:if>
 				</xsl:for-each>
 				<xsl:for-each select="ead:did/ead:langmaterial/ead:language">
-					<xsl:if test="normalize-space(text())!=''">
+					<xsl:if test="normalize-space(string-join(text(),''))!=''">
 						<div class="value">
 							<xsl:value-of select="text()" />
 						</div>

@@ -2031,6 +2031,34 @@ public class BrowserHelper {
         handlebars.registerHelper("field", (o, options) -> {
           return options.fn();
         });
+        handlebars.registerHelper("ifCond", (context, options) -> {
+          // the first parameter of ifCond is placed in the context field by the
+          // parser
+          String condition = (context == null) ? "||" : context.toString();
+          List<Object> values = Arrays.asList(options.params);
+          boolean display;
+          if (condition.equals("||")) {
+            display = false;
+            for (Object value : values) {
+              if (value != null) {
+                display = true;
+                break;
+              }
+            }
+          } else if (condition.equals("&&")) {
+            display = true;
+            for (Object value : values) {
+              if (value == null) {
+                display = false;
+                break;
+              }
+            }
+          } else {
+            display = false;
+          }
+          return display ? options.fn() : options.inverse();
+        });
+        
         Template tmpl = handlebars.compileInline(rawTemplate);
 
         Set<MetadataValue> values = bundle.getValues();

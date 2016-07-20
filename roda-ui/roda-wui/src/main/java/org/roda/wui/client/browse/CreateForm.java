@@ -50,6 +50,9 @@ public class CreateForm {
           case "date":
             addDatePicker(panel, layout, mv);
             break;
+          case "separator":
+              addSeparator(panel,layout,mv);
+              break;
           default:
             addTextField(panel, layout, mv);
             break;
@@ -229,6 +232,22 @@ public class CreateForm {
 
     layout.add(mvLabel);
     layout.add(mvDate);
+
+    // Description
+    String description = mv.get("description");
+    if (description != null && description.length() > 0) {
+      Label mvDescription = new Label(description);
+      mvDescription.addStyleName("form-help");
+      layout.add(mvDescription);
+    }
+
+    panel.add(layout);
+  }
+  
+  private static void addSeparator(FlowPanel panel, final FlowPanel layout, final MetadataValue mv) {
+    Label mvLabel = new Label(getFieldLabel(mv));
+    mvLabel.addStyleName("form-separator");
+    layout.add(mvLabel);
 
     // Description
     String description = mv.get("description");

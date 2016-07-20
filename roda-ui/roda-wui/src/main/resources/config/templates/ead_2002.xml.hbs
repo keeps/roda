@@ -1,30 +1,58 @@
-{{~field name="descDate"    order="3" type="date" auto-generate="now" label="{\"en\": \"Description date\", \"pt_PT\": \"Data da descrição\"}"~}}
-{{~field name="eadheader"   hidden="true" xpath="/*:ead/*:eadheader"~}}
-{{~field name="level"       type="list" list="[\"fonds\",\"subfonds\",\"series\",\"subseries\",\"file\",\"item\", \"otherlevel\"]" auto-generate="level" order="6" label="{\"en\": \"Description level\", \"pt_PT\": \"Nível descritivo\"}" xpath="//*:archdesc/@level/string()"~}}
-{{~field name="otherlevel"  label="{\"en\": \"Other level\", \"pt_PT\": \"Outro nível\"}" xpath="/*:ead/*:archdesc/@otherlevel/string()"~}}
-{{~field name="physdesc"    hidden="true" xpath="/*:ead/*:archdesc/*:did/*:physdesc"~}}
-{{~field name="repository"  hidden="true" xpath="/*:ead/*:archdesc/*:did/*:repository"~}}
-{{~field name="title"       order='2' auto-generate='title' label="{'en': 'Title', 'pt_PT': 'Título'}" xpath="/*:ead/*:archdesc/*:did/*:unittitle/string()"~}}
-{{~field name="id"          order="1" auto-generate="id" label="{'en': 'Identifier', 'pt_PT': 'Identificador'}" xpath="/*:ead/*:archdesc/*:did/*:unitid/string()"~}}
-{{~field name="countryCode" hidden="true" xpath="/*:ead/*:archdesc/*:did/*:unitid/@countrycode/string()"~}}
-{{~field name="repositoryCode" hidden="true" xpath="/*:ead/*:archdesc/*:did/*:unitid/@repositorycode/string()"~}}
-{{~field name="titleType"   hidden="true" xpath="/*:ead/*:archdesc/*:did/*:unittitle/@type/string()"~}}
-{{~field name="dateInitial" order="4" type="date" label="{\"en\": \"Initial date\", \"pt_PT\": \"Data de início\"}" xpath="tokenize(/*:ead/*:archdesc/*:did/*:unitdate/@normal/string(), \"/\")[1]"~}}
-{{~field name="dateFinal"   order="5" type="date" label="{\"en\": \"Final date\", \"pt_PT\": \"Data de fim\"}" xpath="tokenize(/*:ead/*:archdesc/*:did/*:unitdate/@normal/string(), \"/\")[2]"~}}
-{{~field name="producer"    label="{'en': 'Producer', 'pt_PT': 'Produtor'}" xpath="/*:ead/*:archdesc/*:did/*:origination[@label='producer']/string()"~}}
-{{~field name="creator"     label="{'en': 'Creator', 'pt_PT': 'Autor'}" xpath="/*:ead/*:archdesc/*:did/*:origination[@label='creator']/string()"~}}
-{{~field name="language"    auto-generate='language' label="{'en': 'Language', 'pt_PT': 'Idioma'}" xpath="/*:ead/*:archdesc/*:did/*:langmaterial/string()"~}}
-{{~field name="dsc"         hidden="true" xpath="/*:ead/*:archdesc/*:dsc"~}}
-{{~field name="description" type='textarea' label="{'en': 'Description', 'pt_PT': 'Descrição'}" xpath="/*:ead/*:archdesc/*:scopecontent/*:p/string()"~}}
-{{~field name="rights"      label="{'en': 'Rights', 'pt_PT': 'Condições de reprodução'}" xpath="/*:ead/*:archdesc/*:userestrict/*:p/string()"~}}
+{{~field name="identityArea" order="1" type="separator" order="1" label="{'en': 'Identity area', 'pt_PT': 'Área de identificação'}"~}}
+{{~field name="id"          order="2" auto-generate="id" label="{'en': 'Identifier', 'pt_PT': 'Identificador'}" xpath="/*:ead/*:archdesc/*:did/*:unitid/string()"~}}
+{{~field name="countryCode" order="3" label="{'en': 'Country code', 'pt_PT': 'Código do país'}" xpath="/*:ead/*:archdesc/*:did/*:unitid/@countrycode/string()"~}}
+{{~field name="repositoryCode" order="4" label="{'en': 'Repository code', 'pt_PT': 'Código do repositório'}" xpath="/*:ead/*:archdesc/*:did/*:unitid/@repositorycode/string()"~}}
+{{~field name="title"       order="5" auto-generate='title' label="{'en': 'Title', 'pt_PT': 'Título'}" xpath="/*:ead/*:archdesc/*:did/*:unittitle/string()"~}}
+{{~field name="titleType"   order="6" label="{'en': 'Title type', 'pt_PT': 'Tipo de título'}" xpath="/*:ead/*:archdesc/*:did/*:unittitle/@type/string()"~}}
+{{~field name="descDate"    order="7" type="text" auto-generate="now" label="{\"en\": \"Description date\", \"pt_PT\": \"Data da descrição\"}"~}}
+{{~field name="dateInitial" order="8" type="date" label="{\"en\": \"Initial date\", \"pt_PT\": \"Data de início\"}" xpath="tokenize(/*:ead/*:archdesc/*:did/*:unitdate/@normal/string(), \"/\")[1]"~}}
+{{~field name="dateFinal"   order="9" type="date" label="{\"en\": \"Final date\", \"pt_PT\": \"Data de fim\"}" xpath="tokenize(/*:ead/*:archdesc/*:did/*:unitdate/@normal/string(), \"/\")[2]"~}}
+{{~field name="level"       order="10" type="list" list="[\"fonds\",\"subfonds\",\"series\",\"subseries\",\"file\",\"item\", \"otherlevel\"]" auto-generate="level" label="{\"en\": \"Description level\", \"pt_PT\": \"Nível descritivo\"}" xpath="//*:archdesc/@level/string()"~}}
+{{~field name="otherlevel"  order="11" label="{\"en\": \"Other level\", \"pt_PT\": \"Outro nível\"}" xpath="/*:ead/*:archdesc/@otherlevel/string()"~}}
+{{~field name="extent" 		order="12" type="text-area" label="{'en': 'Extent and medium', 'pt_PT': 'Dimensão e suporte'}" xpath="/*:ead/*:archdesc/*:did/*:physdesc/string()"~}}
+{{~field name="contextArea" order="13" type="separator" label="{'en': 'Context area', 'pt_PT': 'Área de contexto'}"~}}
+{{~field name="creator"     order="14" label="{'en': 'Creator', 'pt_PT': 'Autor'}" xpath="/*:ead/*:archdesc/*:did/*:origination[@label='creator']/string()"~}}
+{{~field name="producer"    order="15" label="{'en': 'Producer', 'pt_PT': 'Produtor'}" xpath="/*:ead/*:archdesc/*:did/*:origination[@label='producer']/string()"~}}
+{{~field name="repository" hidden="true"  order="16" label="{'en': 'Repository', 'pt_PT': 'Repositório'}" xpath="/*:ead/*:eadheader/*:filedesc/*:publicationstmt/*:publisher/string()"~}}
+{{~field name="publicationDate" hidden="true" order="17" label="{'en': 'Publication date', 'pt_PT': 'Data de publicação'}" xpath="/*:ead/*:eadheader/*:filedesc/*:publicationstmt/*:date/string()"~}}
+{{~field name="custodhist" order="18" type="text-area" label="{'en': 'Archival history', 'pt_PT': 'História arquivística'}" xpath="/*:ead/*:archdesc/*:custodhist/*:p/string()"~}}
+{{~field name="acqinfo" order="19" type="text-area" label="{'en': 'Immediate source of acquisition or transfer', 'pt_PT': 'Fonte de aquisição ou transferência'}" xpath="/*:ead/*:archdesc/*:acqinfo/*:p/string()"~}}
+{{~field name="contextArea" order="20" type="separator"  label="{'en': 'Content and structure area', 'pt_PT': 'Área de conteúdo e estrutura'}"~}}
+{{~field name="scopeContent" order="21" type="text-area" label="{'en': 'Scope and content', 'pt_PT': 'Âmbito e conteúdo'}" xpath="/*:ead/*:archdesc/*:scopecontent/*:p/string()"~}}
+{{~field name="appraisal" order="22" type="text-area" label="{'en': 'Appraisal, destruction and scheduling', 'pt_PT': 'Avaliação, destruição e agendamento'}" xpath="/*:ead/*:archdesc/*:appraisal/*:p/string()"~}}
+{{~field name="accruals" order="23" type="text-area" label="{'en': 'Accruals', 'pt_PT': 'Acréscimo'}" xpath="/*:ead/*:archdesc/*:accruals/*:p/string()"~}}
+{{~field name="systemOfArrangement" order="24" type="text-area" label="{'en': 'System of arrangement', 'pt_PT': 'Sistema de organização'}" xpath="/*:ead/*:archdesc/*:arrangement/*:p/string()"~}}
+{{~field name="accessArea" order="25" type="separator" label="{'en': 'Conditions of access and use area', 'pt_PT': 'Área de condições de acesso e utilização'}"~}}
+{{~field name="accessrestrict" order="26" type="text-area" label="{'en': 'Conditions governing access', 'pt_PT': 'Condições de acesso'}" xpath="/*:ead/*:archdesc/*:accessrestrict/*:p/string()"~}}
+{{~field name="userestrict" order="27" type="text-area" label="{'en': 'Conditions governing reproduction', 'pt_PT': 'Condições de reprodução'}" xpath="/*:ead/*:archdesc/*:accessrestrict/*:p/string()"~}}
+{{~field name="language" order="28"    auto-generate='language' label="{'en': 'Language', 'pt_PT': 'Idioma'}" xpath="/*:ead/*:archdesc/*:did/*:langmaterial/*:language/text()[normalize-space()]"~}}
+{{~field name="languageScriptNotes" order="29" type="text-area" label="{'en': 'Language and script notes', 'pt_PT': 'Notas sobre línguas e escritas'}" xpath="/*:ead/*:archdesc/*:did/*:langmaterial/text()[normalize-space()]"~}}
+{{~field name="physicalCharacteristics" order="30" type="text-area" label="{'en': 'Physical characteristics and technical requirements', 'pt_PT': 'Características físicas e requisitos técnicos'}" xpath="/*:ead/*:archdesc/*:phystech/*:p/string()"~}}
+{{~field name="otherfindaid" order="31" type="text-area" label="{'en': 'Find aid', 'pt_PT': 'Ajuda'}" xpath="/*:ead/*:archdesc/*:otherfindaid/*:p/string()"~}}
+{{~field name="alliedArea" type="separator" order="32" label="{'en': 'Allied materials area', 'pt_PT': 'Área de recursos adicionados'}"~}}
+{{~field name="originalsloc" order="33" type="text-area" label="{'en': 'Existence and location of originals', 'pt_PT': 'Existência e localização dos originais'}" xpath="/*:ead/*:archdesc/*:originalsloc/*:p/string()"~}}
+{{~field name="altformavail" order="34" type="text-area" label="{'en': 'Existence and location of copies', 'pt_PT': 'Existência e localização de cópias'}" xpath="/*:ead/*:archdesc/*:altformavail/*:p/string()"~}}
+{{~field name="relatedmaterial" order="35" type="text-area" label="{'en': 'Related units of description', 'pt_PT': 'Material relacionado'}" xpath="/*:ead/*:archdesc/*:relatedmaterial/*:p/string()"~}}
+{{~field name="publicationNotes" order="36" type="text-area" label="{'en': 'Publication notes', 'pt_PT': 'Notas de publicação'}" xpath="/*:ead/*:archdesc/*:bibliography/*:p/string()"~}}
+{{~field name="notesArea" order="37" type="separator" label="{'en': 'Notes area', 'pt_PT': 'Área de notas'}"~}}
+{{~field name="notes" order="38" type="text-area" label="{'en': 'Notes', 'pt_PT': 'Notas'}" xpath="/*:ead/*:archdesc/*:did/*:note[@type='generalNote']/string()"~}}
+{{~field name="accessPointArea" order="39" type="separator" label="{'en': 'Access points', 'pt_PT': 'Pontos de acesso'}"~}}
+{{~field name="nameAccessPoint" order="40" label="{'en': 'Name access point', 'pt_PT': 'Nome do ponto de acesso'}" xpath="/*:ead/*:archdesc/*:controlaccess/*:name/string()"~}}
+{{~field name="subjectAccessPoint" order="41" label="{'en': 'Subject access point', 'pt_PT': 'Assunto do ponto de acesso'}" xpath="/*:ead/*:archdesc/*:controlaccess/*:subject/string()"~}}
+{{~field name="placeAccessPoint" order="42" label="{'en': 'Place access point', 'pt_PT': 'Lugar do ponto de acesso'}" xpath="/*:ead/*:archdesc/*:controlaccess/*:geogname/string()"~}}
+{{~field name="descriptionControlArea" order="43" type="separator" label="{'en': 'Description control area', 'pt_PT': 'Área de controlo da descrição'}"~}}
+{{~field name="descriptionIdentifier" order="44" label="{'en': 'Description identifier', 'pt_PT': 'Identificador da descrição'}" xpath="/*:ead/*:archdesc/*:odd[@type='descriptionIdentifier']/string()"~}}
+{{~field name="institutionIdentifier" order="45" label="{'en': 'Institution identifier', 'pt_PT': 'Identificador da instituição'}" xpath="/*:ead/*:archdesc/*:odd[@type='institutionIdentifier']/string()"~}}
+{{~field name="rules" order="46" type="text-area" label="{'en': 'Rules or conventions', 'pt_PT': 'Regras ou convenções'}" xpath="/*:ead/*:eadheader/*:profiledesc/*:descrules/string()"~}}
+{{~field name="statusDescription" order="47" type="list" list="[\"Final\",\"Revised\",\"Draft\"]" auto-generate="Final" label="{'en': 'Status description', 'pt_PT': 'Estado da descrição'}" xpath="/*:ead/*:archdesc/*:odd[@type='statusDescription']/string()"~}}
+{{~field name="levelOfDetail" order="48" type="list" list="[\"Full\",\"Partial\",\"Minimal\"]" auto-generate="Full" label="{'en': 'Level of detail', 'pt_PT': 'Nível de detalhe'}" xpath="/*:ead/*:archdesc/*:odd[@type='levelOfDetail']/string()"~}}
+{{~field name="processDates" order="49" type="text-area" label="{'en': 'Dates of creation, revision and deletion', 'pt_PT': 'Datas de criação, revisão e remoção'}" xpath="/*:ead/*:archdesc/*:processinfo/*:p/*:date/string()[normalize-space()]"~}}
+{{~field name="sources" order="50" type="text-area" label="{'en': 'Sources', 'pt_PT': 'Fontes'}" xpath="/*:ead/*:archdesc/*:did/*:note[@type='sourcesDescription']/string()"~}}
+{{~field name="archivistNotes" order="51" type="text-area" label="{'en': 'Archivist notes', 'pt_PT': 'Notas do arquivista'}" xpath="/*:ead/*:archdesc/*:processinfo/*:p/text()[normalize-space()]"~}}
+{{~field name="publicationStatus" label="{'en': 'Publication status', 'pt_PT': 'Estado de publicação'}" xpath="/*:ead/*:archdesc/*:odd[@type='publicationStatus']/string()[normalize-space()]"~}}
+
 <?xml version="1.0" encoding="utf-8"?>
-<ead
-	xmlns="urn:isbn:1-931666-22-9"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="urn:isbn:1-931666-22-9 ../schemas/ead2002.xsd">
-	{{#if eadheader}}
-	{{{eadheader}}}
-	{{else ~}}
+<ead xmlns="urn:isbn:1-931666-22-9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:isbn:1-931666-22-9 ../schemas/ead2002.xsd">
 	<eadheader>
 		<eadid/>
 		<filedesc>
@@ -37,40 +65,180 @@
 				Generated by RODA version 2.0
 				<date normal='{{descDate}}'>{{descDate}}</date>
 			</creation>
+			{{~#if rules~}}
+				<descrules>{{rules}}</descrules>
+			{{~/if~}}
 		</profiledesc>
 	</eadheader>
-	{{~/if~}}
-	<archdesc level='{{level}}' {{#if otherlevel}}otherlevel="{{otherlevel}}"{{/if}}>
-		<did>
-			{{{physdesc}}}
-			{{{repository}}}
-            <unitid {{#if countryCode}}countrycode="{{countryCode}}"{{/if}} {{#if repositoryCode}}repositorycode="{{repositoryCode}}"{{~/if~}}>{{id}}</unitid>
-			<unittitle {{#if countryCode}}type="{{titleType}}"{{/if}}>{{title}}</unittitle>
-			{{~#if dateInitial~}}
-				{{~#if dateFinal~}}
-					<unitdate normal='{{dateInitial}}/{{dateFinal}}'>{{dateInitial}}/{{dateFinal}}</unitdate>
-				{{~^~}}
-					<unitdate normal="{{dateInitial}}">{{dateInitial}}</unitdate>
-				{{~/if~}}
+  <archdesc level='{{level}}' {{#if otherlevel}}otherlevel="{{otherlevel}}"{{/if}}>
+    <did>
+    	{{~#if title~}}
+      	<unittitle {{#if titleType}}type="{{titleType}}"{{/if}}>{{title}}</unittitle>
+      	{{~/if~}}
+      	{{~#if title~}}
+      	<unitid {{#if countryCode}}countrycode="{{countryCode}}"{{/if}} {{#if repositoryCode}}repositorycode="{{repositoryCode}}"{{/if}}>{{id}}</unitid>
+      	{{~/if~}}
+		{{~#if dateInitial~}}
+			{{~#if dateFinal~}}
+				<unitdate normal='{{dateInitial}}/{{dateFinal}}'>{{dateInitial}}/{{dateFinal}}</unitdate>
 			{{~^~}}
-				{{~#if dateFinal~}}
-					<unitdate normal="{{dateFinal}}">{{dateFinal}}</unitdate>
-				{{~/if~}}
+				<unitdate normal="{{dateInitial}}">{{dateInitial}}</unitdate>
 			{{~/if~}}
-            {{~#if producer~}}<origination label="producer">{{producer}}</origination>{{~/if~}}
-            {{~#if creator~}}<origination label="creator">{{creator}}</origination>{{~/if~}}
-            {{~#if language~}}<langmaterial>{{language}}</langmaterial>{{~/if~}}
-		</did>
-		{{{dsc}}}
-        {{~#if description~}}
-            <scopecontent>
-                <p>{{description}}</p>
-            </scopecontent>
+		{{~^~}}
+			{{~#if dateFinal~}}
+				<unitdate normal="{{dateFinal}}">{{dateFinal}}</unitdate>
+			{{~/if~}}
+		{{~/if~}}
+		{{~#if extent~}}
+		<physdesc>{{extent}}</physdesc>
+		{{~/if~}}
+		{{~#if repository~}}
+      	<repository>
+        	<corpname>{{repository}}</corpname>
+      	</repository>
+      	{{~/if~}}
+		{{~#if language~}}
+      	<langmaterial>
+      		<language>{{language}}</language>
+            {{languageScriptNotes}}     
+        </langmaterial>
         {{~/if~}}
-        {{~#if rights~}}
-            <userestrict>
-            <p>{{~rights~}}</p>
-            </userestrict>
-        {{~/if~}}
-	</archdesc>
+       {{~#if sources~}} 
+      <note type="sourcesDescription">
+        <p>{{sources}}</p>
+      </note>
+      {{~/if~}}
+      {{~#if notes~}} 
+      <note type="generalNote">
+        <p>{{notes}}</p>
+      </note>
+      {{~/if~}}
+      {{~#if creator~}} 
+      <origination label='creator'>
+        <name>{{creator}}</name>
+      </origination>
+      {{~/if~}}
+      {{~#if producer~}} 
+      <origination label='producer'>
+        <name>{{producer}}</name>
+      </origination>
+      {{~/if~}}
+    </did>
+    {{~#if publicationStatus~}} 
+    <odd type="publicationStatus">
+      <p>{{publicationStatus}}</p>
+    </odd>
+    {{~/if~}}
+    {{~#if levelOfDetail~}} 
+    <odd type="levelOfDetail">
+      <p>{{levelOfDetail}}</p>
+    </odd>
+    {{~/if~}}
+    {{~#if statusDescription~}} 
+    <odd type="statusDescription">
+      <p>{{statusDescription}}</p>
+    </odd>
+    {{~/if~}}
+    {{~#if descriptionIdentifier~}} 
+    <odd type="descriptionIdentifier">
+      <p>{{descriptionIdentifier}}</p>
+    </odd>
+    {{~/if~}}
+    {{~#if institutionIdentifier~}} 
+    <odd type="institutionIdentifier">
+      <p>{{institutionIdentifier}}</p>
+    </odd>
+    {{~/if~}}
+    {{~#if scopeContent~}} 
+    <scopecontent>
+      <p>{{scopeContent}}</p>
+    </scopecontent>
+     {{~/if~}}
+     {{~#if systemOfArrangement~}} 
+    <arrangement>
+      <p>{{systemOfArrangement}}</p>
+    </arrangement>
+    {{~/if~}}
+    {{~#ifCond "||" nameAccessPoint subjectAccessPoint placeAccessPoint~}} 
+    <controlaccess>
+    	{{~#if nameAccessPoint~}} 
+      	<name role="subject">{{nameAccessPoint}}</name>
+      	{{~/if~}}
+      	{{~#if subjectAccessPoint~}} 
+      	<subject>{{subjectAccessPoint}}</subject>
+      	{{~/if~}}
+      	{{~#if placeAccessPoint~}} 
+      	<geogname>{{placeAccessPoint}}</geogname>
+      	{{~/if~}}
+    </controlaccess>
+    {{~/ifCond~}}
+    {{~#if physicalCharacteristics~}} 
+    <phystech>
+      <p>{{physicalCharacteristics}}</p>
+    </phystech>
+    {{~/if~}}
+    {{~#if appraisal~}} 
+    <appraisal>
+      <p>{{appraisal}}</p>
+    </appraisal>
+    {{~/if~}}
+    {{~#if acqinfo~}} 
+    <acqinfo>
+      <p>{{acqinfo}}</p>
+    </acqinfo>
+    {{~/if~}}
+    {{~#if accruals~}} 
+    <accruals>
+      <p>{{accruals}}</p>
+    </accruals>
+    {{~/if~}}
+    {{~#if custodhist~}} 
+    <custodhist>
+      <p>{{custodhist}}</p>
+    </custodhist>
+    {{~/if~}}
+        {{~#ifCond "||" processDates archivistNotes~}} 
+    <processinfo>
+	  {{~#if processDates~}}<p><date>{{processDates}}</date></p>{{~/if~}}
+      {{~#if archivistNotes~}}<p>{{archivistNotes}}</p>{{~/if~}}
+    </processinfo>
+    {{~/ifCond~}}
+    {{~#if originalsloc~}} 
+    <originalsloc>
+      <p>{{originalsloc}}</p>
+    </originalsloc>
+    {{~/if~}}
+    {{~#if altformavail~}} 
+    <altformavail>
+      <p>{{altformavail}}</p>
+    </altformavail>
+    {{~/if~}}
+    {{~#if relatedmaterial~}} 
+    <relatedmaterial>
+      <p>{{relatedmaterial}}</p>
+    </relatedmaterial>
+    {{~/if~}}
+    {{~#if accessrestrict~}} 
+    <accessrestrict>
+      <p>{{accessrestrict}}</p>
+    </accessrestrict>
+    {{~/if~}}
+    {{~#if userestrict~}} 
+    <userestrict>
+      <p>{{userestrict}}</p>
+    </userestrict>
+    {{~/if~}}
+    {{~#if otherfindaid~}} 
+    <otherfindaid>
+      <p>{{otherfindaid}}</p>
+    </otherfindaid>
+    {{~/if~}}
+    {{~#if publicationNotes~}} 
+    <bibliography>
+      <p>{{publicationNotes}}</p>
+    </bibliography>
+    {{~/if~}}
+    <dsc type="combined">  
+  </dsc>
+  </archdesc>
 </ead>
