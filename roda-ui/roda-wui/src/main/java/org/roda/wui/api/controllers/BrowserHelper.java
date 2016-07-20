@@ -2031,34 +2031,6 @@ public class BrowserHelper {
         handlebars.registerHelper("field", (o, options) -> {
           return options.fn();
         });
-        handlebars.registerHelper("ifCond", (context, options) -> {
-          // the first parameter of ifCond is placed in the context field by the
-          // parser
-          String condition = (context == null) ? "||" : context.toString();
-          List<Object> values = Arrays.asList(options.params);
-          boolean display;
-          if (condition.equals("||")) {
-            display = false;
-            for (Object value : values) {
-              if (value != null) {
-                display = true;
-                break;
-              }
-            }
-          } else if (condition.equals("&&")) {
-            display = true;
-            for (Object value : values) {
-              if (value == null) {
-                display = false;
-                break;
-              }
-            }
-          } else {
-            display = false;
-          }
-          return display ? options.fn() : options.inverse();
-        });
-
         Template tmpl = handlebars.compileInline(rawTemplate);
 
         Set<MetadataValue> values = bundle.getValues();
@@ -2084,7 +2056,7 @@ public class BrowserHelper {
     return result;
   }
 
-  public static void renameTransferredResource(String transferredResourceId, String newName) throws GenericException,
+  public static String renameTransferredResource(String transferredResourceId, String newName) throws GenericException,
     RequestNotValidException, AlreadyExistsException, IsStillUpdatingException, NotFoundException {
     Filter filter = new Filter(
       new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_UUID, transferredResourceId));
@@ -2093,16 +2065,17 @@ public class BrowserHelper {
 
     if (!resources.getResults().isEmpty()) {
       TransferredResource resource = (TransferredResource) resources.getResults().get(0);
-      RodaCoreFactory.getTransferredResourcesScanner().renameTransferredResource(resource, newName, true, true);
+      return RodaCoreFactory.getTransferredResourcesScanner().renameTransferredResource(resource, newName, true, true);
+    } else {
+      return transferredResourceId;
     }
   }
 
-  public static void moveTransferredResource(SelectedItems selected, TransferredResource transferredResource)
+  public static String moveTransferredResource(SelectedItems selected, TransferredResource transferredResource)
     throws GenericException, RequestNotValidException, AlreadyExistsException, IsStillUpdatingException,
     NotFoundException {
 
     String resourceRelativePath = "";
-
     Filter filter = new Filter();
     int counter = 1;
 
@@ -2121,15 +2094,39 @@ public class BrowserHelper {
 
     if (transferredResource != null) {
       resourceRelativePath = transferredResource.getRelativePath();
-    } else {
-      Filter pathFilter = new Filter(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH, ""));
-      IndexResult<TransferredResource> rootResource = RodaCoreFactory.getIndexService().find(TransferredResource.class,
-        pathFilter, Sorter.NONE, new Sublist(0, 1));
-      transferredResource = rootResource.getResults().get(0);
     }
 
-    RodaCoreFactory.getTransferredResourcesScanner().moveTransferredResource(resources.getResults(),
-      transferredResource.getRelativePath(), true, true, true);
+    Map<String, String> moveMap = RodaCoreFactory.getTransferredResourcesScanner()
+      .moveTransferredResource(resources.getResults(), resourceRelativePath, true, true, true);
 
+    if (!moveMap.isEmpty()) {
+      List<String> values = new ArrayList(moveMap.values());
+      return values.get(0);
+    } else {
+      return transferredResource.getUUID();
+    }
+
+  }
+
+  public static List<TransferredResource> getSelectedTransferredResource(SelectedItems<TransferredResource> selected)
+    throws GenericException, RequestNotValidException {
+    if (selected instanceof SelectedItemsList) {
+      SelectedItemsList selectedList = (SelectedItemsList) selected;
+
+      Filter filter = new Filter(
+        new OneOfManyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_UUID, selectedList.getIds()));
+      IndexResult<TransferredResource> iresults = RodaCoreFactory.getIndexService().find(TransferredResource.class,
+        filter, Sorter.NONE, new Sublist(0, selectedList.getIds().size()));
+      return iresults.getResults();
+    } else if (selected instanceof SelectedItemsFilter) {
+      SelectedItemsFilter selectedFilter = (SelectedItemsFilter) selected;
+
+      Long counter = RodaCoreFactory.getIndexService().count(TransferredResource.class, selectedFilter.getFilter());
+      IndexResult<TransferredResource> iresults = RodaCoreFactory.getIndexService().find(TransferredResource.class,
+        selectedFilter.getFilter(), Sorter.NONE, new Sublist(0, counter.intValue()));
+      return iresults.getResults();
+    } else {
+      return new ArrayList<TransferredResource>();
+    }
   }
 }

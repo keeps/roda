@@ -1608,7 +1608,7 @@ public class Browser extends RodaCoreService {
     return payload;
   }
 
-  public static void renameTransferredResource(RodaUser user, String transferredResourceId, String newName)
+  public static String renameTransferredResource(RodaUser user, String transferredResourceId, String newName)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException,
     IsStillUpdatingException, NotFoundException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {
@@ -1618,13 +1618,14 @@ public class Browser extends RodaCoreService {
     controllerAssistant.checkRoles(user);
 
     // delegate
-    BrowserHelper.renameTransferredResource(transferredResourceId, newName);
+    String ret = BrowserHelper.renameTransferredResource(transferredResourceId, newName);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "transferredResourceId", transferredResourceId);
+    return ret;
   }
 
-  public static void moveTransferredResource(RodaUser user, SelectedItems selected,
+  public static String moveTransferredResource(RodaUser user, SelectedItems selected,
     TransferredResource transferredResource) throws AuthorizationDeniedException, GenericException,
     RequestNotValidException, AlreadyExistsException, IsStillUpdatingException, NotFoundException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {
@@ -1634,10 +1635,11 @@ public class Browser extends RodaCoreService {
     controllerAssistant.checkRoles(user);
 
     // delegate
-    BrowserHelper.moveTransferredResource(selected, transferredResource);
+    String ret = BrowserHelper.moveTransferredResource(selected, transferredResource);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "selected", selected, "transferredResource",
       transferredResource);
+    return ret;
   }
 }

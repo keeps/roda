@@ -179,9 +179,9 @@ public interface BrowserServiceAsync {
 
   void getFileFromId(String fileId, AsyncCallback<IndexedFile> asyncCallback);
 
-  void renameTransferredResource(String transferredResourceId, String newName, AsyncCallback<Void> asyncCallback);
+  void renameTransferredResource(String transferredResourceId, String newName, AsyncCallback<String> asyncCallback);
 
   void moveTransferredResource(SelectedItems selected, TransferredResource transferredResource,
-    AsyncCallback<Void> asyncCallback);
+    AsyncCallback<String> asyncCallback);
 
 }

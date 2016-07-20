@@ -212,7 +212,7 @@ public class TransferredResourcesScanner {
     }
   }
 
-  public void renameTransferredResource(TransferredResource resource, String newName, boolean replaceExisting,
+  public String renameTransferredResource(TransferredResource resource, String newName, boolean replaceExisting,
     boolean reindexResources)
     throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
     Path resourcePath = Paths.get(resource.getFullPath());
@@ -221,6 +221,9 @@ public class TransferredResourcesScanner {
     if (reindexResources) {
       updateAllTransferredResources(resource.getParentUUID(), true);
     }
+
+    Path relativeToBase = basePath.relativize(resourcePath.getParent().resolve(newName));
+    return UUID.nameUUIDFromBytes(relativeToBase.toString().getBytes()).toString();
   }
 
   public Map<String, String> moveTransferredResource(List<TransferredResource> resources, String newRelativePath,

@@ -189,7 +189,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     int i = 0;
     String message = "";
     do {
-      message = generatedMessages.nationalityList(i++);
+      message = generatedMessages.countryList(i++);
       if (!message.isEmpty()) {
         nationalityList.add(message);
       }
