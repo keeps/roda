@@ -191,6 +191,10 @@ public interface ClientMessages extends Messages {
 
   String renameSIPSuccessful();
 
+  String moveSIPFailed();
+
+  String moveSIPSuccessful();
+
   String allItemsWereAccepted();
 
   String jobNotFound();

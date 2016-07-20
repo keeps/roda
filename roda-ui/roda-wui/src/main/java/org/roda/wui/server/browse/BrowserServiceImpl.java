@@ -693,15 +693,16 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void renameTransferredResource(String transferredResourceId, String newName)
-    throws GenericException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
+  public void renameTransferredResource(String transferredResourceId, String newName) throws GenericException,
+    RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, IsStillUpdatingException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     Browser.renameTransferredResource(user, transferredResourceId, newName);
   }
 
   @Override
   public void moveTransferredResource(SelectedItems selected, TransferredResource transferredResource)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, AlreadyExistsException {
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, AlreadyExistsException,
+    IsStillUpdatingException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     Browser.moveTransferredResource(user, selected, transferredResource);
   }

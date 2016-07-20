@@ -2057,7 +2057,7 @@ public class BrowserHelper {
   }
 
   public static void renameTransferredResource(String transferredResourceId, String newName)
-    throws GenericException, RequestNotValidException, AlreadyExistsException {
+    throws GenericException, RequestNotValidException, AlreadyExistsException, IsStillUpdatingException {
     Filter filter = new Filter(
       new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_UUID, transferredResourceId));
     IndexResult<TransferredResource> resources = RodaCoreFactory.getIndexService().find(TransferredResource.class,
@@ -2065,12 +2065,12 @@ public class BrowserHelper {
 
     if (!resources.getResults().isEmpty()) {
       TransferredResource resource = (TransferredResource) resources.getResults().get(0);
-      RodaCoreFactory.getTransferredResourcesScanner().renameTransferredResource(resource, newName, true);
+      RodaCoreFactory.getTransferredResourcesScanner().renameTransferredResource(resource, newName, true, true);
     }
   }
 
   public static void moveTransferredResource(SelectedItems selected, TransferredResource transferredResource)
-    throws GenericException, RequestNotValidException, AlreadyExistsException {
+    throws GenericException, RequestNotValidException, AlreadyExistsException, IsStillUpdatingException {
 
     String resourceRelativePath = "";
     Filter filter = new Filter();
@@ -2091,9 +2091,15 @@ public class BrowserHelper {
 
     if (transferredResource != null) {
       resourceRelativePath = transferredResource.getRelativePath();
+    } else {
+      Filter pathFilter = new Filter(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH, ""));
+      IndexResult<TransferredResource> rootResource = RodaCoreFactory.getIndexService().find(TransferredResource.class,
+        pathFilter, Sorter.NONE, new Sublist(0, 1));
+      transferredResource = rootResource.getResults().get(0);
     }
 
     RodaCoreFactory.getTransferredResourcesScanner().moveTransferredResource(resources.getResults(),
-      resourceRelativePath, true);
+      transferredResource.getRelativePath(), true, true, true);
+
   }
 }

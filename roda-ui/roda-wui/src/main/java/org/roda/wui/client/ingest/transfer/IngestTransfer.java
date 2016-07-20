@@ -24,6 +24,7 @@ import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.SelectedItems;
+import org.roda.core.data.v2.index.SelectedItemsFilter;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.BrowserService;
@@ -649,14 +650,20 @@ public class IngestTransfer extends Composite {
 
   @UiHandler("move")
   void buttonMoveHandler(ClickEvent e) {
-    Filter filter = new Filter(
-      new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, Boolean.FALSE.toString()));
+    Filter filter = new Filter();
+    SimpleFilterParameter param = new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ISFILE,
+      Boolean.FALSE.toString());
 
     if (getSelected() instanceof SelectedItemsList) {
       SelectedItemsList selectedList = (SelectedItemsList) getSelected();
+      filter.add(param);
       for (Object id : selectedList.getIds()) {
         filter.add(new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_UUID, (String) id));
+        // TODO add ancestors verification
       }
+    } else if (getSelected() instanceof SelectedItemsFilter) {
+      // TODO add a not filter parameter
+      filter.add(param);
     }
 
     SelectTransferResourceDialog dialog = new SelectTransferResourceDialog(messages.selectParentTitle(), filter);
@@ -673,12 +680,12 @@ public class IngestTransfer extends Composite {
 
             @Override
             public void onFailure(Throwable caught) {
-              Toast.showInfo(messages.dialogFailure(), messages.renameSIPFailed());
+              Toast.showInfo(messages.dialogFailure(), messages.moveSIPFailed());
             }
 
             @Override
             public void onSuccess(Void result) {
-              Toast.showInfo(messages.dialogSuccess(), messages.renameSIPSuccessful());
+              Toast.showInfo(messages.dialogSuccess(), messages.moveSIPSuccessful());
               IngestTransfer.getInstance().refreshList();
             }
           });
