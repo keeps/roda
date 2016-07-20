@@ -370,17 +370,17 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   public boolean getJustActive() {
     return justActive;
   }
+  
+  public void setJustActive(boolean justActive) {
+    this.justActive = justActive;
+    refresh();
+  }
 
   public void setFilter(Filter filter) {
     this.filter = filter;
     refresh();
   }
-
-  @Override
-  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<IndexResult<T>> handler) {
-    return addHandler(handler, ValueChangeEvent.getType());
-  }
-
+  
   public Facets getFacets() {
     return facets;
   }
@@ -389,6 +389,20 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     this.facets = facets;
     refresh();
   }
+  
+  public void set(Filter filter, boolean justActive, Facets facets) {
+    this.filter = filter;
+    this.justActive = justActive;
+    this.facets = facets;
+    refresh();
+  }
+
+  @Override
+  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<IndexResult<T>> handler) {
+    return addHandler(handler, ValueChangeEvent.getType());
+  }
+
+
 
   public List<T> getVisibleItems() {
     return display.getVisibleItems();

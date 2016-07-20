@@ -146,7 +146,8 @@ public class Browse extends Composite {
     return instance;
   }
 
-  private static Filter COLLECTIONS_FILTER = new Filter(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
+  private static final Filter COLLECTIONS_FILTER = new Filter(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
+  private static final Facets FACETS = Facets.NONE;
 
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
@@ -230,7 +231,7 @@ public class Browse extends Composite {
     String summary = messages.listOfItems();
     boolean selectable = true;
 
-    aipList = new AIPList(Filter.NULL, justActive, Facets.NONE, summary, selectable);
+    aipList = new AIPList(Filter.NULL, justActive, FACETS, summary, selectable);
     initWidget(uiBinder.createAndBindUi(this));
 
     browseDescription.add(new HTMLWidgetWrapper("BrowseDescription.html"));
@@ -333,6 +334,7 @@ public class Browse extends Composite {
   }
 
   private void clear() {
+    justActive = true;
     browseTitle.setVisible(false);
     browseDescription.setVisible(false);
 
@@ -408,6 +410,7 @@ public class Browse extends Composite {
     if (itemBundle != null) {
       this.itemBundle = itemBundle;
       viewingTop = false;
+      this.justActive = AIPState.ACTIVE.equals(itemBundle.getAip().getState());
 
       IndexedAIP aip = itemBundle.getAip();
       List<DescriptiveMetadataViewBundle> descMetadata = itemBundle.getDescriptiveMetadata();
@@ -490,7 +493,7 @@ public class Browse extends Composite {
       }
 
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId()));
-      aipList.setFilter(filter);
+      aipList.set(filter, justActive, FACETS);
 
       appraisalSidebar.setVisible(aip.getState().equals(AIPState.UNDER_APPRAISAL));
       sidebarData.setVisible(representations.size() > 0);
@@ -543,7 +546,7 @@ public class Browse extends Composite {
     itemTitle.addStyleName("browseTitle-allCollections");
     itemIcon.getParent().addStyleName("browseTitle-allCollections-wrapper");
 
-    aipList.setFilter(COLLECTIONS_FILTER);
+    aipList.set(COLLECTIONS_FILTER, justActive, FACETS);
 
     actionsSidebar.setVisible(true);
 
