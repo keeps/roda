@@ -213,7 +213,8 @@ public class TransferredResourcesScanner {
   }
 
   public void renameTransferredResource(TransferredResource resource, String newName, boolean replaceExisting,
-    boolean reindexResources) throws AlreadyExistsException, GenericException, IsStillUpdatingException {
+    boolean reindexResources)
+    throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
     Path resourcePath = Paths.get(resource.getFullPath());
     FSUtils.move(resourcePath, resourcePath.getParent().resolve(newName), replaceExisting);
 
@@ -224,12 +225,13 @@ public class TransferredResourcesScanner {
 
   public Map<String, String> moveTransferredResource(List<TransferredResource> resources, String newRelativePath,
     boolean replaceExisting, boolean reindexResources)
-    throws AlreadyExistsException, GenericException, IsStillUpdatingException {
+    throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
     return moveTransferredResource(resources, newRelativePath, replaceExisting, reindexResources, false);
   }
 
   public Map<String, String> moveTransferredResource(String newRelativePath, List<String> resourcesUUIDs,
-    boolean replaceExisting) throws AlreadyExistsException, GenericException, IsStillUpdatingException {
+    boolean replaceExisting)
+    throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
     List<TransferredResource> resources = Collections.emptyList();
     try {
       resources = index.retrieve(TransferredResource.class, resourcesUUIDs);
@@ -241,7 +243,7 @@ public class TransferredResourcesScanner {
 
   public Map<String, String> moveTransferredResource(List<TransferredResource> resources, String newRelativePath,
     boolean replaceExisting, boolean reindexResources, boolean areResourcesFromSameFolder)
-    throws AlreadyExistsException, GenericException, IsStillUpdatingException {
+    throws AlreadyExistsException, GenericException, NotFoundException, IsStillUpdatingException {
     Map<String, String> oldToNewTransferredResourceIds = new HashMap<String, String>();
     for (TransferredResource resource : resources) {
       Path newResourcePath = basePath.resolve(newRelativePath).resolve(resource.getName());

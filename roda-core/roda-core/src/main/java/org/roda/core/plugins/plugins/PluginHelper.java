@@ -750,7 +750,7 @@ public final class PluginHelper {
           .moveTransferredResource(successPath, success, true);
         updateReportsAfterMovingSIPs(model, jobPluginInfo, successOldToNewTransferredResourceIds);
       }
-    } catch (AlreadyExistsException | GenericException e) {
+    } catch (AlreadyExistsException | GenericException | NotFoundException e) {
       LOGGER.error("Error moving successfully ingested SIPs", e);
     } catch (IsStillUpdatingException e) {
       LOGGER.warn("TransferredResources are already being indexed");
@@ -762,7 +762,7 @@ public final class PluginHelper {
           .moveTransferredResource(unsuccessPath, unsuccess, true);
         updateReportsAfterMovingSIPs(model, jobPluginInfo, unsuccessOldToNewTransferredResourceIds);
       }
-    } catch (AlreadyExistsException | GenericException e) {
+    } catch (AlreadyExistsException | GenericException | NotFoundException e) {
       LOGGER.error("Error moving unsuccessfully ingested SIPs", e);
     } catch (IsStillUpdatingException e) {
       LOGGER.warn("TransferredResources are already being indexed");

@@ -85,7 +85,9 @@ public class FileStorageService implements StorageService {
     initialize(historyPath);
     initialize(historyDataPath);
     initialize(historyMetadataPath);
+    FSUtils.deletePathQuietly(trashPath);
     initialize(trashPath);
+
   }
 
   public FileStorageService(Path basePath) throws GenericException {
@@ -164,15 +166,24 @@ public class FileStorageService implements StorageService {
   @Override
   public void deleteContainer(StoragePath storagePath) throws NotFoundException, GenericException {
     Path containerPath = FSUtils.getEntityPath(basePath, storagePath);
-    try {
-      FSUtils.move(containerPath, trashPath.resolve(rodaDataPath.relativize(containerPath)), true);
-    } catch (AlreadyExistsException e) {
-      // do nothing
-    }
+    trash(containerPath);
 
     // cleanup history
     deleteAllBinaryVersionsUnder(storagePath);
 
+  }
+
+  private void trash(Path path) throws GenericException, NotFoundException {
+    try {
+      FSUtils.move(path, trashPath.resolve(rodaDataPath.relativize(path)), true);
+    } catch (AlreadyExistsException e) {
+      String unique = UUID.randomUUID().toString();
+      try {
+        FSUtils.move(path, trashPath.resolve(unique).resolve(rodaDataPath.relativize(path)), true);
+      } catch (AlreadyExistsException e1) {
+        throw new GenericException("Unexpected exception while moving to trash", e);
+      }
+    }
   }
 
   @Override
@@ -399,11 +410,7 @@ public class FileStorageService implements StorageService {
   @Override
   public void deleteResource(StoragePath storagePath) throws NotFoundException, GenericException {
     Path resourcePath = FSUtils.getEntityPath(basePath, storagePath);
-    try {
-      FSUtils.move(resourcePath, trashPath.resolve(rodaDataPath.relativize(resourcePath)), true);
-    } catch (AlreadyExistsException e) {
-      // do nothing
-    }
+    trash(resourcePath);
 
     // cleanup history
     deleteAllBinaryVersionsUnder(storagePath);
@@ -635,16 +642,8 @@ public class FileStorageService implements StorageService {
     Path dataPath = FSUtils.getEntityPath(historyDataPath, storagePath, version);
     Path metadataPath = FSUtils.getBinaryHistoryMetadataPath(historyDataPath, historyMetadataPath, dataPath);
 
-    try {
-      FSUtils.move(dataPath, trashPath.resolve(rodaDataPath.relativize(dataPath)), true);
-    } catch (AlreadyExistsException e) {
-      // do nothing
-    }
-    try {
-      FSUtils.move(metadataPath, trashPath.resolve(rodaDataPath.relativize(metadataPath)), true);
-    } catch (AlreadyExistsException e) {
-      // do nothing
-    }
+    trash(dataPath);
+    trash(metadataPath);
 
     // cleanup created parents
     FSUtils.deleteEmptyAncestorsQuietly(dataPath, historyDataPath);
@@ -662,23 +661,12 @@ public class FileStorageService implements StorageService {
         Path resourceHistoryMetadataPath = historyMetadataPath
           .resolve(historyDataPath.relativize(resourceHistoryDataPath));
 
-        try {
-          FSUtils.move(resourceHistoryDataPath, trashPath.resolve(rodaDataPath.relativize(resourceHistoryDataPath)),
-            true);
-        } catch (AlreadyExistsException e) {
-          // do nothing
-        }
-
-        try {
-          FSUtils.move(resourceHistoryMetadataPath,
-            trashPath.resolve(rodaDataPath.relativize(resourceHistoryMetadataPath)), true);
-        } catch (AlreadyExistsException e) {
-          // do nothing
-        }
+        trash(resourceHistoryDataPath);
+        trash(resourceHistoryMetadataPath);
 
         FSUtils.deleteEmptyAncestorsQuietly(resourceHistoryDataPath, historyDataPath);
         FSUtils.deleteEmptyAncestorsQuietly(resourceHistoryMetadataPath, historyMetadataPath);
-      } catch (GenericException e) {
+      } catch (GenericException | NotFoundException e) {
         LOGGER.warn("Could not delete history under " + resourceHistoryDataPath, e);
       }
     } else {
@@ -696,23 +684,16 @@ public class FileStorageService implements StorageService {
             }
           });
 
-          for (Path p : directoryStream) {
-            try {
-              FSUtils.move(p, trashPath.resolve(rodaDataPath.relativize(p)), true);
-            } catch (AlreadyExistsException e) {
-              // do nothing
-            }
-            Path pMetadata = FSUtils.getBinaryHistoryMetadataPath(historyDataPath, historyMetadataPath, p);
-            try {
-              FSUtils.move(pMetadata, trashPath.resolve(rodaDataPath.relativize(pMetadata)), true);
-            } catch (AlreadyExistsException e) {
-              // do nothing
-            }
+          for (Path p : directoryStream) {            
+            trash(p);
 
+            Path pMetadata = FSUtils.getBinaryHistoryMetadataPath(historyDataPath, historyMetadataPath, p);
+            trash(pMetadata);
+            
             FSUtils.deleteEmptyAncestorsQuietly(p, historyDataPath);
             FSUtils.deleteEmptyAncestorsQuietly(pMetadata, historyMetadataPath);
           }
-        } catch (IOException | GenericException e) {
+        } catch (IOException | GenericException | NotFoundException e) {
           LOGGER.warn("Could not delete history under " + resourceHistoryDataPath, e);
         } finally {
           IOUtils.closeQuietly(directoryStream);

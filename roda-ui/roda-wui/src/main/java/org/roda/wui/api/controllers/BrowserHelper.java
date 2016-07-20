@@ -2058,7 +2058,7 @@ public class BrowserHelper {
           }
           return display ? options.fn() : options.inverse();
         });
-        
+
         Template tmpl = handlebars.compileInline(rawTemplate);
 
         Set<MetadataValue> values = bundle.getValues();
@@ -2084,8 +2084,8 @@ public class BrowserHelper {
     return result;
   }
 
-  public static void renameTransferredResource(String transferredResourceId, String newName)
-    throws GenericException, RequestNotValidException, AlreadyExistsException, IsStillUpdatingException {
+  public static void renameTransferredResource(String transferredResourceId, String newName) throws GenericException,
+    RequestNotValidException, AlreadyExistsException, IsStillUpdatingException, NotFoundException {
     Filter filter = new Filter(
       new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_UUID, transferredResourceId));
     IndexResult<TransferredResource> resources = RodaCoreFactory.getIndexService().find(TransferredResource.class,
@@ -2098,7 +2098,8 @@ public class BrowserHelper {
   }
 
   public static void moveTransferredResource(SelectedItems selected, TransferredResource transferredResource)
-    throws GenericException, RequestNotValidException, AlreadyExistsException, IsStillUpdatingException {
+    throws GenericException, RequestNotValidException, AlreadyExistsException, IsStillUpdatingException,
+    NotFoundException {
 
     String resourceRelativePath = "";
 

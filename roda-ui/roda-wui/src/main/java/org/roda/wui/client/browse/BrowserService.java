@@ -262,11 +262,12 @@ public interface BrowserService extends RemoteService {
   IndexedFile getFileFromId(String fileId)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 
-  void renameTransferredResource(String transferredResourceId, String newName) throws GenericException,
-    RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, IsStillUpdatingException;
+  void renameTransferredResource(String transferredResourceId, String newName)
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException,
+    IsStillUpdatingException, NotFoundException;
 
   void moveTransferredResource(SelectedItems selected, TransferredResource transferredResource)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, AlreadyExistsException,
-    IsStillUpdatingException;
+    IsStillUpdatingException, NotFoundException;
 
 }

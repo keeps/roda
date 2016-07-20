@@ -1610,7 +1610,7 @@ public class Browser extends RodaCoreService {
 
   public static void renameTransferredResource(RodaUser user, String transferredResourceId, String newName)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException,
-    IsStillUpdatingException {
+    IsStillUpdatingException, NotFoundException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {
     };
 
@@ -1626,7 +1626,7 @@ public class Browser extends RodaCoreService {
 
   public static void moveTransferredResource(RodaUser user, SelectedItems selected,
     TransferredResource transferredResource) throws AuthorizationDeniedException, GenericException,
-    RequestNotValidException, AlreadyExistsException, IsStillUpdatingException {
+    RequestNotValidException, AlreadyExistsException, IsStillUpdatingException, NotFoundException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {
     };
 

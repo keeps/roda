@@ -91,10 +91,11 @@ public final class FSUtils {
    *          exists; false otherwise
    * @throws AlreadyExistsException
    * @throws GenericException
+   * @throws NotFoundException 
    * 
    */
   public static void move(final Path sourcePath, final Path targetPath, boolean replaceExisting)
-    throws AlreadyExistsException, GenericException {
+    throws AlreadyExistsException, GenericException, NotFoundException {
 
     // check if we can replace existing
     if (!replaceExisting && Files.exists(targetPath)) {
@@ -114,12 +115,16 @@ public final class FSUtils {
     if (Files.isDirectory(sourcePath)) {
       try {
         Files.move(sourcePath, targetPath, copyOptions);
+      } catch (DirectoryNotEmptyException e) {
+        throw new AlreadyExistsException("Cannot copy because target path already exists: " + targetPath);
       } catch (IOException e) {
-        throw new GenericException("Error while moving directory from one path to another", e);
+        throw new GenericException("Error while moving directory from " + sourcePath + " to " + targetPath, e);
       }
     } else {
       try {
         Files.move(sourcePath, targetPath, copyOptions);
+      } catch (NoSuchFileException e) {
+        throw new NotFoundException("Could not find resource to move", e);
       } catch (IOException e) {
         throw new GenericException("Error while copying one file into another", e);
       }
@@ -825,8 +830,7 @@ public final class FSUtils {
     }
   }
 
-  
-  public static String asString(List<String> path){
-    return StringUtils.join(path,SEPARATOR);
+  public static String asString(List<String> path) {
+    return StringUtils.join(path, SEPARATOR);
   }
 }
