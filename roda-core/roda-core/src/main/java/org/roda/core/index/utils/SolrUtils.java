@@ -1068,9 +1068,13 @@ public class SolrUtils {
     final Boolean ghost = objectToBoolean(doc.get(RodaConstants.AIP_GHOST), Boolean.FALSE);
 
     Permissions permissions = getPermissions(doc);
-    final String level = levels.isEmpty() ? null : levels.get(0);
     final String title = titles.isEmpty() ? null : titles.get(0);
     final String description = descriptions.isEmpty() ? null : descriptions.get(0);
+
+    String level;
+    if(ghost){
+      level = "ghost";
+    } else level = levels.isEmpty() ? null : levels.get(0);
 
     return new IndexedAIP(id, state, level, title, dateInitial, dateFinal, description, parentId, ancestors,
       permissions, numberOfSubmissionFiles, numberOfDocumentationFiles, numberOfSchemaFiles, hasRepresentations, ghost)

@@ -549,8 +549,7 @@ public class ShowJob extends Composite {
         @Override
         public void onSuccess(IndexedAIP aip) {
           Label itemTitle = new Label();
-          String iconLevel = aip.getGhost() ? "ghost" : aip.getLevel();
-          HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(iconLevel);
+          HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(aip.getLevel());
           itemIconHtmlPanel.addStyleName("itemIcon");
           itemTitle.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
           itemTitle.addStyleName("itemText");

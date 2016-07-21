@@ -187,8 +187,7 @@ public class PreservationEvents extends Composite {
   }
 
   private SafeHtml getBreadcrumbLabel(IndexedAIP ancestor) {
-    String iconLevel = ancestor.getGhost() ? "ghost" : ancestor.getLevel();
-    SafeHtml elementLevelIconSafeHtml = DescriptionLevelUtils.getElementLevelIconSafeHtml(iconLevel, false);
+    SafeHtml elementLevelIconSafeHtml = DescriptionLevelUtils.getElementLevelIconSafeHtml(ancestor.getLevel(), false);
     SafeHtmlBuilder builder = new SafeHtmlBuilder();
     String label = ancestor.getTitle() != null ? ancestor.getTitle() : ancestor.getId();
     builder.append(elementLevelIconSafeHtml).append(SafeHtmlUtils.fromString(label));

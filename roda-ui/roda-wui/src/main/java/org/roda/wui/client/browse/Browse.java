@@ -422,8 +422,7 @@ public class Browse extends Composite {
       breadcrumb.updatePath(getBreadcrumbsFromAncestors(itemBundle.getAIPAncestors(), aip));
       breadcrumb.setVisible(true);
 
-      String iconLevel = aip.getGhost() ? "ghost" : aip.getLevel();
-      HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(iconLevel);
+      HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(aip.getLevel());
       itemIconHtmlPanel.addStyleName("browseItemIcon-other");
       itemIcon.setWidget(itemIconHtmlPanel);
       itemTitle.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());

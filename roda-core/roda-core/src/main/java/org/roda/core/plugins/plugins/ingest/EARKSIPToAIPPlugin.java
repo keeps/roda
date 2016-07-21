@@ -222,6 +222,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
                 new Sublist(0, 1));
         if (result.getTotalCount() >= 1) {
           IndexedAIP indexedAIP = result.getResults().get(0);
+          // TODO apereira 21/07/2016 Discuss if we need to override the parent of the node
 //          AIP aip = model.retrieveAIP(indexedAIP.getId());
 //          aip.setParentId(parent);
 //          model.updateAIP(aip);
