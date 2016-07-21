@@ -140,9 +140,11 @@ public class DigitalSignatureTest {
 
     AssertJUnit.assertEquals(1, transferredResources.size());
 
-    TestsHelper.executeJob(TransferredResourceToAIPPlugin.class, parameters, PluginType.SIP_TO_AIP,
+    Job job = TestsHelper.executeJob(TransferredResourceToAIPPlugin.class, parameters, PluginType.SIP_TO_AIP,
       SelectedItemsList.create(TransferredResource.class,
         transferredResources.stream().map(tr -> tr.getUUID()).collect(Collectors.toList())));
+    
+    TestsHelper.getJobReports(index, job, true);
 
     index.commitAIPs();
 
@@ -175,6 +177,8 @@ public class DigitalSignatureTest {
 
     Job job = TestsHelper.executeJob(DigitalSignaturePlugin.class, parameters, PluginType.AIP_TO_AIP,
       SelectedItemsAll.create(Representation.class));
+    
+    TestsHelper.getJobReports(index, job, true);
 
     aip = model.retrieveAIP(aip.getId());
     AssertJUnit.assertEquals(2, aip.getRepresentations().size());

@@ -139,9 +139,11 @@ public class PdfToPdfaTest {
 
     AssertJUnit.assertEquals(1, transferredResources.size());
 
-    TestsHelper.executeJob(TransferredResourceToAIPPlugin.class, parameters, PluginType.SIP_TO_AIP,
+    Job job = TestsHelper.executeJob(TransferredResourceToAIPPlugin.class, parameters, PluginType.SIP_TO_AIP,
       SelectedItemsList.create(TransferredResource.class,
         transferredResources.stream().map(tr -> tr.getUUID()).collect(Collectors.toList())));
+    
+    TestsHelper.getJobReports(index, job, true);
 
     index.commitAIPs();
 

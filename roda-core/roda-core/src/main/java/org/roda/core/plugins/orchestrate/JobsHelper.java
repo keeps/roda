@@ -19,6 +19,7 @@ import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.NodeType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -209,26 +210,29 @@ public final class JobsHelper {
 
   public static <T extends IsRODAObject> void doJobObjectsCleanup(Job job, ModelService modelService,
     IndexService indexService) {
-    try {
-      // make sure the index is up to date
-      indexService.commit(IndexedAIP.class);
-      // find all AIPs that should be removed
-      Filter filter = new Filter();
-      filter.add(new SimpleFilterParameter(RodaConstants.INGEST_JOB_ID, job.getId()));
-      filter.add(new OneOfManyFilterParameter(RodaConstants.AIP_STATE,
-        Arrays.asList(AIPState.CREATED.toString(), AIPState.INGEST_PROCESSING.toString())));
-      Sublist sublist = new Sublist();
 
-      IndexResult<IndexedAIP> aipsResult;
-      int offset = 0;
-      do {
-        sublist.setFirstElementIndex(offset);
-        aipsResult = indexService.find(IndexedAIP.class, filter, Sorter.NONE, sublist);
-        offset += aipsResult.getLimit();
-        doJobCleanup(modelService, aipsResult.getResults());
-      } while (aipsResult.getTotalCount() > aipsResult.getOffset() + aipsResult.getLimit());
-    } catch (GenericException | RequestNotValidException e) {
-      LOGGER.error("Error doing Job cleanup", e);
+    if (RodaCoreFactory.getNodeType() == NodeType.MASTER) {
+      try {
+        // make sure the index is up to date
+        indexService.commit(IndexedAIP.class);
+        // find all AIPs that should be removed
+        Filter filter = new Filter();
+        filter.add(new SimpleFilterParameter(RodaConstants.INGEST_JOB_ID, job.getId()));
+        filter.add(new OneOfManyFilterParameter(RodaConstants.AIP_STATE,
+          Arrays.asList(AIPState.CREATED.toString(), AIPState.INGEST_PROCESSING.toString())));
+        Sublist sublist = new Sublist();
+
+        IndexResult<IndexedAIP> aipsResult;
+        int offset = 0;
+        do {
+          sublist.setFirstElementIndex(offset);
+          aipsResult = indexService.find(IndexedAIP.class, filter, Sorter.NONE, sublist);
+          offset += aipsResult.getLimit();
+          doJobCleanup(modelService, aipsResult.getResults());
+        } while (aipsResult.getTotalCount() > aipsResult.getOffset() + aipsResult.getLimit());
+      } catch (GenericException | RequestNotValidException e) {
+        LOGGER.error("Error doing Job cleanup", e);
+      }
     }
   }
 

@@ -52,6 +52,7 @@ import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -78,8 +79,9 @@ import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 @Test(groups = {"all", "travis"})
@@ -95,7 +97,7 @@ public class IndexServiceTest {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IndexServiceTest.class);
 
-  @BeforeMethod
+  @BeforeClass
   public static void setUp() throws Exception {
     basePath = TestsHelper.createBaseTempDir(IndexServiceTest.class, true);
 
@@ -119,10 +121,24 @@ public class IndexServiceTest {
     LOGGER.debug("Running index tests under storage {}", basePath);
   }
 
-  @AfterMethod
+  @AfterClass
   public static void tearDown() throws Exception {
     RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
+  }
+
+  @AfterMethod
+  public void cleanUp() throws RODAException {
+    index.execute(IndexedAIP.class, Filter.ALL, new IndexRunnable<IndexedAIP>() {
+      @Override
+      public void run(IndexedAIP item) throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+        try {
+          model.deleteAIP(item.getId());
+        } catch (NotFoundException e) {
+          // do nothing
+        }
+      }
+    });
   }
 
   private void compareAIPWithIndexedAIP(final AIP aip, final IndexedAIP indexedAIP) {

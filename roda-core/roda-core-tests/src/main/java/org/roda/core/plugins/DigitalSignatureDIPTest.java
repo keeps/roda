@@ -43,6 +43,7 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -132,9 +133,11 @@ public class DigitalSignatureDIPTest {
 
     AssertJUnit.assertEquals(1, transferredResources.size());
 
-    TestsHelper.executeJob(TransferredResourceToAIPPlugin.class, parameters, PluginType.SIP_TO_AIP,
+    Job job = TestsHelper.executeJob(TransferredResourceToAIPPlugin.class, parameters, PluginType.SIP_TO_AIP,
       SelectedItemsList.create(TransferredResource.class,
         transferredResources.stream().map(tr -> tr.getUUID()).collect(Collectors.toList())));
+    
+    TestsHelper.getJobReports(index, job, true);
 
     index.commitAIPs();
 
@@ -163,8 +166,10 @@ public class DigitalSignatureDIPTest {
     Map<String, String> parameters = new HashMap<>();
     DigitalSignatureDIPPluginUtils.setKeystorePath(corporaPath.toString() + "/Certification/keystore.jks");
 
-    TestsHelper.executeJob(DigitalSignatureDIPPlugin.class, parameters, PluginType.AIP_TO_AIP,
+    Job job = TestsHelper.executeJob(DigitalSignatureDIPPlugin.class, parameters, PluginType.AIP_TO_AIP,
       SelectedItemsAll.create(Representation.class));
+    
+    TestsHelper.getJobReports(index, job, true);
 
     aip = model.retrieveAIP(aip.getId());
     CloseableIterable<OptionalWithCause<File>> allNewFiles = model.listFilesUnder(aip.getId(),

@@ -61,6 +61,7 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -184,8 +185,10 @@ public class InternalPluginsTest {
     TransferredResource transferredResource = createCorpora();
     AssertJUnit.assertNotNull(transferredResource);
 
-    TestsHelper.executeJob(TransferredResourceToAIPPlugin.class, parameters, PluginType.SIP_TO_AIP,
+    Job job = TestsHelper.executeJob(TransferredResourceToAIPPlugin.class, parameters, PluginType.SIP_TO_AIP,
       SelectedItemsList.create(TransferredResource.class, transferredResource.getUUID()));
+    
+    TestsHelper.getJobReports(index, job, true);
 
     index.commitAIPs();
 
@@ -323,8 +326,9 @@ public class InternalPluginsTest {
     // run siegfried
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS, FAKE_REPORTING_CLASS);
-    TestsHelper.executeJob(SiegfriedPlugin.class, parameters, PluginType.AIP_TO_AIP,
+    Job job = TestsHelper.executeJob(SiegfriedPlugin.class, parameters, PluginType.AIP_TO_AIP,
       SelectedItemsList.create(AIP.class, aip.getId()));
+    TestsHelper.getJobReports(index, job, true);
 
     aip = model.retrieveAIP(aip.getId());
 

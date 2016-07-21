@@ -40,22 +40,26 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.plugins.ingest.EARKSIPToAIPPlugin;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.AssertJUnit;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.google.common.collect.Iterables;
@@ -75,7 +79,7 @@ public class EARKSIPPluginsTest {
 
   private static Path corporaPath;
 
-  @BeforeMethod
+  @BeforeClass
   public void setUp() throws Exception {
     basePath = TestsHelper.createBaseTempDir(getClass(), true);
 
@@ -96,10 +100,24 @@ public class EARKSIPPluginsTest {
     LOGGER.info("Running E-ARK SIP plugins tests under storage {}", basePath);
   }
 
-  @AfterMethod
+  @AfterClass
   public void tearDown() throws Exception {
     RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
+  }
+
+  @AfterMethod
+  public void cleanUp() throws RODAException {
+    index.execute(IndexedAIP.class, Filter.ALL, new IndexRunnable<IndexedAIP>() {
+      @Override
+      public void run(IndexedAIP item) throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+        try {
+          model.deleteAIP(item.getId());
+        } catch (NotFoundException e) {
+          // do nothing
+        }
+      }
+    });
   }
 
   private TransferredResource createCorpora() throws InterruptedException, IOException, FileAlreadyExistsException,
@@ -129,17 +147,19 @@ public class EARKSIPPluginsTest {
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
 
     TransferredResource transferredResource = createCorpora();
-    AssertJUnit.assertNotNull(transferredResource);
+    Assert.assertNotNull(transferredResource);
 
-    TestsHelper.executeJob(EARKSIPToAIPPlugin.class, parameters, PluginType.SIP_TO_AIP,
+    Job job = TestsHelper.executeJob(EARKSIPToAIPPlugin.class, parameters, PluginType.SIP_TO_AIP,
       SelectedItemsList.create(TransferredResource.class, transferredResource.getUUID()));
+
+    TestsHelper.getJobReports(index, job, true);
 
     index.commitAIPs();
 
     IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
       new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10));
 
-    AssertJUnit.assertEquals(1L, find.getTotalCount());
+    Assert.assertEquals(find.getTotalCount(), 1L);
     IndexedAIP indexedAIP = find.getResults().get(0);
 
     AIP aip = model.retrieveAIP(indexedAIP.getId());
@@ -150,7 +170,7 @@ public class EARKSIPPluginsTest {
   public void testIngestEARKSIP()
     throws IOException, InterruptedException, RODAException, SolrServerException, IsStillUpdatingException {
     AIP aip = ingestCorpora();
-    AssertJUnit.assertEquals(1, aip.getRepresentations().size());
+    Assert.assertEquals(aip.getRepresentations().size(), 1);
 
     CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
       aip.getRepresentations().get(0).getId(), true);
@@ -159,7 +179,7 @@ public class EARKSIPPluginsTest {
       Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
 
     // All folders and files
-    AssertJUnit.assertEquals(CORPORA_FOLDERS_COUNT + CORPORA_FILES_COUNT, reusableAllFiles.size());
+    Assert.assertEquals(reusableAllFiles.size(), CORPORA_FOLDERS_COUNT + CORPORA_FILES_COUNT);
   }
 
 }

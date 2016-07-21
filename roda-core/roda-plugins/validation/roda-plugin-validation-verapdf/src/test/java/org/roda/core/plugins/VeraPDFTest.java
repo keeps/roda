@@ -130,9 +130,11 @@ public class VeraPDFTest {
 
     AssertJUnit.assertEquals(1, transferredResources.size());
 
-    TestsHelper.executeJob(TransferredResourceToAIPPlugin.class, parameters, PluginType.SIP_TO_AIP,
+    Job job = TestsHelper.executeJob(TransferredResourceToAIPPlugin.class, parameters, PluginType.SIP_TO_AIP,
       SelectedItemsList.create(TransferredResource.class,
         transferredResources.stream().map(tr -> tr.getUUID()).collect(Collectors.toList())));
+    
+    TestsHelper.getJobReports(index, job, true);
 
     index.commitAIPs();
 
@@ -155,6 +157,8 @@ public class VeraPDFTest {
 
     Job job = TestsHelper.executeJob(VeraPDFPlugin.class, parameters, PluginType.AIP_TO_AIP,
       SelectedItemsAll.create(Representation.class));
+    
+    TestsHelper.getJobReports(index, job, true);
 
     if (job.getJobStats().getSourceObjectsProcessedWithFailure() == 0) {
       AssertJUnit.fail("Report should have ended with failures");
