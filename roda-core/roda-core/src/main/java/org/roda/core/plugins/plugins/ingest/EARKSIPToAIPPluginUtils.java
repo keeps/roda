@@ -68,10 +68,10 @@ public class EARKSIPToAIPPluginUtils {
     // Set Permissions
     Permissions readPermissions = PermissionUtils.grantReadPermissionToUserGroup(model, createdAIP, aip.getPermissions());
     Permissions finalPermissions = PermissionUtils.grantAllPermissions(username, readPermissions, fullPermissions);
-    aip.setPermissions(finalPermissions);
-    model.updateAIPPermissions(aip);
+    createdAIP.setPermissions(finalPermissions);
+    model.updateAIPPermissions(createdAIP);
 
-    return createdAIP;
+    return model.retrieveAIP(aip.getId());
 
   }
 
