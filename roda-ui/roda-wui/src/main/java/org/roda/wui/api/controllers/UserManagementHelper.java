@@ -110,6 +110,12 @@ public class UserManagementHelper {
     RodaCoreFactory.getIndexService().commit(RODAMember.class);
   }
 
+  public static void modifyMyUser(User user, String password)
+    throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
+    RodaCoreFactory.getModelService().modifyMyUser(user, password, true, true);
+    RodaCoreFactory.getIndexService().commit(RODAMember.class);
+  }
+
   public static void removeUser(String username) throws GenericException, AuthorizationDeniedException {
     RodaCoreFactory.getModelService().removeUser(username, true, true);
     RodaCoreFactory.getIndexService().commit(RODAMember.class);

@@ -1388,6 +1388,27 @@ public class ModelService extends ModelObservable {
     }
   }
 
+  public void modifyMyUser(User user, String password, boolean useModel, boolean notify)
+    throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
+    boolean success = true;
+    try {
+      if (useModel) {
+        UserUtility.getLdapUtility().modifySelfUser(user, password);
+      }
+    } catch (LdapUtilityException e) {
+      throw new GenericException("Error modifying user to LDAP", e);
+    } catch (EmailAlreadyExistsException e) {
+      throw new AlreadyExistsException("User already exists", e);
+    } catch (NotFoundException e) {
+      throw new NotFoundException("User doesn't exist", e);
+    } catch (IllegalOperationException e) {
+      throw new AuthorizationDeniedException("Illegal operation", e);
+    }
+    if (success && notify) {
+      notifyUserUpdated(user);
+    }
+  }
+
   public void removeUser(String id, boolean useModel, boolean notify)
     throws GenericException, AuthorizationDeniedException {
     boolean success = true;

@@ -104,7 +104,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public void editMyUser(User modifiedUser, String password) throws AuthorizationDeniedException, NotFoundException,
+  public void modifyMyUser(User modifiedUser, String password) throws AuthorizationDeniedException, NotFoundException,
     AlreadyExistsException, GenericException, IllegalOperationException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     UserManagement.modifyMyUser(user, modifiedUser, password);
