@@ -215,15 +215,20 @@ public class TransferredResourcesScanner {
   public String renameTransferredResource(TransferredResource resource, String newName, boolean replaceExisting,
     boolean reindexResources)
     throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
-    Path resourcePath = Paths.get(resource.getFullPath());
-    FSUtils.move(resourcePath, resourcePath.getParent().resolve(newName), replaceExisting);
 
-    if (reindexResources) {
-      updateAllTransferredResources(resource.getParentUUID(), true);
+    if (Files.exists(Paths.get(resource.getFullPath()))) {
+      Path resourcePath = Paths.get(resource.getFullPath());
+      FSUtils.move(resourcePath, resourcePath.getParent().resolve(newName), replaceExisting);
+
+      if (reindexResources) {
+        updateAllTransferredResources(resource.getParentUUID(), true);
+      }
+
+      Path relativeToBase = basePath.relativize(resourcePath.getParent().resolve(newName));
+      return UUID.nameUUIDFromBytes(relativeToBase.toString().getBytes()).toString();
+    } else {
+      throw new NotFoundException("Transferred resource was moved or does not exist");
     }
-
-    Path relativeToBase = basePath.relativize(resourcePath.getParent().resolve(newName));
-    return UUID.nameUUIDFromBytes(relativeToBase.toString().getBytes()).toString();
   }
 
   public Map<String, String> moveTransferredResource(List<TransferredResource> resources, String newRelativePath,
@@ -246,22 +251,34 @@ public class TransferredResourcesScanner {
 
   public Map<String, String> moveTransferredResource(List<TransferredResource> resources, String newRelativePath,
     boolean replaceExisting, boolean reindexResources, boolean areResourcesFromSameFolder)
-    throws AlreadyExistsException, GenericException, NotFoundException, IsStillUpdatingException {
+    throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
+
     Map<String, String> oldToNewTransferredResourceIds = new HashMap<String, String>();
+    List<TransferredResource> resourcesToIndex = new ArrayList<TransferredResource>();
+    boolean notFoundResources = false;
+
     for (TransferredResource resource : resources) {
-      Path newResourcePath = basePath.resolve(newRelativePath).resolve(resource.getName());
+      if (Files.exists(Paths.get(resource.getFullPath()))) {
+        Path newResourcePath = basePath.resolve(newRelativePath).resolve(resource.getName());
+        FSUtils.move(Paths.get(resource.getFullPath()), newResourcePath, replaceExisting);
 
-      FSUtils.move(Paths.get(resource.getFullPath()), newResourcePath, replaceExisting);
-
-      oldToNewTransferredResourceIds.put(resource.getUUID(),
-        getTransferredResourceUUID(basePath.relativize(newResourcePath)));
+        oldToNewTransferredResourceIds.put(resource.getUUID(),
+          getTransferredResourceUUID(basePath.relativize(newResourcePath)));
+        resourcesToIndex.add(resource);
+      } else {
+        notFoundResources = true;
+      }
     }
 
     if (reindexResources) {
-      RodaCoreFactory.getTransferredResourcesScanner()
-        .updateAllTransferredResources(getTransferredResourceUUID(newRelativePath), true);
-      reindexOldResourcesParentsAfterMove(resources, areResourcesFromSameFolder);
+      updateAllTransferredResources(getTransferredResourceUUID(newRelativePath), true);
+      reindexOldResourcesParentsAfterMove(resourcesToIndex, areResourcesFromSameFolder);
     }
+
+    if (notFoundResources) {
+      throw new NotFoundException("Some transferred resources were moved or do not exist");
+    }
+
     return oldToNewTransferredResourceIds;
   }
 
@@ -271,8 +288,7 @@ public class TransferredResourcesScanner {
 
     if (areResourcesFromSameFolder) {
       if (!resources.isEmpty()) {
-        RodaCoreFactory.getTransferredResourcesScanner().updateAllTransferredResources(resources.get(0).getParentUUID(),
-          true);
+        updateAllTransferredResources(resources.get(0).getParentUUID(), true);
       }
     } else {
 
@@ -292,8 +308,7 @@ public class TransferredResourcesScanner {
       }
 
       for (TransferredResource resourceToUpdate : resourcesToUpdate) {
-        RodaCoreFactory.getTransferredResourcesScanner().updateAllTransferredResources(resourceToUpdate.getParentUUID(),
-          true);
+        updateAllTransferredResources(resourceToUpdate.getParentUUID(), true);
       }
     }
 

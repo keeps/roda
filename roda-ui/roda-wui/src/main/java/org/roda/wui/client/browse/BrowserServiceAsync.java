@@ -181,7 +181,10 @@ public interface BrowserServiceAsync {
 
   void renameTransferredResource(String transferredResourceId, String newName, AsyncCallback<String> asyncCallback);
 
-  void moveTransferredResource(SelectedItems selected, TransferredResource transferredResource,
+  void moveTransferredResource(SelectedItems<TransferredResource> selected, TransferredResource transferredResource,
     AsyncCallback<String> asyncCallback);
+
+  void getSelectedTransferredResource(SelectedItems<TransferredResource> selected,
+    AsyncCallback<List<TransferredResource>> asyncCallback);
 
 }

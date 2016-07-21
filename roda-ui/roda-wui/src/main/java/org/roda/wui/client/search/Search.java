@@ -405,7 +405,7 @@ public class Search extends Composite {
 
     searchPanel.setVariables(DEFAULT_FILTER_REPRESENTATIONS, RodaConstants.REPRESENTATION_SEARCH,
       representationsSearchResultPanel, representationsSearchAdvancedFieldsPanel);
-    searchPanel.setSearchAdvancedFieldOptionsAddVisible(false);
+    searchPanel.setSearchAdvancedFieldOptionsAddVisible(true);
 
     searchResultPanel.clear();
     searchResultPanel.add(representationsSearchResultPanel);
@@ -422,7 +422,7 @@ public class Search extends Composite {
 
     searchPanel.setVariables(DEFAULT_FILTER_FILES, RodaConstants.FILE_SEARCH, filesSearchResultPanel,
       filesSearchAdvancedFieldsPanel);
-    searchPanel.setSearchAdvancedFieldOptionsAddVisible(false);
+    searchPanel.setSearchAdvancedFieldOptionsAddVisible(true);
 
     searchResultPanel.clear();
     searchResultPanel.add(filesSearchResultPanel);

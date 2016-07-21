@@ -266,8 +266,11 @@ public interface BrowserService extends RemoteService {
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException,
     IsStillUpdatingException, NotFoundException;
 
-  String moveTransferredResource(SelectedItems selected, TransferredResource transferredResource)
+  String moveTransferredResource(SelectedItems<TransferredResource> selected, TransferredResource transferredResource)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, AlreadyExistsException,
     IsStillUpdatingException, NotFoundException;
+
+  List<TransferredResource> getSelectedTransferredResource(SelectedItems<TransferredResource> selected)
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException;
 
 }

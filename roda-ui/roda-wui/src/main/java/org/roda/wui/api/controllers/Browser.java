@@ -1642,4 +1642,21 @@ public class Browser extends RodaCoreService {
       transferredResource);
     return ret;
   }
+
+  public static List<TransferredResource> getSelectedTransferredResource(RodaUser user,
+    SelectedItems<TransferredResource> selected)
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {
+    };
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    List<TransferredResource> ret = BrowserHelper.getSelectedTransferredResource(selected);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "selected", selected);
+    return ret;
+  }
 }

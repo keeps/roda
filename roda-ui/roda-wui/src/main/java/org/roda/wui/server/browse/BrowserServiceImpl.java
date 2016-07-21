@@ -708,4 +708,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     return Browser.moveTransferredResource(user, selected, transferredResource);
   }
 
+  @Override
+  public List<TransferredResource> getSelectedTransferredResource(SelectedItems<TransferredResource> selected)
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.getSelectedTransferredResource(user, selected);
+  }
+
 }
