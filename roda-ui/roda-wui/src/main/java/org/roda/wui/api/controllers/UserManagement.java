@@ -231,7 +231,7 @@ public class UserManagement extends RodaCoreService {
     controllerAssistant.checkRoles(user);
 
     // delegate
-    UserManagementHelper.modifyUser(modifiedUser, password);
+    UserManagementHelper.modifyMyUser(modifiedUser, password);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "user", modifiedUser);

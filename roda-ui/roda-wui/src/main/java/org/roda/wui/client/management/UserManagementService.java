@@ -153,7 +153,7 @@ public interface UserManagementService extends RemoteService {
    * @throws GenericException
    * @throws IllegalOperationException
    */
-  public void editMyUser(User user, String password) throws AuthorizationDeniedException, NotFoundException,
+  public void modifyMyUser(User user, String password) throws AuthorizationDeniedException, NotFoundException,
     AlreadyExistsException, GenericException, IllegalOperationException;
 
   /**

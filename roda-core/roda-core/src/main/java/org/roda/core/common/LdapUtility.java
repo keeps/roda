@@ -551,18 +551,16 @@ public class LdapUtility {
 
   /**
    * Modify the {@link User}'s information.
-   * 
+   *
    * @param modifiedUser
    *          the {@link User} to modify.
-   * 
-   * @param currentPassword
-   *          the current {@link User}'s password.
+   *
    * @param newPassword
    *          the new {@link User}'s password. To maintain the current password,
    *          use <code>null</code>.
-   * 
+   *
    * @return the modified {@link User}.
-   * 
+   *
    * @throws NotFoundException
    *           if the Use being modified doesn't exist.
    * @throws EmailAlreadyExistsException
@@ -571,7 +569,7 @@ public class LdapUtility {
    *           if the user is one of the protected users.
    * @throws LdapUtilityException
    */
-  public User modifySelfUser(User modifiedUser, String currentPassword, String newPassword)
+  public User modifySelfUser(User modifiedUser, String newPassword)
     throws NotFoundException, EmailAlreadyExistsException, IllegalOperationException, LdapUtilityException {
 
     LOGGER.trace("modifySelfUser() - " + modifiedUser.getName());
@@ -580,7 +578,7 @@ public class LdapUtility {
     DirContext ctxRoot;
     try {
 
-      ctxRoot = getLDAPDirContext(ldapRootDN, getUserDN(modifiedUser.getName()), currentPassword);
+      ctxRoot = getLDAPAdminDirContext(ldapRootDN);
 
     } catch (NamingException e) {
 

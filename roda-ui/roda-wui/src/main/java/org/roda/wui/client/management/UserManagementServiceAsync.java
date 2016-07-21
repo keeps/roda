@@ -110,7 +110,7 @@ public interface UserManagementServiceAsync {
    * @throws GenericException
    * @throws IllegalOperationException
    */
-  public void editMyUser(User user, String password, AsyncCallback<Void> callback);
+  public void modifyMyUser(User user, String password, AsyncCallback<Void> callback);
 
   /**
    * Try to remove a user, if user cannot be removed it will be deactivated
