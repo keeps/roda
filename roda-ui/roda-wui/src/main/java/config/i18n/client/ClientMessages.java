@@ -283,6 +283,10 @@ public interface ClientMessages extends Messages {
 
   String ingestTransferButtonRefresh();
 
+  String ingestTransferButtonRename();
+
+  String ingestTransferButtonMove();
+
   String ingestTransferButtonDownload();
 
   String ingestTransferButtonCreateFolder();

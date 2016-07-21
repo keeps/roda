@@ -139,7 +139,7 @@ public class ReindexTransferredResourcePlugin extends AbstractPlugin<Transferred
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_MANAGEMENT);
   }
 
   @Override

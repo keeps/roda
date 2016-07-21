@@ -485,22 +485,21 @@ public final class PluginHelper {
   private static <T extends AbstractPlugin> void createDefaultRisk(ModelService model, int riskIndex, String riskId,
     Class<T> pluginClass) throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException {
-    String configurationFile = RodaCoreFactory.getRodaConfigurationAsString("core.plugins.risk", pluginClass.getName(),
-      "path", "r" + Integer.toString(riskIndex + 1));
 
-    if (configurationFile != null) {
-      InputStream inputStream = RodaCoreFactory.getConfigurationFileAsStream(configurationFile);
+    String defaultFile = RodaConstants.CORE_DATA_FOLDER + '/' + RodaConstants.CORE_STORAGE_FOLDER + '/'
+      + RodaConstants.CORE_RISK_FOLDER + '/' + riskId + ".json";
 
-      try {
-        Risk risk = JsonUtils.getObjectFromJson(inputStream, Risk.class);
-        risk.setId(riskId);
-        model.createRisk(risk, false);
-      } catch (GenericException e) {
-        LOGGER.error("Could not create a default risk");
-      }
+    InputStream inputStream = RodaCoreFactory.getDefaultFileAsStream(defaultFile);
 
-      IOUtils.closeQuietly(inputStream);
+    try {
+      Risk risk = JsonUtils.getObjectFromJson(inputStream, Risk.class);
+      risk.setId(riskId);
+      model.createRisk(risk, false);
+    } catch (GenericException e) {
+      LOGGER.error("Could not create a default risk");
     }
+
+    IOUtils.closeQuietly(inputStream);
   }
 
   /***************** Preservation events related *****************/

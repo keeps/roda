@@ -106,7 +106,7 @@ public final class RodaConstants {
 
   public static final String CORE_CROSSWALKS_INGEST = "crosswalks/ingest/";
   public static final String CORE_CROSSWALKS_INGEST_OTHER = "crosswalks/ingest/other/";
-  
+
   public static final String PREMIS_METADATA_TYPE = "premis";
   public static final String PREMIS_METADATA_VERSION = "3";
 
@@ -462,9 +462,8 @@ public final class RodaConstants {
   public static final String PLUGIN_CATEGORY_FEATURE_EXTRACTION = "feature_extraction";
   public static final String PLUGIN_CATEGORY_IDENTIFICATION = "identification";
   public static final String PLUGIN_CATEGORY_INGEST = "ingest";
-  public static final String PLUGIN_CATEGORY_FIXITY_CHECK = "fixity_check";
-  public static final String PLUGIN_CATEGORY_REINDEX = "reindex";
   public static final String PLUGIN_CATEGORY_REPLICATION = "replication";
+  public static final String PLUGIN_CATEGORY_MANAGEMENT = "management";
 
   public static final String PLUGIN_CATEGORY_MISC = "misc";
   public static final String PLUGIN_CATEGORY_NOT_LISTABLE = "not_listable";

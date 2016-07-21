@@ -182,6 +182,12 @@ public class IngestTransfer extends Composite {
   @UiField
   Button startIngest;
 
+  @UiField
+  Button rename;
+
+  @UiField
+  Button move;
+
   private IngestTransfer() {
     Facets facets = null;
     transferredResourceList = new TransferredResourceList(Filter.NULL, facets, messages.ingestTransferList(), true);
@@ -226,9 +232,25 @@ public class IngestTransfer extends Composite {
         startIngest.setText(empty ? messages.ingestTransferButtonIngestWholeFolder()
           : messages.ingestTransferButtonIngestSelectedItems());
         updateVisibles();
+
+        if (selected instanceof SelectedItemsList) {
+          SelectedItemsList selectedList = (SelectedItemsList) selected;
+          if (selectedList.getIds().size() > 0) {
+            move.setEnabled(true);
+            if (selectedList.getIds().size() == 1) {
+              rename.setEnabled(true);
+            }
+          } else {
+            rename.setEnabled(false);
+            move.setEnabled(false);
+          }
+        }
       }
 
     });
+
+    rename.setEnabled(false);
+    move.setEnabled(false);
   }
 
   protected void view(TransferredResource r) {
@@ -578,4 +600,13 @@ public class IngestTransfer extends Composite {
     }
   }
 
+  @UiHandler("rename")
+  void buttonRenameHandler(ClickEvent e) {
+    Toast.showInfo("Warning", "This feature is not yet implemented");
+  }
+
+  @UiHandler("move")
+  void buttonMoveHandler(ClickEvent e) {
+    Toast.showInfo("Warning", "This feature is not yet implemented");
+  }
 }
