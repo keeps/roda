@@ -26,9 +26,12 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsList;
+import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.ViewRepresentation;
@@ -168,10 +171,53 @@ public class Search extends Composite {
   @UiField
   Button moveItem;
 
-  ListBox searchAdvancedFieldOptions;
+  ListBox searchAdvancedFieldOptionsAIP;
+  ListBox searchAdvancedFieldOptionsRepresentation;
+  ListBox searchAdvancedFieldOptionsFile;
+
+  private static Map<String, SearchField> representationFields = new HashMap<String, SearchField>();
+  static {
+    representationFields.put(RodaConstants.REPRESENTATION_ID,
+      new SearchField(RodaConstants.REPRESENTATION_ID, Arrays.asList(RodaConstants.REPRESENTATION_ID),
+        messages.searchRepresentationFieldIdentifier(), RodaConstants.SEARCH_FIELD_TYPE_TEXT));
+    representationFields.put(RodaConstants.REPRESENTATION_ORIGINAL,
+      new SearchField(RodaConstants.REPRESENTATION_ORIGINAL, Arrays.asList(RodaConstants.REPRESENTATION_ORIGINAL),
+        messages.searchRepresentationFieldOriginal(), RodaConstants.SEARCH_FIELD_TYPE_BOOLEAN));
+    representationFields.put(RodaConstants.REPRESENTATION_SIZE_IN_BYTES,
+      new SearchField(RodaConstants.REPRESENTATION_SIZE_IN_BYTES,
+        Arrays.asList(RodaConstants.REPRESENTATION_SIZE_IN_BYTES), messages.searchRepresentationFieldSize(),
+        RodaConstants.SEARCH_FIELD_TYPE_STORAGE));
+    representationFields.put(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES,
+      new SearchField(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES,
+        Arrays.asList(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES),
+        messages.searchRepresentationFieldNumberOfFiles(), RodaConstants.SEARCH_FIELD_TYPE_NUMERIC_INTERVAL));
+  }
+
+  private static Map<String, SearchField> fileFields = new HashMap<String, SearchField>();
+  static {
+    fileFields.put(RodaConstants.FILE_FILEID,
+      new SearchField(RodaConstants.FILE_FILEID, Arrays.asList(RodaConstants.FILE_FILEID),
+        messages.searchFileFieldFilename(), RodaConstants.SEARCH_FIELD_TYPE_TEXT));
+    fileFields.put(RodaConstants.FILE_FILEFORMAT,
+      new SearchField(RodaConstants.FILE_FILEFORMAT, Arrays.asList(RodaConstants.FILE_FILEFORMAT),
+        messages.searchFileFieldFormat(), RodaConstants.SEARCH_FIELD_TYPE_SUGGEST));
+    fileFields.put(RodaConstants.FILE_PRONOM,
+      new SearchField(RodaConstants.FILE_PRONOM, Arrays.asList(RodaConstants.FILE_PRONOM),
+        messages.searchFileFieldPronom(), RodaConstants.SEARCH_FIELD_TYPE_SUGGEST));
+    fileFields.put(RodaConstants.FILE_FORMAT_MIMETYPE,
+      new SearchField(RodaConstants.FILE_FORMAT_MIMETYPE, Arrays.asList(RodaConstants.FILE_FORMAT_MIMETYPE),
+        messages.searchFileFieldMimetype(), RodaConstants.SEARCH_FIELD_TYPE_SUGGEST));
+    fileFields.put(RodaConstants.FILE_SIZE,
+      new SearchField(RodaConstants.FILE_SIZE, Arrays.asList(RodaConstants.FILE_SIZE),
+        messages.searchFileFieldFilesize(), RodaConstants.SEARCH_FIELD_TYPE_STORAGE));
+    fileFields.put(RodaConstants.FILE_FULLTEXT,
+      new SearchField(RodaConstants.FILE_FULLTEXT, Arrays.asList(RodaConstants.FILE_FULLTEXT),
+        messages.searchFileFieldFulltext(), RodaConstants.SEARCH_FIELD_TYPE_TEXT));
+  }
 
   boolean selectable = true;
   boolean justActive = true;
+  String selectedItem = AIP.class.getName();
 
   private Search() {
     facetDescriptionLevels = new FlowPanel();
@@ -188,7 +234,9 @@ public class Search extends Composite {
     searchPanel = new SearchPanel(DEFAULT_FILTER_AIP, RodaConstants.AIP_SEARCH, messages.searchPlaceHolder(), true,
       true);
 
-    searchAdvancedFieldOptions = new ListBox();
+    searchAdvancedFieldOptionsAIP = new ListBox();
+    searchAdvancedFieldOptionsRepresentation = new ListBox();
+    searchAdvancedFieldOptionsFile = new ListBox();
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -227,7 +275,7 @@ public class Search extends Composite {
         public void onSuccess(List<SearchField> searchFields) {
           Search.this.searchFields.clear();
           for (SearchField searchField : searchFields) {
-            ListboxUtils.insertItemByAlphabeticOrder(searchAdvancedFieldOptions, searchField.getLabel(),
+            ListboxUtils.insertItemByAlphabeticOrder(searchAdvancedFieldOptionsAIP, searchField.getLabel(),
               searchField.getId());
             Search.this.searchFields.put(searchField.getId(), searchField);
           }
@@ -235,24 +283,39 @@ public class Search extends Composite {
           for (SearchField searchField : searchFields) {
             if (searchField.isFixed()) {
               SearchFieldPanel searchFieldPanel = new SearchFieldPanel();
-              searchFieldPanel.setSearchAdvancedFields(searchAdvancedFieldOptions);
+              searchFieldPanel.setSearchAdvancedFields(searchAdvancedFieldOptionsAIP);
               searchFieldPanel.setSearchFields(Search.this.searchFields);
-              addSearchFieldPanel(searchFieldPanel);
+              addSearchFieldPanel(searchFieldPanel, itemsSearchAdvancedFieldsPanel);
               searchFieldPanel.selectSearchField(searchField.getId());
             }
           }
         }
       });
 
+    // handler aqui
     searchPanel.addSearchAdvancedFieldAddHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
-        SearchFieldPanel searchFieldPanel = new SearchFieldPanel();
-        searchFieldPanel.setSearchAdvancedFields(searchAdvancedFieldOptions);
-        searchFieldPanel.setSearchFields(searchFields);
-        searchFieldPanel.selectFirstSearchField();
-        addSearchFieldPanel(searchFieldPanel);
+        if (selectedItem.equals(Representation.class.getName())) {
+          SearchFieldPanel searchFieldPanel = new SearchFieldPanel();
+          searchFieldPanel.setSearchAdvancedFields(searchAdvancedFieldOptionsRepresentation);
+          searchFieldPanel.setSearchFields(representationFields);
+          searchFieldPanel.selectFirstSearchField();
+          addSearchFieldPanel(searchFieldPanel, representationsSearchAdvancedFieldsPanel);
+        } else if (selectedItem.equals(File.class.getName())) {
+          SearchFieldPanel searchFieldPanel = new SearchFieldPanel();
+          searchFieldPanel.setSearchAdvancedFields(searchAdvancedFieldOptionsFile);
+          searchFieldPanel.setSearchFields(fileFields);
+          searchFieldPanel.selectFirstSearchField();
+          addSearchFieldPanel(searchFieldPanel, filesSearchAdvancedFieldsPanel);
+        } else {
+          SearchFieldPanel searchFieldPanel = new SearchFieldPanel();
+          searchFieldPanel.setSearchAdvancedFields(searchAdvancedFieldOptionsAIP);
+          searchFieldPanel.setSearchFields(searchFields);
+          searchFieldPanel.selectFirstSearchField();
+          addSearchFieldPanel(searchFieldPanel, itemsSearchAdvancedFieldsPanel);
+        }
       }
     });
 
@@ -269,60 +332,44 @@ public class Search extends Composite {
   }
 
   private void createRepresentationsSearchAdvancedFieldsPanel() {
-    SearchFieldPanel idField = new SearchFieldPanel();
-    SearchFieldPanel sizeField = new SearchFieldPanel();
-    SearchFieldPanel numberOfFilesField = new SearchFieldPanel();
-    SearchFieldPanel typeField = new SearchFieldPanel();
+    for (SearchField searchField : representationFields.values()) {
+      ListboxUtils.insertItemByAlphabeticOrder(searchAdvancedFieldOptionsRepresentation, searchField.getLabel(),
+        searchField.getId());
+    }
 
-    idField.simpleSearchField(RodaConstants.REPRESENTATION_ID, messages.searchRepresentationFieldIdentifier(),
-      RodaConstants.SEARCH_FIELD_TYPE_TEXT);
-    typeField.simpleSearchField(RodaConstants.REPRESENTATION_ORIGINAL, messages.searchRepresentationFieldOriginal(),
-      RodaConstants.SEARCH_FIELD_TYPE_BOOLEAN);
-    sizeField.simpleSearchField(RodaConstants.REPRESENTATION_SIZE_IN_BYTES, messages.searchRepresentationFieldSize(),
-      RodaConstants.SEARCH_FIELD_TYPE_STORAGE);
-    numberOfFilesField.simpleSearchField(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES,
-      messages.searchRepresentationFieldNumberOfFiles(), RodaConstants.SEARCH_FIELD_TYPE_NUMERIC_INTERVAL);
-
-    representationsSearchAdvancedFieldsPanel.add(idField);
-    representationsSearchAdvancedFieldsPanel.add(typeField);
-    representationsSearchAdvancedFieldsPanel.add(sizeField);
-    representationsSearchAdvancedFieldsPanel.add(numberOfFilesField);
+    for (SearchField searchField : representationFields.values()) {
+      SearchFieldPanel searchFieldPanel = new SearchFieldPanel();
+      searchFieldPanel.setSearchAdvancedFields(searchAdvancedFieldOptionsRepresentation);
+      searchFieldPanel.setSearchFields(representationFields);
+      addSearchFieldPanel(searchFieldPanel, representationsSearchAdvancedFieldsPanel);
+      searchFieldPanel.selectSearchField(searchField.getId());
+    }
   }
 
   private void createFilesSearchAdvancedFieldsPanel() {
-    SearchFieldPanel filenameField = new SearchFieldPanel();
-    SearchFieldPanel formatField = new SearchFieldPanel();
-    SearchFieldPanel pronomField = new SearchFieldPanel();
-    SearchFieldPanel mimetypeField = new SearchFieldPanel();
-    SearchFieldPanel sizeField = new SearchFieldPanel();
-    SearchFieldPanel fulltextField = new SearchFieldPanel();
+    for (SearchField searchField : fileFields.values()) {
+      ListboxUtils.insertItemByAlphabeticOrder(searchAdvancedFieldOptionsFile, searchField.getLabel(),
+        searchField.getId());
+    }
 
-    filenameField.simpleSearchField(RodaConstants.FILE_FILEID, messages.searchFileFieldFilename(),
-      RodaConstants.SEARCH_FIELD_TYPE_TEXT);
-    formatField.simpleSearchField(RodaConstants.FILE_FILEFORMAT, messages.searchFileFieldFormat(),
-      RodaConstants.SEARCH_FIELD_TYPE_SUGGEST);
-    pronomField.simpleSearchField(RodaConstants.FILE_PRONOM, messages.searchFileFieldPronom(),
-      RodaConstants.SEARCH_FIELD_TYPE_SUGGEST);
-    mimetypeField.simpleSearchField(RodaConstants.FILE_FORMAT_MIMETYPE, messages.searchFileFieldMimetype(),
-      RodaConstants.SEARCH_FIELD_TYPE_SUGGEST);
-    sizeField.simpleSearchField(RodaConstants.FILE_SIZE, messages.searchFileFieldFilesize(),
-      RodaConstants.SEARCH_FIELD_TYPE_STORAGE);
-    fulltextField.simpleSearchField(RodaConstants.FILE_FULLTEXT, messages.searchFileFieldFulltext(),
-      RodaConstants.SEARCH_FIELD_TYPE_TEXT);
+    for (SearchField searchField : fileFields.values()) {
+      SearchFieldPanel searchFieldPanel = new SearchFieldPanel();
+      searchFieldPanel.setSearchAdvancedFields(searchAdvancedFieldOptionsFile);
+      searchFieldPanel.setSearchFields(fileFields);
+      addSearchFieldPanel(searchFieldPanel, filesSearchAdvancedFieldsPanel);
+      searchFieldPanel.selectSearchField(searchField.getId());
 
-    formatField
-      .addInputSearchSuggestBox(new SearchSuggestBox<IndexedFile>(IndexedFile.class, RodaConstants.FILE_FILEFORMAT));
-    pronomField
-      .addInputSearchSuggestBox(new SearchSuggestBox<IndexedFile>(IndexedFile.class, RodaConstants.FILE_PRONOM));
-    mimetypeField.addInputSearchSuggestBox(
-      new SearchSuggestBox<IndexedFile>(IndexedFile.class, RodaConstants.FILE_FORMAT_MIMETYPE));
-
-    filesSearchAdvancedFieldsPanel.add(filenameField);
-    filesSearchAdvancedFieldsPanel.add(formatField);
-    filesSearchAdvancedFieldsPanel.add(pronomField);
-    filesSearchAdvancedFieldsPanel.add(mimetypeField);
-    filesSearchAdvancedFieldsPanel.add(sizeField);
-    filesSearchAdvancedFieldsPanel.add(fulltextField);
+      if (searchField.getId().equals(RodaConstants.FILE_FILEFORMAT)) {
+        searchFieldPanel.addInputSearchSuggestBox(
+          new SearchSuggestBox<IndexedFile>(IndexedFile.class, RodaConstants.FILE_FILEFORMAT));
+      } else if (searchField.getId().equals(RodaConstants.FILE_PRONOM)) {
+        searchFieldPanel
+          .addInputSearchSuggestBox(new SearchSuggestBox<IndexedFile>(IndexedFile.class, RodaConstants.FILE_PRONOM));
+      } else if (searchField.getId().equals(RodaConstants.FILE_FORMAT_MIMETYPE)) {
+        searchFieldPanel.addInputSearchSuggestBox(
+          new SearchSuggestBox<IndexedFile>(IndexedFile.class, RodaConstants.FILE_FORMAT_MIMETYPE));
+      }
+    }
   }
 
   public Filter buildSearchFilter(String basicQuery, Filter defaultFilter, String allFilter, FlowPanel fieldsPanel) {
@@ -385,9 +432,9 @@ public class Search extends Composite {
     }
   }
 
-  private void addSearchFieldPanel(final SearchFieldPanel searchFieldPanel) {
-    itemsSearchAdvancedFieldsPanel.add(searchFieldPanel);
-    itemsSearchAdvancedFieldsPanel.removeStyleName("empty");
+  private void addSearchFieldPanel(final SearchFieldPanel searchFieldPanel, final FlowPanel searchAdvancedFieldPanel) {
+    searchAdvancedFieldPanel.add(searchFieldPanel);
+    searchAdvancedFieldPanel.removeStyleName("empty");
 
     searchPanel.setSearchAdvancedGoEnabled(true);
 
@@ -395,9 +442,9 @@ public class Search extends Composite {
 
       @Override
       public void onClick(ClickEvent event) {
-        itemsSearchAdvancedFieldsPanel.remove(searchFieldPanel);
-        if (itemsSearchAdvancedFieldsPanel.getWidgetCount() == 0) {
-          itemsSearchAdvancedFieldsPanel.addStyleName("empty");
+        searchAdvancedFieldPanel.remove(searchFieldPanel);
+        if (searchAdvancedFieldPanel.getWidgetCount() == 0) {
+          searchAdvancedFieldPanel.addStyleName("empty");
           searchPanel.setSearchAdvancedGoEnabled(false);
         }
       }
@@ -417,6 +464,7 @@ public class Search extends Composite {
 
     searchResultPanel.clear();
     searchResultPanel.add(itemsSearchResultPanel);
+    selectedItem = AIP.class.getName();
 
     itemsFacets.setVisible(true);
     filesFacets.setVisible(false);
@@ -434,6 +482,7 @@ public class Search extends Composite {
 
     searchResultPanel.clear();
     searchResultPanel.add(representationsSearchResultPanel);
+    selectedItem = Representation.class.getName();
 
     itemsFacets.setVisible(false);
     filesFacets.setVisible(false);
@@ -451,6 +500,7 @@ public class Search extends Composite {
 
     searchResultPanel.clear();
     searchResultPanel.add(filesSearchResultPanel);
+    selectedItem = File.class.getName();
 
     itemsFacets.setVisible(false);
     filesFacets.setVisible(true);

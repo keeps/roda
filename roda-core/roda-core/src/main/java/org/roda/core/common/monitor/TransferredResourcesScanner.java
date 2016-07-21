@@ -275,6 +275,7 @@ public class TransferredResourcesScanner {
       reindexOldResourcesParentsAfterMove(resourcesToIndex, areResourcesFromSameFolder);
     }
 
+    // doing the throw after the moving process to reindex the moved ones
     if (notFoundResources) {
       throw new NotFoundException("Some transferred resources were moved or do not exist");
     }

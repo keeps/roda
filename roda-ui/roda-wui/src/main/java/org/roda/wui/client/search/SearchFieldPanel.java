@@ -53,6 +53,7 @@ public class SearchFieldPanel extends Composite {
 
   // Simple search field
   private Label fieldLabel;
+  private ListBox fieldBox;
 
   // Complex search field
   private ListBox searchAdvancedFields;
@@ -84,6 +85,7 @@ public class SearchFieldPanel extends Composite {
     leftPanel = new FlowPanel();
     inputPanel = new FlowPanel();
     fieldLabel = new Label();
+    fieldBox = new ListBox();
     searchAdvancedFields = new ListBox();
 
     DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
@@ -152,6 +154,7 @@ public class SearchFieldPanel extends Composite {
     inputPanel.addStyleName("full_width");
     remove.addStyleName("search-field-remove");
     fieldLabel.addStyleName("search-field-label");
+    fieldBox.addStyleName("form-listbox");
     searchAdvancedFields.addStyleName("form-listbox");
 
     inputText.addStyleName("form-textbox");
@@ -261,12 +264,13 @@ public class SearchFieldPanel extends Composite {
     searchFields.add(field);
     setSearchField(new SearchField(field, searchFields, label, type));
 
-    fieldLabel.setText(label);
+    fieldBox.addItem(label);
     leftPanel.clear();
-    leftPanel.add(fieldLabel);
+    leftPanel.add(fieldBox);
     leftPanel.add(inputPanel);
     setInputPanel(type);
-    panel.addStyleName("full_width");
+    panel.add(remove);
+    panel.removeStyleName("full_width");
   }
 
   private void setInputPanel(String type) {
