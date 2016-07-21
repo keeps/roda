@@ -1,29 +1,27 @@
 language: java
 jdk:
-  - oraclejdk8
+- oraclejdk8
 sudo: required
 before_script:
-  # Install Siegfried
-  - curl https://bintray.com/user/downloadSubjectPublicKey?username=bintray | sudo apt-key add -
-  - echo "deb http://dl.bintray.com/siegfried/debian wheezy main" | sudo tee -a /etc/apt/sources.list
-  - sudo apt-get update -qq
-  - sudo apt-get install siegfried -y
-  - sudo sf -update
-  # Install Clam Anti Virus
-  - sudo apt-get install clamav clamav-daemon -y
-  - sudo freshclam
-  # Install Avconv
-  - sudo apt-get install libav-tools -y
-  # Install ImageMagick
-  - sudo apt-get install imagemagick -y
-  # Install SoX
-  - sudo apt-get install sox libsox-fmt-all -y
-  # Install GhostScript
-  - sudo apt-get install ghostscript libgs-dev -y
-  # Install Unoconv
-  - sudo add-apt-repository ppa:libreoffice/ppa -y
-  - sudo apt-get update
-  - sudo apt-get install libreoffice libreoffice-script-provider-python -y
-  - sudo apt-get install unoconv -y
-  - sudo apt-get --only-upgrade install cpio libgcrypt11 libnss3 libreoffice-pdfimport multiarch-support -y
+- curl https://bintray.com/user/downloadSubjectPublicKey?username=bintray | sudo apt-key
+  add -
+- echo "deb http://dl.bintray.com/siegfried/debian wheezy main" | sudo tee -a /etc/apt/sources.list
+- sudo apt-get update -qq
+- sudo apt-get install siegfried -y
+- sudo sf -update
+- sudo apt-get install clamav clamav-daemon -y
+- sudo freshclam
+- sudo apt-get install libav-tools -y
+- sudo apt-get install imagemagick -y
+- sudo apt-get install sox libsox-fmt-all -y
+- sudo apt-get install ghostscript libgs-dev -y
+- sudo add-apt-repository ppa:libreoffice/ppa -y
+- sudo apt-get update
+- sudo apt-get install libreoffice libreoffice-script-provider-python -y
+- sudo apt-get install unoconv -y
+- sudo apt-get --only-upgrade install cpio libgcrypt11 libnss3 libreoffice-pdfimport
+  multiarch-support -y
 script: mvn -Dtestng.groups="travis" verify
+notifications:
+  slack:
+    secure: Hg2xvznD2QGhbCHRXN9DFM6dYIfeiZStj0Ud+OBS2swX9YOM77ufbDkMWF/yAAwxNg45QIC3a3okVy6TLzY5hA/PSKlc/5/ClujgRy02HLXlbYZ9psQH22/VFrER3uFkIpvMPhrxh3NLo/UMWfwvmwq26ziFnW4W6UDn/XXCHPE=

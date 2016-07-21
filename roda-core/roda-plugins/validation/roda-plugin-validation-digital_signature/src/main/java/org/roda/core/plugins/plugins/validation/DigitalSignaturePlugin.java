@@ -526,7 +526,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
             reportItem.setPluginDetails("Non PDF files were not ignored");
           }
 
-        } catch (Throwable e) {
+        } catch (RODAException | IOException | RuntimeException e) {
           LOGGER.error("Error processing Representation " + representation.getId() + ": " + e.getMessage(), e);
           reportState = PluginState.FAILURE;
           reportItem.setPluginState(reportState).setPluginDetails(e.getMessage());
@@ -681,7 +681,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
 
           reportItem.setPluginState(reportState);
 
-        } catch (Throwable e) {
+        } catch (RODAException | IOException | RuntimeException e) {
           LOGGER.error("Error processing Representation " + file.getRepresentationId() + ": " + e.getMessage(), e);
           reportState = PluginState.FAILURE;
           reportItem.setPluginState(reportState).setPluginDetails(e.getMessage());

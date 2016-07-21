@@ -8,6 +8,7 @@
 package org.roda.core.plugins.plugins.validation;
 
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -197,7 +198,7 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
         // AbstractConvertPluginUtils.reIndexingRepresentationAfterConversion(this,
         // index, model, storage, aipId, newRepresentationID);
 
-      } catch (Throwable e) {
+      } catch (RODAException | IOException | RuntimeException e) {
         LOGGER.error("Error processing Representation " + representation.getId() + ": " + e.getMessage(), e);
         reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
       } finally {
