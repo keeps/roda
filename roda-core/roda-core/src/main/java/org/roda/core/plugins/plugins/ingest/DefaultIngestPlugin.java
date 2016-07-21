@@ -302,26 +302,26 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         } else if(result.getTotalCount() == 1){
           IndexedAIP newParentIAIP = result.getResults().get(0);
           index.execute(IndexedAIP.class,
-                  new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, ghost.getId())),
-                  child -> {
-                    try {
-                      model.moveAIP(child.getId(), newParentIAIP.getId());
-                    } catch (NotFoundException e) {
-                      LOGGER.debug("Can't move child. It wasn't found.", e);
-                    }
-                  });
+            new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, ghost.getId())),
+            child -> {
+              try {
+                model.moveAIP(child.getId(), newParentIAIP.getId());
+              } catch (NotFoundException e) {
+                LOGGER.debug("Can't move child. It wasn't found.", e);
+              }
+            });
           try {
             // Move the AIP to the ghost's parent
-            model.moveAIP(newParentIAIP.getId(), ghost.getParentID());
+            if(newParentIAIP.getParentID() == null || ghost.getParentID() != null) {
+              model.moveAIP(newParentIAIP.getId(), ghost.getParentID());
+            }
             model.deleteAIP(ghost.getId());
           } catch (NotFoundException e) {
-            LOGGER.debug("Can't delete ghost. It wasn't found.", e);
+            LOGGER.debug("Can't delete ghost or move node. It wasn't found.", e);
           }
         }else if(result.getTotalCount() == 0){
 
         }
-
-        index.commitAIPs();
         // if result total count > 1 then error
         // if result total count == 1 then move all children and delete ghost
         // if result total count == 0 then check if there are other ghosts with the same sip id and from the same job, move all of this ghost children

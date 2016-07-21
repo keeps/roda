@@ -75,8 +75,7 @@ public class EARKSIPToAIPPluginUtils {
 
   }
 
-  public static AIP earkSIPToAIPUpdate(SIP sip, String aipId, Path sipPath, ModelService model, StorageService storage,
-    String ingestSIPId, String ingestJobId, String parentId) throws RequestNotValidException, NotFoundException,
+  public static AIP earkSIPToAIPUpdate(SIP sip, String aipId, ModelService model, StorageService storage) throws RequestNotValidException, NotFoundException,
     GenericException, AlreadyExistsException, AuthorizationDeniedException, ValidationException {
     boolean notify = false;
 

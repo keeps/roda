@@ -149,8 +149,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
         if(IPEnums.IPStatus.UPDATE == sip.getStatus() || (originalAIP != null && originalAIP.getGhost())){
           if(indexedAIP != null) {
             // Update the AIP
-            aip = EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP.getId(), earkSIPPath, model, storage,
-                    sip.getId(), reportItem.getJobId(), computedParentId);
+            aip = EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP.getId(), model, storage);
           }else {
             // Fail to update since there's no AIP
             throw new NotFoundException("Unable to find AIP created with SIP ID: " + sip.getId());
@@ -221,12 +220,12 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
         IndexResult<IndexedAIP> result = index.find(IndexedAIP.class,
                 new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, ancestor)), Sorter.NONE,
                 new Sublist(0, 1));
-        if (result.getTotalCount() == 1) {
+        if (result.getTotalCount() >= 1) {
           IndexedAIP indexedAIP = result.getResults().get(0);
-          AIP aip = model.retrieveAIP(indexedAIP.getId());
-          aip.setParentId(parent);
-          model.updateAIP(aip);
-          parent = aip.getId();
+//          AIP aip = model.retrieveAIP(indexedAIP.getId());
+//          aip.setParentId(parent);
+//          model.updateAIP(aip);
+          parent = indexedAIP.getId();
         }else throw new NotFoundException();
       } catch (NotFoundException e) {
         Job currentJob = PluginHelper.getJobFromIndex(this, index);
