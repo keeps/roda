@@ -178,7 +178,7 @@ public class DigitalSignatureTest {
     Job job = TestsHelper.executeJob(DigitalSignaturePlugin.class, parameters, PluginType.AIP_TO_AIP,
       SelectedItemsAll.create(Representation.class));
     
-    TestsHelper.getJobReports(index, job, true);
+    // this job should fail
 
     aip = model.retrieveAIP(aip.getId());
     AssertJUnit.assertEquals(2, aip.getRepresentations().size());

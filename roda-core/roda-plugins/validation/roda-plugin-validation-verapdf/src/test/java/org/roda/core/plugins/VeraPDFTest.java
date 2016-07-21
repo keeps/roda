@@ -158,7 +158,7 @@ public class VeraPDFTest {
     Job job = TestsHelper.executeJob(VeraPDFPlugin.class, parameters, PluginType.AIP_TO_AIP,
       SelectedItemsAll.create(Representation.class));
     
-    TestsHelper.getJobReports(index, job, true);
+    // job should fail
 
     if (job.getJobStats().getSourceObjectsProcessedWithFailure() == 0) {
       AssertJUnit.fail("Report should have ended with failures");

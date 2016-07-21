@@ -9,7 +9,7 @@ package org.roda.core.common;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.StringReader;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
@@ -156,7 +156,7 @@ public class ApacheDS {
    * @throws Exception
    *           if there were some problems while initializing the system
    */
-  public void initDirectoryService(Path dataDirectory, String adminPassword, List<InputStream> ldifs) throws Exception {
+  public void initDirectoryService(Path dataDirectory, String adminPassword, List<String> ldifs) throws Exception {
     // Initialize the LDAP service
     JdbmPartition rodaPartition = instantiateDirectoryService(dataDirectory);
 
@@ -181,7 +181,7 @@ public class ApacheDS {
       modifyRequestImpl.replace("userPassword", adminPassword);
       service.getAdminSession().modify(modifyRequestImpl);
 
-      for (InputStream ldif : ldifs) {
+      for (String ldif : ldifs) {
         applyLdif(ldif);
       }
     }
@@ -257,8 +257,8 @@ public class ApacheDS {
     server.start();
   }
 
-  private void applyLdif(final InputStream ldifFileInputstream) throws LdapException, IOException {
-    LdifReader entries = new LdifReader(ldifFileInputstream);
+  private void applyLdif(final String ldif) throws LdapException, IOException {
+    LdifReader entries = new LdifReader(new StringReader(ldif));
     for (LdifEntry ldifEntry : entries) {
       DefaultEntry newEntry = new DefaultEntry(service.getSchemaManager(), ldifEntry.getEntry());
       LOGGER.debug("LDIF entry: {}", newEntry);

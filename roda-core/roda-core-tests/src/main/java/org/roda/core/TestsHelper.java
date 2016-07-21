@@ -75,7 +75,7 @@ public final class TestsHelper {
 
     Job job = new Job();
     job.setId(UUID.randomUUID().toString());
-    job.setName(job.getId());
+    job.setName(plugin.getName());
     job.setPlugin(plugin.getName());
     job.setPluginParameters(pluginParameters);
     job.setPluginType(pluginType);

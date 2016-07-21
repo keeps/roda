@@ -50,6 +50,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
@@ -75,8 +76,9 @@ import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.AssertJUnit;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.w3c.util.InvalidDateException;
 
@@ -108,7 +110,7 @@ public class InternalPluginsTest {
   private static ModelService model;
   private static IndexService index;
 
-  @BeforeMethod
+  @BeforeClass
   public void setUp() throws Exception {
     basePath = TestsHelper.createBaseTempDir(getClass(), true,
       PosixFilePermissions
@@ -129,10 +131,36 @@ public class InternalPluginsTest {
     LOGGER.info("Running internal plugins tests under storage {}", basePath);
   }
 
-  @AfterMethod
+  @AfterClass
   public void tearDown() throws Exception {
     RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
+  }
+
+  @AfterMethod
+  public void cleanUp() throws RODAException {
+    
+    // delete all AIPs
+    index.execute(IndexedAIP.class, Filter.ALL, new IndexRunnable<IndexedAIP>() {
+      @Override
+      public void run(IndexedAIP item) throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+        try {
+          model.deleteAIP(item.getId());
+        } catch (NotFoundException e) {
+          // do nothing
+        }
+      }
+    });
+
+    // delete all Transferred Resources
+    index.execute(TransferredResource.class, Filter.ALL, new IndexRunnable<TransferredResource>() {
+
+      @Override
+      public void run(TransferredResource item)
+        throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+        model.deleteTransferredResource(item);
+      }
+    });
   }
 
   private ByteArrayInputStream generateContentData() {
@@ -187,7 +215,7 @@ public class InternalPluginsTest {
 
     Job job = TestsHelper.executeJob(TransferredResourceToAIPPlugin.class, parameters, PluginType.SIP_TO_AIP,
       SelectedItemsList.create(TransferredResource.class, transferredResource.getUUID()));
-    
+
     TestsHelper.getJobReports(index, job, true);
 
     index.commitAIPs();
@@ -223,8 +251,10 @@ public class InternalPluginsTest {
     SolrServerException, XmlException {
     AIP aip = ingestCorpora();
 
-    TestsHelper.executeJob(AntivirusPlugin.class, PluginType.AIP_TO_AIP,
+    Job job = TestsHelper.executeJob(AntivirusPlugin.class, PluginType.AIP_TO_AIP,
       SelectedItemsList.create(AIP.class, aip.getId()));
+    
+    TestsHelper.getJobReports(index, job, true);
 
     aip = model.retrieveAIP(aip.getId());
 

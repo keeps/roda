@@ -823,10 +823,15 @@ public class RodaCoreFactory {
 
       if (!Files.exists(rodaApacheDSDataDirectory)) {
         Files.createDirectories(rodaApacheDSDataDirectory);
-        List<InputStream> ldifs = new ArrayList<>();
-        ldifs.add(RodaCoreFactory.getConfigurationFileAsStream(RodaConstants.CORE_LDAP_FOLDER + "/users.ldif"));
-        ldifs.add(RodaCoreFactory.getConfigurationFileAsStream(RodaConstants.CORE_LDAP_FOLDER + "/groups.ldif"));
-        ldifs.add(RodaCoreFactory.getConfigurationFileAsStream(RodaConstants.CORE_LDAP_FOLDER + "/roles.ldif"));
+        List<String> ldifFileNames = Arrays.asList("users.ldif", "groups.ldif", "roles.ldif");
+        List<String> ldifs = new ArrayList<>();
+        for (String ldifFileName : ldifFileNames) {
+          InputStream ldifInputStream = RodaCoreFactory
+            .getConfigurationFileAsStream(RodaConstants.CORE_LDAP_FOLDER + "/" + ldifFileName);
+          ldifs.add(IOUtils.toString(ldifInputStream, RodaConstants.DEFAULT_ENCODING));
+          IOUtils.closeQuietly(ldifInputStream);
+        }
+
         ldap.initDirectoryService(rodaApacheDSDataDirectory, ldapAdminPassword, ldifs);
         ldap.startServer(ldapUtility, ldapPort);
         indexUsersAndGroupsFromLDAP();
