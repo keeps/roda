@@ -174,7 +174,7 @@ public class Browse extends Composite {
   HTML aipState;
 
   @UiField
-  Label itemTitle, itemId;
+  Label itemTitle, itemId, sipId;
 
   @UiField
   TabPanel itemMetadata;
@@ -345,6 +345,9 @@ public class Browse extends Composite {
     itemTitle.removeStyleName("browseTitle-allCollections");
     itemIcon.getParent().removeStyleName("browseTitle-allCollections-wrapper");
     itemId.setText("");
+    itemId.removeStyleName("browseItemId");
+    sipId.setText("");
+    sipId.removeStyleName("browseSipId");
 
     breadcrumb.setVisible(false);
 
@@ -427,6 +430,9 @@ public class Browse extends Composite {
       itemTitle.removeStyleName("browseTitle-allCollections");
       itemIcon.getParent().removeStyleName("browseTitle-allCollections-wrapper");
       itemId.setText(aip.getId());
+      itemId.addStyleName("browseItemId");
+      sipId.setText(aip.getIngestSIPId());
+      sipId.addStyleName("browseSipId");
 
       final List<Pair<String, HTML>> descriptiveMetadataContainers = new ArrayList<Pair<String, HTML>>();
       final Map<String, DescriptiveMetadataViewBundle> bundles = new HashMap<>();

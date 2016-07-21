@@ -30,6 +30,7 @@
 							ui:field="itemTitle" />
 					</g:FlowPanel>
 					<g:Label addStyleNames="browseItemId" ui:field="itemId" />
+					<g:Label addStyleNames="browseSipId" ui:field="sipId" />
 				</g:FlowPanel>
 				<m:BreadcrumbPanel ui:field="breadcrumb"
 					addStyleNames="browseBreadcrumb" />
