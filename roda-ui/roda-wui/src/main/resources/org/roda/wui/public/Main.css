@@ -390,12 +390,12 @@ pre code {
 color: WHITE;
 border-bottom: 0px SOLID #089DE3;
 font-size: 16px;
-margin: 0 -15px;
-padding: 5px 15px;
+margin: 0px -15px !important;
+padding: 5px 15px !important;
 }
 
 .form-separator:first-child{
-	margin-top:-15px;
+	margin-top:-15px !important;
 }
 
 .form-integerbox {

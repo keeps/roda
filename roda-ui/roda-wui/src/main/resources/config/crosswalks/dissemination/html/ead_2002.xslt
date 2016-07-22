@@ -121,9 +121,9 @@
 			</xsl:if>
 			<xsl:if test="//ead:did/ead:unitdate/@normal">
 				<xsl:choose>
-					<xsl:when test="contains(ead:did/ead:unitdate/@normal, '/')">	<!-- initial/final -->
+					<xsl:when test="contains(//ead:did/ead:unitdate/@normal, '/')">	<!-- initial/final -->
 						<xsl:analyze-string regex="^(\d{{4}}-\d{{2}}-\d{{2}})$"
-							select="normalize-space(substring-before(ead:did/ead:unitdate/@normal, '/'))">
+							select="normalize-space(substring-before(//ead:did/ead:unitdate/@normal, '/'))">
 							<xsl:matching-substring>
 								<div class="field">
 									<div class="label">
@@ -138,7 +138,7 @@
 							</xsl:matching-substring>
 						</xsl:analyze-string>
 						<xsl:analyze-string regex="^(\d{{4}}-\d{{2}})$"
-							select="normalize-space(substring-before(ead:did/ead:unitdate/@normal, '/'))">
+							select="normalize-space(substring-before(//ead:did/ead:unitdate/@normal, '/'))">
 							<xsl:matching-substring>
 								<div class="field">
 									<div class="label">
@@ -154,7 +154,7 @@
 							</xsl:matching-substring>
 						</xsl:analyze-string>
 						<xsl:analyze-string regex="^(\d{{4}})$"
-							select="normalize-space(substring-before(ead:did/ead:unitdate/@normal, '/'))">
+							select="normalize-space(substring-before(//ead:did/ead:unitdate/@normal, '/'))">
 							<xsl:matching-substring>
 								<div class="field">
 									<div class="label">
@@ -170,7 +170,7 @@
 							</xsl:matching-substring>
 						</xsl:analyze-string>
 						<xsl:analyze-string regex="^(\d{{4}})(\d{{2}})(\d{{2}})$"
-							select="normalize-space(substring-before(ead:did/ead:unitdate/@normal, '/'))">
+							select="normalize-space(substring-before(//ead:did/ead:unitdate/@normal, '/'))">
 							<xsl:matching-substring>
 								<div class="field">
 									<div class="label">
@@ -189,7 +189,7 @@
 							</xsl:matching-substring>
 						</xsl:analyze-string>
 						<xsl:analyze-string regex="^(\d{{4}})(\d{{2}})$"
-							select="normalize-space(substring-before(ead:did/ead:unitdate/@normal, '/'))">
+							select="normalize-space(substring-before(//ead:did/ead:unitdate/@normal, '/'))">
 							<xsl:matching-substring>
 								<div class="field">
 									<div class="label">
@@ -208,7 +208,7 @@
 						</xsl:analyze-string>
 	
 						<xsl:analyze-string regex="^(\d{{4}}-\d{{2}}-\d{{2}})$"
-							select="normalize-space(substring-after(ead:did/ead:unitdate/@normal, '/'))">
+							select="normalize-space(substring-after(//ead:did/ead:unitdate/@normal, '/'))">
 							<xsl:matching-substring>
 								<div class="field">
 									<div class="label">
@@ -223,7 +223,7 @@
 							</xsl:matching-substring>
 						</xsl:analyze-string>
 						<xsl:analyze-string regex="^(\d{{4}}-\d{{2}})$"
-							select="normalize-space(substring-after(ead:did/ead:unitdate/@normal, '/'))">
+							select="normalize-space(substring-after(//ead:did/ead:unitdate/@normal, '/'))">
 							<xsl:matching-substring>
 								<div class="field">
 									<div class="label">
@@ -239,7 +239,7 @@
 							</xsl:matching-substring>
 						</xsl:analyze-string>
 						<xsl:analyze-string regex="^(\d{{4}})$"
-							select="normalize-space(substring-after(ead:did/ead:unitdate/@normal, '/'))">
+							select="normalize-space(substring-after(//ead:did/ead:unitdate/@normal, '/'))">
 							<xsl:matching-substring>
 								<div class="field">
 									<div class="label">
@@ -255,7 +255,7 @@
 							</xsl:matching-substring>
 						</xsl:analyze-string>
 						<xsl:analyze-string regex="^(\d{{4}})(\d{{2}})(\d{{2}})$"
-							select="normalize-space(substring-after(ead:did/ead:unitdate/@normal, '/'))">
+							select="normalize-space(substring-after(//ead:did/ead:unitdate/@normal, '/'))">
 							<xsl:matching-substring>
 								<div class="field">
 									<div class="label">
@@ -274,7 +274,7 @@
 							</xsl:matching-substring>
 						</xsl:analyze-string>
 						<xsl:analyze-string regex="^(\d{{4}})(\d{{2}})$"
-							select="normalize-space(substring-after(ead:did/ead:unitdate/@normal, '/'))">
+							select="normalize-space(substring-after(//ead:did/ead:unitdate/@normal, '/'))">
 							<xsl:matching-substring>
 								<div class="field">
 									<div class="label">
@@ -294,7 +294,7 @@
 					</xsl:when>
 					<xsl:otherwise>
 						<xsl:analyze-string regex="^(\d{{4}}-\d{{2}}-\d{{2}})$"
-							select="normalize-space(ead:did/ead:unitdate/@normal)">
+							select="normalize-space(//ead:did/ead:unitdate/@normal)">
 							<xsl:matching-substring>
 								<div class="field">
 									<div class="label">
@@ -309,7 +309,7 @@
 							</xsl:matching-substring>
 						</xsl:analyze-string>
 						<xsl:analyze-string regex="^(\d{{4}}-\d{{2}})$"
-							select="normalize-space(ead:did/ead:unitdate/@normal)">
+							select="normalize-space(//ead:did/ead:unitdate/@normal)">
 							<xsl:matching-substring>
 								<div class="field">
 									<div class="label">
@@ -325,7 +325,7 @@
 							</xsl:matching-substring>
 						</xsl:analyze-string>
 						<xsl:analyze-string regex="^(\d{{4}})$"
-							select="normalize-space(ead:did/ead:unitdate/@normal)">
+							select="normalize-space(//ead:did/ead:unitdate/@normal)">
 							<xsl:matching-substring>
 								<div class="field">
 									<div class="label">
@@ -341,7 +341,7 @@
 							</xsl:matching-substring>
 						</xsl:analyze-string>
 						<xsl:analyze-string regex="^(\d{{4}})(\d{{2}})(\d{{2}})$"
-							select="normalize-space(ead:did/ead:unitdate/@normal)">
+							select="normalize-space(//ead:did/ead:unitdate/@normal)">
 							<xsl:matching-substring>
 								<div class="field">
 									<div class="label">
@@ -360,7 +360,7 @@
 							</xsl:matching-substring>
 						</xsl:analyze-string>
 						<xsl:analyze-string regex="^(\d{{4}})(\d{{2}})$"
-							select="normalize-space(ead:did/ead:unitdate/@normal)">
+							select="normalize-space(//ead:did/ead:unitdate/@normal)">
 							<xsl:matching-substring>
 								<div class="field">
 									<div class="label">

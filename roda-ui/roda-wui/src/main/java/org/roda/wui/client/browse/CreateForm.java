@@ -51,6 +51,7 @@ public class CreateForm {
             addDatePicker(panel, layout, mv);
             break;
           case "separator":
+              layout.addStyleName("form-separator");
               addSeparator(panel,layout,mv);
               break;
           default:
@@ -161,6 +162,7 @@ public class CreateForm {
     mvList.addStyleName("form-textbox");
 
     String list = mv.get("list");
+    mvList.addItem("");
     if (list != null) {
       JSONArray jsonArray = JSONParser.parseLenient(list).isArray();
       for (int i = 0; i < jsonArray.size(); i++) {
@@ -168,7 +170,7 @@ public class CreateForm {
         mvList.addItem(value);
 
         if (value.equals(mv.get("value"))) {
-          mvList.setSelectedIndex(i);
+          mvList.setSelectedIndex(i+1);
         }
       }
     }
@@ -218,9 +220,14 @@ public class CreateForm {
         return dateTimeFormat.format(date);
       }
     });
-    if (mv.get("value") != null && mv.get("value").length() > 0) {
-      Date date = dateTimeFormat.parse(mv.get("value").trim());
-      mvDate.setValue(date);
+    String value = mv.get("value");
+    if (value != null && value.length() > 0) {
+      try{
+        Date date = dateTimeFormat.parse(value.trim());
+        mvDate.setValue(date);
+      }catch(IllegalArgumentException iae){
+        mvDate.getTextBox().setValue(value);
+      }
     }
     mvDate.addValueChangeHandler(new ValueChangeHandler<Date>() {
       @Override
@@ -246,7 +253,6 @@ public class CreateForm {
   
   private static void addSeparator(FlowPanel panel, final FlowPanel layout, final MetadataValue mv) {
     Label mvLabel = new Label(getFieldLabel(mv));
-    mvLabel.addStyleName("form-separator");
     layout.add(mvLabel);
 
     // Description
