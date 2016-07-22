@@ -9,51 +9,51 @@ package org.roda.core.data.exceptions;
 
 /**
  * Thrown to indicate that was not possible to authenticate {@link User} because
- * it is not active.
+ * it's email address is not verified.
  * 
  * @author Rui Castro <rui.castro@gmail.com>
  */
-public class UserInactiveException extends AuthenticationDeniedException {
+public class EmailUnverifiedException extends AuthenticationDeniedException {
   private static final long serialVersionUID = 4619089972230221210L;
 
   /**
-   * Constructs a new {@link UserInactiveException}.
+   * Constructs a new {@link EmailUnverifiedException}.
    */
-  public UserInactiveException() {
+  public EmailUnverifiedException() {
   }
 
   /**
-   * Constructs a new {@link UserInactiveException} with the given error
+   * Constructs a new {@link EmailUnverifiedException} with the given error
    * message.
    *
    * @param message
    *          the error message.
    */
-  public UserInactiveException(String message) {
+  public EmailUnverifiedException(String message) {
     super(message);
   }
 
   /**
-   * Constructs a new {@link UserInactiveException} with the given cause
+   * Constructs a new {@link EmailUnverifiedException} with the given cause
    * exception.
    *
    * @param cause
    *          the cause exception.
    */
-  public UserInactiveException(Throwable cause) {
+  public EmailUnverifiedException(Throwable cause) {
     super(cause);
   }
 
   /**
-   * Constructs a new {@link UserInactiveException} with the given error message
-   * and cause exception.
+   * Constructs a new {@link EmailUnverifiedException} with the given error
+   * message and cause exception.
    *
    * @param message
    *          the error message.
    * @param cause
    *          the cause exception.
    */
-  public UserInactiveException(String message, Throwable cause) {
+  public EmailUnverifiedException(String message, Throwable cause) {
     super(message, cause);
   }
 

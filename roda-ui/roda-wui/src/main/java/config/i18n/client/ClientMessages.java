@@ -1244,7 +1244,7 @@ public interface ClientMessages extends Messages {
 
   String wrongUsernameAndPasswordMessage();
 
-  String inactiveUserMessage();
+  String emailUnverifiedMessage();
 
   String systemCurrentlyUnavailableMessage();
 
