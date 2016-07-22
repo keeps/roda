@@ -1226,6 +1226,8 @@ public interface ClientMessages extends Messages {
 
   String wrongUsernameAndPasswordMessage();
 
+  String inactiveUserMessage();
+
   String systemCurrentlyUnavailableMessage();
 
   /*** More Search ***/
