@@ -17,6 +17,7 @@ public interface SelectDialog<T extends IsIndexed> extends HasValueChangeHandler
 
   public void showAndCenter();
 
+  @Override
   public HandlerRegistration addValueChangeHandler(ValueChangeHandler<T> changeHandler);
 
 }

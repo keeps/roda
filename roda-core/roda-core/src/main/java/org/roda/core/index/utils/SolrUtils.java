@@ -10,6 +10,7 @@ package org.roda.core.index.utils;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
+import java.security.InvalidParameterException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,6 +44,7 @@ import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
 import org.apache.solr.common.params.FacetParams;
@@ -243,7 +245,9 @@ public class SolrUtils {
       ret = queryResponseToIndexResult(response, classToRetrieve, facets);
     } catch (SolrServerException | IOException e) {
       throw new GenericException("Could not query index", e);
-    } catch (RuntimeException e) {
+    } catch (SolrException e) {
+      throw new RequestNotValidException(e.getMessage());
+    }catch (RuntimeException e) {
       throw new GenericException("Unexpected exception while querying index", e);
     }
 

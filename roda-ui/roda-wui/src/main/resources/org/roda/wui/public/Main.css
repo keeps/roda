@@ -1896,16 +1896,6 @@ td.datePickerMonth, td.datePickerYear {
     font-size: 1rem;
 }
 
-.browseItemId:before {
-    content: "AIP";
-    margin-right: 10px;
-}
-
-.browseSipId:before {
-    content: "SIP";
-    margin-right: 11px;
-}
-
 .browseSearchListTitle {
 }
 

@@ -21,6 +21,7 @@ import org.roda.core.data.adapter.facet.SimpleFacetParameter;
 import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.FilterParameter;
+import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.index.SelectedItems;
@@ -358,17 +359,29 @@ public class Search extends Composite {
       // #search/TYPE/key/value/key/value
       String type = historyTokens.get(0);
 
-      if (RodaConstants.SEARCH_LIST_BOX_ITEMS.equals(type)) {
-        // TODO searchPanel.setDropdownSelectedValue(type);
-      } else if (RodaConstants.SEARCH_LIST_BOX_REPRESENTATIONS.equals(type)) {
-        // TODO searchPanel.setDropdownSelectedValue(type);
-      } else if (RodaConstants.SEARCH_LIST_BOX_FILES.equals(type)) {
-        // TODO searchPanel.setDropdownSelectedValue(type);
+      boolean successful = searchPanel.setDropdownSelectedValue(type);
+      if (successful) {
+
+        List<FilterParameter> params = new ArrayList<>();
+        for (int i = 1; i < historyTokens.size() - 1; i += 2) {
+          String key = historyTokens.get(i);
+          String value = historyTokens.get(i + 1);
+
+          GWT.log("search " + key + ": " + value);
+          params.add(new SimpleFilterParameter(key, value));
+        }
+        if (!params.isEmpty()) {
+          searchPanel.setDefaultFilter(new Filter(params));
+          searchPanel.doSearch();
+        }
+
+        callback.onSuccess(this);
       } else {
         Toast.showError("Unrecognized search type: " + type);
         Tools.newHistory(RESOLVER);
         callback.onSuccess(null);
       }
+
     }
   }
 

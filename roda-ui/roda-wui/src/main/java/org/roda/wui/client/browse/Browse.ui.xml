@@ -29,8 +29,8 @@
 						<g:Label styleName="h1" addStyleNames="browseItemText"
 							ui:field="itemTitle" />
 					</g:FlowPanel>
-					<g:Label addStyleNames="browseItemId" ui:field="itemId" />
-					<g:Label addStyleNames="browseSipId" ui:field="sipId" />
+					<g:Label addStyleNames="browseItemId" ui:field="itemId" title="{messages.itemId}" />
+					<g:Label addStyleNames="browseSipId" ui:field="sipId"  title="{messages.sipId}"/>
 				</g:FlowPanel>
 				<m:BreadcrumbPanel ui:field="breadcrumb"
 					addStyleNames="browseBreadcrumb" />

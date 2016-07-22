@@ -9,6 +9,7 @@ package org.roda.wui.client.search;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -116,6 +117,24 @@ public class Dropdown extends Composite implements HasValueChangeHandlers<String
 
   public String getSelectedValue() {
     return popupValues.get(selectedLabel.getText());
+  }
+  
+  public boolean setSelectedValue(String value) {
+    String label = null;
+    for (Entry<String, String> entry : popupValues.entrySet()) {
+      if(entry.getValue().equals(value)) {
+        label = entry.getKey();
+        break;
+      }
+    }
+    
+    if(label != null) {
+      selectedLabel.setText(label);
+      onChange();
+      return true;
+    } else {
+      return false;
+    }
   }
 
   public void setPanelWidth() {

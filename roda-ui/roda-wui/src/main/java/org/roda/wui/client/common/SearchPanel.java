@@ -143,7 +143,7 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
     if (showSearchAdvancedDisclosureButton) {
       searchPanel.addStyleName("searchPanelAdvanced");
     }
-    
+
     drawSearchPreFilters();
   }
 
@@ -151,7 +151,7 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
     searchPreFilters.clear();
 
     searchPreFilters.setVisible(defaultFilter != null && !defaultFilter.getParameters().isEmpty());
-    
+
     if (defaultFilter != null) {
       for (FilterParameter parameter : defaultFilter.getParameters()) {
 
@@ -237,6 +237,10 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
 
   public String getDropdownSelectedValue() {
     return searchInputListBox.getSelectedValue();
+  }
+
+  public boolean setDropdownSelectedValue(String value) {
+    return searchInputListBox.setSelectedValue(value);
   }
 
   public void setDropdownLabel(String label) {

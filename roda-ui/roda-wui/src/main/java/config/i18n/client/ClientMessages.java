@@ -510,6 +510,10 @@ public interface ClientMessages extends Messages {
 
   String browseRemoveConfirmDialogMessage();
 
+  String itemId();
+
+  String sipId();
+
   /************* Search ****************/
   String searchListBoxItems();
 
