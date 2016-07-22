@@ -264,7 +264,7 @@ public class SearchFieldPanel extends Composite {
     searchFields.add(field);
     setSearchField(new SearchField(field, searchFields, label, type));
 
-    fieldBox.addItem(label);
+    fieldLabel.setText(label);
     leftPanel.clear();
     leftPanel.add(fieldBox);
     leftPanel.add(inputPanel);

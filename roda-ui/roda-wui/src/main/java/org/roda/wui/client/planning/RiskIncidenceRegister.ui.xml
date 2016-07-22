@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
+	xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
+	xmlns:common="urn:import:org.roda.wui.client.common" xmlns:lists="urn:import:org.roda.wui.client.common.lists">
+
+	<ui:style>
+
+	</ui:style>
+
+	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
+
+	<g:FlowPanel styleName="wui-risk-register" addStyleNames="wrapper skip_padding">
+		<g:FlowPanel addStyleNames="row full_width skip_padding">
+			<g:FlowPanel addStyleNames="col_10 content">
+				<g:Label styleName="h1" ui:field="riskRegisterTitle">
+					<ui:text from='{messages.riskRegisterTitle}' />
+				</g:Label>
+				<g:Label styleName="h5" ui:field="riskRegisterSubtitle"/>
+				<g:FlowPanel addStyleNames="page-description" ui:field="riskRegisterDescription">
+				</g:FlowPanel>
+				<common:SearchPanel ui:field="searchPanel" />
+				<lists:RiskIncidenceList addStyleNames="searchResults"
+					ui:field="riskIncidenceList" />
+			</g:FlowPanel>
+			<g:FlowPanel addStyleNames="col_2 last sidebar">
+				<g:FlowPanel ui:field="risksSidebar">
+					<g:Label addStyleNames="h4">
+						<ui:text from='{messages.sidebarRisksTitle}' />
+					</g:Label>
+					<g:Button addStyleNames="btn btn-plus" ui:field="buttonAdd">
+						<ui:text from='{messages.newButton}' />
+					</g:Button>
+					<g:Button addStyleNames="btn btn-plus" ui:field="buttonRemove">
+						<ui:text from='{messages.removeButton}' />
+					</g:Button>
+				</g:FlowPanel>
+				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+					<g:Label addStyleNames="h5 sidebar-facet-title">
+						<ui:text from='{messages.riskIncidenceDetectedBy}' />
+					</g:Label>
+					<g:FlowPanel ui:field="facetDetectedBy" />
+				</g:FlowPanel>
+				<g:Label addStyleNames="h5 sidebar-facet-title">
+					<ui:text from='{messages.sidebarFilterDates}' />
+				</g:Label>
+				<d:DateBox
+					addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
+					ui:field="inputDateInitial" />
+				<g:Label addStyleNames="sidebar-facet-date-separator">-</g:Label>
+				<d:DateBox
+					addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
+					ui:field="inputDateFinal" />
+			</g:FlowPanel>
+		</g:FlowPanel>
+	</g:FlowPanel>
+</ui:UiBinder>

@@ -110,7 +110,18 @@
    <field name="filePath" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <field name="fileId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="objectClass" type="string" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="risks" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+   <field name="riskId" type="string" indexed="true" stored="true" required="true" multiValued="true" />
+   <field name="description" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="byPlugin" type="boolean" indexed="true" stored="true" required="true" multiValued="false" />
+   
+   <field name="status" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+   <field name="severity" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+   <field name="detectedOn" type="tdate" indexed="true" stored="true" required="true" multiValued="false" />
+   <field name="detectedBy" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+   <field name="mitigatedOn" type="tdate" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="mitigatedBy" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="mitigatedDescription" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   
    
    <field name="search" type="text_general" indexed="true" stored="false" multiValued="true" />
    

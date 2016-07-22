@@ -77,7 +77,6 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.NotSupportedException;
-import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.agents.Agent;
@@ -966,7 +965,7 @@ public class SolrUtils {
 
       String groupsKey = RodaConstants.INDEX_PERMISSION_GROUPS_PREFIX + PermissionType.READ;
       appendValuesUsingOROperator(fq, groupsKey, new ArrayList<>(user.getAllGroups()), true);
-      
+
       fq.append(")");
     }
 
@@ -1076,9 +1075,10 @@ public class SolrUtils {
     final String description = descriptions.isEmpty() ? null : descriptions.get(0);
 
     String level;
-    if(ghost){
+    if (ghost) {
       level = "ghost";
-    } else level = levels.isEmpty() ? null : levels.get(0);
+    } else
+      level = levels.isEmpty() ? null : levels.get(0);
 
     return new IndexedAIP(id, state, level, title, dateInitial, dateFinal, description, parentId, ancestors,
       permissions, numberOfSubmissionFiles, numberOfDocumentationFiles, numberOfSchemaFiles, hasRepresentations, ghost)
@@ -1982,7 +1982,16 @@ public class SolrUtils {
     doc.addField(RodaConstants.RISK_INCIDENCE_FILE_PATH, incidence.getFilePath());
     doc.addField(RodaConstants.RISK_INCIDENCE_FILE_ID, incidence.getFileId());
     doc.addField(RodaConstants.RISK_INCIDENCE_OBJECT_CLASS, incidence.getObjectClass());
-    doc.addField(RodaConstants.RISK_INCIDENCE_RISKS, incidence.getRisks());
+    doc.addField(RodaConstants.RISK_INCIDENCE_RISK_ID, incidence.getRiskId());
+    doc.addField(RodaConstants.RISK_INCIDENCE_DESCRIPTION, incidence.getDescription());
+    doc.addField(RodaConstants.RISK_INCIDENCE_BYPLUGIN, incidence.isByPlugin());
+    doc.addField(RodaConstants.RISK_INCIDENCE_STATUS, incidence.getStatus().toString());
+    doc.addField(RodaConstants.RISK_INCIDENCE_SEVERITY, incidence.getSeverity().toString());
+    doc.addField(RodaConstants.RISK_INCIDENCE_DETECTED_ON, incidence.getDetectedOn());
+    doc.addField(RodaConstants.RISK_INCIDENCE_DETECTED_BY, incidence.getDetectedBy());
+    doc.addField(RodaConstants.RISK_INCIDENCE_MITIGATED_ON, incidence.getMitigatedOn());
+    doc.addField(RodaConstants.RISK_INCIDENCE_MITIGATED_BY, incidence.getMitigatedBy());
+    doc.addField(RodaConstants.RISK_INCIDENCE_MITIGATED_DESCRIPTION, incidence.getMitigatedDescription());
     return doc;
   }
 
@@ -1994,7 +2003,16 @@ public class SolrUtils {
     incidence.setFilePath(objectToListString(doc.get(RodaConstants.RISK_INCIDENCE_FILE_PATH)));
     incidence.setFileId(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_FILE_ID)));
     incidence.setObjectClass(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_OBJECT_CLASS)));
-    incidence.setRisks(objectToListString(doc.get(RodaConstants.RISK_INCIDENCE_RISKS)));
+    incidence.setRiskId(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_RISK_ID)));
+    incidence.setDescription(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_DESCRIPTION)));
+    incidence
+      .setStatus(RiskIncidence.INCIDENCE_STATUS.valueOf(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_STATUS))));
+    incidence.setSeverity(Risk.SEVERITY_LEVEL.valueOf(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_SEVERITY))));
+    incidence.setDetectedOn(objectToDate(doc.get(RodaConstants.RISK_INCIDENCE_DETECTED_ON)));
+    incidence.setDetectedBy(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_DETECTED_BY)));
+    incidence.setMitigatedOn(objectToDate(doc.get(RodaConstants.RISK_INCIDENCE_MITIGATED_ON)));
+    incidence.setMitigatedBy(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_MITIGATED_BY)));
+    incidence.setMitigatedDescription(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_MITIGATED_DESCRIPTION)));
     return incidence;
   }
 

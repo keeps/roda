@@ -152,7 +152,7 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
   }
 
   public RiskShowPanel(Risk risk, boolean hasTitle) {
-    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISKS, risk.getId()));
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISK_ID, risk.getId()));
     incidenceList = new RiskIncidenceList(filter, null, messages.riskIncidences(), false);
 
     incidenceList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {

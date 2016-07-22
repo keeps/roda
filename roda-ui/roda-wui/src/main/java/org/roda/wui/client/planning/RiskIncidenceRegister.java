@@ -20,33 +20,28 @@ import org.roda.core.data.adapter.facet.SimpleFacetParameter;
 import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import org.roda.core.data.adapter.filter.DateRangeFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.SelectedItems;
-import org.roda.core.data.v2.risks.IndexedRisk;
-import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.Dialogs;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.common.SearchPanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
-import org.roda.wui.client.common.lists.RiskList;
+import org.roda.wui.client.common.lists.RiskIncidenceList;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.process.CreateActionJob;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
-import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -63,7 +58,7 @@ import config.i18n.client.ClientMessages;
  * @author Luis Faria
  *
  */
-public class RiskRegister extends Composite {
+public class RiskIncidenceRegister extends Composite {
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
@@ -74,7 +69,7 @@ public class RiskRegister extends Composite {
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {RiskRegister.RESOLVER}, false, callback);
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {RiskIncidenceRegister.RESOLVER}, false, callback);
     }
 
     public List<String> getHistoryPath() {
@@ -82,25 +77,25 @@ public class RiskRegister extends Composite {
     }
 
     public String getHistoryToken() {
-      return "riskregister";
+      return "riskincidenceregister";
     }
   };
 
-  private static RiskRegister instance = null;
+  private static RiskIncidenceRegister instance = null;
 
   /**
    * Get the singleton instance
    *
    * @return the instance
    */
-  public static RiskRegister getInstance() {
+  public static RiskIncidenceRegister getInstance() {
     if (instance == null) {
-      instance = new RiskRegister();
+      instance = new RiskIncidenceRegister();
     }
     return instance;
   }
 
-  interface MyUiBinder extends UiBinder<Widget, RiskRegister> {
+  interface MyUiBinder extends UiBinder<Widget, RiskIncidenceRegister> {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
@@ -123,16 +118,10 @@ public class RiskRegister extends Composite {
   SearchPanel searchPanel;
 
   @UiField(provided = true)
-  RiskList riskList;
+  RiskIncidenceList riskIncidenceList;
 
   @UiField(provided = true)
-  FlowPanel facetCategories;
-
-  @UiField(provided = true)
-  FlowPanel facetSeverities;
-
-  @UiField(provided = true)
-  FlowPanel facetOwner;
+  FlowPanel facetDetectedBy;
 
   @UiField
   DateBox inputDateInitial;
@@ -141,16 +130,7 @@ public class RiskRegister extends Composite {
   DateBox inputDateFinal;
 
   @UiField
-  Button buttonAdd;
-
-  @UiField
-  Button buttonRemove;
-
-  @UiField
-  Button startProcess;
-
-  @UiField
-  Button buttonRefresh;
+  Button buttonAdd, buttonRemove;
 
   private static final Filter DEFAULT_FILTER = new Filter(
     new BasicSearchFilterParameter(RodaConstants.RISK_SEARCH, "*"));
@@ -161,42 +141,37 @@ public class RiskRegister extends Composite {
    * @param user
    */
 
-  public RiskRegister() {
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.RISK_CATEGORY),
-      new SimpleFacetParameter(RodaConstants.RISK_POS_MITIGATION_SEVERITY_LEVEL),
-      new SimpleFacetParameter(RodaConstants.RISK_MITIGATION_OWNER));
+  public RiskIncidenceRegister() {
+    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.RISK_INCIDENCE_DETECTED_BY));
 
-    riskList = new RiskList(Filter.NULL, facets, messages.risksTitle(), true);
+    riskIncidenceList = new RiskIncidenceList(Filter.NULL, facets, messages.riskIncidencesTitle(), false);
 
-    searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.RISK_SEARCH, messages.riskRegisterSearchPlaceHolder(),
-      false, false);
-    searchPanel.setList(riskList);
+    searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.RISK_INCIDENCE_SEARCH,
+      messages.riskIncidenceRegisterSearchPlaceHolder(), false, false);
+    searchPanel.setList(riskIncidenceList);
 
-    facetCategories = new FlowPanel();
-    facetSeverities = new FlowPanel();
-    facetOwner = new FlowPanel();
+    facetDetectedBy = new FlowPanel();
 
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
-    facetPanels.put(RodaConstants.RISK_CATEGORY, facetCategories);
-    facetPanels.put(RodaConstants.RISK_POS_MITIGATION_SEVERITY_LEVEL, facetSeverities);
-    facetPanels.put(RodaConstants.RISK_MITIGATION_OWNER, facetOwner);
-    FacetUtils.bindFacets(riskList, facetPanels);
+    facetPanels.put(RodaConstants.RISK_INCIDENCE_DETECTED_BY, facetDetectedBy);
+    FacetUtils.bindFacets(riskIncidenceList, facetPanels);
 
-    riskList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+    riskIncidenceList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
 
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
-        IndexedRisk selected = riskList.getSelectionModel().getSelectedObject();
+        final RiskIncidence selected = riskIncidenceList.getSelectionModel().getSelectedObject();
         if (selected != null) {
-          Tools.newHistory(RESOLVER, ShowRisk.RESOLVER.getHistoryToken(), selected.getId());
+          Tools.newHistory(RiskRegister.RESOLVER, ShowRisk.RESOLVER.getHistoryToken(),
+            selected.getRiskId().replace("[", "").replace("]", ""));
         }
       }
     });
 
-    riskList.addCheckboxSelectionListener(new CheckboxSelectionListener<IndexedRisk>() {
+    riskIncidenceList.addCheckboxSelectionListener(new CheckboxSelectionListener<RiskIncidence>() {
 
       @Override
-      public void onSelectionChange(SelectedItems<IndexedRisk> selected) {
+      public void onSelectionChange(SelectedItems<RiskIncidence> selected) {
         boolean empty = SelectedItemsUtils.isEmpty(selected);
         if (empty) {
           buttonRemove.setEnabled(false);
@@ -238,103 +213,32 @@ public class RiskRegister extends Composite {
     Date dateInitial = inputDateInitial.getDatePicker().getValue();
     Date dateFinal = inputDateFinal.getDatePicker().getValue();
 
-    DateRangeFilterParameter filterParameter = new DateRangeFilterParameter(RodaConstants.RISK_IDENTIFIED_ON,
+    DateRangeFilterParameter filterParameter = new DateRangeFilterParameter(RodaConstants.RISK_INCIDENCE_DETECTED_ON,
       dateInitial, dateFinal, RodaConstants.DateGranularity.DAY);
 
-    riskList.setFilter(new Filter(filterParameter));
+    riskIncidenceList.setFilter(new Filter(filterParameter));
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 0) {
-      riskRegisterTitle.setText(messages.riskRegisterTitle());
-      riskList.setFilter(Filter.ALL);
-      riskList.refresh();
+      riskRegisterTitle.setText(messages.riskIncidenceRegisterTitle());
+      riskIncidenceList.setFilter(Filter.ALL);
+      riskIncidenceList.refresh();
       riskRegisterSubtitle.setVisible(false);
       callback.onSuccess(this);
-    } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(ShowRisk.RESOLVER.getHistoryToken())) {
-      ShowRisk.RESOLVER.resolve(Tools.tail(historyTokens), callback);
-    } else if (historyTokens.size() == 1 && historyTokens.get(0).equals(CreateRisk.RESOLVER.getHistoryToken())) {
-      CreateRisk.RESOLVER.resolve(Tools.tail(historyTokens), callback);
-    } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(EditRisk.RESOLVER.getHistoryToken())) {
-      EditRisk.RESOLVER.resolve(Tools.tail(historyTokens), callback);
-    } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(RiskHistory.RESOLVER.getHistoryToken())) {
-      RiskHistory.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else if (historyTokens.size() == 1 && historyTokens.get(0).equals(CreateActionJob.RESOLVER.getHistoryToken())) {
       CreateActionJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+    } else if (historyTokens.size() == 1) {
+      final String aipId = historyTokens.get(0);
+      riskRegisterTitle.setText(messages.riskIncidenceRegisterTitle());
+      riskIncidenceList.setFilter(new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, aipId)));
+      riskIncidenceList.refresh();
+      riskRegisterSubtitle.setVisible(false);
+      callback.onSuccess(this);
     } else {
       Tools.newHistory(RESOLVER);
       callback.onSuccess(null);
     }
-  }
-
-  @UiHandler("buttonAdd")
-  void buttonAddRiskHandler(ClickEvent e) {
-    Tools.newHistory(RESOLVER, CreateRisk.RESOLVER.getHistoryToken());
-  }
-
-  @UiHandler("buttonRefresh")
-  void buttonRefreshRiskHandler(ClickEvent e) {
-    BrowserService.Util.getInstance().updateRiskCounters(new AsyncCallback<Void>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-        riskList.refresh();
-      }
-
-      @Override
-      public void onSuccess(Void result) {
-        Toast.showInfo(messages.dialogRefresh(), messages.riskRefreshDone());
-        riskList.refresh();
-      }
-    });
-  }
-
-  @UiHandler("buttonRemove")
-  void buttonRemoveRiskHandler(ClickEvent e) {
-
-    final SelectedItems<IndexedRisk> selected = riskList.getSelected();
-
-    SelectedItemsUtils.size(IndexedRisk.class, selected, new AsyncCallback<Long>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-      }
-
-      @Override
-      public void onSuccess(final Long size) {
-        Dialogs.showConfirmDialog(messages.riskRemoveFolderConfirmDialogTitle(),
-          messages.riskRemoveSelectedConfirmDialogMessage(size), messages.riskRemoveFolderConfirmDialogCancel(),
-          messages.riskRemoveFolderConfirmDialogOk(), new AsyncCallback<Boolean>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
-            }
-
-            @Override
-            public void onSuccess(Boolean confirmed) {
-              if (confirmed) {
-                BrowserService.Util.getInstance().deleteRisk(selected, new AsyncCallback<Void>() {
-
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    AsyncCallbackUtils.defaultFailureTreatment(caught);
-                    riskList.refresh();
-                  }
-
-                  @Override
-                  public void onSuccess(Void result) {
-                    Toast.showInfo(messages.riskRemoveSuccessTitle(), messages.riskRemoveSuccessMessage(size));
-                    riskList.refresh();
-                  }
-                });
-              }
-            }
-          });
-      }
-    });
   }
 
 }

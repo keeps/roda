@@ -651,13 +651,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public List<String> getRiskOnAIP(String aipId)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.getRiskOnAIP(user, aipId);
-  }
-
-  @Override
   public void deleteRiskIncidences(String id, SelectedItems<RiskIncidence> incidences)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());

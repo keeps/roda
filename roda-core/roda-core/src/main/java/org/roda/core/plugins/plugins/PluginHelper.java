@@ -486,17 +486,17 @@ public final class PluginHelper {
     }
   }
 
-  public static <T extends AbstractPlugin> void createRiskIfNotExists(ModelService model, int riskIndex, String riskId,
+  public static <T extends AbstractPlugin> Risk createRiskIfNotExists(ModelService model, int riskIndex, String riskId,
     Class<T> pluginClass) throws RequestNotValidException, GenericException, AuthorizationDeniedException,
     AlreadyExistsException, NotFoundException {
     try {
-      model.retrieveRisk(riskId);
+      return model.retrieveRisk(riskId);
     } catch (NotFoundException e) {
-      createDefaultRisk(model, riskIndex, riskId, pluginClass);
+      return createDefaultRisk(model, riskIndex, riskId, pluginClass);
     }
   }
 
-  private static <T extends AbstractPlugin> void createDefaultRisk(ModelService model, int riskIndex, String riskId,
+  private static <T extends AbstractPlugin> Risk createDefaultRisk(ModelService model, int riskIndex, String riskId,
     Class<T> pluginClass) throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException {
 
@@ -504,16 +504,19 @@ public final class PluginHelper {
       + RodaConstants.CORE_RISK_FOLDER + '/' + riskId + ".json";
 
     InputStream inputStream = RodaCoreFactory.getDefaultFileAsStream(defaultFile);
+    Risk risk = null;
 
     try {
-      Risk risk = JsonUtils.getObjectFromJson(inputStream, Risk.class);
+      risk = JsonUtils.getObjectFromJson(inputStream, Risk.class);
       risk.setId(riskId);
       model.createRisk(risk, false);
+      return risk;
     } catch (GenericException e) {
       LOGGER.error("Could not create a default risk");
     }
 
     IOUtils.closeQuietly(inputStream);
+    return risk;
   }
 
   /***************** Preservation events related *****************/

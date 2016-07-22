@@ -17,6 +17,7 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.risks.IndexedRisk;
+import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.IncrementalAssociativeList;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
@@ -41,6 +42,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.TextBox;
 
@@ -78,11 +80,37 @@ public class PluginParameterPanel extends Composite {
       createSelectAipLayout();
     } else if (PluginParameterType.RISK_ID.equals(parameter.getType())) {
       createSelectRiskLayout();
+    } else if (PluginParameterType.SEVERITY.equals(parameter.getType())) {
+      createSelectSeverityLayout();
     } else {
       logger
         .warn("Unsupported plugin parameter type: " + parameter.getType() + ". Reverting to default parameter editor.");
       createStringLayout();
     }
+  }
+
+  private void createSelectSeverityLayout() {
+    Label parameterName = new Label(parameter.getName());
+    final ListBox severityBox = new ListBox();
+    severityBox.addStyleName("form-selectbox");
+    severityBox.addStyleName("form-textbox-small");
+
+    for (SEVERITY_LEVEL severity : SEVERITY_LEVEL.values()) {
+      severityBox.addItem(messages.severityLevel(severity), severity.toString());
+    }
+
+    value = severityBox.getSelectedValue();
+
+    severityBox.addChangeHandler(new ChangeHandler() {
+      @Override
+      public void onChange(ChangeEvent event) {
+        value = severityBox.getSelectedValue();
+      }
+    });
+
+    layout.add(parameterName);
+    layout.add(severityBox);
+    addHelp();
   }
 
   private void createSelectRiskLayout() {

@@ -42,7 +42,7 @@ import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
-import org.roda.wui.client.planning.RiskRegister;
+import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -608,13 +608,14 @@ public class Browse extends Composite {
   private SafeHtml getBreadcrumbLabel(IndexedAIP ancestor) {
     SafeHtml breadcrumbLabel;
     SafeHtml elementLevelIconSafeHtml;
-    if(ancestor.getGhost()){
-      elementLevelIconSafeHtml = SafeHtmlUtils.fromSafeConstant("<i class='fa fa-snapchat-ghost' aria-hidden='true'></i>");
+    if (ancestor.getGhost()) {
+      elementLevelIconSafeHtml = SafeHtmlUtils
+        .fromSafeConstant("<i class='fa fa-snapchat-ghost' aria-hidden='true'></i>");
       SafeHtmlBuilder builder = new SafeHtmlBuilder();
       String label = "<i>ghost</i>";
       builder.append(elementLevelIconSafeHtml).append(SafeHtmlUtils.fromSafeConstant(label));
       breadcrumbLabel = builder.toSafeHtml();
-    }else {
+    } else {
       elementLevelIconSafeHtml = DescriptionLevelUtils.getElementLevelIconSafeHtml(ancestor.getLevel(), false);
       SafeHtmlBuilder builder = new SafeHtmlBuilder();
       String label = ancestor.getTitle() != null ? ancestor.getTitle() : ancestor.getId();
@@ -1015,7 +1016,7 @@ public class Browse extends Composite {
   @UiHandler("risks")
   void buttonRisksHandler(ClickEvent e) {
     if (aipId != null) {
-      Tools.newHistory(RiskRegister.RESOLVER, aipId);
+      Tools.newHistory(RiskIncidenceRegister.RESOLVER, aipId);
     }
   }
 

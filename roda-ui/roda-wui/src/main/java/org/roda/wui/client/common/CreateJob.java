@@ -189,8 +189,6 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
   public abstract boolean updateObjectList();
 
   public void configurePlugins(final String selectedClass) {
-    // TODO filter pluginInfos considering the empty or selected type
-    // GWT.log(plugins.toString());
     List<String> categoriesOnListBox = new ArrayList<String>();
 
     if (plugins != null) {

@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,9 @@ import org.roda.core.data.v2.ip.metadata.Fixity;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -155,10 +159,7 @@ public class FileCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
                       } else {
                         failedFiles.add(file.getId());
                         aipFailed = true;
-
-                        PluginHelper.createRiskIfNotExists(model, 0, risks.get(0), getClass());
-                        model.addRiskIncidence(risks.get(0), file.getAipId(), file.getRepresentationId(),
-                          file.getPath(), file.getId());
+                        createRiskAndIncidence(model, file, risks.get(0));
                       }
                     }
                   }
@@ -208,6 +209,23 @@ public class FileCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
     }
 
     return report;
+  }
+
+  private void createRiskAndIncidence(ModelService model, File file, String riskId) throws RequestNotValidException,
+    GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
+    Risk risk = PluginHelper.createRiskIfNotExists(model, 0, risks.get(0), getClass());
+    RiskIncidence incidence = new RiskIncidence();
+    incidence.setDetectedOn(new Date());
+    incidence.setDetectedBy(this.getName());
+    incidence.setRiskId(risks.get(0));
+    incidence.setAipId(file.getAipId());
+    incidence.setRepresentationId(file.getRepresentationId());
+    incidence.setFilePath(file.getPath());
+    incidence.setFileId(file.getId());
+    incidence.setObjectClass(AIP.class.getSimpleName());
+    incidence.setStatus(INCIDENCE_STATUS.UNMITIGATED);
+    incidence.setSeverity(risk.getPreMitigationSeverityLevel());
+    model.createRiskIncidence(incidence, false);
   }
 
   @Override

@@ -419,6 +419,8 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_RISK_ID = "parameter.risk_id";
   public static final String PLUGIN_PARAMS_RISK_NAME = "parameter.risk_name";
   public static final String PLUGIN_PARAMS_RISK_CATEGORY = "parameter.risk_category";
+  public static final String PLUGIN_PARAMS_RISK_INCIDENCE_DESCRIPTION = "parameter.risk_incidence_description";
+  public static final String PLUGIN_PARAMS_RISK_INCIDENCE_SEVERITY = "parameter.risk_incidence_severity";
   public static final String PLUGIN_PARAMS_DO_VIRUS_CHECK = "parameter.do_virus_check";
   public static final String PLUGIN_PARAMS_DO_DESCRIPTIVE_METADATA_VALIDATION = "parameter.do_descriptive_metadata_validation";
   public static final String PLUGIN_PARAMS_CREATE_PREMIS_SKELETON = "parameter.create.premis.skeleton";
@@ -561,7 +563,17 @@ public final class RodaConstants {
   public static final String RISK_INCIDENCE_FILE_PATH = "filePath";
   public static final String RISK_INCIDENCE_FILE_ID = "fileId";
   public static final String RISK_INCIDENCE_OBJECT_CLASS = "objectClass";
-  public static final String RISK_INCIDENCE_RISKS = "risks";
+  public static final String RISK_INCIDENCE_RISK_ID = "riskId";
+  public static final String RISK_INCIDENCE_DESCRIPTION = "description";
+  public static final String RISK_INCIDENCE_BYPLUGIN = "byPlugin";
+
+  public static final String RISK_INCIDENCE_STATUS = "status";
+  public static final String RISK_INCIDENCE_SEVERITY = "severity";
+  public static final String RISK_INCIDENCE_DETECTED_ON = "detectedOn";
+  public static final String RISK_INCIDENCE_DETECTED_BY = "detectedBy";
+  public static final String RISK_INCIDENCE_MITIGATED_ON = "mitigatedOn";
+  public static final String RISK_INCIDENCE_MITIGATED_BY = "mitigatedBy";
+  public static final String RISK_INCIDENCE_MITIGATED_DESCRIPTION = "mitigatedDescription";
 
   public static final String RISK_INCIDENCE_FILE_EXTENSION = ".json";
   public static final String RISK_INCIDENCE_SEARCH = "search";

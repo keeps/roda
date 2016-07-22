@@ -89,7 +89,6 @@ import org.roda.core.data.v2.index.SelectedItemsFilter;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
-import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
@@ -216,7 +215,8 @@ public class BrowserHelper {
     List<DescriptiveMetadata> listDescriptiveMetadataBinaries = model.retrieveAIP(aipId).getDescriptiveMetadata();
     List<DescriptiveMetadataViewBundle> descriptiveMetadataList = new ArrayList<>();
 
-    if(listDescriptiveMetadataBinaries != null) { // Can be null when the AIP is a ghost
+    if (listDescriptiveMetadataBinaries != null) { // Can be null when the AIP
+                                                   // is a ghost
       for (DescriptiveMetadata descriptiveMetadata : listDescriptiveMetadataBinaries) {
         DescriptiveMetadataViewBundle bundle = getDescriptiveMetadataBundle(aipId, descriptiveMetadata, locale);
         descriptiveMetadataList.add(bundle);
@@ -894,6 +894,21 @@ public class BrowserHelper {
     }
 
     RodaCoreFactory.getIndexService().commitAIPs();
+
+    try {
+      Map<String, String> parameters = new HashMap<String, String>();
+      parameters.put("aipIds", StringUtils.join(aipIds, ","));
+
+      Job job = new Job();
+      job.setName(RiskIncidenceRemoverPlugin.getStaticName() + " " + job.getStartDate());
+      job.setPlugin(RiskIncidenceRemoverPlugin.class.getName());
+      job.setPluginParameters(parameters);
+      job.setSourceObjects(new SelectedItemsAll<>(AIP.class.getName()));
+      Jobs.createJob(user, job);
+    } catch (JobAlreadyStartedException e) {
+      LOGGER.error("Could not delete AIP assoaciated incidences");
+    }
+
     return parentId;
   }
 
@@ -936,7 +951,6 @@ public class BrowserHelper {
     }
 
     RodaCoreFactory.getIndexService().commitAIPs();
-
     return parentId;
   }
 
@@ -1608,22 +1622,6 @@ public class BrowserHelper {
     return aips;
   }
 
-  public static void deleteAIPs(List<IndexedAIP> aips, boolean deleteOnlyRepresentation)
-    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    ModelService model = RodaCoreFactory.getModelService();
-    for (IndexedAIP aip : aips) {
-      if (deleteOnlyRepresentation) {
-        AIP fullAIP = model.retrieveAIP(aip.getId());
-        for (Representation r : fullAIP.getRepresentations()) {
-          model.deleteRepresentation(aip.getId(), r.getId());
-        }
-      } else {
-        model.deleteAIP(aip.getId());
-      }
-
-    }
-  }
-
   public static void validateGetAipParams(String acceptFormat) throws RequestNotValidException {
     if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
@@ -1798,51 +1796,23 @@ public class BrowserHelper {
     }
   }
 
-  public static List<String> getRiskOnAIP(String aipId) throws GenericException, RequestNotValidException {
-    Filter filter = new Filter();
-    filter.add(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, aipId));
-    IndexResult<RiskIncidence> incidences = RodaCoreFactory.getIndexService().find(RiskIncidence.class, filter, null,
-      new Sublist());
-    List<String> emptyList = Arrays.asList("");
-
-    if (incidences.getResults().size() == 1) {
-      RiskIncidence incidence = incidences.getResults().get(0);
-
-      if (!incidence.getRisks().isEmpty()) {
-        return incidence.getRisks();
-      } else {
-        return emptyList;
-      }
-    } else {
-      return emptyList;
-    }
-  }
-
   public static void deleteRiskIncidences(RodaUser user, String riskId, SelectedItems<RiskIncidence> incidences)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     List<String> idList = consolidate(user, RiskIncidence.class, incidences);
 
     Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.RISK_INCIDENCE_ID, idList));
     IndexResult<RiskIncidence> incidenceList = RodaCoreFactory.getIndexService().find(RiskIncidence.class, filter, null,
-      new Sublist(0, 10));
+      new Sublist(0, idList.size()));
 
     for (RiskIncidence incidence : incidenceList.getResults()) {
-      if (AIP.class.getSimpleName().equals(incidence.getObjectClass())) {
-        RodaCoreFactory.getModelService().deleteRiskIncidence(riskId, incidence.getAipId(), null, null, null);
-      } else if (Representation.class.getSimpleName().equals(incidence.getObjectClass())) {
-        RodaCoreFactory.getModelService().deleteRiskIncidence(riskId, incidence.getAipId(),
-          incidence.getRepresentationId(), null, null);
-      } else if (File.class.getSimpleName().equals(incidence.getObjectClass())) {
-        RodaCoreFactory.getModelService().deleteRiskIncidence(riskId, incidence.getAipId(),
-          incidence.getRepresentationId(), incidence.getFilePath(), incidence.getFileId());
-      }
+      RodaCoreFactory.getModelService().deleteRiskIncidence(incidence.getId(), false);
     }
 
   }
 
   public static void updateRiskCounters() throws GenericException, RequestNotValidException, NotFoundException {
     IndexResult<RiskIncidence> find = RodaCoreFactory.getIndexService().find(RiskIncidence.class, Filter.ALL,
-      Sorter.NONE, new Sublist(0, 0), new Facets(new SimpleFacetParameter(RodaConstants.RISK_INCIDENCE_RISKS)));
+      Sorter.NONE, new Sublist(0, 0), new Facets(new SimpleFacetParameter(RodaConstants.RISK_INCIDENCE_RISK_ID)));
 
     boolean findFlag = true;
     int initialIndex = 0, interval = 20;
@@ -1945,6 +1915,19 @@ public class BrowserHelper {
         // Reject AIP
         model.deleteAIP(aipId);
 
+        try {
+          Map<String, String> parameters = new HashMap<String, String>();
+          parameters.put("aipIds", aipId);
+
+          Job job = new Job();
+          job.setName(RiskIncidenceRemoverPlugin.getStaticName() + " " + job.getStartDate());
+          job.setPlugin(RiskIncidenceRemoverPlugin.class.getName());
+          job.setPluginParameters(parameters);
+          job.setSourceObjects(new SelectedItemsAll<>(AIP.class.getName()));
+          Jobs.createJob(user, job);
+        } catch (JobAlreadyStartedException e) {
+          LOGGER.error("Could not delete AIP assoaciated incidences");
+        }
       }
 
       // create job report
@@ -2131,4 +2114,5 @@ public class BrowserHelper {
       return new ArrayList<TransferredResource>();
     }
   }
+
 }

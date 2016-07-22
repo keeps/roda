@@ -53,7 +53,12 @@ public class PluginParameter implements Serializable {
     /**
      * Interface to select an Risk Id
      */
-    RISK_ID;
+    RISK_ID,
+
+    /**
+     * Interface to select a severity level
+     */
+    SEVERITY;
   }
 
   /**

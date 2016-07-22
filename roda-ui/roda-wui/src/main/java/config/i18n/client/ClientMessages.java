@@ -47,6 +47,12 @@ public interface ClientMessages extends Messages {
 
   String riskRegisterTitle();
 
+  String riskIncidenceRegisterTitle();
+
+  String editIncidenceTitle();
+
+  String showRiskIncidenceTitle();
+
   String newFormatTitle();
 
   String createFormatTitle();
@@ -76,6 +82,8 @@ public interface ClientMessages extends Messages {
   String showRiskTitle();
 
   String risksTitle();
+
+  String riskIncidencesTitle();
 
   String newDescriptiveMetadataTitle();
 
@@ -765,6 +773,8 @@ public interface ClientMessages extends Messages {
 
   String riskRegisterSearchPlaceHolder();
 
+  String riskIncidenceRegisterSearchPlaceHolder();
+
   String showObjectsRiskCounter(@PluralCount @Optional int counter);
 
   String createRiskFailure(String message);
@@ -1061,6 +1071,10 @@ public interface ClientMessages extends Messages {
   String riskIncidenceObjectId();
 
   String riskIncidenceObjectType();
+
+  String riskIncidenceDetectedOn();
+
+  String riskIncidenceDetectedBy();
 
   String riskObjects();
 

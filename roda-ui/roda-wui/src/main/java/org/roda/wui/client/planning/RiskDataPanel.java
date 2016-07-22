@@ -329,7 +329,7 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
       this.id.setVisible(false);
       incidenceListLabel.setVisible(false);
     } else {
-      Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISKS, risk.getId()));
+      Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISK_ID, risk.getId()));
       incidenceList = new RiskIncidenceList(filter, null, messages.riskIncidences(), true);
       incidenceListPanel.add(incidenceList);
       this.idBox.setVisible(false);

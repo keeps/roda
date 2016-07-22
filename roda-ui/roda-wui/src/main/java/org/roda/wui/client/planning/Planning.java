@@ -89,6 +89,8 @@ public class Planning {
       FormatRegister.getInstance().resolve(Tools.tail(historyTokens), callback);
     } else if (historyTokens.get(0).equals(RiskRegister.RESOLVER.getHistoryToken())) {
       RiskRegister.getInstance().resolve(Tools.tail(historyTokens), callback);
+    } else if (historyTokens.get(0).equals(RiskIncidenceRegister.RESOLVER.getHistoryToken())) {
+      RiskIncidenceRegister.getInstance().resolve(Tools.tail(historyTokens), callback);
     }
   }
 }

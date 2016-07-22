@@ -10,6 +10,7 @@ package org.roda.core.plugins.plugins.risks;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,11 +30,16 @@ import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
+import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -59,11 +65,22 @@ public class RiskJobPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(RiskJobPlugin.class);
 
   private static String riskIds = null;
+  private static String incidenceDescription = "";
+  private static String severity = "";
+
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_ID,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_RISK_ID, "Risks", PluginParameterType.RISK_ID, "", false, false,
         "Add the risks that will be associated with the objects above."));
+
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_DESCRIPTION,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_DESCRIPTION, "Incidence description",
+        PluginParameterType.STRING, "", false, false, "Associate a description to the incidence(s) created"));
+
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_SEVERITY,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_SEVERITY, "Incidence severity",
+        PluginParameterType.SEVERITY, "", false, false, "Associate a severity to the incidence"));
   }
 
   @Override
@@ -73,12 +90,22 @@ public class RiskJobPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_RISK_ID)) {
       riskIds = parameters.get(RodaConstants.PLUGIN_PARAMS_RISK_ID);
     }
+
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_DESCRIPTION)) {
+      incidenceDescription = parameters.get(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_DESCRIPTION);
+    }
+
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_SEVERITY)) {
+      severity = parameters.get(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_SEVERITY);
+    }
   }
 
   @Override
   public List<PluginParameter> getParameters() {
     ArrayList<PluginParameter> parameters = new ArrayList<PluginParameter>();
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_RISK_ID));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_DESCRIPTION));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_SEVERITY));
     return parameters;
   }
 
@@ -121,16 +148,20 @@ public class RiskJobPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
+      String jobId = PluginHelper.getJobId(this);
+      Job job = index.retrieve(Job.class, jobId);
+
       if (!list.isEmpty() && riskIds != null) {
         List<String> risks = Arrays.asList(riskIds.split(","));
         Pair<SimpleJobPluginInfo, Report> jobInfo = new Pair<SimpleJobPluginInfo, Report>();
 
         if (list.get(0) instanceof AIP) {
-          jobInfo = addIncidenceToAIPList(model, index, list, risks, jobPluginInfo, pluginReport);
+          jobInfo = addIncidenceToAIPList(model, index, list, risks, job.getUsername(), jobPluginInfo, pluginReport);
         } else if (list.get(0) instanceof Representation) {
-          jobInfo = addIncidenceToRepresentationList(model, index, list, risks, jobPluginInfo, pluginReport);
+          jobInfo = addIncidenceToRepresentationList(model, index, list, risks, job.getUsername(), jobPluginInfo,
+            pluginReport);
         } else if (list.get(0) instanceof File) {
-          jobInfo = addIncidenceToFileList(model, index, list, risks, jobPluginInfo, pluginReport);
+          jobInfo = addIncidenceToFileList(model, index, list, risks, job.getUsername(), jobPluginInfo, pluginReport);
         }
 
         jobPluginInfo = jobInfo.getFirst();
@@ -142,14 +173,16 @@ public class RiskJobPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       PluginHelper.updateJobInformation(this, jobPluginInfo);
     } catch (JobException e) {
       throw new PluginException("A job exception has occurred", e);
+    } catch (NotFoundException | GenericException e) {
+      LOGGER.error("Could not get job information when creating an incidence");
     }
 
     return pluginReport;
   }
 
   private <T extends Serializable> Pair<SimpleJobPluginInfo, Report> addIncidenceToAIPList(ModelService model,
-    IndexService index, List<T> list, List<String> risks, SimpleJobPluginInfo jobPluginInfo, Report pluginReport)
-    throws JobException {
+    IndexService index, List<T> list, List<String> risks, String jobUsername, SimpleJobPluginInfo jobPluginInfo,
+    Report pluginReport) throws JobException {
 
     List<AIP> aipList = (List<AIP>) list;
     for (AIP aip : aipList) {
@@ -157,8 +190,16 @@ public class RiskJobPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
       for (String riskId : risks) {
         try {
-          model.addRiskIncidence(riskId, aip.getId(), null, null, null);
-        } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
+          RiskIncidence incidence = new RiskIncidence();
+          incidence.setDetectedOn(new Date());
+          incidence.setDetectedBy(jobUsername);
+          incidence.setRiskId(riskId);
+          incidence.setAipId(aip.getId());
+          incidence.setObjectClass(AIP.class.getSimpleName());
+          incidence.setStatus(INCIDENCE_STATUS.UNMITIGATED);
+          incidence.setSeverity(Risk.SEVERITY_LEVEL.valueOf(severity));
+          model.createRiskIncidence(incidence, true);
+        } catch (GenericException e) {
           state = PluginState.FAILURE;
         }
       }
@@ -181,8 +222,8 @@ public class RiskJobPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   }
 
   private <T extends Serializable> Pair<SimpleJobPluginInfo, Report> addIncidenceToRepresentationList(
-    ModelService model, IndexService index, List<T> list, List<String> risks, SimpleJobPluginInfo jobPluginInfo,
-    Report pluginReport) throws JobException {
+    ModelService model, IndexService index, List<T> list, List<String> risks, String jobUsername,
+    SimpleJobPluginInfo jobPluginInfo, Report pluginReport) throws JobException {
 
     List<Representation> representationList = (List<Representation>) list;
     for (Representation representation : representationList) {
@@ -190,8 +231,17 @@ public class RiskJobPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
       for (String riskId : risks) {
         try {
-          model.addRiskIncidence(riskId, representation.getAipId(), representation.getId(), null, null);
-        } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
+          RiskIncidence incidence = new RiskIncidence();
+          incidence.setDetectedOn(new Date());
+          incidence.setDetectedBy(jobUsername);
+          incidence.setRiskId(riskId);
+          incidence.setAipId(representation.getAipId());
+          incidence.setRepresentationId(representation.getId());
+          incidence.setObjectClass(AIP.class.getSimpleName());
+          incidence.setStatus(INCIDENCE_STATUS.UNMITIGATED);
+          incidence.setSeverity(SEVERITY_LEVEL.valueOf(severity));
+          model.createRiskIncidence(incidence, false);
+        } catch (GenericException e) {
           state = PluginState.FAILURE;
         }
       }
@@ -216,8 +266,8 @@ public class RiskJobPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   }
 
   private <T extends Serializable> Pair<SimpleJobPluginInfo, Report> addIncidenceToFileList(ModelService model,
-    IndexService index, List<T> list, List<String> risks, SimpleJobPluginInfo jobPluginInfo, Report pluginReport)
-    throws JobException {
+    IndexService index, List<T> list, List<String> risks, String jobUsername, SimpleJobPluginInfo jobPluginInfo,
+    Report pluginReport) throws JobException {
 
     List<File> fileList = (List<File>) list;
     for (File file : fileList) {
@@ -225,8 +275,19 @@ public class RiskJobPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
       for (String riskId : risks) {
         try {
-          model.addRiskIncidence(riskId, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId());
-        } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
+          RiskIncidence incidence = new RiskIncidence();
+          incidence.setDetectedOn(new Date());
+          incidence.setDetectedBy(jobUsername);
+          incidence.setRiskId(riskId);
+          incidence.setAipId(file.getAipId());
+          incidence.setRepresentationId(file.getRepresentationId());
+          incidence.setFilePath(file.getPath());
+          incidence.setFileId(file.getId());
+          incidence.setObjectClass(AIP.class.getSimpleName());
+          incidence.setStatus(INCIDENCE_STATUS.UNMITIGATED);
+          incidence.setSeverity(SEVERITY_LEVEL.valueOf(severity));
+          model.createRiskIncidence(incidence, false);
+        } catch (GenericException e) {
           state = PluginState.FAILURE;
         }
       }

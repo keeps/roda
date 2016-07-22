@@ -7,13 +7,14 @@
  */
 package org.roda.core.plugins.plugins.risks;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
-import org.roda.core.common.iterables.CloseableIterable;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.SimpleFilterParameter;
+import org.roda.core.data.adapter.sort.Sorter;
+import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -21,12 +22,11 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.common.OptionalWithCause;
+import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
@@ -41,6 +41,7 @@ public class RiskIncidenceRemoverPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(RiskIncidenceRemoverPlugin.class);
 
   private static String riskIds;
+  private static String aipIds;
 
   @Override
   public void init() throws PluginException {
@@ -74,6 +75,10 @@ public class RiskIncidenceRemoverPlugin extends AbstractPlugin<AIP> {
     if (parameters.containsKey("riskIds")) {
       riskIds = parameters.get("riskIds");
     }
+
+    if (parameters.containsKey("aipIds")) {
+      aipIds = parameters.get("aipIds");
+    }
   }
 
   @Override
@@ -84,29 +89,33 @@ public class RiskIncidenceRemoverPlugin extends AbstractPlugin<AIP> {
     Report pluginReport = PluginHelper.initPluginReport(this);
 
     try {
+
+      Filter filter = new Filter();
+      int size = 0;
+
       if (riskIds != null) {
         String[] risks = riskIds.split(",");
+        size = risks.length;
+
         for (String riskId : risks) {
-          for (AIP aip : list) {
-            model.deleteRiskIncidence(riskId, aip.getId(), null, null, null);
+          filter.add(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISK_ID, riskId));
+        }
+      } else if (aipIds != null) {
+        String[] aips = aipIds.split(",");
+        size = aips.length;
 
-            for (Representation representation : aip.getRepresentations()) {
-              model.deleteRiskIncidence(riskId, aip.getId(), representation.getId(), null, null);
-
-              boolean recursive = true;
-              CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
-                representation.getId(), recursive);
-
-              for (OptionalWithCause<File> ofile : allFiles) {
-                File file = ofile.get();
-                model.deleteRiskIncidence(riskId, aip.getId(), representation.getId(), new ArrayList<>(), file.getId());
-              }
-
-              IOUtils.closeQuietly(allFiles);
-            }
-          }
+        for (String aipId : aips) {
+          filter.add(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, aipId));
         }
       }
+
+      IndexResult<RiskIncidence> incidences = index.find(RiskIncidence.class, filter, Sorter.NONE,
+        new Sublist(0, size));
+
+      for (RiskIncidence incidence : incidences.getResults()) {
+        model.deleteRiskIncidence(incidence.getId(), false);
+      }
+
     } catch (GenericException | NotFoundException | AuthorizationDeniedException | RequestNotValidException e) {
       LOGGER.error("Could not delete risk incidence");
     }

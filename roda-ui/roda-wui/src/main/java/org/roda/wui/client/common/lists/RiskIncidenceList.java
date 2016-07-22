@@ -8,6 +8,7 @@
 package org.roda.wui.client.common.lists;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,10 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.common.client.ClientLogger;
 
+import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
@@ -40,6 +44,8 @@ public class RiskIncidenceList extends BasicAsyncTableCell<RiskIncidence> {
 
   private TextColumn<RiskIncidence> objectColumn;
   private TextColumn<RiskIncidence> objectTypeColumn;
+  private Column<RiskIncidence, Date> detectedOnColumn;
+  private TextColumn<RiskIncidence> detectedByColumn;
 
   public RiskIncidenceList() {
     super(null, null, null, false);
@@ -85,11 +91,31 @@ public class RiskIncidenceList extends BasicAsyncTableCell<RiskIncidence> {
       }
     };
 
+    detectedOnColumn = new Column<RiskIncidence, Date>(
+      new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_LONG))) {
+      @Override
+      public Date getValue(RiskIncidence incidence) {
+        return incidence != null ? incidence.getDetectedOn() : null;
+      }
+    };
+
+    detectedByColumn = new TextColumn<RiskIncidence>() {
+
+      @Override
+      public String getValue(RiskIncidence incidence) {
+        return incidence != null ? incidence.getDetectedBy() : null;
+      }
+    };
+
     objectColumn.setSortable(true);
     objectTypeColumn.setSortable(true);
+    detectedOnColumn.setSortable(true);
+    detectedByColumn.setSortable(true);
 
     // TODO externalize strings into constants
     addColumn(objectColumn, messages.riskIncidenceObjectId(), false, false);
+    addColumn(detectedOnColumn, messages.riskIncidenceDetectedOn(), false, false);
+    addColumn(detectedByColumn, messages.riskIncidenceDetectedBy(), false, false);
     addColumn(objectTypeColumn, messages.riskIncidenceObjectType(), true, true, 8);
 
     // define default sorting
@@ -111,6 +137,8 @@ public class RiskIncidenceList extends BasicAsyncTableCell<RiskIncidence> {
       Map<Column<RiskIncidence, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<RiskIncidence, ?>, List<String>>();
       columnSortingKeyMap.put(objectColumn, Arrays.asList(RodaConstants.RISK_INCIDENCE_AIP_ID,
         RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, RodaConstants.RISK_INCIDENCE_FILE_ID));
+      columnSortingKeyMap.put(detectedOnColumn, Arrays.asList(RodaConstants.RISK_INCIDENCE_DETECTED_ON));
+      columnSortingKeyMap.put(detectedByColumn, Arrays.asList(RodaConstants.RISK_INCIDENCE_DETECTED_BY));
       columnSortingKeyMap.put(objectTypeColumn, Arrays.asList(RodaConstants.RISK_INCIDENCE_OBJECT_CLASS));
 
       Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);

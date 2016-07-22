@@ -1494,23 +1494,6 @@ public class Browser extends RodaCoreService {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "selected", selected);
   }
 
-  public static List<String> getRiskOnAIP(RodaUser user, String aipId)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {
-    };
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    // delegate
-    List<String> riskList = BrowserHelper.getRiskOnAIP(aipId);
-
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "aipId", aipId);
-
-    return riskList;
-  }
-
   public static void deleteRiskIncidences(RodaUser user, String id, SelectedItems<RiskIncidence> incidences)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {
@@ -1659,4 +1642,5 @@ public class Browser extends RodaCoreService {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "selected", selected);
     return ret;
   }
+
 }

@@ -210,6 +210,9 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
         SearchFieldPanel searchAdvancedFieldPanel = (SearchFieldPanel) fieldsPanel.getWidget(i);
         FilterParameter filterParameter = searchAdvancedFieldPanel.getFilter();
 
+        // TODO 20160721 Use a OrFilterParameter to treat cases with multiple
+        // field appearance
+
         if (filterParameter != null) {
           parameters.add(filterParameter);
         }

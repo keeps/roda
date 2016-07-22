@@ -244,9 +244,6 @@ public interface BrowserService extends RemoteService {
     Map<String, String> value, String selectedClass) throws AuthorizationDeniedException, RequestNotValidException,
     NotFoundException, GenericException, JobAlreadyStartedException;
 
-  List<String> getRiskOnAIP(String aipId)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException;
-
   void deleteRiskIncidences(String id, SelectedItems<RiskIncidence> incidences)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
