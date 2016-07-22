@@ -1,12 +1,12 @@
 package org.roda.wui.common;
 
+import java.lang.reflect.Method;
 import java.util.Date;
 
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.user.RodaUser;
-import java.lang.reflect.Method;
 
 public class ControllerAssistant {
   private final Date startDate;
