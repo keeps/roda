@@ -386,10 +386,16 @@ pre code {
 }
 
 .form-separator {
-	margin-top: 5px;
-	margin-bottom: 20px;
-	text-transform: uppercase;
-	text-decoration: underline;
+	background-color: #999;
+color: WHITE;
+border-bottom: 0px SOLID #089DE3;
+font-size: 16px;
+margin: 0 -15px;
+padding: 5px 15px;
+}
+
+.form-separator:first-child{
+	margin-top:-15px;
 }
 
 .form-integerbox {
@@ -721,6 +727,7 @@ pre code {
     color: white;
     background-color: #999;
     text-align: center;
+    border-left: 1px SOLID WHITE;
 }
 
 .toolbarLink.toolbarLinkSmall {
@@ -735,6 +742,7 @@ pre code {
 .toolbarLink.active {
     color: white;
     background-color: #089de3;
+    
 }
 
 .nowrap {
