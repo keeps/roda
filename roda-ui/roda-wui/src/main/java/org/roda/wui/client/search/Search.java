@@ -125,6 +125,8 @@ public class Search extends Composite {
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
+  private final Map<String, SearchField> searchFields = new HashMap<String, SearchField>();
+
   @UiField
   FlowPanel searchDescription;
 
@@ -166,8 +168,6 @@ public class Search extends Composite {
   Button moveItem;
 
   ListBox searchAdvancedFieldOptions;
-
-  private final Map<String, SearchField> searchFields = new HashMap<String, SearchField>();
 
   boolean selectable = true;
   boolean justActive = true;
@@ -341,7 +341,7 @@ public class Search extends Composite {
     }
 
     Filter filter;
-    if (parameters.size() == 0) {
+    if (parameters.isEmpty()) {
       filter = defaultFilter;
     } else {
       filter = new Filter(parameters);
@@ -351,12 +351,24 @@ public class Search extends Composite {
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.size() == 0) {
+    if (historyTokens.isEmpty()) {
       itemsSearchResultPanel.refresh();
       callback.onSuccess(this);
     } else {
-      Tools.newHistory(RESOLVER);
-      callback.onSuccess(null);
+      // #search/TYPE/key/value/key/value
+      String type = historyTokens.get(0);
+
+      if (RodaConstants.SEARCH_LIST_BOX_ITEMS.equals(type)) {
+        // TODO searchPanel.setDropdownSelectedValue(type);
+      } else if (RodaConstants.SEARCH_LIST_BOX_REPRESENTATIONS.equals(type)) {
+        // TODO searchPanel.setDropdownSelectedValue(type);
+      } else if (RodaConstants.SEARCH_LIST_BOX_FILES.equals(type)) {
+        // TODO searchPanel.setDropdownSelectedValue(type);
+      } else {
+        Toast.showError("Unrecognized search type: " + type);
+        Tools.newHistory(RESOLVER);
+        callback.onSuccess(null);
+      }
     }
   }
 

@@ -220,11 +220,11 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
     if (defaultFilterIncremental) {
       filter = defaultFilter != null ? new Filter(defaultFilter) : new Filter();
       filter.add(parameters);
-      searchPreFilters.setVisible(filter != null && filter.getParameters().size() > 0);
+      searchPreFilters.setVisible(filter != null && !filter.getParameters().isEmpty());
       GWT.log("Incremental filter: " + filter);
-    } else if (parameters.size() == 0) {
+    } else if (parameters.isEmpty()) {
       filter = defaultFilter;
-      searchPreFilters.setVisible(filter != null && filter.getParameters().size() > 0);
+      searchPreFilters.setVisible(filter != null && !filter.getParameters().isEmpty());
       GWT.log("Default filter: " + filter);
     } else {
       filter = new Filter(parameters);
