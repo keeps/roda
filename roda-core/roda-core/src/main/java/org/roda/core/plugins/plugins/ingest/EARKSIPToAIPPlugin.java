@@ -135,19 +135,15 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
 
         AIP aip;
 
-        IndexResult<IndexedAIP> result = index.find(IndexedAIP.class,
-                new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, sip.getId())), Sorter.NONE,
-                new Sublist(0, 1));
-        IndexedAIP indexedAIP = null;
-        AIP originalAIP = null;
-        if (result.getTotalCount() == 1) {
-          indexedAIP = result.getResults().get(0);
-          originalAIP = model.retrieveAIP(indexedAIP.getId());
-        }
+
 
         // Status is UPDATE or the AIP is a ghost
-        if(IPEnums.IPStatus.UPDATE == sip.getStatus() || (originalAIP != null && originalAIP.getGhost())){
-          if(indexedAIP != null) {
+        if(IPEnums.IPStatus.UPDATE == sip.getStatus()){
+          IndexResult<IndexedAIP> result = index.find(IndexedAIP.class,
+                  new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, sip.getId())), Sorter.NONE,
+                  new Sublist(0, 1));
+          if (result.getTotalCount() == 1) {
+            IndexedAIP indexedAIP = result.getResults().get(0);
             // Update the AIP
             aip = EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP.getId(), model, storage);
           }else {

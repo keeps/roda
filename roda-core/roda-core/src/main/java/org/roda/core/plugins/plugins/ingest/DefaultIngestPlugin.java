@@ -298,7 +298,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
                 Sorter.NONE, new Sublist(0, 1));
 
         if(result.getTotalCount() > 1){
-          //error
+          // TODO apereira 25/07/2016 throw error
         } else if(result.getTotalCount() == 1){
           IndexedAIP newParentIAIP = result.getResults().get(0);
           index.execute(IndexedAIP.class,
@@ -311,22 +311,13 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
               }
             });
           try {
-            // Move the AIP to the ghost's parent
-            if(newParentIAIP.getParentID() == null || ghost.getParentID() != null) {
-              model.moveAIP(newParentIAIP.getId(), ghost.getParentID());
-            }
             model.deleteAIP(ghost.getId());
           } catch (NotFoundException e) {
             LOGGER.debug("Can't delete ghost or move node. It wasn't found.", e);
           }
         }else if(result.getTotalCount() == 0){
-
+          // TODO apereira 25/07/2016 check if there are other ghosts with the same sip id and from the same job, move all of this ghost children
         }
-        // if result total count > 1 then error
-        // if result total count == 1 then move all children and delete ghost
-        // if result total count == 0 then check if there are other ghosts with the same sip id and from the same job, move all of this ghost children
-
-
       });
   }
 
