@@ -36,6 +36,7 @@
 	<xsl:param name="i18n.accessrestrictions" />
 	<xsl:param name="i18n.userestrict" />
 	<xsl:param name="i18n.languages" />
+	<xsl:param name="i18n.languagesMaterial" />
 	
 	<xsl:param name="i18n.alliedArea" />	
 	<xsl:param name="i18n.originalsloc" />
@@ -568,18 +569,11 @@
 				</div>
 			</xsl:if>
 			<xsl:if
-				test="normalize-space(string-join(//ead:did/ead:langmaterial/text(),''))!=''">
+				test="normalize-space(string-join(//ead:did/ead:langmaterial/ead:language/text(),''))!=''">
 				<div class="field">
 					<div class="label">
 						<xsl:value-of select="$i18n.languages" />
 					</div>
-					<xsl:for-each select="//ead:did/ead:langmaterial">
-						<xsl:if test="normalize-space(string-join(text(),''))!=''">
-							<div class="value">
-								<xsl:value-of select="text()" />
-							</div>
-						</xsl:if>
-					</xsl:for-each>
 					<xsl:for-each select="//ead:did/ead:langmaterial/ead:language">
 						<xsl:if test="normalize-space(string-join(text(),''))!=''">
 							<div class="value">
@@ -589,6 +583,29 @@
 					</xsl:for-each>
 				</div>
 			</xsl:if>
+			<xsl:if
+				test="normalize-space(string-join(//ead:did/ead:langmaterial[not(*)]/text(),''))!=''">
+				<div class="field">
+					<div class="label">
+						<xsl:value-of select="$i18n.languagesMaterial" />
+					</div>
+					<xsl:for-each select="//ead:did/ead:langmaterial[not(*)]">
+						<xsl:if test="normalize-space(string-join(text(),''))!=''">
+							<div class="value">
+								<xsl:value-of select="text()" />
+							</div>
+						</xsl:if>
+					</xsl:for-each>
+				</div>
+			</xsl:if>
+			
+			
+			
+			
+			
+			
+			
+			
 			<xsl:if test="//ead:originalsloc/ead:p/text()|//ead:altformavail/ead:p/text()|//ead:relatedmaterial/ead:p/text()|//ead:bibliography/ead:p/text()">
 				<div class="form-separator"><xsl:value-of select="$i18n.alliedArea" /></div>
 			</xsl:if>

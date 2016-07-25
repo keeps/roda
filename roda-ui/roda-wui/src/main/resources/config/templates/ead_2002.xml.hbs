@@ -11,8 +11,8 @@
 {{~field name="otherlevel" 				hidden="true" order="110" label="{\"en\": \"Other level\", \"pt_PT\": \"Outro nível\"}" xpath="/*:ead/*:archdesc/@otherlevel/string()"~}}
 {{~field name="extent" 					hidden="true" order="120" type="text-area" label="{'en': 'Extent and medium', 'pt_PT': 'Dimensão e suporte'}" xpath="/*:ead/*:archdesc/*:did/*:physdesc/string()"~}}
 {{~field name="contextArea" 			order="130" type="separator" label="{'en': 'Context', 'pt_PT': 'Contexto'}"~}}
-{{~field name="creator"     			order="140" label="{'en': 'Name of creator(s)', 'pt_PT': 'Nome do(s)'}" xpath="/*:ead/*:archdesc/*:did/*:origination/*:name/string()"~}}
-{{~field name="producer"    			order="150" label="{'en': 'Producer', 'pt_PT': 'Produtor'}" xpath="/*:ead/*:archdesc/*:did/*:origination[@label='producer']/string()"~}}
+{{~field name="creator"     			order="140" label="{'en': 'Name of creator(s)', 'pt_PT': 'Nome do(s)'}" xpath="/*:ead/*:archdesc/*:did/*:origination[@label='creator']/*:name/string()"~}}
+{{~field name="producer"    			order="150" label="{'en': 'Producer', 'pt_PT': 'Produtor'}" xpath="/*:ead/*:archdesc/*:did/*:origination[@label='producer']/*:name/string()"~}}
 {{~field name="repository" 				order="160" label="{'en': 'Repository', 'pt_PT': 'Repositório'}" xpath="/*:ead/*:archdesc/*:did/*:repository/*:corpname/string()"~}}
 {{~field name="publicationDate" 		hidden="true" order="170" label="{'en': 'Publication date', 'pt_PT': 'Data de publicação'}" xpath="/*:ead/*:eadheader/*:filedesc/*:publicationstmt/*:date/string()"~}}
 {{~field name="custodhist"		 		order="180" type="text-area" label="{'en': 'Archival history', 'pt_PT': 'História custodial'}" xpath="/*:ead/*:archdesc/*:custodhist/*:p/string()"~}}
