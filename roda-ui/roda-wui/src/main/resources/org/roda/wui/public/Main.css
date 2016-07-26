@@ -3905,7 +3905,7 @@ td.datePickerMonth, td.datePickerYear {
     position: absolute;
 }
 
-#upload-list li span:after {
+#upload-list li span.icon:after {
     display: inline-block;
     font: normal normal normal 14px/1 FontAwesome;
     font-size: 1.5rem;
@@ -3925,7 +3925,7 @@ td.datePickerMonth, td.datePickerYear {
     animation:none;
 }
 
-#upload-list li.working span:after {
+#upload-list li.working span.icon:after {
     content: "\f1ce";
     color: #f4d03f;
     -webkit-animation:spin 3s linear infinite;
@@ -3940,7 +3940,7 @@ td.datePickerMonth, td.datePickerYear {
     color: #D20707;
 }
 
-#upload-list li.error span:after {
+#upload-list li.error span.icon:after {
     content: "\f071";
     color: #D20707;
     -webkit-animation: none;
@@ -3949,6 +3949,10 @@ td.datePickerMonth, td.datePickerYear {
 }
 #upload-list li.error:before {
     content: "";
+}
+
+#upload-list li.error .errorMessage {
+	margin-left: 20px;
 }
 
 

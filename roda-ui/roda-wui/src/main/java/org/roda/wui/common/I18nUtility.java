@@ -12,6 +12,7 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.Messages;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.FacetFieldResult;
 import org.roda.core.data.v2.index.FacetValue;
@@ -66,4 +67,9 @@ public class I18nUtility {
     return ret;
   }
 
+  public static String getMessage(String key, String defaultMessage, String localeString) {
+    Locale locale = ServerTools.parseLocale(localeString);
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
+    return messages.getTranslation(key, defaultMessage);
+  }
 }

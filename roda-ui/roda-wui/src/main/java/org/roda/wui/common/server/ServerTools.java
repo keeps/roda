@@ -23,6 +23,7 @@ import java.util.TreeSet;
 
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.client.browse.MetadataValue;
@@ -51,14 +52,19 @@ public class ServerTools {
    * @return
    */
   public static Locale parseLocale(String localeString) {
-    String[] localeArgs = localeString.split("_");
     Locale locale = null;
-    if (localeArgs.length == 1) {
-      locale = new Locale(localeArgs[0]);
-    } else if (localeArgs.length == 2) {
-      locale = new Locale(localeArgs[0], localeArgs[1]);
-    } else if (localeArgs.length == 3) {
-      locale = new Locale(localeArgs[0], localeArgs[1], localeArgs[2]);
+    if (StringUtils.isNotBlank(localeString)) {
+      String[] localeArgs = localeString.split("_");
+
+      if (localeArgs.length == 1) {
+        locale = new Locale(localeArgs[0]);
+      } else if (localeArgs.length == 2) {
+        locale = new Locale(localeArgs[0], localeArgs[1]);
+      } else if (localeArgs.length == 3) {
+        locale = new Locale(localeArgs[0], localeArgs[1], localeArgs[2]);
+      }
+    } else {
+      locale = Locale.ENGLISH;
     }
 
     return locale;

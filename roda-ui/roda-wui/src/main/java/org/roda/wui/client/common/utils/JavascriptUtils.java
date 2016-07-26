@@ -121,10 +121,10 @@ public class JavascriptUtils {
         add: function (e, data) {
 
             var tpl = $wnd.jQuery('<li class="working"><input type="text" value="0" data-width="30" data-height="30"'+
-                ' data-fgColor="#089de3" data-readOnly="1" data-bgColor="#3e4043" /><p></p><span></span></li>');
+                ' data-fgColor="#089de3" data-readOnly="1" data-bgColor="#3e4043" /><p></p><span class="icon"></span></li>');
 
             // Append the file name and file size
-            tpl.find('p').text(data.files[0].name)
+            tpl.find('p').text(data.files[0].name).append('<span class="errorMessage"></span>')
                          .append('<i>' + formatFileSize(data.files[0].size) + '</i>');
 
             // Add the HTML to the UL element
@@ -169,6 +169,7 @@ public class JavascriptUtils {
             data.context.addClass('error');
             data.context[0].setAttribute("data-toggle", "tooltip");
             data.context[0].setAttribute("title", data.jqXHR.responseJSON.message);
+            data.context.find('span.errorMessage').text('(' + data.jqXHR.responseJSON.message + ')');
             $wnd.console.log("data"+data+" error thrown: "+data.errorThrown);
         },
     });

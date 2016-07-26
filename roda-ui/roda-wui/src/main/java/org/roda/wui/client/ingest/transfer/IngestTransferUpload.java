@@ -30,6 +30,7 @@ import com.google.gwt.event.dom.client.DragOverHandler;
 import com.google.gwt.event.dom.client.DropEvent;
 import com.google.gwt.event.dom.client.DropHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -133,9 +134,10 @@ public class IngestTransferUpload extends Composite {
 
     if (resource == null) {
       // upload to root
-      ret = RestUtils.createTransferredResourceUploadUri(null);
+      ret = RestUtils.createTransferredResourceUploadUri(null, LocaleInfo.getCurrentLocale().getLocaleName());
     } else if (resource != null && !resource.isFile()) {
-      ret = RestUtils.createTransferredResourceUploadUri(resource.getUUID());
+      ret = RestUtils.createTransferredResourceUploadUri(resource.getUUID(),
+        LocaleInfo.getCurrentLocale().getLocaleName());
     } else {
       ret = null;
     }

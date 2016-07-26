@@ -81,7 +81,7 @@ public class TransferredResourcesScanner {
   }
 
   public TransferredResource createFile(String parentUUID, String fileName, InputStream inputStream)
-    throws GenericException, RequestNotValidException, NotFoundException {
+    throws GenericException, RequestNotValidException, NotFoundException, AlreadyExistsException {
     Path parentPath;
     if (StringUtils.isNotBlank(parentUUID)) {
       TransferredResource parent = index.retrieve(TransferredResource.class, parentUUID);
@@ -90,18 +90,22 @@ public class TransferredResourcesScanner {
       parentPath = basePath;
     }
 
+    Path file = parentPath.resolve(fileName);
     try {
       try {
         Files.createDirectories(parentPath);
       } catch (FileAlreadyExistsException e) {
         // do nothing and carry on
       }
-      Path file = parentPath.resolve(fileName);
+
       Files.copy(inputStream, file);
       BasicFileAttributes attrs = Files.readAttributes(file, BasicFileAttributes.class);
       TransferredResource resource = createTransferredResource(file, attrs, attrs.size(), basePath, new Date());
       index.create(TransferredResource.class, resource);
       return resource;
+    } catch (FileAlreadyExistsException e) {
+      LOGGER.error("Cannot create file", e);
+      throw new AlreadyExistsException(file.toString());
     } catch (IOException e) {
       LOGGER.error("Cannot create file", e);
       throw new GenericException("Cannot create file", e);
@@ -214,7 +218,7 @@ public class TransferredResourcesScanner {
 
   public String renameTransferredResource(TransferredResource resource, String newName, boolean replaceExisting,
     boolean reindexResources)
-    throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
+      throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
 
     if (Files.exists(Paths.get(resource.getFullPath()))) {
       Path resourcePath = Paths.get(resource.getFullPath());
@@ -233,13 +237,13 @@ public class TransferredResourcesScanner {
 
   public Map<String, String> moveTransferredResource(List<TransferredResource> resources, String newRelativePath,
     boolean replaceExisting, boolean reindexResources)
-    throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
+      throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
     return moveTransferredResource(resources, newRelativePath, replaceExisting, reindexResources, false);
   }
 
   public Map<String, String> moveTransferredResource(String newRelativePath, List<String> resourcesUUIDs,
     boolean replaceExisting)
-    throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
+      throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
     List<TransferredResource> resources = Collections.emptyList();
     try {
       resources = index.retrieve(TransferredResource.class, resourcesUUIDs);
@@ -251,7 +255,7 @@ public class TransferredResourcesScanner {
 
   public Map<String, String> moveTransferredResource(List<TransferredResource> resources, String newRelativePath,
     boolean replaceExisting, boolean reindexResources, boolean areResourcesFromSameFolder)
-    throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
+      throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
 
     Map<String, String> oldToNewTransferredResourceIds = new HashMap<String, String>();
     List<TransferredResource> resourcesToIndex = new ArrayList<TransferredResource>();

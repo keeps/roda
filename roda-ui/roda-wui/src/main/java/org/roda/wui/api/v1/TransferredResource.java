@@ -21,11 +21,13 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
@@ -38,6 +40,7 @@ import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.StreamResponse;
+import org.roda.wui.common.I18nUtility;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -55,7 +58,7 @@ public class TransferredResource {
   @GET
   public Response getResource(
     @ApiParam(value = "The resource id", required = false) @QueryParam(RodaConstants.TRANSFERRED_RESOURCE_RESOURCE_ID) String resourceId)
-    throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException {
+      throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException {
 
     // get user
     RodaUser user = UserUtility.getApiUser(request);
@@ -70,16 +73,23 @@ public class TransferredResource {
   public Response createResource(
     @ApiParam(value = "The id of the parent") @QueryParam(RodaConstants.TRANSFERRED_RESOURCE_PARENT_UUID) String parentUUID,
     @ApiParam(value = "The name of the directory to create", required = false) @QueryParam(RodaConstants.TRANSFERRED_RESOURCE_DIRECTORY_NAME) String name,
+    @ApiParam(value = "Locale", required = false) @QueryParam(RodaConstants.LOCALE) String localeString,
     @FormDataParam("upl") InputStream inputStream, @FormDataParam("upl") FormDataContentDisposition fileDetail)
-    throws RODAException {
+      throws RODAException {
 
     // get user
     RodaUser user = UserUtility.getApiUser(request);
     // delegate action to controller
-    org.roda.core.data.v2.ip.TransferredResource transferredResource = Browser.createTransferredResource(user,
-      parentUUID, fileDetail.getFileName(), inputStream, name, true);
 
-    return Response.ok().entity(transferredResource).build();
+    try {
+      org.roda.core.data.v2.ip.TransferredResource transferredResource = Browser.createTransferredResource(user,
+        parentUUID, fileDetail.getFileName(), inputStream, name, true);
+
+      return Response.ok().entity(transferredResource).build();
+    } catch (AlreadyExistsException e) {
+      return Response.status(Status.CONFLICT).entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
+        I18nUtility.getMessage("ui.upload.error.alreadyexists", e.getMessage(), localeString))).build();
+    }
   }
 
   @DELETE
