@@ -2031,8 +2031,16 @@ td.datePickerMonth, td.datePickerYear {
     color: inherit;
 }
 
-.descriptiveMetadata {
+.descriptiveMetadataHTML {
     padding-top: 25px;
+}
+
+.descriptiveMetadata {
+	padding-top: 25px;
+}
+
+.descriptiveMetadataHTML .descriptiveMetadata {
+	padding-top: 0px;
 }
 
 .descriptiveMetadata .title, .preservationMetadata .title {
@@ -3686,6 +3694,10 @@ td.datePickerMonth, td.datePickerYear {
 .viewRepresentationNotSupportedDownloadButton {
     font-size: 1.2rem;
     padding: 8px 20px;
+}
+
+.viewRepresentationNotSupportedDownloadButton::after {
+	content: "";
 }
 
 .viewRepresentationAudioFilePreviewHTML .fa-5 {

@@ -691,7 +691,9 @@ public class Browse extends Composite {
 
             b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
 
+            b.append(SafeHtmlUtils.fromSafeConstant("<div class='descriptiveMetadataHTML'>"));
             b.append(SafeHtmlUtils.fromTrustedString(html));
+            b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
             SafeHtml safeHtml = b.toSafeHtml();
 
             callback.onSuccess(safeHtml);
