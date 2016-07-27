@@ -45,20 +45,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 // FIXME this should be moved to a more meaningful maven module
+/**
+ * ApacheDS.
+ * 
+ * @see <a href="https://directory.apache.org/apacheds/">https://directory.
+ *      apache.org/apacheds/</a>
+ */
 public class ApacheDS {
+  /** Class logger. */
   private static final Logger LOGGER = LoggerFactory.getLogger(ApacheDS.class);
 
+  /** RODA instance name. */
   private static final String INSTANCE_NAME = "RODA";
-  private static final String BASE_DN = "dc=roda,dc=org";
 
-  /** The directory service */
+  /** The directory service. */
   private DirectoryService service;
 
-  /** The LDAP server */
+  /** The LDAP server. */
   private LdapServer server;
 
   /**
-   * Add a new partition to the server
+   * Add a new partition to the server.
    *
    * @param partitionId
    *          The partition Id
@@ -70,11 +77,13 @@ public class ApacheDS {
    * @throws Exception
    *           If the partition can't be added
    */
-  private JdbmPartition addPartition(String partitionId, String partitionDn, DnFactory dnFactory) throws Exception {
+  private JdbmPartition addPartition(final String partitionId, final String partitionDn, final DnFactory dnFactory)
+    throws Exception {
     // Create a new partition with the given partition id
-    JdbmPartition partition = new JdbmPartition(service.getSchemaManager(), dnFactory);
+    final JdbmPartition partition = new JdbmPartition(service.getSchemaManager(), dnFactory);
     partition.setId(partitionId);
-    partition.setPartitionPath(new File(service.getInstanceLayout().getPartitionsDirectory(), partitionId).toURI());
+    partition
+      .setPartitionPath(new File(service.getInstanceLayout().getPartitionsDirectory(), partitionId).toURI());
     partition.setSuffixDn(new Dn(partitionDn));
     service.addPartition(partition);
 
@@ -82,16 +91,16 @@ public class ApacheDS {
   }
 
   /**
-   * Add a new set of index on the given attributes
+   * Add a new set of index on the given attributes.
    *
    * @param partition
    *          The partition on which we want to add index
    * @param attrs
    *          The list of attributes to index
    */
-  private void addIndex(JdbmPartition partition, String... attrs) {
+  private void addIndex(final JdbmPartition partition, final String... attrs) {
     // Index some attributes on the apache partition
-    Set<Index<?, String>> indexedAttributes = new HashSet<Index<?, String>>();
+    final Set<Index<?, String>> indexedAttributes = new HashSet<>();
 
     for (String attribute : attrs) {
       indexedAttributes.add(new JdbmIndex<String>(attribute, false));
@@ -101,32 +110,32 @@ public class ApacheDS {
   }
 
   /**
-   * initialize the schema manager and add the schema partition to directory
-   * service
+   * Initialize the schema manager and add the schema partition to directory
+   * service.
    *
    * @throws Exception
    *           if the schema LDIF files are not found on the classpath
    */
   private void initSchemaPartition() throws Exception {
-    InstanceLayout instanceLayout = service.getInstanceLayout();
+    final InstanceLayout instanceLayout = service.getInstanceLayout();
 
-    File schemaPartitionDirectory = new File(instanceLayout.getPartitionsDirectory(), "schema");
+    final File schemaPartitionDirectory = new File(instanceLayout.getPartitionsDirectory(), "schema");
 
     // Extract the schema on disk (a brand new one) and load the registries
     if (!schemaPartitionDirectory.exists()) {
-      SchemaLdifExtractor extractor = new DefaultSchemaLdifExtractor(instanceLayout.getPartitionsDirectory());
+      final SchemaLdifExtractor extractor = new DefaultSchemaLdifExtractor(instanceLayout.getPartitionsDirectory());
       extractor.extractOrCopy();
     }
 
-    SchemaLoader loader = new LdifSchemaLoader(schemaPartitionDirectory);
-    SchemaManager schemaManager = new DefaultSchemaManager(loader);
+    final SchemaLoader loader = new LdifSchemaLoader(schemaPartitionDirectory);
+    final SchemaManager schemaManager = new DefaultSchemaManager(loader);
 
     // We have to load the schema now, otherwise we won't be able
     // to initialize the Partitions, as we won't be able to parse
     // and normalize their suffix Dn
     schemaManager.loadAllEnabled();
 
-    List<Throwable> errors = schemaManager.getErrors();
+    final List<Throwable> errors = schemaManager.getErrors();
 
     if (!errors.isEmpty()) {
       throw new LdapUtilityException("Error while loading apacheds schemas");
@@ -135,11 +144,11 @@ public class ApacheDS {
     service.setSchemaManager(schemaManager);
 
     // Init the LdifPartition with schema
-    LdifPartition schemaLdifPartition = new LdifPartition(schemaManager, service.getDnFactory());
+    final LdifPartition schemaLdifPartition = new LdifPartition(schemaManager, service.getDnFactory());
     schemaLdifPartition.setPartitionPath(schemaPartitionDirectory.toURI());
 
     // The schema partition
-    SchemaPartition schemaPartition = new SchemaPartition(schemaManager);
+    final SchemaPartition schemaPartition = new SchemaPartition(schemaManager);
     schemaPartition.setWrappedPartition(schemaLdifPartition);
     service.setSchemaPartition(schemaPartition);
   }
@@ -150,20 +159,28 @@ public class ApacheDS {
    *
    * @param dataDirectory
    *          the directory to be used for storing the data
+   * @param adminDN
+   *          admin DN.
    * @param adminPassword
    *          the admin password to be set in the first time the server is
    *          started
+   * @param ldapBaseDN
+   *          LDAP base DN.
+   * @param ldifs
+   *          LDIF files to apply to Directory Service.
    * @throws Exception
    *           if there were some problems while initializing the system
    */
-  public void initDirectoryService(Path dataDirectory, String adminPassword, List<String> ldifs) throws Exception {
+  public void initDirectoryService(final Path dataDirectory, final String adminDN, final String adminPassword,
+    final String ldapBaseDN, final List<String> ldifs) throws Exception {
     // Initialize the LDAP service
-    JdbmPartition rodaPartition = instantiateDirectoryService(dataDirectory);
+    final JdbmPartition rodaPartition = instantiateDirectoryService(dataDirectory, ldapBaseDN);
 
     // Inject the context entry for dc=roda,dc=org partition
     if (!service.getAdminSession().exists(rodaPartition.getSuffixDn())) {
-      Dn dnApache = new Dn(BASE_DN);
-      Entry entryRoda = service.newEntry(dnApache);
+      final Dn dnApache = new Dn(ldapBaseDN);
+      final Entry entryRoda = service.newEntry(dnApache);
+      // @checkstyle MultipleStringLiterals (1 line)
       entryRoda.add("objectClass", "top", "domain", "extensibleObject");
       entryRoda.add("dc", "roda");
       service.getAdminSession().add(entryRoda);
@@ -177,7 +194,7 @@ public class ApacheDS {
 
       // change apacheds admin password
       modifyRequestImpl = new ModifyRequestImpl();
-      modifyRequestImpl.setName(new Dn("uid=admin,ou=system"));
+      modifyRequestImpl.setName(new Dn(adminDN));
       modifyRequestImpl.replace("userPassword", adminPassword);
       service.getAdminSession().modify(modifyRequestImpl);
 
@@ -187,12 +204,23 @@ public class ApacheDS {
     }
   }
 
-  public JdbmPartition instantiateDirectoryService(Path dataDirectory) throws Exception {
-    service = new DefaultDirectoryService();
+  /**
+   * Instantiate Directory Service.
+   * 
+   * @param dataDirectory
+   *          the data directory.
+   * @param ldapBaseDN
+   *          LDAP base DN.
+   * @return RODA {@link JdbmPartition}
+   * @throws Exception
+   *           if some error occurs.
+   */
+  public JdbmPartition instantiateDirectoryService(final Path dataDirectory, final String ldapBaseDN) throws Exception {
+    this.service = new DefaultDirectoryService();
     service.setInstanceId(INSTANCE_NAME);
     service.setInstanceLayout(new InstanceLayout(dataDirectory.toFile()));
 
-    CacheService cacheService = new CacheService();
+    final CacheService cacheService = new CacheService();
     cacheService.initialize(service.getInstanceLayout());
 
     service.setCacheService(cacheService);
@@ -205,7 +233,8 @@ public class ApacheDS {
     // DO NOT add this via addPartition() method, trunk code complains about
     // duplicate partition
     // while initializing
-    JdbmPartition systemPartition = new JdbmPartition(service.getSchemaManager(), service.getDnFactory());
+    final JdbmPartition systemPartition = new JdbmPartition(service.getSchemaManager(),
+      service.getDnFactory());
     systemPartition.setId("system");
     systemPartition.setPartitionPath(
       new File(service.getInstanceLayout().getPartitionsDirectory(), systemPartition.getId()).toURI());
@@ -221,7 +250,7 @@ public class ApacheDS {
     service.setDenormalizeOpAttrsEnabled(true);
 
     // Now we can create as many partitions as we need
-    JdbmPartition rodaPartition = addPartition(INSTANCE_NAME, BASE_DN, service.getDnFactory());
+    final JdbmPartition rodaPartition = addPartition(INSTANCE_NAME, ldapBaseDN, service.getDnFactory());
 
     // Index some attributes on the apache partition
     addIndex(rodaPartition, "objectClass", "ou", "uid");
@@ -232,6 +261,12 @@ public class ApacheDS {
     return rodaPartition;
   }
 
+  /**
+   * Stop {@link LdapServer} and shutdown {@link DirectoryService}.
+   * 
+   * @throws Exception
+   *           if some error occurs.
+   */
   public void stop() throws Exception {
 
     if (!server.isStarted()) {
@@ -243,28 +278,40 @@ public class ApacheDS {
   }
 
   /**
-   * starts the LdapServer
-   *
+   * Starts the LdapServer.
+   * 
+   * @param ldapPort
+   *          The port where LDAP should bind.
    * @throws Exception
+   *           if some error occurs.
    */
-  public void startServer(LdapUtility ldapUtility, int ldapPort) throws Exception {
-    UserUtility.setLdapUtility(ldapUtility);
+  public void startServer(final int ldapPort) throws Exception {
 
-    server = new LdapServer();
+    this.server = new LdapServer();
     server.setTransports(new TcpTransport(ldapPort));
     server.setDirectoryService(service);
 
     server.start();
   }
 
+  /**
+   * Apply LDIF text.
+   * 
+   * @param ldif
+   *          LDIF text.
+   * @throws LdapException
+   *           if some LDAP related error occurs.
+   * @throws IOException
+   *           if stream could not be closed.
+   */
   private void applyLdif(final String ldif) throws LdapException, IOException {
-    LdifReader entries = new LdifReader(new StringReader(ldif));
-    for (LdifEntry ldifEntry : entries) {
-      DefaultEntry newEntry = new DefaultEntry(service.getSchemaManager(), ldifEntry.getEntry());
-      LOGGER.debug("LDIF entry: {}", newEntry);
-      service.getAdminSession().add(newEntry);
+    try (LdifReader entries = new LdifReader(new StringReader(ldif))) {
+      for (LdifEntry ldifEntry : entries) {
+        final DefaultEntry newEntry = new DefaultEntry(service.getSchemaManager(), ldifEntry.getEntry());
+        LOGGER.debug("LDIF entry: {}", newEntry);
+        service.getAdminSession().add(newEntry);
+      }
     }
-    entries.close();
   }
 
 }
