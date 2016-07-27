@@ -727,7 +727,7 @@ padding: 5px 15px !important;
     color: white;
     background-color: #999;
     text-align: center;
-    border-left: 1px SOLID WHITE;
+    /*border-left: 1px SOLID WHITE;*/
 }
 
 .toolbarLink.toolbarLinkSmall {
