@@ -49,7 +49,7 @@ public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
   private TextColumn<IndexedFile> pathColumn;
   private TextColumn<IndexedFile> filenameColumn;
   private TextColumn<IndexedFile> formatColumn;
-  private TextColumn<IndexedFile> lengthColumn;
+  private TextColumn<IndexedFile> sizeColumn;
 
   public SearchFileList() {
     this(null, true, null, null, false);
@@ -136,7 +136,7 @@ public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
       }
     };
 
-    lengthColumn = new TextColumn<IndexedFile>() {
+    sizeColumn = new TextColumn<IndexedFile>() {
 
       @Override
       public String getValue(IndexedFile file) {
@@ -147,7 +147,7 @@ public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
     /* add sortable */
     filenameColumn.setSortable(true);
     formatColumn.setSortable(true);
-    lengthColumn.setSortable(true);
+    sizeColumn.setSortable(true);
 
     // TODO externalize strings into constants
 
@@ -155,7 +155,7 @@ public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
     addColumn(filenameColumn, messages.fileName(), true, false);
     addColumn(pathColumn, messages.filePath(), true, false);
     addColumn(formatColumn, messages.fileFormat(), true, false);
-    addColumn(lengthColumn, messages.fileLength(), true, false, 7);
+    addColumn(sizeColumn, messages.fileSize(), true, false, 7);
 
     // define default sorting
     display.getColumnSortList().push(new ColumnSortInfo(filenameColumn, false));
@@ -175,7 +175,7 @@ public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
 
       Map<Column<IndexedFile, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedFile, ?>, List<String>>();
       columnSortingKeyMap.put(filenameColumn, Arrays.asList(RodaConstants.FILE_ORIGINALNAME));
-      columnSortingKeyMap.put(lengthColumn, Arrays.asList(RodaConstants.FILE_SIZE));
+      columnSortingKeyMap.put(sizeColumn, Arrays.asList(RodaConstants.FILE_SIZE));
       columnSortingKeyMap.put(formatColumn, Arrays.asList(RodaConstants.FILE_FORMAT_MIMETYPE));
 
       Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);

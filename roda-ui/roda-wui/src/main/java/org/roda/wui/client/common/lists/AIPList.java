@@ -42,10 +42,11 @@ import config.i18n.client.ClientMessages;
 
 public class AIPList extends BasicAsyncTableCell<IndexedAIP> {
 
-  private static final SafeHtml HAS_REPRESENTATIONS_ICON = SafeHtmlUtils
-    .fromSafeConstant("<i class='fa fa-paperclip' title='Has representations' aria-hidden='true'></i>");
   private final ClientLogger logger = new ClientLogger(getClass().getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+
+  private static final SafeHtml HAS_REPRESENTATIONS_ICON = SafeHtmlUtils.fromSafeConstant(
+    "<i class='fa fa-paperclip' title='" + messages.aipHasRepresentations() + "' aria-hidden='true'></i>");
 
   private Column<IndexedAIP, SafeHtml> levelColumn;
   private TextColumn<IndexedAIP> titleColumn;

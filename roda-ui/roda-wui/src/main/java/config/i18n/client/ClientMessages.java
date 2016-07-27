@@ -424,6 +424,8 @@ public interface ClientMessages extends Messages {
   String viewRepresentationPreviousFileButton();
 
   String viewRepresentationDownloadFileButton();
+  
+  String viewRepresentationRemoveFileButton();
 
   String viewRepresentationInfoFileButton();
 
@@ -458,6 +460,10 @@ public interface ClientMessages extends Messages {
   String viewRepresentationInfoHash();
 
   String viewRepresentationInfoStoragePath();
+  
+  String viewRepresentationRemoveFileTitle();
+  
+  String viewRepresentationRemoveFileMessage();
 
   /************* Process new ****************/
 
@@ -578,6 +584,8 @@ public interface ClientMessages extends Messages {
   String aipGenericTitle();
 
   String aipDates();
+  
+  String aipHasRepresentations();
 
   String fileName();
 
