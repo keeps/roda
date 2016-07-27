@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.filter.Filter;
@@ -298,27 +299,40 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
                 Sorter.NONE, new Sublist(0, 1));
 
         if(result.getTotalCount() > 1){
-          // TODO apereira 25/07/2016 throw error
+          LOGGER.debug("Couldn't find non-ghost AIP with ingest SIP id: " + ghost.getIngestSIPId());
         } else if(result.getTotalCount() == 1){
           IndexedAIP newParentIAIP = result.getResults().get(0);
-          index.execute(IndexedAIP.class,
-            new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, ghost.getId())),
-            child -> {
-              try {
-                model.moveAIP(child.getId(), newParentIAIP.getId());
-              } catch (NotFoundException e) {
-                LOGGER.debug("Can't move child. It wasn't found.", e);
-              }
-            });
-          try {
-            model.deleteAIP(ghost.getId());
-          } catch (NotFoundException e) {
-            LOGGER.debug("Can't delete ghost or move node. It wasn't found.", e);
-          }
+          moveChildrenAIPsAndDelete(index, model, ghost.getId(), newParentIAIP.getId());
         }else if(result.getTotalCount() == 0){
-          // TODO apereira 25/07/2016 check if there are other ghosts with the same sip id and from the same job, move all of this ghost children
+          //check if there are other ghosts with the same sip id and from the same job, move all of this ghost children
+          IndexResult<IndexedAIP> otherGhosts = index.find(IndexedAIP.class,
+              new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, ghost.getIngestSIPId()),
+                  new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.TRUE.toString())),
+              Sorter.NONE, new Sublist(0, 1));
+          if(result.getTotalCount() >= 1){
+            IndexedAIP otherGhost = otherGhosts.getResults().get(0);
+            moveChildrenAIPsAndDelete(index, model, ghost.getId(), otherGhost.getId());
+          }
         }
       });
+  }
+
+  private void moveChildrenAIPsAndDelete(IndexService index, ModelService model, String aipId, String newParentId)
+      throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+    index.execute(IndexedAIP.class,
+        new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aipId)),
+        child -> {
+          try {
+            model.moveAIP(child.getId(), newParentId);
+          } catch (NotFoundException e) {
+            LOGGER.debug("Can't move child. It wasn't found.", e);
+          }
+        });
+    try {
+      model.deleteAIP(aipId);
+    } catch (NotFoundException e) {
+      LOGGER.debug("Can't delete ghost or move node. It wasn't found.", e);
+    }
   }
 
   private Report transformTransferredResourceIntoAnAIP(IndexService index, ModelService model, StorageService storage,
