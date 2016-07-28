@@ -24,16 +24,11 @@ For more information, please fell free to visit RODA website:
 
 #### Windows and MacOS X
 
-Install [Kitematic Docker Toolbox](https://kitematic.com), search for `keeps/roda` and create and run the container. Click on the top-right button to open RODA (it might take a minute to initialize).
-
-![Create container](doc/images/kitematic_search.png "Create container")
-
-![Open RODA](doc/images/kitematic_open.png "Open RODA")
-
+The RODA docker container cannot currently be used in Windows due to filename incompatibilities.
 
 #### Linux
 
-On Linux, as Kitematic Docker Toolbox is not yet available, use the following instructions:
+On Linux,use the following instructions:
 
 1. Install docker for your system: https://docs.docker.com/engine/installation/
 2. Pull or update to the latest roda container, on the command line run:  `sudo docker pull keeps/roda`
