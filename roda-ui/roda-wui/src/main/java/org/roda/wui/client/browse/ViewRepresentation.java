@@ -61,7 +61,6 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.media.client.Audio;
 import com.google.gwt.media.client.Video;
-import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -701,7 +700,7 @@ public class ViewRepresentation extends Composite {
 
     if (file != null && !file.isDirectory()) {
       downloadFileButton.setVisible(true);
-      removeFileButton.setVisible(true);
+      // removeFileButton.setVisible(true);
       infoFileButton.setVisible(true);
 
       String type = viewerType(file);
