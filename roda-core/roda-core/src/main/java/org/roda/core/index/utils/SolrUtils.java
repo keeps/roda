@@ -2085,11 +2085,11 @@ public class SolrUtils {
   public static SolrInputDocument representationPermissionsUpdateToSolrDocument(Representation representation,
     Permissions permissions) {
     return permissionsUpdateToSolrDocument(RodaConstants.REPRESENTATION_UUID,
-      IdUtils.getRepresentationId(representation.getAipId(), representation.getId()), permissions);
+      IdUtils.getRepresentationId(representation.getAipId(), IdUtils.getRepresentationId(representation)), permissions);
   }
 
   public static SolrInputDocument filePermissionsUpdateToSolrDocument(File file, Permissions permissions) {
-    return permissionsUpdateToSolrDocument(RodaConstants.FILE_UUID, file.getId(), permissions);
+    return permissionsUpdateToSolrDocument(RodaConstants.FILE_UUID, IdUtils.getFileId(file), permissions);
   }
 
   public static SolrInputDocument preservationEventPermissionsUpdateToSolrDocument(String preservationEventID,
