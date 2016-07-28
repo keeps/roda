@@ -20,8 +20,8 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
+import org.roda.wui.client.common.search.SearchSuggestBox;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
-import org.roda.wui.client.search.SearchSuggestBox;
 import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.core.client.GWT;

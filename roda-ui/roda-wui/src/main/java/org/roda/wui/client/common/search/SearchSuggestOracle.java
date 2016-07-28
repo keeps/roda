@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.client.search;
+package org.roda.wui.client.common.search;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -4,7 +4,8 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
 	xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
-	xmlns:common="urn:import:org.roda.wui.client.common" xmlns:lists="urn:import:org.roda.wui.client.common.lists">
+	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search"
+	xmlns:lists="urn:import:org.roda.wui.client.common.lists">
 
 	<ui:style>
 
@@ -21,7 +22,7 @@
 				<g:Label styleName="h5" ui:field="riskRegisterSubtitle"/>
 				<g:FlowPanel addStyleNames="page-description" ui:field="riskRegisterDescription">
 				</g:FlowPanel>
-				<common:SearchPanel ui:field="searchPanel" />
+				<commonsearch:SearchPanel ui:field="searchPanel" />
 				<lists:RiskIncidenceList addStyleNames="searchResults"
 					ui:field="riskIncidenceList" />
 			</g:FlowPanel>

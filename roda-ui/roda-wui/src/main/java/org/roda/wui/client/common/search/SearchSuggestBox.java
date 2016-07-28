@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.client.search;
+package org.roda.wui.client.common.search;
 
 import org.roda.core.data.v2.index.IsIndexed;
 

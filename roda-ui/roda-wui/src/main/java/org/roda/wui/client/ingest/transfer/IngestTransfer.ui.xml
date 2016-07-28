@@ -4,7 +4,7 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client" xmlns:lists="urn:import:org.roda.wui.client.common.lists"
 	xmlns:d="urn:import:com.google.gwt.user.datepicker.client" xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
-	xmlns:common="urn:import:org.roda.wui.client.common" xmlns:m="urn:import:org.roda.wui.client.main">
+	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search" xmlns:m="urn:import:org.roda.wui.client.main">
 
 	<ui:style>
 
@@ -30,13 +30,13 @@
 				</g:FlowPanel>
 				<m:BreadcrumbPanel ui:field="breadcrumb"
 					addStyleNames="browseBreadcrumb" />
-				<common:SearchPanel ui:field="searchPanel" />
+				<commonsearch:SearchPanel ui:field="searchPanel" />
 				<lists:TransferredResourceList
 					addStyleNames="transferredResourceList" ui:field="transferredResourceList" />
 				<g:Button addStyleNames="btn btn-download" ui:field="download">
 					<ui:text from='{messages.ingestTransferButtonDownload}' />
 				</g:Button>
-				<g:Label styleName="ingest-transfer-lastscanned" ui:field="lastScanned"/>
+				<g:Label styleName="ingest-transfer-lastscanned" ui:field="lastScanned" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel>

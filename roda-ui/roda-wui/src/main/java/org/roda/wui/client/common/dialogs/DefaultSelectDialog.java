@@ -9,8 +9,8 @@ package org.roda.wui.client.common.dialogs;
 
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.wui.client.common.SearchPanel;
 import org.roda.wui.client.common.lists.AsyncTableCell;
+import org.roda.wui.client.common.search.SearchPanel;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;

@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.client.common;
+package org.roda.wui.client.common.search;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +17,6 @@ import org.roda.core.data.adapter.filter.FilterParameter;
 import org.roda.core.data.adapter.filter.NotSimpleFilterParameter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.wui.client.common.lists.AsyncTableCell;
-import org.roda.wui.client.search.Dropdown;
-import org.roda.wui.client.search.SearchFieldPanel;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 
 import com.google.gwt.core.client.GWT;

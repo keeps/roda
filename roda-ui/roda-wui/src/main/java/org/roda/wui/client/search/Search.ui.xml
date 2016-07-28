@@ -4,7 +4,7 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client" xmlns:search="urn:import:org.roda.wui.client.search"
 	xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
-	xmlns:common="urn:import:org.roda.wui.client.common" xmlns:d="urn:import:com.google.gwt.user.datepicker.client">
+	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search" xmlns:d="urn:import:com.google.gwt.user.datepicker.client">
 
 	<ui:style>
 	</ui:style>
@@ -15,11 +15,13 @@
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
 				<g:HTML>
-					<h1><ui:text from='{messages.searchTitle}' /></h1>
+					<h1>
+						<ui:text from='{messages.searchTitle}' />
+					</h1>
 				</g:HTML>
 				<g:FlowPanel addStyleNames="page-description" ui:field="searchDescription">
 				</g:FlowPanel>
-				<common:SearchPanel ui:field="searchPanel" />
+				<commonsearch:SearchPanel ui:field="searchPanel" />
 				<g:FlowPanel addStyleNames="searchResults" ui:field="searchResultPanel" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
