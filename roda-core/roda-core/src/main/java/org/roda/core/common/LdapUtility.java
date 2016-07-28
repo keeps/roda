@@ -7,7 +7,11 @@
  */
 package org.roda.core.common;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -38,6 +42,33 @@ import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapName;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.directory.api.ldap.model.entry.DefaultEntry;
+import org.apache.directory.api.ldap.model.entry.Entry;
+import org.apache.directory.api.ldap.model.exception.LdapEntryAlreadyExistsException;
+import org.apache.directory.api.ldap.model.exception.LdapException;
+import org.apache.directory.api.ldap.model.ldif.LdifEntry;
+import org.apache.directory.api.ldap.model.ldif.LdifReader;
+import org.apache.directory.api.ldap.model.message.ModifyRequestImpl;
+import org.apache.directory.api.ldap.model.name.Dn;
+import org.apache.directory.api.ldap.model.schema.SchemaManager;
+import org.apache.directory.api.ldap.model.schema.registries.SchemaLoader;
+import org.apache.directory.api.ldap.schema.extractor.SchemaLdifExtractor;
+import org.apache.directory.api.ldap.schema.extractor.impl.DefaultSchemaLdifExtractor;
+import org.apache.directory.api.ldap.schema.loader.LdifSchemaLoader;
+import org.apache.directory.api.ldap.schema.manager.impl.DefaultSchemaManager;
+import org.apache.directory.server.constants.ServerDNConstants;
+import org.apache.directory.server.core.DefaultDirectoryService;
+import org.apache.directory.server.core.api.CacheService;
+import org.apache.directory.server.core.api.DirectoryService;
+import org.apache.directory.server.core.api.DnFactory;
+import org.apache.directory.server.core.api.InstanceLayout;
+import org.apache.directory.server.core.api.schema.SchemaPartition;
+import org.apache.directory.server.core.partition.impl.btree.jdbm.JdbmIndex;
+import org.apache.directory.server.core.partition.impl.btree.jdbm.JdbmPartition;
+import org.apache.directory.server.core.partition.ldif.LdifPartition;
+import org.apache.directory.server.ldap.LdapServer;
+import org.apache.directory.server.protocol.shared.transport.TcpTransport;
+import org.apache.directory.server.xdbm.Index;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
@@ -65,12 +96,23 @@ import org.w3c.util.InvalidDateException;
 // more meaningful
 public class LdapUtility {
 
+  /** Class logger */
   private static final Logger LOGGER = LoggerFactory.getLogger(LdapUtility.class);
 
+  /** Simple authentication constant */
   private static final String AUTHENTICATION_SIMPLE = "simple";
+
+  /** Shadow inactive constant */
   private static final String SHADOW_INACTIVE = "shadowInactive";
+
+  /** Unique member constant */
   private static final String UNIQUE_MEMBER = "uniqueMember";
+
+  /** Role occupant constant */
   private static final String ROLE_OCCUPANT = "roleOccupant";
+
+  /** RODA instance name. */
+  private static final String INSTANCE_NAME = "RODA";
 
   /**
    * LDAP server host
@@ -122,14 +164,20 @@ public class LdapUtility {
    * 
    * The list of protected users can be set in roda-core.properties file.
    */
-  private List<String> ldapProtectedUsers = new ArrayList<String>();
+  private List<String> ldapProtectedUsers = new ArrayList<>();
 
   /**
    * List of protected groups. Groups in the protected list cannot be modified.
    * 
    * The list of protected groups can be set in roda-core.properties file.
    */
-  private List<String> ldapProtectedGroups = new ArrayList<String>();
+  private List<String> ldapProtectedGroups = new ArrayList<>();
+
+  /** The directory service. */
+  private DirectoryService service;
+
+  /** The LDAP server. */
+  private LdapServer server;
 
   /**
    * Constructs a new LdapUtility class with the given parameters.
@@ -1487,6 +1535,31 @@ public class LdapUtility {
   }
 
   /**
+   * Adds a new role.
+   *
+   * @param roleName
+   *          the role to add.
+   * @throws RoleAlreadyExistsException
+   *           if a role with the same name already exists.
+   * @throws LdapUtilityException
+   *           if something goes wrong with the creation of the new role.
+   */
+  public void addRoleDS(final String roleName) throws RoleAlreadyExistsException, LdapUtilityException {
+    try {
+      final Dn dnRole = new Dn(String.format("cn=%s,%s", roleName, ldapRolesDN));
+      final Entry entryRole = service.newEntry(dnRole);
+      entryRole.add("objectClass", "organizationalRole", "top");
+      entryRole.add("cn", roleName);
+      entryRole.add(ROLE_OCCUPANT, ldapAdminDN);
+      service.getAdminSession().add(entryRole);
+    } catch (final LdapEntryAlreadyExistsException e) {
+      throw new RoleAlreadyExistsException("Role " + roleName + " already exists.", e);
+    } catch (final LdapException e) {
+      throw new LdapUtilityException("Error adding role '" + roleName + "'", e);
+    }
+  }
+
+  /**
    * Returns the roles assigned to a given group.
    * 
    * @param groupName
@@ -1573,6 +1646,146 @@ public class LdapUtility {
       LOGGER.debug("Error setting user groups", e);
       throw new LdapUtilityException("Error setting user groups", e);
     }
+  }
+
+  /**
+   * Starts the LdapServer.
+   *
+   * @param ldapPort
+   *          The port where LDAP should bind.
+   * @throws Exception
+   *           if some error occurs.
+   */
+  public void startApacheDS(final int ldapPort) throws Exception {
+
+    this.server = new LdapServer();
+    server.setTransports(new TcpTransport(ldapPort));
+    server.setDirectoryService(service);
+
+    server.start();
+  }
+
+  /**
+   * Stop {@link LdapServer} and shutdown {@link DirectoryService}.
+   *
+   * @throws Exception
+   *           if some error occurs.
+   */
+  public void stopApacheDS() throws Exception {
+
+    if (!server.isStarted()) {
+      throw new IllegalStateException("Service is not running");
+    }
+
+    server.stop();
+    service.shutdown();
+  }
+
+  /**
+   * Initialize the server. It creates the partition, adds the index, and
+   * injects the context entries for the created partitions.
+   *
+   * @param dataDirectory
+   *          the directory to be used for storing the data
+   * @param adminDN
+   *          admin DN.
+   * @param adminPassword
+   *          the admin password to be set in the first time the server is
+   *          started
+   * @param ldapBaseDN
+   *          LDAP base DN.
+   * @param ldifs
+   *          LDIF files to apply to Directory Service.
+   * @throws Exception
+   *           if there were some problems while initializing the system
+   */
+  public void initDirectoryService(final Path dataDirectory, final String adminDN, final String adminPassword,
+    final String ldapBaseDN, final List<String> ldifs) throws Exception {
+    // Initialize the LDAP service
+    final JdbmPartition rodaPartition = instantiateDirectoryService(dataDirectory, ldapBaseDN);
+
+    // Inject the context entry for dc=roda,dc=org partition
+    if (!service.getAdminSession().exists(rodaPartition.getSuffixDn())) {
+      final Dn dnApache = new Dn(ldapBaseDN);
+      final Entry entryRoda = service.newEntry(dnApache);
+      // @checkstyle MultipleStringLiterals (1 line)
+      entryRoda.add("objectClass", "top", "domain", "extensibleObject");
+      entryRoda.add("dc", "roda");
+      service.getAdminSession().add(entryRoda);
+
+      // change nis attribute in order to make things like
+      // "shadowinactive" work
+      ModifyRequestImpl modifyRequestImpl = new ModifyRequestImpl();
+      modifyRequestImpl.setName(new Dn("cn=nis,ou=schema"));
+      modifyRequestImpl.replace("m-disabled", "FALSE");
+      service.getAdminSession().modify(modifyRequestImpl);
+
+      // change apacheds admin password
+      modifyRequestImpl = new ModifyRequestImpl();
+      modifyRequestImpl.setName(new Dn(adminDN));
+      modifyRequestImpl.replace("userPassword", adminPassword);
+      service.getAdminSession().modify(modifyRequestImpl);
+
+      for (String ldif : ldifs) {
+        applyLdif(ldif);
+      }
+    }
+  }
+
+  /**
+   * Instantiate Directory Service.
+   *
+   * @param dataDirectory
+   *          the data directory.
+   * @param ldapBaseDN
+   *          LDAP base DN.
+   * @return RODA {@link JdbmPartition}
+   * @throws Exception
+   *           if some error occurs.
+   */
+  public JdbmPartition instantiateDirectoryService(final Path dataDirectory, final String ldapBaseDN) throws Exception {
+    this.service = new DefaultDirectoryService();
+    service.setInstanceId(INSTANCE_NAME);
+    service.setInstanceLayout(new InstanceLayout(dataDirectory.toFile()));
+
+    final CacheService cacheService = new CacheService();
+    cacheService.initialize(service.getInstanceLayout());
+
+    service.setCacheService(cacheService);
+
+    // first load the schema
+    initSchemaPartition();
+
+    // then the system partition
+    // this is a MANDATORY partition
+    // DO NOT add this via addPartition() method, trunk code complains about
+    // duplicate partition
+    // while initializing
+    final JdbmPartition systemPartition = new JdbmPartition(service.getSchemaManager(), service.getDnFactory());
+    systemPartition.setId("system");
+    systemPartition.setPartitionPath(
+      new File(service.getInstanceLayout().getPartitionsDirectory(), systemPartition.getId()).toURI());
+    systemPartition.setSuffixDn(new Dn(ServerDNConstants.SYSTEM_DN));
+    systemPartition.setSchemaManager(service.getSchemaManager());
+
+    // mandatory to call this method to set the system partition
+    // Note: this system partition might be removed from trunk
+    service.setSystemPartition(systemPartition);
+
+    // Disable the ChangeLog system
+    service.getChangeLog().setEnabled(false);
+    service.setDenormalizeOpAttrsEnabled(true);
+
+    // Now we can create as many partitions as we need
+    final JdbmPartition rodaPartition = addPartition(INSTANCE_NAME, ldapBaseDN, service.getDnFactory());
+
+    // Index some attributes on the apache partition
+    addIndex(rodaPartition, "objectClass", "ou", "uid");
+
+    // And start the service
+    service.startup();
+
+    return rodaPartition;
   }
 
   private RodaUser getRodaUser(DirContext ctxRoot, String username) throws NamingException {
@@ -2197,11 +2410,11 @@ public class LdapUtility {
 
   private void addMemberToRole(DirContext ctxRoot, String roleDN, String memberDN) throws NamingException {
 
-    Attributes attributes = ctxRoot.getAttributes(roleDN, new String[] {"roleOccupant"});
+    Attributes attributes = ctxRoot.getAttributes(roleDN, new String[] {ROLE_OCCUPANT});
 
-    Attribute attribute = attributes.get("roleOccupant");
+    Attribute attribute = attributes.get(ROLE_OCCUPANT);
     if (attribute == null) {
-      attribute = new BasicAttribute("roleOccupant");
+      attribute = new BasicAttribute(ROLE_OCCUPANT);
     }
     attribute.add(memberDN);
 
@@ -2219,9 +2432,9 @@ public class LdapUtility {
 
   private void removeMemberFromRole(DirContext ctxRoot, String roleDN, String memberDN) throws NamingException {
 
-    Attributes attributes = ctxRoot.getAttributes(roleDN, new String[] {"roleOccupant"});
+    Attributes attributes = ctxRoot.getAttributes(roleDN, new String[] {ROLE_OCCUPANT});
 
-    Attribute attribute = attributes.get("roleOccupant");
+    Attribute attribute = attributes.get(ROLE_OCCUPANT);
     attribute.remove(memberDN);
 
     ctxRoot.modifyAttributes(roleDN, DirContext.REPLACE_ATTRIBUTE, attributes);
@@ -2426,7 +2639,7 @@ public class LdapUtility {
     // Specify the attributes to match
     Attributes matchAttrs = new BasicAttributes(true); // ignore case
     matchAttrs.put(new BasicAttribute("cn"));
-    matchAttrs.put(new BasicAttribute("roleOccupant", memberDN));
+    matchAttrs.put(new BasicAttribute(ROLE_OCCUPANT, memberDN));
 
     // Search for objects that have those matching attributes
     NamingEnumeration<SearchResult> answer = ctxRoot.search(getRolesDN(), matchAttrs, new String[] {});
@@ -2696,6 +2909,114 @@ public class LdapUtility {
 
   private String userMessage(String user, String message) {
     return "User " + user + message;
+  }
+
+  /**
+   * Initialize the schema manager and add the schema partition to directory
+   * service.
+   *
+   * @throws Exception
+   *           if the schema LDIF files are not found on the classpath
+   */
+  private void initSchemaPartition() throws Exception {
+    final InstanceLayout instanceLayout = service.getInstanceLayout();
+
+    final File schemaPartitionDirectory = new File(instanceLayout.getPartitionsDirectory(), "schema");
+
+    // Extract the schema on disk (a brand new one) and load the registries
+    if (!schemaPartitionDirectory.exists()) {
+      final SchemaLdifExtractor extractor = new DefaultSchemaLdifExtractor(instanceLayout.getPartitionsDirectory());
+      extractor.extractOrCopy();
+    }
+
+    final SchemaLoader loader = new LdifSchemaLoader(schemaPartitionDirectory);
+    final SchemaManager schemaManager = new DefaultSchemaManager(loader);
+
+    // We have to load the schema now, otherwise we won't be able
+    // to initialize the Partitions, as we won't be able to parse
+    // and normalize their suffix Dn
+    schemaManager.loadAllEnabled();
+
+    final List<Throwable> errors = schemaManager.getErrors();
+
+    if (!errors.isEmpty()) {
+      throw new LdapUtilityException("Error while loading apacheds schemas");
+    }
+
+    service.setSchemaManager(schemaManager);
+
+    // Init the LdifPartition with schema
+    final LdifPartition schemaLdifPartition = new LdifPartition(schemaManager, service.getDnFactory());
+    schemaLdifPartition.setPartitionPath(schemaPartitionDirectory.toURI());
+
+    // The schema partition
+    final SchemaPartition schemaPartition = new SchemaPartition(schemaManager);
+    schemaPartition.setWrappedPartition(schemaLdifPartition);
+    service.setSchemaPartition(schemaPartition);
+  }
+
+  /**
+   * Add a new partition to the server.
+   *
+   * @param partitionId
+   *          The partition Id
+   * @param partitionDn
+   *          The partition DN
+   * @param dnFactory
+   *          the DN factory
+   * @return The newly added partition
+   * @throws Exception
+   *           If the partition can't be added
+   */
+  private JdbmPartition addPartition(final String partitionId, final String partitionDn, final DnFactory dnFactory)
+    throws Exception {
+    // Create a new partition with the given partition id
+    final JdbmPartition partition = new JdbmPartition(service.getSchemaManager(), dnFactory);
+    partition.setId(partitionId);
+    partition.setPartitionPath(new File(service.getInstanceLayout().getPartitionsDirectory(), partitionId).toURI());
+    partition.setSuffixDn(new Dn(partitionDn));
+    service.addPartition(partition);
+
+    return partition;
+  }
+
+  /**
+   * Apply LDIF text.
+   *
+   * @param ldif
+   *          LDIF text.
+   * @throws LdapException
+   *           if some LDAP related error occurs.
+   * @throws IOException
+   *           if stream could not be closed.
+   */
+  private void applyLdif(final String ldif) throws LdapException, IOException {
+    try (LdifReader entries = new LdifReader(new StringReader(ldif))) {
+      for (LdifEntry ldifEntry : entries) {
+        final DefaultEntry newEntry = new DefaultEntry(service.getSchemaManager(), ldifEntry.getEntry());
+        LOGGER.debug("LDIF entry: {}", newEntry);
+        service.getAdminSession().add(newEntry);
+      }
+    }
+  }
+
+  /**
+   * Add a new set of index on the given attributes.
+   *
+   * @param partition
+   *          The partition on which we want to add index
+   * @param attrs
+   *          The list of attributes to index
+   */
+  private void addIndex(final JdbmPartition partition, final String... attrs) {
+    // Index some attributes on the apache partition
+    final Set<Index<?, String>> indexedAttributes = new HashSet<>();
+
+    for (String attribute : attrs) {
+      indexedAttributes.add(new JdbmIndex<String>(attribute, false));
+    }
+
+    partition.setIndexedAttributes(indexedAttributes);
   }
 
 }
