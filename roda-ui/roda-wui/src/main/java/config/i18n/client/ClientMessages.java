@@ -1231,6 +1231,8 @@ public interface ClientMessages extends Messages {
   String selectAnItemToRemoveDescription();
 
   String selectAnItemToMoveDescription();
+  
+  /***** Browse representations ****/
 
   /***** Job processes ****/
 

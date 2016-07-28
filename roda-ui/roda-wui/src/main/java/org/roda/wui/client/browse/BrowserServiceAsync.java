@@ -185,4 +185,6 @@ public interface BrowserServiceAsync {
   void getSelectedTransferredResource(SelectedItems<TransferredResource> selected,
     AsyncCallback<List<TransferredResource>> asyncCallback);
 
+  void deleteFile(String fileUUID, AsyncCallback<Void> callback);
+
 }

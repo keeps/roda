@@ -174,7 +174,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public <T extends IsIndexed> IndexResult<T> find(String classNameToReturn, Filter filter, Sorter sorter,
     Sublist sublist, Facets facets, String localeString, boolean justActive)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+      throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     try {
       RodaUser user = UserUtility.getUser(getThreadLocalRequest());
       Class<T> classToReturn = parseClass(classNameToReturn);
@@ -458,7 +458,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public DescriptiveMetadataVersionsBundle getDescriptiveMetadataVersionsBundle(String aipId,
     String descriptiveMetadataId, String localeString)
-    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
+      throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     Locale locale = ServerTools.parseLocale(localeString);
     return Browser.getDescriptiveMetadataVersionsBundle(user, aipId, descriptiveMetadataId, locale);
@@ -621,7 +621,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public <T extends IsIndexed> Job createProcess(String jobName, SelectedItems<T> selected, String id,
     Map<String, String> value, String selectedClass) throws AuthorizationDeniedException, RequestNotValidException,
-    NotFoundException, GenericException, JobAlreadyStartedException {
+      NotFoundException, GenericException, JobAlreadyStartedException {
 
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
 
@@ -706,6 +706,13 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     throws GenericException, RequestNotValidException, AuthorizationDeniedException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.getSelectedTransferredResource(user, selected);
+  }
+
+  @Override
+  public void deleteFile(String fileUUID)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
+    Browser.deleteFile(user, fileUUID);
   }
 
 }

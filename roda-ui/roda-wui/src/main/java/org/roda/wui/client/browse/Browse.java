@@ -289,6 +289,8 @@ public class Browse extends Composite {
       DescriptiveMetadataHistory.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(EditPermissions.RESOLVER.getHistoryToken())) {
       EditPermissions.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+    } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(Representations.RESOLVER.getHistoryToken())) {
+      Representations.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {
       Tools.newHistory(RESOLVER);
       callback.onSuccess(null);

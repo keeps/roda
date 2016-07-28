@@ -532,7 +532,7 @@ public class BrowserHelper {
 
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
       filename = descriptiveMetadataBinary.getStoragePath().getName();
-      mediaType = MediaType.TEXT_XML;
+      mediaType = MediaType.TEXT_XML;   
       stream = new StreamingOutput() {
         @Override
         public void write(OutputStream os) throws IOException, WebApplicationException {

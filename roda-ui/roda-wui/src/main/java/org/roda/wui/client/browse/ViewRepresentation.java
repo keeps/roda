@@ -25,9 +25,11 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
+import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.SearchPanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.SimpleFileList;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.main.BreadcrumbItem;
@@ -59,6 +61,7 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.media.client.Audio;
 import com.google.gwt.media.client.Video;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -129,43 +132,43 @@ public class ViewRepresentation extends Composite {
         BrowserService.Util.getInstance().getItemBundle(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
           new AsyncCallback<BrowseItemBundle>() {
 
-            @Override
-            public void onFailure(Throwable caught) {
+          @Override
+          public void onFailure(Throwable caught) {
+            errorRedirect(callback);
+          }
+
+          @Override
+          public void onSuccess(final BrowseItemBundle itemBundle) {
+            if (itemBundle != null && verifyRepresentation(itemBundle.getRepresentations(), representationUUID)) {
+              if (historyTokens.size() > 2) {
+                final String fileUUID = historyTokens.get(2);
+
+                BrowserService.Util.getInstance().retrieve(IndexedFile.class.getName(), fileUUID,
+                  new AsyncCallback<IndexedFile>() {
+
+                  @Override
+                  public void onSuccess(IndexedFile simpleFile) {
+                    ViewRepresentation view = new ViewRepresentation(viewers, aipId, itemBundle, representationUUID,
+                      fileUUID, simpleFile);
+                    callback.onSuccess(view);
+                  }
+
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
+                    errorRedirect(callback);
+                  }
+                });
+
+              } else {
+                ViewRepresentation view = new ViewRepresentation(viewers, aipId, itemBundle, representationUUID);
+                callback.onSuccess(view);
+              }
+            } else {
               errorRedirect(callback);
             }
-
-            @Override
-            public void onSuccess(final BrowseItemBundle itemBundle) {
-              if (itemBundle != null && verifyRepresentation(itemBundle.getRepresentations(), representationUUID)) {
-                if (historyTokens.size() > 2) {
-                  final String fileUUID = historyTokens.get(2);
-
-                  BrowserService.Util.getInstance().retrieve(IndexedFile.class.getName(), fileUUID,
-                    new AsyncCallback<IndexedFile>() {
-
-                      @Override
-                      public void onSuccess(IndexedFile simpleFile) {
-                        ViewRepresentation view = new ViewRepresentation(viewers, aipId, itemBundle, representationUUID,
-                          fileUUID, simpleFile);
-                        callback.onSuccess(view);
-                      }
-
-                      @Override
-                      public void onFailure(Throwable caught) {
-                        Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
-                        errorRedirect(callback);
-                      }
-                    });
-
-                } else {
-                  ViewRepresentation view = new ViewRepresentation(viewers, aipId, itemBundle, representationUUID);
-                  callback.onSuccess(view);
-                }
-              } else {
-                errorRedirect(callback);
-              }
-            }
-          });
+          }
+        });
       } else {
         errorRedirect(callback);
       }
@@ -242,6 +245,9 @@ public class ViewRepresentation extends Composite {
 
   @UiField
   FocusPanel downloadFileButton;
+
+  @UiField
+  FocusPanel removeFileButton;
 
   @UiField
   FocusPanel infoFileButton;
@@ -335,15 +341,17 @@ public class ViewRepresentation extends Composite {
     breadcrumb.updatePath(getBreadcrumbs());
     breadcrumb.setVisible(true);
 
-    infoFileButton.setVisible(false);
     downloadFileButton.setVisible(false);
+    removeFileButton.setVisible(false);
+    infoFileButton.setVisible(false);
 
     downloadDocumentationButton.setVisible(rep.getNumberOfDocumentationFiles() > 0);
     downloadSchemasButton.setVisible(rep.getNumberOfSchemaFiles() > 0);
 
-    infoFileButton.setTitle(messages.viewRepresentationInfoFileButton());
     downloadFileButton.setTitle(messages.viewRepresentationDownloadFileButton());
-
+    removeFileButton.setTitle(messages.viewRepresentationRemoveFileButton());
+    infoFileButton.setTitle(messages.viewRepresentationInfoFileButton());
+    
     filesList.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
       @Override
@@ -591,6 +599,37 @@ public class ViewRepresentation extends Composite {
     Window.Location.assign(downloadUri.asString());
   }
 
+  @UiHandler("removeFileButton")
+  void buttonRemoveFileButtonHandler(ClickEvent e) {
+    Dialogs.showConfirmDialog(messages.viewRepresentationRemoveFileTitle(),
+      messages.viewRepresentationRemoveFileMessage(), messages.dialogCancel(), messages.dialogYes(),
+      new AsyncCallback<Boolean>() {
+
+        @Override
+        public void onSuccess(Boolean confirmed) {
+          if (confirmed) {
+            BrowserService.Util.getInstance().deleteFile(file.getUUID(), new AsyncCallback<Void>() {
+
+              @Override
+              public void onSuccess(Void result) {
+                clean();
+              }
+
+              @Override
+              public void onFailure(Throwable caught) {
+                AsyncCallbackUtils.defaultFailureTreatment(caught);
+              }
+            });
+          }
+        }
+
+        @Override
+        public void onFailure(Throwable caught) {
+          // nothing to do
+        }
+      });
+  }
+
   @UiHandler("infoFileButton")
   void buttonInfoFileButtonHandler(ClickEvent e) {
     toggleRightPanel();
@@ -662,6 +701,7 @@ public class ViewRepresentation extends Composite {
 
     if (file != null && !file.isDirectory()) {
       downloadFileButton.setVisible(true);
+      removeFileButton.setVisible(true);
       infoFileButton.setVisible(true);
 
       String type = viewerType(file);
@@ -723,6 +763,7 @@ public class ViewRepresentation extends Composite {
     html.setStyleName("viewRepresentationEmptyPreview");
 
     downloadFileButton.setVisible(false);
+    removeFileButton.setVisible(false);
     infoFileButton.setVisible(false);
   }
 
@@ -773,7 +814,7 @@ public class ViewRepresentation extends Composite {
     filePreview.add(html);
     filePreview.add(downloadButton);
     html.setStyleName("viewRepresentationNotSupportedPreview");
-    downloadButton.setStyleName("btn btn-donwload viewRepresentationNotSupportedDownloadButton");
+    downloadButton.setStyleName("btn btn-download viewRepresentationNotSupportedDownloadButton");
   }
 
   private void imagePreview(IndexedFile file) {
