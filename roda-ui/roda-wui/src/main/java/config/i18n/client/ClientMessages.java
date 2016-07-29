@@ -552,6 +552,8 @@ public interface ClientMessages extends Messages {
   String searchFieldNumericToPlaceHolder();
 
   String searchRepresentationFieldIdentifier();
+  
+  String searchRepresentationFieldType();
 
   String searchRepresentationFieldSize();
 

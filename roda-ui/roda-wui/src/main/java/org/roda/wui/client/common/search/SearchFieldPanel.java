@@ -25,6 +25,10 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -38,7 +42,7 @@ import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 
 import config.i18n.client.ClientMessages;
 
-public class SearchFieldPanel extends Composite {
+public class SearchFieldPanel extends Composite implements HasValueChangeHandlers<String> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @SuppressWarnings("unused")
@@ -145,6 +149,7 @@ public class SearchFieldPanel extends Composite {
       @Override
       public void onChange(ChangeEvent event) {
         listBoxSearchField(searchAdvancedFields.getSelectedValue());
+        SearchFieldPanel.this.onChange();
       }
     });
 
@@ -195,6 +200,14 @@ public class SearchFieldPanel extends Composite {
     if (searchAdvancedFields.getItemCount() > 0) {
       listBoxSearchField(searchAdvancedFields.getValue(0));
     }
+  }
+  
+  public String getFirstSearchField() {
+    String searchField = null;
+    if (searchAdvancedFields.getItemCount() > 0) {
+      searchField = searchAdvancedFields.getValue(0);
+    }
+    return searchField;
   }
 
   public void addRemoveClickHandler(ClickHandler clickHandler) {
@@ -357,5 +370,14 @@ public class SearchFieldPanel extends Composite {
     }
 
     return valid;
+  }
+
+  @Override
+  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<String> handler) {
+    return addHandler(handler, ValueChangeEvent.getType());
+  }
+  
+  protected void onChange() {
+    ValueChangeEvent.fire(this, searchField.getId());
   }
 }

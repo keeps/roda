@@ -4,7 +4,7 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client" xmlns:common="urn:import:org.roda.wui.client.common"
 	xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
-	xmlns:s="urn:import:org.roda.wui.client.common.search" xmlns:d="urn:import:com.google.gwt.user.datepicker.client">
+	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search" xmlns:d="urn:import:com.google.gwt.user.datepicker.client">
 
 	<ui:style>
 	</ui:style>
@@ -14,7 +14,7 @@
 	<g:FlowPanel>
 		<g:FlowPanel styleName="searchPanel" ui:field="searchPanel">
 			<g:FlowPanel styleName="searchPanelLeft">
-				<s:Dropdown ui:field="searchInputListBox" addStyleNames="searchInputListBox" />
+				<commonsearch:Dropdown ui:field="searchInputListBox" addStyleNames="searchInputListBox" />
 				<g:FlowPanel styleName="searchPanelLeftInput">
 					<g:TextBox ui:field="searchInputBox" addStyleNames="searchBox" />
 				</g:FlowPanel>

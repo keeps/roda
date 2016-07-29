@@ -241,7 +241,11 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
   }
 
   public boolean setDropdownSelectedValue(String value) {
-    return searchInputListBox.setSelectedValue(value);
+    return setDropdownSelectedValue(value, true);
+  }
+  
+  public boolean setDropdownSelectedValue(String value, boolean fire) {
+    return searchInputListBox.setSelectedValue(value, fire);
   }
 
   public void setDropdownLabel(String label) {
@@ -294,6 +298,10 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
 
   public void setDefaultFilterIncremental(boolean defaultFilterIncremental) {
     this.defaultFilterIncremental = defaultFilterIncremental;
+  }
+
+  public boolean isDefaultFilterIncremental() {
+    return defaultFilterIncremental;
   }
 
   public void clearSearchInputBox() {

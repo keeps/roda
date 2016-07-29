@@ -119,7 +119,7 @@ public class Dropdown extends Composite implements HasValueChangeHandlers<String
     return popupValues.get(selectedLabel.getText());
   }
   
-  public boolean setSelectedValue(String value) {
+  public boolean setSelectedValue(String value, boolean fire) {
     String label = null;
     for (Entry<String, String> entry : popupValues.entrySet()) {
       if(entry.getValue().equals(value)) {
@@ -130,7 +130,9 @@ public class Dropdown extends Composite implements HasValueChangeHandlers<String
     
     if(label != null) {
       selectedLabel.setText(label);
-      onChange();
+      if (fire) {
+        onChange();
+      }
       return true;
     } else {
       return false;

@@ -10,6 +10,7 @@ package org.roda.core.data.adapter.facet;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class Facets implements Serializable {
   private static final long serialVersionUID = -1897012583120840693L;
@@ -30,6 +31,13 @@ public class Facets implements Serializable {
   }
 
   public Facets(FacetParameter... parameters) {
+    super();
+    for (FacetParameter parameter : parameters) {
+      this.parameters.put(parameter.getName(), parameter);
+    }
+  }
+  
+  public Facets(Set<FacetParameter> parameters) {
     super();
     for (FacetParameter parameter : parameters) {
       this.parameters.put(parameter.getName(), parameter);

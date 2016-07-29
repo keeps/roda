@@ -21,8 +21,7 @@
 				</g:HTML>
 				<g:FlowPanel addStyleNames="page-description" ui:field="ingestAppraisalDescription">
 				</g:FlowPanel>
-				<commonsearch:SearchPanel ui:field="searchPanel" />
-				<g:FlowPanel addStyleNames="searchResults" ui:field="searchResultPanel" />
+				<commonsearch:MainSearch ui:field="mainSearch" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel styleName="sidebar-group" ui:field="itemsFacets">
