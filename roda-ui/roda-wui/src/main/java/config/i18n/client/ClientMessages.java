@@ -1287,6 +1287,8 @@ public interface ClientMessages extends Messages {
   String logEntryMethod();
 
   String logEntryAddress();
+  
+  String logEntryState();
 
   String logEntryDatetime();
 

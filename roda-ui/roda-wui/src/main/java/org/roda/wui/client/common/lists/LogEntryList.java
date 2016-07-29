@@ -48,6 +48,7 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
   private TextColumn<LogEntry> usernameColumn;
   private TextColumn<LogEntry> durationColumn;
   private TextColumn<LogEntry> addressColumn;
+  private TextColumn<LogEntry> stateColumn;
 
   public LogEntryList() {
     this(null, null, null, false);
@@ -134,6 +135,14 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
       }
     };
 
+    stateColumn = new TextColumn<LogEntry>() {
+
+      @Override
+      public String getValue(LogEntry logEntry) {
+        return logEntry != null ? logEntry.getState().toString() : null;
+      }
+    };
+
     dateColumn.setSortable(true);
     actionComponentColumn.setSortable(true);
     actionMethodColumn.setSortable(true);
@@ -141,6 +150,7 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
     usernameColumn.setSortable(true);
     durationColumn.setSortable(true);
     addressColumn.setSortable(true);
+    
 
     // TODO externalize strings into constants
 
@@ -150,6 +160,7 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
     addColumn(usernameColumn, messages.logEntryUser(), true, false);
     addColumn(durationColumn, messages.logEntryDuration(), true, true, 5);
     addColumn(addressColumn, messages.logEntryAddress(), true, false);
+    addColumn(stateColumn, messages.logEntryState(), true, false);
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(dateColumn, false));
