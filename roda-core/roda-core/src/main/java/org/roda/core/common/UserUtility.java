@@ -25,6 +25,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.SelectedItems;
@@ -32,6 +33,7 @@ import org.roda.core.data.v2.index.SelectedItemsFilter;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.user.RodaSimpleUser;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.index.IndexService;
@@ -227,6 +229,14 @@ public class UserUtility {
     return noCommonElement;
   }
 
+  /**
+   * This method make sure that a normal user can only upload a file to a folder
+   * with its own username
+   * 
+   * @param user
+   * @param ids
+   * @throws AuthorizationDeniedException
+   */
   public static void checkTransferredResourceAccess(RodaUser user, List<String> ids)
     throws AuthorizationDeniedException {
     // FIXME administrator workaround
@@ -234,12 +244,23 @@ public class UserUtility {
       return;
     } else {
       for (String id : ids) {
+
         if (id == null && !"admin".equals(user.getName())) {
           throw new AuthorizationDeniedException(
             "The user '" + user.getId() + "' does not have permissions to create resource in root!");
-        } else if (!Paths.get(id).getName(0).toString().equalsIgnoreCase(user.getName())) {
-          throw new AuthorizationDeniedException(
-            "The user '" + user.getId() + "' does not have permissions to access to transferred resource " + id + " !");
+        } else {
+          try {
+            IndexService index = RodaCoreFactory.getIndexService();
+            TransferredResource parent = index.retrieve(TransferredResource.class, id);
+            if (!Paths.get(parent.getRelativePath()).getName(0).toString().equalsIgnoreCase(user.getName())) {
+              throw new AuthorizationDeniedException("The user '" + user.getId()
+                + "' does not have permissions to access to transferred resource " + id + " !");
+            }
+          } catch (GenericException | NotFoundException e) {
+            throw new AuthorizationDeniedException("The user '" + user.getId()
+              + "' does not have permissions to access to transferred resource " + id + " !");
+          }
+
         }
       }
     }
