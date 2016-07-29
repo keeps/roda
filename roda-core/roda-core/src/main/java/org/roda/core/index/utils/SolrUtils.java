@@ -10,7 +10,6 @@ package org.roda.core.index.utils;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
-import java.security.InvalidParameterException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,6 +66,7 @@ import org.roda.core.data.adapter.filter.FilterParameter;
 import org.roda.core.data.adapter.filter.LongRangeFilterParameter;
 import org.roda.core.data.adapter.filter.NotSimpleFilterParameter;
 import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
+import org.roda.core.data.adapter.filter.OrFiltersParameters;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.SortParameter;
 import org.roda.core.data.adapter.sort.Sorter;
@@ -225,7 +225,7 @@ public class SolrUtils {
 
   public static <T extends IsIndexed> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve, Filter filter,
     Sorter sorter, Sublist sublist, Facets facets, RodaUser user, boolean justActive)
-    throws GenericException, RequestNotValidException {
+      throws GenericException, RequestNotValidException {
 
     IndexResult<T> ret;
     SolrQuery query = new SolrQuery();
@@ -246,7 +246,7 @@ public class SolrUtils {
       throw new GenericException("Could not query index", e);
     } catch (SolrException e) {
       throw new RequestNotValidException(e.getMessage());
-    }catch (RuntimeException e) {
+    } catch (RuntimeException e) {
       throw new GenericException("Unexpected exception while querying index", e);
     }
 
@@ -466,6 +466,7 @@ public class SolrUtils {
     return ret;
   }
 
+  @SuppressWarnings("unused")
   private static Float objectToFloat(Object object) {
     Float ret;
     if (object instanceof Float) {
@@ -661,7 +662,7 @@ public class SolrUtils {
       ret.append("*:*");
     } else {
       for (FilterParameter parameter : filter.getParameters()) {
-        parseFilterParameter(ret, parameter);
+        parseFilterParameter(ret, parameter, true);
       }
 
       if (ret.length() == 0) {
@@ -673,17 +674,17 @@ public class SolrUtils {
     return ret.toString();
   }
 
-  private static void parseFilterParameter(StringBuilder ret, FilterParameter parameter)
-    throws RequestNotValidException {
+  private static void parseFilterParameter(StringBuilder ret, FilterParameter parameter,
+    boolean prefixWithANDOperatorIfBuilderNotEmpty) throws RequestNotValidException {
     if (parameter instanceof SimpleFilterParameter) {
       SimpleFilterParameter simplePar = (SimpleFilterParameter) parameter;
-      appendExactMatch(ret, simplePar.getName(), simplePar.getValue(), true, true);
+      appendExactMatch(ret, simplePar.getName(), simplePar.getValue(), true, prefixWithANDOperatorIfBuilderNotEmpty);
     } else if (parameter instanceof OneOfManyFilterParameter) {
       OneOfManyFilterParameter param = (OneOfManyFilterParameter) parameter;
-      appendValuesUsingOROperator(ret, param.getName(), param.getValues());
+      appendValuesUsingOROperator(ret, param.getName(), param.getValues(), prefixWithANDOperatorIfBuilderNotEmpty);
     } else if (parameter instanceof BasicSearchFilterParameter) {
       BasicSearchFilterParameter param = (BasicSearchFilterParameter) parameter;
-      appendBasicSearch(ret, param.getName(), param.getValue(), "AND", true);
+      appendBasicSearch(ret, param.getName(), param.getValue(), "AND", prefixWithANDOperatorIfBuilderNotEmpty);
     } else if (parameter instanceof EmptyKeyFilterParameter) {
       EmptyKeyFilterParameter param = (EmptyKeyFilterParameter) parameter;
       appendANDOperator(ret, true);
@@ -691,20 +692,37 @@ public class SolrUtils {
     } else if (parameter instanceof DateRangeFilterParameter) {
       DateRangeFilterParameter param = (DateRangeFilterParameter) parameter;
       appendRange(ret, param.getName(), Date.class, param.getFromValue(), String.class,
-        processToDate(param.getToValue(), param.getGranularity(), false));
+        processToDate(param.getToValue(), param.getGranularity(), false), prefixWithANDOperatorIfBuilderNotEmpty);
     } else if (parameter instanceof DateIntervalFilterParameter) {
       DateIntervalFilterParameter param = (DateIntervalFilterParameter) parameter;
       appendRangeInterval(ret, param.getFromName(), param.getToName(), param.getFromValue(), param.getToValue(),
-        param.getGranularity());
+        param.getGranularity(), prefixWithANDOperatorIfBuilderNotEmpty);
     } else if (parameter instanceof LongRangeFilterParameter) {
       LongRangeFilterParameter param = (LongRangeFilterParameter) parameter;
-      appendRange(ret, param.getName(), Long.class, param.getFromValue(), Long.class, param.getToValue());
+      appendRange(ret, param.getName(), Long.class, param.getFromValue(), Long.class, param.getToValue(),
+        prefixWithANDOperatorIfBuilderNotEmpty);
     } else if (parameter instanceof NotSimpleFilterParameter) {
       NotSimpleFilterParameter notSimplePar = (NotSimpleFilterParameter) parameter;
-      appendNotExactMatch(ret, notSimplePar.getName(), notSimplePar.getValue(), true, true);
+      appendNotExactMatch(ret, notSimplePar.getName(), notSimplePar.getValue(), true,
+        prefixWithANDOperatorIfBuilderNotEmpty);
+    } else if (parameter instanceof OrFiltersParameters) {
+      OrFiltersParameters orFilters = (OrFiltersParameters) parameter;
+      appendFiltersWithOr(ret, orFilters.getName(), orFilters.getValues(), prefixWithANDOperatorIfBuilderNotEmpty);
     } else {
       LOGGER.error("Unsupported filter parameter class: {}", parameter.getClass().getName());
       throw new RequestNotValidException("Unsupported filter parameter class: " + parameter.getClass().getName());
+    }
+  }
+
+  private static void appendANDOperator(StringBuilder ret, boolean prefixWithANDOperatorIfBuilderNotEmpty) {
+    if (prefixWithANDOperatorIfBuilderNotEmpty && ret.length() > 0) {
+      ret.append(" AND ");
+    }
+  }
+
+  private static void appendOROperator(StringBuilder ret, boolean prefixWithOROperatorIfBuilderNotEmpty) {
+    if (prefixWithOROperatorIfBuilderNotEmpty && ret.length() > 0) {
+      ret.append(" OR ");
     }
   }
 
@@ -722,15 +740,10 @@ public class SolrUtils {
     ret.append(")");
   }
 
-  private static void appendANDOperator(StringBuilder ret, boolean prefixWithANDOperatorIfBuilderNotEmpty) {
-    if (prefixWithANDOperatorIfBuilderNotEmpty && ret.length() > 0) {
-      ret.append(" AND ");
-    }
-  }
-
-  private static void appendValuesUsingOROperator(StringBuilder ret, String key, List<String> values) {
+  private static void appendValuesUsingOROperator(StringBuilder ret, String key, List<String> values,
+    boolean prefixWithANDOperatorIfBuilderNotEmpty) {
     if (!values.isEmpty()) {
-      appendANDOperator(ret, true);
+      appendANDOperator(ret, prefixWithANDOperatorIfBuilderNotEmpty);
 
       ret.append("(");
       for (int i = 0; i < values.size(); i++) {
@@ -750,16 +763,34 @@ public class SolrUtils {
     } else if (value.matches("^\".+\"$")) {
       appendExactMatch(ret, key, value.substring(1, value.length() - 1), true, prefixWithANDOperatorIfBuilderNotEmpty);
     } else {
-      appendWhiteSpaceTokenizedString(ret, key, value, operator);
+      appendWhiteSpaceTokenizedString(ret, key, value, operator, prefixWithANDOperatorIfBuilderNotEmpty);
     }
   }
 
+  @SuppressWarnings("unused")
   private static void appendKeyValue(StringBuilder ret, String key, String value) {
     ret.append(key).append(":").append("(").append(value).append(")");
   }
 
-  private static void appendWhiteSpaceTokenizedString(StringBuilder ret, String key, String value, String operator) {
-    appendANDOperator(ret, true);
+  private static void appendFiltersWithOr(StringBuilder ret, String key, List<FilterParameter> values,
+    boolean prefixWithANDOperatorIfBuilderNotEmpty) throws RequestNotValidException {
+    if (!values.isEmpty()) {
+      appendANDOperator(ret, prefixWithANDOperatorIfBuilderNotEmpty);
+
+      ret.append("(");
+      for (int i = 0; i < values.size(); i++) {
+        if (i != 0) {
+          ret.append(" OR ");
+        }
+        parseFilterParameter(ret, values.get(i), false);
+      }
+      ret.append(")");
+    }
+  }
+
+  private static void appendWhiteSpaceTokenizedString(StringBuilder ret, String key, String value, String operator,
+    boolean prefixWithANDOperatorIfBuilderNotEmpty) {
+    appendANDOperator(ret, prefixWithANDOperatorIfBuilderNotEmpty);
 
     String[] split = value.trim().split("\\s+");
     ret.append("(");
@@ -777,9 +808,9 @@ public class SolrUtils {
   }
 
   private static <T extends Serializable, T1 extends Serializable> void appendRange(StringBuilder ret, String key,
-    Class<T> fromClass, T fromValue, Class<T1> toClass, T1 toValue) {
+    Class<T> fromClass, T fromValue, Class<T1> toClass, T1 toValue, boolean prefixWithANDOperatorIfBuilderNotEmpty) {
     if (fromValue != null || toValue != null) {
-      appendANDOperator(ret, true);
+      appendANDOperator(ret, prefixWithANDOperatorIfBuilderNotEmpty);
 
       ret.append("(").append(key).append(":[");
       generateRangeValue(ret, fromClass, fromValue);
@@ -808,9 +839,9 @@ public class SolrUtils {
   }
 
   private static void appendRangeInterval(StringBuilder ret, String fromKey, String toKey, Date fromValue, Date toValue,
-    DateGranularity granularity) {
+    DateGranularity granularity, boolean prefixWithANDOperatorIfBuilderNotEmpty) {
     if (fromValue != null || toValue != null) {
-      appendANDOperator(ret, true);
+      appendANDOperator(ret, prefixWithANDOperatorIfBuilderNotEmpty);
       ret.append("(");
 
       ret.append(fromKey).append(":[");
@@ -926,7 +957,7 @@ public class SolrUtils {
         if (facetParameter instanceof SimpleFacetParameter) {
           setQueryFacetParameter(query, (SimpleFacetParameter) facetParameter);
           appendValuesUsingOROperator(filterQuery, facetParameter.getName(),
-            ((SimpleFacetParameter) facetParameter).getValues());
+            ((SimpleFacetParameter) facetParameter).getValues(), true);
         } else if (facetParameter instanceof RangeFacetParameter) {
           LOGGER.error("Unsupported facet parameter class: {}", facetParameter.getClass().getName());
         } else {
@@ -964,7 +995,7 @@ public class SolrUtils {
       appendExactMatch(fq, usersKey, user.getId(), true, false);
 
       String groupsKey = RodaConstants.INDEX_PERMISSION_GROUPS_PREFIX + PermissionType.READ;
-      appendValuesUsingOROperator(fq, groupsKey, new ArrayList<>(user.getAllGroups()), true);
+      appendValuesUsingOROperatorForQuery(fq, groupsKey, new ArrayList<>(user.getAllGroups()), true);
 
       fq.append(")");
     }
@@ -976,7 +1007,7 @@ public class SolrUtils {
     return fq.toString();
   }
 
-  private static void appendValuesUsingOROperator(StringBuilder ret, String key, List<String> values,
+  private static void appendValuesUsingOROperatorForQuery(StringBuilder ret, String key, List<String> values,
     boolean prependWithOrIfNeeded) {
     if (!values.isEmpty()) {
       if (prependWithOrIfNeeded) {
@@ -993,12 +1024,6 @@ public class SolrUtils {
         appendExactMatch(ret, key, values.get(i), true, false);
       }
       ret.append(")");
-    }
-  }
-
-  private static void appendOROperator(StringBuilder ret, boolean prefixWithANDOperatorIfBuilderNotEmpty) {
-    if (prefixWithANDOperatorIfBuilderNotEmpty && ret.length() > 0) {
-      ret.append(" OR ");
     }
   }
 
@@ -1307,8 +1332,8 @@ public class SolrUtils {
 
   public static SolrInputDocument addOtherPropertiesToIndexedFile(String prefix, OtherMetadata otherMetadataBinary,
     ModelService model, SolrClient index)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
-    ParserConfigurationException, SAXException, IOException, XPathExpressionException, SolrServerException {
+      throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
+      ParserConfigurationException, SAXException, IOException, XPathExpressionException, SolrServerException {
     SolrDocument solrDocument = index.getById(RodaConstants.INDEX_FILE,
       IdUtils.getFileId(otherMetadataBinary.getAipId(), otherMetadataBinary.getRepresentationId(),
         otherMetadataBinary.getFileDirectoryPath(), otherMetadataBinary.getFileId()));

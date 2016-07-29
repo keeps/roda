@@ -8,13 +8,16 @@
 package org.roda.wui.client.common.search;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.FilterParameter;
 import org.roda.core.data.adapter.filter.NotSimpleFilterParameter;
+import org.roda.core.data.adapter.filter.OrFiltersParameters;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.wui.client.common.lists.AsyncTableCell;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
@@ -198,6 +201,7 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
   private Filter buildSearchFilter(String basicQuery, Filter defaultFilter, String allFilter, FlowPanel fieldsPanel,
     boolean defaultFilterIncremental) {
     List<FilterParameter> parameters = new ArrayList<FilterParameter>();
+    Map<String, FilterParameter> advancedSearchFilters = new HashMap<String, FilterParameter>();
 
     if (basicQuery != null && basicQuery.trim().length() > 0) {
       parameters.add(new BasicSearchFilterParameter(allFilter, basicQuery));
@@ -206,14 +210,31 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
     if (fieldsPanel != null && fieldsPanel.getParent() != null && fieldsPanel.getParent().isVisible()) {
       for (int i = 0; i < fieldsPanel.getWidgetCount(); i++) {
         SearchFieldPanel searchAdvancedFieldPanel = (SearchFieldPanel) fieldsPanel.getWidget(i);
+        String searchFieldId = searchAdvancedFieldPanel.getSearchField().getId();
         FilterParameter filterParameter = searchAdvancedFieldPanel.getFilter();
-
-        // TODO 20160721 Use a OrFilterParameter to treat cases with multiple
-        // field appearance
+        FilterParameter oldFilterParameter = advancedSearchFilters.get(searchFieldId);
 
         if (filterParameter != null) {
-          parameters.add(filterParameter);
+          if (oldFilterParameter != null) {
+            if (oldFilterParameter instanceof OrFiltersParameters) {
+              List<FilterParameter> filterParameters = ((OrFiltersParameters) oldFilterParameter).getValues();
+              filterParameters.add(filterParameter);
+              ((OrFiltersParameters) oldFilterParameter).setValues(filterParameters);
+              advancedSearchFilters.put(searchFieldId, oldFilterParameter);
+            } else {
+              List<FilterParameter> filterParameters = new ArrayList<FilterParameter>();
+              filterParameters.add(oldFilterParameter);
+              filterParameters.add(filterParameter);
+              advancedSearchFilters.put(searchFieldId, new OrFiltersParameters(searchFieldId, filterParameters));
+            }
+          } else {
+            advancedSearchFilters.put(searchFieldId, filterParameter);
+          }
         }
+      }
+
+      for (String key : advancedSearchFilters.keySet()) {
+        parameters.add(advancedSearchFilters.get(key));
       }
     }
 
@@ -243,7 +264,7 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
   public boolean setDropdownSelectedValue(String value) {
     return setDropdownSelectedValue(value, true);
   }
-  
+
   public boolean setDropdownSelectedValue(String value, boolean fire) {
     return searchInputListBox.setSelectedValue(value, fire);
   }
