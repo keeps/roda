@@ -10,42 +10,30 @@ package org.roda.core.common;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.naming.AuthenticationException;
-import javax.naming.Context;
-import javax.naming.InvalidNameException;
-import javax.naming.Name;
-import javax.naming.NameAlreadyBoundException;
-import javax.naming.NameNotFoundException;
-import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
-import javax.naming.directory.Attribute;
-import javax.naming.directory.Attributes;
-import javax.naming.directory.BasicAttribute;
-import javax.naming.directory.BasicAttributes;
-import javax.naming.directory.DirContext;
-import javax.naming.directory.InitialDirContext;
-import javax.naming.directory.ModificationItem;
-import javax.naming.directory.SearchControls;
-import javax.naming.directory.SearchResult;
-import javax.naming.ldap.LdapName;
-
 import org.apache.commons.lang3.StringUtils;
+import org.apache.directory.api.ldap.model.cursor.Cursor;
+import org.apache.directory.api.ldap.model.entry.Attribute;
 import org.apache.directory.api.ldap.model.entry.DefaultEntry;
 import org.apache.directory.api.ldap.model.entry.Entry;
+import org.apache.directory.api.ldap.model.entry.Value;
+import org.apache.directory.api.ldap.model.exception.LdapAuthenticationException;
 import org.apache.directory.api.ldap.model.exception.LdapEntryAlreadyExistsException;
 import org.apache.directory.api.ldap.model.exception.LdapException;
+import org.apache.directory.api.ldap.model.exception.LdapInvalidDnException;
+import org.apache.directory.api.ldap.model.exception.LdapNoSuchObjectException;
 import org.apache.directory.api.ldap.model.ldif.LdifEntry;
 import org.apache.directory.api.ldap.model.ldif.LdifReader;
 import org.apache.directory.api.ldap.model.message.ModifyRequestImpl;
@@ -59,6 +47,7 @@ import org.apache.directory.api.ldap.schema.manager.impl.DefaultSchemaManager;
 import org.apache.directory.server.constants.ServerDNConstants;
 import org.apache.directory.server.core.DefaultDirectoryService;
 import org.apache.directory.server.core.api.CacheService;
+import org.apache.directory.server.core.api.CoreSession;
 import org.apache.directory.server.core.api.DirectoryService;
 import org.apache.directory.server.core.api.DnFactory;
 import org.apache.directory.server.core.api.InstanceLayout;
@@ -90,88 +79,115 @@ import org.w3c.util.InvalidDateException;
 
 /**
  * @author Rui Castro
- * 
+ *
  */
 // FIXME this should be moved back to roda-common-servlet-security or any place
 // more meaningful
 public class LdapUtility {
 
-  /** Class logger */
+  /** Class logger. */
   private static final Logger LOGGER = LoggerFactory.getLogger(LdapUtility.class);
-
-  /** Simple authentication constant */
-  private static final String AUTHENTICATION_SIMPLE = "simple";
-
-  /** Shadow inactive constant */
-  private static final String SHADOW_INACTIVE = "shadowInactive";
-
-  /** Unique member constant */
-  private static final String UNIQUE_MEMBER = "uniqueMember";
-
-  /** Role occupant constant */
-  private static final String ROLE_OCCUPANT = "roleOccupant";
 
   /** RODA instance name. */
   private static final String INSTANCE_NAME = "RODA";
 
-  /**
-   * LDAP server host
-   */
-  private String ldapHost = "localhost";
+  /** Size of random passwords */
+  private static final int RANDOM_PASSWORD_LENGTH = 12;
+
+  /** Shadow inactive constant. */
+  private static final String SHADOW_INACTIVE = "shadowInactive";
+
+  /** Unique member constant. */
+  private static final String UNIQUE_MEMBER = "uniqueMember";
+
+  /** Role occupant constant. */
+  private static final String ROLE_OCCUPANT = "roleOccupant";
+
+  /** Object class constant. */
+  private static final String OBJECT_CLASS = "objectClass";
+
+  /** Constant: top. */
+  private static final String OBJECT_CLASS_TOP = "top";
+
+  /** Constant: domain. */
+  private static final String OBJECT_CLASS_DOMAIN = "domain";
+
+  /** Constant: extensibleObject. */
+  private static final String OBJECT_CLASS_EXTENSIBLE_OBJECT = "extensibleObject";
+
+  /** Constant: userPassword. */
+  private static final String USER_PASSWORD = "userPassword";
+
+  /** Constant: uid. */
+  private static final String UID = "uid";
+
+  /** Constant: cn. */
+  private static final String CN = "cn";
+
+  /** Constant: ou. */
+  private static final String OU = "ou";
+
+  /** Constant: email. */
+  private static final String EMAIL = "email";
 
   /**
-   * LDAP server port
-   */
-  private int ldapPort = 10389;
-
-  /**
-   * LDAP administrator Distinguished Name (DN)
+   * LDAP administrator Distinguished Name (DN).
    */
   private String ldapAdminDN = null;
 
   /**
-   * LDAP administrator password
+   * LDAP administrator password.
    */
   private String ldapAdminPassword = null;
 
   /**
-   * LDAP DN of the root
+   * LDAP DN of the root.
    */
   private String ldapRootDN = "";
 
   /**
-   * LDAP OU of the people entry (default: null)
+   * LDAP OU of the people entry (default: null).
    */
   private String ldapPeopleDN = null;
 
   /**
-   * LDAP OU of the groups entry (default: null)
+   * LDAP OU of the groups entry (default: null).
    */
   private String ldapGroupsDN = null;
 
   /**
-   * LDAP OU of the roles entry (default: null)
+   * LDAP OU of the roles entry (default: null).
    */
   private String ldapRolesDN = null;
 
   /**
-   * Password Digest Algorithm
+   * Password Digest Algorithm.
    */
   private String ldapDigestAlgorithm = "MD5";
 
   /**
    * List of protected users. Users in the protected list cannot be modified.
-   * 
+   *
    * The list of protected users can be set in roda-core.properties file.
    */
   private List<String> ldapProtectedUsers = new ArrayList<>();
 
   /**
    * List of protected groups. Groups in the protected list cannot be modified.
-   * 
+   *
    * The list of protected groups can be set in roda-core.properties file.
    */
   private List<String> ldapProtectedGroups = new ArrayList<>();
+
+  /**
+   * RODA administrator Distinguished Name (DN).
+   */
+  private String rodaAdminDN = null;
+
+  /**
+   * Directory where ApacheDS data will be stored.
+   */
+  private Path dataDirectory = null;
 
   /** The directory service. */
   private DirectoryService service;
@@ -181,40 +197,9 @@ public class LdapUtility {
 
   /**
    * Constructs a new LdapUtility class with the given parameters.
-   * 
-   * @param ldapHost
-   *          LDAP server host
-   * @param ldapPort
-   *          LDAP server port
-   * @param ldapPopleDN
-   *          the DN for the people entry. Users should be located under this
-   *          entry.
-   * @param ldapGroupsDN
-   *          the DN for the groups entry. Groups should be located under this
-   *          entry.
-   * @param ldapRolesDN
-   *          the DN for the roles entry. Roles should be located under this
-   *          entry.
-   * @param ldapProtectedUsers
-   *          list of protected users. Users in the protected list cannot be
-   *          modified.
-   * @param ldapProtectedGroups
-   *          list of protected groups. Groups in the protected list cannot be
-   *          modified.
-   */
-  public LdapUtility(String ldapHost, int ldapPort, String ldapPopleDN, String ldapGroupsDN, String ldapRolesDN,
-    List<String> ldapProtectedUsers, List<String> ldapProtectedGroups) {
-    this(ldapHost, ldapPort, ldapPopleDN, ldapGroupsDN, ldapRolesDN, null, null, null, ldapProtectedUsers,
-      ldapProtectedGroups);
-  }
-
-  /**
-   * Constructs a new LdapUtility class with the given parameters.
-   * 
-   * @param ldapHost
-   *          LDAP server host
-   * @param ldapPort
-   *          LDAP server port
+   *
+   * @param ldapRootDN
+   *          the root DN.
    * @param ldapPeopleDN
    *          the DN for the people entry. Users should be located under this
    *          entry.
@@ -237,12 +222,16 @@ public class LdapUtility {
    * @param ldapProtectedGroups
    *          list of protected groups. Groups in the protected list cannot be
    *          modified.
+   * @param rodaAdminDN
+   *          the DN (Distinguished Name) of the RODA administrator.
+   * @param dataDirectory
+   *          Directory where ApacheDS data will be stored.
    */
-  public LdapUtility(String ldapHost, int ldapPort, String ldapPeopleDN, String ldapGroupsDN, String ldapRolesDN,
-    String ldapAdminDN, String ldapAdminPassword, String ldapPasswordDigestAlgorithm, List<String> ldapProtectedUsers,
-    List<String> ldapProtectedGroups) {
-    this.ldapHost = ldapHost;
-    this.ldapPort = ldapPort;
+  public LdapUtility(final String ldapRootDN, final String ldapPeopleDN, final String ldapGroupsDN,
+    final String ldapRolesDN, final String ldapAdminDN, final String ldapAdminPassword,
+    final String ldapPasswordDigestAlgorithm, final List<String> ldapProtectedUsers,
+    final List<String> ldapProtectedGroups, final String rodaAdminDN, final Path dataDirectory) {
+    this.ldapRootDN = ldapRootDN;
     this.ldapPeopleDN = ldapPeopleDN;
     this.ldapGroupsDN = ldapGroupsDN;
     this.ldapRolesDN = ldapRolesDN;
@@ -262,99 +251,157 @@ public class LdapUtility {
       this.ldapProtectedGroups.addAll(ldapProtectedGroups);
       LOGGER.debug("protected groups: " + this.ldapProtectedGroups);
     }
+    this.rodaAdminDN = rodaAdminDN;
+    this.dataDirectory = dataDirectory;
   }
 
-  /*
-   * Users
+  /**
+   * Start the LDAP server.
+   *
+   * @param ldapPort
+   *          The port where LDAP should bind.
+   * @throws Exception
+   *           if some error occurs.
    */
+  public void startLdapServer(final int ldapPort) throws Exception {
+
+    this.server = new LdapServer();
+    server.setTransports(new TcpTransport(ldapPort));
+    server.setDirectoryService(service);
+
+    server.start();
+  }
 
   /**
-   * Returns the number of registered users.
-   * 
-   * @param contentAdapterFilter
-   * 
-   * @return an <code>int</code> with the number of users in the repository.
-   * @throws LdapUtilityException
+   * Stop the LDAP server.
    */
-  // public int getUserCount(Filter contentAdapterFilter) throws
-  // LdapUtilityException {
-  //
-  // JndiContentAdapterEngine<UserAdapter, User> jndiAdapterEngine = new
-  // JndiContentAdapterEngine<UserAdapter, User>(
-  // new UserAdapter(), new ContentAdapter(contentAdapterFilter, null, null));
-  //
-  // try {
-  //
-  // DirContext ctxRoot = getLDAPDirContext(ldapRootDN);
-  //
-  // List<Attributes> attributesList = searchAttributes(ctxRoot, ldapPeopleDN,
-  // "uid", jndiAdapterEngine);
-  //
-  // ctxRoot.close();
-  //
-  // return attributesList.size();
-  //
-  // } catch (NamingException e) {
-  // logger.debug("Error counting users - " + e.getMessage(), e);
-  // throw new LdapUtilityException("Error counting users - " +
-  // e.getMessage(), e);
-  // }
-  // }
+  public void stopLdapServer() {
+
+    if (!server.isStarted()) {
+      throw new IllegalStateException("Service is not running");
+    }
+
+    server.stop();
+    // service.shutdown();
+  }
 
   /**
-   * Return the users that match the given.
-   * 
+   * Initialize the server. It creates the partition and adds the index.
+   *
+   * @throws Exception
+   *           if there were some problems while initializing the system
+   */
+  public void initDirectoryService() throws Exception {
+    initDirectoryService(null);
+  }
+
+  /**
+   * Initialize the server. It creates the partition, adds the index, and
+   * injects the context entries for the created partitions.
+   *
+   * @param ldifs
+   *          LDIF files to apply to Directory Service.
+   * @throws Exception
+   *           if there were some problems while initializing the system
+   */
+  public void initDirectoryService(final List<String> ldifs) throws Exception {
+
+    // Initialize the LDAP service
+    final JdbmPartition rodaPartition = instantiateDirectoryService();
+
+    if (ldifs != null && !ldifs.isEmpty()) {
+      // Inject the context entry for dc=roda,dc=org partition
+      if (!service.getAdminSession().exists(rodaPartition.getSuffixDn())) {
+        final Dn dnApache = new Dn(this.ldapRootDN);
+        final Entry entryRoda = service.newEntry(dnApache);
+        // @checkstyle MultipleStringLiterals (1 line)
+        entryRoda.add(OBJECT_CLASS, OBJECT_CLASS_TOP, OBJECT_CLASS_DOMAIN, OBJECT_CLASS_EXTENSIBLE_OBJECT);
+        entryRoda.add("dc", "roda");
+        service.getAdminSession().add(entryRoda);
+
+        // change nis attribute in order to make things like
+        // "shadowinactive" work
+        ModifyRequestImpl modifyRequestImpl = new ModifyRequestImpl();
+        modifyRequestImpl.setName(new Dn("cn=nis,ou=schema"));
+        modifyRequestImpl.replace("m-disabled", "FALSE");
+        service.getAdminSession().modify(modifyRequestImpl);
+
+        // change apacheds admin password
+        modifyRequestImpl = new ModifyRequestImpl();
+        modifyRequestImpl.setName(new Dn(this.ldapAdminDN));
+        modifyRequestImpl.replace(USER_PASSWORD, this.ldapAdminPassword);
+        service.getAdminSession().modify(modifyRequestImpl);
+
+        for (String ldif : ldifs) {
+          applyLdif(ldif);
+        }
+      }
+    }
+  }
+
+  /**
+   * Return the users that match the given filter.
+   *
    * @param filter
    *          the {@link Filter}.
-   * 
+   *
    * @return a list of {@link User}'s.
-   * 
+   *
    * @throws LdapUtilityException
+   *           if some error occurs.
    */
-  public List<User> getUsers(Filter filter) throws LdapUtilityException {
+  public List<User> getUsers(final Filter filter) throws LdapUtilityException {
     return getUsers(filter, null);
   }
 
-  public List<User> getUsers(Filter filter, Sorter sorter) throws LdapUtilityException {
+  /**
+   * Return the users that match the given filter, ordered by the given sorter.
+   *
+   * @param filter
+   *          the {@link Filter}.
+   * @param sorter
+   *          the {@link Sorter}.
+   *
+   * @return a list of {@link User}'s.
+   *
+   * @throws LdapUtilityException
+   *           if some error occurs.
+   */
+  public List<User> getUsers(final Filter filter, final Sorter sorter) throws LdapUtilityException {
 
     try {
 
-      DirContext ctxRoot = getLDAPDirContext(ldapRootDN);
+      final CoreSession session = service.getAdminSession();
+      final List<Entry> entries = searchEntries(session, ldapPeopleDN, UID, filter);
+      final List<User> users = new ArrayList<>();
+      for (Entry entry : entries) {
 
-      List<Attributes> attributesList = searchAttributes(ctxRoot, ldapPeopleDN, "uid", filter);
-
-      List<User> users = new ArrayList<User>();
-      for (Attributes attributes : attributesList) {
-
-        User user = getUserFromAttributes(attributes);
+        final User user = getUserFromEntry(entry);
 
         // Add all roles assigned to this user
-        Set<String> memberRoles = getMemberRoles(ctxRoot, getUserDN(user.getName()));
+        final Set<String> memberRoles = getMemberRoles(session, getUserDN(user.getName()));
         user.setAllRoles(memberRoles);
 
         // Add direct roles assigned to this user
-        for (String role : getMemberDirectRoles(ctxRoot, getUserDN(user.getName()))) {
+        for (String role : getMemberDirectRoles(session, getUserDN(user.getName()))) {
           user.addDirectRole(role);
         }
 
         // Add all groups to which this user belongs
-        Set<String> memberGroups = getMemberGroups(ctxRoot, getUserDN(user.getName()));
+        final Set<String> memberGroups = getMemberGroups(session, getUserDN(user.getName()));
         user.setAllGroups(memberGroups);
 
         // Add groups to which this user belongs
-        for (String groupDN : getDNsOfGroupsContainingMember(ctxRoot, getUserDN(user.getName()))) {
-          user.addGroup(getGroupCNFromDN(groupDN));
+        for (String groupDN : getDNsOfGroupsContainingMember(session, getUserDN(user.getName()))) {
+          user.addGroup(getFirstNameFromDN(groupDN));
         }
 
         users.add(user);
       }
 
-      ctxRoot.close();
-
       return users;
 
-    } catch (NamingException e) {
-      LOGGER.debug("Error getting users - " + e.getMessage(), e);
+    } catch (final LdapException e) {
       throw new LdapUtilityException("Error getting users - " + e.getMessage(), e);
     }
   }
@@ -362,110 +409,55 @@ public class LdapUtility {
   /**
    * Returns the User with name <code>uid</code> or <code>null</code> if it
    * doesn't exist.
-   * 
+   *
    * @param name
    *          the name of the desired User.
-   * 
+   *
    * @return the User with name <code>name</code> or <code>null</code> if it
    *         doesn't exist.
-   * 
+   *
    * @throws LdapUtilityException
    *           if the user information could not be retrieved from the LDAP
    *           server.
    */
-  public User getUser(String name) throws LdapUtilityException {
-
-    User user = null;
-
+  public User getUser(final String name) throws LdapUtilityException {
     try {
-      // Create initial context
-      DirContext ctxRoot = getLDAPDirContext(ldapRootDN);
-
-      user = getUser(ctxRoot, name);
-
-      // Close the context when we're done
-      ctxRoot.close();
-
-    } catch (NameNotFoundException e) {
-      LOGGER.debug(userMessage(name, " doesn't exist"), e);
-      user = null;
-
-    } catch (NamingException e) {
-      LOGGER.debug("Error getting user " + name, e);
+      return getUser(service.getAdminSession(), name);
+    } catch (final LdapException e) {
       throw new LdapUtilityException("Error getting user " + name, e);
     }
-
-    return user;
-  }
-
-  public RodaUser getRodaUser(String name) throws LdapUtilityException {
-
-    RodaUser user = null;
-
-    try {
-      // Create initial context
-      DirContext ctxRoot = getLDAPDirContext(ldapRootDN);
-
-      user = getRodaUser(ctxRoot, name);
-
-      // Close the context when we're done
-      ctxRoot.close();
-
-    } catch (NameNotFoundException e) {
-      LOGGER.debug(userMessage(name, " doesn't exist"), e);
-      user = null;
-
-    } catch (NamingException e) {
-      LOGGER.debug("Error getting user " + name, e);
-      throw new LdapUtilityException("Error getting user " + name, e);
-    }
-
-    return user;
   }
 
   /**
    * Returns the {@link User} with name <code>email</code> or <code>null</code>
    * if it doesn't exist.
-   * 
+   *
    * @param email
    *          the email of the desired {@link User}.
-   * 
+   *
    * @return the {@link User} with email <code>email</code> or <code>null</code>
    *         if it doesn't exist.
-   * 
+   *
    * @throws LdapUtilityException
    *           if the user information could not be retrieved from the LDAP
    *           server.
    */
-  public User getUserWithEmail(String email) throws LdapUtilityException {
-
-    User user = null;
-
+  public User getUserWithEmail(final String email) throws LdapUtilityException {
     try {
-      // Create initial context
-      DirContext ctxRoot = getLDAPDirContext(ldapRootDN);
-
-      user = getUserWithEmail(ctxRoot, email);
-
-      // Close the context when we're done
-      ctxRoot.close();
-
-    } catch (NamingException e) {
-      LOGGER.debug("Error getting user with email " + email, e);
+      return getUserWithEmail(service.getAdminSession(), email);
+    } catch (final LdapException e) {
       throw new LdapUtilityException("Error getting user with email " + email, e);
     }
-
-    return user;
   }
 
   /**
    * Adds a new {@link User}.
-   * 
+   *
    * @param user
    *          the {@link User} to add.
-   * 
+   *
    * @return the newly created {@link User}.
-   * 
+   *
    * @throws UserAlreadyExistsException
    *           if a User with the same name already exists.
    * @throws EmailAlreadyExistsException
@@ -473,7 +465,8 @@ public class LdapUtility {
    * @throws LdapUtilityException
    *           if something goes wrong with the creation of the new user.
    */
-  public User addUser(User user) throws UserAlreadyExistsException, EmailAlreadyExistsException, LdapUtilityException {
+  public User addUser(final User user)
+    throws UserAlreadyExistsException, EmailAlreadyExistsException, LdapUtilityException {
 
     if (!user.isNameValid()) {
       LOGGER.debug("'" + user.getName() + "' is not a valid user name.");
@@ -486,41 +479,26 @@ public class LdapUtility {
     }
 
     try {
-      // Create initial context
-      DirContext ctxRoot = getLDAPAdminDirContext(ldapRootDN);
-
-      // Get the attributes for the user
-      Attributes attributes = getAttributesFromUser(user, false);
-
-      ctxRoot.bind(getUserDN(user.getName()), null, attributes);
-
-      setMemberDirectRoles(ctxRoot, getUserDN(user.getName()), user.getDirectRoles());
-      setMemberGroups(ctxRoot, getUserDN(user.getName()), user.getDirectGroups());
-
-      // Close the context when we're done
-      ctxRoot.close();
+      final CoreSession session = service.getAdminSession();
+      session.add(getEntryFromUser(user, false));
+      setMemberDirectRoles(session, getUserDN(user.getName()), user.getDirectRoles());
+      setMemberGroups(session, getUserDN(user.getName()), user.getDirectGroups());
 
       if (!user.isActive()) {
         try {
-          setUserPasswordUnchecked(user.getName(), PasswordHandler.generateRandomPassword(12));
-        } catch (NotFoundException e) {
+          setUserPasswordUnchecked(user.getName(), PasswordHandler.generateRandomPassword(RANDOM_PASSWORD_LENGTH));
+        } catch (final NotFoundException e) {
           LOGGER.error("Created user doesn't exist! Notify developers!!!", e);
         }
       }
 
-    } catch (NameAlreadyBoundException e) {
-
-      LOGGER.debug(userMessage(user.getName(), " already exists."), e);
+    } catch (final LdapEntryAlreadyExistsException e) {
       throw new UserAlreadyExistsException(userMessage(user.getName(), " already exists."), e);
-
-    } catch (NamingException e) {
-
-      LOGGER.debug("Error adding user " + user.getName(), e);
+    } catch (final LdapException e) {
       throw new LdapUtilityException("Error adding user " + user.getName(), e);
-
     }
 
-    User newUser = getUser(user.getName());
+    final User newUser = getUser(user.getName());
     if (newUser == null) {
       throw new LdapUtilityException("The user was not created!");
     } else {
@@ -530,12 +508,12 @@ public class LdapUtility {
 
   /**
    * Modify the {@link User}'s information.
-   * 
+   *
    * @param modifiedUser
    *          the {@link User} to modify.
-   * 
+   *
    * @return the modified {@link User}.
-   * 
+   *
    * @throws NotFoundException
    *           if the {@link User} being modified doesn't exist.
    * @throws EmailAlreadyExistsException
@@ -543,51 +521,31 @@ public class LdapUtility {
    * @throws IllegalOperationException
    *           if the user is one of the protected users.
    * @throws LdapUtilityException
+   *           if some error occurred.
    */
-  public User modifyUser(User modifiedUser)
+  public User modifyUser(final User modifiedUser)
     throws NotFoundException, IllegalOperationException, EmailAlreadyExistsException, LdapUtilityException {
-
-    LOGGER.trace("modifyUser() - " + modifiedUser.getName());
-
-    // Create initial context
-    DirContext ctxRoot;
-    try {
-
-      ctxRoot = getLDAPAdminDirContext(ldapRootDN);
-
-    } catch (NamingException e) {
-
-      LOGGER.debug("Error creating LDAP context with user - " + modifiedUser.getName(), e);
-      throw new LdapUtilityException("Error creating LDAP context with user - " + modifiedUser.getName(), e);
-    }
-
-    modifyUser(ctxRoot, modifiedUser, null, true);
-
-    try {
-
-      ctxRoot.close();
-
-    } catch (NamingException e) {
-      // TODO Should I ignore this?
-      LOGGER.warn("Ignoring error closing LDAP context - " + modifiedUser.getName(), e);
-    }
-
+    final CoreSession session = service.getAdminSession();
+    modifyUser(session, modifiedUser, null, true);
     return getUser(modifiedUser.getName());
   }
 
   /**
    * Sets the user's password.
-   * 
+   *
    * @param username
+   *          the username.
    * @param password
-   * 
+   *          the password.
+   *
    * @throws NotFoundException
    *           if specified {@link User} doesn't exist.
    * @throws IllegalOperationException
    *           if the user is one of the protected users.
    * @throws LdapUtilityException
+   *           if some error occurs.
    */
-  public void setUserPassword(String username, String password)
+  public void setUserPassword(final String username, final String password)
     throws IllegalOperationException, NotFoundException, LdapUtilityException {
 
     if (this.ldapProtectedUsers.contains(username)) {
@@ -616,229 +574,113 @@ public class LdapUtility {
    * @throws IllegalOperationException
    *           if the user is one of the protected users.
    * @throws LdapUtilityException
+   *           if some error occurred.
    */
-  public User modifySelfUser(User modifiedUser, String newPassword)
+  public User modifySelfUser(final User modifiedUser, final String newPassword)
     throws NotFoundException, EmailAlreadyExistsException, IllegalOperationException, LdapUtilityException {
-
-    LOGGER.trace("modifySelfUser() - " + modifiedUser.getName());
-
-    // Create initial context
-    DirContext ctxRoot;
-    try {
-
-      ctxRoot = getLDAPAdminDirContext(ldapRootDN);
-
-    } catch (NamingException e) {
-
-      LOGGER.debug("Error creating LDAP context with user - " + modifiedUser.getName(), e);
-      throw new LdapUtilityException("Error creating LDAP context with user - " + modifiedUser.getName(), e);
-    }
-
-    modifyUser(ctxRoot, modifiedUser, newPassword, false);
-
-    try {
-
-      ctxRoot.close();
-
-    } catch (NamingException e) {
-      // TODO Should I ignore this?
-      LOGGER.warn("Ignoring error closing LDAP context - " + modifiedUser.getName(), e);
-    }
-
+    final CoreSession session = service.getAdminSession();
+    modifyUser(session, modifiedUser, newPassword, false);
     return getUser(modifiedUser.getName());
   }
 
   /**
    * Removes a {@link User}.
-   * 
+   *
    * @param username
    *          the name of the user to remove.
-   * 
+   *
    * @throws IllegalOperationException
+   *           if the user is one of the protected users.
    * @throws LdapUtilityException
+   *           if some error occurred.
    */
-  public void removeUser(String username) throws IllegalOperationException, LdapUtilityException {
-
+  public void removeUser(final String username) throws IllegalOperationException, LdapUtilityException {
     if (this.ldapProtectedUsers.contains(username)) {
       throw new IllegalOperationException(userMessage(username, " is protected and cannot be removed."));
     }
-
     try {
-      // Create initial context
-      DirContext ctxRoot = getLDAPAdminDirContext(ldapRootDN);
-
-      removeMember(ctxRoot, getUserDN(username));
-
-      ctxRoot.close();
-
-    } catch (NamingException e) {
-      LOGGER.debug("Error removing user " + username, e);
+      final CoreSession session = service.getAdminSession();
+      removeMember(session, getUserDN(username));
+    } catch (final LdapException e) {
       throw new LdapUtilityException("Error removing user " + username, e);
     }
-
   }
-
-  /**
-   * Marks a {@link User} as inactive.
-   * 
-   * @param username
-   *          the name of the user to deactivate.
-   * 
-   * 
-   * @throws NotFoundException
-   * @throws IllegalOperationException
-   * @throws LdapUtilityException
-   * 
-   */
-  public void deactivateUser(String username)
-    throws NotFoundException, IllegalOperationException, LdapUtilityException {
-
-    User user = getUser(username);
-
-    if (user != null) {
-
-      user.setActive(false);
-
-      try {
-        modifyUser(user);
-      } catch (EmailAlreadyExistsException e) {
-        LOGGER.error("EmailAlreadyExistsException should not occcur here!!! This is problably a bug!", e);
-      }
-
-    } else {
-      throw new NotFoundException(userMessage(username, " doesn't exist."));
-
-    }
-
-  }
-
-  /**
-   * Returns the number of registered groups.
-   * 
-   * @param contentAdapterFilter
-   * 
-   * @return an <code>int</code> with the number of groups in the repository.
-   * @throws LdapUtilityException
-   */
-  // public int getGroupCount(Filter contentAdapterFilter) throws
-  // LdapUtilityException {
-  //
-  // JndiContentAdapterEngine<GroupAdapter, Group> jndiAdapterEngine = new
-  // JndiContentAdapterEngine<GroupAdapter, Group>(
-  // new GroupAdapter(), new ContentAdapter(contentAdapterFilter, null,
-  // null));
-  //
-  // try {
-  //
-  // DirContext ctxRoot = getLDAPDirContext(ldapRootDN);
-  //
-  // List<Attributes> attributesList = searchAttributes(ctxRoot, ldapGroupsDN,
-  // "cn", jndiAdapterEngine);
-  //
-  // ctxRoot.close();
-  //
-  // return attributesList.size();
-  //
-  // } catch (NamingException e) {
-  // logger.debug("Error counting groups - " + e.getMessage(), e);
-  // throw new LdapUtilityException("Error counting groups - " +
-  // e.getMessage(), e);
-  // }
-  // }
 
   /**
    * Return groups that match the given {@link Filter}.
-   * 
+   *
    * @param filter
-   * 
+   *          the filter.
+   *
    * @return an array of {@link Group}'s.
-   * 
+   *
    * @throws LdapUtilityException
+   *           if some error occurred.
    */
-  public List<Group> getGroups(Filter filter) throws LdapUtilityException {
+  public List<Group> getGroups(final Filter filter) throws LdapUtilityException {
 
     try {
 
-      DirContext ctxRoot = getLDAPDirContext(ldapRootDN);
+      final CoreSession session = service.getAdminSession();
 
-      List<Attributes> attributesList = searchAttributes(ctxRoot, ldapGroupsDN, "cn", filter);
+      final List<Entry> entries = searchEntries(session, ldapGroupsDN, CN, filter);
 
-      List<Group> groups = new ArrayList<Group>();
-      for (Attributes attributes : attributesList) {
-        Group group = getGroupFromAttributes(attributes);
+      final List<Group> groups = new ArrayList<>();
+      for (Entry entry : entries) {
+        final Group group = getGroupFromEntry(entry);
 
         // Add all roles assigned to this group
-        Set<String> memberRoles = getMemberRoles(ctxRoot, getGroupDN(group.getName()));
+        final Set<String> memberRoles = getMemberRoles(session, getGroupDN(group.getName()));
         group.setAllRoles(memberRoles);
 
         // Add direct roles assigned to this group
-        for (String role : getMemberDirectRoles(ctxRoot, getGroupDN(group.getName()))) {
+        for (String role : getMemberDirectRoles(session, getGroupDN(group.getName()))) {
           group.addDirectRole(role);
         }
 
         // Add all groups to which this group belongs
-        Set<String> memberGroups = getMemberGroups(ctxRoot, getGroupDN(group.getName()));
+        final Set<String> memberGroups = getMemberGroups(session, getGroupDN(group.getName()));
         group.setAllGroups(memberGroups);
 
         // Add groups to which this group belongs
-        for (String groupDN : getDNsOfGroupsContainingMember(ctxRoot, getGroupDN(group.getName()))) {
-          group.addDirectGroup(getGroupCNFromDN(groupDN));
+        for (String groupDN : getDNsOfGroupsContainingMember(session, getGroupDN(group.getName()))) {
+          group.addDirectGroup(getFirstNameFromDN(groupDN));
         }
 
         groups.add(group);
       }
 
-      ctxRoot.close();
-
       return groups;
 
-    } catch (NamingException e) {
-      LOGGER.debug("Error getting groups - " + e.getMessage(), e);
+    } catch (final LdapException e) {
       throw new LdapUtilityException("Error getting groups - " + e.getMessage(), e);
     }
   }
 
   /**
    * Returns the group named <code>grpName</code>.
-   * 
+   *
    * @param name
    *          the name of the group.
-   * 
+   *
    * @return a Group if the group exists, otherwise <code>null</code>.
-   * 
+   *
    * @throws LdapUtilityException
    *           if the group information could not be retrieved from the LDAP
    *           server.
    */
-  public Group getGroup(String name) throws LdapUtilityException {
-
-    Group group = null;
-
+  public Group getGroup(final String name) throws LdapUtilityException {
     try {
-      // Create initial context
-      DirContext ctxRoot = getLDAPDirContext(ldapRootDN);
-
-      group = getGroup(ctxRoot, name);
-
-      // Close the context when we're done
-      ctxRoot.close();
-
-    } catch (NameNotFoundException e) {
-
-      group = null;
-      LOGGER.debug("Group " + name + " doesn't exist.", e);
-
-    } catch (NamingException e) {
-      LOGGER.debug("Error searching for group " + name, e);
+      final CoreSession session = service.getAdminSession();
+      return getGroup(session, name);
+    } catch (final LdapException e) {
       throw new LdapUtilityException("Error searching for group " + name, e);
     }
-
-    return group;
   }
 
   /**
-   * Adds a new {@link Group}.
-   * 
+   * Add a new {@link Group}.
+   *
    * @param group
    *          the {@link Group} to add.
    * @return the newly created {@link Group}.
@@ -847,59 +689,41 @@ public class LdapUtility {
    * @throws LdapUtilityException
    *           if something goes wrong with the creation of the new group.
    */
-  public Group addGroup(Group group) throws GroupAlreadyExistsException, LdapUtilityException {
-
+  public Group addGroup(final Group group) throws GroupAlreadyExistsException, LdapUtilityException {
     if (!group.isNameValid()) {
-      LOGGER.debug("'" + group.getName() + "' is not a valid group name.");
       throw new LdapUtilityException("'" + group.getName() + "' is not a valid group name.");
     }
-
     try {
-      // Create initial context
-      DirContext ctxRoot = getLDAPAdminDirContext(ldapRootDN);
-
-      Attributes attributes = new BasicAttributes();
-
-      Attribute objectClass = new BasicAttribute("objectclass");
-      objectClass.add("groupOfUniqueNames");
-      objectClass.add("top");
-      objectClass.add("extensibleObject");
-
-      attributes.put(objectClass);
-      attributes.put("cn", group.getName());
-      attributes.put("ou", group.getFullName());
-      attributes.put(SHADOW_INACTIVE, group.isActive() ? "0" : "1");
-
-      Attribute attributeUniqueMember = new BasicAttribute(UNIQUE_MEMBER);
-
+      final Dn dn = new Dn(getGroupDN(group.getName()));
+      final Entry entry = service.newEntry(dn);
+      entry.add(OBJECT_CLASS, "groupOfUniqueNames", OBJECT_CLASS_TOP, OBJECT_CLASS_EXTENSIBLE_OBJECT);
+      entry.add(CN, group.getName());
+      entry.add(OU, group.getFullName());
+      entry.add(SHADOW_INACTIVE, group.isActive() ? "0" : "1");
       // Add admin to all groups
-      attributeUniqueMember.add(ldapAdminDN);
-
+      entry.add(UNIQUE_MEMBER, rodaAdminDN);
+      // Add user members
       for (String memberName : group.getMemberUserNames()) {
-        attributeUniqueMember.add(getUserDN(memberName));
+        entry.add(UNIQUE_MEMBER, getUserDN(memberName));
+      }
+      // Add group members
+      for (String memberName : group.getMemberGroupNames()) {
+        entry.add(UNIQUE_MEMBER, getGroupDN(memberName));
       }
 
-      attributes.put(attributeUniqueMember);
+      final CoreSession session = service.getAdminSession();
+      session.add(entry);
 
-      ctxRoot.bind(getGroupDN(group.getName()), null, attributes);
+      setMemberDirectRoles(session, getGroupDN(group.getName()), group.getDirectRoles());
+      setMemberGroups(session, getGroupDN(group.getName()), group.getDirectGroups());
 
-      setMemberDirectRoles(ctxRoot, getGroupDN(group.getName()), group.getDirectRoles());
-      setMemberGroups(ctxRoot, getGroupDN(group.getName()), group.getDirectGroups());
-
-      // Close the context when we're done
-      ctxRoot.close();
-
-    } catch (NameAlreadyBoundException e) {
-
-      LOGGER.debug("Group " + group.getName() + " already exists.", e);
+    } catch (final LdapEntryAlreadyExistsException e) {
       throw new GroupAlreadyExistsException("Group " + group.getName() + " already exists.", e);
-
-    } catch (NamingException e) {
-      LOGGER.debug("Error adding group " + group.getName(), e);
+    } catch (final LdapException e) {
       throw new LdapUtilityException("Error adding group " + group.getName(), e);
     }
 
-    Group newGroup = getGroup(group.getName());
+    final Group newGroup = getGroup(group.getName());
     if (newGroup == null) {
       throw new LdapUtilityException("The group was not created!");
     } else {
@@ -909,21 +733,21 @@ public class LdapUtility {
 
   /**
    * Modify the {@link Group}'s information.
-   * 
+   *
    * @param modifiedGroup
    *          the {@link Group} to modify.
-   * 
+   *
    * @return the modified {@link Group}.
-   * 
+   *
    * @throws NotFoundException
    *           if the group with being modified doesn't exist.
    * @throws IllegalOperationException
+   *           if the user is one of the protected users.
    * @throws LdapUtilityException
+   *           if some error occurred.
    */
-  public Group modifyGroup(Group modifiedGroup)
+  public Group modifyGroup(final Group modifiedGroup)
     throws NotFoundException, IllegalOperationException, LdapUtilityException {
-
-    LOGGER.trace("modifyGroup() - " + modifiedGroup.getName());
 
     if (this.ldapProtectedGroups.contains(modifiedGroup.getName())) {
       throw new IllegalOperationException(
@@ -931,45 +755,30 @@ public class LdapUtility {
     }
 
     try {
-      // Create initial context
-      DirContext ctxRoot = getLDAPAdminDirContext(ldapRootDN);
-
-      Attributes attributes = new BasicAttributes();
-
-      attributes.put(SHADOW_INACTIVE, modifiedGroup.isActive() ? "0" : "1");
-
-      attributes.put("ou", modifiedGroup.getFullName());
-
-      Attribute attributeUniqueMember = new BasicAttribute(UNIQUE_MEMBER);
-
+      final CoreSession session = service.getAdminSession();
+      final Entry entry = session.lookup(new Dn(getGroupDN(modifiedGroup.getName())));
+      entry.add(CN, modifiedGroup.getName());
+      entry.add(OU, modifiedGroup.getFullName());
+      entry.add(SHADOW_INACTIVE, modifiedGroup.isActive() ? "0" : "1");
+      // Remove all members
+      entry.removeAttributes(UNIQUE_MEMBER);
       // Add admin to all groups
-      attributeUniqueMember.add(ldapAdminDN);
-
-      if (modifiedGroup.getMemberUserNames() != null) {
-        for (String memberName : modifiedGroup.getMemberUserNames()) {
-          attributeUniqueMember.add(getUserDN(memberName));
-        }
+      entry.add(UNIQUE_MEMBER, rodaAdminDN);
+      // Add user members
+      for (String memberName : modifiedGroup.getMemberUserNames()) {
+        entry.add(UNIQUE_MEMBER, getUserDN(memberName));
       }
-      if (modifiedGroup.getMemberGroupNames() != null) {
-        for (String memberName : modifiedGroup.getMemberGroupNames()) {
-          attributeUniqueMember.add(getGroupDN(memberName));
-        }
+      // Add group members
+      for (String memberName : modifiedGroup.getMemberGroupNames()) {
+        entry.add(UNIQUE_MEMBER, getGroupDN(memberName));
       }
-      attributes.put(attributeUniqueMember);
 
-      ctxRoot.modifyAttributes(getGroupDN(modifiedGroup.getName()), DirContext.REPLACE_ATTRIBUTE, attributes);
+      setMemberGroups(session, getGroupDN(modifiedGroup.getName()), modifiedGroup.getDirectGroups());
+      setMemberDirectRoles(session, getGroupDN(modifiedGroup.getName()), modifiedGroup.getDirectRoles());
 
-      setMemberGroups(ctxRoot, getGroupDN(modifiedGroup.getName()), modifiedGroup.getDirectGroups());
-      setMemberDirectRoles(ctxRoot, getGroupDN(modifiedGroup.getName()), modifiedGroup.getDirectRoles());
-
-      // Close the context when we're done
-      ctxRoot.close();
-
-    } catch (NameNotFoundException e) {
-      LOGGER.debug("Group " + modifiedGroup.getName() + " doesn't exist.", e);
+    } catch (final LdapNoSuchObjectException e) {
       throw new NotFoundException("Group " + modifiedGroup.getName() + " doesn't exist.", e);
-    } catch (NamingException e) {
-      LOGGER.debug("Error modifying group " + modifiedGroup.getName(), e);
+    } catch (final LdapException e) {
       throw new LdapUtilityException("Error modifying group " + modifiedGroup.getName(), e);
     }
 
@@ -978,161 +787,45 @@ public class LdapUtility {
 
   /**
    * Removes a group.
-   * 
+   *
    * @param groupname
    *          the name of the group to remove.
    * @throws IllegalOperationException
+   *           if the user is one of the protected users.
    * @throws LdapUtilityException
+   *           if some error occurred.
    */
-  public void removeGroup(String groupname) throws LdapUtilityException, IllegalOperationException {
-
+  public void removeGroup(final String groupname) throws LdapUtilityException, IllegalOperationException {
     if (this.ldapProtectedGroups.contains(groupname)) {
       throw new IllegalOperationException("Group (" + groupname + ") is protected and cannot be removed.");
     }
-
     try {
-
-      // Create initial context
-      DirContext ctxRoot = getLDAPAdminDirContext(ldapRootDN);
-
-      removeMember(ctxRoot, getGroupDN(groupname));
-
-      ctxRoot.close();
-
-    } catch (NamingException e) {
-
-      LOGGER.debug("Error removing group " + groupname, e);
-
+      final CoreSession session = service.getAdminSession();
+      removeMember(session, getGroupDN(groupname));
+    } catch (final LdapException e) {
       throw new LdapUtilityException("Error removing group " + groupname, e);
     }
 
   }
 
   /**
-   * Returns list of {@link User}s that belong to a group named
-   * <code>groupName</code>.
-   * 
-   * @param groupName
-   *          the name of the group.
-   * 
-   * @return an array of {@link User}s with all users that belong to a group
-   *         named <code>groupName</code>.
-   * 
-   * @throws LdapUtilityException
-   *           if the group or user information could not be retrieved from the
-   *           LDAP server.
-   */
-  public User[] getUsersInGroup(String groupName) throws LdapUtilityException {
-    try {
-      List<User> users = new ArrayList<User>();
-
-      DirContext ctxRoot = getLDAPDirContext(ldapRootDN);
-
-      Set<String> directGroupMembersDN = getDNsOfDirectGroupMembers(ctxRoot, getGroupDN(groupName));
-
-      for (String memberDN : directGroupMembersDN) {
-
-        if (memberDN.endsWith(getPeopleDN())) {
-
-          try {
-
-            users.add(getUser(ctxRoot, getUserUIDFromDN(memberDN)));
-
-          } catch (NamingException e) {
-            LOGGER.error("Error getting user " + memberDN + " - " + e.getMessage() + " - IGNORING!", e);
-          }
-
-        } else {
-          // It's not a user
-        }
-
-      }
-
-      ctxRoot.close();
-
-      return users.toArray(new User[users.size()]);
-
-    } catch (NamingException e) {
-      LOGGER.debug("Error getting users in group - " + e.getMessage(), e);
-      throw new LdapUtilityException("Error getting users in group - " + e.getMessage(), e);
-    }
-  }
-
-  /**
-   * Returns the roles assigned to a given user.
-   * 
-   * @param userName
-   *          the name of the user.
-   * @return a Set of roles assigned to a user.
-   * @throws LdapUtilityException
-   */
-  public Set<String> getUserRoles(String userName) throws LdapUtilityException {
-
-    try {
-
-      DirContext ctxRoot = getLDAPDirContext(ldapRootDN);
-
-      Set<String> userRoleNames = getMemberRoles(ctxRoot, getUserDN(userName));
-
-      ctxRoot.close();
-
-      return userRoleNames;
-
-    } catch (NamingException e) {
-      LOGGER.debug("Error getting user group names", e);
-      throw new LdapUtilityException("Error getting user group names", e);
-    }
-  }
-
-  /**
-   * Returns the roles directly assigned to a given user.
-   * 
-   * @param userName
-   *          the name of the user.
-   * 
-   * @return an array of roles directly assigned to a user.
-   * 
-   * @throws LdapUtilityException
-   */
-  public Set<String> getUserDirectRoles(String userName) throws LdapUtilityException {
-
-    try {
-
-      DirContext ctxRoot = getLDAPDirContext(ldapRootDN);
-
-      Set<String> directMemberRolesDN = getDNsOfDirectRolesForMember(ctxRoot, getUserDN(userName));
-
-      ctxRoot.close();
-
-      Set<String> directRoles = new HashSet<String>();
-      for (String roleDN : directMemberRolesDN) {
-        directRoles.add(getRoleCNFromDN(roleDN));
-      }
-
-      return directRoles;
-
-    } catch (NamingException e) {
-      LOGGER.debug("Error getting user group names", e);
-      throw new LdapUtilityException("Error getting user group names", e);
-    }
-  }
-
-  /**
    * Gets {@link User} with <code>username</code> and <code>password</code> from
    * LDAP server using this username and password as login for LDAP to verify
    * that the parameters are valid.
-   * 
+   *
    * @param username
    *          the user's username.
    * @param password
    *          the user's password.
-   * 
+   *
    * @return the {@link User} registered in LDAP.
-   * 
+   *
    * @throws AuthenticationDeniedException
+   *           if the provided credentials are not valid.
    * @throws ServiceException
+   *           if some error occurred.
    */
-  public RodaUser getAuthenticatedUser(String username, String password)
+  public RodaUser getAuthenticatedUser(final String username, final String password)
     throws AuthenticationDeniedException, ServiceException {
 
     if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
@@ -1140,43 +833,34 @@ public class LdapUtility {
     }
 
     try {
-      // Create initial context
-      DirContext ctxRoot = getLDAPDirContext(ldapRootDN, getUserDN(username), password);
 
-      RodaUser user = getRodaUser(ctxRoot, username);
-      ctxRoot.close();
-      return user;
+      final CoreSession session = service.getSession(new Dn(getUserDN(username)), password.getBytes());
+      return getRodaUser(session, username);
 
-    } catch (AuthenticationException e) {
-
+    } catch (final LdapAuthenticationException e) {
+      throw new AuthenticationDeniedException(e.getMessage(), e);
+    } catch (final LdapException e) {
+      LOGGER.debug(e.getMessage(), e);
       if (isInvalidCredentials(e.getMessage())) {
-        throw new AuthenticationDeniedException(e.getMessage());
+        throw new AuthenticationDeniedException(e.getMessage(), e);
       } else {
-        LOGGER.debug("Error searching for user " + username, e);
-        throw new ServiceException(e.getMessage(), ServiceException.INTERNAL_SERVER_ERROR);
+        throw new ServiceException(e.getMessage(), ServiceException.INTERNAL_SERVER_ERROR, e);
       }
-    } catch (NamingException e) {
-      LOGGER.debug("Error searching for user " + username, e);
-      throw new ServiceException(e.getMessage(), ServiceException.INTERNAL_SERVER_ERROR);
     }
 
-  }
-
-  private boolean isInvalidCredentials(String errorMessage) {
-    return errorMessage.contains("LDAP: error code 49 - INVALID_CREDENTIALS");
   }
 
   /**
    * Register a new {@link User}. The new {@link User} will be inactive and a
    * email validation token will be generated.
-   * 
+   *
    * @param user
    *          the new {@link User} to create.
    * @param password
    *          the new {@link User} password.
-   * 
+   *
    * @return the newly created {@link User}.
-   * 
+   *
    * @throws UserAlreadyExistsException
    *           if a {@link User} with the same name already exists.
    * @throws EmailAlreadyExistsException
@@ -1184,29 +868,24 @@ public class LdapUtility {
    * @throws LdapUtilityException
    *           if something goes wrong with the register process.
    */
-  public User registerUser(User user, String password)
+  public User registerUser(final User user, final String password)
     throws UserAlreadyExistsException, EmailAlreadyExistsException, LdapUtilityException {
 
-    // A new registered user, is always inactive.
-    // user.setActive(false);
-
     // Generate an email verification token with 1 day expiration date.
-    UUID uuidToken = UUID.randomUUID();
-    Calendar calendar = Calendar.getInstance();
+    final UUID uuidToken = UUID.randomUUID();
+    final Calendar calendar = Calendar.getInstance();
     calendar.add(Calendar.DAY_OF_MONTH, 1);
-    String isoDateNoMillis = DateParser.getIsoDateNoMillis(calendar.getTime());
+    final String isoDateNoMillis = DateParser.getIsoDateNoMillis(calendar.getTime());
 
     user.setEmailConfirmationToken(uuidToken.toString());
     user.setEmailConfirmationTokenExpirationDate(isoDateNoMillis);
 
-    User newUser = addUser(user);
+    final User newUser = addUser(user);
     try {
 
       setUserPassword(newUser.getName(), password);
 
-    } catch (IllegalOperationException e) {
-      throw new LdapUtilityException("Error setting user password - " + e.getMessage(), e);
-    } catch (NotFoundException e) {
+    } catch (final IllegalOperationException | NotFoundException e) {
       throw new LdapUtilityException("Error setting user password - " + e.getMessage(), e);
     }
 
@@ -1220,15 +899,16 @@ public class LdapUtility {
    * The <code>username</code> and <code>email</code> are used to identify the
    * user. One of them can be <code>null</code>, but not both at the same time.
    * </p>
-   * 
+   *
    * @param username
    *          the name of the {@link User}.
    * @param email
    *          the email address of the {@link User}.
    * @param emailConfirmationToken
-   * 
+   *          the email confirmation token.
+   *
    * @return the {@link User} whose email has been confirmed.
-   * 
+   *
    * @throws NotFoundException
    *           if the username and email don't exist.
    * @throws IllegalArgumentException
@@ -1239,21 +919,14 @@ public class LdapUtility {
    * @throws LdapUtilityException
    *           if something goes wrong with the operation.
    */
-  public User confirmUserEmail(String username, String email, String emailConfirmationToken)
-    throws NotFoundException, IllegalArgumentException, InvalidTokenException, LdapUtilityException {
+  public User confirmUserEmail(final String username, final String email, final String emailConfirmationToken)
+    throws NotFoundException, InvalidTokenException, LdapUtilityException {
 
-    User user = null;
-    if (username != null) {
-      user = getUser(username);
-    } else if (email != null) {
-      user = getUserWithEmail(email);
-    } else {
-      throw new IllegalArgumentException("username and email can not both be null");
-    }
+    final User user = getUserByNameOrEmail(username, email);
 
     if (user == null) {
 
-      String message;
+      final String message;
       if (username != null) {
         message = userMessage(username, " doesn't exist");
       } else {
@@ -1268,26 +941,22 @@ public class LdapUtility {
 
         throw new InvalidTokenException("There's no active email confirmation token.");
 
-      } else if (!user.getEmailConfirmationToken().equals(emailConfirmationToken)) {
+      } else if (!user.getEmailConfirmationToken().equals(emailConfirmationToken)
+        || user.getEmailConfirmationTokenExpirationDate() == null) {
 
-        // Token argument is not equal to stored token.
-        throw new InvalidTokenException("Email confirmation token is invalid.");
-
-      } else if (user.getEmailConfirmationTokenExpirationDate() == null) {
-
+        // Token argument is not equal to stored token, or
         // No expiration date
+        throw new InvalidTokenException("Email confirmation token is invalid.");
 
       } else {
 
-        String currentIsoDate = DateParser.getIsoDateNoMillis(Calendar.getInstance().getTime());
+        final String currentIsoDate = DateParser.getIsoDateNoMillis(Calendar.getInstance().getTime());
 
         if (currentIsoDate.compareToIgnoreCase(user.getEmailConfirmationTokenExpirationDate()) > 0) {
 
           throw new InvalidTokenException(
             "Email confirmation token expired in " + user.getEmailConfirmationTokenExpirationDate());
 
-        } else {
-          // Good, token didn't expired yet.
         }
 
       }
@@ -1300,9 +969,7 @@ public class LdapUtility {
 
         return modifyUser(user);
 
-      } catch (IllegalOperationException e) {
-        throw new LdapUtilityException("Error confirming user email - " + e.getMessage(), e);
-      } catch (EmailAlreadyExistsException e) {
+      } catch (final IllegalOperationException | EmailAlreadyExistsException e) {
         throw new LdapUtilityException("Error confirming user email - " + e.getMessage(), e);
       }
     }
@@ -1315,17 +982,17 @@ public class LdapUtility {
    * The <code>username</code> and <code>email</code> are used to identify the
    * user. One of them can be <code>null</code>, but not both at the same time.
    * </p>
-   * 
+   *
    * @param username
    *          the username of the {@link User} for whom the password needs to be
    *          reset.
-   * 
+   *
    * @param email
    *          the email of the {@link User} for whom the password needs to be
    *          reset.
-   * 
+   *
    * @return the {@link User} with the password reset token and expiration date.
-   * 
+   *
    * @throws NotFoundException
    *           if username or email doesn't correspond to any registered
    *           {@link User}.
@@ -1334,21 +1001,14 @@ public class LdapUtility {
    * @throws LdapUtilityException
    *           if something goes wrong with the operation.
    */
-  public User requestPasswordReset(String username, String email)
+  public User requestPasswordReset(final String username, final String email)
     throws NotFoundException, IllegalOperationException, LdapUtilityException {
 
-    User user = null;
-    if (username != null) {
-      user = getUser(username);
-    } else if (email != null) {
-      user = getUserWithEmail(email);
-    } else {
-      throw new IllegalArgumentException("username and email can not both be null");
-    }
+    final User user = getUserByNameOrEmail(username, email);
 
     if (user == null) {
 
-      String message;
+      final String message;
       if (username != null) {
         message = userMessage(username, " doesn't exist");
       } else {
@@ -1360,10 +1020,10 @@ public class LdapUtility {
     } else {
 
       // Generate a password reset token with 1 day expiration date.
-      UUID uuidToken = UUID.randomUUID();
-      Calendar calendar = Calendar.getInstance();
+      final UUID uuidToken = UUID.randomUUID();
+      final Calendar calendar = Calendar.getInstance();
       calendar.add(Calendar.DAY_OF_MONTH, 1);
-      String isoDateNoMillis = DateParser.getIsoDateNoMillis(calendar.getTime());
+      final String isoDateNoMillis = DateParser.getIsoDateNoMillis(calendar.getTime());
 
       user.setResetPasswordToken(uuidToken.toString());
       user.setResetPasswordTokenExpirationDate(isoDateNoMillis);
@@ -1372,7 +1032,7 @@ public class LdapUtility {
 
         return modifyUser(user);
 
-      } catch (EmailAlreadyExistsException e) {
+      } catch (final EmailAlreadyExistsException e) {
         throw new LdapUtilityException("Error setting password reset token - " + e.getMessage(), e);
       }
     }
@@ -1380,16 +1040,16 @@ public class LdapUtility {
 
   /**
    * Reset {@link User}'s password given a previously generated token.
-   * 
+   *
    * @param username
    *          the {@link User}'s username.
    * @param password
    *          the {@link User}'s password.
    * @param resetPasswordToken
    *          the token to reset {@link User}'s password.
-   * 
+   *
    * @return the modified {@link User}.
-   * 
+   *
    * @throws NotFoundException
    *           if a {@link User} with the same name already exists.
    * @throws InvalidTokenException
@@ -1400,10 +1060,10 @@ public class LdapUtility {
    * @throws LdapUtilityException
    *           if something goes wrong with the operation.
    */
-  public User resetUserPassword(String username, String password, String resetPasswordToken)
+  public User resetUserPassword(final String username, final String password, final String resetPasswordToken)
     throws NotFoundException, InvalidTokenException, IllegalOperationException, LdapUtilityException {
 
-    User user = getUser(username);
+    final User user = getUser(username);
 
     if (user == null) {
 
@@ -1415,28 +1075,19 @@ public class LdapUtility {
 
         throw new InvalidTokenException("There's no active password reset token.");
 
-      } else if (!user.getResetPasswordToken().equals(resetPasswordToken)) {
+      } else if (!user.getResetPasswordToken().equals(resetPasswordToken)
+        || user.getResetPasswordTokenExpirationDate() == null) {
 
-        // Token argument is not equal to stored token.
+        // Token argument is not equal to stored token, or
+        // expiration date is null.
         throw new InvalidTokenException("Password reset token is invalid.");
 
-      } else if (user.getResetPasswordTokenExpirationDate() == null) {
-
-        // No expiration date
-
       } else {
-
-        String currentIsoDate = DateParser.getIsoDateNoMillis(Calendar.getInstance().getTime());
-
+        final String currentIsoDate = DateParser.getIsoDateNoMillis(Calendar.getInstance().getTime());
         if (currentIsoDate.compareToIgnoreCase(user.getResetPasswordTokenExpirationDate()) > 0) {
-
           throw new InvalidTokenException(
             "Password reset token expired in " + user.getResetPasswordTokenExpirationDate());
-
-        } else {
-          // Good, token didn't expired yet.
         }
-
       }
 
       try {
@@ -1448,94 +1099,14 @@ public class LdapUtility {
 
         return modifyUser(user);
 
-      } catch (IllegalOperationException e) {
-        throw new LdapUtilityException("Error reseting user password - " + e.getMessage(), e);
-      } catch (EmailAlreadyExistsException e) {
+      } catch (final IllegalOperationException | EmailAlreadyExistsException e) {
         throw new LdapUtilityException("Error reseting user password - " + e.getMessage(), e);
       }
     }
   }
 
   /**
-   * Gets the list of role names.
-   * 
-   * @return and array {@link String} with all the roles names.
-   * @throws LdapUtilityException
-   */
-  public String[] getRoles() throws LdapUtilityException {
-    try {
-
-      DirContext ctxRoot = getLDAPDirContext(ldapRootDN);
-
-      List<String> rolesDN = getRolesDN(ctxRoot);
-
-      String[] roleNames = new String[rolesDN.size()];
-
-      int index = 0;
-      for (String roleDN : rolesDN) {
-
-        roleNames[index] = getRoleCNFromDN(roleDN);
-
-        index++;
-      }
-
-      ctxRoot.close();
-
-      return roleNames;
-
-    } catch (NamingException e) {
-      LOGGER.debug("Error getting role names", e);
-      throw new LdapUtilityException("Error getting role names", e);
-    }
-  }
-
-  /**
-   * Adds a new role.
-   *
-   * @param roleName
-   *          the role to add.
-   * @throws RoleAlreadyExistsException
-   *           if a role with the same name already exists.
-   * @throws LdapUtilityException
-   *           if something goes wrong with the creation of the new group.
-   */
-  public void addRole(String roleName) throws RoleAlreadyExistsException, LdapUtilityException {
-
-    try {
-      // Create initial context
-      DirContext ctxRoot = getLDAPAdminDirContext(ldapRootDN);
-
-      Attributes attributes = new BasicAttributes();
-
-      Attribute objectClass = new BasicAttribute("objectclass");
-      objectClass.add("organizationalRole");
-      objectClass.add("top");
-
-      attributes.put(objectClass);
-      attributes.put("cn", roleName);
-
-      Attribute attributeRoleOccupant = new BasicAttribute(ROLE_OCCUPANT);
-
-      // Add admin to all roles
-      attributeRoleOccupant.add(ldapAdminDN);
-
-      attributes.put(attributeRoleOccupant);
-
-      ctxRoot.bind(getRoleDN(roleName), null, attributes);
-
-      // Close the context when we're done
-      ctxRoot.close();
-
-    } catch (NameAlreadyBoundException e) {
-      throw new RoleAlreadyExistsException("Role " + roleName + " already exists.", e);
-    } catch (NamingException e) {
-      throw new LdapUtilityException("Error adding role '" + roleName + "'", e);
-    }
-
-  }
-
-  /**
-   * Adds a new role.
+   * Add a new role with the specified name.
    *
    * @param roleName
    *          the role to add.
@@ -1544,12 +1115,12 @@ public class LdapUtility {
    * @throws LdapUtilityException
    *           if something goes wrong with the creation of the new role.
    */
-  public void addRoleDS(final String roleName) throws RoleAlreadyExistsException, LdapUtilityException {
+  public void addRole(final String roleName) throws RoleAlreadyExistsException, LdapUtilityException {
     try {
-      final Dn dnRole = new Dn(String.format("cn=%s,%s", roleName, ldapRolesDN));
+      final Dn dnRole = new Dn(getRoleDN(roleName));
       final Entry entryRole = service.newEntry(dnRole);
-      entryRole.add("objectClass", "organizationalRole", "top");
-      entryRole.add("cn", roleName);
+      entryRole.add(OBJECT_CLASS, "organizationalRole", OBJECT_CLASS_TOP);
+      entryRole.add(CN, roleName);
       entryRole.add(ROLE_OCCUPANT, ldapAdminDN);
       service.getAdminSession().add(entryRole);
     } catch (final LdapEntryAlreadyExistsException e) {
@@ -1560,193 +1131,16 @@ public class LdapUtility {
   }
 
   /**
-   * Returns the roles assigned to a given group.
-   * 
-   * @param groupName
-   *          the name of the group.
-   * 
-   * @return a Set of roles assigned to a group.
-   * @throws LdapUtilityException
-   */
-  public Set<String> getGroupRoles(String groupName) throws LdapUtilityException {
-    try {
-
-      DirContext ctxRoot = getLDAPDirContext(ldapRootDN);
-
-      Set<String> roles = getMemberRoles(ctxRoot, getGroupDN(groupName));
-
-      ctxRoot.close();
-
-      return roles;
-
-    } catch (NamingException e) {
-      LOGGER.debug("Error getting group names", e);
-      throw new LdapUtilityException("Error getting group names", e);
-    }
-  }
-
-  /**
-   * Returns the roles directly assigned to a given group.
-   * 
-   * @param groupName
-   *          the name of the group.
-   * 
-   * @return an array of roles directly assigned to a user.
-   * 
-   * @throws LdapUtilityException
-   */
-  public String[] getGroupDirectRoles(String groupName) throws LdapUtilityException {
-
-    try {
-
-      DirContext ctxRoot = getLDAPDirContext(ldapRootDN);
-
-      Set<String> directMemberRolesDN = getDNsOfDirectRolesForMember(ctxRoot, getGroupDN(groupName));
-
-      ctxRoot.close();
-
-      String[] directRoles = new String[directMemberRolesDN.size()];
-
-      int count = 0;
-      for (String roleDN : directMemberRolesDN) {
-        directRoles[count] = getRoleCNFromDN(roleDN);
-        count++;
-      }
-
-      return directRoles;
-
-    } catch (NamingException e) {
-      LOGGER.debug("Error getting group group names", e);
-      throw new LdapUtilityException("Error getting group group names", e);
-    }
-  }
-
-  /**
-   * Sets the groups to which a group belongs.
-   * 
-   * @param groupName
-   *          the name of the group to change the groups.
-   * @param groups
-   *          a list of groups that this group should belongs.
-   * @throws NotFoundException
-   *           if the specified Group doesn't exist.
-   * @throws LdapUtilityException
-   */
-  public void setSuperGroups(String groupName, Set<String> groups) throws LdapUtilityException, NotFoundException {
-    try {
-
-      DirContext ctxRoot = getLDAPAdminDirContext(ldapRootDN);
-      setMemberGroups(ctxRoot, getGroupDN(groupName), groups);
-      ctxRoot.close();
-
-    } catch (NameNotFoundException e) {
-      LOGGER.debug("Group " + groupName + " doesn't exist.", e);
-      throw new NotFoundException("Group " + groupName + " doesn't exist.", e);
-    } catch (NamingException e) {
-      LOGGER.debug("Error setting user groups", e);
-      throw new LdapUtilityException("Error setting user groups", e);
-    }
-  }
-
-  /**
-   * Starts the LdapServer.
-   *
-   * @param ldapPort
-   *          The port where LDAP should bind.
-   * @throws Exception
-   *           if some error occurs.
-   */
-  public void startApacheDS(final int ldapPort) throws Exception {
-
-    this.server = new LdapServer();
-    server.setTransports(new TcpTransport(ldapPort));
-    server.setDirectoryService(service);
-
-    server.start();
-  }
-
-  /**
-   * Stop {@link LdapServer} and shutdown {@link DirectoryService}.
-   *
-   * @throws Exception
-   *           if some error occurs.
-   */
-  public void stopApacheDS() throws Exception {
-
-    if (!server.isStarted()) {
-      throw new IllegalStateException("Service is not running");
-    }
-
-    server.stop();
-    service.shutdown();
-  }
-
-  /**
-   * Initialize the server. It creates the partition, adds the index, and
-   * injects the context entries for the created partitions.
-   *
-   * @param dataDirectory
-   *          the directory to be used for storing the data
-   * @param adminDN
-   *          admin DN.
-   * @param adminPassword
-   *          the admin password to be set in the first time the server is
-   *          started
-   * @param ldapBaseDN
-   *          LDAP base DN.
-   * @param ldifs
-   *          LDIF files to apply to Directory Service.
-   * @throws Exception
-   *           if there were some problems while initializing the system
-   */
-  public void initDirectoryService(final Path dataDirectory, final String adminDN, final String adminPassword,
-    final String ldapBaseDN, final List<String> ldifs) throws Exception {
-    // Initialize the LDAP service
-    final JdbmPartition rodaPartition = instantiateDirectoryService(dataDirectory, ldapBaseDN);
-
-    // Inject the context entry for dc=roda,dc=org partition
-    if (!service.getAdminSession().exists(rodaPartition.getSuffixDn())) {
-      final Dn dnApache = new Dn(ldapBaseDN);
-      final Entry entryRoda = service.newEntry(dnApache);
-      // @checkstyle MultipleStringLiterals (1 line)
-      entryRoda.add("objectClass", "top", "domain", "extensibleObject");
-      entryRoda.add("dc", "roda");
-      service.getAdminSession().add(entryRoda);
-
-      // change nis attribute in order to make things like
-      // "shadowinactive" work
-      ModifyRequestImpl modifyRequestImpl = new ModifyRequestImpl();
-      modifyRequestImpl.setName(new Dn("cn=nis,ou=schema"));
-      modifyRequestImpl.replace("m-disabled", "FALSE");
-      service.getAdminSession().modify(modifyRequestImpl);
-
-      // change apacheds admin password
-      modifyRequestImpl = new ModifyRequestImpl();
-      modifyRequestImpl.setName(new Dn(adminDN));
-      modifyRequestImpl.replace("userPassword", adminPassword);
-      service.getAdminSession().modify(modifyRequestImpl);
-
-      for (String ldif : ldifs) {
-        applyLdif(ldif);
-      }
-    }
-  }
-
-  /**
    * Instantiate Directory Service.
    *
-   * @param dataDirectory
-   *          the data directory.
-   * @param ldapBaseDN
-   *          LDAP base DN.
    * @return RODA {@link JdbmPartition}
    * @throws Exception
    *           if some error occurs.
    */
-  public JdbmPartition instantiateDirectoryService(final Path dataDirectory, final String ldapBaseDN) throws Exception {
+  private JdbmPartition instantiateDirectoryService() throws Exception {
     this.service = new DefaultDirectoryService();
     service.setInstanceId(INSTANCE_NAME);
-    service.setInstanceLayout(new InstanceLayout(dataDirectory.toFile()));
+    service.setInstanceLayout(new InstanceLayout(this.dataDirectory.toFile()));
 
     final CacheService cacheService = new CacheService();
     cacheService.initialize(service.getInstanceLayout());
@@ -1777,10 +1171,10 @@ public class LdapUtility {
     service.setDenormalizeOpAttrsEnabled(true);
 
     // Now we can create as many partitions as we need
-    final JdbmPartition rodaPartition = addPartition(INSTANCE_NAME, ldapBaseDN, service.getDnFactory());
+    final JdbmPartition rodaPartition = addPartition(INSTANCE_NAME, this.ldapRootDN, service.getDnFactory());
 
     // Index some attributes on the apache partition
-    addIndex(rodaPartition, "objectClass", "ou", "uid");
+    addIndex(rodaPartition, OBJECT_CLASS, OU, UID);
 
     // And start the service
     service.startup();
@@ -1788,162 +1182,111 @@ public class LdapUtility {
     return rodaPartition;
   }
 
-  private RodaUser getRodaUser(DirContext ctxRoot, String username) throws NamingException {
+  private RodaUser getRodaUser(final CoreSession session, final String username) throws LdapException {
 
-    Attributes attributes = ctxRoot.getAttributes(getUserDN(username));
-
-    RodaUser user = getRodaUserFromAttributes(attributes);
+    final Entry entry = session.lookup(new Dn(getUserDN(username)));
+    final RodaUser user = getRodaUserFromEntry(entry);
 
     // Add all roles assigned to this user
-    Set<String> memberRoles = getMemberRoles(ctxRoot, getUserDN(username));
+    final Set<String> memberRoles = getMemberRoles(session, getUserDN(username));
     user.setAllRoles(memberRoles);
 
     // Add direct roles assigned to this user
-    for (String role : getMemberDirectRoles(ctxRoot, getUserDN(username))) {
+    for (String role : getMemberDirectRoles(session, getUserDN(username))) {
       user.addDirectRole(role);
     }
 
     // Add all groups to which this user belongs
-    Set<String> memberGroups = getMemberGroups(ctxRoot, getUserDN(username));
+    final Set<String> memberGroups = getMemberGroups(session, getUserDN(username));
     user.setAllGroups(memberGroups);
 
     // Add groups to which this user belongs
-    for (String groupDN : getDNsOfGroupsContainingMember(ctxRoot, getUserDN(username))) {
-      user.addGroup(getGroupCNFromDN(groupDN));
+    for (String groupDN : getDNsOfGroupsContainingMember(session, getUserDN(username))) {
+      user.addGroup(getFirstNameFromDN(groupDN));
     }
 
     return user;
   }
 
-  private User getUser(DirContext ctxRoot, String username) throws NamingException {
+  private User getUser(final CoreSession session, final String username) throws LdapException {
 
-    Attributes attributes = ctxRoot.getAttributes(getUserDN(username));
-
-    User user = getUserFromAttributes(attributes);
+    final Entry entry = session.lookup(new Dn(getUserDN(username)));
+    final User user = getUserFromEntry(entry);
 
     // Add all roles assigned to this user
-    Set<String> memberRoles = getMemberRoles(ctxRoot, getUserDN(username));
+    final Set<String> memberRoles = getMemberRoles(session, getUserDN(username));
     user.setAllRoles(memberRoles);
 
     // Add direct roles assigned to this user
-    for (String role : getMemberDirectRoles(ctxRoot, getUserDN(username))) {
+    for (String role : getMemberDirectRoles(session, getUserDN(username))) {
       user.addDirectRole(role);
     }
 
     // Add all groups to which this user belongs
-    Set<String> memberGroups = getMemberGroups(ctxRoot, getUserDN(username));
+    final Set<String> memberGroups = getMemberGroups(session, getUserDN(username));
     user.setAllGroups(memberGroups);
 
     // Add groups to which this user belongs
-    for (String groupDN : getDNsOfGroupsContainingMember(ctxRoot, getUserDN(username))) {
-      user.addGroup(getGroupCNFromDN(groupDN));
+    for (String groupDN : getDNsOfGroupsContainingMember(session, getUserDN(username))) {
+      user.addGroup(getFirstNameFromDN(groupDN));
     }
 
     return user;
   }
 
-  private RodaUser getRodaUserFromAttributes(Attributes userAttributes) throws NamingException {
-    RodaUser rodaUser = new RodaUser();
-    rodaUser.setId(userAttributes.get("uid").get().toString());
+  private RodaUser getRodaUserFromEntry(final Entry entry) throws LdapException {
+    final RodaUser rodaUser = new RodaUser();
+    rodaUser.setId(entry.get(UID).getString());
     rodaUser.setName(rodaUser.getId());
-    if (userAttributes.get("email") != null) {
-      rodaUser.setEmail(userAttributes.get("email").get().toString());
-    }
-    if (userAttributes.get("cn") != null) {
-      rodaUser.setFullName(userAttributes.get("cn").get().toString());
-    }
-    if (userAttributes.get(SHADOW_INACTIVE) != null) {
-      String zeroOrOne = userAttributes.get(SHADOW_INACTIVE).get().toString();
-      rodaUser.setActive("0".equalsIgnoreCase(zeroOrOne));
-    } else {
-      rodaUser.setActive(true);
-    }
+    rodaUser.setEmail(entry.get(EMAIL).getString());
+    rodaUser.setFullName(entry.get(CN).getString());
+    rodaUser.setActive("0".equalsIgnoreCase(entry.get(SHADOW_INACTIVE).getString()));
     rodaUser.setGuest(false);
     return rodaUser;
   }
 
-  private User getUserFromAttributes(Attributes userAttributes) throws NamingException {
+  private User getUserFromEntry(final Entry entry) throws LdapException {
 
-    User user = new User(userAttributes.get("uid").get().toString());
+    final User user = new User(entry.get(UID).getString());
 
-    if (userAttributes.get(SHADOW_INACTIVE) != null) {
-      String zeroOrOne = userAttributes.get(SHADOW_INACTIVE).get().toString();
+    if (entry.get(SHADOW_INACTIVE) != null) {
+      final String zeroOrOne = entry.get(SHADOW_INACTIVE).getString();
       user.setActive("0".equalsIgnoreCase(zeroOrOne));
     } else {
       user.setActive(true);
     }
 
-    if (userAttributes.get("documentTitle") != null) {
-      user.setIdDocumentType(userAttributes.get("documentTitle").get().toString());
-    }
-    if (userAttributes.get("documentIdentifier") != null) {
-      user.setIdDocument(userAttributes.get("documentIdentifier").get().toString());
-    }
-    if (userAttributes.get("documentLocation") != null) {
-      user.setIdDocumentLocation(userAttributes.get("documentLocation").get().toString());
-    }
-    if (userAttributes.get("documentVersion") != null) {
-      try {
-        user.setIdDocumentDate(DateParser.parse(userAttributes.get("documentVersion").get().toString()));
-      } catch (InvalidDateException e) {
-        LOGGER.warn("Error parsing ID document date (documentVersion) - " + e.getMessage(), e);
-      }
+    user.setIdDocumentType(entry.get("documentTitle").getString());
+    user.setIdDocument(entry.get("documentIdentifier").getString());
+    user.setIdDocumentLocation(entry.get("documentLocation").getString());
+
+    try {
+      user.setIdDocumentDate(DateParser.parse(entry.get("documentVersion").getString()));
+    } catch (final InvalidDateException e) {
+      LOGGER.warn("Error parsing ID document date (documentVersion) - " + e.getMessage(), e);
     }
 
-    if (userAttributes.get("serialNumber") != null) {
-      user.setFinanceIdentificationNumber(userAttributes.get("serialNumber").get().toString());
-    }
+    user.setFinanceIdentificationNumber(entry.get("serialNumber").getString());
+    user.setBirthCountry(entry.get("co").getString());
+    user.setFullName(entry.get(CN).getString());
+    user.setPostalAddress(entry.get("postalAddress").getString());
+    user.setPostalCode(entry.get("postalCode").getString());
+    user.setLocalityName(entry.get("localityName").getString());
+    user.setLocalityName(entry.get("l").getString());
+    user.setCountryName(entry.get("c").getString());
+    user.setTelephoneNumber(entry.get("telephoneNumber").getString());
+    user.setFax(entry.get("fax").getString());
+    user.setEmail(entry.get(EMAIL).getString());
+    user.setBusinessCategory(entry.get("businessCategory").getString());
+    user.setBirthCountry(entry.get("friendlyCountryName").getString());
+    user.setCountryName(entry.get("countryName").getString());
 
-    if (userAttributes.get("co") != null) {
-      user.setBirthCountry(userAttributes.get("co").get().toString());
-    }
-
-    if (userAttributes.get("cn") != null) {
-      user.setFullName(userAttributes.get("cn").get().toString());
-    }
-    if (userAttributes.get("postalAddress") != null) {
-      user.setPostalAddress(userAttributes.get("postalAddress").get().toString());
-    }
-    if (userAttributes.get("postalCode") != null) {
-      user.setPostalCode(userAttributes.get("postalCode").get().toString());
-    }
-    if (userAttributes.get("localityName") != null) {
-      user.setLocalityName(userAttributes.get("localityName").get().toString());
-    }
-    if (userAttributes.get("l") != null) {
-      user.setLocalityName(userAttributes.get("l").get().toString());
-    }
-    if (userAttributes.get("c") != null) {
-      user.setCountryName(userAttributes.get("c").get().toString());
-    }
-    if (userAttributes.get("telephoneNumber") != null) {
-      user.setTelephoneNumber(userAttributes.get("telephoneNumber").get().toString());
-    }
-    if (userAttributes.get("fax") != null) {
-      user.setFax(userAttributes.get("fax").get().toString());
-    }
-
-    if (userAttributes.get("email") != null) {
-      user.setEmail(userAttributes.get("email").get().toString());
-    }
-
-    if (userAttributes.get("businessCategory") != null) {
-      user.setBusinessCategory(userAttributes.get("businessCategory").get().toString());
-    }
-
-    if (userAttributes.get("friendlyCountryName") != null) {
-      user.setBirthCountry(userAttributes.get("friendlyCountryName").get().toString());
-    }
-    if (userAttributes.get("countryName") != null) {
-      user.setCountryName(userAttributes.get("countryName").get().toString());
-    }
-
-    if (userAttributes.get("info") != null) {
-      String infoStr = userAttributes.get("info").get().toString();
+    if (entry.get("info") != null) {
+      final String infoStr = entry.get("info").getString();
 
       // emailValidationToken;emailValidationTokenValidity;resetPasswordToken;resetPasswordTokenValidity
 
-      String[] parts = infoStr.split(";");
+      final String[] parts = infoStr.split(";");
 
       if (parts.length >= 1 && parts[0].trim().length() > 0) {
         user.setEmailConfirmationToken(parts[0].trim());
@@ -1962,263 +1305,189 @@ public class LdapUtility {
     return user;
   }
 
-  private Attributes getAttributesFromUser(User user, boolean removeUnsetValues) {
-
-    Attributes attributes = new BasicAttributes();
-
-    Attribute objectClass = new BasicAttribute("objectclass");
-    objectClass.add("inetOrgPerson");
-    objectClass.add("organizationalPerson");
-    objectClass.add("person");
-    objectClass.add("top");
-    objectClass.add("extensibleObject");
-
-    attributes.put(objectClass);
-    attributes.put("uid", user.getName());
-    attributes.put("cn", user.getFullName());
-    attributes.put(SHADOW_INACTIVE, user.isActive() ? "0" : "1");
-
-    if (!StringUtils.isBlank(user.getFullName())) {
-      String[] names = user.getFullName().split(" ");
+  private Entry getEntryFromUser(final User user, final boolean removeUnsetValues) throws LdapException {
+    final Entry entry = service.newEntry(new Dn(getUserDN(user.getName())));
+    entry.add(OBJECT_CLASS, "inetOrgPerson", "organizationalPerson", "person", OBJECT_CLASS_TOP,
+      OBJECT_CLASS_EXTENSIBLE_OBJECT);
+    entry.add(UID, user.getName());
+    entry.add(CN, user.getFullName());
+    entry.add(SHADOW_INACTIVE, user.isActive() ? "0" : "1");
+    if (StringUtils.isNotBlank(user.getFullName())) {
+      final String[] names = user.getFullName().split(" ");
       if (names.length > 0) {
-        attributes.put("givenName", names[0]);
-        attributes.put("sn", names[names.length - 1]);
+        entry.add("givenName", names[0]);
+        entry.add("sn", names[names.length - 1]);
       } else {
-        attributes.put("sn", user.getName());
+        entry.add("sn", user.getName());
       }
     }
-
-    if (!StringUtils.isBlank(user.getIdDocumentType())) {
-      attributes.put("documentTitle", user.getIdDocumentType());
+    if (StringUtils.isNotBlank(user.getIdDocumentType())) {
+      entry.add("documentTitle", user.getIdDocumentType());
     } else if (removeUnsetValues) {
-      attributes.remove("documentTitle");
+      entry.removeAttributes("documentTitle");
     }
-    if (!StringUtils.isBlank(user.getIdDocument())) {
-      attributes.put("documentIdentifier", user.getIdDocument());
+    if (StringUtils.isNotBlank(user.getIdDocument())) {
+      entry.add("documentIdentifier", user.getIdDocument());
     } else if (removeUnsetValues) {
-      attributes.remove("documentIdentifier");
+      entry.removeAttributes("documentIdentifier");
     }
-    if (!StringUtils.isBlank(user.getIdDocumentLocation())) {
-      attributes.put("documentLocation", user.getIdDocumentLocation());
+    if (StringUtils.isNotBlank(user.getIdDocumentLocation())) {
+      entry.add("documentLocation", user.getIdDocumentLocation());
     } else if (removeUnsetValues) {
-      attributes.remove("documentLocation");
+      entry.removeAttributes("documentLocation");
     }
     if (user.getIdDocumentDate() != null) {
-      attributes.put("documentVersion", DateParser.getIsoDate(user.getIdDocumentDate()));
+      entry.add("documentVersion", DateParser.getIsoDate(user.getIdDocumentDate()));
     } else if (removeUnsetValues) {
-      attributes.remove("documentVersion");
+      entry.removeAttributes("documentVersion");
     }
 
-    if (!StringUtils.isBlank(user.getFinanceIdentificationNumber())) {
-      attributes.put("serialNumber", user.getFinanceIdentificationNumber());
+    if (StringUtils.isNotBlank(user.getFinanceIdentificationNumber())) {
+      entry.add("serialNumber", user.getFinanceIdentificationNumber());
     } else if (removeUnsetValues) {
-      attributes.remove("serialNumber");
+      entry.removeAttributes("serialNumber");
     }
 
-    if (!StringUtils.isBlank(user.getBirthCountry())) {
-      attributes.put("friendlyCountryName", user.getBirthCountry());
+    if (StringUtils.isNotBlank(user.getBirthCountry())) {
+      entry.add("friendlyCountryName", user.getBirthCountry());
     } else if (removeUnsetValues) {
-      attributes.remove("friendlyCountryName");
+      entry.removeAttributes("friendlyCountryName");
     }
 
-    if (!StringUtils.isBlank(user.getPostalAddress())) {
-      attributes.put("postalAddress", user.getPostalAddress());
+    if (StringUtils.isNotBlank(user.getPostalAddress())) {
+      entry.add("postalAddress", user.getPostalAddress());
     } else if (removeUnsetValues) {
-      attributes.remove("postalAddress");
+      entry.removeAttributes("postalAddress");
     }
-    if (!StringUtils.isBlank(user.getPostalCode())) {
-      attributes.put("postalCode", user.getPostalCode());
+    if (StringUtils.isNotBlank(user.getPostalCode())) {
+      entry.add("postalCode", user.getPostalCode());
     } else if (removeUnsetValues) {
-      attributes.remove("postalCode");
+      entry.removeAttributes("postalCode");
     }
-    if (!StringUtils.isBlank(user.getLocalityName())) {
-      attributes.put("localityName", user.getLocalityName());
+    if (StringUtils.isNotBlank(user.getLocalityName())) {
+      entry.add("localityName", user.getLocalityName());
     } else if (removeUnsetValues) {
-      attributes.remove("localityName");
+      entry.removeAttributes("localityName");
     }
-    if (!StringUtils.isBlank(user.getCountryName())) {
-      attributes.put("countryName", user.getCountryName());
+    if (StringUtils.isNotBlank(user.getCountryName())) {
+      entry.add("countryName", user.getCountryName());
     } else if (removeUnsetValues) {
-      attributes.remove("countryName");
+      entry.removeAttributes("countryName");
     }
-    if (!StringUtils.isBlank(user.getTelephoneNumber())) {
-      attributes.put("telephoneNumber", user.getTelephoneNumber());
+    if (StringUtils.isNotBlank(user.getTelephoneNumber())) {
+      entry.add("telephoneNumber", user.getTelephoneNumber());
     } else if (removeUnsetValues) {
-      attributes.remove("telephoneNumber");
+      entry.removeAttributes("telephoneNumber");
     }
-    if (!StringUtils.isBlank(user.getFax())) {
-      attributes.put("fax", user.getFax());
+    if (StringUtils.isNotBlank(user.getFax())) {
+      entry.add("fax", user.getFax());
     } else if (removeUnsetValues) {
-      attributes.remove("fax");
+      entry.removeAttributes("fax");
     }
-    if (!StringUtils.isBlank(user.getEmail())) {
-      attributes.put("email", user.getEmail());
+    if (StringUtils.isNotBlank(user.getEmail())) {
+      entry.add(EMAIL, user.getEmail());
     } else if (removeUnsetValues) {
-      attributes.remove("email");
+      entry.removeAttributes(EMAIL);
+    }
+    if (StringUtils.isNotBlank(user.getBusinessCategory())) {
+      entry.add("businessCategory", user.getBusinessCategory());
+    } else if (removeUnsetValues) {
+      entry.removeAttributes("businessCategory");
     }
 
-    if (!StringUtils.isBlank(user.getBusinessCategory())) {
-      attributes.put("businessCategory", user.getBusinessCategory());
-    } else if (removeUnsetValues) {
-      attributes.remove("businessCategory");
+    final String[] infoParts = new String[] {user.getEmailConfirmationToken(),
+      user.getEmailConfirmationTokenExpirationDate(), user.getResetPasswordToken(),
+      user.getResetPasswordTokenExpirationDate()};
+    for (int i = 0; i < infoParts.length; i++) {
+      if (StringUtils.isBlank(infoParts[i])) {
+        infoParts[i] = "";
+      }
     }
+    entry.add("info", String.join(";", infoParts));
 
-    String emailToken = user.getEmailConfirmationToken();
-    String emailTokenDate = user.getEmailConfirmationTokenExpirationDate();
-    String passwordToken = user.getResetPasswordToken();
-    String passwordTokenDate = user.getResetPasswordTokenExpirationDate();
-    emailToken = StringUtils.isBlank(emailToken) ? "" : emailToken;
-    emailTokenDate = StringUtils.isBlank(emailTokenDate) ? "" : emailTokenDate;
-    passwordToken = StringUtils.isBlank(passwordToken) ? "" : passwordToken;
-    passwordTokenDate = StringUtils.isBlank(passwordTokenDate) ? "" : passwordTokenDate;
-    attributes.put("info", String.format("%s;%s;%s;%s", emailToken, emailTokenDate, passwordToken, passwordTokenDate));
-
-    return attributes;
+    return entry;
   }
 
-  private Group getGroup(DirContext ctxRoot, String name) throws InvalidNameException, NamingException {
+  private Group getGroup(final CoreSession session, final String name) throws LdapException {
 
-    Attributes attributes = ctxRoot.getAttributes(getGroupDN(name));
+    final Entry entry = session.lookup(new Dn(getGroupDN(name)));
 
-    Group group = getGroupFromAttributes(attributes);
+    final Group group = getGroupFromEntry(entry);
 
     // Add all roles assigned to this group
-    Set<String> memberRoles = getMemberRoles(ctxRoot, getGroupDN(name));
+    final Set<String> memberRoles = getMemberRoles(session, getGroupDN(name));
     group.setAllRoles(memberRoles);
 
     // Add direct roles assigned to this group
-    for (String role : getMemberDirectRoles(ctxRoot, getGroupDN(name))) {
+    for (String role : getMemberDirectRoles(session, getGroupDN(name))) {
       group.addDirectRole(role);
     }
 
     // Add all groups to which this group belongs
-    Set<String> memberGroups = getMemberGroups(ctxRoot, getGroupDN(name));
+    final Set<String> memberGroups = getMemberGroups(session, getGroupDN(name));
     group.setAllGroups(memberGroups);
 
     // Add groups to which this group belongs
-    for (String groupDN : getDNsOfGroupsContainingMember(ctxRoot, getGroupDN(name))) {
-      group.addDirectGroup(getGroupCNFromDN(groupDN));
+    for (String groupDN : getDNsOfGroupsContainingMember(session, getGroupDN(name))) {
+      group.addDirectGroup(getFirstNameFromDN(groupDN));
     }
 
     return group;
   }
 
-  private Group getGroupFromAttributes(Attributes attributes) throws NamingException {
+  private Group getGroupFromEntry(final Entry entry) throws LdapException {
 
-    Group group = new Group(attributes.get("cn").get().toString());
+    final Group group = new Group(entry.get(CN).getString());
 
-    if (attributes.get(SHADOW_INACTIVE) != null) {
-      String zeroOrOne = attributes.get(SHADOW_INACTIVE).get().toString();
-      group.setActive("0".equalsIgnoreCase(zeroOrOne));
-    } else {
-      group.setActive(true);
-    }
+    group.setActive("0".equalsIgnoreCase(entry.get(SHADOW_INACTIVE).getString()));
+    group.setFullName(entry.get(OU).getString());
 
-    if (attributes.get("ou") != null) {
-      group.setFullName(attributes.get("ou").get().toString());
-    }
-
-    Attribute attributeUniqueMember = attributes.get(UNIQUE_MEMBER);
+    final Attribute attributeUniqueMember = entry.get(UNIQUE_MEMBER);
 
     if (attributeUniqueMember != null) {
 
-      for (int i = 0; i < attributeUniqueMember.size(); i++) {
-
-        String memberDN = attributeUniqueMember.get(i).toString();
+      for (Value<?> value : attributeUniqueMember) {
+        final String memberDN = value.toString();
 
         if (memberDN.endsWith(getPeopleDN())) {
-
-          group.addMemberUser(getUserUIDFromDN(memberDN));
-
+          group.addMemberUser(getFirstNameFromDN(memberDN));
         } else if (memberDN.endsWith(getGroupsDN())) {
-
-          group.addMemberGroup(getGroupCNFromDN(memberDN));
-
+          group.addMemberGroup(getFirstNameFromDN(memberDN));
         } else {
-          // admin should be here!
+          LOGGER.warn("Member {} outside users and groups", memberDN);
         }
-
       }
 
     } else {
-      // This group has no members
+      LOGGER.debug("Group {} is empty", group.getName());
     }
 
     return group;
   }
 
-  // @SuppressWarnings("unchecked")
-  // private List<Attributes> searchAttributes(DirContext ctxRoot, String
-  // ctxDN, String keyAttribute,
-  // JndiContentAdapterEngine<? extends JndiEntityAdapter, ? extends
-  // RODAMember> jndiAdapter)
-  // throws NamingException {
-  //
-  // // Create the default search controls
-  // SearchControls searchControls = new SearchControls();
-  //
-  // String filter = jndiAdapter.getJndiFilter(keyAttribute);
-  //
-  // logger.trace("searchAttributes() JNDI filter: " + filter);
-  //
-  // // Search for objects using the filter
-  // NamingEnumeration<SearchResult> answer = ctxRoot.search(ctxDN, filter,
-  // searchControls);
-  //
-  // List<Attributes> filteredAttributesList = new ArrayList<Attributes>();
-  //
-  // while (answer.hasMore()) {
-  // SearchResult sr = answer.next();
-  // filteredAttributesList.add(sr.getAttributes());
-  // }
-  //
-  // filteredAttributesList = (List<Attributes>)
-  // jndiAdapter.filterValues(filteredAttributesList);
-  //
-  // List<Attributes> sortedAttributesList =
-  // jndiAdapter.sortAttributes(filteredAttributesList);
-  //
-  // List<Attributes> attributesList =
-  // jndiAdapter.getSublist(sortedAttributesList);
-  //
-  // return attributesList;
-  // }
-
   // FIXME filter is not being used: see if it is needed
-  private List<Attributes> searchAttributes(DirContext ctxRoot, String ctxDN, String keyAttribute, Filter filter)
-    throws NamingException {
-    // Create the default search controls
-    SearchControls searchControls = new SearchControls();
+  private List<Entry> searchEntries(final CoreSession session, final String ctxDN, final String keyAttribute,
+    final Filter filter) throws LdapException {
 
-    String jndiFilter = "(" + keyAttribute + "=*)";
+    final String jndiFilter = String.format("(%s=*)", keyAttribute);
+    LOGGER.debug("searchEntries() JNDI filter: " + jndiFilter);
 
-    LOGGER.trace("searchAttributes() JNDI filter: " + jndiFilter);
-
-    // Search for objects using the filter
-    NamingEnumeration<SearchResult> answer = ctxRoot.search(ctxDN, jndiFilter, searchControls);
-
-    List<Attributes> filteredAttributesList = new ArrayList<Attributes>();
-
-    while (answer.hasMore()) {
-      SearchResult sr = answer.next();
-      filteredAttributesList.add(sr.getAttributes());
+    final Cursor<Entry> cursor = session.search(new Dn(ctxDN), jndiFilter);
+    final List<Entry> entries = new ArrayList<>();
+    for (Entry entry : cursor) {
+      entries.add(entry);
     }
 
-    // filteredAttributesList = (List<Attributes>) jndiAdapter
-    // .filterValues(filteredAttributesList);
-    //
-    // List<Attributes> sortedAttributesList = jndiAdapter
-    // .sortAttributes(filteredAttributesList);
-    //
-    // List<Attributes> attributesList = jndiAdapter
-    // .getSublist(sortedAttributesList);
+    // List<Entry> filteredEntries = jndiAdapter.filter(entries);
+    // List<Entry> sortedEntries = jndiAdapter.sort(filteredEntries);
+    // List<Entry> sublistEntries = jndiAdapter.getSublist(sortedEntries);
 
-    return filteredAttributesList;
+    return entries;
   }
 
   /**
    * Returns the LDAP DN of the people entry.
-   * 
+   *
    * @return the LDAP DN of the people entry.
    */
   private String getPeopleDN() {
@@ -2227,7 +1496,7 @@ public class LdapUtility {
 
   /**
    * Returns the LDAP DN of the groups entry.
-   * 
+   *
    * @return the LDAP DN of the groups entry.
    */
   private String getGroupsDN() {
@@ -2236,7 +1505,7 @@ public class LdapUtility {
 
   /**
    * Returns the LDAP DN of the roles entry.
-   * 
+   *
    * @return the LDAP DN of the roles entry.
    */
   private String getRolesDN() {
@@ -2245,66 +1514,51 @@ public class LdapUtility {
 
   /**
    * Returns the DN of a user given is username.
-   * 
+   *
    * @param username
    *          the username of the user.
    * @return the DN of a user given is username.
    */
-  private String getUserDN(String username) {
-    return String.format("uid=%1$s,%2$s", username, getPeopleDN());
+  private String getUserDN(final String username) {
+    return String.format("uid=%s,%s", username, getPeopleDN());
   }
 
   /**
    * Returns the DN of a group given is groupName.
-   * 
+   *
    * @param groupName
    *          the name of the group.
    * @return the DN of a group given is groupName.
    */
-  private String getGroupDN(String groupName) {
-    return String.format("cn=%1$s,%2$s", groupName, getGroupsDN());
+  private String getGroupDN(final String groupName) {
+    return String.format("cn=%s,%s", groupName, getGroupsDN());
   }
 
   /**
    * Returns the DN of a role given is roleName.
-   * 
+   *
    * @param roleName
    *          the name of the role.
    * @return the DN of a role given is roleName.
    */
-  private String getRoleDN(String roleName) {
-    return String.format("cn=%1$s,%2$s", roleName, getRolesDN());
-  }
-
-  /**
-   * Returns a role CN (Common Name) from it's DN (Distinguished Name). Ex: for
-   * <i>DN=cn=administrator,ou=roles,dc=roda,dc=org</i> returns
-   * <i>administrator</i>.
-   * 
-   * @param roleDN
-   * @return a {@link java.lang.String} with the CN.
-   * @throws InvalidNameException
-   */
-  private String getRoleCNFromDN(String roleDN) throws InvalidNameException {
-    Name name = new LdapName(roleDN);
-    String roleCNWithCN = name.getSuffix(name.size() - 1).toString();
-    String[] nameComps = roleCNWithCN.split("=");
-    String roleCN = nameComps[1];
-    return roleCN;
+  private String getRoleDN(final String roleName) {
+    return String.format("cn=%s,%s", roleName, getRolesDN());
   }
 
   /**
    * Modify the {@link User}'s information.
-   * 
-   * @param ctxRoot
+   *
+   * @param session
+   *          the session.
    * @param modifiedUser
    *          the {@link User} to modify.
-   * 
    * @param newPassword
    *          the new {@link User}'s password. To maintain the current password,
    *          use <code>null</code>.
    * @param modifyRolesAndGroups
-   * 
+   *          <code>true</code> if User's groups and roles should be updated
+   *          also.
+   *
    * @throws NotFoundException
    *           if the {@link User} being modified doesn't exist.
    * @throws EmailAlreadyExistsException
@@ -2312,11 +1566,11 @@ public class LdapUtility {
    * @throws IllegalOperationException
    *           if the user is one of the protected users.
    * @throws LdapUtilityException
+   *           if some error occurred.
    */
-  private void modifyUser(DirContext ctxRoot, User modifiedUser, String newPassword, boolean modifyRolesAndGroups)
+  private void modifyUser(final CoreSession session, final User modifiedUser, final String newPassword,
+    final boolean modifyRolesAndGroups)
     throws NotFoundException, IllegalOperationException, EmailAlreadyExistsException, LdapUtilityException {
-
-    LOGGER.trace("modifyUser() - " + modifiedUser.getName());
 
     if (this.ldapProtectedUsers.contains(modifiedUser.getName())) {
       throw new IllegalOperationException("User (" + modifiedUser.getName() + ") is protected and cannot be modified.");
@@ -2324,41 +1578,30 @@ public class LdapUtility {
 
     try {
 
-      User currentEmailOwner = getUserWithEmail(ctxRoot, modifiedUser.getEmail());
+      final User currentEmailOwner = getUserWithEmail(session, modifiedUser.getEmail());
       if (currentEmailOwner != null && !modifiedUser.getName().equals(currentEmailOwner.getName())) {
-
-        LOGGER.debug("The email address " + modifiedUser.getEmail() + " is already used by another user.");
-
         throw new EmailAlreadyExistsException(
           "The email address " + modifiedUser.getEmail() + " is already used by another user.");
       }
 
-      Attributes attributes = getAttributesFromUser(modifiedUser, true);
-
-      ctxRoot.modifyAttributes(getUserDN(modifiedUser.getName()), DirContext.REPLACE_ATTRIBUTE, attributes);
+      final Collection<Attribute> newAttributes = getEntryFromUser(modifiedUser, true).getAttributes();
+      final Entry userEntry = session.lookup(new Dn(getUserDN(modifiedUser.getName())));
+      for (Attribute attribute : newAttributes) {
+        userEntry.put(attribute);
+      }
 
       if (newPassword != null) {
-        modifyUserPassword(ctxRoot, modifiedUser.getName(), newPassword);
+        modifyUserPassword(session, modifiedUser.getName(), newPassword);
       }
 
       if (modifyRolesAndGroups) {
-        setMemberGroups(ctxRoot, getUserDN(modifiedUser.getName()), modifiedUser.getDirectGroups());
-        setMemberDirectRoles(ctxRoot, getUserDN(modifiedUser.getName()), modifiedUser.getDirectRoles());
+        setMemberGroups(session, getUserDN(modifiedUser.getName()), modifiedUser.getDirectGroups());
+        setMemberDirectRoles(session, getUserDN(modifiedUser.getName()), modifiedUser.getDirectRoles());
       }
 
-    } catch (NameNotFoundException e) {
-
-      LOGGER.debug(userMessage(modifiedUser.getName(), " doesn't exist."), e);
-      throw new NotFoundException(userMessage(modifiedUser.getName(), " doesn't exist."), e);
-
-    } catch (NamingException e) {
-
-      LOGGER.debug("Error modifying user " + modifiedUser.getName(), e);
+    } catch (final LdapException e) {
       throw new LdapUtilityException("Error modifying user " + modifiedUser.getName() + " - " + e.getMessage(), e);
-
-    } catch (NoSuchAlgorithmException e) {
-
-      LOGGER.debug("Error encoding password for user " + modifiedUser.getName(), e);
+    } catch (final NoSuchAlgorithmException e) {
       throw new LdapUtilityException("Error encoding password for user " + modifiedUser.getName(), e);
     }
 
@@ -2366,430 +1609,267 @@ public class LdapUtility {
 
   /**
    * Modifies user password.
-   * 
-   * @param ctxRoot
+   *
+   * @param session
+   *          the session.
    * @param username
+   *          the username.
    * @param password
-   * @throws NamingException
-   * @throws UnsupportedEncodingException
+   *          the password.
+   * @throws LdapException
+   *           if some error occurs.
    * @throws NoSuchAlgorithmException
+   *           the the algorithm doesn't exist.
    */
-  private void modifyUserPassword(DirContext ctxRoot, String username, String password)
-    throws NamingException, NoSuchAlgorithmException {
-
-    PasswordHandler passwordHandler = PasswordHandler.getInstance();
-    String passwordDigest = passwordHandler.generateDigest(password, null, ldapDigestAlgorithm);
-
-    Attribute attributePassword = new BasicAttribute("userPassword", passwordDigest);
-
-    ModificationItem[] modificationItem = new ModificationItem[1];
-    modificationItem[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, attributePassword);
-
-    ctxRoot.modifyAttributes(getUserDN(username), modificationItem);
+  private void modifyUserPassword(final CoreSession session, final String username, final String password)
+    throws LdapException, NoSuchAlgorithmException {
+    final PasswordHandler passwordHandler = PasswordHandler.getInstance();
+    final String passwordDigest = passwordHandler.generateDigest(password, null, ldapDigestAlgorithm);
+    final Entry entry = session.lookup(new Dn(getUserDN(username)));
+    entry.put(USER_PASSWORD, passwordDigest);
   }
 
-  private void addMemberToGroup(DirContext ctxRoot, String groupDN, String memberDN) throws NamingException {
-
-    Attributes attributes = ctxRoot.getAttributes(groupDN, new String[] {UNIQUE_MEMBER});
-
-    Attribute attribute = attributes.get(UNIQUE_MEMBER);
+  private void addMemberToGroup(final CoreSession session, final String groupDN, final String memberDN)
+    throws LdapException {
+    final Entry entry = session.lookup(new Dn(groupDN), UNIQUE_MEMBER);
+    final Attribute attribute = entry.get(UNIQUE_MEMBER);
     attribute.add(memberDN);
-
-    ctxRoot.modifyAttributes(groupDN, DirContext.REPLACE_ATTRIBUTE, attributes);
   }
 
-  private void addMemberToRole(DirContext ctxRoot, String roleDN, String memberDN) throws NamingException {
-
-    Attributes attributes = ctxRoot.getAttributes(roleDN, new String[] {ROLE_OCCUPANT});
-
-    Attribute attribute = attributes.get(ROLE_OCCUPANT);
-    if (attribute == null) {
-      attribute = new BasicAttribute(ROLE_OCCUPANT);
-    }
+  private void addMemberToRole(final CoreSession session, final String roleDN, final String memberDN)
+    throws LdapException {
+    final Entry entry = session.lookup(new Dn(roleDN), ROLE_OCCUPANT);
+    final Attribute attribute = entry.get(ROLE_OCCUPANT);
     attribute.add(memberDN);
-
-    ctxRoot.modifyAttributes(roleDN, DirContext.REPLACE_ATTRIBUTE, attributes);
   }
 
-  private void removeMemberFromGroup(DirContext ctxRoot, String groupDN, String memberDN) throws NamingException {
-
-    Attributes attributes = ctxRoot.getAttributes(groupDN, new String[] {UNIQUE_MEMBER});
-    Attribute attribute = attributes.get(UNIQUE_MEMBER);
+  private void removeMemberFromGroup(final CoreSession session, final String groupDN, final String memberDN)
+    throws LdapException {
+    final Entry entryGroup = session.lookup(new Dn(groupDN));
+    final Attribute attribute = entryGroup.get(UNIQUE_MEMBER);
     attribute.remove(memberDN);
-
-    ctxRoot.modifyAttributes(groupDN, DirContext.REPLACE_ATTRIBUTE, attributes);
   }
 
-  private void removeMemberFromRole(DirContext ctxRoot, String roleDN, String memberDN) throws NamingException {
-
-    Attributes attributes = ctxRoot.getAttributes(roleDN, new String[] {ROLE_OCCUPANT});
-
-    Attribute attribute = attributes.get(ROLE_OCCUPANT);
+  private void removeMemberFromRole(final CoreSession session, final String roleDN, final String memberDN)
+    throws LdapException {
+    final Entry entryGroup = session.lookup(new Dn(roleDN));
+    final Attribute attribute = entryGroup.get(ROLE_OCCUPANT);
     attribute.remove(memberDN);
-
-    ctxRoot.modifyAttributes(roleDN, DirContext.REPLACE_ATTRIBUTE, attributes);
   }
 
-  private void removeMember(DirContext ctxRoot, String memberDN) throws NamingException {
-
+  private void removeMember(final CoreSession session, final String memberDN) throws LdapException {
     // For each group the member is in, remove that member from the group
-    Set<String> directMemberGroupsDN = getDNsOfGroupsContainingMember(ctxRoot, memberDN);
+    final Set<String> directMemberGroupsDN = getDNsOfGroupsContainingMember(session, memberDN);
     for (String groupDN : directMemberGroupsDN) {
-      removeMemberFromGroup(ctxRoot, groupDN, memberDN);
+      removeMemberFromGroup(session, groupDN, memberDN);
     }
-
     // For each role the member owns, remove that member from the
     // roleOccupant
-    Set<String> directMemberRolesDN = getDNsOfDirectRolesForMember(ctxRoot, memberDN);
+    final Set<String> directMemberRolesDN = getDNsOfDirectRolesForMember(session, memberDN);
     for (String roleDN : directMemberRolesDN) {
-      removeMemberFromRole(ctxRoot, roleDN, memberDN);
+      removeMemberFromRole(session, roleDN, memberDN);
     }
-
-    ctxRoot.unbind(memberDN);
-  }
-
-  /**
-   * Returns the DirContext through the JNDI API using anonymous login to access
-   * the LDAP server.
-   * 
-   * @param contextName
-   *          the name of the context.
-   * 
-   * @return DirContext
-   * @throws NamingException
-   */
-  private DirContext getLDAPDirContext(String contextName) throws NamingException {
-    // FIXME
-    // return getLDAPDirContext(contextName, null, null);
-    return getLDAPDirContext(contextName, ldapAdminDN, ldapAdminPassword);
-  }
-
-  /**
-   * Returns the DirContext through the JNDI API using admin's username and
-   * password. to access the LDAP server.
-   * 
-   * @param contextName
-   *          the name of the context.
-   * 
-   * @return DirContext
-   * @throws NamingException
-   */
-  private DirContext getLDAPAdminDirContext(String contextName) throws NamingException {
-    return getLDAPDirContext(contextName, ldapAdminDN, ldapAdminPassword);
-  }
-
-  /**
-   * Returns the DirContext through the JNDI API using <code>accessUser</code>
-   * and <code>accessPassword</code> to access the LDAP server.
-   * 
-   * @param contextDN
-   *          the name of the context.
-   * @param accessUserDN
-   *          the username to access the LDAP server.
-   * @param accessPassword
-   *          the password to access the LDAP server.
-   * @return the DirContext.
-   * @throws NamingException
-   */
-  private DirContext getLDAPDirContext(String contextDN, String accessUserDN, String accessPassword)
-    throws NamingException {
-
-    // Set up the environment for creating the initial context
-    final Hashtable<String, Object> env = new Hashtable<String, Object>(11);
-
-    env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-    env.put(Context.PROVIDER_URL, String.format("ldap://%1$s:%2$d/%3$s", ldapHost, ldapPort, contextDN));
-
-    env.put(Context.SECURITY_AUTHENTICATION, AUTHENTICATION_SIMPLE);
-
-    if (accessUserDN != null) {
-      env.put(Context.SECURITY_PRINCIPAL, accessUserDN);
-      env.put(Context.SECURITY_CREDENTIALS, accessPassword);
-    }
-
-    // env.put(Context.AUTHORITATIVE, "true"); // dont use cache
-
-    return new InitialDirContext(env);
-  }
-
-  private Set<String> getDNsOfDirectGroupMembers(DirContext ctxRoot, String groupDN) throws NamingException {
-
-    Set<String> membersDN = new HashSet<String>();
-
-    Attributes attributes = ctxRoot.getAttributes(groupDN, new String[] {UNIQUE_MEMBER});
-
-    Attribute attrUniqueMember = attributes.get(UNIQUE_MEMBER);
-
-    NamingEnumeration<?> e = attrUniqueMember.getAll();
-
-    while (e.hasMore()) {
-      Object next = e.next();
-      if (next.toString().equals(ldapAdminDN)) {
-        // It's the admin user. don't add it to the list.
-      } else {
-        membersDN.add(next.toString());
-      }
-    }
-
-    return membersDN;
+    session.delete(new Dn(memberDN));
   }
 
   /**
    * Returns the DN of groups that contain the given member.
-   * 
-   * @param ctxRoot
+   *
+   * @param session
+   *          the session.
    * @param memberDN
    *          the DN of the member.
    * @return the DNs of the groups that has memberDN as member.
-   * @throws NamingException
+   * @throws LdapException
+   *           if some error occurs.
    */
-  private Set<String> getDNsOfGroupsContainingMember(DirContext ctxRoot, String memberDN) throws NamingException {
-    Set<String> groupsDN = new HashSet<String>();
-
-    // Specify the attributes to match
-    Attributes matchAttrs = new BasicAttributes(true); // ignore case
-    matchAttrs.put(new BasicAttribute("cn"));
-    matchAttrs.put(new BasicAttribute(UNIQUE_MEMBER, memberDN));
-
-    // Search for objects that have those matching attributes
-    NamingEnumeration<SearchResult> answer = ctxRoot.search(getGroupsDN(), matchAttrs, new String[] {});
-
-    while (answer.hasMore()) {
-
-      SearchResult sr = answer.next();
-      groupsDN.add(sr.getNameInNamespace());
+  private Set<String> getDNsOfGroupsContainingMember(final CoreSession session, final String memberDN)
+    throws LdapException {
+    final Cursor<Entry> cursor = session.search(new Dn(getGroupsDN()),
+      String.format("(&(%s=*)(%s=%s))", CN, UNIQUE_MEMBER, memberDN));
+    final Set<String> groupsDN = new HashSet<>();
+    for (Entry entry : cursor) {
+      groupsDN.add(entry.getDn().getName());
     }
-
     return groupsDN;
   }
 
   /**
    * Returns the DN of active groups that contain the given member.
-   * 
-   * @param ctxRoot
+   *
+   * @param session
+   *          the session.
    * @param memberDN
    *          the DN of the member.
    * @return the DNs of the groups that has memberDN as member.
-   * @throws NamingException
+   * @throws LdapException
+   *           if some error occurs.
    */
-  private Set<String> getDNsOfActiveGroupsContainingMember(DirContext ctxRoot, String memberDN) throws NamingException {
-
-    Set<String> groupsDN = new HashSet<String>();
-
-    // Specify the attributes to match
-    Attributes matchAttrs = new BasicAttributes(true); // ignore case
-    matchAttrs.put(new BasicAttribute("cn"));
-    // matchAttrs.put(new BasicAttribute("olcReadOnly", "FALSE"));
-    // matchAttrs.put(new BasicAttribute(SHADOW_INACTIVE, "FALSE"));
-    matchAttrs.put(new BasicAttribute(UNIQUE_MEMBER, memberDN));
-
-    // Search for objects that have those matching attributes
-    NamingEnumeration<SearchResult> answer = ctxRoot.search(getGroupsDN(), matchAttrs, new String[] {SHADOW_INACTIVE});
-
-    while (answer.hasMore()) {
-
-      SearchResult sr = answer.next();
-
-      String shadowInactive = "0";
-      if (sr.getAttributes().get(SHADOW_INACTIVE) != null) {
-        shadowInactive = sr.getAttributes().get(SHADOW_INACTIVE).get().toString();
-      }
-
-      if ("0".equalsIgnoreCase(shadowInactive)) {
-        // its active
-        groupsDN.add(sr.getNameInNamespace());
-      } else {
-        // it's read only (inactive)
-      }
+  private Set<String> getDNsOfActiveGroupsContainingMember(final CoreSession session, final String memberDN)
+    throws LdapException {
+    final Cursor<Entry> cursor = session.search(new Dn(getGroupsDN()),
+      String.format("(&(%s=%s)(%s=%s))", UNIQUE_MEMBER, memberDN, SHADOW_INACTIVE, "0"));
+    final Set<String> groupsDN = new HashSet<>();
+    for (Entry entry : cursor) {
+      groupsDN.add(entry.getDn().getName());
     }
-
     return groupsDN;
   }
 
-  private Set<String> getDNsOfAllActiveGroupsForMember(DirContext ctxRoot, String memberDN) throws NamingException {
-
-    Set<String> allMemberActiveGroupsDN = new HashSet<String>();
-
-    Set<String> directMemberGroupsDN = getDNsOfActiveGroupsContainingMember(ctxRoot, memberDN);
-
+  private Set<String> getDNsOfAllActiveGroupsForMember(final CoreSession session, final String memberDN)
+    throws LdapException {
+    final Set<String> allGroupsDN = new HashSet<>();
+    final Set<String> directGroupsDN = getDNsOfActiveGroupsContainingMember(session, memberDN);
     // add the groups that the member directly belongs to
-    allMemberActiveGroupsDN.addAll(directMemberGroupsDN);
-
+    allGroupsDN.addAll(directGroupsDN);
     // For each group, get the groups to which it belongs
-    for (String memberGroupDN : directMemberGroupsDN) {
-      allMemberActiveGroupsDN.addAll(getDNsOfAllActiveGroupsForMember(ctxRoot, memberGroupDN));
+    for (String groupDN : directGroupsDN) {
+      allGroupsDN.addAll(getDNsOfAllActiveGroupsForMember(session, groupDN));
     }
-
-    return allMemberActiveGroupsDN;
+    return allGroupsDN;
   }
 
-  private Set<String> getDNsOfDirectRolesForMember(DirContext ctxRoot, String memberDN) throws NamingException {
-    Set<String> rolesDN = new HashSet<String>();
-
-    // Specify the attributes to match
-    Attributes matchAttrs = new BasicAttributes(true); // ignore case
-    matchAttrs.put(new BasicAttribute("cn"));
-    matchAttrs.put(new BasicAttribute(ROLE_OCCUPANT, memberDN));
-
-    // Search for objects that have those matching attributes
-    NamingEnumeration<SearchResult> answer = ctxRoot.search(getRolesDN(), matchAttrs, new String[] {});
-
-    while (answer.hasMore()) {
-
-      SearchResult sr = answer.next();
-      rolesDN.add(sr.getNameInNamespace());
+  private Set<String> getDNsOfDirectRolesForMember(final CoreSession session, final String memberDN)
+    throws LdapException {
+    final Set<String> rolesDN = new HashSet<>();
+    final Cursor<Entry> cursor = session.search(new Dn(getRolesDN()),
+      String.format("(&(cn=*)(%s=%s))", ROLE_OCCUPANT, memberDN));
+    for (Entry entry : cursor) {
+      rolesDN.add(entry.getDn().getName());
     }
-
     return rolesDN;
   }
 
-  private Set<String> getDNsOfAllRolesForMember(DirContext ctxRoot, String memberDN) throws NamingException {
-    Set<String> allMemberRolesDN = new HashSet<String>();
-
-    Set<String> directMemberRolesDN = getDNsOfDirectRolesForMember(ctxRoot, memberDN);
-
+  private Set<String> getDNsOfAllRolesForMember(final CoreSession session, final String memberDN) throws LdapException {
+    final Set<String> directMemberRolesDN = getDNsOfDirectRolesForMember(session, memberDN);
+    final Set<String> allMemberRolesDN = new HashSet<>();
     // add the roles that the member directly owns
     allMemberRolesDN.addAll(directMemberRolesDN);
-
     // for each group that the member belongs to, get it's roles
     // too..
-    Set<String> directMemberGroupsDN = getDNsOfActiveGroupsContainingMember(ctxRoot, memberDN);
-
+    final Set<String> directMemberGroupsDN = getDNsOfActiveGroupsContainingMember(session, memberDN);
     for (String memberGroupDN : directMemberGroupsDN) {
-      allMemberRolesDN.addAll(getDNsOfAllRolesForMember(ctxRoot, memberGroupDN));
+      allMemberRolesDN.addAll(getDNsOfAllRolesForMember(session, memberGroupDN));
     }
-
     return allMemberRolesDN;
   }
 
-  private Set<String> getMemberRoles(DirContext ctxRoot, String memberDN) throws NamingException {
-    Set<String> roles = new HashSet<String>();
-
-    Set<String> allMemberRolesDN = getDNsOfAllRolesForMember(ctxRoot, memberDN);
+  private Set<String> getMemberRoles(final CoreSession session, final String memberDN) throws LdapException {
+    final Set<String> allMemberRolesDN = getDNsOfAllRolesForMember(session, memberDN);
+    final Set<String> roles = new HashSet<>();
     for (String roleDN : allMemberRolesDN) {
-      roles.add(getRoleCNFromDN(roleDN));
+      roles.add(getFirstNameFromDN(roleDN));
     }
-
     return roles;
   }
 
-  private Set<String> getMemberDirectRoles(DirContext ctxRoot, String memberDN) throws NamingException {
-    Set<String> directRoles = new HashSet<String>();
-
-    Set<String> memberDirectRolesDN = getDNsOfDirectRolesForMember(ctxRoot, memberDN);
-
+  private Set<String> getMemberDirectRoles(final CoreSession session, final String memberDN) throws LdapException {
+    final Set<String> memberDirectRolesDN = getDNsOfDirectRolesForMember(session, memberDN);
+    final Set<String> directRoles = new HashSet<>();
     for (String roleDN : memberDirectRolesDN) {
-      directRoles.add(getRoleCNFromDN(roleDN));
+      directRoles.add(getFirstNameFromDN(roleDN));
     }
-
     return directRoles;
   }
 
-  private Set<String> getMemberGroups(DirContext ctxRoot, String memberDN) throws NamingException {
-    Set<String> groups = new HashSet<String>();
-
-    Set<String> allMemberGroupsDN = getDNsOfAllActiveGroupsForMember(ctxRoot, memberDN);
+  private Set<String> getMemberGroups(final CoreSession session, final String memberDN) throws LdapException {
+    final Set<String> allMemberGroupsDN = getDNsOfAllActiveGroupsForMember(session, memberDN);
+    final Set<String> groups = new HashSet<>();
     for (String groupDN : allMemberGroupsDN) {
-      groups.add(getGroupCNFromDN(groupDN));
+      groups.add(getFirstNameFromDN(groupDN));
     }
-
     return groups;
   }
 
-  private User getUserWithEmail(DirContext ctxRoot, String email) throws NamingException {
-
-    // Specify the attributes to match
-    Attributes matchAttrs = new BasicAttributes(true); // ignore case
-    matchAttrs.put(new BasicAttribute("email", email));
-
-    // Search for objects that have those matching attributes
-    NamingEnumeration<SearchResult> answer = ctxRoot.search(getPeopleDN(), matchAttrs);
-
+  private User getUserWithEmail(final CoreSession session, final String email) throws LdapException {
+    final Cursor<Entry> cursor = session.search(new Dn(getPeopleDN()), String.format("email=%s", email));
+    final Iterator<Entry> it = cursor.iterator();
     User user = null;
-    while (answer.hasMore() && user != null) {
-      SearchResult sr = answer.next();
-      user = getUserFromAttributes(sr.getAttributes());
+    while (it.hasNext() && user == null) {
+      user = getUserFromEntry(it.next());
     }
-
     return user;
   }
 
   /**
    * Sets the roles that a member owns.
-   * 
-   * @param ctxRoot
-   *          the root context of LDAP
+   *
+   * @param session
+   *          the session
    * @param memberDN
    *          the DN of the member to change the roles for.
    * @param roles
    *          a list of roles that this member should own.
-   * @throws NamingException
+   * @throws LdapException
+   *           if some error occurs.
    */
-  private void setMemberDirectRoles(DirContext ctxRoot, String memberDN, final Set<String> roles)
-    throws NamingException {
-
+  private void setMemberDirectRoles(final CoreSession session, final String memberDN, final Set<String> roles)
+    throws LdapException {
     Set<String> properRoles = roles;
     if (properRoles == null) {
-      LOGGER.warn("setMemberRoles() - roles is null. no roles");
-      properRoles = new HashSet<String>();
+      LOGGER.warn("setMemberDirectRoles() - roles is null. no roles");
+      properRoles = new HashSet<>();
     }
 
-    Set<String> oldroles = getMemberDirectRoles(ctxRoot, memberDN);
-    Set<String> newroles = new HashSet<String>(properRoles);
+    final Set<String> oldRoles = getMemberDirectRoles(session, memberDN);
+    final Set<String> newRoles = new HashSet<>(properRoles);
 
-    // removing from oldroles all the roles in newroles, oldroles
+    // removing from oldRoles all the roles in newRoles, oldRoles
     // becomes the Set of roles that the user doesn't want to own
     // anymore.
-    Set<String> tempOldroles = new HashSet<String>(oldroles);
-    tempOldroles.removeAll(newroles);
+    final Set<String> tempOldRoles = new HashSet<>(oldRoles);
+    tempOldRoles.removeAll(newRoles);
 
-    // remove user from the roles in oldroles
-    for (String role : tempOldroles) {
-      removeMemberFromRole(ctxRoot, getRoleDN(role), memberDN);
+    // remove user from the roles in oldRoles
+    for (String role : tempOldRoles) {
+      removeMemberFromRole(session, getRoleDN(role), memberDN);
     }
 
-    // removing from newroles all the roles in oldroles, newroles
+    // removing from newRoles all the roles in oldRoles, newRoles
     // becomes the Set of the new roles that the user wants to own.
-    newroles.removeAll(oldroles);
+    newRoles.removeAll(oldRoles);
 
-    // add member to the roles in newroles
-    for (String role : newroles) {
-      addMemberToRole(ctxRoot, getRoleDN(role), memberDN);
+    // add member to the roles in newRoles
+    for (String role : newRoles) {
+      addMemberToRole(session, getRoleDN(role), memberDN);
     }
-
   }
 
   /**
    * Sets the groups to which a member belongs to.
-   * 
+   *
+   * @param session
+   *          the session.
    * @param memberDN
    *          the DN of the member to change the groups for.
    * @param groups
    *          a list of groups that this member should belong to.
-   * @throws NamingException
+   * @throws LdapException
+   *           if some error occurs.
    */
-  private void setMemberGroups(DirContext ctxRoot, String memberDN, Set<String> groups) throws NamingException {
+  private void setMemberGroups(final CoreSession session, final String memberDN, final Set<String> groups)
+    throws LdapException {
 
+    Set<String> properGroups = groups;
     if (groups == null) {
       LOGGER.warn("setMemberGroups() - groups is null. no groups");
-      groups = new HashSet<String>();
+      properGroups = new HashSet<>();
     }
 
-    Set<String> oldgroupDNs = getDNsOfGroupsContainingMember(ctxRoot, memberDN);
-    Set<String> newgroupDNs = new HashSet<String>();
-    Iterator<String> it = groups.iterator();
-    while (it.hasNext()) {
-      newgroupDNs.add(getGroupDN(it.next()));
+    final Set<String> oldgroupDNs = getDNsOfGroupsContainingMember(session, memberDN);
+    final Set<String> newgroupDNs = new HashSet<>();
+    for (String groupName : properGroups) {
+      newgroupDNs.add(getGroupDN(groupName));
     }
 
     // removing all the groups in newgroups, oldgroups becomes the Set
     // of groups that the user doesn't want to belong to anymore.
-    Set<String> tempOldgroupDNs = new HashSet<String>(oldgroupDNs);
+    final Set<String> tempOldgroupDNs = new HashSet<>(oldgroupDNs);
     tempOldgroupDNs.removeAll(newgroupDNs);
 
     // remove user from the groups in oldgroups
     for (String groupDN : tempOldgroupDNs) {
-      removeMemberFromGroup(ctxRoot, groupDN, memberDN);
+      removeMemberFromGroup(session, groupDN, memberDN);
     }
 
     // removing all the groups in oldgroups, newgroups becomes the Set
@@ -2798,106 +1878,65 @@ public class LdapUtility {
 
     // add user to the groups in newgroups
     for (String groupDN : newgroupDNs) {
-      addMemberToGroup(ctxRoot, groupDN, memberDN);
+      addMemberToGroup(session, groupDN, memberDN);
     }
 
   }
 
   /**
    * Sets the user's password without checking admin and guest users.
-   * 
+   *
    * @param username
+   *          the username.
    * @param password
-   * 
+   *          the password.
+   *
    * @throws NotFoundException
    *           if specified {@link User} doesn't exist.
    * @throws LdapUtilityException
+   *           if some error occurs.
    */
-  private void setUserPasswordUnchecked(String username, String password)
+  private void setUserPasswordUnchecked(final String username, final String password)
     throws NotFoundException, LdapUtilityException {
-
     try {
-
-      // Create initial context
-      DirContext ctxRoot = getLDAPAdminDirContext(ldapRootDN);
-
-      modifyUserPassword(ctxRoot, username, password);
-
-      ctxRoot.close();
-
-    } catch (NameNotFoundException e) {
-      LOGGER.debug(userMessage(username, " doesn't exist."), e);
-      throw new NotFoundException(userMessage(username, " doesn't exist."), e);
-    } catch (NamingException e) {
-      LOGGER.debug("Error setting password for user " + username, e);
+      final CoreSession session = service.getAdminSession();
+      modifyUserPassword(session, username, password);
+    } catch (final LdapException e) {
       throw new LdapUtilityException("Error setting password for user " + username, e);
-    } catch (NoSuchAlgorithmException e) {
-      LOGGER.debug("Error encoding password for user " + username, e);
+    } catch (final NoSuchAlgorithmException e) {
       throw new LdapUtilityException("Error encoding password for user " + username, e);
     }
-
   }
 
   /**
-   * Returns a user UID (Unique ID) from it's DN (Distinguished Name). Ex: for
-   * <i>DN=uid=xpto,ou=people,dc=roda,dc=org</i> returns <i>rcastro</i>.
-   * 
-   * @param userDN
-   * @return a {@link java.lang.String} with the UID.
-   * @throws InvalidNameException
-   */
-  private String getUserUIDFromDN(String userDN) throws InvalidNameException {
-    Name name = new LdapName(userDN);
-    String userCNWithCN = name.getSuffix(name.size() - 1).toString();
-    String[] nameComps = userCNWithCN.split("=");
-    String userCN = nameComps[1];
-    return userCN;
-  }
-
-  /**
-   * Returns a group CN (Common Name) from it's DN (Distinguished Name). Ex: for
+   * Returns the first name from a DN (Distinguished Name). Ex: for
    * <i>DN=cn=administrators,ou=groups,dc=roda,dc=org</i> returns
    * <i>administrators</i>.
-   * 
-   * @param groupDN
-   * @return a {@link java.lang.String} with the CN.
-   * @throws InvalidNameException
+   *
+   * @param dn
+   *          the Distinguished Name.
+   * @return a {@link String} with the first name.
+   * @throws LdapInvalidDnException
+   *           if the DN is not valid.
    */
-  private String getGroupCNFromDN(String groupDN) throws InvalidNameException {
-    Name name = new LdapName(groupDN);
-    String groupCNWithCN = name.getSuffix(name.size() - 1).toString();
-    String[] nameComps = groupCNWithCN.split("=");
-    String groupCN = nameComps[1];
-    return groupCN;
+  private String getFirstNameFromDN(final String dn) throws LdapInvalidDnException {
+    return getFirstNameFromDN(new Dn(dn));
   }
 
-  private List<String> getRolesDN(DirContext ctxRoot) throws NamingException {
-    return getDNsOfUsersGroupsRoles(ctxRoot, ldapRolesDN, "cn");
+  /**
+   * Returns the first name from a DN (Distinguished Name). Ex: for
+   * <i>DN=cn=administrators,ou=groups,dc=roda,dc=org</i> returns
+   * <i>administrators</i>.
+   *
+   * @param dn
+   *          the Distinguished Name.
+   * @return a {@link String} with the first name.
+   */
+  private String getFirstNameFromDN(final Dn dn) {
+    return dn.getRdn().getValue();
   }
 
-  private List<String> getDNsOfUsersGroupsRoles(DirContext ctxRoot, String ctxDN, String keyAttribute)
-    throws NamingException {
-
-    List<String> dnList = new ArrayList<String>();
-
-    // Specify the attributes to match
-    Attributes matchAttrs = new BasicAttributes(true); // ignore case
-    matchAttrs.put(new BasicAttribute(keyAttribute));
-
-    // Search for objects that have those matching attributes
-    NamingEnumeration<SearchResult> answer = ctxRoot.search(ctxDN, matchAttrs, new String[] {});
-
-    while (answer.hasMore()) {
-      SearchResult sr = answer.next();
-
-      // Adds a new entry with the username
-      dnList.add(sr.getNameInNamespace());
-    }
-
-    return dnList;
-  }
-
-  private String userMessage(String user, String message) {
+  private String userMessage(final String user, final String message) {
     return "User " + user + message;
   }
 
@@ -2966,7 +2005,6 @@ public class LdapUtility {
     partition.setPartitionPath(new File(service.getInstanceLayout().getPartitionsDirectory(), partitionId).toURI());
     partition.setSuffixDn(new Dn(partitionDn));
     service.addPartition(partition);
-
     return partition;
   }
 
@@ -3007,6 +2045,22 @@ public class LdapUtility {
     }
 
     partition.setIndexedAttributes(indexedAttributes);
+  }
+
+  private boolean isInvalidCredentials(final String errorMessage) {
+    return errorMessage.contains("LDAP: error code 49 - INVALID_CREDENTIALS");
+  }
+
+  private User getUserByNameOrEmail(final String username, final String email) throws LdapUtilityException {
+    final User user;
+    if (username != null) {
+      user = getUser(username);
+    } else if (email != null) {
+      user = getUserWithEmail(email);
+    } else {
+      throw new IllegalArgumentException("username and email can not both be null");
+    }
+    return user;
   }
 
 }
