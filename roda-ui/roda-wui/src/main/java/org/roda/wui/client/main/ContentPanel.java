@@ -27,6 +27,7 @@ import org.roda.wui.client.management.ResetPassword;
 import org.roda.wui.client.management.VerifyEmail;
 import org.roda.wui.client.planning.Planning;
 import org.roda.wui.client.process.Process;
+import org.roda.wui.client.search.Relation;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.client.welcome.Help;
 import org.roda.wui.client.welcome.Welcome;
@@ -51,6 +52,7 @@ public class ContentPanel extends SimplePanel {
 
   private static ContentPanel instance = null;
 
+  @SuppressWarnings("unused")
   private static ClientLogger logger = new ClientLogger(ContentPanel.class.getName());
 
   /**
@@ -90,6 +92,7 @@ public class ContentPanel extends SimplePanel {
     resolvers.add(Browse.RESOLVER);
     // Search
     resolvers.add(Search.RESOLVER);
+    resolvers.add(Relation.RESOLVER);
     // Ingest
     resolvers.add(Ingest.RESOLVER);
     // Management

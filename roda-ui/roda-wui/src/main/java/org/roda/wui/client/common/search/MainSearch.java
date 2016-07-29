@@ -581,7 +581,6 @@ public class MainSearch extends Composite {
         String key = historyTokens.get(i);
         String value = historyTokens.get(i + 1);
 
-        GWT.log("search " + key + ": " + value);
         params.add(new SimpleFilterParameter(key, value));
       }
 
