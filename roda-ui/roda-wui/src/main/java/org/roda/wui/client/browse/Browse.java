@@ -43,6 +43,7 @@ import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
+import org.roda.wui.client.search.Relation;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -218,6 +219,12 @@ public class Browse extends Composite {
   @UiField
   Button download, submission, documentation, schemas;
 
+  @UiField
+  FlowPanel searchSection;
+
+  @UiField
+  Button searchContext;
+
   private boolean viewingTop;
 
   private List<HandlerRegistration> handlers;
@@ -369,6 +376,8 @@ public class Browse extends Composite {
     appraisalSidebar.setVisible(false);
     preservationSidebar.setVisible(false);
     actionsSidebar.setVisible(false);
+
+    searchSection.setVisible(false);
 
     // Set button visibility
     createItem.setVisible(false);
@@ -523,6 +532,7 @@ public class Browse extends Composite {
       submission.setVisible(aip.getNumberOfSubmissionFiles() > 0);
       documentation.setVisible(aip.getNumberOfDocumentationFiles() > 0);
       schemas.setVisible(aip.getNumberOfSchemaFiles() > 0);
+      searchSection.setVisible(true);
 
       for (AIPState state : AIPState.values()) {
         this.removeStyleName(state.toString().toLowerCase());
@@ -566,6 +576,8 @@ public class Browse extends Composite {
 
     downloadSection.setVisible(false);
     download.setVisible(false);
+
+    searchSection.setVisible(false);
 
     this.removeStyleName("inactive");
     aipState.setVisible(false);
@@ -862,32 +874,32 @@ public class Browse extends Composite {
             messages.ingestTransferRemoveFolderConfirmDialogCancel(),
             messages.ingestTransferRemoveFolderConfirmDialogOk(), new AsyncCallback<Boolean>() {
 
-              @Override
-              public void onSuccess(Boolean confirmed) {
-                if (confirmed) {
-                  BrowserService.Util.getInstance().removeAIP(selected, new LoadingAsyncCallback<String>() {
+            @Override
+            public void onSuccess(Boolean confirmed) {
+              if (confirmed) {
+                BrowserService.Util.getInstance().removeAIP(selected, new LoadingAsyncCallback<String>() {
 
-                    @Override
-                    public void onFailureImpl(Throwable caught) {
-                      AsyncCallbackUtils.defaultFailureTreatment(caught);
-                      aipList.refresh();
-                    }
+                  @Override
+                  public void onFailureImpl(Throwable caught) {
+                    AsyncCallbackUtils.defaultFailureTreatment(caught);
+                    aipList.refresh();
+                  }
 
-                    @Override
-                    public void onSuccessImpl(String parentId) {
-                      Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
-                        messages.ingestTransferRemoveSuccessMessage(size));
-                      aipList.refresh();
-                    }
-                  });
-                }
+                  @Override
+                  public void onSuccessImpl(String parentId) {
+                    Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
+                      messages.ingestTransferRemoveSuccessMessage(size));
+                    aipList.refresh();
+                  }
+                });
               }
+            }
 
-              @Override
-              public void onFailure(Throwable caught) {
-                AsyncCallbackUtils.defaultFailureTreatment(caught);
-              }
-            });
+            @Override
+            public void onFailure(Throwable caught) {
+              AsyncCallbackUtils.defaultFailureTreatment(caught);
+            }
+          });
         }
 
       });
@@ -1093,5 +1105,10 @@ public class Browse extends Composite {
           });
         }
       });
+  }
+
+  @UiHandler("searchContext")
+  void searchContextHandler(ClickEvent e) {
+    Tools.newHistory(Relation.RESOLVER, RodaConstants.SEARCH_LIST_BOX_ITEMS, RodaConstants.AIP_SEARCH, aipId);
   }
 }
