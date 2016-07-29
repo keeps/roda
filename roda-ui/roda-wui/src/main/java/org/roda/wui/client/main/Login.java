@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
+import org.roda.core.data.exceptions.EmailUnverifiedException;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.management.RecoverLogin;
@@ -175,7 +176,9 @@ public class Login extends Composite {
 
         @Override
         public void onFailure(Throwable caught) {
-          if (caught instanceof AuthenticationDeniedException) {
+          if (caught instanceof EmailUnverifiedException) {
+            error.setText(messages.emailUnverifiedMessage());
+          } else if (caught instanceof AuthenticationDeniedException) {
             error.setText(messages.wrongUsernameAndPasswordMessage());
           } else {
             error.setText(messages.systemCurrentlyUnavailableMessage());

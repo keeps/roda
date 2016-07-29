@@ -1850,25 +1850,15 @@ public class LdapUtility {
       attributes.remove("businessCategory");
     }
 
-    String infoStr = "";
-    if (user.getEmailConfirmationToken() != null && user.getEmailConfirmationToken().trim().length() > 0) {
-      infoStr = user.getEmailConfirmationToken();
-    }
-    infoStr += ";";
-    if (user.getEmailConfirmationTokenExpirationDate() != null
-      && user.getEmailConfirmationTokenExpirationDate().trim().length() > 0) {
-      infoStr += user.getEmailConfirmationTokenExpirationDate();
-    }
-    infoStr += ";";
-    if (user.getResetPasswordToken() != null && user.getResetPasswordToken().trim().length() > 0) {
-      infoStr += user.getResetPasswordToken();
-    }
-    infoStr += ";";
-    if (user.getResetPasswordTokenExpirationDate() != null
-      && user.getResetPasswordTokenExpirationDate().trim().length() > 0) {
-      infoStr += user.getResetPasswordTokenExpirationDate();
-    }
-    attributes.put("info", infoStr);
+    String emailToken = user.getEmailConfirmationToken();
+    String emailTokenDate = user.getEmailConfirmationTokenExpirationDate();
+    String passwordToken = user.getResetPasswordToken();
+    String passwordTokenDate = user.getResetPasswordTokenExpirationDate();
+    emailToken = StringUtils.isBlank(emailToken) ? "" : emailToken;
+    emailTokenDate = StringUtils.isBlank(emailTokenDate) ? "" : emailTokenDate;
+    passwordToken = StringUtils.isBlank(passwordToken) ? "" : passwordToken;
+    passwordTokenDate = StringUtils.isBlank(passwordTokenDate) ? "" : passwordTokenDate;
+    attributes.put("info", String.format("%s;%s;%s;%s", emailToken, emailTokenDate, passwordToken, passwordTokenDate));
 
     return attributes;
   }

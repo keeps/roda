@@ -9,30 +9,36 @@ package org.roda.wui.api.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.ServiceException;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.v2.user.RodaSimpleUser;
 import org.roda.core.data.v2.user.RodaUser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.roda.core.data.v2.user.User;
+import org.roda.wui.client.common.utils.StringUtils;
+import org.roda.core.data.exceptions.EmailUnverifiedException;
 
 public class UserLoginHelper {
-  private static final Logger LOGGER = LoggerFactory.getLogger(UserLoginHelper.class);
 
   public static RodaUser login(String username, String password, HttpServletRequest request)
     throws GenericException, AuthenticationDeniedException {
     try {
-      RodaUser user = UserUtility.getLdapUtility().getAuthenticatedUser(username, password);
-      if (!user.isActive()) {
+      RodaUser rodaUser = UserUtility.getLdapUtility().getAuthenticatedUser(username, password);
+      if (!rodaUser.isActive()) {
+        User user = UserUtility.getLdapUtility().getUser(rodaUser.getName());
+        if (StringUtils.isNotBlank(user.getEmailConfirmationToken())) {
+          throw new EmailUnverifiedException("Email is not verified.");
+        }
         throw new AuthenticationDeniedException("User is not active.");
       }
-      user.setIpAddress(request.getRemoteAddr());
-      UserUtility.setUser(request, new RodaSimpleUser(user.getId(), user.getName(), user.getEmail(), user.isGuest()));
-      return user;
-    } catch (ServiceException e) {
-      throw new GenericException(e.getMessage());
+      rodaUser.setIpAddress(request.getRemoteAddr());
+      UserUtility.setUser(request,
+        new RodaSimpleUser(rodaUser.getId(), rodaUser.getName(), rodaUser.getEmail(), rodaUser.isGuest()));
+      return rodaUser;
+    } catch (ServiceException | LdapUtilityException e) {
+      throw new GenericException(e.getMessage(), e);
     }
   }
 
