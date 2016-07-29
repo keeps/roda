@@ -818,9 +818,12 @@ public class RodaCoreFactory {
       final String ldapPasswordDigestAlgorithm = rodaConfig.getString("ldap.passwordDigestAlgorithm");
       final List<String> ldapProtectedUsers = RodaUtils.copyList(rodaConfig.getList("ldap.protectedUsers"));
       final List<String> ldapProtectedGroups = RodaUtils.copyList(rodaConfig.getList("ldap.protectedGroups"));
+      final String rodaAdminDN = rodaConfig.getString("ldap.rodaAdminDN");
 
-      RodaCoreFactory.ldapUtility = new LdapUtility(ldapHost, ldapPort, ldapPeopleDN, ldapGroupsDN, ldapRolesDN,
-        ldapAdminDN, ldapAdminPassword, ldapPasswordDigestAlgorithm, ldapProtectedUsers, ldapProtectedGroups);
+      RodaCoreFactory.ldapUtility = new LdapUtility(ldapBaseDN, ldapPeopleDN, ldapGroupsDN, ldapRolesDN, ldapAdminDN,
+        ldapAdminPassword, ldapPasswordDigestAlgorithm, ldapProtectedUsers, ldapProtectedGroups, rodaAdminDN,
+        rodaApacheDSDataDirectory);
+
       UserUtility.setLdapUtility(ldapUtility);
 
       if (!Files.exists(rodaApacheDSDataDirectory)) {
@@ -834,12 +837,12 @@ public class RodaCoreFactory {
           IOUtils.closeQuietly(ldifInputStream);
         }
 
-        RodaCoreFactory.ldapUtility.initDirectoryService(rodaApacheDSDataDirectory, ldapAdminDN, ldapAdminPassword, ldapBaseDN, ldifs);
-        RodaCoreFactory.ldapUtility.startApacheDS(ldapPort);
+        RodaCoreFactory.ldapUtility.initDirectoryService(ldifs);
+        RodaCoreFactory.ldapUtility.startLdapServer(ldapPort);
         indexUsersAndGroupsFromLDAP();
       } else {
-        RodaCoreFactory.ldapUtility.instantiateDirectoryService(rodaApacheDSDataDirectory, ldapBaseDN);
-        RodaCoreFactory.ldapUtility.startApacheDS(ldapPort);
+        RodaCoreFactory.ldapUtility.initDirectoryService();
+        RodaCoreFactory.ldapUtility.startLdapServer(ldapPort);
       }
 
       createRoles(rodaConfig);
@@ -853,7 +856,7 @@ public class RodaCoreFactory {
 
   private static void stopApacheDS() {
     try {
-      RodaCoreFactory.ldapUtility.stopApacheDS();
+      RodaCoreFactory.ldapUtility.stopLdapServer();
     } catch (final Exception e) {
       LOGGER.error("Error while shutting down ApacheDS embedded server", e);
     }
@@ -880,7 +883,7 @@ public class RodaCoreFactory {
         LOGGER.info("Created LDAP role {}", role);
       } catch (final RoleAlreadyExistsException e) {
         LOGGER.info("Role {} already exists.", role);
-        LOGGER.debug(e.getMessage(), e);
+        LOGGER.trace(e.getMessage(), e);
       } catch (final LdapUtilityException e) {
         throw new GenericException("Error creating role '" + role + "'", e);
       }
@@ -910,7 +913,7 @@ public class RodaCoreFactory {
       }
 
       transferredResourcesScanner = new TransferredResourcesScanner(transferredResourcesFolderPath, getIndexService());
-    } catch (Exception e) {
+    } catch (final Exception e) {
       LOGGER.error("Error starting Transferred Resources Scanner: " + e.getMessage(), e);
       instantiatedWithoutErrors = false;
     }
