@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jute.Index;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.filter.Filter;
@@ -130,12 +131,10 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
       reportItem.setSourceObjectOriginalId(sip.getId());
 
       if (sip.getValidationReport().isValid()) {
-        String sipParentId = createAncestors(sip, index, model, storage);
+        String sipParentId = createAncestors(sip, index, model, PluginHelper.getParentIdFromParameters(this));
         String computedParentId = PluginHelper.computeParentId(this, index, sipParentId);
 
         AIP aip;
-
-
 
         // Status is UPDATE or the AIP is a ghost
         if(IPEnums.IPStatus.UPDATE == sip.getStatus()){
@@ -201,7 +200,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
     }
   }
 
-  private String createAncestors(SIP sip, IndexService index, ModelService model, StorageService storage)
+  private String createAncestors(SIP sip, IndexService index, ModelService model, String forcedParent)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException,
     AlreadyExistsException, ValidationException {
     List<String> ancestors = new ArrayList<>(sip.getAncestors());
@@ -209,19 +208,17 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
       return null;
     // Reverse list so that the top ancestors come first
     Collections.reverse(ancestors);
-    String parent = null;
+    String parent = StringUtils.isBlank(forcedParent) ? null : forcedParent;
 
     for (String ancestor : ancestors) {
       try {
-        IndexResult<IndexedAIP> result = index.find(IndexedAIP.class,
-                new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, ancestor)), Sorter.NONE,
-                new Sublist(0, 1));
+        Filter ancestorFilter = new Filter( new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, ancestor));
+        if(!StringUtils.isBlank(forcedParent)){
+          ancestorFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, forcedParent));
+        }
+        IndexResult<IndexedAIP> result = index.find(IndexedAIP.class, ancestorFilter, Sorter.NONE, new Sublist(0, 1));
         if (result.getTotalCount() >= 1) {
           IndexedAIP indexedAIP = result.getResults().get(0);
-          // TODO apereira 21/07/2016 Discuss if we need to override the parent of the node
-//          AIP aip = model.retrieveAIP(indexedAIP.getId());
-//          aip.setParentId(parent);
-//          model.updateAIP(aip);
           parent = indexedAIP.getId();
         }else throw new NotFoundException();
       } catch (NotFoundException e) {

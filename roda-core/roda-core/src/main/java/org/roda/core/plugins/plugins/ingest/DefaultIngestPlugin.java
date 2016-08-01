@@ -289,38 +289,47 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   }
 
   private void fixParents (IndexService index, ModelService model) throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException{
+    String forcedParent = PluginHelper.getParentIdFromParameters(this);
     index.execute(IndexedAIP.class,
       new Filter(new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.TRUE.toString())),
       ghost -> {
+        Filter nonGhostsFilter = new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, ghost.getIngestSIPId()),
+                new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.FALSE.toString()));
+        if(!StringUtils.isBlank(forcedParent)){
+          nonGhostsFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, forcedParent));
+        }
         // if there are AIPs that have the same sip id
-        IndexResult<IndexedAIP> result = index.find(IndexedAIP.class,
-                new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, ghost.getIngestSIPId()),
-                        new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.FALSE.toString())),
-                Sorter.NONE, new Sublist(0, 1));
+        IndexResult<IndexedAIP> result = index.find(IndexedAIP.class, nonGhostsFilter, Sorter.NONE, new Sublist(0, 1));
 
         if(result.getTotalCount() > 1){
           LOGGER.debug("Couldn't find non-ghost AIP with ingest SIP id: " + ghost.getIngestSIPId());
         } else if(result.getTotalCount() == 1){
           IndexedAIP newParentIAIP = result.getResults().get(0);
-          moveChildrenAIPsAndDelete(index, model, ghost.getId(), newParentIAIP.getId());
+          moveChildrenAIPsAndDelete(index, model, ghost.getId(), newParentIAIP.getId(), forcedParent);
         }else if(result.getTotalCount() == 0){
           //check if there are other ghosts with the same sip id and from the same job, move all of this ghost children
-          IndexResult<IndexedAIP> otherGhosts = index.find(IndexedAIP.class,
-              new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, ghost.getIngestSIPId()),
-                  new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.TRUE.toString())),
-              Sorter.NONE, new Sublist(0, 1));
+          Filter otherGhostsFilter = new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, ghost.getIngestSIPId()),
+                  new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.TRUE.toString()));
+          if(!StringUtils.isBlank(forcedParent)){
+            otherGhostsFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, forcedParent));
+          }
+          IndexResult<IndexedAIP> otherGhosts = index.find(IndexedAIP.class, otherGhostsFilter, Sorter.NONE, new Sublist(0, 1));
           if(result.getTotalCount() >= 1){
             IndexedAIP otherGhost = otherGhosts.getResults().get(0);
-            moveChildrenAIPsAndDelete(index, model, ghost.getId(), otherGhost.getId());
+            moveChildrenAIPsAndDelete(index, model, ghost.getId(), otherGhost.getId(), forcedParent);
           }
         }
       });
   }
 
-  private void moveChildrenAIPsAndDelete(IndexService index, ModelService model, String aipId, String newParentId)
+  private void moveChildrenAIPsAndDelete(IndexService index, ModelService model, String aipId, String newParentId, String forcedParent)
       throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+    Filter parentFilter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aipId));
+    if(!StringUtils.isBlank(forcedParent)){
+      parentFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, PluginHelper.getParentIdFromParameters(this)));
+    }
     index.execute(IndexedAIP.class,
-        new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aipId)),
+        parentFilter,
         child -> {
           try {
             model.moveAIP(child.getId(), newParentId);

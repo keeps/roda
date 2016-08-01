@@ -409,7 +409,7 @@ public final class PluginHelper {
     return plugin.getParameterValues().getOrDefault(pluginParameter.getId(), pluginParameter.getDefaultValue());
   }
 
-  private static <T extends IsRODAObject> String getParentIdFromParameters(Plugin<T> plugin) {
+  public static <T extends IsRODAObject> String getParentIdFromParameters(Plugin<T> plugin) {
     return plugin.getParameterValues().get(RodaConstants.PLUGIN_PARAMS_PARENT_ID);
   }
 
