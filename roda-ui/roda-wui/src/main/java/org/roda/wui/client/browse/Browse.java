@@ -37,6 +37,7 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
+import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
@@ -187,6 +188,9 @@ public class Browse extends Composite {
   Label fondsPanelTitle;
 
   @UiField(provided = true)
+  SearchPanel searchPanel;
+
+  @UiField(provided = true)
   AIPList aipList;
 
   @UiField
@@ -231,6 +235,8 @@ public class Browse extends Composite {
 
   boolean justActive = true;
 
+  boolean searchable = false;
+
   private Browse() {
     viewingTop = true;
     handlers = new ArrayList<HandlerRegistration>();
@@ -239,6 +245,12 @@ public class Browse extends Composite {
     boolean selectable = true;
 
     aipList = new AIPList(Filter.NULL, justActive, FACETS, summary, selectable);
+
+    searchPanel = new SearchPanel(COLLECTIONS_FILTER, RodaConstants.AIP_SEARCH, messages.searchPlaceHolder(), false,
+      false);
+    searchPanel.setDefaultFilterIncremental(true);
+    searchPanel.setList(aipList);
+
     initWidget(uiBinder.createAndBindUi(this));
 
     browseDescription.add(new HTMLWidgetWrapper("BrowseDescription.html"));
@@ -258,8 +270,13 @@ public class Browse extends Composite {
 
       @Override
       public void onValueChange(ValueChangeEvent<IndexResult<IndexedAIP>> event) {
-        fondsPanelTitle.setVisible(!viewingTop && event.getValue().getTotalCount() > 0);
-        aipList.setVisible(viewingTop || event.getValue().getTotalCount() > 0);
+        if (!viewingTop && event.getValue().getTotalCount() > 0 && !searchable) {
+          searchable = true;
+        }
+
+        fondsPanelTitle.setVisible(searchable);
+        searchPanel.setVisible(searchable);
+        aipList.setVisible(viewingTop || searchable);
       }
     });
   }
@@ -367,7 +384,10 @@ public class Browse extends Composite {
     newDescriptiveMetadata.setVisible(false);
 
     viewingTop = false;
+    searchable = false;
     fondsPanelTitle.setVisible(false);
+    searchPanel.setVisible(false);
+    searchPanel.clearSearchInputBox();
     aipList.setVisible(false);
 
     downloadList.clear();
@@ -510,6 +530,8 @@ public class Browse extends Composite {
       }
 
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId()));
+      searchPanel.setDefaultFilter(filter);
+      searchPanel.clearSearchInputBox();
       aipList.set(filter, justActive, FACETS);
 
       appraisalSidebar.setVisible(aip.getState().equals(AIPState.UNDER_APPRAISAL));
@@ -564,6 +586,7 @@ public class Browse extends Composite {
     itemTitle.addStyleName("browseTitle-allCollections");
     itemIcon.getParent().addStyleName("browseTitle-allCollections-wrapper");
 
+    searchPanel.setDefaultFilter(COLLECTIONS_FILTER);
     aipList.set(COLLECTIONS_FILTER, justActive, FACETS);
 
     actionsSidebar.setVisible(true);

@@ -3,6 +3,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client" xmlns:m="urn:import:org.roda.wui.client.main"
+	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search"
 	xmlns:lists="urn:import:org.roda.wui.client.common.lists">
 
 	<ui:style>
@@ -29,8 +30,10 @@
 						<g:Label styleName="h1" addStyleNames="browseItemText"
 							ui:field="itemTitle" />
 					</g:FlowPanel>
-					<g:Label addStyleNames="browseItemId" ui:field="itemId" title="{messages.itemId}" />
-					<g:Label addStyleNames="browseSipId" ui:field="sipId"  title="{messages.sipId}"/>
+					<g:Label addStyleNames="browseItemId" ui:field="itemId"
+						title="{messages.itemId}" />
+					<g:Label addStyleNames="browseSipId" ui:field="sipId"
+						title="{messages.sipId}" />
 				</g:FlowPanel>
 				<m:BreadcrumbPanel ui:field="breadcrumb"
 					addStyleNames="browseBreadcrumb" />
@@ -43,7 +46,8 @@
 				<g:Label addStyleNames="h4 browseSearchListTitle" ui:field="fondsPanelTitle">
 					<ui:text from='{messages.sublevels}' />
 				</g:Label>
-				<lists:AIPList ui:field="aipList" />
+				<commonsearch:SearchPanel ui:field="searchPanel" />
+				<lists:AIPList addStyleNames="searchResults" ui:field="aipList" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel ui:field="appraisalSidebar">
@@ -122,8 +126,7 @@
 					<g:Label addStyleNames="h4">
 						<ui:text from='{messages.searchTitle}' />
 					</g:Label>
-					<g:Button addStyleNames="btn btn-search"
-						ui:field="searchContext">
+					<g:Button addStyleNames="btn btn-search" ui:field="searchContext">
 						<ui:text from='{messages.searchContext}' />
 					</g:Button>
 				</g:FlowPanel>
