@@ -27,6 +27,7 @@ import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.management.NotificationRegister;
 import org.roda.wui.client.management.Profile;
 import org.roda.wui.client.management.Register;
+import org.roda.wui.client.management.Statistics;
 import org.roda.wui.client.management.UserLog;
 import org.roda.wui.client.planning.FormatRegister;
 import org.roda.wui.client.planning.Planning;
@@ -93,6 +94,7 @@ public class Menu extends Composite {
   private MenuItem administration_user;
   private MenuItem administration_log;
   private MenuItem administration_notifications;
+  private MenuItem administration_statistics;
   // private MenuItem administration_preferences;
 
   private final MenuBar planningMenu;
@@ -144,6 +146,8 @@ public class Menu extends Composite {
     // FIXME add constant for notification title
     administration_notifications = administrationMenu.addItem(messages.title("administration_notifications"),
       createCommand(NotificationRegister.RESOLVER.getHistoryPath()));
+    administration_statistics = administrationMenu.addItem(messages.title("administration_statistics"),
+      createCommand(Statistics.RESOLVER.getHistoryPath()));
     // administration_preferences =
     // administrationMenu.addItem(messages.title("administration_preferences"),
     // createCommand(Management.RESOLVER.getHistoryPath()));
@@ -245,6 +249,7 @@ public class Menu extends Composite {
     updateResolverSubItemVisibility(MemberManagement.RESOLVER, administration_user);
     updateResolverSubItemVisibility(UserLog.RESOLVER, administration_log);
     updateResolverSubItemVisibility(NotificationRegister.RESOLVER, administration_notifications);
+    updateResolverSubItemVisibility(Statistics.RESOLVER, administration_statistics);
     // updateResolverSubItemVisibility(Management.RESOLVER,
     // administration_preferences);
     updateResolverTopItemVisibility(Management.RESOLVER,
