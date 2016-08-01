@@ -13,11 +13,13 @@ import java.util.Map;
 
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.facet.SimpleFacetParameter;
+import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.RodaMemberList;
+import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Tools;
@@ -83,14 +85,11 @@ public class MemberManagement extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  // private UserManagementConstants constants = (UserManagementConstants)
-  // GWT.create(UserManagementConstants.class);
-
-  // private UserManagementMessages messages = (UserManagementMessages)
-  // GWT.create(UserManagementMessages.class);
-
   @UiField
   FlowPanel memberManagementDescription;
+
+  @UiField(provided = true)
+  SearchPanel searchPanel;
 
   @UiField(provided = true)
   RodaMemberList list;
@@ -110,6 +109,9 @@ public class MemberManagement extends Composite {
   @UiField
   Button buttonAddGroup;
 
+  private static final Filter DEFAULT_FILTER = new Filter(
+    new BasicSearchFilterParameter(RodaConstants.MEMBERS_SEARCH, "*"));
+
   public MemberManagement() {
     Filter filter = null;
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.MEMBERS_IS_ACTIVE),
@@ -117,6 +119,11 @@ public class MemberManagement extends Composite {
       new SimpleFacetParameter(RodaConstants.MEMBERS_GROUPS_ALL));
 
     list = new RodaMemberList(filter, facets, messages.usersAndGroupsTitle(), false);
+
+    searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.MEMBERS_SEARCH,
+      messages.usersAndGroupsSearchPlaceHolder(), false, false);
+    searchPanel.setList(list);
+
     facetIsActive = new FlowPanel();
     facetIsUser = new FlowPanel();
     facetGroups = new FlowPanel();

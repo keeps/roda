@@ -108,6 +108,8 @@ public interface ClientMessages extends Messages {
   String notificationTitle();
 
   String usersAndGroupsTitle();
+  
+  String usersAndGroupsSearchPlaceHolder();
 
   String logsTitle();
 
