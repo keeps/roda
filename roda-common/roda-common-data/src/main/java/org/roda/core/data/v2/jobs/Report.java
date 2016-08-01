@@ -29,6 +29,7 @@ public class Report implements Serializable, IsIndexed {
   private String sourceObjectId = "";
   private String sourceObjectClass = "";
   private String sourceObjectOriginalId = "";
+  private String sourceObjectOriginalName = "";
   private String outcomeObjectId = "";
   private String outcomeObjectClass = "";
   private AIPState outcomeObjectState = AIPState.getDefault();
@@ -66,6 +67,7 @@ public class Report implements Serializable, IsIndexed {
     this.sourceObjectId = report.getSourceObjectId();
     this.sourceObjectClass = report.getSourceObjectClass();
     this.sourceObjectOriginalId = report.getSourceObjectOriginalId();
+    this.sourceObjectOriginalName = report.getSourceObjectOriginalName();
     this.outcomeObjectId = report.getOutcomeObjectId();
     this.outcomeObjectClass = report.getOutcomeObjectClass();
     this.outcomeObjectState = report.getOutcomeObjectState();
@@ -125,6 +127,15 @@ public class Report implements Serializable, IsIndexed {
 
   public Report setSourceObjectOriginalId(String sourceObjectOriginalId) {
     this.sourceObjectOriginalId = sourceObjectOriginalId;
+    return this;
+  }
+
+  public String getSourceObjectOriginalName() {
+    return sourceObjectOriginalName;
+  }
+
+  public Report setSourceObjectOriginalName(String sourceObjectOriginalName) {
+    this.sourceObjectOriginalName = sourceObjectOriginalName;
     return this;
   }
 

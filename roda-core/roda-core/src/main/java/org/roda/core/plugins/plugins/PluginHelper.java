@@ -89,7 +89,7 @@ public final class PluginHelper {
     TransferredResource transferredResource) {
     return initPluginReportItem(plugin, "", transferredResource.getUUID())
       .setSourceObjectClass(TransferredResource.class.getName()).setOutcomeObjectClass(AIP.class.getName())
-      .setOutcomeObjectState(AIPState.INGEST_PROCESSING);
+      .setOutcomeObjectState(AIPState.INGEST_PROCESSING).setSourceObjectOriginalName(transferredResource.getName());
   }
 
   public static <T extends IsRODAObject> Report initPluginReportItem(Plugin<T> plugin, String outcomeObjectId,

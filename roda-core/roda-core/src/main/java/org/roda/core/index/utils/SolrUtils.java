@@ -1718,6 +1718,7 @@ public class SolrUtils {
     doc.addField(RodaConstants.JOB_REPORT_JOB_ID, jobReport.getJobId());
     doc.addField(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID, jobReport.getSourceObjectId());
     doc.addField(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ORIGINAL_ID, jobReport.getSourceObjectOriginalId());
+    doc.addField(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ORIGINAL_NAME, jobReport.getSourceObjectOriginalName());
     doc.addField(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID, jobReport.getOutcomeObjectId());
     doc.addField(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_STATE, jobReport.getOutcomeObjectState().toString());
     doc.addField(RodaConstants.JOB_REPORT_TITLE, jobReport.getTitle());
@@ -1748,6 +1749,8 @@ public class SolrUtils {
     jobReport.setSourceObjectClass(objectToString(doc.get(RodaConstants.JOB_REPORT_SOURCE_OBJECT_CLASS), ""));
     jobReport
       .setSourceObjectOriginalId(objectToString(doc.get(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ORIGINAL_ID), ""));
+    jobReport
+            .setSourceObjectOriginalName(objectToString(doc.get(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ORIGINAL_NAME), ""));
     jobReport.setOutcomeObjectId(objectToString(doc.get(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID), ""));
     jobReport.setOutcomeObjectClass(objectToString(doc.get(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_CLASS), ""));
     jobReport.setOutcomeObjectState(AIPState.valueOf(
