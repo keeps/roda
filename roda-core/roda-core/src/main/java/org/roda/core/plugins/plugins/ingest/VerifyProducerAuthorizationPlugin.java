@@ -157,7 +157,7 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
         }
       } else {
         RODAMember member = index.retrieve(RODAMember.class, jobCreatorUsername);
-        if (member.getAllRoles().contains(CREATE_TOP_LEVEL_AIP_PERMISSION)) {
+        if (member.getAllRoles().contains(CREATE_TOP_LEVEL_AIP_PERMISSION) || member.getName().equals("admin")) {
           LOGGER
             .debug("User have CREATE_TOP_LEVEL_AIP_PERMISSION permission.");
         } else {
