@@ -489,12 +489,14 @@ public final class RodaConstants {
   public static final String JOB_REPORT_STEPS_COMPLETED = "stepsCompleted";
   public static final String JOB_REPORT_TOTAL_STEPS = "totalSteps";
   public static final String JOB_REPORT_PLUGIN = "plugin";
+  public static final String JOB_REPORT_PLUGIN_NAME = "pluginName";
   public static final String JOB_REPORT_PLUGIN_VERSION = "pluginVersion";
   public static final String JOB_REPORT_PLUGIN_STATE = "pluginState";
   public static final String JOB_REPORT_PLUGIN_DETAILS = "pluginDetails";
   public static final String JOB_REPORT_HTML_PLUGIN_DETAILS = "htmlPluginDetails";
   public static final String JOB_REPORT_REPORTS = "reports";
   public static final String JOB_REPORT_FILE_EXTENSION = ".json";
+  public static final String JOB_REPORT_SEARCH = "search";
 
   public static final String FILE_UUID = "uuid";
   public static final String FILE_PATH = "path";

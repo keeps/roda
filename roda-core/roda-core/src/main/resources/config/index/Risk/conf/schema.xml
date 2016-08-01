@@ -135,7 +135,8 @@
    <field name="updatedOn" type="tdate" indexed="true" stored="true" required="true" multiValued="false" /> 
    <field name="updatedBy" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
 
-   <field name="objectsSize" type="int" indexed="true" stored="true" required="false" multiValued="false" />   
+   <field name="objectsSize" type="int" indexed="true" stored="true" required="false" multiValued="false" />
+   
    <field name="search" type="text_general" indexed="true" stored="false" multiValued="true" />
    
    <copyField source="*" dest="search" />

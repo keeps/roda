@@ -138,6 +138,10 @@ public interface ClientMessages extends Messages {
   String sidebarRisksTitle();
 
   String sidebarAppraisalTitle();
+  
+  String sidebarJobReportStatusTitle();
+  
+  String sidebarJobReportLastActionTitle();
 
   SafeHtml metadataParseError(int line, int column, String message);
 
@@ -969,6 +973,8 @@ public interface ClientMessages extends Messages {
   String jobPlugin();
 
   String jobProcessed();
+  
+  String jobProcessedSearchPlaceHolder();
 
   String jobList();
 

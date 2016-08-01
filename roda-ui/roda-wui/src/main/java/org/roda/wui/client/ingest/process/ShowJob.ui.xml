@@ -3,12 +3,14 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
-	xmlns:p="urn:import:org.roda.wui.client.ingest.process" xmlns:lists="urn:import:org.roda.wui.client.common.lists">
+	xmlns:p="urn:import:org.roda.wui.client.ingest.process"
+	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search"
+	xmlns:lists="urn:import:org.roda.wui.client.common.lists">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<ui:style>
-	
+
 	</ui:style>
 
 	<g:FlowPanel styleName="wui-ingest-new" addStyleNames="wrapper skip_padding">
@@ -65,14 +67,14 @@
 							<g:FlowPanel styleName="field">
 
 							</g:FlowPanel>
-							
+
 							<g:FlowPanel styleName="field" ui:field="selectedListPanel">
 								<g:Label addStyleNames="label">
 									<ui:text from='{messages.showJobSourceObjects}' />
 								</g:Label>
 								<g:FlowPanel ui:field="selectedList" />
 							</g:FlowPanel>
-							
+
 							<g:FlowPanel styleName="field">
 								<g:Label addStyleNames="label">
 									<ui:text from='{messages.jobPlugin}' />
@@ -87,8 +89,14 @@
 								<g:Label addStyleNames="h4" ui:field="reportsLabel">
 									<ui:text from='{messages.jobProcessed}' />
 								</g:Label>
-								<lists:IngestJobReportList ui:field="ingestJobReports" />
-								<lists:SimpleJobReportList ui:field="simpleJobReports" />
+
+								<commonsearch:SearchPanel ui:field="ingestJobReportsSearchPanel" />
+								<lists:IngestJobReportList
+									addStyleNames="searchResults" ui:field="ingestJobReports" />
+
+								<commonsearch:SearchPanel ui:field="simpleJobReportsSearchPanel" />
+								<lists:SimpleJobReportList
+									addStyleNames="searchResults" ui:field="simpleJobReports" />
 							</g:FlowPanel>
 
 						</g:FlowPanel>
@@ -97,6 +105,18 @@
 			</g:FlowPanel>
 
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
+				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+					<g:Label addStyleNames="h5 sidebar-facet-title">
+						<ui:text from='{messages.sidebarJobReportStatusTitle}' />
+					</g:Label>
+					<g:FlowPanel ui:field="jobReportStatus" />
+				</g:FlowPanel>
+				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+					<g:Label addStyleNames="h5 sidebar-facet-title">
+						<ui:text from='{messages.sidebarJobReportLastActionTitle}' />
+					</g:Label>
+					<g:FlowPanel ui:field="jobReportLastAction" />
+				</g:FlowPanel>
 				<g:FlowPanel>
 					<g:Label addStyleNames="h4">
 						<ui:text from='{messages.sidebarActionsTitle}' />

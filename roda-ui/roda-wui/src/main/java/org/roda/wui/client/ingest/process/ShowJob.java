@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.data.adapter.facet.Facets;
+import org.roda.core.data.adapter.facet.SimpleFacetParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
@@ -46,6 +48,7 @@ import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.SimpleFileList;
 import org.roda.wui.client.common.lists.SimpleJobReportList;
 import org.roda.wui.client.common.lists.TransferredResourceList;
+import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
@@ -54,6 +57,7 @@ import org.roda.wui.client.process.IngestProcess;
 import org.roda.wui.client.process.Process;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
+import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.Humanize.DHMSFormat;
 import org.roda.wui.common.client.tools.Tools;
@@ -199,13 +203,25 @@ public class ShowJob extends Composite {
   Label reportsLabel;
 
   @UiField(provided = true)
+  SearchPanel ingestJobReportsSearchPanel;
+
+  @UiField(provided = true)
   IngestJobReportList ingestJobReports;
+
+  @UiField(provided = true)
+  SearchPanel simpleJobReportsSearchPanel;
 
   @UiField(provided = true)
   SimpleJobReportList simpleJobReports;
 
   @UiField
   Button buttonAppraisal, buttonBack;
+
+  @UiField(provided = true)
+  FlowPanel jobReportStatus;
+
+  @UiField(provided = true)
+  FlowPanel jobReportLastAction;
 
   private final DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT);
 
@@ -214,21 +230,45 @@ public class ShowJob extends Composite {
     this.pluginsInfo = pluginsInfo;
     boolean isIngest = false;
 
+    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.JOB_REPORT_PLUGIN_STATE),
+      new SimpleFacetParameter(RodaConstants.JOB_REPORT_PLUGIN_NAME));
+
     if (job.getPluginType().equals(PluginType.INGEST)) {
       ingestJobReports = new IngestJobReportList(
-        new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId())), null,
+        new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId())), facets,
         messages.reportList(), pluginsInfo, false);
       simpleJobReports = new SimpleJobReportList();
       isIngest = true;
     } else {
       simpleJobReports = new SimpleJobReportList(
-        new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId())), null,
+        new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId())), facets,
         messages.reportList(), pluginsInfo, false);
       ingestJobReports = new IngestJobReportList();
     }
 
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getUUID()));
+
+    ingestJobReportsSearchPanel = new SearchPanel(filter, RodaConstants.JOB_REPORT_SEARCH,
+      messages.jobProcessedSearchPlaceHolder(), false, false);
+    ingestJobReportsSearchPanel.setDefaultFilterIncremental(true);
+    ingestJobReportsSearchPanel.setList(ingestJobReports);
+
+    simpleJobReportsSearchPanel = new SearchPanel(filter, RodaConstants.JOB_REPORT_SEARCH,
+      messages.jobProcessedSearchPlaceHolder(), false, false);
+    simpleJobReportsSearchPanel.setDefaultFilterIncremental(true);
+    simpleJobReportsSearchPanel.setList(simpleJobReports);
+
+    jobReportStatus = new FlowPanel();
+    jobReportLastAction = new FlowPanel();
+
+    Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
+    facetPanels.put(RodaConstants.JOB_REPORT_PLUGIN_STATE, jobReportStatus);
+    facetPanels.put(RodaConstants.JOB_REPORT_PLUGIN_NAME, jobReportLastAction);
+
     initWidget(uiBinder.createAndBindUi(this));
+    simpleJobReportsSearchPanel.setVisible(!isIngest);
     simpleJobReports.setVisible(!isIngest);
+    ingestJobReportsSearchPanel.setVisible(isIngest);
     ingestJobReports.setVisible(isIngest);
     reportListPanel.setVisible(false);
 
@@ -240,6 +280,8 @@ public class ShowJob extends Composite {
     SelectedItems selected = job.getSourceObjects();
 
     if (isIngest) {
+
+      FacetUtils.bindFacets(ingestJobReports, facetPanels);
 
       ingestJobReports.addValueChangeHandler(new ValueChangeHandler<IndexResult<Report>>() {
         @Override
@@ -265,6 +307,8 @@ public class ShowJob extends Composite {
       showIngestSourceObjects(selected);
 
     } else {
+
+      FacetUtils.bindFacets(simpleJobReports, facetPanels);
 
       simpleJobReports.addValueChangeHandler(new ValueChangeHandler<IndexResult<Report>>() {
         @Override

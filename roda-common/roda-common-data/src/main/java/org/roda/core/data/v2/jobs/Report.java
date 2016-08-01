@@ -40,6 +40,7 @@ public class Report implements Serializable, IsIndexed {
   private Integer stepsCompleted = 0;
   private Integer totalSteps = 0;
   private String plugin = "";
+  private String pluginName = "";
   private String pluginVersion = "";
   private PluginState pluginState = PluginState.RUNNING;
   private String pluginDetails = "";
@@ -75,6 +76,7 @@ public class Report implements Serializable, IsIndexed {
     this.stepsCompleted = report.getStepsCompleted();
     this.totalSteps = report.getTotalSteps();
     this.plugin = report.getPlugin();
+    this.pluginName = report.getPluginName();
     this.pluginVersion = report.getPluginVersion();
     this.pluginState = report.getPluginState();
     this.pluginDetails = report.getPluginDetails();
@@ -216,6 +218,15 @@ public class Report implements Serializable, IsIndexed {
     return this;
   }
 
+  public String getPluginName() {
+    return pluginName;
+  }
+
+  public Report setPluginName(String pluginName) {
+    this.pluginName = pluginName;
+    return this;
+  }
+
   public String getPluginVersion() {
     return pluginVersion;
   }
@@ -270,6 +281,7 @@ public class Report implements Serializable, IsIndexed {
       completionPercentage = Math.round(((100f / totalSteps) * stepsCompleted));
     }
     setPlugin(report.getPlugin());
+    setPluginName(report.getPluginName());
     setPluginVersion(report.getPluginVersion());
     setPluginState(report.getPluginState());
     setPluginDetails(
@@ -301,8 +313,8 @@ public class Report implements Serializable, IsIndexed {
       + outcomeObjectId + ", outcomeObjectClass=" + outcomeObjectClass + ", outcomeObjectState=" + outcomeObjectState
       + ", title=" + title + ", dateCreated=" + dateCreated + ", dateUpdated=" + dateUpdated + ", completionPercentage="
       + completionPercentage + ", stepsCompleted=" + stepsCompleted + ", totalSteps=" + totalSteps + ", plugin="
-      + plugin + ", pluginVersion=" + pluginVersion + ", pluginState=" + pluginState + ", pluginDetails="
-      + pluginDetails + ", htmlPluginDetails=" + htmlPluginDetails + ", reports=" + reports + "]";
+      + plugin + ", pluginName=" + pluginName + ", pluginVersion=" + pluginVersion + ", pluginState=" + pluginState
+      + ", pluginDetails=" + pluginDetails + ", htmlPluginDetails=" + htmlPluginDetails + ", reports=" + reports + "]";
   }
 
   @JsonIgnore
@@ -310,5 +322,4 @@ public class Report implements Serializable, IsIndexed {
   public String getUUID() {
     return getId();
   }
-
 }
