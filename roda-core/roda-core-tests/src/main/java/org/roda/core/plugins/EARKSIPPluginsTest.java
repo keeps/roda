@@ -13,11 +13,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.solr.client.solrj.SolrServerException;
@@ -52,6 +48,8 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.plugins.plugins.base.FixAncestorsPlugin;
+import org.roda.core.plugins.plugins.ingest.DefaultIngestPlugin;
 import org.roda.core.plugins.plugins.ingest.EARKSIPToAIPPlugin;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
@@ -180,6 +178,70 @@ public class EARKSIPPluginsTest {
 
     // All folders and files
     Assert.assertEquals(reusableAllFiles.size(), CORPORA_FOLDERS_COUNT + CORPORA_FILES_COUNT);
+  }
+
+  private List<String> createCorporaAncestors() throws InterruptedException, IOException,
+      NotFoundException, GenericException, RequestNotValidException, IsStillUpdatingException, AlreadyExistsException {
+    TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
+    List<String> resultIDs = new ArrayList<>();
+
+    Path sipFolder = corporaPath.resolve(CorporaConstants.SIP_FOLDER).resolve(CorporaConstants.ANCESTOR_SIP_FOLDER);
+    Files.walk(sipFolder).forEach(filePath -> {
+      if (Files.isRegularFile(filePath)) {
+        try {
+          TransferredResource tr = f.createFile(null, filePath.getFileName().toString(), Files.newInputStream(filePath));
+          resultIDs.add(tr.getUUID());
+        } catch (GenericException | RequestNotValidException | NotFoundException | AlreadyExistsException | IOException e) {
+          LOGGER.error("Error creating file: " + filePath, e);
+        }
+      }
+    });
+
+    f.updateAllTransferredResources(null, true);
+    index.commit(TransferredResource.class);
+
+    return resultIDs;
+  }
+
+  private void ingestCorporaAncestors() throws RequestNotValidException, NotFoundException, GenericException,
+      AlreadyExistsException, AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException,
+      SolrServerException, IsStillUpdatingException {
+    String parentId = null;
+    String aipType = RodaConstants.AIP_TYPE_MIXED;
+    AIP root = model.createAIP(parentId, aipType, new Permissions());
+
+    Map<String, String> parameters = new HashMap<>();
+    parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
+
+    List<String> transferredResourcesIDs= createCorporaAncestors();
+    Assert.assertNotNull(transferredResourcesIDs);
+
+    Job job = TestsHelper.executeJob(EARKSIPToAIPPlugin.class, parameters, PluginType.SIP_TO_AIP,
+        SelectedItemsList.create(TransferredResource.class, transferredResourcesIDs));
+    index.commitAIPs();
+
+    TestsHelper.executeJob(FixAncestorsPlugin.class, parameters, PluginType.AIP_TO_AIP,
+        SelectedItemsList.create(AIP.class, Arrays.asList(root.getId())));
+
+    TestsHelper.getJobReports(index, job, true);
+
+    index.commitAIPs();
+
+    IndexResult<IndexedAIP> findAllAIP = index.find(IndexedAIP.class, Filter.ALL, null, new Sublist(0, 12));
+    Assert.assertEquals(findAllAIP.getTotalCount(), 12L);
+
+    IndexResult<IndexedAIP> findRootChildren = index.find(IndexedAIP.class, new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 2));
+    Assert.assertEquals(findRootChildren.getTotalCount(), 2L);
+
+    IndexResult<IndexedAIP> findSpecificAIP = index.find(IndexedAIP.class, new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, "026106")), null, new Sublist(0, 1));
+    Assert.assertEquals(findSpecificAIP.getTotalCount(), 1L);
+    IndexedAIP specificAIP = findSpecificAIP.getResults().get(0);
+    Assert.assertEquals(specificAIP.getAncestors().size(), 4);
+  }
+
+  @Test
+  public void testIngestAncestors() throws IOException, InterruptedException, RODAException, SolrServerException{
+    ingestCorporaAncestors();
   }
 
 }
