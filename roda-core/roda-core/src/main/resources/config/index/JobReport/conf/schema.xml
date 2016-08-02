@@ -109,6 +109,7 @@
    <field name="sourceObjectId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="sourceObjectClass" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="sourceObjectOriginalId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="sourceObjectOriginalName" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="outcomeObjectId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="outcomeObjectClass" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="outcomeObjectState" type="string" indexed="true" stored="true" required="false" multiValued="false" />

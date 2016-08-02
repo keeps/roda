@@ -31,7 +31,7 @@
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
 								<g:Label addStyleNames="label" ui:field="sourceObjectLabel" />
-								<g:Anchor ui:field="sourceObject" />
+								<g:Anchor ui:field="sourceObject"/>
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
 								<g:Label addStyleNames="label" ui:field="outcomeObjectLabel" />
