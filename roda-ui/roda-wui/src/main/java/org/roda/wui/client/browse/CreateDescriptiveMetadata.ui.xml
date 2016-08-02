@@ -31,6 +31,8 @@
 					<ui:text from='{messages.editDescriptiveMetadataFormLabel}' />
 				</g:Label>
 
+				<g:HTML visible="false" ui:field="errors" addStyleNames="metadata-edit-errors" />
+
 				<g:FlowPanel addStyleNames="panel panelDescriptiveMetadata">
 					<g:FocusPanel ui:field="showXml" styleName="toolbarLink">
 						<g:FlowPanel>
@@ -44,8 +46,6 @@
 					</g:FocusPanel>
 					<g:FlowPanel ui:field="formOrXML" addStyleNames="panel-body" />
 				</g:FlowPanel>
-
-				<g:HTML visible="false" ui:field="errors" addStyleNames="metadata-edit-errors" />
 			</g:FlowPanel>
 
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
