@@ -35,7 +35,7 @@ public abstract class MyAsyncDataProvider<T extends Serializable> extends AsyncD
   }
 
   @Override
-  protected void onRangeChanged(HasData<T> display) {
+  protected void onRangeChanged(final HasData<T> display) {
     fetch(display, new AsyncCallback<Void>() {
 
       @Override

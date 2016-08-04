@@ -1132,6 +1132,6 @@ public class Browse extends Composite {
 
   @UiHandler("searchContext")
   void searchContextHandler(ClickEvent e) {
-    Tools.newHistory(Relation.RESOLVER, RodaConstants.SEARCH_LIST_BOX_ITEMS, RodaConstants.AIP_SEARCH, aipId);
+    Tools.newHistory(Relation.RESOLVER, RodaConstants.SEARCH_LIST_BOX_ITEMS, RodaConstants.AIP_ANCESTORS, aipId);
   }
 }
