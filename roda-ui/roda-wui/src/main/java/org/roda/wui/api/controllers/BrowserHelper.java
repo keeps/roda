@@ -532,7 +532,7 @@ public class BrowserHelper {
 
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
       filename = descriptiveMetadataBinary.getStoragePath().getName();
-      mediaType = MediaType.TEXT_XML;   
+      mediaType = MediaType.TEXT_XML;
       stream = new StreamingOutput() {
         @Override
         public void write(OutputStream os) throws IOException, WebApplicationException {
@@ -1808,6 +1808,7 @@ public class BrowserHelper {
       RodaCoreFactory.getModelService().deleteRiskIncidence(incidence.getId(), false);
     }
 
+    RodaCoreFactory.getIndexService().commit(RiskIncidence.class);
   }
 
   public static void updateRiskCounters() throws GenericException, RequestNotValidException, NotFoundException {
@@ -2017,7 +2018,8 @@ public class BrowserHelper {
           return options.fn();
         });
         handlebars.registerHelper("ifCond", (context, options) -> {
-          // the first parameter of ifCond is placed in the context field by the parser
+          // the first parameter of ifCond is placed in the context field by the
+          // parser
           String condition = (context == null) ? "||" : context.toString();
           List<Object> values = Arrays.asList(options.params);
           boolean display;
@@ -2042,7 +2044,7 @@ public class BrowserHelper {
           }
           return display ? options.fn() : options.inverse();
         });
-        
+
         Template tmpl = handlebars.compileInline(rawTemplate);
 
         Set<MetadataValue> values = bundle.getValues();

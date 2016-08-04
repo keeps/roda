@@ -1817,7 +1817,7 @@ public class ModelService extends ModelObservable {
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
     StoragePath riskIncidencePath = ModelUtils.getRiskIncidenceStoragePath(riskIncidenceId);
     storage.deleteResource(riskIncidencePath);
-    notifyRiskDeleted(riskIncidenceId, commit);
+    notifyRiskIncidenceDeleted(riskIncidenceId, commit);
   }
 
   public RiskIncidence retrieveRiskIncidence(String incidenceId)

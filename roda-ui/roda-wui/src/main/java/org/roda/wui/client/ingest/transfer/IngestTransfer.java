@@ -32,9 +32,9 @@ import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.SelectTransferResourceDialog;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
-import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.lists.TransferredResourceList;
+import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.main.BreadcrumbItem;
@@ -667,27 +667,37 @@ public class IngestTransfer extends Composite {
 
         @Override
         public void onSuccess(List<TransferredResource> result) {
-          doTransferredResourceMove(result, resource.isFile());
+          doTransferredResourceMove(result);
         }
 
       });
   }
 
-  private void doTransferredResourceMove(List<TransferredResource> resources, boolean isFile) {
+  private void doTransferredResourceMove(List<TransferredResource> resources) {
 
     Filter filter = new Filter();
 
-    if (isFile) {
-      filter
-        .add(new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_UUID, resources.get(0).getParentUUID()));
+    if (resource != null) {
+      boolean isFile = resource.isFile();
+
+      if (isFile) {
+        filter
+          .add(new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_UUID, resources.get(0).getParentUUID()));
+      } else {
+        filter.add(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, Boolean.FALSE.toString()));
+
+        for (TransferredResource resource : resources) {
+          filter.add(new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_UUID, resource.getUUID()));
+          filter.add(
+            new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS, resource.getRelativePath()));
+          filter.add(new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_UUID, resource.getParentUUID()));
+        }
+      }
     } else {
       filter.add(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, Boolean.FALSE.toString()));
 
       for (TransferredResource resource : resources) {
         filter.add(new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_UUID, resource.getUUID()));
-        filter
-          .add(new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS, resource.getRelativePath()));
-        filter.add(new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_UUID, resource.getParentUUID()));
       }
     }
 
@@ -711,7 +721,7 @@ public class IngestTransfer extends Composite {
             @Override
             public void onSuccess(String result) {
               Toast.showInfo(messages.dialogSuccess(), messages.moveSIPSuccessful());
-              if (resource.isFile()) {
+              if (resource != null && resource.isFile()) {
                 Tools.newHistory(IngestTransfer.RESOLVER, result);
               } else {
                 transferredResourceList.refresh();

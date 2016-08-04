@@ -61,8 +61,8 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Hélder Silva <hsilva@keep.pt>
  */
-public class RiskJobPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(RiskJobPlugin.class);
+public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(RiskAssociationPlugin.class);
 
   private static String riskIds = null;
   private static String incidenceDescription = "";
@@ -323,7 +323,7 @@ public class RiskJobPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
   @Override
   public String getName() {
-    return "Risk Job Plugin";
+    return "Risk association plugin";
   }
 
   @Override
@@ -333,7 +333,7 @@ public class RiskJobPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
   @Override
   public Plugin<T> cloneMe() {
-    return new RiskJobPlugin<T>();
+    return new RiskAssociationPlugin<T>();
   }
 
   @Override
