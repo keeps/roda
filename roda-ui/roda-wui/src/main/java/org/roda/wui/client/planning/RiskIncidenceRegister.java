@@ -26,9 +26,9 @@ import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
-import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
+import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.process.CreateActionJob;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
@@ -162,8 +162,8 @@ public class RiskIncidenceRegister extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         final RiskIncidence selected = riskIncidenceList.getSelectionModel().getSelectedObject();
         if (selected != null) {
-          Tools.newHistory(RiskRegister.RESOLVER, ShowRisk.RESOLVER.getHistoryToken(),
-            selected.getRiskId().replace("[", "").replace("]", ""));
+          Tools.newHistory(RiskIncidenceRegister.RESOLVER, ShowRiskIncidence.RESOLVER.getHistoryToken(),
+            selected.getId());
         }
       }
     });
@@ -228,6 +228,10 @@ public class RiskIncidenceRegister extends Composite {
       callback.onSuccess(this);
     } else if (historyTokens.size() == 1 && historyTokens.get(0).equals(CreateActionJob.RESOLVER.getHistoryToken())) {
       CreateActionJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+    } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(ShowRiskIncidence.RESOLVER.getHistoryToken())) {
+      ShowRiskIncidence.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+    } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(EditRiskIncidence.RESOLVER.getHistoryToken())) {
+      EditRiskIncidence.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else if (historyTokens.size() == 1) {
       final String aipId = historyTokens.get(0);
       riskRegisterTitle.setText(messages.riskIncidenceRegisterTitle());

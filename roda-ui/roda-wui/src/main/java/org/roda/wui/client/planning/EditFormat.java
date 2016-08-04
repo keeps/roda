@@ -104,9 +104,9 @@ public class EditFormat extends Composite {
   void buttonApplyHandler(ClickEvent e) {
     if (formatDataPanel.isChanged()) {
       if (formatDataPanel.isValid()) {
-        String agentId = format.getId();
+        String formatId = format.getId();
         format = formatDataPanel.getFormat();
-        format.setId(agentId);
+        format.setId(formatId);
         BrowserService.Util.getInstance().modifyFormat(format, new AsyncCallback<Void>() {
 
           @Override

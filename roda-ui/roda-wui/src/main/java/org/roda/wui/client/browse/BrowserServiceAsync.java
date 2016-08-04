@@ -187,4 +187,6 @@ public interface BrowserServiceAsync {
 
   void deleteFile(String fileUUID, AsyncCallback<Void> callback);
 
+  void modifyRiskIncidence(RiskIncidence incidence, AsyncCallback<Void> asyncCallback);
+
 }

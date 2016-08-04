@@ -17,6 +17,7 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
+import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
 
 import com.google.gwt.i18n.client.Messages;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -108,7 +109,7 @@ public interface ClientMessages extends Messages {
   String notificationTitle();
 
   String usersAndGroupsTitle();
-  
+
   String usersAndGroupsSearchPlaceHolder();
 
   String logsTitle();
@@ -138,9 +139,9 @@ public interface ClientMessages extends Messages {
   String sidebarRisksTitle();
 
   String sidebarAppraisalTitle();
-  
+
   String sidebarJobReportStatusTitle();
-  
+
   String sidebarJobReportLastActionTitle();
 
   SafeHtml metadataParseError(int line, int column, String message);
@@ -430,7 +431,7 @@ public interface ClientMessages extends Messages {
   String viewRepresentationPreviousFileButton();
 
   String viewRepresentationDownloadFileButton();
-  
+
   String viewRepresentationRemoveFileButton();
 
   String viewRepresentationInfoFileButton();
@@ -466,9 +467,9 @@ public interface ClientMessages extends Messages {
   String viewRepresentationInfoHash();
 
   String viewRepresentationInfoStoragePath();
-  
+
   String viewRepresentationRemoveFileTitle();
-  
+
   String viewRepresentationRemoveFileMessage();
 
   /************* Process new ****************/
@@ -558,7 +559,7 @@ public interface ClientMessages extends Messages {
   String searchFieldNumericToPlaceHolder();
 
   String searchRepresentationFieldIdentifier();
-  
+
   String searchRepresentationFieldType();
 
   String searchRepresentationFieldSize();
@@ -592,7 +593,7 @@ public interface ClientMessages extends Messages {
   String aipGenericTitle();
 
   String aipDates();
-  
+
   String aipHasRepresentations();
 
   String fileName();
@@ -821,6 +822,10 @@ public interface ClientMessages extends Messages {
 
   String riskHistoryButton();
 
+  String editIncidenceNotFound(String incidence);
+
+  String editIncidenceFailure(String errorMessage);
+
   /************* Agent register ****************/
 
   String agentRegisterTitle();
@@ -973,7 +978,7 @@ public interface ClientMessages extends Messages {
   String jobPlugin();
 
   String jobProcessed();
-  
+
   String jobProcessedSearchPlaceHolder();
 
   String jobList();
@@ -1099,6 +1104,24 @@ public interface ClientMessages extends Messages {
   String riskMitigationProbability(@Select String probability);
 
   String riskMitigationImpact(@Select String impact);
+
+  String riskIncidenceIdentifier();
+
+  String riskIncidenceDescription();
+
+  String riskIncidenceRisk();
+
+  String riskIncidenceStatus();
+
+  String riskIncidenceSeverity();
+
+  String riskIncidenceMitigatedOn();
+
+  String riskIncidenceMitigatedBy();
+
+  String riskIncidenceMitigatedDescription();
+
+  String riskIncidenceStatusValue(@Select INCIDENCE_STATUS status);
 
   /*** AGents ***/
 
@@ -1241,9 +1264,9 @@ public interface ClientMessages extends Messages {
   String selectAnItemToRemoveDescription();
 
   String selectAnItemToMoveDescription();
-  
+
   String searchContext();
-  
+
   /***** Browse representations ****/
 
   /***** Job processes ****/
@@ -1297,7 +1320,7 @@ public interface ClientMessages extends Messages {
   String logEntryMethod();
 
   String logEntryAddress();
-  
+
   String logEntryState();
 
   String logEntryDatetime();

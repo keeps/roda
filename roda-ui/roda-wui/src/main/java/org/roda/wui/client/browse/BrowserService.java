@@ -159,7 +159,7 @@ public interface BrowserService extends RemoteService {
 
   DescriptiveMetadataVersionsBundle getDescriptiveMetadataVersionsBundle(String aipId, String descriptiveMetadataId,
     String localeString)
-      throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException;
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException;
 
   void revertDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
@@ -169,7 +169,7 @@ public interface BrowserService extends RemoteService {
 
   <T extends IsIndexed> IndexResult<T> find(String classNameToReturn, Filter filter, Sorter sorter, Sublist sublist,
     Facets facets, String localeString, boolean justActive)
-      throws GenericException, AuthorizationDeniedException, RequestNotValidException;
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException;
 
   <T extends IsIndexed> Long count(String classNameToReturn, Filter filter)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException;
@@ -242,7 +242,7 @@ public interface BrowserService extends RemoteService {
 
   <T extends IsIndexed> Job createProcess(String jobName, SelectedItems<T> selected, String id,
     Map<String, String> value, String selectedClass) throws AuthorizationDeniedException, RequestNotValidException,
-      NotFoundException, GenericException, JobAlreadyStartedException;
+    NotFoundException, GenericException, JobAlreadyStartedException;
 
   void deleteRiskIncidences(String id, SelectedItems<RiskIncidence> incidences)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
@@ -272,4 +272,6 @@ public interface BrowserService extends RemoteService {
 
   void deleteFile(String fileUUID)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
+
+  void modifyRiskIncidence(RiskIncidence incidence) throws AuthorizationDeniedException, GenericException;
 }

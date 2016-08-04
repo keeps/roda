@@ -2144,4 +2144,8 @@ public class BrowserHelper {
     }
   }
 
+  public static void modifyRiskIncidence(RiskIncidence incidence) throws GenericException {
+    RodaCoreFactory.getModelService().updateRiskIncidence(incidence, true);
+  }
+
 }

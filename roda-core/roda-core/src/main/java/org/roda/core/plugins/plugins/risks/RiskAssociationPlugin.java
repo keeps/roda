@@ -198,6 +198,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
           incidence.setObjectClass(AIP.class.getSimpleName());
           incidence.setStatus(INCIDENCE_STATUS.UNMITIGATED);
           incidence.setSeverity(Risk.SEVERITY_LEVEL.valueOf(severity));
+          incidence.setDescription(incidenceDescription);
           model.createRiskIncidence(incidence, true);
         } catch (GenericException e) {
           state = PluginState.FAILURE;

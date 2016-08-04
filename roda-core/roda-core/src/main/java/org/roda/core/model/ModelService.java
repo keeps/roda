@@ -1801,8 +1801,9 @@ public class ModelService extends ModelObservable {
     return riskIncidence;
   }
 
-  public void updateRiskIncidence(Risk riskIncidence, boolean commit) throws GenericException {
+  public void updateRiskIncidence(RiskIncidence riskIncidence, boolean commit) throws GenericException {
     try {
+      riskIncidence.setRiskId(riskIncidence.getRiskId().replace("[", "").replace("]", ""));
       String riskIncidenceAsJson = JsonUtils.getJsonFromObject(riskIncidence);
       StoragePath riskIncidencePath = ModelUtils.getRiskIncidenceStoragePath(riskIncidence.getId());
       storage.updateBinaryContent(riskIncidencePath, new StringContentPayload(riskIncidenceAsJson), false, true);
@@ -1810,7 +1811,7 @@ public class ModelService extends ModelObservable {
       LOGGER.error("Error updating risk incidence in storage", e);
     }
 
-    notifyRiskCreatedOrUpdated(riskIncidence, commit);
+    notifyRiskIncidenceCreatedOrUpdated(riskIncidence, commit);
   }
 
   public void deleteRiskIncidence(String riskIncidenceId, boolean commit)

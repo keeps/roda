@@ -44,6 +44,7 @@ public class RiskIncidenceList extends BasicAsyncTableCell<RiskIncidence> {
 
   private TextColumn<RiskIncidence> objectColumn;
   private TextColumn<RiskIncidence> objectTypeColumn;
+  private TextColumn<RiskIncidence> riskColumn;
   private Column<RiskIncidence, Date> detectedOnColumn;
   private TextColumn<RiskIncidence> detectedByColumn;
 
@@ -91,6 +92,14 @@ public class RiskIncidenceList extends BasicAsyncTableCell<RiskIncidence> {
       }
     };
 
+    riskColumn = new TextColumn<RiskIncidence>() {
+
+      @Override
+      public String getValue(RiskIncidence incidence) {
+        return incidence.getRiskId().replace("[", "").replace("]", "");
+      }
+    };
+
     detectedOnColumn = new Column<RiskIncidence, Date>(
       new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_LONG))) {
       @Override
@@ -109,11 +118,13 @@ public class RiskIncidenceList extends BasicAsyncTableCell<RiskIncidence> {
 
     objectColumn.setSortable(true);
     objectTypeColumn.setSortable(true);
+    riskColumn.setSortable(true);
     detectedOnColumn.setSortable(true);
     detectedByColumn.setSortable(true);
 
     // TODO externalize strings into constants
     addColumn(objectColumn, messages.riskIncidenceObjectId(), false, false);
+    addColumn(riskColumn, messages.riskIncidenceRisk(), false, false);
     addColumn(detectedOnColumn, messages.riskIncidenceDetectedOn(), false, false);
     addColumn(detectedByColumn, messages.riskIncidenceDetectedBy(), false, false);
     addColumn(objectTypeColumn, messages.riskIncidenceObjectType(), true, true, 8);
@@ -137,6 +148,7 @@ public class RiskIncidenceList extends BasicAsyncTableCell<RiskIncidence> {
       Map<Column<RiskIncidence, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<RiskIncidence, ?>, List<String>>();
       columnSortingKeyMap.put(objectColumn, Arrays.asList(RodaConstants.RISK_INCIDENCE_AIP_ID,
         RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, RodaConstants.RISK_INCIDENCE_FILE_ID));
+      columnSortingKeyMap.put(riskColumn, Arrays.asList(RodaConstants.RISK_INCIDENCE_RISK_ID));
       columnSortingKeyMap.put(detectedOnColumn, Arrays.asList(RodaConstants.RISK_INCIDENCE_DETECTED_ON));
       columnSortingKeyMap.put(detectedByColumn, Arrays.asList(RodaConstants.RISK_INCIDENCE_DETECTED_BY));
       columnSortingKeyMap.put(objectTypeColumn, Arrays.asList(RodaConstants.RISK_INCIDENCE_OBJECT_CLASS));

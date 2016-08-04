@@ -152,7 +152,6 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
   private int severityHighLimit;
   private int probabilitiesSize;
   private int impactsSize;
-  private int riskCounter;
   private RiskIncidenceList incidenceList;
 
   private Date createdOn;
@@ -426,8 +425,6 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
 
     this.createdOn = risk.getCreatedOn();
     this.createdBy = risk.getCreatedBy();
-
-    this.riskCounter = risk.getObjectsSize();
   }
 
   public Risk getRisk() {
