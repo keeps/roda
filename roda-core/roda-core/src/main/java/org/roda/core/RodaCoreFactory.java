@@ -807,7 +807,7 @@ public class RodaCoreFactory {
     try {
       final Configuration rodaConfig = RodaCoreFactory.getRodaConfiguration();
 
-      final String ldapHost = rodaConfig.getString("ldap.host", RodaConstants.CORE_LDAP_DEFAULT_HOST);
+      final boolean ldapStartServer = rodaConfig.getBoolean("ldap.startServer", false);
       final int ldapPort = rodaConfig.getInt("ldap.port", RodaConstants.CORE_LDAP_DEFAULT_PORT);
       final String ldapBaseDN = rodaConfig.getString("ldap.baseDN");
       final String ldapPeopleDN = rodaConfig.getString("ldap.peopleDN");
@@ -820,9 +820,9 @@ public class RodaCoreFactory {
       final List<String> ldapProtectedGroups = RodaUtils.copyList(rodaConfig.getList("ldap.protectedGroups"));
       final String rodaAdminDN = rodaConfig.getString("ldap.rodaAdminDN");
 
-      RodaCoreFactory.ldapUtility = new LdapUtility(ldapBaseDN, ldapPeopleDN, ldapGroupsDN, ldapRolesDN, ldapAdminDN,
-        ldapAdminPassword, ldapPasswordDigestAlgorithm, ldapProtectedUsers, ldapProtectedGroups, rodaAdminDN,
-        rodaApacheDSDataDirectory);
+      RodaCoreFactory.ldapUtility = new LdapUtility(ldapStartServer, ldapPort, ldapBaseDN, ldapPeopleDN, ldapGroupsDN,
+        ldapRolesDN, ldapAdminDN, ldapAdminPassword, ldapPasswordDigestAlgorithm, ldapProtectedUsers,
+        ldapProtectedGroups, rodaAdminDN, rodaApacheDSDataDirectory);
 
       UserUtility.setLdapUtility(ldapUtility);
 
@@ -838,11 +838,9 @@ public class RodaCoreFactory {
         }
 
         RodaCoreFactory.ldapUtility.initDirectoryService(ldifs);
-        RodaCoreFactory.ldapUtility.startLdapServer(ldapPort);
         indexUsersAndGroupsFromLDAP();
       } else {
         RodaCoreFactory.ldapUtility.initDirectoryService();
-        RodaCoreFactory.ldapUtility.startLdapServer(ldapPort);
       }
 
       createRoles(rodaConfig);
@@ -856,7 +854,7 @@ public class RodaCoreFactory {
 
   private static void stopApacheDS() {
     try {
-      RodaCoreFactory.ldapUtility.stopLdapServer();
+      RodaCoreFactory.ldapUtility.stopService();
     } catch (final Exception e) {
       LOGGER.error("Error while shutting down ApacheDS embedded server", e);
     }
