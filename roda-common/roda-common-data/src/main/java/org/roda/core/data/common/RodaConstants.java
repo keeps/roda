@@ -186,7 +186,6 @@ public final class RodaConstants {
 
   public static final OrchestratorType DEFAULT_ORCHESTRATOR_TYPE = OrchestratorType.EMBEDDED;
 
-  public static final String CORE_LDAP_DEFAULT_HOST = "localhost";
   public static final int CORE_LDAP_DEFAULT_PORT = 10389;
 
   /*
