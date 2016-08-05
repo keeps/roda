@@ -1307,6 +1307,8 @@ public interface ClientMessages extends Messages {
 
   String searchMimetypes();
 
+  String searchDuplicateWarningMessage(String field);
+
   /**** Activity log ****/
 
   String logComponents();

@@ -1095,8 +1095,7 @@ public class Browse extends Composite {
         Tools.newHistory(RESOLVER, EditPermissions.RESOLVER.getHistoryToken(), aipId);
       }
     } else {
-      Toast.showInfo("Warning", "This feature is not yet implemented");
-      // Tools.newHistory(RESOLVER, EditPermissions.RESOLVER.getHistoryToken());
+      Tools.newHistory(RESOLVER, EditPermissions.RESOLVER.getHistoryToken());
     }
   }
 

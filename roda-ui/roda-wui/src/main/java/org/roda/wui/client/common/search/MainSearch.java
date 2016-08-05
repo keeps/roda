@@ -35,6 +35,8 @@ import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -312,6 +314,7 @@ public class MainSearch extends Composite {
         if (searchAdvancedFieldPanel.getWidgetCount() == 0) {
           searchAdvancedFieldPanel.addStyleName("empty");
           searchPanel.setSearchAdvancedGoEnabled(false);
+          addWarningToDuplicateFields(searchAdvancedFieldPanel);
         }
       }
     };
@@ -325,12 +328,40 @@ public class MainSearch extends Composite {
       }
     });
 
+    searchFieldPanel.addListBoxChangeHandler(new ChangeHandler() {
+
+      @Override
+      public void onChange(ChangeEvent event) {
+        addWarningToDuplicateFields(searchAdvancedFieldPanel);
+      }
+    });
+
     setSuggestions(selectedField, searchFieldPanel);
 
     searchAdvancedFieldPanel.add(searchFieldPanel);
     searchAdvancedFieldPanel.removeStyleName("empty");
 
     searchPanel.setSearchAdvancedGoEnabled(true);
+    addWarningToDuplicateFields(searchAdvancedFieldPanel);
+  }
+
+  private void addWarningToDuplicateFields(final FlowPanel searchAdvancedFieldPanel) {
+    List<String> activeFields = new ArrayList<String>();
+    for (int i = 0; i < searchAdvancedFieldPanel.getWidgetCount(); i++) {
+      Widget widget = searchAdvancedFieldPanel.getWidget(i);
+
+      if (widget instanceof SearchFieldPanel) {
+        SearchFieldPanel fieldPanel = (SearchFieldPanel) widget;
+        ListBox listBox = fieldPanel.getAdvancedFieldBox();
+
+        if (activeFields.contains(listBox.getSelectedValue())) {
+          fieldPanel.setWarningVisible(true, listBox.getSelectedValue());
+        } else {
+          activeFields.add(listBox.getSelectedValue());
+          fieldPanel.setWarningVisible(false);
+        }
+      }
+    }
   }
 
   private void setSuggestions(String searchFieldId, SearchFieldPanel searchFieldPanel) {

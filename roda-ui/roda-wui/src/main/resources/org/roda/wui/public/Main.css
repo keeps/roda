@@ -3128,6 +3128,17 @@ td.datePickerMonth, td.datePickerYear {
     height: 35px;
 }
 
+.search-field-warning {
+    margin-right: 20px;
+    height: 50px;
+}
+
+.search-field-warning-label {
+    font-size: 1.1rem;
+    color: #999;
+    position: absolute;
+}
+
 .search-field.full_width {
     margin-right: 0px;
 }

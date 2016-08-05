@@ -22,6 +22,7 @@ import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Humanize;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -52,6 +53,7 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
   private FlowPanel leftPanel;
   private FlowPanel inputPanel;
   private Button remove = new Button("<i class=\"fa fa-close\"></i>");
+  private Label duplicateWarning;
 
   private SearchField searchField;
 
@@ -91,6 +93,7 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     fieldLabel = new Label();
     fieldBox = new ListBox();
     searchAdvancedFields = new ListBox();
+    duplicateWarning = new Label();
 
     DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
 
@@ -161,6 +164,8 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     fieldLabel.addStyleName("search-field-label");
     fieldBox.addStyleName("form-listbox");
     searchAdvancedFields.addStyleName("form-listbox");
+    duplicateWarning.addStyleName("search-field-warning-label");
+    duplicateWarning.setVisible(false);
 
     inputText.addStyleName("form-textbox");
     inputDateBox.addStyleName("form-textbox form-textbox-small");
@@ -201,13 +206,17 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
       listBoxSearchField(searchAdvancedFields.getValue(0));
     }
   }
-  
+
   public String getFirstSearchField() {
     String searchField = null;
     if (searchAdvancedFields.getItemCount() > 0) {
       searchField = searchAdvancedFields.getValue(0);
     }
     return searchField;
+  }
+
+  public ListBox getAdvancedFieldBox() {
+    return searchAdvancedFields;
   }
 
   public void addRemoveClickHandler(ClickHandler clickHandler) {
@@ -269,6 +278,7 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     leftPanel.add(inputPanel);
     setInputPanel(searchField.getType());
     panel.add(remove);
+    panel.add(duplicateWarning);
     panel.removeStyleName("full_width");
   }
 
@@ -376,8 +386,31 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
   public HandlerRegistration addValueChangeHandler(ValueChangeHandler<String> handler) {
     return addHandler(handler, ValueChangeEvent.getType());
   }
-  
+
+  public HandlerRegistration addListBoxChangeHandler(ChangeHandler handler) {
+    return searchAdvancedFields.addChangeHandler(handler);
+  }
+
   protected void onChange() {
     ValueChangeEvent.fire(this, searchField.getId());
+  }
+
+  public void setWarningVisible(boolean visible) {
+    setWarningVisible(visible, null);
+  }
+
+  public void setWarningVisible(boolean visible, String field) {
+    duplicateWarning.setVisible(visible);
+
+    if (visible) {
+      duplicateWarning.setText(messages.searchDuplicateWarningMessage(field));
+      int width = searchAdvancedFields.getOffsetWidth() + 2;
+      duplicateWarning.getElement().getStyle().setMarginLeft(width, Unit.PX);
+      panel.removeStyleName("search-field");
+      panel.addStyleName("search-field-warning");
+    } else {
+      panel.removeStyleName("search-field-warning");
+      panel.addStyleName("search-field");
+    }
   }
 }
