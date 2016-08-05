@@ -1672,4 +1672,16 @@ public class Browser extends RodaCoreService {
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "incidence", incidence);
   }
+
+  public static void showLogs(RodaUser user) throws AuthorizationDeniedException {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {
+    };
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+    UserUtility.checkRoles(user, "administration.user");
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
+  }
 }

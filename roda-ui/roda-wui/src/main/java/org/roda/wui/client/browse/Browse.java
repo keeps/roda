@@ -36,6 +36,7 @@ import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.lists.AIPList;
+import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -43,6 +44,7 @@ import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
+import org.roda.wui.client.management.UserLog;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.client.search.Relation;
 import org.roda.wui.common.client.ClientLogger;
@@ -209,7 +211,7 @@ public class Browse extends Composite {
   FlowPanel actionsSidebar;
 
   @UiField
-  Button preservationEvents, risks, newProcess;
+  Button preservationEvents, risks, logs, newProcess;
 
   @UiField
   Button createItem, moveItem, remove;
@@ -279,6 +281,36 @@ public class Browse extends Composite {
         aipList.setVisible(viewingTop || searchable);
       }
     });
+
+    aipList.addCheckboxSelectionListener(new CheckboxSelectionListener<IndexedAIP>() {
+
+      @Override
+      public void onSelectionChange(SelectedItems<IndexedAIP> selected) {
+        boolean empty = SelectedItemsUtils.isEmpty(selected);
+
+        if (empty) {
+          moveItem.setEnabled(false);
+          editPermissions.setEnabled(false);
+        } else {
+          moveItem.setEnabled(true);
+          editPermissions.setEnabled(true);
+        }
+      }
+
+    });
+
+    BrowserService.Util.getInstance().showLogs(new AsyncCallback<Void>() {
+
+      @Override
+      public void onFailure(Throwable caught) {
+        logs.setVisible(false);
+      }
+
+      @Override
+      public void onSuccess(Void visible) {
+        logs.setVisible(true);
+      }
+    });
   }
 
   protected void onPermissionsUpdate(RodaUser user) {
@@ -295,7 +327,7 @@ public class Browse extends Composite {
     if (historyTokens.size() == 0) {
       viewAction();
       callback.onSuccess(this);
-    } else if (historyTokens.size() == 1) {
+    } else if (historyTokens.size() == 1 && !historyTokens.get(0).equals(EditPermissions.RESOLVER.getHistoryToken())) {
       viewAction(historyTokens.get(0));
       callback.onSuccess(this);
     } else if (historyTokens.size() > 1
@@ -311,7 +343,7 @@ public class Browse extends Composite {
     } else if (historyTokens.size() > 1
       && historyTokens.get(0).equals(DescriptiveMetadataHistory.RESOLVER.getHistoryToken())) {
       DescriptiveMetadataHistory.RESOLVER.resolve(Tools.tail(historyTokens), callback);
-    } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(EditPermissions.RESOLVER.getHistoryToken())) {
+    } else if (historyTokens.size() >= 1 && historyTokens.get(0).equals(EditPermissions.RESOLVER.getHistoryToken())) {
       EditPermissions.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(Representations.RESOLVER.getHistoryToken())) {
       Representations.RESOLVER.resolve(Tools.tail(historyTokens), callback);
@@ -443,6 +475,7 @@ public class Browse extends Composite {
   protected void viewAction(BrowseItemBundle itemBundle) {
     if (itemBundle != null) {
       this.itemBundle = itemBundle;
+
       viewingTop = false;
       this.justActive = AIPState.ACTIVE.equals(itemBundle.getAip().getState());
 
@@ -547,7 +580,9 @@ public class Browse extends Composite {
 
       createItem.setVisible(true);
       moveItem.setVisible(true);
+      moveItem.setEnabled(true);
       editPermissions.setVisible(true);
+      editPermissions.setEnabled(true);
       remove.setVisible(true);
       downloadSection.setVisible(true);
       download.setVisible(true);
@@ -594,7 +629,9 @@ public class Browse extends Composite {
     // Set button visibility
     createItem.setVisible(true);
     moveItem.setVisible(true);
-    editPermissions.setVisible(false);
+    moveItem.setEnabled(false);
+    editPermissions.setVisible(true);
+    editPermissions.setEnabled(false);
     remove.setVisible(true);
 
     downloadSection.setVisible(false);
@@ -807,6 +844,10 @@ public class Browse extends Composite {
     return historyUpdated;
   }
 
+  public SelectedItems getSelected() {
+    return aipList.getSelected();
+  }
+
   @UiHandler("preservationEvents")
   void buttonPreservationEventsHandler(ClickEvent e) {
     if (aipId != null) {
@@ -897,32 +938,32 @@ public class Browse extends Composite {
             messages.ingestTransferRemoveFolderConfirmDialogCancel(),
             messages.ingestTransferRemoveFolderConfirmDialogOk(), new AsyncCallback<Boolean>() {
 
-            @Override
-            public void onSuccess(Boolean confirmed) {
-              if (confirmed) {
-                BrowserService.Util.getInstance().removeAIP(selected, new LoadingAsyncCallback<String>() {
+              @Override
+              public void onSuccess(Boolean confirmed) {
+                if (confirmed) {
+                  BrowserService.Util.getInstance().removeAIP(selected, new LoadingAsyncCallback<String>() {
 
-                  @Override
-                  public void onFailureImpl(Throwable caught) {
-                    AsyncCallbackUtils.defaultFailureTreatment(caught);
-                    aipList.refresh();
-                  }
+                    @Override
+                    public void onFailureImpl(Throwable caught) {
+                      AsyncCallbackUtils.defaultFailureTreatment(caught);
+                      aipList.refresh();
+                    }
 
-                  @Override
-                  public void onSuccessImpl(String parentId) {
-                    Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
-                      messages.ingestTransferRemoveSuccessMessage(size));
-                    aipList.refresh();
-                  }
-                });
+                    @Override
+                    public void onSuccessImpl(String parentId) {
+                      Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
+                        messages.ingestTransferRemoveSuccessMessage(size));
+                      aipList.refresh();
+                    }
+                  });
+                }
               }
-            }
 
-            @Override
-            public void onFailure(Throwable caught) {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
-            }
-          });
+              @Override
+              public void onFailure(Throwable caught) {
+                AsyncCallbackUtils.defaultFailureTreatment(caught);
+              }
+            });
         }
 
       });
@@ -1047,8 +1088,15 @@ public class Browse extends Composite {
 
   @UiHandler("editPermissions")
   void buttonEditPermissionsHandler(ClickEvent e) {
-    if (aipId != null) {
-      Tools.newHistory(RESOLVER, EditPermissions.RESOLVER.getHistoryToken(), aipId);
+    final SelectedItems<IndexedAIP> selected = aipList.getSelected();
+
+    if (SelectedItemsUtils.isEmpty(selected)) {
+      if (aipId != null) {
+        Tools.newHistory(RESOLVER, EditPermissions.RESOLVER.getHistoryToken(), aipId);
+      }
+    } else {
+      Toast.showInfo("Warning", "This feature is not yet implemented");
+      // Tools.newHistory(RESOLVER, EditPermissions.RESOLVER.getHistoryToken());
     }
   }
 
@@ -1056,6 +1104,13 @@ public class Browse extends Composite {
   void buttonRisksHandler(ClickEvent e) {
     if (aipId != null) {
       Tools.newHistory(RiskIncidenceRegister.RESOLVER, aipId);
+    }
+  }
+
+  @UiHandler("logs")
+  void buttonLogsHandler(ClickEvent e) {
+    if (aipId != null) {
+      Tools.newHistory(UserLog.RESOLVER, aipId);
     }
   }
 

@@ -27,9 +27,9 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
-import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.lists.RiskList;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
+import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.process.CreateActionJob;
 import org.roda.wui.common.client.ClientLogger;
@@ -112,9 +112,6 @@ public class RiskRegister extends Composite {
 
   @UiField
   Label riskRegisterTitle;
-
-  @UiField
-  Label riskRegisterSubtitle;
 
   @UiField
   FlowPanel riskRegisterDescription;
@@ -246,10 +243,8 @@ public class RiskRegister extends Composite {
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 0) {
-      riskRegisterTitle.setText(messages.riskRegisterTitle());
       riskList.setFilter(Filter.ALL);
       riskList.refresh();
-      riskRegisterSubtitle.setVisible(false);
       callback.onSuccess(this);
     } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(ShowRisk.RESOLVER.getHistoryToken())) {
       ShowRisk.RESOLVER.resolve(Tools.tail(historyTokens), callback);

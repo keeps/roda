@@ -20,6 +20,7 @@ import org.roda.core.data.adapter.facet.SimpleFacetParameter;
 import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import org.roda.core.data.adapter.filter.DateRangeFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.wui.client.common.UserLogin;
@@ -131,10 +132,9 @@ public class UserLog extends Composite {
    * @param user
    */
   public UserLog() {
-    Filter filter = null;
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.LOG_ACTION_COMPONENT),
       new SimpleFacetParameter(RodaConstants.LOG_ACTION_METHOD), new SimpleFacetParameter(RodaConstants.LOG_USERNAME));
-    logList = new LogEntryList(filter, facets, messages.logsTitle(), false);
+    logList = new LogEntryList(Filter.NULL, facets, messages.logsTitle(), false);
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.LOG_SEARCH, messages.userLogSearchPlaceHolder(), false,
       false);
@@ -201,10 +201,16 @@ public class UserLog extends Composite {
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 0) {
+      logList.setFilter(Filter.ALL);
       logList.refresh();
       callback.onSuccess(this);
     } else if (historyTokens.size() > 1 && ShowLogEntry.RESOLVER.getHistoryToken().equals(historyTokens.get(0))) {
       ShowLogEntry.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+    } else if (historyTokens.size() == 1) {
+      final String aipId = historyTokens.get(0);
+      logList.setFilter(new Filter(new SimpleFilterParameter(RodaConstants.LOG_RELATED_OBJECT_ID, aipId)));
+      logList.refresh();
+      callback.onSuccess(this);
     } else {
       Tools.newHistory(RESOLVER);
       callback.onSuccess(null);

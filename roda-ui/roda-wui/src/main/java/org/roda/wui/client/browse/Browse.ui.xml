@@ -100,6 +100,10 @@
 						ui:field="risks">
 						<ui:text from='{messages.preservationRisks}' />
 					</g:Button>
+					<g:Button addStyleNames="btn btn-default btn-clock"
+						ui:field="logs">
+						<ui:text from='{messages.preservationLogs}' />
+					</g:Button>
 				</g:FlowPanel>
 				<g:FlowPanel ui:field="downloadSection">
 					<g:Label addStyleNames="h4">

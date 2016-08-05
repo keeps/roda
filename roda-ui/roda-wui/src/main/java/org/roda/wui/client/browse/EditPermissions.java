@@ -22,6 +22,7 @@ import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.MemberSelectDialog;
+import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
@@ -69,6 +70,8 @@ public class EditPermissions extends Composite {
           }
         });
 
+      } else if (historyTokens.size() == 0 && !SelectedItemsUtils.isEmpty(Browse.getInstance().getSelected())) {
+        Toast.showInfo("Warning", "This feature is not yet implemented");
       } else {
         Tools.newHistory(Browse.RESOLVER);
         callback.onSuccess(null);
@@ -102,10 +105,14 @@ public class EditPermissions extends Composite {
   @UiField
   FlowPanel userPermissionsPanel, groupPermissionsPanel;
 
-  private IndexedAIP aip;
+  private List<IndexedAIP> aips;
+
+  public EditPermissions() {
+    initWidget(uiBinder.createAndBindUi(this));
+  }
 
   public EditPermissions(IndexedAIP aip) {
-    this.aip = aip;
+    this.aips.add(aip);
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -113,7 +120,7 @@ public class EditPermissions extends Composite {
   }
 
   private void createPermissionPanel() {
-    Permissions permissions = aip.getPermissions();
+    Permissions permissions = aips.get(0).getPermissions();
     GWT.log("Permissions are: " + permissions);
 
     if (permissions.getUsernames().size() == 0) {
@@ -221,7 +228,7 @@ public class EditPermissions extends Composite {
   private void apply(boolean recursive) {
     Permissions permissions = getPermissions();
 
-    BrowserService.Util.getInstance().updateAIPPermissions(aip.getId(), permissions, recursive,
+    BrowserService.Util.getInstance().updateAIPPermissions(aips.get(0).getId(), permissions, recursive,
       new LoadingAsyncCallback<Void>() {
 
         @Override
@@ -248,7 +255,7 @@ public class EditPermissions extends Composite {
   }
 
   public void close() {
-    Tools.newHistory(Browse.RESOLVER, aip.getId());
+    Tools.newHistory(Browse.RESOLVER, aips.get(0).getId());
   }
 
   public class PermissionPanel extends Composite {

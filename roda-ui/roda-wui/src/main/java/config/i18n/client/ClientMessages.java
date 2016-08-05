@@ -1239,6 +1239,8 @@ public interface ClientMessages extends Messages {
 
   String preservationRisks();
 
+  String preservationLogs();
+
   String downloadTitle();
 
   String downloadArchivalPackage();

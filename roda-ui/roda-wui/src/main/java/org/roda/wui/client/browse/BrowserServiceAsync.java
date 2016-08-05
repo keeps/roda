@@ -189,4 +189,6 @@ public interface BrowserServiceAsync {
 
   void modifyRiskIncidence(RiskIncidence incidence, AsyncCallback<Void> asyncCallback);
 
+  void showLogs(AsyncCallback<Void> asyncCallback);
+
 }

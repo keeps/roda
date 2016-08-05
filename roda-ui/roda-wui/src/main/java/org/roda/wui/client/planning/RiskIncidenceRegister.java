@@ -109,9 +109,6 @@ public class RiskIncidenceRegister extends Composite {
   Label riskRegisterTitle;
 
   @UiField
-  Label riskRegisterSubtitle;
-
-  @UiField
   FlowPanel riskRegisterDescription;
 
   @UiField(provided = true)
@@ -183,7 +180,7 @@ public class RiskIncidenceRegister extends Composite {
     });
 
     initWidget(uiBinder.createAndBindUi(this));
-    riskRegisterDescription.add(new HTMLWidgetWrapper("RiskRegisterDescription.html"));
+    riskRegisterDescription.add(new HTMLWidgetWrapper("RiskIncidenceRegisterDescription.html"));
     buttonRemove.setEnabled(false);
 
     DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
@@ -221,10 +218,8 @@ public class RiskIncidenceRegister extends Composite {
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 0) {
-      riskRegisterTitle.setText(messages.riskIncidenceRegisterTitle());
       riskIncidenceList.setFilter(Filter.ALL);
       riskIncidenceList.refresh();
-      riskRegisterSubtitle.setVisible(false);
       callback.onSuccess(this);
     } else if (historyTokens.size() == 1 && historyTokens.get(0).equals(CreateActionJob.RESOLVER.getHistoryToken())) {
       CreateActionJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
@@ -234,10 +229,8 @@ public class RiskIncidenceRegister extends Composite {
       EditRiskIncidence.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else if (historyTokens.size() == 1) {
       final String aipId = historyTokens.get(0);
-      riskRegisterTitle.setText(messages.riskIncidenceRegisterTitle());
       riskIncidenceList.setFilter(new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, aipId)));
       riskIncidenceList.refresh();
-      riskRegisterSubtitle.setVisible(false);
       callback.onSuccess(this);
     } else {
       Tools.newHistory(RESOLVER);

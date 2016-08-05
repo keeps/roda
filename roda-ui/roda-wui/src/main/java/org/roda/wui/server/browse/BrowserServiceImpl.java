@@ -721,4 +721,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     Browser.modifyRiskIncidence(user, incidence);
   }
 
+  @Override
+  public void showLogs() throws AuthorizationDeniedException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
+    Browser.showLogs(user);
+  }
+
 }

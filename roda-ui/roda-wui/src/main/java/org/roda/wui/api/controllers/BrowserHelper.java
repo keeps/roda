@@ -1485,6 +1485,8 @@ public class BrowserHelper {
             model.updateAIPPermissions(descendant);
           } catch (NotFoundException e) {
             LOGGER.warn("Got an AIP from index which was not found in the model", e);
+          } catch (RuntimeException e) {
+            LOGGER.error("Error applying permissions", e);
           }
 
         }
