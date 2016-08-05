@@ -58,7 +58,6 @@ import org.reflections.scanners.ResourcesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
-import org.roda.core.common.ApacheDS;
 import org.roda.core.common.LdapUtility;
 import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.Messages;
@@ -170,8 +169,7 @@ public class RodaCoreFactory {
   private static boolean FEATURE_DISTRIBUTED_AKKA = false;
   private static Config akkaConfig;
 
-  // ApacheDS related objects
-  private static ApacheDS ldap;
+  private static LdapUtility ldapUtility;
   private static Path rodaApacheDSDataDirectory = null;
 
   // TransferredResources related objects
@@ -800,53 +798,66 @@ public class RodaCoreFactory {
     }
   }
 
-  public static void startApacheDS() {
-    ldap = new ApacheDS();
+  /**
+   * Start ApacheDS.
+   */
+  private static void startApacheDS() {
     rodaApacheDSDataDirectory = RodaCoreFactory.getDataPath().resolve(RodaConstants.CORE_LDAP_FOLDER);
 
     try {
-      Configuration rodaConfig = RodaCoreFactory.getRodaConfiguration();
+      final Configuration rodaConfig = RodaCoreFactory.getRodaConfiguration();
 
-      String ldapHost = rodaConfig.getString("ldap.host", RodaConstants.CORE_LDAP_DEFAULT_HOST);
-      int ldapPort = rodaConfig.getInt("ldap.port", RodaConstants.CORE_LDAP_DEFAULT_PORT);
-      String ldapPeopleDN = rodaConfig.getString("ldap.peopleDN");
-      String ldapGroupsDN = rodaConfig.getString("ldap.groupsDN");
-      String ldapRolesDN = rodaConfig.getString("ldap.rolesDN");
-      String ldapAdminDN = rodaConfig.getString("ldap.adminDN");
-      String ldapAdminPassword = rodaConfig.getString("ldap.adminPassword");
-      String ldapPasswordDigestAlgorithm = rodaConfig.getString("ldap.passwordDigestAlgorithm");
-      List<String> ldapProtectedUsers = RodaUtils.copyList(rodaConfig.getList("ldap.protectedUsers"));
-      List<String> ldapProtectedGroups = RodaUtils.copyList(rodaConfig.getList("ldap.protectedGroups"));
+      final boolean ldapStartServer = rodaConfig.getBoolean("ldap.startServer", false);
+      final int ldapPort = rodaConfig.getInt("ldap.port", RodaConstants.CORE_LDAP_DEFAULT_PORT);
+      final String ldapBaseDN = rodaConfig.getString("ldap.baseDN");
+      final String ldapPeopleDN = rodaConfig.getString("ldap.peopleDN");
+      final String ldapGroupsDN = rodaConfig.getString("ldap.groupsDN");
+      final String ldapRolesDN = rodaConfig.getString("ldap.rolesDN");
+      final String ldapAdminDN = rodaConfig.getString("ldap.adminDN");
+      final String ldapAdminPassword = rodaConfig.getString("ldap.adminPassword");
+      final String ldapPasswordDigestAlgorithm = rodaConfig.getString("ldap.passwordDigestAlgorithm");
+      final List<String> ldapProtectedUsers = RodaUtils.copyList(rodaConfig.getList("ldap.protectedUsers"));
+      final List<String> ldapProtectedGroups = RodaUtils.copyList(rodaConfig.getList("ldap.protectedGroups"));
+      final String rodaAdminDN = rodaConfig.getString("ldap.rodaAdminDN");
 
-      LdapUtility ldapUtility = new LdapUtility(ldapHost, ldapPort, ldapPeopleDN, ldapGroupsDN, ldapRolesDN,
-        ldapAdminDN, ldapAdminPassword, ldapPasswordDigestAlgorithm, ldapProtectedUsers, ldapProtectedGroups);
+      RodaCoreFactory.ldapUtility = new LdapUtility(ldapStartServer, ldapPort, ldapBaseDN, ldapPeopleDN, ldapGroupsDN,
+        ldapRolesDN, ldapAdminDN, ldapAdminPassword, ldapPasswordDigestAlgorithm, ldapProtectedUsers,
+        ldapProtectedGroups, rodaAdminDN, rodaApacheDSDataDirectory);
+
+      UserUtility.setLdapUtility(ldapUtility);
 
       if (!Files.exists(rodaApacheDSDataDirectory)) {
         Files.createDirectories(rodaApacheDSDataDirectory);
-        List<String> ldifFileNames = Arrays.asList("users.ldif", "groups.ldif", "roles.ldif");
-        List<String> ldifs = new ArrayList<>();
+        final List<String> ldifFileNames = Arrays.asList("users.ldif", "groups.ldif", "roles.ldif");
+        final List<String> ldifs = new ArrayList<>();
         for (String ldifFileName : ldifFileNames) {
-          InputStream ldifInputStream = RodaCoreFactory
+          final InputStream ldifInputStream = RodaCoreFactory
             .getConfigurationFileAsStream(RodaConstants.CORE_LDAP_FOLDER + "/" + ldifFileName);
           ldifs.add(IOUtils.toString(ldifInputStream, RodaConstants.DEFAULT_ENCODING));
           IOUtils.closeQuietly(ldifInputStream);
         }
 
-        ldap.initDirectoryService(rodaApacheDSDataDirectory, ldapAdminPassword, ldifs);
-        ldap.startServer(ldapUtility, ldapPort);
+        RodaCoreFactory.ldapUtility.initDirectoryService(ldifs);
         indexUsersAndGroupsFromLDAP();
       } else {
-        ldap.instantiateDirectoryService(rodaApacheDSDataDirectory);
-        ldap.startServer(ldapUtility, ldapPort);
+        RodaCoreFactory.ldapUtility.initDirectoryService();
       }
 
-      createRoles(rodaConfig, ldapUtility);
+      createRoles(rodaConfig);
 
-    } catch (Exception e) {
+    } catch (final Exception e) {
       LOGGER.error("Error starting up embedded ApacheDS", e);
       instantiatedWithoutErrors = false;
     }
 
+  }
+
+  private static void stopApacheDS() {
+    try {
+      RodaCoreFactory.ldapUtility.stopService();
+    } catch (final Exception e) {
+      LOGGER.error("Error while shutting down ApacheDS embedded server", e);
+    }
   }
 
   /**
@@ -855,12 +866,10 @@ public class RodaCoreFactory {
    * 
    * @param rodaConfig
    *          roda configuration
-   * @param ldapUtility
-   *          LDAP utility class.
    * @throws GenericException
    *           if something unexpected happens creating roles.
    */
-  private static void createRoles(Configuration rodaConfig, LdapUtility ldapUtility) throws GenericException {
+  private static void createRoles(final Configuration rodaConfig) throws GenericException {
     final Iterator<String> keys = rodaConfig.getKeys("core.roles");
     final Set<String> roles = new HashSet<>();
     while (keys.hasNext()) {
@@ -868,11 +877,12 @@ public class RodaCoreFactory {
     }
     for (final String role : roles) {
       try {
-        ldapUtility.addRole(role);
+        RodaCoreFactory.ldapUtility.addRole(role);
         LOGGER.info("Created LDAP role {}", role);
-      } catch (RoleAlreadyExistsException e) {
+      } catch (final RoleAlreadyExistsException e) {
         LOGGER.info("Role {} already exists.", role);
-      } catch (LdapUtilityException e) {
+        LOGGER.trace(e.getMessage(), e);
+      } catch (final LdapUtilityException e) {
         throw new GenericException("Error creating role '" + role + "'", e);
       }
     }
@@ -901,7 +911,7 @@ public class RodaCoreFactory {
       }
 
       transferredResourcesScanner = new TransferredResourcesScanner(transferredResourcesFolderPath, getIndexService());
-    } catch (Exception e) {
+    } catch (final Exception e) {
       LOGGER.error("Error starting Transferred Resources Scanner: " + e.getMessage(), e);
       instantiatedWithoutErrors = false;
     }
@@ -913,14 +923,6 @@ public class RodaCoreFactory {
 
   public static void setTransferredResourcesScannerUpdateStatus(boolean isUpdating) {
     TransferUpdateStatus.getInstance().setUpdatingStatus(isUpdating);
-  }
-
-  public static void stopApacheDS() {
-    try {
-      ldap.stop();
-    } catch (Exception e) {
-      LOGGER.error("Error while shutting down ApacheDS embedded server", e);
-    }
   }
 
   public static StorageService getStorageService() {
