@@ -321,6 +321,7 @@ public final class RodaConstants {
   public static final String REPRESENTATION_NUMBER_OF_DATA_FILES = "numberOfDataFiles";
   public static final String REPRESENTATION_NUMBER_OF_DOCUMENTATION_FILES = "numberOfDocumentationFiles";
   public static final String REPRESENTATION_NUMBER_OF_SCHEMA_FILES = "numberOfSchemaFiles";
+  public static final String REPRESENTATION_ANCESTORS = "ancestors";
   public static final String REPRESENTATION_SEARCH = "search";
 
   // Representation types
@@ -523,6 +524,7 @@ public final class RodaConstants {
   public static final String FILE_DATE_CREATED_BY_APPLICATION = "dateCreatedByApplication";
   public static final String FILE_HASH = "hash";
   public static final String FILE_FULLTEXT = "fulltext";
+  public static final String FILE_ANCESTORS = "ancestors";
   public static final String FILE_SEARCH = "search";
 
   /* Risks */

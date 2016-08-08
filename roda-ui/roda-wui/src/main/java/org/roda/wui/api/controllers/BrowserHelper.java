@@ -867,6 +867,8 @@ public class BrowserHelper {
 
     IndexService index = RodaCoreFactory.getIndexService();
     index.commit(IndexedAIP.class);
+    index.commit(IndexedRepresentation.class);
+    index.commit(IndexedFile.class);
 
     return index.retrieve(IndexedAIP.class, parentId);
   }

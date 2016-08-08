@@ -130,6 +130,7 @@
    <field name="dateCreatedByApplication" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="hash" type="string" indexed="true" stored="true" required="false" multiValued="true" /> 
    <field name="search" type="search" indexed="true" stored="false" required="false" multiValued="true" />
+   <field name="ancestors" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    
    <defaultSearchField>search</defaultSearchField>
    <copyField source="*_txt" dest="search"/>

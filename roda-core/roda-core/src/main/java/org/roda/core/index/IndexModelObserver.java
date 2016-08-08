@@ -96,20 +96,25 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void aipCreated(final AIP aip) {
-    indexAIP(aip);
-    indexRepresentations(aip);
-    indexPreservationsEvents(aip);
-    // indexOtherMetadata(aip);
-  }
-
-  private void indexAIP(final AIP aip) {
-    boolean safemode = false;
-    indexAIP(aip, safemode);
-  }
-
-  private void indexAIP(final AIP aip, boolean safemode) {
     try {
-      SolrInputDocument aipDoc = SolrUtils.aipToSolrInputDocument(aip, model, safemode);
+      List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
+      indexAIP(aip, ancestors);
+      indexRepresentations(aip, ancestors);
+      indexPreservationsEvents(aip);
+      // indexOtherMetadata(aip);
+    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
+      LOGGER.error("Error getting ancestors when creating AIP");
+    }
+  }
+
+  private void indexAIP(final AIP aip, final List<String> ancestors) {
+    boolean safemode = false;
+    indexAIP(aip, ancestors, safemode);
+  }
+
+  private void indexAIP(final AIP aip, final List<String> ancestors, boolean safemode) {
+    try {
+      SolrInputDocument aipDoc = SolrUtils.aipToSolrInputDocument(aip, ancestors, model, safemode);
       index.add(RodaConstants.INDEX_AIP, aipDoc);
 
       LOGGER.trace("Adding AIP: {}", aipDoc);
@@ -118,7 +123,7 @@ public class IndexModelObserver implements ModelObserver {
       if (!safemode) {
         LOGGER.error("Error indexing AIP, trying safe mode", e);
         safemode = true;
-        indexAIP(aip, safemode);
+        indexAIP(aip, ancestors, safemode);
       } else {
         LOGGER.error("Cannot index created AIP", e);
       }
@@ -169,13 +174,13 @@ public class IndexModelObserver implements ModelObserver {
     // TODO index other metadata
   }
 
-  private void indexRepresentations(final AIP aip) {
+  private void indexRepresentations(final AIP aip, final List<String> ancestors) {
     for (Representation representation : aip.getRepresentations()) {
-      indexRepresentation(aip, representation);
+      indexRepresentation(aip, representation, ancestors);
     }
   }
 
-  private void indexRepresentation(final AIP aip, final Representation representation) {
+  private void indexRepresentation(final AIP aip, final Representation representation, final List<String> ancestors) {
     CloseableIterable<OptionalWithCause<File>> allFiles = null;
     try {
       Long sizeInBytes = 0L;
@@ -186,7 +191,7 @@ public class IndexModelObserver implements ModelObserver {
       for (OptionalWithCause<File> file : allFiles) {
         if (file.isPresent()) {
           boolean recursiveIndexFile = false;
-          sizeInBytes += indexFile(aip, file.get(), recursiveIndexFile);
+          sizeInBytes += indexFile(aip, file.get(), ancestors, recursiveIndexFile);
         } else {
           LOGGER.error("Cannot index representation file", file.getCause());
         }
@@ -214,7 +219,7 @@ public class IndexModelObserver implements ModelObserver {
       }
 
       SolrInputDocument representationDocument = SolrUtils.representationToSolrDocument(aip, representation,
-        sizeInBytes, numberOfDataFiles, numberOfDocumentationFiles, numberOfSchemaFiles);
+        sizeInBytes, numberOfDataFiles, numberOfDocumentationFiles, numberOfSchemaFiles, ancestors);
       index.add(RodaConstants.INDEX_REPRESENTATION, representationDocument);
 
     } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException
@@ -232,11 +237,11 @@ public class IndexModelObserver implements ModelObserver {
   // }
   // }
 
-  private Long indexFile(AIP aip, File file, boolean recursive) {
+  private Long indexFile(AIP aip, File file, List<String> ancestors, boolean recursive) {
 
     Long sizeInBytes = 0L;
 
-    SolrInputDocument fileDocument = SolrUtils.fileToSolrDocument(aip, file);
+    SolrInputDocument fileDocument = SolrUtils.fileToSolrDocument(aip, file, ancestors);
 
     // Add information from PREMIS
     Binary premisFile = getFilePremisFile(file);
@@ -271,7 +276,7 @@ public class IndexModelObserver implements ModelObserver {
         CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(file, true);
         for (OptionalWithCause<File> subfile : allFiles) {
           if (subfile.isPresent()) {
-            sizeInBytes += indexFile(aip, subfile.get(), false);
+            sizeInBytes += indexFile(aip, subfile.get(), ancestors, false);
           } else {
             LOGGER.error("Cannot index file", subfile.getCause());
           }
@@ -443,8 +448,10 @@ public class IndexModelObserver implements ModelObserver {
 
     try {
       LOGGER.debug("Reindexing moved aip " + aip.getId());
-      SolrInputDocument aipDoc = SolrUtils.updateAIPParentId(aip.getId(), newParentId, model);
+      List<String> topAncestors = SolrUtils.getAncestors(newParentId, model);
+      SolrInputDocument aipDoc = SolrUtils.updateAIPParentId(aip.getId(), newParentId, topAncestors);
       index.add(RodaConstants.INDEX_AIP, aipDoc);
+      updateRepresentationAndFileAncestors(aip, topAncestors);
 
       LOGGER.debug("Finding descendents of moved aip " + aip.getId());
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
@@ -456,17 +463,45 @@ public class IndexModelObserver implements ModelObserver {
           SolrInputDocument descendantDoc;
           try {
             LOGGER.debug("Reindexing aip " + aip.getId() + " descendent " + item.getId());
-            descendantDoc = SolrUtils.updateAIPAncestors(item.getId(), item.getParentID(), model);
+            List<String> ancestors = SolrUtils.getAncestors(item.getParentID(), model);
+            descendantDoc = SolrUtils.updateAIPAncestors(item.getId(), ancestors);
             index.add(RodaConstants.INDEX_AIP, descendantDoc);
-          } catch (SolrServerException | IOException e) {
+
+            // update representation and file ancestors information
+            if (item.getHasRepresentations()) {
+              AIP aip = model.retrieveAIP(item.getId());
+              updateRepresentationAndFileAncestors(aip, ancestors);
+            }
+
+          } catch (SolrServerException | IOException | NotFoundException e) {
             LOGGER.error("Error indexing moved AIP " + aip.getId() + " from " + oldParentId + " to " + newParentId, e);
           }
         }
       });
 
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | SolrServerException
-      | IOException e) {
+      | IOException | NotFoundException e) {
       LOGGER.error("Error indexing moved AIP " + aip.getId() + " from " + oldParentId + " to " + newParentId, e);
+    }
+  }
+
+  private void updateRepresentationAndFileAncestors(AIP aip, List<String> ancestors) throws RequestNotValidException,
+    GenericException, AuthorizationDeniedException, SolrServerException, IOException, NotFoundException {
+    for (Representation representation : aip.getRepresentations()) {
+      SolrInputDocument descendantRepresentationDoc = SolrUtils
+        .updateRepresentationAncestors(IdUtils.getRepresentationId(representation), ancestors);
+      index.add(RodaConstants.INDEX_REPRESENTATION, descendantRepresentationDoc);
+
+      CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(), representation.getId(),
+        true);
+
+      for (OptionalWithCause<File> oFile : allFiles) {
+        if (oFile.isPresent()) {
+          File file = oFile.get();
+          SolrInputDocument descendantFileDoc = SolrUtils.updateFileAncestors(IdUtils.getFileId(file), ancestors);
+          index.add(RodaConstants.INDEX_FILE, descendantFileDoc);
+        }
+      }
     }
   }
 
@@ -486,7 +521,9 @@ public class IndexModelObserver implements ModelObserver {
   public void descriptiveMetadataCreated(DescriptiveMetadata descriptiveMetadata) {
     if (descriptiveMetadata.isFromAIP()) {
       try {
-        indexAIP((model.retrieveAIP(descriptiveMetadata.getAipId())));
+        AIP aip = model.retrieveAIP(descriptiveMetadata.getAipId());
+        List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
+        indexAIP(aip, ancestors);
       } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
         LOGGER.error("Error when descriptive metadata created on retrieving the full AIP", e);
       }
@@ -497,7 +534,9 @@ public class IndexModelObserver implements ModelObserver {
   public void descriptiveMetadataUpdated(DescriptiveMetadata descriptiveMetadata) {
     if (descriptiveMetadata.isFromAIP()) {
       try {
-        indexAIP((model.retrieveAIP(descriptiveMetadata.getAipId())));
+        AIP aip = model.retrieveAIP(descriptiveMetadata.getAipId());
+        List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
+        indexAIP(aip, ancestors);
       } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
         LOGGER.error("Error when descriptive metadata updated on retrieving the full AIP", e);
       }
@@ -508,7 +547,9 @@ public class IndexModelObserver implements ModelObserver {
   public void descriptiveMetadataDeleted(String aipId, String representationId, String descriptiveMetadataBinaryId) {
     if (representationId == null) {
       try {
-        indexAIP((model.retrieveAIP(aipId)));
+        AIP aip = model.retrieveAIP(aipId);
+        List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
+        indexAIP(aip, ancestors);
       } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
         LOGGER.error("Error when descriptive metadata deleted on retrieving the full AIP", e);
       }
@@ -518,8 +559,9 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public void representationCreated(Representation representation) {
     try {
-      indexRepresentation(model.retrieveAIP(representation.getAipId()), representation);
-
+      AIP aip = model.retrieveAIP(representation.getAipId());
+      List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
+      indexRepresentation(aip, representation, ancestors);
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Cannot index representation: " + representation, e);
     }
@@ -549,7 +591,9 @@ public class IndexModelObserver implements ModelObserver {
   public void fileCreated(File file) {
     boolean recursive = true;
     try {
-      indexFile(model.retrieveAIP(file.getAipId()), file, recursive);
+      AIP aip = model.retrieveAIP(file.getAipId());
+      List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
+      indexFile(aip, file, ancestors, recursive);
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error indexing file: " + file, e);
     }

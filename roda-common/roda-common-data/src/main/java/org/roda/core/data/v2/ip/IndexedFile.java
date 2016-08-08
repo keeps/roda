@@ -36,6 +36,7 @@ public class IndexedFile implements IsIndexed {
   private List<String> hash;
   private String storagePath;
 
+  private List<String> ancestors;
   private Map<String, List<String>> otherProperties;
 
   public IndexedFile() {
@@ -45,7 +46,8 @@ public class IndexedFile implements IsIndexed {
   public IndexedFile(String uuid, String parentUUID, String aipId, String representationId, String representationUUID,
     List<String> path, String id, boolean entryPoint, FileFormat fileFormat, String originalName, long size,
     boolean isDirectory, String creatingApplicationName, String creatingApplicationVersion,
-    String dateCreatedByApplication, List<String> hash, String storagePath, Map<String, List<String>> otherProperties) {
+    String dateCreatedByApplication, List<String> hash, String storagePath, List<String> ancestors,
+    Map<String, List<String>> otherProperties) {
     this.uuid = uuid;
     this.parentUUID = parentUUID;
 
@@ -64,6 +66,7 @@ public class IndexedFile implements IsIndexed {
     this.dateCreatedByApplication = dateCreatedByApplication;
     this.hash = hash;
     this.storagePath = storagePath;
+    this.ancestors = ancestors;
     this.otherProperties = otherProperties;
   }
 
@@ -196,6 +199,14 @@ public class IndexedFile implements IsIndexed {
     this.storagePath = storagePath;
   }
 
+  public List<String> getAncestors() {
+    return ancestors;
+  }
+
+  public void setAncestors(List<String> ancestors) {
+    this.ancestors = ancestors;
+  }
+
   public Map<String, List<String>> getOtherProperties() {
     return otherProperties;
   }
@@ -325,7 +336,7 @@ public class IndexedFile implements IsIndexed {
       + ", fileFormat=" + fileFormat + ", originalName=" + originalName + ", size=" + size + ", isDirectory="
       + isDirectory + ", creatingApplicationName=" + creatingApplicationName + ", creatingApplicationVersion="
       + creatingApplicationVersion + ", dateCreatedByApplication=" + dateCreatedByApplication + ", hash=" + hash
-      + ", storagePath=" + storagePath + ", otherProperties=" + otherProperties + "]";
+      + ", storagePath=" + storagePath + ", ancestors=" + ancestors + ", otherProperties=" + otherProperties + "]";
   }
 
 }

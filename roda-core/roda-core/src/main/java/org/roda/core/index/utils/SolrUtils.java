@@ -225,7 +225,7 @@ public class SolrUtils {
 
   public static <T extends IsIndexed> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve, Filter filter,
     Sorter sorter, Sublist sublist, Facets facets, RodaUser user, boolean justActive)
-      throws GenericException, RequestNotValidException {
+    throws GenericException, RequestNotValidException {
 
     IndexResult<T> ret;
     SolrQuery query = new SolrQuery();
@@ -1110,7 +1110,8 @@ public class SolrUtils {
         .setIngestSIPId(ingestSIPId).setIngestJobId(ingestJobId);
   }
 
-  public static SolrInputDocument aipToSolrInputDocument(AIP aip, ModelService model, boolean safemode)
+  public static SolrInputDocument aipToSolrInputDocument(AIP aip, List<String> ancestors, ModelService model,
+    boolean safemode)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     SolrInputDocument ret = new SolrInputDocument();
 
@@ -1122,7 +1123,7 @@ public class SolrUtils {
     ret.addField(RodaConstants.INGEST_JOB_ID, aip.getIngestJobId());
 
     // set ancestors
-    List<String> ancestors = getAncestors(aip.getParentId(), model);
+    // List<String> ancestors = getAncestors(aip.getParentId(), model);
     ret.addField(RodaConstants.AIP_ANCESTORS, ancestors);
 
     List<String> descriptiveMetadataIds = aip.getDescriptiveMetadata().stream().map(dm -> dm.getId())
@@ -1211,12 +1212,14 @@ public class SolrUtils {
       doc.get(RodaConstants.REPRESENTATION_NUMBER_OF_DOCUMENTATION_FILES), 0L);
     final Long numberOfSchemaFiles = objectToLong(doc.get(RodaConstants.REPRESENTATION_NUMBER_OF_SCHEMA_FILES), 0L);
 
+    final List<String> ancestors = objectToListString(doc.get(RodaConstants.AIP_ANCESTORS));
+
     return new IndexedRepresentation(uuid, id, aipId, Boolean.TRUE.equals(original), type, sizeInBytes,
-      totalNumberOfFiles, numberOfDocumentationFiles, numberOfSchemaFiles);
+      totalNumberOfFiles, numberOfDocumentationFiles, numberOfSchemaFiles, ancestors);
   }
 
   public static SolrInputDocument representationToSolrDocument(AIP aip, Representation rep, Long sizeInBytes,
-    Long numberOfDataFiles, Long numberOfDocumentationFiles, Long numberOfSchemaFiles) {
+    Long numberOfDataFiles, Long numberOfDocumentationFiles, Long numberOfSchemaFiles, List<String> ancestors) {
     SolrInputDocument doc = new SolrInputDocument();
     doc.addField(RodaConstants.REPRESENTATION_UUID, IdUtils.getRepresentationId(rep.getAipId(), rep.getId()));
     doc.addField(RodaConstants.REPRESENTATION_ID, rep.getId());
@@ -1233,12 +1236,13 @@ public class SolrUtils {
     doc.addField(RodaConstants.STATE, aip.getState().toString());
     doc.addField(RodaConstants.INGEST_SIP_ID, aip.getIngestSIPId());
     doc.addField(RodaConstants.INGEST_JOB_ID, aip.getIngestJobId());
+    doc.addField(RodaConstants.REPRESENTATION_ANCESTORS, ancestors);
     setPermissions(aip.getPermissions(), doc);
 
     return doc;
   }
 
-  public static SolrInputDocument fileToSolrDocument(AIP aip, File file) {
+  public static SolrInputDocument fileToSolrDocument(AIP aip, File file, List<String> ancestors) {
     SolrInputDocument doc = new SolrInputDocument();
     doc.addField(RodaConstants.FILE_UUID, IdUtils.getFileId(file));
     List<String> path = file.getPath();
@@ -1272,6 +1276,7 @@ public class SolrUtils {
     doc.addField(RodaConstants.STATE, aip.getState().toString());
     doc.addField(RodaConstants.INGEST_SIP_ID, aip.getIngestSIPId());
     doc.addField(RodaConstants.INGEST_JOB_ID, aip.getIngestJobId());
+    doc.addField(RodaConstants.FILE_ANCESTORS, ancestors);
     setPermissions(aip.getPermissions(), doc);
 
     return doc;
@@ -1309,6 +1314,7 @@ public class SolrUtils {
     String creatingApplicationVersion = objectToString(doc.get(RodaConstants.FILE_CREATING_APPLICATION_VERSION));
     String dateCreatedByApplication = objectToString(doc.get(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION));
     // String fullText = objectToString(doc.get(RodaConstants.FILE_FULLTEXT));
+    final List<String> ancestors = objectToListString(doc.get(RodaConstants.AIP_ANCESTORS));
 
     // handle other properties
     Map<String, List<String>> otherProperties = new HashMap<String, List<String>>();
@@ -1325,15 +1331,15 @@ public class SolrUtils {
 
     file = new IndexedFile(uuid, parentUUID, aipId, representationId, representationUUID, path, fileId, false,
       fileFormat, originalName, size, isDirectory, creatingApplicationName, creatingApplicationVersion,
-      dateCreatedByApplication, hash, storagePath, otherProperties);
+      dateCreatedByApplication, hash, storagePath, ancestors, otherProperties);
 
     return file;
   }
 
   public static SolrInputDocument addOtherPropertiesToIndexedFile(String prefix, OtherMetadata otherMetadataBinary,
     ModelService model, SolrClient index)
-      throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
-      ParserConfigurationException, SAXException, IOException, XPathExpressionException, SolrServerException {
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
+    ParserConfigurationException, SAXException, IOException, XPathExpressionException, SolrServerException {
     SolrDocument solrDocument = index.getById(RodaConstants.INDEX_FILE,
       IdUtils.getFileId(otherMetadataBinary.getAipId(), otherMetadataBinary.getRepresentationId(),
         otherMetadataBinary.getFileDirectoryPath(), otherMetadataBinary.getFileId()));
@@ -1750,7 +1756,7 @@ public class SolrUtils {
     jobReport
       .setSourceObjectOriginalId(objectToString(doc.get(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ORIGINAL_ID), ""));
     jobReport
-            .setSourceObjectOriginalName(objectToString(doc.get(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ORIGINAL_NAME), ""));
+      .setSourceObjectOriginalName(objectToString(doc.get(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ORIGINAL_NAME), ""));
     jobReport.setOutcomeObjectId(objectToString(doc.get(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID), ""));
     jobReport.setOutcomeObjectClass(objectToString(doc.get(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_CLASS), ""));
     jobReport.setOutcomeObjectState(AIPState.valueOf(
@@ -2123,20 +2129,36 @@ public class SolrUtils {
     return doc;
   }
 
-  public static SolrInputDocument updateAIPParentId(String aipId, String parentId, ModelService model)
+  public static SolrInputDocument updateAIPParentId(String aipId, String parentId, List<String> ancestors)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException {
     SolrInputDocument doc = new SolrInputDocument();
     doc.addField(RodaConstants.AIP_ID, aipId);
     doc.addField(RodaConstants.AIP_PARENT_ID, set(parentId));
-    doc.addField(RodaConstants.AIP_ANCESTORS, set(getAncestors(parentId, model)));
+    doc.addField(RodaConstants.AIP_ANCESTORS, set(ancestors));
     return doc;
   }
 
-  public static SolrInputDocument updateAIPAncestors(String aipId, String parentId, ModelService model)
+  public static SolrInputDocument updateAIPAncestors(String aipId, List<String> ancestors)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException {
     SolrInputDocument doc = new SolrInputDocument();
     doc.addField(RodaConstants.AIP_ID, aipId);
-    doc.addField(RodaConstants.AIP_ANCESTORS, set(getAncestors(parentId, model)));
+    doc.addField(RodaConstants.AIP_ANCESTORS, set(ancestors));
+    return doc;
+  }
+
+  public static SolrInputDocument updateRepresentationAncestors(String representationUUID, List<String> ancestors)
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
+    SolrInputDocument doc = new SolrInputDocument();
+    doc.addField(RodaConstants.REPRESENTATION_UUID, representationUUID);
+    doc.addField(RodaConstants.REPRESENTATION_ANCESTORS, set(ancestors));
+    return doc;
+  }
+
+  public static SolrInputDocument updateFileAncestors(String fileUUID, List<String> ancestors)
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
+    SolrInputDocument doc = new SolrInputDocument();
+    doc.addField(RodaConstants.FILE_UUID, fileUUID);
+    doc.addField(RodaConstants.FILE_ANCESTORS, set(ancestors));
     return doc;
   }
 
@@ -2199,7 +2221,7 @@ public class SolrUtils {
     }
   }
 
-  private static List<String> getAncestors(String parentId, ModelService model)
+  public static List<String> getAncestors(String parentId, ModelService model)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException {
     List<String> ancestors = new ArrayList<>();
     String nextAncestorId = parentId;

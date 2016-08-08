@@ -7,6 +7,8 @@
  */
 package org.roda.core.data.v2.ip;
 
+import java.util.List;
+
 import org.roda.core.data.v2.index.IsIndexed;
 
 public class IndexedRepresentation extends Representation implements IsIndexed {
@@ -21,18 +23,21 @@ public class IndexedRepresentation extends Representation implements IsIndexed {
   private long numberOfDocumentationFiles;
   private long numberOfSchemaFiles;
 
+  private List<String> ancestors;
+
   public IndexedRepresentation() {
     super();
   }
 
   public IndexedRepresentation(String uuid, String id, String aipId, boolean original, String type, long sizeInBytes,
-    long totalNumberOfFiles, long numberOfDocumentationFiles, long numberOfSchemaFiles) {
+    long totalNumberOfFiles, long numberOfDocumentationFiles, long numberOfSchemaFiles, List<String> ancestors) {
     super(id, aipId, original, type);
     this.uuid = uuid;
     this.sizeInBytes = sizeInBytes;
     this.numberOfDataFiles = totalNumberOfFiles;
     this.numberOfDocumentationFiles = numberOfDocumentationFiles;
     this.numberOfSchemaFiles = numberOfSchemaFiles;
+    this.ancestors = ancestors;
   }
 
   @Override
@@ -76,6 +81,14 @@ public class IndexedRepresentation extends Representation implements IsIndexed {
     this.numberOfSchemaFiles = numberOfSchemaFiles;
   }
 
+  public List<String> getAncestors() {
+    return ancestors;
+  }
+
+  public void setAncestors(List<String> ancestors) {
+    this.ancestors = ancestors;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -115,9 +128,9 @@ public class IndexedRepresentation extends Representation implements IsIndexed {
 
   @Override
   public String toString() {
-    return "IndexedRepresentation [uuid=" + uuid + ", sizeInBytes=" + sizeInBytes + ", totalNumberOfFiles="
+    return "IndexedRepresentation [uuid=" + uuid + ", sizeInBytes=" + sizeInBytes + ", numberOfDataFiles="
       + numberOfDataFiles + ", numberOfDocumentationFiles=" + numberOfDocumentationFiles + ", numberOfSchemaFiles="
-      + numberOfSchemaFiles + "]";
+      + numberOfSchemaFiles + ", ancestors=" + ancestors + "]";
   }
 
 }
