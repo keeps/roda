@@ -7,22 +7,9 @@
  */
 package org.roda.core.plugins.plugins.ingest;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import com.hp.hpl.jena.rdf.model.Model;
+import com.google.common.base.CaseFormat;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.filter.SimpleFilterParameter;
-import org.roda.core.data.adapter.sort.Sorter;
-import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -32,11 +19,8 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
-import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobStats;
@@ -62,7 +46,14 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.CaseFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /***
  * https://docs.google.com/spreadsheets/d/
@@ -280,68 +271,12 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     try {
       sendNotification(model);
       index.commitAIPs();
-      fixParents(index, model);
+      PluginHelper.fixParents(this, index, model);
     } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
       LOGGER.error("Could not send ingest notification");
     }
 
     return null;
-  }
-
-  private void fixParents (IndexService index, ModelService model) throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException{
-    String forcedParent = PluginHelper.getParentIdFromParameters(this);
-    index.execute(IndexedAIP.class,
-      new Filter(new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.TRUE.toString())),
-      ghost -> {
-        Filter nonGhostsFilter = new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, ghost.getIngestSIPId()),
-                new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.FALSE.toString()));
-        if(!StringUtils.isBlank(forcedParent)){
-          nonGhostsFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, forcedParent));
-        }
-        // if there are AIPs that have the same sip id
-        IndexResult<IndexedAIP> result = index.find(IndexedAIP.class, nonGhostsFilter, Sorter.NONE, new Sublist(0, 1));
-
-        if(result.getTotalCount() > 1){
-          LOGGER.debug("Couldn't find non-ghost AIP with ingest SIP id: " + ghost.getIngestSIPId());
-        } else if(result.getTotalCount() == 1){
-          IndexedAIP newParentIAIP = result.getResults().get(0);
-          moveChildrenAIPsAndDelete(index, model, ghost.getId(), newParentIAIP.getId(), forcedParent);
-        }else if(result.getTotalCount() == 0){
-          //check if there are other ghosts with the same sip id and from the same job, move all of this ghost children
-          Filter otherGhostsFilter = new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, ghost.getIngestSIPId()),
-                  new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.TRUE.toString()));
-          if(!StringUtils.isBlank(forcedParent)){
-            otherGhostsFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, forcedParent));
-          }
-          IndexResult<IndexedAIP> otherGhosts = index.find(IndexedAIP.class, otherGhostsFilter, Sorter.NONE, new Sublist(0, 1));
-          if(result.getTotalCount() >= 1){
-            IndexedAIP otherGhost = otherGhosts.getResults().get(0);
-            moveChildrenAIPsAndDelete(index, model, ghost.getId(), otherGhost.getId(), forcedParent);
-          }
-        }
-      });
-  }
-
-  private void moveChildrenAIPsAndDelete(IndexService index, ModelService model, String aipId, String newParentId, String forcedParent)
-      throws GenericException, AuthorizationDeniedException, RequestNotValidException {
-    Filter parentFilter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aipId));
-    if(!StringUtils.isBlank(forcedParent)){
-      parentFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, PluginHelper.getParentIdFromParameters(this)));
-    }
-    index.execute(IndexedAIP.class,
-        parentFilter,
-        child -> {
-          try {
-            model.moveAIP(child.getId(), newParentId);
-          } catch (NotFoundException e) {
-            LOGGER.debug("Can't move child. It wasn't found.", e);
-          }
-        });
-    try {
-      model.deleteAIP(aipId);
-    } catch (NotFoundException e) {
-      LOGGER.debug("Can't delete ghost or move node. It wasn't found.", e);
-    }
   }
 
   private Report transformTransferredResourceIntoAnAIP(IndexService index, ModelService model, StorageService storage,
@@ -352,7 +287,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       getPluginParameter(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS).getId(),
       getPluginParameter(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS).getDefaultValue());
 
-    Plugin<TransferredResource> plugin = (Plugin<TransferredResource>) RodaCoreFactory.getPluginManager()
+    Plugin<TransferredResource> plugin = RodaCoreFactory.getPluginManager()
       .getPlugin(pluginClassName, TransferredResource.class);
     try {
       plugin.setParameterValues(getParameterValues());

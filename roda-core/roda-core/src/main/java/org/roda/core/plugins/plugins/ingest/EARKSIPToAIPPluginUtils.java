@@ -7,11 +7,6 @@
  */
 package org.roda.core.plugins.plugins.ingest;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Optional;
-
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -37,6 +32,10 @@ import org.roda_project.commons_ip.model.IPRepresentation;
 import org.roda_project.commons_ip.model.SIP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 
 public class EARKSIPToAIPPluginUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(EARKSIPToAIPPluginUtils.class);

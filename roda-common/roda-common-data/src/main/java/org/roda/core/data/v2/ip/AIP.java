@@ -7,15 +7,13 @@
  */
 package org.roda.core.data.v2.ip;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.ArrayList;
+import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AIP implements IsRODAObject {

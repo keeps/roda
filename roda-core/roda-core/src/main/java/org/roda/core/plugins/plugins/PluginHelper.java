@@ -7,24 +7,15 @@
  */
 package org.roda.core.plugins.plugins;
 
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.PremisV3Utils;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.SimpleFilterParameter;
+import org.roda.core.data.adapter.sort.Sorter;
+import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.RODA_TYPE;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -39,6 +30,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LinkingObjectUtils;
+import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
@@ -71,6 +63,19 @@ import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
 
 public final class PluginHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(PluginHelper.class);
@@ -812,6 +817,62 @@ public final class PluginHelper {
       model.createOrUpdateJob(job);
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
       LOGGER.error("Error updating Job", e);
+    }
+  }
+
+  public static <T extends IsRODAObject> void fixParents (Plugin<T> plugin, IndexService index, ModelService model)
+      throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException{
+    String forcedParent = getParentIdFromParameters(plugin);
+    index.execute(IndexedAIP.class,
+        new Filter(new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.TRUE.toString())),
+        ghost -> {
+          Filter nonGhostsFilter = new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, ghost.getIngestSIPId()),
+              new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.FALSE.toString()));
+          if(!StringUtils.isBlank(forcedParent)){
+            nonGhostsFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, forcedParent));
+          }
+          // if there are AIPs that have the same sip id
+          IndexResult<IndexedAIP> result = index.find(IndexedAIP.class, nonGhostsFilter, Sorter.NONE, new Sublist(0, 1));
+
+          if(result.getTotalCount() > 1){
+            LOGGER.debug("Couldn't find non-ghost AIP with ingest SIP id {}", ghost.getIngestSIPId());
+          } else if(result.getTotalCount() == 1){
+            IndexedAIP newParentIAIP = result.getResults().get(0);
+            moveChildrenAIPsAndDelete(plugin, index, model, ghost.getId(), newParentIAIP.getId(), forcedParent);
+          }else if(result.getTotalCount() == 0){
+            //check if there are other ghosts with the same sip id and from the same job, move all of this ghost children
+            Filter otherGhostsFilter = new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, ghost.getIngestSIPId()),
+                new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.TRUE.toString()));
+            if(!StringUtils.isBlank(forcedParent)){
+              otherGhostsFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, forcedParent));
+            }
+            IndexResult<IndexedAIP> otherGhosts = index.find(IndexedAIP.class, otherGhostsFilter, Sorter.NONE, new Sublist(0, 1));
+            if(otherGhosts.getTotalCount() >= 1){
+              IndexedAIP otherGhost = otherGhosts.getResults().get(0);
+              moveChildrenAIPsAndDelete(plugin, index, model, ghost.getId(), otherGhost.getId(), forcedParent);
+            }
+          }
+        });
+  }
+  private static <T extends IsRODAObject> void moveChildrenAIPsAndDelete(Plugin<T> plugin, IndexService index, ModelService model, String aipId, String newParentId, String forcedParent)
+      throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+    Filter parentFilter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aipId));
+    if(!StringUtils.isBlank(forcedParent)){
+      parentFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, getParentIdFromParameters(plugin)));
+    }
+    index.execute(IndexedAIP.class,
+        parentFilter,
+        child -> {
+          try {
+            model.moveAIP(child.getId(), newParentId);
+          } catch (NotFoundException e) {
+            LOGGER.debug("Can't move child. It wasn't found.", e);
+          }
+        });
+    try {
+      model.deleteAIP(aipId);
+    } catch (NotFoundException e) {
+      LOGGER.debug("Can't delete ghost or move node. It wasn't found.", e);
     }
   }
 

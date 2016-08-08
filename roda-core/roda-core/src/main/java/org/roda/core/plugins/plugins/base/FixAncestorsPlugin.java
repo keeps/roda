@@ -7,17 +7,14 @@
  */
 package org.roda.core.plugins.plugins.base;
 
-import org.apache.commons.lang3.StringUtils;
-import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.filter.SimpleFilterParameter;
-import org.roda.core.data.adapter.sort.Sorter;
-import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
-import org.roda.core.data.exceptions.*;
-import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.JobException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -34,10 +31,8 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.List;
 
-public class FixAncestorsPlugin extends AbstractPlugin<AIP> {
+public class FixAncestorsPlugin extends AbstractPlugin<Void> {
   private static final Logger LOGGER = LoggerFactory.getLogger(FixAncestorsPlugin.class);
-
-  private boolean hasFreeAccess = false;
 
   @Override
   public void init() throws PluginException {
@@ -73,79 +68,24 @@ public class FixAncestorsPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
+  public Report execute(IndexService index, ModelService model, StorageService storage, List<Void> list)
       throws PluginException {
     try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, 0);
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      list.forEach(aip -> jobPluginInfo.incrementObjectsProcessedWithSuccess());
-
-      String forcedParent = PluginHelper.getParentIdFromParameters(this);
-
-      index.execute(IndexedAIP.class,
-          new Filter(new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.TRUE.toString())),
-          ghost -> {
-            Filter nonGhostsFilter = new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, ghost.getIngestSIPId()),
-                new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.FALSE.toString()));
-            if(!StringUtils.isBlank(forcedParent)){
-              nonGhostsFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, forcedParent));
-            }
-            // if there are AIPs that have the same sip id
-            IndexResult<IndexedAIP> result = index.find(IndexedAIP.class, nonGhostsFilter, Sorter.NONE, new Sublist(0, 1));
-
-            if(result.getTotalCount() > 1){
-              LOGGER.debug("Couldn't find non-ghost AIP with ingest SIP id: " + ghost.getIngestSIPId());
-            } else if(result.getTotalCount() == 1){
-              IndexedAIP newParentIAIP = result.getResults().get(0);
-              moveChildrenAIPsAndDelete(index, model, ghost.getId(), newParentIAIP.getId(), forcedParent);
-            }else if(result.getTotalCount() == 0){
-              //check if there are other ghosts with the same sip id and from the same job, move all of this ghost children
-              Filter otherGhostsFilter = new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, ghost.getIngestSIPId()),
-                  new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.TRUE.toString()));
-              if(!StringUtils.isBlank(forcedParent)){
-                otherGhostsFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, forcedParent));
-              }
-              IndexResult<IndexedAIP> otherGhosts = index.find(IndexedAIP.class, otherGhostsFilter, Sorter.NONE, new Sublist(0, 1));
-              if(result.getTotalCount() >= 1){
-                IndexedAIP otherGhost = otherGhosts.getResults().get(0);
-                moveChildrenAIPsAndDelete(index, model, ghost.getId(), otherGhost.getId(), forcedParent);
-              }
-            }
-          });
+      PluginHelper.fixParents(this, index, model);
 
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException |JobException e) {
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException |JobException | NotFoundException e) {
       LOGGER.error("Error while fixing the ancestors.", e);
     }
     return PluginHelper.initPluginReport(this);
   }
 
-  private void moveChildrenAIPsAndDelete(IndexService index, ModelService model, String aipId, String newParentId, String forcedParent)
-      throws GenericException, AuthorizationDeniedException, RequestNotValidException {
-    Filter parentFilter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aipId));
-    if(!StringUtils.isBlank(forcedParent)){
-      parentFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, PluginHelper.getParentIdFromParameters(this)));
-    }
-    index.execute(IndexedAIP.class,
-        parentFilter,
-        child -> {
-          try {
-            model.moveAIP(child.getId(), newParentId);
-          } catch (NotFoundException e) {
-            LOGGER.debug("Can't move child. It wasn't found.", e);
-          }
-        });
-    try {
-      model.deleteAIP(aipId);
-    } catch (NotFoundException e) {
-      LOGGER.debug("Can't delete ghost or move node. It wasn't found.", e);
-    }
-  }
-
   @Override
-  public Plugin<AIP> cloneMe() {
+  public Plugin<Void> cloneMe() {
     return new FixAncestorsPlugin();
   }
 
@@ -199,7 +139,7 @@ public class FixAncestorsPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public List<Class<AIP>> getObjectClasses() {
-    return Arrays.asList(AIP.class);
+  public List<Class<Void>> getObjectClasses() {
+    return Arrays.asList(Void.class);
   }
 }
