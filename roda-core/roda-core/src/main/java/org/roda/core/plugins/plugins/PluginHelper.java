@@ -783,7 +783,7 @@ public final class PluginHelper {
     for (Entry<String, String> oldToNewId : oldToNewTransferredResourceIds.entrySet()) {
       String oldSIPId = oldToNewId.getKey();
       String newSIPId = oldToNewId.getValue();
-      for (Report report : jobPluginInfo.getReports().get(oldSIPId).values()) {
+      for (Report report : jobPluginInfo.getAllReports().get(oldSIPId).values()) {
         report.setSourceObjectId(newSIPId);
         if (!report.getReports().isEmpty()) {
           report.getReports().get(0).setSourceObjectId(newSIPId);

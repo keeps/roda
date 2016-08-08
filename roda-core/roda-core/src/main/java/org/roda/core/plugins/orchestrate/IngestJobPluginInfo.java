@@ -25,7 +25,9 @@ public class IngestJobPluginInfo extends JobPluginInfo {
   private int totalSteps = 0;
 
   // transferredResourceId > map<aipId, report>
-  private Map<String, Map<String, Report>> reports = new HashMap<>();
+  private Map<String, Map<String, Report>> allReports = new HashMap<>();
+  // transferredResourceId > map<aipId, report>
+  private Map<String, Map<String, Report>> reportsFromBeingProcessed = new HashMap<>();
   // transferredResourceId > list<aipId>
   private Map<String, List<String>> transferredResourceToAipIds = new HashMap<>();
   // aipId > transferredResourceId
@@ -115,8 +117,12 @@ public class IngestJobPluginInfo extends JobPluginInfo {
     return ingestInfoUpdated;
   }
 
-  public Map<String, Map<String, Report>> getReports() {
-    return reports;
+  public Map<String, Map<String, Report>> getAllReports() {
+    return allReports;
+  }
+
+  public Map<String, Map<String, Report>> getReportsFromBeingProcessed() {
+    return reportsFromBeingProcessed;
   }
 
   public Map<String, List<String>> getTransferredResourceToAipIds() {
@@ -150,21 +156,24 @@ public class IngestJobPluginInfo extends JobPluginInfo {
         transferredResourceToAipIds.put(sourceObjectId, aipIds);
       }
     }
-    if (reports.get(sourceObjectId) != null) {
-      reports.get(sourceObjectId).put(outcomeObjectId, report);
+    if (reportsFromBeingProcessed.get(sourceObjectId) != null) {
+      reportsFromBeingProcessed.get(sourceObjectId).put(outcomeObjectId, report);
+      allReports.get(sourceObjectId).put(outcomeObjectId, report);
     } else {
       Map<String, Report> innerReports = new HashMap<>();
       innerReports.put(outcomeObjectId, report);
-      reports.put(sourceObjectId, innerReports);
+      reportsFromBeingProcessed.put(sourceObjectId, innerReports);
+      allReports.put(sourceObjectId, innerReports);
     }
   }
 
   public void addReport(String outcomeObjectId, Report report) {
-    reports.get(aipIdToTransferredResourceId.get(outcomeObjectId)).get(outcomeObjectId).addReport(report);
+    reportsFromBeingProcessed.get(aipIdToTransferredResourceId.get(outcomeObjectId)).get(outcomeObjectId)
+      .addReport(report);
   }
 
   public void remove(String transferredResourceId) {
-    reports.remove(transferredResourceId);
+    reportsFromBeingProcessed.remove(transferredResourceId);
     transferredResourceToAipIds.remove(transferredResourceId);
   }
 

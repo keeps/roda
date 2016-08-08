@@ -143,6 +143,7 @@ public class EARKSIPPluginsTest {
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
+    parameters.put(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, "true");
 
     TransferredResource transferredResource = createCorpora();
     Assert.assertNotNull(transferredResource);
