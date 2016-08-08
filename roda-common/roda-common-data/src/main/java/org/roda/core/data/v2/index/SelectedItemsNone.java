@@ -7,13 +7,15 @@
  */
 package org.roda.core.data.v2.index;
 
-public class SelectedItemsNone<T extends IsIndexed> implements SelectedItems<T> {
+import org.roda.core.data.v2.IsRODAObject;
+
+public class SelectedItemsNone<T extends IsRODAObject> implements SelectedItems<T> {
 
   private static final long serialVersionUID = -5364779540199737165L;
 
   private static SelectedItemsNone selectedItemsNone = new SelectedItemsNone<>();
 
-  public static <T extends IsIndexed> SelectedItemsNone<T> create() {
+  public static <T extends IsRODAObject> SelectedItemsNone<T> create() {
     return selectedItemsNone;
   }
 

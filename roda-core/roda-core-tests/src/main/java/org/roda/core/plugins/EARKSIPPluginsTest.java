@@ -7,15 +7,8 @@
  */
 package org.roda.core.plugins;
 
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.stream.Collectors;
-
+import com.google.common.collect.Iterables;
+import jersey.repackaged.com.google.common.collect.Lists;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
@@ -38,6 +31,7 @@ import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.SelectedItemsList;
+import org.roda.core.data.v2.index.SelectedItemsNone;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -45,11 +39,9 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
-import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.plugins.base.FixAncestorsPlugin;
-import org.roda.core.plugins.plugins.ingest.DefaultIngestPlugin;
 import org.roda.core.plugins.plugins.ingest.EARKSIPToAIPPlugin;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
@@ -60,9 +52,18 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.google.common.collect.Iterables;
-
-import jersey.repackaged.com.google.common.collect.Lists;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Test(groups = {"all", "travis"})
 public class EARKSIPPluginsTest {
@@ -221,8 +222,7 @@ public class EARKSIPPluginsTest {
         SelectedItemsList.create(TransferredResource.class, transferredResourcesIDs));
     index.commitAIPs();
 
-    TestsHelper.executeJob(FixAncestorsPlugin.class, parameters, PluginType.AIP_TO_AIP,
-        SelectedItemsList.create(AIP.class, Arrays.asList(root.getId())));
+    TestsHelper.executeJob(FixAncestorsPlugin.class, parameters, PluginType.MISC, new SelectedItemsNone<>());
 
     TestsHelper.getJobReports(index, job, true);
 
