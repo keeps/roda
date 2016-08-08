@@ -149,24 +149,18 @@ public class AIPList extends BasicAsyncTableCell<IndexedAIP> {
   @Override
   protected void getData(Sublist sublist, ColumnSortList columnSortList,
     AsyncCallback<IndexResult<IndexedAIP>> callback) {
-
     Filter filter = getFilter();
-    if (filter == Filter.NULL) {
-      // search not yet ready, deliver empty result
-      callback.onSuccess(null);
-    } else {
 
-      Map<Column<IndexedAIP, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedAIP, ?>, List<String>>();
-      columnSortingKeyMap.put(levelColumn, Arrays.asList(RodaConstants.AIP_LEVEL));
-      columnSortingKeyMap.put(titleColumn, Arrays.asList(RodaConstants.AIP_TITLE_SORT));
-      columnSortingKeyMap.put(datesColumn, Arrays.asList(RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_DATE_FINAL));
-      columnSortingKeyMap.put(hasRepresentationsColumn, Arrays.asList(RodaConstants.AIP_HAS_REPRESENTATIONS));
+    Map<Column<IndexedAIP, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedAIP, ?>, List<String>>();
+    columnSortingKeyMap.put(levelColumn, Arrays.asList(RodaConstants.AIP_LEVEL));
+    columnSortingKeyMap.put(titleColumn, Arrays.asList(RodaConstants.AIP_TITLE_SORT));
+    columnSortingKeyMap.put(datesColumn, Arrays.asList(RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_DATE_FINAL));
+    columnSortingKeyMap.put(hasRepresentationsColumn, Arrays.asList(RodaConstants.AIP_HAS_REPRESENTATIONS));
 
-      Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
+    Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
-      BrowserService.Util.getInstance().find(IndexedAIP.class.getName(), filter, sorter, sublist, getFacets(),
-        LocaleInfo.getCurrentLocale().getLocaleName(), getJustActive(), callback);
-    }
+    BrowserService.Util.getInstance().find(IndexedAIP.class.getName(), filter, sorter, sublist, getFacets(),
+      LocaleInfo.getCurrentLocale().getLocaleName(), getJustActive(), callback);
   }
 
 }

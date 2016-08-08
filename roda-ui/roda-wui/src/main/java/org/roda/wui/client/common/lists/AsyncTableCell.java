@@ -139,7 +139,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
       @Override
       public void getData(Sublist sublist, ColumnSortList columnSortList, AsyncCallback<IndexResult<T>> callback) {
-        AsyncTableCell.this.getData(sublist, columnSortList, callback);
+        AsyncTableCell.this.getData(AsyncTableCell.this.getFilter(), sublist, columnSortList, callback);
       }
     }) {
 
@@ -278,6 +278,16 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     };
   }
 
+  private void getData(Filter filter, Sublist sublist, ColumnSortList columnSortList,
+    AsyncCallback<IndexResult<T>> callback) {
+    GWT.log("FILTER " + ((filter != null) ? filter.toString() : "NULL"));
+    if (filter == null) {
+      callback.onSuccess(null);
+    } else {
+      getData(sublist, columnSortList, callback);
+    }
+  }
+
   protected abstract void getData(Sublist sublist, ColumnSortList columnSortList,
     AsyncCallback<IndexResult<T>> callback);
 
@@ -370,7 +380,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   public boolean getJustActive() {
     return justActive;
   }
-  
+
   public void setJustActive(boolean justActive) {
     this.justActive = justActive;
     refresh();
@@ -380,7 +390,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     this.filter = filter;
     refresh();
   }
-  
+
   public Facets getFacets() {
     return facets;
   }
@@ -389,7 +399,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     this.facets = facets;
     refresh();
   }
-  
+
   public void set(Filter filter, boolean justActive, Facets facets) {
     this.filter = filter;
     this.justActive = justActive;
@@ -401,8 +411,6 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   public HandlerRegistration addValueChangeHandler(ValueChangeHandler<IndexResult<T>> handler) {
     return addHandler(handler, ValueChangeEvent.getType());
   }
-
-
 
   public List<T> getVisibleItems() {
     return display.getVisibleItems();

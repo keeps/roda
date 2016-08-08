@@ -170,26 +170,19 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
   @Override
   protected void getData(Sublist sublist, ColumnSortList columnSortList,
     AsyncCallback<IndexResult<LogEntry>> callback) {
-
     Filter filter = getFilter();
-    if (filter == null) {
-      // search not yet ready, deliver empty result
-      callback.onSuccess(null);
-    } else {
 
-      Map<Column<LogEntry, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<LogEntry, ?>, List<String>>();
-      columnSortingKeyMap.put(dateColumn, Arrays.asList(RodaConstants.LOG_DATETIME));
-      columnSortingKeyMap.put(actionComponentColumn, Arrays.asList(RodaConstants.LOG_ACTION_COMPONENT));
-      columnSortingKeyMap.put(actionMethodColumn, Arrays.asList(RodaConstants.LOG_ACTION_METHOD));
-      columnSortingKeyMap.put(usernameColumn, Arrays.asList(RodaConstants.LOG_USERNAME));
-      columnSortingKeyMap.put(durationColumn, Arrays.asList(RodaConstants.LOG_DURATION));
-      columnSortingKeyMap.put(addressColumn, Arrays.asList(RodaConstants.LOG_ADDRESS));
+    Map<Column<LogEntry, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<LogEntry, ?>, List<String>>();
+    columnSortingKeyMap.put(dateColumn, Arrays.asList(RodaConstants.LOG_DATETIME));
+    columnSortingKeyMap.put(actionComponentColumn, Arrays.asList(RodaConstants.LOG_ACTION_COMPONENT));
+    columnSortingKeyMap.put(actionMethodColumn, Arrays.asList(RodaConstants.LOG_ACTION_METHOD));
+    columnSortingKeyMap.put(usernameColumn, Arrays.asList(RodaConstants.LOG_USERNAME));
+    columnSortingKeyMap.put(durationColumn, Arrays.asList(RodaConstants.LOG_DURATION));
+    columnSortingKeyMap.put(addressColumn, Arrays.asList(RodaConstants.LOG_ADDRESS));
 
-      Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
+    Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
-      UserManagementService.Util.getInstance().findLogEntries(filter, sorter, sublist, getFacets(), callback);
-    }
-
+    UserManagementService.Util.getInstance().findLogEntries(filter, sorter, sublist, getFacets(), callback);
   }
 
   @Override

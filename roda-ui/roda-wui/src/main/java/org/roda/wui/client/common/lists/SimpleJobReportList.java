@@ -60,7 +60,9 @@ public class SimpleJobReportList extends BasicAsyncTableCell<Report> {
   private TextColumn<Report> completionStatusColumn;
 
   private final Map<String, PluginInfo> pluginsInfo;
+  @SuppressWarnings("unused")
   private String sourceClass;
+  @SuppressWarnings("unused")
   private String outcomeClass;
 
   public SimpleJobReportList() {
@@ -202,7 +204,6 @@ public class SimpleJobReportList extends BasicAsyncTableCell<Report> {
 
   @Override
   protected void getData(Sublist sublist, ColumnSortList columnSortList, AsyncCallback<IndexResult<Report>> callback) {
-
     Filter filter = getFilter();
 
     Map<Column<Report, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<Report, ?>, List<String>>();

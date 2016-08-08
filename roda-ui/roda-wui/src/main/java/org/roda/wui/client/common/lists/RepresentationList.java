@@ -171,28 +171,22 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
   protected void getData(Sublist sublist, ColumnSortList columnSortList,
     AsyncCallback<IndexResult<IndexedRepresentation>> callback) {
     Filter filter = getFilter();
-    if (filter == null) {
-      // search not yet ready, deliver empty result
-      callback.onSuccess(null);
-    } else {
+    
+    Map<Column<IndexedRepresentation, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedRepresentation, ?>, List<String>>();
+    columnSortingKeyMap.put(idColumn, Arrays.asList(RodaConstants.REPRESENTATION_ID));
+    columnSortingKeyMap.put(originalColumn, Arrays.asList(RodaConstants.REPRESENTATION_ORIGINAL));
+    columnSortingKeyMap.put(typeColumn, Arrays.asList(RodaConstants.REPRESENTATION_TYPE));
+    columnSortingKeyMap.put(sizeInBytesColumn, Arrays.asList(RodaConstants.REPRESENTATION_SIZE_IN_BYTES));
+    columnSortingKeyMap.put(numberOfDataFilesColumn, Arrays.asList(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES));
+    columnSortingKeyMap.put(numberOfDocumentationFilesColumn,
+      Arrays.asList(RodaConstants.REPRESENTATION_NUMBER_OF_DOCUMENTATION_FILES));
+    columnSortingKeyMap.put(numberOfSchemasFilesColumn,
+      Arrays.asList(RodaConstants.REPRESENTATION_NUMBER_OF_SCHEMA_FILES));
 
-      Map<Column<IndexedRepresentation, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedRepresentation, ?>, List<String>>();
-      columnSortingKeyMap.put(idColumn, Arrays.asList(RodaConstants.REPRESENTATION_ID));
-      columnSortingKeyMap.put(originalColumn, Arrays.asList(RodaConstants.REPRESENTATION_ORIGINAL));
-      columnSortingKeyMap.put(typeColumn, Arrays.asList(RodaConstants.REPRESENTATION_TYPE));
-      columnSortingKeyMap.put(sizeInBytesColumn, Arrays.asList(RodaConstants.REPRESENTATION_SIZE_IN_BYTES));
-      columnSortingKeyMap.put(numberOfDataFilesColumn,
-        Arrays.asList(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES));
-      columnSortingKeyMap.put(numberOfDocumentationFilesColumn,
-        Arrays.asList(RodaConstants.REPRESENTATION_NUMBER_OF_DOCUMENTATION_FILES));
-      columnSortingKeyMap.put(numberOfSchemasFilesColumn,
-        Arrays.asList(RodaConstants.REPRESENTATION_NUMBER_OF_SCHEMA_FILES));
+    Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
-      Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
-
-      BrowserService.Util.getInstance().find(IndexedRepresentation.class.getName(), filter, sorter, sublist,
-        getFacets(), LocaleInfo.getCurrentLocale().getLocaleName(), getJustActive(), callback);
-    }
+    BrowserService.Util.getInstance().find(IndexedRepresentation.class.getName(), filter, sorter, sublist, getFacets(),
+      LocaleInfo.getCurrentLocale().getLocaleName(), getJustActive(), callback);
   }
 
 }

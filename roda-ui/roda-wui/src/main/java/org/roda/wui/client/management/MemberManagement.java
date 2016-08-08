@@ -113,12 +113,11 @@ public class MemberManagement extends Composite {
     new BasicSearchFilterParameter(RodaConstants.MEMBERS_SEARCH, "*"));
 
   public MemberManagement() {
-    Filter filter = null;
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.MEMBERS_IS_ACTIVE),
       new SimpleFacetParameter(RodaConstants.MEMBERS_IS_USER),
       new SimpleFacetParameter(RodaConstants.MEMBERS_GROUPS_ALL));
 
-    list = new RodaMemberList(filter, facets, messages.usersAndGroupsTitle(), false);
+    list = new RodaMemberList(DEFAULT_FILTER, facets, messages.usersAndGroupsTitle(), false);
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.MEMBERS_SEARCH,
       messages.usersAndGroupsSearchPlaceHolder(), false, false);

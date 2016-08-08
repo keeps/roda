@@ -236,7 +236,6 @@ public class JobList extends BasicAsyncTableCell<Job> {
 
   @Override
   protected void getData(Sublist sublist, ColumnSortList columnSortList, AsyncCallback<IndexResult<Job>> callback) {
-
     Filter filter = getFilter();
 
     Map<Column<Job, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<Job, ?>, List<String>>();

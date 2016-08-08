@@ -130,7 +130,6 @@ public class TransferredResourceList extends BasicAsyncTableCell<TransferredReso
   @Override
   protected void getData(Sublist sublist, ColumnSortList columnSortList,
     AsyncCallback<IndexResult<TransferredResource>> callback) {
-
     Filter filter = getFilter();
 
     Map<Column<TransferredResource, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<TransferredResource, ?>, List<String>>();

@@ -100,7 +100,6 @@ public class SimpleRodaMemberList extends BasicAsyncTableCell<RODAMember> {
   @Override
   protected void getData(Sublist sublist, ColumnSortList columnSortList,
     AsyncCallback<IndexResult<RODAMember>> callback) {
-
     Filter filter = getFilter();
 
     Map<Column<RODAMember, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<RODAMember, ?>, List<String>>();
