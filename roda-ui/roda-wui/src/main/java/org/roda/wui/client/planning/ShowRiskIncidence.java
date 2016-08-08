@@ -13,15 +13,8 @@ package org.roda.wui.client.planning;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.browse.ViewRepresentation;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.StringUtils;
@@ -148,51 +141,7 @@ public class ShowRiskIncidence extends Composite {
 
     incidenceId.setText(incidence.getId());
 
-    if (AIP.class.getSimpleName().equals(incidence.getObjectClass())) {
-      objectLabel.setText(messages.showAIPExtended());
-      objectLink.setHref(Tools.createHistoryHashLink(Browse.RESOLVER, incidence.getAipId()));
-      objectLink.setText(incidence.getAipId());
-
-    } else if (Representation.class.getSimpleName().equals(incidence.getObjectClass())) {
-      BrowserService.Util.getInstance().getRepresentationFromId(incidence.getRepresentationId(),
-        new AsyncCallback<IndexedRepresentation>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            // do nothing
-          }
-
-          @Override
-          public void onSuccess(IndexedRepresentation result) {
-            if (result != null) {
-              objectLabel.setText(messages.showRepresentationExtended());
-              objectLink.setHref(Tools.createHistoryHashLink(Browse.RESOLVER,
-                ViewRepresentation.RESOLVER.getHistoryToken(), result.getAipId(), result.getUUID()));
-              objectLink.setText(result.getUUID());
-            }
-          }
-        });
-
-    } else if (File.class.getSimpleName().equals(incidence.getObjectClass())) {
-      BrowserService.Util.getInstance().getFileFromId(incidence.getFileId(), new AsyncCallback<IndexedFile>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          // do nothing
-        }
-
-        @Override
-        public void onSuccess(IndexedFile result) {
-          if (result != null) {
-            objectLabel.setText(messages.showFileExtended());
-            objectLink
-              .setHref(Tools.createHistoryHashLink(Browse.RESOLVER, ViewRepresentation.RESOLVER.getHistoryToken(),
-                result.getAipId(), result.getRepresentationUUID(), result.getUUID()));
-            objectLink.setText(result.getUUID());
-          }
-        }
-      });
-    }
+    HtmlSnippetUtils.addRiskIncidenceObjectLinks(incidence, objectLabel, objectLink);
 
     String riskId = incidence.getRiskId().replace("[", "").replace("]", "");
     riskLink.setText(riskId);

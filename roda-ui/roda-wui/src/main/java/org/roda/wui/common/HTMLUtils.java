@@ -21,6 +21,9 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.storage.Binary;
 
 import com.google.common.io.CharStreams;
+import com.google.gwt.core.client.GWT;
+
+import config.i18n.client.ClientMessages;
 
 /**
  * HTML related utility class
@@ -30,6 +33,8 @@ import com.google.common.io.CharStreams;
  * @author Sébastien Leroux <sleroux@keep.pt>
  */
 public final class HTMLUtils {
+
+  private static ClientMessages messages = GWT.create(ClientMessages.class);
 
   /** Private empty constructor */
   private HTMLUtils() {
@@ -75,4 +80,5 @@ public final class HTMLUtils {
     }
     return translations;
   }
+
 }

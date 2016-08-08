@@ -121,9 +121,13 @@ public interface BrowserServiceAsync {
 
   <T extends IsIndexed> void retrieve(String classNameToReturn, String id, AsyncCallback<T> callback);
 
+  <T extends IsIndexed> void retrieve(String classNameToReturn, SelectedItems<T> selectedItems,
+    AsyncCallback<List<T>> asyncCallback);
+
   void suggest(String classNameToReturn, String field, String query, AsyncCallback<List<String>> callback);
 
-  void updateAIPPermissions(String aipId, Permissions permissions, boolean recursive, AsyncCallback<Void> callback);
+  void updateAIPPermissions(List<IndexedAIP> aips, Permissions permissions, boolean recursive,
+    AsyncCallback<Void> callback);
 
   void addRisk(Risk risk, AsyncCallback<Risk> asyncCallback);
 

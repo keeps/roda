@@ -381,6 +381,21 @@ public class BrowserHelper {
     return RodaCoreFactory.getIndexService().retrieve(returnClass, id);
   }
 
+  protected static <T extends IsIndexed> List<T> retrieve(Class<T> returnClass, SelectedItems<T> selectedItems)
+    throws GenericException, NotFoundException, RequestNotValidException {
+    if (selectedItems instanceof SelectedItemsList) {
+      SelectedItemsList<T> selectedList = (SelectedItemsList<T>) selectedItems;
+      return RodaCoreFactory.getIndexService().retrieve(returnClass, selectedList.getIds());
+    } else if (selectedItems instanceof SelectedItemsFilter) {
+      SelectedItemsFilter<T> selectedFilter = (SelectedItemsFilter<T>) selectedItems;
+      int counter = RodaCoreFactory.getIndexService().count(returnClass, selectedFilter.getFilter()).intValue();
+      return RodaCoreFactory.getIndexService()
+        .find(returnClass, selectedFilter.getFilter(), Sorter.NONE, new Sublist(0, counter)).getResults();
+    }
+
+    return null;
+  }
+
   protected static <T extends IsIndexed> List<String> suggest(Class<T> returnClass, String field, String query)
     throws GenericException, NotFoundException {
     return RodaCoreFactory.getIndexService().suggest(returnClass, field, query);

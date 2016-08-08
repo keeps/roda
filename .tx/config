@@ -162,6 +162,13 @@ source_file = roda-ui/roda-wui/src/main/resources/config/theme/NotificationDescr
 source_lang = en
 type = HTML
 
+[roda2.editpermissionsdescriptionhtml]
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/EditPermissionsDescription_<lang>.html
+minimum_perc = 50
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/EditPermissionsDescription.html
+source_lang = en
+type = HTML
+
 [roda2.footerhtml]
 file_filter = roda-ui/roda-wui/src/main/resources/config/theme/Footer_<lang>.html
 minimum_perc = 50

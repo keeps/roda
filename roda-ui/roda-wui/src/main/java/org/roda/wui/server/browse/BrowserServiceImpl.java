@@ -203,6 +203,14 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
+  public <T extends IsIndexed> List<T> retrieve(String classNameToReturn, SelectedItems<T> selectedItems)
+    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
+    Class<T> classToReturn = parseClass(classNameToReturn);
+    return Browser.retrieve(user, classToReturn, selectedItems);
+  }
+
+  @Override
   public <T extends IsIndexed> void delete(String classNameToReturn, SelectedItems<T> ids)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
@@ -479,10 +487,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void updateAIPPermissions(String aipId, Permissions permissions, boolean recursive)
+  public void updateAIPPermissions(List<IndexedAIP> aips, Permissions permissions, boolean recursive)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.updateAIPPermissions(user, aipId, permissions, recursive);
+    Browser.updateAIPPermissions(user, aips, permissions, recursive);
   }
 
   @Override

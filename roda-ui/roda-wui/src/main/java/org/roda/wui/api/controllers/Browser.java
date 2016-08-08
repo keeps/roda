@@ -244,6 +244,22 @@ public class Browser extends RodaCoreService {
     return ret;
   }
 
+  public static <T extends IsIndexed> List<T> retrieve(RodaUser user, Class<T> classToReturn,
+    SelectedItems<T> selectedItems)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {
+    };
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+    List<T> objects = BrowserHelper.retrieve(classToReturn, selectedItems);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "selectedItems", selectedItems);
+
+    return objects;
+  }
+
   public static <T extends IsIndexed> void delete(RodaUser user, Class<T> classToReturn, SelectedItems<T> ids)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {
@@ -1071,20 +1087,21 @@ public class Browser extends RodaCoreService {
       versionId);
   }
 
-  public static void updateAIPPermissions(RodaUser user, String aipId, Permissions permissions, boolean recursive)
+  public static void updateAIPPermissions(RodaUser user, List<IndexedAIP> aips, Permissions permissions,
+    boolean recursive)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {
     };
 
     // check user permissions
     controllerAssistant.checkRoles(user);
-    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
 
-    BrowserHelper.updateAIPPermissions(aip, permissions, recursive);
+    for (IndexedAIP aip : aips) {
+      UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
+      BrowserHelper.updateAIPPermissions(aip, permissions, recursive);
+    }
 
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
-      "permissions", permissions);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "aips", aips, "permissions", permissions);
   }
 
   public static <T extends IsIndexed> List<String> consolidate(RodaUser user, Class<T> classToReturn,
@@ -1684,4 +1701,5 @@ public class Browser extends RodaCoreService {
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
   }
+
 }

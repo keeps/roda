@@ -404,8 +404,7 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
 
     if (visible) {
       duplicateWarning.setText(messages.searchDuplicateWarningMessage(field));
-      int width = searchAdvancedFields.getOffsetWidth() + 2;
-      duplicateWarning.getElement().getStyle().setMarginLeft(width, Unit.PX);
+      duplicateWarning.getElement().getStyle().setMarginLeft(searchAdvancedFields.getOffsetWidth() + 2, Unit.PX);
       panel.removeStyleName("search-field");
       panel.addStyleName("search-field-warning");
     } else {

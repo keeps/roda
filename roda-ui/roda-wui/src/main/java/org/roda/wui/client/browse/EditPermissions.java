@@ -8,13 +8,16 @@
 package org.roda.wui.client.browse;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.NotSimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
@@ -25,6 +28,7 @@ import org.roda.wui.client.common.dialogs.MemberSelectDialog;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -71,7 +75,22 @@ public class EditPermissions extends Composite {
         });
 
       } else if (historyTokens.size() == 0 && !SelectedItemsUtils.isEmpty(Browse.getInstance().getSelected())) {
-        Toast.showInfo("Warning", "This feature is not yet implemented");
+        final SelectedItems<IndexedAIP> selected = Browse.getInstance().getSelected();
+        BrowserService.Util.getInstance().retrieve(IndexedAIP.class.getName(), selected,
+          new AsyncCallback<List<IndexedAIP>>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+              Tools.newHistory(Browse.RESOLVER);
+              callback.onSuccess(null);
+            }
+
+            @Override
+            public void onSuccess(List<IndexedAIP> aips) {
+              EditPermissions edit = new EditPermissions(aips);
+              callback.onSuccess(edit);
+            }
+          });
       } else {
         Tools.newHistory(Browse.RESOLVER);
         callback.onSuccess(null);
@@ -100,23 +119,92 @@ public class EditPermissions extends Composite {
   private static ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
+  FlowPanel editPermissionsDescription;
+
+  @UiField
   Label userPermissionsHeader, groupPermissionsHeader;
 
   @UiField
   FlowPanel userPermissionsPanel, groupPermissionsPanel;
 
-  private List<IndexedAIP> aips;
-
-  public EditPermissions() {
-    initWidget(uiBinder.createAndBindUi(this));
-  }
+  private List<IndexedAIP> aips = new ArrayList<IndexedAIP>();
 
   public EditPermissions(IndexedAIP aip) {
     this.aips.add(aip);
-
     initWidget(uiBinder.createAndBindUi(this));
-
     createPermissionPanel();
+  }
+
+  public EditPermissions(List<IndexedAIP> aips) {
+    this.aips.addAll(aips);
+    initWidget(uiBinder.createAndBindUi(this));
+    editPermissionsDescription.add(new HTMLWidgetWrapper("EditPermissionsDescription.html"));
+    createPermissionPanelList();
+  }
+
+  private void createPermissionPanelList() {
+    Map<String, Set<PermissionType>> userPermissionsToShow = new HashMap<String, Set<PermissionType>>();
+    Map<String, Set<PermissionType>> groupPermissionsToShow = new HashMap<String, Set<PermissionType>>();
+
+    if (!aips.isEmpty()) {
+      Permissions firstAIPPermissions = aips.get(0).getPermissions();
+
+      for (String userName : firstAIPPermissions.getUsernames()) {
+        userPermissionsToShow.put(userName, firstAIPPermissions.getUserPermissions(userName));
+      }
+
+      for (String groupName : firstAIPPermissions.getGroupnames()) {
+        groupPermissionsToShow.put(groupName, firstAIPPermissions.getGroupPermissions(groupName));
+      }
+
+      for (int i = 1; i < aips.size(); i++) {
+        Permissions permissions = aips.get(i).getPermissions();
+
+        for (String permissionUser : userPermissionsToShow.keySet()) {
+          if (permissions.getUsernames().contains(permissionUser)) {
+            Set<PermissionType> userPermissionType = new HashSet<PermissionType>(
+              userPermissionsToShow.get(permissionUser));
+            for (PermissionType permissionType : userPermissionType) {
+              if (!permissions.getUserPermissions(permissionUser).contains(permissionType)) {
+                userPermissionsToShow.get(permissionUser).remove(permissionType);
+              }
+            }
+          } else {
+            userPermissionsToShow.remove(permissionUser);
+          }
+        }
+
+        for (String permissionGroup : groupPermissionsToShow.keySet()) {
+          if (permissions.getGroupnames().contains(permissionGroup)) {
+            Set<PermissionType> groupPermissionType = new HashSet<PermissionType>(
+              groupPermissionsToShow.get(permissionGroup));
+            for (PermissionType permissionType : groupPermissionType) {
+              if (!permissions.getGroupPermissions(permissionGroup).contains(permissionType)) {
+                groupPermissionsToShow.get(permissionGroup).remove(permissionType);
+              }
+            }
+          } else {
+            groupPermissionsToShow.remove(permissionGroup);
+          }
+        }
+      }
+    }
+
+    if (userPermissionsToShow.size() == 0) {
+      userPermissionsHeader.setVisible(false);
+    }
+
+    if (groupPermissionsToShow.size() == 0) {
+      groupPermissionsHeader.setVisible(false);
+    }
+
+    for (String username : userPermissionsToShow.keySet()) {
+      userPermissionsPanel.add(new PermissionPanel(username, true, userPermissionsToShow.get(username)));
+    }
+
+    for (String groupname : groupPermissionsToShow.keySet()) {
+      groupPermissionsPanel.add(new PermissionPanel(groupname, false, groupPermissionsToShow.get(groupname)));
+    }
   }
 
   private void createPermissionPanel() {
@@ -154,9 +242,11 @@ public class EditPermissions extends Composite {
   void buttonAddHandler(ClickEvent e) {
 
     Filter filter = new Filter();
+
     for (String username : getAssignedUserNames()) {
       filter.add(new NotSimpleFilterParameter(RodaConstants.MEMBERS_ID, username));
     }
+
     for (String groupname : getAssignedGroupNames()) {
       filter.add(new NotSimpleFilterParameter(RodaConstants.MEMBERS_ID, groupname));
     }
@@ -228,7 +318,7 @@ public class EditPermissions extends Composite {
   private void apply(boolean recursive) {
     Permissions permissions = getPermissions();
 
-    BrowserService.Util.getInstance().updateAIPPermissions(aips.get(0).getId(), permissions, recursive,
+    BrowserService.Util.getInstance().updateAIPPermissions(aips, permissions, recursive,
       new LoadingAsyncCallback<Void>() {
 
         @Override
@@ -255,7 +345,11 @@ public class EditPermissions extends Composite {
   }
 
   public void close() {
-    Tools.newHistory(Browse.RESOLVER, aips.get(0).getId());
+    if (aips.size() == 1) {
+      Tools.newHistory(Browse.RESOLVER, aips.get(0).getId());
+    } else {
+      Tools.newHistory(Browse.RESOLVER);
+    }
   }
 
   public class PermissionPanel extends Composite {

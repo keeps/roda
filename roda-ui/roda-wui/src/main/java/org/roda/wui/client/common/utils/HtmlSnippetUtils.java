@@ -7,16 +7,29 @@
  */
 package org.roda.wui.client.common.utils;
 
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
+import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.wui.client.browse.Browse;
+import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.browse.ViewRepresentation;
+import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.Label;
 
 import config.i18n.client.ClientMessages;
 
@@ -131,6 +144,55 @@ public class HtmlSnippetUtils {
 
   public static SafeHtml getSeverityDefinition(int severity, int lowLimit, int highLimit) {
     return getSeverityDefinition(getSeverityLevel(severity, lowLimit, highLimit));
+  }
+
+  public static void addRiskIncidenceObjectLinks(RiskIncidence incidence, final Label objectLabel,
+    final Anchor objectLink) {
+    if (AIP.class.getSimpleName().equals(incidence.getObjectClass())) {
+      objectLabel.setText(messages.showAIPExtended());
+      objectLink.setHref(Tools.createHistoryHashLink(Browse.RESOLVER, incidence.getAipId()));
+      objectLink.setText(incidence.getAipId());
+
+    } else if (Representation.class.getSimpleName().equals(incidence.getObjectClass())) {
+      BrowserService.Util.getInstance().getRepresentationFromId(incidence.getRepresentationId(),
+        new AsyncCallback<IndexedRepresentation>() {
+
+          @Override
+          public void onFailure(Throwable caught) {
+            // do nothing
+          }
+
+          @Override
+          public void onSuccess(IndexedRepresentation result) {
+            if (result != null) {
+              objectLabel.setText(messages.showRepresentationExtended());
+              objectLink.setHref(Tools.createHistoryHashLink(Browse.RESOLVER,
+                ViewRepresentation.RESOLVER.getHistoryToken(), result.getAipId(), result.getUUID()));
+              objectLink.setText(result.getUUID());
+            }
+          }
+        });
+
+    } else if (File.class.getSimpleName().equals(incidence.getObjectClass())) {
+      BrowserService.Util.getInstance().getFileFromId(incidence.getFileId(), new AsyncCallback<IndexedFile>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          // do nothing
+        }
+
+        @Override
+        public void onSuccess(IndexedFile result) {
+          if (result != null) {
+            objectLabel.setText(messages.showFileExtended());
+            objectLink
+              .setHref(Tools.createHistoryHashLink(Browse.RESOLVER, ViewRepresentation.RESOLVER.getHistoryToken(),
+                result.getAipId(), result.getRepresentationUUID(), result.getUUID()));
+            objectLink.setText(result.getUUID());
+          }
+        }
+      });
+    }
   }
 
 }

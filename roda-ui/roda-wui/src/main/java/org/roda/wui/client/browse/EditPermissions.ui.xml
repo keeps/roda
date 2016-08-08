@@ -16,6 +16,7 @@
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
 				<g:Label styleName="h1"><ui:text from='{messages.archivalPackagePermissionsTitle}' /></g:Label>
+				<g:FlowPanel addStyleNames="page-description" ui:field="editPermissionsDescription"></g:FlowPanel>
 				<g:Label styleName="h4" ui:field="groupPermissionsHeader"><ui:text from='{messages.permissionAssignedGroups}' /></g:Label>
 				<g:FlowPanel ui:field="groupPermissionsPanel" />
 				<g:Label styleName="h4" ui:field="userPermissionsHeader"><ui:text from='{messages.permissionAssignedUsers}' /></g:Label>

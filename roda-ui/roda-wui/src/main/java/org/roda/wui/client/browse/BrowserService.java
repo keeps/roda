@@ -177,13 +177,16 @@ public interface BrowserService extends RemoteService {
   <T extends IsIndexed> T retrieve(String classNameToReturn, String id)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
+  <T extends IsIndexed> List<T> retrieve(String classNameToReturn, SelectedItems<T> selectedItems)
+    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException;
+
   <T extends IsIndexed> void delete(String classNameToReturn, SelectedItems<T> ids)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   <T extends IsIndexed> List<String> suggest(String classNameToReturn, String field, String query)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
-  void updateAIPPermissions(String aipId, Permissions permissions, boolean recursive)
+  void updateAIPPermissions(List<IndexedAIP> aips, Permissions permissions, boolean recursive)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
 
   void modifyRisk(Risk risk, String message)
