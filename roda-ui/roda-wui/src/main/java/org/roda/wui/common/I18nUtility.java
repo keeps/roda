@@ -17,6 +17,8 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.FacetFieldResult;
 import org.roda.core.data.v2.index.FacetValue;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.log.LogEntry;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.server.ServerTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,11 +59,15 @@ public class I18nUtility {
       + (facetValue != null && facetValue.trim().length() == 0 ? "" : "." + facetValue.trim());
     String ret;
 
-    try {
-      ret = RodaCoreFactory.getI18NMessages(locale).getTranslation(bundleKey);
-    } catch (MissingResourceException e) {
-      ret = facetValue;
-      LOGGER.trace("Translation not found: " + bundleKey + " locale: " + locale);
+    if (resultClass.equals(LogEntry.class) && facetField.equals(RodaConstants.LOG_ACTION_METHOD)) {
+      ret = StringUtils.getPrettifiedActionMethod(facetValue);
+    } else {
+      try {
+        ret = RodaCoreFactory.getI18NMessages(locale).getTranslation(bundleKey);
+      } catch (MissingResourceException e) {
+        ret = facetValue;
+        LOGGER.trace("Translation not found: " + bundleKey + " locale: " + locale);
+      }
     }
 
     return ret;

@@ -20,12 +20,14 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
-import org.roda.wui.client.management.UserManagementService;
+import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.utils.StringUtils;
 
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
@@ -84,9 +86,7 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
           return null;
         }
 
-        String method = logEntry.getActionMethod().substring(0, 1).toUpperCase()
-          + logEntry.getActionMethod().substring(1);
-        return method.replaceAll("([A-Z])", " $1").trim();
+        return StringUtils.getPrettifiedActionMethod(logEntry.getActionMethod());
       }
     };
 
@@ -182,7 +182,10 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
-    UserManagementService.Util.getInstance().findLogEntries(filter, sorter, sublist, getFacets(), callback);
+    // UserManagementService.Util.getInstance().findLogEntries(filter, sorter,
+    // sublist, getFacets(), callback);
+    BrowserService.Util.getInstance().find(LogEntry.class.getName(), filter, sorter, sublist, getFacets(),
+      LocaleInfo.getCurrentLocale().getLocaleName(), getJustActive(), callback);
   }
 
   @Override
