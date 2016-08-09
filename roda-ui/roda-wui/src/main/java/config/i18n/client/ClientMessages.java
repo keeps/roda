@@ -1268,6 +1268,8 @@ public interface ClientMessages extends Messages {
   String selectAnItemToMoveDescription();
 
   String searchContext();
+  
+  String searchAIP();
 
   /***** Browse representations ****/
 

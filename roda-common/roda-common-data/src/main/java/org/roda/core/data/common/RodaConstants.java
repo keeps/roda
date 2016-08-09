@@ -276,6 +276,7 @@ public final class RodaConstants {
    * AIP FIELDS
    */
   public static final String AIP_ID = "id";
+  public static final String AIP_AIP_ID = "aipId";
   public static final String AIP_PARENT_ID = "parentId";
   public static final String AIP_ANCESTORS = "ancestors";
   public static final String STATE = "state";
