@@ -163,7 +163,7 @@ public class BrowserHelper {
   private static final int BUNDLE_MAX_REPRESENTATION_COUNT = 10;
   private static final int BUNDLE_MAX_ADDED_ORIGINAL_REPRESENTATION_COUNT = 1;
 
-  protected static BrowseItemBundle getItemBundle(String aipId, Locale locale)
+  protected static BrowseItemBundle retrieveItemBundle(String aipId, Locale locale)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     BrowseItemBundle itemBundle = new BrowseItemBundle();
 
@@ -173,14 +173,14 @@ public class BrowserHelper {
 
     // set aip ancestors
     try {
-      itemBundle.setAIPAncestors(getAncestors(aip));
+      itemBundle.setAIPAncestors(retrieveAncestors(aip));
     } catch (NotFoundException e) {
       LOGGER.warn("Found an item with invalid ancestors: " + aipId, e);
     }
 
     // set descriptive metadata
     try {
-      List<DescriptiveMetadataViewBundle> descriptiveMetadataList = getDescriptiveMetadataBundles(aipId, locale);
+      List<DescriptiveMetadataViewBundle> descriptiveMetadataList = retrieveDescriptiveMetadataBundles(aipId, locale);
       itemBundle.setDescriptiveMetadata(descriptiveMetadataList);
     } catch (NotFoundException e) {
       // do nothing
@@ -209,7 +209,8 @@ public class BrowserHelper {
     return itemBundle;
   }
 
-  private static List<DescriptiveMetadataViewBundle> getDescriptiveMetadataBundles(String aipId, final Locale locale)
+  private static List<DescriptiveMetadataViewBundle> retrieveDescriptiveMetadataBundles(String aipId,
+    final Locale locale)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     ModelService model = RodaCoreFactory.getModelService();
     List<DescriptiveMetadata> listDescriptiveMetadataBinaries = model.retrieveAIP(aipId).getDescriptiveMetadata();
@@ -218,7 +219,7 @@ public class BrowserHelper {
     if (listDescriptiveMetadataBinaries != null) { // Can be null when the AIP
                                                    // is a ghost
       for (DescriptiveMetadata descriptiveMetadata : listDescriptiveMetadataBinaries) {
-        DescriptiveMetadataViewBundle bundle = getDescriptiveMetadataBundle(aipId, descriptiveMetadata, locale);
+        DescriptiveMetadataViewBundle bundle = retrieveDescriptiveMetadataBundle(aipId, descriptiveMetadata, locale);
         descriptiveMetadataList.add(bundle);
       }
     }
@@ -226,7 +227,7 @@ public class BrowserHelper {
     return descriptiveMetadataList;
   }
 
-  private static DescriptiveMetadataViewBundle getDescriptiveMetadataBundle(String aipId,
+  private static DescriptiveMetadataViewBundle retrieveDescriptiveMetadataBundle(String aipId,
     DescriptiveMetadata descriptiveMetadata, final Locale locale)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     ModelService model = RodaCoreFactory.getModelService();
@@ -257,25 +258,25 @@ public class BrowserHelper {
     return bundle;
   }
 
-  private static DescriptiveMetadataViewBundle getDescriptiveMetadataBundle(String aipId, String descriptiveMetadataId,
-    final Locale locale)
+  private static DescriptiveMetadataViewBundle retrieveDescriptiveMetadataBundle(String aipId,
+    String descriptiveMetadataId, final Locale locale)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     ModelService model = RodaCoreFactory.getModelService();
     DescriptiveMetadata descriptiveMetadata = model.retrieveDescriptiveMetadata(aipId, descriptiveMetadataId);
-    return getDescriptiveMetadataBundle(aipId, descriptiveMetadata, locale);
+    return retrieveDescriptiveMetadataBundle(aipId, descriptiveMetadata, locale);
   }
 
-  public static DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(RodaUser user, IndexedAIP aip,
+  public static DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(RodaUser user, IndexedAIP aip,
     String descriptiveMetadataId)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
 
     DescriptiveMetadata metadata = RodaCoreFactory.getModelService().retrieveDescriptiveMetadata(aip.getId(),
       descriptiveMetadataId);
-    return getDescriptiveMetadataEditBundle(user, aip, descriptiveMetadataId, metadata.getType(),
+    return retrieveDescriptiveMetadataEditBundle(user, aip, descriptiveMetadataId, metadata.getType(),
       metadata.getVersion());
   }
 
-  public static DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(RodaUser user, IndexedAIP aip,
+  public static DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(RodaUser user, IndexedAIP aip,
     String descriptiveMetadataId, String type, String version)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     DescriptiveMetadataEditBundle ret;
@@ -289,8 +290,8 @@ public class BrowserHelper {
       // Get the supported metadata type with the same type and version
       // We need this to try to get get the values for the form
       SupportedMetadataTypeBundle metadataTypeBundle = null;
-      List<SupportedMetadataTypeBundle> supportedMetadataTypeBundles = BrowserHelper.getSupportedMetadata(user, aip,
-        Locale.getDefault());
+      List<SupportedMetadataTypeBundle> supportedMetadataTypeBundles = BrowserHelper.retrieveSupportedMetadata(user,
+        aip, Locale.getDefault());
       for (SupportedMetadataTypeBundle typeBundle : supportedMetadataTypeBundles) {
         if (typeBundle.getType() != null && typeBundle.getType().equalsIgnoreCase(type)) {
           if (typeBundle.getVersion() == version
@@ -335,7 +336,7 @@ public class BrowserHelper {
           // Identity check. Test if the original XML is equal to the result of
           // applying the extracted values to the template
           metadataTypeBundle.setValues(values);
-          String templateWithValues = getDescriptiveMetadataPreview(metadataTypeBundle);
+          String templateWithValues = retrieveDescriptiveMetadataPreview(metadataTypeBundle);
           try {
             XMLUnit.setIgnoreComments(true);
             XMLUnit.setIgnoreWhitespace(true);
@@ -360,8 +361,8 @@ public class BrowserHelper {
     return ret;
   }
 
-  protected static List<IndexedAIP> getAncestors(IndexedAIP aip) throws GenericException, NotFoundException {
-    return RodaCoreFactory.getIndexService().getAncestors(aip);
+  protected static List<IndexedAIP> retrieveAncestors(IndexedAIP aip) throws GenericException, NotFoundException {
+    return RodaCoreFactory.getIndexService().retrieveAncestors(aip);
   }
 
   protected static <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter,
@@ -419,14 +420,14 @@ public class BrowserHelper {
 
   }
 
-  public static void validateGetAipRepresentationFileParams(String acceptFormat) throws RequestNotValidException {
+  public static void validateGetAIPRepresentationFileParams(String acceptFormat) throws RequestNotValidException {
     if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
       throw new RequestNotValidException("Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT
         + "' value. Expected values: " + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN));
     }
   }
 
-  protected static void validateGetAipRepresentationParams(String acceptFormat) throws RequestNotValidException {
+  protected static void validateGetAIPRepresentationParams(String acceptFormat) throws RequestNotValidException {
     if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)
       && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)) {
       throw new RequestNotValidException(
@@ -435,7 +436,7 @@ public class BrowserHelper {
     }
   }
 
-  protected static StreamResponse getAipRepresentation(IndexedRepresentation representation, String acceptFormat)
+  protected static StreamResponse retrieveAIPRepresentation(IndexedRepresentation representation, String acceptFormat)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
 
     String aipId = representation.getAipId();
@@ -464,7 +465,7 @@ public class BrowserHelper {
     }
   }
 
-  public static StreamResponse getAipRepresentationPart(IndexedRepresentation representation, String part)
+  public static StreamResponse retrieveAIPRepresentationPart(IndexedRepresentation representation, String part)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     String aipId = representation.getAipId();
     String representationId = representation.getId();
@@ -488,14 +489,14 @@ public class BrowserHelper {
     }
   }
 
-  protected static void validateListAipDescriptiveMetadataParams(String acceptFormat) throws RequestNotValidException {
+  protected static void validateListAIPDescriptiveMetadataParams(String acceptFormat) throws RequestNotValidException {
     if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
       throw new RequestNotValidException("Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT
         + "' value. Expected values: " + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN));
     }
   }
 
-  protected static StreamResponse listAipDescriptiveMetadata(String aipId, String start, String limit)
+  protected static StreamResponse listAIPDescriptiveMetadata(String aipId, String start, String limit)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     List<DescriptiveMetadata> metadata = null;
 
@@ -522,7 +523,7 @@ public class BrowserHelper {
     return createZipStreamResponse(zipEntries, aipId);
   }
 
-  protected static void validateGetAipDescritiveMetadataParams(String acceptFormat) throws RequestNotValidException {
+  protected static void validateGetAIPDescritiveMetadataParams(String acceptFormat) throws RequestNotValidException {
     if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)
       && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
       throw new RequestNotValidException(
@@ -531,7 +532,7 @@ public class BrowserHelper {
     }
   }
 
-  public static StreamResponse getAipDescritiveMetadata(String aipId, String metadataId, String acceptFormat,
+  public static StreamResponse retrieveAIPDescritiveMetadata(String aipId, String metadataId, String acceptFormat,
     String language)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
 
@@ -581,7 +582,7 @@ public class BrowserHelper {
     return ret;
   }
 
-  public static StreamResponse getAipDescritiveMetadataVersion(String aipId, String metadataId, String versionId,
+  public static StreamResponse retrieveAIPDescritiveMetadataVersion(String aipId, String metadataId, String versionId,
     String acceptFormat, String language)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
 
@@ -632,7 +633,7 @@ public class BrowserHelper {
     return ret;
   }
 
-  protected static void validateListAipPreservationMetadataParams(String acceptFormat) throws RequestNotValidException {
+  protected static void validateListAIPPreservationMetadataParams(String acceptFormat) throws RequestNotValidException {
     if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
       throw new RequestNotValidException("Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT
         + "' value. Expected values: " + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN));
@@ -642,7 +643,7 @@ public class BrowserHelper {
 
   // FIXME 20160406 hsilva: representation preservation metadata is not being
   // included in the response "package"
-  public static StreamResponse aipsAipIdPreservationMetadataGet(String aipId)
+  public static StreamResponse aipsAIPIdPreservationMetadataGet(String aipId)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
 
     List<Representation> representations = null;
@@ -706,7 +707,7 @@ public class BrowserHelper {
 
   }
 
-  protected static void validateGetAipRepresentationPreservationMetadataParams(String acceptFormat, String language)
+  protected static void validateGetAIPRepresentationPreservationMetadataParams(String acceptFormat, String language)
     throws RequestNotValidException {
     if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)
       && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
@@ -722,7 +723,7 @@ public class BrowserHelper {
 
   }
 
-  public static StreamResponse getAipRepresentationPreservationMetadata(String aipId, String representationId,
+  public static StreamResponse retrieveAIPRepresentationPreservationMetadata(String aipId, String representationId,
     String startAgent, String limitAgent, String startEvent, String limitEvent, String startFile, String limitFile,
     String acceptFormat, String language)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
@@ -792,7 +793,7 @@ public class BrowserHelper {
 
   }
 
-  public static StreamResponse getAipRepresentationPreservationMetadataFile(String aipId, String representationId,
+  public static StreamResponse retrieveAIPRepresentationPreservationMetadataFile(String aipId, String representationId,
     String fileId) throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
 
     Binary binary = RodaCoreFactory.getModelService().retrievePreservationRepresentation(aipId, representationId);
@@ -808,7 +809,7 @@ public class BrowserHelper {
     return new StreamResponse(filename, MediaType.APPLICATION_OCTET_STREAM, stream);
   }
 
-  public static void createOrUpdateAipRepresentationPreservationMetadataFile(String aipId, String representationId,
+  public static void createOrUpdateAIPRepresentationPreservationMetadataFile(String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId, InputStream is, FormDataContentDisposition fileDetail,
     boolean create) throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException,
     ValidationException, AlreadyExistsException {
@@ -840,15 +841,7 @@ public class BrowserHelper {
     }
   }
 
-  public static void aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(String aipId, String representationId,
-    String fileId, String preservationId)
-    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
-    boolean notify = true;
-    RodaCoreFactory.getModelService().deletePreservationMetadata(PreservationMetadataType.FILE, aipId, representationId,
-      preservationId, notify);
-  }
-
-  public static IndexedAIP moveInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, RodaUser user)
+  public static IndexedAIP moveAIPInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, RodaUser user)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
     AlreadyExistsException, ValidationException {
     List<String> aipIds = consolidate(user, IndexedAIP.class, selected);
@@ -881,7 +874,7 @@ public class BrowserHelper {
     return aip;
   }
 
-  public static String removeAIP(SelectedItems<IndexedAIP> selected, RodaUser user)
+  public static String deleteAIP(SelectedItems<IndexedAIP> selected, RodaUser user)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     List<String> aipIds = consolidate(user, IndexedAIP.class, selected);
 
@@ -929,7 +922,7 @@ public class BrowserHelper {
     return parentId;
   }
 
-  public static String removeAIPRepresentations(SelectedItems<IndexedAIP> selected, RodaUser user)
+  public static String deleteAIPRepresentations(SelectedItems<IndexedAIP> selected, RodaUser user)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     List<String> aipIds = consolidate(user, IndexedAIP.class, selected);
 
@@ -1012,7 +1005,7 @@ public class BrowserHelper {
 
   }
 
-  public static void removeDescriptiveMetadataFile(String aipId, String descriptiveMetadataId)
+  public static void deleteDescriptiveMetadataFile(String aipId, String descriptiveMetadataId)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     RodaCoreFactory.getModelService().deleteDescriptiveMetadata(aipId, descriptiveMetadataId);
   }
@@ -1052,19 +1045,19 @@ public class BrowserHelper {
 
   }
 
-  public static void removeRepresentation(String aipId, String representationId)
+  public static void deleteRepresentation(String aipId, String representationId)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     RodaCoreFactory.getModelService().deleteRepresentation(aipId, representationId);
   }
 
-  public static void removeRepresentationFile(String fileUUID)
+  public static void deleteRepresentationFile(String fileUUID)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     IndexedFile file = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class, fileUUID);
     RodaCoreFactory.getModelService().deleteFile(file.getAipId(), file.getRepresentationId(), file.getPath(),
       file.getId(), true);
   }
 
-  public static StreamResponse getAipRepresentationFile(String fileUuid, String acceptFormat)
+  public static StreamResponse retrieveAIPRepresentationFile(String fileUuid, String acceptFormat)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
 
     IndexedFile indexedFile = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class, fileUuid);
@@ -1094,7 +1087,7 @@ public class BrowserHelper {
     return new StreamResponse(filename, mediaType, stream);
   }
 
-  public static void createOrUpdateAipDescriptiveMetadataFile(String aipId, String metadataId, String metadataType,
+  public static void createOrUpdateAIPDescriptiveMetadataFile(String aipId, String metadataId, String metadataType,
     String metadataVersion, String updateMessage, InputStream is, FormDataContentDisposition fileDetail, boolean create)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException,
     AlreadyExistsException, ValidationException {
@@ -1163,14 +1156,14 @@ public class BrowserHelper {
     return ret;
   }
 
-  public static void removeTransferredResources(SelectedItems<TransferredResource> selected, RodaUser user)
+  public static void deleteTransferredResources(SelectedItems<TransferredResource> selected, RodaUser user)
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
     List<String> ids = consolidate(user, TransferredResource.class, selected);
 
     // check permissions
     UserUtility.checkTransferredResourceAccess(user, ids);
 
-    RodaCoreFactory.getTransferredResourcesScanner().removeTransferredResource(ids);
+    RodaCoreFactory.getTransferredResourcesScanner().deleteTransferredResource(ids);
   }
 
   public static TransferredResource createTransferredResourceFile(String parentUUID, String fileName,
@@ -1193,7 +1186,7 @@ public class BrowserHelper {
     RodaCoreFactory.getIndexService().commit(returnClass);
   }
 
-  public static boolean getScanUpdateStatus() {
+  public static boolean retrieveScanUpdateStatus() {
     return RodaCoreFactory.getTransferredResourcesScannerUpdateStatus();
   }
 
@@ -1203,7 +1196,7 @@ public class BrowserHelper {
   }
 
   // TODO Limit access to SDO accessible by user
-  public static StreamResponse getClassificationPlan(String type, RodaUser user)
+  public static StreamResponse retrieveClassificationPlan(String type, RodaUser user)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     try {
       JsonFactory factory = new JsonFactory();
@@ -1294,8 +1287,8 @@ public class BrowserHelper {
     return node;
   }
 
-  public static List<SupportedMetadataTypeBundle> getSupportedMetadata(RodaUser user, IndexedAIP aip, Locale locale)
-    throws GenericException {
+  public static List<SupportedMetadataTypeBundle> retrieveSupportedMetadata(RodaUser user, IndexedAIP aip,
+    Locale locale) throws GenericException {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     List<String> types = RodaUtils
       .copyList(RodaCoreFactory.getRodaConfiguration().getList(RodaConstants.UI_BROWSER_METADATA_DESCRIPTIVE_TYPES));
@@ -1347,7 +1340,7 @@ public class BrowserHelper {
     return supportedMetadata;
   }
 
-  public static StreamResponse getTransferredResource(final TransferredResource transferredResource)
+  public static StreamResponse retrieveTransferredResource(final TransferredResource transferredResource)
     throws NotFoundException, RequestNotValidException, GenericException {
 
     StreamingOutput streamingOutput = new StreamingOutput() {
@@ -1448,12 +1441,14 @@ public class BrowserHelper {
 
   }
 
-  public static DescriptiveMetadataVersionsBundle getDescriptiveMetadataVersionsBundle(String aipId, String metadataId,
-    Locale locale) throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+  public static DescriptiveMetadataVersionsBundle retrieveDescriptiveMetadataVersionsBundle(String aipId,
+    String metadataId, Locale locale)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     DescriptiveMetadataVersionsBundle bundle = new DescriptiveMetadataVersionsBundle();
 
     IndexedAIP aip = retrieve(IndexedAIP.class, aipId);
-    DescriptiveMetadataViewBundle descriptiveMetadataBundle = getDescriptiveMetadataBundle(aipId, metadataId, locale);
+    DescriptiveMetadataViewBundle descriptiveMetadataBundle = retrieveDescriptiveMetadataBundle(aipId, metadataId,
+      locale);
 
     List<BinaryVersionBundle> versionBundles = new ArrayList<>();
 
@@ -1475,7 +1470,7 @@ public class BrowserHelper {
       message);
   }
 
-  public static void removeDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId)
+  public static void deleteDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId)
     throws NotFoundException, GenericException, RequestNotValidException {
     StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, descriptiveMetadataId);
     RodaCoreFactory.getStorageService().deleteBinaryVersion(storagePath, versionId);
@@ -1512,7 +1507,7 @@ public class BrowserHelper {
 
   }
 
-  public static Risk addRisk(Risk risk, RodaUser user, boolean commit)
+  public static Risk createRisk(Risk risk, RodaUser user, boolean commit)
     throws GenericException, RequestNotValidException {
     risk.setCreatedBy(user.getName());
     risk.setUpdatedBy(user.getName());
@@ -1521,31 +1516,31 @@ public class BrowserHelper {
     return createdRisk;
   }
 
-  public static void modifyRisk(Risk risk, RodaUser user, String message, boolean commit)
+  public static void updateRisk(Risk risk, RodaUser user, String message, boolean commit)
     throws GenericException, RequestNotValidException {
     risk.setUpdatedBy(user.getName());
     RodaCoreFactory.getModelService().updateRisk(risk, message, commit);
     RodaCoreFactory.getIndexService().commit(IndexedRisk.class);
   }
 
-  public static Agent addAgent(Agent agent, boolean commit) throws GenericException, RequestNotValidException {
+  public static Agent createAgent(Agent agent, boolean commit) throws GenericException, RequestNotValidException {
     Agent createdAgent = RodaCoreFactory.getModelService().createAgent(agent, commit);
     RodaCoreFactory.getIndexService().commit(Agent.class);
     return createdAgent;
   }
 
-  public static void modifyAgent(Agent agent, boolean commit) throws GenericException, RequestNotValidException {
+  public static void updateAgent(Agent agent, boolean commit) throws GenericException, RequestNotValidException {
     RodaCoreFactory.getModelService().updateAgent(agent, commit);
     RodaCoreFactory.getIndexService().commit(Agent.class);
   }
 
-  public static Format addFormat(Format format, boolean commit) throws GenericException, RequestNotValidException {
+  public static Format createFormat(Format format, boolean commit) throws GenericException, RequestNotValidException {
     Format createdFormat = RodaCoreFactory.getModelService().createFormat(format, commit);
     RodaCoreFactory.getIndexService().commit(Format.class);
     return createdFormat;
   }
 
-  public static void modifyFormat(Format format, boolean commit) throws GenericException, RequestNotValidException {
+  public static void updateFormat(Format format, boolean commit) throws GenericException, RequestNotValidException {
     RodaCoreFactory.getModelService().updateFormat(format, commit);
     RodaCoreFactory.getIndexService().commit(Format.class);
   }
@@ -1607,7 +1602,7 @@ public class BrowserHelper {
     RodaCoreFactory.getModelService().revertRiskVersion(riskId, versionId, message, false);
   }
 
-  public static void removeRiskVersion(String riskId, String versionId)
+  public static void deleteRiskVersion(String riskId, String versionId)
     throws NotFoundException, GenericException, RequestNotValidException {
     StoragePath storagePath = ModelUtils.getRiskStoragePath(riskId);
     RodaCoreFactory.getStorageService().deleteBinaryVersion(storagePath, versionId);
@@ -1620,7 +1615,7 @@ public class BrowserHelper {
     return oldRisk;
   }
 
-  public static void validateExportAipParams(String acceptFormat) throws RequestNotValidException {
+  public static void validateExportAIPParams(String acceptFormat) throws RequestNotValidException {
     if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
       throw new RequestNotValidException("Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT
         + "' value. Expected values: " + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN));
@@ -1641,7 +1636,7 @@ public class BrowserHelper {
     return aips;
   }
 
-  public static void validateGetAipParams(String acceptFormat) throws RequestNotValidException {
+  public static void validateGetAIPParams(String acceptFormat) throws RequestNotValidException {
     if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
       throw new RequestNotValidException(
@@ -1651,7 +1646,7 @@ public class BrowserHelper {
 
   }
 
-  public static StreamResponse getAIP(IndexedAIP indexedAIP, String acceptFormat)
+  public static StreamResponse retrieveAIP(IndexedAIP indexedAIP, String acceptFormat)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
       StoragePath storagePath = ModelUtils.getAIPStoragePath(indexedAIP.getId());
@@ -1683,7 +1678,7 @@ public class BrowserHelper {
     }
   }
 
-  public static StreamResponse getAIPPart(IndexedAIP aip, String part)
+  public static StreamResponse retrieveAIPPart(IndexedAIP aip, String part)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     String aipId = aip.getId();
 
@@ -1701,7 +1696,7 @@ public class BrowserHelper {
     }
   }
 
-  public static StreamResponse getAIPs(SelectedItems<IndexedAIP> selected, String acceptFormat)
+  public static StreamResponse retrieveAIPs(SelectedItems<IndexedAIP> selected, String acceptFormat)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException, IOException {
     IndexService index = RodaCoreFactory.getIndexService();
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
@@ -2000,7 +1995,7 @@ public class BrowserHelper {
     RodaCoreFactory.getIndexService().commit(IndexedAIP.class, Job.class, Report.class, IndexedPreservationEvent.class);
   }
 
-  public static IndexedRepresentation getRepresentationFromId(RodaUser user, String representationId)
+  public static IndexedRepresentation retrieveRepresentationById(RodaUser user, String representationId)
     throws GenericException, RequestNotValidException {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_ID, representationId));
     IndexResult<IndexedRepresentation> reps = RodaCoreFactory.getIndexService().find(IndexedRepresentation.class,
@@ -2013,7 +2008,7 @@ public class BrowserHelper {
     }
   }
 
-  public static IndexedFile getFileFromId(RodaUser user, String fileId)
+  public static IndexedFile retrieveFileById(RodaUser user, String fileId)
     throws GenericException, RequestNotValidException {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_FILEID, fileId));
     IndexResult<IndexedFile> files = RodaCoreFactory.getIndexService().find(IndexedFile.class, filter, Sorter.NONE,
@@ -2026,7 +2021,7 @@ public class BrowserHelper {
     }
   }
 
-  public static String getDescriptiveMetadataPreview(SupportedMetadataTypeBundle bundle) throws GenericException {
+  public static String retrieveDescriptiveMetadataPreview(SupportedMetadataTypeBundle bundle) throws GenericException {
     String rawTemplate = bundle.getTemplate();
     String result;
     if (StringUtils.isNotBlank(rawTemplate)) {
@@ -2141,8 +2136,8 @@ public class BrowserHelper {
 
   }
 
-  public static List<TransferredResource> getSelectedTransferredResource(SelectedItems<TransferredResource> selected)
-    throws GenericException, RequestNotValidException {
+  public static List<TransferredResource> retrieveSelectedTransferredResource(
+    SelectedItems<TransferredResource> selected) throws GenericException, RequestNotValidException {
     if (selected instanceof SelectedItemsList) {
       SelectedItemsList selectedList = (SelectedItemsList) selected;
 
@@ -2163,7 +2158,7 @@ public class BrowserHelper {
     }
   }
 
-  public static void modifyRiskIncidence(RiskIncidence incidence) throws GenericException {
+  public static void updateRiskIncidence(RiskIncidence incidence) throws GenericException {
     RodaCoreFactory.getModelService().updateRiskIncidence(incidence, true);
   }
 

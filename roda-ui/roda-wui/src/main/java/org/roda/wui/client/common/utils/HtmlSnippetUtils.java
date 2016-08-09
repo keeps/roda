@@ -154,7 +154,7 @@ public class HtmlSnippetUtils {
       objectLink.setText(incidence.getAipId());
 
     } else if (Representation.class.getSimpleName().equals(incidence.getObjectClass())) {
-      BrowserService.Util.getInstance().getRepresentationFromId(incidence.getRepresentationId(),
+      BrowserService.Util.getInstance().retrieveRepresentationById(incidence.getRepresentationId(),
         new AsyncCallback<IndexedRepresentation>() {
 
           @Override
@@ -174,7 +174,7 @@ public class HtmlSnippetUtils {
         });
 
     } else if (File.class.getSimpleName().equals(incidence.getObjectClass())) {
-      BrowserService.Util.getInstance().getFileFromId(incidence.getFileId(), new AsyncCallback<IndexedFile>() {
+      BrowserService.Util.getInstance().retrieveFileById(incidence.getFileId(), new AsyncCallback<IndexedFile>() {
 
         @Override
         public void onFailure(Throwable caught) {

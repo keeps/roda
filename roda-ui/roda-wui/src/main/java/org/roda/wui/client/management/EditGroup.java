@@ -116,7 +116,7 @@ public class EditGroup extends Composite {
       if (groupDataPanel.isValid()) {
         group = groupDataPanel.getGroup();
 
-        UserManagementService.Util.getInstance().modifyGroup(group, new AsyncCallback<Void>() {
+        UserManagementService.Util.getInstance().updateGroup(group, new AsyncCallback<Void>() {
 
           public void onSuccess(Void result) {
             Tools.newHistory(MemberManagement.RESOLVER);
@@ -134,7 +134,7 @@ public class EditGroup extends Composite {
 
   @UiHandler("buttonRemove")
   void buttonRemoveHandler(ClickEvent e) {
-    UserManagementService.Util.getInstance().removeGroup(group.getId(), new AsyncCallback<Void>() {
+    UserManagementService.Util.getInstance().deleteGroup(group.getId(), new AsyncCallback<Void>() {
 
       @Override
       public void onSuccess(Void result) {

@@ -148,7 +148,7 @@ public class PreservationEvents extends Composite {
       }
     });
 
-    BrowserService.Util.getInstance().getItemBundle(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
+    BrowserService.Util.getInstance().retrieveItemBundle(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
       new AsyncCallback<BrowseItemBundle>() {
 
         @Override

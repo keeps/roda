@@ -18,10 +18,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
@@ -61,14 +59,14 @@ public class RepresentationsResource {
     // get user
     RodaUser user = UserUtility.getApiUser(request);
     // delegate action to controller
-    StreamResponse aipRepresentation = Browser.getAipRepresentation(user, representationUUID, acceptFormat);
+    StreamResponse aipRepresentation = Browser.retrieveAIPRepresentation(user, representationUUID, acceptFormat);
 
     return ApiUtils.okResponse(aipRepresentation);
   }
 
   @GET
   @Path("/{" + RodaConstants.REPRESENTATION_UUID + "}/{part}")
-  //@Produces({"application/json", MediaType.APPLICATION_OCTET_STREAM})
+  // @Produces({"application/json", MediaType.APPLICATION_OCTET_STREAM})
   @ApiOperation(value = "Download part of the representation")
   public Response getRepresentationPart(
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam(RodaConstants.REPRESENTATION_UUID) String representationUUID,
@@ -77,7 +75,7 @@ public class RepresentationsResource {
     // get user
     RodaUser user = UserUtility.getApiUser(request);
     // delegate action to controller
-    StreamResponse aipRepresentation = Browser.getAipRepresentationPart(user, representationUUID, part);
+    StreamResponse aipRepresentation = Browser.retrieveAIPRepresentationPart(user, representationUUID, part);
 
     return ApiUtils.okResponse(aipRepresentation);
   }
@@ -125,7 +123,7 @@ public class RepresentationsResource {
     // get user
     RodaUser user = UserUtility.getApiUser(request);
     // delegate action to controller
-    Browser.removeRepresentation(user, aipId, representationId);
+    Browser.deleteRepresentation(user, aipId, representationId);
 
     // FIXME give a better answer
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();

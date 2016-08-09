@@ -87,7 +87,7 @@ public class CreateAgent extends Composite {
   void buttonApplyHandler(ClickEvent e) {
     if (agentDataPanel.isValid()) {
       agent = agentDataPanel.getAgent();
-      BrowserService.Util.getInstance().addAgent(agent, new AsyncCallback<Agent>() {
+      BrowserService.Util.getInstance().createAgent(agent, new AsyncCallback<Agent>() {
 
         public void onFailure(Throwable caught) {
           errorMessage(caught);

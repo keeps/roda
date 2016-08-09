@@ -44,7 +44,7 @@ public class EditUser extends Composite {
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
         String username = historyTokens.get(0);
-        UserManagementService.Util.getInstance().getUser(username, new AsyncCallback<User>() {
+        UserManagementService.Util.getInstance().retrieveUser(username, new AsyncCallback<User>() {
 
           @Override
           public void onFailure(Throwable caught) {
@@ -130,7 +130,7 @@ public class EditUser extends Composite {
         final User user = userDataPanel.getUser();
         final String password = userDataPanel.getPassword();
 
-        UserManagementService.Util.getInstance().modifyUser(user, password, new AsyncCallback<Void>() {
+        UserManagementService.Util.getInstance().updateUser(user, password, new AsyncCallback<Void>() {
 
           public void onFailure(Throwable caught) {
             errorMessage(caught);
@@ -150,7 +150,7 @@ public class EditUser extends Composite {
   void buttonDeActivateHandler(ClickEvent e) {
     user.setActive(!user.isActive());
 
-    UserManagementService.Util.getInstance().modifyUser(user, null, new AsyncCallback<Void>() {
+    UserManagementService.Util.getInstance().updateUser(user, null, new AsyncCallback<Void>() {
 
       @Override
       public void onSuccess(Void result) {
@@ -167,7 +167,7 @@ public class EditUser extends Composite {
 
   @UiHandler("buttonRemove")
   void buttonRemoveHandler(ClickEvent e) {
-    UserManagementService.Util.getInstance().removeUser(user.getId(), new AsyncCallback<Void>() {
+    UserManagementService.Util.getInstance().deleteUser(user.getId(), new AsyncCallback<Void>() {
 
       @Override
       public void onSuccess(Void result) {

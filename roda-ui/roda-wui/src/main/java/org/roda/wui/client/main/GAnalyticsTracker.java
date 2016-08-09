@@ -24,7 +24,7 @@ public class GAnalyticsTracker {
 
   private static void getAccountId(final AsyncCallback<String> callback) {
     if (ACCOUNT_ID == null) {
-      BrowserService.Util.getInstance().getGoogleAnalyticsAccount(new AsyncCallback<String>() {
+      BrowserService.Util.getInstance().retrieveGoogleAnalyticsAccount(new AsyncCallback<String>() {
 
         public void onFailure(Throwable caught) {
           callback.onFailure(caught);
@@ -76,26 +76,26 @@ public class GAnalyticsTracker {
    * @param historyToken
    */
   public static native void trackGoogleAnalytics(String historyToken, String accountId) /*-{
-                                                                                        try {
+		try {
 
-                                                                                        // setup tracking object with account
-                                                                                        //var pageTracker = $wnd._gat._getTracker(accountId);
+			// setup tracking object with account
+			//var pageTracker = $wnd._gat._getTracker(accountId);
 
-                                                                                        //pageTracker._setRemoteServerMode();
+			//pageTracker._setRemoteServerMode();
 
-                                                                                        // turn on anchor observing
-                                                                                        //pageTracker._setAllowAnchor(true)
+			// turn on anchor observing
+			//pageTracker._setAllowAnchor(true)
 
-                                                                                        // send event to google server
-                                                                                        //pageTracker._trackPageview(historyToken);
-                                                                                        
-                                                                                        $wnd._gaq.push(['_setAccount', accountId]);
-                                                                                        $wnd._gaq.push(['_trackPageview', historyToken]);
+			// send event to google server
+			//pageTracker._trackPageview(historyToken);
 
-                                                                                        } catch(err) {
+			$wnd._gaq.push([ '_setAccount', accountId ]);
+			$wnd._gaq.push([ '_trackPageview', historyToken ]);
 
-                                                                                        // debug
-                                                                                        alert('FAILURE: to send in event to google analytics: ' + err);
-                                                                                        }
-                                                                                        }-*/;
+		} catch (err) {
+
+			// debug
+			alert('FAILURE: to send in event to google analytics: ' + err);
+		}
+  }-*/;
 }

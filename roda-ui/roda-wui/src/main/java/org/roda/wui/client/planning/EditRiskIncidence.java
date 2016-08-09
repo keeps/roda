@@ -203,7 +203,7 @@ public class EditRiskIncidence extends Composite {
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
     getRiskIncidence();
-    BrowserService.Util.getInstance().modifyRiskIncidence(incidence, new AsyncCallback<Void>() {
+    BrowserService.Util.getInstance().updateRiskIncidence(incidence, new AsyncCallback<Void>() {
 
       @Override
       public void onFailure(Throwable caught) {

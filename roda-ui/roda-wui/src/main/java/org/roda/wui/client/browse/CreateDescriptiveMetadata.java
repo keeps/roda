@@ -182,7 +182,7 @@ public class CreateDescriptiveMetadata extends Composite {
       }
     });
 
-    BrowserService.Util.getInstance().getSupportedMetadata(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
+    BrowserService.Util.getInstance().retrieveSupportedMetadata(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
       new AsyncCallback<List<SupportedMetadataTypeBundle>>() {
 
         @Override
@@ -277,27 +277,28 @@ public class CreateDescriptiveMetadata extends Composite {
   }
 
   private void updateMetadataXML() {
-    BrowserService.Util.getInstance().getDescriptiveMetadataPreview(aipId, selectedBundle, new AsyncCallback<String>() {
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-      }
+    BrowserService.Util.getInstance().retrieveDescriptiveMetadataPreview(aipId, selectedBundle,
+      new AsyncCallback<String>() {
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
 
-      @Override
-      public void onSuccess(String preview) {
-        formOrXML.clear();
-        metadataXML.setText(preview);
-        formOrXML.add(metadataXML);
-        metadataTextFromForm = preview;
-      }
-    });
+        @Override
+        public void onSuccess(String preview) {
+          formOrXML.clear();
+          metadataXML.setText(preview);
+          formOrXML.add(metadataXML);
+          metadataTextFromForm = preview;
+        }
+      });
   }
 
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
     buttonApply.setEnabled(false);
     String idText = id.getText();
-    String typeText = selectedBundle != null ? selectedBundle.getType() : messages.otherItem(); //Other
+    String typeText = selectedBundle != null ? selectedBundle.getType() : messages.otherItem(); // Other
     String typeVersion = selectedBundle != null ? selectedBundle.getVersion() : "";
     String template = selectedBundle != null ? selectedBundle.getTemplate() : null;
     String xmlText = metadataXML.getText();
@@ -364,7 +365,7 @@ public class CreateDescriptiveMetadata extends Composite {
 
       SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<IndexedAIP>(Arrays.asList(aipId),
         IndexedAIP.class.getName());
-      BrowserService.Util.getInstance().removeAIP(selected, new AsyncCallback<String>() {
+      BrowserService.Util.getInstance().deleteAIP(selected, new AsyncCallback<String>() {
 
         @Override
         public void onFailure(Throwable caught) {

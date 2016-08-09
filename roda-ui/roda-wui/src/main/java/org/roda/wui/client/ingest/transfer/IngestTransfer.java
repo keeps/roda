@@ -512,7 +512,7 @@ public class IngestTransfer extends Composite {
               if (confirmed) {
                 SelectedItems<TransferredResource> s = new SelectedItemsList<TransferredResource>(
                   Arrays.asList(resource.getUUID()), TransferredResource.class.getName());
-                BrowserService.Util.getInstance().removeTransferredResources(s, new AsyncCallback<Void>() {
+                BrowserService.Util.getInstance().deleteTransferredResources(s, new AsyncCallback<Void>() {
 
                   @Override
                   public void onFailure(Throwable caught) {
@@ -557,7 +557,7 @@ public class IngestTransfer extends Composite {
               @Override
               public void onSuccess(Boolean confirmed) {
                 if (confirmed) {
-                  BrowserService.Util.getInstance().removeTransferredResources(selected, new AsyncCallback<Void>() {
+                  BrowserService.Util.getInstance().deleteTransferredResources(selected, new AsyncCallback<Void>() {
 
                     @Override
                     public void onFailure(Throwable caught) {
@@ -657,7 +657,7 @@ public class IngestTransfer extends Composite {
 
   @UiHandler("move")
   void buttonMoveHandler(ClickEvent e) {
-    BrowserService.Util.getInstance().getSelectedTransferredResource(getSelected(),
+    BrowserService.Util.getInstance().retrieveSelectedTransferredResource(getSelected(),
       new AsyncCallback<List<TransferredResource>>() {
 
         @Override

@@ -58,12 +58,12 @@ public class TransferredResource {
   @GET
   public Response getResource(
     @ApiParam(value = "The resource id", required = false) @QueryParam(RodaConstants.TRANSFERRED_RESOURCE_RESOURCE_ID) String resourceId)
-      throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException {
+    throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException {
 
     // get user
     RodaUser user = UserUtility.getApiUser(request);
 
-    StreamResponse response = Browser.getTransferredResource(user, resourceId);
+    StreamResponse response = Browser.retrieveTransferredResource(user, resourceId);
 
     return ApiUtils.okResponse(response);
   }
@@ -75,7 +75,7 @@ public class TransferredResource {
     @ApiParam(value = "The name of the directory to create", required = false) @QueryParam(RodaConstants.TRANSFERRED_RESOURCE_DIRECTORY_NAME) String name,
     @ApiParam(value = "Locale", required = false) @QueryParam(RodaConstants.LOCALE) String localeString,
     @FormDataParam("upl") InputStream inputStream, @FormDataParam("upl") FormDataContentDisposition fileDetail)
-      throws RODAException {
+    throws RODAException {
 
     // get user
     RodaUser user = UserUtility.getApiUser(request);
@@ -101,7 +101,7 @@ public class TransferredResource {
     // TODO support remove multiple resources in one go
     SelectedItemsList<org.roda.core.data.v2.ip.TransferredResource> selected = new SelectedItemsList<org.roda.core.data.v2.ip.TransferredResource>(
       Arrays.asList(path), TransferredResource.class.getName());
-    Browser.removeTransferredResources(user, selected);
+    Browser.deleteTransferredResources(user, selected);
     // FIXME give a better answer
     return Response.ok().entity("{'status':'success'}").build();
   }

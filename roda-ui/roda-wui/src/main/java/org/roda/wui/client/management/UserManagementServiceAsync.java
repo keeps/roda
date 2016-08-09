@@ -29,7 +29,6 @@ import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
-import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
 
@@ -62,7 +61,7 @@ public interface UserManagementServiceAsync {
    *
    * @throws RODAException
    */
-  void getUser(String username, AsyncCallback<User> callback);
+  void retrieveUser(String username, AsyncCallback<User> callback);
 
   /**
    * Register a new user
@@ -81,7 +80,7 @@ public interface UserManagementServiceAsync {
    */
   public void registerUser(User user, String password, String captcha, AsyncCallback<Void> callback);
 
-  void addUser(User user, String password, AsyncCallback<User> callback);
+  void createUser(User user, String password, AsyncCallback<User> callback);
 
   /**
    * Modify a user
@@ -95,7 +94,7 @@ public interface UserManagementServiceAsync {
    * @throws AlreadyExistsException
    * @throws GenericException
    */
-  public void modifyUser(User user, String password, AsyncCallback<Void> callback);
+  public void updateUser(User user, String password, AsyncCallback<Void> callback);
 
   /**
    * Modify the authenticated user
@@ -110,7 +109,7 @@ public interface UserManagementServiceAsync {
    * @throws GenericException
    * @throws IllegalOperationException
    */
-  public void modifyMyUser(User user, String password, AsyncCallback<Void> callback);
+  public void updateMyUser(User user, String password, AsyncCallback<Void> callback);
 
   /**
    * Try to remove a user, if user cannot be removed it will be deactivated
@@ -121,7 +120,7 @@ public interface UserManagementServiceAsync {
    * @throws AuthorizationDeniedException
    * @throws GenericException
    */
-  public void removeUser(String username, AsyncCallback<Void> callback);
+  public void deleteUser(String username, AsyncCallback<Void> callback);
 
   /**
    * Create a group
@@ -132,7 +131,7 @@ public interface UserManagementServiceAsync {
    * @throws GenericException
    * @throws AlreadyExistsException
    */
-  public void addGroup(Group group, AsyncCallback<Void> callback);
+  public void createGroup(Group group, AsyncCallback<Void> callback);
 
   /**
    * Modify a group
@@ -143,7 +142,7 @@ public interface UserManagementServiceAsync {
    * @throws GenericException
    * @throws NotFoundException
    */
-  public void modifyGroup(Group group, AsyncCallback<Void> callback);
+  public void updateGroup(Group group, AsyncCallback<Void> callback);
 
   /**
    * Remove a group
@@ -153,7 +152,7 @@ public interface UserManagementServiceAsync {
    * @throws AuthorizationDeniedException
    * @throws GenericException
    */
-  public void removeGroup(String groupname, AsyncCallback<Void> callback);
+  public void deleteGroup(String groupname, AsyncCallback<Void> callback);
 
   /**
    * Get the number log entries
@@ -162,7 +161,7 @@ public interface UserManagementServiceAsync {
    * @return
    * @throws RODAException
    */
-  public void getLogEntriesCount(Filter filter, AsyncCallback<Long> callback);
+  public void retrieveLogEntriesCount(Filter filter, AsyncCallback<Long> callback);
 
   public void findLogEntries(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
     AsyncCallback<IndexResult<LogEntry>> callback);

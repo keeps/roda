@@ -88,7 +88,7 @@ public interface UserManagementService extends RemoteService {
    *
    * @throws RODAException
    */
-  public User getUser(String username) throws RODAException;
+  public User retrieveUser(String username) throws RODAException;
 
   /**
    * Register a new user
@@ -122,7 +122,7 @@ public interface UserManagementService extends RemoteService {
    * @throws UserAlreadyExistsException
    * @throws GenericException
    */
-  public User addUser(User user, String password) throws AuthorizationDeniedException, NotFoundException,
+  public User createUser(User user, String password) throws AuthorizationDeniedException, NotFoundException,
     EmailAlreadyExistsException, UserAlreadyExistsException, GenericException, IllegalOperationException;
 
   /**
@@ -137,7 +137,7 @@ public interface UserManagementService extends RemoteService {
    * @throws AlreadyExistsException
    * @throws GenericException
    */
-  public void modifyUser(User user, String password)
+  public void updateUser(User user, String password)
     throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException;
 
   /**
@@ -153,7 +153,7 @@ public interface UserManagementService extends RemoteService {
    * @throws GenericException
    * @throws IllegalOperationException
    */
-  public void modifyMyUser(User user, String password) throws AuthorizationDeniedException, NotFoundException,
+  public void updateMyUser(User user, String password) throws AuthorizationDeniedException, NotFoundException,
     AlreadyExistsException, GenericException, IllegalOperationException;
 
   /**
@@ -165,7 +165,7 @@ public interface UserManagementService extends RemoteService {
    * @throws AuthorizationDeniedException
    * @throws GenericException
    */
-  public void removeUser(String username) throws AuthorizationDeniedException, GenericException;
+  public void deleteUser(String username) throws AuthorizationDeniedException, GenericException;
 
   /**
    * Create a group
@@ -176,7 +176,7 @@ public interface UserManagementService extends RemoteService {
    * @throws GenericException
    * @throws AlreadyExistsException
    */
-  public void addGroup(Group group) throws AuthorizationDeniedException, GenericException, AlreadyExistsException;
+  public void createGroup(Group group) throws AuthorizationDeniedException, GenericException, AlreadyExistsException;
 
   /**
    * Modify a group
@@ -187,7 +187,7 @@ public interface UserManagementService extends RemoteService {
    * @throws GenericException
    * @throws NotFoundException
    */
-  public void modifyGroup(Group group) throws AuthorizationDeniedException, GenericException, NotFoundException;
+  public void updateGroup(Group group) throws AuthorizationDeniedException, GenericException, NotFoundException;
 
   /**
    * Remove a group
@@ -197,7 +197,7 @@ public interface UserManagementService extends RemoteService {
    * @throws AuthorizationDeniedException
    * @throws GenericException
    */
-  public void removeGroup(String groupname) throws AuthorizationDeniedException, GenericException;
+  public void deleteGroup(String groupname) throws AuthorizationDeniedException, GenericException;
 
   /**
    * Get the number log entries
@@ -206,7 +206,7 @@ public interface UserManagementService extends RemoteService {
    * @return
    * @throws RODAException
    */
-  public Long getLogEntriesCount(Filter filter) throws RODAException;
+  public Long retrieveLogEntriesCount(Filter filter) throws RODAException;
 
   public IndexResult<LogEntry> findLogEntries(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException;

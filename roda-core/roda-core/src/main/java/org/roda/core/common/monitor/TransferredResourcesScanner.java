@@ -178,7 +178,7 @@ public class TransferredResourcesScanner {
     return tr;
   }
 
-  public void removeTransferredResource(List<String> ids)
+  public void deleteTransferredResource(List<String> ids)
     throws NotFoundException, GenericException, RequestNotValidException {
     for (String uuid : ids) {
       TransferredResource tr = index.retrieve(TransferredResource.class, uuid);
@@ -218,7 +218,7 @@ public class TransferredResourcesScanner {
 
   public String renameTransferredResource(TransferredResource resource, String newName, boolean replaceExisting,
     boolean reindexResources)
-      throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
+    throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
 
     if (Files.exists(Paths.get(resource.getFullPath()))) {
       Path resourcePath = Paths.get(resource.getFullPath());
@@ -237,13 +237,13 @@ public class TransferredResourcesScanner {
 
   public Map<String, String> moveTransferredResource(List<TransferredResource> resources, String newRelativePath,
     boolean replaceExisting, boolean reindexResources)
-      throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
+    throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
     return moveTransferredResource(resources, newRelativePath, replaceExisting, reindexResources, false);
   }
 
   public Map<String, String> moveTransferredResource(String newRelativePath, List<String> resourcesUUIDs,
     boolean replaceExisting)
-      throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
+    throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
     List<TransferredResource> resources = Collections.emptyList();
     try {
       resources = index.retrieve(TransferredResource.class, resourcesUUIDs);
@@ -255,7 +255,7 @@ public class TransferredResourcesScanner {
 
   public Map<String, String> moveTransferredResource(List<TransferredResource> resources, String newRelativePath,
     boolean replaceExisting, boolean reindexResources, boolean areResourcesFromSameFolder)
-      throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
+    throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
 
     Map<String, String> oldToNewTransferredResourceIds = new HashMap<String, String>();
     List<TransferredResource> resourcesToIndex = new ArrayList<TransferredResource>();

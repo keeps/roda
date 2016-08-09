@@ -199,7 +199,7 @@ public class RiskHistory extends Composite {
 
   @UiHandler("buttonRemove")
   void buttonRemoveHandler(ClickEvent e) {
-    BrowserService.Util.getInstance().removeRiskVersion(riskId, selectedVersion, new AsyncCallback<Void>() {
+    BrowserService.Util.getInstance().deleteRiskVersion(riskId, selectedVersion, new AsyncCallback<Void>() {
 
       @Override
       public void onFailure(Throwable caught) {

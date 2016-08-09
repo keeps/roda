@@ -96,7 +96,7 @@ public class ViewRepresentation extends Composite {
 
     @Override
     public void resolve(final List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      BrowserService.Util.getInstance().getViewersProperties(new AsyncCallback<Viewers>() {
+      BrowserService.Util.getInstance().retrieveViewersProperties(new AsyncCallback<Viewers>() {
 
         @Override
         public void onSuccess(Viewers viewers) {
@@ -128,46 +128,46 @@ public class ViewRepresentation extends Composite {
         final String aipId = historyTokens.get(0);
         final String representationUUID = historyTokens.get(1);
 
-        BrowserService.Util.getInstance().getItemBundle(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
+        BrowserService.Util.getInstance().retrieveItemBundle(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
           new AsyncCallback<BrowseItemBundle>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            errorRedirect(callback);
-          }
-
-          @Override
-          public void onSuccess(final BrowseItemBundle itemBundle) {
-            if (itemBundle != null && verifyRepresentation(itemBundle.getRepresentations(), representationUUID)) {
-              if (historyTokens.size() > 2) {
-                final String fileUUID = historyTokens.get(2);
-
-                BrowserService.Util.getInstance().retrieve(IndexedFile.class.getName(), fileUUID,
-                  new AsyncCallback<IndexedFile>() {
-
-                  @Override
-                  public void onSuccess(IndexedFile simpleFile) {
-                    ViewRepresentation view = new ViewRepresentation(viewers, aipId, itemBundle, representationUUID,
-                      fileUUID, simpleFile);
-                    callback.onSuccess(view);
-                  }
-
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
-                    errorRedirect(callback);
-                  }
-                });
-
-              } else {
-                ViewRepresentation view = new ViewRepresentation(viewers, aipId, itemBundle, representationUUID);
-                callback.onSuccess(view);
-              }
-            } else {
+            @Override
+            public void onFailure(Throwable caught) {
               errorRedirect(callback);
             }
-          }
-        });
+
+            @Override
+            public void onSuccess(final BrowseItemBundle itemBundle) {
+              if (itemBundle != null && verifyRepresentation(itemBundle.getRepresentations(), representationUUID)) {
+                if (historyTokens.size() > 2) {
+                  final String fileUUID = historyTokens.get(2);
+
+                  BrowserService.Util.getInstance().retrieve(IndexedFile.class.getName(), fileUUID,
+                    new AsyncCallback<IndexedFile>() {
+
+                      @Override
+                      public void onSuccess(IndexedFile simpleFile) {
+                        ViewRepresentation view = new ViewRepresentation(viewers, aipId, itemBundle, representationUUID,
+                          fileUUID, simpleFile);
+                        callback.onSuccess(view);
+                      }
+
+                      @Override
+                      public void onFailure(Throwable caught) {
+                        Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
+                        errorRedirect(callback);
+                      }
+                    });
+
+                } else {
+                  ViewRepresentation view = new ViewRepresentation(viewers, aipId, itemBundle, representationUUID);
+                  callback.onSuccess(view);
+                }
+              } else {
+                errorRedirect(callback);
+              }
+            }
+          });
       } else {
         errorRedirect(callback);
       }
@@ -350,7 +350,7 @@ public class ViewRepresentation extends Composite {
     downloadFileButton.setTitle(messages.viewRepresentationDownloadFileButton());
     removeFileButton.setTitle(messages.viewRepresentationRemoveFileButton());
     infoFileButton.setTitle(messages.viewRepresentationInfoFileButton());
-    
+
     filesList.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
       @Override

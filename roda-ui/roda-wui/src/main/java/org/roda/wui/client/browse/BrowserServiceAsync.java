@@ -48,34 +48,35 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  */
 public interface BrowserServiceAsync {
 
-  void getItemBundle(String aipId, String localeString, AsyncCallback<BrowseItemBundle> callback);
+  void retrieveItemBundle(String aipId, String localeString, AsyncCallback<BrowseItemBundle> callback);
 
-  void getDescriptiveMetadataEditBundle(String aipId, String descId, String type, String version,
+  void retrieveDescriptiveMetadataEditBundle(String aipId, String descId, String type, String version,
     AsyncCallback<DescriptiveMetadataEditBundle> callback);
 
-  void getDescriptiveMetadataEditBundle(String aipId, String descId,
+  void retrieveDescriptiveMetadataEditBundle(String aipId, String descId,
     AsyncCallback<DescriptiveMetadataEditBundle> callback);
 
-  void getSearchFields(String locale, AsyncCallback<List<SearchField>> callback);
+  void retrieveSearchFields(String locale, AsyncCallback<List<SearchField>> callback);
 
-  void moveInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, AsyncCallback<IndexedAIP> callback);
+  void moveAIPInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, AsyncCallback<IndexedAIP> callback);
 
   void createAIP(String parentId, String type, AsyncCallback<String> callback);
 
-  void removeAIP(SelectedItems<IndexedAIP> aips, AsyncCallback<String> callback);
+  void deleteAIP(SelectedItems<IndexedAIP> aips, AsyncCallback<String> callback);
 
   void updateDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle, AsyncCallback<Void> callback);
 
-  void removeDescriptiveMetadataFile(String itemId, String descriptiveMetadataId, AsyncCallback<Void> callback);
+  void deleteDescriptiveMetadataFile(String itemId, String descriptiveMetadataId, AsyncCallback<Void> callback);
 
   void createDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle newBundle,
     AsyncCallback<Void> asyncCallback);
 
-  void getDescriptiveMetadataPreview(String aipId, SupportedMetadataTypeBundle bundle, AsyncCallback<String> async);
+  void retrieveDescriptiveMetadataPreview(String aipId, SupportedMetadataTypeBundle bundle,
+    AsyncCallback<String> async);
 
   void createTransferredResourcesFolder(String parent, String folderName, AsyncCallback<String> callback);
 
-  void removeTransferredResources(SelectedItems<TransferredResource> selected, AsyncCallback<Void> callback);
+  void deleteTransferredResources(SelectedItems<TransferredResource> selected, AsyncCallback<Void> callback);
 
   void transferScanIsUpdating(AsyncCallback<Boolean> callback);
 
@@ -83,33 +84,34 @@ public interface BrowserServiceAsync {
 
   void createJob(Job job, AsyncCallback<Job> callback);
 
-  void getPluginsInfo(List<PluginType> type, AsyncCallback<List<PluginInfo>> callback);
+  void retrievePluginsInfo(List<PluginType> type, AsyncCallback<List<PluginInfo>> callback);
 
-  void getCreateIngestProcessBundle(AsyncCallback<CreateIngestJobBundle> callback);
+  void retrieveCreateIngestProcessBundle(AsyncCallback<CreateIngestJobBundle> callback);
 
   void retrieveJobBundle(String jobId, AsyncCallback<JobBundle> callback);
 
-  void getViewersProperties(AsyncCallback<Viewers> callback);
+  void retrieveViewersProperties(AsyncCallback<Viewers> callback);
 
-  void getSupportedMetadata(String aipId, String locale, AsyncCallback<List<SupportedMetadataTypeBundle>> callback);
+  void retrieveSupportedMetadata(String aipId, String locale,
+    AsyncCallback<List<SupportedMetadataTypeBundle>> callback);
 
   void isCookiesMessageActive(AsyncCallback<Boolean> callback);
 
   void isRegisterActive(AsyncCallback<Boolean> callback);
 
-  void getGoogleAnalyticsAccount(AsyncCallback<String> callback);
+  void retrieveGoogleAnalyticsAccount(AsyncCallback<String> callback);
 
-  void getGoogleReCAPTCHAAccount(AsyncCallback<String> callback);
+  void retrieveGoogleReCAPTCHAAccount(AsyncCallback<String> callback);
 
   void retrievePreservationEventViewBundle(String eventId, AsyncCallback<PreservationEventViewBundle> asyncCallback);
 
-  void getDescriptiveMetadataVersionsBundle(String aipId, String descriptiveMetadataId, String localeString,
+  void retrieveDescriptiveMetadataVersionsBundle(String aipId, String descriptiveMetadataId, String localeString,
     AsyncCallback<DescriptiveMetadataVersionsBundle> callback);
 
   void revertDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId,
     AsyncCallback<Void> callback);
 
-  void removeDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId,
+  void deleteDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId,
     AsyncCallback<Void> callback);
 
   <T extends IsIndexed> void find(String classNameToReturn, Filter filter, Sorter sorter, Sublist sublist,
@@ -129,17 +131,17 @@ public interface BrowserServiceAsync {
   void updateAIPPermissions(List<IndexedAIP> aips, Permissions permissions, boolean recursive,
     AsyncCallback<Void> callback);
 
-  void addRisk(Risk risk, AsyncCallback<Risk> asyncCallback);
+  void createRisk(Risk risk, AsyncCallback<Risk> asyncCallback);
 
-  void modifyRisk(Risk risk, String message, AsyncCallback<Void> asyncCallback);
+  void updateRisk(Risk risk, String message, AsyncCallback<Void> asyncCallback);
 
-  void addAgent(Agent agent, AsyncCallback<Agent> asyncCallback);
+  void createAgent(Agent agent, AsyncCallback<Agent> asyncCallback);
 
-  void modifyAgent(Agent agent, AsyncCallback<Void> asyncCallback);
+  void updateAgent(Agent agent, AsyncCallback<Void> asyncCallback);
 
-  void addFormat(Format format, AsyncCallback<Format> asyncCallback);
+  void createFormat(Format format, AsyncCallback<Format> asyncCallback);
 
-  void modifyFormat(Format format, AsyncCallback<Void> asyncCallback);
+  void updateFormat(Format format, AsyncCallback<Void> asyncCallback);
 
   void retrieveFormats(String agentId, AsyncCallback<List<Format>> asyncCallback);
 
@@ -147,7 +149,7 @@ public interface BrowserServiceAsync {
 
   void revertRiskVersion(String riskId, String versionId, String message, AsyncCallback<Void> callback);
 
-  void removeRiskVersion(String riskId, String versionId, AsyncCallback<Void> callback);
+  void deleteRiskVersion(String riskId, String versionId, AsyncCallback<Void> callback);
 
   void retrieveRiskVersions(String riskId, AsyncCallback<RiskVersionsBundle> callback);
 
@@ -177,21 +179,21 @@ public interface BrowserServiceAsync {
 
   void appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason, AsyncCallback<Void> callback);
 
-  void getRepresentationFromId(String representationId, AsyncCallback<IndexedRepresentation> asyncCallback);
+  void retrieveRepresentationById(String representationId, AsyncCallback<IndexedRepresentation> asyncCallback);
 
-  void getFileFromId(String fileId, AsyncCallback<IndexedFile> asyncCallback);
+  void retrieveFileById(String fileId, AsyncCallback<IndexedFile> asyncCallback);
 
   void renameTransferredResource(String transferredResourceId, String newName, AsyncCallback<String> asyncCallback);
 
   void moveTransferredResource(SelectedItems<TransferredResource> selected, TransferredResource transferredResource,
     AsyncCallback<String> asyncCallback);
 
-  void getSelectedTransferredResource(SelectedItems<TransferredResource> selected,
+  void retrieveSelectedTransferredResource(SelectedItems<TransferredResource> selected,
     AsyncCallback<List<TransferredResource>> asyncCallback);
 
   void deleteFile(String fileUUID, AsyncCallback<Void> callback);
 
-  void modifyRiskIncidence(RiskIncidence incidence, AsyncCallback<Void> asyncCallback);
+  void updateRiskIncidence(RiskIncidence incidence, AsyncCallback<Void> asyncCallback);
 
   void showLogs(AsyncCallback<Void> asyncCallback);
 

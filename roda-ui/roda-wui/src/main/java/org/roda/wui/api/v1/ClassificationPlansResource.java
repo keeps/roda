@@ -16,7 +16,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.user.RodaUser;
@@ -47,13 +46,13 @@ public class ClassificationPlansResource {
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   public Response getClassificationPlan(
     @ApiParam(value = "Type of classification plan to produce.", allowMultiple = false, allowableValues = "bagit", required = true) @QueryParam("type") String type)
-      throws RODAException {
+    throws RODAException {
 
     // get user
     RodaUser user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    StreamResponse streamResponse = Browser.getClassificationPlan(user, type);
+    StreamResponse streamResponse = Browser.retrieveClassificationPlan(user, type);
 
     return ApiUtils.okResponse(streamResponse);
   }

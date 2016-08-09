@@ -85,7 +85,7 @@ public class IndexService {
     return SolrUtils.retrieve(index, IndexedAIP.class, aip.getParentID());
   }
 
-  public List<IndexedAIP> getAncestors(IndexedAIP aip) throws GenericException {
+  public List<IndexedAIP> retrieveAncestors(IndexedAIP aip) throws GenericException {
     List<IndexedAIP> ancestors = new ArrayList<IndexedAIP>();
     IndexedAIP parent = null, actual = aip;
 

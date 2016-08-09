@@ -101,7 +101,7 @@ public class EditAgent extends Composite {
         String agentId = agent.getId();
         agent = agentDataPanel.getAgent();
         agent.setId(agentId);
-        BrowserService.Util.getInstance().modifyAgent(agent, new AsyncCallback<Void>() {
+        BrowserService.Util.getInstance().updateAgent(agent, new AsyncCallback<Void>() {
 
           @Override
           public void onFailure(Throwable caught) {

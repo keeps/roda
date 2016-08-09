@@ -87,7 +87,7 @@ public class CreateFormat extends Composite {
   void buttonApplyHandler(ClickEvent e) {
     if (formatDataPanel.isValid()) {
       format = formatDataPanel.getFormat();
-      BrowserService.Util.getInstance().addFormat(format, new AsyncCallback<Format>() {
+      BrowserService.Util.getInstance().createFormat(format, new AsyncCallback<Format>() {
 
         public void onFailure(Throwable caught) {
           errorMessage(caught);

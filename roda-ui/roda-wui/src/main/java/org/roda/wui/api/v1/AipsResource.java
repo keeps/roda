@@ -87,7 +87,7 @@ public class AipsResource {
     RodaUser user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    StreamResponse aipRepresentation = Browser.getAIP(user, aipId, acceptFormat);
+    StreamResponse aipRepresentation = Browser.retrieveAIP(user, aipId, acceptFormat);
 
     return ApiUtils.okResponse(aipRepresentation);
   }
@@ -105,7 +105,7 @@ public class AipsResource {
     RodaUser user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    StreamResponse aipRepresentation = Browser.getAIPPart(user, aipId, part);
+    StreamResponse aipRepresentation = Browser.retrieveAIPPart(user, aipId, part);
 
     return ApiUtils.okResponse(aipRepresentation);
   }
@@ -153,7 +153,7 @@ public class AipsResource {
     // delegate action to controller
 
     SelectedItems<IndexedAIP> aips = new SelectedItemsList<>(Arrays.asList(aipId), IndexedAIP.class.getName());
-    Browser.removeAIP(user, aips);
+    Browser.deleteAIP(user, aips);
 
     // FIXME give a better answer
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Done!")).build();
@@ -175,7 +175,7 @@ public class AipsResource {
     // get user
     RodaUser user = UserUtility.getApiUser(request);
     // delegate action to controller
-    StreamResponse aipRepresentation = Browser.listAipDescriptiveMetadata(user, aipId, start, limit, acceptFormat);
+    StreamResponse aipRepresentation = Browser.listAIPDescriptiveMetadata(user, aipId, start, limit, acceptFormat);
 
     return ApiUtils.okResponse(aipRepresentation);
   }
@@ -199,9 +199,9 @@ public class AipsResource {
       // delegate action to controller
       StreamResponse aipDescriptiveMetadata;
       if (versionId == null) {
-        aipDescriptiveMetadata = Browser.getAipDescritiveMetadata(user, aipId, metadataId, acceptFormat, language);
+        aipDescriptiveMetadata = Browser.retrieveAIPDescritiveMetadata(user, aipId, metadataId, acceptFormat, language);
       } else {
-        aipDescriptiveMetadata = Browser.getAipDescritiveMetadataVersion(user, aipId, metadataId, versionId,
+        aipDescriptiveMetadata = Browser.retrieveAIPDescritiveMetadataVersion(user, aipId, metadataId, versionId,
           acceptFormat, language);
       }
 
@@ -270,7 +270,7 @@ public class AipsResource {
     // get user
     RodaUser user = UserUtility.getApiUser(request);
     // delegate action to controller
-    Browser.removeDescriptiveMetadataFile(user, aipId, metadataId);
+    Browser.deleteDescriptiveMetadataFile(user, aipId, metadataId);
 
     // FIXME give a better answer
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
@@ -289,7 +289,7 @@ public class AipsResource {
     // get user
     RodaUser user = UserUtility.getApiUser(request);
     // delegate action to controller
-    StreamResponse aipPreservationMetadataList = Browser.listAipPreservationMetadata(user, aipId, acceptFormat);
+    StreamResponse aipPreservationMetadataList = Browser.listAIPPreservationMetadata(user, aipId, acceptFormat);
 
     return ApiUtils.okResponse(aipPreservationMetadataList);
   }
@@ -316,7 +316,7 @@ public class AipsResource {
       // get user
       RodaUser user = UserUtility.getApiUser(request);
       // delegate action to controller
-      StreamResponse aipRepresentationPreservationMetadata = Browser.getAipRepresentationPreservationMetadata(user,
+      StreamResponse aipRepresentationPreservationMetadata = Browser.retrieveAIPRepresentationPreservationMetadata(user,
         aipId, representationId, startAgent, limitAgent, startEvent, limitEvent, startFile, limitFile, acceptFormat,
         language);
 
@@ -342,7 +342,7 @@ public class AipsResource {
     RodaUser user = UserUtility.getApiUser(request);
     // delegate action to controller
     StreamResponse aipRepresentationPreservationMetadataFile = Browser
-      .getAipRepresentationPreservationMetadataFile(user, aipId, representationId, fileId);
+      .retrieveAIPRepresentationPreservationMetadataFile(user, aipId, representationId, fileId);
 
     return ApiUtils.okResponse(aipRepresentationPreservationMetadataFile);
   }
@@ -366,7 +366,7 @@ public class AipsResource {
     // TODO set this by params
     List<String> fileDirectoryPath = new ArrayList<>();
 
-    Browser.postAipRepresentationPreservationMetadataFile(user, aipId, representationId, fileDirectoryPath, fileId,
+    Browser.postAIPRepresentationPreservationMetadataFile(user, aipId, representationId, fileDirectoryPath, fileId,
       inputStream, fileDetail);
 
     // FIXME give a better answer
@@ -390,7 +390,7 @@ public class AipsResource {
     // delegate action to controller
     // TODO set this by params
     List<String> fileDirectoryPath = new ArrayList<>();
-    Browser.putAipRepresentationPreservationMetadataFile(user, aipId, representationId, fileDirectoryPath, fileId,
+    Browser.putAIPRepresentationPreservationMetadataFile(user, aipId, representationId, fileDirectoryPath, fileId,
       inputStream, fileDetail);
 
     // FIXME give a better answer

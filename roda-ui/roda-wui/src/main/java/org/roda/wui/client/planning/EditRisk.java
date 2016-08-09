@@ -116,7 +116,7 @@ public class EditRisk extends Composite {
         String riskId = risk.getId();
         risk = riskDataPanel.getRisk();
         risk.setId(riskId);
-        BrowserService.Util.getInstance().modifyRisk(risk, messages.modifyRiskMessage(), new AsyncCallback<Void>() {
+        BrowserService.Util.getInstance().updateRisk(risk, messages.modifyRiskMessage(), new AsyncCallback<Void>() {
 
           @Override
           public void onFailure(Throwable caught) {

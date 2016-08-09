@@ -98,7 +98,7 @@ public class CreateGroup extends Composite {
     if (groupDataPanel.isValid()) {
       group = groupDataPanel.getGroup();
 
-      UserManagementService.Util.getInstance().addGroup(group, new AsyncCallback<Void>() {
+      UserManagementService.Util.getInstance().createGroup(group, new AsyncCallback<Void>() {
 
         public void onSuccess(Void result) {
           Tools.newHistory(MemberManagement.RESOLVER);

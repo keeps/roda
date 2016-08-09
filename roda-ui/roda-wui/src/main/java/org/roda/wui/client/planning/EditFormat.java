@@ -107,7 +107,7 @@ public class EditFormat extends Composite {
         String formatId = format.getId();
         format = formatDataPanel.getFormat();
         format.setId(formatId);
-        BrowserService.Util.getInstance().modifyFormat(format, new AsyncCallback<Void>() {
+        BrowserService.Util.getInstance().updateFormat(format, new AsyncCallback<Void>() {
 
           @Override
           public void onFailure(Throwable caught) {

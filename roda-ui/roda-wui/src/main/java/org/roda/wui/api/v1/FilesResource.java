@@ -22,7 +22,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
@@ -57,11 +56,11 @@ public class FilesResource {
   public Response retrieve(
     @ApiParam(value = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileUuid,
     @ApiParam(value = "Choose format in which to get the file", allowableValues = "json, bin") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
-      throws RODAException {
+    throws RODAException {
     // get user
     RodaUser user = UserUtility.getApiUser(request);
 
-    StreamResponse aipRepresentationFile = Browser.getAipRepresentationFile(user, fileUuid, acceptFormat);
+    StreamResponse aipRepresentationFile = Browser.retrieveAIPRepresentationFile(user, fileUuid, acceptFormat);
 
     return ApiUtils.okResponse(aipRepresentationFile);
   }
@@ -75,7 +74,7 @@ public class FilesResource {
   public Response update(
     @ApiParam(value = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileUUID,
     @ApiParam(value = "The path to the file in the shared file system where the file should be provided.", required = true) @FormParam("filepath") String filepath)
-      throws RODAException {
+    throws RODAException {
     // TODO
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
@@ -90,7 +89,7 @@ public class FilesResource {
     @ApiParam(value = "The requested ID for the new representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
     @ApiParam(value = "The requested ID of the new file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileId,
     @ApiParam(value = "The path to the directory in the shared file system where the representation should be provided.", required = true) @FormParam("filepath") String filepath)
-      throws RODAException {
+    throws RODAException {
     // TODO
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
@@ -103,11 +102,11 @@ public class FilesResource {
 
   public Response aipsAipIdDataRepresentationIdFileIdDelete(
     @ApiParam(value = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileUUID)
-      throws RODAException {
+    throws RODAException {
     // get user
     RodaUser user = UserUtility.getApiUser(request);
     // delegate action to controller
-    Browser.removeRepresentationFile(user, fileUUID);
+    Browser.deleteRepresentationFile(user, fileUUID);
 
     // FIXME give a better answer
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();

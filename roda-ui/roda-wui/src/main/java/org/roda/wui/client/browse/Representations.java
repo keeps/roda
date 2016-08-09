@@ -45,21 +45,21 @@ public class Representations extends Composite {
       if (historyTokens.size() == 1) {
         final String aipId = historyTokens.get(0);
 
-        BrowserService.Util.getInstance().getItemBundle(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
+        BrowserService.Util.getInstance().retrieveItemBundle(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
           new AsyncCallback<BrowseItemBundle>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            Tools.newHistory(Browse.RESOLVER);
-            callback.onSuccess(null);
-          }
+            @Override
+            public void onFailure(Throwable caught) {
+              Tools.newHistory(Browse.RESOLVER);
+              callback.onSuccess(null);
+            }
 
-          @Override
-          public void onSuccess(BrowseItemBundle itemBundle) {
-            Representations representations = new Representations(itemBundle);
-            callback.onSuccess(representations);
-          }
-        });
+            @Override
+            public void onSuccess(BrowseItemBundle itemBundle) {
+              Representations representations = new Representations(itemBundle);
+              callback.onSuccess(representations);
+            }
+          });
       } else {
         Tools.newHistory(Browse.RESOLVER);
         callback.onSuccess(null);
@@ -144,7 +144,7 @@ public class Representations extends Composite {
       panel = new FlowPanel();
       panelBody = new FlowPanel();
       rightPanel = new FlowPanel();
-      
+
       representationPanel = new FlowPanel();
       representationIconPanel = new SimplePanel();
       representationDataPanel = new VerticalPanel();
@@ -168,18 +168,18 @@ public class Representations extends Composite {
 
       rightPanel.add(viewButton);
       rightPanel.add(removeButton);
-      
-      panelBody.add(rightPanel);   
+
+      panelBody.add(rightPanel);
       panelBody.add(representationPanel);
       panel.add(panelBody);
-      
+
       initWidget(panel);
 
       panel.addStyleName("panel representation");
       panelBody.addStyleName("panel-body");
       rightPanel.addStyleName("pull-right");
       removeButton.addStyleName("btn btn-danger btn-ban");
-      viewButton.addStyleName("btn btn-view");    
+      viewButton.addStyleName("btn btn-view");
       representationPanel.addStyleName("representationPanel");
       representationIconPanel.addStyleName("representationIconPanel");
       representationDataPanel.addStyleName("representationDataPanel");
@@ -196,18 +196,18 @@ public class Representations extends Composite {
             messages.viewRepresentationRemoveFileMessage(), messages.dialogCancel(), messages.dialogYes(),
             new AsyncCallback<Boolean>() {
 
-            @Override
-            public void onSuccess(Boolean confirmed) {
-              if (confirmed) {
-                RepresentationPanel.this.removeFromParent();
+              @Override
+              public void onSuccess(Boolean confirmed) {
+                if (confirmed) {
+                  RepresentationPanel.this.removeFromParent();
+                }
               }
-            }
 
-            @Override
-            public void onFailure(Throwable caught) {
-              // nothing to do
-            }
-          });
+              @Override
+              public void onFailure(Throwable caught) {
+                // nothing to do
+              }
+            });
         }
       });
 
@@ -219,7 +219,7 @@ public class Representations extends Composite {
             RepresentationPanel.this.representation.getUUID());
         }
       };
-      
+
       representationType.addClickHandler(clickHandler);
       viewButton.addClickHandler(clickHandler);
     }

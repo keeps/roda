@@ -377,7 +377,7 @@ public class Browse extends Composite {
       viewAction();
     } else {
       aipId = id;
-      BrowserService.Util.getInstance().getItemBundle(id, LocaleInfo.getCurrentLocale().getLocaleName(),
+      BrowserService.Util.getInstance().retrieveItemBundle(id, LocaleInfo.getCurrentLocale().getLocaleName(),
         new AsyncCallback<BrowseItemBundle>() {
 
           @Override
@@ -900,7 +900,7 @@ public class Browse extends Composite {
               if (confirmed) {
                 SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<IndexedAIP>(Arrays.asList(aipId),
                   IndexedAIP.class.getName());
-                BrowserService.Util.getInstance().removeAIP(selected, new AsyncCallback<String>() {
+                BrowserService.Util.getInstance().deleteAIP(selected, new AsyncCallback<String>() {
 
                   @Override
                   public void onFailure(Throwable caught) {
@@ -945,7 +945,7 @@ public class Browse extends Composite {
               @Override
               public void onSuccess(Boolean confirmed) {
                 if (confirmed) {
-                  BrowserService.Util.getInstance().removeAIP(selected, new LoadingAsyncCallback<String>() {
+                  BrowserService.Util.getInstance().deleteAIP(selected, new LoadingAsyncCallback<String>() {
 
                     @Override
                     public void onFailureImpl(Throwable caught) {
@@ -1011,7 +1011,7 @@ public class Browse extends Composite {
             SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<IndexedAIP>(Arrays.asList(aipId),
               IndexedAIP.class.getName());
 
-            BrowserService.Util.getInstance().moveInHierarchy(selected, parentId, new AsyncCallback<IndexedAIP>() {
+            BrowserService.Util.getInstance().moveAIPInHierarchy(selected, parentId, new AsyncCallback<IndexedAIP>() {
 
               @Override
               public void onSuccess(IndexedAIP result) {
@@ -1059,26 +1059,27 @@ public class Browse extends Composite {
           final IndexedAIP parentAIP = event.getValue();
           final String parentId = (parentAIP != null) ? parentAIP.getId() : null;
 
-          BrowserService.Util.getInstance().moveInHierarchy(selected, parentId, new LoadingAsyncCallback<IndexedAIP>() {
+          BrowserService.Util.getInstance().moveAIPInHierarchy(selected, parentId,
+            new LoadingAsyncCallback<IndexedAIP>() {
 
-            @Override
-            public void onSuccessImpl(IndexedAIP result) {
-              if (result != null) {
-                Tools.newHistory(Browse.RESOLVER, result.getId());
-              } else {
-                Tools.newHistory(Browse.RESOLVER);
+              @Override
+              public void onSuccessImpl(IndexedAIP result) {
+                if (result != null) {
+                  Tools.newHistory(Browse.RESOLVER, result.getId());
+                } else {
+                  Tools.newHistory(Browse.RESOLVER);
+                }
               }
-            }
 
-            @Override
-            public void onFailureImpl(Throwable caught) {
-              if (caught instanceof NotFoundException) {
-                Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-              } else if (!AsyncCallbackUtils.treatCommonFailures(caught)) {
-                Toast.showError(messages.moveIllegalOperation(caught.getMessage()));
+              @Override
+              public void onFailureImpl(Throwable caught) {
+                if (caught instanceof NotFoundException) {
+                  Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+                } else if (!AsyncCallbackUtils.treatCommonFailures(caught)) {
+                  Toast.showError(messages.moveIllegalOperation(caught.getMessage()));
+                }
               }
-            }
-          });
+            });
         }
       });
 

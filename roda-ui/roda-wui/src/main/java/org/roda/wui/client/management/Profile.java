@@ -123,7 +123,7 @@ public class Profile extends Composite {
         final User user = userDataPanel.getUser();
         final String password = userDataPanel.getPassword();
 
-        UserManagementService.Util.getInstance().modifyMyUser(user, password, new AsyncCallback<Void>() {
+        UserManagementService.Util.getInstance().updateMyUser(user, password, new AsyncCallback<Void>() {
 
           public void onFailure(Throwable caught) {
             errorMessage(caught);

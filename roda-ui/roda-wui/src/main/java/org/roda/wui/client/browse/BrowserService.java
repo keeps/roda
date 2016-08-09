@@ -81,27 +81,28 @@ public interface BrowserService extends RemoteService {
     }
   }
 
-  BrowseItemBundle getItemBundle(String aipId, String localeString)
+  BrowseItemBundle retrieveItemBundle(String aipId, String localeString)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
-  DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(String aipId, String descId, String type,
+  DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String descId, String type,
     String version) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
-  DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(String aipId, String descId)
+  DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String descId)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
-  List<SearchField> getSearchFields(String locale) throws GenericException;
+  List<SearchField> retrieveSearchFields(String locale) throws GenericException;
 
-  IndexedAIP moveInHierarchy(SelectedItems<IndexedAIP> selected, String parentId) throws AuthorizationDeniedException,
-    GenericException, NotFoundException, RequestNotValidException, AlreadyExistsException, ValidationException;
+  IndexedAIP moveAIPInHierarchy(SelectedItems<IndexedAIP> selected, String parentId)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
+    AlreadyExistsException, ValidationException;
 
   String createAIP(String parentId, String type) throws AuthorizationDeniedException, GenericException,
     NotFoundException, RequestNotValidException, AlreadyExistsException;
 
-  String removeAIP(SelectedItems<IndexedAIP> aips)
+  String deleteAIP(SelectedItems<IndexedAIP> aips)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
-  void removeDescriptiveMetadataFile(String itemId, String descriptiveMetadataId)
+  void deleteDescriptiveMetadataFile(String itemId, String descriptiveMetadataId)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   void updateDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle)
@@ -112,14 +113,14 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     AlreadyExistsException, ValidationException;
 
-  String getDescriptiveMetadataPreview(String aipId, SupportedMetadataTypeBundle bundle)
+  String retrieveDescriptiveMetadataPreview(String aipId, SupportedMetadataTypeBundle bundle)
     throws AuthorizationDeniedException, GenericException, ValidationException, NotFoundException,
     RequestNotValidException;
 
   String createTransferredResourcesFolder(String parent, String folderName)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
-  void removeTransferredResources(SelectedItems<TransferredResource> selected)
+  void deleteTransferredResources(SelectedItems<TransferredResource> selected)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   boolean transferScanIsUpdating();
@@ -129,15 +130,15 @@ public interface BrowserService extends RemoteService {
   Job createJob(Job job) throws AuthorizationDeniedException, NotFoundException, RequestNotValidException,
     GenericException, JobAlreadyStartedException;
 
-  List<PluginInfo> getPluginsInfo(List<PluginType> type);
+  List<PluginInfo> retrievePluginsInfo(List<PluginType> type);
 
-  CreateIngestJobBundle getCreateIngestProcessBundle();
+  CreateIngestJobBundle retrieveCreateIngestProcessBundle();
 
   JobBundle retrieveJobBundle(String jobId) throws AuthorizationDeniedException, GenericException, NotFoundException;
 
-  Viewers getViewersProperties() throws GenericException;
+  Viewers retrieveViewersProperties() throws GenericException;
 
-  List<SupportedMetadataTypeBundle> getSupportedMetadata(String aipId, String locale)
+  List<SupportedMetadataTypeBundle> retrieveSupportedMetadata(String aipId, String locale)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
   boolean isCookiesMessageActive();
@@ -147,24 +148,24 @@ public interface BrowserService extends RemoteService {
   /**
    * Get Google Analytics account id
    */
-  String getGoogleAnalyticsAccount();
+  String retrieveGoogleAnalyticsAccount();
 
   /**
    * Get Google reCAPTCHA account id
    */
-  String getGoogleReCAPTCHAAccount();
+  String retrieveGoogleReCAPTCHAAccount();
 
   PreservationEventViewBundle retrievePreservationEventViewBundle(String eventId)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
-  DescriptiveMetadataVersionsBundle getDescriptiveMetadataVersionsBundle(String aipId, String descriptiveMetadataId,
-    String localeString)
+  DescriptiveMetadataVersionsBundle retrieveDescriptiveMetadataVersionsBundle(String aipId,
+    String descriptiveMetadataId, String localeString)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException;
 
   void revertDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 
-  void removeDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId)
+  void deleteDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 
   <T extends IsIndexed> IndexResult<T> find(String classNameToReturn, Filter filter, Sorter sorter, Sublist sublist,
@@ -189,22 +190,22 @@ public interface BrowserService extends RemoteService {
   void updateAIPPermissions(List<IndexedAIP> aips, Permissions permissions, boolean recursive)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
 
-  void modifyRisk(Risk risk, String message)
+  void updateRisk(Risk risk, String message)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
-  void modifyFormat(Format format)
+  void updateFormat(Format format)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
-  void modifyAgent(Agent agent)
+  void updateAgent(Agent agent)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
-  Risk addRisk(Risk risk)
+  Risk createRisk(Risk risk)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
-  Format addFormat(Format format)
+  Format createFormat(Format format)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
-  Agent addAgent(Agent agent)
+  Agent createAgent(Agent agent)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
   List<Format> retrieveFormats(String agentId) throws AuthorizationDeniedException, NotFoundException, GenericException;
@@ -218,7 +219,7 @@ public interface BrowserService extends RemoteService {
   boolean hasRiskVersions(String id)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException;
 
-  void removeRiskVersion(String riskId, String versionId)
+  void deleteRiskVersion(String riskId, String versionId)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IOException;
 
   RiskVersionsBundle retrieveRiskVersions(String riskId)
@@ -256,10 +257,10 @@ public interface BrowserService extends RemoteService {
   void appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
 
-  IndexedRepresentation getRepresentationFromId(String representationId)
+  IndexedRepresentation retrieveRepresentationById(String representationId)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 
-  IndexedFile getFileFromId(String fileId)
+  IndexedFile retrieveFileById(String fileId)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 
   String renameTransferredResource(String transferredResourceId, String newName)
@@ -270,13 +271,13 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, AlreadyExistsException,
     IsStillUpdatingException, NotFoundException;
 
-  List<TransferredResource> getSelectedTransferredResource(SelectedItems<TransferredResource> selected)
+  List<TransferredResource> retrieveSelectedTransferredResource(SelectedItems<TransferredResource> selected)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException;
 
   void deleteFile(String fileUUID)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
-  void modifyRiskIncidence(RiskIncidence incidence) throws AuthorizationDeniedException, GenericException;
+  void updateRiskIncidence(RiskIncidence incidence) throws AuthorizationDeniedException, GenericException;
 
   void showLogs() throws AuthorizationDeniedException;
 }

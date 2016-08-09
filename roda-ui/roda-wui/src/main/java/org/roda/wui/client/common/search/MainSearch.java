@@ -215,7 +215,7 @@ public class MainSearch extends Composite {
 
     searchPanel.addDropdownPopupStyleName("searchInputListBoxPopup");
 
-    BrowserService.Util.getInstance().getSearchFields(LocaleInfo.getCurrentLocale().getLocaleName(),
+    BrowserService.Util.getInstance().retrieveSearchFields(LocaleInfo.getCurrentLocale().getLocaleName(),
       new AsyncCallback<List<SearchField>>() {
         @Override
         public void onFailure(Throwable caught) {

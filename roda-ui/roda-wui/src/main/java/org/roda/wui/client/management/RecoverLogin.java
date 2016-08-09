@@ -136,7 +136,7 @@ public class RecoverLogin extends Composite {
       }
     });
 
-    BrowserService.Util.getInstance().getGoogleReCAPTCHAAccount(new AsyncCallback<String>() {
+    BrowserService.Util.getInstance().retrieveGoogleReCAPTCHAAccount(new AsyncCallback<String>() {
 
       @Override
       public void onSuccess(String result) {

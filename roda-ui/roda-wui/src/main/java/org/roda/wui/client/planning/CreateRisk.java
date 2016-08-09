@@ -85,7 +85,7 @@ public class CreateRisk extends Composite {
   void buttonApplyHandler(ClickEvent e) {
     if (riskDataPanel.isValid()) {
       Risk risk = riskDataPanel.getRisk();
-      BrowserService.Util.getInstance().addRisk(risk, new AsyncCallback<Risk>() {
+      BrowserService.Util.getInstance().createRisk(risk, new AsyncCallback<Risk>() {
 
         public void onFailure(Throwable caught) {
           errorMessage(caught);

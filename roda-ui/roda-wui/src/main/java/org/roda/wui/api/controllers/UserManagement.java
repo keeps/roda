@@ -48,7 +48,8 @@ public class UserManagement extends RodaCoreService {
 
   public static Long countLogEntries(RodaUser user, Filter filter)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {
+    };
 
     // check user permissions
     controllerAssistant.checkRoles(user);
@@ -64,7 +65,8 @@ public class UserManagement extends RodaCoreService {
 
   public static IndexResult<LogEntry> findLogEntries(RodaUser user, Filter filter, Sorter sorter, Sublist sublist,
     Facets facets) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {
+    };
 
     // check user permissions
     controllerAssistant.checkRoles(user);
@@ -81,7 +83,8 @@ public class UserManagement extends RodaCoreService {
 
   public static LogEntry retrieveLogEntry(RodaUser user, String logEntryId)
     throws GenericException, AuthorizationDeniedException, NotFoundException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {
+    };
     // check user permissions
     controllerAssistant.checkRoles(user);
 
@@ -96,7 +99,8 @@ public class UserManagement extends RodaCoreService {
 
   public static Long countMembers(RodaUser user, Filter filter)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {
+    };
 
     // check user permissions
     controllerAssistant.checkRoles(user);
@@ -112,7 +116,8 @@ public class UserManagement extends RodaCoreService {
 
   public static IndexResult<RODAMember> findMembers(RodaUser user, Filter filter, Sorter sorter, Sublist sublist,
     Facets facets) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {
+    };
 
     // check user permissions
     controllerAssistant.checkRoles(user);
@@ -129,7 +134,8 @@ public class UserManagement extends RodaCoreService {
 
   public static User retrieveUser(RodaUser user, String username)
     throws AuthorizationDeniedException, GenericException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {
+    };
 
     // check user permissions
     controllerAssistant.checkRoles(user);
@@ -145,7 +151,8 @@ public class UserManagement extends RodaCoreService {
 
   public static RodaUser retrieveRodaUser(RodaUser user, String username)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {
+    };
 
     // check user permissions
     controllerAssistant.checkRoles(user);
@@ -161,7 +168,8 @@ public class UserManagement extends RodaCoreService {
 
   public static Group retrieveGroup(RodaUser user, String groupname)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {
+    };
 
     // check user permissions
     controllerAssistant.checkRoles(user);
@@ -176,7 +184,8 @@ public class UserManagement extends RodaCoreService {
   }
 
   public static List<Group> listAllGroups(RodaUser user) throws AuthorizationDeniedException, GenericException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {
+    };
 
     // check user permissions
     controllerAssistant.checkRoles(user);
@@ -192,7 +201,8 @@ public class UserManagement extends RodaCoreService {
 
   public static void registerUser(User user, String password)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {
+    };
 
     // delegate
     UserManagementHelper.registerUser(user, password);
@@ -201,16 +211,17 @@ public class UserManagement extends RodaCoreService {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "user", user);
   }
 
-  public static User addUser(RodaUser user, User newUser, String password)
+  public static User createUser(RodaUser user, User newUser, String password)
     throws AuthorizationDeniedException, NotFoundException, GenericException, EmailAlreadyExistsException,
     UserAlreadyExistsException, IllegalOperationException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {
+    };
 
     // check user permissions
     controllerAssistant.checkRoles(user);
 
     // delegate
-    User ret = UserManagementHelper.addUser(newUser, password);
+    User ret = UserManagementHelper.createUser(newUser, password);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "user", newUser);
@@ -218,10 +229,11 @@ public class UserManagement extends RodaCoreService {
     return ret;
   }
 
-  public static void modifyMyUser(RodaUser user, User modifiedUser, String password)
+  public static void updateMyUser(RodaUser user, User modifiedUser, String password)
     throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException,
     IllegalOperationException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {
+    };
 
     if (!user.getId().equals(modifiedUser.getId())) {
       throw new IllegalOperationException("Trying to modify user information for another user");
@@ -231,74 +243,79 @@ public class UserManagement extends RodaCoreService {
     controllerAssistant.checkRoles(user);
 
     // delegate
-    UserManagementHelper.modifyMyUser(modifiedUser, password);
+    UserManagementHelper.updateMyUser(modifiedUser, password);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "user", modifiedUser);
   }
 
-  public static void modifyUser(RodaUser user, User modifiedUser, String password)
+  public static void updateUser(RodaUser user, User modifiedUser, String password)
     throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {
+    };
 
     // check user permissions
     controllerAssistant.checkRoles(user);
 
     // delegate
-    UserManagementHelper.modifyUser(modifiedUser, password);
+    UserManagementHelper.updateUser(modifiedUser, password);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "user", modifiedUser);
   }
 
-  public static void removeUser(RodaUser user, String username) throws AuthorizationDeniedException, GenericException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+  public static void deleteUser(RodaUser user, String username) throws AuthorizationDeniedException, GenericException {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {
+    };
 
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    UserManagementHelper.removeUser(username);
+    UserManagementHelper.deleteUser(username);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "username", username);
   }
 
-  public static void addGroup(RodaUser user, Group group)
+  public static void createGroup(RodaUser user, Group group)
     throws AuthorizationDeniedException, GenericException, AlreadyExistsException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {
+    };
 
     // check user permissions
     controllerAssistant.checkRoles(user);
 
     // delegate
-    UserManagementHelper.addGroup(group);
+    UserManagementHelper.createGroup(group);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "group", group);
   }
 
-  public static void modifyGroup(RodaUser user, Group group)
+  public static void updateGroup(RodaUser user, Group group)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {
+    };
 
     // check user permissions
     controllerAssistant.checkRoles(user);
 
     // delegate
-    UserManagementHelper.modifyGroup(group);
+    UserManagementHelper.updateGroup(group);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "group", group);
   }
 
-  public static void removeGroup(RodaUser user, String groupname)
+  public static void deleteGroup(RodaUser user, String groupname)
     throws AuthorizationDeniedException, GenericException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {
+    };
 
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    UserManagementHelper.removeGroup(groupname);
+    UserManagementHelper.deleteGroup(groupname);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "groupname", groupname);
@@ -311,7 +328,8 @@ public class UserManagement extends RodaCoreService {
 
   public static void sendEmailVerification(String servletPath, String username)
     throws GenericException, NotFoundException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {
+    };
 
     User user = UserManagementHelper.retrieveUser(username);
 
@@ -329,7 +347,8 @@ public class UserManagement extends RodaCoreService {
 
   public static void confirmUserEmail(String username, String emailConfirmationToken)
     throws InvalidTokenException, NotFoundException, GenericException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {
+    };
 
     User user = UserManagementHelper.confirmUserEmail(username, null, emailConfirmationToken);
 
@@ -339,7 +358,8 @@ public class UserManagement extends RodaCoreService {
 
   public static void requestPasswordReset(String servletPath, String usernameOrEmail)
     throws GenericException, NotFoundException, IllegalOperationException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {
+    };
 
     String username = null;
     String email = null;
@@ -360,7 +380,8 @@ public class UserManagement extends RodaCoreService {
 
   public static void resetUserPassword(String username, String password, String resetPasswordToken)
     throws InvalidTokenException, IllegalOperationException, NotFoundException, GenericException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {
+    };
 
     User user = UserManagementHelper.resetUserPassword(username, password, resetPasswordToken);
 

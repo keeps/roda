@@ -68,7 +68,7 @@ public class DescriptiveMetadataHistory extends Composite {
         final String aipId = historyTokens.get(0);
         final String descriptiveMetadataId = historyTokens.get(1);
 
-        BrowserService.Util.getInstance().getDescriptiveMetadataVersionsBundle(aipId, descriptiveMetadataId,
+        BrowserService.Util.getInstance().retrieveDescriptiveMetadataVersionsBundle(aipId, descriptiveMetadataId,
           LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<DescriptiveMetadataVersionsBundle>() {
 
             @Override
@@ -324,7 +324,7 @@ public class DescriptiveMetadataHistory extends Composite {
 
   @UiHandler("buttonRemove")
   void buttonRemoveHandler(ClickEvent e) {
-    BrowserService.Util.getInstance().removeDescriptiveMetadataVersion(aipId, descriptiveMetadataId, selectedVersion,
+    BrowserService.Util.getInstance().deleteDescriptiveMetadataVersion(aipId, descriptiveMetadataId, selectedVersion,
       new AsyncCallback<Void>() {
 
         @Override
@@ -344,7 +344,7 @@ public class DescriptiveMetadataHistory extends Composite {
   }
 
   protected void refresh() {
-    BrowserService.Util.getInstance().getDescriptiveMetadataVersionsBundle(aipId, descriptiveMetadataId,
+    BrowserService.Util.getInstance().retrieveDescriptiveMetadataVersionsBundle(aipId, descriptiveMetadataId,
       LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<DescriptiveMetadataVersionsBundle>() {
 
         @Override

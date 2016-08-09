@@ -246,26 +246,27 @@ public class Search extends Composite {
         final IndexedAIP parentAIP = event.getValue();
         final String parentId = (parentAIP != null) ? parentAIP.getId() : null;
 
-        BrowserService.Util.getInstance().moveInHierarchy(selected, parentId, new LoadingAsyncCallback<IndexedAIP>() {
+        BrowserService.Util.getInstance().moveAIPInHierarchy(selected, parentId,
+          new LoadingAsyncCallback<IndexedAIP>() {
 
-          @Override
-          public void onSuccessImpl(IndexedAIP result) {
-            if (result != null) {
-              Tools.newHistory(Browse.RESOLVER, result.getId());
-            } else {
-              Tools.newHistory(Search.RESOLVER);
+            @Override
+            public void onSuccessImpl(IndexedAIP result) {
+              if (result != null) {
+                Tools.newHistory(Browse.RESOLVER, result.getId());
+              } else {
+                Tools.newHistory(Search.RESOLVER);
+              }
             }
-          }
 
-          @Override
-          public void onFailureImpl(Throwable caught) {
-            if (caught instanceof NotFoundException) {
-              Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-            } else if (!AsyncCallbackUtils.treatCommonFailures(caught)) {
-              Toast.showError(messages.moveIllegalOperation(caught.getMessage()));
+            @Override
+            public void onFailureImpl(Throwable caught) {
+              if (caught instanceof NotFoundException) {
+                Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+              } else if (!AsyncCallbackUtils.treatCommonFailures(caught)) {
+                Toast.showError(messages.moveIllegalOperation(caught.getMessage()));
+              }
             }
-          }
-        });
+          });
       }
     });
 

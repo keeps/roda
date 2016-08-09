@@ -30,13 +30,11 @@ import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
-import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.UserManagement;
 import org.roda.wui.client.management.UserManagementService;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
-import org.roda.wui.common.I18nUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,7 +78,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public User getUser(String username) throws RODAException {
+  public User retrieveUser(String username) throws RODAException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return UserManagement.retrieveUser(user, username);
   }
@@ -97,52 +95,52 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public User addUser(User newUser, String password) throws AuthorizationDeniedException, NotFoundException,
+  public User createUser(User newUser, String password) throws AuthorizationDeniedException, NotFoundException,
     GenericException, EmailAlreadyExistsException, UserAlreadyExistsException, IllegalOperationException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
-    return UserManagement.addUser(user, newUser, password);
+    return UserManagement.createUser(user, newUser, password);
   }
 
   @Override
-  public void modifyMyUser(User modifiedUser, String password) throws AuthorizationDeniedException, NotFoundException,
+  public void updateMyUser(User modifiedUser, String password) throws AuthorizationDeniedException, NotFoundException,
     AlreadyExistsException, GenericException, IllegalOperationException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
-    UserManagement.modifyMyUser(user, modifiedUser, password);
+    UserManagement.updateMyUser(user, modifiedUser, password);
   }
 
   @Override
-  public void modifyUser(User modifiedUser, String password)
+  public void updateUser(User modifiedUser, String password)
     throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
-    UserManagement.modifyUser(user, modifiedUser, password);
+    UserManagement.updateUser(user, modifiedUser, password);
   }
 
   @Override
-  public void removeUser(String username) throws AuthorizationDeniedException, GenericException {
+  public void deleteUser(String username) throws AuthorizationDeniedException, GenericException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
-    UserManagement.removeUser(user, username);
+    UserManagement.deleteUser(user, username);
   }
 
   @Override
-  public void addGroup(Group group) throws AuthorizationDeniedException, GenericException, AlreadyExistsException {
+  public void createGroup(Group group) throws AuthorizationDeniedException, GenericException, AlreadyExistsException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
-    UserManagement.addGroup(user, group);
+    UserManagement.createGroup(user, group);
   }
 
   @Override
-  public void modifyGroup(Group group) throws AuthorizationDeniedException, GenericException, NotFoundException {
+  public void updateGroup(Group group) throws AuthorizationDeniedException, GenericException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
-    UserManagement.modifyGroup(user, group);
+    UserManagement.updateGroup(user, group);
   }
 
   @Override
-  public void removeGroup(String groupname) throws AuthorizationDeniedException, GenericException {
+  public void deleteGroup(String groupname) throws AuthorizationDeniedException, GenericException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
-    UserManagement.removeGroup(user, groupname);
+    UserManagement.deleteGroup(user, groupname);
   }
 
   @Override
-  public Long getLogEntriesCount(Filter filter) throws RODAException {
+  public Long retrieveLogEntriesCount(Filter filter) throws RODAException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return UserManagement.countLogEntries(user, filter);
   }
@@ -163,7 +161,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 
   @Override
   public void sendEmailVerification(String username) throws GenericException, NotFoundException {
-    String servletPath = getServletUrl(getThreadLocalRequest());
+    String servletPath = retrieveServletUrl(getThreadLocalRequest());
     UserManagement.sendEmailVerification(servletPath, username);
   }
 
@@ -199,7 +197,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
       RecaptchaUtils
         .recaptchaVerify(RodaCoreFactory.getRodaConfiguration().getString(RECAPTCHA_CODE_SECRET_PROPERTY, ""), captcha);
     }
-    String servletPath = getServletUrl(getThreadLocalRequest());
+    String servletPath = retrieveServletUrl(getThreadLocalRequest());
     UserManagement.requestPasswordReset(servletPath, usernameOrEmail);
   }
 
@@ -209,7 +207,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
     UserManagement.resetUserPassword(username, password, resetPasswordToken);
   }
 
-  private static String getServletUrl(HttpServletRequest req) {
+  private static String retrieveServletUrl(HttpServletRequest req) {
     String scheme = req.getScheme();
     String serverName = req.getServerName();
     int serverPort = req.getServerPort();

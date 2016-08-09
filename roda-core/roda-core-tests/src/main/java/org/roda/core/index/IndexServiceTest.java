@@ -355,7 +355,7 @@ public class IndexServiceTest {
     index.commitAIPs();
 
     IndexedAIP aip = index.retrieve(IndexedAIP.class, CorporaConstants.OTHER_AIP_ID);
-    List<IndexedAIP> ancestors = index.getAncestors(aip);
+    List<IndexedAIP> ancestors = index.retrieveAncestors(aip);
     MatcherAssert.assertThat(ancestors,
       Matchers.hasItem(Matchers.<IndexedAIP> hasProperty("id", Matchers.equalTo(CorporaConstants.SOURCE_AIP_ID))));
   }

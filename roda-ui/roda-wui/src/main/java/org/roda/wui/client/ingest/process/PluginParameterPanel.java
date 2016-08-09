@@ -224,7 +224,7 @@ public class PluginParameterPanel extends Composite {
   private void createPluginSipToAipLayout() {
 
     List<PluginType> plugins = Arrays.asList(PluginType.SIP_TO_AIP);
-    BrowserService.Util.getInstance().getPluginsInfo(plugins, new AsyncCallback<List<PluginInfo>>() {
+    BrowserService.Util.getInstance().retrievePluginsInfo(plugins, new AsyncCallback<List<PluginInfo>>() {
 
       @Override
       public void onFailure(Throwable caught) {

@@ -148,7 +148,7 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
     }
 
     initWidget(uiBinder.createAndBindUi(this));
-    BrowserService.Util.getInstance().getPluginsInfo(pluginType, new AsyncCallback<List<PluginInfo>>() {
+    BrowserService.Util.getInstance().retrievePluginsInfo(pluginType, new AsyncCallback<List<PluginInfo>>() {
 
       @Override
       public void onFailure(Throwable caught) {

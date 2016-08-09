@@ -62,7 +62,7 @@ public class EditDescriptiveMetadata extends Composite {
         final String aipId = historyTokens.get(0);
         final String descriptiveMetadataId = historyTokens.get(1);
 
-        BrowserService.Util.getInstance().getDescriptiveMetadataEditBundle(aipId, descriptiveMetadataId,
+        BrowserService.Util.getInstance().retrieveDescriptiveMetadataEditBundle(aipId, descriptiveMetadataId,
           new AsyncCallback<DescriptiveMetadataEditBundle>() {
 
             @Override
@@ -157,13 +157,13 @@ public class EditDescriptiveMetadata extends Composite {
 
     // Create new Set of MetadataValues so we can keep the original
     HashSet<MetadataValue> newValues = null;
-    if(bundle.getValues() != null){
+    if (bundle.getValues() != null) {
       newValues = new HashSet<MetadataValue>();
-      for(MetadataValue mv: bundle.getValues())
+      for (MetadataValue mv : bundle.getValues())
         newValues.add(mv.clone());
     }
     supportedBundle = new SupportedMetadataTypeBundle(bundle.getType(), bundle.getVersion(), bundle.getId(),
-            bundle.getRawTemplate(), newValues);
+      bundle.getRawTemplate(), newValues);
 
     initWidget(uiBinder.createAndBindUi(this));
     metadataXML = new TextArea();
@@ -185,8 +185,8 @@ public class EditDescriptiveMetadata extends Composite {
           typeString = value;
         }
 
-        BrowserService.Util.getInstance().getDescriptiveMetadataEditBundle(aipId, bundle.getId(), typeString, version,
-          new AsyncCallback<DescriptiveMetadataEditBundle>() {
+        BrowserService.Util.getInstance().retrieveDescriptiveMetadataEditBundle(aipId, bundle.getId(), typeString,
+          version, new AsyncCallback<DescriptiveMetadataEditBundle>() {
             @Override
             public void onFailure(Throwable caught) {
               AsyncCallbackUtils.defaultFailureTreatment(caught);
@@ -197,9 +197,9 @@ public class EditDescriptiveMetadata extends Composite {
               bundle = editBundle;
               // Create new Set of MetadataValues so we can keep the original
               HashSet<MetadataValue> newValues = null;
-              if(bundle.getValues() != null){
+              if (bundle.getValues() != null) {
                 newValues = new HashSet<MetadataValue>();
-                for(MetadataValue mv: bundle.getValues())
+                for (MetadataValue mv : bundle.getValues())
                   newValues.add(mv.clone());
               }
               supportedBundle = new SupportedMetadataTypeBundle(bundle.getType(), bundle.getVersion(), bundle.getId(),
@@ -210,7 +210,7 @@ public class EditDescriptiveMetadata extends Composite {
       }
     });
 
-    BrowserService.Util.getInstance().getSupportedMetadata(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
+    BrowserService.Util.getInstance().retrieveSupportedMetadata(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
       new AsyncCallback<List<SupportedMetadataTypeBundle>>() {
 
         @Override
@@ -287,9 +287,9 @@ public class EditDescriptiveMetadata extends Composite {
 
   private void updateFormOrXML() {
     if (bundle != null && bundle.getValues() != null && !bundle.getValues().isEmpty()) {
-      if(!bundle.isSimilar()){
+      if (!bundle.isSimilar()) {
         formSimilarDanger.setVisible(true);
-      }else{
+      } else {
         formSimilarDanger.setVisible(false);
       }
       showXml.setVisible(true);
@@ -335,46 +335,46 @@ public class EditDescriptiveMetadata extends Composite {
     }
   }
 
-  private boolean hasModifiedForm(){
+  private boolean hasModifiedForm() {
     HashMap<String, MetadataValue> formMap = new HashMap<>();
-    for(MetadataValue mv: supportedBundle.getValues()){
-      formMap.put(mv.getId(),mv);
+    for (MetadataValue mv : supportedBundle.getValues()) {
+      formMap.put(mv.getId(), mv);
     }
     HashMap<String, MetadataValue> bundleMap = new HashMap<>();
-    for(MetadataValue mv: bundle.getValues()) {
+    for (MetadataValue mv : bundle.getValues()) {
       bundleMap.put(mv.getId(), mv);
     }
-    for(String key: formMap.keySet()){
+    for (String key : formMap.keySet()) {
       MetadataValue mvForm = formMap.get(key);
       String formValue = mvForm != null ? formMap.get(key).get("value") : "";
       MetadataValue mvBundle = bundleMap.get(key);
       String bundleValue = mvBundle != null ? bundleMap.get(key).get("value") : "";
 
-      if(!formValue.equals(bundleValue))
+      if (!formValue.equals(bundleValue))
         return true;
     }
     return false;
   }
 
   private void updateMetadataXML() {
-    if(hasModifiedForm()){
+    if (hasModifiedForm()) {
       // Apply the form values to the template (server)
-    BrowserService.Util.getInstance().getDescriptiveMetadataPreview(aipId, supportedBundle,
-      new AsyncCallback<String>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
+      BrowserService.Util.getInstance().retrieveDescriptiveMetadataPreview(aipId, supportedBundle,
+        new AsyncCallback<String>() {
+          @Override
+          public void onFailure(Throwable caught) {
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
+          }
 
-        @Override
-        public void onSuccess(String preview) {
-          formOrXML.clear();
-          metadataXML.setText(preview);
-          formOrXML.add(metadataXML);
-          metadataTextFromForm = preview;
-        }
-      });
-    }else{
+          @Override
+          public void onSuccess(String preview) {
+            formOrXML.clear();
+            metadataXML.setText(preview);
+            formOrXML.add(metadataXML);
+            metadataTextFromForm = preview;
+          }
+        });
+    } else {
       formOrXML.clear();
       metadataXML.setText(bundle.getXml());
       formOrXML.add(metadataXML);
@@ -389,7 +389,7 @@ public class EditDescriptiveMetadata extends Composite {
       updateMetadataOnServer(xmlText);
     } else {
       // Get the resulting XML using the data from the form
-      BrowserService.Util.getInstance().getDescriptiveMetadataPreview(aipId, supportedBundle,
+      BrowserService.Util.getInstance().retrieveDescriptiveMetadataPreview(aipId, supportedBundle,
         new AsyncCallback<String>() {
           @Override
           public void onFailure(Throwable caught) {
@@ -455,7 +455,7 @@ public class EditDescriptiveMetadata extends Composite {
 
   @UiHandler("buttonRemove")
   void buttonRemoveHandler(ClickEvent e) {
-    BrowserService.Util.getInstance().removeDescriptiveMetadataFile(aipId, bundle.getId(), new AsyncCallback<Void>() {
+    BrowserService.Util.getInstance().deleteDescriptiveMetadataFile(aipId, bundle.getId(), new AsyncCallback<Void>() {
 
       @Override
       public void onFailure(Throwable caught) {
