@@ -250,11 +250,19 @@ public class TransferredResourcesScanner {
     } catch (NotFoundException e) {
       // do nothing and pass it an empty list
     }
-    return moveTransferredResource(resources, newRelativePath, replaceExisting, true, false);
+    return moveTransferredResource(resources, newRelativePath, replaceExisting, true, false, true);
   }
 
   public Map<String, String> moveTransferredResource(List<TransferredResource> resources, String newRelativePath,
     boolean replaceExisting, boolean reindexResources, boolean areResourcesFromSameFolder)
+    throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
+    return moveTransferredResource(resources, newRelativePath, replaceExisting, reindexResources,
+      areResourcesFromSameFolder, false);
+  }
+
+  public Map<String, String> moveTransferredResource(List<TransferredResource> resources, String newRelativePath,
+    boolean replaceExisting, boolean reindexResources, boolean areResourcesFromSameFolder,
+    boolean addOldRelativePathToNewRelativePath)
     throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
 
     Map<String, String> oldToNewTransferredResourceIds = new HashMap<String, String>();
@@ -263,9 +271,14 @@ public class TransferredResourcesScanner {
 
     for (TransferredResource resource : resources) {
       if (Files.exists(Paths.get(resource.getFullPath()))) {
-        Path newResourcePath = basePath.resolve(newRelativePath).resolve(resource.getName());
-        FSUtils.move(Paths.get(resource.getFullPath()), newResourcePath, replaceExisting);
+        Path newResourcePath = basePath.resolve(newRelativePath);
+        if (addOldRelativePathToNewRelativePath) {
+          newResourcePath = newResourcePath.resolve(resource.getRelativePath());
+        } else {
+          newResourcePath = newResourcePath.resolve(resource.getName());
+        }
 
+        FSUtils.move(Paths.get(resource.getFullPath()), newResourcePath, replaceExisting);
         oldToNewTransferredResourceIds.put(resource.getUUID(),
           getTransferredResourceUUID(basePath.relativize(newResourcePath)));
         resourcesToIndex.add(resource);
