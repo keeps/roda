@@ -524,7 +524,7 @@ public class IndexServiceTest {
         user.setAllRoles(roles);
         user.setDirectGroups(groups);
         user.setDirectRoles(roles);
-        user.setEmail("mail@example.com");
+        user.setEmail("mail_" + i + "@example.com");
         user.setGuest(false);
         user.setId("USER" + i);
         user.setName("NAMEUSER" + i);
