@@ -25,7 +25,12 @@ import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-public class XMLUtility {
+public final class XMLUtility {
+
+  /** Private empty constructor */
+  private XMLUtility() {
+
+  }
 
   public static String getStringFromFile(Path file, String xpath) {
     String ret = "";

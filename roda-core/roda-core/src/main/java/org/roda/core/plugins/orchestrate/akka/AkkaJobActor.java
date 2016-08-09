@@ -41,6 +41,14 @@ import akka.japi.pf.DeciderBuilder;
 public class AkkaJobActor extends UntypedActor {
   private static final Logger LOGGER = LoggerFactory.getLogger(AkkaJobActor.class);
 
+  private SupervisorStrategy strategy = new OneForOneStrategy(false, DeciderBuilder.matchAny(e -> {
+    for (ActorRef actorRef : getContext().getChildren()) {
+      actorRef.tell(new Messages.JobStateUpdated(null, JOB_STATE.FAILED_TO_COMPLETE, e), ActorRef.noSender());
+    }
+    return SupervisorStrategy.resume();
+  }).build());
+
+  /** Public empty constructor */
   public AkkaJobActor() {
 
   }
@@ -149,13 +157,6 @@ public class AkkaJobActor extends UntypedActor {
     RodaCoreFactory.getPluginOrchestrator().runPluginFromIndex(jobStateInfoActor, sourceObjectsClass,
       selectedItems.getFilter(), (Plugin) plugin);
   }
-
-  private SupervisorStrategy strategy = new OneForOneStrategy(false, DeciderBuilder.matchAny(e -> {
-    for (ActorRef actorRef : getContext().getChildren()) {
-      actorRef.tell(new Messages.JobStateUpdated(null, JOB_STATE.FAILED_TO_COMPLETE, e), ActorRef.noSender());
-    }
-    return SupervisorStrategy.resume();
-  }).build());
 
   @Override
   public SupervisorStrategy supervisorStrategy() {

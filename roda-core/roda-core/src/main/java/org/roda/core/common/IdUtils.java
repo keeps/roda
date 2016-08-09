@@ -65,6 +65,7 @@ public final class IdUtils {
     return jobId + ID_SEPARATOR + aipId;
   }
 
+  // FIXME 20160809 hsilva: type is not being used. but should it???
   private static String getFileId(String aipId, String representationId, List<String> fileDirectoryPath, String fileId,
     String type, String separator) {
     StringBuilder idBuilder = new StringBuilder();

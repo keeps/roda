@@ -44,13 +44,18 @@ import gov.loc.repository.bagit.BagInfoTxt;
 public class MetadataFileUtils {
   private static Logger LOGGER = LoggerFactory.getLogger(MetadataFileUtils.class);
 
+  /** Private empty constructor */
+  private MetadataFileUtils() {
+
+  }
+
   public static String generateMetadataFile(BagInfoTxt bagInfoTxt) throws GenericException {
     try {
       Element root = new Element("metadata");
       org.jdom2.Document doc = new org.jdom2.Document();
 
       for (Map.Entry<String, String> entry : bagInfoTxt.entrySet()) {
-        if (!entry.getKey().equalsIgnoreCase("parent")) {
+        if (!"parent".equalsIgnoreCase(entry.getKey())) {
           Element child = new Element("field");
           child.setAttribute("name", escapeAttribute(entry.getKey()));
           child.addContent(escapeContent(entry.getValue()));

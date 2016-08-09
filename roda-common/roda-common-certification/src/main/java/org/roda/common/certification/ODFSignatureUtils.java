@@ -89,6 +89,7 @@ import org.apache.poi.poifs.crypt.dsig.KeyInfoKeySelector;
 import org.apache.xml.security.Init;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.roda.core.data.common.RodaConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -99,10 +100,16 @@ import org.xml.sax.SAXException;
 import com.itextpdf.text.log.Logger;
 import com.itextpdf.text.log.LoggerFactory;
 
-public class ODFSignatureUtils {
+public final class ODFSignatureUtils {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ODFSignatureUtils.class);
+  private static final String META_INF_DOCUMENTSIGNATURES_XML = "META-INF/documentsignatures.xml";
   private static final String OPENOFFICE = "urn:oasis:names:tc:opendocument:xmlns:digitalsignature:1.0";
+
+  /** Private empty constructor */
+  private ODFSignatureUtils() {
+
+  }
 
   public static String runDigitalSignatureVerify(Path input) throws IOException, GeneralSecurityException {
     String result = "Passed";
@@ -111,7 +118,7 @@ public class ODFSignatureUtils {
     for (enumeration = zipFile.entries(); enumeration.hasMoreElements();) {
       ZipEntry entry = (ZipEntry) enumeration.nextElement();
       String entryName = entry.getName();
-      if (entryName.equalsIgnoreCase("META-INF/documentsignatures.xml")) {
+      if (META_INF_DOCUMENTSIGNATURES_XML.equalsIgnoreCase(entryName)) {
         InputStream zipStream = zipFile.getInputStream(entry);
         InputSource inputSource = new InputSource(zipStream);
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -152,7 +159,7 @@ public class ODFSignatureUtils {
     for (enumeration = zipFile.entries(); enumeration.hasMoreElements();) {
       ZipEntry entry = (ZipEntry) enumeration.nextElement();
       String entryName = entry.getName();
-      if (entryName.equalsIgnoreCase("META-INF/documentsignatures.xml")) {
+      if (META_INF_DOCUMENTSIGNATURES_XML.equalsIgnoreCase(entryName)) {
         Path extractedSignature = Files.createTempFile("extraction", ".xml");
         InputStream zipStream = zipFile.getInputStream(entry);
         FileUtils.copyInputStreamToFile(zipStream, extractedSignature.toFile());
@@ -175,7 +182,7 @@ public class ODFSignatureUtils {
     for (enumeration = zipFile.entries(); enumeration.hasMoreElements();) {
       ZipEntry entry = (ZipEntry) enumeration.nextElement();
       String entryName = entry.getName();
-      if (!entryName.equalsIgnoreCase("META-INF/documentsignatures.xml") && entry.getSize() > 0) {
+      if (!META_INF_DOCUMENTSIGNATURES_XML.equalsIgnoreCase(entryName) && entry.getSize() > 0) {
 
         InputStream zipStream = zipFile.getInputStream(entry);
         ZipEntry destEntry = new ZipEntry(entryName);
@@ -244,8 +251,8 @@ public class ODFSignatureUtils {
       Document docSignatures;
       Element rootSignatures;
 
-      if (zipFile.getEntry("META-INF/documentsignatures.xml") != null) {
-        InputStream is = zipFile.getInputStream(zipFile.getEntry("META-INF/documentsignatures.xml"));
+      if (zipFile.getEntry(META_INF_DOCUMENTSIGNATURES_XML) != null) {
+        InputStream is = zipFile.getInputStream(zipFile.getEntry(META_INF_DOCUMENTSIGNATURES_XML));
         docSignatures = documentBuilder.parse(is);
         rootSignatures = docSignatures.getDocumentElement();
         IOUtils.closeQuietly(is);
@@ -257,7 +264,7 @@ public class ODFSignatureUtils {
 
         Element nodeDocumentSignatures = docManifest.createElement("manifest:file-entry");
         nodeDocumentSignatures.setAttribute("manifest:media-type", "");
-        nodeDocumentSignatures.setAttribute("manifest:full-path", "META-INF/documentsignatures.xml");
+        nodeDocumentSignatures.setAttribute("manifest:full-path", META_INF_DOCUMENTSIGNATURES_XML);
         rootManifest.appendChild(nodeDocumentSignatures);
 
         Element nodeMetaInf = docManifest.createElement("manifest:file-entry");
@@ -284,11 +291,11 @@ public class ODFSignatureUtils {
   private static void writeXML(OutputStream outStream, Node node, boolean indent)
     throws TransformerFactoryConfigurationError, TransformerException {
 
-    OutputStreamWriter osw = new OutputStreamWriter(outStream, Charset.forName("UTF-8"));
+    OutputStreamWriter osw = new OutputStreamWriter(outStream, Charset.forName(RodaConstants.DEFAULT_ENCODING));
     BufferedWriter bw = new BufferedWriter(osw);
     TransformerFactory transformerFactory = new org.apache.xalan.processor.TransformerFactoryImpl();
     Transformer serializer = transformerFactory.newTransformer();
-    serializer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+    serializer.setOutputProperty(OutputKeys.ENCODING, RodaConstants.DEFAULT_ENCODING);
 
     if (indent) {
       serializer.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -302,9 +309,8 @@ public class ODFSignatureUtils {
     IOUtils.closeQuietly(osw);
   }
 
-  private static void verifyCertificates(Path input, Node signatureNode) throws MarshalException,
-    XMLSignatureException, NoSuchAlgorithmException, CertificateException, FileNotFoundException, IOException,
-    KeyStoreException {
+  private static void verifyCertificates(Path input, Node signatureNode) throws MarshalException, XMLSignatureException,
+    NoSuchAlgorithmException, CertificateException, FileNotFoundException, IOException, KeyStoreException {
 
     XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory.getInstance("DOM");
     DOMValidateContext domValidateContext = new DOMValidateContext(new KeyInfoKeySelector(), signatureNode);
@@ -392,7 +398,7 @@ public class ODFSignatureUtils {
       ZipEntry zeOut = (ZipEntry) enumeration.nextElement();
       String fileName = zeOut.getName();
 
-      if (!fileName.equals("META-INF/documentsignatures.xml") && !fileName.equals("META-INF/manifest.xml")) {
+      if (!fileName.equals(META_INF_DOCUMENTSIGNATURES_XML) && !fileName.equals("META-INF/manifest.xml")) {
         zos.putNextEntry(zeOut);
         InputStream is = zipFile.getInputStream(zipFile.getEntry(fileName));
         zos.write(IOUtils.toByteArray(is));
@@ -401,7 +407,7 @@ public class ODFSignatureUtils {
       }
     }
 
-    ZipEntry zeDocumentSignatures = new ZipEntry("META-INF/documentsignatures.xml");
+    ZipEntry zeDocumentSignatures = new ZipEntry(META_INF_DOCUMENTSIGNATURES_XML);
     zos.putNextEntry(zeDocumentSignatures);
     ByteArrayOutputStream baosXML = new ByteArrayOutputStream();
     writeXML(baosXML, rootSignatures, false);
@@ -430,14 +436,14 @@ public class ODFSignatureUtils {
     List<Transform> transformList = new ArrayList<Transform>();
     transformList.add(transform);
 
-    MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
+    MessageDigest messageDigest = MessageDigest.getInstance(RodaConstants.SHA1);
     List<Reference> referenceList = new ArrayList<Reference>();
 
     for (int i = 0; i < listFileEntry.getLength(); i++) {
       String fullPath = ((Element) listFileEntry.item(i)).getAttribute("manifest:full-path");
       Reference reference;
 
-      if (!fullPath.endsWith("/") && !fullPath.equals("META-INF/documentsignatures.xml")) {
+      if (!fullPath.endsWith("/") && !fullPath.equals(META_INF_DOCUMENTSIGNATURES_XML)) {
         if (fullPath.equals("content.xml") || fullPath.equals("meta.xml") || fullPath.equals("styles.xml")
           || fullPath.equals("settings.xml")) {
 
@@ -455,8 +461,8 @@ public class ODFSignatureUtils {
           InputStream is = zipFile.getInputStream(zipFile.getEntry(fullPath));
           byte[] digestValue = messageDigest.digest(IOUtils.toByteArray(is));
           IOUtils.closeQuietly(is);
-          reference = factory
-            .newReference(fullPath.replaceAll(" ", "%20"), digestMethod, null, null, null, digestValue);
+          reference = factory.newReference(fullPath.replaceAll(" ", "%20"), digestMethod, null, null, null,
+            digestValue);
         }
 
         referenceList.add(reference);
@@ -466,8 +472,8 @@ public class ODFSignatureUtils {
     return referenceList;
   }
 
-  private static void digitalSign(XMLSignatureFactory factory, List<Reference> referenceList,
-    DigestMethod digestMethod, X509Certificate certificate, Document docSignatures, Element rootSignatures, Key key)
+  private static void digitalSign(XMLSignatureFactory factory, List<Reference> referenceList, DigestMethod digestMethod,
+    X509Certificate certificate, Document docSignatures, Element rootSignatures, Key key)
     throws MarshalException, XMLSignatureException, NoSuchAlgorithmException, InvalidAlgorithmParameterException {
 
     String signatureId = UUID.randomUUID().toString();

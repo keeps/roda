@@ -298,8 +298,8 @@ public class RodaCoreFactory {
       }
 
       // last log message that state if system was loaded without errors or not
-      LOGGER.info("RODA Core loading completed {}", (instantiatedWithoutErrors ? "with success!"
-        : "with some errors!!! See logs because these errors might cause instability in the system."));
+      LOGGER.info("RODA Core loading completed {}", instantiatedWithoutErrors ? "with success!"
+        : "with some errors!!! See logs because these errors might cause instability in the system.");
     }
   }
 
@@ -401,16 +401,12 @@ public class RodaCoreFactory {
     if (!nodeType.equals(NodeType.TEST)) {
       // copy configs folder from classpath to example folder
       try {
-        try {
-          FSUtils.deletePath(exampleConfigPath);
-        } catch (NotFoundException e) {
-          // do nothing and carry on
-        }
+        FSUtils.deletePathQuietly(exampleConfigPath);
         Files.createDirectories(exampleConfigPath);
         copyFilesFromClasspath(RodaConstants.CORE_CONFIG_FOLDER + "/", exampleConfigPath, true,
           Arrays.asList(RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_LDAP_FOLDER,
             RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER));
-      } catch (GenericException | IOException e) {
+      } catch (IOException e) {
         LOGGER.error("Unable to create " + exampleConfigPath, e);
         instantiatedWithoutErrors = false;
       }
@@ -456,7 +452,7 @@ public class RodaCoreFactory {
   private static void copyFilesFromClasspath(String classpathPrefix, Path destinationDirectory,
     boolean removeClasspathPrefixFromFinalPath) {
     copyFilesFromClasspath(classpathPrefix, destinationDirectory, removeClasspathPrefixFromFinalPath,
-      Collections.EMPTY_LIST);
+      Collections.emptyList());
   }
 
   private static void copyFilesFromClasspath(String classpathPrefix, Path destinationDirectory,

@@ -51,10 +51,15 @@ import org.apache.poi.poifs.crypt.dsig.SignatureConfig;
 import org.apache.poi.poifs.crypt.dsig.SignatureInfo;
 import org.apache.poi.poifs.crypt.dsig.SignatureInfo.SignaturePart;
 
-public class OOXMLSignatureUtils {
+public final class OOXMLSignatureUtils {
 
   private static final String SIGN_CONTENT_TYPE_OOXML = "application/vnd.openxmlformats-package.digital-signature-xmlsignature+xml";
   private static final String SIGN_REL_TYPE_OOXML = "http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/origin";
+
+  /** Private empty constructor */
+  private OOXMLSignatureUtils() {
+
+  }
 
   public static String runDigitalSignatureVerify(Path input) throws IOException, GeneralSecurityException {
     boolean isValid = true;

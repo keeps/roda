@@ -94,7 +94,7 @@ public class ConfigurableEmailUtility {
       String mailProperty = RodaCoreFactory.getRodaConfigurationAsString("core", "email", property);
       if (mailProperty != null) {
         props.put("mail." + this.protocol + "." + property, mailProperty);
-        if (property.equals("auth") && mailProperty.equals("true")) {
+        if ("auth".equals(property) && "true".equals(mailProperty)) {
           hasAuth = true;
         }
       }
@@ -102,6 +102,7 @@ public class ConfigurableEmailUtility {
 
     if (hasAuth) {
       authenticator = new javax.mail.Authenticator() {
+        @Override
         protected PasswordAuthentication getPasswordAuthentication() {
           return new PasswordAuthentication(user, password);
         }

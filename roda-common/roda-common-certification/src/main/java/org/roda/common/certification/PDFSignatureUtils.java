@@ -54,9 +54,14 @@ import com.itextpdf.text.pdf.security.MakeSignature;
 import com.itextpdf.text.pdf.security.PdfPKCS7;
 import com.itextpdf.text.pdf.security.PrivateKeySignature;
 
-public class PDFSignatureUtils {
+public final class PDFSignatureUtils {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PDFSignatureUtils.class);
+
+  /** Private empty constructor */
+  private PDFSignatureUtils() {
+
+  }
 
   public static String runDigitalSignatureVerify(Path input) throws IOException, GeneralSecurityException {
     Security.addProvider(new BouncyCastleProvider());
@@ -67,7 +72,7 @@ public class PDFSignatureUtils {
     String result = "Passed";
 
     for (int i = 0; i < names.size(); i++) {
-      String name = (String) names.get(i);
+      String name = names.get(i);
 
       try {
         PdfPKCS7 pk = fields.verifySignature(name);

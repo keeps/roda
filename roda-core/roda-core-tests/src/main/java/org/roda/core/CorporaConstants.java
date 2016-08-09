@@ -18,7 +18,7 @@ import org.roda.core.data.common.RodaConstants;
  * @author Luis Faria <lfaria@keep.pt>
  *
  */
-public class CorporaConstants {
+public final class CorporaConstants {
   // Corpora constants
   public static final String SOURCE_AIP_CONTAINER = RodaConstants.STORAGE_CONTAINER_AIP;
   public static final String SOURCE_PRESERVATION_CONTAINER = RodaConstants.STORAGE_CONTAINER_PRESERVATION;
@@ -137,5 +137,10 @@ public class CorporaConstants {
   public static String BAGIT_SIP = "bagit.zip";
   public static String TRANSFERRED_RESOURCE = "transferredresource";
   public static String ANCESTOR_SIP_FOLDER = "ancestorsFolder";
+
+  /** Private empty constructor */
+  private CorporaConstants() {
+
+  }
 
 }

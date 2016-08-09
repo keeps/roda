@@ -88,12 +88,16 @@ import gov.loc.premis.v3.Representation;
 import gov.loc.premis.v3.StorageComplexType;
 import gov.loc.premis.v3.StringPlusAuthority;
 
-public class PremisV3Utils {
-  private static final String FIXITY_ORIGINATOR = "RODA";
+public final class PremisV3Utils {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PremisV3Utils.class);
-
+  private static final String FIXITY_ORIGINATOR = "RODA";
   private static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
+
+  /** Private empty constructor */
+  private PremisV3Utils() {
+
+  }
 
   public static List<Fixity> calculateFixities(Binary binary, Collection<String> algorithms, String originator)
     throws IOException, NoSuchAlgorithmException {
@@ -137,8 +141,6 @@ public class PremisV3Utils {
     IOUtils.closeQuietly(schemaStream);
     return premisV2;
   }
-
-  
 
   private static class RodaErrorHandler extends DefaultHandler {
     List<SAXParseException> errors;
@@ -461,25 +463,26 @@ public class PremisV3Utils {
     IOUtils.closeQuietly(inputStream);
     return fixities;
   }
-  
-  public static String extractFixity(Binary premisFile, String fixityType) throws IOException, GenericException, XmlException {
-	  String fixityValue = null;
-	  InputStream inputStream = premisFile.getContent().createInputStream();
-	    gov.loc.premis.v3.File f = binaryToFile(inputStream);
-	    if (f.getObjectCharacteristicsArray() != null && f.getObjectCharacteristicsArray().length > 0) {
-	      ObjectCharacteristicsComplexType occt = f.getObjectCharacteristicsArray(0);
-	      if (occt.getFixityArray() != null && occt.getFixityArray().length > 0) {
-	        for (FixityComplexType fct : occt.getFixityArray()) {
-	        	if(fct.getMessageDigestAlgorithm().getStringValue().equalsIgnoreCase(fixityType)){
-	        		fixityValue = fct.getMessageDigest();
-	        		break;
-	        	}
-	        }
-	      }
-	    }
-	    IOUtils.closeQuietly(inputStream);
-	    return fixityValue;
-	}
+
+  public static String extractFixity(Binary premisFile, String fixityType)
+    throws IOException, GenericException, XmlException {
+    String fixityValue = null;
+    InputStream inputStream = premisFile.getContent().createInputStream();
+    gov.loc.premis.v3.File f = binaryToFile(inputStream);
+    if (f.getObjectCharacteristicsArray() != null && f.getObjectCharacteristicsArray().length > 0) {
+      ObjectCharacteristicsComplexType occt = f.getObjectCharacteristicsArray(0);
+      if (occt.getFixityArray() != null && occt.getFixityArray().length > 0) {
+        for (FixityComplexType fct : occt.getFixityArray()) {
+          if (fct.getMessageDigestAlgorithm().getStringValue().equalsIgnoreCase(fixityType)) {
+            fixityValue = fct.getMessageDigest();
+            break;
+          }
+        }
+      }
+    }
+    IOUtils.closeQuietly(inputStream);
+    return fixityValue;
+  }
 
   public static gov.loc.premis.v3.Representation binaryToRepresentation(InputStream binaryInputStream)
     throws XmlException, IOException, GenericException {
@@ -661,10 +664,10 @@ public class PremisV3Utils {
         if (occt.getFormatArray() != null && occt.getFormatArray().length > 0) {
           FormatComplexType fct = occt.getFormatArray(0);
           if (fct.getFormatDesignation() != null) {
-            if(StringUtils.isNotBlank(fct.getFormatDesignation().getFormatName().getStringValue())){
+            if (StringUtils.isNotBlank(fct.getFormatDesignation().getFormatName().getStringValue())) {
               doc.addField(RodaConstants.FILE_FILEFORMAT, fct.getFormatDesignation().getFormatName().getStringValue());
             }
-            if(StringUtils.isNotBlank(fct.getFormatDesignation().getFormatVersion())){
+            if (StringUtils.isNotBlank(fct.getFormatDesignation().getFormatVersion())) {
               doc.addField(RodaConstants.FILE_FORMAT_VERSION, fct.getFormatDesignation().getFormatVersion());
             }
           }

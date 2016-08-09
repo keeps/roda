@@ -11,8 +11,6 @@ import org.roda.core.data.common.RodaConstants.RODA_TYPE;
 import org.roda.core.data.v2.ip.TransferredResource;
 
 public final class LinkingObjectUtils {
-  private static final String ID_SEPARATOR = "-";
-  private static final String LINKING_ID_SEPARATOR = "/";
 
   /** Private empty constructor */
   private LinkingObjectUtils() {

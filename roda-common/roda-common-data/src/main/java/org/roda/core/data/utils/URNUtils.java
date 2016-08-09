@@ -7,13 +7,16 @@
  */
 package org.roda.core.data.utils;
 
-import java.util.Optional;
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.RODA_TYPE;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 
-public class URNUtils {
+public final class URNUtils {
+
+  /** Private empty constructor */
+  private URNUtils() {
+
+  }
 
   public static String createRodaURN(RODA_TYPE type, String id) {
     StringBuilder sb = new StringBuilder();
@@ -61,10 +64,10 @@ public class URNUtils {
     return sb.toString().toLowerCase();
   }
 
-  public static RODA_TYPE  getRodaType(String value) {
+  public static RODA_TYPE getRodaType(String value) {
     if (value.contains(RodaConstants.URN_SEPARATOR) && value.split(RodaConstants.URN_SEPARATOR).length > 3) {
       return RODA_TYPE.valueOf(value.split(RodaConstants.URN_SEPARATOR)[2].toUpperCase());
-    }else{
+    } else {
       return null;
     }
   }

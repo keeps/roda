@@ -15,9 +15,14 @@ import org.hamcrest.Matchers;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.testng.Assert;
-import org.testng.AssertJUnit;
 
-public class ReportAssertUtils {
+public final class ReportAssertUtils {
+
+  /** Private empty constructor */
+  private ReportAssertUtils() {
+
+  }
+
   public static void assertReports(List<Report> reports) {
     assertReports(reports, null, null);
   }
@@ -47,7 +52,7 @@ public class ReportAssertUtils {
       }
 
       // assert sub-reports
-      if (report.getReports().size() > 0) {
+      if (!report.getReports().isEmpty()) {
         assertReports(report.getReports(), outcomeObjectIds, sourceObjectIds);
       }
     }

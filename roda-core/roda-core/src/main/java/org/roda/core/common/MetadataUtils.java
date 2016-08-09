@@ -32,14 +32,18 @@ import org.roda.core.storage.InputStreamContentPayload.ProvidesInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * This is an utility class for metadata helpers.
  * 
  * @author Luis Faria <lfaria@keep.pt>
  */
-public class MetadataUtils {
-  private static final Logger logger = LoggerFactory.getLogger(MetadataUtils.class);
+public final class MetadataUtils {
+  private static final Logger LOGGER = LoggerFactory.getLogger(MetadataUtils.class);
+
+  /** Private empty constructor */
+  private MetadataUtils() {
+
+  }
 
   /**
    * Saves the current XML object to a byte array.
@@ -145,7 +149,7 @@ public class MetadataUtils {
   public static void saveToOutputStream(XmlObject xmlObject, OutputStream outputStream, boolean writeXMLDeclaration)
     throws GenericException, ValidationException {
 
-    logger.trace("Serializing XML Object " + xmlObject.toString());
+    LOGGER.trace("Serializing XML Object {}", xmlObject);
 
     // Create an XmlOptions instance and set the error listener.
     XmlOptions validateOptions = new XmlOptions();
@@ -168,7 +172,7 @@ public class MetadataUtils {
         xmlObject.save(outputStream, xmlSaveOptions);
 
       } catch (IOException e) {
-        logger.debug("Error serializing XML object - " + e.getMessage(), e);
+        LOGGER.debug("Error serializing XML object - " + e.getMessage(), e);
         throw new GenericException("Error serializing XML object", e);
       }
 

@@ -289,7 +289,7 @@ public class Report implements Serializable, IsIndexed {
     }
     stepsCompleted = stepsCompleted + 1;
     if (totalSteps != 0) {
-      completionPercentage = Math.round(((100f / totalSteps) * stepsCompleted));
+      completionPercentage = Math.round((100f / totalSteps) * stepsCompleted);
     }
     setPlugin(report.getPlugin());
     setPluginName(report.getPluginName());

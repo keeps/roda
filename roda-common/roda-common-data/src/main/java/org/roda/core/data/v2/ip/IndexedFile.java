@@ -43,6 +43,7 @@ public class IndexedFile implements IsIndexed {
     super();
   }
 
+  // FIXME 20160809 hsilva: entryPoint is not being used. but should it?
   public IndexedFile(String uuid, String parentUUID, String aipId, String representationId, String representationUUID,
     List<String> path, String id, boolean entryPoint, FileFormat fileFormat, String originalName, long size,
     boolean isDirectory, String creatingApplicationName, String creatingApplicationVersion,

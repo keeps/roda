@@ -28,8 +28,13 @@ import java.util.Set;
 import com.itextpdf.text.log.Logger;
 import com.itextpdf.text.log.LoggerFactory;
 
-public class SignatureUtils {
+public final class SignatureUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(SignatureUtils.class);
+
+  /** Private empty constructor */
+  private SignatureUtils() {
+
+  }
 
   public static boolean isCertificateSelfSigned(Certificate cert) {
 
@@ -46,7 +51,7 @@ public class SignatureUtils {
     X509Certificate cert) {
 
     try {
-      if (trustedRootCerts.size() > 0) {
+      if (!trustedRootCerts.isEmpty()) {
         X509CertSelector selector = new X509CertSelector();
         selector.setCertificate(cert);
         Set<TrustAnchor> trustAnchors = new HashSet<TrustAnchor>();
@@ -56,8 +61,8 @@ public class SignatureUtils {
 
         PKIXBuilderParameters pkixParams = new PKIXBuilderParameters(trustAnchors, selector);
         pkixParams.setRevocationEnabled(false);
-        CertStore intermediateCertStore = CertStore.getInstance("Collection", new CollectionCertStoreParameters(
-          intermediateCerts), "BC");
+        CertStore intermediateCertStore = CertStore.getInstance("Collection",
+          new CollectionCertStoreParameters(intermediateCerts), "BC");
         pkixParams.addCertStore(intermediateCertStore);
         CertPathBuilder builder = CertPathBuilder.getInstance("PKIX", "BC");
         builder.build(pkixParams);

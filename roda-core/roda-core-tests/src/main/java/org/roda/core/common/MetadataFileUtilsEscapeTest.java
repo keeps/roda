@@ -30,7 +30,6 @@ public class MetadataFileUtilsEscapeTest {
   @Test
   public void testEscape() throws GenericException {
     int total = (int) Math.pow(2, 20);
-    System.out.println(total);
     String temp = "";
     Map<String, String> values = new HashMap<String, String>();
     for (int i = 0; i < total; i++) {
@@ -69,6 +68,7 @@ public class MetadataFileUtilsEscapeTest {
       reader.read(documentToPrettyInputStream(document));
       AssertJUnit.fail();
     } catch (Exception e) {
+      // do nothing
     }
   }
 

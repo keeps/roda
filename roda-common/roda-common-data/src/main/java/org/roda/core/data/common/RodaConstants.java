@@ -40,8 +40,6 @@ public final class RodaConstants {
    */
   public static final String INSTALL_FOLDER_ENVIRONEMNT_VARIABLE = "RODA_HOME";
   public static final String ISO8601 = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
-  @Deprecated
-  public static final String SOLRDATEFORMAT = ISO8601;
   public static final String SHA1 = "SHA-1";
   public static final String SHA256 = "SHA-256";
   public static final String MD5 = "MD5";
