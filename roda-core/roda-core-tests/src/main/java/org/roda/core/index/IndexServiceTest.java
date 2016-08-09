@@ -94,6 +94,7 @@ public class IndexServiceTest {
 
   private static Path corporaPath;
   private static StorageService corporaService;
+  private static String aipCreator = "admin";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IndexServiceTest.class);
 
@@ -174,7 +175,7 @@ public class IndexServiceTest {
 
     // Create AIP
     final AIP aip = model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), aipCreator);
 
     index.commitAIPs();
 
@@ -258,7 +259,7 @@ public class IndexServiceTest {
     final String aipId = UUID.randomUUID().toString();
 
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID_3));
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID_3), aipCreator);
 
     index.commitAIPs();
 
@@ -281,11 +282,11 @@ public class IndexServiceTest {
 
     // testing AIP
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), aipCreator);
 
     final StoragePath otherAipPath = DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER,
       CorporaConstants.OTHER_AIP_ID);
-    final AIP updatedAIP = model.updateAIP(aipId, corporaService, otherAipPath);
+    final AIP updatedAIP = model.updateAIP(aipId, corporaService, otherAipPath, aipCreator);
 
     final IndexedAIP indexedAIP = index.retrieve(IndexedAIP.class, aipId);
 
@@ -298,9 +299,9 @@ public class IndexServiceTest {
   public void testListCollections() throws RODAException {
     // set up
     model.createAIP(CorporaConstants.SOURCE_AIP_ID, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), aipCreator);
     model.createAIP(CorporaConstants.OTHER_AIP_ID, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.OTHER_AIP_ID));
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.OTHER_AIP_ID), aipCreator);
 
     index.commitAIPs();
 
@@ -323,9 +324,9 @@ public class IndexServiceTest {
   public void testSubElements() throws RODAException {
     // set up
     model.createAIP(CorporaConstants.SOURCE_AIP_ID, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), aipCreator);
     model.createAIP(CorporaConstants.OTHER_AIP_ID, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.OTHER_AIP_ID));
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.OTHER_AIP_ID), aipCreator);
 
     index.commitAIPs();
 
@@ -348,9 +349,9 @@ public class IndexServiceTest {
   public void testGetAncestors() throws RODAException {
     // set up
     model.createAIP(CorporaConstants.SOURCE_AIP_ID, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), aipCreator);
     model.createAIP(CorporaConstants.OTHER_AIP_ID, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.OTHER_AIP_ID));
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.OTHER_AIP_ID), aipCreator);
 
     index.commitAIPs();
 
@@ -367,7 +368,7 @@ public class IndexServiceTest {
 
     // Create AIP
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), aipCreator);
 
     index.commitAIPs();
 
@@ -499,7 +500,8 @@ public class IndexServiceTest {
     for (int i = 0; i < 10; i++) {
       final String aipId = UUID.randomUUID().toString();
       model.createAIP(aipId, corporaService,
-        DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), false);
+        DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), false,
+        aipCreator);
     }
 
     index.reindexAIPs();
@@ -566,7 +568,7 @@ public class IndexServiceTest {
 
     // Create AIP
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), aipCreator);
 
     index.commitAIPs();
 

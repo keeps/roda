@@ -47,6 +47,7 @@ public class PermissionsTest {
 
   private static Path corporaPath;
   private static StorageService corporaService;
+  private static String aipCreator = "admin";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PermissionsTest.class);
 
@@ -87,7 +88,8 @@ public class PermissionsTest {
     // Create AIP
     // TODO move aip id to constants
     final AIP aip = model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_PERMISSIONS));
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_PERMISSIONS),
+      aipCreator);
 
     index.commitAIPs();
 
@@ -141,7 +143,8 @@ public class PermissionsTest {
     // Create AIP
     // TODO move aip id to constants
     final AIP aip = model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_PERMISSIONS));
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_PERMISSIONS),
+      aipCreator);
 
     index.commitAIPs();
 
@@ -194,7 +197,8 @@ public class PermissionsTest {
     // Create AIP
     // TODO move aip id to constants
     final AIP aip = model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_PERMISSIONS));
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_PERMISSIONS),
+      aipCreator);
 
     index.commitAIPs();
 
@@ -247,7 +251,8 @@ public class PermissionsTest {
     // Create AIP
     // TODO move aip id to constants
     final AIP aip = model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_PERMISSIONS));
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_PERMISSIONS),
+      aipCreator);
 
     index.commitAIPs();
 

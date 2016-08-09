@@ -66,6 +66,7 @@ public class VeraPDFTest {
   private static ModelService model;
   private static IndexService index;
   private static Path corporaPath;
+  private static String aipCreator = "admin";
 
   @BeforeMethod
   public void setUp() throws Exception {
@@ -120,7 +121,7 @@ public class VeraPDFTest {
     FileAlreadyExistsException, SolrServerException, IsStillUpdatingException {
     String parentId = null;
     String aipType = RodaConstants.AIP_TYPE_MIXED;
-    AIP root = model.createAIP(parentId, aipType, new Permissions());
+    AIP root = model.createAIP(parentId, aipType, new Permissions(), aipCreator);
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
@@ -133,7 +134,7 @@ public class VeraPDFTest {
     Job job = TestsHelper.executeJob(TransferredResourceToAIPPlugin.class, parameters, PluginType.SIP_TO_AIP,
       SelectedItemsList.create(TransferredResource.class,
         transferredResources.stream().map(tr -> tr.getUUID()).collect(Collectors.toList())));
-    
+
     TestsHelper.getJobReports(index, job, true);
 
     index.commitAIPs();
@@ -157,7 +158,7 @@ public class VeraPDFTest {
 
     Job job = TestsHelper.executeJob(VeraPDFPlugin.class, parameters, PluginType.AIP_TO_AIP,
       SelectedItemsAll.create(Representation.class));
-    
+
     // job should fail
 
     if (job.getJobStats().getSourceObjectsProcessedWithFailure() == 0) {

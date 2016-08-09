@@ -7,13 +7,15 @@
  */
 package org.roda.core.data.v2.ip;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AIP implements IsRODAObject {
@@ -36,27 +38,47 @@ public class AIP implements IsRODAObject {
 
   private Boolean ghost = null;
 
+  private AIPFormat format;
+  private List<Relationship> relationships;
+
+  private Date createdOn = null;
+  private String createdBy = null;
+  private Date updatedOn = null;
+  private String updatedBy = null;
+
   public AIP() {
     super();
   }
 
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions) {
-    this(id, parentId, type, state, permissions, new ArrayList<DescriptiveMetadata>(), new ArrayList<Representation>());
+    this(id, parentId, type, state, permissions, new ArrayList<DescriptiveMetadata>(), new ArrayList<Representation>(),
+      new AIPFormat(), new ArrayList<Relationship>(), new Date(), null, new Date(), null);
+  }
+
+  public AIP(String id, String parentId, String type, AIPState state, Permissions permissions, String createdBy) {
+    this(id, parentId, type, state, permissions, new ArrayList<DescriptiveMetadata>(), new ArrayList<Representation>(),
+      new AIPFormat(), new ArrayList<Relationship>(), new Date(), createdBy, new Date(), createdBy);
   }
 
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions,
-    List<DescriptiveMetadata> descriptiveMetadata, List<Representation> representations) {
+    List<DescriptiveMetadata> descriptiveMetadata, List<Representation> representations, AIPFormat format,
+    List<Relationship> relationships, Date createdOn, String createdBy, Date updatedOn, String updatedBy) {
     super();
     this.id = id;
     this.parentId = parentId;
     this.type = type;
     this.state = state;
     this.permissions = permissions;
+    this.relationships = relationships;
 
     this.descriptiveMetadata = descriptiveMetadata;
-
     this.representations = representations;
+    this.format = format;
 
+    this.createdOn = createdOn;
+    this.createdBy = createdBy;
+    this.updatedOn = updatedOn;
+    this.updatedBy = updatedBy;
   }
 
   /**
@@ -180,22 +202,94 @@ public class AIP implements IsRODAObject {
     }
   }
 
+  public AIPFormat getFormat() {
+    return format;
+  }
+
+  public void setFormat(AIPFormat format) {
+    this.format = format;
+  }
+
+  public void setFormat(String name, String version) {
+    this.format = new AIPFormat(name, version);
+  }
+
+  public List<Relationship> getRelationships() {
+    return relationships;
+  }
+
+  public void setRelationships(List<Relationship> relationships) {
+    this.relationships = relationships;
+  }
+
+  public void addRelationship(Relationship relationship) {
+    if (relationships == null) {
+      relationships = new ArrayList<Relationship>();
+    }
+
+    relationships.add(relationship);
+  }
+
+  public Date getCreatedOn() {
+    return createdOn;
+  }
+
+  public void setCreatedOn(Date createdOn) {
+    this.createdOn = createdOn;
+  }
+
+  public String getCreatedBy() {
+    return createdBy;
+  }
+
+  public void setCreatedBy(String createdBy) {
+    this.createdBy = createdBy;
+  }
+
+  public Date getUpdatedOn() {
+    return updatedOn;
+  }
+
+  public void setUpdatedOn(Date updatedOn) {
+    this.updatedOn = updatedOn;
+  }
+
+  public String getUpdatedBy() {
+    return updatedBy;
+  }
+
+  public void setUpdatedBy(String updatedBy) {
+    this.updatedBy = updatedBy;
+  }
+
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
 
     AIP aip = (AIP) o;
 
-    if (id != null ? !id.equals(aip.id) : aip.id != null) return false;
-    if (parentId != null ? !parentId.equals(aip.parentId) : aip.parentId != null) return false;
-    if (type != null ? !type.equals(aip.type) : aip.type != null) return false;
-    if (state != aip.state) return false;
-    if (permissions != null ? !permissions.equals(aip.permissions) : aip.permissions != null) return false;
-    if (descriptiveMetadata != null ? !descriptiveMetadata.equals(aip.descriptiveMetadata) : aip.descriptiveMetadata != null) return false;
-    if (representations != null ? !representations.equals(aip.representations) : aip.representations != null) return false;
-    if (ingestSIPId != null ? !ingestSIPId.equals(aip.ingestSIPId) : aip.ingestSIPId != null) return false;
-    if (ingestJobId != null ? !ingestJobId.equals(aip.ingestJobId) : aip.ingestJobId != null) return false;
+    if (id != null ? !id.equals(aip.id) : aip.id != null)
+      return false;
+    if (parentId != null ? !parentId.equals(aip.parentId) : aip.parentId != null)
+      return false;
+    if (type != null ? !type.equals(aip.type) : aip.type != null)
+      return false;
+    if (state != aip.state)
+      return false;
+    if (permissions != null ? !permissions.equals(aip.permissions) : aip.permissions != null)
+      return false;
+    if (descriptiveMetadata != null ? !descriptiveMetadata.equals(aip.descriptiveMetadata)
+      : aip.descriptiveMetadata != null)
+      return false;
+    if (representations != null ? !representations.equals(aip.representations) : aip.representations != null)
+      return false;
+    if (ingestSIPId != null ? !ingestSIPId.equals(aip.ingestSIPId) : aip.ingestSIPId != null)
+      return false;
+    if (ingestJobId != null ? !ingestJobId.equals(aip.ingestJobId) : aip.ingestJobId != null)
+      return false;
     return ghost != null ? ghost.equals(aip.ghost) : aip.ghost == null;
 
   }
@@ -217,18 +311,11 @@ public class AIP implements IsRODAObject {
 
   @Override
   public String toString() {
-    return "AIP{" +
-            "id='" + id + '\'' +
-            ", parentId='" + parentId + '\'' +
-            ", type='" + type + '\'' +
-            ", state=" + state +
-            ", permissions=" + permissions +
-            ", descriptiveMetadata=" + descriptiveMetadata +
-            ", representations=" + representations +
-            ", ingestSIPId='" + ingestSIPId + '\'' +
-            ", ingestJobId='" + ingestJobId + '\'' +
-            ", ghost=" + ghost +
-            '}';
+    return "AIP{" + "id='" + id + '\'' + ", parentId='" + parentId + '\'' + ", type='" + type + '\'' + ", state="
+      + state + ", permissions=" + permissions + ", descriptiveMetadata=" + descriptiveMetadata + ", representations="
+      + representations + ", ingestSIPId='" + ingestSIPId + '\'' + ", ingestJobId='" + ingestJobId + '\'' + ", ghost="
+      + ghost + ", format=" + format + ", relationships=" + relationships + ", createdOn=" + createdOn + ", createdBy="
+      + createdBy + ", updatedOn=" + updatedOn + ", updatedBy=" + updatedBy + '}';
   }
 
 }

@@ -7,6 +7,16 @@
  */
 package org.roda.core.plugins.plugins.ingest;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.filter.Filter;
@@ -44,22 +54,13 @@ import org.roda_project.commons_ip.utils.IPEnums;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
 public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
   private static final Logger LOGGER = LoggerFactory.getLogger(EARKSIPToAIPPlugin.class);
 
   public static String UNPACK_DESCRIPTION = "Extracted objects from package in E-ARK SIP format.";
 
   private boolean createSubmission = false;
+  private String username = null;
 
   @Override
   public void init() throws PluginException {
@@ -91,6 +92,10 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
 
     if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_CREATE_SUBMISSION)) {
       createSubmission = Boolean.parseBoolean(getParameterValues().get(RodaConstants.PLUGIN_PARAMS_CREATE_SUBMISSION));
+    }
+
+    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_USERNAME)) {
+      username = getParameterValues().get(RodaConstants.PLUGIN_PARAMS_USERNAME);
     }
   }
 
@@ -136,20 +141,25 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
         AIP aip;
 
         // Status is UPDATE or the AIP is a ghost
-        if(IPEnums.IPStatus.UPDATE == sip.getStatus()){
+        if (IPEnums.IPStatus.UPDATE == sip.getStatus()) {
           IndexResult<IndexedAIP> result = index.find(IndexedAIP.class,
-                  new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, sip.getId())), Sorter.NONE,
-                  new Sublist(0, 1));
+            new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, sip.getId())), Sorter.NONE,
+            new Sublist(0, 1));
           if (result.getTotalCount() == 1) {
             IndexedAIP indexedAIP = result.getResults().get(0);
+            Job currentJob = PluginHelper.getJobFromIndex(this, index);
+            if (currentJob == null) {
+              throw new GenericException("Job is null");
+            }
+            String username = currentJob.getUsername();
             // Update the AIP
-            aip = EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP.getId(), model, storage);
-          }else {
+            aip = EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP.getId(), model, storage, username);
+          } else {
             // Fail to update since there's no AIP
             throw new NotFoundException("Unable to find AIP created with SIP ID: " + sip.getId());
           }
-        }else{
-          if(IPEnums.IPStatus.NEW == sip.getStatus()){
+        } else {
+          if (IPEnums.IPStatus.NEW == sip.getStatus()) {
             Job currentJob = PluginHelper.getJobFromIndex(this, index);
             if (currentJob == null) {
               throw new GenericException("Job is null");
@@ -158,12 +168,13 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
             Permissions fullPermissions = new Permissions();
 
             fullPermissions.setUserPermissions(username,
-                    new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
-                            Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE, Permissions.PermissionType.GRANT)));
+              new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
+                Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE,
+                Permissions.PermissionType.GRANT)));
             // Create the permissions object for the user that created the job
             aip = EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, username, fullPermissions, model, storage, sip.getId(),
-                    reportItem.getJobId(), computedParentId);
-          }else {
+              reportItem.getJobId(), computedParentId);
+          } else {
             throw new GenericException("Unknown IP Status: " + sip.getStatus());
           }
         }
@@ -185,7 +196,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
         LOGGER.debug("The SIP {} is not valid", earkSIPPath);
       }
 
-    } catch (RODAException | ParseException | RuntimeException| IOException e) {
+    } catch (RODAException | ParseException | RuntimeException | IOException e) {
       reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
       LOGGER.error("Error converting " + earkSIPPath + " to AIP", e);
     } finally {
@@ -211,15 +222,16 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
 
     for (String ancestor : ancestors) {
       try {
-        Filter ancestorFilter = new Filter( new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, ancestor));
-        if(!StringUtils.isBlank(forcedParent)){
+        Filter ancestorFilter = new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, ancestor));
+        if (!StringUtils.isBlank(forcedParent)) {
           ancestorFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, forcedParent));
         }
         IndexResult<IndexedAIP> result = index.find(IndexedAIP.class, ancestorFilter, Sorter.NONE, new Sublist(0, 1));
         if (result.getTotalCount() >= 1) {
           IndexedAIP indexedAIP = result.getResults().get(0);
           parent = indexedAIP.getId();
-        }else throw new NotFoundException();
+        } else
+          throw new NotFoundException();
       } catch (NotFoundException e) {
         Job currentJob = PluginHelper.getJobFromIndex(this, index);
         if (currentJob == null) {
@@ -232,7 +244,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
           new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
             Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE, Permissions.PermissionType.GRANT)));
         boolean isGhost = true;
-        AIP ghostAIP = model.createAIP(parent, "", permissions, true, ancestor, isGhost);
+        AIP ghostAIP = model.createAIP(parent, "", permissions, true, ancestor, isGhost, username);
         parent = ghostAIP.getId();
       }
     }

@@ -17,7 +17,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 
-import org.hamcrest.MatcherAssert;
 import org.roda.core.CorporaConstants;
 import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -51,6 +50,7 @@ public class ValidationUtilsTest {
 
   private static Path corporaPath;
   private static StorageService corporaService;
+  private static String aipCreator = "admin";
 
   private static final Logger logger = LoggerFactory.getLogger(ModelServiceTest.class);
 
@@ -105,7 +105,7 @@ public class ValidationUtilsTest {
     AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), aipCreator);
     final DescriptiveMetadata descMetadata = model.retrieveDescriptiveMetadata(aipId,
       CorporaConstants.DESCRIPTIVE_METADATA_ID);
     assertEquals(ValidationUtils.isDescriptiveMetadataValid(model, descMetadata, true).isValid(), true);
@@ -117,7 +117,8 @@ public class ValidationUtilsTest {
     final String aipId = UUID.randomUUID().toString();
     try {
       model.createAIP(aipId, corporaService,
-        DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_BUGGY_ID));
+        DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_BUGGY_ID),
+        aipCreator);
       final DescriptiveMetadata descMetadata = model.retrieveDescriptiveMetadata(aipId,
         CorporaConstants.DESCRIPTIVE_METADATA_ID);
       assertEquals(ValidationUtils.isDescriptiveMetadataValid(model, descMetadata, true), false);
@@ -131,7 +132,7 @@ public class ValidationUtilsTest {
     AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
     final String aipId = UUID.randomUUID().toString();
     final AIP aip = model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), aipCreator);
     assertEquals(ValidationUtils.isAIPDescriptiveMetadataValid(model, aip.getId(), true).isValid(), true);
   }
 
@@ -142,7 +143,8 @@ public class ValidationUtilsTest {
     // buggy aip have acqinfo2 instead of acqinfo in ead-c.xml
     final String aipId = UUID.randomUUID().toString();
     final AIP aip = model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_BUGGY_ID));
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_BUGGY_ID),
+      aipCreator);
     assertEquals(ValidationUtils.isAIPDescriptiveMetadataValid(model, aip.getId(), true), false);
   }
 }

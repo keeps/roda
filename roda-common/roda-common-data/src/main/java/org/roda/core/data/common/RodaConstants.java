@@ -435,6 +435,7 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_EMAIL_NOTIFICATION = "parameter.email_notification";
   public static final String PLUGIN_PARAMS_CREATES_PLUGIN_EVENT = "createsPluginEvent";
   public static final String PLUGIN_PARAMS_CREATE_SUBMISSION = "parameter.create_submission";
+  public static final String PLUGIN_PARAMS_USERNAME = "parameter.username";
   public static final String PLUGIN_PARAMS_IGNORE_OTHER_FILES = "parameter.ignore_other_files";
   public static final String PLUGIN_PARAMS_PDF_PROFILE = "parameter.pdf_profile";
   public static final String PLUGIN_PARAMS_SIGNATURE_VERIFY = "parameter.signature_verify";

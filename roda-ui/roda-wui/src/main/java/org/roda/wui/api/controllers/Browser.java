@@ -620,7 +620,7 @@ public class Browser extends RodaCoreService {
     permissions.setUserPermissions(user.getId(), new HashSet<PermissionType>(Arrays.asList(PermissionType.values())));
 
     // delegate
-    AIP aip = BrowserHelper.createAIP(parentId, type, permissions);
+    AIP aip = BrowserHelper.createAIP(user, parentId, type, permissions);
 
     // register action
     controllerAssistant.registerAction(user, aip.getId(), LOG_ENTRY_STATE.SUCCESS, "parentId", parentId);
@@ -1078,7 +1078,7 @@ public class Browser extends RodaCoreService {
 
     for (IndexedAIP aip : aips) {
       UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
-      BrowserHelper.updateAIPPermissions(aip, permissions, recursive);
+      BrowserHelper.updateAIPPermissions(user, aip, permissions, recursive);
     }
 
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "aips", aips, "permissions", permissions);

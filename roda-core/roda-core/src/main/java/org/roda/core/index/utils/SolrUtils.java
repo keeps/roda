@@ -2089,32 +2089,36 @@ public class SolrUtils {
   }
 
   public static SolrInputDocument aipPermissionsUpdateToSolrDocument(AIP aip) {
-    return permissionsUpdateToSolrDocument(RodaConstants.AIP_ID, aip.getId(), aip.getPermissions());
+    SolrInputDocument document = new SolrInputDocument();
+    document.addField(RodaConstants.AIP_ID, aip.getId());
+    return permissionsUpdateToSolrDocument(document, aip.getPermissions());
   }
 
   public static SolrInputDocument representationPermissionsUpdateToSolrDocument(Representation representation,
     Permissions permissions) {
-    return permissionsUpdateToSolrDocument(RodaConstants.REPRESENTATION_UUID,
-      IdUtils.getRepresentationId(representation.getAipId(), IdUtils.getRepresentationId(representation)), permissions);
+    SolrInputDocument document = new SolrInputDocument();
+    document.addField(RodaConstants.REPRESENTATION_UUID,
+      IdUtils.getRepresentationId(representation.getAipId(), IdUtils.getRepresentationId(representation)));
+    document.addField(RodaConstants.REPRESENTATION_ID, representation.getId());
+    return permissionsUpdateToSolrDocument(document, permissions);
   }
 
   public static SolrInputDocument filePermissionsUpdateToSolrDocument(File file, Permissions permissions) {
-    return permissionsUpdateToSolrDocument(RodaConstants.FILE_UUID, IdUtils.getFileId(file), permissions);
+    SolrInputDocument document = new SolrInputDocument();
+    document.addField(RodaConstants.FILE_UUID, IdUtils.getFileId(file));
+    return permissionsUpdateToSolrDocument(document, permissions);
   }
 
   public static SolrInputDocument preservationEventPermissionsUpdateToSolrDocument(String preservationEventID,
     String preservationEventAipId, Permissions permissions) {
-    SolrInputDocument document = permissionsUpdateToSolrDocument(RodaConstants.PRESERVATION_EVENT_ID,
-      preservationEventID, permissions);
+    SolrInputDocument document = new SolrInputDocument();
+    document.addField(RodaConstants.PRESERVATION_EVENT_ID, preservationEventID);
+    document = permissionsUpdateToSolrDocument(document, permissions);
     document.addField(RodaConstants.PRESERVATION_EVENT_AIP_ID, preservationEventAipId);
     return document;
   }
 
-  private static SolrInputDocument permissionsUpdateToSolrDocument(String idField, String idValue,
-    Permissions permissions) {
-    SolrInputDocument doc = new SolrInputDocument();
-    doc.addField(idField, idValue);
-
+  private static SolrInputDocument permissionsUpdateToSolrDocument(SolrInputDocument doc, Permissions permissions) {
     for (Entry<PermissionType, Set<String>> entry : permissions.getUsers().entrySet()) {
       String key = RodaConstants.INDEX_PERMISSION_USERS_PREFIX + entry.getKey();
       List<String> value = new ArrayList<>(entry.getValue());

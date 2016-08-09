@@ -7,7 +7,15 @@
  */
 package org.roda.core.plugins.plugins.ingest;
 
-import com.google.common.base.CaseFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
@@ -46,14 +54,7 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import com.google.common.base.CaseFormat;
 
 /***
  * https://docs.google.com/spreadsheets/d/
@@ -127,6 +128,9 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       Report report = PluginHelper.initPluginReport(this);
       Report pluginReport;
 
+      Job job = PluginHelper.getJobFromIndex(this, index);
+      String username = job.getUsername();
+
       IngestJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, IngestJobPluginInfo.class);
       PluginHelper.updateJobInformation(this, jobPluginInfo.setTotalSteps(getTotalSteps()));
 
@@ -141,7 +145,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
       // 1) unpacking & wellformedness check (transform TransferredResource into
       // an AIP)
-      pluginReport = transformTransferredResourceIntoAnAIP(index, model, storage, resources);
+      pluginReport = transformTransferredResourceIntoAnAIP(index, model, storage, resources, username);
       jobPluginInfo = mergeReports(jobPluginInfo, pluginReport);
       List<AIP> aips = getAIPsFromReports(model, resources, jobPluginInfo);
       PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
@@ -241,7 +245,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
           aips = recalculateAIPsList(model, jobPluginInfo, true);
           jobPluginInfo.incrementStepsCompletedByOne();
         } else {
-          updateAIPsToBeAppraised(model, aips, jobPluginInfo);
+          updateAIPsToBeAppraised(model, aips, jobPluginInfo, username);
         }
       }
 
@@ -259,7 +263,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       createIngestEndedEvent(model, index, aips);
 
       return report;
-    } catch (JobException e) {
+    } catch (JobException | NotFoundException | GenericException e) {
       throw new PluginException("A job exception has occurred", e);
     }
 
@@ -280,17 +284,19 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   }
 
   private Report transformTransferredResourceIntoAnAIP(IndexService index, ModelService model, StorageService storage,
-    List<TransferredResource> transferredResources) {
+    List<TransferredResource> transferredResources, String username) {
     Report report = null;
 
     String pluginClassName = getParameterValues().getOrDefault(
       getPluginParameter(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS).getId(),
       getPluginParameter(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS).getDefaultValue());
 
-    Plugin<TransferredResource> plugin = RodaCoreFactory.getPluginManager()
-      .getPlugin(pluginClassName, TransferredResource.class);
+    Plugin<TransferredResource> plugin = RodaCoreFactory.getPluginManager().getPlugin(pluginClassName,
+      TransferredResource.class);
     try {
-      plugin.setParameterValues(getParameterValues());
+      Map<String, String> parameters = getParameterValues();
+      parameters.put(RodaConstants.PLUGIN_PARAMS_USERNAME, username);
+      plugin.setParameterValues(parameters);
       report = plugin.execute(index, model, storage, transferredResources);
     } catch (PluginException | InvalidParameterException e) {
       // FIXME handle failure
@@ -573,12 +579,13 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     return report;
   }
 
-  private void updateAIPsToBeAppraised(ModelService model, List<AIP> aips, IngestJobPluginInfo jobPluginInfo) {
+  private void updateAIPsToBeAppraised(ModelService model, List<AIP> aips, IngestJobPluginInfo jobPluginInfo,
+    String username) {
 
     for (AIP aip : aips) {
       aip.setState(AIPState.UNDER_APPRAISAL);
       try {
-        aip = model.updateAIPState(aip);
+        aip = model.updateAIPState(aip, username);
 
         // update main report outcomeObjectState
         PluginHelper.updateJobReportState(this, model, aip.getId(), AIPState.UNDER_APPRAISAL);

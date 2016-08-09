@@ -7,8 +7,19 @@
  */
 package org.roda.core.plugins;
 
-import com.google.common.collect.Iterables;
-import jersey.repackaged.com.google.common.collect.Lists;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import org.apache.solr.client.solrj.SolrServerException;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
@@ -52,18 +63,9 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import com.google.common.collect.Iterables;
+
+import jersey.repackaged.com.google.common.collect.Lists;
 
 @Test(groups = {"all", "travis"})
 public class EARKSIPPluginsTest {
@@ -77,6 +79,7 @@ public class EARKSIPPluginsTest {
   private static IndexService index;
 
   private static Path corporaPath;
+  private static String aipCreator = "admin";
 
   @BeforeClass
   public void setUp() throws Exception {
@@ -140,7 +143,7 @@ public class EARKSIPPluginsTest {
     FileAlreadyExistsException, SolrServerException, IsStillUpdatingException {
     String parentId = null;
     String aipType = RodaConstants.AIP_TYPE_MIXED;
-    AIP root = model.createAIP(parentId, aipType, new Permissions());
+    AIP root = model.createAIP(parentId, aipType, new Permissions(), aipCreator);
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
@@ -182,8 +185,8 @@ public class EARKSIPPluginsTest {
     Assert.assertEquals(reusableAllFiles.size(), CORPORA_FOLDERS_COUNT + CORPORA_FILES_COUNT);
   }
 
-  private List<String> createCorporaAncestors() throws InterruptedException, IOException,
-      NotFoundException, GenericException, RequestNotValidException, IsStillUpdatingException, AlreadyExistsException {
+  private List<String> createCorporaAncestors() throws InterruptedException, IOException, NotFoundException,
+    GenericException, RequestNotValidException, IsStillUpdatingException, AlreadyExistsException {
     TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
     List<String> resultIDs = new ArrayList<>();
 
@@ -191,9 +194,11 @@ public class EARKSIPPluginsTest {
     Files.walk(sipFolder).forEach(filePath -> {
       if (Files.isRegularFile(filePath)) {
         try {
-          TransferredResource tr = f.createFile(null, filePath.getFileName().toString(), Files.newInputStream(filePath));
+          TransferredResource tr = f.createFile(null, filePath.getFileName().toString(),
+            Files.newInputStream(filePath));
           resultIDs.add(tr.getUUID());
-        } catch (GenericException | RequestNotValidException | NotFoundException | AlreadyExistsException | IOException e) {
+        } catch (GenericException | RequestNotValidException | NotFoundException | AlreadyExistsException
+          | IOException e) {
           LOGGER.error("Error creating file: " + filePath, e);
         }
       }
@@ -206,20 +211,20 @@ public class EARKSIPPluginsTest {
   }
 
   private void ingestCorporaAncestors() throws RequestNotValidException, NotFoundException, GenericException,
-      AlreadyExistsException, AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException,
-      SolrServerException, IsStillUpdatingException {
+    AlreadyExistsException, AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException,
+    SolrServerException, IsStillUpdatingException {
     String parentId = null;
     String aipType = RodaConstants.AIP_TYPE_MIXED;
-    AIP root = model.createAIP(parentId, aipType, new Permissions());
+    AIP root = model.createAIP(parentId, aipType, new Permissions(), aipCreator);
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
 
-    List<String> transferredResourcesIDs= createCorporaAncestors();
+    List<String> transferredResourcesIDs = createCorporaAncestors();
     Assert.assertNotNull(transferredResourcesIDs);
 
     Job job = TestsHelper.executeJob(EARKSIPToAIPPlugin.class, parameters, PluginType.SIP_TO_AIP,
-        SelectedItemsList.create(TransferredResource.class, transferredResourcesIDs));
+      SelectedItemsList.create(TransferredResource.class, transferredResourcesIDs));
     index.commitAIPs();
 
     TestsHelper.executeJob(FixAncestorsPlugin.class, parameters, PluginType.MISC, new SelectedItemsNone<>());
@@ -231,17 +236,19 @@ public class EARKSIPPluginsTest {
     IndexResult<IndexedAIP> findAllAIP = index.find(IndexedAIP.class, Filter.ALL, null, new Sublist(0, 12));
     Assert.assertEquals(findAllAIP.getTotalCount(), 12L);
 
-    IndexResult<IndexedAIP> findRootChildren = index.find(IndexedAIP.class, new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 2));
+    IndexResult<IndexedAIP> findRootChildren = index.find(IndexedAIP.class,
+      new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 2));
     Assert.assertEquals(findRootChildren.getTotalCount(), 2L);
 
-    IndexResult<IndexedAIP> findSpecificAIP = index.find(IndexedAIP.class, new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, "026106")), null, new Sublist(0, 1));
+    IndexResult<IndexedAIP> findSpecificAIP = index.find(IndexedAIP.class,
+      new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, "026106")), null, new Sublist(0, 1));
     Assert.assertEquals(findSpecificAIP.getTotalCount(), 1L);
     IndexedAIP specificAIP = findSpecificAIP.getResults().get(0);
     Assert.assertEquals(specificAIP.getAncestors().size(), 4);
   }
 
   @Test
-  public void testIngestAncestors() throws IOException, InterruptedException, RODAException, SolrServerException{
+  public void testIngestAncestors() throws IOException, InterruptedException, RODAException, SolrServerException {
     ingestCorporaAncestors();
   }
 

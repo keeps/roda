@@ -51,6 +51,7 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
   private static final String UNPACK_DESCRIPTION = "Extracted objects from package in file/folder format.";
 
   private boolean createSubmission = false;
+  private String username = null;
 
   @Override
   public void init() throws PluginException {
@@ -83,6 +84,10 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
     if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_CREATE_SUBMISSION)) {
       createSubmission = Boolean.parseBoolean(getParameterValues().get(RodaConstants.PLUGIN_PARAMS_CREATE_SUBMISSION));
     }
+
+    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_USERNAME)) {
+      username = getParameterValues().get(RodaConstants.PLUGIN_PARAMS_USERNAME);
+    }
   }
 
   @Override
@@ -113,7 +118,7 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
         String aipType = RodaConstants.AIP_TYPE_MIXED;
 
         final AIP aip = model.createAIP(state, parentId, aipType, permissions, transferredResource.getName(),
-          reportItem.getJobId(), notifyCreatedAIP);
+          reportItem.getJobId(), notifyCreatedAIP, username);
 
         PluginHelper.createSubmission(model, createSubmission, transferredResourcePath, aip.getId());
 

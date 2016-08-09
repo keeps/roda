@@ -52,7 +52,7 @@ public class EARKSIPToAIPPluginUtils {
 
     String aipType = IngestHelper.getType(sip);
 
-    AIP aip = model.createAIP(state, parentId, aipType, permissions, ingestSIPId, ingestJobId, notify);
+    AIP aip = model.createAIP(state, parentId, aipType, permissions, ingestSIPId, ingestJobId, notify, username);
 
     // process IP information
     processIPInformation(model, sip, aip.getId(), notify, false);
@@ -71,14 +71,14 @@ public class EARKSIPToAIPPluginUtils {
       aip.getPermissions());
     Permissions finalPermissions = PermissionUtils.grantAllPermissions(username, readPermissions, fullPermissions);
     createdAIP.setPermissions(finalPermissions);
-    model.updateAIP(createdAIP);
+    model.updateAIP(createdAIP, username);
 
     return model.retrieveAIP(aip.getId());
 
   }
 
-  public static AIP earkSIPToAIPUpdate(SIP sip, String aipId, ModelService model, StorageService storage)
-    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+  public static AIP earkSIPToAIPUpdate(SIP sip, String aipId, ModelService model, StorageService storage,
+    String username) throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, ValidationException {
     boolean notify = false;
 
@@ -92,7 +92,7 @@ public class EARKSIPToAIPPluginUtils {
 
     AIP aip = model.retrieveAIP(aipId);
     aip.setGhost(false);
-    model.updateAIP(aip);
+    model.updateAIP(aip, username);
 
     return aip;
   }

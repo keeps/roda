@@ -46,7 +46,6 @@ import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.management.UserLog;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
-import org.roda.wui.client.search.Relation;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
@@ -234,7 +233,7 @@ public class Browse extends Composite {
 
   @UiField
   Button searchAIP;
-  
+
   private boolean viewingTop;
 
   private List<HandlerRegistration> handlers;
@@ -1193,7 +1192,7 @@ public class Browse extends Composite {
   void searchContextHandler(ClickEvent e) {
     Tools.newHistory(Search.RESOLVER, RodaConstants.SEARCH_LIST_BOX_ITEMS, RodaConstants.AIP_ANCESTORS, aipId);
   }
-  
+
   @UiHandler("searchAIP")
   void searchAIPHandler(ClickEvent e) {
     Tools.newHistory(Search.RESOLVER, RodaConstants.SEARCH_LIST_BOX_REPRESENTATIONS, RodaConstants.AIP_AIP_ID, aipId);

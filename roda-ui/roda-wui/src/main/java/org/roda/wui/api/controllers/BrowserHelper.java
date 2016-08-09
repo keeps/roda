@@ -866,11 +866,12 @@ public class BrowserHelper {
     return index.retrieve(IndexedAIP.class, parentId);
   }
 
-  public static AIP createAIP(String parentAipId, String type, Permissions permissions) throws GenericException,
-    AuthorizationDeniedException, RequestNotValidException, NotFoundException, AlreadyExistsException {
+  public static AIP createAIP(RodaUser user, String parentAipId, String type, Permissions permissions)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
+    AlreadyExistsException {
     ModelService model = RodaCoreFactory.getModelService();
 
-    AIP aip = model.createAIP(parentAipId, type, permissions);
+    AIP aip = model.createAIP(parentAipId, type, permissions, user.getName());
     return aip;
   }
 
@@ -1476,12 +1477,13 @@ public class BrowserHelper {
     RodaCoreFactory.getStorageService().deleteBinaryVersion(storagePath, versionId);
   }
 
-  public static void updateAIPPermissions(IndexedAIP indexedAIP, Permissions permissions, boolean recursive)
+  public static void updateAIPPermissions(RodaUser user, IndexedAIP indexedAIP, Permissions permissions,
+    boolean recursive)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     final ModelService model = RodaCoreFactory.getModelService();
     AIP aip = model.retrieveAIP(indexedAIP.getId());
     aip.setPermissions(permissions);
-    model.updateAIPPermissions(aip);
+    model.updateAIPPermissions(aip, user.getName());
 
     if (recursive) {
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, indexedAIP.getId()));
@@ -1494,7 +1496,7 @@ public class BrowserHelper {
           try {
             descendant = model.retrieveAIP(idescendant.getId());
             descendant.setPermissions(permissions);
-            model.updateAIPPermissions(descendant);
+            model.updateAIPPermissions(descendant, user.getName());
           } catch (NotFoundException e) {
             LOGGER.warn("Got an AIP from index which was not found in the model", e);
           } catch (RuntimeException e) {
@@ -1902,7 +1904,7 @@ public class BrowserHelper {
       if (accept) {
         // Accept AIP
         aip.setState(AIPState.ACTIVE);
-        model.updateAIPState(aip);
+        model.updateAIPState(aip, user.getName());
 
         // create preservation event
         String id = IdUtils.createPreservationMetadataId(PreservationMetadataType.EVENT);

@@ -15,6 +15,7 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -22,6 +23,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,19 +69,25 @@ public class MoveOrphansToParentNodePlugin extends AbstractPlugin<IndexedAIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<IndexedAIP> list)
     throws PluginException {
 
-    for (IndexedAIP indexedAIP : list) {
-      try {
-        LOGGER.debug("Processing AIP {}", indexedAIP.getId());
-        if (indexedAIP.getLevel() == null || !indexedAIP.getLevel().trim().equalsIgnoreCase("fonds")) {
-          AIP aip = model.retrieveAIP(indexedAIP.getId());
-          aip.setParentId(newParent.getId());
-          model.updateAIP(aip);
-        } else {
-          LOGGER.debug("AIP doesn't need to be moved... level: {}", indexedAIP.getLevel());
+    try {
+      Job job = PluginHelper.getJobFromIndex(this, index);
+
+      for (IndexedAIP indexedAIP : list) {
+        try {
+          LOGGER.debug("Processing AIP {}", indexedAIP.getId());
+          if (indexedAIP.getLevel() == null || !indexedAIP.getLevel().trim().equalsIgnoreCase("fonds")) {
+            AIP aip = model.retrieveAIP(indexedAIP.getId());
+            aip.setParentId(newParent.getId());
+            model.updateAIP(aip, job.getUsername());
+          } else {
+            LOGGER.debug("AIP doesn't need to be moved... level: {}", indexedAIP.getLevel());
+          }
+        } catch (RODAException e) {
+          LOGGER.error("Error processing AIP " + indexedAIP.getId() + " (RemoveOrphansAction)", e);
         }
-      } catch (RODAException e) {
-        LOGGER.error("Error processing AIP " + indexedAIP.getId() + " (RemoveOrphansAction)", e);
       }
+    } catch (RODAException e) {
+      LOGGER.error("Error getting job from plugin", e);
     }
     return null;
   }

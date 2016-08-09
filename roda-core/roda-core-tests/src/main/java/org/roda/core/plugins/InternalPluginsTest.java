@@ -109,6 +109,7 @@ public class InternalPluginsTest {
 
   private static ModelService model;
   private static IndexService index;
+  private static String aipCreator = "admin";
 
   @BeforeClass
   public void setUp() throws Exception {
@@ -139,7 +140,7 @@ public class InternalPluginsTest {
 
   @AfterMethod
   public void cleanUp() throws RODAException {
-    
+
     // delete all AIPs
     index.execute(IndexedAIP.class, Filter.ALL, new IndexRunnable<IndexedAIP>() {
       @Override
@@ -206,7 +207,7 @@ public class InternalPluginsTest {
     FileAlreadyExistsException, SolrServerException {
     String parentId = null;
     String aipType = RodaConstants.AIP_TYPE_MIXED;
-    AIP root = model.createAIP(parentId, aipType, new Permissions());
+    AIP root = model.createAIP(parentId, aipType, new Permissions(), aipCreator);
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
@@ -253,7 +254,7 @@ public class InternalPluginsTest {
 
     Job job = TestsHelper.executeJob(AntivirusPlugin.class, PluginType.AIP_TO_AIP,
       SelectedItemsList.create(AIP.class, aip.getId()));
-    
+
     TestsHelper.getJobReports(index, job, true);
 
     aip = model.retrieveAIP(aip.getId());

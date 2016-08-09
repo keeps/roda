@@ -39,6 +39,7 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
   private static String UNPACK_DESCRIPTION = "Extracted objects from package in Bagit format.";
 
   private boolean createSubmission = false;
+  private String username = null;
 
   @Override
   public void init() throws PluginException {
@@ -71,6 +72,10 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
     if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_CREATE_SUBMISSION)) {
       createSubmission = Boolean.parseBoolean(getParameterValues().get(RodaConstants.PLUGIN_PARAMS_CREATE_SUBMISSION));
     }
+
+    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_USERNAME)) {
+      username = getParameterValues().get(RodaConstants.PLUGIN_PARAMS_USERNAME);
+    }
   }
 
   @Override
@@ -98,7 +103,7 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
           String parentId = PluginHelper.computeParentId(this, index, bag.getBagInfoTxt().get("parent"));
 
           AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bag, bagitPath, model, "metadata.xml",
-            transferredResource.getName(), reportItem.getJobId(), parentId);
+            transferredResource.getName(), reportItem.getJobId(), parentId, username);
 
           PluginHelper.createSubmission(model, createSubmission, bagitPath, aipCreated.getId());
 

@@ -230,9 +230,9 @@ public class ModelService extends ModelObservable {
    * @throws AlreadyExistsException
    * @throws ValidationException
    */
-  public AIP createAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath, boolean notify)
-    throws RequestNotValidException, GenericException, AuthorizationDeniedException, AlreadyExistsException,
-    NotFoundException, ValidationException {
+  public AIP createAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath, boolean notify,
+    String createdBy) throws RequestNotValidException, GenericException, AuthorizationDeniedException,
+    AlreadyExistsException, NotFoundException, ValidationException {
     // XXX possible optimization would be to allow move between storage
     // TODO support asReference
     ModelService sourceModelService = new ModelService(sourceStorage);
@@ -247,6 +247,11 @@ public class ModelService extends ModelObservable {
       Directory newDirectory = storage.getDirectory(ModelUtils.getAIPStoragePath(aipId));
 
       aip = ResourceParseUtils.getAIPMetadata(getStorage(), newDirectory.getStoragePath());
+      aip.setCreatedBy(createdBy);
+      aip.setCreatedOn(new Date());
+      aip.setUpdatedBy(createdBy);
+      aip.setUpdatedOn(new Date());
+
       if (notify) {
         notifyAipCreated(aip);
       }
@@ -258,14 +263,14 @@ public class ModelService extends ModelObservable {
   }
 
   public AIP createAIP(String parentId, String type, Permissions permissions, boolean notify, String sipId,
-    boolean isGhost) throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
-    AuthorizationDeniedException {
+    boolean isGhost, String createdBy) throws RequestNotValidException, NotFoundException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException {
 
     AIPState state = AIPState.ACTIVE;
     Directory directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
     String id = directory.getStoragePath().getName();
 
-    AIP aip = new AIP(id, parentId, type, state, permissions);
+    AIP aip = new AIP(id, parentId, type, state, permissions, createdBy);
 
     aip.setGhost(isGhost);
     aip.setIngestSIPId(sipId);
@@ -279,28 +284,29 @@ public class ModelService extends ModelObservable {
     return aip;
   }
 
-  public AIP createAIP(String parentId, String type, Permissions permissions) throws RequestNotValidException,
-    NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
+  public AIP createAIP(String parentId, String type, Permissions permissions, String createdBy)
+    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException {
     AIPState state = AIPState.ACTIVE;
     boolean notify = true;
-    return createAIP(state, parentId, type, permissions, notify);
+    return createAIP(state, parentId, type, permissions, notify, createdBy);
   }
 
-  public AIP createAIP(AIPState state, String parentId, String type, Permissions permissions)
+  public AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, String createdBy)
     throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException {
     boolean notify = true;
-    return createAIP(state, parentId, type, permissions, notify);
+    return createAIP(state, parentId, type, permissions, notify, createdBy);
   }
 
-  public AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, boolean notify)
-    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+  public AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, boolean notify,
+    String createdBy) throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException {
 
     Directory directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
     String id = directory.getStoragePath().getName();
 
-    AIP aip = new AIP(id, parentId, type, state, permissions);
+    AIP aip = new AIP(id, parentId, type, state, permissions, createdBy);
     createAIPMetadata(aip);
 
     if (notify) {
@@ -311,13 +317,14 @@ public class ModelService extends ModelObservable {
   }
 
   public AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, String ingestSIPId,
-    String ingestJobId, boolean notify) throws RequestNotValidException, NotFoundException, GenericException,
-    AlreadyExistsException, AuthorizationDeniedException {
+    String ingestJobId, boolean notify, String createdBy) throws RequestNotValidException, NotFoundException,
+    GenericException, AlreadyExistsException, AuthorizationDeniedException {
 
     Directory directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
     String id = directory.getStoragePath().getName();
 
-    AIP aip = new AIP(id, parentId, type, state, permissions).setIngestSIPId(ingestSIPId).setIngestJobId(ingestJobId);
+    AIP aip = new AIP(id, parentId, type, state, permissions, createdBy).setIngestSIPId(ingestSIPId)
+      .setIngestJobId(ingestJobId);
     createAIPMetadata(aip);
 
     if (notify) {
@@ -327,10 +334,10 @@ public class ModelService extends ModelObservable {
     return aip;
   }
 
-  public AIP createAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath)
+  public AIP createAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath, String createdBy)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, AlreadyExistsException,
     NotFoundException, ValidationException {
-    return createAIP(aipId, sourceStorage, sourcePath, true);
+    return createAIP(aipId, sourceStorage, sourcePath, true, createdBy);
   }
 
   public AIP notifyAIPCreated(String aipId)
@@ -348,7 +355,7 @@ public class ModelService extends ModelObservable {
   }
 
   // TODO support asReference
-  public AIP updateAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath)
+  public AIP updateAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath, String updatedBy)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
     AlreadyExistsException, ValidationException {
     // TODO verify structure of source AIP and update it in the storage
@@ -370,6 +377,8 @@ public class ModelService extends ModelObservable {
       Directory directoryUpdated = storage.getDirectory(aipPath);
 
       aip = ResourceParseUtils.getAIPMetadata(getStorage(), directoryUpdated.getStoragePath());
+      aip.setUpdatedBy(updatedBy);
+      aip.setUpdatedOn(new Date());
       notifyAipUpdated(aip);
     } else {
       throw new ValidationException(validationReport);
@@ -378,17 +387,20 @@ public class ModelService extends ModelObservable {
     return aip;
   }
 
-  public AIP updateAIP(AIP aip)
+  public AIP updateAIP(AIP aip, String updatedBy)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    aip.setUpdatedBy(updatedBy);
+    aip.setUpdatedOn(new Date());
     updateAIPMetadata(aip);
     notifyAipUpdated(aip);
 
     return aip;
   }
 
-  public AIP updateAIPState(AIP aip)
+  public AIP updateAIPState(AIP aip, String updatedBy)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
-
+    aip.setUpdatedBy(updatedBy);
+    aip.setUpdatedOn(new Date());
     updateAIPMetadata(aip);
     notifyAipStateUpdated(aip);
 
@@ -1666,8 +1678,10 @@ public class ModelService extends ModelObservable {
     notifyJobReportDeleted(jobReportId);
   }
 
-  public void updateAIPPermissions(AIP aip)
+  public void updateAIPPermissions(AIP aip, String updatedBy)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    aip.setUpdatedBy(updatedBy);
+    aip.setUpdatedOn(new Date());
     updateAIPMetadata(aip);
     notifyAipPermissionsUpdated(aip);
   }

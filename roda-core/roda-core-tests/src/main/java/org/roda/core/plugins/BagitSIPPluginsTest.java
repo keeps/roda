@@ -86,6 +86,7 @@ public class BagitSIPPluginsTest {
 
   private static Path corporaPath;
   private static StorageService corporaService;
+  private static String aipCreator = "admin";
 
   private static final Logger logger = LoggerFactory.getLogger(ModelServiceTest.class);
 
@@ -151,7 +152,7 @@ public class BagitSIPPluginsTest {
     String parentId = null;
     String aipType = RodaConstants.AIP_TYPE_MIXED;
 
-    AIP root = model.createAIP(parentId, aipType, new Permissions());
+    AIP root = model.createAIP(parentId, aipType, new Permissions(), aipCreator);
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
@@ -161,9 +162,9 @@ public class BagitSIPPluginsTest {
 
     Job job = TestsHelper.executeJob(BagitToAIPPlugin.class, parameters, PluginType.SIP_TO_AIP,
       SelectedItemsList.create(TransferredResource.class, transferredResource.getUUID()));
-    
+
     TestsHelper.getJobReports(index, job, true);
-    
+
     index.commitAIPs();
 
     IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,

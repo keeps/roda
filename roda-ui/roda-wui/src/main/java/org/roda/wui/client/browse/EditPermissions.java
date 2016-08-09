@@ -10,8 +10,10 @@ package org.roda.wui.client.browse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.roda.core.data.adapter.filter.Filter;
@@ -160,33 +162,44 @@ public class EditPermissions extends Composite {
       for (int i = 1; i < aips.size(); i++) {
         Permissions permissions = aips.get(i).getPermissions();
 
-        for (String permissionUser : userPermissionsToShow.keySet()) {
-          if (permissions.getUsernames().contains(permissionUser)) {
-            Set<PermissionType> userPermissionType = new HashSet<PermissionType>(
-              userPermissionsToShow.get(permissionUser));
-            for (PermissionType permissionType : userPermissionType) {
-              if (!permissions.getUserPermissions(permissionUser).contains(permissionType)) {
-                userPermissionsToShow.get(permissionUser).remove(permissionType);
+        for (Iterator<Entry<String, Set<PermissionType>>> userIterator = userPermissionsToShow.entrySet()
+          .iterator(); userIterator.hasNext();) {
+          Entry<String, Set<PermissionType>> entry = userIterator.next();
+          if (permissions.getUsernames().contains(entry.getKey())) {
+            Set<PermissionType> userPermissionType = entry.getValue();
+
+            for (Iterator<PermissionType> permissionTypeIterator = userPermissionType.iterator(); permissionTypeIterator
+              .hasNext();) {
+              PermissionType permissionType = permissionTypeIterator.next();
+
+              if (!permissions.getUserPermissions(entry.getKey()).contains(permissionType)) {
+                permissionTypeIterator.remove();
               }
             }
           } else {
-            userPermissionsToShow.remove(permissionUser);
+            userIterator.remove();
           }
         }
 
-        for (String permissionGroup : groupPermissionsToShow.keySet()) {
-          if (permissions.getGroupnames().contains(permissionGroup)) {
-            Set<PermissionType> groupPermissionType = new HashSet<PermissionType>(
-              groupPermissionsToShow.get(permissionGroup));
-            for (PermissionType permissionType : groupPermissionType) {
-              if (!permissions.getGroupPermissions(permissionGroup).contains(permissionType)) {
-                groupPermissionsToShow.get(permissionGroup).remove(permissionType);
+        for (Iterator<Entry<String, Set<PermissionType>>> groupIterator = groupPermissionsToShow.entrySet()
+          .iterator(); groupIterator.hasNext();) {
+          Entry<String, Set<PermissionType>> entry = groupIterator.next();
+          if (permissions.getGroupnames().contains(entry.getKey())) {
+            Set<PermissionType> groupPermissionType = entry.getValue();
+
+            for (Iterator<PermissionType> permissionTypeIterator = groupPermissionType
+              .iterator(); permissionTypeIterator.hasNext();) {
+              PermissionType permissionType = permissionTypeIterator.next();
+
+              if (!permissions.getGroupPermissions(entry.getKey()).contains(permissionType)) {
+                permissionTypeIterator.remove();
               }
             }
           } else {
-            groupPermissionsToShow.remove(permissionGroup);
+            groupIterator.remove();
           }
         }
+
       }
     }
 

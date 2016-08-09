@@ -20,6 +20,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -80,36 +81,42 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
 
     Report report = PluginHelper.initPluginReport(this);
 
-    for (AIP aip : list) {
-      Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+    try {
+      Job job = PluginHelper.getJobFromIndex(this, index);
 
-      String outcomeDetail = "";
-      try {
-        LOGGER.debug("Auto accepting AIP {}", aip.getId());
+      for (AIP aip : list) {
+        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
 
-        aip.setState(AIPState.ACTIVE);
-        aip = model.updateAIPState(aip);
-        reportItem.setPluginState(PluginState.SUCCESS).setOutcomeObjectState(AIPState.ACTIVE);
-        LOGGER.debug("Done with auto accepting AIP {}", aip.getId());
-      } catch (RODAException e) {
-        LOGGER.error("Error updating AIP (metadata attribute state=ACTIVE)", e);
-        outcomeDetail = "Error updating AIP (metadata attribute state=ACTIVE): " + e.getMessage();
-        reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(outcomeDetail)
-          .setOutcomeObjectState(AIPState.UNDER_APPRAISAL);
+        String outcomeDetail = "";
+        try {
+          LOGGER.debug("Auto accepting AIP {}", aip.getId());
+
+          aip.setState(AIPState.ACTIVE);
+          aip = model.updateAIPState(aip, job.getUsername());
+          reportItem.setPluginState(PluginState.SUCCESS).setOutcomeObjectState(AIPState.ACTIVE);
+          LOGGER.debug("Done with auto accepting AIP {}", aip.getId());
+        } catch (RODAException e) {
+          LOGGER.error("Error updating AIP (metadata attribute state=ACTIVE)", e);
+          outcomeDetail = "Error updating AIP (metadata attribute state=ACTIVE): " + e.getMessage();
+          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(outcomeDetail)
+            .setOutcomeObjectState(AIPState.UNDER_APPRAISAL);
+        }
+
+        try {
+          boolean notify = true;
+          PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(), outcomeDetail,
+            notify);
+        } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
+          | AuthorizationDeniedException | AlreadyExistsException e) {
+          LOGGER.error("Error creating event: " + e.getMessage(), e);
+        }
+
+        report.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
       }
-
-      try {
-        boolean notify = true;
-        PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(), outcomeDetail,
-          notify);
-      } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
-        | AuthorizationDeniedException | AlreadyExistsException e) {
-        LOGGER.error("Error creating event: " + e.getMessage(), e);
-      }
-
-      report.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+    } catch (RODAException e) {
+      LOGGER.error("Error getting job from plugin", e);
     }
 
     return report;
