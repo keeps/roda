@@ -9,51 +9,51 @@ package org.roda.core.data.exceptions;
 
 /**
  * Thrown to indicate that was not possible to authenticate {@link User} because
- * it's email address is not verified.
+ * it is not active.
  * 
  * @author Rui Castro <rui.castro@gmail.com>
  */
-public class EmailUnverifiedException extends AuthenticationDeniedException {
-  private static final long serialVersionUID = 4619089972230221210L;
+public class InactiveUserException extends AuthenticationDeniedException {
+  private static final long serialVersionUID = -1893919532523481577L;
 
   /**
-   * Constructs a new {@link EmailUnverifiedException}.
+   * Constructs a new {@link InactiveUserException}.
    */
-  public EmailUnverifiedException() {
+  public InactiveUserException() {
   }
 
   /**
-   * Constructs a new {@link EmailUnverifiedException} with the given error
+   * Constructs a new {@link InactiveUserException} with the given error
    * message.
    *
    * @param message
    *          the error message.
    */
-  public EmailUnverifiedException(final String message) {
+  public InactiveUserException(final String message) {
     super(message);
   }
 
   /**
-   * Constructs a new {@link EmailUnverifiedException} with the given cause
+   * Constructs a new {@link InactiveUserException} with the given cause
    * exception.
    *
    * @param cause
    *          the cause exception.
    */
-  public EmailUnverifiedException(final Throwable cause) {
+  public InactiveUserException(final Throwable cause) {
     super(cause);
   }
 
   /**
-   * Constructs a new {@link EmailUnverifiedException} with the given error
-   * message and cause exception.
+   * Constructs a new {@link InactiveUserException} with the given error message
+   * and cause exception.
    *
    * @param message
    *          the error message.
    * @param cause
    *          the cause exception.
    */
-  public EmailUnverifiedException(final String message, final Throwable cause) {
+  public InactiveUserException(final String message, final Throwable cause) {
     super(message, cause);
   }
 
