@@ -184,7 +184,7 @@ public class RodaUtils {
         String basePath = key.getLeft();
         String metadataType = key.getMiddle();
         String metadataVersion = key.getRight();
-        return createMetadataTranformer(basePath, metadataType, metadataVersion);
+        return createMetadataTransformer(basePath, metadataType, metadataVersion);
       }
 
     });
@@ -200,7 +200,7 @@ public class RodaUtils {
       xmlReader.setEntityResolver(new RodaEntityResolver());
       InputSource source = new InputSource(descMetadataReader);
       Source text = new SAXSource(xmlReader, source);
-      
+
       XsltExecutable xsltExecutable = CACHE.get(Triple.of(basePath, metadataType, metadataVersion));
 
       XsltTransformer transformer = xsltExecutable.load();
@@ -220,6 +220,7 @@ public class RodaUtils {
       return new CharArrayReader(transformerResult.toCharArray());
 
     } catch (IOException | SAXException | ExecutionException | SaxonApiException e) {
+      LOGGER.error(e.getMessage(), e);
       throw new GenericException("Could not process descriptive metadata binary " + binary.getStoragePath()
         + " metadata type " + metadataType + " and version " + metadataVersion, e);
     } finally {
@@ -227,8 +228,8 @@ public class RodaUtils {
     }
   }
 
-  protected static XsltExecutable createMetadataTranformer(String basePath, String metadataType, String metadataVersion)
-    throws SaxonApiException, GenericException {
+  protected static XsltExecutable createMetadataTransformer(String basePath, String metadataType,
+    String metadataVersion) throws SaxonApiException, GenericException {
     InputStream transformerStream = null;
 
     try {

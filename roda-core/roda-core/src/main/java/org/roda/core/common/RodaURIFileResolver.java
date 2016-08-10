@@ -9,6 +9,7 @@ package org.roda.core.common;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -28,10 +29,10 @@ import com.google.common.cache.LoadingCache;
 
 class RodaURIResolver implements URIResolver {
 
-  private static CacheLoader<String, ByteArrayInputStream> loader = new CacheLoader<String, ByteArrayInputStream>() {
+  private static CacheLoader<String, byte[]> loader = new CacheLoader<String, byte[]>() {
 
     @Override
-    public ByteArrayInputStream load(String href) throws Exception {
+    public byte[] load(String href) throws Exception {
       InputStream in = null;
       ByteArrayOutputStream out = null;
       try {
@@ -40,7 +41,7 @@ class RodaURIResolver implements URIResolver {
         out = new ByteArrayOutputStream();
         IOUtils.copy(in, out);
 
-        return new ByteArrayInputStream(out.toByteArray());
+        return out.toByteArray();
       } finally {
         IOUtils.closeQuietly(in);
         IOUtils.closeQuietly(out);
@@ -48,14 +49,14 @@ class RodaURIResolver implements URIResolver {
     }
 
   };
-  private static LoadingCache<String, ByteArrayInputStream> cache = CacheBuilder.newBuilder()
+  private static LoadingCache<String, byte[]> cache = CacheBuilder.newBuilder()
     .expireAfterWrite(1, TimeUnit.MINUTES).build(loader);
 
   @Override
   public Source resolve(String href, String base) throws TransformerException {
     try {
-      ByteArrayInputStream in = cache.get(href);
-      return new StreamSource(in);
+      byte[] in = cache.get(href);
+      return new StreamSource(new ByteArrayInputStream(in));
     } catch (ExecutionException e) {
       throw new TransformerException("Could not load URI: " + href, e);
     }
