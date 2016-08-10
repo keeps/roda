@@ -122,6 +122,9 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
   TextBox fax;
 
   @UiField
+  TextBox extra;
+
+  @UiField
   FlowPanel groupSelectPanel;
 
   @UiField(provided = true)
@@ -331,6 +334,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     country.addKeyUpHandler(keyUpHandler);
     phoneNumber.addChangeHandler(changeHandler);
     fax.addChangeHandler(changeHandler);
+    extra.addChangeHandler(changeHandler);
 
     permissionsPanel.addValueChangeHandler(new ValueChangeHandler<List<String>>() {
 
@@ -395,6 +399,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     this.country.setText(user.getCountryName());
     this.phoneNumber.setText(user.getTelephoneNumber());
     this.fax.setText(user.getFax());
+    this.extra.setText(user.getExtra());
 
     this.setMemberGroups(user.getAllGroups());
     this.setPermissions(user.getDirectRoles(), user.getAllRoles());
@@ -455,6 +460,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     user.setCountryName(country.getText());
     user.setTelephoneNumber(phoneNumber.getText());
     user.setFax(fax.getText());
+    user.setExtra(extra.getText());
 
     if (enableGroupSelect) {
       user.setDirectGroups(this.getMemberGroups());
@@ -618,6 +624,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     country.setText("");
     email.setText("");
     fax.setText("");
+    extra.setText("");
     phoneNumber.setText("");
   }
 

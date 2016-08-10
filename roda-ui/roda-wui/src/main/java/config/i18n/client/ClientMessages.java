@@ -1647,6 +1647,8 @@ public interface ClientMessages extends Messages {
 
   String fax();
 
+  String extra();
+
   String userDataNote();
 
   String allGroups();
