@@ -122,6 +122,9 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
   TextBox fax;
 
   @UiField
+  TextBox extra;
+
+  @UiField
   FlowPanel groupSelectPanel;
 
   @UiField(provided = true)
@@ -331,6 +334,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     country.addKeyUpHandler(keyUpHandler);
     phoneNumber.addChangeHandler(changeHandler);
     fax.addChangeHandler(changeHandler);
+    extra.addChangeHandler(changeHandler);
 
     permissionsPanel.addValueChangeHandler(new ValueChangeHandler<List<String>>() {
 
@@ -380,21 +384,8 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
   public void setUser(User user) {
     this.username.setText(user.getName());
     this.fullname.setText(user.getFullName());
-    setSelected(businessCategory, user.getBusinessCategory());
-    setSelected(idType, user.getIdDocumentType());
-    this.idNumber.setText(user.getIdDocument());
-    this.idDate.setValue(user.getIdDocumentDate());
-    this.idLocality.setText(user.getIdDocumentLocation());
-    this.nationality.setText(user.getBirthCountry());
-    this.nif.setText(user.getFinanceIdentificationNumber());
-
     this.email.setText(user.getEmail());
-    this.postalAddress.setText(user.getPostalAddress());
-    this.postalCode.setText(user.getPostalCode());
-    this.locality.setText(user.getLocalityName());
-    this.country.setText(user.getCountryName());
-    this.phoneNumber.setText(user.getTelephoneNumber());
-    this.fax.setText(user.getFax());
+    this.extra.setText(user.getExtra());
 
     this.setMemberGroups(user.getAllGroups());
     this.setPermissions(user.getDirectRoles(), user.getAllRoles());
@@ -440,21 +431,8 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     user.setId(username.getText());
     user.setName(username.getText());
     user.setFullName(fullname.getText());
-    // user.setBusinessCategory(businessCategory.getValue(businessCategory.getSelectedIndex()));
-    // user.setIdDocumentType(idType.getValue(idType.getSelectedIndex()));
-    user.setIdDocument(idNumber.getText());
-    // user.setIdDocumentDate(idDate.getValue());
-    user.setIdDocumentLocation(idLocality.getText());
-    user.setBirthCountry(nationality.getText());
-    user.setFinanceIdentificationNumber(nif.getText());
-
     user.setEmail(email.getText());
-    user.setPostalAddress(postalAddress.getText());
-    user.setPostalCode(postalCode.getText());
-    user.setLocalityName(locality.getText());
-    user.setCountryName(country.getText());
-    user.setTelephoneNumber(phoneNumber.getText());
-    user.setFax(fax.getText());
+    user.setExtra(extra.getText());
 
     if (enableGroupSelect) {
       user.setDirectGroups(this.getMemberGroups());
@@ -618,6 +596,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     country.setText("");
     email.setText("");
     fax.setText("");
+    extra.setText("");
     phoneNumber.setText("");
   }
 
