@@ -1117,7 +1117,7 @@ public class LdapUtility {
       final Entry entryRole = service.newEntry(dnRole);
       entryRole.add(OBJECT_CLASS, "organizationalRole", OBJECT_CLASS_TOP);
       entryRole.add(CN, roleName);
-      entryRole.add(ROLE_OCCUPANT, ldapAdminDN);
+      entryRole.add(ROLE_OCCUPANT, rodaAdminDN);
       service.getAdminSession().add(entryRole);
     } catch (final LdapEntryAlreadyExistsException e) {
       throw new RoleAlreadyExistsException("Role " + roleName + " already exists.", e);
