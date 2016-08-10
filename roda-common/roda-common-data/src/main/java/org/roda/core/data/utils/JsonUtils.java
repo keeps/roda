@@ -20,6 +20,8 @@ import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataMixIn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,8 +73,7 @@ public final class JsonUtils {
     try {
       JsonFactory factory = new JsonFactory();
       ObjectMapper mapper = new ObjectMapper(factory);
-      ret = mapper.readValue(json, new TypeReference<Map<String, String>>() {
-      });
+      ret = mapper.readValue(json, new TypeReference<Map<String, String>>() {});
     } catch (IOException e) {
       LOGGER.error("Error transforming json string to log entry parameters", e);
     }
@@ -84,11 +85,27 @@ public final class JsonUtils {
     try {
       JsonFactory factory = new JsonFactory();
       ObjectMapper mapper = new ObjectMapper(factory);
+      mapper = addMixinsToMapper(mapper, object);
       ret = mapper.writeValueAsString(object);
     } catch (IOException e) {
       LOGGER.error("Error transforming object '" + object + "' to json string", e);
     }
     return ret;
+  }
+
+  private static ObjectMapper addMixinsToMapper(ObjectMapper mapper, Object object) {
+    if (!(object instanceof DescriptiveMetadata)) {
+      if ((object instanceof List<?>)) {
+        List<?> objectList = (List<?>) object;
+        if (!objectList.isEmpty() && !(objectList.get(0) instanceof DescriptiveMetadata)) {
+          mapper.addMixIn(DescriptiveMetadata.class, DescriptiveMetadataMixIn.class);
+        }
+      } else {
+        mapper.addMixIn(DescriptiveMetadata.class, DescriptiveMetadataMixIn.class);
+      }
+    }
+
+    return mapper;
   }
 
   public static <T> T getObjectFromJson(InputStream json, Class<T> objectClass) throws GenericException {

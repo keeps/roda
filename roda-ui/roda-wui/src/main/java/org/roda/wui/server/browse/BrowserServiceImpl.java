@@ -339,7 +339,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public void deleteDescriptiveMetadataFile(String itemId, String descriptiveMetadataId)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.deleteDescriptiveMetadataFile(user, itemId, descriptiveMetadataId);
+    Browser.deleteAIPDescriptiveMetadataFile(user, itemId, descriptiveMetadataId);
   }
 
   public String createTransferredResourcesFolder(String parent, String folderName)

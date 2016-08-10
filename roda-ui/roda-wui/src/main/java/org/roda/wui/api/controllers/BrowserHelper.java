@@ -490,45 +490,86 @@ public class BrowserHelper {
   }
 
   protected static void validateListAIPDescriptiveMetadataParams(String acceptFormat) throws RequestNotValidException {
-    if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
-      throw new RequestNotValidException("Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT
-        + "' value. Expected values: " + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN));
+    if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)
+      && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)) {
+      throw new RequestNotValidException(
+        "Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT + "' value. Expected values: " + Arrays
+          .asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN, RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON));
     }
   }
 
-  protected static StreamResponse listAIPDescriptiveMetadata(String aipId, String start, String limit)
-    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
-    List<DescriptiveMetadata> metadata = null;
-
+  protected static StreamResponse listAIPDescriptiveMetadata(String aipId, String start, String limit,
+    String acceptFormat)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     ModelService model = RodaCoreFactory.getModelService();
+    AIP aip = model.retrieveAIP(aipId);
+    List<DescriptiveMetadata> metadata = aip.getDescriptiveMetadata();
+    return listDescriptiveMetadata(metadata, aipId, start, limit, acceptFormat);
+  }
+
+  protected static StreamResponse listRepresentationDescriptiveMetadata(String aipId, String representationId,
+    String start, String limit, String acceptFormat)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    ModelService model = RodaCoreFactory.getModelService();
+    Representation representation = model.retrieveRepresentation(aipId, representationId);
+    List<DescriptiveMetadata> metadata = representation.getDescriptiveMetadata();
+    return listDescriptiveMetadata(metadata, aipId, start, limit, acceptFormat);
+  }
+
+  private static StreamResponse listDescriptiveMetadata(List<DescriptiveMetadata> metadata, String aipId, String start,
+    String limit, String acceptFormat)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     StorageService storage = RodaCoreFactory.getStorageService();
-    metadata = model.retrieveAIP(aipId).getDescriptiveMetadata();
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
     int startInt = pagingParams.getFirst();
     int limitInt = pagingParams.getSecond();
     int counter = 0;
-    List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
-    for (DescriptiveMetadata dm : metadata) {
-      if (counter >= startInt && (counter <= limitInt || limitInt == -1)) {
-        StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, dm.getId());
-        Binary binary = storage.getBinary(storagePath);
-        ZipEntryInfo info = new ZipEntryInfo(storagePath.getName(), binary.getContent());
-        zipEntries.add(info);
-      } else {
-        break;
+
+    if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
+      List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
+      for (DescriptiveMetadata dm : metadata) {
+        if (counter >= startInt && (counter <= limitInt || limitInt == -1)) {
+          StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, dm.getId());
+          Binary binary = storage.getBinary(storagePath);
+          ZipEntryInfo info = new ZipEntryInfo(storagePath.getName(), binary.getContent());
+          zipEntries.add(info);
+        } else {
+          break;
+        }
+        counter++;
       }
-      counter++;
+
+      return createZipStreamResponse(zipEntries, aipId);
+    } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)) {
+      int endInt = limitInt == -1 ? metadata.size() : (limitInt > metadata.size() ? metadata.size() : limitInt);
+      String json = JsonUtils.getJsonFromObject(metadata.subList(startInt, endInt));
+
+      String filename = "";
+      String mediaType = MediaType.APPLICATION_JSON;
+      StreamingOutput stream = new StreamingOutput() {
+        @Override
+        public void write(OutputStream os) throws IOException, WebApplicationException {
+          InputStream inputStream = IOUtils.toInputStream(json, "UTF-8");
+          try {
+            IOUtils.copy(inputStream, os);
+          } finally {
+            IOUtils.closeQuietly(inputStream);
+          }
+        }
+      };
+      return new StreamResponse(filename, mediaType, stream);
     }
 
-    return createZipStreamResponse(zipEntries, aipId);
+    return null;
   }
 
-  protected static void validateGetAIPDescritiveMetadataParams(String acceptFormat) throws RequestNotValidException {
+  protected static void validateGetAIPDescriptiveMetadataParams(String acceptFormat) throws RequestNotValidException {
     if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)
-      && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
-      throw new RequestNotValidException(
-        "Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT + "' value. Expected values: " + Arrays
-          .asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML, RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML));
+      && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)
+      && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)) {
+      throw new RequestNotValidException("Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT
+        + "' value. Expected values: " + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML,
+          RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML, RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON));
     }
   }
 
@@ -540,13 +581,10 @@ public class BrowserHelper {
     final String mediaType;
     final StreamingOutput stream;
     StreamResponse ret = null;
-
     ModelService model = RodaCoreFactory.getModelService();
-    Binary descriptiveMetadataBinary;
-
-    descriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aipId, metadataId);
 
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
+      Binary descriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aipId, metadataId);
       filename = descriptiveMetadataBinary.getStoragePath().getName();
       mediaType = MediaType.TEXT_XML;
       stream = new StreamingOutput() {
@@ -558,6 +596,7 @@ public class BrowserHelper {
       ret = new StreamResponse(filename, mediaType, stream);
 
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
+      Binary descriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aipId, metadataId);
       filename = descriptiveMetadataBinary.getStoragePath().getName() + ".html";
       DescriptiveMetadata descriptiveMetadata = model.retrieveDescriptiveMetadata(aipId, metadataId);
       mediaType = MediaType.TEXT_HTML;
@@ -574,6 +613,104 @@ public class BrowserHelper {
 
       };
       ret = new StreamResponse(filename, mediaType, stream);
+
+    } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)) {
+      AIP aip = model.retrieveAIP(aipId);
+      List<DescriptiveMetadata> resultList = aip.getDescriptiveMetadata().stream()
+        .filter(dm -> dm.getId().equals(metadataId)).collect(Collectors.toList());
+      if (!resultList.isEmpty()) {
+        String json = JsonUtils.getJsonFromObject(resultList.get(0));
+
+        filename = "";
+        mediaType = MediaType.APPLICATION_JSON;
+        stream = new StreamingOutput() {
+          @Override
+          public void write(OutputStream os) throws IOException, WebApplicationException {
+            InputStream inputStream = IOUtils.toInputStream(json, "UTF-8");
+            try {
+              IOUtils.copy(inputStream, os);
+            } finally {
+              IOUtils.closeQuietly(inputStream);
+            }
+          }
+        };
+        return new StreamResponse(filename, mediaType, stream);
+      } else {
+        throw new GenericException("Descriptive metadata not found on the AIP");
+      }
+
+    } else {
+      throw new GenericException("Unsupported accept format: " + acceptFormat);
+    }
+
+    return ret;
+  }
+
+  public static StreamResponse retrieveRepresentationDescriptiveMetadata(String aipId, String representationId,
+    String metadataId, String acceptFormat, String language)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+
+    final String filename;
+    final String mediaType;
+    final StreamingOutput stream;
+    StreamResponse ret = null;
+    ModelService model = RodaCoreFactory.getModelService();
+
+    if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
+      Binary descriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aipId, representationId, metadataId);
+      filename = descriptiveMetadataBinary.getStoragePath().getName();
+      mediaType = MediaType.TEXT_XML;
+      stream = new StreamingOutput() {
+        @Override
+        public void write(OutputStream os) throws IOException, WebApplicationException {
+          IOUtils.copy(descriptiveMetadataBinary.getContent().createInputStream(), os);
+        }
+      };
+      ret = new StreamResponse(filename, mediaType, stream);
+
+    } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
+      Binary descriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aipId, representationId, metadataId);
+      filename = descriptiveMetadataBinary.getStoragePath().getName() + ".html";
+      DescriptiveMetadata descriptiveMetadata = model.retrieveDescriptiveMetadata(aipId, representationId, metadataId);
+      mediaType = MediaType.TEXT_HTML;
+      String htmlDescriptive = HTMLUtils.descriptiveMetadataToHtml(descriptiveMetadataBinary,
+        descriptiveMetadata.getType(), descriptiveMetadata.getVersion(), ServerTools.parseLocale(language));
+      stream = new StreamingOutput() {
+
+        @Override
+        public void write(OutputStream os) throws IOException, WebApplicationException {
+          PrintStream printStream = new PrintStream(os);
+          printStream.print(htmlDescriptive);
+          printStream.close();
+        }
+
+      };
+      ret = new StreamResponse(filename, mediaType, stream);
+
+    } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)) {
+      Representation representation = model.retrieveRepresentation(aipId, representationId);
+      List<DescriptiveMetadata> resultList = representation.getDescriptiveMetadata().stream()
+        .filter(dm -> dm.getId().equals(metadataId)).collect(Collectors.toList());
+      if (!resultList.isEmpty()) {
+        String json = JsonUtils.getJsonFromObject(resultList.get(0));
+
+        filename = "";
+        mediaType = MediaType.APPLICATION_JSON;
+        stream = new StreamingOutput() {
+          @Override
+          public void write(OutputStream os) throws IOException, WebApplicationException {
+            InputStream inputStream = IOUtils.toInputStream(json, "UTF-8");
+            try {
+              IOUtils.copy(inputStream, os);
+            } finally {
+              IOUtils.closeQuietly(inputStream);
+            }
+          }
+        };
+        return new StreamResponse(filename, mediaType, stream);
+      } else {
+        throw new GenericException("Descriptive metadata not found on the Representation");
+      }
 
     } else {
       throw new GenericException("Unsupported accept format: " + acceptFormat);
@@ -1006,9 +1143,9 @@ public class BrowserHelper {
 
   }
 
-  public static void deleteDescriptiveMetadataFile(String aipId, String descriptiveMetadataId)
+  public static void deleteDescriptiveMetadataFile(String aipId, String representationId, String descriptiveMetadataId)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    RodaCoreFactory.getModelService().deleteDescriptiveMetadata(aipId, descriptiveMetadataId);
+    RodaCoreFactory.getModelService().deleteDescriptiveMetadata(aipId, representationId, descriptiveMetadataId);
   }
 
   public static DescriptiveMetadata retrieveMetadataFile(String aipId, String descriptiveMetadataId)
@@ -1088,10 +1225,10 @@ public class BrowserHelper {
     return new StreamResponse(filename, mediaType, stream);
   }
 
-  public static void createOrUpdateAIPDescriptiveMetadataFile(String aipId, String metadataId, String metadataType,
-    String metadataVersion, String updateMessage, InputStream is, FormDataContentDisposition fileDetail, boolean create)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException,
-    AlreadyExistsException, ValidationException {
+  public static void createOrUpdateAIPDescriptiveMetadataFile(String aipId, String representationId, String metadataId,
+    String metadataType, String metadataVersion, String updateMessage, InputStream is,
+    FormDataContentDisposition fileDetail, boolean create) throws GenericException, RequestNotValidException,
+    NotFoundException, AuthorizationDeniedException, AlreadyExistsException, ValidationException {
     Path file = null;
     try {
       ModelService model = RodaCoreFactory.getModelService();
@@ -1100,10 +1237,12 @@ public class BrowserHelper {
       ContentPayload payload = new FSPathContentPayload(file);
 
       if (create) {
-        model.createDescriptiveMetadata(aipId, metadataId, payload, metadataType, metadataVersion);
+        model.createDescriptiveMetadata(aipId, representationId, metadataId, payload, metadataType, metadataVersion);
       } else {
-        model.updateDescriptiveMetadata(aipId, metadataId, payload, metadataType, metadataVersion, updateMessage);
+        model.updateDescriptiveMetadata(aipId, representationId, metadataId, payload, metadataType, metadataVersion,
+          updateMessage);
       }
+
     } catch (IOException e) {
       throw new GenericException("Error creating or updating AIP descriptive metadata file", e);
     } finally {

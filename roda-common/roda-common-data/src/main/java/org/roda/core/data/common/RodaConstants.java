@@ -143,6 +143,7 @@ public final class RodaConstants {
   // "http path param" related strings
   public static final String API_PATH_PARAM_AIP_ID = "aip_id";
   public static final String API_PATH_PARAM_REPRESENTATION_ID = "representation_id";
+  public static final String API_PATH_PARAM_REPRESENTATION_UUID = "representation_uuid";
   public static final String API_PATH_PARAM_FILE_UUID = "file_uuid";
   public static final String API_PATH_PARAM_METADATA_ID = "metadata_id";
   public static final String API_QUERY_PARAM_VERSION = "version";

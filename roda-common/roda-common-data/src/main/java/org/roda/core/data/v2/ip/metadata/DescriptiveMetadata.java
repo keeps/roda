@@ -10,12 +10,13 @@ package org.roda.core.data.v2.ip.metadata;
 import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class DescriptiveMetadata implements Serializable {
   private static final long serialVersionUID = 5460845130599998867L;
 
   private String id;
-  @JsonIgnore
   private String aipId;
   private String representationId;
   private String type;
