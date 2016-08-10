@@ -384,14 +384,11 @@ pre code {
 .form-label {
 	margin-top: 5px;
 }
-
 .form-separator {
-	background-color: #999;
-color: WHITE;
-border-bottom: 0px SOLID #089DE3;
-font-size: 16px;
-margin: 0px -15px !important;
-padding: 5px 15px !important;
+	color: #089de3;
+	font-size: 1.8rem;
+	margin: 1em -15px 0 -15px !important;
+	padding: 5px 15px !important;
 }
 
 .form-separator:first-child{

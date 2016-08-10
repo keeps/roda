@@ -58,13 +58,13 @@
 				</div>
 			</div>
 		</xsl:if>
-		<xsl:if test="ead:did/ead:unittitle/@type">
+		<xsl:if test="eadc:did/eadc:unittitle/@type">
 			<div class="field">
 				<div class="label">
 					<xsl:value-of select="$i18n.titletype" />
 				</div>
 				<div class="value">
-					<xsl:value-of select="ead:did/ead:unittitle/@type" />
+					<xsl:value-of select="eadc:did/eadc:unittitle/@type" />
 				</div>
 			</div>
 		</xsl:if>
@@ -683,7 +683,7 @@
 				</div>
 			</div>
 		</xsl:if>
-		<xsl:if test="eadc:altformavail/ead:p/text()">
+		<xsl:if test="eadc:altformavail/eadc:p/text()">
 			<div class="field">
 				<div class="label">
 					<xsl:value-of select="$i18n.altformavail" />
