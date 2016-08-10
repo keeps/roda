@@ -10,8 +10,6 @@
  */
 package org.roda.wui.client.management;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,21 +34,16 @@ import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
-import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.user.datepicker.client.DateBox;
-import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 
 import config.i18n.client.ClientGeneratedMessages;
 import config.i18n.client.ClientMessages;
@@ -66,9 +59,11 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
-  private static ClientGeneratedMessages generatedMessages = (ClientGeneratedMessages) GWT
-    .create(ClientGeneratedMessages.class);
+  // private static ClientMessages messages = (ClientMessages)
+  // GWT.create(ClientMessages.class);
+  // private static ClientGeneratedMessages generatedMessages =
+  // (ClientGeneratedMessages) GWT
+  // .create(ClientGeneratedMessages.class);
 
   @UiField
   TextBox username;
@@ -79,50 +74,50 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
   @UiField
   TextBox fullname;
 
-  @UiField
-  ListBox businessCategory;
-
-  @UiField
-  ListBox idType;
-
-  @UiField
-  TextBox idNumber;
-
-  @UiField
-  DateBox idDate;
-
-  @UiField
-  TextBox idLocality;
-
-  @UiField(provided = true)
-  SuggestBox nationality;
-
-  @UiField
-  TextBox nif;
+  // @UiField
+  // ListBox businessCategory;
+  //
+  // @UiField
+  // ListBox idType;
+  //
+  // @UiField
+  // TextBox idNumber;
+  //
+  // @UiField
+  // DateBox idDate;
+  //
+  // @UiField
+  // TextBox idLocality;
+  //
+  // @UiField(provided = true)
+  // SuggestBox nationality;
+  //
+  // @UiField
+  // TextBox nif;
 
   @UiField
   TextBox email;
 
-  @UiField
-  TextArea postalAddress;
+  // @UiField
+  // TextArea postalAddress;
+  //
+  // @UiField
+  // TextBox postalCode;
+  //
+  // @UiField
+  // TextBox locality;
+  //
+  // @UiField(provided = true)
+  // SuggestBox country;
+  //
+  // @UiField
+  // TextBox phoneNumber;
+  //
+  // @UiField
+  // TextBox fax;
 
   @UiField
-  TextBox postalCode;
-
-  @UiField
-  TextBox locality;
-
-  @UiField(provided = true)
-  SuggestBox country;
-
-  @UiField
-  TextBox phoneNumber;
-
-  @UiField
-  TextBox fax;
-
-  @UiField
-  TextBox extra;
+  TextArea extra;
 
   @UiField
   FlowPanel groupSelectPanel;
@@ -186,34 +181,34 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
     password = new PasswordPanel(editmode);
 
-    MultiWordSuggestOracle nationalityOracle = new MultiWordSuggestOracle();
-    List<String> nationalityList = new ArrayList<String>();
+    // MultiWordSuggestOracle nationalityOracle = new MultiWordSuggestOracle();
+    // List<String> nationalityList = new ArrayList<String>();
 
-    int i = 0;
-    String message = "";
-    do {
-      message = generatedMessages.countryList(i++);
-      if (!message.isEmpty()) {
-        nationalityList.add(message);
-      }
-    } while (!message.isEmpty());
+    // int i = 0;
+    // String message = "";
+    // do {
+    // message = generatedMessages.countryList(i++);
+    // if (!message.isEmpty()) {
+    // nationalityList.add(message);
+    // }
+    // } while (!message.isEmpty());
 
-    nationalityOracle.addAll(nationalityList);
-    nationality = new SuggestBox(nationalityOracle);
+    // nationalityOracle.addAll(nationalityList);
+    // nationality = new SuggestBox(nationalityOracle);
 
-    MultiWordSuggestOracle countryOracle = new MultiWordSuggestOracle();
-    List<String> countryList = new ArrayList<String>();
-
-    i = 0;
-    do {
-      message = generatedMessages.countryList(i++);
-      if (!message.isEmpty()) {
-        countryList.add(message);
-      }
-    } while (!message.isEmpty());
-
-    countryOracle.addAll(countryList);
-    country = new SuggestBox(countryOracle);
+    // MultiWordSuggestOracle countryOracle = new MultiWordSuggestOracle();
+    // List<String> countryList = new ArrayList<String>();
+    //
+    // i = 0;
+    // do {
+    // message = generatedMessages.countryList(i++);
+    // if (!message.isEmpty()) {
+    // countryList.add(message);
+    // }
+    // } while (!message.isEmpty());
+    //
+    // countryOracle.addAll(countryList);
+    // country = new SuggestBox(countryOracle);
 
     groupSelect = new GroupSelect(enableGroupSelect);
 
@@ -226,31 +221,32 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     groupSelectPanel.setVisible(enableGroupSelect);
     permissionsSelectPanel.setVisible(enablePermissions);
 
-    businessCategory.setVisibleItemCount(1);
-
-    i = 0;
-    do {
-      message = messages.getJobFunctions(i++);
-      if (!message.isEmpty()) {
-        businessCategory.addItem(message);
-      }
-    } while (!message.isEmpty());
-
-    idType.setVisibleItemCount(1);
-    for (String type : User.ID_TYPES) {
-      String typeText = messages.id_type(type);
-
-      if (typeText.isEmpty()) {
-        typeText = type;
-      }
-
-      idType.addItem(typeText, type);
-    }
-
-    DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
-    idDate.setFormat(dateFormat);
-    idDate.getDatePicker().setYearArrowsVisible(true);
-    idDate.setFireNullValues(true);
+    // businessCategory.setVisibleItemCount(1);
+    //
+    // i = 0;
+    // do {
+    // message = messages.getJobFunctions(i++);
+    // if (!message.isEmpty()) {
+    // businessCategory.addItem(message);
+    // }
+    // } while (!message.isEmpty());
+    //
+    // idType.setVisibleItemCount(1);
+    // for (String type : User.ID_TYPES) {
+    // String typeText = messages.id_type(type);
+    //
+    // if (typeText.isEmpty()) {
+    // typeText = type;
+    // }
+    //
+    // idType.addItem(typeText, type);
+    // }
+    //
+    // DefaultFormat dateFormat = new
+    // DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
+    // idDate.setFormat(dateFormat);
+    // idDate.getDatePicker().setYearArrowsVisible(true);
+    // idDate.setFireNullValues(true);
 
     // username.setFocus(true);
 
@@ -306,34 +302,34 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     password.addValueChangeHandler(valueChangedHandler);
     fullname.addChangeHandler(changeHandler);
     fullname.addKeyUpHandler(keyUpHandler);
-    businessCategory.addChangeHandler(changeHandler);
-    idType.addChangeHandler(changeHandler);
-    idNumber.addChangeHandler(changeHandler);
-    idNumber.addKeyUpHandler(keyUpHandler);
-    idDate.addValueChangeHandler(new ValueChangeHandler<Date>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<Date> event) {
-        onChange();
-      }
-    });
-    idLocality.addChangeHandler(changeHandler);
-    idLocality.addKeyUpHandler(keyUpHandler);
-    nationality.addValueChangeHandler(valueChangedHandler);
-    nationality.addSelectionHandler(selectionHandler);
-    nationality.addKeyUpHandler(keyUpHandler);
-    nif.addChangeHandler(changeHandler);
-
-    email.addChangeHandler(changeHandler);
-    email.addKeyUpHandler(keyUpHandler);
-    postalAddress.addChangeHandler(changeHandler);
-    postalCode.addChangeHandler(changeHandler);
-    locality.addChangeHandler(changeHandler);
-    country.addValueChangeHandler(valueChangedHandler);
-    country.addSelectionHandler(selectionHandler);
-    country.addKeyUpHandler(keyUpHandler);
-    phoneNumber.addChangeHandler(changeHandler);
-    fax.addChangeHandler(changeHandler);
+    // businessCategory.addChangeHandler(changeHandler);
+    // idType.addChangeHandler(changeHandler);
+    // idNumber.addChangeHandler(changeHandler);
+    // idNumber.addKeyUpHandler(keyUpHandler);
+    // idDate.addValueChangeHandler(new ValueChangeHandler<Date>() {
+    //
+    // @Override
+    // public void onValueChange(ValueChangeEvent<Date> event) {
+    // onChange();
+    // }
+    // });
+    // idLocality.addChangeHandler(changeHandler);
+    // idLocality.addKeyUpHandler(keyUpHandler);
+    // nationality.addValueChangeHandler(valueChangedHandler);
+    // nationality.addSelectionHandler(selectionHandler);
+    // nationality.addKeyUpHandler(keyUpHandler);
+    // nif.addChangeHandler(changeHandler);
+    //
+    // email.addChangeHandler(changeHandler);
+    // email.addKeyUpHandler(keyUpHandler);
+    // postalAddress.addChangeHandler(changeHandler);
+    // postalCode.addChangeHandler(changeHandler);
+    // locality.addChangeHandler(changeHandler);
+    // country.addValueChangeHandler(valueChangedHandler);
+    // country.addSelectionHandler(selectionHandler);
+    // country.addKeyUpHandler(keyUpHandler);
+    // phoneNumber.addChangeHandler(changeHandler);
+    // fax.addChangeHandler(changeHandler);
     extra.addChangeHandler(changeHandler);
 
     permissionsPanel.addValueChangeHandler(new ValueChangeHandler<List<String>>() {
@@ -516,28 +512,28 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
       fullname.removeStyleName("isWrong");
     }
 
-    if (idNumber.getText().length() == 0) {
-      valid = false;
-      idNumber.addStyleName("isWrong");
-    } else {
-      idNumber.removeStyleName("isWrong");
-    }
+    // if (idNumber.getText().length() == 0) {
+    // valid = false;
+    // idNumber.addStyleName("isWrong");
+    // } else {
+    // idNumber.removeStyleName("isWrong");
+    // }
 
     // idDate.setValidStyle(idDate.isValid(), "isWrong");
 
-    if (idLocality.getText().length() == 0) {
-      valid = false;
-      idLocality.addStyleName("isWrong");
-    } else {
-      idLocality.removeStyleName("isWrong");
-    }
-
-    if (nationality.getText().length() == 0) {
-      valid = false;
-      nationality.addStyleName("isWrong");
-    } else {
-      nationality.removeStyleName("isWrong");
-    }
+    // if (idLocality.getText().length() == 0) {
+    // valid = false;
+    // idLocality.addStyleName("isWrong");
+    // } else {
+    // idLocality.removeStyleName("isWrong");
+    // }
+    //
+    // if (nationality.getText().length() == 0) {
+    // valid = false;
+    // nationality.addStyleName("isWrong");
+    // } else {
+    // nationality.removeStyleName("isWrong");
+    // }
 
     if (!email.getText()
       .matches("^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[_A-Za-z0-9-]+)")) {
@@ -547,12 +543,12 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
       email.removeStyleName("isWrong");
     }
 
-    if (country.getText().length() == 0) {
-      valid = false;
-      country.addStyleName("isWrong");
-    } else {
-      country.removeStyleName("isWrong");
-    }
+    // if (country.getText().length() == 0) {
+    // valid = false;
+    // country.addStyleName("isWrong");
+    // } else {
+    // country.removeStyleName("isWrong");
+    // }
 
     checked = true;
 
@@ -587,17 +583,17 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
   public void clear() {
     username.setText("");
     password.clear();
-    businessCategory.setSelectedIndex(0);
+    // businessCategory.setSelectedIndex(0);
     fullname.setText("");
-    idNumber.setText("");
-    postalAddress.setText("");
-    postalCode.setText("");
-    locality.setText("");
-    country.setText("");
+    // idNumber.setText("");
+    // postalAddress.setText("");
+    // postalCode.setText("");
+    // locality.setText("");
+    // country.setText("");
     email.setText("");
-    fax.setText("");
+    // fax.setText("");
     extra.setText("");
-    phoneNumber.setText("");
+    // phoneNumber.setText("");
   }
 
   /**

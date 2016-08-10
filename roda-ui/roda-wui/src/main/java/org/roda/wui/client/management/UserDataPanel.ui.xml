@@ -32,6 +32,7 @@
 					<ui:text from='{messages.fullname}' />
 				</g:Label>
 				<g:TextBox ui:field="fullname" addStyleNames="form-textbox" />
+				<!-- 
 				<g:Label addStyleNames="form-label">
 					<ui:text from="{messages.jobFunction}" />
 				</g:Label>
@@ -54,10 +55,12 @@
 					<ui:text from="{messages.nif}" />
 				</g:Label>
 				<g:TextBox ui:field="nif" addStyleNames="form-textbox" />
+				 -->
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.email}' />
 				</g:Label>
 				<g:TextBox ui:field="email" addStyleNames="form-textbox" />
+				<!--
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.address}' />
 				</g:Label>
@@ -79,10 +82,11 @@
 					<ui:text from='{messages.fax}' />
 				</g:Label>
 				<g:TextBox ui:field="fax" addStyleNames="form-textbox" />
+				-->
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.extra}' />
 				</g:Label>
-				<g:TextBox ui:field="extra" addStyleNames="form-textbox" />
+				<g:TextArea ui:field="extra" addStyleNames="form-textbox" />
 				<g:Label styleName="wui-user-data-note">
 					<ui:text from="{messages.userDataNote}" />
 				</g:Label>
