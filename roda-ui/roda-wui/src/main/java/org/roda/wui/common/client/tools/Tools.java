@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.roda.wui.common.client.HistoryResolver;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
@@ -78,7 +79,7 @@ public class Tools {
     List<String> splitted = Arrays.asList(hash.split(HISTORY_SEP_REGEX));
     List<String> tokens = new ArrayList<String>();
     for (String item : splitted) {
-      tokens.add(URL.decode(item));
+      tokens.add(URL.decodeQueryString(item));
     }
     return tokens;
   }
