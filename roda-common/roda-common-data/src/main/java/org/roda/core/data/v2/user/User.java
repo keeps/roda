@@ -68,6 +68,9 @@ public class User extends RodaUser {
   // LDAP info
   private String emailConfirmationTokenExpirationDate = null;
 
+  /** Extra information about this user. */
+  private String extra = null;
+
   /**
    * Constructs a new empty user.
    */
@@ -81,7 +84,7 @@ public class User extends RodaUser {
    * @param name
    *          the name of the new user.
    */
-  public User(String name) {
+  public User(final String name) {
     super();
     super.setName(name);
     super.setId(name);
@@ -94,7 +97,7 @@ public class User extends RodaUser {
    * @param user
    *          the User to be cloned.
    */
-  public User(User user) {
+  public User(final User user) {
 
     super(user.getId(), user.getName(), user.getEmail(), false, user.getIpAddress(), user.getDirectGroups(),
       user.getAllGroups(), user.getDirectRoles(), user.getAllRoles());
@@ -123,7 +126,7 @@ public class User extends RodaUser {
     setEmailConfirmationTokenExpirationDate(user.getResetPasswordTokenExpirationDate());
   }
 
-  public User(RodaUser rodaUser) {
+  public User(final RodaUser rodaUser) {
     super(rodaUser);
   }
 
@@ -136,10 +139,10 @@ public class User extends RodaUser {
       + ", financeIdentificationNumber=" + getFinanceIdentificationNumber() + ", birthCountry=" + getBirthCountry()
       + ", postalAddress=" + getPostalAddress() + ", postalCode=" + getPostalCode() + ", localityName="
       + getLocalityName() + ", countryName=" + getCountryName() + ", telephoneName=" + getTelephoneNumber() + ", fax="
-      + getFax() + ", email=" + getEmail() + ", businessCategory=" + getBusinessCategory() + ", resetPasswordToken="
-      + getResetPasswordToken() + ", resetPasswordTokenExpirationDate=" + getResetPasswordTokenExpirationDate()
-      + ", emailConfirmationToken=" + getEmailConfirmationToken() + ", emailConfirmationTokenExpirationDate="
-      + getEmailConfirmationTokenExpirationDate() + ")";
+      + getFax() + ", email=" + getEmail() + ", businessCategory=" + getBusinessCategory() + ", extra=" + getExtra()
+      + ", resetPasswordToken=" + getResetPasswordToken() + ", resetPasswordTokenExpirationDate="
+      + getResetPasswordTokenExpirationDate() + ", emailConfirmationToken=" + getEmailConfirmationToken()
+      + ", emailConfirmationTokenExpirationDate=" + getEmailConfirmationTokenExpirationDate() + ")";
   }
 
   /**
@@ -250,7 +253,7 @@ public class User extends RodaUser {
    * @param email
    *          the email to set
    */
-  public void setEmail(String email) {
+  public void setEmail(final String email) {
     super.setEmail(email);
   }
 
@@ -373,7 +376,7 @@ public class User extends RodaUser {
    * @param resetPasswordToken
    *          the resetPasswordToken to set
    */
-  public void setResetPasswordToken(String resetPasswordToken) {
+  public void setResetPasswordToken(final String resetPasswordToken) {
     this.resetPasswordToken = resetPasswordToken;
   }
 
@@ -388,7 +391,7 @@ public class User extends RodaUser {
    * @param resetPasswordTokenExpirationDate
    *          the resetPasswordTokenExpirationDate to set
    */
-  public void setResetPasswordTokenExpirationDate(String resetPasswordTokenExpirationDate) {
+  public void setResetPasswordTokenExpirationDate(final String resetPasswordTokenExpirationDate) {
     this.resetPasswordTokenExpirationDate = resetPasswordTokenExpirationDate;
   }
 
@@ -403,7 +406,7 @@ public class User extends RodaUser {
    * @param emailConfirmationToken
    *          the emailConfirmationToken to set
    */
-  public void setEmailConfirmationToken(String emailConfirmationToken) {
+  public void setEmailConfirmationToken(final String emailConfirmationToken) {
     this.emailConfirmationToken = emailConfirmationToken;
   }
 
@@ -418,8 +421,27 @@ public class User extends RodaUser {
    * @param emailConfirmationTokenExpirationDate
    *          the emailConfirmationTokenExpirationDate to set
    */
-  public void setEmailConfirmationTokenExpirationDate(String emailConfirmationTokenExpirationDate) {
+  public void setEmailConfirmationTokenExpirationDate(final String emailConfirmationTokenExpirationDate) {
     this.emailConfirmationTokenExpirationDate = emailConfirmationTokenExpirationDate;
+  }
+
+  /**
+   * Get User's extra information.
+   * 
+   * @return a {@link String} with user's extra information.
+   */
+  public String getExtra() {
+    return extra;
+  }
+
+  /**
+   * Set {@link User}'s extra information.
+   * 
+   * @param extra
+   *          a {@link String} with user's extra information.
+   */
+  public void setExtra(final String extra) {
+    this.extra = extra;
   }
 
 }

@@ -1286,6 +1286,7 @@ public class LdapUtility {
     user.setBusinessCategory(getEntryAttributeAsString(entry, "businessCategory"));
     user.setBirthCountry(getEntryAttributeAsString(entry, "friendlyCountryName"));
     user.setCountryName(getEntryAttributeAsString(entry, "countryName"));
+    user.setExtra(getEntryAttributeAsString(entry, "description"));
 
     if (entry.get("info") != null) {
       final String infoStr = entry.get("info").getString();
@@ -1371,6 +1372,9 @@ public class LdapUtility {
     }
     if (StringUtils.isNotBlank(user.getBusinessCategory())) {
       entry.add("businessCategory", user.getBusinessCategory());
+    }
+    if (StringUtils.isNotBlank(user.getExtra())) {
+      entry.add("description", user.getExtra());
     }
 
     final String[] infoParts = new String[] {user.getEmailConfirmationToken(),
