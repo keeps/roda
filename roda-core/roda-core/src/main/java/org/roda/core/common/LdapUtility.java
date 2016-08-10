@@ -15,7 +15,6 @@ import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -82,7 +81,6 @@ import org.roda.core.util.PasswordHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.util.DateParser;
-import org.w3c.util.InvalidDateException;
 
 /**
  * @author Rui Castro
@@ -1268,24 +1266,8 @@ public class LdapUtility {
 
     final User user = new User(getEntryAttributeAsString(entry, UID));
     user.setActive("0".equalsIgnoreCase(getEntryAttributeAsString(entry, SHADOW_INACTIVE)));
-    user.setIdDocumentType(getEntryAttributeAsString(entry, "documentTitle"));
-    user.setIdDocument(getEntryAttributeAsString(entry, "documentIdentifier"));
-    user.setIdDocumentLocation(getEntryAttributeAsString(entry, "documentLocation"));
-    user.setIdDocumentDate(getEntryAttributeAsDate(entry, "documentVersion"));
-    user.setFinanceIdentificationNumber(getEntryAttributeAsString(entry, "serialNumber"));
-    user.setBirthCountry(getEntryAttributeAsString(entry, "co"));
     user.setFullName(getEntryAttributeAsString(entry, CN));
-    user.setPostalAddress(getEntryAttributeAsString(entry, "postalAddress"));
-    user.setPostalCode(getEntryAttributeAsString(entry, "postalCode"));
-    user.setLocalityName(getEntryAttributeAsString(entry, "localityName"));
-    user.setLocalityName(getEntryAttributeAsString(entry, "l"));
-    user.setCountryName(getEntryAttributeAsString(entry, "c"));
-    user.setTelephoneNumber(getEntryAttributeAsString(entry, "telephoneNumber"));
-    user.setFax(getEntryAttributeAsString(entry, "fax"));
     user.setEmail(entry.get(EMAIL).getString());
-    user.setBusinessCategory(getEntryAttributeAsString(entry, "businessCategory"));
-    user.setBirthCountry(getEntryAttributeAsString(entry, "friendlyCountryName"));
-    user.setCountryName(getEntryAttributeAsString(entry, "countryName"));
     user.setExtra(getEntryAttributeAsString(entry, "description"));
 
     if (entry.get("info") != null) {
@@ -1328,50 +1310,8 @@ public class LdapUtility {
         entry.add("sn", user.getName());
       }
     }
-    if (StringUtils.isNotBlank(user.getIdDocumentType())) {
-      entry.add("documentTitle", user.getIdDocumentType());
-    }
-    if (StringUtils.isNotBlank(user.getIdDocument())) {
-      entry.add("documentIdentifier", user.getIdDocument());
-    }
-    if (StringUtils.isNotBlank(user.getIdDocumentLocation())) {
-      entry.add("documentLocation", user.getIdDocumentLocation());
-    }
-    if (user.getIdDocumentDate() != null) {
-      entry.add("documentVersion", DateParser.getIsoDate(user.getIdDocumentDate()));
-    }
-
-    if (StringUtils.isNotBlank(user.getFinanceIdentificationNumber())) {
-      entry.add("serialNumber", user.getFinanceIdentificationNumber());
-    }
-
-    if (StringUtils.isNotBlank(user.getBirthCountry())) {
-      entry.add("friendlyCountryName", user.getBirthCountry());
-    }
-
-    if (StringUtils.isNotBlank(user.getPostalAddress())) {
-      entry.add("postalAddress", user.getPostalAddress());
-    }
-    if (StringUtils.isNotBlank(user.getPostalCode())) {
-      entry.add("postalCode", user.getPostalCode());
-    }
-    if (StringUtils.isNotBlank(user.getLocalityName())) {
-      entry.add("localityName", user.getLocalityName());
-    }
-    if (StringUtils.isNotBlank(user.getCountryName())) {
-      entry.add("countryName", user.getCountryName());
-    }
-    if (StringUtils.isNotBlank(user.getTelephoneNumber())) {
-      entry.add("telephoneNumber", user.getTelephoneNumber());
-    }
-    if (StringUtils.isNotBlank(user.getFax())) {
-      entry.add("fax", user.getFax());
-    }
     if (StringUtils.isNotBlank(user.getEmail())) {
       entry.add(EMAIL, user.getEmail());
-    }
-    if (StringUtils.isNotBlank(user.getBusinessCategory())) {
-      entry.add("businessCategory", user.getBusinessCategory());
     }
     if (StringUtils.isNotBlank(user.getExtra())) {
       entry.add("description", user.getExtra());
@@ -2061,20 +2001,6 @@ public class LdapUtility {
       value = attribute.getString();
     }
     return value;
-  }
-
-  private Date getEntryAttributeAsDate(final Entry entry, final String attributeName)
-    throws LdapInvalidAttributeValueException {
-    final Attribute attribute = entry.get(attributeName);
-    Date date = null;
-    if (attribute != null) {
-      try {
-        date = DateParser.parse(attribute.getString());
-      } catch (final InvalidDateException e) {
-        LOGGER.warn("Error parsing date from attribute (" + attributeName + ") - " + e.getMessage(), e);
-      }
-    }
-    return date;
   }
 
 }
