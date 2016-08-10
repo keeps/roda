@@ -7,6 +7,10 @@
  */
 package org.roda.core.plugins.plugins.ingest;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -29,20 +33,18 @@ import org.roda_project.commons_ip.model.IPDescriptiveMetadata;
 import org.roda_project.commons_ip.model.IPFile;
 import org.roda_project.commons_ip.model.IPMetadata;
 import org.roda_project.commons_ip.model.IPRepresentation;
+import org.roda_project.commons_ip.model.RepresentationStatus;
 import org.roda_project.commons_ip.model.SIP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-
 public class EARKSIPToAIPPluginUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(EARKSIPToAIPPluginUtils.class);
 
-  public static AIP earkSIPToAIP(SIP sip, String username, Permissions fullPermissions, ModelService model, StorageService storage, String ingestSIPId,
-    String ingestJobId, String parentId) throws RequestNotValidException, NotFoundException, GenericException,
-    AlreadyExistsException, AuthorizationDeniedException, ValidationException, IOException {
+  public static AIP earkSIPToAIP(SIP sip, String username, Permissions fullPermissions, ModelService model,
+    StorageService storage, String ingestSIPId, String ingestJobId, String parentId)
+    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException, ValidationException, IOException {
 
     AIPState state = AIPState.INGEST_PROCESSING;
     Permissions permissions = new Permissions();
@@ -65,7 +67,8 @@ public class EARKSIPToAIPPluginUtils {
     AIP createdAIP = model.retrieveAIP(aip.getId());
 
     // Set Permissions
-    Permissions readPermissions = PermissionUtils.grantReadPermissionToUserGroup(model, createdAIP, aip.getPermissions());
+    Permissions readPermissions = PermissionUtils.grantReadPermissionToUserGroup(model, createdAIP,
+      aip.getPermissions());
     Permissions finalPermissions = PermissionUtils.grantAllPermissions(username, readPermissions, fullPermissions);
     createdAIP.setPermissions(finalPermissions);
     model.updateAIP(createdAIP);
@@ -74,8 +77,9 @@ public class EARKSIPToAIPPluginUtils {
 
   }
 
-  public static AIP earkSIPToAIPUpdate(SIP sip, String aipId, ModelService model, StorageService storage) throws RequestNotValidException, NotFoundException,
-    GenericException, AlreadyExistsException, AuthorizationDeniedException, ValidationException {
+  public static AIP earkSIPToAIPUpdate(SIP sip, String aipId, ModelService model, StorageService storage)
+    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException, ValidationException {
     boolean notify = false;
 
     // process IP information
@@ -204,8 +208,8 @@ public class EARKSIPToAIPPluginUtils {
   private static void processIPRepresentationInformation(ModelService model, IPRepresentation sr, String aipId,
     StorageService storage, boolean notify, boolean update) throws RequestNotValidException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, NotFoundException, ValidationException {
-    boolean original = true;
     String representationType = IngestHelper.getType(sr);
+    boolean isOriginal = RepresentationStatus.getORIGINAL().equals(sr.getStatus());
 
     Representation representation = null;
     if (update) {
@@ -216,7 +220,7 @@ public class EARKSIPToAIPPluginUtils {
     }
     // Either we're not updating or the retrieve failed
     if (representation == null) {
-      representation = model.createRepresentation(aipId, sr.getObjectID(), original, representationType, notify);
+      representation = model.createRepresentation(aipId, sr.getObjectID(), isOriginal, representationType, notify);
     }
     // process representation descriptive metadata
     processDescriptiveMetadata(model, aipId, representation.getId(), sr.getDescriptiveMetadata(), notify, update);
