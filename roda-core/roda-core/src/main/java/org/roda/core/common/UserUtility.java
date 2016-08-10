@@ -32,8 +32,8 @@ import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsFilter;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.user.RodaSimpleUser;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.index.IndexService;
@@ -122,7 +122,7 @@ public class UserUtility {
     return getUser(request, true);
   }
 
-  public static void checkRoles(RodaUser rsu, List<String> rolesToCheck) throws AuthorizationDeniedException {
+  public static void checkRoles(final RodaUser rsu, final List<String> rolesToCheck) throws AuthorizationDeniedException {
     if (!rsu.getAllRoles().containsAll(rolesToCheck)) {
       LOGGER.debug("User \"{}\" roles: {} vs. roles to check: {}", rsu.getId(), rsu.getAllRoles(), rolesToCheck);
       throw new AuthorizationDeniedException(
@@ -130,13 +130,21 @@ public class UserUtility {
     }
   }
 
-  public static void checkRoles(RodaUser user, String... rolesToCheck) throws AuthorizationDeniedException {
+  public static void checkRoles(final RodaUser user, final String... rolesToCheck) throws AuthorizationDeniedException {
     checkRoles(user, Arrays.asList(rolesToCheck));
   }
 
-  public static void checkRoles(RodaUser user, Class<?> invokingMethodInnerClass) throws AuthorizationDeniedException {
+  public static void checkRoles(final RodaUser user, final Class<?> invokingMethodInnerClass)
+    throws AuthorizationDeniedException {
+    checkRoles(user, invokingMethodInnerClass, null);
+  }
+
+  public static void checkRoles(final RodaUser user, final Class<?> invokingMethodInnerClass,
+    final Class<?> classToReturn) throws AuthorizationDeniedException {
     final Method method = invokingMethodInnerClass.getEnclosingMethod();
-    final String configKey = "core.roles." + method.getDeclaringClass().getName() + "." + method.getName();
+    final String classParam = (classToReturn == null) ? "" : "(" + classToReturn.getSimpleName() + ")";
+    final String configKey = String.format("core.roles.%s.%s%s", method.getDeclaringClass().getName(), method.getName(),
+      classParam);
     final List<String> roles = RodaCoreFactory.getRodaConfigurationAsList(configKey);
     checkRoles(user, roles);
   }
@@ -232,7 +240,7 @@ public class UserUtility {
   /**
    * This method make sure that a normal user can only upload a file to a folder
    * with its own username
-   * 
+   *
    * @param user
    * @param ids
    * @throws AuthorizationDeniedException
@@ -294,4 +302,5 @@ public class UserUtility {
     }
 
   }
+
 }

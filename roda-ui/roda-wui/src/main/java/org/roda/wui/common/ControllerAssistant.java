@@ -24,26 +24,36 @@ public class ControllerAssistant {
     this.enclosingMethod = this.getClass().getEnclosingMethod();
   }
 
-  public void checkRoles(RodaUser user) throws AuthorizationDeniedException {
+  public void checkRoles(final RodaUser user) throws AuthorizationDeniedException {
     try {
       UserUtility.checkRoles(user, this.getClass());
-    } catch (AuthorizationDeniedException e) {
+    } catch (final AuthorizationDeniedException e) {
       registerAction(user, LOG_ENTRY_STATE.UNAUTHORIZED);
       throw e;
     }
   }
 
-  public void registerAction(RodaUser user, String aipId, LOG_ENTRY_STATE state, Object... parameters) {
-    long duration = new Date().getTime() - startDate.getTime();
+  public void checkRoles(final RodaUser user, final Class<?> classToReturn) throws AuthorizationDeniedException {
+    try {
+      UserUtility.checkRoles(user, this.getClass(), classToReturn);
+    } catch (final AuthorizationDeniedException e) {
+      registerAction(user, LOG_ENTRY_STATE.UNAUTHORIZED);
+      throw e;
+    }
+  }
+
+  public void registerAction(final RodaUser user, final String aipId, final LOG_ENTRY_STATE state,
+    final Object... parameters) {
+    final long duration = new Date().getTime() - startDate.getTime();
     RodaCoreService.registerAction(user, this.enclosingMethod.getDeclaringClass().getName(),
       this.enclosingMethod.getName(), aipId, duration, state, parameters);
   }
 
-  public void registerAction(RodaUser user, LOG_ENTRY_STATE state, Object... parameters) {
+  public void registerAction(final RodaUser user, final LOG_ENTRY_STATE state, final Object... parameters) {
     registerAction(user, null, state, parameters);
   }
 
-  public void registerAction(RodaUser user, LOG_ENTRY_STATE state) {
+  public void registerAction(final RodaUser user, final LOG_ENTRY_STATE state) {
     registerAction(user, (String) null, state);
   }
 }
