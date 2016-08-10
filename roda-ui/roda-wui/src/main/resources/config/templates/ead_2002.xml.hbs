@@ -4,9 +4,9 @@
 {{~field name="countryCode" 			hidden="true" order="40" label="{'en': 'Country code', 'pt_PT': 'Código do país'}" xpath="/*:ead/*:archdesc/*:did/*:unitid/@countrycode/string()"~}}
 {{~field name="repositoryCode" 			order="50" label="{'en': 'Repository code', 'pt_PT': 'Código do repositório'}" xpath="/*:ead/*:archdesc/*:did/*:unitid/@repositorycode/string()"~}}
 {{~field name="titleType"				hidden="true" order="60" label="{'en': 'Title type', 'pt_PT': 'Tipo de título'}" xpath="/*:ead/*:archdesc/*:did/*:unittitle/@type/string()"~}}
-{{~field name="descDate"   				order="70" type="text" auto-generate="now" label="{\"en\": \"Descriptive date\", \"pt_PT\": \"Data descritiva\"}" xpath="/*:ead/*:archdesc/*:did/*:unitdate/string()"~}}
-{{~field name="dateInitial" 			order="80" type="date" label="{\"en\": \"Initial date\", \"pt_PT\": \"Data de início\"}" xpath="tokenize(/*:ead/*:archdesc/*:did/*:unitdate/@normal/string(), \"/\")[1]"~}}
-{{~field name="dateFinal"   			order="90" type="date" label="{\"en\": \"Final date\", \"pt_PT\": \"Data de fim\"}" xpath="tokenize(/*:ead/*:archdesc/*:did/*:unitdate/@normal/string(), \"/\")[2]"~}}
+{{~field name="dateInitial" 			order="70" type="date" label="{\"en\": \"Initial date\", \"pt_PT\": \"Data de início\"}" xpath="tokenize(/*:ead/*:archdesc/*:did/*:unitdate/@normal/string(), \"/\")[1]"~}}
+{{~field name="dateFinal"   			order="80" type="date" label="{\"en\": \"Final date\", \"pt_PT\": \"Data de fim\"}" xpath="tokenize(/*:ead/*:archdesc/*:did/*:unitdate/@normal/string(), \"/\")[2]"~}}
+{{~field name="descDate"   				order="90" type="text" auto-generate="now" label="{\"en\": \"Descriptive date\", \"pt_PT\": \"Data descritiva\"}" xpath="/*:ead/*:archdesc/*:did/*:unitdate/string()"~}}
 {{~field name="level"       			order="100" type="list" list="[\"fonds\",\"class\",\"collection\",\"recordgrp\",\"subgrp\",\"subfonds\",\"series\",\"subseries\",\"file\",\"item\"]" auto-generate="level" label="{\"en\": \"Description level\", \"pt_PT\": \"Nível descritivo\"}" xpath="//*:archdesc/@level/string()"~}}
 {{~field name="otherlevel" 				hidden="true" order="110" label="{\"en\": \"Other level\", \"pt_PT\": \"Outro nível\"}" xpath="/*:ead/*:archdesc/@otherlevel/string()"~}}
 {{~field name="extent" 					hidden="true" order="120" type="text-area" label="{'en': 'Extent and medium', 'pt_PT': 'Dimensão e suporte'}" xpath="/*:ead/*:archdesc/*:did/*:physdesc/string()"~}}
