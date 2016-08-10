@@ -1295,6 +1295,8 @@ public interface ClientMessages extends Messages {
 
   String emailUnverifiedMessage();
 
+  String inactiveUserMessage();
+
   String systemCurrentlyUnavailableMessage();
 
   /*** More Search ***/
