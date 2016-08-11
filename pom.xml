@@ -722,17 +722,17 @@
 			<dependency>
 				<groupId>org.bouncycastle</groupId>
 				<artifactId>bcprov-jdk15on</artifactId>
-				<version>1.47</version>
+				<version>1.54</version>
 			</dependency>
 			<dependency>
 				<groupId>org.bouncycastle</groupId>
 				<artifactId>bcmail-jdk15on</artifactId>
-				<version>1.47</version>
+				<version>1.54</version>
 			</dependency>
 			<dependency>
 				<groupId>com.itextpdf</groupId>
 				<artifactId>itextpdf</artifactId>
-				<version>5.3.2</version>
+				<version>5.5.9</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.santuario</groupId>

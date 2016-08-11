@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -62,6 +63,7 @@ import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.Assert;
 import org.testng.AssertJUnit;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -182,7 +184,9 @@ public class DigitalSignatureDIPTest {
     aip = model.retrieveAIP(aip.getId());
     CloseableIterable<OptionalWithCause<File>> allNewFiles = model.listFilesUnder(aip.getId(),
       aip.getRepresentations().get(1).getId(), true);
-    OptionalWithCause<File> newFile = allNewFiles.iterator().next();
+    Iterator<OptionalWithCause<File>> iterator = allNewFiles.iterator();
+    Assert.assertTrue(iterator.hasNext(), "Iterator should have at least one element");
+    OptionalWithCause<File> newFile = iterator.next();
 
     StoragePath newFileStoragePath = ModelUtils.getFileStoragePath(newFile.get());
     DirectResourceAccess newDirectAccess = model.getStorage().getDirectAccess(newFileStoragePath);

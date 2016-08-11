@@ -13,7 +13,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.MessageDigest;
@@ -22,11 +21,10 @@ import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.Security;
 import java.security.UnrecoverableKeyException;
-import java.security.cert.CertStore;
 import java.security.cert.CertStoreException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
-import java.security.cert.CollectionCertStoreParameters;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,14 +33,24 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaCertStore;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSProcessableFile;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
+import org.bouncycastle.cms.DefaultCMSSignatureAlgorithmNameGenerator;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationStore;
+import org.bouncycastle.cms.SignerInformationVerifier;
+import org.bouncycastle.cms.bc.BcRSASignerInfoVerifierBuilder;
+import org.bouncycastle.cms.jcajce.JcaSignerInfoGeneratorBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
+import org.bouncycastle.operator.DefaultSignatureAlgorithmIdentifierFinder;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 import org.bouncycastle.util.Store;
 
 /**
@@ -53,10 +61,10 @@ import org.bouncycastle.util.Store;
  */
 public class SignatureUtility {
 
-  private static final String DEFAULT_PROVIDER = BouncyCastleProvider.PROVIDER_NAME;
+  private static final String SIGN_ALGORITHM = "SHA256WITHRSA";
+  private static final String SIGN_PROVIDER = BouncyCastleProvider.PROVIDER_NAME;
 
   private final KeyStore ks;
-  private final String provider;
   private final CMSSignedDataGenerator signGenerator;
 
   /**
@@ -67,13 +75,12 @@ public class SignatureUtility {
    * @throws NoSuchProviderException
    */
   public SignatureUtility() throws KeyStoreException, NoSuchAlgorithmException, NoSuchProviderException {
-    this(DEFAULT_PROVIDER);
+    this(SIGN_PROVIDER);
   }
 
   protected SignatureUtility(String provider)
     throws KeyStoreException, NoSuchAlgorithmException, NoSuchProviderException {
     this.ks = KeyStore.getInstance(KeyStore.getDefaultType());
-    this.provider = provider;
     Security.addProvider(new BouncyCastleProvider());
     this.signGenerator = new CMSSignedDataGenerator();
 
@@ -106,24 +113,25 @@ public class SignatureUtility {
    * @throws KeyStoreException
    * @throws NoSuchAlgorithmException
    * @throws UnrecoverableKeyException
-   * @throws InvalidAlgorithmParameterException
+   * @throws OperatorCreationException
+   * @throws CertificateEncodingException
    * @throws CMSException
-   * @throws CertStoreException
-   * @throws NoSuchProviderException
    */
-  public void initSign(String alias, char[] password)
-    throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, InvalidAlgorithmParameterException,
-    CertStoreException, CMSException, NoSuchProviderException {
+  public void initSign(String alias, char[] password) throws UnrecoverableKeyException, KeyStoreException,
+    NoSuchAlgorithmException, CertificateEncodingException, OperatorCreationException, CMSException {
     PrivateKey pk = (PrivateKey) ks.getKey(alias, password);
     Certificate[] certificateChain = ks.getCertificateChain(alias);
     if (certificateChain != null) {
       X509Certificate certificate = (X509Certificate) certificateChain[0];
       List<Certificate> certList = new ArrayList<Certificate>(Arrays.asList(certificateChain));
-      signGenerator.addSigner(pk, certificate, CMSSignedDataGenerator.DIGEST_SHA224);
-      signGenerator.addSigner(pk, certificate, CMSSignedDataGenerator.DIGEST_SHA1);
-      signGenerator.addSigner(pk, certificate, CMSSignedDataGenerator.DIGEST_MD5);
-      CertStore certs = CertStore.getInstance("Collection", new CollectionCertStoreParameters(certList), provider);
-      signGenerator.addCertificatesAndCRLs(certs);
+
+      signGenerator.addSignerInfoGenerator(
+        new JcaSignerInfoGeneratorBuilder(new JcaDigestCalculatorProviderBuilder().setProvider(SIGN_PROVIDER).build())
+          .build(new JcaContentSignerBuilder(SIGN_ALGORITHM).setProvider(SIGN_PROVIDER).build(pk), certificate));
+
+      JcaCertStore certs = new JcaCertStore(certList);
+      signGenerator.addCertificates(certs);
+
     } else {
       System.err.println("Certificate chain for " + alias + " not found");
     }
@@ -185,9 +193,11 @@ public class SignatureUtility {
    * @throws FileNotFoundException
    * @throws IOException
    * @throws CertificateException
+   * @throws OperatorCreationException
    */
-  public boolean verify(File file, File signature) throws NoSuchAlgorithmException, NoSuchProviderException,
-    CertStoreException, CMSException, FileNotFoundException, IOException, CertificateException {
+  public boolean verify(File file, File signature)
+    throws NoSuchAlgorithmException, NoSuchProviderException, CertStoreException, CMSException, FileNotFoundException,
+    IOException, CertificateException, OperatorCreationException {
     CMSProcessableFile cmsFile = new CMSProcessableFile(file);
     CMSSignedData signedData = new CMSSignedData(cmsFile, new FileInputStream(signature));
 
@@ -195,12 +205,12 @@ public class SignatureUtility {
   }
 
   @SuppressWarnings("unchecked")
-  private boolean verifySignatures(CMSSignedData s, byte[] contentDigest)
-    throws NoSuchAlgorithmException, NoSuchProviderException, CMSException, CertStoreException, CertificateException {
+  private boolean verifySignatures(CMSSignedData s, byte[] contentDigest) throws NoSuchAlgorithmException,
+    NoSuchProviderException, CMSException, CertStoreException, CertificateException, OperatorCreationException {
     boolean valid = true;
 
     // CertStore certStore = s.getCertificatesAndCRLs("Collection", provider);
-    Store certStore = s.getCertificates();
+    Store<?> certStore = s.getCertificates();
     SignerInformationStore signers = s.getSignerInfos();
 
     Collection<SignerInformation> c = signers.getSigners();
@@ -208,18 +218,20 @@ public class SignatureUtility {
 
     while (it.hasNext()) {
       SignerInformation signer = it.next();
-      Collection certCollection = certStore.getMatches(signer.getSID());
+      Collection<?> certCollection = certStore.getMatches(signer.getSID());
 
-      Iterator certIt = certCollection.iterator();
+      Iterator<?> certIt = certCollection.iterator();
       X509CertificateHolder certHolder = (X509CertificateHolder) certIt.next();
-      X509Certificate cert = new JcaX509CertificateConverter().setProvider(provider).getCertificate(certHolder);
 
-      boolean certValid = signer.verify(cert, provider);
+      SignerInformationVerifier signerVerifierInformation = new BcRSASignerInfoVerifierBuilder(
+        new DefaultCMSSignatureAlgorithmNameGenerator(), new DefaultSignatureAlgorithmIdentifierFinder(),
+        new DefaultDigestAlgorithmIdentifierFinder(), new BcDigestCalculatorProvider()).build(certHolder);
+      boolean certValid = signer.verify(signerVerifierInformation);
 
       valid &= certValid;
 
       if (!certValid) {
-        System.err.println("Invalid certificate " + cert);
+        System.err.println("Invalid certificate " + certHolder);
       }
 
       if (contentDigest != null) {

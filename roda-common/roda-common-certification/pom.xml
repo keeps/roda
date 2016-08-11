@@ -15,8 +15,8 @@
 
 	<dependencies>
 		<dependency>
-		<groupId>org.roda-project</groupId>
-		<artifactId>roda-common-data</artifactId>
+			<groupId>org.roda-project</groupId>
+			<artifactId>roda-common-data</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>

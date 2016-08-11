@@ -14,18 +14,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.UnrecoverableKeyException;
-import java.security.cert.CertStoreException;
 import java.security.cert.CertificateException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.operator.OperatorCreationException;
 import org.roda.common.certification.ODFSignatureUtils;
 import org.roda.common.certification.OOXMLSignatureUtils;
 import org.roda.common.certification.PDFSignatureUtils;
@@ -112,7 +111,7 @@ public class DigitalSignatureDIPPluginUtils {
       LOGGER.error("Cannot load keystore " + KEYSTORE_PATH, e);
     } catch (KeyStoreException | NoSuchAlgorithmException | NoSuchProviderException e) {
       LOGGER.error("Error initializing SignatureUtility", e);
-    } catch (UnrecoverableKeyException | InvalidAlgorithmParameterException | CertStoreException | CMSException e) {
+    } catch (UnrecoverableKeyException | CMSException | OperatorCreationException e) {
       LOGGER.error("Error running initSign of SignatureUtility", e);
     }
 
