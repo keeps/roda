@@ -1486,6 +1486,8 @@ public interface ClientMessages extends Messages {
   // Content Panel
 
   String authorizationDeniedAlert();
+  
+  String authorizationDeniedAlertMessage(String message);
 
   String casForwardWarning();
 

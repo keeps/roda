@@ -8,10 +8,14 @@
 package org.roda.wui.client.common.utils;
 
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.welcome.Welcome;
+import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.StatusCodeException;
 
 import config.i18n.client.ClientMessages;
@@ -31,7 +35,20 @@ public class AsyncCallbackUtils {
       }
       treatedError = true;
     } else if (caught instanceof AuthorizationDeniedException) {
-      UserLogin.getInstance().login();
+      Dialogs.showInformationDialog(messages.authorizationDeniedAlert(),
+        messages.authorizationDeniedAlertMessage(caught.getMessage()), messages.dialogOk(), new AsyncCallback<Void>() {
+
+          @Override
+          public void onSuccess(Void result) {
+            Tools.newHistory(Welcome.RESOLVER);
+          }
+
+          @Override
+          public void onFailure(Throwable caught) {
+            // do nothing
+          }
+        });
+
       treatedError = true;
     }
     return treatedError;
