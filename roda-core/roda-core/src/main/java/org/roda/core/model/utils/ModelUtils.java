@@ -631,7 +631,7 @@ public final class ModelUtils {
     if (!file.isDirectory()) {
       StoragePath filePath = ModelUtils.getFileStoragePath(file);
       Binary binary = storage.getBinary(filePath);
-      ZipEntryInfo info = new ZipEntryInfo(flat ? filePath.getName() : FSUtils.getStoragePathAsString(filePath, false),
+      ZipEntryInfo info = new ZipEntryInfo(flat ? filePath.getName() : FSUtils.getStoragePathAsString(filePath, true),
         binary.getContent());
       zipEntries.add(info);
     } else {
@@ -645,7 +645,8 @@ public final class ModelUtils {
   @Deprecated
   public static void addToZip(List<ZipEntryInfo> zipEntries, Binary binary)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    ZipEntryInfo info = new ZipEntryInfo(FSUtils.getStoragePathAsString(binary.getStoragePath(), false),
+    String path = FSUtils.getStoragePathAsString(binary.getStoragePath(), true);
+    ZipEntryInfo info = new ZipEntryInfo(path,
       binary.getContent());
     zipEntries.add(info);
   }
