@@ -73,6 +73,7 @@ import org.roda.wui.client.browse.SupportedMetadataTypeBundle;
 import org.roda.wui.client.browse.UserExtraBundle;
 import org.roda.wui.client.browse.Viewers;
 import org.roda.wui.client.common.search.SearchField;
+import org.roda.wui.client.common.utils.Tree;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
@@ -159,16 +160,18 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String descId, String type,
-    String version) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    String version, String localeString) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.retrieveDescriptiveMetadataEditBundle(user, aipId, descId, type, version);
+    Locale locale = ServerTools.parseLocale(localeString);
+    return Browser.retrieveDescriptiveMetadataEditBundle(user, aipId, descId, type, version,locale);
   }
 
   @Override
-  public DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String descId)
+  public DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String descId, String localeString)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.retrieveDescriptiveMetadataEditBundle(user, aipId, descId);
+    Locale locale = ServerTools.parseLocale(localeString);
+    return Browser.retrieveDescriptiveMetadataEditBundle(user, aipId, descId, locale);
   }
 
   @SuppressWarnings("unchecked")
@@ -247,15 +250,15 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public List<SearchField> retrieveSearchFields(String localeString) throws GenericException {
     List<SearchField> searchFields = new ArrayList<SearchField>();
     List<String> fields = RodaUtils.copyList(RodaCoreFactory.getRodaConfiguration().getList("ui.search.fields"));
-
     Locale locale = ServerTools.parseLocale(localeString);
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     for (String field : fields) {
       SearchField searchField = new SearchField();
-
       String fieldsNames = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "fields");
       String fieldType = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "type");
       String fieldLabelI18N = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "i18n");
+      String fieldsTermsKey = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "prefix");
+      
       boolean fieldFixed = Boolean
         .valueOf(RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "fixed"));
 
@@ -272,7 +275,17 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
         }
         searchField.setFixed(fieldFixed);
 
+        
+        if(fieldsTermsKey!=null){
+          Map<String,String> labels = messages.getTranslations(fieldsTermsKey, String.class, false);
+          Tree<String> terms = new Tree<String>(field,field);
+          for(Map.Entry<String, String> entry : labels.entrySet()){
+            terms.addChild(entry.getValue(),entry.getKey().replace(fieldsTermsKey+".",""));
+          }
+          searchField.setTerms(terms);
+        }
         searchFields.add(searchField);
+
       }
     }
 

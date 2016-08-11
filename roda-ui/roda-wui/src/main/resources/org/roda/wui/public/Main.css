@@ -494,6 +494,10 @@ pre code {
     margin-bottom: 10px;
 }
 
+.form-controlled{
+	padding: 0px 5px 0px 5px;
+}
+
 .itemPanel {
     padding-top: 2px;
     padding-bottom: 5px;

@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.notifications.EmailNotificationProcessor;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -45,8 +46,8 @@ public class Notifications extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    RodaCoreFactory.getModelService().createNotification(notification, "test-email-template",
-      new HashMap<String, Object>());
+    RodaCoreFactory.getModelService().createNotification(notification,
+      new EmailNotificationProcessor("test-email-template", new HashMap<String, Object>()));
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "notification", notification);

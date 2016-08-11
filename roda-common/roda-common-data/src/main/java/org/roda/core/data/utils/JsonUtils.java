@@ -76,7 +76,7 @@ public final class JsonUtils {
       ObjectMapper mapper = new ObjectMapper(new JsonFactory());
       ret = mapper.readValue(json, new TypeReference<Map<String, String>>() {});
     } catch (IOException e) {
-      LOGGER.error("Error transforming json string to log entry parameters", e);
+      LOGGER.error("Error transforming json string to Map<String,String>", e);
     }
     return ret;
   }

@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.notifications.EmailNotificationProcessor;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
@@ -388,8 +389,8 @@ public class UserManagement extends RodaWuiController {
       scopes.put("verificationURL", verificationURL);
       scopes.put("verificationCompleteURL", verificationCompleteURL);
 
-      RodaCoreFactory.getModelService().createNotification(notification, RodaConstants.VERIFICATION_EMAIL_TEMPLATE,
-        scopes);
+      RodaCoreFactory.getModelService().createNotification(notification,
+        new EmailNotificationProcessor(RodaConstants.VERIFICATION_EMAIL_TEMPLATE, scopes));
 
     } catch (GenericException | UnsupportedEncodingException e) {
       throw new GenericException("Problem sending email");
@@ -414,9 +415,8 @@ public class UserManagement extends RodaWuiController {
       scopes.put("token", token);
       scopes.put("recoverLoginURL", recoverLoginURL);
       scopes.put("recoverLoginCompleteURL", recoverLoginCompleteURL);
-
-      RodaCoreFactory.getModelService().createNotification(notification, RodaConstants.RECOVER_LOGIN_EMAIL_TEMPLATE,
-        scopes);
+      RodaCoreFactory.getModelService().createNotification(notification,
+        new EmailNotificationProcessor(RodaConstants.RECOVER_LOGIN_EMAIL_TEMPLATE, scopes));
 
     } catch (Exception e) {
       throw new GenericException("Problem sending email");

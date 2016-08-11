@@ -760,7 +760,7 @@ public final class PremisV3Utils {
     return identifiers;
   }
 
-  private static StringPlusAuthority getStringPlusAuthority(String value) {
+  public static StringPlusAuthority getStringPlusAuthority(String value) {
     return getStringPlusAuthority(value, "");
   }
 
@@ -773,7 +773,7 @@ public final class PremisV3Utils {
     return spa;
   }
 
-  private static StringPlusAuthority[] getStringPlusAuthorityArray(List<String> values) {
+  public static StringPlusAuthority[] getStringPlusAuthorityArray(List<String> values) {
     List<StringPlusAuthority> l = new ArrayList<StringPlusAuthority>();
     if (values != null && !values.isEmpty()) {
       for (String value : values) {

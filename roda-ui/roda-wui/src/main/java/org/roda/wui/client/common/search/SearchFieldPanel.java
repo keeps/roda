@@ -18,6 +18,7 @@ import org.roda.core.data.adapter.filter.LongRangeFilterParameter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.wui.client.common.utils.ListboxUtils;
+import org.roda.wui.client.common.utils.Tree;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Humanize;
 
@@ -85,6 +86,9 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
   private CheckBox inputCheckBox;
   // Suggestion
   private SearchSuggestBox<?> inputSearchSuggestBox = null;
+  
+  //controlled
+  private ListBox inputControlled;
 
   public SearchFieldPanel() {
     panel = new FlowPanel();
@@ -142,6 +146,8 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     }
 
     inputCheckBox = new CheckBox();
+    
+    inputControlled = new ListBox();
 
     panel.add(leftPanel);
 
@@ -178,6 +184,7 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     inputStorageSizeTo.addStyleName("form-textbox form-textbox-small");
     inputStorageSizeList.addStyleName("form-listbox");
     inputCheckBox.addStyleName("form-checkbox");
+    inputControlled.addStyleName("form-controlled");
   }
 
   public SearchField getSearchField() {
@@ -186,6 +193,14 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
 
   public void setSearchField(SearchField searchField) {
     this.searchField = searchField;
+    
+    if(searchField.getTerms()!=null){
+      for(Tree<String> term : searchField.getTerms().getChildren()){
+        inputControlled.addItem(term.getLabel(), term.getValue());
+      }
+      // TODO add terms to listbox
+    }
+    
   }
 
   public void setSearchAdvancedFields(ListBox searchAdvancedFieldOptions) {
@@ -261,7 +276,9 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
         filterParameter = new SimpleFilterParameter(field, Boolean.toString(inputCheckBox.getValue()));
       } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_SUGGEST) && valid(inputSearchSuggestBox)) {
         filterParameter = new SimpleFilterParameter(field, inputSearchSuggestBox.getValue());
-      } else if (valid(inputText)) {
+      } else if(type.equals(RodaConstants.SEARCH_FIELD_TYPE_CONTROLLED)){ 
+        filterParameter = new SimpleFilterParameter(field, inputControlled.getSelectedValue());
+      }else if (valid(inputText)) {
         filterParameter = new BasicSearchFilterParameter(field, inputText.getValue());
       }
     }
@@ -282,10 +299,10 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     panel.removeStyleName("full_width");
   }
 
-  public void simpleSearchField(String field, String label, String type) {
+  public void simpleSearchField(String field, String label, String type, Tree<String> terms) {
     List<String> searchFields = new ArrayList<String>();
     searchFields.add(field);
-    setSearchField(new SearchField(field, searchFields, label, type));
+    setSearchField(new SearchField(field, searchFields, label, type,terms));
 
     fieldLabel.setText(label);
     leftPanel.clear();
@@ -317,6 +334,9 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_BOOLEAN)) {
       inputPanel.add(inputCheckBox);
     } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_SUGGEST)) {
+      
+    } else if(type.equals(RodaConstants.SEARCH_FIELD_TYPE_CONTROLLED)){ 
+      inputPanel.add(inputControlled);
     } else {
       inputPanel.add(inputText);
       inputPanel.addStyleName("full_width");

@@ -22,20 +22,16 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.mail.MessagingException;
-
 import org.apache.commons.io.IOUtils;
-import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.ConfigurableEmailUtility;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.UserUtility;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
+import org.roda.core.common.notifications.NotificationProcessor;
 import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -46,6 +42,7 @@ import org.roda.core.data.exceptions.GroupAlreadyExistsException;
 import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.InvalidTokenException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.utils.JsonUtils;
@@ -91,9 +88,6 @@ import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.Template;
 
 /**
  * Class that "relates" Model & Storage
@@ -2092,94 +2086,23 @@ public class ModelService extends ModelObservable {
   /***************** Notification related *****************/
   /************************************************/
 
-  public Notification createNotification(Notification notification, String templateName, Map<String, Object> scopes)
+  public Notification createNotification(Notification notification, NotificationProcessor processor)
     throws GenericException {
     try {
       notification.setId(UUID.randomUUID().toString());
       notification.setAcknowledgeToken(UUID.randomUUID().toString());
-      List<String> recipients = notification.getRecipientUsers();
 
-      String templatePath = RodaCoreFactory.getRodaConfigurationAsString("core", "notification", "template_path");
-
-      InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(templatePath + templateName);
-      String template = IOUtils.toString(templateStream, "UTF-8");
-      IOUtils.closeQuietly(templateStream);
-
-      if (!scopes.containsKey("from")) {
-        scopes.put("from", notification.getFromUser());
-      }
-
-      if (recipients.size() == 1) {
-        scopes.put("recipient", recipients.get(0));
-      } else {
-        scopes.put("recipient", RodaConstants.NOTIFICATION_VARIOUS_RECIPIENT_USERS);
-      }
-
-      notification.setBody(executeHandlebars(template, templateName, scopes));
-      scopes.remove("recipient");
-
-      ConfigurableEmailUtility emailUtility = new ConfigurableEmailUtility(notification.getFromUser(),
-        notification.getSubject());
-
-      for (String recipient : recipients) {
-        String modifiedBody = getUpdatedMessageBody(notification, recipient, template, templateName, scopes);
-        String host = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "host");
-
-        if (host != null && !host.equals("")) {
-          LOGGER.debug("Sending email ...");
-          emailUtility.sendMail(recipient, modifiedBody);
-          LOGGER.debug("Email sent");
-        } else {
-          LOGGER.warn("SMTP not defined, cannot send emails");
-        }
-      }
+      notification = processor.processNotification(notification);
 
       String notificationAsJson = JsonUtils.getJsonFromObject(notification);
       StoragePath notificationPath = ModelUtils.getNotificationStoragePath(notification.getId());
       storage.createBinary(notificationPath, new StringContentPayload(notificationAsJson), false);
-    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException
-      | AlreadyExistsException | MessagingException | IOException e) {
+    } catch (RODAException e) {
       LOGGER.error("Error creating notification in storage", e);
     }
 
     notifyNotificationCreatedOrUpdated(notification);
     return notification;
-  }
-
-  private String getUpdatedMessageBody(Notification notification, String recipient, String template,
-    String templateName, Map<String, Object> scopes) {
-
-    // update body message with the recipient user and acknowledge URL
-    String userUUID = UUID.nameUUIDFromBytes(recipient.getBytes()).toString();
-    String ackUrl = RodaCoreFactory.getRodaConfigurationAsString("core", "notification", "acknowledge");
-    ackUrl = ackUrl.replaceAll("\\{notificationId\\}", notification.getId());
-    ackUrl = ackUrl.replaceAll("\\{token\\}", notification.getAcknowledgeToken() + userUUID);
-
-    scopes.put("acknowledge", ackUrl);
-    scopes.put("recipient", recipient);
-
-    try {
-      User user = UserUtility.getLdapUtility().getUserWithEmail(recipient);
-      if (user != null) {
-        scopes.put("recipient", user.getName());
-      }
-    } catch (LdapUtilityException e) {
-      // do nothing
-    }
-
-    return executeHandlebars(template, templateName, scopes);
-  }
-
-  private String executeHandlebars(String template, String templateName, Map<String, Object> scopes) {
-    Handlebars handlebars = new Handlebars();
-    String result = "";
-    try {
-      Template templ = handlebars.compileInline(template);
-      result = templ.apply(scopes);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return result;
   }
 
   public void updateNotification(Notification notification) throws GenericException {

@@ -86,7 +86,6 @@ public class CreateForm {
         JSONValue jsonValue = jsonObject.get(loc);
         if (jsonValue != null) {
           JSONString jsonString = jsonObject.get(loc).isString();
-
           if (jsonString != null) {
             result = jsonString.stringValue();
           }
@@ -179,12 +178,39 @@ public class CreateForm {
     mvList.addItem("");
     if (list != null) {
       JSONArray jsonArray = JSONParser.parseLenient(list).isArray();
-      for (int i = 0; i < jsonArray.size(); i++) {
-        String value = jsonArray.get(i).isString().stringValue();
-        mvList.addItem(value);
+      if (jsonArray != null) {
+        for (int i = 0; i < jsonArray.size(); i++) {
+          String value = jsonArray.get(i).isString().stringValue();
+          mvList.addItem(value);
 
-        if (value.equals(mv.get("value"))) {
-          mvList.setSelectedIndex(i + 1);
+          if (value.equals(mv.get("value"))) {
+            mvList.setSelectedIndex(i + 1);
+          }
+        }
+      } else {
+        JSONObject jsonObject = JSONParser.parseLenient(list).isObject();
+        if (jsonObject != null) {
+          String loc = LocaleInfo.getCurrentLocale().getLocaleName();
+          int i = 0;
+          for (String key : jsonObject.keySet()) {
+            JSONValue entry = jsonObject.get(key);
+            if (entry.isObject() != null) {
+              JSONValue jsonValue = entry.isObject().get(loc);
+              String value = null;
+              if (jsonValue != null) {
+                value = jsonValue.isString().stringValue();
+              } else {
+                value = entry.isObject().get(entry.isObject().keySet().iterator().next()).isString().stringValue();
+              }
+              if (value != null) {
+                mvList.addItem(value, key);
+                if (key.equals(mv.get("value"))) {
+                  mvList.setSelectedIndex(i + 1);
+                }
+              }
+            }
+            i++;
+          }
         }
       }
     }
@@ -248,6 +274,19 @@ public class CreateForm {
       public void onValueChange(ValueChangeEvent<Date> valueChangeEvent) {
         String newValue = dateTimeFormat.format(mvDate.getValue());
         mv.set("value", newValue);
+      }
+    });
+    mvDate.getTextBox().addValueChangeHandler(new ValueChangeHandler<String>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<String> event) {
+        String value = event.getValue();
+        try {
+          Date date = dateTimeFormat.parse(value.trim());
+          mvDate.setValue(date);
+        } catch (IllegalArgumentException iae) {
+          mvDate.getTextBox().setValue(value);
+        }
       }
     });
 

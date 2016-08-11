@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.api.v1.utils;
+package org.roda.core.common;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -15,11 +15,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.commons.compress.utils.IOUtils;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -34,26 +29,24 @@ import org.roda.core.storage.StorageService;
 
 public class DownloadUtils {
 
+  private static final String BIN_MEDIA_TYPE = "application/octet-stream";
   private static final String ZIP_MEDIA_TYPE = "application/zip";
   private static final String ZIP_FILE_NAME_EXTENSION = ".zip";
   private static final String ZIP_PATH_DELIMITER = "/";
 
-  public static StreamResponse download(final StorageService storage, final Resource resource) {
+  public static ConsumesOutputStream download(final StorageService storage, final Resource resource) {
 
-    String filename;
-    String mediaType;
-    StreamingOutput stream;
+    ConsumesOutputStream stream;
 
     final StoragePath storagePath = resource.getStoragePath();
 
     if (resource.isDirectory()) {
       // send zip with directory contents
-      filename = storagePath.getName() + ZIP_FILE_NAME_EXTENSION;
-      mediaType = ZIP_MEDIA_TYPE;
-      stream = new StreamingOutput() {
+
+      stream = new ConsumesOutputStream() {
 
         @Override
-        public void write(OutputStream out) throws IOException, WebApplicationException {
+        public void consumeOutputStream(OutputStream out) throws IOException {
           CloseableIterable<Resource> resources;
           BufferedOutputStream bos = new BufferedOutputStream(out);
           ZipOutputStream zos = new ZipOutputStream(bos);
@@ -85,9 +78,8 @@ public class DownloadUtils {
 
             IOUtils.closeQuietly(resources);
 
-          } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
-            // TODO re-throw correct web application exception
-            throw new InternalServerErrorException(e);
+          } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
+            throw new IOException(e);
           } finally {
             IOUtils.closeQuietly(zos);
             IOUtils.closeQuietly(bos);
@@ -95,16 +87,24 @@ public class DownloadUtils {
           }
 
         }
+
+        @Override
+        public String getFileName() {
+          return storagePath.getName() + ZIP_FILE_NAME_EXTENSION;
+        }
+
+        @Override
+        public String getMediaType() {
+          return ZIP_MEDIA_TYPE;
+        }
       };
 
     } else {
       // send the one file
-      filename = storagePath.getName();
-      mediaType = MediaType.APPLICATION_OCTET_STREAM;
-      stream = new StreamingOutput() {
+      stream = new ConsumesOutputStream() {
 
         @Override
-        public void write(OutputStream out) throws IOException, WebApplicationException {
+        public void consumeOutputStream(OutputStream out) throws IOException {
           BufferedOutputStream bos = new BufferedOutputStream(out);
           Binary binary;
           try {
@@ -113,8 +113,7 @@ public class DownloadUtils {
             IOUtils.copy(inputStream, bos);
             IOUtils.closeQuietly(inputStream);
           } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
-            // TODO re-throw correct web application exception
-            throw new InternalServerErrorException(e);
+            throw new IOException(e);
           } finally {
             IOUtils.closeQuietly(bos);
             IOUtils.closeQuietly(out);
@@ -122,11 +121,21 @@ public class DownloadUtils {
 
         }
 
+        @Override
+        public String getFileName() {
+          return storagePath.getName();
+        }
+
+        @Override
+        public String getMediaType() {
+          return BIN_MEDIA_TYPE;
+        }
+
       };
 
     }
 
-    return new StreamResponse(filename, mediaType, stream);
+    return stream;
   }
 
 }

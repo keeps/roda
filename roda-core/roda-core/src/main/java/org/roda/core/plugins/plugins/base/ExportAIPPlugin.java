@@ -20,8 +20,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.roda.core.common.tools.ZipEntryInfo;
-import org.roda.core.common.tools.ZipTools;
+import org.roda.core.common.ConsumesOutputStream;
+import org.roda.core.common.DownloadUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.ExportType;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -49,6 +49,7 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.Directory;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
@@ -153,7 +154,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
       }
       LOGGER.error("Error: " + error);
       if (error == null && exportType == ExportType.MULTI_ZIP) {
-        report = exportMultiZip(aips, outputPath, report, model, index, jobPluginInfo);
+        report = exportMultiZip(aips, outputPath, report, model, index, storage, jobPluginInfo);
       } else if (error == null && exportType == ExportType.FOLDER) {
         report = exportFolders(aips, outputPath, storage, model, index, report, jobPluginInfo);
       } else if (error != null) {
@@ -186,17 +187,17 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
               localStorage.deleteResource(DefaultStoragePath.parse(aip.getId()));
               localStorage.copy(storage, aipPath, DefaultStoragePath.parse(aip.getId()));
             } catch (AlreadyExistsException e2) {
-              error = "Error removing/creating folder "+aipPath.toString();
+              error = "Error removing/creating folder " + aipPath.toString();
             }
           } else {
-            error = "Folder "+aipPath.toString()+" already exists.";
+            error = "Folder " + aipPath.toString() + " already exists.";
           }
         }
-        
-        
+
         Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
         if (error != null) {
-          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails("Export AIP did not end successfully: "+error);
+          reportItem.setPluginState(PluginState.FAILURE)
+            .setPluginDetails("Export AIP did not end successfully: " + error);
           jobPluginInfo.incrementObjectsProcessedWithFailure();
         } else {
           reportItem.setPluginState(PluginState.SUCCESS).setPluginDetails("Export AIP ended successfully");
@@ -207,13 +208,13 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
 
       }
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
-      LOGGER.error(e.getMessage(),e);
+      LOGGER.error(e.getMessage(), e);
     }
     return report;
   }
 
   private Report exportMultiZip(List<AIP> aips, Path outputPath, Report report, ModelService model, IndexService index,
-    SimpleJobPluginInfo jobPluginInfo) {
+    StorageService storage, SimpleJobPluginInfo jobPluginInfo) {
     for (AIP aip : aips) {
       LOGGER.debug("Exporting AIP {} to ZIP", aip.getId());
       OutputStream os = null;
@@ -226,9 +227,11 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
           error = "File " + zip.toString() + " already exists";
         }
         if (error == null) {
-          List<ZipEntryInfo> zipEntries = ModelUtils.aipToZipEntry(aip);
           os = Files.newOutputStream(zip, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-          ZipTools.zip(zipEntries, os);
+
+          Directory directory = storage.getDirectory(ModelUtils.getAIPStoragePath(aip.getId()));
+          ConsumesOutputStream cos = DownloadUtils.download(storage, directory);
+          cos.consumeOutputStream(os);
         }
       } catch (Exception e) {
         LOGGER.error("Error exporting AIP " + aip.getId() + ": " + e.getMessage());
@@ -241,7 +244,8 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
 
       Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
       if (error != null) {
-        reportItem.setPluginState(PluginState.FAILURE).setPluginDetails("Export AIP did not end successfully: "+error);
+        reportItem.setPluginState(PluginState.FAILURE)
+          .setPluginDetails("Export AIP did not end successfully: " + error);
         jobPluginInfo.incrementObjectsProcessedWithFailure();
       } else {
         reportItem.setPluginState(PluginState.SUCCESS).setPluginDetails("Export AIP ended successfully");

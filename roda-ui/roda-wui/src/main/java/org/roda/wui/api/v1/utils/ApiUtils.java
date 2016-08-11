@@ -20,6 +20,7 @@ import javax.ws.rs.core.Response;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang.StringUtils;
+import org.roda.core.common.StreamResponse;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RODAException;

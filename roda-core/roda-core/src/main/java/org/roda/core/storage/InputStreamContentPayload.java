@@ -15,13 +15,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 import org.apache.commons.io.IOUtils;
+import org.roda.core.common.ProvidesInputStream;
 
 public class InputStreamContentPayload implements ContentPayload {
-
-  // FIXME 20160818 hsilva: externalize this interface
-  public static interface ProvidesInputStream {
-    public InputStream createInputStream() throws IOException;
-  }
 
   private final ProvidesInputStream inputStreamProvider;
 

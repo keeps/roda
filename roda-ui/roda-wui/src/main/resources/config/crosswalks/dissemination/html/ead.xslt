@@ -28,13 +28,13 @@
 	<xsl:param name="i18n.custodialhistory" />
 	<xsl:param name="i18n.acquisitioninformation" />
 	<xsl:param name="i18n.description" />
-	<xsl:param name="i18n.organizationandordering" />
+	<xsl:param name="i18n.arrangement" />
 	<xsl:param name="i18n.appraisal" />
 	<xsl:param name="i18n.accruals" />
 	<xsl:param name="i18n.physicalcharacteristicsandtechnicalrequirements" />
 	<xsl:param name="i18n.accessrestrictions" />
 	<xsl:param name="i18n.altformavail" />
-	<xsl:param name="i18n.reproductionrestrictions" />
+	<xsl:param name="i18n.userestrict" />
 	<xsl:param name="i18n.relatedmaterials" />
 	<xsl:param name="i18n.otherfindaids" />
 	<xsl:param name="i18n.userestrict" />
@@ -672,7 +672,7 @@
 		<xsl:if test="ead:arrangement/ead:p/text()">
 			<div class="field">
 				<div class="label">
-					<xsl:value-of select="$i18n.organizationandordering" />
+					<xsl:value-of select="$i18n.arrangement" />
 				</div>
 				<div class="value">
 					<xsl:value-of select="ead:arrangement/ead:p/text()" />
@@ -682,7 +682,7 @@
 		<xsl:if test="ead:arrangement/ead:table">
 			<div class="field">
 				<div class="label">
-					<xsl:value-of select="$i18n.organizationandordering" />
+					<xsl:value-of select="$i18n.arrangement" />
 				</div>
 				<xsl:variable name="output">
 					<table>
@@ -770,7 +770,7 @@
 		<xsl:if test="ead:userrestrict/ead:p/text()">
 			<div class="field">
 				<div class="label">
-					<xsl:value-of select="$i18n.reproductionrestrictions" />
+					<xsl:value-of select="$i18n.userestrict" />
 				</div>
 				<div class="value">
 					<xsl:value-of select="ead:userrestrict/ead:p/text()" />

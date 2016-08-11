@@ -1,8 +1,8 @@
-{{~field name="id" 				label="{'en': 'ID'}" auto-generate="id" xpath="//*:unitid/string()"~}}
-{{~field name="title"			label="{'en': 'Title'}" auto-generate="title" xpath="//*:unittitle/string()"~}}
+{{~field name="id" 				label="{\"en\": \"ID\"}" auto-generate="id" xpath="//*:unitid/string()"~}}
+{{~field name="title"			label="{\"en': \"Title\"}" auto-generate="title" xpath="//*:unittitle/string()"~}}
 {{~field name="date" 			type="date" auto-generate="now" label="{\"en\": \"Date\"}" xpath="//*:unitdate/@normal/string()"~}}
-{{~field name="origination"		label="{'en': 'Origination'}" xpath="/*:ead-c/*:did/*:origination/string()"~}}
-{{~field name="scopecontent"	label="{'en': 'Scope and content'}" xpath="/*:ead-c/*:scopecontent/*:p/string()"~}}
+{{~field name="origination"		label="{\"en\": \"Origination\"}" xpath="/*:ead-c/*:did/*:origination/string()"~}}
+{{~field name="scopecontent"	label="{\"en\": \"Scope and content\"}" xpath="/*:ead-c/*:scopecontent/*:p/string()"~}}
 <ead-c xmlns="http://roda.dgarq.gov.pt/2008/EADCSchema" level="item">
 	<did>
 		<unitid repositorycode="PT-RODA">{{id}}</unitid>

@@ -9,7 +9,7 @@
 	<xsl:output method="xml" indent="yes" encoding="UTF-8"
 		omit-xml-declaration="yes" />
 
-	<xsl:param name="i18n.identityArea" />	
+	<xsl:param name="i18n.identityarea" />	
 	<xsl:param name="i18n.reference" />
 	<xsl:param name="i18n.title" />
 	<xsl:param name="i18n.repositorycode" />
@@ -19,35 +19,35 @@
 	<xsl:param name="i18n.level" />
 	<xsl:param name="i18n.extent" />
 	
-	<xsl:param name="i18n.contextArea" />	
+	<xsl:param name="i18n.contextarea" />	
 	<xsl:param name="i18n.creator" />	
 	<xsl:param name="i18n.producer" />	
 	<xsl:param name="i18n.repository" />	
 	<xsl:param name="i18n.custodialhistory" />
 	<xsl:param name="i18n.acquisitioninformation" />
 	
-	<xsl:param name="i18n.contentArea" />	
+	<xsl:param name="i18n.contentarea" />	
 	<xsl:param name="i18n.description" />
 	<xsl:param name="i18n.appraisal" />
 	<xsl:param name="i18n.accruals" />
-	<xsl:param name="i18n.organizationandordering" />
+	<xsl:param name="i18n.arrangement" />
 	
-	<xsl:param name="i18n.accessArea" />	
+	<xsl:param name="i18n.accessarea" />	
 	<xsl:param name="i18n.accessrestrictions" />
 	<xsl:param name="i18n.userestrict" />
 	<xsl:param name="i18n.languages" />
 	<xsl:param name="i18n.languagesMaterial" />
 	
-	<xsl:param name="i18n.alliedArea" />	
+	<xsl:param name="i18n.alliedarea" />	
 	<xsl:param name="i18n.originalsloc" />
 	<xsl:param name="i18n.altformavail" />
 	<xsl:param name="i18n.relatedmaterials" />
 	<xsl:param name="i18n.bibliography" />
 	
-	<xsl:param name="i18n.notesArea" />	
+	<xsl:param name="i18n.notesarea" />	
 	<xsl:param name="i18n.notes" />
 	
-	<xsl:param name="i18n.descriptionControlArea" />
+	<xsl:param name="i18n.descriptioncontrolarea" />
 	<xsl:param name="i18n.rules" />
 	<xsl:param name="i18n.statusDescription" />
 	<xsl:param name="i18n.levelOfDetail" />
@@ -71,12 +71,11 @@
 	<xsl:param name="i18n.administrativeandbiographicalhistory" />
 	
 	<xsl:param name="i18n.physicalcharacteristicsandtechnicalrequirements" />
-	<xsl:param name="i18n.reproductionrestrictions" />
 	<xsl:param name="i18n.otherfindaids" />
 	<xsl:template match="/">
 		<div class="descriptiveMetadata">
 			<xsl:if test="//ead:did/ead:unitid/text()|//ead:did/ead:unittitle/text()|//ead:did/ead:unitid/@repositorycode|//ead:did/ead:unitdate/text()|//ead:did/ead:unitdate/@normal|//ead:archdesc/@level|//ead:extent">
-				<div class="form-separator"><xsl:value-of select="$i18n.identityArea" /></div>
+				<div class="form-separator"><xsl:value-of select="$i18n.identityarea" /></div>
 			</xsl:if>
 			<xsl:if test="//ead:did/ead:unitid/text()">
 				<div class="field">
@@ -123,261 +122,66 @@
 			<xsl:if test="//ead:did/ead:unitdate/@normal">
 				<xsl:choose>
 					<xsl:when test="contains(//ead:did/ead:unitdate/@normal, '/')">	<!-- initial/final -->
-						<xsl:analyze-string regex="^(\d{{4}}-\d{{2}}-\d{{2}})$"
-							select="normalize-space(substring-before(//ead:did/ead:unitdate/@normal, '/'))">
-							<xsl:matching-substring>
-								<div class="field">
-									<div class="label">
-										<xsl:value-of select="$i18n.initialdate" />
-									</div>
-									<div class="value">
-										<span class="value">
-											<xsl:value-of select="regex-group(1)" />
-										</span>
-									</div>
-								</div>
-							</xsl:matching-substring>
-						</xsl:analyze-string>
-						<xsl:analyze-string regex="^(\d{{4}}-\d{{2}})$"
-							select="normalize-space(substring-before(//ead:did/ead:unitdate/@normal, '/'))">
-							<xsl:matching-substring>
-								<div class="field">
-									<div class="label">
-										<xsl:value-of select="$i18n.initialdate" />
-									</div>
-									<div class="value">
-										<span class="value">
-											<xsl:value-of select="regex-group(1)" />
-											-01
-										</span>
-									</div>
-								</div>
-							</xsl:matching-substring>
-						</xsl:analyze-string>
-						<xsl:analyze-string regex="^(\d{{4}})$"
-							select="normalize-space(substring-before(//ead:did/ead:unitdate/@normal, '/'))">
-							<xsl:matching-substring>
-								<div class="field">
-									<div class="label">
-										<xsl:value-of select="$i18n.initialdate" />
-									</div>
-									<div class="value">
-										<span class="value">
-											<xsl:value-of select="regex-group(1)" />
-											-01-01
-										</span>
-									</div>
-								</div>
-							</xsl:matching-substring>
-						</xsl:analyze-string>
-						<xsl:analyze-string regex="^(\d{{4}})(\d{{2}})(\d{{2}})$"
-							select="normalize-space(substring-before(//ead:did/ead:unitdate/@normal, '/'))">
-							<xsl:matching-substring>
-								<div class="field">
-									<div class="label">
-										<xsl:value-of select="$i18n.initialdate" />
-									</div>
-									<div class="value">
-										<span class="value">
-											<xsl:value-of select="regex-group(1)" />
-											-
-											<xsl:value-of select="regex-group(2)" />
-											-
-											<xsl:value-of select="regex-group(3)" />
-										</span>
-									</div>
-								</div>
-							</xsl:matching-substring>
-						</xsl:analyze-string>
-						<xsl:analyze-string regex="^(\d{{4}})(\d{{2}})$"
-							select="normalize-space(substring-before(//ead:did/ead:unitdate/@normal, '/'))">
-							<xsl:matching-substring>
-								<div class="field">
-									<div class="label">
-										<xsl:value-of select="$i18n.initialdate" />
-									</div>
-									<div class="value">
-										<span class="value">
-											<xsl:value-of select="regex-group(1)" />
-											-
-											<xsl:value-of select="regex-group(2)" />
-											-01
-										</span>
-									</div>
-								</div>
-							</xsl:matching-substring>
-						</xsl:analyze-string>
-	
-						<xsl:analyze-string regex="^(\d{{4}}-\d{{2}}-\d{{2}})$"
-							select="normalize-space(substring-after(//ead:did/ead:unitdate/@normal, '/'))">
-							<xsl:matching-substring>
-								<div class="field">
-									<div class="label">
-										<xsl:value-of select="$i18n.finaldate" />
-									</div>
-									<div class="value">
-										<span class="value">
-											<xsl:value-of select="regex-group(1)" />
-										</span>
-									</div>
-								</div>
-							</xsl:matching-substring>
-						</xsl:analyze-string>
-						<xsl:analyze-string regex="^(\d{{4}}-\d{{2}})$"
-							select="normalize-space(substring-after(//ead:did/ead:unitdate/@normal, '/'))">
-							<xsl:matching-substring>
-								<div class="field">
-									<div class="label">
-										<xsl:value-of select="$i18n.finaldate" />
-									</div>
-									<div class="value">
-										<span class="value">
-											<xsl:value-of select="regex-group(1)" />
-											-01
-										</span>
-									</div>
-								</div>
-							</xsl:matching-substring>
-						</xsl:analyze-string>
-						<xsl:analyze-string regex="^(\d{{4}})$"
-							select="normalize-space(substring-after(//ead:did/ead:unitdate/@normal, '/'))">
-							<xsl:matching-substring>
-								<div class="field">
-									<div class="label">
-										<xsl:value-of select="$i18n.finaldate" />
-									</div>
-									<div class="value">
-										<span class="value">
-											<xsl:value-of select="regex-group(1)" />
-											-01-01
-										</span>
-									</div>
-								</div>
-							</xsl:matching-substring>
-						</xsl:analyze-string>
-						<xsl:analyze-string regex="^(\d{{4}})(\d{{2}})(\d{{2}})$"
-							select="normalize-space(substring-after(//ead:did/ead:unitdate/@normal, '/'))">
-							<xsl:matching-substring>
-								<div class="field">
-									<div class="label">
-										<xsl:value-of select="$i18n.finaldate" />
-									</div>
-									<div class="value">
-										<span class="value">
-											<xsl:value-of select="regex-group(1)" />
-											-
-											<xsl:value-of select="regex-group(2)" />
-											-
-											<xsl:value-of select="regex-group(3)" />
-										</span>
-									</div>
-								</div>
-							</xsl:matching-substring>
-						</xsl:analyze-string>
-						<xsl:analyze-string regex="^(\d{{4}})(\d{{2}})$"
-							select="normalize-space(substring-after(//ead:did/ead:unitdate/@normal, '/'))">
-							<xsl:matching-substring>
-								<div class="field">
-									<div class="label">
-										<xsl:value-of select="$i18n.finaldate" />
-									</div>
-									<div class="value">
-									   <span class="value">
-											<xsl:value-of select="regex-group(1)" />
-											-
-											<xsl:value-of select="regex-group(2)" />
-											-01
-										</span>
-									</div>
-								</div>
-							</xsl:matching-substring>
-						</xsl:analyze-string>
+						<div class="field">
+							<div class="label">
+								<xsl:value-of select="$i18n.initialdate" />
+							</div>
+							<div class="value">
+								<span class="value">
+									<xsl:value-of select="normalize-space(substring-before(//ead:did/ead:unitdate/@normal, '/'))" />
+								</span>
+							</div>
+						</div>
+						<div class="field">
+							<div class="label">
+								<xsl:value-of select="$i18n.finaldate" />
+							</div>
+							<div class="value">
+								<span class="value">
+									<xsl:value-of select="normalize-space(substring-after(//ead:did/ead:unitdate/@normal, '/'))" />
+								</span>
+							</div>
+						</div>
 					</xsl:when>
 					<xsl:otherwise>
-						<xsl:analyze-string regex="^(\d{{4}}-\d{{2}}-\d{{2}})$"
-							select="normalize-space(//ead:did/ead:unitdate/@normal)">
-							<xsl:matching-substring>
+						<xsl:choose>
+							<xsl:when test="//ead:did/ead:unitdate[@label='UnitDateInitial']">	<!-- initial date. internal 'hack' -->
 								<div class="field">
 									<div class="label">
 										<xsl:value-of select="$i18n.initialdate" />
 									</div>
 									<div class="value">
 										<span class="value">
-											<xsl:value-of select="regex-group(1)" />
+											<xsl:value-of select="normalize-space(//ead:did/ead:unitdate/@normal)" />
 										</span>
 									</div>
 								</div>
-							</xsl:matching-substring>
-						</xsl:analyze-string>
-						<xsl:analyze-string regex="^(\d{{4}}-\d{{2}})$"
-							select="normalize-space(//ead:did/ead:unitdate/@normal)">
-							<xsl:matching-substring>
+							</xsl:when>
+							<xsl:when test="//ead:did/ead:unitdate[@label='UnitDateFinal']">	<!-- final date. internal 'hack' -->
+								<div class="field">
+									<div class="label">
+										<xsl:value-of select="$i18n.finaldate" />
+									</div>
+									<div class="value">
+										<span class="value">
+											<xsl:value-of select="normalize-space(//ead:did/ead:unitdate/@normal)" />
+										</span>
+									</div>
+								</div>
+							</xsl:when>
+							<xsl:otherwise> <!-- fallback to date initial -->
 								<div class="field">
 									<div class="label">
 										<xsl:value-of select="$i18n.initialdate" />
 									</div>
 									<div class="value">
 										<span class="value">
-											<xsl:value-of select="regex-group(1)" />
-											-01
+											<xsl:value-of select="normalize-space(//ead:did/ead:unitdate/@normal)" />
 										</span>
 									</div>
 								</div>
-							</xsl:matching-substring>
-						</xsl:analyze-string>
-						<xsl:analyze-string regex="^(\d{{4}})$"
-							select="normalize-space(//ead:did/ead:unitdate/@normal)">
-							<xsl:matching-substring>
-								<div class="field">
-									<div class="label">
-										<xsl:value-of select="$i18n.initialdate" />
-									</div>
-									<div class="value">
-										<span class="value">
-											<xsl:value-of select="regex-group(1)" />
-											-01-01
-										</span>
-									</div>
-								</div>
-							</xsl:matching-substring>
-						</xsl:analyze-string>
-						<xsl:analyze-string regex="^(\d{{4}})(\d{{2}})(\d{{2}})$"
-							select="normalize-space(//ead:did/ead:unitdate/@normal)">
-							<xsl:matching-substring>
-								<div class="field">
-									<div class="label">
-										<xsl:value-of select="$i18n.initialdate" />
-									</div>
-									<div class="value">
-										<span class="value">
-											<xsl:value-of select="regex-group(1)" />
-											-
-											<xsl:value-of select="regex-group(2)" />
-											-
-											<xsl:value-of select="regex-group(3)" />
-										</span>
-									</div>
-								</div>
-							</xsl:matching-substring>
-						</xsl:analyze-string>
-						<xsl:analyze-string regex="^(\d{{4}})(\d{{2}})$"
-							select="normalize-space(//ead:did/ead:unitdate/@normal)">
-							<xsl:matching-substring>
-								<div class="field">
-									<div class="label">
-										<xsl:value-of select="$i18n.initialdate" />
-									</div>
-									<div class="value">
-										<span class="value">
-											<xsl:value-of select="regex-group(1)" />
-											-
-											<xsl:value-of select="regex-group(2)" />
-											-01
-										</span>
-									</div>
-								</div>
-							</xsl:matching-substring>
-						</xsl:analyze-string>
+							</xsl:otherwise>	
+						</xsl:choose>
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:if>
@@ -411,7 +215,7 @@
 				</xsl:if>
 			</xsl:for-each>
 			<xsl:if test="//ead:did/ead:origination[@label='creator']/ead:name/text()|//ead:did/ead:origination[@label='producer']/ead:name/text()|//ead:did/ead:repository/ead:corpname/text()|//ead:custodhist/ead:p/text()|//ead:acqinfo/ead:p/text()">
-				<div class="form-separator"><xsl:value-of select="$i18n.contextArea" /></div>
+				<div class="form-separator"><xsl:value-of select="$i18n.contextarea" /></div>
 			</xsl:if>
 			<xsl:if test="//ead:did/ead:origination[@label='creator']/ead:name/text()">
 				<div class="field">
@@ -466,7 +270,7 @@
 				</div>
 			</xsl:if>
 			<xsl:if test="//ead:scopecontent/ead:p/text()|//ead:appraisal/ead:p/text()|//ead:accruals/ead:p/text()|//ead:arrangement/ead:p/text()|ead:arrangement/ead:table">
-				<div class="form-separator"><xsl:value-of select="$i18n.contentArea" /></div>
+				<div class="form-separator"><xsl:value-of select="$i18n.contentarea" /></div>
 			</xsl:if>
 			<xsl:if
 				test="normalize-space(string-join(//ead:scopecontent/ead:p/text(),''))!=''">
@@ -502,7 +306,7 @@
 			<xsl:if test="//ead:arrangement/ead:p/text()">
 				<div class="field">
 					<div class="label">
-						<xsl:value-of select="$i18n.organizationandordering" />
+						<xsl:value-of select="$i18n.arrangement" />
 					</div>
 					<div class="value">
 						<xsl:value-of select="//ead:arrangement/ead:p/text()" />
@@ -512,7 +316,7 @@
 			<xsl:if test="ead:arrangement/ead:table">
 				<div class="field">
 					<div class="label">
-						<xsl:value-of select="$i18n.organizationandordering" />
+						<xsl:value-of select="$i18n.arrangement" />
 					</div>
 					<xsl:variable name="output">
 						<table>
@@ -546,7 +350,7 @@
 				</div>
 			</xsl:if>
 			<xsl:if test="//ead:accessrestrict/ead:p/text()|//ead:userestrict/ead:p/text()|//ead:did/ead:langmaterial/text()">
-				<div class="form-separator"><xsl:value-of select="$i18n.accessArea" /></div>
+				<div class="form-separator"><xsl:value-of select="$i18n.accessarea" /></div>
 			</xsl:if>
 			<xsl:if test="//ead:accessrestrict/ead:p/text()">
 				<div class="field">
@@ -561,7 +365,7 @@
 			<xsl:if test="//ead:userestrict/ead:p/text()">
 				<div class="field">
 					<div class="label">
-						<xsl:value-of select="$i18n.reproductionrestrictions" />
+						<xsl:value-of select="$i18n.userestrict" />
 					</div>
 					<div class="value">
 						<xsl:value-of select="//ead:userestrict/ead:p/text()" />
@@ -607,7 +411,7 @@
 			
 			
 			<xsl:if test="//ead:originalsloc/ead:p/text()|//ead:altformavail/ead:p/text()|//ead:relatedmaterial/ead:p/text()|//ead:bibliography/ead:p/text()">
-				<div class="form-separator"><xsl:value-of select="$i18n.alliedArea" /></div>
+				<div class="form-separator"><xsl:value-of select="$i18n.alliedarea" /></div>
 			</xsl:if>
 			<xsl:if test="//ead:originalsloc/ead:p/text()">
 				<div class="field">
@@ -650,7 +454,7 @@
 				</div>
 			</xsl:if>
 			<xsl:if test="//ead:note[@type='generalNote']/ead:p/text()">
-				<div class="form-separator"><xsl:value-of select="$i18n.notesArea" /></div>
+				<div class="form-separator"><xsl:value-of select="$i18n.notesarea" /></div>
 			</xsl:if>
 			<xsl:if test="//ead:note[@type='generalNote']/ead:p/text()">
 				<div class="field">
@@ -663,7 +467,7 @@
 				</div>
 			</xsl:if>
 			<xsl:if test="//ead:profiledesc/ead:descrules|//ead:odd[@type='statusDescription']/ead:p|//ead:odd[@type='levelOfDetail']/ead:p|//ead:processinfo/ead:p/ead:date|//ead:did/ead:note[@type='sourcesDescription']/ead:p|//ead:processinfo/ead:p[not(*)]">
-				<div class="form-separator"><xsl:value-of select="$i18n.descriptionControlArea" /></div>
+				<div class="form-separator"><xsl:value-of select="$i18n.descriptioncontrolarea" /></div>
 			</xsl:if>
 			<xsl:for-each select="//ead:profiledesc/ead:descrules">
 				<xsl:if test="./text()">

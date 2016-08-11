@@ -464,6 +464,7 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_DO_PRODUCER_AUTHORIZATION_CHECK = "parameter.do_producer_authorization_check";
   public static final String PLUGIN_PARAMS_DO_AUTO_ACCEPT = "parameter.do_auto_accept";
   public static final String PLUGIN_PARAMS_EMAIL_NOTIFICATION = "parameter.email_notification";
+  public static final String PLUGIN_PARAMS_HTTP_NOTIFICATION = "parameter.http_notification";
   public static final String PLUGIN_PARAMS_CREATES_PLUGIN_EVENT = "createsPluginEvent";
   public static final String PLUGIN_PARAMS_CREATE_SUBMISSION = "parameter.create_submission";
   public static final String PLUGIN_PARAMS_USERNAME = "parameter.username";
@@ -808,6 +809,7 @@ public final class RodaConstants {
   public static final String SEARCH_FIELD_TYPE_STORAGE = "storage";
   public static final String SEARCH_FIELD_TYPE_BOOLEAN = "boolean";
   public static final String SEARCH_FIELD_TYPE_SUGGEST = "suggest";
+  public static final String SEARCH_FIELD_TYPE_CONTROLLED = "controlled";
 
   public static final String METADATA_VERSION_SEPARATOR = "_";
   public static final String METADATA_TEMPLATE_FOLDER = "templates";

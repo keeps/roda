@@ -28,7 +28,6 @@ import org.roda.core.data.v2.validation.ValidationIssue;
 import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.InputStreamContentPayload;
-import org.roda.core.storage.InputStreamContentPayload.ProvidesInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

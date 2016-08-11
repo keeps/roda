@@ -64,7 +64,7 @@ public class EditDescriptiveMetadata extends Composite {
         final String descriptiveMetadataId = historyTokens.get(1);
 
         BrowserService.Util.getInstance().retrieveDescriptiveMetadataEditBundle(aipId, descriptiveMetadataId,
-          new AsyncCallback<DescriptiveMetadataEditBundle>() {
+          LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<DescriptiveMetadataEditBundle>() {
 
             @Override
             public void onFailure(Throwable caught) {
@@ -187,7 +187,7 @@ public class EditDescriptiveMetadata extends Composite {
         }
 
         BrowserService.Util.getInstance().retrieveDescriptiveMetadataEditBundle(aipId, bundle.getId(), typeString,
-          version, new AsyncCallback<DescriptiveMetadataEditBundle>() {
+          version, LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<DescriptiveMetadataEditBundle>() {
             @Override
             public void onFailure(Throwable caught) {
               AsyncCallbackUtils.defaultFailureTreatment(caught);

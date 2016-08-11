@@ -20,8 +20,10 @@ import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
@@ -69,24 +71,37 @@ public class RemoveAIPPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> aips)
     throws PluginException {
+    Report report = PluginHelper.initPluginReport(this);
+
     try {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, aips.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
       for (AIP aip : aips) {
+        String error = null;
         try {
           LOGGER.debug("Removing AIP {}", aip.getId());
           model.deleteAIP(aip.getId());
-          jobPluginInfo.incrementObjectsProcessedWithSuccess();
         } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
+          error = e.getMessage();
         }
+        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
+        if (error != null) {
+          reportItem.setPluginState(PluginState.FAILURE)
+            .setPluginDetails("Removal of AIP "+aip.getId()+" did not end successfully: "+error);
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+        } else {
+          reportItem.setPluginState(PluginState.SUCCESS).setPluginDetails("Removal of AIP "+aip.getId()+" ended successfully");
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        }
+        report.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
       }
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
     } catch (JobException e) {
       LOGGER.error("Could not update Job information");
     }
-    return PluginHelper.initPluginReport(this);
+    return report;
   }
 
   @Override

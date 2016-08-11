@@ -30,7 +30,7 @@ public final class LinkingObjectUtils {
   }
 
   public static RODA_TYPE getLinkingIdentifierType(String value) {
-    if (value.contains(RodaConstants.URN_SEPARATOR)) {
+    if (value.contains(RodaConstants.URN_SEPARATOR) && value.split(RodaConstants.URN_SEPARATOR).length>2) {
       return RODA_TYPE.valueOf(value.split(RodaConstants.URN_SEPARATOR)[2].toUpperCase());
     } else {
       return null;

@@ -41,11 +41,14 @@ import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.ConsumesOutputStream;
+import org.roda.core.common.DownloadUtils;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.Messages;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.RodaUtils;
+import org.roda.core.common.StreamResponse;
 import org.roda.core.common.UserUtility;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
@@ -134,14 +137,13 @@ import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Directory;
+import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.wui.api.v1.utils.ApiUtils;
-import org.roda.wui.api.v1.utils.DownloadUtils;
 import org.roda.wui.api.v1.utils.EntityResponse;
 import org.roda.wui.api.v1.utils.ObjectResponse;
-import org.roda.wui.api.v1.utils.StreamResponse;
 import org.roda.wui.client.browse.BinaryVersionBundle;
 import org.roda.wui.client.browse.BrowseItemBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
@@ -155,6 +157,7 @@ import org.roda.wui.client.planning.MitigationPropertiesBundle;
 import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
 import org.roda.wui.common.HTMLUtils;
+import org.roda.wui.common.server.RodaStreamingOutput;
 import org.roda.wui.common.server.ServerTools;
 import org.roda.wui.server.common.XMLSimilarityIgnoreElements;
 import org.slf4j.Logger;
@@ -281,17 +284,17 @@ public class BrowserHelper {
   }
 
   public static DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(RodaUser user, IndexedAIP aip,
-    String descriptiveMetadataId)
+    String descriptiveMetadataId, final Locale locale)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
 
     DescriptiveMetadata metadata = RodaCoreFactory.getModelService().retrieveDescriptiveMetadata(aip.getId(),
       descriptiveMetadataId);
     return retrieveDescriptiveMetadataEditBundle(user, aip, descriptiveMetadataId, metadata.getType(),
-      metadata.getVersion());
+      metadata.getVersion(), locale);
   }
 
   public static DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(RodaUser user, IndexedAIP aip,
-    String descriptiveMetadataId, String type, String version)
+    String descriptiveMetadataId, String type, String version, final Locale locale)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     DescriptiveMetadataEditBundle ret;
     InputStream inputStream = null;
@@ -305,7 +308,7 @@ public class BrowserHelper {
       // We need this to try to get get the values for the form
       SupportedMetadataTypeBundle metadataTypeBundle = null;
       List<SupportedMetadataTypeBundle> supportedMetadataTypeBundles = BrowserHelper.retrieveSupportedMetadata(user,
-        aip, Locale.getDefault());
+        aip, locale);
       for (SupportedMetadataTypeBundle typeBundle : supportedMetadataTypeBundles) {
         if (typeBundle.getType() != null && typeBundle.getType().equalsIgnoreCase(type)) {
           if (typeBundle.getVersion() == version
@@ -464,7 +467,7 @@ public class BrowserHelper {
       StoragePath storagePath = ModelUtils.getRepresentationStoragePath(representation.getAipId(),
         representation.getId());
       Directory directory = RodaCoreFactory.getStorageService().getDirectory(storagePath);
-      return DownloadUtils.download(RodaCoreFactory.getStorageService(), directory);
+      return download(directory);
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
       ModelService model = RodaCoreFactory.getModelService();
@@ -475,6 +478,12 @@ public class BrowserHelper {
     }
   }
 
+  private static StreamResponse download(Resource resource) {
+    ConsumesOutputStream download = DownloadUtils.download(RodaCoreFactory.getStorageService(), resource);
+    StreamingOutput streamingOutput = new RodaStreamingOutput(download);
+    return new StreamResponse(download.getFileName(), download.getMediaType(), streamingOutput);
+  }
+
   public static StreamResponse retrieveAIPRepresentationPart(IndexedRepresentation representation, String part)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     String aipId = representation.getAipId();
@@ -483,17 +492,17 @@ public class BrowserHelper {
     if (RodaConstants.STORAGE_DIRECTORY_DATA.equals(part)) {
       StoragePath storagePath = ModelUtils.getRepresentationDataStoragePath(aipId, representationId);
       Directory directory = RodaCoreFactory.getStorageService().getDirectory(storagePath);
-      return DownloadUtils.download(RodaCoreFactory.getStorageService(), directory);
+      return download(directory);
     } else if (RodaConstants.STORAGE_DIRECTORY_METADATA.equals(part)) {
       StoragePath storagePath = ModelUtils.getRepresentationMetadataStoragePath(aipId, representationId);
       Directory directory = RodaCoreFactory.getStorageService().getDirectory(storagePath);
-      return DownloadUtils.download(RodaCoreFactory.getStorageService(), directory);
+      return download(directory);
     } else if (RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION.equals(part)) {
       Directory directory = RodaCoreFactory.getModelService().getDocumentationDirectory(aipId, representationId);
-      return DownloadUtils.download(RodaCoreFactory.getStorageService(), directory);
+      return download(directory);
     } else if (RodaConstants.STORAGE_DIRECTORY_SCHEMAS.equals(part)) {
       Directory directory = RodaCoreFactory.getModelService().getSchemasDirectory(aipId, representationId);
-      return DownloadUtils.download(RodaCoreFactory.getStorageService(), directory);
+      return download(directory);
     } else {
       throw new GenericException("Unsupported part: " + part);
     }
@@ -1456,7 +1465,7 @@ public class BrowserHelper {
         if (id.contains(RodaConstants.METADATA_VERSION_SEPARATOR)) {
           version = id.substring(id.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1, id.length());
           type = id.substring(0, id.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));
-        } 
+        }
 
         String key = RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX + id;
         if (version != null) {
@@ -1482,6 +1491,34 @@ public class BrowserHelper {
                   mv.set("value", value);
                 }
               }
+              String labels = mv.get("label");
+              String labelI18N = mv.get("labeli18n");
+              if (labels != null && labelI18N != null) {
+                Map<String, String> labelsMaps = JsonUtils.getMapFromJson(labels);
+                try {
+                  labelsMaps.put(locale.toString(), RodaCoreFactory.getI18NMessages(locale).getTranslation(labelI18N));
+                } catch (MissingResourceException e) {
+                  LOGGER.debug("Missing resource: " + labelI18N);
+                }
+                labels = JsonUtils.getJsonFromObject(labelsMaps);
+                mv.set("label", labels);
+              }
+              String i18nPrefix = mv.get("listi18n");
+              if (i18nPrefix != null) {
+                try {
+                  Map<String, String> terms = messages.getTranslations(i18nPrefix, String.class, false);
+                  Map<String, Map<String, String>> i18nMap = new HashMap<String, Map<String, String>>();
+                  for (Map.Entry<String, String> entry : terms.entrySet()) {
+                    Map<String, String> term = new HashMap<String, String>();
+                    term.put(locale.toString(), entry.getValue());
+                    i18nMap.put(entry.getKey().replace(i18nPrefix + ".", ""), term);
+                  }
+                  mv.set("list", JsonUtils.getJsonFromObject(i18nMap));
+                } catch (MissingResourceException e) {
+                  LOGGER.error(e.getMessage(), e);
+                }
+              }
+
             }
           } catch (IOException e) {
             LOGGER.error("Error getting the template from the stream", e);
@@ -1905,13 +1942,13 @@ public class BrowserHelper {
 
     if (RodaConstants.STORAGE_DIRECTORY_SUBMISSION.equals(part)) {
       Directory directory = RodaCoreFactory.getModelService().getSubmissionDirectory(aipId);
-      return DownloadUtils.download(RodaCoreFactory.getStorageService(), directory);
+      return download(directory);
     } else if (RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION.equals(part)) {
       Directory directory = RodaCoreFactory.getModelService().getDocumentationDirectory(aipId);
-      return DownloadUtils.download(RodaCoreFactory.getStorageService(), directory);
+      return download(directory);
     } else if (RodaConstants.STORAGE_DIRECTORY_SCHEMAS.equals(part)) {
       Directory directory = RodaCoreFactory.getModelService().getSchemasDirectory(aipId);
-      return DownloadUtils.download(RodaCoreFactory.getStorageService(), directory);
+      return download(directory);
     } else {
       throw new GenericException("Unsupported part: " + part);
     }

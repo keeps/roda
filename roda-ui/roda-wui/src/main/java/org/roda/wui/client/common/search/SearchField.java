@@ -10,6 +10,8 @@ package org.roda.wui.client.common.search;
 import java.io.Serializable;
 import java.util.List;
 
+import org.roda.wui.client.common.utils.Tree;
+
 public class SearchField implements Serializable {
   private static final long serialVersionUID = -2809811191632936028L;
   private String id;
@@ -17,6 +19,7 @@ public class SearchField implements Serializable {
   private String label;
   private String type;
   private boolean fixed;
+  private Tree<String> terms;
 
   public SearchField() {
     super();
@@ -28,6 +31,16 @@ public class SearchField implements Serializable {
     this.searchFields = searchFields;
     this.label = label;
     this.type = type;
+    this.terms = null;
+  }
+  
+  public SearchField(String id, List<String> searchFields, String label, String type, Tree<String> terms) {
+    super();
+    this.id = id;
+    this.searchFields = searchFields;
+    this.label = label;
+    this.type = type;
+    this.terms = terms;
   }
 
   public String getId() {
@@ -68,6 +81,14 @@ public class SearchField implements Serializable {
 
   public void setFixed(boolean fixed) {
     this.fixed = fixed;
+  }
+
+  public Tree<String> getTerms() {
+    return terms;
+  }
+
+  public void setTerms(Tree<String> terms) {
+    this.terms = terms;
   }
 
   @Override

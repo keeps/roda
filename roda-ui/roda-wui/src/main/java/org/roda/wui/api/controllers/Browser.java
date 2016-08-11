@@ -21,6 +21,7 @@ import javax.xml.transform.TransformerException;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.StreamResponse;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
@@ -61,10 +62,6 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.storage.ContentPayload;
-import org.roda.core.storage.fs.FSPathContentPayload;
-import org.roda.wui.api.v1.utils.ApiUtils;
-import org.roda.wui.api.v1.utils.EntityResponse;
-import org.roda.wui.api.v1.utils.StreamResponse;
 import org.roda.wui.client.browse.BrowseItemBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataVersionsBundle;
@@ -124,7 +121,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(RodaUser user, String aipId,
-    String metadataId, String type, String version)
+    String metadataId, String type, String version, Locale locale)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -135,7 +132,7 @@ public class Browser extends RodaWuiController {
 
     // delegate
     DescriptiveMetadataEditBundle bundle = BrowserHelper.retrieveDescriptiveMetadataEditBundle(user, aip, metadataId,
-      type, version);
+      type, version, locale);
 
     // register action
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
@@ -145,7 +142,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(RodaUser user, String aipId,
-    String metadataId)
+    String metadataId, Locale locale)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -156,7 +153,7 @@ public class Browser extends RodaWuiController {
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
     // delegate
-    DescriptiveMetadataEditBundle bundle = BrowserHelper.retrieveDescriptiveMetadataEditBundle(user, aip, metadataId);
+    DescriptiveMetadataEditBundle bundle = BrowserHelper.retrieveDescriptiveMetadataEditBundle(user, aip, metadataId, locale);
 
     // register action
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,

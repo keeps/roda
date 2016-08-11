@@ -1,14 +1,14 @@
-{{~field name="id" 			order=1 auto-generate='id' label="{'en': 'ID'}" xpath="//*:recordid/string() ##%## //*:unitid/string()"~}}
-{{~field name="title" 		order='2' auto-generate='title' label="{'en': 'Title'}" xpath="//*:titleproper/string() ##%## //*:unittitle/string()"~}}
-{{~field name="producer" 	label="{'en': 'Producer'}" xpath="//*:agencyname/string() ##%## //*:origination[@label='producer']/*:corpname/*:part/string()"~}}
+{{~field name="id" 			order=1 auto-generate='id' label="{\"en\": \"ID\"}" xpath="//*:recordid/string() ##%## //*:unitid/string()"~}}
+{{~field name="title" 		order='2' auto-generate='title' label="{\"en\": \"Title\"}" xpath="//*:titleproper/string() ##%## //*:unittitle/string()"~}}
+{{~field name="producer" 	label="{\"en\": \"Producer\"}" xpath="//*:agencyname/string() ##%## //*:origination[@label='producer']/*:corpname/*:part/string()"~}}
 {{~field name="descDate" 	order="3" type="date" auto-generate="now" label="{\"en\": \"Description date\"}" xpath="//*:eventdatetime/@standardtime/string() ##%## //*:eventdatetime/string()"~}}
-{{~field name="level" 		order="6" type="list" list="[\"fonds\",\"subfonds\",\"series\",\"subseries\",\"file\",\"item\"]" auto-generate="level" label="{\"en\": \"Description level\"}" xpath="//*:archdesc/@level/string()"~}}
+{{~field name="level" 		order="6" type="list" list="{\"fonds\": {\"en\": \"Fonds\", \"pt_PT\": \"Fundo\"}, \"subfonds\": {\"en\": \"Subfonds\", \"pt_PT\": \"Sub-fundo\"}, \"series\": {\"en\": \"Series\", \"pt_PT\": \"Série\"}, \"subseries\": {\"en\": \"Sub-series\", \"pt_PT\": \"Sub-série\"}, \"file\": {\"en\": \"File\", \"pt_PT\": \"Ficheiro\"}, \"item\": {\"en\": \"Item\", \"pt_PT\": \"Objeto\"}}" auto-generate="level" label="{\"en\": \"Description level\"}" xpath="//*:archdesc/@level/string()"~}}
 {{~field name="dateInitial" order="4" type="date" label="{\"en\": \"Initial date\"}" xpath="//*:fromdate/@standarddate/string() ##%## //*:fromdate/string()"~}}
 {{~field name="dateFinal" 	order="5" type="date" label="{\"en\": \"Final date\"}" xpath="//*:todate/@standarddate/string() ##%## //*:todate/string()"~}}
-{{~field name="creator" 	label="{'en': 'Creator'}" xpath="//*:origination[@label='producer']/*:corpname/*:part/string()"~}}
-{{~field name="language" 	auto-generate='language' label="{'en': 'Language'}" xpath="//*:language/string()"~}}
-{{~field name="description" type='text-area' label="{'en': 'Description'}" xpath="//*:scopecontent/*:p/string()"~}}
-{{~field name="rights" 		label="{'en': 'Rights'}" xpath="//*:userestrict/*:p/string()"~}}
+{{~field name="creator" 	label="{\"en\": \"Creator\"}" xpath="//*:origination[@label='producer']/*:corpname/*:part/string()"~}}
+{{~field name="language" 	auto-generate='language' label="{\"en\": \"Language\"}" xpath="//*:language/string()"~}}
+{{~field name="description" type='text-area' label="{\"en\": \"Description\"}" xpath="//*:scopecontent/*:p/string()"~}}
+{{~field name="rights" 		label="{\"en\": \"Rights\"}" xpath="//*:userestrict/*:p/string()"~}}
 <ead xmlns="http://ead3.archivists.org/schema/"
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://ead3.archivists.org/schema/ ../schemas/ead3.xsd">

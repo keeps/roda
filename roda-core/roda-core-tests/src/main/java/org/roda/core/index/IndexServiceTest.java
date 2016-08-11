@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -35,6 +36,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.RodaUtils;
+import org.roda.core.common.notifications.EmailNotificationProcessor;
 import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
@@ -791,8 +793,7 @@ public class IndexServiceTest {
     notification.setSentOn(new Date());
     notification.setFromUser("Test Message Index");
     notification.setRecipientUsers(Arrays.asList("recipientuser@example.com"));
-
-    model.createNotification(notification, "test-email-template.vm", new HashMap<String, Object>());
+    model.createNotification(notification, new EmailNotificationProcessor("test-email-template.vm", new HashMap<String, Object>()));
     index.commit(Notification.class);
 
     Notification message2 = model.retrieveNotification(notification.getId());

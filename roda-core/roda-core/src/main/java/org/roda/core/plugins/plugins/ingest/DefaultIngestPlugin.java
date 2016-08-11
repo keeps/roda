@@ -18,6 +18,8 @@ import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.notifications.EmailNotificationProcessor;
+import org.roda.core.common.notifications.HTTPNotificationProcessor;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -378,9 +380,26 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
       long duration = (new Date().getTime() - job.getStartDate().getTime()) / 1000;
       scopes.put("duration", duration + " seconds");
-
-      model.createNotification(notification, RodaConstants.INGEST_EMAIL_TEMPLATE, scopes);
+      model.createNotification(notification, new EmailNotificationProcessor(RodaConstants.INGEST_EMAIL_TEMPLATE, scopes));
     }
+
+    String httpNotifications = PluginHelper.getStringFromParameters(this,
+      getPluginParameter(RodaConstants.PLUGIN_PARAMS_HTTP_NOTIFICATION));
+    if (StringUtils.isNotBlank(httpNotifications)) {
+      Notification notification = new Notification();
+      String outcome = PluginState.SUCCESS.toString();
+
+      if (jobStats.getSourceObjectsProcessedWithFailure() > 0) {
+        outcome = PluginState.FAILURE.toString();
+      }
+      notification.setSubject("RODA ingest process finished - " + outcome);
+      notification.setFromUser(this.getClass().getSimpleName());
+      notification.setRecipientUsers(Arrays.asList(httpNotifications));
+      Map<String, Object> scope = new HashMap<String, Object>();
+      scope.put(HTTPNotificationProcessor.JOB_KEY, job);
+      model.createNotification(notification, new HTTPNotificationProcessor(httpNotifications, scope));
+    }
+
   }
 
   /**

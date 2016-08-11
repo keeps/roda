@@ -53,9 +53,9 @@ public interface BrowserServiceAsync {
   void retrieveItemBundle(String aipId, String localeString, AsyncCallback<BrowseItemBundle> callback);
 
   void retrieveDescriptiveMetadataEditBundle(String aipId, String descId, String type, String version,
-    AsyncCallback<DescriptiveMetadataEditBundle> callback);
+    String localeString, AsyncCallback<DescriptiveMetadataEditBundle> callback);
 
-  void retrieveDescriptiveMetadataEditBundle(String aipId, String descId,
+  void retrieveDescriptiveMetadataEditBundle(String aipId, String descId, String localeString,
     AsyncCallback<DescriptiveMetadataEditBundle> callback);
 
   void retrieveSearchFields(String locale, AsyncCallback<List<SearchField>> callback);

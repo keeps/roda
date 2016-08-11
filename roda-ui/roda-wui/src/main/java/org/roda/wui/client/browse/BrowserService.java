@@ -87,9 +87,9 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String descId, String type,
-    String version) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
+    String version, String localeString) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
-  DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String descId)
+  DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String descId, String localeString)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
   List<SearchField> retrieveSearchFields(String locale) throws GenericException;

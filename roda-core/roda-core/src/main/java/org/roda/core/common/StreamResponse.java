@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.api.v1.utils;
+package org.roda.core.common;
 
 import javax.ws.rs.core.StreamingOutput;
 

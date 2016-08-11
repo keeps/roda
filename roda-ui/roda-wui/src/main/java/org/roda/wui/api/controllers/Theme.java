@@ -23,10 +23,10 @@ import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.StreamResponse;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.wui.api.v1.utils.StreamResponse;
 import org.roda.wui.common.RodaWuiController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

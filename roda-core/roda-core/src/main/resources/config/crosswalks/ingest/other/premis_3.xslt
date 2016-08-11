@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="2.0"
+	xmlns:xhtml="http://www.w3.org/1999/xhtml" 
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:prem="http://www.loc.gov/premis/v3"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	exclude-result-prefixes="prem">
@@ -104,10 +105,10 @@
 			</xsl:if>
 			<xsl:if test="prem:eventOutcomeInformation/prem:eventOutcomeDetail">
 				<xsl:if
-					test="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailExtension">
+					test="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailExtension/xhtml:p/text()">
 					<field name="eventOutcomeDetailExtension">
 						<xsl:value-of
-							select="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailExtension/text()" />
+							select="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailExtension/xhtml:p/text()" />
 					</field>
 				</xsl:if>
 				<xsl:if
