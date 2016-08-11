@@ -10,8 +10,10 @@ package org.roda.wui.api.v1;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.roda.core.common.UserUtility;
@@ -51,26 +53,27 @@ public class IndexResource {
    * Find indexed resources.
    * 
    * @param returnClass
-   *          the {@link Class} of the resources.
+   *          {@link Class} of resources to return.
    * @param start
-   *          the first resource to return (0-based index).
+   *          Index of the first element to return (0-based index).
    * @param limit
-   *          the maximum number of resources to return.
+   *          Maximum number of elements to return.
    * @param onlyActive
-   *          only return active resources?
+   *          Return only active resources?
    * @param <T>
-   *          the type of the resource.
+   *          Type of the resources to return.
    * @return a {@link Response} with the resources.
    * @throws RODAException
    *           if some error occurs.
    */
   @GET
-  @ApiOperation(value = "List indexed resources", notes = "Gets a list of indexed resources.", response = IsIndexed.class, responseContainer = "List")
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @ApiOperation(value = "Find indexed resources.", notes = "Find indexed resources.", response = IsIndexed.class, responseContainer = "List")
   public <T extends IsIndexed> Response list(
     @ApiParam(value = "Class of resources to return") @QueryParam(RodaConstants.API_QUERY_RETURN_CLASS) final String returnClass,
-    @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) final int start,
+    @ApiParam(value = "Index of the first element to return (0-based index)", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) final int start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam(RodaConstants.API_QUERY_KEY_LIMIT) final int limit,
-    @ApiParam(value = "Return only active resources", defaultValue = "true") @QueryParam(RodaConstants.API_QUERY_ONLY_ACTIVE) final boolean onlyActive)
+    @ApiParam(value = "Return only active resources?", defaultValue = "true") @QueryParam(RodaConstants.API_QUERY_ONLY_ACTIVE) final boolean onlyActive)
     throws RODAException {
     final String mediaType = ApiUtils.getMediaType(null, request);
     final RodaUser user = UserUtility.getApiUser(request);
