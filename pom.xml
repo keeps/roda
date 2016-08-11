@@ -265,36 +265,36 @@
 					</includes>
 				</configuration>
 			</plugin>
-			               <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>1.4</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>com.redhat.victims</groupId>
-                            <artifactId>enforce-victims-rule</artifactId>
-                            <version>1.3.4</version>
-                            <type>jar</type>
-                        </dependency>
-                    </dependencies>
-                    <executions>
-                        <execution>
-                            <id>enforce-victims-rule</id>
-                            <goals>
-                                <goal>enforce</goal>
-                            </goals>
-                            <configuration>
-                                <rules>
-                                    <rule implementation="com.redhat.victims.VictimsRule">
-                                        <metadata>warning</metadata>
-                                        <fingerprint>warning</fingerprint>
-                                        <updates>daily</updates>
-                                    </rule>
-                                </rules>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>1.4</version>
+				<dependencies>
+					<dependency>
+						<groupId>com.redhat.victims</groupId>
+						<artifactId>enforce-victims-rule</artifactId>
+						<version>1.3.4</version>
+						<type>jar</type>
+					</dependency>
+				</dependencies>
+				<executions>
+					<execution>
+						<id>enforce-victims-rule</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<rule implementation="com.redhat.victims.VictimsRule">
+									<metadata>warning</metadata>
+									<fingerprint>warning</fingerprint>
+									<updates>daily</updates>
+								</rule>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -933,8 +933,8 @@
 			<!-- ApacheDS related dependencies - start -->
 			<dependency>
 				<groupId>org.apache.directory.server</groupId>
-				<artifactId>apacheds-all-shaded</artifactId>
-				<version>2.0.0-M21</version>
+				<artifactId>apacheds-all</artifactId>
+				<version>2.0.0-M23</version>
 			</dependency>
 			<dependency>
 				<groupId>net.sf.ehcache</groupId>
@@ -968,10 +968,10 @@
 				<version>9.6.0-7</version>
 			</dependency>
 			<dependency>
-			    <groupId>org.hamcrest</groupId>
-			    <artifactId>hamcrest-core</artifactId>
-			    <version>1.3</version>
-			  </dependency>
+				<groupId>org.hamcrest</groupId>
+				<artifactId>hamcrest-core</artifactId>
+				<version>1.3</version>
+			</dependency>
 			<dependency>
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-core</artifactId>

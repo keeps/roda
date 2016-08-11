@@ -1137,7 +1137,7 @@ public class BrowserHelper {
     return transferredResource;
   }
 
-  public static <T extends IsIndexed> List<String> consolidate(RodaUser user, Class<T> classToReturn,
+  private static <T extends IsIndexed> List<String> consolidate(RodaUser user, Class<T> classToReturn,
     SelectedItems<T> selected) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     List<String> ret;
 

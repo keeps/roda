@@ -42,8 +42,8 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
-import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.risks.IndexedRisk;
@@ -217,7 +217,7 @@ public class Browser extends RodaCoreService {
 
   public static <T extends IsIndexed> T retrieve(final RodaUser user, final Class<T> classToReturn, final String id)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() { };
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
     controllerAssistant.checkRoles(user, classToReturn);
@@ -1039,21 +1039,6 @@ public class Browser extends RodaCoreService {
     }
 
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "aips", aips, "permissions", permissions);
-  }
-
-  public static <T extends IsIndexed> List<String> consolidate(final RodaUser user, final Class<T> classToReturn,
-    final SelectedItems<T> selected) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user, classToReturn);
-
-    final List<String> result = BrowserHelper.consolidate(user, classToReturn, selected);
-
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "classToReturn", classToReturn, "selectedClass",
-      selected.getSelectedClass());
-
-    return result;
   }
 
   public static void updateRisk(RodaUser user, Risk risk, String message)
