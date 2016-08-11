@@ -7,8 +7,11 @@
  */
 package org.roda.core.plugins.plugins.base;
 
-import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -63,7 +66,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
   static {
     pluginParameters.put(PLUGIN_PARAM_EXPORT_FOLDER_PARAMETER,
       new PluginParameter(PLUGIN_PARAM_EXPORT_FOLDER_PARAMETER, "Output folder", PluginParameterType.STRING,
-        "/home/sleroux/output", true, false, "Folder where the exported AIP will be sent."));
+        "/tmp", true, false, "Folder where the exported AIP will be sent."));
     pluginParameters.put(PLUGIN_PARAM_EXPORT_TYPE, new PluginParameter(PLUGIN_PARAM_EXPORT_TYPE, "Type of export",
       PluginParameterType.STRING, "FOLDER", true, false, "Type of exportation (MULTI_ZIP, FOLDER)"));
     pluginParameters.put(PLUGIN_PARAM_EXPORT_REMOVE_IF_ALREADY_EXISTS,
@@ -128,8 +131,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> aips)
     throws PluginException {
-    FileOutputStream fos = null;
-    // FIXME 20160418 hsilva: change all java.io to nio based code
+    OutputStream os = null;
     try {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, aips.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
@@ -139,13 +141,14 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
           LOGGER.debug("Exporting AIP {}", aip.getId());
           try {
             List<ZipEntryInfo> zipEntries = ModelUtils.aipToZipEntry(aip);
-            java.io.File outputFolderFile = new java.io.File(outputFolder);
-            java.io.File zip = new java.io.File(outputFolderFile, aip.getId() + ".zip");
-            if (zip.exists() && removeIfAlreadyExists) {
-              zip.delete();
+            Path outputPath = Paths.get(outputFolder);
+            Path zip = outputPath.resolve(aip.getId() + ".zip");
+            if (Files.exists(zip) && removeIfAlreadyExists) {
+              Files.delete(zip);
             }
-            fos = new FileOutputStream(zip);
-            ZipTools.zip(zipEntries, fos);
+
+            os = Files.newOutputStream(zip, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            ZipTools.zip(zipEntries, os);
             jobPluginInfo.incrementObjectsProcessedWithSuccess();
           } catch (Exception e) {
             LOGGER.error("Error exporting AIP " + aip.getId() + ": " + e.getMessage());
@@ -186,7 +189,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
     } catch (JobException e) {
       LOGGER.error("Could not update Job information");
     } finally {
-      IOUtils.closeQuietly(fos);
+      IOUtils.closeQuietly(os);
     }
     return PluginHelper.initPluginReport(this);
   }
