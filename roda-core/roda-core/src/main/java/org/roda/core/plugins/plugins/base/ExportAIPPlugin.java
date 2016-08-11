@@ -186,12 +186,14 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
               localStorage.deleteResource(DefaultStoragePath.parse(aip.getId()));
               localStorage.copy(storage, aipPath, DefaultStoragePath.parse(aip.getId()));
             } catch (AlreadyExistsException e2) {
-              error = e2.getMessage();
+              error = "Error removing/creating folder "+aipPath.toString();
             }
           } else {
-            error = "Folder "+aip.toString()+" already exists.";
+            error = "Folder "+aipPath.toString()+" already exists.";
           }
         }
+        
+        
         Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
         if (error != null) {
           reportItem.setPluginState(PluginState.FAILURE).setPluginDetails("Export AIP did not end successfully: "+error);
@@ -205,7 +207,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
 
       }
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
-
+      LOGGER.error(e.getMessage(),e);
     }
     return report;
   }
