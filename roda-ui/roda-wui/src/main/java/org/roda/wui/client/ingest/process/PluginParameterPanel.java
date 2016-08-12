@@ -9,6 +9,7 @@ package org.roda.wui.client.ingest.process;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -82,6 +83,10 @@ public class PluginParameterPanel extends Composite {
       createSelectRiskLayout();
     } else if (PluginParameterType.SEVERITY.equals(parameter.getType())) {
       createSelectSeverityLayout();
+    } else if (PluginParameterType.SEVERITY.equals(parameter.getType())) {
+      createSelectSeverityLayout();
+    } else if (PluginParameterType.RODA_OBJECT.equals(parameter.getType())) {
+      createSelectRodaObjectLayout();
     } else {
       logger
         .warn("Unsupported plugin parameter type: " + parameter.getType() + ". Reverting to default parameter editor.");
@@ -219,6 +224,41 @@ public class PluginParameterPanel extends Composite {
     buttonsPanel.addStyleName("itemButtonsPanel");
     editButton.addStyleName("toolbarLink toolbarLinkSmall");
     removeButton.addStyleName("toolbarLink toolbarLinkSmall");
+  }
+
+  private void createSelectRodaObjectLayout() {
+    Label parameterName = new Label(parameter.getName());
+    final ListBox objectBox = new ListBox();
+    objectBox.addStyleName("form-selectbox");
+    objectBox.addStyleName("form-textbox-small");
+
+    BrowserService.Util.getInstance().retrieveReindexPluginObjectClasses(new AsyncCallback<Set<Class>>() {
+
+      @Override
+      public void onFailure(Throwable caught) {
+        // do nothing
+      }
+
+      @Override
+      public void onSuccess(Set<Class> result) {
+        for (Class objectClass : result) {
+          objectBox.addItem(objectClass.getSimpleName(), objectClass.getName());
+        }
+
+        value = objectBox.getSelectedValue();
+      }
+    });
+
+    objectBox.addChangeHandler(new ChangeHandler() {
+      @Override
+      public void onChange(ChangeEvent event) {
+        value = objectBox.getSelectedValue();
+      }
+    });
+
+    layout.add(parameterName);
+    layout.add(objectBox);
+    addHelp();
   }
 
   private void createPluginSipToAipLayout() {

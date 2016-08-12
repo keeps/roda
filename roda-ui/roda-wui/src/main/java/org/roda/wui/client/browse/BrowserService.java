@@ -10,6 +10,7 @@ package org.roda.wui.client.browse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
@@ -131,6 +132,8 @@ public interface BrowserService extends RemoteService {
     GenericException, JobAlreadyStartedException;
 
   List<PluginInfo> retrievePluginsInfo(List<PluginType> type);
+
+  Set<Class> retrieveReindexPluginObjectClasses();
 
   CreateIngestJobBundle retrieveCreateIngestProcessBundle();
 
@@ -280,4 +283,5 @@ public interface BrowserService extends RemoteService {
   void updateRiskIncidence(RiskIncidence incidence) throws AuthorizationDeniedException, GenericException;
 
   void showLogs() throws AuthorizationDeniedException;
+
 }

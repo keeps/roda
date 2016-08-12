@@ -58,7 +58,12 @@ public class PluginParameter implements Serializable {
     /**
      * Interface to select a severity level
      */
-    SEVERITY;
+    SEVERITY,
+
+    /**
+     * Interface to select a RODA object
+     */
+    RODA_OBJECT;
   }
 
   /**

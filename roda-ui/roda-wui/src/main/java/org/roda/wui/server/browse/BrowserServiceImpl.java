@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
+import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
 import org.roda.core.RodaCoreFactory;
@@ -56,6 +57,7 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.validation.ValidationException;
+import org.roda.core.plugins.plugins.base.ReindexPlugin;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StringContentPayload;
 import org.roda.wui.api.controllers.Browser;
@@ -411,6 +413,14 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public List<PluginInfo> retrievePluginsInfo(List<PluginType> types) {
     // TODO check permissions
     return RodaCoreFactory.getPluginManager().getPluginsInfo(types);
+  }
+
+  @Override
+  public Set<Class> retrieveReindexPluginObjectClasses() {
+    // TODO check permissions
+    Set<Class> classes = RodaCoreFactory.getPluginManager().getPluginObjectClasses(ReindexPlugin.class.getName());
+    classes.remove(Void.class);
+    return classes;
   }
 
   @Override

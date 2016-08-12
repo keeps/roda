@@ -13,6 +13,7 @@ package org.roda.wui.client.browse;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.validation.ValidationException;
@@ -223,6 +224,7 @@ public class EditDescriptiveMetadata extends Composite {
           // TODO sort by alphabetic order of value
           int selected = -1;
           int index = 0;
+          Map<String, Integer> types = new HashMap<String, Integer>();
           for (SupportedMetadataTypeBundle b : metadataTypes) {
             if (b.getVersion() != null) {
               type.addItem(b.getLabel(), b.getType() + RodaConstants.METADATA_VERSION_SEPARATOR + b.getVersion());
@@ -242,6 +244,7 @@ public class EditDescriptiveMetadata extends Composite {
               }
             }
 
+            types.put(b.getType(), index);
             index++;
           }
 
@@ -254,9 +257,15 @@ public class EditDescriptiveMetadata extends Composite {
             type.addItem(messages.otherItem(), "");
             type.setSelectedIndex(type.getItemCount() - 1);
           } else {
-            type.addItem(messages.otherItem() + "(" + bundle.getType() + ")", bundle.getType());
-            type.addItem(messages.otherItem(), "");
-            type.setSelectedIndex(type.getItemCount() - 2);
+            if (!types.keySet().contains(bundle.getType())) {
+              type.addItem(messages.otherItem() + "(" + bundle.getType() + ")", bundle.getType());
+              type.addItem(messages.otherItem(), "");
+              type.setSelectedIndex(type.getItemCount() - 2);
+            } else {
+              type.addItem(messages.otherItem(), "");
+              type.setSelectedIndex(types.get(bundle.getType()));
+            }
+
           }
         }
       });

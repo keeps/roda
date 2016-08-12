@@ -12,6 +12,7 @@ package org.roda.wui.client.browse;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
@@ -85,6 +86,8 @@ public interface BrowserServiceAsync {
   void createJob(Job job, AsyncCallback<Job> callback);
 
   void retrievePluginsInfo(List<PluginType> type, AsyncCallback<List<PluginInfo>> callback);
+
+  void retrieveReindexPluginObjectClasses(AsyncCallback<Set<Class>> asyncCallback);
 
   void retrieveCreateIngestProcessBundle(AsyncCallback<CreateIngestJobBundle> callback);
 
