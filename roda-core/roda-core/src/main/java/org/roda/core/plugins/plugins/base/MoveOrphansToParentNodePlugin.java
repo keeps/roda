@@ -15,7 +15,6 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -70,7 +69,7 @@ public class MoveOrphansToParentNodePlugin extends AbstractPlugin<IndexedAIP> {
     throws PluginException {
 
     try {
-      Job job = PluginHelper.getJobFromIndex(this, index);
+      String username = PluginHelper.getJobUsername(this, index);
 
       for (IndexedAIP indexedAIP : list) {
         try {
@@ -78,7 +77,7 @@ public class MoveOrphansToParentNodePlugin extends AbstractPlugin<IndexedAIP> {
           if (indexedAIP.getLevel() == null || !indexedAIP.getLevel().trim().equalsIgnoreCase("fonds")) {
             AIP aip = model.retrieveAIP(indexedAIP.getId());
             aip.setParentId(newParent.getId());
-            model.updateAIP(aip, job.getUsername());
+            model.updateAIP(aip, username);
           } else {
             LOGGER.debug("AIP doesn't need to be moved... level: {}", indexedAIP.getLevel());
           }

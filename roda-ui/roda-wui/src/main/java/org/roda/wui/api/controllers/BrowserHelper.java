@@ -1225,11 +1225,12 @@ public class BrowserHelper {
     return new StreamResponse(filename, mediaType, stream);
   }
 
-  public static void createOrUpdateAIPDescriptiveMetadataFile(String aipId, String representationId, String metadataId,
-    String metadataType, String metadataVersion, String updateMessage, InputStream is,
+  public static DescriptiveMetadata createOrUpdateAIPDescriptiveMetadataFile(String aipId, String representationId,
+    String metadataId, String metadataType, String metadataVersion, String updateMessage, InputStream is,
     FormDataContentDisposition fileDetail, boolean create) throws GenericException, RequestNotValidException,
     NotFoundException, AuthorizationDeniedException, AlreadyExistsException, ValidationException {
     Path file = null;
+    DescriptiveMetadata dm = null;
     try {
       ModelService model = RodaCoreFactory.getModelService();
       file = Files.createTempFile("descriptive", ".tmp");
@@ -1237,10 +1238,12 @@ public class BrowserHelper {
       ContentPayload payload = new FSPathContentPayload(file);
 
       if (create) {
-        model.createDescriptiveMetadata(aipId, representationId, metadataId, payload, metadataType, metadataVersion);
+        dm = model.createDescriptiveMetadata(aipId, representationId, metadataId, payload, metadataType,
+          metadataVersion);
       } else {
-        model.updateDescriptiveMetadata(aipId, representationId, metadataId, payload, metadataType, metadataVersion,
-          updateMessage);
+        LOGGER.error("ERROR: " + metadataType + " - " + metadataVersion);
+        dm = model.updateDescriptiveMetadata(aipId, representationId, metadataId, payload, metadataType,
+          metadataVersion, updateMessage);
       }
 
     } catch (IOException e) {
@@ -1249,22 +1252,8 @@ public class BrowserHelper {
       FSUtils.deletePathQuietly(file);
     }
 
+    return dm;
   }
-
-  // public static IndexResult<TransferredResource>
-  // findTransferredResources(Filter filter, Sorter sorter, Sublist sublist,
-  // Facets facets) throws GenericException, RequestNotValidException {
-  // return RodaCoreFactory.getIndexService().find(TransferredResource.class,
-  // filter, sorter, sublist, facets);
-  // }
-  //
-  // public static TransferredResource retrieveTransferredResource(String
-  // transferredResourceId)
-  // throws GenericException, NotFoundException {
-  // return
-  // RodaCoreFactory.getIndexService().retrieve(TransferredResource.class,
-  // transferredResourceId);
-  // }
 
   public static TransferredResource createTransferredResourcesFolder(String parentUUID, String folderName,
     boolean forceCommit) throws GenericException, RequestNotValidException, NotFoundException {

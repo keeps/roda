@@ -51,7 +51,6 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
   private static final String UNPACK_DESCRIPTION = "Extracted objects from package in file/folder format.";
 
   private boolean createSubmission = false;
-  private String username = null;
 
   @Override
   public void init() throws PluginException {
@@ -84,10 +83,6 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
     if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_CREATE_SUBMISSION)) {
       createSubmission = Boolean.parseBoolean(getParameterValues().get(RodaConstants.PLUGIN_PARAMS_CREATE_SUBMISSION));
     }
-
-    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_USERNAME)) {
-      username = getParameterValues().get(RodaConstants.PLUGIN_PARAMS_USERNAME);
-    }
   }
 
   @Override
@@ -101,73 +96,78 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<TransferredResource> list)
     throws PluginException {
     Report report = PluginHelper.initPluginReport(this);
-
     String parentId = PluginHelper.computeParentId(this, index, null);
 
-    for (TransferredResource transferredResource : list) {
-      Report reportItem = PluginHelper.initPluginReportItem(this, transferredResource);
+    try {
+      String username = PluginHelper.getJobUsername(this, index);
 
-      try {
-        Path transferredResourcePath = Paths.get(transferredResource.getFullPath());
-        LOGGER.debug("Converting {} to AIP", transferredResourcePath);
+      for (TransferredResource transferredResource : list) {
+        Report reportItem = PluginHelper.initPluginReportItem(this, transferredResource);
 
-        AIPState state = AIPState.INGEST_PROCESSING;
-        Permissions permissions = new Permissions();
-        boolean notifyCreatedAIP = false;
+        try {
+          Path transferredResourcePath = Paths.get(transferredResource.getFullPath());
+          LOGGER.debug("Converting {} to AIP", transferredResourcePath);
 
-        String aipType = RodaConstants.AIP_TYPE_MIXED;
+          AIPState state = AIPState.INGEST_PROCESSING;
+          Permissions permissions = new Permissions();
+          boolean notifyCreatedAIP = false;
 
-        final AIP aip = model.createAIP(state, parentId, aipType, permissions, transferredResource.getName(),
-          reportItem.getJobId(), notifyCreatedAIP, username);
+          String aipType = RodaConstants.AIP_TYPE_MIXED;
 
-        PluginHelper.createSubmission(model, createSubmission, transferredResourcePath, aip.getId());
+          final AIP aip = model.createAIP(state, parentId, aipType, permissions, transferredResource.getName(),
+            reportItem.getJobId(), notifyCreatedAIP, username);
 
-        final String representationId = UUID.randomUUID().toString();
-        final boolean original = true;
-        boolean notifyRepresentationCreated = false;
+          PluginHelper.createSubmission(model, createSubmission, transferredResourcePath, aip.getId());
 
-        String representationType = RodaConstants.REPRESENTATION_TYPE_MIXED;
+          final String representationId = UUID.randomUUID().toString();
+          final boolean original = true;
+          boolean notifyRepresentationCreated = false;
 
-        model.createRepresentation(aip.getId(), representationId, original, representationType,
-          notifyRepresentationCreated);
+          String representationType = RodaConstants.REPRESENTATION_TYPE_MIXED;
 
-        // create files
+          model.createRepresentation(aip.getId(), representationId, original, representationType,
+            notifyRepresentationCreated);
 
-        if (transferredResource.isFile()) {
-          String fileId = transferredResource.getName();
-          List<String> directoryPath = new ArrayList<>();
-          ContentPayload payload = new FSPathContentPayload(transferredResourcePath);
-          boolean notifyFileCreated = false;
+          // create files
 
-          model.createFile(aip.getId(), representationId, directoryPath, fileId, payload, notifyFileCreated);
-        } else {
-          processTransferredResourceDirectory(model, transferredResourcePath, aip, representationId);
+          if (transferredResource.isFile()) {
+            String fileId = transferredResource.getName();
+            List<String> directoryPath = new ArrayList<>();
+            ContentPayload payload = new FSPathContentPayload(transferredResourcePath);
+            boolean notifyFileCreated = false;
+
+            model.createFile(aip.getId(), representationId, directoryPath, fileId, payload, notifyFileCreated);
+          } else {
+            processTransferredResourceDirectory(model, transferredResourcePath, aip, representationId);
+          }
+          createUnpackingEventSuccess(model, index, transferredResource, aip, UNPACK_DESCRIPTION);
+          ContentPayload metadataPayload = MetadataFileUtils.getMetadataPayload(transferredResource);
+          boolean notifyDescriptiveMetadataCreated = false;
+
+          // TODO make the following strings constants
+          model.createDescriptiveMetadata(aip.getId(), "metadata.xml", metadataPayload, METADATA_TYPE, METADATA_VERSION,
+            notifyDescriptiveMetadataCreated);
+
+          // FIXME 20160516 hsilva: put "SIP" inside the AIP???
+
+          model.notifyAIPCreated(aip.getId());
+
+          reportItem.setOutcomeObjectId(aip.getId()).setPluginState(PluginState.SUCCESS);
+
+          createWellformedEventSuccess(model, index, transferredResource, aip);
+          LOGGER.debug("Done with converting {} to AIP {}", transferredResourcePath, aip.getId());
+        } catch (RODAException | IOException | RuntimeException e) {
+          LOGGER.error("Error converting " + transferredResource.getId() + " to AIP", e);
+          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
+
         }
-        createUnpackingEventSuccess(model, index, transferredResource, aip, UNPACK_DESCRIPTION);
-        ContentPayload metadataPayload = MetadataFileUtils.getMetadataPayload(transferredResource);
-        boolean notifyDescriptiveMetadataCreated = false;
 
-        // TODO make the following strings constants
-        model.createDescriptiveMetadata(aip.getId(), "metadata.xml", metadataPayload, METADATA_TYPE, METADATA_VERSION,
-          notifyDescriptiveMetadataCreated);
-
-        // FIXME 20160516 hsilva: put "SIP" inside the AIP???
-
-        model.notifyAIPCreated(aip.getId());
-
-        reportItem.setOutcomeObjectId(aip.getId()).setPluginState(PluginState.SUCCESS);
-
-        createWellformedEventSuccess(model, index, transferredResource, aip);
-        LOGGER.debug("Done with converting {} to AIP {}", transferredResourcePath, aip.getId());
-      } catch (RODAException | IOException | RuntimeException e) {
-        LOGGER.error("Error converting " + transferredResource.getId() + " to AIP", e);
-        reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
+        report.addReport(reportItem);
+        PluginHelper.createJobReport(this, model, reportItem);
 
       }
-
-      report.addReport(reportItem);
-      PluginHelper.createJobReport(this, model, reportItem);
-
+    } catch (RODAException e) {
+      LOGGER.error("Error getting job from plugin", e);
     }
     return report;
   }

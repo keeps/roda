@@ -215,17 +215,17 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @ApiParam(value = "The ID of the existing metadata file to update", required = true) @PathParam(RodaConstants.API_PATH_PARAM_METADATA_ID) String metadataId,
     @FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition fileDetail,
-    @ApiParam(value = "The type of the metadata file (e.g. eadc2014, dc)", required = true) @FormParam("metadataType") String metadataType,
-    @ApiParam(value = "The version of the metadata type used", required = false) @FormParam("metadataVersion") String metadataVersion)
+    @ApiParam(value = "The type of the metadata file (e.g. eadc2014, dc)", required = true) @QueryParam("metadataType") String metadataType,
+    @ApiParam(value = "The version of the metadata type used", required = false) @QueryParam("metadataVersion") String metadataVersion)
     throws RODAException {
     // get user
     RodaUser user = UserUtility.getApiUser(request);
     // delegate action to controller
-    Browser.putAIPDescriptiveMetadataFile(user, aipId, metadataId, metadataType, metadataVersion, inputStream,
-      fileDetail);
+    DescriptiveMetadata dm = Browser.putAIPDescriptiveMetadataFile(user, aipId, metadataId, metadataType,
+      metadataVersion, inputStream, fileDetail);
 
     // FIXME give a better answer
-    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+    return Response.ok().entity(dm).build();
   }
 
   @POST
@@ -238,17 +238,17 @@ public class AipsResource {
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @ApiParam(value = "The suggested ID metadata file to create", required = true) @PathParam(RodaConstants.API_PATH_PARAM_METADATA_ID) String metadataId,
     @FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition fileDetail,
-    @ApiParam(value = "The type of the metadata file (e.g. eadc2014, dc)", required = true) @FormParam("metadataType") String metadataType,
-    @ApiParam(value = "The version of the metadata type used", required = false) @FormParam("metadataVersion") String metadataVersion)
+    @ApiParam(value = "The type of the metadata file (e.g. eadc2014, dc)", required = true) @QueryParam("metadataType") String metadataType,
+    @ApiParam(value = "The version of the metadata type used", required = false) @QueryParam("metadataVersion") String metadataVersion)
     throws RODAException {
     // get user
     RodaUser user = UserUtility.getApiUser(request);
     // delegate action to controller
-    Browser.postAIPDescriptiveMetadataFile(user, aipId, metadataId, metadataType, metadataVersion, inputStream,
-      fileDetail);
+    DescriptiveMetadata dm = Browser.postAIPDescriptiveMetadataFile(user, aipId, metadataId, metadataType,
+      metadataVersion, inputStream, fileDetail);
 
     // FIXME give a better answer
-    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+    return Response.ok().entity(dm).build();
   }
 
   @DELETE
@@ -267,7 +267,9 @@ public class AipsResource {
     Browser.deleteAIPDescriptiveMetadataFile(user, aipId, metadataId);
 
     // FIXME give a better answer
-    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+    return Response.ok()
+      .entity(new ApiResponseMessage(ApiResponseMessage.OK, "The descriptive metadata was successfully deleted"))
+      .build();
   }
 
   @GET

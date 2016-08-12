@@ -39,7 +39,6 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
   private static String UNPACK_DESCRIPTION = "Extracted objects from package in Bagit format.";
 
   private boolean createSubmission = false;
-  private String username = null;
 
   @Override
   public void init() throws PluginException {
@@ -72,10 +71,6 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
     if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_CREATE_SUBMISSION)) {
       createSubmission = Boolean.parseBoolean(getParameterValues().get(RodaConstants.PLUGIN_PARAMS_CREATE_SUBMISSION));
     }
-
-    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_USERNAME)) {
-      username = getParameterValues().get(RodaConstants.PLUGIN_PARAMS_USERNAME);
-    }
   }
 
   @Override
@@ -90,42 +85,48 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
     throws PluginException {
     Report report = PluginHelper.initPluginReport(this);
 
-    for (TransferredResource transferredResource : list) {
-      Report reportItem = PluginHelper.initPluginReportItem(this, transferredResource);
-      Path bagitPath = Paths.get(transferredResource.getFullPath());
+    try {
+      String username = PluginHelper.getJobUsername(this, index);
 
-      try {
-        LOGGER.debug("Converting {} to AIP", bagitPath);
-        BagFactory bagFactory = new BagFactory();
-        Bag bag = bagFactory.createBag(bagitPath.toFile());
-        SimpleResult result = bag.verifyPayloadManifests();
-        if (result.isSuccess()) {
-          String parentId = PluginHelper.computeParentId(this, index, bag.getBagInfoTxt().get("parent"));
+      for (TransferredResource transferredResource : list) {
+        Report reportItem = PluginHelper.initPluginReportItem(this, transferredResource);
+        Path bagitPath = Paths.get(transferredResource.getFullPath());
 
-          AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bag, bagitPath, model, "metadata.xml",
-            transferredResource.getName(), reportItem.getJobId(), parentId, username);
+        try {
+          LOGGER.debug("Converting {} to AIP", bagitPath);
+          BagFactory bagFactory = new BagFactory();
+          Bag bag = bagFactory.createBag(bagitPath.toFile());
+          SimpleResult result = bag.verifyPayloadManifests();
+          if (result.isSuccess()) {
+            String parentId = PluginHelper.computeParentId(this, index, bag.getBagInfoTxt().get("parent"));
 
-          PluginHelper.createSubmission(model, createSubmission, bagitPath, aipCreated.getId());
+            AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bag, bagitPath, model, "metadata.xml",
+              transferredResource.getName(), reportItem.getJobId(), parentId, username);
 
-          createUnpackingEventSuccess(model, index, transferredResource, aipCreated, UNPACK_DESCRIPTION);
-          reportItem.setOutcomeObjectId(aipCreated.getId()).setPluginState(PluginState.SUCCESS);
+            PluginHelper.createSubmission(model, createSubmission, bagitPath, aipCreated.getId());
 
-          if (aipCreated.getParentId() == null) {
-            reportItem.setPluginDetails(String.format("Parent with id '%s' not found", parentId));
+            createUnpackingEventSuccess(model, index, transferredResource, aipCreated, UNPACK_DESCRIPTION);
+            reportItem.setOutcomeObjectId(aipCreated.getId()).setPluginState(PluginState.SUCCESS);
+
+            if (aipCreated.getParentId() == null) {
+              reportItem.setPluginDetails(String.format("Parent with id '%s' not found", parentId));
+            }
+
+            createWellformedEventSuccess(model, index, transferredResource, aipCreated);
+            LOGGER.debug("Done with converting {} to AIP {}", bagitPath, aipCreated.getId());
+          } else {
+            reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(result.getMessages() + "");
           }
+        } catch (RODAException | RuntimeException e) {
+          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
 
-          createWellformedEventSuccess(model, index, transferredResource, aipCreated);
-          LOGGER.debug("Done with converting {} to AIP {}", bagitPath, aipCreated.getId());
-        } else {
-          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(result.getMessages() + "");
+          LOGGER.error("Error converting " + bagitPath + " to AIP", e);
         }
-      } catch (RODAException | RuntimeException e) {
-        reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
-
-        LOGGER.error("Error converting " + bagitPath + " to AIP", e);
+        report.addReport(reportItem);
+        PluginHelper.createJobReport(this, model, reportItem);
       }
-      report.addReport(reportItem);
-      PluginHelper.createJobReport(this, model, reportItem);
+    } catch (RODAException e) {
+      LOGGER.error("Error getting job from plugin", e);
     }
 
     return report;

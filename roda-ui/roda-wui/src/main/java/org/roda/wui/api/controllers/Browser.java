@@ -836,8 +836,8 @@ public class Browser extends RodaCoreService {
     return aipRepresentationFile;
   }
 
-  public static void putAIPDescriptiveMetadataFile(RodaUser user, String aipId, String metadataId, String metadataType,
-    String metadataVersion, InputStream is, FormDataContentDisposition fileDetail)
+  public static DescriptiveMetadata putAIPDescriptiveMetadataFile(RodaUser user, String aipId, String metadataId,
+    String metadataType, String metadataVersion, InputStream is, FormDataContentDisposition fileDetail)
     throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException,
     AlreadyExistsException, ValidationException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -849,18 +849,19 @@ public class Browser extends RodaCoreService {
 
     // delegate
     String message = "Updated by " + user.getName();
-    BrowserHelper.createOrUpdateAIPDescriptiveMetadataFile(aipId, null, metadataId, metadataType, metadataVersion,
-      message, is, fileDetail, false);
+    DescriptiveMetadata ret = BrowserHelper.createOrUpdateAIPDescriptiveMetadataFile(aipId, null, metadataId,
+      metadataType, metadataVersion, message, is, fileDetail, false);
 
     // register action
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
       RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
+    return ret;
   }
 
-  public static void putRepresentationDescriptiveMetadataFile(RodaUser user, String representationId, String metadataId,
-    String metadataType, String metadataVersion, InputStream is, FormDataContentDisposition fileDetail)
-    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException,
-    AlreadyExistsException, ValidationException {
+  public static DescriptiveMetadata putRepresentationDescriptiveMetadataFile(RodaUser user, String representationId,
+    String metadataId, String metadataType, String metadataVersion, InputStream is,
+    FormDataContentDisposition fileDetail) throws GenericException, AuthorizationDeniedException, NotFoundException,
+    RequestNotValidException, AlreadyExistsException, ValidationException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -871,17 +872,18 @@ public class Browser extends RodaCoreService {
 
     // delegate
     String message = "Updated by " + user.getName();
-    BrowserHelper.createOrUpdateAIPDescriptiveMetadataFile(representation.getAipId(), representation.getId(),
-      metadataId, metadataType, metadataVersion, message, is, fileDetail, false);
+    DescriptiveMetadata ret = BrowserHelper.createOrUpdateAIPDescriptiveMetadataFile(representation.getAipId(),
+      representation.getId(), metadataId, metadataType, metadataVersion, message, is, fileDetail, false);
 
     // register action
     controllerAssistant.registerAction(user, representationId, LOG_ENTRY_STATE.SUCCESS,
       RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID, representationId, RodaConstants.API_PATH_PARAM_METADATA_ID,
       metadataId);
+    return ret;
   }
 
-  public static void postAIPDescriptiveMetadataFile(RodaUser user, String aipId, String metadataId, String metadataType,
-    String metadataVersion, InputStream is, FormDataContentDisposition fileDetail)
+  public static DescriptiveMetadata postAIPDescriptiveMetadataFile(RodaUser user, String aipId, String metadataId,
+    String metadataType, String metadataVersion, InputStream is, FormDataContentDisposition fileDetail)
     throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException,
     AlreadyExistsException, ValidationException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -893,15 +895,16 @@ public class Browser extends RodaCoreService {
 
     // delegate
     String message = "Created by " + user.getName();
-    BrowserHelper.createOrUpdateAIPDescriptiveMetadataFile(aipId, null, metadataId, metadataType, metadataVersion,
-      message, is, fileDetail, true);
+    DescriptiveMetadata ret = BrowserHelper.createOrUpdateAIPDescriptiveMetadataFile(aipId, null, metadataId,
+      metadataType, metadataVersion, message, is, fileDetail, true);
 
     // register action
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
       RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
+    return ret;
   }
 
-  public static void postRepresentationDescriptiveMetadataFile(RodaUser user, String representationId,
+  public static DescriptiveMetadata postRepresentationDescriptiveMetadataFile(RodaUser user, String representationId,
     String metadataId, String metadataType, String metadataVersion, InputStream is,
     FormDataContentDisposition fileDetail) throws GenericException, AuthorizationDeniedException, NotFoundException,
     RequestNotValidException, AlreadyExistsException, ValidationException {
@@ -915,13 +918,14 @@ public class Browser extends RodaCoreService {
 
     // delegate
     String message = "Created by " + user.getName();
-    BrowserHelper.createOrUpdateAIPDescriptiveMetadataFile(representation.getAipId(), representation.getId(),
-      metadataId, metadataType, metadataVersion, message, is, fileDetail, true);
+    DescriptiveMetadata ret = BrowserHelper.createOrUpdateAIPDescriptiveMetadataFile(representation.getAipId(),
+      representation.getId(), metadataId, metadataType, metadataVersion, message, is, fileDetail, true);
 
     // register action
     controllerAssistant.registerAction(user, representationId, LOG_ENTRY_STATE.SUCCESS,
       RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID, representationId, RodaConstants.API_PATH_PARAM_METADATA_ID,
       metadataId);
+    return ret;
   }
 
   public static TransferredResource createTransferredResourcesFolder(RodaUser user, String parentUUID,

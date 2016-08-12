@@ -238,9 +238,9 @@ public final class PluginHelper {
    */
   public static <T extends IsRODAObject> Job getJobFromIndex(Plugin<T> plugin, IndexService index)
     throws NotFoundException, GenericException {
-    String jobID = getJobId(plugin);
-    if (jobID != null) {
-      return index.retrieve(Job.class, jobID);
+    String jobId = getJobId(plugin);
+    if (jobId != null) {
+      return index.retrieve(Job.class, jobId);
     } else {
       throw new NotFoundException("Job not found");
     }
@@ -263,6 +263,30 @@ public final class PluginHelper {
     String jobId = getJobId(plugin);
     if (jobId != null) {
       return model.retrieveJob(jobId);
+    } else {
+      throw new NotFoundException("Job not found");
+    }
+
+  }
+
+  public static <T extends IsRODAObject> String getJobUsername(Plugin<T> plugin, IndexService index)
+    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    String jobId = getJobId(plugin);
+    if (jobId != null) {
+      Job job = index.retrieve(Job.class, jobId);
+      return job.getUsername();
+    } else {
+      throw new NotFoundException("Job not found");
+    }
+
+  }
+
+  public static <T extends IsRODAObject> String getJobUsername(Plugin<T> plugin, ModelService model)
+    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    String jobId = getJobId(plugin);
+    if (jobId != null) {
+      Job job = model.retrieveJob(jobId);
+      return job.getUsername();
     } else {
       throw new NotFoundException("Job not found");
     }
