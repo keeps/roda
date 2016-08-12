@@ -143,7 +143,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
           if (result.getTotalCount() == 1) {
             IndexedAIP indexedAIP = result.getResults().get(0);
 
-            String jobUsername = PluginHelper.getJobUsernameFromIndex(this, index);
+            String jobUsername = PluginHelper.getJobUsername(this, index);
             // Update the AIP
             aip = EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP.getId(), model, storage, jobUsername);
           } else {
@@ -152,7 +152,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
           }
         } else {
           if (IPEnums.IPStatus.NEW == sip.getStatus()) {
-            String jobUsername = PluginHelper.getJobUsernameFromIndex(this, index);
+            String jobUsername = PluginHelper.getJobUsername(this, index);
             Permissions fullPermissions = new Permissions();
 
             fullPermissions.setUserPermissions(jobUsername,

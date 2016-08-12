@@ -247,17 +247,6 @@ public final class PluginHelper {
 
   }
 
-  public static <T extends IsRODAObject> String getJobUsernameFromIndex(Plugin<T> plugin, IndexService index)
-    throws NotFoundException, GenericException {
-
-    String username = null;
-    Job currentJob = PluginHelper.getJobFromIndex(plugin, index);
-    if (currentJob != null) {
-      username = currentJob.getUsername();
-    }
-    return username;
-  }
-
   public static <T extends IsRODAObject> Job getJobFromModel(Plugin<T> plugin, ModelService model)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     String jobId = getJobId(plugin);
