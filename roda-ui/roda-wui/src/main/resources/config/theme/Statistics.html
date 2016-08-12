@@ -1,46 +1,16 @@
 <div id="statistics" class="static-page max-width">
-	<h1>Statistics</h1>
+    <h1>Statistics</h1>
 
-	<canvas id="canvasChart" width="400" height="400"></canvas>
+    <h2>File format distribution</h2>
+    <canvas class="chart" data-function="singleFacetPieChart"
+            data-function-params="org.roda.core.data.v2.ip.IndexedFile, fileFormat"></canvas>
 
-	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-		eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-		minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-		aliquip ex ea commodo consequat. Duis aute irure dolor in
-		reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-		pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-		culpa qui officia deserunt mollit anim id est laborum.</p>
+    <h2>Mimetype distribution</h2>
+    <canvas class="chart" data-function="singleFacetPieChart"
+            data-function-params="org.roda.core.data.v2.ip.IndexedFile, formatMimetype"></canvas>
 
-	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-		eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-		minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-		aliquip ex ea commodo consequat. Duis aute irure dolor in
-		reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-		pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-		culpa qui officia deserunt mollit anim id est laborum.</p>
-
-	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-		eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-		minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-		aliquip ex ea commodo consequat. Duis aute irure dolor in
-		reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-		pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-		culpa qui officia deserunt mollit anim id est laborum.</p>
-
-	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-		eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-		minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-		aliquip ex ea commodo consequat. Duis aute irure dolor in
-		reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-		pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-		culpa qui officia deserunt mollit anim id est laborum.</p>
-
-	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-		eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-		minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-		aliquip ex ea commodo consequat. Duis aute irure dolor in
-		reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-		pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-		culpa qui officia deserunt mollit anim id est laborum.</p>
+    <h2>Pronom format distribution</h2>
+    <canvas class="chart" data-function="singleFacetPieChart"
+            data-function-params="org.roda.core.data.v2.ip.IndexedFile, formatPronom"></canvas>
 
 </div>
