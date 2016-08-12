@@ -295,8 +295,10 @@ public class Report implements Serializable, IsIndexed {
     setPluginName(report.getPluginName());
     setPluginVersion(report.getPluginVersion());
     setPluginState(report.getPluginState());
-    setPluginDetails(
-      (!"".equals(getPluginDetails()) ? getPluginDetails() + lineSeparator : "") + report.getPluginDetails());
+    if (!"".equals(report.getPluginDetails()) && !getPluginDetails().equals(report.getPluginDetails())) {
+      setPluginDetails(
+        (!"".equals(getPluginDetails()) ? getPluginDetails() + lineSeparator : "") + report.getPluginDetails());
+    }
     setOutcomeObjectState(report.getOutcomeObjectState());
 
     reports.add(report);
