@@ -12,10 +12,13 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import org.roda.core.data.adapter.facet.FacetParameter;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import org.roda.core.data.adapter.sort.SortParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
@@ -525,7 +528,14 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   public SelectedItems<T> getSelected() {
     SelectedItems<T> ret;
     if (isAllSelected()) {
-      ret = new SelectedItemsFilter<T>(getFilter(), selectedClass.getName(), getJustActive());
+      Filter filterPlusFacets = new Filter(getFilter());
+      for (FacetParameter facetParameter : getFacets().getParameters().values()) {
+        if (!facetParameter.getValues().isEmpty()) {
+          filterPlusFacets.add(new OneOfManyFilterParameter(facetParameter.getName(), facetParameter.getValues()));
+        }
+      }
+
+      ret = new SelectedItemsFilter<T>(filterPlusFacets, selectedClass.getName(), getJustActive());
     } else {
       List<String> ids = new ArrayList<>();
 
