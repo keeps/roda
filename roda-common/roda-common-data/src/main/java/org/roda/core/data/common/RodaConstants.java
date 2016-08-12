@@ -140,8 +140,9 @@ public final class RodaConstants {
   public static final String API_QUERY_VALUE_LANG_EN_US = "en_US";
   public static final String API_QUERY_KEY_START = "start";
   public static final String API_QUERY_KEY_LIMIT = "limit";
-  public static final String API_QUERY_RETURN_CLASS = "returnClass";
-  public static final String API_QUERY_ONLY_ACTIVE = "onlyActive";
+  public static final String API_QUERY_KEY_RETURN_CLASS = "returnClass";
+  public static final String API_QUERY_KEY_ONLY_ACTIVE = "onlyActive";
+  public static final String API_QUERY_KEY_FACET = "facet";
   // "http path param" related strings
   public static final String API_PATH_PARAM_AIP_ID = "aip_id";
   public static final String API_PATH_PARAM_REPRESENTATION_ID = "representation_id";
