@@ -7,7 +7,7 @@ $(function () {
         mutations.forEach(function (mutation) {
             console.log(mutation.type);
             $(".chart").each(function () {
-                initChart(this);
+                executeFunctionByName(window, $(this).data("function"), this);
             });
         });
     });
@@ -20,62 +20,52 @@ $(function () {
 
     // later, you can stop observing
     // observer.disconnect();
-
-    var executeFunctionByName = function (context, functionName/*, args */) {
-        var args = Array.prototype.slice.call(arguments, 2);
-        if (args.length == 1 && Array.isArray(args[0])) {
-            args = args[0];
-        }
-        var namespaces = functionName.split(".");
-        var func = namespaces.pop();
-        for (var i = 0; i < namespaces.length; i++) {
-            context = context[namespaces[i]];
-        }
-        return context[func].apply(context, args);
-    };
-
-    var initChart = function (element) {
-        if (element.chart == null) {
-            var functionName = $(element).data("function");
-            var functionParams = $(element).data("function-params");
-            var params = functionParams.split(",").map(function (param) {
-                return param.trim();
-            });
-            var chartOptions = executeFunctionByName(window, functionName, params);
-            element.chart = new Chart(element, chartOptions);
-            console.log("element.chart = ", element.chart);
-        } else {
-            // element.chart != null
-            console.log("element.chart already exists");
-        }
-    };
-
 });
 
-function singleFacetPieChart(returnClass, facet) {
-    var values = [];
-    $.ajax({
-        async: false,
-        url: "/api/v1/index?returnClass=" + returnClass + "&facet=" + facet + "&start=0&limit=0&onlyActive=false"
-    }).done(function (data) {
-        values = data.facetResults[0].values;
-    });
-    return {
-        type: 'pie',
-        data: {
-            labels: values.map(function (value) {
-                return value.label;
-            }),
-            datasets: [{
-                data: values.map(function (value) {
-                    return value.count;
-                }),
-                backgroundColor: values.map(function () {
-                    return rgbaRandomColor();
-                })
-            }]
-        }
-    };
+function executeFunctionByName(context, functionName/*, args */) {
+    var args = Array.prototype.slice.call(arguments, 2);
+    if (args.length == 1 && Array.isArray(args[0])) {
+        args = args[0];
+    }
+    var namespaces = functionName.split(".");
+    var func = namespaces.pop();
+    for (var i = 0; i < namespaces.length; i++) {
+        context = context[namespaces[i]];
+    }
+    return context[func].apply(context, args);
+}
+
+function singleFacetPieChart(element) {
+    if (element.chart == null) {
+        var returnClass = $(element).data("class");
+        var facet = $(element).data("facet");
+        $.ajax({
+            url: "/api/v1/index?returnClass=" + returnClass + "&facet=" + facet + "&start=0&limit=0&onlyActive=false"
+        }).done(function (data) {
+            var values = data.facetResults[0].values;
+            var options = {
+                type: 'pie',
+                data: {
+                    labels: values.map(function (value) {
+                        return value.label;
+                    }),
+                    datasets: [{
+                        data: values.map(function (value) {
+                            return value.count;
+                        }),
+                        backgroundColor: values.map(function () {
+                            return rgbaRandomColor();
+                        })
+                    }]
+                }
+            };
+            element.chart = new Chart(element, options);
+            console.log("element.chart = ", element.chart);
+        });
+    } else {
+        // element.chart != null
+        console.log("element.chart already exists");
+    }
 }
 
 /**
