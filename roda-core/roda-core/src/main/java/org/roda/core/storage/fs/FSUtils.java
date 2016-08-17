@@ -91,7 +91,7 @@ public final class FSUtils {
    *          exists; false otherwise
    * @throws AlreadyExistsException
    * @throws GenericException
-   * @throws NotFoundException 
+   * @throws NotFoundException
    * 
    */
   public static void move(final Path sourcePath, final Path targetPath, boolean replaceExisting)
@@ -401,10 +401,7 @@ public final class FSUtils {
   public static Long recursivelyCountPath(Path directoryPath) throws NotFoundException, GenericException {
     // starting at -1 because the walk counts the directory itself
     Long count = -1L;
-    Stream<Path> walk = null;
-    try {
-      walk = Files.walk(directoryPath);
-
+    try (Stream<Path> walk = Files.walk(directoryPath)) {
       final Iterator<Path> pathIterator = walk.iterator();
       while (pathIterator.hasNext()) {
         count++;
@@ -414,10 +411,6 @@ public final class FSUtils {
       throw new NotFoundException("Could not list contents of entity because it doesn't exist: " + directoryPath);
     } catch (IOException e) {
       throw new GenericException("Could not list contents of entity at: " + directoryPath, e);
-    } finally {
-      if (walk != null) {
-        walk.close();
-      }
     }
 
     return count;
@@ -654,10 +647,8 @@ public final class FSUtils {
   }
 
   public static String computeContentDigest(Path path, String algorithm) throws GenericException {
-    FileChannel fc = null;
-    try {
+    try (FileChannel fc = FileChannel.open(path)) {
       final int bufferSize = 1073741824;
-      fc = FileChannel.open(path);
       final long size = fc.size();
       final MessageDigest hash = MessageDigest.getInstance(algorithm);
       long position = 0;
@@ -688,14 +679,6 @@ public final class FSUtils {
 
     } catch (NoSuchAlgorithmException | IOException e) {
       throw new GenericException("Cannot compute content digest for " + path + " using algorithm " + algorithm);
-    } finally {
-      if (fc != null) {
-        try {
-          fc.close();
-        } catch (IOException e) {
-          LOGGER.warn("Cannot close file channel", e);
-        }
-      }
     }
   }
 

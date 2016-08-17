@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
@@ -71,8 +72,7 @@ public final class JsonUtils {
   public static Map<String, String> getMapFromJson(String json) {
     Map<String, String> ret = new HashMap<String, String>();
     try {
-      JsonFactory factory = new JsonFactory();
-      ObjectMapper mapper = new ObjectMapper(factory);
+      ObjectMapper mapper = new ObjectMapper(new JsonFactory());
       ret = mapper.readValue(json, new TypeReference<Map<String, String>>() {});
     } catch (IOException e) {
       LOGGER.error("Error transforming json string to log entry parameters", e);
@@ -83,8 +83,7 @@ public final class JsonUtils {
   public static String getJsonFromObject(Object object) {
     String ret = null;
     try {
-      JsonFactory factory = new JsonFactory();
-      ObjectMapper mapper = new ObjectMapper(factory);
+      ObjectMapper mapper = new ObjectMapper(new JsonFactory());
       mapper = addMixinsToMapper(mapper, object);
       ret = mapper.writeValueAsString(object);
     } catch (IOException e) {
@@ -122,28 +121,31 @@ public final class JsonUtils {
   }
 
   public static <T> T getObjectFromJson(String json, Class<T> objectClass) throws GenericException {
-    T ret;
     try {
-      JsonFactory factory = new JsonFactory();
-      ObjectMapper mapper = new ObjectMapper(factory);
-      ret = mapper.readValue(json, objectClass);
+      ObjectMapper mapper = new ObjectMapper(new JsonFactory());
+      return mapper.readValue(json, objectClass);
     } catch (IOException e) {
       throw new GenericException("Error while parsing JSON", e);
     }
-    return ret;
   }
 
   public static <T> List<T> getListFromJson(String json, Class<T> objectClass) throws GenericException {
-    List<T> ret;
     try {
-      JsonFactory factory = new JsonFactory();
-      ObjectMapper mapper = new ObjectMapper(factory);
+      ObjectMapper mapper = new ObjectMapper(new JsonFactory());
       TypeFactory t = TypeFactory.defaultInstance();
-      ret = mapper.readValue(json, t.constructCollectionType(ArrayList.class, objectClass));
+      return mapper.readValue(json, t.constructCollectionType(ArrayList.class, objectClass));
     } catch (IOException e) {
       throw new GenericException("Error while parsing JSON", e);
     }
-    return ret;
+  }
+
+  public static JsonNode parseJson(String json) throws GenericException {
+    try {
+      ObjectMapper mapper = new ObjectMapper(new JsonFactory());
+      return mapper.readTree(json);
+    } catch (IOException e) {
+      throw new GenericException("Error while parsing JSON", e);
+    }
   }
 
 }

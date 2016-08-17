@@ -47,6 +47,7 @@ public final class RodaConstants {
   public static final String DEFAULT_ENCODING = "UTF-8";
   public static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
   public static final int DEFAULT_PAGINATION_VALUE = 100;
+  public static final String DEFAULT_PAGINATION_STRING_VALUE = "100";
 
   public static final List<String> DEFAULT_ALGORITHMS = Arrays.asList(SHA256);
 

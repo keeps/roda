@@ -742,7 +742,8 @@ public class SolrUtils {
 
   private static void appendValuesUsingOROperator(StringBuilder ret, String key, List<String> values,
     boolean prefixWithANDOperatorIfBuilderNotEmpty) {
-    if (!values.isEmpty()) {
+    // FIXME 20160822 hsilva: values should never be null
+    if (!values.stream().filter(e -> e != null).collect(Collectors.toList()).isEmpty()) {
       appendANDOperator(ret, prefixWithANDOperatorIfBuilderNotEmpty);
 
       ret.append("(");

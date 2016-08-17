@@ -18,6 +18,7 @@ import org.apache.commons.io.IOUtils;
 
 public class InputStreamContentPayload implements ContentPayload {
 
+  // FIXME 20160818 hsilva: externalize this interface
   public static interface ProvidesInputStream {
     public InputStream createInputStream() throws IOException;
   }

@@ -8,7 +8,6 @@
 package org.roda.core;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileAttribute;
@@ -45,32 +44,48 @@ public final class TestsHelper {
 
   }
 
-  public static <T extends Serializable> Path createBaseTempDir(Class testClass, boolean setAsRODAHomeSystemProperty,
-    FileAttribute<?>... attributes) throws IOException {
+  public static Path createBaseTempDir(Class<?> testClass, boolean setAsRODAHome, FileAttribute<?>... attributes)
+    throws IOException {
     Path baseTempDir = Files.createTempDirectory("_" + testClass.getSimpleName(), attributes);
-    if (setAsRODAHomeSystemProperty) {
-      System.setProperty("roda.home", baseTempDir.toString());
+    if (setAsRODAHome) {
+      System.setProperty(RodaConstants.INSTALL_FOLDER_SYSTEM_PROPERTY, baseTempDir.toString());
     }
     return baseTempDir;
   }
 
-  public static <T extends Serializable> Path createBaseTempDir(Class testClass, boolean setAsRODAHome)
-    throws IOException {
-    Path baseTempDir = Files.createTempDirectory("_" + testClass.getSimpleName());
-    if (setAsRODAHome) {
-      System.setProperty("roda.home", baseTempDir.toString());
-    }
-    return baseTempDir;
+  public static Path createBaseTempDir(Class<?> testClass, boolean setAsRODAHome) throws IOException {
+    return createBaseTempDir(testClass, setAsRODAHome, new FileAttribute[] {});
   }
 
   public static <T extends IsRODAObject, T1 extends Plugin<T>> Job executeJob(Class<T1> plugin, PluginType pluginType,
     SelectedItems<T> selectedItems)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    return executeJob(plugin, new HashMap<>(), pluginType, selectedItems);
+    return executeJob(plugin, new HashMap<>(), pluginType, selectedItems, JOB_STATE.COMPLETED);
+  }
+
+  /**
+   * 20160818 hsilva: this method is only useful for testing Jobs (in particular
+   * Job failures)
+   */
+  public static <T extends IsRODAObject, T1 extends Plugin<T>> Job executeJob(Class<T1> plugin, PluginType pluginType,
+    SelectedItems<T> selectedItems, JOB_STATE expectedJobState)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    return executeJob(plugin, new HashMap<>(), pluginType, selectedItems, expectedJobState);
   }
 
   public static <T extends IsRODAObject, T1 extends Plugin<T>> Job executeJob(Class<T1> plugin,
     Map<String, String> pluginParameters, PluginType pluginType, SelectedItems<T> selectedItems)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    return executeJob(plugin, pluginParameters, pluginType, selectedItems, JOB_STATE.COMPLETED);
+  }
+
+  /**
+   * 20160818 hsilva: this method is only useful for testing Jobs (in particular
+   * Job failures)
+   */
+  public static <T extends IsRODAObject, T1 extends Plugin<T>> Job executeJob(Class<T1> plugin,
+    Map<String, String> pluginParameters, PluginType pluginType, SelectedItems<T> selectedItems,
+    JOB_STATE expectedJobState)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
     Job job = new Job();
@@ -89,7 +104,7 @@ public final class TestsHelper {
     }
 
     Job jobUpdated = RodaCoreFactory.getModelService().retrieveJob(job.getId());
-    MatcherAssert.assertThat(jobUpdated.getState(), Is.is(JOB_STATE.COMPLETED));
+    MatcherAssert.assertThat(jobUpdated.getState(), Is.is(expectedJobState));
     return jobUpdated;
 
   }
@@ -102,8 +117,7 @@ public final class TestsHelper {
   public static List<Report> getJobReports(IndexService index, Job job, boolean failIfReportNotSucceeded)
     throws GenericException, RequestNotValidException {
 
-    index.commit(Job.class);
-    index.commit(Report.class);
+    index.commit(Job.class, Report.class);
 
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId()));
 

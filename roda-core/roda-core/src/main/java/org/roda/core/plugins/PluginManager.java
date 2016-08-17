@@ -170,8 +170,8 @@ public class PluginManager {
    * @param pluginID
    *          the ID (classname) of the {@link Plugin}.
    * 
-   * @return a {@link Plugin} or <code>null</code> if the specified classname if
-   *         not a {@link Plugin}.
+   * @return a {@link Plugin} or <code>null</code> if the specified classname is
+   *         not a {@link Plugin} or something went wrong during its init().
    */
   public Plugin<? extends IsRODAObject> getPlugin(String pluginID) {
     Plugin<? extends IsRODAObject> plugin = null;
@@ -332,15 +332,15 @@ public class PluginManager {
     for (Class<? extends AbstractPlugin> plugin : plugins) {
       String name = plugin.getName();
       if (!Modifier.isAbstract(plugin.getModifiers()) && !blacklistedPlugins.contains(name)) {
-        Plugin<? extends IsRODAObject> p;
+        LOGGER.debug("Loading internal plugin {}", name);
         try {
-          p = (Plugin<?>) ClassLoaderUtility.createObject(plugin.getName());
+          Plugin<? extends IsRODAObject> p = (Plugin<?>) ClassLoaderUtility.createObject(plugin.getName());
           p.init();
           internalPluginChache.put(plugin.getName(), p);
           processAndCachePluginInformation(p);
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | PluginException
           | RuntimeException e) {
-          LOGGER.error("Unable to instantiate plugin '{}'. {}", plugin.getName(), e);
+          LOGGER.error("Unable to instantiate plugin '{}'", plugin.getName(), e);
         }
       }
     }

@@ -8,11 +8,16 @@
 		</encoder>
 	</appender>
 
+	<!-- <logger name="org.roda.core.plugins.orchestrate.akka" additivity="false"> -->
+	<!-- <level value="TRACE" /> -->
+	<!-- <appender-ref ref="STDOUT" /> -->
+	<!-- </logger> -->
+
 	<logger name="org.roda" additivity="false">
 		<level value="INFO" />
 		<appender-ref ref="STDOUT" />
 	</logger>
-	
+
 	<logger name="org.apache.solr" additivity="false">
 		<level value="ERROR" />
 		<appender-ref ref="STDOUT" />

@@ -14,23 +14,23 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import akka.actor.UntypedActor;
-
-public class AkkaWorkerActor extends UntypedActor {
+public class AkkaWorkerActor extends AkkaBaseActor {
   private static final Logger LOGGER = LoggerFactory.getLogger(AkkaWorkerActor.class);
 
   private final IndexService index;
   private final ModelService model;
   private final StorageService storage;
 
-  public AkkaWorkerActor(StorageService storage, ModelService model, IndexService index) {
-    this.storage = storage;
-    this.model = model;
-    this.index = index;
+  public AkkaWorkerActor() {
+    super();
+    this.storage = super.getStorage();
+    this.model = super.getModel();
+    this.index = super.getIndex();
   }
 
   @Override
   public void onReceive(Object msg) throws Exception {
+    super.setup(msg);
     if (msg instanceof Messages.PluginExecuteIsReady) {
       handlePluginExecuteIsReady(msg);
     } else if (msg instanceof Messages.PluginAfterAllExecuteIsReady) {
@@ -43,6 +43,7 @@ public class AkkaWorkerActor extends UntypedActor {
 
   private void handlePluginExecuteIsReady(Object msg) {
     Messages.PluginExecuteIsReady message = (Messages.PluginExecuteIsReady) msg;
+    message.logProcessingStarted();
     Plugin<?> plugin = message.getPlugin();
     try {
       plugin.execute(index, model, storage, message.getList());
@@ -51,10 +52,12 @@ public class AkkaWorkerActor extends UntypedActor {
       LOGGER.error("Error executing plugin.execute()", e);
       getSender().tell(new Messages.PluginExecuteIsDone(plugin, true), getSelf());
     }
+    message.logProcessingEnded();
   }
 
   private void handlePluginAfterAllExecuteIsReady(Object msg) {
     Messages.PluginAfterAllExecuteIsReady message = (Messages.PluginAfterAllExecuteIsReady) msg;
+    message.logProcessingStarted();
     Plugin<?> plugin = message.getPlugin();
     try {
       plugin.afterAllExecute(index, model, storage);
@@ -63,6 +66,7 @@ public class AkkaWorkerActor extends UntypedActor {
       LOGGER.error("Error executing plugin.afterAllExecute()", e);
       getSender().tell(new Messages.PluginAfterAllExecuteIsDone(plugin, true), getSelf());
     }
+    message.logProcessingEnded();
   }
 
 }

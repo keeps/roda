@@ -18,10 +18,6 @@ import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaCoreService;
 
-/**
- * FIXME 1) verify all checkObject*Permissions (because now also a permission
- * for insert is available)
- */
 public class Jobs extends RodaCoreService {
 
   private Jobs() {
@@ -38,7 +34,7 @@ public class Jobs extends RodaCoreService {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // validate input and set missing information when possible
-    JobsHelper.validateAndSetCreateJobInformation(user, job);
+    JobsHelper.validateAndSetJobInformation(user, job);
 
     // check user permissions
     controllerAssistant.checkRoles(user);

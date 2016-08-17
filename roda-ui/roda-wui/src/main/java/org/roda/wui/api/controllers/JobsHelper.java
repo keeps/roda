@@ -10,6 +10,7 @@ package org.roda.wui.api.controllers;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
@@ -42,14 +43,14 @@ import org.slf4j.LoggerFactory;
 public class JobsHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(JobsHelper.class);
 
-  protected static void validateAndSetCreateJobInformation(RodaUser user, Job job) throws RequestNotValidException {
+  protected static void validateAndSetJobInformation(RodaUser user, Job job) throws RequestNotValidException {
     validateJobPluginInformation(job);
 
     // always set a new UUID (even if job already brings one)
     job.setId(UUID.randomUUID().toString());
 
     // set "missing" information whenever it is not impeditive for job creation
-    if (org.apache.commons.lang3.StringUtils.isBlank(job.getName())) {
+    if (StringUtils.isBlank(job.getName())) {
       job.setName(job.getId());
     }
     job.setUsername(user.getName());

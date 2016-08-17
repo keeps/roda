@@ -154,10 +154,6 @@
 		</dependency>
 		<!-- FEDORA CLIENT - end -->
 		<dependency>
-			<groupId>org.yaml</groupId>
-			<artifactId>snakeyaml</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
@@ -268,44 +264,11 @@
 			<groupId>com.typesafe.akka</groupId>
 			<artifactId>akka-slf4j_2.11</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.fusesource.leveldbjni</groupId>
-			<artifactId>leveldbjni-all</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.iq80.leveldb</groupId>
-			<artifactId>leveldb</artifactId>
-		</dependency>
 		<!-- Akka related dependencies - end -->
-		<!-- Plugins related dependencies - start -->
-		<!-- XXX droid and jhove dependencies are troublemakers -->
 		<dependency>
 			<groupId>gov.loc</groupId>
 			<artifactId>bagit</artifactId>
 		</dependency>
-		<!-- <dependency> -->
-		<!-- <groupId>org.apache.tika</groupId> -->
-		<!-- <artifactId>tika-parsers</artifactId> -->
-		<!-- <exclusions> -->
-		<!-- <exclusion> -->
-		<!-- <artifactId>bcmail-jdk15on</artifactId> -->
-		<!-- <groupId>org.bouncycastle</groupId> -->
-		<!-- </exclusion> -->
-		<!-- <exclusion> -->
-		<!-- <artifactId>bcpkix-jdk15on</artifactId> -->
-		<!-- <groupId>org.bouncycastle</groupId> -->
-		<!-- </exclusion> -->
-		<!-- <exclusion> -->
-		<!-- <artifactId>bcprov-jdk15on</artifactId> -->
-		<!-- <groupId>org.bouncycastle</groupId> -->
-		<!-- </exclusion> -->
-		<!-- </exclusions> -->
-		<!-- </dependency> -->
-		<!-- <dependency> -->
-		<!-- <groupId>org.apache.tika</groupId> -->
-		<!-- <artifactId>tika-core</artifactId> -->
-		<!-- </dependency> -->
-		<!-- Plugins related dependencies - end -->
 		<dependency>
 			<groupId>com.github.jknack</groupId>
 			<artifactId>handlebars</artifactId>
@@ -327,8 +290,8 @@
 			<artifactId>jdom2</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.json</groupId>
-			<artifactId>json</artifactId>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
 		</dependency>
 	</dependencies>
 </project>

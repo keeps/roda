@@ -21,6 +21,7 @@ import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsList;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
@@ -28,11 +29,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @XmlRootElement(name = "job")
 @JsonInclude(JsonInclude.Include.ALWAYS)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Job implements IsIndexed, Serializable {
   private static final long serialVersionUID = 615993757726175203L;
 
   public static enum JOB_STATE {
-    CREATED, STARTED, COMPLETED, FAILED_DURING_CREATION, FAILED_TO_COMPLETE;
+    CREATED, STARTED, COMPLETED, FAILED_DURING_CREATION, FAILED_TO_COMPLETE, STOPPED, STOPPING;
   }
 
   // job identifier
@@ -194,6 +196,15 @@ public class Job implements IsIndexed, Serializable {
   public Job setPluginType(PluginType pluginType) {
     this.pluginType = pluginType;
     return this;
+  }
+
+  public boolean isInFinalState() {
+    return isFinalState(state);
+  }
+
+  public static boolean isFinalState(JOB_STATE state) {
+    return JOB_STATE.COMPLETED == state || JOB_STATE.FAILED_TO_COMPLETE == state || JOB_STATE.STOPPED == state
+      || JOB_STATE.FAILED_DURING_CREATION == state;
   }
 
   @Override

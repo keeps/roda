@@ -250,12 +250,16 @@ public final class PluginHelper {
   public static <T extends IsRODAObject> Job getJobFromModel(Plugin<T> plugin, ModelService model)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     String jobId = getJobId(plugin);
+    return getJobFromModel(jobId, model);
+  }
+
+  public static <T extends IsRODAObject> Job getJobFromModel(String jobId, ModelService model)
+    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     if (jobId != null) {
       return model.retrieveJob(jobId);
     } else {
       throw new NotFoundException("Job not found");
     }
-
   }
 
   public static <T extends IsRODAObject> String getJobUsername(Plugin<T> plugin, IndexService index)
@@ -344,11 +348,33 @@ public final class PluginHelper {
       if (stateDetails.isPresent()) {
         job.setStateDetails(stateDetails.get());
       }
-      if (job.getState() == JOB_STATE.COMPLETED || job.getState() == JOB_STATE.FAILED_TO_COMPLETE) {
+      if (job.isInFinalState()) {
         job.setEndDate(new Date());
       }
 
       model.createOrUpdateJob(job);
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      LOGGER.error("Unable to get or update Job from model", e);
+    }
+  }
+
+  /**
+   * 20160531 hsilva:Only orchestrators/orchestrators related classes should
+   * invoke this method
+   */
+  public static <T extends IsRODAObject> void updateJobState(Job job, ModelService model, JOB_STATE state,
+    Optional<String> stateDetails) {
+    try {
+      Job jobFromModel = PluginHelper.getJobFromModel(job.getId(), model);
+      jobFromModel.setState(state);
+      if (stateDetails.isPresent()) {
+        jobFromModel.setStateDetails(stateDetails.get());
+      }
+      if (jobFromModel.isInFinalState()) {
+        jobFromModel.setEndDate(new Date());
+      }
+
+      model.createOrUpdateJob(jobFromModel);
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
       LOGGER.error("Unable to get or update Job from model", e);
     }

@@ -497,6 +497,10 @@ public interface ClientMessages extends Messages {
   String showJobStatusFailedDuringCreation();
 
   String showJobStatusFailedToComplete();
+  
+  String showJobStatusStopping();
+  
+  String showJobStatusStopped();
 
   SafeHtml showJobProgressCompletionPercentage(int completionPercentage);
 

@@ -627,7 +627,7 @@ public class ModelService extends ModelObservable {
   }
 
   private List<DescriptiveMetadata> getDescriptiveMetadata(AIP aip, String representationId) {
-    List<DescriptiveMetadata> descriptiveMetadataList = Collections.EMPTY_LIST;
+    List<DescriptiveMetadata> descriptiveMetadataList = Collections.emptyList();
     if (representationId == null) {
       // AIP descriptive metadata
       descriptiveMetadataList = aip.getDescriptiveMetadata();

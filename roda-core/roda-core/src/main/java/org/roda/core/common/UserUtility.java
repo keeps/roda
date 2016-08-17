@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -32,8 +31,8 @@ import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsFilter;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.user.RodaSimpleUser;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.index.IndexService;
@@ -122,9 +121,10 @@ public class UserUtility {
     return getUser(request, true);
   }
 
-  public static void checkRoles(final RodaUser rsu, final List<String> rolesToCheck) throws AuthorizationDeniedException {
+  public static void checkRoles(final RodaUser rsu, final List<String> rolesToCheck)
+    throws AuthorizationDeniedException {
     if (!rsu.getAllRoles().containsAll(rolesToCheck)) {
-      LOGGER.debug("User \"{}\" roles: {} vs. roles to check: {}", rsu.getId(), rsu.getAllRoles(), rolesToCheck);
+      LOGGER.debug("User '{}' roles: {} vs. roles to check: {}", rsu.getId(), rsu.getAllRoles(), rolesToCheck);
       throw new AuthorizationDeniedException(
         "The user '" + rsu.getId() + "' does not have all needed permissions: " + rolesToCheck);
     }
@@ -150,8 +150,7 @@ public class UserUtility {
   }
 
   public static RodaUser getFullUser(RodaSimpleUser rsu) throws LdapUtilityException {
-    RodaUser u = UserUtility.getLdapUtility().getUser(rsu.getId());
-    return u;
+    return UserUtility.getLdapUtility().getUser(rsu.getId());
   }
 
   public static void setUser(HttpServletRequest request, RodaSimpleUser rsu) {
@@ -197,22 +196,13 @@ public class UserUtility {
 
   }
 
-  /**
-   * @deprecated this method should not be used; it always returns
-   *             {@code session.getId()}
-   */
-  @Deprecated
-  public static String getClientUserPassword(HttpSession session) {
-    return session.getId();
-  }
-
   public static void checkObjectPermissions(RodaUser user, IndexedAIP aip, PermissionType permissionType)
     throws AuthorizationDeniedException {
 
     Set<String> users = aip.getPermissions().getUsers().get(permissionType);
     Set<String> groups = aip.getPermissions().getGroups().get(permissionType);
 
-    LOGGER.debug("Checking if user \"{}\" has permissions to {} object {} (object read permissions: {} & {})",
+    LOGGER.debug("Checking if user '{}' has permissions to {} object {} (object read permissions: {} & {})",
       user.getId(), permissionType, aip.getId(), users, groups);
 
     // FIXME
@@ -272,11 +262,6 @@ public class UserUtility {
         }
       }
     }
-  }
-
-  public static void checkRoles(Function<?, ?> function) {
-    // TODO Auto-generated method stub
-
   }
 
   public static void checkObjectPermissions(RodaUser user, SelectedItems<IndexedAIP> selected,

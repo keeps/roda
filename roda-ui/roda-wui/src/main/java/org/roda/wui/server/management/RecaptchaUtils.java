@@ -15,8 +15,10 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.json.JSONObject;
+import org.roda.core.data.utils.JsonUtils;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class RecaptchaUtils {
   public static void recaptchaVerify(String secret, String captcha) throws RecaptchaException {
@@ -38,8 +40,8 @@ public class RecaptchaUtils {
       for (String line = null; (line = bufferedReader.readLine()) != null;) {
         builder.append(line).append("\n");
       }
-      JSONObject jsonObject = new JSONObject(builder.toString());
-      boolean success = jsonObject.getBoolean("success");
+      JsonNode jsonObject = JsonUtils.parseJson(builder.toString());
+      boolean success = jsonObject.get("success").asBoolean(false);
       if (!success) {
         throw new RecaptchaException("ReCAPTCHA verification failed");
       }

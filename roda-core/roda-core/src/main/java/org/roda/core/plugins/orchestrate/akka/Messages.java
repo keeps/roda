@@ -10,24 +10,55 @@ package org.roda.core.plugins.orchestrate.akka;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Messages {
+  private static final Logger LOGGER = LoggerFactory.getLogger(Messages.class);
 
-  /*-------------------- STATE RELATED STATIC CLASSES --------------------*/
-  public static final class JobInfoUpdated implements Serializable {
+  private static abstract class AbstractMessage implements Serializable {
+    private static final long serialVersionUID = 1898368418865765060L;
+    private String uuid;
+
+    private AbstractMessage() {
+      uuid = UUID.randomUUID().toString();
+      LOGGER.trace("{} Created message {}", uuid, getClass().getSimpleName());
+    }
+
+    public void logProcessingStarted() {
+      LOGGER.trace("{} Started processing message {} [[{}]]", uuid, getClass().getSimpleName(), toString());
+    }
+
+    public void logProcessingEnded() {
+      LOGGER.trace("{} Ended processing message {}", uuid, getClass().getSimpleName());
+    }
+  }
+
+  /*-------------------- JOB STATE RELATED STATIC CLASSES --------------------*/
+  public static final class JobInfoUpdated extends AbstractMessage {
     private static final long serialVersionUID = -6918015956027259760L;
 
-    public Plugin<?> plugin;
-    public JobPluginInfo jobPluginInfo;
+    private Plugin<?> plugin;
+    private JobPluginInfo jobPluginInfo;
 
     public JobInfoUpdated(Plugin<?> plugin, JobPluginInfo jobPluginInfo) {
+      super();
       this.plugin = plugin;
       this.jobPluginInfo = jobPluginInfo;
+    }
+
+    public Plugin<?> getPlugin() {
+      return plugin;
+    }
+
+    public JobPluginInfo getJobPluginInfo() {
+      return jobPluginInfo;
     }
 
     @Override
@@ -36,7 +67,7 @@ public class Messages {
     }
   }
 
-  public static final class JobStateUpdated implements Serializable {
+  public static final class JobStateUpdated extends AbstractMessage {
     private static final long serialVersionUID = 1946036502369851214L;
 
     private Plugin<?> plugin;
@@ -44,21 +75,18 @@ public class Messages {
     private Optional<String> stateDatails;
 
     public JobStateUpdated(Plugin<?> plugin, JOB_STATE state) {
-      this.plugin = plugin;
-      this.state = state;
-      this.stateDatails = Optional.empty();
+      this(plugin, state, Optional.empty());
     }
 
     public JobStateUpdated(Plugin<?> plugin, JOB_STATE state, Optional<String> stateDatails) {
+      super();
       this.plugin = plugin;
       this.state = state;
       this.stateDatails = stateDatails;
     }
 
     public JobStateUpdated(Plugin<?> plugin, JOB_STATE state, Throwable throwable) {
-      this.plugin = plugin;
-      this.state = state;
-      this.stateDatails = Optional.ofNullable(throwable.getClass().getName() + ": " + throwable.getMessage());
+      this(plugin, state, Optional.of(throwable.getClass().getName() + ": " + throwable.getMessage()));
     }
 
     public Plugin<?> getPlugin() {
@@ -77,76 +105,61 @@ public class Messages {
     public String toString() {
       return "JobIsDone [plugin=" + plugin + ", state=" + state + "]";
     }
-
   }
 
-  public static final class JobInitEnded implements Serializable {
+  public static final class JobInitEnded extends AbstractMessage {
     private static final long serialVersionUID = 5040958276243865900L;
 
     public JobInitEnded() {
-
+      super();
     }
 
     @Override
     public String toString() {
       return "JobInitEnded []";
     }
-
   }
 
-  public static class PluginInitEnded<T extends IsRODAObject> implements Serializable {
-    private static final long serialVersionUID = -5214600055070295410L;
-
-    private Plugin<T> plugin;
-
-    public PluginInitEnded(Plugin<T> plugin) {
-      this.plugin = plugin;
-    }
-
-    public Plugin<T> getPlugin() {
-      return plugin;
-    }
-
-    public void setPlugin(Plugin<T> plugin) {
-      this.plugin = plugin;
-    }
-
-    @Override
-    public String toString() {
-      return "PluginInitEnded [plugin=" + plugin + "]";
-    }
-  }
-
-  public static class JobCleanup implements Serializable {
+  public static class JobCleanup extends AbstractMessage {
     private static final long serialVersionUID = -5175825019027462407L;
 
     public JobCleanup() {
+      super();
     }
 
     @Override
     public String toString() {
       return "JobCleanup []";
     }
+  }
 
+  public static class JobStop extends AbstractMessage {
+    private static final long serialVersionUID = -8806029242967727412L;
+
+    public JobStop() {
+      super();
+    }
+
+    @Override
+    public String toString() {
+      return "JobStop []";
+    }
   }
 
   /*-------------------- PLUGIN STATE TRANSITIONS RELATED STATIC CLASSES --------------------*/
 
-  private static class PluginMethodIsReady<T extends IsRODAObject> implements Serializable {
+  private static class PluginMethodIsReady<T extends IsRODAObject> extends AbstractMessage {
     private static final long serialVersionUID = -5214600055070295410L;
 
     private Plugin<T> plugin;
 
     public PluginMethodIsReady(Plugin<T> plugin) {
+      super();
       this.plugin = plugin;
     }
 
     public Plugin<T> getPlugin() {
       return plugin;
-    }
-
-    public void setPlugin(Plugin<T> plugin) {
-      this.plugin = plugin;
     }
 
     @Override
@@ -155,13 +168,14 @@ public class Messages {
     }
   }
 
-  private static class PluginMethodIsDone implements Serializable {
+  private static class PluginMethodIsDone extends AbstractMessage {
     private static final long serialVersionUID = -8701179264086005994L;
 
     private Plugin<?> plugin;
     private boolean withError;
 
     public PluginMethodIsDone(Plugin<?> plugin, boolean withError) {
+      super();
       this.plugin = plugin;
       this.withError = withError;
     }
@@ -170,29 +184,47 @@ public class Messages {
       return plugin;
     }
 
-    public void setPlugin(Plugin<?> plugin) {
-      this.plugin = plugin;
-    }
-
     public boolean isWithError() {
       return withError;
-    }
-
-    public void setWithError(boolean withError) {
-      this.withError = withError;
     }
 
     @Override
     public String toString() {
       return "PluginMethodIsDone [plugin=" + plugin + ", withError=" + withError + "]";
     }
+  }
 
+  public static class PluginBeforeAllExecuteIsReady<T extends IsRODAObject> extends PluginMethodIsReady<T> {
+    private static final long serialVersionUID = -7730727049162062388L;
+
+    public PluginBeforeAllExecuteIsReady(Plugin<T> plugin) {
+      super(plugin);
+    }
+
+    @Override
+    public String toString() {
+      return "PluginBeforeAllExecuteIsReady [getPlugin()=" + getPlugin() + "]";
+    }
+  }
+
+  public static class PluginBeforeAllExecuteIsDone extends PluginMethodIsDone {
+    private static final long serialVersionUID = 7449486178368177015L;
+
+    public PluginBeforeAllExecuteIsDone(Plugin<?> plugin, boolean withError) {
+      super(plugin, withError);
+    }
+
+    @Override
+    public String toString() {
+      return "PluginBeforeAllExecuteIsDone [getPlugin()=" + getPlugin() + ", isWithError()=" + isWithError() + "]";
+    }
   }
 
   public static class PluginExecuteIsReady<T extends IsRODAObject> extends PluginMethodIsReady<T> {
     private static final long serialVersionUID = 1821489252490235130L;
 
     private List<T> list;
+    private boolean hasBeenForwarded = false;
 
     public PluginExecuteIsReady(Plugin<T> plugin, List<T> list) {
       super(plugin);
@@ -203,13 +235,14 @@ public class Messages {
       return list;
     }
 
-    public void setList(List<T> list) {
-      this.list = list;
+    public void setHasBeenForwarded() {
+      this.hasBeenForwarded = true;
     }
 
     @Override
     public String toString() {
-      return "PluginExecuteIsReady [getPlugin()=" + getPlugin() + "]";
+      return "PluginExecuteIsReady [list=" + list + ", hasBeenForwarded=" + hasBeenForwarded + ", getPlugin()="
+        + getPlugin() + "]";
     }
   }
 
@@ -227,7 +260,7 @@ public class Messages {
   }
 
   public static class PluginAfterAllExecuteIsReady<T extends IsRODAObject> extends PluginMethodIsReady<T> {
-    private static final long serialVersionUID = 1821489252490235130L;
+    private static final long serialVersionUID = 8852688692792086166L;
 
     public PluginAfterAllExecuteIsReady(Plugin<T> plugin) {
       super(plugin);

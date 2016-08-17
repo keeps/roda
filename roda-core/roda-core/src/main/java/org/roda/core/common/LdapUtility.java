@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.directory.api.ldap.model.cursor.Cursor;
 import org.apache.directory.api.ldap.model.entry.Attribute;
@@ -63,7 +64,6 @@ import org.apache.directory.server.core.partition.ldif.LdifPartition;
 import org.apache.directory.server.ldap.LdapServer;
 import org.apache.directory.server.protocol.shared.transport.TcpTransport;
 import org.apache.directory.server.xdbm.Index;
-import org.iq80.leveldb.util.FileUtils;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
@@ -261,12 +261,12 @@ public class LdapUtility {
     this.ldapProtectedUsers.clear();
     if (ldapProtectedUsers != null) {
       this.ldapProtectedUsers.addAll(ldapProtectedUsers);
-      LOGGER.debug("protected users: " + this.ldapProtectedUsers);
+      LOGGER.debug("Protected users: {}", this.ldapProtectedUsers);
     }
     this.ldapProtectedGroups.clear();
     if (ldapProtectedGroups != null) {
       this.ldapProtectedGroups.addAll(ldapProtectedGroups);
-      LOGGER.debug("protected groups: " + this.ldapProtectedGroups);
+      LOGGER.debug("Protected groups: {}", this.ldapProtectedGroups);
     }
     this.rodaAdminDN = rodaAdminDN;
     this.dataDirectory = dataDirectory;
@@ -1153,7 +1153,7 @@ public class LdapUtility {
     // It will be recreated again.
     // TODO: this is a workaround for this issue
     // https://issues.apache.org/jira/browse/DIRSERVER-1954
-    if (!FileUtils.deleteRecursively(systemPartitionPath)) {
+    if (!FileUtils.deleteQuietly(systemPartitionPath)) {
       LOGGER.warn("Could not delete ApacheDS system partition directory: {}", systemPartitionPath);
     }
 

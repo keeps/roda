@@ -206,7 +206,7 @@ public class ManagementTasksResource extends RodaCoreService {
       response.setMessage("Reindex Jobs job created (" + jobCreated + ")");
       // register action
       long duration = new Date().getTime() - startDate.getTime();
-      registerAction(user, "ManagementTasks", "reindex jobs", null, duration);
+      registerAction(user, "ManagementTasks", "reindex jobs", null, duration, LOG_ENTRY_STATE.SUCCESS);
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
       | JobAlreadyStartedException e) {
       LOGGER.error("Error creating reindex Jobs job", e);
@@ -227,7 +227,7 @@ public class ManagementTasksResource extends RodaCoreService {
       response.setMessage("Reindex job created (" + jobCreated + ")");
       // register action
       long duration = new Date().getTime() - startDate.getTime();
-      registerAction(user, "ManagementTasks", "reindex risks", null, duration);
+      registerAction(user, "ManagementTasks", "reindex risks", null, duration, LOG_ENTRY_STATE.SUCCESS);
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
       | JobAlreadyStartedException e) {
       LOGGER.error("Error creating reindex Risks job", e);
@@ -248,7 +248,7 @@ public class ManagementTasksResource extends RodaCoreService {
       response.setMessage("Reindex job created (" + jobCreated + ")");
       // register action
       long duration = new Date().getTime() - startDate.getTime();
-      registerAction(user, "ManagementTasks", "reindex risk incidences", null, duration);
+      registerAction(user, "ManagementTasks", "reindex risk incidences", null, duration, LOG_ENTRY_STATE.SUCCESS);
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
       | JobAlreadyStartedException e) {
       LOGGER.error("Error creating reindex Risk Incidences job", e);
@@ -269,7 +269,7 @@ public class ManagementTasksResource extends RodaCoreService {
       response.setMessage("Reindex job created (" + jobCreated + ")");
       // register action
       long duration = new Date().getTime() - startDate.getTime();
-      registerAction(user, "ManagementTasks", "reindex agents", null, duration);
+      registerAction(user, "ManagementTasks", "reindex agents", null, duration, LOG_ENTRY_STATE.SUCCESS);
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
       | JobAlreadyStartedException e) {
       LOGGER.error("Error creating reindex Agents job", e);
@@ -290,7 +290,7 @@ public class ManagementTasksResource extends RodaCoreService {
       response.setMessage("Reindex job created (" + jobCreated + ")");
       // register action
       long duration = new Date().getTime() - startDate.getTime();
-      registerAction(user, "ManagementTasks", "reindex formats", null, duration);
+      registerAction(user, "ManagementTasks", "reindex formats", null, duration, LOG_ENTRY_STATE.SUCCESS);
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
       | JobAlreadyStartedException e) {
       LOGGER.error("Error creating reindex Formats job", e);
@@ -311,7 +311,7 @@ public class ManagementTasksResource extends RodaCoreService {
       response.setMessage("Reindex job created (" + jobCreated + ")");
       // register action
       long duration = new Date().getTime() - startDate.getTime();
-      registerAction(user, "ManagementTasks", "reindex notifications", null, duration);
+      registerAction(user, "ManagementTasks", "reindex notifications", null, duration, LOG_ENTRY_STATE.SUCCESS);
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
       | JobAlreadyStartedException e) {
       LOGGER.error("Error creating reindex Notifications job", e);
@@ -334,7 +334,7 @@ public class ManagementTasksResource extends RodaCoreService {
       response.setMessage("Reindex job created (" + jobCreated + ")");
       // register action
       long duration = new Date().getTime() - startDate.getTime();
-      registerAction(user, "ManagementTasks", "reindex transferred resources", null, duration);
+      registerAction(user, "ManagementTasks", "reindex transferred resources", null, duration, LOG_ENTRY_STATE.SUCCESS);
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
       | JobAlreadyStartedException e) {
       LOGGER.error("Error creating reindex TransferredResources job", e);
@@ -356,7 +356,7 @@ public class ManagementTasksResource extends RodaCoreService {
       response.setMessage("Reindex job created (" + jobCreated + ")");
       // register action
       long duration = new Date().getTime() - startDate.getTime();
-      registerAction(user, "ManagementTasks", "reindex action logs", null, duration);
+      registerAction(user, "ManagementTasks", "reindex action logs", null, duration, LOG_ENTRY_STATE.SUCCESS);
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
       | JobAlreadyStartedException e) {
       LOGGER.error("Error creating reindex Action logs job", e);
@@ -379,7 +379,7 @@ public class ManagementTasksResource extends RodaCoreService {
       response.setMessage("Ended users and groups reindex");
       // register action
       long duration = new Date().getTime() - startDate.getTime();
-      registerAction(user, "ManagementTasks", "reindex users and groups", null, duration);
+      registerAction(user, "ManagementTasks", "reindex users and groups", null, duration, LOG_ENTRY_STATE.SUCCESS);
     } catch (NotFoundException | GenericException | AlreadyExistsException | EmailAlreadyExistsException
       | UserAlreadyExistsException | IllegalOperationException | LdapUtilityException e) {
       response.setMessage("Error reindexing users and groups: " + e.getMessage());
@@ -401,7 +401,7 @@ public class ManagementTasksResource extends RodaCoreService {
       response.setMessage("Reindex job created (" + jobCreated + ")");
       // register action
       long duration = new Date().getTime() - startDate.getTime();
-      registerAction(user, "ManagementTasks", "reindex all aips", null, duration);
+      registerAction(user, "ManagementTasks", "reindex all aips", null, duration, LOG_ENTRY_STATE.SUCCESS);
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
       | JobAlreadyStartedException e) {
       LOGGER.error("Error creating reindex job", e);
@@ -419,7 +419,8 @@ public class ManagementTasksResource extends RodaCoreService {
       response.setMessage("Reindex job created (" + jobCreated + ")");
       // register action
       long duration = new Date().getTime() - startDate.getTime();
-      registerAction(user, "ManagementTasks", "reindex aips", null, duration, "params", params);
+      registerAction(user, "ManagementTasks", "reindex aips", null, duration, LOG_ENTRY_STATE.SUCCESS, "params",
+        params);
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
       | JobAlreadyStartedException e) {
       LOGGER.error("Error creating reindex job", e);
@@ -442,7 +443,8 @@ public class ManagementTasksResource extends RodaCoreService {
       response.setMessage("Log cleaner created (" + jobCreated + ")");
       // register action
       long duration = new Date().getTime() - startDate.getTime();
-      registerAction(user, "ManagementTasks", "action log clean", null, duration, "daysToKeep", daysToKeep);
+      registerAction(user, "ManagementTasks", "action log clean", null, duration, LOG_ENTRY_STATE.SUCCESS, "daysToKeep",
+        daysToKeep);
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
       | JobAlreadyStartedException e) {
       LOGGER.error("Error creating log cleaner job", e);

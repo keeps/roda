@@ -61,6 +61,9 @@ public class HtmlSnippetUtils {
       } else if (JOB_STATE.FAILED_TO_COMPLETE.equals(state)) {
         ret = SafeHtmlUtils
           .fromSafeConstant("<span class='label-default'>" + messages.showJobStatusFailedToComplete() + "</span>");
+      } else if (JOB_STATE.STOPPED.equals(state)) {
+        ret = SafeHtmlUtils
+          .fromSafeConstant("<span class='label-default'>" + messages.showJobStatusStopped() + "</span>");
       } else if (JOB_STATE.CREATED.equals(state)) {
         ret = SafeHtmlUtils.fromSafeConstant("<span class='label-info'>" + messages.showJobStatusCreated() + "</span>");
       } else if (JOB_STATE.STARTED.equals(state)) {

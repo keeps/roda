@@ -18,8 +18,8 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,7 +88,7 @@ public class EmailUtility {
     // msg.addHeader("MyHeaderName", "myHeaderValue");
 
     String htmlMessage = String.format("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-      + "<html><body><pre>%s</pre></body></html>", StringEscapeUtils.escapeHtml(message));
+      + "<html><body><pre>%s</pre></body></html>", StringEscapeUtils.escapeHtml4(message));
 
     MimeMultipart mimeMultipart = new MimeMultipart();
     MimeBodyPart mimeBodyPart = new MimeBodyPart();

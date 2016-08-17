@@ -11,7 +11,7 @@ package org.roda.core.data.exceptions;
  * @author Hélder Silva <hsilva@keep.pt>
  * 
  */
-public class JobAlreadyStartedException extends RODAException {
+public class JobAlreadyStartedException extends JobException {
 
   private static final long serialVersionUID = -6744205569453461540L;
 

@@ -7,13 +7,15 @@
  */
 package org.roda.core.plugins.orchestrate.akka;
 
-import org.roda.core.RodaCoreFactory;
+import java.util.UUID;
+
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.index.IndexService;
 import org.roda.core.plugins.Plugin;
+import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.orchestrate.JobInfo;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.JobsHelper;
@@ -22,105 +24,178 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import akka.actor.ActorRef;
-import akka.actor.UntypedActor;
+import akka.actor.Props;
+import akka.actor.Terminated;
+import akka.routing.RoundRobinPool;
 
-public class AkkaJobStateInfoActor extends UntypedActor {
+public class AkkaJobStateInfoActor extends AkkaBaseActor {
   private static final Logger LOGGER = LoggerFactory.getLogger(AkkaJobStateInfoActor.class);
 
   private JobInfo jobInfo;
   private Plugin<?> plugin;
   private ActorRef jobCreator;
+  private ActorRef workersRouter;
+  boolean stopping = false;
 
-  public AkkaJobStateInfoActor(Plugin<?> plugin, ActorRef jobCreator) {
+  public AkkaJobStateInfoActor(Plugin<?> plugin, ActorRef jobCreator, int numberOfJobsWorkers) {
+    super();
     jobInfo = new JobInfo();
     this.plugin = plugin;
     this.jobCreator = jobCreator;
+
+    LOGGER.debug("Starting AkkaJobStateInfoActor router with {} actors", numberOfJobsWorkers);
+    Props workersProps = new RoundRobinPool(numberOfJobsWorkers).props(Props.create(AkkaWorkerActor.class));
+    workersRouter = getContext().actorOf(workersProps, "WorkersRouter" + UUID.randomUUID().toString());
+    getContext().watch(workersRouter);
   }
 
   @Override
   public void onReceive(Object msg) throws Exception {
+    super.setup(msg);
     if (msg instanceof Messages.JobStateUpdated) {
       handleJobStateUpdated(msg);
     } else if (msg instanceof Messages.JobInfoUpdated) {
       handleJobInfoUpdated(msg);
-    } else if (msg instanceof Messages.PluginInitEnded) {
-      handlePluginInitEnded(msg);
+    } else if (msg instanceof Messages.JobStop) {
+      handleJobStop(msg);
+    } else if (msg instanceof Terminated) {
+      handleTerminated(msg);
+    } else if (msg instanceof Messages.PluginExecuteIsReady) {
+      handleExecuteIsReady(msg);
     } else if (msg instanceof Messages.JobInitEnded) {
       handleJobInitEnded(msg);
+    } else if (msg instanceof Messages.PluginBeforeAllExecuteIsReady) {
+      handleBeforeAllExecuteIsReady(msg);
     } else if (msg instanceof Messages.PluginExecuteIsDone) {
       handleExecuteIsDone(msg);
     } else if (msg instanceof Messages.PluginAfterAllExecuteIsDone) {
       handleAfterAllExecuteIsDone(msg);
     } else if (msg instanceof Messages.JobCleanup) {
-      handleJobCleanup();
+      handleJobCleanup(msg);
     } else {
-      LOGGER.error("Received a message that it doesn't know how to process (" + msg.getClass().getName() + ")...");
+      LOGGER.error("Received a message that don't know how to process (" + msg.getClass().getName() + ")...");
       unhandled(msg);
     }
   }
 
   private void handleJobStateUpdated(Object msg) {
     Messages.JobStateUpdated message = (Messages.JobStateUpdated) msg;
-    Plugin<?> p = message.getPlugin() == null ? plugin : message.getPlugin();
+    message.logProcessingStarted();
+    Plugin<?> p = message.getPlugin() == null ? this.plugin : message.getPlugin();
     try {
-      Job job = PluginHelper.getJobFromIndex(message.getPlugin(), RodaCoreFactory.getIndexService());
-      LOGGER.info("Setting job '{}' ({}) state to {}", job.getName(), job.getId(), message.getState());
+      Job job = PluginHelper.getJobFromIndex(p, super.getIndex());
+      LOGGER.info("Setting job '{}' ({}) state to {}. Details: {}", job.getName(), job.getId(), message.getState(),
+        message.getStateDatails().orElse("NO DETAILS"));
     } catch (NotFoundException | GenericException e) {
       LOGGER.error("Unable to get Job from index to log its state change", e);
     }
-    PluginHelper.updateJobState(p, RodaCoreFactory.getModelService(), message.getState(), message.getStateDatails());
-    if (JOB_STATE.FAILED_TO_COMPLETE == message.getState() || JOB_STATE.COMPLETED == message.getState()) {
+    PluginHelper.updateJobState(p, super.getModel(), message.getState(), message.getStateDatails());
+    if (Job.isFinalState(message.getState())) {
+      // 20160817 hsilva: the following instruction is needed for the "sync"
+      // execution of a job (i.e. for testing purposes)
       jobCreator.tell("Done", getSelf());
       getContext().stop(getSelf());
     }
+    message.logProcessingEnded();
   }
 
   private void handleJobInfoUpdated(Object msg) {
     Messages.JobInfoUpdated message = (Messages.JobInfoUpdated) msg;
-    jobInfo.put(message.plugin, message.jobPluginInfo);
-    JobPluginInfo infoUpdated = message.jobPluginInfo.processJobPluginInformation(message.plugin, jobInfo);
+    message.logProcessingStarted();
+    jobInfo.put(message.getPlugin(), message.getJobPluginInfo());
+    JobPluginInfo infoUpdated = message.getJobPluginInfo().processJobPluginInformation(message.getPlugin(), jobInfo);
     jobInfo.setObjectsCount(infoUpdated.getSourceObjectsCount());
-    PluginHelper.updateJobInformation(message.plugin, RodaCoreFactory.getModelService(), infoUpdated);
+    PluginHelper.updateJobInformation(message.getPlugin(), super.getModel(), infoUpdated);
+    message.logProcessingEnded();
   }
 
-  private void handlePluginInitEnded(Object msg) {
-    Messages.PluginInitEnded message = (Messages.PluginInitEnded) msg;
+  private void handleJobStop(Object msg) {
+    Messages.JobStop message = (Messages.JobStop) msg;
+    message.logProcessingStarted();
+    getSelf().tell(new Messages.JobStateUpdated(plugin, JOB_STATE.STOPPING), getSelf());
+    stopping = true;
+    getContext().getChildren().forEach(e -> getContext().stop(e));
+    message.logProcessingEnded();
+  }
+
+  private void handleTerminated(Object msg) {
+    LOGGER.trace("{} Started processing message {}", "NO_UUID", Terminated.class.getSimpleName());
+    boolean allChildrenAreDead = true;
+    if (stopping) {
+      for (ActorRef child : getContext().getChildren()) {
+        allChildrenAreDead = false;
+        break;
+      }
+      if (allChildrenAreDead) {
+        getSelf().tell(new Messages.JobStateUpdated(plugin, JOB_STATE.STOPPED), getSelf());
+      }
+    }
+    LOGGER.trace("{} Ended processing message {} (stopping={} allChildrenAreDead={})", "NO_UUID",
+      Terminated.class.getSimpleName(), stopping, allChildrenAreDead);
+  }
+
+  private void handleExecuteIsReady(Object msg) {
+    Messages.PluginExecuteIsReady message = (Messages.PluginExecuteIsReady) msg;
+    message.logProcessingStarted();
     jobInfo.setStarted(message.getPlugin());
+    // 20160819 hsilva: the following it's just for debugging purposes
+    message.setHasBeenForwarded();
+    workersRouter.tell(message, getSelf());
+    message.logProcessingEnded();
   }
 
   private void handleJobInitEnded(Object msg) {
+    Messages.JobInitEnded message = (Messages.JobInitEnded) msg;
+    message.logProcessingStarted();
     jobInfo.setInitEnded(true);
     // INFO 20160630 hsilva: the following test is needed because messages can
     // be out of order and a plugin might already arrived to the end
     if (jobInfo.isDone()) {
       getSender().tell(new Messages.PluginAfterAllExecuteIsReady(plugin), getSelf());
     }
+    message.logProcessingEnded();
+  }
+
+  private void handleBeforeAllExecuteIsReady(Object msg) throws PluginException {
+    Messages.PluginBeforeAllExecuteIsReady message = (Messages.PluginBeforeAllExecuteIsReady) msg;
+    message.logProcessingStarted();
+    message.getPlugin().beforeAllExecute(super.getIndex(), super.getModel(), super.getStorage());
+    // do nothing because if all goes good, the next messages are of type
+    // PluginExecuteIsReady
+    message.logProcessingEnded();
   }
 
   private void handleExecuteIsDone(Object msg) {
     Messages.PluginExecuteIsDone message = (Messages.PluginExecuteIsDone) msg;
-
+    message.logProcessingStarted();
     jobInfo.setDone(message.getPlugin());
     if (jobInfo.isDone() && jobInfo.isInitEnded()) {
       getSender().tell(new Messages.PluginAfterAllExecuteIsReady(plugin), getSelf());
     }
+    message.logProcessingEnded();
   }
 
   private void handleAfterAllExecuteIsDone(Object msg) {
+    Messages.PluginAfterAllExecuteIsDone message = (Messages.PluginAfterAllExecuteIsDone) msg;
+    message.logProcessingStarted();
     getSelf().tell(new Messages.JobCleanup(), getSelf());
     getSelf().tell(new Messages.JobStateUpdated(plugin, JOB_STATE.COMPLETED), getSelf());
+    message.logProcessingEnded();
   }
 
-  private void handleJobCleanup() {
+  private void handleJobCleanup(Object msg) {
+    Messages.JobCleanup message = (Messages.JobCleanup) msg;
+    message.logProcessingStarted();
     try {
-      LOGGER.info("Doing Job cleanup - start");
-      IndexService indexService = RodaCoreFactory.getIndexService();
+      LOGGER.info("Doing job cleanup");
+      IndexService indexService = super.getIndex();
       Job job = PluginHelper.getJobFromIndex(plugin, indexService);
-      JobsHelper.doJobObjectsCleanup(job, RodaCoreFactory.getModelService(), indexService);
-      LOGGER.info("Doing Job cleanup - end");
+      JobsHelper.doJobObjectsCleanup(job, super.getModel(), indexService);
+      LOGGER.info("Ended doing job cleanup");
     } catch (NotFoundException | GenericException e) {
       LOGGER.error("Unable to get Job for doing cleanup", e);
     }
+    message.logProcessingEnded();
   }
 
 }

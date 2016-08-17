@@ -34,7 +34,6 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
@@ -362,9 +361,7 @@ public class ShowJob extends Composite {
   }
 
   private boolean isJobRunning() {
-    return job != null && !JOB_STATE.COMPLETED.equals(job.getState())
-      && !JOB_STATE.FAILED_DURING_CREATION.equals(job.getState())
-      && !JOB_STATE.FAILED_TO_COMPLETE.equals(job.getState());
+    return job != null && !job.isInFinalState();
   }
 
   private void showIngestSourceObjects(SelectedItems selected) {
@@ -525,9 +522,7 @@ public class ShowJob extends Composite {
   private Timer autoUpdateTimer = null;
 
   private void scheduleUpdateStatus() {
-    JOB_STATE state = job.getState();
-    if (!JOB_STATE.COMPLETED.equals(state) && !JOB_STATE.FAILED_DURING_CREATION.equals(state)
-      && !JOB_STATE.FAILED_TO_COMPLETE.equals(state)) {
+    if (!job.isInFinalState()) {
       if (autoUpdateTimer == null) {
         autoUpdateTimer = new Timer() {
 

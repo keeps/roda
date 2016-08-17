@@ -1048,7 +1048,7 @@ public class BrowserHelper {
       parameters.put("aipIds", StringUtils.join(aipIds, ","));
 
       Job job = new Job();
-      job.setName(RiskIncidenceRemoverPlugin.getStaticName() + " " + job.getStartDate());
+      job.setName(RiskIncidenceRemoverPlugin.class.getSimpleName() + " " + job.getStartDate());
       job.setPlugin(RiskIncidenceRemoverPlugin.class.getName());
       job.setPluginParameters(parameters);
       job.setSourceObjects(new SelectedItemsAll<>(AIP.class.getName()));
@@ -1916,7 +1916,7 @@ public class BrowserHelper {
     parameters.put("riskIds", StringUtils.join(idList, ","));
 
     Job job = new Job();
-    job.setName(RiskIncidenceRemoverPlugin.getStaticName() + " " + job.getStartDate());
+    job.setName(RiskIncidenceRemoverPlugin.class.getSimpleName() + " " + job.getStartDate());
     job.setPlugin(RiskIncidenceRemoverPlugin.class.getName());
     job.setPluginParameters(parameters);
     job.setSourceObjects(new SelectedItemsAll<>(AIP.class.getName()));
@@ -2065,7 +2065,7 @@ public class BrowserHelper {
           parameters.put("aipIds", aipId);
 
           Job job = new Job();
-          job.setName(RiskIncidenceRemoverPlugin.getStaticName() + " " + job.getStartDate());
+          job.setName(RiskIncidenceRemoverPlugin.class.getSimpleName() + " " + job.getStartDate());
           job.setPlugin(RiskIncidenceRemoverPlugin.class.getName());
           job.setPluginParameters(parameters);
           job.setSourceObjects(new SelectedItemsAll<>(AIP.class.getName()));

@@ -117,6 +117,22 @@ public class JobsResource {
     return Response.ok(job, mediaType).build();
   }
 
+  @GET
+  @Path("/{" + RodaConstants.API_PATH_PARAM_JOB_ID + "}/stop")
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @ApiOperation(value = "Stop Job", notes = "Stops a particular Job.", response = Job.class)
+  public Response stopJob(@PathParam(RodaConstants.API_PATH_PARAM_JOB_ID) String jobId,
+    @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat) throws RODAException {
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
+
+    // get user
+    RodaUser user = UserUtility.getApiUser(request);
+    // delegate action to controller
+    org.roda.wui.api.controllers.Jobs.stopJob(user, jobId);
+
+    return Response.ok("Stopped", mediaType).build();
+  }
+
   @DELETE
   @Path("/{" + RodaConstants.API_PATH_PARAM_JOB_ID + "}")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -132,7 +148,6 @@ public class JobsResource {
 
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Job deleted"), mediaType).build();
   }
-
 
   @GET
   @Path("/{" + RodaConstants.API_PATH_PARAM_JOB_ID + "}/reports")

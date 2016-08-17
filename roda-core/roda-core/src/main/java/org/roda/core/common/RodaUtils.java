@@ -9,9 +9,6 @@ package org.roda.core.common;
 
 import java.io.CharArrayReader;
 import java.io.CharArrayWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -58,7 +55,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
-import org.yaml.snakeyaml.Yaml;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -136,18 +132,6 @@ public class RodaUtils {
       }
     }
     return temp;
-  }
-
-  public static Map<String, List<String>> parseYmlPropertiesFile(File file) throws FileNotFoundException {
-    Map<String, List<String>> properties = new HashMap<String, List<String>>();
-
-    Yaml yaml = new Yaml();
-    Map<String, Object> map = RodaUtils.copyMap(yaml.load(new FileInputStream(file)));
-    for (Map.Entry<String, Object> entry : map.entrySet()) {
-      properties.put(entry.getKey(), RodaUtils.copyList(entry.getValue()));
-    }
-
-    return properties;
   }
 
   /**

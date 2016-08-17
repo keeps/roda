@@ -26,7 +26,7 @@
 	<appender name="AKKA_FILE" class="ch.qos.logback.core.FileAppender">
 		<file>${roda.home}/log/roda-core-akka.log</file>
 		<encoder>
-			<pattern>%d [%X{akkaSource} %X{sourceThread}] %-5level %logger{36} - %msg%n</pattern>
+			<pattern>%d [%X{akkaSourceActor} %X{akkaSourceThread}] %-5level %logger{36} - %msg%n</pattern>
 		</encoder>
 	</appender>
 
@@ -35,8 +35,9 @@
 	</appender>
 	
 	<logger name="org.roda.core.plugins.orchestrate.akka" additivity="false">
-		<level value="DEBUG" />
+		<level value="TRACE" />
 		<appender-ref ref="CORE_FILEOUT" />
+		<!-- <appender-ref ref="AKKA_FILE" /> -->
 	</logger>
 
 	<logger name="org.roda.core.plugins.PluginManager" additivity="false">

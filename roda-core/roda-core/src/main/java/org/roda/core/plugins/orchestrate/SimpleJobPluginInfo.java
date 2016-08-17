@@ -30,7 +30,6 @@ public class SimpleJobPluginInfo extends JobPluginInfo {
 
   @Override
   public <T extends IsRODAObject> JobPluginInfo processJobPluginInformation(Plugin<T> plugin, JobInfo jobInfo) {
-    int taskObjectsCount = jobInfo.getObjectsCount();
     Map<Plugin<?>, JobPluginInfo> jobInfos = jobInfo.getJobInfo();
     // update information in the map<plugin, pluginInfo>
     // FIXME/INFO 20160601 hsilva: the following code would be necessary in a
@@ -39,19 +38,12 @@ public class SimpleJobPluginInfo extends JobPluginInfo {
     // jobInfos.get(plugin);
     // jobPluginInfo.update(this);
 
-    float percentage = 0f;
     int sourceObjectsCount = 0;
     int sourceObjectsBeingProcessed = 0;
     int sourceObjectsProcessedWithSuccess = 0;
     int sourceObjectsProcessedWithFailure = 0;
     for (JobPluginInfo jpi : jobInfos.values()) {
       SimpleJobPluginInfo pluginInfo = (SimpleJobPluginInfo) jpi;
-
-      // float pluginPercentage = pluginInfo.isDone() ? 1 : 0;
-      // float pluginWeight = ((float) pluginInfo.getSourceObjectsCount()) /
-      // taskObjectsCount;
-      // percentage += (pluginPercentage * pluginWeight);
-
       sourceObjectsProcessedWithSuccess += pluginInfo.getSourceObjectsProcessedWithSuccess();
       sourceObjectsProcessedWithFailure += pluginInfo.getSourceObjectsProcessedWithFailure();
       sourceObjectsBeingProcessed += pluginInfo.getSourceObjectsBeingProcessed();
@@ -59,8 +51,13 @@ public class SimpleJobPluginInfo extends JobPluginInfo {
     }
 
     SimpleJobPluginInfo infoUpdated = new SimpleJobPluginInfo();
-    int newPercentage = Math
-      .round((((sourceObjectsProcessedWithSuccess + sourceObjectsProcessedWithFailure) * 100) / sourceObjectsCount));
+    // FIXME 20160819 hsilva: divide by zero problem when # of sourceObjects is
+    // unknown
+    int newPercentage = 0;
+    if (sourceObjectsCount > 0) {
+      newPercentage = Math
+        .round((((sourceObjectsProcessedWithSuccess + sourceObjectsProcessedWithFailure) * 100) / sourceObjectsCount));
+    }
     infoUpdated.setCompletionPercentage(newPercentage);
     infoUpdated.setSourceObjectsCount(sourceObjectsCount);
     infoUpdated.setSourceObjectsBeingProcessed(sourceObjectsBeingProcessed);

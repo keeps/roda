@@ -67,12 +67,4 @@ public abstract class AbstractPlugin<T extends IsRODAObject> implements Plugin<T
 
   public abstract String getVersionImpl();
 
-  public static String getStaticName() {
-    return "PLUGIN STATIC NAME NOT DEFINED";
-  }
-
-  public static String getStaticDescription() {
-    return "PLUGIN STATIC DESCRIPTION NOT DEFINED";
-  }
-
 }

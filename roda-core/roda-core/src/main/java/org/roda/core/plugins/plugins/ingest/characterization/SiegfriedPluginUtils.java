@@ -16,8 +16,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.PremisV3Utils;
@@ -28,6 +26,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
@@ -48,6 +47,8 @@ import org.roda.core.util.CommandUtility;
 import org.roda.core.util.HTTPUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 import gov.loc.premis.v3.File;
 
@@ -115,13 +116,11 @@ public class SiegfriedPluginUtils {
       IOUtils.closeQuietly(directAccess);
 
       boolean notify = false;
-      final JSONObject obj = new JSONObject(siegfriedOutput);
-      JSONArray files = (JSONArray) obj.get("files");
+      final JsonNode jsonObject = JsonUtils.parseJson(siegfriedOutput);
+      final JsonNode files = jsonObject.get("files");
 
-      for (int i = 0; i < files.length(); i++) {
-        JSONObject fileObject = files.getJSONObject(i);
-
-        Path fullFsPath = Paths.get(fileObject.getString("filename"));
+      for (JsonNode file : files) {
+        Path fullFsPath = Paths.get(file.get("filename").asText());
         Path relativeFsPath = representationFsPath.relativize(fullFsPath);
 
         String fileId = relativeFsPath.getFileName().toString();
@@ -130,55 +129,51 @@ public class SiegfriedPluginUtils {
           fileDirectoryPath.add(relativeFsPath.getName(j).toString());
         }
 
-        ContentPayload payload = new StringContentPayload(fileObject.toString());
+        ContentPayload payload = new StringContentPayload(file.toString());
 
         model.createOtherMetadata(aip.getId(), representation.getId(), fileDirectoryPath, fileId,
           SiegfriedPlugin.FILE_SUFFIX, RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED, payload, notify);
 
         // Update PREMIS files
-        JSONArray matches = (JSONArray) fileObject.get("matches");
-        if (matches.length() > 0) {
-          for (int j = 0; j < matches.length(); j++) {
-            JSONObject match = (JSONObject) matches.get(j);
-            String format = null;
-            String version = null;
-            String pronom = null;
-            String mime = null;
+        final JsonNode matches = file.get("matches");
+        for (JsonNode match : matches) {
+          String format = null;
+          String version = null;
+          String pronom = null;
+          String mime = null;
 
-            if (plugin.getVersion().startsWith("1.5") || plugin.getVersion().startsWith("1.6")) {
-              if (match.getString("ns").equalsIgnoreCase("pronom")) {
-                format = match.getString("format");
-                version = match.getString("version");
-                pronom = match.getString("id");
-                mime = match.getString("mime");
-              }
-            } else {
-              if (match.getString("id").equalsIgnoreCase("pronom")) {
-                format = match.getString("format");
-                version = match.getString("version");
-                pronom = match.getString("puid");
-                mime = match.getString("mime");
-              }
+          if (plugin.getVersion().startsWith("1.5") || plugin.getVersion().startsWith("1.6")) {
+            if (match.get("ns").textValue().equalsIgnoreCase("pronom")) {
+              format = match.get("format").textValue();
+              version = match.get("version").textValue();
+              pronom = match.get("id").textValue();
+              mime = match.get("mime").textValue();
             }
-            try {
-              Binary premisBin = model.retrievePreservationFile(aip.getId(), representation.getId(), fileDirectoryPath,
-                fileId);
-
-              File premisFile = PremisV3Utils.binaryToFile(premisBin.getContent(), false);
-              PremisV3Utils.updateFileFormat(premisFile, format, version, pronom, mime);
-
-              PreservationMetadataType type = PreservationMetadataType.FILE;
-              String id = IdUtils.getPreservationId(type, aip.getId(), representation.getId(), fileDirectoryPath,
-                fileId);
-
-              ContentPayload premisFilePayload = PremisV3Utils.fileToBinary(premisFile);
-              model.updatePreservationMetadata(id, type, aip.getId(), representation.getId(), fileDirectoryPath, fileId,
-                premisFilePayload, notify);
-            } catch (NotFoundException e) {
-              LOGGER.debug("Siegfried will not update PREMIS because it doesn't exist");
-            } catch (RODAException e) {
-              LOGGER.error("Siegfried will not update PREMIS due to an error", e);
+          } else {
+            if (match.get("id").textValue().equalsIgnoreCase("pronom")) {
+              format = match.get("format").textValue();
+              version = match.get("version").textValue();
+              pronom = match.get("puid").textValue();
+              mime = match.get("mime").textValue();
             }
+          }
+          try {
+            Binary premisBin = model.retrievePreservationFile(aip.getId(), representation.getId(), fileDirectoryPath,
+              fileId);
+
+            File premisFile = PremisV3Utils.binaryToFile(premisBin.getContent(), false);
+            PremisV3Utils.updateFileFormat(premisFile, format, version, pronom, mime);
+
+            PreservationMetadataType type = PreservationMetadataType.FILE;
+            String id = IdUtils.getPreservationId(type, aip.getId(), representation.getId(), fileDirectoryPath, fileId);
+
+            ContentPayload premisFilePayload = PremisV3Utils.fileToBinary(premisFile);
+            model.updatePreservationMetadata(id, type, aip.getId(), representation.getId(), fileDirectoryPath, fileId,
+              premisFilePayload, notify);
+          } catch (NotFoundException e) {
+            LOGGER.debug("Siegfried will not update PREMIS because it doesn't exist");
+          } catch (RODAException e) {
+            LOGGER.error("Siegfried will not update PREMIS due to an error", e);
           }
         }
       }
