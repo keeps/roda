@@ -34,6 +34,7 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiUtils;
+import org.roda.wui.api.v1.utils.CountRequest;
 import org.roda.wui.api.v1.utils.FindRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -156,6 +157,7 @@ public class IndexResource {
    *           if some error occurs.
    */
   @POST
+  @Path("/find")
   @Consumes({MediaType.APPLICATION_JSON})
   @Produces({MediaType.APPLICATION_JSON})
   @ApiOperation(value = "Find indexed resources.", notes = "Find indexed resources.", response = IsIndexed.class, responseContainer = "List")
@@ -176,6 +178,39 @@ public class IndexResource {
 
     } catch (final ClassNotFoundException e) {
       throw new InvalidParameterException("Invalid value for classToReturn '" + findRequest.classToReturn + "'", e);
+    }
+  }
+
+  /**
+   * Count indexed resources.
+   *
+   * @param countRequest
+   *          count parameters.
+   * @return a {@link Response} with the count.
+   * @throws RODAException
+   *           if some error occurs.
+   */
+  @POST
+  @Path("/count")
+  @Consumes({MediaType.APPLICATION_JSON})
+  @Produces({MediaType.APPLICATION_JSON})
+  @ApiOperation(value = "Count indexed resources.", notes = "Count indexed resources.", response = Long.class)
+  public <T extends IsIndexed> Response count(@ApiParam(value = "Count parameters") final CountRequest countRequest)
+    throws RODAException {
+    final String mediaType = ApiUtils.getMediaType(null, request);
+    final RodaUser user = UserUtility.getApiUser(request);
+
+    try {
+
+      @SuppressWarnings("unchecked")
+      final Class<T> classToReturn = (Class<T>) Class.forName(countRequest.classToReturn);
+
+      final long result = Browser.count(user, classToReturn, countRequest.filter);
+
+      return Response.ok(result, mediaType).build();
+
+    } catch (final ClassNotFoundException e) {
+      throw new InvalidParameterException("Invalid value for classToReturn '" + countRequest.classToReturn + "'", e);
     }
   }
 }

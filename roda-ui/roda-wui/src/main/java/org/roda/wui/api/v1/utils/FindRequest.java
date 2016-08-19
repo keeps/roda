@@ -1,7 +1,5 @@
 package org.roda.wui.api.v1.utils;
 
-import java.io.Serializable;
-
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
@@ -12,14 +10,10 @@ import org.roda.core.data.adapter.sublist.Sublist;
  * 
  * @author Rui Castro <rui.castro@gmail.com>
  */
-public class FindRequest implements Serializable {
+public class FindRequest extends CountRequest {
 
   private static final long serialVersionUID = 5997470558754294987L;
 
-  /** Class name of resources to return. */
-  public String classToReturn;
-  /** Filter. */
-  public Filter filter;
   /** Sorter. */
   public Sorter sorter;
   /** Sublist (paging). */
@@ -54,8 +48,7 @@ public class FindRequest implements Serializable {
    */
   public FindRequest(final String classToReturn, final Filter filter, final Sorter sorter, final Sublist sublist,
     final Facets facets, final boolean onlyActive) {
-    this.classToReturn = classToReturn;
-    this.filter = filter;
+    super(classToReturn, filter);
     this.sorter = sorter;
     this.sublist = sublist;
     this.facets = facets;
