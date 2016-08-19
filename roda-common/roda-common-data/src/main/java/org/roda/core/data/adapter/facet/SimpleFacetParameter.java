@@ -50,4 +50,8 @@ public class SimpleFacetParameter extends FacetParameter {
   public void setLimit(int limit) {
     this.limit = limit;
   }
+
+  public String toString() {
+    return "SimpleFacetParameter [ super=" + super.toString() + ", limit=" + this.limit + "]";
+  }
 }

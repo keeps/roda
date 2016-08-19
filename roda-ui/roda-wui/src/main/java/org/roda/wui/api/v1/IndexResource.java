@@ -12,10 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -37,6 +34,7 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiUtils;
+import org.roda.wui.api.v1.utils.FindRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +52,6 @@ import io.swagger.annotations.ApiParam;
 public class IndexResource {
   /** Logger. */
   private static final Logger LOGGER = LoggerFactory.getLogger(IndexResource.class);
-
   /** Default value for <i>start</i> parameter. */
   private static final int DEFAULT_START = 0;
   /** Default value for <i>limit</i> parameter. */
@@ -62,6 +59,7 @@ public class IndexResource {
   /** Default value for <i>onlyActive</i> parameter. */
   private static final boolean DEFAULT_ONLY_ACTIVE = true;
 
+  /** HTTP request. */
   @Context
   private HttpServletRequest request;
 
@@ -89,7 +87,8 @@ public class IndexResource {
    *           if some error occurs.
    */
   @GET
-  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @Consumes({MediaType.APPLICATION_JSON})
+  @Produces({MediaType.APPLICATION_JSON})
   @ApiOperation(value = "Find indexed resources.", notes = "Find indexed resources.", response = IsIndexed.class, responseContainer = "List")
   public <T extends IsIndexed> Response list(
     @ApiParam(value = "Class of resources to return", required = true, example = "org.roda.core.data.v2.ip.IndexedFile") @QueryParam(RodaConstants.API_QUERY_KEY_RETURN_CLASS) final String returnClass,
@@ -147,4 +146,36 @@ public class IndexResource {
     }
   }
 
+  /**
+   * Find indexed resources.
+   *
+   * @param findRequest
+   *          find parameters.
+   * @return a {@link Response} with the resources.
+   * @throws RODAException
+   *           if some error occurs.
+   */
+  @POST
+  @Consumes({MediaType.APPLICATION_JSON})
+  @Produces({MediaType.APPLICATION_JSON})
+  @ApiOperation(value = "Find indexed resources.", notes = "Find indexed resources.", response = IsIndexed.class, responseContainer = "List")
+  public <T extends IsIndexed> Response list(@ApiParam(value = "Find parameters") final FindRequest findRequest)
+    throws RODAException {
+    final String mediaType = ApiUtils.getMediaType(null, request);
+    final RodaUser user = UserUtility.getApiUser(request);
+
+    try {
+
+      @SuppressWarnings("unchecked")
+      final Class<T> classToReturn = (Class<T>) Class.forName(findRequest.classToReturn);
+
+      final IndexResult<T> result = Browser.find(classToReturn, findRequest.filter, findRequest.sorter,
+        findRequest.sublist, findRequest.facets, user, findRequest.onlyActive);
+
+      return Response.ok(result, mediaType).build();
+
+    } catch (final ClassNotFoundException e) {
+      throw new InvalidParameterException("Invalid value for classToReturn '" + findRequest.classToReturn + "'", e);
+    }
+  }
 }
