@@ -40,23 +40,26 @@ import org.roda.wui.api.v1.utils.ApiUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 /**
  * REST API resource Index.
  *
  * @author Rui Castro <rui.castro@gmail.com>
  */
-@Path(IndexResource.ENDPOINT)
-@Api(value = IndexResource.SWAGGER_ENDPOINT)
+@Path("/v1/index")
+@Api(value = "v1 index")
 public class IndexResource {
-  private static Logger LOGGER = LoggerFactory.getLogger(IndexResource.class);
+  /** Logger. */
+  private static final Logger LOGGER = LoggerFactory.getLogger(IndexResource.class);
 
-  public static final String ENDPOINT = "/v1/index";
-  public static final String SWAGGER_ENDPOINT = "v1 index";
-
+  /** Default value for <i>start</i> parameter. */
   private static final int DEFAULT_START = 0;
+  /** Default value for <i>limit</i> parameter. */
   private static final int DEFAULT_LIMIT = 100;
+  /** Default value for <i>onlyActive</i> parameter. */
   private static final boolean DEFAULT_ONLY_ACTIVE = true;
 
   @Context
@@ -101,6 +104,7 @@ public class IndexResource {
     final RodaUser user = UserUtility.getApiUser(request);
     try {
 
+      @SuppressWarnings("unchecked")
       final Class<T> classToReturn = (Class<T>) Class.forName(returnClass);
 
       final Filter filter = new Filter();
