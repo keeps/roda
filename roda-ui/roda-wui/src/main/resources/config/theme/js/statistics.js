@@ -5,7 +5,6 @@ $(function () {
     // create an observer instance
     var observer = new MutationObserver(function (mutations) {
         mutations.forEach(function (mutation) {
-            console.log(mutation.type);
             $(".chart").each(function () {
                 executeFunctionByName(window, $(this).data("function"), this);
             });
@@ -43,7 +42,7 @@ function singleFacetPieChart(element) {
             url: "/api/v1/index?returnClass=" + returnClass + "&facet=" + facet + "&start=0&limit=0&onlyActive=false"
         }).done(function (data) {
             var values = data.facetResults[0].values;
-            var options = {
+            element.chart = new Chart(element, {
                 type: 'pie',
                 data: {
                     labels: values.map(function (value) {
@@ -58,15 +57,119 @@ function singleFacetPieChart(element) {
                         })
                     }]
                 }
-            };
-            element.chart = new Chart(element, options);
-            console.log("element.chart = ", element.chart);
+            });
         });
     } else {
         // element.chart != null
-        console.log("element.chart already exists");
     }
 }
+
+function singleFacetLineChart(element) {
+    if (element.chart == null) {
+        var returnClass = $(element).data("class");
+        var facet = $(element).data("facet");
+        $.ajax({
+            url: "/api/v1/index?returnClass=" + returnClass + "&facet=" + facet + "&start=0&limit=0&onlyActive=false"
+        }).done(function (data) {
+            var values = data.facetResults[0].values;
+            element.chart = new Chart(element, {
+                type: 'line',
+                data: {
+                    labels: values.map(function (value) { return value.label; }),
+                    datasets: [
+                        {
+                            label: facet,
+                            data: values.map(function (value) { return value.count; }),
+                            fill: false,
+                            lineTension: 0.1,
+                            backgroundColor: "rgba(75,192,192,0.4)",
+                            borderColor: "rgba(75,192,192,1)",
+                            borderCapStyle: 'butt',
+                            borderDash: [],
+                            borderDashOffset: 0.0,
+                            borderJoinStyle: 'miter',
+                            pointBorderColor: "rgba(75,192,192,1)",
+                            pointBackgroundColor: "#fff",
+                            pointBorderWidth: 1,
+                            pointHoverRadius: 5,
+                            pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                            pointHoverBorderColor: "rgba(220,220,220,1)",
+                            pointHoverBorderWidth: 2,
+                            pointRadius: 1,
+                            pointHitRadius: 10,
+                            spanGaps: false
+                        }
+                    ]
+                }
+            });
+        });
+    } else {
+        // element.chart != null
+    }
+}
+
+function singleFacetBarChart(element) {
+    if (element.chart == null) {
+        var returnClass = $(element).data("class");
+        var facet = $(element).data("facet");
+        $.ajax({
+            url: "/api/v1/index?returnClass=" + returnClass + "&facet=" + facet + "&start=0&limit=0&onlyActive=false"
+        }).done(function (data) {
+            var values = data.facetResults[0].values;
+            element.chart = new Chart(element, {
+                type: 'bar',
+                data: {
+                    labels: values.map(function (value) {
+                        return value.label;
+                    }),
+                    datasets: [{
+                        label: facet,
+                        data: values.map(function (value) {
+                            return value.count;
+                        }),
+                        backgroundColor: values.map(function () {
+                            return rgbaRandomColor();
+                        }),
+                        borderWidth: 1
+                    }]
+                }
+            });
+        });
+    } else {
+        // element.chart != null
+    }
+}
+
+/*
+function multipleFacetsRadarChart(element) {
+    if (element.chart == null) {
+        var returnClass = $(element).data("class");
+        var facets = $(element).data("facets").split(",");
+        var facetParams = facets.map(function(facet) { return "facet=" + facet }).join("&");
+        $.ajax({
+            url: "/api/v1/index?returnClass=" + returnClass + "&" + facetParams + "&start=0&limit=0&onlyActive=false"
+        }).done(function (data) {
+            var values = data.facetResults[0].values;
+            var datasets = data.facetResults.map(
+                function(facetResult) {
+                    return {
+
+                    };
+                }
+            );
+            element.chart = new Chart(element, {
+                type: 'radar',
+                data: {
+                    labels: values.map(function (value) { return value.label; }),
+                    datasets: datasets
+                }
+            });
+        });
+    } else {
+        // element.chart != null
+    }
+}
+*/
 
 /**
  * Randomly generate an aesthetically-pleasing color palette.

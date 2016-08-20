@@ -1,19 +1,49 @@
 <div id="statistics" class="static-page max-width">
     <h1>Statistics</h1>
 
-    <h2>File format distribution</h2>
+    <h2>Line charts</h2>
+    <h3>Description level distribution</h3>
+    <canvas class="chart" data-function="singleFacetLineChart"
+            data-class="org.roda.core.data.v2.ip.IndexedAIP"
+            data-facet="level"></canvas>
+
+    <h3>Log entries per component distribution</h3>
+    <canvas class="chart" data-function="singleFacetLineChart"
+            data-class="org.roda.core.data.v2.log.LogEntry"
+            data-facet="actionComponent"></canvas>
+
+    <h2>Bar charts</h2>
+    <h3>Description level distribution</h3>
+    <canvas class="chart" data-function="singleFacetBarChart"
+            data-class="org.roda.core.data.v2.ip.IndexedAIP"
+            data-facet="level"></canvas>
+
+    <h3>Log entries per component distribution</h3>
+    <canvas class="chart" data-function="singleFacetBarChart"
+            data-class="org.roda.core.data.v2.log.LogEntry"
+            data-facet="actionComponent"></canvas>
+
+    <!--
+    <h2>Radar charts</h2>
+    <h3>File formats</h3>
+    <canvas class="chart" data-function="multipleFacetsRadarChart"
+            data-class="org.roda.core.data.v2.ip.IndexedFile"
+            data-facets="fileFormat,formatMimetype,formatPronom"></canvas>
+    -->
+
+    <h2>Pie charts</h2>
+    <h3>File format distribution</h3>
     <canvas class="chart" data-function="singleFacetPieChart"
             data-class="org.roda.core.data.v2.ip.IndexedFile"
             data-facet="fileFormat"></canvas>
 
-    <h2>Mimetype distribution</h2>
+    <h3>Mimetype distribution</h3>
     <canvas class="chart" data-function="singleFacetPieChart"
             data-class="org.roda.core.data.v2.ip.IndexedFile"
             data-facet="formatMimetype"></canvas>
 
-    <h2>Pronom format distribution</h2>
+    <h3>Pronom format distribution</h3>
     <canvas class="chart" data-function="singleFacetPieChart"
             data-class="org.roda.core.data.v2.ip.IndexedFile"
             data-facet="formatPronom"></canvas>
-
 </div>
