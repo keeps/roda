@@ -9,6 +9,7 @@ package org.roda.core.plugins.orchestrate.akka;
 
 import java.util.Optional;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
@@ -97,22 +98,14 @@ public class AkkaJobActor extends AkkaBaseActor {
     }
   }
 
-  private void runOnAll(Job job, Plugin<?> plugin, ActorRef jobStateInfoActor) throws GenericException {
+  private <T extends IsRODAObject> void runOnAll(Job job, Plugin<T> plugin, ActorRef jobStateInfoActor)
+    throws GenericException {
     // get class
     Class<IsRODAObject> sourceObjectsClass = JobsHelper
       .getSelectedClassFromString(job.getSourceObjects().getSelectedClass());
 
-    if (AIP.class.getName().equals(sourceObjectsClass.getName())) {
-      super.getPluginOrchestrator().runPluginOnAllAIPs(jobStateInfoActor, (Plugin<AIP>) plugin);
-    } else if (Representation.class.getName().equals(sourceObjectsClass.getName())) {
-      super.getPluginOrchestrator().runPluginOnAllRepresentations(jobStateInfoActor, (Plugin<Representation>) plugin);
-    } else if (File.class.getName().equals(sourceObjectsClass.getName())) {
-      super.getPluginOrchestrator().runPluginOnAllFiles(jobStateInfoActor, (Plugin<File>) plugin);
-    } else {
-      LOGGER.error("Error executing job on unknown source objects class '{}'", sourceObjectsClass.getName());
-      throw new GenericException(
-        "Error executing job on unknown source objects class '" + sourceObjectsClass.getName() + "'");
-    }
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllObjects(jobStateInfoActor, plugin,
+      (Class<T>) sourceObjectsClass);
   }
 
   private void runFromList(Job job, Plugin<?> plugin, ActorRef jobStateInfoActor) throws GenericException {

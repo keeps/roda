@@ -171,7 +171,7 @@ public class SolrUtils {
     throws NotFoundException, GenericException {
     T ret;
     try {
-      SolrDocument doc = index.getById(getIndexName(classToRetrieve), id);
+      SolrDocument doc = index.getById(getIndexName(classToRetrieve).get(0), id);
       if (doc != null) {
         ret = solrDocumentTo(classToRetrieve, doc);
       } else {
@@ -187,7 +187,7 @@ public class SolrUtils {
     throws NotFoundException, GenericException {
     List<T> ret = new ArrayList<>();
     try {
-      SolrDocumentList docs = index.getById(getIndexName(classToRetrieve), id);
+      SolrDocumentList docs = index.getById(getIndexName(classToRetrieve).get(0), id);
       for (SolrDocument doc : docs) {
         ret.add(solrDocumentTo(classToRetrieve, doc));
       }
@@ -214,7 +214,7 @@ public class SolrUtils {
     parseAndConfigureFacets(facets, query);
 
     try {
-      QueryResponse response = index.query(getIndexName(classToRetrieve), query);
+      QueryResponse response = index.query(getIndexName(classToRetrieve).get(0), query);
       ret = queryResponseToIndexResult(response, classToRetrieve, facets);
     } catch (SolrServerException | IOException e) {
       throw new GenericException("Could not query index", e);
@@ -240,7 +240,7 @@ public class SolrUtils {
     }
 
     try {
-      QueryResponse response = index.query(getIndexName(classToRetrieve), query);
+      QueryResponse response = index.query(getIndexName(classToRetrieve).get(0), query);
       ret = queryResponseToIndexResult(response, classToRetrieve, facets);
     } catch (SolrServerException | IOException e) {
       throw new GenericException("Could not query index", e);
@@ -338,52 +338,56 @@ public class SolrUtils {
     return ret;
   }
 
-  public static <T extends Serializable> String getIndexName(Class<T> resultClass) throws GenericException {
-    String indexName;
-    if (resultClass.equals(AIP.class)) {
-      indexName = RodaConstants.INDEX_AIP;
-    } else if (resultClass.equals(IndexedAIP.class)) {
-      indexName = RodaConstants.INDEX_AIP;
-    } else if (resultClass.equals(Representation.class)) {
-      indexName = RodaConstants.INDEX_REPRESENTATION;
-    } else if (resultClass.equals(IndexedRepresentation.class)) {
-      indexName = RodaConstants.INDEX_REPRESENTATION;
+  public static <T extends Serializable> List<String> getIndexName(Class<T> resultClass) throws GenericException {
+    List<String> indexNames = new ArrayList<>();
+
+    // the first index name must be the "main" one
+    if (resultClass.equals(AIP.class) || resultClass.equals(IndexedAIP.class)) {
+      indexNames.add(RodaConstants.INDEX_AIP);
+      indexNames.add(RodaConstants.INDEX_REPRESENTATION);
+      indexNames.add(RodaConstants.INDEX_FILE);
+      indexNames.add(RodaConstants.INDEX_PRESERVATION_EVENTS);
+      indexNames.add(RodaConstants.INDEX_PRESERVATION_AGENTS);
+    } else if (resultClass.equals(Representation.class) || resultClass.equals(IndexedRepresentation.class)) {
+      indexNames.add(RodaConstants.INDEX_REPRESENTATION);
     } else if (resultClass.equals(IndexedPreservationEvent.class)) {
-      indexName = RodaConstants.INDEX_PRESERVATION_EVENTS;
+      indexNames.add(RodaConstants.INDEX_PRESERVATION_EVENTS);
     } else if (resultClass.equals(IndexedPreservationAgent.class)) {
-      indexName = RodaConstants.INDEX_PRESERVATION_AGENTS;
+      indexNames.add(RodaConstants.INDEX_PRESERVATION_AGENTS);
     } else if (resultClass.equals(LogEntry.class)) {
-      indexName = RodaConstants.INDEX_ACTION_LOG;
+      indexNames.add(RodaConstants.INDEX_ACTION_LOG);
     } else if (resultClass.equals(Report.class)) {
-      indexName = RodaConstants.INDEX_JOB_REPORT;
+      indexNames.add(RodaConstants.INDEX_JOB_REPORT);
     } else if (resultClass.equals(User.class)) {
       LOGGER.warn("Use {} instead of {}", RODAMember.class.getName(), User.class.getName());
-      indexName = RodaConstants.INDEX_MEMBERS;
+      indexNames.add(RodaConstants.INDEX_MEMBERS);
     } else if (resultClass.equals(Group.class)) {
       LOGGER.warn("Use {} instead of {}", RODAMember.class.getName(), Group.class.getName());
-      indexName = RodaConstants.INDEX_MEMBERS;
+      indexNames.add(RodaConstants.INDEX_MEMBERS);
     } else if (resultClass.equals(RODAMember.class)) {
-      indexName = RodaConstants.INDEX_MEMBERS;
+      indexNames.add(RodaConstants.INDEX_MEMBERS);
     } else if (resultClass.equals(TransferredResource.class)) {
-      indexName = RodaConstants.INDEX_TRANSFERRED_RESOURCE;
+      indexNames.add(RodaConstants.INDEX_TRANSFERRED_RESOURCE);
     } else if (resultClass.equals(Job.class)) {
-      indexName = RodaConstants.INDEX_JOB;
+      indexNames.add(RodaConstants.INDEX_JOB);
+      indexNames.add(RodaConstants.INDEX_JOB_REPORT);
     } else if (resultClass.equals(IndexedFile.class)) {
-      indexName = RodaConstants.INDEX_FILE;
+      indexNames.add(RodaConstants.INDEX_FILE);
     } else if (resultClass.equals(Risk.class) || resultClass.equals(IndexedRisk.class)) {
-      indexName = RodaConstants.INDEX_RISK;
+      indexNames.add(RodaConstants.INDEX_RISK);
     } else if (resultClass.equals(Agent.class)) {
-      indexName = RodaConstants.INDEX_AGENT;
+      indexNames.add(RodaConstants.INDEX_AGENT);
     } else if (resultClass.equals(Format.class)) {
-      indexName = RodaConstants.INDEX_FORMAT;
+      indexNames.add(RodaConstants.INDEX_FORMAT);
     } else if (resultClass.equals(Notification.class)) {
-      indexName = RodaConstants.INDEX_NOTIFICATION;
+      indexNames.add(RodaConstants.INDEX_NOTIFICATION);
     } else if (resultClass.equals(RiskIncidence.class)) {
-      indexName = RodaConstants.INDEX_RISK_INCIDENCE;
+      indexNames.add(RodaConstants.INDEX_RISK_INCIDENCE);
     } else {
       throw new GenericException("Cannot find class index name: " + resultClass.getName());
     }
-    return indexName;
+
+    return indexNames;
   }
 
   private static <T> boolean hasPermissionFilters(Class<T> resultClass) throws GenericException {
@@ -1049,7 +1053,7 @@ public class SolrUtils {
   public static void commit(SolrClient index, List<Class<? extends IsIndexed>> resultClasses) throws GenericException {
     List<String> collections = new ArrayList<>();
     for (Class<? extends IsIndexed> resultClass : resultClasses) {
-      collections.add(getIndexName(resultClass));
+      collections.add(getIndexName(resultClass).get(0));
     }
 
     commit(index, collections.toArray(new String[] {}));
@@ -1064,7 +1068,7 @@ public class SolrUtils {
   public static <T extends IsIndexed> void create(SolrClient index, Class<T> classToCreate, T instance)
     throws GenericException {
     try {
-      index.add(getIndexName(classToCreate), toSolrDocument(classToCreate, instance));
+      index.add(getIndexName(classToCreate).get(0), toSolrDocument(classToCreate, instance));
     } catch (SolrServerException | IOException | NotSupportedException e) {
       throw new GenericException("Error adding instance to index", e);
     }
@@ -2359,7 +2363,7 @@ public class SolrUtils {
     query.setParam("suggest.q", queryString);
 
     try {
-      QueryResponse response = index.query(getIndexName(classToRetrieve), query);
+      QueryResponse response = index.query(getIndexName(classToRetrieve).get(0), query);
       return response.getSuggesterResponse().getSuggestedTerms().get(dictionaryName);
     } catch (SolrServerException | IOException e) {
       throw new GenericException("Could not get suggestions", e);
@@ -2396,7 +2400,7 @@ public class SolrUtils {
   public static <T extends IsIndexed> void delete(SolrClient index, Class<T> classToDelete, List<String> ids)
     throws GenericException {
     try {
-      index.deleteById(getIndexName(classToDelete), ids);
+      index.deleteById(getIndexName(classToDelete).get(0), ids);
     } catch (SolrServerException | IOException e) {
       throw new GenericException("Could not delete items", e);
     }
@@ -2405,7 +2409,7 @@ public class SolrUtils {
   public static <T extends IsIndexed> void delete(SolrClient index, Class<T> classToDelete, Filter filter)
     throws GenericException, RequestNotValidException {
     try {
-      index.deleteByQuery(getIndexName(classToDelete), parseFilter(filter));
+      index.deleteByQuery(getIndexName(classToDelete).get(0), parseFilter(filter));
     } catch (SolrServerException | IOException e) {
       throw new GenericException("Could not delete items", e);
     }

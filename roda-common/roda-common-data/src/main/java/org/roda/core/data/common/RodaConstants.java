@@ -141,12 +141,14 @@ public final class RodaConstants {
   public static final String API_QUERY_VALUE_LANG_EN_US = "en_US";
   public static final String API_QUERY_KEY_START = "start";
   public static final String API_QUERY_KEY_LIMIT = "limit";
+  public static final String API_QUERY_IS_ORIGINAL = "isOriginal";
   // "http path param" related strings
   public static final String API_PATH_PARAM_AIP_ID = "aip_id";
   public static final String API_PATH_PARAM_REPRESENTATION_ID = "representation_id";
   public static final String API_PATH_PARAM_REPRESENTATION_UUID = "representation_uuid";
   public static final String API_PATH_PARAM_FILE_UUID = "file_uuid";
   public static final String API_PATH_PARAM_METADATA_ID = "metadata_id";
+  public static final String API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID = "transferred_resource_uuid";
   public static final String API_QUERY_PARAM_VERSION = "version";
   // http headers used
   public static final String API_HTTP_HEADER_ACCEPT = "Accept";
@@ -413,6 +415,7 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_STRING_VALUE = "parameter.string_value";
   public static final String PLUGIN_PARAMS_BOOLEAN_VALUE = "parameter.boolean_value";
   public static final String PLUGIN_PARAMS_CLEAR_INDEXES = "parameter.clear_indexes";
+  public static final String PLUGIN_PARAMS_REINDEX_ALL = "parameter.reindex_all";
   public static final String PLUGIN_PARAMS_OBJECT_CLASS = "parameter.object_class";
   public static final String PLUGIN_PARAMS_RECURSIVE_LISTING = "parameter.recursive_listing";
   public static final String PLUGIN_PARAMS_CLASS_CANONICAL_NAME = "parameter.class_canonical_name";

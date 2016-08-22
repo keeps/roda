@@ -12,15 +12,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.util.DateUtil;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
@@ -29,6 +32,7 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
@@ -44,6 +48,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -209,7 +214,7 @@ public class IndexService {
   }
 
   public void reindexJob(Job job) {
-    observer.jobCreatedOrUpdated(job);
+    observer.jobCreatedOrUpdated(job, true);
   }
 
   public void reindexJobReport(Report jobReport) {
@@ -224,7 +229,7 @@ public class IndexService {
     try {
       reindex(storage, Risk.class);
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
-      | IOException e) {
+      | IOException | IsStillUpdatingException e) {
       LOGGER.error("Error reindexing risks");
     }
   }
@@ -245,27 +250,54 @@ public class IndexService {
     try {
       reindex(storage, Format.class);
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
-      | IOException e) {
+      | IOException | IsStillUpdatingException e) {
       LOGGER.error("Error reindexing formats");
     }
   }
 
-  public <T extends IsRODAObject> void reindex(StorageService storage, Class<T> objectClass)
-    throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException, IOException {
+  public <T extends IsRODAObject> void reindex(StorageService storage, Class<T> objectClass) throws NotFoundException,
+    GenericException, AuthorizationDeniedException, RequestNotValidException, IOException, IsStillUpdatingException {
     CloseableIterable<Resource> listResourcesUnderDirectory = null;
     try {
-      StoragePath containerPath = ModelUtils.getContainerPath(objectClass);
-      listResourcesUnderDirectory = storage.listResourcesUnderContainer(containerPath, false);
-
-      for (Resource resource : listResourcesUnderDirectory) {
-        if (!resource.isDirectory()) {
-          Binary binary = (Binary) resource;
-          InputStream inputStream = binary.getContent().createInputStream();
-          String jsonString = IOUtils.toString(inputStream, RodaConstants.DEFAULT_ENCODING);
-          T object = JsonUtils.getObjectFromJson(jsonString, objectClass);
-          IOUtils.closeQuietly(inputStream);
-          reindex(objectClass, object);
+      if (AIP.class.equals(objectClass)) {
+        reindexAIPs();
+      } else if (TransferredResource.class.equals(objectClass)) {
+        RodaCoreFactory.getTransferredResourcesScanner().updateAllTransferredResources(null, true);
+      } else {
+        StoragePath containerPath = ModelUtils.getContainerPath(objectClass);
+        try {
+          listResourcesUnderDirectory = storage.listResourcesUnderContainer(containerPath, false);
+          for (Resource resource : listResourcesUnderDirectory) {
+            if (!resource.isDirectory()) {
+              Binary binary = (Binary) resource;
+              InputStream inputStream = binary.getContent().createInputStream();
+              String jsonString = IOUtils.toString(inputStream, RodaConstants.DEFAULT_ENCODING);
+              T object = JsonUtils.getObjectFromJson(jsonString, objectClass);
+              IOUtils.closeQuietly(inputStream);
+              reindex(objectClass, object);
+            }
+          }
+        } catch (NoSuchFileException | NotFoundException e) {
+          // do nothing
         }
+      }
+    } finally {
+      IOUtils.closeQuietly(listResourcesUnderDirectory);
+    }
+  }
+
+  public <T extends Serializable> void reindex(StorageService storage, T object) throws NotFoundException,
+    GenericException, AuthorizationDeniedException, RequestNotValidException, IOException, IsStillUpdatingException {
+    CloseableIterable<Resource> listResourcesUnderDirectory = null;
+    try {
+      if (AIP.class.equals(object.getClass())) {
+        reindexAIP((AIP) object);
+      } else if (TransferredResource.class.equals(object.getClass())) {
+        TransferredResource resource = (TransferredResource) object;
+        String folderUUID = UUID.nameUUIDFromBytes(resource.getParentPath().getBytes()).toString();
+        RodaCoreFactory.getTransferredResourcesScanner().updateAllTransferredResources(folderUUID, true);
+      } else {
+        reindex((Class<T>) object.getClass(), object);
       }
     } finally {
       IOUtils.closeQuietly(listResourcesUnderDirectory);
@@ -277,7 +309,9 @@ public class IndexService {
   }
 
   public <T extends Serializable> void reindex(Class<T> objectClass, T object) {
-    if (Agent.class.equals(objectClass)) {
+    if (AIP.class.equals(objectClass) || IndexedAIP.class.equals(objectClass)) {
+      reindexAIP(AIP.class.cast(object));
+    } else if (Agent.class.equals(objectClass)) {
       reindexAgent(Agent.class.cast(object));
     } else if (Format.class.equals(objectClass)) {
       reindexFormat(Format.class.cast(object));
@@ -287,6 +321,10 @@ public class IndexService {
       reindexRisk(Risk.class.cast(object));
     } else if (RiskIncidence.class.equals(objectClass)) {
       reindexRiskIncidence(RiskIncidence.class.cast(object));
+    } else if (LogEntry.class.equals(objectClass)) {
+      reindexActionLog(LogEntry.class.cast(object));
+    } else if (Job.class.equals(objectClass)) {
+      reindexJob(Job.class.cast(object));
     } else {
       LOGGER.error("Error trying to reindex an unconfigured object class: {}", objectClass.getName());
     }
@@ -356,11 +394,23 @@ public class IndexService {
     }
   }
 
+  public void clearIndexes(List<String> indexNames) throws GenericException {
+    for (String indexName : indexNames) {
+      clearIndex(indexName);
+    }
+  }
+
   public void optimizeIndex(String indexName) throws GenericException {
     try {
       index.optimize(indexName);
     } catch (SolrServerException | IOException e) {
       throw new GenericException("Error while optimizing indexes", e);
+    }
+  }
+
+  public void optimizeIndexes(List<String> indexNames) throws GenericException {
+    for (String indexName : indexNames) {
+      optimizeIndex(indexName);
     }
   }
 

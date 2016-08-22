@@ -238,7 +238,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
           incidence.setRiskId(riskId);
           incidence.setAipId(representation.getAipId());
           incidence.setRepresentationId(representation.getId());
-          incidence.setObjectClass(AIP.class.getSimpleName());
+          incidence.setObjectClass(Representation.class.getSimpleName());
           incidence.setStatus(INCIDENCE_STATUS.UNMITIGATED);
           incidence.setSeverity(SEVERITY_LEVEL.valueOf(severity));
           model.createRiskIncidence(incidence, false);
@@ -284,7 +284,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
           incidence.setRepresentationId(file.getRepresentationId());
           incidence.setFilePath(file.getPath());
           incidence.setFileId(file.getId());
-          incidence.setObjectClass(AIP.class.getSimpleName());
+          incidence.setObjectClass(File.class.getSimpleName());
           incidence.setStatus(INCIDENCE_STATUS.UNMITIGATED);
           incidence.setSeverity(SEVERITY_LEVEL.valueOf(severity));
           model.createRiskIncidence(incidence, false);

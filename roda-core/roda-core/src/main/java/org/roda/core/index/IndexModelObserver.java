@@ -32,6 +32,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
@@ -69,6 +70,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.Directory;
+import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -710,8 +712,44 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   @Override
-  public void jobCreatedOrUpdated(Job job) {
+  public void jobCreatedOrUpdated(Job job, boolean reindexJobReports) {
     addDocumentToIndex(Job.class, job);
+
+    if (reindexJobReports) {
+      indexJobReports(job);
+    }
+  }
+
+  private void indexJobReports(Job job) {
+    StorageService storage = RodaCoreFactory.getStorageService();
+    CloseableIterable<Resource> listResourcesUnderDirectory = null;
+    try {
+      boolean recursive = true;
+      listResourcesUnderDirectory = storage
+        .listResourcesUnderDirectory(ModelUtils.getJobReportsStoragePath(job.getId()), recursive);
+
+      if (listResourcesUnderDirectory != null) {
+        for (Resource resource : listResourcesUnderDirectory) {
+          if (!resource.isDirectory()) {
+            try {
+              Binary binary = storage.getBinary(resource.getStoragePath());
+              InputStream inputStream = binary.getContent().createInputStream();
+              Report objectFromJson = JsonUtils.getObjectFromJson(inputStream, Report.class);
+              IOUtils.closeQuietly(inputStream);
+              RodaCoreFactory.getIndexService().reindexJobReport(objectFromJson);
+            } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
+              | IOException e) {
+              LOGGER.error("Error getting report json from binary", e);
+            }
+          }
+        }
+      }
+
+    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
+      LOGGER.error("Error reindexing job reports", e);
+    } finally {
+      IOUtils.closeQuietly(listResourcesUnderDirectory);
+    }
   }
 
   @Override

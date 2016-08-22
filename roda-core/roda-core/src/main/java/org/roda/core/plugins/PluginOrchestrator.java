@@ -37,11 +37,7 @@ public interface PluginOrchestrator {
 
   public void runPluginOnFiles(Object context, Plugin<File> plugin, List<String> uuids);
 
-  public void runPluginOnAllAIPs(Object context, Plugin<AIP> plugin);
-
-  public void runPluginOnAllRepresentations(Object context, Plugin<Representation> plugin);
-
-  public void runPluginOnAllFiles(Object context, Plugin<File> plugin);
+  public <T extends IsRODAObject> void runPluginOnAllObjects(Object context, Plugin<T> plugin, Class<T> objectClass);
 
   public void runPluginOnTransferredResources(Object context, Plugin<TransferredResource> plugin, List<String> uuids);
 

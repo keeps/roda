@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -232,22 +233,23 @@ public class PluginParameterPanel extends Composite {
     objectBox.addStyleName("form-selectbox");
     objectBox.addStyleName("form-textbox-small");
 
-    BrowserService.Util.getInstance().retrieveReindexPluginObjectClasses(new AsyncCallback<Set<Class>>() {
+    BrowserService.Util.getInstance()
+      .retrieveReindexPluginObjectClasses(new AsyncCallback<Set<Pair<String, String>>>() {
 
-      @Override
-      public void onFailure(Throwable caught) {
-        // do nothing
-      }
-
-      @Override
-      public void onSuccess(Set<Class> result) {
-        for (Class objectClass : result) {
-          objectBox.addItem(objectClass.getSimpleName(), objectClass.getName());
+        @Override
+        public void onFailure(Throwable caught) {
+          // do nothing
         }
 
-        value = objectBox.getSelectedValue();
-      }
-    });
+        @Override
+        public void onSuccess(Set<Pair<String, String>> result) {
+          for (Pair<String, String> classNames : result) {
+            objectBox.addItem(classNames.getFirst(), classNames.getSecond());
+          }
+
+          value = objectBox.getSelectedValue();
+        }
+      });
 
     objectBox.addChangeHandler(new ChangeHandler() {
       @Override

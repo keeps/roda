@@ -498,6 +498,14 @@ public class BrowserHelper {
     }
   }
 
+  protected static void validateListTransferredResourcesReportsParams(String acceptFormat)
+    throws RequestNotValidException {
+    if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)) {
+      throw new RequestNotValidException("Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT
+        + "' value. Expected values: " + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON));
+    }
+  }
+
   protected static StreamResponse listAIPDescriptiveMetadata(String aipId, String start, String limit,
     String acceptFormat)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
@@ -615,6 +623,7 @@ public class BrowserHelper {
       ret = new StreamResponse(filename, mediaType, stream);
 
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)) {
+
       AIP aip = model.retrieveAIP(aipId);
       List<DescriptiveMetadata> resultList = aip.getDescriptiveMetadata().stream()
         .filter(dm -> dm.getId().equals(metadataId)).collect(Collectors.toList());
@@ -2289,6 +2298,94 @@ public class BrowserHelper {
 
   public static void updateRiskIncidence(RiskIncidence incidence) throws GenericException {
     RodaCoreFactory.getModelService().updateRiskIncidence(incidence, true);
+  }
+
+  protected static StreamResponse listTransferredResourcesReports(String resourceId, String start, String limit,
+    boolean isOriginal, String acceptFormat)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
+    int startInt = pagingParams.getFirst();
+    int limitInt = pagingParams.getSecond();
+
+    IndexService indexService = RodaCoreFactory.getIndexService();
+    Filter filter = new Filter();
+    filter.add(
+      new SimpleFilterParameter(RodaConstants.JOB_REPORT_SOURCE_OBJECT_CLASS, TransferredResource.class.getName()));
+
+    if (isOriginal) {
+      filter.add(new SimpleFilterParameter(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ORIGINAL_ID, resourceId));
+    } else {
+      filter.add(new SimpleFilterParameter(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID, resourceId));
+    }
+
+    int reportCounter = indexService.count(Report.class, filter).intValue();
+    int endInt = limitInt == -1 ? reportCounter : (limitInt > reportCounter ? reportCounter : limitInt);
+
+    Sorter sorter = new Sorter(new SortParameter(RodaConstants.JOB_REPORT_DATE_UPDATE, true));
+    IndexResult<Report> indexReports = indexService.find(Report.class, filter, sorter, new Sublist(startInt, endInt));
+    List<Report> reports = indexReports.getResults();
+
+    if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)) {
+      String json = JsonUtils.getJsonFromObject(reports);
+
+      String filename = "";
+      String mediaType = MediaType.APPLICATION_JSON;
+      StreamingOutput stream = new StreamingOutput() {
+        @Override
+        public void write(OutputStream os) throws IOException, WebApplicationException {
+          InputStream inputStream = IOUtils.toInputStream(json, "UTF-8");
+          try {
+            IOUtils.copy(inputStream, os);
+          } finally {
+            IOUtils.closeQuietly(inputStream);
+          }
+        }
+      };
+      return new StreamResponse(filename, mediaType, stream);
+    }
+
+    return null;
+  }
+
+  protected static StreamResponse listTransferredResourcesLastReport(String resourceId, boolean isOriginal,
+    String acceptFormat)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+
+    Filter filter = new Filter();
+    filter.add(
+      new SimpleFilterParameter(RodaConstants.JOB_REPORT_SOURCE_OBJECT_CLASS, TransferredResource.class.getName()));
+
+    if (isOriginal) {
+      filter.add(new SimpleFilterParameter(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ORIGINAL_ID, resourceId));
+    } else {
+      filter.add(new SimpleFilterParameter(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID, resourceId));
+    }
+
+    Sorter sorter = new Sorter(new SortParameter(RodaConstants.JOB_REPORT_DATE_UPDATE, true));
+    IndexResult<Report> indexReports = RodaCoreFactory.getIndexService().find(Report.class, filter, sorter,
+      new Sublist(0, 1));
+    List<Report> reports = indexReports.getResults();
+
+    if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)) {
+      String json = JsonUtils.getJsonFromObject(reports.get(0));
+
+      String filename = "";
+      String mediaType = MediaType.APPLICATION_JSON;
+      StreamingOutput stream = new StreamingOutput() {
+        @Override
+        public void write(OutputStream os) throws IOException, WebApplicationException {
+          InputStream inputStream = IOUtils.toInputStream(json, "UTF-8");
+          try {
+            IOUtils.copy(inputStream, os);
+          } finally {
+            IOUtils.closeQuietly(inputStream);
+          }
+        }
+      };
+      return new StreamResponse(filename, mediaType, stream);
+    }
+
+    return null;
   }
 
 }

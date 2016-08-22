@@ -265,148 +265,44 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void runPluginOnAllAIPs(Object context, Plugin<AIP> plugin) {
+  public <T extends IsRODAObject> void runPluginOnAllObjects(Object context, Plugin<T> plugin, Class<T> objectClass) {
     try {
       LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
       ActorRef jobStateInfoActor = (ActorRef) context;
       int blockSize = JobsHelper.getBlockSize();
-      CloseableIterable<OptionalWithCause<AIP>> aips = model.listAIPs();
-      Iterator<OptionalWithCause<AIP>> iter = aips.iterator();
-      Plugin<AIP> innerPlugin;
+      CloseableIterable<OptionalWithCause<T>> objects = model.list(objectClass);
+      Iterator<OptionalWithCause<T>> iter = objects.iterator();
+      Plugin<T> innerPlugin;
 
       jobStateInfoActor.tell(new Messages.PluginBeforeAllExecuteIsReady<>(plugin), ActorRef.noSender());
 
-      List<AIP> block = new ArrayList<AIP>();
+      List<T> block = new ArrayList<T>();
       while (iter.hasNext()) {
         if (block.size() == blockSize) {
-          innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, AIP.class, blockSize);
+
+          innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, objectClass, blockSize);
           jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, block), ActorRef.noSender());
           block = new ArrayList<>();
         }
-        OptionalWithCause<AIP> nextAIP = iter.next();
-        if (nextAIP.isPresent()) {
-          block.add(nextAIP.get());
+
+        OptionalWithCause<T> nextObject = iter.next();
+        if (nextObject.isPresent()) {
+          block.add(nextObject.get());
         } else {
-          LOGGER.error("Cannot process AIP", nextAIP.getCause());
+          LOGGER.error("Cannot process object", nextObject.getCause());
         }
       }
 
       if (!block.isEmpty()) {
-        innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, AIP.class, block.size());
+        innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, objectClass, block.size());
         jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, block), ActorRef.noSender());
       }
 
       jobStateInfoActor.tell(new Messages.JobInitEnded(), ActorRef.noSender());
-
-      IOUtils.closeQuietly(aips);
-
-    } catch (Exception e) {
-      LOGGER.error("Error running plugin on all AIPs", e);
-      JobsHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
-    }
-
-  }
-
-  @Override
-  public void runPluginOnAllRepresentations(Object context, Plugin<Representation> plugin) {
-    try {
-      LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
-      ActorRef jobStateInfoActor = (ActorRef) context;
-      int blockSize = JobsHelper.getBlockSize();
-      CloseableIterable<OptionalWithCause<AIP>> aips = model.listAIPs();
-      Iterator<OptionalWithCause<AIP>> aipIter = aips.iterator();
-      Plugin<Representation> innerPlugin;
-
-      jobStateInfoActor.tell(new Messages.PluginBeforeAllExecuteIsReady<>(plugin), ActorRef.noSender());
-
-      List<Representation> block = new ArrayList<Representation>();
-      while (aipIter.hasNext()) {
-        OptionalWithCause<AIP> aip = aipIter.next();
-        if (aip.isPresent()) {
-          for (Representation representation : aip.get().getRepresentations()) {
-            if (block.size() == blockSize) {
-              innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, Representation.class, blockSize);
-              jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, block), ActorRef.noSender());
-              block = new ArrayList<>();
-            }
-            block.add(representation);
-          }
-        } else {
-          LOGGER.error("Cannot process AIP", aip.getCause());
-        }
-      }
-
-      if (!block.isEmpty()) {
-        innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, Representation.class, block.size());
-        jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, block), ActorRef.noSender());
-      }
-
-      jobStateInfoActor.tell(new Messages.JobInitEnded(), ActorRef.noSender());
-
-      IOUtils.closeQuietly(aips);
+      IOUtils.closeQuietly(objects);
 
     } catch (Exception e) {
-      LOGGER.error("Error running plugin on all representations", e);
-      JobsHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
-    }
-
-  }
-
-  @Override
-  public void runPluginOnAllFiles(Object context, Plugin<File> plugin) {
-    try {
-      LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
-      ActorRef jobStateInfoActor = (ActorRef) context;
-      int blockSize = JobsHelper.getBlockSize();
-      CloseableIterable<OptionalWithCause<AIP>> aips = model.listAIPs();
-      Iterator<OptionalWithCause<AIP>> aipIter = aips.iterator();
-      Plugin<File> innerPlugin;
-
-      jobStateInfoActor.tell(new Messages.PluginBeforeAllExecuteIsReady<>(plugin), ActorRef.noSender());
-
-      List<File> block = new ArrayList<File>();
-      while (aipIter.hasNext()) {
-        OptionalWithCause<AIP> aip = aipIter.next();
-        if (aip.isPresent()) {
-          for (Representation representation : aip.get().getRepresentations()) {
-            boolean recursive = true;
-            CloseableIterable<OptionalWithCause<File>> files = model.listFilesUnder(aip.get().getId(),
-              representation.getId(), recursive);
-            Iterator<OptionalWithCause<File>> fileIter = files.iterator();
-
-            while (fileIter.hasNext()) {
-
-              if (block.size() == blockSize) {
-                innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, File.class, blockSize);
-                jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, block), ActorRef.noSender());
-                block = new ArrayList<>();
-              }
-
-              OptionalWithCause<File> file = fileIter.next();
-              if (file.isPresent()) {
-                block.add(file.get());
-              } else {
-                LOGGER.error("Cannot process File", file.getCause());
-              }
-            }
-            IOUtils.closeQuietly(files);
-          }
-        } else {
-          LOGGER.error("Cannot process AIP", aip.getCause());
-        }
-      }
-
-      if (!block.isEmpty()) {
-        innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, File.class, block.size());
-        jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, block), ActorRef.noSender());
-      }
-
-      jobStateInfoActor.tell(new Messages.JobInitEnded(), ActorRef.noSender());
-
-      IOUtils.closeQuietly(aips);
-
-    } catch (Exception e) {
-      LOGGER.error("Error running plugin on all files", e);
+      LOGGER.error("Error running plugin on all objects", e);
       JobsHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
     }
 

@@ -7,7 +7,6 @@
  */
 package org.roda.core.plugins.orchestrate;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -16,9 +15,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
@@ -28,7 +25,6 @@ import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
-import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
@@ -175,136 +171,6 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void runPluginOnAllAIPs(Object context, Plugin<AIP> plugin) {
-    try {
-
-      CloseableIterable<OptionalWithCause<AIP>> aips = model.listAIPs();
-      Iterator<OptionalWithCause<AIP>> iter = aips.iterator();
-
-      List<AIP> block = new ArrayList<AIP>();
-      while (iter.hasNext()) {
-        if (block.size() == BLOCK_SIZE) {
-          submitPlugin(block, plugin);
-          block = new ArrayList<AIP>();
-        }
-
-        OptionalWithCause<AIP> nextAIP = iter.next();
-        if (nextAIP.isPresent()) {
-          block.add(nextAIP.get());
-        } else {
-          LOGGER.error("Cannot process AIP", nextAIP.getCause());
-        }
-      }
-
-      if (!block.isEmpty()) {
-        submitPlugin(block, plugin);
-      }
-
-      aips.close();
-
-      finishedSubmit();
-
-    } catch (IOException | RequestNotValidException | GenericException | NotFoundException
-      | AuthorizationDeniedException e) {
-      // TODO review this exception handling
-      LOGGER.error("Error running plugin on all AIPs", e);
-    }
-  }
-
-  @Override
-  public void runPluginOnAllRepresentations(Object context, Plugin<Representation> plugin) {
-    try {
-
-      CloseableIterable<OptionalWithCause<AIP>> aips = model.listAIPs();
-      Iterator<OptionalWithCause<AIP>> aipIter = aips.iterator();
-
-      List<Representation> block = new ArrayList<Representation>();
-      while (aipIter.hasNext()) {
-        OptionalWithCause<AIP> aip = aipIter.next();
-        if (aip.isPresent()) {
-          for (Representation representation : aip.get().getRepresentations()) {
-            if (block.size() == BLOCK_SIZE) {
-              submitPlugin(block, plugin);
-              block = new ArrayList<Representation>();
-            }
-
-            block.add(representation);
-          }
-        } else {
-          LOGGER.error("Cannot process AIP", aip.getCause());
-        }
-      }
-
-      if (!block.isEmpty()) {
-        submitPlugin(block, plugin);
-      }
-
-      aips.close();
-
-      finishedSubmit();
-
-    } catch (IOException | RequestNotValidException | GenericException | NotFoundException
-      | AuthorizationDeniedException e) {
-      // TODO review this exception handling
-      LOGGER.error("Error running plugin on all representations", e);
-    }
-  }
-
-  @Override
-  public void runPluginOnAllFiles(Object context, Plugin<File> plugin) {
-    try {
-
-      CloseableIterable<OptionalWithCause<AIP>> aips = model.listAIPs();
-      Iterator<OptionalWithCause<AIP>> aipIter = aips.iterator();
-
-      List<File> block = new ArrayList<File>();
-      while (aipIter.hasNext()) {
-        OptionalWithCause<AIP> aip = aipIter.next();
-        for (Representation rep : aip.get().getRepresentations()) {
-          if (aip.isPresent()) {
-            boolean recursive = true;
-            CloseableIterable<OptionalWithCause<File>> files = model.listFilesUnder(aip.get().getId(), rep.getId(),
-              recursive);
-            Iterator<OptionalWithCause<File>> fileIter = files.iterator();
-
-            while (fileIter.hasNext()) {
-              if (block.size() == BLOCK_SIZE) {
-                submitPlugin(block, plugin);
-                block = new ArrayList<File>();
-              }
-
-              OptionalWithCause<File> file = fileIter.next();
-              if (file.isPresent()) {
-                if (!file.get().isDirectory()) {
-                  block.add(file.get());
-                }
-              } else {
-                LOGGER.error("Cannot process AIP representation file", file.getCause());
-              }
-            }
-            IOUtils.closeQuietly(files);
-          } else {
-            LOGGER.error("Cannot process AIP", aip.getCause());
-          }
-        }
-      }
-
-      if (!block.isEmpty()) {
-        submitPlugin(block, plugin);
-      }
-
-      aips.close();
-
-      finishedSubmit();
-
-    } catch (IOException | RequestNotValidException | GenericException | NotFoundException
-      | AuthorizationDeniedException e) {
-      // TODO review this exception handling
-      LOGGER.error("Error running plugin on all files", e);
-    }
-  }
-
-  @Override
   public void runPluginOnTransferredResources(Object context, Plugin<TransferredResource> plugin, List<String> uuids) {
     try {
 
@@ -375,6 +241,12 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   @Override
   public void setJobContextInformation(String jobId, Object object) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public <T extends IsRODAObject> void runPluginOnAllObjects(Object context, Plugin<T> plugin, Class<T> objectClass) {
     // TODO Auto-generated method stub
 
   }

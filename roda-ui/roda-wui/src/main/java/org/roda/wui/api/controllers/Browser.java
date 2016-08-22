@@ -1712,4 +1712,48 @@ public class Browser extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
   }
 
+  public static StreamResponse listTransferredResourcesReports(RodaUser user, String resourceId, String start,
+    String limit, boolean isOriginal, String acceptFormat)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // validate input
+    BrowserHelper.validateListTransferredResourcesReportsParams(acceptFormat);
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    StreamResponse reportList = BrowserHelper.listTransferredResourcesReports(resourceId, start, limit, isOriginal,
+      acceptFormat);
+
+    // register action
+    controllerAssistant.registerAction(user, resourceId, LOG_ENTRY_STATE.SUCCESS,
+      RodaConstants.API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID, resourceId, RodaConstants.API_QUERY_KEY_START, start,
+      RodaConstants.API_QUERY_KEY_LIMIT, limit);
+
+    return reportList;
+  }
+
+  public static StreamResponse listTransferredResourcesLastReport(RodaUser user, String resourceId, boolean isOriginal,
+    String acceptFormat)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // validate input
+    BrowserHelper.validateListTransferredResourcesReportsParams(acceptFormat);
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    StreamResponse reportList = BrowserHelper.listTransferredResourcesLastReport(resourceId, isOriginal, acceptFormat);
+
+    // register action
+    controllerAssistant.registerAction(user, resourceId, LOG_ENTRY_STATE.SUCCESS,
+      RodaConstants.API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID, resourceId);
+
+    return reportList;
+  }
+
 }

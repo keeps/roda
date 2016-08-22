@@ -9,6 +9,7 @@ package org.roda.core.model;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -1604,7 +1605,7 @@ public class ModelService extends ModelObservable {
     }
 
     // index it
-    notifyJobCreatedOrUpdated(job);
+    notifyJobCreatedOrUpdated(job, false);
   }
 
   public Job retrieveJob(String jobId)
@@ -2307,6 +2308,62 @@ public class ModelService extends ModelObservable {
     file = ResourceParseUtils.convertResourceToFile(createdBinary);
 
     return file;
+  }
+
+  private <T extends Serializable> CloseableIterable<OptionalWithCause<T>> listRepresentations(Class<T> objectClass)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    CloseableIterable<OptionalWithCause<AIP>> aips = listAIPs();
+    Iterator<OptionalWithCause<AIP>> aipIter = aips.iterator();
+    List<CloseableIterable<OptionalWithCause<T>>> representations = new ArrayList<CloseableIterable<OptionalWithCause<T>>>();
+
+    while (aipIter.hasNext()) {
+      OptionalWithCause<AIP> oaip = aipIter.next();
+      AIP aip = oaip.get();
+      if (oaip.isPresent() && !aip.getRepresentations().isEmpty()) {
+        final CloseableIterable<Resource> resourcesIterable = storage
+          .listResourcesUnderContainer(ModelUtils.getRepresentationsContainerPath(aip.getId()), false);
+        CloseableIterable<OptionalWithCause<T>> fs = ResourceParseUtils.convert(getStorage(), resourcesIterable,
+          objectClass);
+        representations.add(fs);
+      }
+    }
+
+    return CloseableIterables.concat(representations);
+  }
+
+  private <T extends Serializable> CloseableIterable<OptionalWithCause<T>> listFiles(Class<T> objectClass)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    CloseableIterable<OptionalWithCause<AIP>> aips = listAIPs();
+    Iterator<OptionalWithCause<AIP>> aipIter = aips.iterator();
+    List<CloseableIterable<OptionalWithCause<T>>> files = new ArrayList<CloseableIterable<OptionalWithCause<T>>>();
+
+    while (aipIter.hasNext()) {
+      OptionalWithCause<AIP> aip = aipIter.next();
+      if (aip.isPresent()) {
+        for (Representation representation : aip.get().getRepresentations()) {
+          final CloseableIterable<Resource> resourcesIterable = storage.listResourcesUnderContainer(
+            ModelUtils.getRepresentationDataStoragePath(aip.get().getId(), representation.getId()), true);
+          CloseableIterable<OptionalWithCause<T>> fs = ResourceParseUtils.convert(getStorage(), resourcesIterable,
+            objectClass);
+          files.add(fs);
+        }
+      }
+    }
+
+    return CloseableIterables.concat(files);
+  }
+
+  public <T extends Serializable> CloseableIterable<OptionalWithCause<T>> list(Class<T> objectClass)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    if (Representation.class.equals(objectClass)) {
+      return listRepresentations(objectClass);
+    } else if (File.class.equals(objectClass)) {
+      return listFiles(objectClass);
+    } else {
+      StoragePath containerPath = ModelUtils.getContainerPath(objectClass);
+      final CloseableIterable<Resource> resourcesIterable = storage.listResourcesUnderContainer(containerPath, false);
+      return ResourceParseUtils.convert(getStorage(), resourcesIterable, objectClass);
+    }
   }
 
 }

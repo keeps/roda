@@ -25,6 +25,7 @@ import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.agents.Agent;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -133,7 +134,7 @@ public interface BrowserService extends RemoteService {
 
   List<PluginInfo> retrievePluginsInfo(List<PluginType> type);
 
-  Set<Class> retrieveReindexPluginObjectClasses();
+  Set<Pair<String, String>> retrieveReindexPluginObjectClasses();
 
   CreateIngestJobBundle retrieveCreateIngestProcessBundle();
 

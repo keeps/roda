@@ -172,24 +172,6 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
   }
 
   @Override
-  public void runPluginOnAllAIPs(Object context, Plugin<AIP> plugin) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void runPluginOnAllRepresentations(Object context, Plugin<Representation> plugin) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void runPluginOnAllFiles(Object context, Plugin<File> plugin) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
   public void runPluginOnTransferredResources(Object context, Plugin<TransferredResource> plugin, List<String> uuids) {
     // TODO Auto-generated method stub
 
@@ -234,6 +216,12 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
 
   @Override
   public <T extends IsRODAObject> void updateJob(Plugin<T> plugin, JobPartialUpdate partialUpdate) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public <T extends IsRODAObject> void runPluginOnAllObjects(Object context, Plugin<T> plugin, Class<T> objectClass) {
     // TODO Auto-generated method stub
 
   }

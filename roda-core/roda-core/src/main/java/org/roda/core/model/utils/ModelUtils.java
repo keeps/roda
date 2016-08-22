@@ -7,6 +7,7 @@
  */
 package org.roda.core.model.utils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,7 +23,6 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
@@ -38,8 +38,12 @@ import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
@@ -121,6 +125,11 @@ public final class ModelUtils {
     } else {
       return build(getAIPPath(aipId), RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS, representationId);
     }
+  }
+
+  public static StoragePath getRepresentationsContainerPath(String aipId) throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
+      RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS);
   }
 
   public static StoragePath getRepresentationStoragePath(String aipId, String representationId)
@@ -487,6 +496,10 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(path);
   }
 
+  public static StoragePath getLogContainerPath() throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG);
+  }
+
   public static StoragePath getLogStoragePath(String logFile) throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG, logFile);
   }
@@ -598,7 +611,7 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(path);
   }
 
-  public static <T extends IsRODAObject> StoragePath getContainerPath(Class<T> clazz) throws RequestNotValidException {
+  public static <T extends Serializable> StoragePath getContainerPath(Class<T> clazz) throws RequestNotValidException {
     if (clazz.equals(Agent.class)) {
       return getAgentContainerPath();
     } else if (clazz.equals(Format.class)) {
@@ -607,6 +620,16 @@ public final class ModelUtils {
       return getNotificationContainerPath();
     } else if (clazz.equals(Risk.class)) {
       return getRiskContainerPath();
+    } else if (clazz.equals(LogEntry.class)) {
+      return getLogContainerPath();
+    } else if (clazz.equals(Job.class)) {
+      return getJobContainerPath();
+    } else if (clazz.equals(AIP.class)) {
+      return getAIPcontainerPath();
+    } else if (clazz.equals(Report.class)) {
+      return getJobReportContainerPath();
+    } else if (clazz.equals(RiskIncidence.class)) {
+      return getRiskIncidenceContainerPath();
     } else {
       throw new RequestNotValidException("Unknown class for getting container path: " + clazz.getName());
     }
@@ -646,8 +669,7 @@ public final class ModelUtils {
   public static void addToZip(List<ZipEntryInfo> zipEntries, Binary binary)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     String path = FSUtils.getStoragePathAsString(binary.getStoragePath(), true);
-    ZipEntryInfo info = new ZipEntryInfo(path,
-      binary.getContent());
+    ZipEntryInfo info = new ZipEntryInfo(path, binary.getContent());
     zipEntries.add(info);
   }
 

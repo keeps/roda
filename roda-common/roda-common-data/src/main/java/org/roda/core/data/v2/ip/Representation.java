@@ -33,6 +33,12 @@ public class Representation implements IsRODAObject {
     super();
   }
 
+  public Representation(String id, String aipId) {
+    super();
+    this.id = id;
+    this.aipId = aipId;
+  }
+
   public Representation(String id, String aipId, boolean original, String type) {
     this(id, aipId, original, type, new ArrayList<DescriptiveMetadata>());
   }

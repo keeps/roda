@@ -19,6 +19,7 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.v2.agents.Agent;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -87,7 +88,7 @@ public interface BrowserServiceAsync {
 
   void retrievePluginsInfo(List<PluginType> type, AsyncCallback<List<PluginInfo>> callback);
 
-  void retrieveReindexPluginObjectClasses(AsyncCallback<Set<Class>> asyncCallback);
+  void retrieveReindexPluginObjectClasses(AsyncCallback<Set<Pair<String, String>>> asyncCallback);
 
   void retrieveCreateIngestProcessBundle(AsyncCallback<CreateIngestJobBundle> callback);
 

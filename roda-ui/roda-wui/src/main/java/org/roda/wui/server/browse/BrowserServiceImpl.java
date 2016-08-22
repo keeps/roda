@@ -10,6 +10,7 @@ package org.roda.wui.server.browse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -35,6 +36,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.agents.Agent;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -57,7 +59,7 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.validation.ValidationException;
-import org.roda.core.plugins.plugins.base.ReindexPlugin;
+import org.roda.core.plugins.plugins.base.ReindexRodaEntityPlugin;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StringContentPayload;
 import org.roda.wui.api.controllers.Browser;
@@ -416,11 +418,20 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public Set<Class> retrieveReindexPluginObjectClasses() {
+  public Set<Pair<String, String>> retrieveReindexPluginObjectClasses() {
     // TODO check permissions
-    Set<Class> classes = RodaCoreFactory.getPluginManager().getPluginObjectClasses(ReindexPlugin.class.getName());
+    Set<Pair<String, String>> classNames = new HashSet<>();
+    List<?> classes = RodaCoreFactory.getPluginManager().getPlugin(ReindexRodaEntityPlugin.class.getName())
+      .getObjectClasses();
     classes.remove(Void.class);
-    return classes;
+
+    for (Object o : classes) {
+      Class c = (Class) o;
+      Pair<String, String> names = new Pair<String, String>(c.getSimpleName(), c.getName());
+      classNames.add(names);
+    }
+
+    return classNames;
   }
 
   @Override

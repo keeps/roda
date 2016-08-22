@@ -7,8 +7,10 @@
  */
 package org.roda.core.data.v2.ip.metadata;
 
+import org.roda.core.data.common.RodaConstants;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-@JsonIgnoreProperties({"aipId", "representationId"})
+@JsonIgnoreProperties({RodaConstants.AIP_AIP_ID, RodaConstants.AIP_REPRESENTATION_ID})
 public class DescriptiveMetadataMixIn {
 }

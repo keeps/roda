@@ -195,9 +195,9 @@ public abstract class ModelObservable {
     }
   }
 
-  protected void notifyJobCreatedOrUpdated(Job job) {
+  protected void notifyJobCreatedOrUpdated(Job job, boolean reindexJobReports) {
     for (ModelObserver observer : observers) {
-      observer.jobCreatedOrUpdated(job);
+      observer.jobCreatedOrUpdated(job, reindexJobReports);
     }
   }
 

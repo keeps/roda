@@ -79,7 +79,7 @@ public interface ModelObserver {
 
   public void otherMetadataCreated(OtherMetadata otherMetadataBinary);
 
-  public void jobCreatedOrUpdated(Job job);
+  public void jobCreatedOrUpdated(Job job, boolean reindexJobReports);
 
   public void jobDeleted(String jobId);
 
