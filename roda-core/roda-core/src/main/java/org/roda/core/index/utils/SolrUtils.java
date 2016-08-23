@@ -742,8 +742,7 @@ public class SolrUtils {
 
   private static void appendValuesUsingOROperator(StringBuilder ret, String key, List<String> values,
     boolean prefixWithANDOperatorIfBuilderNotEmpty) {
-    // FIXME 20160822 hsilva: values should never be null
-    if (!values.stream().filter(e -> e != null).collect(Collectors.toList()).isEmpty()) {
+    if (!values.isEmpty()) {
       appendANDOperator(ret, prefixWithANDOperatorIfBuilderNotEmpty);
 
       ret.append("(");
@@ -967,7 +966,7 @@ public class SolrUtils {
       }
       if (filterQuery.length() > 0) {
         query.addFilterQuery(filterQuery.toString());
-        LOGGER.trace("Query after defining facets: " + query.toString());
+        LOGGER.trace("Query after defining facets: {}", query);
       }
     }
   }
@@ -1042,7 +1041,7 @@ public class SolrUtils {
       try {
         index.commit(collection, waitFlush, waitSearcher, softCommit);
       } catch (SolrServerException | IOException e) {
-        LOGGER.error("Error commiting into collection: " + collection, e);
+        LOGGER.error("Error commiting into collection: {}", collection, e);
       }
     }
   }
@@ -1161,7 +1160,7 @@ public class SolrUtils {
             }
           }
         } catch (Exception e) {
-          LOGGER.error("Error processing descriptive metadata: " + metadata, e);
+          LOGGER.error("Error processing descriptive metadata: {}", metadata, e);
         }
       }
     }
@@ -1541,7 +1540,7 @@ public class SolrUtils {
       }
       ipe.setSourcesObjectIds(ids);
     } catch (GenericException | RuntimeException e) {
-      LOGGER.error("Error setting event linking source: " + e.getMessage(), e);
+      LOGGER.error("Error setting event linking source", e);
     }
     try {
       List<LinkingIdentifier> ids = new ArrayList<LinkingIdentifier>();
@@ -1550,7 +1549,7 @@ public class SolrUtils {
       }
       ipe.setOutcomeObjectIds(ids);
     } catch (GenericException | RuntimeException e) {
-      LOGGER.error("Error setting event linking outcome: " + e.getMessage(), e);
+      LOGGER.error("Error setting event linking outcome", e);
     }
     try {
       List<LinkingIdentifier> ids = new ArrayList<LinkingIdentifier>();
@@ -1559,7 +1558,7 @@ public class SolrUtils {
       }
       ipe.setLinkingAgentIds(ids);
     } catch (GenericException | RuntimeException e) {
-      LOGGER.error("Error setting event linking agents: " + e.getMessage(), e);
+      LOGGER.error("Error setting event linking agents", e);
     }
     return ipe;
   }

@@ -27,11 +27,11 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.wui.api.v1.utils.StreamResponse;
-import org.roda.wui.common.RodaCoreService;
+import org.roda.wui.common.RodaWuiController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Theme extends RodaCoreService {
+public class Theme extends RodaWuiController {
 
   @SuppressWarnings("unused")
   private static final Logger LOGGER = LoggerFactory.getLogger(Theme.class);

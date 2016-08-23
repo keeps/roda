@@ -38,9 +38,9 @@ import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.ControllerAssistant;
-import org.roda.wui.common.RodaCoreService;
+import org.roda.wui.common.RodaWuiController;
 
-public class UserManagement extends RodaCoreService {
+public class UserManagement extends RodaWuiController {
 
   private UserManagement() {
     super();

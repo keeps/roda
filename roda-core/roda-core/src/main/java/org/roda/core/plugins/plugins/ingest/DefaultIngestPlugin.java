@@ -250,7 +250,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       if (PluginHelper.verifyIfStepShouldBePerformed(this,
         getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT))
         && RodaCoreFactory.getRodaConfiguration().getBoolean("core.ingest.processed.move_when_autoaccept", true)) {
-        PluginHelper.moveSIPs(this, model, resources, jobPluginInfo);
+        PluginHelper.moveSIPs(this, model, index, resources, jobPluginInfo);
       }
 
       // X) final job info update
@@ -295,7 +295,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       report = plugin.execute(index, model, storage, transferredResources);
     } catch (PluginException | InvalidParameterException e) {
       // FIXME handle failure
-      LOGGER.error("Error executing plug-in", e);
+      LOGGER.error("Error executing plugin", e);
     }
 
     return report;
@@ -343,7 +343,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
   private void sendNotification(ModelService model)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    Job job = PluginHelper.getJobFromModel(this, model);
+    Job job = PluginHelper.getJob(this, model);
     JobStats jobStats = job.getJobStats();
 
     String emails = PluginHelper.getStringFromParameters(this,
@@ -568,7 +568,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       plugin.setParameterValues(mergedParams);
       report = plugin.execute(index, model, storage, aips);
     } catch (InvalidParameterException | PluginException | RuntimeException e) {
-      LOGGER.error("Error executing plug-in", e);
+      LOGGER.error("Error executing plugin", e);
     }
 
     return report;

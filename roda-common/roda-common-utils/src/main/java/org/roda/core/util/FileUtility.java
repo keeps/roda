@@ -48,7 +48,7 @@ public class FileUtility {
         ret = new FileInputStream(staticConfig.toFile());
         LOGGER.debug("Using static configuration");
       } catch (FileNotFoundException e) {
-        LOGGER.debug("Couldn't find static configuration file - " + staticConfig);
+        LOGGER.debug("Couldn't find static configuration file - {}", staticConfig);
         LOGGER.debug("Using internal configuration");
         ret = FileUtility.class.getResourceAsStream("/" + RodaConstants.CORE_CONFIG_FOLDER + "/" + relativePath);
       }

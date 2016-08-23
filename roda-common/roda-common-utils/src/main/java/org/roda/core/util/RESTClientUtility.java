@@ -22,8 +22,15 @@ import org.roda.core.data.exceptions.RODAException;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 
+/**
+ * 20160824 hsilva: I think someone, outside RODA code base, is using this
+ * method via maven dependency
+ * 
+ * @author Hélder Silva <hsilva@keep.pt>
+ */
 public final class RESTClientUtility {
 
+  /** Private empty constructor */
   private RESTClientUtility() {
   }
 

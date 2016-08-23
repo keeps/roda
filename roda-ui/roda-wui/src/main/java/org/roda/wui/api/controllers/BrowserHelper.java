@@ -175,7 +175,7 @@ public class BrowserHelper {
     try {
       itemBundle.setAIPAncestors(retrieveAncestors(aip));
     } catch (NotFoundException e) {
-      LOGGER.warn("Found an item with invalid ancestors: " + aipId, e);
+      LOGGER.warn("Found an item with invalid ancestors: {}", aipId, e);
     }
 
     // set descriptive metadata
@@ -990,7 +990,7 @@ public class BrowserHelper {
       if (!aipId.equals(parentId)) {
         // laxing check of ancestry so a big list can be moved to one of the
         // siblings
-        LOGGER.debug("Moving AIP " + aipId + " under " + parentId);
+        LOGGER.debug("Moving AIP {} under {}", aipId, parentId);
         model.moveAIP(aipId, parentId);
       }
     }
@@ -1241,7 +1241,6 @@ public class BrowserHelper {
         dm = model.createDescriptiveMetadata(aipId, representationId, metadataId, payload, metadataType,
           metadataVersion);
       } else {
-        LOGGER.error("ERROR: " + metadataType + " - " + metadataVersion);
         dm = model.updateDescriptiveMetadata(aipId, representationId, metadataId, payload, metadataType,
           metadataVersion, updateMessage);
       }
@@ -1509,7 +1508,7 @@ public class BrowserHelper {
             agentID.getValue());
           agents.put(agentID.getValue(), agent);
         } catch (NotFoundException | GenericException e) {
-          LOGGER.error("Error getting agent " + agentID + ": " + e.getMessage());
+          LOGGER.error("Error getting agent {}: {}", agentID, e.getMessage());
         }
       }
       eventBundle.setAgents(agents);
@@ -1547,7 +1546,7 @@ public class BrowserHelper {
           TransferredResource tr = retrieve(TransferredResource.class, uuid);
           transferredResources.put(idValue, tr);
         } else {
-          LOGGER.warn("No support for linking object type: " + linkingType);
+          LOGGER.warn("No support for linking object type: {}", linkingType);
         }
       } catch (NotFoundException e) {
         // nothing to do

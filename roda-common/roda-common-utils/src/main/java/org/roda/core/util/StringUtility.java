@@ -16,6 +16,9 @@ import java.util.Iterator;
  * 
  * @author Luis Faria
  * @author Rui Castro
+ * 
+ * @deprecated 20160824 hsilva: not seeing any method using it, so it will be
+ *             removed soon
  */
 public class StringUtility {
 

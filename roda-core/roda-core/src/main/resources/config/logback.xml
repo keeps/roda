@@ -35,7 +35,8 @@
 	</appender>
 	
 	<logger name="org.roda.core.plugins.orchestrate.akka" additivity="false">
-		<level value="TRACE" />
+		<level value="DEBUG" />
+		<!-- <level value="TRACE" /> -->
 		<appender-ref ref="CORE_FILEOUT" />
 		<!-- <appender-ref ref="AKKA_FILE" /> -->
 	</logger>

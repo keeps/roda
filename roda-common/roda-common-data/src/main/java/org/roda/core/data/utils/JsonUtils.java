@@ -35,6 +35,7 @@ public final class JsonUtils {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(JsonUtils.class);
 
+  /** Private empty constructor */
   private JsonUtils() {
 
   }
@@ -87,7 +88,7 @@ public final class JsonUtils {
       mapper = addMixinsToMapper(mapper, object);
       ret = mapper.writeValueAsString(object);
     } catch (IOException e) {
-      LOGGER.error("Error transforming object '" + object + "' to json string", e);
+      LOGGER.error("Error transforming object '{}' to json string", object, e);
     }
     return ret;
   }

@@ -351,7 +351,7 @@ public class IndexService {
       index.deleteByQuery(indexName, "*:*");
       index.commit(indexName);
     } catch (SolrServerException | IOException e) {
-      LOGGER.error("Error cleaning up index " + indexName, e);
+      LOGGER.error("Error cleaning up index {}", indexName, e);
       throw new GenericException("Error cleaning up index " + indexName, e);
     }
   }

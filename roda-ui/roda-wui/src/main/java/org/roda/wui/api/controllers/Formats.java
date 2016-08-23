@@ -20,13 +20,13 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.common.ControllerAssistant;
-import org.roda.wui.common.RodaCoreService;
+import org.roda.wui.common.RodaWuiController;
 
 /**
  * FIXME 1) verify all checkObject*Permissions (because now also a permission
  * for insert is available)
  */
-public class Formats extends RodaCoreService {
+public class Formats extends RodaWuiController {
 
   private Formats() {
     super();

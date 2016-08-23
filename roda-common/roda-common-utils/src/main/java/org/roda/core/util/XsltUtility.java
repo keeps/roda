@@ -23,10 +23,10 @@ import javax.xml.transform.stream.StreamSource;
 /**
  * @author Rui Castro
  * 
+ * @deprecated 20160824 hsilva: not seeing any method using it, so it will be
+ *             removed soon
  */
-public class XsltUtility {
-
-  // final private static Logger logger = LoggerFactory.getLogger(XsltUtility.class);
+public final class XsltUtility {
 
   /**
    * Apply the XSLT transformation (<code>xsltStream</code>) to the xml given (

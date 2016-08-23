@@ -10,8 +10,11 @@ package org.roda.core.util;
 /**
  * @author Rui Castro
  * @author Luis Faria
+ * 
+ * @deprecated 20160824 hsilva: not seeing any method using it, so it will be
+ *             removed soon
  */
-public class XmlEncodeUtility {
+public final class XmlEncodeUtility {
 
   /**
    * Encode XML entities and unicode control chars

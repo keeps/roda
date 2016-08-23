@@ -16,9 +16,12 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author Rui Castro
+ * 
+ * @deprecated 20160824 hsilva: not seeing any method using it, so it will be
+ *             removed soon
  */
-public class TempDir {
-  private static final Logger logger = LoggerFactory.getLogger(TempDir.class);
+public final class TempDir {
+  private static final Logger LOGGER = LoggerFactory.getLogger(TempDir.class);
 
   private static DirDeleter deleterThread = null;
 
@@ -45,21 +48,21 @@ public class TempDir {
 
     if (tempFile.exists() && !tempFile.delete()) {
 
-      logger.debug("Temporary directory " + tempFile + " already exists and couldn't be deleted.");
+      LOGGER.debug("Temporary directory " + tempFile + " already exists and couldn't be deleted.");
       throw new IOException("Temporary directory " + tempFile + " already exists and couldn't be deleted.");
 
     } else if (!tempFile.mkdir()) {
 
-      logger.debug("Could not create temporary directory " + tempFile);
+      LOGGER.debug("Could not create temporary directory " + tempFile);
       throw new IOException("Could not create temporary directory " + tempFile);
 
     } else {
 
-      logger.trace("Temporary directory " + tempFile + " created successfully.");
+      LOGGER.trace("Temporary directory " + tempFile + " created successfully.");
 
       deleterThread.add(tempFile);
 
-      logger.debug("Temporary directory " + tempFile + " scheduled for removal.");
+      LOGGER.debug("Temporary directory " + tempFile + " scheduled for removal.");
 
       return tempFile;
     }
@@ -85,20 +88,20 @@ public class TempDir {
     File tempFile = File.createTempFile(prefix, "temp", directory);
 
     if (tempFile.exists() && !tempFile.delete()) {
-      logger.debug("Temporary directory " + tempFile + " already exists and couldn't be deleted.");
+      LOGGER.debug("Temporary directory " + tempFile + " already exists and couldn't be deleted.");
       throw new IOException("Temporary directory " + tempFile + " already exists and couldn't be deleted.");
     }
 
     if (!tempFile.mkdir()) {
-      logger.debug("Could not create temporary directory " + tempFile);
+      LOGGER.debug("Could not create temporary directory " + tempFile);
       throw new IOException("Could not create temporary directory " + tempFile);
     }
 
-    logger.trace("Temporary directory " + tempFile + " created successfully.");
+    LOGGER.trace("Temporary directory " + tempFile + " created successfully.");
 
     deleterThread.add(tempFile);
 
-    logger.debug("Temporary directory " + tempFile + " scheduled for removal.");
+    LOGGER.debug("Temporary directory " + tempFile + " scheduled for removal.");
 
     return tempFile;
   }
@@ -122,19 +125,19 @@ public class TempDir {
     File tempFile = new File(directory, name);
 
     if (tempFile.exists() && !tempFile.delete()) {
-      logger.debug("Temporary directory " + tempFile + " already exists and couldn't be deleted.");
+      LOGGER.debug("Temporary directory " + tempFile + " already exists and couldn't be deleted.");
       throw new IOException("Temporary directory " + tempFile + " already exists and couldn't be deleted.");
     }
     if (!tempFile.mkdir()) {
-      logger.debug("Could not create temporary directory " + tempFile);
+      LOGGER.debug("Could not create temporary directory " + tempFile);
       throw new IOException("Could not create temporary directory " + tempFile);
     }
 
-    logger.trace("Temporary directory " + tempFile + " created successfully.");
+    LOGGER.trace("Temporary directory " + tempFile + " created successfully.");
 
     deleterThread.add(tempFile);
 
-    logger.debug("Temporary directory " + tempFile + " scheduled for removal.");
+    LOGGER.debug("Temporary directory " + tempFile + " scheduled for removal.");
 
     return tempFile;
   }
@@ -157,12 +160,12 @@ public class TempDir {
     File tempFile = File.createTempFile(prefix, "temp", directory);
 
     if (tempFile.exists() && !tempFile.delete()) {
-      logger.debug("Directory " + tempFile + " already exists and couldn't be deleted.");
+      LOGGER.debug("Directory " + tempFile + " already exists and couldn't be deleted.");
       throw new IOException("Directory " + tempFile + " already exists and couldn't be deleted.");
     }
 
     if (!tempFile.mkdir()) {
-      logger.debug("Could not create directory " + tempFile);
+      LOGGER.debug("Could not create directory " + tempFile);
       throw new IOException("Could not create directory " + tempFile);
     }
 

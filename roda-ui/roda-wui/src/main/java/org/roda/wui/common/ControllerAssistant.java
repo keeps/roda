@@ -24,6 +24,15 @@ public class ControllerAssistant {
     this.enclosingMethod = this.getClass().getEnclosingMethod();
   }
 
+  public void checkGroup(final RodaUser user, final String group) throws AuthorizationDeniedException {
+    try {
+      UserUtility.checkGroup(user, group);
+    } catch (final AuthorizationDeniedException e) {
+      registerAction(user, LOG_ENTRY_STATE.UNAUTHORIZED);
+      throw e;
+    }
+  }
+
   public void checkRoles(final RodaUser user) throws AuthorizationDeniedException {
     try {
       UserUtility.checkRoles(user, this.getClass());
@@ -45,7 +54,7 @@ public class ControllerAssistant {
   public void registerAction(final RodaUser user, final String aipId, final LOG_ENTRY_STATE state,
     final Object... parameters) {
     final long duration = new Date().getTime() - startDate.getTime();
-    RodaCoreService.registerAction(user, this.enclosingMethod.getDeclaringClass().getName(),
+    ControllerAssistantUtils.registerAction(user, this.enclosingMethod.getDeclaringClass().getName(),
       this.enclosingMethod.getName(), aipId, duration, state, parameters);
   }
 

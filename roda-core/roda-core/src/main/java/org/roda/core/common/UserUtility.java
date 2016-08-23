@@ -130,6 +130,14 @@ public class UserUtility {
     }
   }
 
+  public static void checkGroup(final RodaUser rsu, final String group) throws AuthorizationDeniedException {
+    if (!rsu.getAllGroups().contains(group)) {
+      LOGGER.debug("User '{}' groups: {} vs. group to check: {}", rsu.getId(), rsu.getAllGroups(), group);
+      throw new AuthorizationDeniedException(
+        "The user '" + rsu.getId() + "' does not belong to the group '" + group + "'");
+    }
+  }
+
   public static void checkRoles(final RodaUser user, final String... rolesToCheck) throws AuthorizationDeniedException {
     checkRoles(user, Arrays.asList(rolesToCheck));
   }

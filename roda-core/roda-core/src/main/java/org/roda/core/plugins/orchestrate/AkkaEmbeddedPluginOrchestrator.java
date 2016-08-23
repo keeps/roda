@@ -14,14 +14,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
-import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
@@ -50,6 +48,8 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginOrchestrator;
 import org.roda.core.plugins.orchestrate.akka.AkkaJobActor;
 import org.roda.core.plugins.orchestrate.akka.Messages;
+import org.roda.core.plugins.orchestrate.akka.Messages.JobPartialUpdate;
+import org.roda.core.plugins.orchestrate.akka.Messages.JobStateUpdated;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -152,7 +152,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin from index", e);
-      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
+      JobsHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
     }
 
   }
@@ -188,7 +188,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on AIPs", e);
-      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
+      JobsHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
     }
 
   }
@@ -224,7 +224,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on Representations", e);
-      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
+      JobsHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
     }
   }
 
@@ -259,7 +259,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on Files", e);
-      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
+      JobsHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
     }
 
   }
@@ -302,7 +302,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on all AIPs", e);
-      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
+      JobsHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
     }
 
   }
@@ -347,7 +347,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on all representations", e);
-      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
+      JobsHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
     }
 
   }
@@ -407,7 +407,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on all files", e);
-      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
+      JobsHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
     }
 
   }
@@ -442,7 +442,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on transferred resources", e);
-      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
+      JobsHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
     }
   }
 
@@ -459,7 +459,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin", e);
-      PluginHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
+      JobsHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
     }
   }
 
@@ -554,35 +554,6 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void startJobsInTheStateCreated() {
-    Filter filter = new Filter();
-    filter.add(new SimpleFilterParameter(RodaConstants.JOB_STATE, Job.JOB_STATE.CREATED.toString()));
-    Sublist sublist = new Sublist(0, RodaConstants.DEFAULT_PAGINATION_VALUE);
-    IndexResult<Job> jobs = null;
-    List<Job> jobsToBeStarted = new ArrayList<>();
-    try {
-      do {
-        jobs = index.find(Job.class, filter, null, sublist);
-        jobsToBeStarted.addAll(jobs.getResults());
-        sublist.setFirstElementIndex(sublist.getFirstElementIndex() + Math.toIntExact(jobs.getLimit()));
-      } while (jobs.getTotalCount() > jobs.getOffset() + jobs.getLimit());
-    } catch (GenericException | RequestNotValidException e) {
-      LOGGER.error("Unable to find Jobs still to be started", e);
-    }
-
-    if (!jobsToBeStarted.isEmpty()) {
-      for (Job job : jobsToBeStarted) {
-        try {
-          executeJob(model.retrieveJob(job.getId()), true);
-        } catch (JobAlreadyStartedException | RequestNotValidException | GenericException | NotFoundException
-          | AuthorizationDeniedException e) {
-          LOGGER.error("Unable to get Job", e);
-        }
-      }
-    }
-  }
-
-  @Override
   public void cleanUnfinishedJobs() {
     Filter filter = new Filter();
     filter.add(new OneOfManyFilterParameter(RodaConstants.JOB_STATE,
@@ -617,13 +588,12 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public <T extends IsRODAObject> void updateJobState(Plugin<T> plugin, JOB_STATE state,
-    Optional<String> stateDetails) {
+  public <T extends IsRODAObject> void updateJob(Plugin<T> plugin, JobPartialUpdate partialUpdate) {
     String jobId = PluginHelper.getJobId(plugin);
     if (jobId != null && runningJobs.get(jobId) != null) {
       ActorRef jobInfoActor = runningJobs.get(jobId);
-      jobInfoActor.tell(new Messages.JobStateUpdated(plugin, state, stateDetails), ActorRef.noSender());
-      if (Job.isFinalState(state)) {
+      jobInfoActor.tell(partialUpdate, ActorRef.noSender());
+      if (partialUpdate instanceof JobStateUpdated && Job.isFinalState(((JobStateUpdated) partialUpdate).getState())) {
         runningJobs.remove(jobId);
       }
 

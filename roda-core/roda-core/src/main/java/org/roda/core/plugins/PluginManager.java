@@ -332,7 +332,7 @@ public class PluginManager {
     for (Class<? extends AbstractPlugin> plugin : plugins) {
       String name = plugin.getName();
       if (!Modifier.isAbstract(plugin.getModifiers()) && !blacklistedPlugins.contains(name)) {
-        LOGGER.debug("Loading internal plugin {}", name);
+        LOGGER.debug("Loading internal plugin '{}'", name);
         try {
           Plugin<? extends IsRODAObject> p = (Plugin<?>) ClassLoaderUtility.createObject(plugin.getName());
           p.init();

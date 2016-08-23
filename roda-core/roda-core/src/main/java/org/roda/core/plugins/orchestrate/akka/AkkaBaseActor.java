@@ -19,7 +19,15 @@ import akka.actor.UntypedActor;
 public abstract class AkkaBaseActor extends UntypedActor {
 
   public AkkaBaseActor() {
+    setup();
+  }
 
+  private void setup() {
+    try {
+      setup(null);
+    } catch (Exception e) {
+      // do nothing
+    }
   }
 
   public void setup(Object msg) throws Exception {

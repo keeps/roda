@@ -7,10 +7,15 @@
  */
 package org.roda.core.plugins.orchestrate.akka;
 
-import java.util.UUID;
+import java.util.ArrayList;
 
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.index.SelectedItems;
+import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.index.IndexService;
@@ -45,7 +50,7 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
 
     LOGGER.debug("Starting AkkaJobStateInfoActor router with {} actors", numberOfJobsWorkers);
     Props workersProps = new RoundRobinPool(numberOfJobsWorkers).props(Props.create(AkkaWorkerActor.class));
-    workersRouter = getContext().actorOf(workersProps, "WorkersRouter" + UUID.randomUUID().toString());
+    workersRouter = getContext().actorOf(workersProps, "WorkersRouter");
     getContext().watch(workersRouter);
   }
 
@@ -54,6 +59,8 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
     super.setup(msg);
     if (msg instanceof Messages.JobStateUpdated) {
       handleJobStateUpdated(msg);
+    } else if (msg instanceof Messages.JobSourceObjectsUpdated) {
+      handleJobSourceObjectsUpdated(msg);
     } else if (msg instanceof Messages.JobInfoUpdated) {
       handleJobInfoUpdated(msg);
     } else if (msg instanceof Messages.JobStop) {
@@ -73,7 +80,7 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
     } else if (msg instanceof Messages.JobCleanup) {
       handleJobCleanup(msg);
     } else {
-      LOGGER.error("Received a message that don't know how to process (" + msg.getClass().getName() + ")...");
+      LOGGER.error("Received a message that don't know how to process ({})...", msg.getClass().getName());
       unhandled(msg);
     }
   }
@@ -83,13 +90,13 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
     message.logProcessingStarted();
     Plugin<?> p = message.getPlugin() == null ? this.plugin : message.getPlugin();
     try {
-      Job job = PluginHelper.getJobFromIndex(p, super.getIndex());
+      Job job = PluginHelper.getJob(p, super.getIndex());
       LOGGER.info("Setting job '{}' ({}) state to {}. Details: {}", job.getName(), job.getId(), message.getState(),
         message.getStateDatails().orElse("NO DETAILS"));
     } catch (NotFoundException | GenericException e) {
       LOGGER.error("Unable to get Job from index to log its state change", e);
     }
-    PluginHelper.updateJobState(p, super.getModel(), message.getState(), message.getStateDatails());
+    JobsHelper.updateJobState(p, super.getModel(), message.getState(), message.getStateDatails());
     if (Job.isFinalState(message.getState())) {
       // 20160817 hsilva: the following instruction is needed for the "sync"
       // execution of a job (i.e. for testing purposes)
@@ -99,13 +106,39 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
     message.logProcessingEnded();
   }
 
+  private <T extends IsRODAObject> void handleJobSourceObjectsUpdated(Object msg) {
+    Messages.JobSourceObjectsUpdated message = (Messages.JobSourceObjectsUpdated) msg;
+    message.logProcessingStarted();
+    try {
+      Job job = PluginHelper.getJob(plugin, getModel());
+      SelectedItems<?> sourceObjects = job.getSourceObjects();
+      if (sourceObjects instanceof SelectedItemsList) {
+        SelectedItemsList<T> items = (SelectedItemsList<T>) sourceObjects;
+        ArrayList<String> newIds = new ArrayList<String>();
+        for (String oldId : items.getIds()) {
+          if (message.getOldToNewIds().get(oldId) != null) {
+            newIds.add(message.getOldToNewIds().get(oldId));
+          } else {
+            newIds.add(oldId);
+          }
+        }
+        items.setIds(newIds);
+        getModel().createOrUpdateJob(job);
+      }
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      LOGGER.error("Error while retrieving Job for doing an update", e);
+    }
+
+    message.logProcessingEnded();
+  }
+
   private void handleJobInfoUpdated(Object msg) {
     Messages.JobInfoUpdated message = (Messages.JobInfoUpdated) msg;
     message.logProcessingStarted();
     jobInfo.put(message.getPlugin(), message.getJobPluginInfo());
     JobPluginInfo infoUpdated = message.getJobPluginInfo().processJobPluginInformation(message.getPlugin(), jobInfo);
     jobInfo.setObjectsCount(infoUpdated.getSourceObjectsCount());
-    PluginHelper.updateJobInformation(message.getPlugin(), super.getModel(), infoUpdated);
+    JobsHelper.updateJobInformation(message.getPlugin(), super.getModel(), infoUpdated);
     message.logProcessingEnded();
   }
 
@@ -189,7 +222,7 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
     try {
       LOGGER.info("Doing job cleanup");
       IndexService indexService = super.getIndex();
-      Job job = PluginHelper.getJobFromIndex(plugin, indexService);
+      Job job = PluginHelper.getJob(plugin, indexService);
       JobsHelper.doJobObjectsCleanup(job, super.getModel(), indexService);
       LOGGER.info("Ended doing job cleanup");
     } catch (NotFoundException | GenericException e) {

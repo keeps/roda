@@ -35,11 +35,14 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Rui Castro
  * @author Vladislav Korecký <vladislav_korecky@gordic.cz>
+ * 
+ * @deprecated 20160824 hsilva: not seeing any method using it, so it will be
+ *             removed soon
  */
-public class ZipUtility {
+public final class ZipUtility {
 
-  final private static Logger logger = LoggerFactory.getLogger(ZipUtility.class);
-  final private static int BUFFER_SIZE = 1024;
+  private static final Logger LOGGER = LoggerFactory.getLogger(ZipUtility.class);
+  private static final int BUFFER_SIZE = 1024;
 
   /**
    * Extract files in zipFilename to outputDir.
@@ -132,7 +135,7 @@ public class ZipUtility {
         String entryName = zipEntry.getName();
         // String entryName = jarEntry.getName();
 
-        logger.debug("Extracting " + entryName);
+        LOGGER.debug("Extracting " + entryName);
 
         File newFile = new File(outputDir, entryName);
 
@@ -219,7 +222,7 @@ public class ZipUtility {
       // ZipEntry(relativeFile.toString()));
       jarOutputStream.putNextEntry(new JarEntry(relativeFile));
 
-      logger.trace("Adding " + relativeFile);
+      LOGGER.trace("Adding " + relativeFile);
 
       int length;
       while ((length = in.read(buffer)) > 0) {

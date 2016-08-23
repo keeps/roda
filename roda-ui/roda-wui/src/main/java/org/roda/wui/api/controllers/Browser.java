@@ -62,13 +62,13 @@ import org.roda.wui.client.planning.MitigationPropertiesBundle;
 import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
 import org.roda.wui.common.ControllerAssistant;
-import org.roda.wui.common.RodaCoreService;
+import org.roda.wui.common.RodaWuiController;
 
 /**
  * FIXME 1) verify all checkObject*Permissions (because now also a permission
  * for insert is available)
  */
-public class Browser extends RodaCoreService {
+public class Browser extends RodaWuiController {
 
   private static final String AIP_PARAM = "aip";
 

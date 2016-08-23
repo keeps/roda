@@ -808,4 +808,8 @@ public final class RodaConstants {
     AIP, REPRESENTATION, FILE, TRANSFERRED_RESOURCE;
   }
 
+  /** Private empty constructor */
+  private RodaConstants() {
+
+  }
 }

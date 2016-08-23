@@ -15,9 +15,9 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.common.ControllerAssistant;
-import org.roda.wui.common.RodaCoreService;
+import org.roda.wui.common.RodaWuiController;
 
-public class UserLogin extends RodaCoreService {
+public class UserLogin extends RodaWuiController {
 
   private UserLogin() {
     super();

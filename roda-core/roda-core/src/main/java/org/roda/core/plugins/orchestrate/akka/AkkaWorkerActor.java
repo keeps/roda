@@ -36,7 +36,7 @@ public class AkkaWorkerActor extends AkkaBaseActor {
     } else if (msg instanceof Messages.PluginAfterAllExecuteIsReady) {
       handlePluginAfterAllExecuteIsReady(msg);
     } else {
-      LOGGER.error("Received a message that it doesn't know how to process (" + msg.getClass().getName() + ")...");
+      LOGGER.error("Received a message that it doesn't know how to process ({})...", msg.getClass().getName());
       unhandled(msg);
     }
   }

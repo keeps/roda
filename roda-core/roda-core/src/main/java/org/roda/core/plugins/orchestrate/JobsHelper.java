@@ -10,7 +10,10 @@ package org.roda.core.plugins.orchestrate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.filter.Filter;
@@ -22,6 +25,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.NodeType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -41,6 +45,9 @@ import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.JobStats;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.plugins.Plugin;
+import org.roda.core.plugins.orchestrate.akka.Messages;
+import org.roda.core.plugins.plugins.PluginHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,6 +79,98 @@ public final class JobsHelper {
     return RodaCoreFactory.getRodaConfiguration().getInt(key, DEFAULT_BLOCK_SIZE);
   }
 
+  public static <T extends IsRODAObject> void updateJobState(Plugin<T> plugin, ModelService model, JOB_STATE state,
+    Optional<String> stateDetails) {
+    try {
+      Job job = PluginHelper.getJob(plugin, model);
+      job.setState(state);
+      if (stateDetails.isPresent()) {
+        job.setStateDetails(stateDetails.get());
+      }
+      if (job.isInFinalState()) {
+        job.setEndDate(new Date());
+      }
+
+      model.createOrUpdateJob(job);
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      LOGGER.error("Unable to get or update Job from model", e);
+    }
+  }
+
+  public static <T extends IsRODAObject> void updateJobState(Job job, ModelService model, JOB_STATE state,
+    Optional<String> stateDetails) {
+    try {
+      Job jobFromModel = PluginHelper.getJob(job.getId(), model);
+      jobFromModel.setState(state);
+      if (stateDetails.isPresent()) {
+        jobFromModel.setStateDetails(stateDetails.get());
+      }
+      if (jobFromModel.isInFinalState()) {
+        jobFromModel.setEndDate(new Date());
+      }
+
+      model.createOrUpdateJob(jobFromModel);
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      LOGGER.error("Unable to get or update Job from model", e);
+    }
+  }
+
+  public static <T extends IsRODAObject> void updateJobObjectsCount(Plugin<T> plugin, ModelService model,
+    Long objectsCount) {
+    try {
+      Job job = PluginHelper.getJob(plugin, model);
+      job.getJobStats().setSourceObjectsCount(objectsCount.intValue())
+        .setSourceObjectsWaitingToBeProcessed(objectsCount.intValue());
+
+      model.createOrUpdateJob(job);
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      LOGGER.error("Unable to get or update Job from model", e);
+    }
+  }
+
+  public static <T extends IsRODAObject> void updateJobInformation(Plugin<T> plugin, ModelService model,
+    JobPluginInfo jobPluginInfo) {
+
+    // update job
+    try {
+      LOGGER.debug("New job completionPercentage: {}", jobPluginInfo.getCompletionPercentage());
+      Job job = PluginHelper.getJob(plugin, model);
+      job = setJobCounters(job, jobPluginInfo);
+
+      model.createOrUpdateJob(job);
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      LOGGER.error("Unable to get or update Job from model", e);
+    }
+  }
+
+  private static Job setJobCounters(Job job, JobPluginInfo jobPluginInfo) {
+    JobStats jobStats = job.getJobStats();
+
+    jobStats.setCompletionPercentage(jobPluginInfo.getCompletionPercentage());
+    jobStats.setSourceObjectsCount(jobPluginInfo.getSourceObjectsCount());
+    jobStats.setSourceObjectsBeingProcessed(jobPluginInfo.getSourceObjectsBeingProcessed());
+    jobStats.setSourceObjectsProcessedWithSuccess(jobPluginInfo.getSourceObjectsProcessedWithSuccess());
+    jobStats.setSourceObjectsProcessedWithFailure(jobPluginInfo.getSourceObjectsProcessedWithFailure());
+    jobStats
+      .setSourceObjectsWaitingToBeProcessed(jobStats.getSourceObjectsCount() - jobStats.getSourceObjectsBeingProcessed()
+        - jobStats.getSourceObjectsProcessedWithFailure() - jobStats.getSourceObjectsProcessedWithSuccess());
+    jobStats.setOutcomeObjectsWithManualIntervention(jobPluginInfo.getOutcomeObjectsWithManualIntervention());
+    return job;
+  }
+
+  /**
+   * Updates the job state
+   */
+  public static <T extends IsRODAObject> void updateJobState(Plugin<T> plugin, JOB_STATE state,
+    Optional<String> stateDetails) {
+    RodaCoreFactory.getPluginOrchestrator().updateJob(plugin,
+      new Messages.JobStateUpdated(plugin, state, stateDetails));
+  }
+
+  public static <T extends IsRODAObject> void updateJobState(Plugin<T> plugin, JOB_STATE state, Throwable throwable) {
+    updateJobState(plugin, state, Optional.ofNullable(throwable.getClass().getName() + ": " + throwable.getMessage()));
+  }
+
   public static Job updateJobInTheStateStartedOrCreated(Job job) {
     job.setState(JOB_STATE.FAILED_TO_COMPLETE);
     JobStats jobStats = job.getJobStats();
@@ -81,6 +180,16 @@ public final class JobsHelper {
       jobStats.getSourceObjectsCount() - jobStats.getSourceObjectsProcessedWithSuccess());
     job.setEndDate(new Date());
     return job;
+  }
+
+  public static <T extends IsRODAObject> void setPluginParameters(Plugin<T> plugin, Job job) {
+    Map<String, String> parameters = new HashMap<String, String>(job.getPluginParameters());
+    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, job.getId());
+    try {
+      plugin.setParameterValues(parameters);
+    } catch (InvalidParameterException e) {
+      LOGGER.error("Error setting plugin parameters", e);
+    }
   }
 
   public static List<TransferredResource> getTransferredResources(IndexService index, List<String> uuids)

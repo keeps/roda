@@ -8,7 +8,6 @@
 package org.roda.core.plugins;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
@@ -20,8 +19,8 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
+import org.roda.core.plugins.orchestrate.akka.Messages.JobPartialUpdate;
 
 public interface PluginOrchestrator {
 
@@ -55,17 +54,8 @@ public interface PluginOrchestrator {
   /** 201603 hsilva: only tests should invoke this method synchronously */
   public void executeJob(Job job, boolean async) throws JobAlreadyStartedException;
 
-  /**
-   * 20160701 hsilva: not quite sure if this will continue to exist (e.g. in
-   * Akka this is difficult to implement)
-   */
+  /** 201608 hsilva: this method is sync */
   public void stopJob(Job job);
-
-  /**
-   * 20160701 hsilva: not quite sure if this will continue to exist as it isn't
-   * used
-   */
-  public void startJobsInTheStateCreated();
 
   /** 201607 hsilva: this method is sync */
   public void cleanUnfinishedJobs();
@@ -77,7 +67,7 @@ public interface PluginOrchestrator {
   public <T extends IsRODAObject> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo)
     throws JobException;
 
-  /** 201607 hsilva: this method is async */
-  public <T extends IsRODAObject> void updateJobState(Plugin<T> plugin, JOB_STATE state, Optional<String> stateDetails);
+  /** 201608 hsilva: this method is async */
+  public <T extends IsRODAObject> void updateJob(Plugin<T> plugin, JobPartialUpdate partialUpdate);
 
 }

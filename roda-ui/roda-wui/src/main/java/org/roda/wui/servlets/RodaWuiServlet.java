@@ -9,7 +9,6 @@ package org.roda.wui.servlets;
 
 import java.io.IOException;
 
-import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 
@@ -19,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RodaWuiServlet extends HttpServlet {
-  private static final Logger LOGGER = LoggerFactory.getLogger(ServletContextListener.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(RodaWuiServlet.class);
   private static final long serialVersionUID = 1523530268219980563L;
 
   @Override
@@ -42,7 +41,7 @@ public class RodaWuiServlet extends HttpServlet {
       RodaCoreFactory.shutdown();
       LOGGER.info("Shudown: ok...");
     } catch (IOException e) {
-      LOGGER.error("Error while shutting down " + RodaCoreFactory.class.getName());
+      LOGGER.error("Error while shutting down {}", RodaCoreFactory.class.getName());
     }
 
   }

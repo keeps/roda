@@ -8,7 +8,6 @@
 package org.roda.core.plugins.orchestrate;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.roda.core.data.adapter.filter.Filter;
@@ -21,11 +20,11 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginOrchestrator;
+import org.roda.core.plugins.orchestrate.akka.Messages.JobPartialUpdate;
 import org.roda.core.plugins.orchestrate.akka.distributed.AkkaDistributedPlugin;
 import org.roda.core.plugins.orchestrate.akka.distributed.Frontend;
 import org.roda.core.plugins.orchestrate.akka.distributed.Master;
@@ -215,12 +214,6 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
   }
 
   @Override
-  public void startJobsInTheStateCreated() {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
   public void cleanUnfinishedJobs() {
     // TODO Auto-generated method stub
 
@@ -240,8 +233,7 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
   }
 
   @Override
-  public <T extends IsRODAObject> void updateJobState(Plugin<T> plugin, JOB_STATE state,
-    Optional<String> stateDetails) {
+  public <T extends IsRODAObject> void updateJob(Plugin<T> plugin, JobPartialUpdate partialUpdate) {
     // TODO Auto-generated method stub
 
   }

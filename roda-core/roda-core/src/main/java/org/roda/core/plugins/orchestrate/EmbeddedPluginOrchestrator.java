@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -37,12 +36,12 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginOrchestrator;
+import org.roda.core.plugins.orchestrate.akka.Messages.JobPartialUpdate;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -354,11 +353,6 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void startJobsInTheStateCreated() {
-    // TODO Auto-generated method stub
-  }
-
-  @Override
   public void cleanUnfinishedJobs() {
     // TODO Auto-generated method stub
   }
@@ -374,8 +368,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public <T extends IsRODAObject> void updateJobState(Plugin<T> plugin, JOB_STATE state,
-    Optional<String> stateDetails) {
+  public <T extends IsRODAObject> void updateJob(Plugin<T> plugin, JobPartialUpdate partialUpdate) {
     // TODO Auto-generated method stub
 
   }

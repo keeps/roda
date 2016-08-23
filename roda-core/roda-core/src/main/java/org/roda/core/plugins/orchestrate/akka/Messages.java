@@ -9,6 +9,7 @@ package org.roda.core.plugins.orchestrate.akka;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,16 +28,22 @@ public class Messages {
     private String uuid;
 
     private AbstractMessage() {
-      uuid = UUID.randomUUID().toString();
-      LOGGER.trace("{} Created message {}", uuid, getClass().getSimpleName());
+      if (LOGGER.isTraceEnabled()) {
+        uuid = UUID.randomUUID().toString();
+        LOGGER.trace("{} Created message {}", uuid, getClass().getSimpleName());
+      }
     }
 
     public void logProcessingStarted() {
-      LOGGER.trace("{} Started processing message {} [[{}]]", uuid, getClass().getSimpleName(), toString());
+      if (LOGGER.isTraceEnabled()) {
+        LOGGER.trace("{} Started processing message {} [[{}]]", uuid, getClass().getSimpleName(), toString());
+      }
     }
 
     public void logProcessingEnded() {
-      LOGGER.trace("{} Ended processing message {}", uuid, getClass().getSimpleName());
+      if (LOGGER.isTraceEnabled()) {
+        LOGGER.trace("{} Ended processing message {}", uuid, getClass().getSimpleName());
+      }
     }
   }
 
@@ -67,7 +74,31 @@ public class Messages {
     }
   }
 
-  public static final class JobStateUpdated extends AbstractMessage {
+  public static abstract class JobPartialUpdate extends AbstractMessage {
+    private static final long serialVersionUID = 4722216970884172260L;
+  }
+
+  public static class JobSourceObjectsUpdated extends JobPartialUpdate {
+    private static final long serialVersionUID = -8395563279621159731L;
+
+    private Map<String, String> oldToNewIds;
+
+    public JobSourceObjectsUpdated(Map<String, String> oldToNewIds) {
+      super();
+      this.oldToNewIds = oldToNewIds;
+    }
+
+    public Map<String, String> getOldToNewIds() {
+      return oldToNewIds;
+    }
+
+    @Override
+    public String toString() {
+      return "JobSourceObjectsUpdate [oldToNewIds=" + oldToNewIds + "]";
+    }
+  }
+
+  public static final class JobStateUpdated extends JobPartialUpdate {
     private static final long serialVersionUID = 1946036502369851214L;
 
     private Plugin<?> plugin;

@@ -10,7 +10,6 @@
  */
 package org.roda.wui.common.client;
 
-import org.roda.core.data.common.LoginException;
 import org.roda.core.data.exceptions.LoggerException;
 
 import com.google.gwt.core.client.GWT;
@@ -157,6 +156,6 @@ public interface ClientLoggerService extends RemoteService {
    * @throws LoginException
    * @throws LoggerException
    */
-  public void pagehit(String pagename) throws LoginException, LoggerException;
+  public void pagehit(String pagename) throws LoggerException;
 
 }

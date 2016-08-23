@@ -28,7 +28,6 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.JobsHelper;
-import org.roda.core.plugins.plugins.PluginHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,13 +60,13 @@ public class AkkaJobActor extends AkkaBaseActor {
       Job job = (Job) msg;
       Plugin<? extends IsRODAObject> plugin = super.getPluginManager().getPlugin(job.getPlugin());
       if (plugin == null) {
-        PluginHelper.updateJobState(job, super.getModel(), JOB_STATE.FAILED_TO_COMPLETE, Optional.of("Plugin is NULL"));
+        JobsHelper.updateJobState(job, super.getModel(), JOB_STATE.FAILED_TO_COMPLETE, Optional.of("Plugin is NULL"));
         // 20160818 hsilva: the following instruction is needed for the "sync"
         // execution of a job (i.e. for testing purposes)
         getSender().tell("Failed to complete", getSelf());
         return;
       }
-      PluginHelper.setPluginParameters(plugin, job);
+      JobsHelper.setPluginParameters(plugin, job);
 
       String jobId = job.getId();
       ActorRef jobStateInfoActor = getContext().actorOf(
@@ -93,7 +92,7 @@ public class AkkaJobActor extends AkkaBaseActor {
       }
 
     } else {
-      LOGGER.error("Received a message that it doesn't know how to process (" + msg.getClass().getName() + ")...");
+      LOGGER.error("Received a message that it doesn't know how to process ({})...", msg.getClass().getName());
       unhandled(msg);
     }
   }
@@ -159,7 +158,7 @@ public class AkkaJobActor extends AkkaBaseActor {
 
     // count objects & update job stats
     Long objectsCount = super.getIndex().count(sourceObjectsClass, selectedItems.getFilter());
-    PluginHelper.updateJobObjectsCount(plugin, super.getModel(), objectsCount);
+    JobsHelper.updateJobObjectsCount(plugin, super.getModel(), objectsCount);
 
     // execute
     super.getPluginOrchestrator().runPluginFromIndex(jobStateInfoActor, sourceObjectsClass, selectedItems.getFilter(),

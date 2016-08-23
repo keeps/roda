@@ -21,21 +21,10 @@ import org.roda.core.data.v2.user.RodaUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// FIXME 20160714 hsilva: to be removed and code moved to ControllerAssistant
-public abstract class RodaCoreService {
-  private static final Logger LOGGER = LoggerFactory.getLogger(RodaCoreService.class);
+public final class ControllerAssistantUtils {
+  private static final Logger LOGGER = LoggerFactory.getLogger(ControllerAssistantUtils.class);
 
-  /**
-   * @deprecated 20160718 hsilva: use
-   *             {@link RodaCoreService#registerAction(RodaUser, String, String, String, long, LOG_ENTRY_STATE, Object...)}
-   *             instead
-   */
-  public static void registerAction(RodaUser user, String actionComponent, String actionMethod, String aipId,
-    long duration, Object... parameters) {
-    registerAction(user, actionComponent, actionMethod, aipId, duration, LOG_ENTRY_STATE.UNKNOWN, parameters);
-  }
-
-  public static void registerAction(RodaUser user, String actionComponent, String actionMethod, String aipId,
+  protected static void registerAction(RodaUser user, String actionComponent, String actionMethod, String aipId,
     long duration, LOG_ENTRY_STATE state, Object... parameters) {
     LogEntry logEntry = createLogEntry(user, actionComponent, actionMethod, aipId, duration, state, parameters);
     registerAction(logEntry);
@@ -46,8 +35,9 @@ public abstract class RodaCoreService {
     List<LogEntryParameter> logParameters = new ArrayList<LogEntryParameter>();
     if (parameters != null && parameters.length > 0) {
       if ((parameters.length % 2) != 0) {
-        LOGGER.warn("registerAction(" + actionComponent + "/" + actionMethod
-          + ",...) failed because parameters array must have pairs of elements (even length)");
+        LOGGER.warn(
+          "registerAction (actionComponent={}, actionMethod={}) failed because parameters array must have pairs of elements (even length)",
+          actionComponent, actionMethod);
       } else {
         for (int i = 0; i < parameters.length; i += 2) {
           Object key = parameters[i];
@@ -82,7 +72,8 @@ public abstract class RodaCoreService {
     try {
       RodaCoreFactory.getModelService().addLogEntry(logEntry, RodaCoreFactory.getLogPath());
     } catch (RODAException e) {
-      LOGGER.error("Error registering action '" + logEntry.getActionComponent() + "'", e);
+      LOGGER.error("Error registering action (actionComponent={}, actionMethod={})", logEntry.getActionComponent(),
+        logEntry.getActionMethod(), e);
     }
   }
 }

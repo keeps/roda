@@ -16,7 +16,15 @@ import java.net.URL;
 
 import org.roda.core.data.exceptions.GenericException;
 
-public class HTTPUtility {
+/**
+ * @author Sébastien Leroux <sleroux@keep.pt>
+ */
+public final class HTTPUtility {
+  /** Private empty constructor */
+  private HTTPUtility() {
+
+  }
+
   public static String doGet(String url) throws IOException, GenericException {
     String res = null;
     URL obj = new URL(url);

@@ -221,7 +221,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
         } else
           throw new NotFoundException();
       } catch (NotFoundException e) {
-        Job currentJob = PluginHelper.getJobFromIndex(this, index);
+        Job currentJob = PluginHelper.getJob(this, index);
         if (currentJob == null) {
           throw new GenericException("Job is null");
         }

@@ -268,7 +268,7 @@ public class IndexModelObserver implements ModelObserver {
       index.add(RodaConstants.INDEX_FILE, fileDocument);
 
     } catch (SolrServerException | IOException e) {
-      LOGGER.error("Cannot index file: " + file, e);
+      LOGGER.error("Cannot index file: {}", file, e);
     }
 
     if (recursive && file.isDirectory()) {
@@ -284,7 +284,7 @@ public class IndexModelObserver implements ModelObserver {
         IOUtils.closeQuietly(allFiles);
 
       } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-        LOGGER.error("Cannot index file sub-resources: " + file, e);
+        LOGGER.error("Cannot index file sub-resources: {}", file, e);
       }
     }
 
@@ -298,7 +298,7 @@ public class IndexModelObserver implements ModelObserver {
     } catch (NotFoundException e) {
       LOGGER.trace("On indexing representations, did not find PREMIS for file: {}", file);
     } catch (RODAException e) {
-      LOGGER.warn("On indexing representations, error loading PREMIS for file: " + file, e);
+      LOGGER.warn("On indexing representations, error loading PREMIS for file: {}", file, e);
     }
     return premisFile;
   }
@@ -316,7 +316,7 @@ public class IndexModelObserver implements ModelObserver {
         fulltext = IOUtils.toString(inputStream);
       }
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | IOException e) {
-      LOGGER.warn("Error getting fulltext for file: " + file, e);
+      LOGGER.warn("Error getting fulltext for file: {}", file, e);
     } catch (NotFoundException e) {
       LOGGER.trace("Fulltext not found for file: {}", file);
     } finally {
@@ -385,7 +385,7 @@ public class IndexModelObserver implements ModelObserver {
       index.add(RodaConstants.INDEX_FILE, fileDoc);
 
     } catch (SolrServerException | IOException e) {
-      LOGGER.error("Cannot index file: " + file, e);
+      LOGGER.error("Cannot index file: {}", file, e);
     }
 
     if (recursive && file.isDirectory()) {
@@ -401,7 +401,7 @@ public class IndexModelObserver implements ModelObserver {
         IOUtils.closeQuietly(allFiles);
 
       } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-        LOGGER.error("Cannot index file sub-resources: " + file, e);
+        LOGGER.error("Cannot index file sub-resources: {}", file, e);
       }
     }
   }
@@ -447,13 +447,13 @@ public class IndexModelObserver implements ModelObserver {
   public void aipMoved(AIP aip, String oldParentId, String newParentId) {
 
     try {
-      LOGGER.debug("Reindexing moved aip " + aip.getId());
+      LOGGER.debug("Reindexing moved aip {}", aip.getId());
       List<String> topAncestors = SolrUtils.getAncestors(newParentId, model);
       SolrInputDocument aipDoc = SolrUtils.updateAIPParentId(aip.getId(), newParentId, topAncestors);
       index.add(RodaConstants.INDEX_AIP, aipDoc);
       updateRepresentationAndFileAncestors(aip, topAncestors);
 
-      LOGGER.debug("Finding descendents of moved aip " + aip.getId());
+      LOGGER.debug("Finding descendents of moved aip {}", aip.getId());
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
       SolrUtils.execute(index, IndexedAIP.class, filter, new IndexRunnable<IndexedAIP>() {
 
@@ -462,7 +462,7 @@ public class IndexModelObserver implements ModelObserver {
           throws RequestNotValidException, GenericException, AuthorizationDeniedException {
           SolrInputDocument descendantDoc;
           try {
-            LOGGER.debug("Reindexing aip " + aip.getId() + " descendent " + item.getId());
+            LOGGER.debug("Reindexing aip {} descendent {}", aip.getId(), item.getId());
             List<String> ancestors = SolrUtils.getAncestors(item.getParentID(), model);
             descendantDoc = SolrUtils.updateAIPAncestors(item.getId(), ancestors);
             index.add(RodaConstants.INDEX_AIP, descendantDoc);
@@ -474,14 +474,14 @@ public class IndexModelObserver implements ModelObserver {
             }
 
           } catch (SolrServerException | IOException | NotFoundException e) {
-            LOGGER.error("Error indexing moved AIP " + aip.getId() + " from " + oldParentId + " to " + newParentId, e);
+            LOGGER.error("Error indexing moved AIP {} from {} to {}", aip.getId(), oldParentId, newParentId, e);
           }
         }
       });
 
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | SolrServerException
       | IOException | NotFoundException e) {
-      LOGGER.error("Error indexing moved AIP " + aip.getId() + " from " + oldParentId + " to " + newParentId, e);
+      LOGGER.error("Error indexing moved AIP {} from {} to {}", aip.getId(), oldParentId, newParentId, e);
     }
   }
 
@@ -563,7 +563,7 @@ public class IndexModelObserver implements ModelObserver {
       List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
       indexRepresentation(aip, representation, ancestors);
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      LOGGER.error("Cannot index representation: " + representation, e);
+      LOGGER.error("Cannot index representation: {}", representation, e);
     }
 
   }
@@ -595,7 +595,7 @@ public class IndexModelObserver implements ModelObserver {
       List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
       indexFile(aip, file, ancestors, recursive);
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      LOGGER.error("Error indexing file: " + file, e);
+      LOGGER.error("Error indexing file: {}", file, e);
     }
   }
 
@@ -703,7 +703,7 @@ public class IndexModelObserver implements ModelObserver {
       } catch (SolrServerException | RequestNotValidException | GenericException | NotFoundException
         | AuthorizationDeniedException | XPathExpressionException | ParserConfigurationException | SAXException
         | IOException e) {
-        LOGGER.error("Error adding other properties to indexed file: " + e.getMessage(), e);
+        LOGGER.error("Error adding other properties to indexed file", e);
       }
 
     }
@@ -808,7 +808,7 @@ public class IndexModelObserver implements ModelObserver {
       index.add(RodaConstants.INDEX_FILE, fileDoc);
 
     } catch (SolrServerException | IOException e) {
-      LOGGER.error("Cannot index file: " + file, e);
+      LOGGER.error("Cannot index file: {}", file, e);
     }
 
     if (recursive && file.isDirectory()) {
@@ -824,7 +824,7 @@ public class IndexModelObserver implements ModelObserver {
         IOUtils.closeQuietly(allFiles);
 
       } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-        LOGGER.error("Cannot index file sub-resources: " + file, e);
+        LOGGER.error("Cannot index file sub-resources: {}", file, e);
       }
     }
   }

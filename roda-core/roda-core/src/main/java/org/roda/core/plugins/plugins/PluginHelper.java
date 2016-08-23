@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -34,7 +33,6 @@ import org.roda.core.data.common.RodaConstants.RODA_TYPE;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -56,8 +54,6 @@ import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.Job.JOB_STATE;
-import org.roda.core.data.v2.jobs.JobStats;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -70,6 +66,7 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.IngestJobPluginInfo;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
+import org.roda.core.plugins.orchestrate.akka.Messages;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
@@ -236,7 +233,7 @@ public final class PluginHelper {
    * 20160329 hsilva: use this method only to get job information that most
    * certainly won't change in time (e.g. username, etc.)
    */
-  public static <T extends IsRODAObject> Job getJobFromIndex(Plugin<T> plugin, IndexService index)
+  public static <T extends IsRODAObject> Job getJob(Plugin<T> plugin, IndexService index)
     throws NotFoundException, GenericException {
     String jobId = getJobId(plugin);
     if (jobId != null) {
@@ -247,13 +244,13 @@ public final class PluginHelper {
 
   }
 
-  public static <T extends IsRODAObject> Job getJobFromModel(Plugin<T> plugin, ModelService model)
+  public static <T extends IsRODAObject> Job getJob(Plugin<T> plugin, ModelService model)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     String jobId = getJobId(plugin);
-    return getJobFromModel(jobId, model);
+    return getJob(jobId, model);
   }
 
-  public static <T extends IsRODAObject> Job getJobFromModel(String jobId, ModelService model)
+  public static <T extends IsRODAObject> Job getJob(String jobId, ModelService model)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     if (jobId != null) {
       return model.retrieveJob(jobId);
@@ -284,18 +281,6 @@ public final class PluginHelper {
       throw new NotFoundException("Job not found");
     }
 
-  }
-
-  /**
-   * Updates the job state
-   */
-  public static <T extends IsRODAObject> void updateJobState(Plugin<T> plugin, JOB_STATE state,
-    Optional<String> stateDetails) {
-    RodaCoreFactory.getPluginOrchestrator().updateJobState(plugin, state, stateDetails);
-  }
-
-  public static <T extends IsRODAObject> void updateJobState(Plugin<T> plugin, JOB_STATE state, Throwable throwable) {
-    updateJobState(plugin, state, Optional.ofNullable(throwable.getClass().getName() + ": " + throwable.getMessage()));
   }
 
   /**
@@ -336,124 +321,8 @@ public final class PluginHelper {
     return jobPluginInfo;
   }
 
-  /**
-   * 20160531 hsilva:Only orchestrators/orchestrators related classes should
-   * invoke this method
-   */
-  public static <T extends IsRODAObject> void updateJobState(Plugin<T> plugin, ModelService model, JOB_STATE state,
-    Optional<String> stateDetails) {
-    try {
-      Job job = PluginHelper.getJobFromModel(plugin, model);
-      job.setState(state);
-      if (stateDetails.isPresent()) {
-        job.setStateDetails(stateDetails.get());
-      }
-      if (job.isInFinalState()) {
-        job.setEndDate(new Date());
-      }
-
-      model.createOrUpdateJob(job);
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-      LOGGER.error("Unable to get or update Job from model", e);
-    }
-  }
-
-  /**
-   * 20160531 hsilva:Only orchestrators/orchestrators related classes should
-   * invoke this method
-   */
-  public static <T extends IsRODAObject> void updateJobState(Job job, ModelService model, JOB_STATE state,
-    Optional<String> stateDetails) {
-    try {
-      Job jobFromModel = PluginHelper.getJobFromModel(job.getId(), model);
-      jobFromModel.setState(state);
-      if (stateDetails.isPresent()) {
-        jobFromModel.setStateDetails(stateDetails.get());
-      }
-      if (jobFromModel.isInFinalState()) {
-        jobFromModel.setEndDate(new Date());
-      }
-
-      model.createOrUpdateJob(jobFromModel);
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-      LOGGER.error("Unable to get or update Job from model", e);
-    }
-  }
-
-  /**
-   * 20160531 hsilva:Only orchestrators/orchestrators related classes should
-   * invoke this method
-   */
-  public static <T extends IsRODAObject> void updateJobObjectsCount(Plugin<T> plugin, ModelService model,
-    Long objectsCount) {
-    try {
-      Job job = PluginHelper.getJobFromModel(plugin, model);
-      job.getJobStats().setSourceObjectsCount(objectsCount.intValue())
-        .setSourceObjectsWaitingToBeProcessed(objectsCount.intValue());
-
-      model.createOrUpdateJob(job);
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-      LOGGER.error("Unable to get or update Job from model", e);
-    }
-  }
-
-  /**
-   * 20160531 hsilva:Only orchestrators/orchestrators related classes should
-   * invoke this method
-   */
-  public static <T extends IsRODAObject> void updateJobInformation(Plugin<T> plugin, ModelService model,
-    JobPluginInfo jobPluginInfo) {
-
-    // update job
-    try {
-      LOGGER.debug("New job completionPercentage: {}", jobPluginInfo.getCompletionPercentage());
-      Job job = PluginHelper.getJobFromModel(plugin, model);
-      job = setJobCounters(job, jobPluginInfo);
-
-      model.createOrUpdateJob(job);
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-      LOGGER.error("Unable to get or update Job from model", e);
-    }
-  }
-
-  public static Job updateJobInTheStateStartedOrCreated(Job job) {
-    job.setState(JOB_STATE.FAILED_TO_COMPLETE);
-    JobStats jobStats = job.getJobStats();
-    jobStats.setSourceObjectsBeingProcessed(0);
-    jobStats.setSourceObjectsProcessedWithSuccess(0);
-    jobStats.setSourceObjectsProcessedWithFailure(jobStats.getSourceObjectsCount());
-    jobStats.setSourceObjectsWaitingToBeProcessed(0);
-    job.setEndDate(new Date());
-    return job;
-  }
-
-  public static Job setJobCounters(Job job, JobPluginInfo jobPluginInfo) {
-    JobStats jobStats = job.getJobStats();
-
-    jobStats.setCompletionPercentage(jobPluginInfo.getCompletionPercentage());
-    jobStats.setSourceObjectsCount(jobPluginInfo.getSourceObjectsCount());
-    jobStats.setSourceObjectsBeingProcessed(jobPluginInfo.getSourceObjectsBeingProcessed());
-    jobStats.setSourceObjectsProcessedWithSuccess(jobPluginInfo.getSourceObjectsProcessedWithSuccess());
-    jobStats.setSourceObjectsProcessedWithFailure(jobPluginInfo.getSourceObjectsProcessedWithFailure());
-    jobStats
-      .setSourceObjectsWaitingToBeProcessed(jobStats.getSourceObjectsCount() - jobStats.getSourceObjectsBeingProcessed()
-        - jobStats.getSourceObjectsProcessedWithFailure() - jobStats.getSourceObjectsProcessedWithSuccess());
-    jobStats.setOutcomeObjectsWithManualIntervention(jobPluginInfo.getOutcomeObjectsWithManualIntervention());
-    return job;
-  }
-
   /***************** Plugin parameters related *****************/
   /*************************************************************/
-  public static <T extends IsRODAObject> void setPluginParameters(Plugin<T> plugin, Job job) {
-    Map<String, String> parameters = new HashMap<String, String>(job.getPluginParameters());
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, job.getId());
-    try {
-      plugin.setParameterValues(parameters);
-    } catch (InvalidParameterException e) {
-      LOGGER.error("Error setting plug-in parameters", e);
-    }
-  }
-
   public static <T extends IsRODAObject> boolean getBooleanFromParameters(Plugin<T> plugin,
     PluginParameter pluginParameter) {
     return verifyIfStepShouldBePerformed(plugin, pluginParameter);
@@ -614,6 +483,10 @@ public final class PluginHelper {
       outcomeDetailExtension, notify, new Date());
   }
 
+  /**
+   * @deprecated 20160824 hsilva: not seeing any method using it, so it will be
+   *             removed soon
+   */
   public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
     ModelService model, IndexService index, PluginState outcome, String outcomeDetailExtension, boolean notify,
     Date eventDate) throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
@@ -680,7 +553,7 @@ public final class PluginHelper {
 
     Job job;
     try {
-      job = getJobFromIndex(plugin, index);
+      job = getJob(plugin, index);
     } catch (NotFoundException e) {
       job = null;
     }
@@ -744,6 +617,10 @@ public final class PluginHelper {
     return li;
   }
 
+  /**
+   * @deprecated 20160824 hsilva: not seeing any method using it, so it will be
+   *             removed soon
+   */
   public static List<LinkingIdentifier> getLinkingRepresentations(AIP aip, String role) {
     List<LinkingIdentifier> identifiers = new ArrayList<LinkingIdentifier>();
     if (aip.getRepresentations() != null && !aip.getRepresentations().isEmpty()) {
@@ -754,6 +631,10 @@ public final class PluginHelper {
     return identifiers;
   }
 
+  /**
+   * @deprecated 20160824 hsilva: not seeing any method using it, so it will be
+   *             removed soon
+   */
   public static List<LinkingIdentifier> getLinkingIdentifiers(List<TransferredResource> resources, String role) {
     List<LinkingIdentifier> identifiers = new ArrayList<LinkingIdentifier>();
     if (resources != null && !resources.isEmpty()) {
@@ -764,7 +645,7 @@ public final class PluginHelper {
     return identifiers;
   }
 
-  public static <T extends IsRODAObject> void moveSIPs(Plugin<T> plugin, ModelService model,
+  public static <T extends IsRODAObject> void moveSIPs(Plugin<T> plugin, ModelService model, IndexService index,
     List<TransferredResource> transferredResources, IngestJobPluginInfo jobPluginInfo) {
     List<String> success = new ArrayList<>();
     List<String> unsuccess = new ArrayList<>();
@@ -829,7 +710,7 @@ public final class PluginHelper {
 
     // update Job (with all new ids)
     successOldToNewTransferredResourceIds.putAll(unsuccessOldToNewTransferredResourceIds);
-    updateJobAfterMovingSIPs(plugin, model, successOldToNewTransferredResourceIds);
+    updateJobAfterMovingSIPs(plugin, index, successOldToNewTransferredResourceIds);
 
   }
 
@@ -850,23 +731,20 @@ public final class PluginHelper {
     }
   }
 
-  private static <T extends IsRODAObject> void updateJobAfterMovingSIPs(Plugin<T> plugin, ModelService model,
+  /**
+   * Update Job source object ids (done asynchronously)
+   */
+  private static <T extends IsRODAObject> void updateJobAfterMovingSIPs(Plugin<T> plugin, IndexService index,
     Map<String, String> oldToNewTransferredResourceIds) {
     try {
-      Job job = getJobFromModel(plugin, model);
+      Job job = getJob(plugin, index);
       SelectedItems<?> sourceObjects = job.getSourceObjects();
       if (sourceObjects instanceof SelectedItemsList) {
-        SelectedItemsList<T> list = (SelectedItemsList<T>) sourceObjects;
-        ArrayList<String> newIds = new ArrayList<String>();
-        for (String oldId : list.getIds()) {
-          newIds.add(oldToNewTransferredResourceIds.get(oldId));
-        }
-        list.setIds(newIds);
+        RodaCoreFactory.getPluginOrchestrator().updateJob(plugin,
+          new Messages.JobSourceObjectsUpdated(oldToNewTransferredResourceIds));
       }
-
-      model.createOrUpdateJob(job);
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-      LOGGER.error("Error updating Job", e);
+    } catch (NotFoundException | GenericException e) {
+      LOGGER.error("Error retrieving Job", e);
     }
   }
 

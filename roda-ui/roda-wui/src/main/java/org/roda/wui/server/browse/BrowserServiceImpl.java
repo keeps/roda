@@ -124,7 +124,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public String retrieveGoogleAnalyticsAccount() {
     if (GANALYTICS_ACCOUNT_CODE == null) {
       GANALYTICS_ACCOUNT_CODE = RodaCoreFactory.getRodaConfiguration().getString(GANALYTICS_CODE_PROPERTY, "");
-      LOGGER.debug("Google Analytics Account Code: " + GANALYTICS_ACCOUNT_CODE);
+      LOGGER.debug("Google Analytics Account Code: {}", GANALYTICS_ACCOUNT_CODE);
     }
     return GANALYTICS_ACCOUNT_CODE;
   }
@@ -133,7 +133,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public String retrieveGoogleReCAPTCHAAccount() {
     if (GRECAPTCHA_ACCOUNT_CODE == null) {
       GRECAPTCHA_ACCOUNT_CODE = RodaCoreFactory.getRodaConfiguration().getString(GRECAPTCHA_CODE_PROPERTY, "");
-      LOGGER.debug("Google ReCAPTCHA Account Code: " + GRECAPTCHA_ACCOUNT_CODE);
+      LOGGER.debug("Google ReCAPTCHA Account Code: {}", GRECAPTCHA_ACCOUNT_CODE);
     }
     return GRECAPTCHA_ACCOUNT_CODE;
   }
@@ -237,7 +237,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     List<SearchField> searchFields = new ArrayList<SearchField>();
     List<String> fields = RodaUtils.copyList(RodaCoreFactory.getRodaConfiguration().getList("ui.search.fields"));
 
-    Messages messages = RodaCoreFactory.getI18NMessages(new Locale(localeString));
+    Locale locale = ServerTools.parseLocale(localeString);
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
     for (String field : fields) {
       SearchField searchField = new SearchField();
 

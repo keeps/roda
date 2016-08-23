@@ -70,7 +70,7 @@ public class ClassLoaderUtility {
     for (int i = 0; i < urls.length; i++) {
 
       if (StringUtils.equalsIgnoreCase(urls[i].toString(), url.toString())) {
-        LOGGER.debug("URL " + url + " is already in the CLASSPATH");
+        LOGGER.debug("URL {} is already in the CLASSPATH", url);
         return;
       }
     }
@@ -82,8 +82,7 @@ public class ClassLoaderUtility {
       method.setAccessible(true);
       method.invoke(sysLoader, new Object[] {url});
     } catch (Throwable t) {
-      t.printStackTrace();
-      throw new IOException("Error, could not add URL to system classloader");
+      throw new IOException("Error, could not add URL to system classloader", t);
     }
   }
 
@@ -105,11 +104,9 @@ public class ClassLoaderUtility {
       throw new IllegalArgumentException("className cannot be null");
     }
 
-    LOGGER.trace("Loading class " + className + " with ClassLoader " + CLASS_LOADER.getClass().getSimpleName());
+    LOGGER.trace("Loading class {} with ClassLoader {}", className, CLASS_LOADER.getClass().getSimpleName());
 
-    Class clazz = CLASS_LOADER.loadClass(className);
-
-    return clazz.newInstance();
+    return CLASS_LOADER.loadClass(className).newInstance();
   }
 
   /**
@@ -135,10 +132,9 @@ public class ClassLoaderUtility {
 
     URLClassLoader clazzLoader = new URLClassLoader(urls, CLASS_LOADER);
 
-    LOGGER.trace("Loading class " + className + " with ClassLoader " + CLASS_LOADER.getClass().getSimpleName());
+    LOGGER.trace("Loading class {} with ClassLoader {}", className, CLASS_LOADER.getClass().getSimpleName());
 
-    Class clazz = clazzLoader.loadClass(className);
-    return clazz.newInstance();
+    return clazzLoader.loadClass(className).newInstance();
   }
 
   /**
@@ -169,11 +165,9 @@ public class ClassLoaderUtility {
 
     URLClassLoader clazzLoader = new URLClassLoader(new URL[] {url}, CLASS_LOADER);
 
-    LOGGER.trace("Loading class " + className + " with ClassLoader " + CLASS_LOADER.getClass().getSimpleName());
+    LOGGER.trace("Loading class {} with ClassLoader {}", className, CLASS_LOADER.getClass().getSimpleName());
 
-    Class clazz = clazzLoader.loadClass(className);
-
-    return clazz.newInstance();
+    return clazzLoader.loadClass(className).newInstance();
   }
 
 }

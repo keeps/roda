@@ -28,9 +28,12 @@ import org.slf4j.LoggerFactory;
  * (http://www.javacommerce.com/displaypage.jsp?name=javamail.sql&id=18274).
  * 
  * @author Rui Castro
+ * 
+ * @deprecated 20160824 hsilva: not seeing any method using it, so it will be
+ *             removed soon
  */
 public class EmailUtility {
-  private static final Logger logger = LoggerFactory.getLogger(EmailUtility.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(EmailUtility.class);
 
   private String smtpHost = null;
 
@@ -45,7 +48,7 @@ public class EmailUtility {
   public EmailUtility(String smtpHost) {
 
     if (StringUtils.isBlank(smtpHost)) {
-      logger.warn("SMTP host is not valid '" + smtpHost + "'. Using default localhost.");
+      LOGGER.warn("SMTP host is not valid '{}'. Using default localhost.", smtpHost);
       this.smtpHost = "localhost";
     } else {
       this.smtpHost = smtpHost;
@@ -87,8 +90,9 @@ public class EmailUtility {
     // want
     // msg.addHeader("MyHeaderName", "myHeaderValue");
 
-    String htmlMessage = String.format("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-      + "<html><body><pre>%s</pre></body></html>", StringEscapeUtils.escapeHtml4(message));
+    String htmlMessage = String.format(
+      "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "<html><body><pre>%s</pre></body></html>",
+      StringEscapeUtils.escapeHtml4(message));
 
     MimeMultipart mimeMultipart = new MimeMultipart();
     MimeBodyPart mimeBodyPart = new MimeBodyPart();
