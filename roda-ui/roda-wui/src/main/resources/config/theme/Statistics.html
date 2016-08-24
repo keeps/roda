@@ -3,47 +3,67 @@
 
     <h2>Line charts</h2>
     <h3>Description level distribution</h3>
-    <canvas class="chart" data-function="singleFacetLineChart"
+    <canvas class="chart"
+            data-type="line"
+            data-source="facet"
             data-class="org.roda.core.data.v2.ip.IndexedAIP"
             data-facet="level"></canvas>
 
     <h3>Log entries per component distribution</h3>
-    <canvas class="chart" data-function="singleFacetLineChart"
+    <canvas class="chart"
+            data-type="line"
+            data-source="facet"
             data-class="org.roda.core.data.v2.log.LogEntry"
             data-facet="actionComponent"></canvas>
 
     <h2>Bar charts</h2>
     <h3>Description level distribution</h3>
-    <canvas class="chart" data-function="singleFacetBarChart"
+    <canvas class="chart"
+            data-type="bar"
+            data-source="facet"
             data-class="org.roda.core.data.v2.ip.IndexedAIP"
             data-facet="level"></canvas>
 
     <h3>Log entries per component distribution</h3>
-    <canvas class="chart" data-function="singleFacetBarChart"
+    <canvas class="chart"
+            data-type="bar"
+            data-source="facet"
             data-class="org.roda.core.data.v2.log.LogEntry"
             data-facet="actionComponent"></canvas>
 
-    <!--
     <h2>Radar charts</h2>
     <h3>File formats</h3>
-    <canvas class="chart" data-function="multipleFacetsRadarChart"
-            data-class="org.roda.core.data.v2.ip.IndexedFile"
-            data-facets="fileFormat,formatMimetype,formatPronom"></canvas>
-    -->
-
-    <h2>Pie charts</h2>
-    <h3>File format distribution</h3>
-    <canvas class="chart" data-function="singleFacetPieChart"
+    <canvas class="chart"
+            data-type="radar"
+            data-source="facet"
             data-class="org.roda.core.data.v2.ip.IndexedFile"
             data-facet="fileFormat"></canvas>
 
+    <h2>Polar area charts</h2>
     <h3>Mimetype distribution</h3>
-    <canvas class="chart" data-function="singleFacetPieChart"
+    <canvas class="chart"
+            data-type="polarArea"
+            data-source="facet"
             data-class="org.roda.core.data.v2.ip.IndexedFile"
             data-facet="formatMimetype"></canvas>
 
+    <h2>Pie/doughnut charts</h2>
+    <h3>File format distribution</h3>
+    <canvas class="chart"
+            data-type="pie"
+            data-source="facet"
+            data-class="org.roda.core.data.v2.ip.IndexedFile"
+            data-facet="fileFormat"></canvas>
+
     <h3>Pronom format distribution</h3>
-    <canvas class="chart" data-function="singleFacetPieChart"
+    <canvas class="chart"
+            data-type="doughnut"
+            data-source="facet"
             data-class="org.roda.core.data.v2.ip.IndexedFile"
             data-facet="formatPronom"></canvas>
+
+    <h2>Bubble charts</h2>
+    <h3>Custom data</h3>
+    <canvas class="chart"
+            data-function="customDataBubbleChart"></canvas>
 </div>
