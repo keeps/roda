@@ -11,6 +11,171 @@
 <div id="statistics" class="static-page max-width">
     <h1>Statistics</h1>
 
+    <h2>AIP Index</h2>
+    <h3>Distribution of description levels</h3>
+    <table>
+        <tbody>
+        <tr>
+            <td>
+                <canvas class="chart"
+                        data-type="pie"
+                        data-source="facet"
+                        data-class="org.roda.core.data.v2.ip.IndexedAIP"
+                        data-facets="level"></canvas>
+            </td>
+            <td>
+                <pre>
+&lt;canvas class="chart"
+        data-type="bar"
+        data-source="facet"
+        data-class="org.roda.core.data.v2.ip.IndexedAIP"
+        data-facets="level"&gt;&lt;/canvas&gt;
+                </pre>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h2>Representations Index</h2>
+    <h3>Distribution of representation types</h3>
+    <table>
+        <tbody>
+        <tr>
+            <td>
+                <canvas class="chart"
+                        data-type="bar"
+                        data-source="facet"
+                        data-class="org.roda.core.data.v2.ip.IndexedRepresentation"
+                        data-facets="type"></canvas>
+            </td>
+            <td>
+                <pre>
+&lt;canvas class="chart"
+        data-type="bar"
+        data-source="facet"
+        data-class="org.roda.core.data.v2.ip.IndexedRepresentation"
+        data-facets="type"&gt;&lt;/canvas&gt;
+                </pre>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h2>Files index</h2>
+    <h3>Distribution of mimetypes</h3>
+    <table>
+        <tbody>
+        <tr>
+            <td>
+                <canvas class="chart"
+                        data-type="pie"
+                        data-source="facet"
+                        data-class="org.roda.core.data.v2.ip.IndexedFile"
+                        data-facets="formatMimetype"></canvas>
+            </td>
+            <td>
+                <pre>
+&lt;canvas class="chart"
+        data-type="pie"
+        data-source="facet"
+        data-class="org.roda.core.data.v2.ip.IndexedFile"
+        data-facets="formatMimetype"&gt;&lt;/canvas&gt;
+                </pre>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h3>Distribution of PRONOM IDs</h3>
+    <table>
+        <tbody>
+        <tr>
+            <td>
+                <canvas class="chart"
+                        data-type="doughnut"
+                        data-source="facet"
+                        data-class="org.roda.core.data.v2.ip.IndexedFile"
+                        data-facets="formatPronom"></canvas>
+            </td>
+            <td>
+                <pre>
+&lt;canvas class="chart"
+        data-type="pie"
+        data-source="facet"
+        data-class="org.roda.core.data.v2.ip.IndexedFile"
+        data-facets="formatPronom"&gt;&lt;/canvas&gt;
+                </pre>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h3>Distribution of MB per mime type (bars)</h3>
+    <strong>Custom function, but done on client site is not scalable.</strong>
+
+    <h2>Job index</h2>
+    <h3>Total No of Ingest jobs</h3>
+    <table>
+        <tbody>
+        <tr>
+            <td>
+                <canvas class="chart"
+                        data-type="pie"
+                        data-source="facet"
+                        data-class="org.roda.core.data.v2.jobs.Job"
+                        data-filters="pluginType=INGEST, state=COMPLETED"
+                        data-facets="pluginType"></canvas>
+            </td>
+            <td>
+                <pre>
+&lt;canvas class="chart"
+        data-type="pie"
+        data-source="facet"
+        data-class="org.roda.core.data.v2.jobs.Job"
+        data-filters="pluginType=INGEST, state=COMPLETED"
+        data-facets="pluginType">&lt;/canvas>
+                </pre>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h2>Users and groups index</h2>
+    <h3>Total No. of users</h3>
+    <strong>Custom function.</strong>
+    (Apparently it's not possible to get a list of users; only a list of RODAMembers.)
+    <h3>Distribution of number of users per group (Pie or Bars)</h3>
+    <strong>Custom function</strong>
+
+    <h2>Log index</h2>
+    <h3>Total No of successful/failed logins</h3>
+    <table>
+        <tbody>
+        <tr>
+            <td>
+                <canvas class="chart"
+                        data-type="pie"
+                        data-source="facet"
+                        data-class="org.roda.core.data.v2.log.LogEntry"
+                        data-filters="actionComponent=org.roda.wui.api.controllers.UserLogin, actionMethod=login"
+                        data-facets="state"></canvas>
+            </td>
+            <td>
+                <pre>
+&lt;canvas class="chart"
+        data-type="pie"
+        data-source="facet"
+        data-class="org.roda.core.data.v2.log.LogEntry"
+        data-filters="actionComponent=org.roda.wui.api.controllers.UserLogin, actionMethod=login"
+        data-facets="state">&lt;/canvas>
+                </pre>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h1>Other charts</h1>
+
     <h2>Line charts</h2>
     <h3>Description level distribution</h3>
     <table>
@@ -30,79 +195,6 @@
         data-source="facet"
         data-class="org.roda.core.data.v2.ip.IndexedAIP"
         data-facets="level"></canvas>
-                </pre>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-
-    <h3>Log entries per component distribution</h3>
-    <table>
-        <tbody>
-        <tr>
-            <td>
-                <canvas class="chart"
-                        data-type="line"
-                        data-source="facet"
-                        data-class="org.roda.core.data.v2.log.LogEntry"
-                        data-facets="actionComponent"></canvas>
-            </td>
-            <td>
-                <pre>
-&lt;canvas class="chart"
-        data-type="line"
-        data-source="facet"
-        data-class="org.roda.core.data.v2.log.LogEntry"
-        data-facets="actionComponent"&gt;&lt;/canvas&gt;
-                </pre>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-
-    <h2>Bar charts</h2>
-    <h3>Description level distribution</h3>
-    <table>
-        <tbody>
-        <tr>
-            <td>
-                <canvas class="chart"
-                        data-type="bar"
-                        data-source="facet"
-                        data-class="org.roda.core.data.v2.ip.IndexedAIP"
-                        data-facets="level"></canvas>
-            </td>
-            <td>
-                <pre>
-&lt;canvas class="chart"
-        data-type="bar"
-        data-source="facet"
-        data-class="org.roda.core.data.v2.ip.IndexedAIP"
-        data-facets="level"&gt;&lt;/canvas&gt;
-                </pre>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-
-    <h3>Log entries per component distribution</h3>
-    <table>
-        <tbody>
-        <tr>
-            <td>
-                <canvas class="chart"
-                        data-type="bar"
-                        data-source="facet"
-                        data-class="org.roda.core.data.v2.log.LogEntry"
-                        data-facets="actionComponent"></canvas>
-            </td>
-            <td>
-                <pre>
-&lt;canvas class="chart"
-        data-type="bar"
-        data-source="facet"
-        data-class="org.roda.core.data.v2.log.LogEntry"
-        data-facets="actionComponent"&gt;&lt;/canvas&gt;
                 </pre>
             </td>
         </tr>
@@ -159,57 +251,8 @@
         </tbody>
     </table>
 
-    <h2>Pie/doughnut charts</h2>
-    <h3>File format distribution</h3>
-    <table>
-        <tbody>
-        <tr>
-            <td>
-                <canvas class="chart"
-                        data-type="pie"
-                        data-source="facet"
-                        data-class="org.roda.core.data.v2.ip.IndexedFile"
-                        data-facets="fileFormat"></canvas>
-            </td>
-            <td>
-                <pre>
-&lt;canvas class="chart"
-        data-type="pie"
-        data-source="facet"
-        data-class="org.roda.core.data.v2.ip.IndexedFile"
-        data-facets="fileFormat"&gt;&lt;/canvas&gt;
-                </pre>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-
-    <h3>Mimetype distribution</h3>
-    <table>
-        <tbody>
-        <tr>
-            <td>
-                <canvas class="chart"
-                        data-type="doughnut"
-                        data-source="facet"
-                        data-class="org.roda.core.data.v2.ip.IndexedFile"
-                        data-facets="formatMimetype"></canvas>
-            </td>
-            <td>
-                <pre>
-&lt;canvas class="chart"
-        data-type="doughnut"
-        data-source="facet"
-        data-class="org.roda.core.data.v2.ip.IndexedFile"
-        data-facets="formatMimetype"&gt;&lt;/canvas&gt;
-                </pre>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-
+    <h2>Custom function to handle facet data</h2>
     <h3>Pronon format distribution</h3>
-    <h4>(custom function to handle facet data)</h4>
     <table>
         <tbody>
         <tr>
@@ -233,9 +276,9 @@
         <tr>
             <td>
                 <pre style="font-size: smaller;">
-function facetCustomDataHandlerChartOptions(facetResults, element){
+function facetCustomDataHandlerChartOptions(data, element){
     var options = {};
-    var facet = facetResults && facetResults.length > 0 ? facetResults[0] : null;
+    var facet = data && data.facetResults && data.facetResults.length > 0 ? data.facetResults[0] : null;
     if (facet) {
         options = {
             type: "pie",
@@ -264,8 +307,8 @@ function facetCustomDataHandlerChartOptions(facetResults, element){
         </tbody>
     </table>
 
-    <h2>Bubble charts</h2>
-    <h3>Custom function to create chart</h3>
+    <h2>Custom function to create chart</h2>
+    <h3>Bubble chart</h3>
     <table>
         <tbody>
         <tr>
@@ -278,7 +321,7 @@ function facetCustomDataHandlerChartOptions(facetResults, element){
                 <pre>
 &lt;canvas class="chart"
         data-source="function"
-        data-function="customDataBubbleChart"&gt;&lt;/canvas&gt;
+        data-function="customDataBubbleChart">&lt;/canvas>
                 </pre>
             </td>
         </tr>
@@ -305,6 +348,44 @@ function customDataBubbleChart(element) {
                 ]
             }
         });
+}
+                </pre>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h3>Custom function to set tag inner text</h3>
+    <table>
+        <tbody>
+        <tr>
+            <td rowspan="2" style="font-size: large;">
+                <dl>
+                    <dt style="display: inline;">Total nº of files:</dt>
+                    <dd style="display: inline; font-weight: bold;">
+                        <span class="chart"
+                              data-source="function"
+                              data-function="customTagInnerText"></span>
+                    </dd>
+                </dl>
+            </td>
+            <td>
+                <pre>
+&lt;span class="chart"
+      data-source="function"
+      data-function="customTagInnerText">&lt;/span>
+                </pre>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <pre style="font-size: smaller;">
+function customTagInnerText(element) {
+    $.ajax({
+        url: "/api/v1/index?returnClass=org.roda.core.data.v2.ip.IndexedFile&limit=0"
+    }).done(function (data) {
+        element.text(data.totalCount);
+    });
 }
                 </pre>
             </td>
