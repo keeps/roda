@@ -8,15 +8,6 @@
                 return;
             }
 
-            // retrieves the reference to the various elements for which the
-            // proper extension/plugin is going to be applied
-            // var accordion = jQuery(".accordion", matchedObject);
-
-            // runs the various component oriented extension/plugins, this
-            // should changed the overall page behaviour
-            // matchedObject.bsteps();
-            // accordion.baccordion();
-
             matchedObject.each(function() {
                 var element = $(this);
                 if (element._chart == null) {
@@ -63,8 +54,6 @@
                 }).done(function (data) {
                     element._chart = new Chart(element, dataSourceCallback(data.facetResults, element));
                 });
-            } else {
-                // element._chart != null
             }
         }
 
@@ -333,7 +322,5 @@ function customDataBubbleChart(element) {
                 ]
             }
         });
-    } else {
-        // element._chart != null
     }
 }
