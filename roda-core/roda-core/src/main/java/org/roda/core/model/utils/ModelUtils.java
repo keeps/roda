@@ -23,6 +23,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
@@ -32,6 +33,8 @@ import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
@@ -42,6 +45,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
@@ -782,5 +786,20 @@ public final class ModelUtils {
       jobPluginInfo.incrementObjectsProcessedWithSuccess();
     }
     return zipEntries;
+  }
+
+  public static <T extends IsRODAObject> Class<T> giveRespectiveModelClass(Class<T> inputClass) {
+    // function that give the model representation object of a RODA object
+    if (IndexedAIP.class.equals(inputClass)) {
+      return (Class<T>) AIP.class;
+    } else if (IndexedRepresentation.class.equals(inputClass)) {
+      return (Class<T>) Representation.class;
+    } else if (IndexedFile.class.equals(inputClass)) {
+      return (Class<T>) File.class;
+    } else if (IndexedRisk.class.equals(inputClass)) {
+      return (Class<T>) Risk.class;
+    } else {
+      return inputClass;
+    }
   }
 }

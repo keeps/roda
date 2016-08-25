@@ -2218,11 +2218,11 @@ public class ModelService extends ModelObservable {
 
     Notification notification = this.retrieveNotification(notificationId);
     String ackToken = token.substring(0, 36);
-    String emailToken = token.substring(36);
+    String emailToken = email;
 
     if (notification.getAcknowledgeToken().equals(ackToken)) {
       for (String recipient : notification.getRecipientUsers()) {
-        if (UUID.nameUUIDFromBytes(recipient.getBytes()).toString().equals(emailToken)) {
+        if (recipient.equals(emailToken)) {
           DateFormat df = DateFormat.getDateTimeInstance();
           String ackDate = df.format(new Date());
           notification.addAcknowledgedUser(recipient, ackDate);

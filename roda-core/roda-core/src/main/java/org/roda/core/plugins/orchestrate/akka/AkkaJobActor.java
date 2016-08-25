@@ -18,15 +18,9 @@ import org.roda.core.data.v2.index.SelectedItemsAll;
 import org.roda.core.data.v2.index.SelectedItemsFilter;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.index.SelectedItemsNone;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
+import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.JobsHelper;
 import org.slf4j.Logger;
@@ -108,36 +102,15 @@ public class AkkaJobActor extends AkkaBaseActor {
       (Class<T>) sourceObjectsClass);
   }
 
-  private void runFromList(Job job, Plugin<?> plugin, ActorRef jobStateInfoActor) throws GenericException {
+  private <T extends IsRODAObject> void runFromList(Job job, Plugin<T> plugin, ActorRef jobStateInfoActor)
+    throws GenericException {
     // get class
     Class<IsRODAObject> sourceObjectsClass = JobsHelper
       .getSelectedClassFromString(job.getSourceObjects().getSelectedClass());
 
-    if (AIP.class.getName().equals(sourceObjectsClass.getName())) {
-      RodaCoreFactory.getPluginOrchestrator().runPluginOnObjects(jobStateInfoActor, (Plugin<AIP>) plugin, AIP.class,
-        ((SelectedItemsList<IsRODAObject>) job.getSourceObjects()).getIds());
-
-    } else if (IndexedAIP.class.getName().equals(sourceObjectsClass.getName())) {
-      RodaCoreFactory.getPluginOrchestrator().runPluginOnObjects(jobStateInfoActor, (Plugin<AIP>) plugin, AIP.class,
-        ((SelectedItemsList<IsRODAObject>) job.getSourceObjects()).getIds());
-
-    } else if (IndexedRepresentation.class.getName().equals(sourceObjectsClass.getName())) {
-      RodaCoreFactory.getPluginOrchestrator().runPluginOnObjects(jobStateInfoActor, (Plugin<Representation>) plugin,
-        Representation.class, ((SelectedItemsList<IndexedRepresentation>) job.getSourceObjects()).getIds());
-
-    } else if (IndexedFile.class.getName().equals(sourceObjectsClass.getName())) {
-      RodaCoreFactory.getPluginOrchestrator().runPluginOnObjects(jobStateInfoActor, (Plugin<File>) plugin, File.class,
-        ((SelectedItemsList<IndexedFile>) job.getSourceObjects()).getIds());
-
-    } else if (TransferredResource.class.getName().equals(sourceObjectsClass.getName())) {
-      RodaCoreFactory.getPluginOrchestrator().runPluginOnObjects(jobStateInfoActor,
-        (Plugin<TransferredResource>) plugin, TransferredResource.class,
-        ((SelectedItemsList<TransferredResource>) job.getSourceObjects()).getIds());
-    } else {
-      LOGGER.error("Error executing job on unknown source objects class '{}'", sourceObjectsClass.getName());
-      throw new GenericException(
-        "Error executing job on unknown source objects class '" + sourceObjectsClass.getName() + "'");
-    }
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnObjects(jobStateInfoActor, plugin,
+      (Class<T>) ModelUtils.giveRespectiveModelClass(sourceObjectsClass),
+      ((SelectedItemsList<IsRODAObject>) job.getSourceObjects()).getIds());
   }
 
   private void runFromFilter(Job job, Plugin<?> plugin, ActorRef jobStateInfoActor)

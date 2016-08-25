@@ -35,8 +35,6 @@ import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -47,8 +45,6 @@ import io.swagger.annotations.ApiParam;
 public class NotificationsResource {
   public static final String ENDPOINT = "/v1/notifications";
   public static final String SWAGGER_ENDPOINT = "v1 notifications";
-
-  private static Logger LOGGER = LoggerFactory.getLogger(NotificationsResource.class);
 
   @Context
   private HttpServletRequest request;
@@ -72,8 +68,8 @@ public class NotificationsResource {
       Facets.NONE, user, justActive);
 
     // transform controller method output
-    List<Notification> notifications = org.roda.wui.api.controllers.Notifications
-      .retrieveNotifications(user, listNotificationsIndexResult);
+    List<Notification> notifications = org.roda.wui.api.controllers.Notifications.retrieveNotifications(user,
+      listNotificationsIndexResult);
 
     return Response.ok(notifications, mediaType).build();
   }
@@ -95,10 +91,10 @@ public class NotificationsResource {
   }
 
   @GET
-  @Path("/{notificationId}")
+  @Path("/{notification_id}")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @ApiOperation(value = "Get Notification", notes = "Gets a particular Notification.", response = Notification.class)
-  public Response getNotification(@PathParam("notificationId") String notificationId,
+  public Response getNotification(@PathParam(RodaConstants.API_PATH_PARAM_NOTIFICATION_ID) String notificationId,
     @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat) throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
@@ -111,10 +107,10 @@ public class NotificationsResource {
   }
 
   @DELETE
-  @Path("/{notificationId}")
+  @Path("/{notification_id}")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @ApiOperation(value = "Delete Notification", notes = "Delete a particular Notification.", response = ApiResponseMessage.class)
-  public Response deleteNotification(@PathParam("notificationId") String notificationId,
+  public Response deleteNotification(@PathParam(RodaConstants.API_PATH_PARAM_NOTIFICATION_ID) String notificationId,
     @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat) throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
@@ -127,11 +123,13 @@ public class NotificationsResource {
   }
 
   @GET
-  @Path("/{notificationId}/acknowledge")
+  @Path("/{notification_id}/acknowledge")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @ApiOperation(value = "Acknowledge Notification", notes = "Acknowledge a particular Notification.", response = Notification.class)
-  public Response acknowledgeNotification(@PathParam("notificationId") String notificationId,
-    @QueryParam("token") String token, @QueryParam("email") String email,
+  public Response acknowledgeNotification(
+    @ApiParam(value = "The notification id", required = true) @PathParam(RodaConstants.API_PATH_PARAM_NOTIFICATION_ID) String notificationId,
+    @ApiParam(value = "The notification user token", required = true) @QueryParam(RodaConstants.API_QUERY_PARAM_NOTIFICATION_TOKEN) String token,
+    @ApiParam(value = "The user email used to notificate", required = true) @QueryParam(RodaConstants.API_QUERY_PARAM_NOTIFICATION_EMAIL) String email,
     @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat) throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 

@@ -149,7 +149,10 @@ public final class RodaConstants {
   public static final String API_PATH_PARAM_FILE_UUID = "file_uuid";
   public static final String API_PATH_PARAM_METADATA_ID = "metadata_id";
   public static final String API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID = "transferred_resource_uuid";
+  public static final String API_PATH_PARAM_NOTIFICATION_ID = "notification_id";
   public static final String API_QUERY_PARAM_VERSION = "version";
+  public static final String API_QUERY_PARAM_NOTIFICATION_TOKEN = "token";
+  public static final String API_QUERY_PARAM_NOTIFICATION_EMAIL = "email";
   // http headers used
   public static final String API_HTTP_HEADER_ACCEPT = "Accept";
   // job related params
