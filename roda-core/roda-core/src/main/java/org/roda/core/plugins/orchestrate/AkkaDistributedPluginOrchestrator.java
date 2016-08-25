@@ -15,10 +15,6 @@ import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -154,30 +150,6 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
   }
 
   @Override
-  public void runPluginOnAIPs(Object context, Plugin<AIP> plugin, List<String> uuids, boolean retrieveFromModel) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void runPluginOnRepresentations(Object context, Plugin<Representation> plugin, List<String> uuids) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void runPluginOnFiles(Object context, Plugin<File> plugin, List<String> uuids) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void runPluginOnTransferredResources(Object context, Plugin<TransferredResource> plugin, List<String> uuids) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
   public <T extends IsRODAObject> void runPlugin(Object context, Plugin<T> plugin) {
     // TODO Auto-generated method stub
 
@@ -222,6 +194,13 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
 
   @Override
   public <T extends IsRODAObject> void runPluginOnAllObjects(Object context, Plugin<T> plugin, Class<T> objectClass) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public <T extends IsRODAObject> void runPluginOnObjects(Object context, Plugin<T> plugin, Class<T> objectClass,
+    List<String> uuids) {
     // TODO Auto-generated method stub
 
   }

@@ -201,29 +201,14 @@ public final class JobsHelper {
     return ret;
   }
 
-  public static List<AIP> getAIPs(ModelService model, IndexService index, List<String> uuids, boolean retrieveFromModel)
-    throws NotFoundException {
+  public static List<AIP> getAIPs(ModelService model, IndexService index, List<String> uuids) throws NotFoundException {
     List<AIP> aipsToReturn = new ArrayList<>();
-
     if (!uuids.isEmpty()) {
-      if (retrieveFromModel) {
-        for (String uuid : uuids) {
-          try {
-            aipsToReturn.add(model.retrieveAIP(uuid));
-          } catch (RODAException | RuntimeException e) {
-            LOGGER.error("Error while retrieving AIP from model", e);
-          }
-        }
-      } else {
+      for (String uuid : uuids) {
         try {
-          List<IndexedAIP> retrieve = index.retrieve(IndexedAIP.class, uuids);
-
-          for (IndexedAIP indexedAIP : retrieve) {
-            aipsToReturn.add(model.retrieveAIP(indexedAIP.getId()));
-          }
-
+          aipsToReturn.add(model.retrieveAIP(uuid));
         } catch (RODAException | RuntimeException e) {
-          LOGGER.error("Error while retrieving AIP from index", e);
+          LOGGER.error("Error while retrieving AIP from model", e);
         }
       }
     }
@@ -283,6 +268,28 @@ public final class JobsHelper {
     }
 
     return filesToReturn;
+  }
+
+  public static <T extends IsRODAObject> List<T> getObjects(ModelService model, IndexService index,
+    Class<T> objectClass, List<String> uuids) throws NotFoundException, GenericException {
+    if (AIP.class.equals(objectClass)) {
+      return (List<T>) getAIPs(model, index, uuids);
+    } else if (Representation.class.equals(objectClass)) {
+      return (List<T>) getRepresentations(model, index, uuids);
+    } else if (File.class.equals(objectClass)) {
+      return (List<T>) getFiles(model, index, uuids);
+    } else {
+      return (List<T>) getObjectsFromIndex(index, objectClass, uuids);
+    }
+  }
+
+  public static <T extends IsRODAObject> List<T> getObjectsFromIndex(IndexService index, Class<T> objectClass,
+    List<String> uuids) throws NotFoundException, GenericException {
+    List<T> ret = (List<T>) index.retrieve((Class<IsIndexed>) objectClass, uuids);
+    if (ret.isEmpty()) {
+      throw new NotFoundException("Could not retrive the " + objectClass.getSimpleName());
+    }
+    return ret;
   }
 
   public static Class<IsRODAObject> getSelectedClassFromString(String selectedClass) throws GenericException {

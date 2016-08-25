@@ -7,8 +7,6 @@
  */
 package org.roda.core.plugins.orchestrate;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -19,18 +17,12 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
-import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -141,63 +133,6 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void runPluginOnAIPs(Object context, Plugin<AIP> plugin, List<String> ids, boolean retrieveFromModel) {
-    try {
-
-      Iterator<String> iter = ids.iterator();
-      String aipId;
-
-      List<AIP> block = new ArrayList<AIP>();
-      while (iter.hasNext()) {
-        if (block.size() == BLOCK_SIZE) {
-          submitPlugin(block, plugin);
-          block = new ArrayList<AIP>();
-        }
-
-        aipId = iter.next();
-        block.add(model.retrieveAIP(aipId));
-      }
-
-      if (!block.isEmpty()) {
-        submitPlugin(block, plugin);
-      }
-
-      finishedSubmit();
-
-    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      // TODO review this exception handling
-      LOGGER.error("Error running plugin on AIPs: " + ids, e);
-    }
-  }
-
-  @Override
-  public void runPluginOnTransferredResources(Object context, Plugin<TransferredResource> plugin, List<String> uuids) {
-    try {
-
-      List<TransferredResource> resources = JobsHelper.getTransferredResources(index, uuids);
-
-      List<TransferredResource> block = new ArrayList<TransferredResource>();
-      for (TransferredResource resource : resources) {
-        if (block.size() == BLOCK_SIZE) {
-          submitPlugin(block, plugin);
-          block = new ArrayList<TransferredResource>();
-        }
-        block.add(resource);
-      }
-
-      if (!block.isEmpty()) {
-        submitPlugin(block, plugin);
-      }
-
-      finishedSubmit();
-
-    } catch (Exception e) {
-      // TODO review this exception handling
-      LOGGER.error("Error running plugin on transferred resources", e);
-    }
-  }
-
-  @Override
   public <T extends IsRODAObject> void runPlugin(Object context, Plugin<T> plugin) {
     // TODO Auto-generated method stub
 
@@ -224,29 +159,25 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void runPluginOnRepresentations(Object context, Plugin<Representation> plugin, List<String> ids) {
-    // TODO Auto-generated method stub
-  }
-
-  @Override
-  public void runPluginOnFiles(Object context, Plugin<File> plugin, List<String> ids) {
-    // TODO Auto-generated method stub
-  }
-
-  @Override
   public <T extends IsRODAObject> void updateJob(Plugin<T> plugin, JobPartialUpdate partialUpdate) {
+    // TODO Auto-generated method stub
+  }
+
+  @Override
+  public <T extends IsRODAObject> void runPluginOnAllObjects(Object context, Plugin<T> plugin, Class<T> objectClass) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public <T extends IsRODAObject> void runPluginOnObjects(Object context, Plugin<T> plugin, Class<T> objectClass,
+    List<String> uuids) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
   public void setJobContextInformation(String jobId, Object object) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public <T extends IsRODAObject> void runPluginOnAllObjects(Object context, Plugin<T> plugin, Class<T> objectClass) {
     // TODO Auto-generated method stub
 
   }

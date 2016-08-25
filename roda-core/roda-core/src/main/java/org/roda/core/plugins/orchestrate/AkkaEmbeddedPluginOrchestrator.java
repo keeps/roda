@@ -34,10 +34,6 @@ import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -158,21 +154,22 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void runPluginOnAIPs(Object context, Plugin<AIP> plugin, List<String> uuids, boolean retrieveFromModel) {
+  public <T extends IsRODAObject> void runPluginOnObjects(Object context, Plugin<T> plugin, Class<T> objectClass,
+    List<String> uuids) {
     try {
       LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
       ActorRef jobStateInfoActor = (ActorRef) context;
       int blockSize = JobsHelper.getBlockSize();
-      List<AIP> aips = JobsHelper.getAIPs(model, index, uuids, retrieveFromModel);
-      Iterator<AIP> iter = aips.iterator();
-      Plugin<AIP> innerPlugin;
+      List<T> objects = JobsHelper.getObjects(model, index, objectClass, uuids);
+      Iterator<T> iter = objects.iterator();
+      Plugin<T> innerPlugin;
 
       jobStateInfoActor.tell(new Messages.PluginBeforeAllExecuteIsReady<>(plugin), ActorRef.noSender());
 
-      List<AIP> block = new ArrayList<AIP>();
+      List<T> block = new ArrayList<T>();
       while (iter.hasNext()) {
         if (block.size() == blockSize) {
-          innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, AIP.class, blockSize);
+          innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, objectClass, blockSize);
           jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, block), ActorRef.noSender());
           block = new ArrayList<>();
         }
@@ -180,85 +177,14 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       }
 
       if (!block.isEmpty()) {
-        innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, AIP.class, block.size());
+        innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, objectClass, block.size());
         jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, block), ActorRef.noSender());
       }
 
       jobStateInfoActor.tell(new Messages.JobInitEnded(), ActorRef.noSender());
 
     } catch (Exception e) {
-      LOGGER.error("Error running plugin on AIPs", e);
-      JobsHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
-    }
-
-  }
-
-  @Override
-  public void runPluginOnRepresentations(Object context, Plugin<Representation> plugin, List<String> uuids) {
-    try {
-      LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
-      ActorRef jobStateInfoActor = (ActorRef) context;
-      int blockSize = JobsHelper.getBlockSize();
-      List<Representation> representations = JobsHelper.getRepresentations(model, index, uuids);
-      Iterator<Representation> iter = representations.iterator();
-      Plugin<Representation> innerPlugin;
-
-      jobStateInfoActor.tell(new Messages.PluginBeforeAllExecuteIsReady<>(plugin), ActorRef.noSender());
-
-      List<Representation> block = new ArrayList<Representation>();
-      while (iter.hasNext()) {
-        if (block.size() == blockSize) {
-          innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, Representation.class, blockSize);
-          jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, block), ActorRef.noSender());
-          block = new ArrayList<>();
-        }
-        block.add(iter.next());
-      }
-
-      if (!block.isEmpty()) {
-        innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, Representation.class, block.size());
-        jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, block), ActorRef.noSender());
-      }
-
-      jobStateInfoActor.tell(new Messages.JobInitEnded(), ActorRef.noSender());
-
-    } catch (Exception e) {
-      LOGGER.error("Error running plugin on Representations", e);
-      JobsHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
-    }
-  }
-
-  @Override
-  public void runPluginOnFiles(Object context, Plugin<File> plugin, List<String> uuids) {
-    try {
-      LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
-      ActorRef jobStateInfoActor = (ActorRef) context;
-      int blockSize = JobsHelper.getBlockSize();
-      List<File> files = JobsHelper.getFiles(model, index, uuids);
-      Iterator<File> iter = files.iterator();
-      Plugin<File> innerPlugin;
-
-      jobStateInfoActor.tell(new Messages.PluginBeforeAllExecuteIsReady<>(plugin), ActorRef.noSender());
-
-      List<File> block = new ArrayList<File>();
-      while (iter.hasNext()) {
-        if (block.size() == blockSize) {
-          innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, File.class, blockSize);
-          jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, block), ActorRef.noSender());
-          block = new ArrayList<>();
-        }
-        block.add(iter.next());
-      }
-
-      if (!block.isEmpty()) {
-        innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, File.class, block.size());
-        jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, block), ActorRef.noSender());
-      }
-
-      jobStateInfoActor.tell(new Messages.JobInitEnded(), ActorRef.noSender());
-
-    } catch (Exception e) {
-      LOGGER.error("Error running plugin on Files", e);
+      LOGGER.error("Error running plugin on RODA Objects ({})", objectClass.getSimpleName(), e);
       JobsHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
     }
 
@@ -306,40 +232,6 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       JobsHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
     }
 
-  }
-
-  @Override
-  public void runPluginOnTransferredResources(Object context, Plugin<TransferredResource> plugin, List<String> uuids) {
-    try {
-      LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
-      ActorRef jobStateInfoActor = (ActorRef) context;
-      int blockSize = JobsHelper.getBlockSize();
-      List<TransferredResource> resources = JobsHelper.getTransferredResources(index, uuids);
-      Plugin<TransferredResource> innerPlugin;
-
-      jobStateInfoActor.tell(new Messages.PluginBeforeAllExecuteIsReady<>(plugin), ActorRef.noSender());
-
-      List<TransferredResource> block = new ArrayList<TransferredResource>();
-      for (TransferredResource resource : resources) {
-        if (block.size() == blockSize) {
-          innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, TransferredResource.class, blockSize);
-          jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, block), ActorRef.noSender());
-          block = new ArrayList<>();
-        }
-        block.add(resource);
-      }
-
-      if (!block.isEmpty()) {
-        innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, TransferredResource.class, block.size());
-        jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, block), ActorRef.noSender());
-      }
-
-      jobStateInfoActor.tell(new Messages.JobInitEnded(), ActorRef.noSender());
-
-    } catch (Exception e) {
-      LOGGER.error("Error running plugin on transferred resources", e);
-      JobsHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
-    }
   }
 
   @Override

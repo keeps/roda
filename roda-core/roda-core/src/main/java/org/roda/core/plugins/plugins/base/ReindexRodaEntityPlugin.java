@@ -155,7 +155,7 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
               index.reindex(storage, reindexClass);
               jobPluginInfo.incrementObjectsProcessedWithSuccess();
             } catch (RODAException | IOException e) {
-              LOGGER.error("Error reindexing (all) {}: ", reindexClass.getSimpleName(), e);
+              LOGGER.error("Error reindexing (all): {}", reindexClass.getSimpleName(), e);
               jobPluginInfo.incrementObjectsProcessedWithFailure();
             }
           }
@@ -169,14 +169,14 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
         pluginReport.setPluginState(PluginState.SUCCESS);
       } catch (RODAException | IOException e) {
         jobPluginInfo.incrementObjectsProcessedWithFailure(size);
-        LOGGER.error("Error reindexing RODA entity: ", e);
+        LOGGER.error("Error reindexing RODA entity", e);
         pluginReport.setPluginState(PluginState.FAILURE).setPluginDetails("Reindex did not execute successfully");
       }
 
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
     } catch (JobException e) {
-      LOGGER.error("Error reindexing RODA entity: ", e);
+      LOGGER.error("Error reindexing RODA entity", e);
     }
 
     return pluginReport;
@@ -197,7 +197,7 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
           if (clazz != null) {
             index.clearIndexes(SolrUtils.getIndexName(clazz));
           } else {
-            Job job = PluginHelper.getJobFromIndex(this, index);
+            Job job = PluginHelper.getJob(this, index);
             Class selectedClass = Class.forName(job.getSourceObjects().getSelectedClass());
             index.clearIndexes(SolrUtils.getIndexName(selectedClass));
           }
@@ -226,7 +226,7 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
         if (clazz != null) {
           index.optimizeIndexes(SolrUtils.getIndexName(clazz));
         } else {
-          Job job = PluginHelper.getJobFromIndex(this, index);
+          Job job = PluginHelper.getJob(this, index);
           Class selectedClass = Class.forName(job.getSourceObjects().getSelectedClass());
           index.optimizeIndexes(SolrUtils.getIndexName(selectedClass));
         }

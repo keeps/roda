@@ -114,24 +114,24 @@ public class AkkaJobActor extends AkkaBaseActor {
       .getSelectedClassFromString(job.getSourceObjects().getSelectedClass());
 
     if (AIP.class.getName().equals(sourceObjectsClass.getName())) {
-      super.getPluginOrchestrator().runPluginOnAIPs(jobStateInfoActor, (Plugin<AIP>) plugin,
-        ((SelectedItemsList<IsRODAObject>) job.getSourceObjects()).getIds(), true);
+      RodaCoreFactory.getPluginOrchestrator().runPluginOnObjects(jobStateInfoActor, (Plugin<AIP>) plugin, AIP.class,
+        ((SelectedItemsList<IsRODAObject>) job.getSourceObjects()).getIds());
 
     } else if (IndexedAIP.class.getName().equals(sourceObjectsClass.getName())) {
-      super.getPluginOrchestrator().runPluginOnAIPs(jobStateInfoActor, (Plugin<AIP>) plugin,
-        ((SelectedItemsList<IsRODAObject>) job.getSourceObjects()).getIds(), false);
+      RodaCoreFactory.getPluginOrchestrator().runPluginOnObjects(jobStateInfoActor, (Plugin<AIP>) plugin, AIP.class,
+        ((SelectedItemsList<IsRODAObject>) job.getSourceObjects()).getIds());
 
     } else if (IndexedRepresentation.class.getName().equals(sourceObjectsClass.getName())) {
-      super.getPluginOrchestrator().runPluginOnRepresentations(jobStateInfoActor, (Plugin<Representation>) plugin,
-        ((SelectedItemsList<IndexedRepresentation>) job.getSourceObjects()).getIds());
+      RodaCoreFactory.getPluginOrchestrator().runPluginOnObjects(jobStateInfoActor, (Plugin<Representation>) plugin,
+        Representation.class, ((SelectedItemsList<IndexedRepresentation>) job.getSourceObjects()).getIds());
 
     } else if (IndexedFile.class.getName().equals(sourceObjectsClass.getName())) {
-      super.getPluginOrchestrator().runPluginOnFiles(jobStateInfoActor, (Plugin<File>) plugin,
+      RodaCoreFactory.getPluginOrchestrator().runPluginOnObjects(jobStateInfoActor, (Plugin<File>) plugin, File.class,
         ((SelectedItemsList<IndexedFile>) job.getSourceObjects()).getIds());
 
     } else if (TransferredResource.class.getName().equals(sourceObjectsClass.getName())) {
-      super.getPluginOrchestrator().runPluginOnTransferredResources(jobStateInfoActor,
-        (Plugin<TransferredResource>) plugin,
+      RodaCoreFactory.getPluginOrchestrator().runPluginOnObjects(jobStateInfoActor,
+        (Plugin<TransferredResource>) plugin, TransferredResource.class,
         ((SelectedItemsList<TransferredResource>) job.getSourceObjects()).getIds());
     } else {
       LOGGER.error("Error executing job on unknown source objects class '{}'", sourceObjectsClass.getName());

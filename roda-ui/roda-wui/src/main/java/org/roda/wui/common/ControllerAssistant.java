@@ -51,11 +51,11 @@ public class ControllerAssistant {
     }
   }
 
-  public void registerAction(final RodaUser user, final String aipId, final LOG_ENTRY_STATE state,
+  public void registerAction(final RodaUser user, final String relatedObjectId, final LOG_ENTRY_STATE state,
     final Object... parameters) {
     final long duration = new Date().getTime() - startDate.getTime();
     ControllerAssistantUtils.registerAction(user, this.enclosingMethod.getDeclaringClass().getName(),
-      this.enclosingMethod.getName(), aipId, duration, state, parameters);
+      this.enclosingMethod.getName(), relatedObjectId, duration, state, parameters);
   }
 
   public void registerAction(final RodaUser user, final LOG_ENTRY_STATE state, final Object... parameters) {

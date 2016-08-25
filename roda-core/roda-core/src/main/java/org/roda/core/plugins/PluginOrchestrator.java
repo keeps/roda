@@ -14,10 +14,6 @@ import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.akka.Messages.JobPartialUpdate;
@@ -31,15 +27,10 @@ public interface PluginOrchestrator {
   public <T extends IsIndexed> void runPluginFromIndex(Object context, Class<T> classToActOn, Filter filter,
     Plugin<T> plugin);
 
-  public void runPluginOnAIPs(Object context, Plugin<AIP> plugin, List<String> uuids, boolean retrieveFromModel);
-
-  public void runPluginOnRepresentations(Object context, Plugin<Representation> plugin, List<String> uuids);
-
-  public void runPluginOnFiles(Object context, Plugin<File> plugin, List<String> uuids);
+  public <T extends IsRODAObject> void runPluginOnObjects(Object context, Plugin<T> plugin, Class<T> objectClass,
+    List<String> uuids);
 
   public <T extends IsRODAObject> void runPluginOnAllObjects(Object context, Plugin<T> plugin, Class<T> objectClass);
-
-  public void runPluginOnTransferredResources(Object context, Plugin<TransferredResource> plugin, List<String> uuids);
 
   public <T extends IsRODAObject> void runPlugin(Object context, Plugin<T> plugin);
 
