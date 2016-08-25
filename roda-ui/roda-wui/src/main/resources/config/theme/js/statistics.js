@@ -2,16 +2,6 @@
 
     $.fn.chart = function() {
         var matchedObject = this;
-        var sourceTypeFunction = {
-            "facet": {
-                "line": singleFacetLineChart,
-                "bar": singleFacetBarChart,
-                "radar": singleFacetRadarChart,
-                "polarArea": singleFacetPolarAreaChart,
-                "pie": singleFacetPieChart,
-                "doughnut": singleFacetDoughnutChart
-            }
-        };
 
         function init() {
             if (!matchedObject || matchedObject.length == 0) {
@@ -30,227 +20,155 @@
             matchedObject.each(function() {
                 var element = $(this);
                 if (element._chart == null) {
-                    var customFunction = element.data("function");
-                    if (customFunction) {
+                    var source = element.data("source");
+                    if (source == "facet") {
+                        initFacetChart(element);
+                    } else if (source == "function") {
+                        var customFunction = element.data("function");
                         executeFunctionByName(window, customFunction, element);
                     } else {
-                        var source = element.data("source");
-                        var type = element.data("type");
-                        sourceTypeFunction[source][type](element);
+                        console.log("Unknown data source '"+source+"'");
                     }
                 }
             });
         }
 
-        function singleFacetLineChart(element) {
+        function initFacetChart(element) {
+            var facetCallback;
+            var customFacetFunction = element.data("facet-function");
+            if (customFacetFunction) {
+                facetCallback = functionByName(window, customFacetFunction);
+            } else {
+                var type = element.data("type");
+                var facetDataSourceCallbacks = {
+                    "line": facetLineChartOptions,
+                    "bar": facetBarChartOptions,
+                    "radar": facetRadarChartOptions,
+                    "polarArea": facetPolarAreaChartOptions,
+                    "pie": facetPieChartOptions,
+                    "doughnut": facetDoughnutChartOptions
+                };
+                facetCallback = facetDataSourceCallbacks[type];
+            }
+            facetsChart(element, facetCallback);
+        }
+
+        function facetsChart(element, dataSourceCallback) {
             if (element._chart == null) {
                 var returnClass = $(element).data("class");
-                var facet = $(element).data("facet");
+                var facets = $(element).data("facets").split(/\s*[ ,]\s*/);
+                var facetParams = facets.map(function(facet) { return "facet=" + facet }).join("&");
                 $.ajax({
-                    url: "/api/v1/index?returnClass=" + returnClass + "&facet=" + facet + "&start=0&limit=0&onlyActive=false"
+                    url: "/api/v1/index?returnClass=" + returnClass + "&" + facetParams + "&start=0&limit=0&onlyActive=false"
                 }).done(function (data) {
-                    var values = data.facetResults[0].values;
-                    element._chart = new Chart(element, {
-                        type: 'line',
-                        data: {
-                            labels: values.map(function (value) { return value.label; }),
-                            datasets: [
-                                {
-                                    label: facet,
-                                    data: values.map(function (value) { return value.count; }),
-                                    fill: false,
-                                    lineTension: 0.1,
-                                    backgroundColor: "rgba(75,192,192,0.4)",
-                                    borderColor: "rgba(75,192,192,1)",
-                                    borderCapStyle: 'butt',
-                                    borderDash: [],
-                                    borderDashOffset: 0.0,
-                                    borderJoinStyle: 'miter',
-                                    pointBorderColor: "rgba(75,192,192,1)",
-                                    pointBackgroundColor: "#fff",
-                                    pointBorderWidth: 1,
-                                    pointHoverRadius: 5,
-                                    pointHoverBackgroundColor: "rgba(75,192,192,1)",
-                                    pointHoverBorderColor: "rgba(220,220,220,1)",
-                                    pointHoverBorderWidth: 2,
-                                    pointRadius: 1,
-                                    pointHitRadius: 10,
-                                    spanGaps: false
-                                }
-                            ]
-                        }
-                    });
+                    element._chart = new Chart(element, dataSourceCallback(data.facetResults, element));
                 });
             } else {
                 // element._chart != null
             }
         }
 
-        function singleFacetBarChart(element) {
-            if (element._chart == null) {
-                var returnClass = $(element).data("class");
-                var facet = $(element).data("facet");
-                $.ajax({
-                    url: "/api/v1/index?returnClass=" + returnClass + "&facet=" + facet + "&start=0&limit=0&onlyActive=false"
-                }).done(function (data) {
-                    var values = data.facetResults[0].values;
-                    element._chart = new Chart(element, {
-                        type: 'bar',
-                        data: {
-                            labels: values.map(function (value) {
-                                return value.label;
-                            }),
-                            datasets: [{
-                                label: facet,
-                                data: values.map(function (value) {
+        function facetLineChartOptions(facetResults, element){
+            var options = facetCommonChartOptions("line", facetResults, element);
+            var baseColor = rgbRandomColor();
+            var paleColor = rgbaRandomColorAsString($.extend(baseColor, { alpha: 0.5 }));
+            var opaqueColor = rgbaRandomColorAsString($.extend(baseColor, { alpha: 1 }));
+            options.data.datasets.forEach(
+                function(dataset){
+                    $.extend(dataset, {
+                        fill: false,
+                        lineTension: 0.1,
+                        backgroundColor: paleColor,
+                        borderColor: opaqueColor,
+                        borderCapStyle: 'butt',
+                        borderDash: [],
+                        borderDashOffset: 0.0,
+                        borderJoinStyle: 'miter',
+                        pointBackgroundColor: paleColor,
+                        pointBorderColor: opaqueColor,
+                        pointBorderWidth: 1,
+                        pointHoverRadius: 5,
+                        pointHoverBackgroundColor: paleColor,
+                        pointHoverBorderColor: opaqueColor,
+                        pointHoverBorderWidth: 2,
+                        pointRadius: 1,
+                        pointHitRadius: 10,
+                        spanGaps: false
+                    });
+                }
+            );
+            return options;
+        }
+
+        function facetBarChartOptions(facetResults, element){
+            var options = facetCommonChartOptions("bar", facetResults, element);
+            options.data.datasets.forEach(
+                function(dataset){
+                    $.extend(dataset, {
+                        borderWidth: 1
+                    });
+                }
+            );
+            return options;
+        }
+
+        function facetRadarChartOptions(facetResults, element){
+            var options = facetCommonChartOptions("radar", facetResults, element);
+            var baseColor = rgbRandomColor();
+            var paleColor = rgbaRandomColorAsString($.extend(baseColor, { alpha: 0.2 }));
+            var opaqueColor = rgbaRandomColorAsString($.extend(baseColor, { alpha: 1 }));
+            options.data.datasets.forEach(
+                function(dataset){
+                    $.extend(dataset, {
+                        backgroundColor: paleColor,
+                        borderColor: opaqueColor,
+                        pointBackgroundColor: opaqueColor,
+                        pointBorderColor: "#fff",
+                        pointHoverBackgroundColor: "#fff",
+                        pointHoverBorderColor: opaqueColor
+                    });
+                }
+            );
+            return options;
+        }
+
+        function facetPolarAreaChartOptions(facetResults, element){
+            return facetCommonChartOptions("polarArea", facetResults, element);
+        }
+
+        function facetPieChartOptions(facetResults, element){
+            return facetCommonChartOptions("pie", facetResults, element);
+        }
+
+        function facetDoughnutChartOptions(facetResults, element){
+            return facetCommonChartOptions("doughnut", facetResults, element);
+        }
+
+        function facetCommonChartOptions(type, facetResults, element){
+            var options = {};
+            var facet = facetResults && facetResults.length > 0 ? facetResults[0] : null;
+            if (facet) {
+                options = {
+                    type: type,
+                    data: {
+                        labels: facet.values.map(function (value) {
+                            return value.label;
+                        }),
+                        datasets: [
+                            {
+                                label: facet.field,
+                                data: facet.values.map(function (value) {
                                     return value.count;
                                 }),
-                                backgroundColor: values.map(function () {
-                                    return rgbaRandomColor();
-                                }),
-                                borderWidth: 1
-                            }]
-                        }
-                    });
-                });
-            } else {
-                // element._chart != null
+                                backgroundColor: facet.values.map(function () {
+                                    return rgbaRandomOpaqueColorAsString();
+                                })
+                            }
+                        ]
+                    }
+                };
             }
-        }
-
-        function singleFacetRadarChart(element) {
-            if (element._chart == null) {
-                var returnClass = $(element).data("class");
-                var facet = $(element).data("facet");
-                $.ajax({
-                    url: "/api/v1/index?returnClass=" + returnClass + "&facet=" + facet + "&start=0&limit=0&onlyActive=false"
-                }).done(function (data) {
-                    var values = data.facetResults[0].values;
-                    element._chart = new Chart(element, {
-                        type: 'radar',
-                        data: {
-                            labels: values.map(function (value) {
-                                return value.label;
-                            }),
-                            datasets: [
-                                {
-                                    label: facet,
-                                    data: values.map(function (value) {
-                                        return value.count;
-                                    }),
-                                    backgroundColor: "rgba(255,99,132,0.2)",
-                                    borderColor: "rgba(255,99,132,1)",
-                                    pointBackgroundColor: "rgba(255,99,132,1)",
-                                    pointBorderColor: "#fff",
-                                    pointHoverBackgroundColor: "#fff",
-                                    pointHoverBorderColor: "rgba(255,99,132,1)"
-                                }
-                            ]
-                        }
-                    });
-                });
-            } else {
-                // element._chart != null
-            }
-        }
-
-        function singleFacetPolarAreaChart(element) {
-            if (element._chart == null) {
-                var returnClass = $(element).data("class");
-                var facet = $(element).data("facet");
-                $.ajax({
-                    url: "/api/v1/index?returnClass=" + returnClass + "&facet=" + facet + "&start=0&limit=0&onlyActive=false"
-                }).done(function (data) {
-                    var values = data.facetResults[0].values;
-                    element._chart = new Chart(element, {
-                        type: 'polarArea',
-                        data: {
-                            labels: values.map(function (value) {
-                                return value.label;
-                            }),
-                            datasets: [
-                                {
-                                    label: facet,
-                                    data: values.map(function (value) {
-                                        return value.count;
-                                    }),
-                                    backgroundColor: values.map(function () {
-                                        return rgbaRandomColor();
-                                    })
-                                }
-                            ]
-                        }
-                    });
-                });
-            } else {
-                // element._chart != null
-            }
-        }
-
-        function singleFacetPieChart(element) {
-            if (element._chart == null) {
-                var returnClass = $(element).data("class");
-                var facet = $(element).data("facet");
-                $.ajax({
-                    url: "/api/v1/index?returnClass=" + returnClass + "&facet=" + facet + "&start=0&limit=0&onlyActive=false"
-                }).done(function (data) {
-                    var values = data.facetResults[0].values;
-                    element._chart = new Chart(element, {
-                        type: 'pie',
-                        data: {
-                            labels: values.map(function (value) {
-                                return value.label;
-                            }),
-                            datasets: [
-                                {
-                                    label: facet,
-                                    data: values.map(function (value) {
-                                        return value.count;
-                                    }),
-                                    backgroundColor: values.map(function () {
-                                        return rgbaRandomColor();
-                                    })
-                                }
-                            ]
-                        }
-                    });
-                });
-            } else {
-                // element._chart != null
-            }
-        }
-
-        function singleFacetDoughnutChart(element) {
-            if (element._chart == null) {
-                var returnClass = $(element).data("class");
-                var facet = $(element).data("facet");
-                $.ajax({
-                    url: "/api/v1/index?returnClass=" + returnClass + "&facet=" + facet + "&start=0&limit=0&onlyActive=false"
-                }).done(function (data) {
-                    var values = data.facetResults[0].values;
-                    element._chart = new Chart(element, {
-                        type: 'doughnut',
-                        data: {
-                            labels: values.map(function (value) {
-                                return value.label;
-                            }),
-                            datasets: [
-                                {
-                                    label: facet,
-                                    data: values.map(function (value) {
-                                        return value.count;
-                                    }),
-                                    backgroundColor: values.map(function () {
-                                        return rgbaRandomColor();
-                                    })
-                                }
-                            ]
-                        }
-                    });
-                });
-            } else {
-                // element._chart != null
-            }
+            return options;
         }
 
         function executeFunctionByName(context, functionName/*, args */) {
@@ -258,12 +176,16 @@
             if (args.length == 1 && Array.isArray(args[0])) {
                 args = args[0];
             }
+            functionByName(context, functionName).apply(context, args);
+        }
+
+        function functionByName(context, functionName) {
             var namespaces = functionName.split(".");
             var func = namespaces.pop();
             for (var i = 0; i < namespaces.length; i++) {
                 context = context[namespaces[i]];
             }
-            return context[func].apply(context, args);
+            return context[func];
         }
 
         init();
@@ -307,8 +229,8 @@
  * @param mix
  * @returns {{red: number, green: number, blue: number}}
  */
-function randomColor(mix) {
-    if (mix == null) {
+function rgbRandomColor(mix) {
+    if (!mix) {
         mix = {red: 255, green: 255, blue: 255};
     }
     var red = Math.random() * 256;
@@ -316,18 +238,78 @@ function randomColor(mix) {
     var blue = Math.random() * 256;
 
     // mix the color
-    if (mix != null) {
-        red = (red + mix.red) / 2;
-        green = (green + mix.green) / 2;
-        blue = (blue + mix.blue) / 2;
-    }
+    red = (red + mix.red) / 2;
+    green = (green + mix.green) / 2;
+    blue = (blue + mix.blue) / 2;
 
-    return {red: Math.floor(red), green: Math.floor(green), blue: Math.floor(blue)};
+    return {
+        red: Math.floor(red),
+        green: Math.floor(green),
+        blue: Math.floor(blue),
+    };
 }
 
-function rgbaRandomColor() {
-    var color = randomColor();
-    return "rgba(" + color.red + ", " + color.green + ", " + color.blue + ", 1)";
+/**
+ * Randomly generate an aesthetically-pleasing color palette.
+ *
+ * @see http://stackoverflow.com/a/43235/2602440
+ * @param mix
+ * @returns {{red: number, green: number, blue: number, alpha: number}}
+ */
+function rgbaRandomColor(mix) {
+    if (!mix) {
+        mix = {red: 255, green: 255, blue: 255, alpha: 1};
+    }
+    var color = rgbRandomColor(mix);
+    var alpha = Math.random();
+    // mix the color
+    alpha = (alpha + mix.alpha) / 2;
+    return $.extend(color, {
+        alpha: Math.floor(alpha)
+    });
+}
+
+function rgbaRandomColorAsString(color) {
+    if (!color) {
+        color = rgbaRandomColor();
+    }
+    return "rgba(" + color.red + ", " + color.green + ", " + color.blue + ", " + color.alpha + ")";
+}
+
+function rgbaRandomOpaqueColorAsString() {
+    var color = rgbRandomColor();
+    color.alpha = 1;
+    return rgbaRandomColorAsString(color);
+}
+
+function facetCustomDataHandlerChartOptions(facetResults, element){
+    var options = {};
+    var facet = facetResults && facetResults.length > 0 ? facetResults[0] : null;
+    if (facet) {
+        options = {
+            type: "pie",
+            data: {
+                labels: facet.values.map(function (value) {
+                    return value.label;
+                }),
+                datasets: [
+                    {
+                        label: facet.field,
+                        data: facet.values.map(function (value) {
+                            return value.count;
+                        }),
+                        backgroundColor: facet.values.map(function () {
+                            return rgbaRandomOpaqueColorAsString();
+                        })
+                    }
+                ]
+            },
+            options: {
+                cutoutPercentage: 90
+            }
+        };
+    }
+    return options;
 }
 
 function customDataBubbleChart(element) {
@@ -345,8 +327,8 @@ function customDataBubbleChart(element) {
                                 r: Math.abs(value) * 10
                             };
                         }),
-                        backgroundColor: rgbaRandomColor(),
-                        hoverBackgroundColor: rgbaRandomColor()
+                        backgroundColor: rgbaRandomOpaqueColorAsString(),
+                        hoverBackgroundColor: rgbaRandomOpaqueColorAsString()
                     }
                 ]
             }

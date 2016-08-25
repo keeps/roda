@@ -1,69 +1,314 @@
+<style>
+    #statistics table {
+        width: 100%;
+    }
+    #statistics table td {
+        width: 50%;
+        vertical-align: middle;
+    }
+
+</style>
 <div id="statistics" class="static-page max-width">
     <h1>Statistics</h1>
 
     <h2>Line charts</h2>
     <h3>Description level distribution</h3>
-    <canvas class="chart"
-            data-type="line"
-            data-source="facet"
-            data-class="org.roda.core.data.v2.ip.IndexedAIP"
-            data-facet="level"></canvas>
+    <table>
+        <tbody>
+        <tr>
+            <td>
+                <canvas class="chart"
+                        data-type="line"
+                        data-source="facet"
+                        data-class="org.roda.core.data.v2.ip.IndexedAIP"
+                        data-facets="level"></canvas>
+            </td>
+            <td>
+                <pre>
+&lt;canvas class="chart"
+        data-type="line"
+        data-source="facet"
+        data-class="org.roda.core.data.v2.ip.IndexedAIP"
+        data-facets="level"></canvas>
+                </pre>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 
     <h3>Log entries per component distribution</h3>
-    <canvas class="chart"
-            data-type="line"
-            data-source="facet"
-            data-class="org.roda.core.data.v2.log.LogEntry"
-            data-facet="actionComponent"></canvas>
+    <table>
+        <tbody>
+        <tr>
+            <td>
+                <canvas class="chart"
+                        data-type="line"
+                        data-source="facet"
+                        data-class="org.roda.core.data.v2.log.LogEntry"
+                        data-facets="actionComponent"></canvas>
+            </td>
+            <td>
+                <pre>
+&lt;canvas class="chart"
+        data-type="line"
+        data-source="facet"
+        data-class="org.roda.core.data.v2.log.LogEntry"
+        data-facets="actionComponent"&gt;&lt;/canvas&gt;
+                </pre>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 
     <h2>Bar charts</h2>
     <h3>Description level distribution</h3>
-    <canvas class="chart"
-            data-type="bar"
-            data-source="facet"
-            data-class="org.roda.core.data.v2.ip.IndexedAIP"
-            data-facet="level"></canvas>
+    <table>
+        <tbody>
+        <tr>
+            <td>
+                <canvas class="chart"
+                        data-type="bar"
+                        data-source="facet"
+                        data-class="org.roda.core.data.v2.ip.IndexedAIP"
+                        data-facets="level"></canvas>
+            </td>
+            <td>
+                <pre>
+&lt;canvas class="chart"
+        data-type="bar"
+        data-source="facet"
+        data-class="org.roda.core.data.v2.ip.IndexedAIP"
+        data-facets="level"&gt;&lt;/canvas&gt;
+                </pre>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 
     <h3>Log entries per component distribution</h3>
-    <canvas class="chart"
-            data-type="bar"
-            data-source="facet"
-            data-class="org.roda.core.data.v2.log.LogEntry"
-            data-facet="actionComponent"></canvas>
+    <table>
+        <tbody>
+        <tr>
+            <td>
+                <canvas class="chart"
+                        data-type="bar"
+                        data-source="facet"
+                        data-class="org.roda.core.data.v2.log.LogEntry"
+                        data-facets="actionComponent"></canvas>
+            </td>
+            <td>
+                <pre>
+&lt;canvas class="chart"
+        data-type="bar"
+        data-source="facet"
+        data-class="org.roda.core.data.v2.log.LogEntry"
+        data-facets="actionComponent"&gt;&lt;/canvas&gt;
+                </pre>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 
     <h2>Radar charts</h2>
     <h3>File formats</h3>
-    <canvas class="chart"
-            data-type="radar"
-            data-source="facet"
-            data-class="org.roda.core.data.v2.ip.IndexedFile"
-            data-facet="fileFormat"></canvas>
+    <table>
+        <tbody>
+        <tr>
+            <td>
+                <canvas class="chart"
+                        data-type="radar"
+                        data-source="facet"
+                        data-class="org.roda.core.data.v2.ip.IndexedFile"
+                        data-facets="fileFormat"></canvas>
+            </td>
+            <td>
+                <pre>
+&lt;canvas class="chart"
+        data-type="radar"
+        data-source="facet"
+        data-class="org.roda.core.data.v2.ip.IndexedFile"
+        data-facets="fileFormat"&gt;&lt;/canvas&gt;
+                </pre>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 
     <h2>Polar area charts</h2>
-    <h3>Mimetype distribution</h3>
-    <canvas class="chart"
-            data-type="polarArea"
-            data-source="facet"
-            data-class="org.roda.core.data.v2.ip.IndexedFile"
-            data-facet="formatMimetype"></canvas>
+    <h3>Pronom format distribution</h3>
+    <table>
+        <tbody>
+        <tr>
+            <td>
+                <canvas class="chart"
+                        data-type="polarArea"
+                        data-source="facet"
+                        data-class="org.roda.core.data.v2.ip.IndexedFile"
+                        data-facets="formatPronom"></canvas>
+            </td>
+            <td>
+                <pre>
+&lt;canvas class="chart"
+        data-type="polarArea"
+        data-source="facet"
+        data-class="org.roda.core.data.v2.ip.IndexedFile"
+        data-facets="formatPronom"&gt;&lt;/canvas&gt;
+                </pre>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 
     <h2>Pie/doughnut charts</h2>
     <h3>File format distribution</h3>
-    <canvas class="chart"
-            data-type="pie"
-            data-source="facet"
-            data-class="org.roda.core.data.v2.ip.IndexedFile"
-            data-facet="fileFormat"></canvas>
+    <table>
+        <tbody>
+        <tr>
+            <td>
+                <canvas class="chart"
+                        data-type="pie"
+                        data-source="facet"
+                        data-class="org.roda.core.data.v2.ip.IndexedFile"
+                        data-facets="fileFormat"></canvas>
+            </td>
+            <td>
+                <pre>
+&lt;canvas class="chart"
+        data-type="pie"
+        data-source="facet"
+        data-class="org.roda.core.data.v2.ip.IndexedFile"
+        data-facets="fileFormat"&gt;&lt;/canvas&gt;
+                </pre>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 
-    <h3>Pronom format distribution</h3>
-    <canvas class="chart"
-            data-type="doughnut"
-            data-source="facet"
-            data-class="org.roda.core.data.v2.ip.IndexedFile"
-            data-facet="formatPronom"></canvas>
+    <h3>Mimetype distribution</h3>
+    <table>
+        <tbody>
+        <tr>
+            <td>
+                <canvas class="chart"
+                        data-type="doughnut"
+                        data-source="facet"
+                        data-class="org.roda.core.data.v2.ip.IndexedFile"
+                        data-facets="formatMimetype"></canvas>
+            </td>
+            <td>
+                <pre>
+&lt;canvas class="chart"
+        data-type="doughnut"
+        data-source="facet"
+        data-class="org.roda.core.data.v2.ip.IndexedFile"
+        data-facets="formatMimetype"&gt;&lt;/canvas&gt;
+                </pre>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h3>Pronon format distribution</h3>
+    <h4>(custom function to handle facet data)</h4>
+    <table>
+        <tbody>
+        <tr>
+            <td rowspan="2">
+                <canvas class="chart"
+                        data-source="facet"
+                        data-class="org.roda.core.data.v2.ip.IndexedFile"
+                        data-facets="formatPronom"
+                        data-facet-function="facetCustomDataHandlerChartOptions"></canvas>
+            </td>
+            <td>
+                <pre>
+&lt;canvas class="chart"
+        data-source="facet"
+        data-class="org.roda.core.data.v2.ip.IndexedFile"
+        data-facets="formatPronom"
+        data-facet-function="facetCustomDataHandlerChartOptions"&gt;&lt;/canvas&gt;
+                </pre>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <pre style="font-size: smaller;">
+function facetCustomDataHandlerChartOptions(facetResults, element){
+    var options = {};
+    var facet = facetResults && facetResults.length > 0 ? facetResults[0] : null;
+    if (facet) {
+        options = {
+            type: "pie",
+            data: {
+                labels: facet.values.map(function (value) { return value.label; }),
+                datasets: [
+                    {
+                        label: facet.field,
+                        data: facet.values.map(function (value) { return value.count; }),
+                        backgroundColor: facet.values.map(function () {
+                            return rgbaRandomOpaqueColorAsString();
+                        })
+                    }
+                ]
+            },
+            options: {
+                cutoutPercentage: 90
+            }
+        };
+    }
+    return options;
+}
+                </pre>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 
     <h2>Bubble charts</h2>
-    <h3>Custom data</h3>
-    <canvas class="chart"
-            data-function="customDataBubbleChart"></canvas>
+    <h3>Custom function to create chart</h3>
+    <table>
+        <tbody>
+        <tr>
+            <td rowspan="2">
+                <canvas class="chart"
+                        data-source="function"
+                        data-function="customDataBubbleChart"></canvas>
+            </td>
+            <td>
+                <pre>
+&lt;canvas class="chart"
+        data-source="function"
+        data-function="customDataBubbleChart"&gt;&lt;/canvas&gt;
+                </pre>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <pre style="font-size: smaller;">
+function customDataBubbleChart(element) {
+        new Chart(element, {
+            type: 'bubble',
+            data: {
+                datasets: [
+                    {
+                        label: "Test dataset",
+                        data: [-3,-2,-1,0,1,2,3].map(function (value) {
+                            return {
+                                x: value,
+                                y: value * value,
+                                r: Math.abs(value) * 10
+                            };
+                        }),
+                        backgroundColor: rgbaRandomOpaqueColorAsString(),
+                        hoverBackgroundColor: rgbaRandomOpaqueColorAsString()
+                    }
+                ]
+            }
+        });
+}
+                </pre>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </div>
