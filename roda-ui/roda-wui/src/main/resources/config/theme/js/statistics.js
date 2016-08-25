@@ -47,18 +47,26 @@
         function facetsChart(element, dataSourceCallback) {
             if (element._chart == null) {
                 var returnClass = $(element).data("class");
-                var facets = $(element).data("facets").split(/\s*[ ,]\s*/);
+
+                var filters = $(element).data("filters") ? $(element).data("filters").split(/\s*[ ,]\s*/) : [];
+                var filterParams = filters.map(function(filter) { return "filter=" + filter }).join("&");
+
+                var facets = $(element).data("facets") ? $(element).data("facets").split(/\s*[ ,]\s*/) : [];
                 var facetParams = facets.map(function(facet) { return "facet=" + facet }).join("&");
+
                 $.ajax({
-                    url: "/api/v1/index?returnClass=" + returnClass + "&" + facetParams + "&start=0&limit=0&onlyActive=false"
+                    url: "/api/v1/index?returnClass=" + returnClass +
+                        "&" + facetParams +
+                        "&" + filterParams +
+                        "&start=0&limit=0&onlyActive=false"
                 }).done(function (data) {
-                    element._chart = new Chart(element, dataSourceCallback(data.facetResults, element));
+                    element._chart = new Chart(element, dataSourceCallback(data, element));
                 });
             }
         }
 
-        function facetLineChartOptions(facetResults, element){
-            var options = facetCommonChartOptions("line", facetResults, element);
+        function facetLineChartOptions(data, element){
+            var options = facetCommonChartOptions("line", data, element);
             var baseColor = rgbRandomColor();
             var paleColor = rgbaRandomColorAsString($.extend(baseColor, { alpha: 0.5 }));
             var opaqueColor = rgbaRandomColorAsString($.extend(baseColor, { alpha: 1 }));
@@ -89,8 +97,8 @@
             return options;
         }
 
-        function facetBarChartOptions(facetResults, element){
-            var options = facetCommonChartOptions("bar", facetResults, element);
+        function facetBarChartOptions(data, element){
+            var options = facetCommonChartOptions("bar", data, element);
             options.data.datasets.forEach(
                 function(dataset){
                     $.extend(dataset, {
@@ -101,8 +109,8 @@
             return options;
         }
 
-        function facetRadarChartOptions(facetResults, element){
-            var options = facetCommonChartOptions("radar", facetResults, element);
+        function facetRadarChartOptions(data, element){
+            var options = facetCommonChartOptions("radar", data, element);
             var baseColor = rgbRandomColor();
             var paleColor = rgbaRandomColorAsString($.extend(baseColor, { alpha: 0.2 }));
             var opaqueColor = rgbaRandomColorAsString($.extend(baseColor, { alpha: 1 }));
@@ -121,21 +129,21 @@
             return options;
         }
 
-        function facetPolarAreaChartOptions(facetResults, element){
-            return facetCommonChartOptions("polarArea", facetResults, element);
+        function facetPolarAreaChartOptions(data, element){
+            return facetCommonChartOptions("polarArea", data, element);
         }
 
-        function facetPieChartOptions(facetResults, element){
-            return facetCommonChartOptions("pie", facetResults, element);
+        function facetPieChartOptions(data, element){
+            return facetCommonChartOptions("pie", data, element);
         }
 
-        function facetDoughnutChartOptions(facetResults, element){
-            return facetCommonChartOptions("doughnut", facetResults, element);
+        function facetDoughnutChartOptions(data, element){
+            return facetCommonChartOptions("doughnut", data, element);
         }
 
-        function facetCommonChartOptions(type, facetResults, element){
+        function facetCommonChartOptions(type, data, element){
             var options = {};
-            var facet = facetResults && facetResults.length > 0 ? facetResults[0] : null;
+            var facet = data && data.facetResults && data.facetResults.length > 0 ? data.facetResults[0] : null;
             if (facet) {
                 options = {
                     type: type,
@@ -234,7 +242,7 @@ function rgbRandomColor(mix) {
     return {
         red: Math.floor(red),
         green: Math.floor(green),
-        blue: Math.floor(blue),
+        blue: Math.floor(blue)
     };
 }
 
@@ -271,9 +279,9 @@ function rgbaRandomOpaqueColorAsString() {
     return rgbaRandomColorAsString(color);
 }
 
-function facetCustomDataHandlerChartOptions(facetResults, element){
+function facetCustomDataHandlerChartOptions(data, element){
     var options = {};
-    var facet = facetResults && facetResults.length > 0 ? facetResults[0] : null;
+    var facet = data && data.facetResults && data.facetResults.length > 0 ? data.facetResults[0] : null;
     if (facet) {
         options = {
             type: "pie",
@@ -323,4 +331,12 @@ function customDataBubbleChart(element) {
             }
         });
     }
+}
+
+function customTagInnerText(element) {
+    $.ajax({
+        url: "/api/v1/index?returnClass=org.roda.core.data.v2.ip.IndexedFile&limit=0"
+    }).done(function (data) {
+        element.text(data.totalCount);
+    });
 }
