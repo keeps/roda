@@ -10,7 +10,7 @@
  */
 package org.roda.wui.common.client;
 
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.RodaSimpleUser;
 
 /**
  * @author Luis Faria
@@ -23,6 +23,6 @@ public interface LoginStatusListener {
    * 
    * @param user
    */
-  public void onLoginStatusChanged(RodaUser user);
+  public void onLoginStatusChanged(RodaSimpleUser user);
 
 }

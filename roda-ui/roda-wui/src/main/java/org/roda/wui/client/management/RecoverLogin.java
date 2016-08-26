@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.RodaSimpleUser;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
@@ -28,22 +28,13 @@ import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyPressEvent;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.event.dom.client.*;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.*;
 
 import config.i18n.client.ClientMessages;
 
@@ -63,10 +54,10 @@ public class RecoverLogin extends Composite {
 
     @Override
     public void isCurrentUserPermitted(final AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaUser>() {
+      UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaSimpleUser>() {
 
         @Override
-        public void onSuccess(RodaUser user) {
+        public void onSuccess(RodaSimpleUser user) {
           if (user.isGuest()) {
             callback.onSuccess(true);
           } else {

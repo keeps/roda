@@ -11,41 +11,25 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.*;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrQuery.SortClause;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
-import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.SolrInputField;
+import org.apache.solr.client.solrj.response.FacetField.Count;
+import org.apache.solr.common.*;
 import org.apache.solr.common.params.FacetParams;
 import org.apache.solr.common.util.DateUtil;
 import org.apache.solr.handler.loader.XMLLoader;
@@ -57,71 +41,35 @@ import org.roda.core.data.adapter.facet.FacetParameter;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.facet.RangeFacetParameter;
 import org.roda.core.data.adapter.facet.SimpleFacetParameter;
-import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
-import org.roda.core.data.adapter.filter.DateIntervalFilterParameter;
-import org.roda.core.data.adapter.filter.DateRangeFilterParameter;
-import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
-import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.filter.FilterParameter;
-import org.roda.core.data.adapter.filter.LongRangeFilterParameter;
-import org.roda.core.data.adapter.filter.NotSimpleFilterParameter;
-import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
-import org.roda.core.data.adapter.filter.OrFiltersParameters;
-import org.roda.core.data.adapter.filter.SimpleFilterParameter;
+import org.roda.core.data.adapter.filter.*;
 import org.roda.core.data.adapter.sort.SortParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.DateGranularity;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.NotSupportedException;
-import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.*;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.formats.Format;
-import org.roda.core.data.v2.index.FacetFieldResult;
-import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.IndexRunnable;
-import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.index.SelectedItems;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.AIPState;
-import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.index.*;
+import org.roda.core.data.v2.ip.*;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
-import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
-import org.roda.core.data.v2.ip.metadata.FileFormat;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
-import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
-import org.roda.core.data.v2.ip.metadata.OtherMetadata;
+import org.roda.core.data.v2.ip.metadata.*;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.JobStats;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.log.LogEntry;
-import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.log.LogEntryParameter;
+import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.core.data.v2.user.Group;
-import org.roda.core.data.v2.user.RODAMember;
-import org.roda.core.data.v2.user.RodaGroup;
-import org.roda.core.data.v2.user.RodaUser;
-import org.roda.core.data.v2.user.User;
+import org.roda.core.data.v2.user.*;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
@@ -163,7 +111,7 @@ public class SolrUtils {
   }
 
   public static <T extends IsIndexed> Long count(SolrClient index, Class<T> classToRetrieve, Filter filter,
-    RodaUser user, boolean justActive) throws GenericException, RequestNotValidException {
+    RodaSimpleUser user, boolean justActive) throws GenericException, RequestNotValidException {
     return find(index, classToRetrieve, filter, null, new Sublist(0, 0), null, user, justActive).getTotalCount();
   }
 
@@ -224,7 +172,7 @@ public class SolrUtils {
   }
 
   public static <T extends IsIndexed> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve, Filter filter,
-    Sorter sorter, Sublist sublist, Facets facets, RodaUser user, boolean justActive)
+    Sorter sorter, Sublist sublist, Facets facets, RodaSimpleUser user, boolean justActive)
     throws GenericException, RequestNotValidException {
 
     IndexResult<T> ret;
@@ -988,7 +936,7 @@ public class SolrUtils {
    * Roda user > Apache Solr filter query
    * ____________________________________________________________________________________________________________________
    */
-  private static String getFilterQueries(RodaUser user, boolean justActive) {
+  private static String getFilterQueries(RodaSimpleUser user, boolean justActive) {
 
     StringBuilder fq = new StringBuilder();
 
@@ -1425,8 +1373,8 @@ public class SolrUtils {
     }
 
     // Add user specific fields
-    if (member instanceof RodaUser) {
-      RodaUser user = (RodaUser) member;
+    if (member instanceof RodaSimpleUser) {
+      RodaSimpleUser user = (RodaSimpleUser) member;
       doc.addField(RodaConstants.MEMBERS_EMAIL, user.getEmail());
     }
 
@@ -1448,7 +1396,7 @@ public class SolrUtils {
     List<String> possibleRoles = objectToListString(doc.get(RodaConstants.MEMBERS_ROLES_ALL));
     roles.addAll(possibleRoles);
     if (isUser) {
-      RodaUser user = new RodaUser();
+      RodaSimpleUser user = new RodaSimpleUser();
       user.setId(id);
       user.setName(name);
       user.setFullName(fullName);

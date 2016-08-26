@@ -7,17 +7,9 @@
  */
 package org.roda.core.index;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Serializable;
+import java.io.*;
 import java.nio.file.NoSuchFileException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrClient;
@@ -30,11 +22,7 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.IsStillUpdatingException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.*;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.agents.Agent;
@@ -43,12 +31,7 @@ import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.*;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -58,7 +41,7 @@ import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.RodaSimpleUser;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
@@ -131,11 +114,11 @@ public class IndexService {
   }
 
   public <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets, RodaUser user, boolean justActive) throws GenericException, RequestNotValidException {
+    Facets facets, RodaSimpleUser user, boolean justActive) throws GenericException, RequestNotValidException {
     return SolrUtils.find(index, returnClass, filter, sorter, sublist, facets, user, justActive);
   }
 
-  public <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, RodaUser user, boolean justActive)
+  public <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, RodaSimpleUser user, boolean justActive)
     throws GenericException, RequestNotValidException {
     return SolrUtils.count(index, returnClass, filter, user, justActive);
   }

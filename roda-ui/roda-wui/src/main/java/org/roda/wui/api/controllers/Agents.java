@@ -14,7 +14,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.RodaSimpleUser;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
 
@@ -33,7 +33,7 @@ public class Agents extends RodaWuiController {
    * ---------------- REST related methods - start -----------------------------
    * ---------------------------------------------------------------------------
    */
-  public static Agent createAgent(RodaUser user, Agent agent)
+  public static Agent createAgent(RodaSimpleUser user, Agent agent)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -48,7 +48,7 @@ public class Agents extends RodaWuiController {
     return agent;
   }
 
-  public static void deleteAgent(RodaUser user, String agentId)
+  public static void deleteAgent(RodaSimpleUser user, String agentId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 

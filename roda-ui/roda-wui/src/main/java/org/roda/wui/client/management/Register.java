@@ -15,7 +15,7 @@ import java.util.List;
 
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.RodaSimpleUser;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.Dialogs;
@@ -63,10 +63,10 @@ public class Register extends Composite {
 
     @Override
     public void isCurrentUserPermitted(final AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaUser>() {
+      UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaSimpleUser>() {
 
         @Override
-        public void onSuccess(RodaUser user) {
+        public void onSuccess(RodaSimpleUser user) {
           if (user != null && user.isGuest()) {
             callback.onSuccess(true);
           } else {

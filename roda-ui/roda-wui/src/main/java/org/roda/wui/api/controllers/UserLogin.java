@@ -13,7 +13,7 @@ import org.roda.core.common.UserUtility;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.RodaSimpleUser;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
 
@@ -23,9 +23,9 @@ public class UserLogin extends RodaWuiController {
     super();
   }
 
-  public static RodaUser login(String username, String password, HttpServletRequest request)
+  public static RodaSimpleUser login(String username, String password, HttpServletRequest request)
     throws AuthenticationDeniedException, GenericException {
-    RodaUser user;
+    RodaSimpleUser user;
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     try {

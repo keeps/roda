@@ -7,11 +7,10 @@
  */
 package org.roda.core.data.v2.user;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class RodaSimpleUser extends RodaPrincipal implements Serializable {
+public class RodaSimpleUser extends RodaPrincipal {
   private static final long serialVersionUID = 6514790636010895870L;
 
   private String email;
@@ -22,8 +21,18 @@ public class RodaSimpleUser extends RodaPrincipal implements Serializable {
     this(null, null, null, false);
   }
 
+  public RodaSimpleUser(final RodaSimpleUser user) {
+    this(user.getId(), user.getName(), user.getEmail(), user.isGuest(), user.getIpAddress(), user.getAllRoles(),
+      user.getDirectRoles(), user.getAllGroups(), user.getDirectGroups());
+  }
+
+  public RodaSimpleUser(final String id, final String name, final boolean guest) {
+    this(id, name, null, guest);
+  }
+
   public RodaSimpleUser(final String id, final String name, final String email, final boolean guest) {
-    this(id, name, email, guest, "", new HashSet<String>(), new HashSet<String>(), new HashSet<String>(), new HashSet<String>());
+    this(id, name, email, guest, "", new HashSet<String>(), new HashSet<String>(), new HashSet<String>(),
+      new HashSet<String>());
   }
 
   public RodaSimpleUser(final String id, final String name, final String email, final boolean guest,

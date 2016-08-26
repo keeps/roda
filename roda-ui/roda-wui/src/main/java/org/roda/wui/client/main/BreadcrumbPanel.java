@@ -13,7 +13,7 @@ package org.roda.wui.client.main;
 import java.util.List;
 import java.util.Stack;
 
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.RodaSimpleUser;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.LoginStatusListener;
 import org.roda.wui.common.client.tools.Tools;
@@ -49,7 +49,7 @@ public class BreadcrumbPanel extends FlowPanel {
 
     UserLogin.getInstance().addLoginStatusListener(new LoginStatusListener() {
 
-      public void onLoginStatusChanged(RodaUser user) {
+      public void onLoginStatusChanged(RodaSimpleUser user) {
         updatePath(currentpath);
       }
 

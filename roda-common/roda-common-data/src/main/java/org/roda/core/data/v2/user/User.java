@@ -12,7 +12,7 @@ package org.roda.core.data.v2.user;
  * 
  * @author Rui Castro
  */
-public class User extends RodaUser {
+public class User extends RodaSimpleUser {
 
   private static final long serialVersionUID = 4646063259443634000L;
 
@@ -74,12 +74,12 @@ public class User extends RodaUser {
   }
 
   /**
-   * Construct a new User cloning a given {@link RodaUser}
+   * Construct a new User cloning a given {@link RodaSimpleUser}
    * 
    * @param rodaUser
-   *          the {@link RodaUser} to be cloned.
+   *          the {@link RodaSimpleUser} to be cloned.
    */
-  public User(final RodaUser rodaUser) {
+  public User(final RodaSimpleUser rodaUser) {
     super(rodaUser);
   }
 

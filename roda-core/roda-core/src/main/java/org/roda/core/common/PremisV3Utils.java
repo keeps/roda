@@ -10,11 +10,7 @@ package org.roda.core.common;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 import javax.xml.transform.Source;
@@ -33,11 +29,7 @@ import org.apache.xmlbeans.XmlValidationError;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationAgentType;
-import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.*;
 import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.metadata.Fixity;
@@ -45,7 +37,7 @@ import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.user.RODAMember;
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.RodaSimpleUser;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -61,32 +53,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import gov.loc.premis.v3.AgentComplexType;
-import gov.loc.premis.v3.AgentDocument;
-import gov.loc.premis.v3.AgentIdentifierComplexType;
-import gov.loc.premis.v3.ContentLocationComplexType;
-import gov.loc.premis.v3.CreatingApplicationComplexType;
-import gov.loc.premis.v3.EventComplexType;
-import gov.loc.premis.v3.EventDetailInformationComplexType;
-import gov.loc.premis.v3.EventDocument;
-import gov.loc.premis.v3.EventIdentifierComplexType;
-import gov.loc.premis.v3.EventOutcomeDetailComplexType;
-import gov.loc.premis.v3.EventOutcomeInformationComplexType;
-import gov.loc.premis.v3.FixityComplexType;
-import gov.loc.premis.v3.FormatComplexType;
-import gov.loc.premis.v3.FormatDesignationComplexType;
-import gov.loc.premis.v3.FormatRegistryComplexType;
-import gov.loc.premis.v3.LinkingAgentIdentifierComplexType;
-import gov.loc.premis.v3.LinkingObjectIdentifierComplexType;
-import gov.loc.premis.v3.ObjectCharacteristicsComplexType;
-import gov.loc.premis.v3.ObjectComplexType;
-import gov.loc.premis.v3.ObjectDocument;
-import gov.loc.premis.v3.ObjectIdentifierComplexType;
-import gov.loc.premis.v3.RelatedObjectIdentifierComplexType;
-import gov.loc.premis.v3.RelationshipComplexType;
-import gov.loc.premis.v3.Representation;
-import gov.loc.premis.v3.StorageComplexType;
-import gov.loc.premis.v3.StringPlusAuthority;
+import gov.loc.premis.v3.*;
 
 public final class PremisV3Utils {
 
@@ -809,8 +776,8 @@ public final class PremisV3Utils {
       try {
         RODAMember member = index.retrieve(RODAMember.class, username);
         fullName = member.getFullName();
-        if (member instanceof RodaUser) {
-          RodaUser user = (RodaUser) member;
+        if (member instanceof RodaSimpleUser) {
+          RodaSimpleUser user = (RodaSimpleUser) member;
           note = user.getEmail();
         }
       } catch (NotFoundException e) {

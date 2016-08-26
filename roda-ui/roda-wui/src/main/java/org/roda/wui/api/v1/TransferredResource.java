@@ -12,12 +12,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -27,15 +22,10 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.IsStillUpdatingException;
+import org.roda.core.data.exceptions.*;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.SelectedItemsList;
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.RodaSimpleUser;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
@@ -61,7 +51,7 @@ public class TransferredResource {
     throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException {
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    RodaSimpleUser user = UserUtility.getApiUser(request);
 
     StreamResponse response = Browser.retrieveTransferredResource(user, resourceId);
 
@@ -78,7 +68,7 @@ public class TransferredResource {
     throws RODAException {
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    RodaSimpleUser user = UserUtility.getApiUser(request);
     // delegate action to controller
 
     try {
@@ -96,7 +86,7 @@ public class TransferredResource {
   public Response deleteResource(
     @ApiParam(value = "The id of the resource", required = true) @QueryParam("path") String path) throws RODAException {
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    RodaSimpleUser user = UserUtility.getApiUser(request);
     // delegate action to controller
     // TODO support remove multiple resources in one go
     SelectedItemsList<org.roda.core.data.v2.ip.TransferredResource> selected = new SelectedItemsList<org.roda.core.data.v2.ip.TransferredResource>(

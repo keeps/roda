@@ -13,7 +13,7 @@ package org.roda.wui.client.common;
 import java.util.Map;
 
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.RodaSimpleUser;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -29,7 +29,7 @@ public interface UserLoginServiceAsync {
    * @return
    * @throws RODAException
    */
-  public void getAuthenticatedUser(AsyncCallback<RodaUser> callback);
+  public void getAuthenticatedUser(AsyncCallback<RodaSimpleUser> callback);
 
   /**
    * Login into RODA Core
@@ -39,7 +39,7 @@ public interface UserLoginServiceAsync {
    * @return
    * @throws RODAException
    */
-  public void login(String username, String password, AsyncCallback<RodaUser> callback);
+  public void login(String username, String password, AsyncCallback<RodaSimpleUser> callback);
 
   /**
    * Get RODA properties

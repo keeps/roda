@@ -16,7 +16,7 @@ import java.util.List;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.EmailUnverifiedException;
 import org.roda.core.data.exceptions.InactiveUserException;
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.RodaSimpleUser;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.management.RecoverLogin;
 import org.roda.wui.client.management.Register;
@@ -35,11 +35,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.PasswordTextBox;
-import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.*;
 
 import config.i18n.client.ClientMessages;
 
@@ -173,7 +169,7 @@ public class Login extends Composite {
       error.setText(messages.fillUsernameAndPasswordMessage());
     } else {
 
-      UserLogin.getInstance().login(usernameText, passwordText, new AsyncCallback<RodaUser>() {
+      UserLogin.getInstance().login(usernameText, passwordText, new AsyncCallback<RodaSimpleUser>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -189,7 +185,7 @@ public class Login extends Composite {
         }
 
         @Override
-        public void onSuccess(RodaUser user) {
+        public void onSuccess(RodaSimpleUser user) {
           if (service != null && service.length() > 0) {
             History.newItem(service);
           } else {

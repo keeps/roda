@@ -12,20 +12,13 @@ import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.RodaSimpleUser;
 import org.roda.wui.client.browse.MetadataValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,13 +26,7 @@ import org.slf4j.LoggerFactory;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 
-import net.sf.saxon.s9api.DocumentBuilder;
-import net.sf.saxon.s9api.Processor;
-import net.sf.saxon.s9api.XPathCompiler;
-import net.sf.saxon.s9api.XPathSelector;
-import net.sf.saxon.s9api.XdmItem;
-import net.sf.saxon.s9api.XdmNode;
-import net.sf.saxon.s9api.XdmValue;
+import net.sf.saxon.s9api.*;
 
 public class ServerTools {
   private static final Logger LOGGER = LoggerFactory.getLogger(ServerTools.class);
@@ -171,7 +158,7 @@ public class ServerTools {
     return values;
   }
 
-  public static String autoGenerateValue(IndexedAIP aip, RodaUser user, String generator) {
+  public static String autoGenerateValue(IndexedAIP aip, RodaSimpleUser user, String generator) {
     String result = null;
     switch (generator) {
       case "now":

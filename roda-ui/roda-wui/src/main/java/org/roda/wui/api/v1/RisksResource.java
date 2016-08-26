@@ -10,14 +10,7 @@ package org.roda.wui.api.v1;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -33,7 +26,7 @@ import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.RodaSimpleUser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.slf4j.Logger;
@@ -63,7 +56,7 @@ public class RisksResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    RodaSimpleUser user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
@@ -87,7 +80,7 @@ public class RisksResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    RodaSimpleUser user = UserUtility.getApiUser(request);
     // delegate action to controller
     Risk newRisk = org.roda.wui.api.controllers.Risks.createRisk(user, risk);
 
@@ -103,7 +96,7 @@ public class RisksResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    RodaSimpleUser user = UserUtility.getApiUser(request);
     // delegate action to controller
     Risk risk = org.roda.wui.api.controllers.Browser.retrieve(user, IndexedRisk.class, riskId);
 
@@ -119,7 +112,7 @@ public class RisksResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    RodaSimpleUser user = UserUtility.getApiUser(request);
     // delegate action to controller
     org.roda.wui.api.controllers.Risks.deleteRisk(user, riskId);
 

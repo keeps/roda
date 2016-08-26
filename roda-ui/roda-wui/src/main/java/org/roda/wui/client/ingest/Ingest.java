@@ -10,7 +10,7 @@ package org.roda.wui.client.ingest;
 import java.util.Arrays;
 import java.util.List;
 
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.RodaSimpleUser;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -137,14 +137,14 @@ public class Ingest {
       }
 
       public void onSuccess(final String rodaInUrl) {
-        UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaUser>() {
+        UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaSimpleUser>() {
 
           public void onFailure(Throwable caught) {
             AsyncCallbackUtils.defaultFailureTreatment(caught);
           }
 
-          public void onSuccess(RodaUser user) {
-            RodaUser target = targetUser == null ? user : targetUser;
+          public void onSuccess(RodaSimpleUser user) {
+            RodaSimpleUser target = targetUser == null ? user : targetUser;
             String url = rodaInUrl.replaceAll("$USERNAME", user.getName()) + "/" + target.getName();
             if (os != null) {
               url += "?os=" + os;

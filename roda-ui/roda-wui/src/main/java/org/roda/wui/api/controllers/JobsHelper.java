@@ -18,21 +18,16 @@ import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.JobAlreadyStartedException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.*;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.SelectedItemsNone;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.jobs.Reports;
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.user.RodaSimpleUser;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
@@ -43,7 +38,7 @@ import org.slf4j.LoggerFactory;
 public class JobsHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(JobsHelper.class);
 
-  protected static void validateAndSetJobInformation(RodaUser user, Job job) throws RequestNotValidException {
+  protected static void validateAndSetJobInformation(RodaSimpleUser user, Job job) throws RequestNotValidException {
     validateJobPluginInformation(job);
 
     // always set a new UUID (even if job already brings one)
@@ -112,7 +107,7 @@ public class JobsHelper {
     return updatedJob;
   }
 
-  public static org.roda.core.data.v2.jobs.Jobs getJobsFromIndexResult(RodaUser user, String start, String limit)
+  public static org.roda.core.data.v2.jobs.Jobs getJobsFromIndexResult(RodaSimpleUser user, String start, String limit)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     org.roda.core.data.v2.jobs.Jobs jobs = new org.roda.core.data.v2.jobs.Jobs();
 
@@ -184,7 +179,7 @@ public class JobsHelper {
     }
   }
 
-  public static Reports getJobReportsFromIndexResult(RodaUser user, String jobId, boolean justFailed, String start,
+  public static Reports getJobReportsFromIndexResult(RodaSimpleUser user, String jobId, boolean justFailed, String start,
     String limit) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     Reports reports = new Reports();
 

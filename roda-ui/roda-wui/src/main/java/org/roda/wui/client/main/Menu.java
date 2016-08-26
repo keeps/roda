@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.RodaSimpleUser;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -22,13 +22,7 @@ import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.preingest.PreIngest;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
-import org.roda.wui.client.management.Management;
-import org.roda.wui.client.management.MemberManagement;
-import org.roda.wui.client.management.NotificationRegister;
-import org.roda.wui.client.management.Profile;
-import org.roda.wui.client.management.Register;
-import org.roda.wui.client.management.Statistics;
-import org.roda.wui.client.management.UserLog;
+import org.roda.wui.client.management.*;
 import org.roda.wui.client.planning.FormatRegister;
 import org.roda.wui.client.planning.Planning;
 import org.roda.wui.client.planning.RiskRegister;
@@ -181,13 +175,13 @@ public class Menu extends Composite {
 
     // settingsMenu = new MenuBar(true);
 
-    UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaUser>() {
+    UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaSimpleUser>() {
 
       public void onFailure(Throwable caught) {
         logger.fatal("Error getting Authenticated user", caught);
       }
 
-      public void onSuccess(RodaUser user) {
+      public void onSuccess(RodaSimpleUser user) {
         updateVisibles(user);
       }
 
@@ -195,7 +189,7 @@ public class Menu extends Composite {
 
     UserLogin.getInstance().addLoginStatusListener(new LoginStatusListener() {
 
-      public void onLoginStatusChanged(RodaUser user) {
+      public void onLoginStatusChanged(RodaSimpleUser user) {
         updateVisibles(user);
       }
 
@@ -222,7 +216,7 @@ public class Menu extends Composite {
     };
   }
 
-  private void updateVisibles(RodaUser user) {
+  private void updateVisibles(RodaSimpleUser user) {
 
     leftMenu.clearItems();
     leftMenuItemCount = 0;
