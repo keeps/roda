@@ -8,28 +8,38 @@
 package org.roda.core.data.v2.user;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 public class RodaSimpleUser extends RodaPrincipal implements Serializable {
   private static final long serialVersionUID = 6514790636010895870L;
 
   private String email;
   private boolean guest;
+  private String ipAddress = "";
 
   public RodaSimpleUser() {
-    super();
+    this(null, null, null, false);
   }
 
-  public RodaSimpleUser(String id, String name, String email, boolean guest) {
-    super(id, name);
+  public RodaSimpleUser(final String id, final String name, final String email, final boolean guest) {
+    this(id, name, email, guest, "", new HashSet<String>(), new HashSet<String>(), new HashSet<String>(), new HashSet<String>());
+  }
+
+  public RodaSimpleUser(final String id, final String name, final String email, final boolean guest,
+    final String ipAddress, final Set<String> allRoles, final Set<String> directRoles, final Set<String> allGroups,
+    final Set<String> directGroups) {
+    super(id, name, allRoles, directRoles, allGroups, directGroups);
     this.email = email;
     this.guest = guest;
+    this.ipAddress = ipAddress;
   }
 
   public String getEmail() {
     return email;
   }
 
-  public void setEmail(String email) {
+  public void setEmail(final String email) {
     this.email = email;
   }
 
@@ -37,8 +47,16 @@ public class RodaSimpleUser extends RodaPrincipal implements Serializable {
     return guest;
   }
 
-  public void setGuest(boolean guest) {
+  public void setGuest(final boolean guest) {
     this.guest = guest;
+  }
+
+  public String getIpAddress() {
+    return ipAddress;
+  }
+
+  public void setIpAddress(final String ipAddress) {
+    this.ipAddress = ipAddress;
   }
 
   @Override
@@ -51,7 +69,7 @@ public class RodaSimpleUser extends RodaPrincipal implements Serializable {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(final Object obj) {
     if (this == obj) {
       return true;
     }
@@ -61,7 +79,7 @@ public class RodaSimpleUser extends RodaPrincipal implements Serializable {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    RodaSimpleUser other = (RodaSimpleUser) obj;
+    final RodaSimpleUser other = (RodaSimpleUser) obj;
     if (email == null) {
       if (other.email != null) {
         return false;
@@ -72,12 +90,19 @@ public class RodaSimpleUser extends RodaPrincipal implements Serializable {
     if (guest != other.guest) {
       return false;
     }
+    if (ipAddress == null) {
+      if (other.ipAddress != null) {
+        return false;
+      }
+    } else if (!ipAddress.equals(other.ipAddress)) {
+      return false;
+    }
     return true;
   }
 
   @Override
   public String toString() {
-    StringBuilder builder = new StringBuilder();
+    final StringBuilder builder = new StringBuilder();
     builder.append("RodaSimpleUser [getId()=");
     builder.append(getId());
     builder.append(", getName()=");
@@ -86,8 +111,14 @@ public class RodaSimpleUser extends RodaPrincipal implements Serializable {
     builder.append(email);
     builder.append(", guest=");
     builder.append(guest);
+    builder.append(", ipAddress=");
+    builder.append(ipAddress);
     builder.append("]");
     return builder.toString();
   }
 
+  @Override
+  public boolean isUser() {
+    return true;
+  }
 }
