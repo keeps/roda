@@ -86,6 +86,8 @@ public interface BrowserServiceAsync {
 
   void createJob(Job job, AsyncCallback<Job> callback);
 
+  void stopJob(String jobId, AsyncCallback<Void> callback);
+
   void retrievePluginsInfo(List<PluginType> type, AsyncCallback<List<PluginInfo>> callback);
 
   void retrieveReindexPluginObjectClasses(AsyncCallback<Set<Pair<String, String>>> asyncCallback);

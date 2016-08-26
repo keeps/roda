@@ -175,7 +175,7 @@
 			<groupId>org.roda-project</groupId>
 			<artifactId>roda-common-data</artifactId>
 			<classifier>sources</classifier>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>commons-httpclient</groupId>

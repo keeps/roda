@@ -202,6 +202,10 @@ public class Job implements IsIndexed, Serializable {
     return isFinalState(state);
   }
 
+  public boolean isStopping() {
+    return JOB_STATE.STOPPING == state;
+  }
+
   public static boolean isFinalState(JOB_STATE state) {
     return JOB_STATE.COMPLETED == state || JOB_STATE.FAILED_TO_COMPLETE == state || JOB_STATE.STOPPED == state
       || JOB_STATE.FAILED_DURING_CREATION == state;

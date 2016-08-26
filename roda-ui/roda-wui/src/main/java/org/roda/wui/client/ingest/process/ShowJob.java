@@ -214,7 +214,7 @@ public class ShowJob extends Composite {
   SimpleJobReportList simpleJobReports;
 
   @UiField
-  Button buttonAppraisal, buttonBack;
+  Button buttonAppraisal, buttonBack, buttonStop;
 
   @UiField(provided = true)
   FlowPanel jobReportStatus;
@@ -509,6 +509,10 @@ public class ShowJob extends Composite {
 
     progress.setHTML(b.toSafeHtml());
 
+    buttonStop.setText(messages.stopButton());
+    buttonStop.setVisible(!job.isInFinalState());
+    buttonStop.setEnabled(!job.isStopping());
+
     buttonAppraisal
       .setText(messages.appraisalTitle() + " (" + job.getJobStats().getOutcomeObjectsWithManualIntervention() + ")");
 
@@ -683,6 +687,11 @@ public class ShowJob extends Composite {
     cancel();
   }
 
+  @UiHandler("buttonStop")
+  void buttonStopHandler(ClickEvent e) {
+    stop();
+  }
+
   private void cancel() {
     if (job.getPluginType().equals(PluginType.INGEST)) {
       Tools.newHistory(IngestProcess.RESOLVER);
@@ -691,4 +700,17 @@ public class ShowJob extends Composite {
     }
   }
 
+  private void stop() {
+    BrowserService.Util.getInstance().stopJob(job.getId(), new AsyncCallback<Void>() {
+      @Override
+      public void onFailure(Throwable caught) {
+        // FIXME 20160826 hsilva: do proper handling of the failure
+      }
+
+      @Override
+      public void onSuccess(Void result) {
+        // FIXME 20160826 hsilva: do proper handling of the success
+      }
+    });
+  }
 }

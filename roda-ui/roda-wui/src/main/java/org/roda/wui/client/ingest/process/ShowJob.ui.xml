@@ -121,6 +121,9 @@
 					<g:Label addStyleNames="h4">
 						<ui:text from='{messages.sidebarActionsTitle}' />
 					</g:Label>
+					<g:Button addStyleNames="btn btn-stop" ui:field="buttonStop">
+						<ui:text from='{messages.stopButton}' />
+					</g:Button>
 					<g:Button addStyleNames="btn btn-play" ui:field="buttonAppraisal">
 						<ui:text from='{messages.sidebarAppraisalTitle}' />
 					</g:Button>

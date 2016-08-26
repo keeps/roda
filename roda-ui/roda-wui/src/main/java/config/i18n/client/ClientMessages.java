@@ -423,6 +423,8 @@ public interface ClientMessages extends Messages {
   String confirmButton();
 
   String applyAllButton();
+  
+  String stopButton();
 
   /*** View representation ***/
 

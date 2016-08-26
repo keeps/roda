@@ -341,7 +341,7 @@ public class SolrUtils {
   public static <T extends Serializable> List<String> getIndexName(Class<T> resultClass) throws GenericException {
     List<String> indexNames = new ArrayList<>();
 
-    // the first index name must be the "main" one
+    // 201608 nvieira: the first index name must be the "main" one
     if (resultClass.equals(AIP.class) || resultClass.equals(IndexedAIP.class)) {
       indexNames.add(RodaConstants.INDEX_AIP);
       indexNames.add(RodaConstants.INDEX_REPRESENTATION);

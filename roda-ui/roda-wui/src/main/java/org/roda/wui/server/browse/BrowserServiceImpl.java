@@ -412,6 +412,13 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
+  public void stopJob(String jobId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
+    Jobs.stopJob(user, jobId);
+  }
+
+  @Override
   public List<PluginInfo> retrievePluginsInfo(List<PluginType> types) {
     // TODO check permissions
     return RodaCoreFactory.getPluginManager().getPluginsInfo(types);

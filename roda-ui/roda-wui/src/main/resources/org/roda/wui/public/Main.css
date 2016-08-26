@@ -691,6 +691,10 @@ pre code {
     content: "\f002";
 }
 
+.btn-stop:after{
+	content: "\f04d"
+}
+
 .btn-back:after {
     content: "\f0a8";
 }
