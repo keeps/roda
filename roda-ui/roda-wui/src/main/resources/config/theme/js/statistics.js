@@ -193,15 +193,36 @@
     };
 
     $(window).ready(function() {
+
+        function recreateScriptTags(element) {
+            var scriptNodes = element.getElementsByTagName('script');
+            for (var i = 0; i < scriptNodes.length ; i++) {
+                var scriptNode = scriptNodes[i];
+                var parent = scriptNode.parentElement;
+                var newScriptNode = document.createElement('script');
+                newScriptNode.async = scriptNode.async;
+                newScriptNode.type = scriptNode.type;
+                if (scriptNode.src) {
+                    newScriptNode.src = scriptNode.src;
+                }
+                newScriptNode.innerHTML = scriptNode.innerHTML;
+                parent.insertBefore(newScriptNode, scriptNode);
+                parent.removeChild(scriptNode);
+            }
+        }
+
         // select the target node
         var target = document.body;
 
         // create an observer instance
         var observer = new MutationObserver(function (mutations) {
             mutations.forEach(function (mutation) {
-                // when the statistics page is added, init chart() plugin for existing .chart elements.
+                // when the statistics page is added...
                 var statistics = document.getElementById("statistics");
                 if (statistics && Array.from(mutation.addedNodes).indexOf(statistics) >= 0) {
+                    // Recreate the <script> elements to make them "active"
+                    recreateScriptTags(statistics);
+                    // init chart() plugin for existing .chart elements.
                     $(".chart").chart();
                 }
             });
@@ -277,66 +298,4 @@ function rgbaRandomOpaqueColorAsString() {
     var color = rgbRandomColor();
     color.alpha = 1;
     return rgbaRandomColorAsString(color);
-}
-
-function facetCustomDataHandlerChartOptions(data, element){
-    var options = {};
-    var facet = data && data.facetResults && data.facetResults.length > 0 ? data.facetResults[0] : null;
-    if (facet) {
-        options = {
-            type: "pie",
-            data: {
-                labels: facet.values.map(function (value) {
-                    return value.label;
-                }),
-                datasets: [
-                    {
-                        label: facet.field,
-                        data: facet.values.map(function (value) {
-                            return value.count;
-                        }),
-                        backgroundColor: facet.values.map(function () {
-                            return rgbaRandomOpaqueColorAsString();
-                        })
-                    }
-                ]
-            },
-            options: {
-                cutoutPercentage: 90
-            }
-        };
-    }
-    return options;
-}
-
-function customDataBubbleChart(element) {
-    if (element._chart == null) {
-        element._chart = new Chart(element, {
-            type: 'bubble',
-            data: {
-                datasets: [
-                    {
-                        label: "Test dataset",
-                        data: [-3,-2,-1,0,1,2,3].map(function (value) {
-                            return {
-                                x: value,
-                                y: value * value,
-                                r: Math.abs(value) * 10
-                            };
-                        }),
-                        backgroundColor: rgbaRandomOpaqueColorAsString(),
-                        hoverBackgroundColor: rgbaRandomOpaqueColorAsString()
-                    }
-                ]
-            }
-        });
-    }
-}
-
-function customTagInnerText(element) {
-    $.ajax({
-        url: "/api/v1/index?returnClass=org.roda.core.data.v2.ip.IndexedFile&limit=0"
-    }).done(function (data) {
-        element.text(data.totalCount);
-    });
 }

@@ -256,51 +256,78 @@
     <table>
         <tbody>
         <tr>
-            <td rowspan="2">
+            <td>
                 <canvas class="chart"
                         data-source="facet"
                         data-class="org.roda.core.data.v2.ip.IndexedFile"
                         data-facets="formatPronom"
                         data-facet-function="facetCustomDataHandlerChartOptions"></canvas>
+                <script type="text/javascript">
+                    function facetCustomDataHandlerChartOptions(data, element){
+                        var options = {};
+                        var facet = data && data.facetResults && data.facetResults.length > 0 ? data.facetResults[0] : null;
+                        if (facet) {
+                            options = {
+                                type: "pie",
+                                data: {
+                                    labels: facet.values.map(function (value) {
+                                        return value.label;
+                                    }),
+                                    datasets: [
+                                        {
+                                            label: facet.field,
+                                            data: facet.values.map(function (value) {
+                                                return value.count;
+                                            }),
+                                            backgroundColor: facet.values.map(function () {
+                                                return rgbaRandomOpaqueColorAsString();
+                                            })
+                                        }
+                                    ]
+                                },
+                                options: {
+                                    cutoutPercentage: 90
+                                }
+                            };
+                        }
+                        return options;
+                    }
+                </script>
             </td>
             <td>
-                <pre>
+                <pre style="font-size: smaller;">
 &lt;canvas class="chart"
         data-source="facet"
         data-class="org.roda.core.data.v2.ip.IndexedFile"
         data-facets="formatPronom"
         data-facet-function="facetCustomDataHandlerChartOptions"&gt;&lt;/canvas&gt;
-                </pre>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <pre style="font-size: smaller;">
-function facetCustomDataHandlerChartOptions(data, element){
-    var options = {};
-    var facet = data && data.facetResults && data.facetResults.length > 0 ? data.facetResults[0] : null;
-    if (facet) {
-        options = {
-            type: "pie",
-            data: {
-                labels: facet.values.map(function (value) { return value.label; }),
-                datasets: [
-                    {
-                        label: facet.field,
-                        data: facet.values.map(function (value) { return value.count; }),
-                        backgroundColor: facet.values.map(function () {
-                            return rgbaRandomOpaqueColorAsString();
-                        })
-                    }
-                ]
-            },
-            options: {
-                cutoutPercentage: 90
-            }
-        };
+&lt;script type="text/javascript">
+    function facetCustomDataHandlerChartOptions(data, element){
+        var options = {};
+        var facet = data && data.facetResults && data.facetResults.length > 0 ? data.facetResults[0] : null;
+        if (facet) {
+            options = {
+                type: "pie",
+                data: {
+                    labels: facet.values.map(function (value) { return value.label; }),
+                    datasets: [
+                        {
+                            label: facet.field,
+                            data: facet.values.map(function (value) { return value.count; }),
+                            backgroundColor: facet.values.map(function () {
+                                return rgbaRandomOpaqueColorAsString();
+                            })
+                        }
+                    ]
+                },
+                options: {
+                    cutoutPercentage: 90
+                }
+            };
+        }
+        return options;
     }
-    return options;
-}
+&lt;/script>
                 </pre>
             </td>
         </tr>
@@ -312,23 +339,43 @@ function facetCustomDataHandlerChartOptions(data, element){
     <table>
         <tbody>
         <tr>
-            <td rowspan="2">
+            <td>
                 <canvas class="chart"
                         data-source="function"
                         data-function="customDataBubbleChart"></canvas>
+                <script type="text/javascript">
+                    function customDataBubbleChart(element) {
+                        if (element._chart == null) {
+                            element._chart = new Chart(element, {
+                                type: 'bubble',
+                                data: {
+                                    datasets: [
+                                        {
+                                            label: "Test dataset",
+                                            data: [-3,-2,-1,0,1,2,3].map(function (value) {
+                                                return {
+                                                    x: value,
+                                                    y: value * value,
+                                                    r: Math.abs(value) * 10
+                                                };
+                                            }),
+                                            backgroundColor: rgbaRandomOpaqueColorAsString(),
+                                            hoverBackgroundColor: rgbaRandomOpaqueColorAsString()
+                                        }
+                                    ]
+                                }
+                            });
+                        }
+                    }
+                </script>
             </td>
             <td>
-                <pre>
+                <pre style="font-size: smaller;">
 &lt;canvas class="chart"
         data-source="function"
         data-function="customDataBubbleChart">&lt;/canvas>
-                </pre>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <pre style="font-size: smaller;">
-function customDataBubbleChart(element) {
+&lt;script type="text/javascript">
+    function customDataBubbleChart(element) {
         new Chart(element, {
             type: 'bubble',
             data: {
@@ -348,7 +395,8 @@ function customDataBubbleChart(element) {
                 ]
             }
         });
-}
+    }
+&lt;/script>
                 </pre>
             </td>
         </tr>
@@ -366,27 +414,32 @@ function customDataBubbleChart(element) {
                         <span class="chart"
                               data-source="function"
                               data-function="customTagInnerText"></span>
+                        <script type="text/javascript">
+                            function customTagInnerText(element) {
+                                $.ajax({
+                                    url: "/api/v1/index?returnClass=org.roda.core.data.v2.ip.IndexedFile&limit=0"
+                                }).done(function (data) {
+                                    element.text(data.totalCount);
+                                });
+                            }
+                        </script>
                     </dd>
                 </dl>
             </td>
             <td>
-                <pre>
+                <pre style="font-size: smaller;">
 &lt;span class="chart"
       data-source="function"
       data-function="customTagInnerText">&lt;/span>
-                </pre>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <pre style="font-size: smaller;">
-function customTagInnerText(element) {
-    $.ajax({
-        url: "/api/v1/index?returnClass=org.roda.core.data.v2.ip.IndexedFile&limit=0"
-    }).done(function (data) {
-        element.text(data.totalCount);
-    });
-}
+&lt;script type="text/javascript">
+    function customTagInnerText(element) {
+        $.ajax({
+            url: "/api/v1/index?returnClass=org.roda.core.data.v2.ip.IndexedFile&limit=0"
+        }).done(function (data) {
+            element.text(data.totalCount);
+        });
+    }
+&lt;/script>
                 </pre>
             </td>
         </tr>
