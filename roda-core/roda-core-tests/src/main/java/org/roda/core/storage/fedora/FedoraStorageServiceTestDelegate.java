@@ -124,8 +124,8 @@ public class FedoraStorageServiceTestDelegate extends AbstractStorageServiceTest
   }
 
   @Test(enabled = false)
-  public void testDeleteNonEmptyContaienr() throws RODAException {
-    super.testDeleteNonEmptyContaienr();
+  public void testDeleteNonEmptyContainer() throws RODAException {
+    super.testDeleteNonEmptyContainer();
   }
 
   @Test(enabled = false)

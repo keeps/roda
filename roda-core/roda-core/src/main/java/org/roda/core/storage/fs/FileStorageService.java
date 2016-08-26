@@ -173,15 +173,20 @@ public class FileStorageService implements StorageService {
 
   }
 
-  private void trash(Path path) throws GenericException, NotFoundException {
+  private void trash(Path fromPath) throws GenericException, NotFoundException {
     try {
-      FSUtils.move(path, trashPath.resolve(rodaDataPath.relativize(path)), true);
+      Path toPath = trashPath.resolve(rodaDataPath.relativize(fromPath));
+      LOGGER.debug("Moving to trash: {} to {}", fromPath, toPath);
+      FSUtils.move(fromPath, toPath, true);
     } catch (AlreadyExistsException e) {
       String unique = UUID.randomUUID().toString();
+      Path uniqueToPath = trashPath.resolve(unique).resolve(rodaDataPath.relativize(fromPath));
       try {
-        FSUtils.move(path, trashPath.resolve(unique).resolve(rodaDataPath.relativize(path)), true);
+        LOGGER.debug("Re-trying to move to trash: {} to {}", fromPath, uniqueToPath);
+        FSUtils.move(fromPath, uniqueToPath, true);
       } catch (AlreadyExistsException e1) {
-        throw new GenericException("Unexpected exception while moving to trash", e);
+        LOGGER.error("Error moving to trash: {} to {}", fromPath, uniqueToPath, e1);
+        throw new GenericException("Unexpected exception while moving to trash", e1);
       }
     }
   }
@@ -684,12 +689,12 @@ public class FileStorageService implements StorageService {
             }
           });
 
-          for (Path p : directoryStream) {            
+          for (Path p : directoryStream) {
             trash(p);
 
             Path pMetadata = FSUtils.getBinaryHistoryMetadataPath(historyDataPath, historyMetadataPath, p);
             trash(pMetadata);
-            
+
             FSUtils.deleteEmptyAncestorsQuietly(p, historyDataPath);
             FSUtils.deleteEmptyAncestorsQuietly(pMetadata, historyMetadataPath);
           }

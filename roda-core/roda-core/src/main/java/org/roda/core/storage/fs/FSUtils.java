@@ -116,7 +116,12 @@ public final class FSUtils {
       try {
         Files.move(sourcePath, targetPath, copyOptions);
       } catch (DirectoryNotEmptyException e) {
-        throw new AlreadyExistsException("Cannot copy because target path already exists: " + targetPath);
+        // 20160826 hsilva: this might happen in some filesystems (e.g. XFS)
+        // because moving a directory implies also moving its entries. In Ext4
+        // this doesn't happen.
+        LOGGER.debug("Copying, as a fallback & instead of moving, from {} to {}", sourcePath, targetPath);
+        copy(sourcePath, targetPath, replaceExisting);
+        deletePathQuietly(sourcePath);
       } catch (IOException e) {
         throw new GenericException("Error while moving directory from " + sourcePath + " to " + targetPath, e);
       }

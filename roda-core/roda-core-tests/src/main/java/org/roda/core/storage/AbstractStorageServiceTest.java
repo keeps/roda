@@ -200,7 +200,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
 
   }
 
-  public void testDeleteNonEmptyContaienr() throws RODAException {
+  public void testDeleteNonEmptyContainer() throws RODAException {
     // Set up
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
     getStorage().createContainer(containerStoragePath);

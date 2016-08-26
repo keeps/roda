@@ -68,7 +68,7 @@ public class FedoraStorageServiceTest extends AbstractTestNGSpringContextTests {
 
   @Test
   public void testDeleteNonEmptyContaienr() throws RODAException {
-    delegate.testDeleteNonEmptyContaienr();
+    delegate.testDeleteNonEmptyContainer();
   }
 
   @Test
