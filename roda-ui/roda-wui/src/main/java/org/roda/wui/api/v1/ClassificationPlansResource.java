@@ -19,7 +19,7 @@ import javax.ws.rs.core.Response;
 import org.roda.core.common.StreamResponse;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiUtils;
 
@@ -45,7 +45,7 @@ public class ClassificationPlansResource {
     throws RODAException {
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     StreamResponse streamResponse = Browser.retrieveClassificationPlan(user, type);

@@ -17,21 +17,21 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.log.LogEntryParameter;
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class ControllerAssistantUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(ControllerAssistantUtils.class);
 
-  protected static void registerAction(RodaUser user, String actionComponent, String actionMethod,
+  protected static void registerAction(User user, String actionComponent, String actionMethod,
     String relatedObjectId, long duration, LOG_ENTRY_STATE state, Object... parameters) {
     LogEntry logEntry = createLogEntry(user, actionComponent, actionMethod, relatedObjectId, duration, state,
       parameters);
     registerAction(logEntry);
   }
 
-  private static LogEntry createLogEntry(RodaUser user, String actionComponent, String actionMethod,
+  private static LogEntry createLogEntry(User user, String actionComponent, String actionMethod,
     String relatedObjectId, long duration, LOG_ENTRY_STATE state, Object... parameters) {
     List<LogEntryParameter> logParameters = new ArrayList<LogEntryParameter>();
     if (parameters != null && parameters.length > 0) {
@@ -51,7 +51,7 @@ public final class ControllerAssistantUtils {
     return createLogEntry(user, actionComponent, actionMethod, relatedObjectId, duration, state, logParameters);
   }
 
-  private static LogEntry createLogEntry(RodaUser user, String actionComponent, String actionMethod,
+  private static LogEntry createLogEntry(User user, String actionComponent, String actionMethod,
     String relatedObjectId, long duration, LOG_ENTRY_STATE state, List<LogEntryParameter> parameters) {
 
     LogEntry logEntry = new LogEntry();

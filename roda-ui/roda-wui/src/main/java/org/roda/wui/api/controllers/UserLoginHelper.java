@@ -16,8 +16,6 @@ import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.EmailUnverifiedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InactiveUserException;
-import org.roda.core.data.v2.user.RodaSimpleUser;
-import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.utils.StringUtils;
 
@@ -35,7 +33,7 @@ public class UserLoginHelper {
    *          the user password.
    * @param request
    *          the HTTP request.
-   * @return the authenticated {@link RodaUser}.
+   * @return the authenticated {@link User}.
    * @throws GenericException
    *           if some error occurs.
    * @throws AuthenticationDeniedException
@@ -43,10 +41,10 @@ public class UserLoginHelper {
    *           Authentication can be denied by bag credentials, unverified user
    *           email or inactive user.
    */
-  public static RodaUser login(final String username, final String password, final HttpServletRequest request)
+  public static User login(final String username, final String password, final HttpServletRequest request)
     throws GenericException, AuthenticationDeniedException {
     try {
-      final RodaUser rodaUser = UserUtility.getLdapUtility().getAuthenticatedUser(username, password);
+      final User rodaUser = UserUtility.getLdapUtility().getAuthenticatedUser(username, password);
       if (!rodaUser.isActive()) {
         final User user = UserUtility.getLdapUtility().getUser(rodaUser.getName());
         if (StringUtils.isNotBlank(user.getEmailConfirmationToken())) {
@@ -55,8 +53,7 @@ public class UserLoginHelper {
         throw new InactiveUserException("User is not active.");
       }
       rodaUser.setIpAddress(request.getRemoteAddr());
-      UserUtility.setUser(request,
-        new RodaSimpleUser(rodaUser.getId(), rodaUser.getName(), rodaUser.getEmail(), rodaUser.isGuest()));
+      UserUtility.setUser(request, rodaUser);
       return rodaUser;
     } catch (final ServiceException | LdapUtilityException e) {
       throw new GenericException(e.getMessage(), e);

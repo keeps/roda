@@ -12,7 +12,12 @@ import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -31,7 +36,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.CountRequest;
@@ -100,7 +105,7 @@ public class IndexResource {
     @ApiParam(value = "Return only active resources?", defaultValue = "true") @QueryParam(RodaConstants.API_QUERY_KEY_ONLY_ACTIVE) final Boolean onlyActive)
     throws RODAException {
     final String mediaType = ApiUtils.getMediaType(null, request);
-    final RodaUser user = UserUtility.getApiUser(request);
+    final User user = UserUtility.getApiUser(request);
     try {
 
       @SuppressWarnings("unchecked")
@@ -163,7 +168,7 @@ public class IndexResource {
   public <T extends IsIndexed> Response list(@ApiParam(value = "Find parameters") final FindRequest findRequest)
     throws RODAException {
     final String mediaType = ApiUtils.getMediaType(null, request);
-    final RodaUser user = UserUtility.getApiUser(request);
+    final User user = UserUtility.getApiUser(request);
 
     try {
 
@@ -197,7 +202,7 @@ public class IndexResource {
   public <T extends IsIndexed> Response count(@ApiParam(value = "Count parameters") final CountRequest countRequest)
     throws RODAException {
     final String mediaType = ApiUtils.getMediaType(null, request);
-    final RodaUser user = UserUtility.getApiUser(request);
+    final User user = UserUtility.getApiUser(request);
 
     try {
 

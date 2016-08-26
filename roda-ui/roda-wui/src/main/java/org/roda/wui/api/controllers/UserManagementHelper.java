@@ -38,7 +38,6 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
-import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.MetadataValue;
 import org.roda.wui.client.browse.UserExtraBundle;
@@ -71,10 +70,6 @@ public class UserManagementHelper {
   protected static IndexResult<RODAMember> findMembers(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     return RodaCoreFactory.getIndexService().find(RODAMember.class, filter, sorter, sublist, facets);
-  }
-
-  protected static RodaUser retrieveRodaUser(String username) throws GenericException, NotFoundException {
-    return RodaCoreFactory.getIndexService().retrieve(RodaUser.class, username);
   }
 
   protected static User retrieveUser(String username) throws GenericException {

@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -181,13 +181,13 @@ public class Menu extends Composite {
 
     // settingsMenu = new MenuBar(true);
 
-    UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaUser>() {
+    UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<User>() {
 
       public void onFailure(Throwable caught) {
         logger.fatal("Error getting Authenticated user", caught);
       }
 
-      public void onSuccess(RodaUser user) {
+      public void onSuccess(User user) {
         updateVisibles(user);
       }
 
@@ -195,7 +195,7 @@ public class Menu extends Composite {
 
     UserLogin.getInstance().addLoginStatusListener(new LoginStatusListener() {
 
-      public void onLoginStatusChanged(RodaUser user) {
+      public void onLoginStatusChanged(User user) {
         updateVisibles(user);
       }
 
@@ -222,7 +222,7 @@ public class Menu extends Composite {
     };
   }
 
-  private void updateVisibles(RodaUser user) {
+  private void updateVisibles(User user) {
 
     leftMenu.clearItems();
     leftMenuItemCount = 0;

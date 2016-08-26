@@ -27,7 +27,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.agents.Agents;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
@@ -57,7 +57,7 @@ public class AgentsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     Agents agents = (Agents) Browser.retrieveObjects(user, Agent.class, start, limit, acceptFormat);
@@ -74,7 +74,7 @@ public class AgentsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     Agent newAgent = org.roda.wui.api.controllers.Agents.createAgent(user, agent);
@@ -91,7 +91,7 @@ public class AgentsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     Agent updatedAgent = org.roda.wui.api.controllers.Agents.updateAgent(user, agent);
@@ -108,7 +108,7 @@ public class AgentsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     Agent agent = org.roda.wui.api.controllers.Browser.retrieve(user, Agent.class, agentId);
@@ -125,7 +125,7 @@ public class AgentsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     org.roda.wui.api.controllers.Agents.deleteAgent(user, agentId);

@@ -17,7 +17,6 @@ import java.util.Vector;
 
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
-import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
@@ -109,10 +108,10 @@ public class UserLogin {
     listeners = new Vector<LoginStatusListener>();
   }
 
-  private final CachedAsynRequest<RodaUser> getUserRequest = new CachedAsynRequest<RodaUser>() {
+  private final CachedAsynRequest<User> getUserRequest = new CachedAsynRequest<User>() {
 
     @Override
-    public void getFromServer(AsyncCallback<RodaUser> callback) {
+    public void getFromServer(AsyncCallback<User> callback) {
       userLoginService.getAuthenticatedUser(callback);
     }
   };
@@ -125,16 +124,12 @@ public class UserLogin {
    *          call back handler that receives error if failed or AuthOfficeUser
    *          if success.
    */
-  public void getAuthenticatedUser(final AsyncCallback<RodaUser> callback) {
+  public void getAuthenticatedUser(final AsyncCallback<User> callback) {
     getUserRequest.request(callback);
   }
 
   /**
    * Login into RODA Core
-   * 
-   * @param username
-   * @param password
-   * @param callback
    */
   public void login() {
     String currentURL = Window.Location.getHref().replaceAll("#", "%23");
@@ -147,8 +142,8 @@ public class UserLogin {
     Window.open("/login?service=" + currentURL + "&hash=" + hash + "&locale=" + locale, "_self", "");
   }
 
-  public void login(String username, String password, final AsyncCallback<RodaUser> callback) {
-    userLoginService.login(username, password, new AsyncCallback<RodaUser>() {
+  public void login(String username, String password, final AsyncCallback<User> callback) {
+    userLoginService.login(username, password, new AsyncCallback<User>() {
 
       @Override
       public void onFailure(Throwable caught) {
@@ -156,7 +151,7 @@ public class UserLogin {
       }
 
       @Override
-      public void onSuccess(RodaUser newUser) {
+      public void onSuccess(User newUser) {
         getUserRequest.setCached(newUser);
         onLoginStatusChanged(newUser);
         callback.onSuccess(newUser);
@@ -166,7 +161,6 @@ public class UserLogin {
 
   /**
    * 
-   * @param callback
    */
   public void logout() {
     String currentURL = Window.Location.getHref().replaceAll("#", "%23");
@@ -193,7 +187,7 @@ public class UserLogin {
     listeners.remove(listener);
   }
 
-  public void onLoginStatusChanged(RodaUser newUser) {
+  public void onLoginStatusChanged(User newUser) {
     for (LoginStatusListener listener : listeners) {
       listener.onLoginStatusChanged(newUser);
     }
@@ -207,14 +201,14 @@ public class UserLogin {
    *          the member which had his permissions changed
    */
   public void permissionsChanged(final RODAMember member) {
-    getAuthenticatedUser(new AsyncCallback<RodaUser>() {
+    getAuthenticatedUser(new AsyncCallback<User>() {
 
       public void onFailure(Throwable caught) {
         // do nothing
       }
 
-      public void onSuccess(RodaUser user) {
-        RodaUser authUser = user;
+      public void onSuccess(User user) {
+        User authUser = user;
         if (member instanceof User && member.getName().equals(authUser.getName())) {
           onLoginStatusChanged(authUser);
         } else if (member instanceof Group && Arrays.asList(authUser.getAllGroups()).contains(member.getName())) {
@@ -306,13 +300,13 @@ public class UserLogin {
         if (role == null) {
           GWT.log("Could not find role for path " + res.getHistoryPath());
         }
-        getAuthenticatedUser(new AsyncCallback<RodaUser>() {
+        getAuthenticatedUser(new AsyncCallback<User>() {
 
           public void onFailure(Throwable caught) {
             callback.onFailure(caught);
           }
 
-          public void onSuccess(RodaUser authUser) {
+          public void onSuccess(User authUser) {
             callback.onSuccess(new Boolean(authUser.hasRole(role)));
           }
 

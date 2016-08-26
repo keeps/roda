@@ -35,7 +35,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.Files;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
@@ -69,7 +69,7 @@ public class FilesResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     Files files = (Files) Browser.retrieveObjects(user, IndexedFile.class, start, limit, acceptFormat);
@@ -90,7 +90,7 @@ public class FilesResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     EntityResponse efile = Browser.retrieveAIPRepresentationFile(user, fileUUID, acceptFormat);
@@ -114,7 +114,7 @@ public class FilesResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     org.roda.core.data.v2.ip.File updatedFile = Browser.updateFile(user, file);
@@ -136,7 +136,7 @@ public class FilesResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     org.roda.core.data.v2.ip.File file;
@@ -159,7 +159,7 @@ public class FilesResource {
     @ApiParam(value = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileUUID)
     throws RODAException {
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     Browser.deleteRepresentationFile(user, fileUUID);
@@ -181,7 +181,7 @@ public class FilesResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     EntityResponse preservationMetadataList = Browser.retrieveAIPRepresentationPreservationMetadataFile(user, fileId,

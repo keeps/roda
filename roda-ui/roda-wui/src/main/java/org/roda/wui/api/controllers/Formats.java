@@ -18,7 +18,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
 
@@ -37,7 +37,7 @@ public class Formats extends RodaWuiController {
    * ---------------- REST related methods - start -----------------------------
    * ---------------------------------------------------------------------------
    */
-  public static Format createFormat(RodaUser user, Format format)
+  public static Format createFormat(User user, Format format)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -52,7 +52,7 @@ public class Formats extends RodaWuiController {
     return format;
   }
 
-  public static Format updateFormat(RodaUser user, Format format)
+  public static Format updateFormat(User user, Format format)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -67,7 +67,7 @@ public class Formats extends RodaWuiController {
     return format;
   }
 
-  public static void deleteFormat(RodaUser user, String formatId)
+  public static void deleteFormat(User user, String formatId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -81,7 +81,7 @@ public class Formats extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "formatId", formatId);
   }
 
-  public static List<Format> retrieveFormats(RodaUser user, IndexResult<Format> listFormatsIndexResult)
+  public static List<Format> retrieveFormats(User user, IndexResult<Format> listFormatsIndexResult)
     throws AuthorizationDeniedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 

@@ -26,7 +26,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.notifications.Notifications;
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
@@ -56,7 +56,7 @@ public class NotificationsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     Notifications notifications = (Notifications) Browser.retrieveObjects(user, Notification.class, start, limit,
@@ -74,7 +74,7 @@ public class NotificationsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     Notification newNotification = org.roda.wui.api.controllers.Notifications.createNotification(user, notification);
@@ -91,7 +91,7 @@ public class NotificationsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     Notification updatedNotification = org.roda.wui.api.controllers.Notifications.updateNotification(user,
@@ -109,7 +109,7 @@ public class NotificationsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     Notification notification = org.roda.wui.api.controllers.Browser.retrieve(user, Notification.class, notificationId);
@@ -126,7 +126,7 @@ public class NotificationsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     org.roda.wui.api.controllers.Notifications.deleteNotification(user, notificationId);
@@ -150,7 +150,7 @@ public class NotificationsResource {
     }
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     org.roda.wui.api.controllers.Notifications.acknowledgeNotification(user, notificationId, token);

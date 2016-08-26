@@ -75,7 +75,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RoleAlreadyExistsException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.user.Group;
-import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.util.PasswordHandler;
 import org.slf4j.Logger;
@@ -822,7 +821,7 @@ public class LdapUtility {
    * @throws ServiceException
    *           if some error occurred.
    */
-  public RodaUser getAuthenticatedUser(final String username, final String password)
+  public User getAuthenticatedUser(final String username, final String password)
     throws AuthenticationDeniedException, ServiceException {
 
     if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
@@ -835,9 +834,9 @@ public class LdapUtility {
       // Use this session to retrieve user's direct attributes.
       final CoreSession userSession = service.getSession(new Dn(getUserDN(username)), password.getBytes());
       final Entry entry = userSession.lookup(new Dn(getUserDN(username)));
-      final RodaUser user = getRodaUserFromEntry(entry);
+      final User user = getUserFromEntry(entry);
       // Use the admin session to get the user roles and groups
-      return getRodaUserRolesAndGroups(service.getAdminSession(), user);
+      return setUserRolesAndGroups(service.getAdminSession(), user);
 
     } catch (final LdapAuthenticationException e) {
       throw new AuthenticationDeniedException(e.getMessage(), e);
@@ -1203,7 +1202,8 @@ public class LdapUtility {
     return rodaPartition;
   }
 
-  private RodaUser getRodaUserRolesAndGroups(final CoreSession session, final RodaUser user) throws LdapException {
+  private User setUserRolesAndGroups(final CoreSession session, final User user)
+    throws LdapException {
     // Add all roles assigned to this user
     final Set<String> memberRoles = getMemberRoles(session, getUserDN(user.getName()));
     user.setAllRoles(memberRoles);
@@ -1251,23 +1251,17 @@ public class LdapUtility {
     return user;
   }
 
-  private RodaUser getRodaUserFromEntry(final Entry entry) throws LdapException {
-    final RodaUser rodaUser = new RodaUser();
-    rodaUser.setId(getEntryAttributeAsString(entry, UID));
-    rodaUser.setName(rodaUser.getId());
-    rodaUser.setEmail(getEntryAttributeAsString(entry, EMAIL));
-    rodaUser.setFullName(getEntryAttributeAsString(entry, CN));
-    rodaUser.setActive("0".equalsIgnoreCase(getEntryAttributeAsString(entry, SHADOW_INACTIVE)));
-    rodaUser.setGuest(false);
-    return rodaUser;
-  }
-
   private User getUserFromEntry(final Entry entry) throws LdapException {
 
     final User user = new User(getEntryAttributeAsString(entry, UID));
-    user.setActive("0".equalsIgnoreCase(getEntryAttributeAsString(entry, SHADOW_INACTIVE)));
+    // id and name set in the constructor
     user.setFullName(getEntryAttributeAsString(entry, CN));
+
+    user.setActive("0".equalsIgnoreCase(getEntryAttributeAsString(entry, SHADOW_INACTIVE)));
+
     user.setEmail(entry.get(EMAIL).getString());
+    user.setGuest(false);
+
     user.setExtra(getEntryAttributeAsString(entry, "description"));
 
     if (entry.get("info") != null) {

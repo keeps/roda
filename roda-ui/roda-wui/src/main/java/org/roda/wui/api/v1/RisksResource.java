@@ -27,7 +27,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.Risks;
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
@@ -57,7 +57,7 @@ public class RisksResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     Risks risks = (Risks) Browser.retrieveObjects(user, IndexedRisk.class, start, limit, acceptFormat);
@@ -74,7 +74,7 @@ public class RisksResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     Risk newRisk = org.roda.wui.api.controllers.Risks.createRisk(user, risk);
@@ -91,7 +91,7 @@ public class RisksResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     Risk updatedRisk = org.roda.wui.api.controllers.Risks.updateRisk(user, risk, updateMessage);
@@ -108,7 +108,7 @@ public class RisksResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     Risk risk = org.roda.wui.api.controllers.Browser.retrieve(user, IndexedRisk.class, riskId);
@@ -125,7 +125,7 @@ public class RisksResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     org.roda.wui.api.controllers.Risks.deleteRisk(user, riskId);

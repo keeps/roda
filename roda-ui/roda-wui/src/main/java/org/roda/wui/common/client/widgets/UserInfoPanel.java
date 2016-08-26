@@ -10,7 +10,7 @@
  */
 package org.roda.wui.common.client.widgets;
 
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.User;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.DisclosurePanel;
@@ -31,7 +31,7 @@ public class UserInfoPanel {
 
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
-  private final RodaUser user;
+  private final User user;
 
   private final DockPanel layout;
 
@@ -50,7 +50,7 @@ public class UserInfoPanel {
    * 
    * @param user
    */
-  public UserInfoPanel(RodaUser user) {
+  public UserInfoPanel(User user) {
     this.user = user;
 
     layout = new DockPanel();

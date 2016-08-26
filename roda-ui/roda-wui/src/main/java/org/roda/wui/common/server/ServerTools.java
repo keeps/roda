@@ -25,7 +25,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.MetadataValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -171,7 +171,7 @@ public class ServerTools {
     return values;
   }
 
-  public static String autoGenerateValue(IndexedAIP aip, RodaUser user, String generator) {
+  public static String autoGenerateValue(IndexedAIP aip, User user, String generator) {
     String result = null;
     switch (generator) {
       case "now":

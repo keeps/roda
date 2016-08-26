@@ -48,7 +48,6 @@ import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
-import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.plugins.plugins.base.ActionLogCleanerPlugin;
 import org.roda.core.plugins.plugins.base.ReindexAllRodaEntitiesPlugin;
@@ -81,7 +80,7 @@ public class ManagementTasksResource {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // get user & check permissions
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     controllerAssistant.checkGroup(user, "administrators");
     return executeReindex(user, controllerAssistant, entity, params);
@@ -95,14 +94,14 @@ public class ManagementTasksResource {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // get user & check permissions
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     controllerAssistant.checkGroup(user, "administrators");
 
     return Response.ok().entity(createJobForRunningActionlogCleaner(user, daysToKeep, controllerAssistant)).build();
   }
 
-  private Response executeReindex(RodaUser user, ControllerAssistant controllerAssistant, String entity,
+  private Response executeReindex(User user, ControllerAssistant controllerAssistant, String entity,
     List<String> params) {
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
     if ("aip".equals(entity)) {
@@ -131,7 +130,7 @@ public class ManagementTasksResource {
     return Response.ok().entity(response).build();
   }
 
-  private <T extends IsRODAObject> ApiResponseMessage createJobToReindex(RodaUser user,
+  private <T extends IsRODAObject> ApiResponseMessage createJobToReindex(User user,
     ControllerAssistant controllerAssistant, List<String> params, Class<T> classToCreate) {
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
 
@@ -150,7 +149,7 @@ public class ManagementTasksResource {
     return response;
   }
 
-  private ApiResponseMessage createJobToReindexAllRODAObjects(RodaUser user, ControllerAssistant controllerAssistant) {
+  private ApiResponseMessage createJobToReindexAllRODAObjects(User user, ControllerAssistant controllerAssistant) {
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
     Job job = new Job().setName("Management Task | Reindex 'All RODA Objects' job")
       .setSourceObjects(SelectedItemsNone.create()).setPlugin(ReindexAllRodaEntitiesPlugin.class.getName());
@@ -160,7 +159,7 @@ public class ManagementTasksResource {
     return response;
   }
 
-  private ApiResponseMessage reindexUsersAndGroups(RodaUser user, ControllerAssistant controllerAssistant,
+  private ApiResponseMessage reindexUsersAndGroups(User user, ControllerAssistant controllerAssistant,
     List<String> params) {
     boolean success = true;
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
@@ -187,7 +186,7 @@ public class ManagementTasksResource {
     return response;
   }
 
-  private void createJobAndRegisterAction(RodaUser user, ControllerAssistant controllerAssistant,
+  private void createJobAndRegisterAction(User user, ControllerAssistant controllerAssistant,
     ApiResponseMessage response, Job job, Object... params) {
     boolean success = true;
     try {
@@ -203,7 +202,7 @@ public class ManagementTasksResource {
     controllerAssistant.registerAction(user, success ? LOG_ENTRY_STATE.SUCCESS : LOG_ENTRY_STATE.FAILURE, params);
   }
 
-  private ApiResponseMessage createJobForRunningActionlogCleaner(RodaUser user, String daysToKeep,
+  private ApiResponseMessage createJobForRunningActionlogCleaner(User user, String daysToKeep,
     ControllerAssistant controllerAssistant) {
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
     Job job = new Job();

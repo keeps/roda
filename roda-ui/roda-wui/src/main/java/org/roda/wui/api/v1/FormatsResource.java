@@ -26,7 +26,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.formats.Formats;
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
@@ -56,7 +56,7 @@ public class FormatsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     Formats formats = (Formats) Browser.retrieveObjects(user, Format.class, start, limit, acceptFormat);
@@ -73,7 +73,7 @@ public class FormatsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     Format newFormat = org.roda.wui.api.controllers.Formats.createFormat(user, format);
@@ -90,7 +90,7 @@ public class FormatsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     Format updatedFormat = org.roda.wui.api.controllers.Formats.updateFormat(user, format);
@@ -107,7 +107,7 @@ public class FormatsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     Format format = org.roda.wui.api.controllers.Browser.retrieve(user, Format.class, formatId);
@@ -124,7 +124,7 @@ public class FormatsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     org.roda.wui.api.controllers.Formats.deleteFormat(user, formatId);

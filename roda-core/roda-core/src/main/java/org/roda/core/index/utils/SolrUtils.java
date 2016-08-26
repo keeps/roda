@@ -119,8 +119,6 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
-import org.roda.core.data.v2.user.RodaGroup;
-import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
@@ -163,7 +161,7 @@ public class SolrUtils {
   }
 
   public static <T extends IsIndexed> Long count(SolrClient index, Class<T> classToRetrieve, Filter filter,
-    RodaUser user, boolean justActive) throws GenericException, RequestNotValidException {
+    User user, boolean justActive) throws GenericException, RequestNotValidException {
     return find(index, classToRetrieve, filter, null, new Sublist(0, 0), null, user, justActive).getTotalCount();
   }
 
@@ -224,7 +222,7 @@ public class SolrUtils {
   }
 
   public static <T extends IsIndexed> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve, Filter filter,
-    Sorter sorter, Sublist sublist, Facets facets, RodaUser user, boolean justActive)
+    Sorter sorter, Sublist sublist, Facets facets, User user, boolean justActive)
     throws GenericException, RequestNotValidException {
 
     IndexResult<T> ret;
@@ -988,7 +986,7 @@ public class SolrUtils {
    * Roda user > Apache Solr filter query
    * ____________________________________________________________________________________________________________________
    */
-  private static String getFilterQueries(RodaUser user, boolean justActive) {
+  private static String getFilterQueries(User user, boolean justActive) {
 
     StringBuilder fq = new StringBuilder();
 
@@ -1424,8 +1422,8 @@ public class SolrUtils {
     }
 
     // Add user specific fields
-    if (member instanceof RodaUser) {
-      RodaUser user = (RodaUser) member;
+    if (member instanceof User) {
+      User user = (User) member;
       doc.addField(RodaConstants.MEMBERS_EMAIL, user.getEmail());
     }
 
@@ -1447,7 +1445,7 @@ public class SolrUtils {
     List<String> possibleRoles = objectToListString(doc.get(RodaConstants.MEMBERS_ROLES_ALL));
     roles.addAll(possibleRoles);
     if (isUser) {
-      RodaUser user = new RodaUser();
+      User user = new User();
       user.setId(id);
       user.setName(name);
       user.setFullName(fullName);
@@ -1460,7 +1458,7 @@ public class SolrUtils {
 
       return user;
     } else {
-      RodaGroup group = new RodaGroup();
+      Group group = new Group();
       group.setId(id);
       group.setActive(isActive);
       group.setAllGroups(groups);

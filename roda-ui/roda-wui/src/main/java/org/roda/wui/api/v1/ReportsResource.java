@@ -20,7 +20,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Reports;
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiUtils;
 
@@ -55,7 +55,7 @@ public class ReportsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     Reports reportList = Browser.listTransferredResourcesReports(user, resourceId, start, limit, isOriginal,
       acceptFormat);
@@ -76,7 +76,7 @@ public class ReportsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // get last job reports of a transferred resource
     Reports lastReports = Browser.listTransferredResourcesLastReport(user, resourceId, isOriginal, acceptFormat);
