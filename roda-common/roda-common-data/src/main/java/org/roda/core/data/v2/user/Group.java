@@ -17,7 +17,7 @@ import java.util.Set;
  * 
  * @author Rui Castro
  */
-public class Group extends RodaGroup {
+public class Group extends RodaPrincipal {
 
   private static final long serialVersionUID = -4051946961307715630L;
 
@@ -62,6 +62,11 @@ public class Group extends RodaGroup {
   public String toString() {
     return "Group (" + super.toString() + ", memberUserNames=" + this.memberUserNames + ", memberGroupNames="
       + this.memberGroupNames + ")";
+  }
+
+  @Override
+  public boolean isUser() {
+    return false;
   }
 
   /**

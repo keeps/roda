@@ -69,7 +69,10 @@ import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.core.data.v2.user.*;
+import org.roda.core.data.v2.user.Group;
+import org.roda.core.data.v2.user.RODAMember;
+import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
@@ -1409,7 +1412,7 @@ public class SolrUtils {
 
       return user;
     } else {
-      RodaGroup group = new RodaGroup();
+      Group group = new Group();
       group.setId(id);
       group.setActive(isActive);
       group.setAllGroups(groups);
