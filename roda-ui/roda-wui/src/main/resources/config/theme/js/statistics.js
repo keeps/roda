@@ -1,6 +1,6 @@
 (function($) {
 
-    $.fn.chart = function() {
+    $.fn.statistic = function() {
         var matchedObject = this;
 
         function init() {
@@ -10,27 +10,71 @@
 
             matchedObject.each(function() {
                 var element = $(this);
-                if (element._chart == null) {
-                    var source = element.data("source");
-                    if (source == "facet") {
-                        initFacetChart(element);
-                    } else if (source == "function") {
-                        var customFunction = element.data("function");
-                        executeFunctionByName(window, customFunction, element);
+
+                var view = element.data("view");
+                var viewCallback;
+                if (view == "chart") {
+                    var viewField = element.data("view-field");
+                    if (viewField == "facetResults") {
+                        viewCallback = initViewFacetChart;
                     } else {
-                        console.log("Unknown data source '"+source+"'");
+                        console.log("Unknown view-field '"+viewField+"'");
                     }
+                } else if (view == "text") {
+                    viewCallback = initViewText;
+                } else {
+                    viewCallback = function() {};
+                    console.log("Unknown view '"+view+"'");
+                }
+
+                var source = element.data("source");
+                if (source == "index") {
+                    fetchIndexData(element, viewCallback);
+                } else if (source == "function") {
+                    var customFunction = element.data("function");
+                    executeFunctionByName(window, customFunction, element, viewCallback);
+                } else {
+                    console.log("Unknown data source '"+source+"'");
                 }
             });
         }
 
-        function initFacetChart(element) {
-            var facetCallback;
-            var customFacetFunction = element.data("facet-function");
-            if (customFacetFunction) {
-                facetCallback = functionByName(window, customFacetFunction);
+        function fetchIndexData(element, viewCallback) {
+            var returnClass = $(element).data("source-class");
+
+            var filters = $(element).data("source-filters") ? $(element).data("source-filters").split(/\s*[ ,]\s*/) : [];
+            var filterParams = filters.map(function(filter) { return "filter=" + filter }).join("&");
+
+            var facets = $(element).data("source-facets") ? $(element).data("source-facets").split(/\s*[ ,]\s*/) : [];
+            var facetParams = facets.map(function(facet) { return "facet=" + facet }).join("&");
+
+            var start = $(element).data("source-start") || 0;
+            var limit = $(element).data("source-limit") || 0;
+            var onlyActive = $(element).data("source-onlyActive") || "false";
+
+            $.ajax({
+                url: "/api/v1/index?returnClass=" + returnClass +
+                    "&" + filterParams +
+                    "&" + facetParams +
+                    "&start=" + start +
+                    "&limit=" + limit +
+                    "&onlyActive=" + onlyActive
+            }).done(function (data) {
+                viewCallback(element, data);
+            });
+        }
+
+        function initViewText(element, data) {
+            element.text(data[element.data("view-field")]);
+        }
+
+        function initViewFacetChart(element, data) {
+            var chartOptionsCallback;
+            var type = element.data("view-type");
+            if (type == "function") {
+                var customFacetFunction = element.data("view-type-function");
+                chartOptionsCallback = functionByName(window, customFacetFunction);
             } else {
-                var type = element.data("type");
                 var facetDataSourceCallbacks = {
                     "line": facetLineChartOptions,
                     "bar": facetBarChartOptions,
@@ -39,30 +83,14 @@
                     "pie": facetPieChartOptions,
                     "doughnut": facetDoughnutChartOptions
                 };
-                facetCallback = facetDataSourceCallbacks[type];
+                if (type in facetDataSourceCallbacks) {
+                    chartOptionsCallback = facetDataSourceCallbacks[type];
+                } else {
+                    chartOptionsCallback = function(){};
+                    console.log("Unknown view-type '" + type + "'");
+                }
             }
-            facetsChart(element, facetCallback);
-        }
-
-        function facetsChart(element, dataSourceCallback) {
-            if (element._chart == null) {
-                var returnClass = $(element).data("class");
-
-                var filters = $(element).data("filters") ? $(element).data("filters").split(/\s*[ ,]\s*/) : [];
-                var filterParams = filters.map(function(filter) { return "filter=" + filter }).join("&");
-
-                var facets = $(element).data("facets") ? $(element).data("facets").split(/\s*[ ,]\s*/) : [];
-                var facetParams = facets.map(function(facet) { return "facet=" + facet }).join("&");
-
-                $.ajax({
-                    url: "/api/v1/index?returnClass=" + returnClass +
-                        "&" + facetParams +
-                        "&" + filterParams +
-                        "&start=0&limit=0&onlyActive=false"
-                }).done(function (data) {
-                    element._chart = new Chart(element, dataSourceCallback(data, element));
-                });
-            }
+            new Chart(element, chartOptionsCallback(data, element));
         }
 
         function facetLineChartOptions(data, element){
@@ -222,8 +250,8 @@
                 if (statistics && Array.from(mutation.addedNodes).indexOf(statistics) >= 0) {
                     // Recreate the <script> elements to make them "active"
                     recreateScriptTags(statistics);
-                    // init chart() plugin for existing .chart elements.
-                    $(".chart").chart();
+                    // init statistic() plugin for existing .statistic elements.
+                    $(".statistic").statistic();
                 }
             });
         });
