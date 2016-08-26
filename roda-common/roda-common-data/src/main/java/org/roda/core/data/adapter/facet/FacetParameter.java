@@ -11,8 +11,16 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes({@Type(value = SimpleFacetParameter.class, name = "SimpleFacetParameter"),
+  @Type(value = RangeFacetParameter.class, name = "RangeFacetParameter")})
 public abstract class FacetParameter implements Serializable {
   private static final long serialVersionUID = 4927529408810091855L;
+
   public static final int DEFAULT_MIN_COUNT = 1;
 
   private String name;
@@ -20,22 +28,18 @@ public abstract class FacetParameter implements Serializable {
   private int minCount = DEFAULT_MIN_COUNT;
 
   public FacetParameter() {
-
+    this(null);
   }
 
-  public FacetParameter(String name) {
-    super();
-    this.name = name;
-    this.values = new ArrayList<String>();
+  public FacetParameter(final String name) {
+    this(name, new ArrayList<String>());
   }
 
-  public FacetParameter(String name, List<String> values) {
-    super();
-    this.name = name;
-    this.values = values;
+  public FacetParameter(final String name, final List<String> values) {
+    this(name, values, DEFAULT_MIN_COUNT);
   }
 
-  public FacetParameter(String name, List<String> values, int minCount) {
+  public FacetParameter(final String name, final List<String> values, final int minCount) {
     super();
     this.name = name;
     this.values = values;
@@ -67,6 +71,6 @@ public abstract class FacetParameter implements Serializable {
   }
 
   public String toString() {
-    return "FacetParameter [name=" + name + ", values=" + values.toString() + "]";
+    return "FacetParameter [name=" + name + ", values=" + this.values + "]";
   }
 }

@@ -78,4 +78,7 @@ public class Facets implements Serializable {
     this.query = query;
   }
 
+  public String toString() {
+    return "Facets [query=" + this.query + ", parameters=" + this.parameters + "]";
+  }
 }
