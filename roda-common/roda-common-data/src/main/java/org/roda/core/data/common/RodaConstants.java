@@ -119,7 +119,7 @@ public final class RodaConstants {
   public static final String API_REST_V1_AIPS = "api/v1/aips/";
   public static final String API_REST_V1_REPRESENTATIONS = "api/v1/representations/";
   public static final String API_REST_V1_FILES = "api/v1/files/";
-  public static final String API_REST_V1_TRANSFERRED = "api/v1/transferred";
+  public static final String API_REST_V1_RESOURCES = "api/v1/transfers";
   public static final String API_REST_V1_THEME = "api/v1/theme";
   // sub-resources strings
   public static final String API_DATA = "data";
@@ -135,6 +135,7 @@ public final class RodaConstants {
   public static final String API_QUERY_VALUE_ACCEPT_FORMAT_XML = "xml";
   public static final String API_QUERY_VALUE_ACCEPT_FORMAT_HTML = "html";
   public static final String API_QUERY_VALUE_ACCEPT_FORMAT_JSON = "json";
+  public static final String API_QUERY_VALUE_ACCEPT_FORMAT_ZIP = "zip";
   public static final String API_QUERY_KEY_LANG = "lang";
   public static final String API_QUERY_VALUE_LANG_DEFAULT = RodaConstants.API_QUERY_VALUE_LANG_PT_PT;
   public static final String API_QUERY_VALUE_LANG_PT_PT = "pt_PT";
@@ -146,13 +147,24 @@ public final class RodaConstants {
   public static final String API_PATH_PARAM_AIP_ID = "aip_id";
   public static final String API_PATH_PARAM_REPRESENTATION_ID = "representation_id";
   public static final String API_PATH_PARAM_REPRESENTATION_UUID = "representation_uuid";
+  public static final String API_PATH_PARAM_FILE_ID = "file_id";
   public static final String API_PATH_PARAM_FILE_UUID = "file_uuid";
   public static final String API_PATH_PARAM_METADATA_ID = "metadata_id";
+  public static final String API_PATH_PARAM_TRANSFERRED_RESOURCE_ID = "transferred_resource_id";
   public static final String API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID = "transferred_resource_uuid";
   public static final String API_PATH_PARAM_NOTIFICATION_ID = "notification_id";
+  public static final String API_PATH_PARAM_AGENT_ID = "agent_id";
+  public static final String API_PATH_PARAM_FORMAT_ID = "format_id";
+  public static final String API_PATH_PARAM_RISK_ID = "risk_id";
+  public static final String API_PATH_PARAM_PART = "part";
   public static final String API_QUERY_PARAM_VERSION = "version";
   public static final String API_QUERY_PARAM_NOTIFICATION_TOKEN = "token";
-  public static final String API_QUERY_PARAM_NOTIFICATION_EMAIL = "email";
+  public static final String API_QUERY_PARAM_RESOURCE_ID = "resource_id";
+  public static final String API_QUERY_PARAM_DEFAULT_RESOURCE_ID = "default_resource_id";
+  public static final String API_QUERY_PARAM_INLINE = "inline";
+  public static final String API_QUERY_PARAM_FILEPATH = "filepath";
+  public static final String API_QUERY_PARAM_PARENT_ID = "parent_id";
+  public static final String API_QUERY_PARAM_TYPE = "type";
   // http headers used
   public static final String API_HTTP_HEADER_ACCEPT = "Accept";
   // job related params

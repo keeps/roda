@@ -19,12 +19,10 @@ import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.Reports;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiUtils;
-import org.roda.wui.api.v1.utils.StreamResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -38,13 +36,11 @@ public class ReportsResource {
   public static final String ENDPOINT = "/v1/reports";
   public static final String SWAGGER_ENDPOINT = "v1 reports";
 
-  private static Logger LOGGER = LoggerFactory.getLogger(ReportsResource.class);
-
   @Context
   private HttpServletRequest request;
 
   @GET
-  @Path("/{transferred_resource_uuid}")
+  @Path("/{" + RodaConstants.API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID + "}")
   @ApiOperation(value = "List reports", notes = "List reports", response = Report.class, responseContainer = "List")
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Report.class, responseContainer = "List"),
     @ApiResponse(code = 404, message = "Transferred resource not found", response = Report.class, responseContainer = "List")})
@@ -56,17 +52,18 @@ public class ReportsResource {
     @ApiParam(value = "Is the indicated ID the original one?", defaultValue = "false") @QueryParam(RodaConstants.API_QUERY_IS_ORIGINAL) boolean isOriginal,
     @ApiParam(value = "Choose format in which to get the reports", allowableValues = "json") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
+
     // get user
     RodaUser user = UserUtility.getApiUser(request);
 
-    StreamResponse reportList = Browser.listTransferredResourcesReports(user, resourceId, start, limit, isOriginal,
+    Reports reportList = Browser.listTransferredResourcesReports(user, resourceId, start, limit, isOriginal,
       acceptFormat);
-
-    return ApiUtils.okResponse(reportList);
+    return Response.ok(reportList, mediaType).build();
   }
 
   @GET
-  @Path("/{transferred_resource_uuid}/last")
+  @Path("/{" + RodaConstants.API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID + "}/last")
   @ApiOperation(value = "Last report", notes = "Last report", response = Report.class, responseContainer = "List")
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Report.class, responseContainer = "List"),
     @ApiResponse(code = 404, message = "Transferred resource not found", response = Report.class, responseContainer = "List")})
@@ -76,13 +73,14 @@ public class ReportsResource {
     @ApiParam(value = "Is the indicated ID the original one?", defaultValue = "false") @QueryParam(RodaConstants.API_QUERY_IS_ORIGINAL) boolean isOriginal,
     @ApiParam(value = "Choose format in which to get the reports", allowableValues = "json") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
+
     // get user
     RodaUser user = UserUtility.getApiUser(request);
 
     // get last job reports of a transferred resource
-    StreamResponse lastReports = Browser.listTransferredResourcesLastReport(user, resourceId, isOriginal, acceptFormat);
-
-    return ApiUtils.okResponse(lastReports);
+    Reports lastReports = Browser.listTransferredResourcesLastReport(user, resourceId, isOriginal, acceptFormat);
+    return Response.ok(lastReports, mediaType).build();
   }
 
 }

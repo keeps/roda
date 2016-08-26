@@ -52,6 +52,21 @@ public class Formats extends RodaWuiController {
     return format;
   }
 
+  public static Format updateFormat(RodaUser user, Format format)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    RodaCoreFactory.getModelService().updateFormat(format, false);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "format", format);
+
+    return format;
+  }
+
   public static void deleteFormat(RodaUser user, String formatId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};

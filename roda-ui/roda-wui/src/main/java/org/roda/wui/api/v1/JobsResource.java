@@ -30,8 +30,6 @@ import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.api.controllers.JobsHelper;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -42,8 +40,6 @@ import io.swagger.annotations.ApiParam;
 public class JobsResource {
   public static final String ENDPOINT = "/v1/jobs";
   public static final String SWAGGER_ENDPOINT = "v1 jobs";
-
-  private static Logger LOGGER = LoggerFactory.getLogger(JobsResource.class);
 
   @Context
   private HttpServletRequest request;
@@ -63,7 +59,6 @@ public class JobsResource {
 
     // delegate action to controller
     Jobs jobs = JobsHelper.getJobsFromIndexResult(user, start, limit);
-
     return Response.ok(jobs, mediaType).build();
   }
 
@@ -80,7 +75,6 @@ public class JobsResource {
 
     // delegate action to controller
     Job updatedJob = org.roda.wui.api.controllers.Jobs.createJob(user, job);
-
     return Response.created(ApiUtils.getUriFromRequest(request)).entity(updatedJob).type(mediaType).build();
   }
 
@@ -95,9 +89,9 @@ public class JobsResource {
 
     // get user
     RodaUser user = UserUtility.getApiUser(request);
+
     // delegate action to controller
     Job job = org.roda.wui.api.controllers.Jobs.startJob(user, jobId);
-
     return Response.created(ApiUtils.getUriFromRequest(request)).entity(job).type(mediaType).build();
   }
 
@@ -111,9 +105,9 @@ public class JobsResource {
 
     // get user
     RodaUser user = UserUtility.getApiUser(request);
+
     // delegate action to controller
     Job job = org.roda.wui.api.controllers.Browser.retrieve(user, Job.class, jobId);
-
     return Response.ok(job, mediaType).build();
   }
 
@@ -127,9 +121,9 @@ public class JobsResource {
 
     // get user
     RodaUser user = UserUtility.getApiUser(request);
+
     // delegate action to controller
     org.roda.wui.api.controllers.Jobs.stopJob(user, jobId);
-
     return Response.ok("Stopped", mediaType).build();
   }
 
@@ -143,9 +137,9 @@ public class JobsResource {
 
     // get user
     RodaUser user = UserUtility.getApiUser(request);
+
     // delegate action to controller
     org.roda.wui.api.controllers.Jobs.deleteJob(user, jobId);
-
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Job deleted"), mediaType).build();
   }
 
@@ -167,7 +161,6 @@ public class JobsResource {
 
     // delegate action to controller
     Reports reports = JobsHelper.getJobReportsFromIndexResult(user, jobId, justFailed, start, limit);
-
     return Response.ok(reports, mediaType).build();
   }
 

@@ -11,18 +11,19 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@XmlRootElement(name = "aip")
 public class AIP implements IsRODAObject {
 
   private static final long serialVersionUID = 430629679119752757L;
 
-  @JsonIgnore
   private String id;
   private String parentId;
   private String type;

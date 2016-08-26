@@ -9,6 +9,9 @@ package org.roda.wui.api.controllers;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -33,18 +36,24 @@ import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.agents.Agent;
+import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.common.RODAObjectList;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.data.v2.jobs.Reports;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
@@ -52,6 +61,9 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.fs.FSPathContentPayload;
+import org.roda.wui.api.v1.utils.ApiUtils;
+import org.roda.wui.api.v1.utils.EntityResponse;
 import org.roda.wui.api.v1.utils.StreamResponse;
 import org.roda.wui.client.browse.BrowseItemBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
@@ -310,7 +322,7 @@ public class Browser extends RodaWuiController {
    * ---------------- REST related methods - start -----------------------------
    * ---------------------------------------------------------------------------
    */
-  public static StreamResponse retrieveAIPRepresentation(RodaUser user, String representationUUID, String acceptFormat)
+  public static EntityResponse retrieveAIPRepresentation(RodaUser user, String representationUUID, String acceptFormat)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -325,7 +337,7 @@ public class Browser extends RodaWuiController {
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
     // delegate
-    StreamResponse aipRepresentation = BrowserHelper.retrieveAIPRepresentation(representation, acceptFormat);
+    EntityResponse aipRepresentation = BrowserHelper.retrieveAIPRepresentation(representation, acceptFormat);
 
     // register action
     controllerAssistant.registerAction(user, representation.getAipId(), LOG_ENTRY_STATE.SUCCESS,
@@ -355,7 +367,7 @@ public class Browser extends RodaWuiController {
     return aipRepresentation;
   }
 
-  public static StreamResponse listAIPDescriptiveMetadata(RodaUser user, String aipId, String start, String limit,
+  public static EntityResponse listAIPDescriptiveMetadata(RodaUser user, String aipId, String start, String limit,
     String acceptFormat)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -369,7 +381,7 @@ public class Browser extends RodaWuiController {
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
     // delegate
-    StreamResponse aipDescriptiveMetadataList = BrowserHelper.listAIPDescriptiveMetadata(aipId, start, limit,
+    EntityResponse aipDescriptiveMetadataList = BrowserHelper.listAIPDescriptiveMetadata(aipId, start, limit,
       acceptFormat);
 
     // register action
@@ -379,7 +391,7 @@ public class Browser extends RodaWuiController {
     return aipDescriptiveMetadataList;
   }
 
-  public static StreamResponse listRepresentationDescriptiveMetadata(RodaUser user, String representationId,
+  public static EntityResponse listRepresentationDescriptiveMetadata(RodaUser user, String representationId,
     String start, String limit, String acceptFormat)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -394,7 +406,7 @@ public class Browser extends RodaWuiController {
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
     // delegate
-    StreamResponse aipDescriptiveMetadataList = BrowserHelper.listRepresentationDescriptiveMetadata(
+    EntityResponse aipDescriptiveMetadataList = BrowserHelper.listRepresentationDescriptiveMetadata(
       representation.getAipId(), representation.getId(), start, limit, acceptFormat);
 
     // register action
@@ -405,7 +417,7 @@ public class Browser extends RodaWuiController {
     return aipDescriptiveMetadataList;
   }
 
-  public static StreamResponse retrieveAIPDescriptiveMetadata(RodaUser user, String aipId, String metadataId,
+  public static EntityResponse retrieveAIPDescriptiveMetadata(RodaUser user, String aipId, String metadataId,
     String acceptFormat, String language) throws AuthorizationDeniedException, GenericException, TransformerException,
     NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -419,7 +431,7 @@ public class Browser extends RodaWuiController {
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
     // delegate
-    StreamResponse aipDescritiveMetadata = BrowserHelper.retrieveAIPDescritiveMetadata(aipId, metadataId, acceptFormat,
+    EntityResponse aipDescritiveMetadata = BrowserHelper.retrieveAIPDescritiveMetadata(aipId, metadataId, acceptFormat,
       language);
 
     // register action
@@ -430,7 +442,7 @@ public class Browser extends RodaWuiController {
 
   }
 
-  public static StreamResponse retrieveRepresentationDescriptiveMetadata(RodaUser user, String representationId,
+  public static EntityResponse retrieveRepresentationDescriptiveMetadata(RodaUser user, String representationId,
     String metadataId, String acceptFormat, String language) throws AuthorizationDeniedException, GenericException,
     TransformerException, NotFoundException, RequestNotValidException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -445,7 +457,7 @@ public class Browser extends RodaWuiController {
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
     // delegate
-    StreamResponse aipDescritiveMetadata = BrowserHelper.retrieveRepresentationDescriptiveMetadata(
+    EntityResponse aipDescritiveMetadata = BrowserHelper.retrieveRepresentationDescriptiveMetadata(
       representation.getAipId(), representation.getId(), metadataId, acceptFormat, language);
 
     // register action
@@ -481,7 +493,7 @@ public class Browser extends RodaWuiController {
 
   }
 
-  public static StreamResponse listAIPPreservationMetadata(RodaUser user, String aipId, String acceptFormat)
+  public static EntityResponse listAIPPreservationMetadata(RodaUser user, String aipId, String acceptFormat)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -494,7 +506,7 @@ public class Browser extends RodaWuiController {
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
     // delegate
-    StreamResponse aipPreservationMetadataList = BrowserHelper.aipsAIPIdPreservationMetadataGet(aipId);
+    EntityResponse aipPreservationMetadataList = BrowserHelper.listAIPPreservationMetadata(aipId, acceptFormat);
 
     // register action
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID,
@@ -503,10 +515,10 @@ public class Browser extends RodaWuiController {
     return aipPreservationMetadataList;
   }
 
-  public static StreamResponse retrieveAIPRepresentationPreservationMetadata(RodaUser user, String aipId,
-    String representationId, String startAgent, String limitAgent, String startEvent, String limitEvent,
-    String startFile, String limitFile, String acceptFormat, String language) throws AuthorizationDeniedException,
-    GenericException, TransformerException, NotFoundException, RequestNotValidException {
+  public static EntityResponse retrieveAIPRepresentationPreservationMetadata(RodaUser user, String representationId,
+    String startAgent, String limitAgent, String startEvent, String limitEvent, String startFile, String limitFile,
+    String acceptFormat, String language) throws AuthorizationDeniedException, GenericException, TransformerException,
+    NotFoundException, RequestNotValidException, IOException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // validate input
@@ -514,40 +526,46 @@ public class Browser extends RodaWuiController {
 
     // check user permissions
     controllerAssistant.checkRoles(user);
-    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
+    IndexedRepresentation rep = BrowserHelper.retrieve(IndexedRepresentation.class, representationId);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, rep.getAipId());
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
     // delegate
-    StreamResponse aipRepresentationPreservationMetadata = BrowserHelper.retrieveAIPRepresentationPreservationMetadata(
-      aipId, representationId, startAgent, limitAgent, startEvent, limitEvent, startFile, limitFile, acceptFormat,
+    EntityResponse aipRepresentationPreservationMetadata = BrowserHelper.retrieveAIPRepresentationPreservationMetadata(
+      aip.getId(), representationId, startAgent, limitAgent, startEvent, limitEvent, startFile, limitFile, acceptFormat,
       language);
 
     // register action
-    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
-      "startAgent", startAgent, "limitAgent", limitAgent, "startEvent", startEvent, "limitEvent", limitEvent,
-      "startFile", startFile, "limitFile", limitFile);
+    controllerAssistant.registerAction(user, aip.getId(), LOG_ENTRY_STATE.SUCCESS,
+      RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID, representationId, "startAgent", startAgent, "limitAgent",
+      limitAgent, "startEvent", startEvent, "limitEvent", limitEvent, "startFile", startFile, "limitFile", limitFile);
 
     return aipRepresentationPreservationMetadata;
 
   }
 
-  public static StreamResponse retrieveAIPRepresentationPreservationMetadataFile(RodaUser user, String aipId,
-    String representationId, String fileId)
+  public static StreamResponse retrieveAIPRepresentationPreservationMetadataFile(RodaUser user, String fileUUID,
+    String acceptFormat)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
+    // validate input
+    BrowserHelper.validateListAIPPreservationMetadataParams(acceptFormat);
+
     // check user permissions
     controllerAssistant.checkRoles(user);
-    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
+    IndexedFile file = BrowserHelper.retrieve(IndexedFile.class, fileUUID);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, file.getAipId());
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
     // delegate
     StreamResponse aipRepresentationPreservationMetadataFile = BrowserHelper
-      .retrieveAIPRepresentationPreservationMetadataFile(aipId, representationId, fileId);
+      .retrieveAIPRepresentationPreservationMetadataFile(aip.getId(), file.getRepresentationId(), file.getId(),
+        acceptFormat);
 
     // register action
-    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
-      RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId, RodaConstants.API_PATH_PARAM_FILE_UUID, fileId);
+    controllerAssistant.registerAction(user, aip.getId(), LOG_ENTRY_STATE.SUCCESS,
+      RodaConstants.API_PATH_PARAM_FILE_UUID, fileUUID);
 
     return aipRepresentationPreservationMetadataFile;
   }
@@ -591,6 +609,26 @@ public class Browser extends RodaWuiController {
     // register action
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
       RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId);
+
+  }
+
+  public static void deletePreservationMetadataFile(RodaUser user, String aipId, String representationId, String id,
+    String type) throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
+    ValidationException, AlreadyExistsException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
+    UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
+
+    // delegate
+    BrowserHelper.deletePreservationMetadataFile(PreservationMetadataType.valueOf(type), aipId, representationId, id,
+      false);
+
+    // register action
+    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
+      RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId, "id", id);
 
   }
 
@@ -657,6 +695,22 @@ public class Browser extends RodaWuiController {
     controllerAssistant.registerAction(user, aip.getId(), LOG_ENTRY_STATE.SUCCESS, "parentId", parentId);
 
     return aip;
+  }
+
+  public static AIP updateAIP(RodaUser user, AIP aip) throws AuthorizationDeniedException, GenericException,
+    RequestNotValidException, NotFoundException, AlreadyExistsException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    AIP updatedAip = BrowserHelper.updateAIP(user, aip);
+
+    // register action
+    controllerAssistant.registerAction(user, aip.getId(), LOG_ENTRY_STATE.SUCCESS, "aip", aip);
+
+    return updatedAip;
   }
 
   public static String deleteAIP(RodaUser user, SelectedItems<IndexedAIP> aips)
@@ -774,21 +828,58 @@ public class Browser extends RodaWuiController {
     return dm;
   }
 
-  public static void deleteRepresentation(RodaUser user, String aipId, String representationId)
+  public static Representation createRepresentation(RodaUser user, String aipId, String representationId, String type)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException,
+    AlreadyExistsException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    Representation updatedRep = BrowserHelper.createRepresentation(aipId, representationId, type);
+
+    // register action
+    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, "aipId", aipId, "representationId",
+      representationId, "type", type);
+
+    return updatedRep;
+  }
+
+  public static Representation updateRepresentation(RodaUser user, Representation representation)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException,
+    AlreadyExistsException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    Representation updatedRep = BrowserHelper.updateRepresentation(user, representation);
+
+    // register action
+    controllerAssistant.registerAction(user, representation.getAipId(), LOG_ENTRY_STATE.SUCCESS, "representation",
+      representation);
+
+    return updatedRep;
+  }
+
+  public static void deleteRepresentation(RodaUser user, String representationUUID)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
     controllerAssistant.checkRoles(user);
-    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
+    IndexedRepresentation rep = BrowserHelper.retrieve(IndexedRepresentation.class, representationUUID);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, rep.getAipId());
     UserUtility.checkObjectPermissions(user, aip, PermissionType.DELETE);
 
     // delegate
-    BrowserHelper.deleteRepresentation(aipId, representationId);
+    BrowserHelper.deleteRepresentation(rep.getAipId(), rep.getId());
 
     // register action
     controllerAssistant.registerAction(user, aip.getId(), LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID,
-      aipId, RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId);
+      rep.getAipId(), RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, rep.getId());
   }
 
   public static void deleteRepresentationFile(RodaUser user, String fileUUID)
@@ -811,7 +902,7 @@ public class Browser extends RodaWuiController {
       file.getPath(), RodaConstants.FILE_FILEID, file.getId());
   }
 
-  public static StreamResponse retrieveAIPRepresentationFile(RodaUser user, String fileUuid, String acceptFormat)
+  public static EntityResponse retrieveAIPRepresentationFile(RodaUser user, String fileUuid, String acceptFormat)
     throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -826,7 +917,7 @@ public class Browser extends RodaWuiController {
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
     // delegate
-    StreamResponse aipRepresentationFile = BrowserHelper.retrieveAIPRepresentationFile(fileUuid, acceptFormat);
+    EntityResponse aipRepresentationFile = BrowserHelper.retrieveAIPRepresentationFile(fileUuid, acceptFormat);
 
     // register action
     controllerAssistant.registerAction(user, file.getAipId(), LOG_ENTRY_STATE.SUCCESS,
@@ -1067,15 +1158,15 @@ public class Browser extends RodaWuiController {
     return supportedMetadata;
   }
 
-  public static StreamResponse retrieveTransferredResource(RodaUser user, String resourceId)
+  public static EntityResponse retrieveTransferredResource(RodaUser user, String resourceId, String acceptFormat)
     throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    StreamResponse response = BrowserHelper
-      .retrieveTransferredResource(BrowserHelper.retrieve(TransferredResource.class, resourceId));
+    EntityResponse response = BrowserHelper
+      .retrieveTransferredResource(BrowserHelper.retrieve(TransferredResource.class, resourceId), acceptFormat);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "resourceId", resourceId);
@@ -1336,7 +1427,29 @@ public class Browser extends RodaWuiController {
     return aipExport;
   }
 
-  public static StreamResponse retrieveAIP(RodaUser user, String aipId, String acceptFormat)
+  public static <T extends IsIndexed> RODAObjectList<?> retrieveObjects(RodaUser user, Class<T> objectClass,
+    String start, String limit, String acceptFormat)
+    throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // validate input
+    BrowserHelper.validateListingParams(acceptFormat);
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
+    RODAObjectList<?> aip = BrowserHelper.retrieveObjects(objectClass, pagingParams.getFirst(),
+      pagingParams.getSecond(), acceptFormat);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
+
+    return aip;
+  }
+
+  public static EntityResponse retrieveAIP(RodaUser user, String aipId, String acceptFormat)
     throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1349,7 +1462,7 @@ public class Browser extends RodaWuiController {
     UserUtility.checkObjectPermissions(user, indexedAIP, PermissionType.READ);
 
     // delegate
-    StreamResponse aip = BrowserHelper.retrieveAIP(indexedAIP, acceptFormat);
+    EntityResponse aip = BrowserHelper.retrieveAIP(indexedAIP, acceptFormat);
 
     // register action
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS);
@@ -1673,6 +1786,44 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
+  public static File createFile(RodaUser user, String aipId, String representationId, List<String> directoryPath,
+    String fileId, InputStream is) throws AuthorizationDeniedException, GenericException, RequestNotValidException,
+    NotFoundException, AlreadyExistsException, IOException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    Path file = Files.createTempFile("descriptive", ".tmp");
+    Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
+    ContentPayload payload = new FSPathContentPayload(file);
+
+    File updatedFile = BrowserHelper.createFile(aipId, representationId, directoryPath, fileId, payload);
+
+    // register action
+    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, "aipId", aipId, "representationId",
+      representationId, "directoryPath", directoryPath, "fileId", fileId);
+
+    return updatedFile;
+  }
+
+  public static File updateFile(RodaUser user, File file) throws AuthorizationDeniedException, GenericException,
+    RequestNotValidException, NotFoundException, AlreadyExistsException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    File updatedFile = BrowserHelper.updateFile(user, file);
+
+    // register action
+    controllerAssistant.registerAction(user, file.getAipId(), LOG_ENTRY_STATE.SUCCESS, "file", file);
+
+    return updatedFile;
+  }
+
   public static void deleteFile(RodaUser user, String fileUUID)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -1712,19 +1863,19 @@ public class Browser extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
   }
 
-  public static StreamResponse listTransferredResourcesReports(RodaUser user, String resourceId, String start,
-    String limit, boolean isOriginal, String acceptFormat)
+  public static Reports listTransferredResourcesReports(RodaUser user, String resourceId, String start, String limit,
+    boolean isOriginal, String acceptFormat)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // validate input
-    BrowserHelper.validateListTransferredResourcesReportsParams(acceptFormat);
+    BrowserHelper.validateListingParams(acceptFormat);
 
     // check user permissions
     controllerAssistant.checkRoles(user);
 
     // delegate
-    StreamResponse reportList = BrowserHelper.listTransferredResourcesReports(resourceId, start, limit, isOriginal,
+    Reports reportList = BrowserHelper.listTransferredResourcesReports(resourceId, start, limit, isOriginal,
       acceptFormat);
 
     // register action
@@ -1735,19 +1886,19 @@ public class Browser extends RodaWuiController {
     return reportList;
   }
 
-  public static StreamResponse listTransferredResourcesLastReport(RodaUser user, String resourceId, boolean isOriginal,
+  public static Reports listTransferredResourcesLastReport(RodaUser user, String resourceId, boolean isOriginal,
     String acceptFormat)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // validate input
-    BrowserHelper.validateListTransferredResourcesReportsParams(acceptFormat);
+    BrowserHelper.validateListingParams(acceptFormat);
 
     // check user permissions
     controllerAssistant.checkRoles(user);
 
     // delegate
-    StreamResponse reportList = BrowserHelper.listTransferredResourcesLastReport(resourceId, isOriginal, acceptFormat);
+    Reports reportList = BrowserHelper.listTransferredResourcesLastReport(resourceId, isOriginal, acceptFormat);
 
     // register action
     controllerAssistant.registerAction(user, resourceId, LOG_ENTRY_STATE.SUCCESS,

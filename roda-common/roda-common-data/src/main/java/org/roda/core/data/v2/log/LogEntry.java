@@ -10,14 +10,19 @@ package org.roda.core.data.v2.log;
 import java.util.Date;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.roda.core.data.v2.index.IsIndexed;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * @author Rui Castro
  * 
  */
+@XmlRootElement(name = "log_entry")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class LogEntry implements IsIndexed {
   private static final long serialVersionUID = -178083792639806983L;
 

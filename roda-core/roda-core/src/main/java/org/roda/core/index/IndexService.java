@@ -153,6 +153,7 @@ public class IndexService {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     CloseableIterable<OptionalWithCause<AIP>> aips = null;
     try {
+      clearAIPs();
       LOGGER.info("{} > Listing AIPs", new Date().getTime());
       aips = model.listAIPs();
       for (OptionalWithCause<AIP> aip : aips) {
@@ -175,7 +176,7 @@ public class IndexService {
           aips.close();
         }
       } catch (IOException e) {
-        LOGGER.error("Error while while freeing up resources", e);
+        LOGGER.error("Error while freeing up resources", e);
       }
     }
   }
@@ -183,6 +184,14 @@ public class IndexService {
   public void commitAIPs() throws GenericException {
     commit(IndexedAIP.class, IndexedRepresentation.class, IndexedFile.class, IndexedPreservationEvent.class,
       IndexedPreservationAgent.class);
+  }
+
+  public void clearAIPs() throws GenericException {
+    clearIndex(RodaConstants.INDEX_AIP);
+    clearIndex(RodaConstants.INDEX_FILE);
+    clearIndex(RodaConstants.INDEX_REPRESENTATION);
+    clearIndex(RodaConstants.INDEX_PRESERVATION_EVENTS);
+    clearIndex(RodaConstants.INDEX_PRESERVATION_AGENTS);
   }
 
   public void optimizeAIPs() throws GenericException {

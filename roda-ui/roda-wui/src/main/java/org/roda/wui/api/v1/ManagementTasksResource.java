@@ -83,9 +83,7 @@ public class ManagementTasksResource {
     RodaUser user = UserUtility.getApiUser(request);
 
     controllerAssistant.checkGroup(user, "administrators");
-
     return executeReindex(user, controllerAssistant, entity, params);
-
   }
 
   @POST

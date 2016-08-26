@@ -54,6 +54,21 @@ public class Notifications extends RodaWuiController {
     return notification;
   }
 
+  public static Notification updateNotification(RodaUser user, Notification notification)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    RodaCoreFactory.getModelService().updateNotification(notification);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "notification", notification);
+
+    return notification;
+  }
+
   public static void deleteNotification(RodaUser user, String notificationId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -89,7 +104,7 @@ public class Notifications extends RodaWuiController {
     return notifications;
   }
 
-  public static void acknowledgeNotification(RodaUser user, String notificationId, String token, String email)
+  public static void acknowledgeNotification(RodaUser user, String notificationId, String token)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -97,7 +112,7 @@ public class Notifications extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     // delegate
-    RodaCoreFactory.getModelService().acknowledgeNotification(notificationId, token, email);
+    RodaCoreFactory.getModelService().acknowledgeNotification(notificationId, token);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "notification_id", notificationId, "token",

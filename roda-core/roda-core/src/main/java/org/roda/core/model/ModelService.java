@@ -716,7 +716,6 @@ public class ModelService extends ModelObservable {
     }
 
     return representation;
-
   }
 
   // TODO support asReference
@@ -745,6 +744,11 @@ public class ModelService extends ModelObservable {
       throw new ValidationException(validationReport);
     }
 
+    return representation;
+  }
+
+  public Representation updateRepresentationInfo(Representation representation) {
+    notifyRepresentationUpdated(representation);
     return representation;
   }
 
@@ -885,6 +889,11 @@ public class ModelService extends ModelObservable {
       notifyFileCreated(file);
     }
 
+    return file;
+  }
+
+  public File updateFileInfo(File file) {
+    notifyFileUpdated(file);
     return file;
   }
 
@@ -1719,7 +1728,6 @@ public class ModelService extends ModelObservable {
   public void updateRisk(Risk risk, String message, boolean commit) throws GenericException {
     try {
       risk.setUpdatedOn(new Date());
-
       String riskAsJson = JsonUtils.getJsonFromObject(risk);
       StoragePath riskPath = ModelUtils.getRiskStoragePath(risk.getId());
 
@@ -2146,7 +2154,6 @@ public class ModelService extends ModelObservable {
     String ackUrl = RodaCoreFactory.getRodaConfigurationAsString("core", "notification", "acknowledge");
     ackUrl = ackUrl.replaceAll("\\{notificationId\\}", notification.getId());
     ackUrl = ackUrl.replaceAll("\\{token\\}", notification.getAcknowledgeToken() + userUUID);
-    ackUrl = ackUrl.replaceAll("\\{email\\}", recipient);
 
     scopes.put("acknowledge", ackUrl);
     scopes.put("recipient", recipient);
@@ -2213,12 +2220,12 @@ public class ModelService extends ModelObservable {
     return ret;
   }
 
-  public void acknowledgeNotification(String notificationId, String token, String email)
+  public void acknowledgeNotification(String notificationId, String token)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
     Notification notification = this.retrieveNotification(notificationId);
     String ackToken = token.substring(0, 36);
-    String emailToken = email;
+    String emailToken = token.substring(36);
 
     if (notification.getAcknowledgeToken().equals(ackToken)) {
       for (String recipient : notification.getRecipientUsers()) {

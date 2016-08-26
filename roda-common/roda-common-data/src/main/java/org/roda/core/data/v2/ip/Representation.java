@@ -10,11 +10,16 @@ package org.roda.core.data.v2.ip;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
+@XmlRootElement(name = "representation")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Representation implements IsRODAObject {
 
   private static final long serialVersionUID = 3658011895150894795L;

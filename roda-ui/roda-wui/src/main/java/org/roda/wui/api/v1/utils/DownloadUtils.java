@@ -116,6 +116,7 @@ public class DownloadUtils {
             // TODO re-throw correct web application exception
             throw new InternalServerErrorException(e);
           } finally {
+            IOUtils.closeQuietly(bos);
             IOUtils.closeQuietly(out);
           }
 

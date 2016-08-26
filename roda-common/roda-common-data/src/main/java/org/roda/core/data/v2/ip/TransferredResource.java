@@ -10,8 +10,14 @@ package org.roda.core.data.v2.ip;
 import java.util.Date;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.roda.core.data.v2.index.IsIndexed;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@XmlRootElement(name = "transferred_resource")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TransferredResource implements IsIndexed {
 
   private static final long serialVersionUID = 1L;

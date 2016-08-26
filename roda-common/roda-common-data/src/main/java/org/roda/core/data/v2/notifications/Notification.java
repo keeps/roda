@@ -20,7 +20,7 @@ import org.roda.core.data.v2.index.IsIndexed;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@XmlRootElement(name = "message")
+@XmlRootElement(name = "notification")
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class Notification implements IsIndexed, Serializable {
 

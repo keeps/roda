@@ -48,6 +48,21 @@ public class Agents extends RodaWuiController {
     return agent;
   }
 
+  public static Agent updateAgent(RodaUser user, Agent agent)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    RodaCoreFactory.getModelService().updateAgent(agent, false);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "agent", agent);
+
+    return agent;
+  }
+
   public static void deleteAgent(RodaUser user, String agentId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};

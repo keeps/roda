@@ -53,6 +53,21 @@ public class Risks extends RodaWuiController {
     return risk;
   }
 
+  public static Risk updateRisk(RodaUser user, Risk risk, String updateMessage)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    RodaCoreFactory.getModelService().updateRisk(risk, updateMessage, false);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "risk", risk);
+
+    return risk;
+  }
+
   public static void deleteRisk(RodaUser user, String riskId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};

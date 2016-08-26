@@ -22,8 +22,6 @@ import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.StreamResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
@@ -36,8 +34,6 @@ import io.swagger.annotations.ApiParam;
 public class ClassificationPlansResource {
   public static final String ENDPOINT = "/v1/classification_plans";
   public static final String SWAGGER_ENDPOINT = "v1 classification plans";
-
-  private static Logger LOGGER = LoggerFactory.getLogger(ClassificationPlansResource.class);
 
   @Context
   private HttpServletRequest request;

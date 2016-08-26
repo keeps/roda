@@ -9,8 +9,14 @@ package org.roda.core.data.v2.ip;
 
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.roda.core.data.v2.IsRODAObject;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@XmlRootElement(name = "file")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class File implements IsRODAObject {
 
   private static final long serialVersionUID = 3303019735787641534L;

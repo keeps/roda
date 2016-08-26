@@ -7,10 +7,17 @@
  */
 package org.roda.core.data.v2.ip.metadata;
 
-import java.io.Serializable;
 import java.util.List;
 
-public class PreservationMetadata implements Serializable {
+import javax.xml.bind.annotation.XmlRootElement;
+
+import org.roda.core.data.v2.IsRODAObject;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@XmlRootElement(name = "preservation_metadata")
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class PreservationMetadata implements IsRODAObject {
   private static final long serialVersionUID = -4312941542769679721L;
 
   public static enum PreservationMetadataType {

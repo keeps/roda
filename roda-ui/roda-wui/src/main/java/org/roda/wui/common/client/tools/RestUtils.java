@@ -191,7 +191,7 @@ public class RestUtils {
     // api/v1/transferred/?parentUUID={parentUUID}&locale={locale}
     StringBuilder b = new StringBuilder();
     // base uri
-    b.append(RodaConstants.API_REST_V1_TRANSFERRED);
+    b.append(RodaConstants.API_REST_V1_RESOURCES);
 
     if (parentUUID != null || locale != null) {
       b.append(RodaConstants.API_QUERY_START);
@@ -207,8 +207,7 @@ public class RestUtils {
     }
 
     if (locale != null) {
-      b.append(RodaConstants.LOCALE).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
-        .append(locale);
+      b.append(RodaConstants.LOCALE).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(locale);
     }
 
     return b.toString();
@@ -218,8 +217,9 @@ public class RestUtils {
     // api/v1/transferred/?resourceId={resourceId}
     StringBuilder b = new StringBuilder();
     // base uri
-    b.append(RodaConstants.API_REST_V1_TRANSFERRED).append(RodaConstants.API_QUERY_START).append("resourceId")
-      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(resourceId);
+    b.append(RodaConstants.API_REST_V1_RESOURCES).append(RodaConstants.API_QUERY_START)
+      .append(RodaConstants.API_PATH_PARAM_TRANSFERRED_RESOURCE_ID).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
+      .append(resourceId);
 
     return UriUtils.fromSafeConstant(b.toString());
   }
@@ -228,17 +228,18 @@ public class RestUtils {
     // api/v1/theme/?resourceId={resourceId}&defaultResourceId={defaultResourceId}
     StringBuilder b = new StringBuilder();
 
-    b.append(RodaConstants.API_REST_V1_THEME).append(RodaConstants.API_QUERY_START).append("resourceId")
-      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(resourceId);
+    b.append(RodaConstants.API_REST_V1_THEME).append(RodaConstants.API_QUERY_START)
+      .append(RodaConstants.API_PATH_PARAM_TRANSFERRED_RESOURCE_ID).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
+      .append(resourceId);
 
     if (defaultResourceId != null) {
-      b.append(RodaConstants.API_QUERY_SEP).append("defaultResourceId").append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
-        .append(defaultResourceId);
+      b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_PARAM_DEFAULT_RESOURCE_ID)
+        .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(defaultResourceId);
     }
 
     if (inline) {
-      b.append(RodaConstants.API_QUERY_SEP).append("inline").append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
-        .append(inline);
+      b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_PARAM_INLINE)
+        .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(inline);
     }
 
     return UriUtils.fromSafeConstant(b.toString());

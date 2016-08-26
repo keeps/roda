@@ -9,7 +9,7 @@ package org.roda.wui.api.v1.utils;
 
 import javax.ws.rs.core.StreamingOutput;
 
-public class StreamResponse {
+public class StreamResponse implements EntityResponse {
   private String filename;
   private String mediaType;
   private StreamingOutput stream;
