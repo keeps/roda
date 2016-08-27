@@ -7,14 +7,10 @@
  */
 package org.roda.wui.api.controllers;
 
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.JobAlreadyStartedException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.*;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
 
@@ -29,7 +25,7 @@ public class Jobs extends RodaWuiController {
    * ---------------- REST related methods - start -----------------------------
    * ---------------------------------------------------------------------------
    */
-  public static Job createJob(RodaUser user, Job job) throws AuthorizationDeniedException, RequestNotValidException,
+  public static Job createJob(User user, Job job) throws AuthorizationDeniedException, RequestNotValidException,
     NotFoundException, GenericException, JobAlreadyStartedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -48,7 +44,7 @@ public class Jobs extends RodaWuiController {
     return updatedJob;
   }
 
-  public static Job startJob(RodaUser user, String jobId) throws RequestNotValidException, GenericException,
+  public static Job startJob(User user, String jobId) throws RequestNotValidException, GenericException,
     NotFoundException, AuthorizationDeniedException, JobAlreadyStartedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -64,7 +60,7 @@ public class Jobs extends RodaWuiController {
     return job;
   }
 
-  public static void stopJob(RodaUser user, String jobId)
+  public static void stopJob(User user, String jobId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -78,7 +74,7 @@ public class Jobs extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "jobId", jobId);
   }
 
-  public static void deleteJob(RodaUser user, String jobId)
+  public static void deleteJob(User user, String jobId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 

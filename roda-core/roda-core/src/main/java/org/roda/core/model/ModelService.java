@@ -10,21 +10,10 @@ package org.roda.core.model;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.nio.file.DirectoryStream;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import javax.mail.MessagingException;
 
@@ -38,28 +27,13 @@ import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.EmailAlreadyExistsException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.GroupAlreadyExistsException;
-import org.roda.core.data.exceptions.IllegalOperationException;
-import org.roda.core.data.exceptions.InvalidTokenException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.exceptions.*;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.AIPState;
-import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.Permissions;
-import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.*;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -76,17 +50,7 @@ import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.model.utils.ResourceParseUtils;
-import org.roda.core.storage.Binary;
-import org.roda.core.storage.BinaryVersion;
-import org.roda.core.storage.ContentPayload;
-import org.roda.core.storage.DefaultBinary;
-import org.roda.core.storage.DefaultStoragePath;
-import org.roda.core.storage.Directory;
-import org.roda.core.storage.EmptyClosableIterable;
-import org.roda.core.storage.Entity;
-import org.roda.core.storage.Resource;
-import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StringContentPayload;
+import org.roda.core.storage.*;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
@@ -1319,7 +1283,7 @@ public class ModelService extends ModelObservable {
       }
     } catch (LdapUtilityException e) {
       success = false;
-      throw new GenericException("Error registering user to LDAP", e);
+      throw new GenericException("Error registering User to LDAP", e);
     } catch (UserAlreadyExistsException e) {
       success = false;
       throw new UserAlreadyExistsException("User already exists", e);
@@ -1353,7 +1317,7 @@ public class ModelService extends ModelObservable {
       }
     } catch (LdapUtilityException e) {
       success = false;
-      throw new GenericException("Error adding user to LDAP", e);
+      throw new GenericException("Error adding User to LDAP", e);
     } catch (UserAlreadyExistsException e) {
       success = false;
       throw new UserAlreadyExistsException("User already exists", e);
@@ -1385,7 +1349,7 @@ public class ModelService extends ModelObservable {
       }
     } catch (LdapUtilityException e) {
       success = false;
-      throw new GenericException("Error modifying user to LDAP", e);
+      throw new GenericException("Error modifying User to LDAP", e);
     } catch (EmailAlreadyExistsException e) {
       success = false;
       throw new AlreadyExistsException("User already exists", e);
@@ -1409,7 +1373,7 @@ public class ModelService extends ModelObservable {
         UserUtility.getLdapUtility().modifySelfUser(user, password);
       }
     } catch (LdapUtilityException e) {
-      throw new GenericException("Error modifying user to LDAP", e);
+      throw new GenericException("Error modifying User to LDAP", e);
     } catch (EmailAlreadyExistsException e) {
       throw new AlreadyExistsException("User already exists", e);
     } catch (NotFoundException e) {
@@ -1431,7 +1395,7 @@ public class ModelService extends ModelObservable {
       }
     } catch (LdapUtilityException e) {
       success = false;
-      throw new GenericException("Error removing user from LDAP", e);
+      throw new GenericException("Error removing User from LDAP", e);
     } catch (IllegalOperationException e) {
       success = false;
       throw new AuthorizationDeniedException("Illegal operation", e);
@@ -2141,7 +2105,7 @@ public class ModelService extends ModelObservable {
   private String getUpdatedMessageBody(Notification notification, String recipient, String template,
     String templateName, Map<String, Object> scopes) {
 
-    // update body message with the recipient user and acknowledge URL
+    // update body message with the recipient User and acknowledge URL
     String userUUID = UUID.nameUUIDFromBytes(recipient.getBytes()).toString();
     String ackUrl = RodaCoreFactory.getRodaConfigurationAsString("core", "notification", "acknowledge");
     ackUrl = ackUrl.replaceAll("\\{notificationId\\}", notification.getId());

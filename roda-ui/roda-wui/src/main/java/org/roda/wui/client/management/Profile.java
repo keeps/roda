@@ -15,7 +15,6 @@ import java.util.List;
 
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
@@ -44,13 +43,13 @@ public class Profile extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaUser>() {
+      UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<User>() {
 
         public void onFailure(Throwable caught) {
           callback.onFailure(caught);
         }
 
-        public void onSuccess(RodaUser user) {
+        public void onSuccess(User user) {
           Profile preferences = new Profile(new User(user));
           callback.onSuccess(preferences);
         }
@@ -60,13 +59,13 @@ public class Profile extends Composite {
 
     @Override
     public void isCurrentUserPermitted(final AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaUser>() {
+      UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<User>() {
 
         public void onFailure(Throwable caught) {
           callback.onFailure(caught);
         }
 
-        public void onSuccess(RodaUser user) {
+        public void onSuccess(User user) {
           callback.onSuccess(new Boolean(!user.isGuest()));
         }
       });

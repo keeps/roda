@@ -13,30 +13,13 @@ import java.io.StringReader;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.directory.api.ldap.model.cursor.Cursor;
-import org.apache.directory.api.ldap.model.entry.Attribute;
-import org.apache.directory.api.ldap.model.entry.DefaultEntry;
-import org.apache.directory.api.ldap.model.entry.DefaultModification;
-import org.apache.directory.api.ldap.model.entry.Entry;
-import org.apache.directory.api.ldap.model.entry.ModificationOperation;
-import org.apache.directory.api.ldap.model.entry.Value;
-import org.apache.directory.api.ldap.model.exception.LdapAuthenticationException;
-import org.apache.directory.api.ldap.model.exception.LdapEntryAlreadyExistsException;
-import org.apache.directory.api.ldap.model.exception.LdapException;
-import org.apache.directory.api.ldap.model.exception.LdapInvalidAttributeValueException;
-import org.apache.directory.api.ldap.model.exception.LdapInvalidDnException;
-import org.apache.directory.api.ldap.model.exception.LdapInvalidSearchFilterException;
-import org.apache.directory.api.ldap.model.exception.LdapNoSuchObjectException;
+import org.apache.directory.api.ldap.model.entry.*;
+import org.apache.directory.api.ldap.model.exception.*;
 import org.apache.directory.api.ldap.model.filter.FilterParser;
 import org.apache.directory.api.ldap.model.ldif.LdifEntry;
 import org.apache.directory.api.ldap.model.ldif.LdifReader;
@@ -52,11 +35,7 @@ import org.apache.directory.api.ldap.schema.loader.LdifSchemaLoader;
 import org.apache.directory.api.ldap.schema.manager.impl.DefaultSchemaManager;
 import org.apache.directory.server.constants.ServerDNConstants;
 import org.apache.directory.server.core.DefaultDirectoryService;
-import org.apache.directory.server.core.api.CacheService;
-import org.apache.directory.server.core.api.CoreSession;
-import org.apache.directory.server.core.api.DirectoryService;
-import org.apache.directory.server.core.api.DnFactory;
-import org.apache.directory.server.core.api.InstanceLayout;
+import org.apache.directory.server.core.api.*;
 import org.apache.directory.server.core.api.schema.SchemaPartition;
 import org.apache.directory.server.core.partition.impl.btree.jdbm.JdbmIndex;
 import org.apache.directory.server.core.partition.impl.btree.jdbm.JdbmPartition;
@@ -66,16 +45,8 @@ import org.apache.directory.server.protocol.shared.transport.TcpTransport;
 import org.apache.directory.server.xdbm.Index;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
-import org.roda.core.data.exceptions.AuthenticationDeniedException;
-import org.roda.core.data.exceptions.EmailAlreadyExistsException;
-import org.roda.core.data.exceptions.GroupAlreadyExistsException;
-import org.roda.core.data.exceptions.IllegalOperationException;
-import org.roda.core.data.exceptions.InvalidTokenException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RoleAlreadyExistsException;
-import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.exceptions.*;
 import org.roda.core.data.v2.user.Group;
-import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.util.PasswordHandler;
 import org.slf4j.Logger;
@@ -822,7 +793,7 @@ public class LdapUtility {
    * @throws ServiceException
    *           if some error occurred.
    */
-  public RodaUser getAuthenticatedUser(final String username, final String password)
+  public User getAuthenticatedUser(final String username, final String password)
     throws AuthenticationDeniedException, ServiceException {
 
     if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
@@ -835,9 +806,9 @@ public class LdapUtility {
       // Use this session to retrieve user's direct attributes.
       final CoreSession userSession = service.getSession(new Dn(getUserDN(username)), password.getBytes());
       final Entry entry = userSession.lookup(new Dn(getUserDN(username)));
-      final RodaUser user = getRodaUserFromEntry(entry);
+      final User user = getUserFromEntry(entry);
       // Use the admin session to get the user roles and groups
-      return getRodaUserRolesAndGroups(service.getAdminSession(), user);
+      return setUserRolesAndGroups(service.getAdminSession(), user);
 
     } catch (final LdapAuthenticationException e) {
       throw new AuthenticationDeniedException(e.getMessage(), e);
@@ -1203,7 +1174,8 @@ public class LdapUtility {
     return rodaPartition;
   }
 
-  private RodaUser getRodaUserRolesAndGroups(final CoreSession session, final RodaUser user) throws LdapException {
+  private User setUserRolesAndGroups(final CoreSession session, final User user)
+    throws LdapException {
     // Add all roles assigned to this user
     final Set<String> memberRoles = getMemberRoles(session, getUserDN(user.getName()));
     user.setAllRoles(memberRoles);
@@ -1251,23 +1223,17 @@ public class LdapUtility {
     return user;
   }
 
-  private RodaUser getRodaUserFromEntry(final Entry entry) throws LdapException {
-    final RodaUser rodaUser = new RodaUser();
-    rodaUser.setId(getEntryAttributeAsString(entry, UID));
-    rodaUser.setName(rodaUser.getId());
-    rodaUser.setEmail(getEntryAttributeAsString(entry, EMAIL));
-    rodaUser.setFullName(getEntryAttributeAsString(entry, CN));
-    rodaUser.setActive("0".equalsIgnoreCase(getEntryAttributeAsString(entry, SHADOW_INACTIVE)));
-    rodaUser.setGuest(false);
-    return rodaUser;
-  }
-
   private User getUserFromEntry(final Entry entry) throws LdapException {
 
     final User user = new User(getEntryAttributeAsString(entry, UID));
-    user.setActive("0".equalsIgnoreCase(getEntryAttributeAsString(entry, SHADOW_INACTIVE)));
+    // id and name set in the constructor
     user.setFullName(getEntryAttributeAsString(entry, CN));
+
+    user.setActive("0".equalsIgnoreCase(getEntryAttributeAsString(entry, SHADOW_INACTIVE)));
+
     user.setEmail(entry.get(EMAIL).getString());
+    user.setGuest(false);
+
     user.setExtra(getEntryAttributeAsString(entry, "description"));
 
     if (entry.get("info") != null) {

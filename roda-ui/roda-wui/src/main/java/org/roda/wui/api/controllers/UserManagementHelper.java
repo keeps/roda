@@ -16,20 +16,11 @@ import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
-import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.EmailAlreadyExistsException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.IllegalOperationException;
-import org.roda.core.data.exceptions.InvalidTokenException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.exceptions.*;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
-import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,10 +48,6 @@ public class UserManagementHelper {
   protected static IndexResult<RODAMember> findMembers(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     return RodaCoreFactory.getIndexService().find(RODAMember.class, filter, sorter, sublist, facets);
-  }
-
-  protected static RodaUser retrieveRodaUser(String username) throws GenericException, NotFoundException {
-    return RodaCoreFactory.getIndexService().retrieve(RodaUser.class, username);
   }
 
   protected static User retrieveUser(String username) throws GenericException {

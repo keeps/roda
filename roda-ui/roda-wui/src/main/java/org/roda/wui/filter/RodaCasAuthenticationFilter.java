@@ -10,12 +10,7 @@ package org.roda.wui.filter;
 import java.io.IOException;
 import java.security.Principal;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -26,8 +21,6 @@ import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.user.RODAMember;
-import org.roda.core.data.v2.user.RodaSimpleUser;
-import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,7 +78,7 @@ public class RodaCasAuthenticationFilter implements Filter {
           UserUtility.setUser(servletRequest, getUser(servletRequest.getUserPrincipal()));
         } else {
           logger.debug("User principal exist but user doesn't (" + servletRequest.getUserPrincipal().getName() + ")");
-          RodaSimpleUser rsu = getUser(servletRequest.getUserPrincipal());
+          User rsu = getUser(servletRequest.getUserPrincipal());
           logger.debug("Adding user to ldap/index: " + rsu);
           addUserToLdapAndIndex(request, rsu);
           UserUtility.setUser(servletRequest, rsu);
@@ -113,17 +106,17 @@ public class RodaCasAuthenticationFilter implements Filter {
   }
 
   // TODO test this
-  private void addUserToLdapAndIndex(ServletRequest request, RodaSimpleUser userPrincipal) {
+  private void addUserToLdapAndIndex(ServletRequest request, User userPrincipal) {
     try {
-      User user = new User(new RodaUser(userPrincipal));
+      final User user = new User(userPrincipal);
       RodaCoreFactory.getModelService().addUser(user, true, true);
     } catch (RODAException e) {
       logger.error("Error while creating and indexing user", e);
     }
   }
 
-  private RodaSimpleUser getUser(Principal userPrincipal) {
-    RodaSimpleUser rsu = new RodaSimpleUser();
+  private User getUser(Principal userPrincipal) {
+    User rsu = new User();
     rsu.setId(userPrincipal.getName());
     rsu.setGuest(false);
     return rsu;

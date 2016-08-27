@@ -7,21 +7,23 @@
  */
 package org.roda.core.data.v2.user;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * This is a user of RODA.
- * 
+ *
  * @author Rui Castro
  */
-public class User extends RodaUser {
+public class User extends RodaPrincipal {
+  private static final long serialVersionUID = 6514790636010895870L;
 
-  private static final long serialVersionUID = 4646063259443634000L;
-
-  public static final String ID_TYPE_BI = "bi";
-  public static final String ID_TYPE_PASSPORT = "passport";
-  public static final String ID_TYPE_CITIZEN_CARD = "citizen_card";
-
-  // FIXME change this to list?
-  public static final String[] ID_TYPES = new String[] {ID_TYPE_BI, ID_TYPE_PASSPORT, ID_TYPE_CITIZEN_CARD};
+  /** Email address */
+  private String email;
+  /** Is a guest user? */
+  private boolean guest;
+  /** IP address */
+  private String ipAddress = "";
 
   /** LDAP info */
   private String resetPasswordToken = null;
@@ -36,80 +38,95 @@ public class User extends RodaUser {
   private String extra = null;
 
   /**
-   * Constructs a new empty user.
+   * Constructor.
    */
   public User() {
-    super();
+    this((String) null);
   }
 
   /**
    * Constructs a new user with the given name.
-   * 
+   *
    * @param name
    *          the name of the new user.
    */
   public User(final String name) {
-    super();
-    super.setName(name);
-    super.setId(name);
-    setActive(true);
+    this(name, name, false);
   }
 
-  /**
-   * Constructs a new user cloning a given user.
-   * 
-   * @param user
-   *          the User to be cloned.
-   */
   public User(final User user) {
-    super(user.getId(), user.getName(), user.getEmail(), false, user.getIpAddress(), user.getDirectGroups(),
-      user.getAllGroups(), user.getDirectRoles(), user.getAllRoles());
-    setActive(user.isActive());
-    setEmail(user.getEmail());
-    setExtra(user.getExtra());
-    setResetPasswordToken(user.getResetPasswordToken());
-    setResetPasswordTokenExpirationDate(user.getResetPasswordTokenExpirationDate());
-    setEmailConfirmationToken(user.getResetPasswordToken());
-    setEmailConfirmationTokenExpirationDate(user.getResetPasswordTokenExpirationDate());
+    this(user.getId(), user.getName(), user.getFullName(), user.isActive(), user.getAllRoles(), user.getDirectRoles(),
+      user.getAllGroups(), user.getDirectGroups(), user.getEmail(), user.isGuest(), user.getIpAddress(),
+      user.getExtra(), user.getResetPasswordToken(), user.getResetPasswordTokenExpirationDate(),
+      user.getEmailConfirmationToken(), user.getEmailConfirmationTokenExpirationDate());
   }
 
-  /**
-   * Construct a new User cloning a given {@link RodaUser}
-   * 
-   * @param rodaUser
-   *          the {@link RodaUser} to be cloned.
-   */
-  public User(final RodaUser rodaUser) {
-    super(rodaUser);
+  public User(final String id, final String name, final boolean guest) {
+    this(id, name, null, guest);
   }
 
-  /**
-   * @see RODAMember#toString()
-   */
-  public String toString() {
-    return "User (" + super.toString() + ", email=" + getEmail() + ", extra=" + getExtra() + ", resetPasswordToken="
-      + getResetPasswordToken() + ", resetPasswordTokenExpirationDate=" + getResetPasswordTokenExpirationDate()
-      + ", emailConfirmationToken=" + getEmailConfirmationToken() + ", emailConfirmationTokenExpirationDate="
-      + getEmailConfirmationTokenExpirationDate() + ")";
+  public User(final String id, final String name, final String email, final boolean guest) {
+    this(id, name, email, guest, "", new HashSet<String>(), new HashSet<String>(), new HashSet<String>(),
+      new HashSet<String>());
   }
 
-  /**
-   * @return the email
-   */
+  public User(final String id, final String name, final String email, final boolean guest,
+    final String ipAddress, final Set<String> allRoles, final Set<String> directRoles, final Set<String> allGroups,
+    final Set<String> directGroups) {
+    this(id, name, email, guest, ipAddress, allRoles, directRoles, allGroups, directGroups, null, null, null, null);
+  }
+
+  public User(final String id, final String name, final String email, final boolean guest,
+    final String ipAddress, final Set<String> allRoles, final Set<String> directRoles, final Set<String> allGroups,
+    final Set<String> directGroups, final String resetPasswordToken, final String resetPasswordTokenExpirationDate,
+    final String emailConfirmationToken, final String emailConfirmationTokenExpirationDate) {
+    this(id, name, name, true, allRoles, directRoles, allGroups, directGroups, email, guest, ipAddress, null,
+      resetPasswordToken, resetPasswordTokenExpirationDate, emailConfirmationToken,
+      emailConfirmationTokenExpirationDate);
+  }
+
+  public User(final String id, final String name, final String fullName, final boolean active,
+    final Set<String> allRoles, final Set<String> directRoles, final Set<String> allGroups,
+    final Set<String> directGroups, final String email, final boolean guest, final String ipAddress, final String extra,
+    final String resetPasswordToken, final String resetPasswordTokenExpirationDate, final String emailConfirmationToken,
+    final String emailConfirmationTokenExpirationDate) {
+    super(id, name, fullName, active, allRoles, directRoles, allGroups, directGroups);
+    this.email = email;
+    this.guest = guest;
+    this.ipAddress = ipAddress;
+    this.extra = extra;
+    this.resetPasswordToken = resetPasswordToken;
+    this.resetPasswordTokenExpirationDate = resetPasswordTokenExpirationDate;
+    this.emailConfirmationToken = emailConfirmationToken;
+    this.emailConfirmationTokenExpirationDate = emailConfirmationTokenExpirationDate;
+  }
+
   public String getEmail() {
-    return super.getEmail();
+    return email;
   }
 
-  /**
-   * @param email
-   *          the email to set
-   */
   public void setEmail(final String email) {
-    super.setEmail(email);
+    this.email = email;
+  }
+
+  public boolean isGuest() {
+    return guest;
+  }
+
+  public void setGuest(final boolean guest) {
+    this.guest = guest;
+  }
+
+  public String getIpAddress() {
+    return ipAddress;
+  }
+
+  public void setIpAddress(final String ipAddress) {
+    this.ipAddress = ipAddress;
   }
 
   /**
-   * Get User's extra information.
+   * Get {@link User}'s extra information.
    *
    * @return a {@link String} with user's extra information.
    */
@@ -187,4 +204,74 @@ public class User extends RodaUser {
     this.emailConfirmationTokenExpirationDate = emailConfirmationTokenExpirationDate;
   }
 
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((email == null) ? 0 : email.hashCode());
+    result = prime * result + (guest ? 1231 : 1237);
+    return result;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    final User other = (User) obj;
+    if (email == null) {
+      if (other.email != null) {
+        return false;
+      }
+    } else if (!email.equals(other.email)) {
+      return false;
+    }
+    if (guest != other.guest) {
+      return false;
+    }
+    if (ipAddress == null) {
+      if (other.ipAddress != null) {
+        return false;
+      }
+    } else if (!ipAddress.equals(other.ipAddress)) {
+      return false;
+    }
+    return true;
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder builder = new StringBuilder();
+    builder.append("User [");
+    builder.append(super.toString());
+    builder.append(", email=");
+    builder.append(email);
+    builder.append(", guest=");
+    builder.append(guest);
+    builder.append(", ipAddress=");
+    builder.append(ipAddress);
+    builder.append(", resetPasswordToken=");
+    builder.append(resetPasswordToken);
+    builder.append(", resetPasswordTokenExpirationDate=");
+    builder.append(resetPasswordTokenExpirationDate);
+    builder.append(", emailConfirmationToken=");
+    builder.append(emailConfirmationToken);
+    builder.append(", emailConfirmationTokenExpirationDate=");
+    builder.append(emailConfirmationTokenExpirationDate);
+    builder.append(", extra=");
+    builder.append(extra);
+    builder.append("]");
+    return builder.toString();
+  }
+
+  @Override
+  public boolean isUser() {
+    return true;
+  }
 }

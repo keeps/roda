@@ -7,26 +7,13 @@
  */
 package org.roda.wui.api.controllers;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.StringWriter;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.MissingResourceException;
-import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.WebApplicationException;
@@ -40,11 +27,7 @@ import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.IdUtils;
-import org.roda.core.common.Messages;
-import org.roda.core.common.PremisV3Utils;
-import org.roda.core.common.RodaUtils;
-import org.roda.core.common.UserUtility;
+import org.roda.core.common.*;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.common.tools.ZipEntryInfo;
@@ -63,45 +46,17 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.common.RodaConstants.RODA_TYPE;
 import org.roda.core.data.descriptionLevels.DescriptionLevel;
-import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.IsStillUpdatingException;
-import org.roda.core.data.exceptions.JobAlreadyStartedException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.*;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.LinkingObjectUtils;
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.formats.Format;
-import org.roda.core.data.v2.index.FacetFieldResult;
-import org.roda.core.data.v2.index.FacetValue;
-import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.IndexRunnable;
-import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.index.SelectedItems;
-import org.roda.core.data.v2.index.SelectedItemsAll;
-import org.roda.core.data.v2.index.SelectedItemsFilter;
-import org.roda.core.data.v2.index.SelectedItemsList;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.AIPState;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.index.*;
+import org.roda.core.data.v2.ip.*;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
-import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
-import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
-import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
+import org.roda.core.data.v2.ip.metadata.*;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
@@ -109,7 +64,7 @@ import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.index.IndexService;
@@ -118,25 +73,13 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.plugins.plugins.ingest.AutoAcceptSIPPlugin;
 import org.roda.core.plugins.plugins.risks.RiskIncidenceRemoverPlugin;
-import org.roda.core.storage.Binary;
-import org.roda.core.storage.BinaryVersion;
-import org.roda.core.storage.ContentPayload;
-import org.roda.core.storage.DefaultStoragePath;
-import org.roda.core.storage.Directory;
-import org.roda.core.storage.StorageService;
+import org.roda.core.storage.*;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.DownloadUtils;
 import org.roda.wui.api.v1.utils.StreamResponse;
-import org.roda.wui.client.browse.BinaryVersionBundle;
-import org.roda.wui.client.browse.BrowseItemBundle;
-import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
-import org.roda.wui.client.browse.DescriptiveMetadataVersionsBundle;
-import org.roda.wui.client.browse.DescriptiveMetadataViewBundle;
-import org.roda.wui.client.browse.MetadataValue;
-import org.roda.wui.client.browse.PreservationEventViewBundle;
-import org.roda.wui.client.browse.SupportedMetadataTypeBundle;
+import org.roda.wui.client.browse.*;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
 import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
@@ -266,7 +209,7 @@ public class BrowserHelper {
     return retrieveDescriptiveMetadataBundle(aipId, descriptiveMetadata, locale);
   }
 
-  public static DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(RodaUser user, IndexedAIP aip,
+  public static DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(User user, IndexedAIP aip,
     String descriptiveMetadataId)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
 
@@ -276,7 +219,7 @@ public class BrowserHelper {
       metadata.getVersion());
   }
 
-  public static DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(RodaUser user, IndexedAIP aip,
+  public static DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(User user, IndexedAIP aip,
     String descriptiveMetadataId, String type, String version)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     DescriptiveMetadataEditBundle ret;
@@ -366,12 +309,12 @@ public class BrowserHelper {
   }
 
   protected static <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter,
-    Sublist sublist, Facets facets, RodaUser user, boolean justActive)
+    Sublist sublist, Facets facets, User user, boolean justActive)
     throws GenericException, RequestNotValidException {
     return RodaCoreFactory.getIndexService().find(returnClass, filter, sorter, sublist, facets, user, justActive);
   }
 
-  protected static <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, RodaUser user)
+  protected static <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, User user)
     throws GenericException, RequestNotValidException {
     boolean justActive = false;
     return RodaCoreFactory.getIndexService().count(returnClass, filter, user, justActive);
@@ -987,7 +930,7 @@ public class BrowserHelper {
     }
   }
 
-  public static IndexedAIP moveAIPInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, RodaUser user)
+  public static IndexedAIP moveAIPInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, User user)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
     AlreadyExistsException, ValidationException {
     List<String> aipIds = consolidate(user, IndexedAIP.class, selected);
@@ -1012,7 +955,7 @@ public class BrowserHelper {
     return index.retrieve(IndexedAIP.class, parentId);
   }
 
-  public static AIP createAIP(RodaUser user, String parentAipId, String type, Permissions permissions)
+  public static AIP createAIP(User user, String parentAipId, String type, Permissions permissions)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
     AlreadyExistsException {
     ModelService model = RodaCoreFactory.getModelService();
@@ -1021,7 +964,7 @@ public class BrowserHelper {
     return aip;
   }
 
-  public static String deleteAIP(SelectedItems<IndexedAIP> selected, RodaUser user)
+  public static String deleteAIP(SelectedItems<IndexedAIP> selected, User user)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     List<String> aipIds = consolidate(user, IndexedAIP.class, selected);
 
@@ -1069,7 +1012,7 @@ public class BrowserHelper {
     return parentId;
   }
 
-  public static String deleteAIPRepresentations(SelectedItems<IndexedAIP> selected, RodaUser user)
+  public static String deleteAIPRepresentations(SelectedItems<IndexedAIP> selected, User user)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     List<String> aipIds = consolidate(user, IndexedAIP.class, selected);
 
@@ -1273,7 +1216,7 @@ public class BrowserHelper {
     return transferredResource;
   }
 
-  private static <T extends IsIndexed> List<String> consolidate(RodaUser user, Class<T> classToReturn,
+  private static <T extends IsIndexed> List<String> consolidate(User user, Class<T> classToReturn,
     SelectedItems<T> selected) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     List<String> ret;
 
@@ -1293,7 +1236,7 @@ public class BrowserHelper {
     return ret;
   }
 
-  public static void deleteTransferredResources(SelectedItems<TransferredResource> selected, RodaUser user)
+  public static void deleteTransferredResources(SelectedItems<TransferredResource> selected, User user)
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
     List<String> ids = consolidate(user, TransferredResource.class, selected);
 
@@ -1316,7 +1259,7 @@ public class BrowserHelper {
     return transferredResource;
   }
 
-  protected static <T extends IsIndexed> void delete(RodaUser user, Class<T> returnClass, SelectedItems<T> ids)
+  protected static <T extends IsIndexed> void delete(User user, Class<T> returnClass, SelectedItems<T> ids)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     List<String> idList = consolidate(user, returnClass, ids);
     RodaCoreFactory.getIndexService().delete(returnClass, idList);
@@ -1333,7 +1276,7 @@ public class BrowserHelper {
   }
 
   // TODO Limit access to SDO accessible by user
-  public static StreamResponse retrieveClassificationPlan(String type, RodaUser user)
+  public static StreamResponse retrieveClassificationPlan(String type, User user)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     try {
       JsonFactory factory = new JsonFactory();
@@ -1424,7 +1367,7 @@ public class BrowserHelper {
     return node;
   }
 
-  public static List<SupportedMetadataTypeBundle> retrieveSupportedMetadata(RodaUser user, IndexedAIP aip,
+  public static List<SupportedMetadataTypeBundle> retrieveSupportedMetadata(User user, IndexedAIP aip,
     Locale locale) throws GenericException {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     List<String> types = RodaUtils
@@ -1613,7 +1556,7 @@ public class BrowserHelper {
     RodaCoreFactory.getStorageService().deleteBinaryVersion(storagePath, versionId);
   }
 
-  public static void updateAIPPermissions(RodaUser user, IndexedAIP indexedAIP, Permissions permissions,
+  public static void updateAIPPermissions(User user, IndexedAIP indexedAIP, Permissions permissions,
     boolean recursive)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     final ModelService model = RodaCoreFactory.getModelService();
@@ -1645,7 +1588,7 @@ public class BrowserHelper {
 
   }
 
-  public static Risk createRisk(Risk risk, RodaUser user, boolean commit)
+  public static Risk createRisk(Risk risk, User user, boolean commit)
     throws GenericException, RequestNotValidException {
     risk.setCreatedBy(user.getName());
     risk.setUpdatedBy(user.getName());
@@ -1654,7 +1597,7 @@ public class BrowserHelper {
     return createdRisk;
   }
 
-  public static void updateRisk(Risk risk, RodaUser user, String message, boolean commit)
+  public static void updateRisk(Risk risk, User user, String message, boolean commit)
     throws GenericException, RequestNotValidException {
     risk.setUpdatedBy(user.getName());
     RodaCoreFactory.getModelService().updateRisk(risk, message, commit);
@@ -1760,7 +1703,7 @@ public class BrowserHelper {
     }
   }
 
-  public static List<IndexedAIP> matchAIP(Filter filter, RodaUser user)
+  public static List<IndexedAIP> matchAIP(Filter filter, User user)
     throws GenericException, RequestNotValidException {
     List<IndexedAIP> aips = new ArrayList<IndexedAIP>();
     long count = count(IndexedAIP.class, filter, user);
@@ -1911,7 +1854,7 @@ public class BrowserHelper {
     return properties;
   }
 
-  public static void deleteRisk(RodaUser user, SelectedItems<IndexedRisk> selected)
+  public static void deleteRisk(User user, SelectedItems<IndexedRisk> selected)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
     InvalidParameterException, JobAlreadyStartedException {
     List<String> idList = consolidate(user, IndexedRisk.class, selected);
@@ -1932,7 +1875,7 @@ public class BrowserHelper {
     Jobs.createJob(user, job);
   }
 
-  public static void deleteAgent(RodaUser user, SelectedItems<Agent> selected)
+  public static void deleteAgent(User user, SelectedItems<Agent> selected)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     List<String> idList = consolidate(user, Agent.class, selected);
     for (String agentId : idList) {
@@ -1940,7 +1883,7 @@ public class BrowserHelper {
     }
   }
 
-  public static void deleteFormat(RodaUser user, SelectedItems<Format> selected)
+  public static void deleteFormat(User user, SelectedItems<Format> selected)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     List<String> idList = consolidate(user, Format.class, selected);
     for (String formatId : idList) {
@@ -1948,7 +1891,7 @@ public class BrowserHelper {
     }
   }
 
-  public static void deleteRiskIncidences(RodaUser user, String riskId, SelectedItems<RiskIncidence> incidences)
+  public static void deleteRiskIncidences(User user, String riskId, SelectedItems<RiskIncidence> incidences)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     List<String> idList = consolidate(user, RiskIncidence.class, incidences);
 
@@ -2012,7 +1955,7 @@ public class BrowserHelper {
     RodaCoreFactory.getIndexService().commit(IndexedRisk.class);
   }
 
-  public static void appraisal(RodaUser user, SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
+  public static void appraisal(User user, SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     List<String> listOfIds = consolidate(user, IndexedAIP.class, selected);
 
@@ -2133,7 +2076,7 @@ public class BrowserHelper {
     RodaCoreFactory.getIndexService().commit(IndexedAIP.class, Job.class, Report.class, IndexedPreservationEvent.class);
   }
 
-  public static IndexedRepresentation retrieveRepresentationById(RodaUser user, String representationId)
+  public static IndexedRepresentation retrieveRepresentationById(User user, String representationId)
     throws GenericException, RequestNotValidException {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_ID, representationId));
     IndexResult<IndexedRepresentation> reps = RodaCoreFactory.getIndexService().find(IndexedRepresentation.class,
@@ -2146,7 +2089,7 @@ public class BrowserHelper {
     }
   }
 
-  public static IndexedFile retrieveFileById(RodaUser user, String fileId)
+  public static IndexedFile retrieveFileById(User user, String fileId)
     throws GenericException, RequestNotValidException {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_FILEID, fileId));
     IndexResult<IndexedFile> files = RodaCoreFactory.getIndexService().find(IndexedFile.class, filter, Sorter.NONE,

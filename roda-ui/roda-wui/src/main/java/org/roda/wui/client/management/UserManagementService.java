@@ -17,16 +17,7 @@ import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
-import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.EmailAlreadyExistsException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.IllegalOperationException;
-import org.roda.core.data.exceptions.InvalidTokenException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.exceptions.*;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
@@ -122,8 +113,9 @@ public interface UserManagementService extends RemoteService {
    * @throws UserAlreadyExistsException
    * @throws GenericException
    */
-  public User createUser(User user, String password) throws AuthorizationDeniedException, NotFoundException,
-    EmailAlreadyExistsException, UserAlreadyExistsException, GenericException, IllegalOperationException;
+  public User createUser(User user, String password)
+    throws AuthorizationDeniedException, NotFoundException, EmailAlreadyExistsException, UserAlreadyExistsException,
+    GenericException, IllegalOperationException;
 
   /**
    * Modify a user

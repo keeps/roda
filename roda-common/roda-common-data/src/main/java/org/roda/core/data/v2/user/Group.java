@@ -10,13 +10,14 @@ package org.roda.core.data.v2.user;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 /**
  * This is a group in RODA.
  * 
  * @author Rui Castro
  */
-public class Group extends RodaGroup {
+public class Group extends RodaPrincipal {
 
   private static final long serialVersionUID = -4051946961307715630L;
 
@@ -63,6 +64,11 @@ public class Group extends RodaGroup {
       + this.memberGroupNames + ")";
   }
 
+  @Override
+  public boolean isUser() {
+    return false;
+  }
+
   /**
    * @return the memberUserNames
    */
@@ -93,9 +99,9 @@ public class Group extends RodaGroup {
    * <p>
    * <strong>NOTE:</strong> using this method doesn't change the member groups
    * when UserManagement.modifyGroup(Group group) is called. Use
-   * {@link RODAMember#addGroup(String)} or
-   * {@link RODAMember#setGroups(String[])} to change the {@link Group}s of a
-   * {@link RODAMember} ({@link User} or {@link Group}).
+   * {@link RodaPrincipal#addDirectGroup(String)} or
+   * {@link RodaPrincipal#setDirectGroups(Set)} to change the {@link Group}s of
+   * a {@link RodaPrincipal} ({@link User} or {@link Group}).
    * </p>
    * 
    * @param memberGroupNames

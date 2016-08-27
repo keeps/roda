@@ -15,7 +15,7 @@ import java.util.Map;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.User;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -57,7 +57,7 @@ public interface UserLoginService extends RemoteService {
    * @return
    * @throws RODAException
    */
-  public RodaUser getAuthenticatedUser() throws RODAException;
+  public User getAuthenticatedUser() throws RODAException;
 
   /**
    * Login into RODA Core
@@ -67,7 +67,7 @@ public interface UserLoginService extends RemoteService {
    * @return
    * @throws RODAException
    */
-  public RodaUser login(String username, String password) throws AuthenticationDeniedException,
+  public User login(String username, String password) throws AuthenticationDeniedException,
     GenericException;
 
   /**

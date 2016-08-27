@@ -19,18 +19,14 @@ import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.StreamResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 
 @Path(ReportsResource.ENDPOINT)
 @Api(value = ReportsResource.SWAGGER_ENDPOINT)
@@ -57,7 +53,7 @@ public class ReportsResource {
     @ApiParam(value = "Choose format in which to get the reports", allowableValues = "json") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     StreamResponse reportList = Browser.listTransferredResourcesReports(user, resourceId, start, limit, isOriginal,
       acceptFormat);
@@ -77,7 +73,7 @@ public class ReportsResource {
     @ApiParam(value = "Choose format in which to get the reports", allowableValues = "json") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     // get user
-    RodaUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // get last job reports of a transferred resource
     StreamResponse lastReports = Browser.listTransferredResourcesLastReport(user, resourceId, isOriginal, acceptFormat);
