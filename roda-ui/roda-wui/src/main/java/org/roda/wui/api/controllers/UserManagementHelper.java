@@ -50,10 +50,6 @@ public class UserManagementHelper {
     return RodaCoreFactory.getIndexService().find(RODAMember.class, filter, sorter, sublist, facets);
   }
 
-  protected static User retrieveRodaSimpleUser(String username) throws GenericException, NotFoundException {
-    return RodaCoreFactory.getIndexService().retrieve(User.class, username);
-  }
-
   protected static User retrieveUser(String username) throws GenericException {
     try {
       return UserUtility.getLdapUtility().getUser(username);

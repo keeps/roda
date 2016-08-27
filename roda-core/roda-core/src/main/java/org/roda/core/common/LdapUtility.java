@@ -808,7 +808,7 @@ public class LdapUtility {
       final Entry entry = userSession.lookup(new Dn(getUserDN(username)));
       final User user = getUserFromEntry(entry);
       // Use the admin session to get the user roles and groups
-      return getRodaSimpleUserRolesAndGroups(service.getAdminSession(), user);
+      return setUserRolesAndGroups(service.getAdminSession(), user);
 
     } catch (final LdapAuthenticationException e) {
       throw new AuthenticationDeniedException(e.getMessage(), e);
@@ -1174,7 +1174,7 @@ public class LdapUtility {
     return rodaPartition;
   }
 
-  private User getRodaSimpleUserRolesAndGroups(final CoreSession session, final User user)
+  private User setUserRolesAndGroups(final CoreSession session, final User user)
     throws LdapException {
     // Add all roles assigned to this user
     final Set<String> memberRoles = getMemberRoles(session, getUserDN(user.getName()));
