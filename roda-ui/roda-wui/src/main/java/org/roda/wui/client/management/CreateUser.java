@@ -14,7 +14,7 @@ import java.util.List;
 
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
-import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
@@ -42,7 +42,7 @@ public class CreateUser extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      RodaSimpleUser user = new RodaSimpleUser();
+      User user = new User();
       CreateUser createUser = new CreateUser(user);
       callback.onSuccess(createUser);
     }
@@ -66,7 +66,7 @@ public class CreateUser extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  private RodaSimpleUser user;
+  private User user;
 
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
@@ -85,7 +85,7 @@ public class CreateUser extends Composite {
    * @param user
    *          the user to create
    */
-  public CreateUser(RodaSimpleUser user) {
+  public CreateUser(User user) {
     this.user = user;
 
     this.userDataPanel = new UserDataPanel(true, false, true);
@@ -100,13 +100,13 @@ public class CreateUser extends Composite {
       user = userDataPanel.getUser();
       final String password = userDataPanel.getPassword();
 
-      UserManagementService.Util.getInstance().createUser(user, password, new AsyncCallback<RodaSimpleUser>() {
+      UserManagementService.Util.getInstance().createUser(user, password, new AsyncCallback<User>() {
 
         public void onFailure(Throwable caught) {
           errorMessage(caught);
         }
 
-        public void onSuccess(RodaSimpleUser createdUser) {
+        public void onSuccess(User createdUser) {
           Tools.newHistory(MemberManagement.RESOLVER);
         }
 

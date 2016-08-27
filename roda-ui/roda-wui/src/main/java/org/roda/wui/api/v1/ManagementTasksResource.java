@@ -40,7 +40,7 @@ import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
-import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.plugins.plugins.base.ActionLogCleanerPlugin;
 import org.roda.core.plugins.plugins.base.ReindexRodaEntityPlugin;
 import org.roda.wui.api.controllers.Jobs;
@@ -71,7 +71,7 @@ public class ManagementTasksResource {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // get user & check permissions
-    RodaSimpleUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     controllerAssistant.checkGroup(user, "administrators");
 
@@ -87,14 +87,14 @@ public class ManagementTasksResource {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // get user & check permissions
-    RodaSimpleUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     controllerAssistant.checkGroup(user, "administrators");
 
     return Response.ok().entity(createJobForRunningActionlogCleaner(user, daysToKeep, controllerAssistant)).build();
   }
 
-  private Response executeReindex(RodaSimpleUser user, ControllerAssistant controllerAssistant, String entity,
+  private Response executeReindex(User user, ControllerAssistant controllerAssistant, String entity,
     List<String> params) {
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
     if ("aip".equals(entity)) {
@@ -123,7 +123,7 @@ public class ManagementTasksResource {
     return Response.ok().entity(response).build();
   }
 
-  private <T extends IsRODAObject> ApiResponseMessage createJobToReindex(RodaSimpleUser user,
+  private <T extends IsRODAObject> ApiResponseMessage createJobToReindex(User user,
     ControllerAssistant controllerAssistant, List<String> params, Class<T> classToCreate) {
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
 
@@ -142,7 +142,7 @@ public class ManagementTasksResource {
     return response;
   }
 
-  private ApiResponseMessage createJobToReindexAllRODAObjects(RodaSimpleUser user, ControllerAssistant controllerAssistant) {
+  private ApiResponseMessage createJobToReindexAllRODAObjects(User user, ControllerAssistant controllerAssistant) {
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
     Job job = new Job().setName("Management Task | Reindex 'All RODA Objects' job")
       .setSourceObjects(SelectedItemsNone.create()).setPlugin(ReindexRodaEntityPlugin.class.getName());
@@ -156,12 +156,12 @@ public class ManagementTasksResource {
     return response;
   }
 
-  private ApiResponseMessage reindexUsersAndGroups(RodaSimpleUser user, ControllerAssistant controllerAssistant,
+  private ApiResponseMessage reindexUsersAndGroups(User user, ControllerAssistant controllerAssistant,
     List<String> params) {
     boolean success = true;
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
     try {
-      for (RodaSimpleUser ldapUser : UserUtility.getLdapUtility().getUsers(new Filter())) {
+      for (User ldapUser : UserUtility.getLdapUtility().getUsers(new Filter())) {
         LOGGER.debug("User to be indexed: {}", ldapUser);
         RodaCoreFactory.getModelService().addUser(ldapUser, false, true);
       }
@@ -183,7 +183,7 @@ public class ManagementTasksResource {
     return response;
   }
 
-  private void createJobAndRegisterAction(RodaSimpleUser user, ControllerAssistant controllerAssistant,
+  private void createJobAndRegisterAction(User user, ControllerAssistant controllerAssistant,
     ApiResponseMessage response, Job job, Object... params) {
     boolean success = true;
     try {
@@ -199,7 +199,7 @@ public class ManagementTasksResource {
     controllerAssistant.registerAction(user, success ? LOG_ENTRY_STATE.SUCCESS : LOG_ENTRY_STATE.FAILURE, params);
   }
 
-  private ApiResponseMessage createJobForRunningActionlogCleaner(RodaSimpleUser user, String daysToKeep,
+  private ApiResponseMessage createJobForRunningActionlogCleaner(User user, String daysToKeep,
     ControllerAssistant controllerAssistant) {
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
     Job job = new Job();

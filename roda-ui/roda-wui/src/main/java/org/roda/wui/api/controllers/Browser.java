@@ -37,7 +37,7 @@ import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.storage.ContentPayload;
 import org.roda.wui.api.v1.utils.StreamResponse;
@@ -75,7 +75,7 @@ public class Browser extends RodaWuiController {
     super();
   }
 
-  public static BrowseItemBundle retrieveItemBundle(RodaSimpleUser user, String aipId, Locale locale)
+  public static BrowseItemBundle retrieveItemBundle(User user, String aipId, Locale locale)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -94,7 +94,7 @@ public class Browser extends RodaWuiController {
     return itemBundle;
   }
 
-  public static DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(RodaSimpleUser user, String aipId,
+  public static DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(User user, String aipId,
     String metadataId, String type, String version)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -115,7 +115,7 @@ public class Browser extends RodaWuiController {
     return bundle;
   }
 
-  public static DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(RodaSimpleUser user, String aipId,
+  public static DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(User user, String aipId,
     String metadataId)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -136,7 +136,7 @@ public class Browser extends RodaWuiController {
     return bundle;
   }
 
-  public static DescriptiveMetadataVersionsBundle retrieveDescriptiveMetadataVersionsBundle(RodaSimpleUser user, String aipId,
+  public static DescriptiveMetadataVersionsBundle retrieveDescriptiveMetadataVersionsBundle(User user, String aipId,
     String metadataId, Locale locale)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -159,7 +159,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static <T extends IsIndexed> IndexResult<T> find(final Class<T> classToReturn, final Filter filter,
-    final Sorter sorter, final Sublist sublist, final Facets facets, final RodaSimpleUser user, final boolean justActive)
+    final Sorter sorter, final Sublist sublist, final Facets facets, final User user, final boolean justActive)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -180,7 +180,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static <T extends IsIndexed> Long count(final RodaSimpleUser user, final Class<T> classToReturn, final Filter filter)
+  public static <T extends IsIndexed> Long count(final User user, final Class<T> classToReturn, final Filter filter)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -199,7 +199,7 @@ public class Browser extends RodaWuiController {
     return count;
   }
 
-  public static <T extends IsIndexed> T retrieve(final RodaSimpleUser user, final Class<T> classToReturn, final String id)
+  public static <T extends IsIndexed> T retrieve(final User user, final Class<T> classToReturn, final String id)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -221,7 +221,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static <T extends IsIndexed> List<T> retrieve(final RodaSimpleUser user, final Class<T> classToReturn,
+  public static <T extends IsIndexed> List<T> retrieve(final User user, final Class<T> classToReturn,
     final SelectedItems<T> selectedItems)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -236,7 +236,7 @@ public class Browser extends RodaWuiController {
     return objects;
   }
 
-  public static <T extends IsIndexed> void delete(final RodaSimpleUser user, final Class<T> classToReturn,
+  public static <T extends IsIndexed> void delete(final User user, final Class<T> classToReturn,
     final SelectedItems<T> ids)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -253,7 +253,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "class", classToReturn.getSimpleName());
   }
 
-  public static <T extends IsIndexed> List<String> suggest(final RodaSimpleUser user, final Class<T> classToReturn,
+  public static <T extends IsIndexed> List<String> suggest(final User user, final Class<T> classToReturn,
     final String field, final String query) throws AuthorizationDeniedException, GenericException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -272,7 +272,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static List<IndexedAIP> retrieveAncestors(RodaSimpleUser user, IndexedAIP aip)
+  public static List<IndexedAIP> retrieveAncestors(User user, IndexedAIP aip)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -294,7 +294,7 @@ public class Browser extends RodaWuiController {
    * ---------------- REST related methods - start -----------------------------
    * ---------------------------------------------------------------------------
    */
-  public static StreamResponse retrieveAIPRepresentation(RodaSimpleUser user, String representationUUID, String acceptFormat)
+  public static StreamResponse retrieveAIPRepresentation(User user, String representationUUID, String acceptFormat)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -318,7 +318,7 @@ public class Browser extends RodaWuiController {
     return aipRepresentation;
   }
 
-  public static StreamResponse retrieveAIPRepresentationPart(RodaSimpleUser user, String representationUUID, String part)
+  public static StreamResponse retrieveAIPRepresentationPart(User user, String representationUUID, String part)
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -339,7 +339,7 @@ public class Browser extends RodaWuiController {
     return aipRepresentation;
   }
 
-  public static StreamResponse listAIPDescriptiveMetadata(RodaSimpleUser user, String aipId, String start, String limit,
+  public static StreamResponse listAIPDescriptiveMetadata(User user, String aipId, String start, String limit,
     String acceptFormat)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -363,7 +363,7 @@ public class Browser extends RodaWuiController {
     return aipDescriptiveMetadataList;
   }
 
-  public static StreamResponse listRepresentationDescriptiveMetadata(RodaSimpleUser user, String representationId,
+  public static StreamResponse listRepresentationDescriptiveMetadata(User user, String representationId,
     String start, String limit, String acceptFormat)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -389,7 +389,7 @@ public class Browser extends RodaWuiController {
     return aipDescriptiveMetadataList;
   }
 
-  public static StreamResponse retrieveAIPDescriptiveMetadata(RodaSimpleUser user, String aipId, String metadataId,
+  public static StreamResponse retrieveAIPDescriptiveMetadata(User user, String aipId, String metadataId,
     String acceptFormat, String language) throws AuthorizationDeniedException, GenericException, TransformerException,
     NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -414,7 +414,7 @@ public class Browser extends RodaWuiController {
 
   }
 
-  public static StreamResponse retrieveRepresentationDescriptiveMetadata(RodaSimpleUser user, String representationId,
+  public static StreamResponse retrieveRepresentationDescriptiveMetadata(User user, String representationId,
     String metadataId, String acceptFormat, String language) throws AuthorizationDeniedException, GenericException,
     TransformerException, NotFoundException, RequestNotValidException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -440,7 +440,7 @@ public class Browser extends RodaWuiController {
 
   }
 
-  public static StreamResponse retrieveAIPDescriptiveMetadataVersion(RodaSimpleUser user, String aipId, String metadataId,
+  public static StreamResponse retrieveAIPDescriptiveMetadataVersion(User user, String aipId, String metadataId,
     String versionId, String acceptFormat, String language) throws AuthorizationDeniedException, GenericException,
     TransformerException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -465,7 +465,7 @@ public class Browser extends RodaWuiController {
 
   }
 
-  public static StreamResponse listAIPPreservationMetadata(RodaSimpleUser user, String aipId, String acceptFormat)
+  public static StreamResponse listAIPPreservationMetadata(User user, String aipId, String acceptFormat)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -487,7 +487,7 @@ public class Browser extends RodaWuiController {
     return aipPreservationMetadataList;
   }
 
-  public static StreamResponse retrieveAIPRepresentationPreservationMetadata(RodaSimpleUser user, String aipId,
+  public static StreamResponse retrieveAIPRepresentationPreservationMetadata(User user, String aipId,
     String representationId, String startAgent, String limitAgent, String startEvent, String limitEvent,
     String startFile, String limitFile, String acceptFormat, String language) throws AuthorizationDeniedException,
     GenericException, TransformerException, NotFoundException, RequestNotValidException {
@@ -515,7 +515,7 @@ public class Browser extends RodaWuiController {
 
   }
 
-  public static StreamResponse retrieveAIPRepresentationPreservationMetadataFile(RodaSimpleUser user, String aipId,
+  public static StreamResponse retrieveAIPRepresentationPreservationMetadataFile(User user, String aipId,
     String representationId, String fileId)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -536,7 +536,7 @@ public class Browser extends RodaWuiController {
     return aipRepresentationPreservationMetadataFile;
   }
 
-  public static void postAIPRepresentationPreservationMetadataFile(RodaSimpleUser user, String aipId, String representationId,
+  public static void postAIPRepresentationPreservationMetadataFile(User user, String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId, InputStream is, FormDataContentDisposition fileDetail)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     ValidationException, AlreadyExistsException {
@@ -557,7 +557,7 @@ public class Browser extends RodaWuiController {
       RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId);
   }
 
-  public static void putAIPRepresentationPreservationMetadataFile(RodaSimpleUser user, String aipId, String representationId,
+  public static void putAIPRepresentationPreservationMetadataFile(User user, String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId, InputStream is, FormDataContentDisposition fileDetail)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     ValidationException, AlreadyExistsException {
@@ -584,7 +584,7 @@ public class Browser extends RodaWuiController {
    * ---------------------------------------------------------------------------
    */
 
-  public static IndexedAIP moveAIPInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, RodaSimpleUser user)
+  public static IndexedAIP moveAIPInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, User user)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     AlreadyExistsException, ValidationException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -608,7 +608,7 @@ public class Browser extends RodaWuiController {
     return returnAIP;
   }
 
-  public static AIP createAIP(RodaSimpleUser user, String parentId, String type) throws AuthorizationDeniedException,
+  public static AIP createAIP(User user, String parentId, String type) throws AuthorizationDeniedException,
     GenericException, NotFoundException, RequestNotValidException, AlreadyExistsException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -643,7 +643,7 @@ public class Browser extends RodaWuiController {
     return aip;
   }
 
-  public static String deleteAIP(RodaSimpleUser user, SelectedItems<IndexedAIP> aips)
+  public static String deleteAIP(User user, SelectedItems<IndexedAIP> aips)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -659,7 +659,7 @@ public class Browser extends RodaWuiController {
     return parentId;
   }
 
-  public static DescriptiveMetadata createDescriptiveMetadataFile(RodaSimpleUser user, String aipId, String metadataId,
+  public static DescriptiveMetadata createDescriptiveMetadataFile(User user, String aipId, String metadataId,
     String metadataType, String metadataVersion, ContentPayload metadataPayload) throws AuthorizationDeniedException,
     GenericException, ValidationException, NotFoundException, RequestNotValidException, AlreadyExistsException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -680,7 +680,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static DescriptiveMetadata updateDescriptiveMetadataFile(RodaSimpleUser user, String aipId, String metadataId,
+  public static DescriptiveMetadata updateDescriptiveMetadataFile(User user, String aipId, String metadataId,
     String metadataType, String metadataVersion, ContentPayload metadataPayload) throws AuthorizationDeniedException,
     GenericException, ValidationException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -702,7 +702,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static void deleteAIPDescriptiveMetadataFile(RodaSimpleUser user, String aipId, String metadataId)
+  public static void deleteAIPDescriptiveMetadataFile(User user, String aipId, String metadataId)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -719,7 +719,7 @@ public class Browser extends RodaWuiController {
       aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
   }
 
-  public static void deleteRepresentationDescriptiveMetadataFile(RodaSimpleUser user, String representationId,
+  public static void deleteRepresentationDescriptiveMetadataFile(User user, String representationId,
     String metadataId)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -739,7 +739,7 @@ public class Browser extends RodaWuiController {
       metadataId);
   }
 
-  public static DescriptiveMetadata retrieveDescriptiveMetadataFile(RodaSimpleUser user, String aipId, String metadataId)
+  public static DescriptiveMetadata retrieveDescriptiveMetadataFile(User user, String aipId, String metadataId)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -758,7 +758,7 @@ public class Browser extends RodaWuiController {
     return dm;
   }
 
-  public static void deleteRepresentation(RodaSimpleUser user, String aipId, String representationId)
+  public static void deleteRepresentation(User user, String aipId, String representationId)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -775,7 +775,7 @@ public class Browser extends RodaWuiController {
       aipId, RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId);
   }
 
-  public static void deleteRepresentationFile(RodaSimpleUser user, String fileUUID)
+  public static void deleteRepresentationFile(User user, String fileUUID)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -795,7 +795,7 @@ public class Browser extends RodaWuiController {
       file.getPath(), RodaConstants.FILE_FILEID, file.getId());
   }
 
-  public static StreamResponse retrieveAIPRepresentationFile(RodaSimpleUser user, String fileUuid, String acceptFormat)
+  public static StreamResponse retrieveAIPRepresentationFile(User user, String fileUuid, String acceptFormat)
     throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -820,7 +820,7 @@ public class Browser extends RodaWuiController {
     return aipRepresentationFile;
   }
 
-  public static DescriptiveMetadata putAIPDescriptiveMetadataFile(RodaSimpleUser user, String aipId, String metadataId,
+  public static DescriptiveMetadata putAIPDescriptiveMetadataFile(User user, String aipId, String metadataId,
     String metadataType, String metadataVersion, InputStream is, FormDataContentDisposition fileDetail)
     throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException,
     AlreadyExistsException, ValidationException {
@@ -842,7 +842,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static DescriptiveMetadata putRepresentationDescriptiveMetadataFile(RodaSimpleUser user, String representationId,
+  public static DescriptiveMetadata putRepresentationDescriptiveMetadataFile(User user, String representationId,
     String metadataId, String metadataType, String metadataVersion, InputStream is,
     FormDataContentDisposition fileDetail) throws GenericException, AuthorizationDeniedException, NotFoundException,
     RequestNotValidException, AlreadyExistsException, ValidationException {
@@ -866,7 +866,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static DescriptiveMetadata postAIPDescriptiveMetadataFile(RodaSimpleUser user, String aipId, String metadataId,
+  public static DescriptiveMetadata postAIPDescriptiveMetadataFile(User user, String aipId, String metadataId,
     String metadataType, String metadataVersion, InputStream is, FormDataContentDisposition fileDetail)
     throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException,
     AlreadyExistsException, ValidationException {
@@ -888,7 +888,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static DescriptiveMetadata postRepresentationDescriptiveMetadataFile(RodaSimpleUser user, String representationId,
+  public static DescriptiveMetadata postRepresentationDescriptiveMetadataFile(User user, String representationId,
     String metadataId, String metadataType, String metadataVersion, InputStream is,
     FormDataContentDisposition fileDetail) throws GenericException, AuthorizationDeniedException, NotFoundException,
     RequestNotValidException, AlreadyExistsException, ValidationException {
@@ -912,7 +912,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static TransferredResource createTransferredResourcesFolder(RodaSimpleUser user, String parentUUID,
+  public static TransferredResource createTransferredResourcesFolder(User user, String parentUUID,
     String folderName, boolean forceCommit)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -938,7 +938,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static void deleteTransferredResources(RodaSimpleUser user, SelectedItems<TransferredResource> selected)
+  public static void deleteTransferredResources(User user, SelectedItems<TransferredResource> selected)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -952,7 +952,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "selected", selected);
   }
 
-  public static TransferredResource createTransferredResourceFile(RodaSimpleUser user, String parentUUID, String fileName,
+  public static TransferredResource createTransferredResourceFile(User user, String parentUUID, String fileName,
     InputStream inputStream, boolean forceCommit) throws AuthorizationDeniedException, GenericException,
     AlreadyExistsException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -981,7 +981,7 @@ public class Browser extends RodaWuiController {
 
   }
 
-  public static StreamResponse retrieveClassificationPlan(RodaSimpleUser user, String type)
+  public static StreamResponse retrieveClassificationPlan(User user, String type)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -997,7 +997,7 @@ public class Browser extends RodaWuiController {
     return classificationPlan;
   }
 
-  public static TransferredResource createTransferredResource(RodaSimpleUser user, String parentUUID, String fileName,
+  public static TransferredResource createTransferredResource(User user, String parentUUID, String fileName,
     InputStream inputStream, String name, boolean forceCommit) throws AuthorizationDeniedException, GenericException,
     AlreadyExistsException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -1022,18 +1022,18 @@ public class Browser extends RodaWuiController {
 
   public static boolean retrieveScanUpdateStatus() {
     // TODO: should this method use ControllerAssistant to checkRoles and
-    // registerAction? Where is RodaSimpleUser?
+    // registerAction? Where is User?
     return BrowserHelper.retrieveScanUpdateStatus();
   }
 
   public static void updateAllTransferredResources(String subFolderUUID, boolean waitToFinish)
     throws IsStillUpdatingException {
     // TODO: should this method use ControllerAssistant to checkRoles and
-    // registerAction? Where is RodaSimpleUser?
+    // registerAction? Where is User?
     BrowserHelper.runTransferredResourceScan(subFolderUUID, waitToFinish);
   }
 
-  public static List<SupportedMetadataTypeBundle> retrieveSupportedMetadata(RodaSimpleUser user, String aipId, Locale locale)
+  public static List<SupportedMetadataTypeBundle> retrieveSupportedMetadata(User user, String aipId, Locale locale)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1051,7 +1051,7 @@ public class Browser extends RodaWuiController {
     return supportedMetadata;
   }
 
-  public static StreamResponse retrieveTransferredResource(RodaSimpleUser user, String resourceId)
+  public static StreamResponse retrieveTransferredResource(User user, String resourceId)
     throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1067,7 +1067,7 @@ public class Browser extends RodaWuiController {
     return response;
   }
 
-  public static PreservationEventViewBundle retrievePreservationEventViewBundle(RodaSimpleUser user, String eventId)
+  public static PreservationEventViewBundle retrievePreservationEventViewBundle(User user, String eventId)
     throws AuthorizationDeniedException, NotFoundException, GenericException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1089,7 +1089,7 @@ public class Browser extends RodaWuiController {
     return resource;
   }
 
-  public static void revertDescriptiveMetadataVersion(RodaSimpleUser user, String aipId, String descriptiveMetadataId,
+  public static void revertDescriptiveMetadataVersion(User user, String aipId, String descriptiveMetadataId,
     String versionId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -1110,7 +1110,7 @@ public class Browser extends RodaWuiController {
       versionId);
   }
 
-  public static void deleteDescriptiveMetadataVersion(RodaSimpleUser user, String aipId, String descriptiveMetadataId,
+  public static void deleteDescriptiveMetadataVersion(User user, String aipId, String descriptiveMetadataId,
     String versionId)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -1132,7 +1132,7 @@ public class Browser extends RodaWuiController {
       versionId);
   }
 
-  public static void updateAIPPermissions(RodaSimpleUser user, List<IndexedAIP> aips, Permissions permissions,
+  public static void updateAIPPermissions(User user, List<IndexedAIP> aips, Permissions permissions,
     boolean recursive)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -1148,7 +1148,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "aips", aips, "permissions", permissions);
   }
 
-  public static void updateRisk(RodaSimpleUser user, Risk risk, String message)
+  public static void updateRisk(User user, Risk risk, String message)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1162,7 +1162,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "risk", risk);
   }
 
-  public static void updateFormat(RodaSimpleUser user, Format format)
+  public static void updateFormat(User user, Format format)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1176,7 +1176,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "format", format);
   }
 
-  public static void updateAgent(RodaSimpleUser user, Agent agent)
+  public static void updateAgent(User user, Agent agent)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1190,7 +1190,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "agent", agent);
   }
 
-  public static Risk createRisk(RodaSimpleUser user, Risk risk)
+  public static Risk createRisk(User user, Risk risk)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1206,7 +1206,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static Format createFormat(RodaSimpleUser user, Format format)
+  public static Format createFormat(User user, Format format)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1222,7 +1222,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static Agent createAgent(RodaSimpleUser user, Agent agent)
+  public static Agent createAgent(User user, Agent agent)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1238,7 +1238,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static List<Format> retrieveFormats(RodaSimpleUser user, String agentId)
+  public static List<Format> retrieveFormats(User user, String agentId)
     throws AuthorizationDeniedException, NotFoundException, GenericException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1254,7 +1254,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static List<Agent> retrieveRequiredAgents(RodaSimpleUser user, String agentId)
+  public static List<Agent> retrieveRequiredAgents(User user, String agentId)
     throws AuthorizationDeniedException, NotFoundException, GenericException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1270,7 +1270,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static void revertRiskVersion(RodaSimpleUser user, String riskId, String versionId, String message)
+  public static void revertRiskVersion(User user, String riskId, String versionId, String message)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IOException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1299,7 +1299,7 @@ public class Browser extends RodaWuiController {
    * @throws RequestNotValidException
    * @throws IOException
    */
-  public static StreamResponse exportAIP(RodaSimpleUser user, SelectedItems<IndexedAIP> selected, String acceptFormat)
+  public static StreamResponse exportAIP(User user, SelectedItems<IndexedAIP> selected, String acceptFormat)
     throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException, IOException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1320,7 +1320,7 @@ public class Browser extends RodaWuiController {
     return aipExport;
   }
 
-  public static StreamResponse retrieveAIP(RodaSimpleUser user, String aipId, String acceptFormat)
+  public static StreamResponse retrieveAIP(User user, String aipId, String acceptFormat)
     throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1341,7 +1341,7 @@ public class Browser extends RodaWuiController {
     return aip;
   }
 
-  public static StreamResponse retrieveAIPPart(RodaSimpleUser user, String aipId, String part)
+  public static StreamResponse retrieveAIPPart(User user, String aipId, String part)
     throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1359,7 +1359,7 @@ public class Browser extends RodaWuiController {
     return aip;
   }
 
-  public static void deleteRiskVersion(RodaSimpleUser user, String riskId, String versionId)
+  public static void deleteRiskVersion(User user, String riskId, String versionId)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IOException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1374,7 +1374,7 @@ public class Browser extends RodaWuiController {
       versionId);
   }
 
-  public static RiskVersionsBundle retrieveRiskVersions(RodaSimpleUser user, String riskId)
+  public static RiskVersionsBundle retrieveRiskVersions(User user, String riskId)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IOException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1390,7 +1390,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static boolean hasRiskVersions(RodaSimpleUser user, String id)
+  public static boolean hasRiskVersions(User user, String id)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1406,7 +1406,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static Risk retrieveRiskVersion(RodaSimpleUser user, String riskId, String selectedVersion)
+  public static Risk retrieveRiskVersion(User user, String riskId, String selectedVersion)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException, IOException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1423,7 +1423,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static RiskMitigationBundle retrieveShowMitigationTerms(RodaSimpleUser user, int preMitigationProbability,
+  public static RiskMitigationBundle retrieveShowMitigationTerms(User user, int preMitigationProbability,
     int preMitigationImpact, int posMitigationProbability, int posMitigationImpact)
     throws AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -1443,7 +1443,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static List<String> retrieveMitigationSeverityLimits(RodaSimpleUser user) throws AuthorizationDeniedException {
+  public static List<String> retrieveMitigationSeverityLimits(User user) throws AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -1458,7 +1458,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static MitigationPropertiesBundle retrieveAllMitigationProperties(RodaSimpleUser user)
+  public static MitigationPropertiesBundle retrieveAllMitigationProperties(User user)
     throws AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1474,7 +1474,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static void deleteRisk(RodaSimpleUser user, SelectedItems<IndexedRisk> selected)
+  public static void deleteRisk(User user, SelectedItems<IndexedRisk> selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException,
     InvalidParameterException, JobAlreadyStartedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -1489,7 +1489,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "selected", selected);
   }
 
-  public static void deleteAgent(RodaSimpleUser user, SelectedItems<Agent> selected)
+  public static void deleteAgent(User user, SelectedItems<Agent> selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1503,7 +1503,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "selected", selected);
   }
 
-  public static void deleteFormat(RodaSimpleUser user, SelectedItems<Format> selected)
+  public static void deleteFormat(User user, SelectedItems<Format> selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1517,7 +1517,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "selected", selected);
   }
 
-  public static void deleteRiskIncidences(RodaSimpleUser user, String id, SelectedItems<RiskIncidence> incidences)
+  public static void deleteRiskIncidences(User user, String id, SelectedItems<RiskIncidence> incidences)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1531,7 +1531,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "incidences", incidences);
   }
 
-  public static void updateRiskCounters(RodaSimpleUser user)
+  public static void updateRiskCounters(User user)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1545,7 +1545,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
   }
 
-  public static void appraisal(RodaSimpleUser user, SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
+  public static void appraisal(User user, SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1560,7 +1560,7 @@ public class Browser extends RodaWuiController {
       "rejectReason", rejectReason);
   }
 
-  public static IndexedRepresentation retrieveRepresentationById(RodaSimpleUser user, String representationId)
+  public static IndexedRepresentation retrieveRepresentationById(User user, String representationId)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1576,7 +1576,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static IndexedFile retrieveFileById(RodaSimpleUser user, String fileId)
+  public static IndexedFile retrieveFileById(User user, String fileId)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1592,7 +1592,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static String createDescriptiveMetadataPreview(RodaSimpleUser user, String aipId, SupportedMetadataTypeBundle bundle)
+  public static String createDescriptiveMetadataPreview(User user, String aipId, SupportedMetadataTypeBundle bundle)
     throws AuthorizationDeniedException, GenericException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1608,7 +1608,7 @@ public class Browser extends RodaWuiController {
     return payload;
   }
 
-  public static String renameTransferredResource(RodaSimpleUser user, String transferredResourceId, String newName)
+  public static String renameTransferredResource(User user, String transferredResourceId, String newName)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException,
     IsStillUpdatingException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -1624,7 +1624,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static String moveTransferredResource(RodaSimpleUser user, SelectedItems selected,
+  public static String moveTransferredResource(User user, SelectedItems selected,
     TransferredResource transferredResource) throws AuthorizationDeniedException, GenericException,
     RequestNotValidException, AlreadyExistsException, IsStillUpdatingException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -1641,7 +1641,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static List<TransferredResource> retrieveSelectedTransferredResource(RodaSimpleUser user,
+  public static List<TransferredResource> retrieveSelectedTransferredResource(User user,
     SelectedItems<TransferredResource> selected)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -1657,7 +1657,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static void deleteFile(RodaSimpleUser user, String fileUUID)
+  public static void deleteFile(User user, String fileUUID)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1671,7 +1671,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "fileUUID", fileUUID);
   }
 
-  public static void updateRiskIncidence(RodaSimpleUser user, RiskIncidence incidence)
+  public static void updateRiskIncidence(User user, RiskIncidence incidence)
     throws AuthorizationDeniedException, GenericException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1685,7 +1685,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "incidence", incidence);
   }
 
-  public static void showLogs(RodaSimpleUser user) throws AuthorizationDeniedException {
+  public static void showLogs(User user) throws AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -1696,7 +1696,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
   }
 
-  public static StreamResponse listTransferredResourcesReports(RodaSimpleUser user, String resourceId, String start,
+  public static StreamResponse listTransferredResourcesReports(User user, String resourceId, String start,
     String limit, boolean isOriginal, String acceptFormat)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -1719,7 +1719,7 @@ public class Browser extends RodaWuiController {
     return reportList;
   }
 
-  public static StreamResponse listTransferredResourcesLastReport(RodaSimpleUser user, String resourceId, boolean isOriginal,
+  public static StreamResponse listTransferredResourcesLastReport(User user, String resourceId, boolean isOriginal,
     String acceptFormat)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};

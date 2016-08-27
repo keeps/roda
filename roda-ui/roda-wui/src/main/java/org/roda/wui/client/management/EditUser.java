@@ -14,7 +14,7 @@ import java.util.List;
 
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
@@ -44,7 +44,7 @@ public class EditUser extends Composite {
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
         String username = historyTokens.get(0);
-        UserManagementService.Util.getInstance().retrieveUser(username, new AsyncCallback<RodaSimpleUser>() {
+        UserManagementService.Util.getInstance().retrieveUser(username, new AsyncCallback<User>() {
 
           @Override
           public void onFailure(Throwable caught) {
@@ -52,7 +52,7 @@ public class EditUser extends Composite {
           }
 
           @Override
-          public void onSuccess(RodaSimpleUser user) {
+          public void onSuccess(User user) {
             EditUser editUser = new EditUser(user);
             callback.onSuccess(editUser);
           }
@@ -82,7 +82,7 @@ public class EditUser extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  private final RodaSimpleUser user;
+  private final User user;
 
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
@@ -107,7 +107,7 @@ public class EditUser extends Composite {
    * @param user
    *          the user to edit
    */
-  public EditUser(RodaSimpleUser user) {
+  public EditUser(User user) {
     this.user = user;
 
     this.userDataPanel = new UserDataPanel(true, true, true);
@@ -127,7 +127,7 @@ public class EditUser extends Composite {
   void buttonApplyHandler(ClickEvent e) {
     if (userDataPanel.isChanged()) {
       if (userDataPanel.isValid()) {
-        final RodaSimpleUser user = userDataPanel.getUser();
+        final User user = userDataPanel.getUser();
         final String password = userDataPanel.getPassword();
 
         UserManagementService.Util.getInstance().updateUser(user, password, new AsyncCallback<Void>() {

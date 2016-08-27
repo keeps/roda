@@ -17,7 +17,7 @@ import javax.ws.rs.core.Response;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
@@ -46,7 +46,7 @@ public class FilesResource {
     @ApiParam(value = "Choose format in which to get the file", allowableValues = "json, bin") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     // get user
-    RodaSimpleUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     StreamResponse aipRepresentationFile = Browser.retrieveAIPRepresentationFile(user, fileUuid, acceptFormat);
 
@@ -92,7 +92,7 @@ public class FilesResource {
     @ApiParam(value = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileUUID)
     throws RODAException {
     // get user
-    RodaSimpleUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
     // delegate action to controller
     Browser.deleteRepresentationFile(user, fileUUID);
 

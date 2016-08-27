@@ -26,7 +26,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
-import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
@@ -93,7 +93,7 @@ public class PermissionsTest {
 
     index.commitAIPs();
 
-    RodaSimpleUser user = null;
+    User user = null;
     boolean justActive = true;
     IndexResult<IndexedAIP> find1 = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), null, user,
       justActive);
@@ -104,7 +104,7 @@ public class PermissionsTest {
       justActive);
     assertEquals(1, find2.getTotalCount());
 
-    user = new RodaSimpleUser("testuser", "User with access", "", false);
+    user = new User("testuser", "User with access", "", false);
     justActive = true;
     IndexResult<IndexedAIP> find3 = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), null, user,
       justActive);
@@ -115,7 +115,7 @@ public class PermissionsTest {
       justActive);
     assertEquals(1, find4.getTotalCount());
 
-    user = new RodaSimpleUser("guest", "User with access", "", true);
+    user = new User("guest", "User with access", "", true);
     justActive = true;
     IndexResult<IndexedAIP> find5 = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), null, user,
       justActive);
@@ -148,7 +148,7 @@ public class PermissionsTest {
 
     index.commitAIPs();
 
-    RodaSimpleUser user = null;
+    User user = null;
     boolean justActive = true;
     IndexResult<IndexedRepresentation> find1 = index.find(IndexedRepresentation.class, null, null, new Sublist(0, 10),
       null, user, justActive);
@@ -159,7 +159,7 @@ public class PermissionsTest {
       null, user, justActive);
     assertEquals(2, find2.getTotalCount());
 
-    user = new RodaSimpleUser("testuser", "User with access", "", false);
+    user = new User("testuser", "User with access", "", false);
     justActive = true;
     IndexResult<IndexedRepresentation> find3 = index.find(IndexedRepresentation.class, null, null, new Sublist(0, 10),
       null, user, justActive);
@@ -170,7 +170,7 @@ public class PermissionsTest {
       null, user, justActive);
     assertEquals(2, find4.getTotalCount());
 
-    user = new RodaSimpleUser("guest", "User with access", "", true);
+    user = new User("guest", "User with access", "", true);
     justActive = true;
     IndexResult<IndexedRepresentation> find5 = index.find(IndexedRepresentation.class, null, null, new Sublist(0, 10),
       null, user, justActive);
@@ -202,7 +202,7 @@ public class PermissionsTest {
 
     index.commitAIPs();
 
-    RodaSimpleUser user = null;
+    User user = null;
     boolean justActive = true;
     IndexResult<IndexedFile> find1 = index.find(IndexedFile.class, null, null, new Sublist(0, 10), null, user,
       justActive);
@@ -213,7 +213,7 @@ public class PermissionsTest {
       justActive);
     assertEquals(4, find2.getTotalCount());
 
-    user = new RodaSimpleUser("testuser", "User with access", "", false);
+    user = new User("testuser", "User with access", "", false);
     justActive = true;
     IndexResult<IndexedFile> find3 = index.find(IndexedFile.class, null, null, new Sublist(0, 10), null, user,
       justActive);
@@ -224,7 +224,7 @@ public class PermissionsTest {
       justActive);
     assertEquals(4, find4.getTotalCount());
 
-    user = new RodaSimpleUser("guest", "User with access", "", true);
+    user = new User("guest", "User with access", "", true);
     justActive = true;
     IndexResult<IndexedFile> find5 = index.find(IndexedFile.class, null, null, new Sublist(0, 10), null, user,
       justActive);
@@ -256,7 +256,7 @@ public class PermissionsTest {
 
     index.commitAIPs();
 
-    RodaSimpleUser user = null;
+    User user = null;
     boolean justActive = true;
     IndexResult<IndexedPreservationEvent> find1 = index.find(IndexedPreservationEvent.class, null, null,
       new Sublist(0, 10), null, user, justActive);
@@ -267,7 +267,7 @@ public class PermissionsTest {
       new Sublist(0, 10), null, user, justActive);
     assertEquals(2, find2.getTotalCount());
 
-    user = new RodaSimpleUser("testuser", "User with access", "", false);
+    user = new User("testuser", "User with access", "", false);
     justActive = true;
     IndexResult<IndexedPreservationEvent> find3 = index.find(IndexedPreservationEvent.class, null, null,
       new Sublist(0, 10), null, user, justActive);
@@ -278,7 +278,7 @@ public class PermissionsTest {
       new Sublist(0, 10), null, user, justActive);
     assertEquals(2, find4.getTotalCount());
 
-    user = new RodaSimpleUser("guest", "User with access", "", true);
+    user = new User("guest", "User with access", "", true);
     justActive = true;
     IndexResult<IndexedPreservationEvent> find5 = index.find(IndexedPreservationEvent.class, null, null,
       new Sublist(0, 10), null, user, justActive);

@@ -16,7 +16,7 @@ import java.util.List;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.EmailUnverifiedException;
 import org.roda.core.data.exceptions.InactiveUserException;
-import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.management.RecoverLogin;
 import org.roda.wui.client.management.Register;
@@ -169,7 +169,7 @@ public class Login extends Composite {
       error.setText(messages.fillUsernameAndPasswordMessage());
     } else {
 
-      UserLogin.getInstance().login(usernameText, passwordText, new AsyncCallback<RodaSimpleUser>() {
+      UserLogin.getInstance().login(usernameText, passwordText, new AsyncCallback<User>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -185,7 +185,7 @@ public class Login extends Composite {
         }
 
         @Override
-        public void onSuccess(RodaSimpleUser user) {
+        public void onSuccess(User user) {
           if (service != null && service.length() > 0) {
             History.newItem(service);
           } else {

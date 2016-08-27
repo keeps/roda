@@ -19,7 +19,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Jobs;
 import org.roda.core.data.v2.jobs.Reports;
-import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.JobsHelper;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
@@ -52,7 +52,7 @@ public class JobsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaSimpleUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     Jobs jobs = JobsHelper.getJobsFromIndexResult(user, start, limit);
@@ -69,7 +69,7 @@ public class JobsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaSimpleUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     Job updatedJob = org.roda.wui.api.controllers.Jobs.createJob(user, job);
@@ -87,7 +87,7 @@ public class JobsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaSimpleUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
     // delegate action to controller
     Job job = org.roda.wui.api.controllers.Jobs.startJob(user, jobId);
 
@@ -103,7 +103,7 @@ public class JobsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaSimpleUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
     // delegate action to controller
     Job job = org.roda.wui.api.controllers.Browser.retrieve(user, Job.class, jobId);
 
@@ -119,7 +119,7 @@ public class JobsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaSimpleUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
     // delegate action to controller
     org.roda.wui.api.controllers.Jobs.stopJob(user, jobId);
 
@@ -135,7 +135,7 @@ public class JobsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaSimpleUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
     // delegate action to controller
     org.roda.wui.api.controllers.Jobs.deleteJob(user, jobId);
 
@@ -156,7 +156,7 @@ public class JobsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaSimpleUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     Reports reports = JobsHelper.getJobReportsFromIndexResult(user, jobId, justFailed, start, limit);

@@ -45,7 +45,7 @@ import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
-import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.model.utils.ModelUtils;
@@ -1274,7 +1274,7 @@ public class ModelService extends ModelObservable {
   /***************** Users/Groups related *****************/
   /********************************************************/
 
-  public void registerUser(RodaSimpleUser user, String password, boolean useModel, boolean notify)
+  public void registerUser(User user, String password, boolean useModel, boolean notify)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException {
     boolean success = true;
     try {
@@ -1283,10 +1283,10 @@ public class ModelService extends ModelObservable {
       }
     } catch (LdapUtilityException e) {
       success = false;
-      throw new GenericException("Error registering RodaSimpleUser to LDAP", e);
+      throw new GenericException("Error registering User to LDAP", e);
     } catch (UserAlreadyExistsException e) {
       success = false;
-      throw new UserAlreadyExistsException("RodaSimpleUser already exists", e);
+      throw new UserAlreadyExistsException("User already exists", e);
     } catch (EmailAlreadyExistsException e) {
       success = false;
       throw new EmailAlreadyExistsException("Email already exists", e);
@@ -1296,15 +1296,15 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  public RodaSimpleUser addUser(RodaSimpleUser user, boolean useModel, boolean notify) throws GenericException, EmailAlreadyExistsException,
+  public User addUser(User user, boolean useModel, boolean notify) throws GenericException, EmailAlreadyExistsException,
     UserAlreadyExistsException, IllegalOperationException, NotFoundException {
     return addUser(user, null, useModel, notify);
   }
 
-  public RodaSimpleUser addUser(RodaSimpleUser user, String password, boolean useModel, boolean notify) throws GenericException,
+  public User addUser(User user, String password, boolean useModel, boolean notify) throws GenericException,
     EmailAlreadyExistsException, UserAlreadyExistsException, IllegalOperationException, NotFoundException {
     boolean success = true;
-    RodaSimpleUser createdUser;
+    User createdUser;
     try {
       if (useModel) {
         createdUser = UserUtility.getLdapUtility().addUser(user);
@@ -1317,10 +1317,10 @@ public class ModelService extends ModelObservable {
       }
     } catch (LdapUtilityException e) {
       success = false;
-      throw new GenericException("Error adding RodaSimpleUser to LDAP", e);
+      throw new GenericException("Error adding User to LDAP", e);
     } catch (UserAlreadyExistsException e) {
       success = false;
-      throw new UserAlreadyExistsException("RodaSimpleUser already exists", e);
+      throw new UserAlreadyExistsException("User already exists", e);
     } catch (EmailAlreadyExistsException e) {
       success = false;
       throw new EmailAlreadyExistsException("Email already exists", e);
@@ -1331,12 +1331,12 @@ public class ModelService extends ModelObservable {
     return createdUser;
   }
 
-  public void modifyUser(RodaSimpleUser user, boolean useModel, boolean notify)
+  public void modifyUser(User user, boolean useModel, boolean notify)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     modifyUser(user, null, useModel, notify);
   }
 
-  public void modifyUser(RodaSimpleUser user, String password, boolean useModel, boolean notify)
+  public void modifyUser(User user, String password, boolean useModel, boolean notify)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     boolean success = true;
     try {
@@ -1349,13 +1349,13 @@ public class ModelService extends ModelObservable {
       }
     } catch (LdapUtilityException e) {
       success = false;
-      throw new GenericException("Error modifying RodaSimpleUser to LDAP", e);
+      throw new GenericException("Error modifying User to LDAP", e);
     } catch (EmailAlreadyExistsException e) {
       success = false;
-      throw new AlreadyExistsException("RodaSimpleUser already exists", e);
+      throw new AlreadyExistsException("User already exists", e);
     } catch (NotFoundException e) {
       success = false;
-      throw new NotFoundException("RodaSimpleUser doesn't exist", e);
+      throw new NotFoundException("User doesn't exist", e);
     } catch (IllegalOperationException e) {
       success = false;
       throw new AuthorizationDeniedException("Illegal operation", e);
@@ -1365,7 +1365,7 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  public void modifyMyUser(RodaSimpleUser user, String password, boolean useModel, boolean notify)
+  public void modifyMyUser(User user, String password, boolean useModel, boolean notify)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     boolean success = true;
     try {
@@ -1373,11 +1373,11 @@ public class ModelService extends ModelObservable {
         UserUtility.getLdapUtility().modifySelfUser(user, password);
       }
     } catch (LdapUtilityException e) {
-      throw new GenericException("Error modifying RodaSimpleUser to LDAP", e);
+      throw new GenericException("Error modifying User to LDAP", e);
     } catch (EmailAlreadyExistsException e) {
-      throw new AlreadyExistsException("RodaSimpleUser already exists", e);
+      throw new AlreadyExistsException("User already exists", e);
     } catch (NotFoundException e) {
-      throw new NotFoundException("RodaSimpleUser doesn't exist", e);
+      throw new NotFoundException("User doesn't exist", e);
     } catch (IllegalOperationException e) {
       throw new AuthorizationDeniedException("Illegal operation", e);
     }
@@ -1395,7 +1395,7 @@ public class ModelService extends ModelObservable {
       }
     } catch (LdapUtilityException e) {
       success = false;
-      throw new GenericException("Error removing RodaSimpleUser from LDAP", e);
+      throw new GenericException("Error removing User from LDAP", e);
     } catch (IllegalOperationException e) {
       success = false;
       throw new AuthorizationDeniedException("Illegal operation", e);
@@ -1464,9 +1464,9 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  public RodaSimpleUser confirmUserEmail(String username, String email, String emailConfirmationToken, boolean useModel,
+  public User confirmUserEmail(String username, String email, String emailConfirmationToken, boolean useModel,
     boolean notify) throws NotFoundException, InvalidTokenException, GenericException {
-    RodaSimpleUser user = null;
+    User user = null;
     boolean success = true;
     try {
       if (useModel) {
@@ -1478,7 +1478,7 @@ public class ModelService extends ModelObservable {
       throw new GenericException("Error on password reset", e);
     } catch (NotFoundException e) {
       success = false;
-      throw new NotFoundException("RodaSimpleUser doesn't exist", e);
+      throw new NotFoundException("User doesn't exist", e);
     } catch (InvalidTokenException e) {
       success = false;
       throw new InvalidTokenException("Token exception", e);
@@ -1489,9 +1489,9 @@ public class ModelService extends ModelObservable {
     return user;
   }
 
-  public RodaSimpleUser requestPasswordReset(String username, String email, boolean useModel, boolean notify)
+  public User requestPasswordReset(String username, String email, boolean useModel, boolean notify)
     throws IllegalOperationException, NotFoundException, GenericException {
-    RodaSimpleUser user = null;
+    User user = null;
     boolean success = true;
     try {
       if (useModel) {
@@ -1503,7 +1503,7 @@ public class ModelService extends ModelObservable {
       throw new GenericException("Error requesting password reset", e);
     } catch (NotFoundException e) {
       success = false;
-      throw new NotFoundException("RodaSimpleUser doesn't exist", e);
+      throw new NotFoundException("User doesn't exist", e);
     } catch (IllegalOperationException e) {
       success = false;
       throw new IllegalOperationException("Illegal operation", e);
@@ -1514,9 +1514,9 @@ public class ModelService extends ModelObservable {
     return user;
   }
 
-  public RodaSimpleUser resetUserPassword(String username, String password, String resetPasswordToken, boolean useModel,
+  public User resetUserPassword(String username, String password, String resetPasswordToken, boolean useModel,
     boolean notify) throws NotFoundException, InvalidTokenException, IllegalOperationException, GenericException {
-    RodaSimpleUser user = null;
+    User user = null;
     boolean success = true;
     try {
       if (useModel) {
@@ -1528,7 +1528,7 @@ public class ModelService extends ModelObservable {
       throw new GenericException("Error on password reset", e);
     } catch (NotFoundException e) {
       success = false;
-      throw new NotFoundException("RodaSimpleUser doesn't exist", e);
+      throw new NotFoundException("User doesn't exist", e);
     } catch (InvalidTokenException e) {
       success = false;
       throw new InvalidTokenException("Token exception", e);
@@ -2105,7 +2105,7 @@ public class ModelService extends ModelObservable {
   private String getUpdatedMessageBody(Notification notification, String recipient, String template,
     String templateName, Map<String, Object> scopes) {
 
-    // update body message with the recipient RodaSimpleUser and acknowledge URL
+    // update body message with the recipient User and acknowledge URL
     String userUUID = UUID.nameUUIDFromBytes(recipient.getBytes()).toString();
     String ackUrl = RodaCoreFactory.getRodaConfigurationAsString("core", "notification", "acknowledge");
     ackUrl = ackUrl.replaceAll("\\{notificationId\\}", notification.getId());
@@ -2116,7 +2116,7 @@ public class ModelService extends ModelObservable {
     scopes.put("recipient", recipient);
 
     try {
-      RodaSimpleUser user = UserUtility.getLdapUtility().getUserWithEmail(recipient);
+      User user = UserUtility.getLdapUtility().getUserWithEmail(recipient);
       if (user != null) {
         scopes.put("recipient", user.getName());
       }

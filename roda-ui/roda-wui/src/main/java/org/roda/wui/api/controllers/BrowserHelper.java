@@ -64,7 +64,7 @@ import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.index.IndexService;
@@ -209,7 +209,7 @@ public class BrowserHelper {
     return retrieveDescriptiveMetadataBundle(aipId, descriptiveMetadata, locale);
   }
 
-  public static DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(RodaSimpleUser user, IndexedAIP aip,
+  public static DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(User user, IndexedAIP aip,
     String descriptiveMetadataId)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
 
@@ -219,7 +219,7 @@ public class BrowserHelper {
       metadata.getVersion());
   }
 
-  public static DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(RodaSimpleUser user, IndexedAIP aip,
+  public static DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(User user, IndexedAIP aip,
     String descriptiveMetadataId, String type, String version)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     DescriptiveMetadataEditBundle ret;
@@ -309,12 +309,12 @@ public class BrowserHelper {
   }
 
   protected static <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter,
-    Sublist sublist, Facets facets, RodaSimpleUser user, boolean justActive)
+    Sublist sublist, Facets facets, User user, boolean justActive)
     throws GenericException, RequestNotValidException {
     return RodaCoreFactory.getIndexService().find(returnClass, filter, sorter, sublist, facets, user, justActive);
   }
 
-  protected static <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, RodaSimpleUser user)
+  protected static <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, User user)
     throws GenericException, RequestNotValidException {
     boolean justActive = false;
     return RodaCoreFactory.getIndexService().count(returnClass, filter, user, justActive);
@@ -930,7 +930,7 @@ public class BrowserHelper {
     }
   }
 
-  public static IndexedAIP moveAIPInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, RodaSimpleUser user)
+  public static IndexedAIP moveAIPInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, User user)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
     AlreadyExistsException, ValidationException {
     List<String> aipIds = consolidate(user, IndexedAIP.class, selected);
@@ -955,7 +955,7 @@ public class BrowserHelper {
     return index.retrieve(IndexedAIP.class, parentId);
   }
 
-  public static AIP createAIP(RodaSimpleUser user, String parentAipId, String type, Permissions permissions)
+  public static AIP createAIP(User user, String parentAipId, String type, Permissions permissions)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
     AlreadyExistsException {
     ModelService model = RodaCoreFactory.getModelService();
@@ -964,7 +964,7 @@ public class BrowserHelper {
     return aip;
   }
 
-  public static String deleteAIP(SelectedItems<IndexedAIP> selected, RodaSimpleUser user)
+  public static String deleteAIP(SelectedItems<IndexedAIP> selected, User user)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     List<String> aipIds = consolidate(user, IndexedAIP.class, selected);
 
@@ -1012,7 +1012,7 @@ public class BrowserHelper {
     return parentId;
   }
 
-  public static String deleteAIPRepresentations(SelectedItems<IndexedAIP> selected, RodaSimpleUser user)
+  public static String deleteAIPRepresentations(SelectedItems<IndexedAIP> selected, User user)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     List<String> aipIds = consolidate(user, IndexedAIP.class, selected);
 
@@ -1216,7 +1216,7 @@ public class BrowserHelper {
     return transferredResource;
   }
 
-  private static <T extends IsIndexed> List<String> consolidate(RodaSimpleUser user, Class<T> classToReturn,
+  private static <T extends IsIndexed> List<String> consolidate(User user, Class<T> classToReturn,
     SelectedItems<T> selected) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     List<String> ret;
 
@@ -1236,7 +1236,7 @@ public class BrowserHelper {
     return ret;
   }
 
-  public static void deleteTransferredResources(SelectedItems<TransferredResource> selected, RodaSimpleUser user)
+  public static void deleteTransferredResources(SelectedItems<TransferredResource> selected, User user)
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
     List<String> ids = consolidate(user, TransferredResource.class, selected);
 
@@ -1259,7 +1259,7 @@ public class BrowserHelper {
     return transferredResource;
   }
 
-  protected static <T extends IsIndexed> void delete(RodaSimpleUser user, Class<T> returnClass, SelectedItems<T> ids)
+  protected static <T extends IsIndexed> void delete(User user, Class<T> returnClass, SelectedItems<T> ids)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     List<String> idList = consolidate(user, returnClass, ids);
     RodaCoreFactory.getIndexService().delete(returnClass, idList);
@@ -1276,7 +1276,7 @@ public class BrowserHelper {
   }
 
   // TODO Limit access to SDO accessible by user
-  public static StreamResponse retrieveClassificationPlan(String type, RodaSimpleUser user)
+  public static StreamResponse retrieveClassificationPlan(String type, User user)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     try {
       JsonFactory factory = new JsonFactory();
@@ -1367,7 +1367,7 @@ public class BrowserHelper {
     return node;
   }
 
-  public static List<SupportedMetadataTypeBundle> retrieveSupportedMetadata(RodaSimpleUser user, IndexedAIP aip,
+  public static List<SupportedMetadataTypeBundle> retrieveSupportedMetadata(User user, IndexedAIP aip,
     Locale locale) throws GenericException {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     List<String> types = RodaUtils
@@ -1556,7 +1556,7 @@ public class BrowserHelper {
     RodaCoreFactory.getStorageService().deleteBinaryVersion(storagePath, versionId);
   }
 
-  public static void updateAIPPermissions(RodaSimpleUser user, IndexedAIP indexedAIP, Permissions permissions,
+  public static void updateAIPPermissions(User user, IndexedAIP indexedAIP, Permissions permissions,
     boolean recursive)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     final ModelService model = RodaCoreFactory.getModelService();
@@ -1588,7 +1588,7 @@ public class BrowserHelper {
 
   }
 
-  public static Risk createRisk(Risk risk, RodaSimpleUser user, boolean commit)
+  public static Risk createRisk(Risk risk, User user, boolean commit)
     throws GenericException, RequestNotValidException {
     risk.setCreatedBy(user.getName());
     risk.setUpdatedBy(user.getName());
@@ -1597,7 +1597,7 @@ public class BrowserHelper {
     return createdRisk;
   }
 
-  public static void updateRisk(Risk risk, RodaSimpleUser user, String message, boolean commit)
+  public static void updateRisk(Risk risk, User user, String message, boolean commit)
     throws GenericException, RequestNotValidException {
     risk.setUpdatedBy(user.getName());
     RodaCoreFactory.getModelService().updateRisk(risk, message, commit);
@@ -1703,7 +1703,7 @@ public class BrowserHelper {
     }
   }
 
-  public static List<IndexedAIP> matchAIP(Filter filter, RodaSimpleUser user)
+  public static List<IndexedAIP> matchAIP(Filter filter, User user)
     throws GenericException, RequestNotValidException {
     List<IndexedAIP> aips = new ArrayList<IndexedAIP>();
     long count = count(IndexedAIP.class, filter, user);
@@ -1854,7 +1854,7 @@ public class BrowserHelper {
     return properties;
   }
 
-  public static void deleteRisk(RodaSimpleUser user, SelectedItems<IndexedRisk> selected)
+  public static void deleteRisk(User user, SelectedItems<IndexedRisk> selected)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
     InvalidParameterException, JobAlreadyStartedException {
     List<String> idList = consolidate(user, IndexedRisk.class, selected);
@@ -1875,7 +1875,7 @@ public class BrowserHelper {
     Jobs.createJob(user, job);
   }
 
-  public static void deleteAgent(RodaSimpleUser user, SelectedItems<Agent> selected)
+  public static void deleteAgent(User user, SelectedItems<Agent> selected)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     List<String> idList = consolidate(user, Agent.class, selected);
     for (String agentId : idList) {
@@ -1883,7 +1883,7 @@ public class BrowserHelper {
     }
   }
 
-  public static void deleteFormat(RodaSimpleUser user, SelectedItems<Format> selected)
+  public static void deleteFormat(User user, SelectedItems<Format> selected)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     List<String> idList = consolidate(user, Format.class, selected);
     for (String formatId : idList) {
@@ -1891,7 +1891,7 @@ public class BrowserHelper {
     }
   }
 
-  public static void deleteRiskIncidences(RodaSimpleUser user, String riskId, SelectedItems<RiskIncidence> incidences)
+  public static void deleteRiskIncidences(User user, String riskId, SelectedItems<RiskIncidence> incidences)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     List<String> idList = consolidate(user, RiskIncidence.class, incidences);
 
@@ -1955,7 +1955,7 @@ public class BrowserHelper {
     RodaCoreFactory.getIndexService().commit(IndexedRisk.class);
   }
 
-  public static void appraisal(RodaSimpleUser user, SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
+  public static void appraisal(User user, SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     List<String> listOfIds = consolidate(user, IndexedAIP.class, selected);
 
@@ -2076,7 +2076,7 @@ public class BrowserHelper {
     RodaCoreFactory.getIndexService().commit(IndexedAIP.class, Job.class, Report.class, IndexedPreservationEvent.class);
   }
 
-  public static IndexedRepresentation retrieveRepresentationById(RodaSimpleUser user, String representationId)
+  public static IndexedRepresentation retrieveRepresentationById(User user, String representationId)
     throws GenericException, RequestNotValidException {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_ID, representationId));
     IndexResult<IndexedRepresentation> reps = RodaCoreFactory.getIndexService().find(IndexedRepresentation.class,
@@ -2089,7 +2089,7 @@ public class BrowserHelper {
     }
   }
 
-  public static IndexedFile retrieveFileById(RodaSimpleUser user, String fileId)
+  public static IndexedFile retrieveFileById(User user, String fileId)
     throws GenericException, RequestNotValidException {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_FILEID, fileId));
     IndexResult<IndexedFile> files = RodaCoreFactory.getIndexService().find(IndexedFile.class, filter, Sorter.NONE,

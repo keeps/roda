@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
@@ -54,10 +54,10 @@ public class RecoverLogin extends Composite {
 
     @Override
     public void isCurrentUserPermitted(final AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaSimpleUser>() {
+      UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<User>() {
 
         @Override
-        public void onSuccess(RodaSimpleUser user) {
+        public void onSuccess(User user) {
           if (user.isGuest()) {
             callback.onSuccess(true);
           } else {

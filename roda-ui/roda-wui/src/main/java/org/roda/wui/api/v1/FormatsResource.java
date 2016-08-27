@@ -25,7 +25,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.slf4j.Logger;
@@ -55,7 +55,7 @@ public class FormatsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaSimpleUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
@@ -79,7 +79,7 @@ public class FormatsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaSimpleUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
     // delegate action to controller
     Format newFormat = org.roda.wui.api.controllers.Formats.createFormat(user, format);
 
@@ -95,7 +95,7 @@ public class FormatsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaSimpleUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
     // delegate action to controller
     Format format = org.roda.wui.api.controllers.Browser.retrieve(user, Format.class, formatId);
 
@@ -111,7 +111,7 @@ public class FormatsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaSimpleUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
     // delegate action to controller
     org.roda.wui.api.controllers.Formats.deleteFormat(user, formatId);
 

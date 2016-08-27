@@ -41,7 +41,7 @@ import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
@@ -114,11 +114,11 @@ public class IndexService {
   }
 
   public <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets, RodaSimpleUser user, boolean justActive) throws GenericException, RequestNotValidException {
+    Facets facets, User user, boolean justActive) throws GenericException, RequestNotValidException {
     return SolrUtils.find(index, returnClass, filter, sorter, sublist, facets, user, justActive);
   }
 
-  public <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, RodaSimpleUser user, boolean justActive)
+  public <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, User user, boolean justActive)
     throws GenericException, RequestNotValidException {
     return SolrUtils.count(index, returnClass, filter, user, justActive);
   }

@@ -26,7 +26,7 @@ import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
@@ -296,7 +296,7 @@ public class Browse extends Composite {
     });
   }
 
-  protected void onPermissionsUpdate(RodaSimpleUser user) {
+  protected void onPermissionsUpdate(User user) {
     // FIXME
     if (user.hasRole(RodaConstants.REPOSITORY_PERMISSIONS_METADATA_EDITOR)) {
       createItem.setVisible(true);

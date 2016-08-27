@@ -64,7 +64,7 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
-import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
@@ -854,7 +854,7 @@ public class RodaCoreFactory {
   private static void indexUsersAndGroupsFromLDAP()
     throws LdapUtilityException, GenericException, EmailAlreadyExistsException, UserAlreadyExistsException,
     IllegalOperationException, NotFoundException, AlreadyExistsException {
-    for (RodaSimpleUser user : UserUtility.getLdapUtility().getUsers(new Filter())) {
+    for (User user : UserUtility.getLdapUtility().getUsers(new Filter())) {
       LOGGER.debug("User to be indexed: {}", user);
       RodaCoreFactory.getModelService().addUser(user, false, true);
     }

@@ -46,7 +46,7 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
-import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
@@ -609,12 +609,12 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   @Override
-  public void userCreated(RodaSimpleUser user) {
+  public void userCreated(User user) {
     addDocumentToIndex(RODAMember.class, user);
   }
 
   @Override
-  public void userUpdated(RodaSimpleUser user) {
+  public void userUpdated(User user) {
     userDeleted(user.getId());
     userCreated(user);
   }

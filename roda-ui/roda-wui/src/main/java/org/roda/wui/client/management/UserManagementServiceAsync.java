@@ -21,7 +21,7 @@ import org.roda.core.data.exceptions.*;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
-import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -53,7 +53,7 @@ public interface UserManagementServiceAsync {
    *
    * @throws RODAException
    */
-  void retrieveUser(String username, AsyncCallback<RodaSimpleUser> callback);
+  void retrieveUser(String username, AsyncCallback<User> callback);
 
   /**
    * Register a new user
@@ -70,9 +70,9 @@ public interface UserManagementServiceAsync {
    * @throws EmailAlreadyExistsException
    * @throws RecaptchaException
    */
-  public void registerUser(RodaSimpleUser user, String password, String captcha, AsyncCallback<Void> callback);
+  public void registerUser(User user, String password, String captcha, AsyncCallback<Void> callback);
 
-  void createUser(RodaSimpleUser user, String password, AsyncCallback<RodaSimpleUser> callback);
+  void createUser(User user, String password, AsyncCallback<User> callback);
 
   /**
    * Modify a user
@@ -86,7 +86,7 @@ public interface UserManagementServiceAsync {
    * @throws AlreadyExistsException
    * @throws GenericException
    */
-  public void updateUser(RodaSimpleUser user, String password, AsyncCallback<Void> callback);
+  public void updateUser(User user, String password, AsyncCallback<Void> callback);
 
   /**
    * Modify the authenticated user
@@ -101,7 +101,7 @@ public interface UserManagementServiceAsync {
    * @throws GenericException
    * @throws IllegalOperationException
    */
-  public void updateMyUser(RodaSimpleUser user, String password, AsyncCallback<Void> callback);
+  public void updateMyUser(User user, String password, AsyncCallback<Void> callback);
 
   /**
    * Try to remove a user, if user cannot be removed it will be deactivated

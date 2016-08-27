@@ -19,7 +19,7 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
-import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
 
@@ -38,7 +38,7 @@ public class Risks extends RodaWuiController {
    * ---------------- REST related methods - start -----------------------------
    * ---------------------------------------------------------------------------
    */
-  public static Risk createRisk(RodaSimpleUser user, Risk risk)
+  public static Risk createRisk(User user, Risk risk)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -53,7 +53,7 @@ public class Risks extends RodaWuiController {
     return risk;
   }
 
-  public static void deleteRisk(RodaSimpleUser user, String riskId)
+  public static void deleteRisk(User user, String riskId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -67,7 +67,7 @@ public class Risks extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "riskId", riskId);
   }
 
-  public static List<IndexedRisk> retrieveRisks(RodaSimpleUser user, IndexResult<IndexedRisk> listRisksIndexResult)
+  public static List<IndexedRisk> retrieveRisks(User user, IndexResult<IndexedRisk> listRisksIndexResult)
     throws AuthorizationDeniedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 

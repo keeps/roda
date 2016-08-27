@@ -21,7 +21,7 @@ import org.roda.core.data.exceptions.*;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
-import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
 
 import com.google.gwt.core.client.GWT;
@@ -79,7 +79,7 @@ public interface UserManagementService extends RemoteService {
    *
    * @throws RODAException
    */
-  public RodaSimpleUser retrieveUser(String username) throws RODAException;
+  public User retrieveUser(String username) throws RODAException;
 
   /**
    * Register a new user
@@ -96,7 +96,7 @@ public interface UserManagementService extends RemoteService {
    * @throws EmailAlreadyExistsException
    * @throws RecaptchaException
    */
-  public void registerUser(RodaSimpleUser user, String password, String captcha)
+  public void registerUser(User user, String password, String captcha)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException, RecaptchaException;
 
   /**
@@ -113,7 +113,7 @@ public interface UserManagementService extends RemoteService {
    * @throws UserAlreadyExistsException
    * @throws GenericException
    */
-  public RodaSimpleUser createUser(RodaSimpleUser user, String password)
+  public User createUser(User user, String password)
     throws AuthorizationDeniedException, NotFoundException, EmailAlreadyExistsException, UserAlreadyExistsException,
     GenericException, IllegalOperationException;
 
@@ -129,7 +129,7 @@ public interface UserManagementService extends RemoteService {
    * @throws AlreadyExistsException
    * @throws GenericException
    */
-  public void updateUser(RodaSimpleUser user, String password)
+  public void updateUser(User user, String password)
     throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException;
 
   /**
@@ -145,7 +145,7 @@ public interface UserManagementService extends RemoteService {
    * @throws GenericException
    * @throws IllegalOperationException
    */
-  public void updateMyUser(RodaSimpleUser user, String password) throws AuthorizationDeniedException, NotFoundException,
+  public void updateMyUser(User user, String password) throws AuthorizationDeniedException, NotFoundException,
     AlreadyExistsException, GenericException, IllegalOperationException;
 
   /**

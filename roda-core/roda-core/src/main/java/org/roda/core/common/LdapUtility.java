@@ -47,7 +47,7 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.exceptions.*;
 import org.roda.core.data.v2.user.Group;
-import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.util.PasswordHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -314,12 +314,12 @@ public class LdapUtility {
    * @param filter
    *          the {@link Filter}.
    *
-   * @return a list of {@link RodaSimpleUser}'s.
+   * @return a list of {@link User}'s.
    *
    * @throws LdapUtilityException
    *           if some error occurs.
    */
-  public List<RodaSimpleUser> getUsers(final Filter filter) throws LdapUtilityException {
+  public List<User> getUsers(final Filter filter) throws LdapUtilityException {
     return getUsers(filter, null);
   }
 
@@ -331,21 +331,21 @@ public class LdapUtility {
    * @param sorter
    *          the {@link Sorter}.
    *
-   * @return a list of {@link RodaSimpleUser}'s.
+   * @return a list of {@link User}'s.
    *
    * @throws LdapUtilityException
    *           if some error occurs.
    */
-  public List<RodaSimpleUser> getUsers(final Filter filter, final Sorter sorter) throws LdapUtilityException {
+  public List<User> getUsers(final Filter filter, final Sorter sorter) throws LdapUtilityException {
 
     try {
 
       final CoreSession session = service.getAdminSession();
       final List<Entry> entries = searchEntries(session, ldapPeopleDN, UID, filter);
-      final List<RodaSimpleUser> users = new ArrayList<>();
+      final List<User> users = new ArrayList<>();
       for (Entry entry : entries) {
 
-        final RodaSimpleUser user = getUserFromEntry(entry);
+        final User user = getUserFromEntry(entry);
 
         // Add all roles assigned to this user
         final Set<String> memberRoles = getMemberRoles(session, getUserDN(user.getName()));
@@ -389,7 +389,7 @@ public class LdapUtility {
    *           if the user information could not be retrieved from the LDAP
    *           server.
    */
-  public RodaSimpleUser getUser(final String name) throws LdapUtilityException {
+  public User getUser(final String name) throws LdapUtilityException {
     try {
       return getUser(service.getAdminSession(), name);
     } catch (final LdapException e) {
@@ -398,20 +398,20 @@ public class LdapUtility {
   }
 
   /**
-   * Returns the {@link RodaSimpleUser} with name <code>email</code> or <code>null</code>
+   * Returns the {@link User} with name <code>email</code> or <code>null</code>
    * if it doesn't exist.
    *
    * @param email
-   *          the email of the desired {@link RodaSimpleUser}.
+   *          the email of the desired {@link User}.
    *
-   * @return the {@link RodaSimpleUser} with email <code>email</code> or <code>null</code>
+   * @return the {@link User} with email <code>email</code> or <code>null</code>
    *         if it doesn't exist.
    *
    * @throws LdapUtilityException
    *           if the user information could not be retrieved from the LDAP
    *           server.
    */
-  public RodaSimpleUser getUserWithEmail(final String email) throws LdapUtilityException {
+  public User getUserWithEmail(final String email) throws LdapUtilityException {
     try {
       return getUserWithEmail(service.getAdminSession(), email);
     } catch (final LdapException e) {
@@ -420,21 +420,21 @@ public class LdapUtility {
   }
 
   /**
-   * Adds a new {@link RodaSimpleUser}.
+   * Adds a new {@link User}.
    *
    * @param user
-   *          the {@link RodaSimpleUser} to add.
+   *          the {@link User} to add.
    *
-   * @return the newly created {@link RodaSimpleUser}.
+   * @return the newly created {@link User}.
    *
    * @throws UserAlreadyExistsException
    *           if a User with the same name already exists.
    * @throws EmailAlreadyExistsException
-   *           if the {@link RodaSimpleUser}'s email is already used.
+   *           if the {@link User}'s email is already used.
    * @throws LdapUtilityException
    *           if something goes wrong with the creation of the new user.
    */
-  public RodaSimpleUser addUser(final RodaSimpleUser user)
+  public User addUser(final User user)
     throws UserAlreadyExistsException, EmailAlreadyExistsException, LdapUtilityException {
 
     if (!user.isNameValid()) {
@@ -469,7 +469,7 @@ public class LdapUtility {
       throw new LdapUtilityException("Error adding user " + user.getName(), e);
     }
 
-    final RodaSimpleUser newUser = getUser(user.getName());
+    final User newUser = getUser(user.getName());
     if (newUser == null) {
       throw new LdapUtilityException("The user was not created!");
     } else {
@@ -478,15 +478,15 @@ public class LdapUtility {
   }
 
   /**
-   * Modify the {@link RodaSimpleUser}'s information.
+   * Modify the {@link User}'s information.
    *
    * @param modifiedUser
-   *          the {@link RodaSimpleUser} to modify.
+   *          the {@link User} to modify.
    *
-   * @return the modified {@link RodaSimpleUser}.
+   * @return the modified {@link User}.
    *
    * @throws NotFoundException
-   *           if the {@link RodaSimpleUser} being modified doesn't exist.
+   *           if the {@link User} being modified doesn't exist.
    * @throws EmailAlreadyExistsException
    *           if the specified email is already used by another user.
    * @throws IllegalOperationException
@@ -494,7 +494,7 @@ public class LdapUtility {
    * @throws LdapUtilityException
    *           if some error occurred.
    */
-  public RodaSimpleUser modifyUser(final RodaSimpleUser modifiedUser)
+  public User modifyUser(final User modifiedUser)
     throws NotFoundException, IllegalOperationException, EmailAlreadyExistsException, LdapUtilityException {
     modifyUser(service.getAdminSession(), modifiedUser, null, true);
     return getUser(modifiedUser.getName());
@@ -509,7 +509,7 @@ public class LdapUtility {
    *          the password.
    *
    * @throws NotFoundException
-   *           if specified {@link RodaSimpleUser} doesn't exist.
+   *           if specified {@link User} doesn't exist.
    * @throws IllegalOperationException
    *           if the user is one of the protected users.
    * @throws LdapUtilityException
@@ -526,16 +526,16 @@ public class LdapUtility {
   }
 
   /**
-   * Modify the {@link RodaSimpleUser}'s information.
+   * Modify the {@link User}'s information.
    *
    * @param modifiedUser
-   *          the {@link RodaSimpleUser} to modify.
+   *          the {@link User} to modify.
    *
    * @param newPassword
-   *          the new {@link RodaSimpleUser}'s password. To maintain the current password,
+   *          the new {@link User}'s password. To maintain the current password,
    *          use <code>null</code>.
    *
-   * @return the modified {@link RodaSimpleUser}.
+   * @return the modified {@link User}.
    *
    * @throws NotFoundException
    *           if the Use being modified doesn't exist.
@@ -546,14 +546,14 @@ public class LdapUtility {
    * @throws LdapUtilityException
    *           if some error occurred.
    */
-  public RodaSimpleUser modifySelfUser(final RodaSimpleUser modifiedUser, final String newPassword)
+  public User modifySelfUser(final User modifiedUser, final String newPassword)
     throws NotFoundException, EmailAlreadyExistsException, IllegalOperationException, LdapUtilityException {
     modifyUser(service.getAdminSession(), modifiedUser, newPassword, false);
     return getUser(modifiedUser.getName());
   }
 
   /**
-   * Removes a {@link RodaSimpleUser}.
+   * Removes a {@link User}.
    *
    * @param username
    *          the name of the user to remove.
@@ -777,7 +777,7 @@ public class LdapUtility {
   }
 
   /**
-   * Gets {@link RodaSimpleUser} with <code>username</code> and <code>password</code> from
+   * Gets {@link User} with <code>username</code> and <code>password</code> from
    * LDAP server using this username and password as login for LDAP to verify
    * that the parameters are valid.
    *
@@ -786,14 +786,14 @@ public class LdapUtility {
    * @param password
    *          the user's password.
    *
-   * @return the {@link RodaSimpleUser} registered in LDAP.
+   * @return the {@link User} registered in LDAP.
    *
    * @throws AuthenticationDeniedException
    *           if the provided credentials are not valid.
    * @throws ServiceException
    *           if some error occurred.
    */
-  public RodaSimpleUser getAuthenticatedUser(final String username, final String password)
+  public User getAuthenticatedUser(final String username, final String password)
     throws AuthenticationDeniedException, ServiceException {
 
     if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
@@ -806,7 +806,7 @@ public class LdapUtility {
       // Use this session to retrieve user's direct attributes.
       final CoreSession userSession = service.getSession(new Dn(getUserDN(username)), password.getBytes());
       final Entry entry = userSession.lookup(new Dn(getUserDN(username)));
-      final RodaSimpleUser user = getUserFromEntry(entry);
+      final User user = getUserFromEntry(entry);
       // Use the admin session to get the user roles and groups
       return getRodaSimpleUserRolesAndGroups(service.getAdminSession(), user);
 
@@ -818,24 +818,24 @@ public class LdapUtility {
   }
 
   /**
-   * Register a new {@link RodaSimpleUser}. The new {@link RodaSimpleUser} will be inactive and a
+   * Register a new {@link User}. The new {@link User} will be inactive and a
    * email validation token will be generated.
    *
    * @param user
-   *          the new {@link RodaSimpleUser} to create.
+   *          the new {@link User} to create.
    * @param password
-   *          the new {@link RodaSimpleUser} password.
+   *          the new {@link User} password.
    *
-   * @return the newly created {@link RodaSimpleUser}.
+   * @return the newly created {@link User}.
    *
    * @throws UserAlreadyExistsException
-   *           if a {@link RodaSimpleUser} with the same name already exists.
+   *           if a {@link User} with the same name already exists.
    * @throws EmailAlreadyExistsException
-   *           if the {@link RodaSimpleUser}'s email is already used.
+   *           if the {@link User}'s email is already used.
    * @throws LdapUtilityException
    *           if something goes wrong with the register process.
    */
-  public RodaSimpleUser registerUser(final RodaSimpleUser user, final String password)
+  public User registerUser(final User user, final String password)
     throws UserAlreadyExistsException, EmailAlreadyExistsException, LdapUtilityException {
 
     // Generate an email verification token with 1 day expiration date.
@@ -847,7 +847,7 @@ public class LdapUtility {
     user.setEmailConfirmationToken(uuidToken.toString());
     user.setEmailConfirmationTokenExpirationDate(isoDateNoMillis);
 
-    final RodaSimpleUser newUser = addUser(user);
+    final User newUser = addUser(user);
     try {
 
       setUserPassword(newUser.getName(), password);
@@ -860,21 +860,21 @@ public class LdapUtility {
   }
 
   /**
-   * Confirms the {@link RodaSimpleUser} email using the token supplied at register time
-   * and activate the {@link RodaSimpleUser}.
+   * Confirms the {@link User} email using the token supplied at register time
+   * and activate the {@link User}.
    * <p>
    * The <code>username</code> and <code>email</code> are used to identify the
    * user. One of them can be <code>null</code>, but not both at the same time.
    * </p>
    *
    * @param username
-   *          the name of the {@link RodaSimpleUser}.
+   *          the name of the {@link User}.
    * @param email
-   *          the email address of the {@link RodaSimpleUser}.
+   *          the email address of the {@link User}.
    * @param emailConfirmationToken
    *          the email confirmation token.
    *
-   * @return the {@link RodaSimpleUser} whose email has been confirmed.
+   * @return the {@link User} whose email has been confirmed.
    *
    * @throws NotFoundException
    *           if the username and email don't exist.
@@ -886,10 +886,10 @@ public class LdapUtility {
    * @throws LdapUtilityException
    *           if something goes wrong with the operation.
    */
-  public RodaSimpleUser confirmUserEmail(final String username, final String email, final String emailConfirmationToken)
+  public User confirmUserEmail(final String username, final String email, final String emailConfirmationToken)
     throws NotFoundException, InvalidTokenException, LdapUtilityException {
 
-    final RodaSimpleUser user = getUserByNameOrEmail(username, email);
+    final User user = getUserByNameOrEmail(username, email);
 
     if (user == null) {
 
@@ -943,7 +943,7 @@ public class LdapUtility {
   }
 
   /**
-   * Generate a password reset token for the {@link RodaSimpleUser} with the given
+   * Generate a password reset token for the {@link User} with the given
    * username or email.
    * <p>
    * The <code>username</code> and <code>email</code> are used to identify the
@@ -951,27 +951,27 @@ public class LdapUtility {
    * </p>
    *
    * @param username
-   *          the username of the {@link RodaSimpleUser} for whom the password needs to be
+   *          the username of the {@link User} for whom the password needs to be
    *          reset.
    *
    * @param email
-   *          the email of the {@link RodaSimpleUser} for whom the password needs to be
+   *          the email of the {@link User} for whom the password needs to be
    *          reset.
    *
-   * @return the {@link RodaSimpleUser} with the password reset token and expiration date.
+   * @return the {@link User} with the password reset token and expiration date.
    *
    * @throws NotFoundException
    *           if username or email doesn't correspond to any registered
-   *           {@link RodaSimpleUser}.
+   *           {@link User}.
    * @throws IllegalOperationException
-   *           if email corresponds to a protected {@link RodaSimpleUser}.
+   *           if email corresponds to a protected {@link User}.
    * @throws LdapUtilityException
    *           if something goes wrong with the operation.
    */
-  public RodaSimpleUser requestPasswordReset(final String username, final String email)
+  public User requestPasswordReset(final String username, final String email)
     throws NotFoundException, IllegalOperationException, LdapUtilityException {
 
-    final RodaSimpleUser user = getUserByNameOrEmail(username, email);
+    final User user = getUserByNameOrEmail(username, email);
 
     if (user == null) {
 
@@ -1006,31 +1006,31 @@ public class LdapUtility {
   }
 
   /**
-   * Reset {@link RodaSimpleUser}'s password given a previously generated token.
+   * Reset {@link User}'s password given a previously generated token.
    *
    * @param username
-   *          the {@link RodaSimpleUser}'s username.
+   *          the {@link User}'s username.
    * @param password
-   *          the {@link RodaSimpleUser}'s password.
+   *          the {@link User}'s password.
    * @param resetPasswordToken
-   *          the token to reset {@link RodaSimpleUser}'s password.
+   *          the token to reset {@link User}'s password.
    *
-   * @return the modified {@link RodaSimpleUser}.
+   * @return the modified {@link User}.
    *
    * @throws NotFoundException
-   *           if a {@link RodaSimpleUser} with the same name already exists.
+   *           if a {@link User} with the same name already exists.
    * @throws InvalidTokenException
    *           if the specified token doesn't exist, has already expired or it
    *           doesn't correspond to the stored token.
    * @throws IllegalOperationException
-   *           if the username corresponds to a protected {@link RodaSimpleUser}.
+   *           if the username corresponds to a protected {@link User}.
    * @throws LdapUtilityException
    *           if something goes wrong with the operation.
    */
-  public RodaSimpleUser resetUserPassword(final String username, final String password, final String resetPasswordToken)
+  public User resetUserPassword(final String username, final String password, final String resetPasswordToken)
     throws NotFoundException, InvalidTokenException, IllegalOperationException, LdapUtilityException {
 
-    final RodaSimpleUser user = getUser(username);
+    final User user = getUser(username);
 
     if (user == null) {
 
@@ -1174,7 +1174,7 @@ public class LdapUtility {
     return rodaPartition;
   }
 
-  private RodaSimpleUser getRodaSimpleUserRolesAndGroups(final CoreSession session, final RodaSimpleUser user)
+  private User getRodaSimpleUserRolesAndGroups(final CoreSession session, final User user)
     throws LdapException {
     // Add all roles assigned to this user
     final Set<String> memberRoles = getMemberRoles(session, getUserDN(user.getName()));
@@ -1197,10 +1197,10 @@ public class LdapUtility {
     return user;
   }
 
-  private RodaSimpleUser getUser(final CoreSession session, final String username) throws LdapException {
+  private User getUser(final CoreSession session, final String username) throws LdapException {
 
     final Entry entry = session.lookup(new Dn(getUserDN(username)));
-    final RodaSimpleUser user = getUserFromEntry(entry);
+    final User user = getUserFromEntry(entry);
 
     // Add all roles assigned to this user
     final Set<String> memberRoles = getMemberRoles(session, getUserDN(username));
@@ -1223,9 +1223,9 @@ public class LdapUtility {
     return user;
   }
 
-  private RodaSimpleUser getUserFromEntry(final Entry entry) throws LdapException {
+  private User getUserFromEntry(final Entry entry) throws LdapException {
 
-    final RodaSimpleUser user = new RodaSimpleUser(getEntryAttributeAsString(entry, UID));
+    final User user = new User(getEntryAttributeAsString(entry, UID));
     // id and name set in the constructor
     user.setFullName(getEntryAttributeAsString(entry, CN));
 
@@ -1260,7 +1260,7 @@ public class LdapUtility {
     return user;
   }
 
-  private Entry getEntryFromUser(final RodaSimpleUser user) throws LdapException {
+  private Entry getEntryFromUser(final User user) throws LdapException {
     final Entry entry = service.newEntry(new Dn(getUserDN(user.getName())));
     entry.add(OBJECT_CLASS, "inetOrgPerson", "organizationalPerson", "person", OBJECT_CLASS_TOP,
       OBJECT_CLASS_EXTENSIBLE_OBJECT);
@@ -1431,21 +1431,21 @@ public class LdapUtility {
   }
 
   /**
-   * Modify the {@link RodaSimpleUser}'s information.
+   * Modify the {@link User}'s information.
    *
    * @param session
    *          the session.
    * @param modifiedUser
-   *          the {@link RodaSimpleUser} to modify.
+   *          the {@link User} to modify.
    * @param newPassword
-   *          the new {@link RodaSimpleUser}'s password. To maintain the current password,
+   *          the new {@link User}'s password. To maintain the current password,
    *          use <code>null</code>.
    * @param modifyRolesAndGroups
    *          <code>true</code> if User's groups and roles should be updated
    *          also.
    *
    * @throws NotFoundException
-   *           if the {@link RodaSimpleUser} being modified doesn't exist.
+   *           if the {@link User} being modified doesn't exist.
    * @throws EmailAlreadyExistsException
    *           if the specified email is already used by another user.
    * @throws IllegalOperationException
@@ -1453,7 +1453,7 @@ public class LdapUtility {
    * @throws LdapUtilityException
    *           if some error occurred.
    */
-  private void modifyUser(final CoreSession session, final RodaSimpleUser modifiedUser, final String newPassword,
+  private void modifyUser(final CoreSession session, final User modifiedUser, final String newPassword,
     final boolean modifyRolesAndGroups)
     throws NotFoundException, IllegalOperationException, EmailAlreadyExistsException, LdapUtilityException {
 
@@ -1463,7 +1463,7 @@ public class LdapUtility {
 
     try {
 
-      final RodaSimpleUser currentEmailOwner = getUserWithEmail(session, modifiedUser.getEmail());
+      final User currentEmailOwner = getUserWithEmail(session, modifiedUser.getEmail());
       if (currentEmailOwner != null && !modifiedUser.getName().equals(currentEmailOwner.getName())) {
         throw new EmailAlreadyExistsException(
           "The email address " + modifiedUser.getEmail() + " is already used by another user.");
@@ -1684,10 +1684,10 @@ public class LdapUtility {
     return groups;
   }
 
-  private RodaSimpleUser getUserWithEmail(final CoreSession session, final String email) throws LdapException {
+  private User getUserWithEmail(final CoreSession session, final String email) throws LdapException {
     final Cursor<Entry> cursor = search(session, getPeopleDN(), String.format("(email=%s)", email));
     final Iterator<Entry> it = cursor.iterator();
-    RodaSimpleUser user = null;
+    User user = null;
     while (it.hasNext() && user == null) {
       user = getUserFromEntry(it.next());
     }
@@ -1784,7 +1784,7 @@ public class LdapUtility {
    *          the password.
    *
    * @throws NotFoundException
-   *           if specified {@link RodaSimpleUser} doesn't exist.
+   *           if specified {@link User} doesn't exist.
    * @throws LdapUtilityException
    *           if some error occurs.
    */
@@ -1938,8 +1938,8 @@ public class LdapUtility {
     partition.setIndexedAttributes(indexedAttributes);
   }
 
-  private RodaSimpleUser getUserByNameOrEmail(final String username, final String email) throws LdapUtilityException {
-    final RodaSimpleUser user;
+  private User getUserByNameOrEmail(final String username, final String email) throws LdapUtilityException {
+    final User user;
     if (username != null) {
       user = getUser(username);
     } else if (email != null) {

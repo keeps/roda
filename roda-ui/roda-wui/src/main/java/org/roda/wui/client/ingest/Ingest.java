@@ -10,7 +10,7 @@ package org.roda.wui.client.ingest;
 import java.util.Arrays;
 import java.util.List;
 
-import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
@@ -128,7 +128,7 @@ public class Ingest {
    *          the target operative system, e.g. windows, linux or mac. Use null
    *          to get a cross-platform installer
    */
-  public static void downloadRodaIn(final RodaSimpleUser targetUser, final String os) {
+  public static void downloadRodaIn(final User targetUser, final String os) {
     UserLogin.getRodaProperty("roda.in.installer.url", new AsyncCallback<String>() {
 
       public void onFailure(Throwable caught) {
@@ -136,14 +136,14 @@ public class Ingest {
       }
 
       public void onSuccess(final String rodaInUrl) {
-        UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaSimpleUser>() {
+        UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<User>() {
 
           public void onFailure(Throwable caught) {
             AsyncCallbackUtils.defaultFailureTreatment(caught);
           }
 
-          public void onSuccess(RodaSimpleUser user) {
-            RodaSimpleUser target = targetUser == null ? user : targetUser;
+          public void onSuccess(User user) {
+            User target = targetUser == null ? user : targetUser;
             String url = rodaInUrl.replaceAll("$USERNAME", user.getName()) + "/" + target.getName();
             if (os != null) {
               url += "?os=" + os;

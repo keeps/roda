@@ -25,7 +25,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.*;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.index.SelectedItemsList;
-import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
@@ -51,7 +51,7 @@ public class TransferredResource {
     throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException {
 
     // get user
-    RodaSimpleUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
 
     StreamResponse response = Browser.retrieveTransferredResource(user, resourceId);
 
@@ -68,7 +68,7 @@ public class TransferredResource {
     throws RODAException {
 
     // get user
-    RodaSimpleUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
     // delegate action to controller
 
     try {
@@ -86,7 +86,7 @@ public class TransferredResource {
   public Response deleteResource(
     @ApiParam(value = "The id of the resource", required = true) @QueryParam("path") String path) throws RODAException {
     // get user
-    RodaSimpleUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
     // delegate action to controller
     // TODO support remove multiple resources in one go
     SelectedItemsList<org.roda.core.data.v2.ip.TransferredResource> selected = new SelectedItemsList<org.roda.core.data.v2.ip.TransferredResource>(

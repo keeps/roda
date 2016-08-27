@@ -29,7 +29,7 @@ import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
-import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.utils.ModelUtils;
 import org.slf4j.Logger;
@@ -56,9 +56,9 @@ public class UserUtility {
 
   // FIXME 20151002 hsilva: this method should be more auth scheme agnostic
   // (basic auth vs. cas)
-  public static RodaSimpleUser getApiUser(HttpServletRequest request) throws AuthorizationDeniedException {
+  public static User getApiUser(HttpServletRequest request) throws AuthorizationDeniedException {
 
-    RodaSimpleUser user;
+    User user;
     Pair<String, String> credentials = getUserCredentialsFromBasicAuth(request);
     if (credentials != null) {
       try {
@@ -93,10 +93,10 @@ public class UserUtility {
     return ret;
   }
 
-  public static RodaSimpleUser getUser(HttpServletRequest request, boolean returnGuestIfNoUserInSession) {
-    RodaSimpleUser user = null;
+  public static User getUser(HttpServletRequest request, boolean returnGuestIfNoUserInSession) {
+    User user = null;
     if (request.getSession().getAttribute(RODA_USER) != null) {
-      RodaSimpleUser rsu = (RodaSimpleUser) request.getSession().getAttribute(RODA_USER);
+      User rsu = (User) request.getSession().getAttribute(RODA_USER);
       if (!rsu.isGuest()) {
         try {
           user = UserUtility.getLdapUtility().getUser(rsu.getId());
@@ -112,11 +112,11 @@ public class UserUtility {
     return user;
   }
 
-  public static RodaSimpleUser getUser(HttpServletRequest request) {
+  public static User getUser(HttpServletRequest request) {
     return getUser(request, true);
   }
 
-  public static void checkRoles(final RodaSimpleUser rsu, final List<String> rolesToCheck)
+  public static void checkRoles(final User rsu, final List<String> rolesToCheck)
     throws AuthorizationDeniedException {
     if (!rsu.getAllRoles().containsAll(rolesToCheck)) {
       LOGGER.debug("User '{}' roles: {} vs. roles to check: {}", rsu.getId(), rsu.getAllRoles(), rolesToCheck);
@@ -125,7 +125,7 @@ public class UserUtility {
     }
   }
 
-  public static void checkGroup(final RodaSimpleUser rsu, final String group) throws AuthorizationDeniedException {
+  public static void checkGroup(final User rsu, final String group) throws AuthorizationDeniedException {
     if (!rsu.getAllGroups().contains(group)) {
       LOGGER.debug("User '{}' groups: {} vs. group to check: {}", rsu.getId(), rsu.getAllGroups(), group);
       throw new AuthorizationDeniedException(
@@ -133,16 +133,16 @@ public class UserUtility {
     }
   }
 
-  public static void checkRoles(final RodaSimpleUser user, final String... rolesToCheck) throws AuthorizationDeniedException {
+  public static void checkRoles(final User user, final String... rolesToCheck) throws AuthorizationDeniedException {
     checkRoles(user, Arrays.asList(rolesToCheck));
   }
 
-  public static void checkRoles(final RodaSimpleUser user, final Class<?> invokingMethodInnerClass)
+  public static void checkRoles(final User user, final Class<?> invokingMethodInnerClass)
     throws AuthorizationDeniedException {
     checkRoles(user, invokingMethodInnerClass, null);
   }
 
-  public static void checkRoles(final RodaSimpleUser user, final Class<?> invokingMethodInnerClass,
+  public static void checkRoles(final User user, final Class<?> invokingMethodInnerClass,
     final Class<?> classToReturn) throws AuthorizationDeniedException {
     final Method method = invokingMethodInnerClass.getEnclosingMethod();
     final String classParam = (classToReturn == null) ? "" : "(" + classToReturn.getSimpleName() + ")";
@@ -152,11 +152,11 @@ public class UserUtility {
     checkRoles(user, roles);
   }
 
-  public static RodaSimpleUser getFullUser(RodaSimpleUser rsu) throws LdapUtilityException {
+  public static User getFullUser(User rsu) throws LdapUtilityException {
     return UserUtility.getLdapUtility().getUser(rsu.getId());
   }
 
-  public static void setUser(HttpServletRequest request, RodaSimpleUser rsu) {
+  public static void setUser(HttpServletRequest request, User rsu) {
     request.getSession(true).setAttribute(RODA_USER, rsu);
   }
 
@@ -170,14 +170,14 @@ public class UserUtility {
   /**
    * Retrieves guest used
    */
-  public static RodaSimpleUser getGuest() {
-    return new RodaSimpleUser("guest", "guest", true);
+  public static User getGuest() {
+    return new User("guest", "guest", true);
   }
 
-  public static RodaSimpleUser getClientUser(HttpSession session) {
-    final RodaSimpleUser rsu;
+  public static User getClientUser(HttpSession session) {
+    final User rsu;
     if (session.getAttribute(RODA_USER) != null) {
-      rsu = (RodaSimpleUser) session.getAttribute(RODA_USER);
+      rsu = (User) session.getAttribute(RODA_USER);
     } else {
       rsu = null;
     }
@@ -187,7 +187,7 @@ public class UserUtility {
   public static String getClientUserName(HttpSession session) {
     final String username;
     if (session.getAttribute(RODA_USER) != null) {
-      username = ((RodaSimpleUser) session.getAttribute(RODA_USER)).getName();
+      username = ((User) session.getAttribute(RODA_USER)).getName();
     } else {
       username = null;
     }
@@ -195,7 +195,7 @@ public class UserUtility {
 
   }
 
-  public static void checkObjectPermissions(RodaSimpleUser user, IndexedAIP aip, PermissionType permissionType)
+  public static void checkObjectPermissions(User user, IndexedAIP aip, PermissionType permissionType)
     throws AuthorizationDeniedException {
 
     Set<String> users = aip.getPermissions().getUsers().get(permissionType);
@@ -234,7 +234,7 @@ public class UserUtility {
    * @param ids
    * @throws AuthorizationDeniedException
    */
-  public static void checkTransferredResourceAccess(RodaSimpleUser user, List<String> ids)
+  public static void checkTransferredResourceAccess(User user, List<String> ids)
     throws AuthorizationDeniedException {
     // FIXME administrator workaround
     if ("admin".equalsIgnoreCase(user.getId())) {
@@ -263,7 +263,7 @@ public class UserUtility {
     }
   }
 
-  public static void checkObjectPermissions(RodaSimpleUser user, SelectedItems<IndexedAIP> selected,
+  public static void checkObjectPermissions(User user, SelectedItems<IndexedAIP> selected,
     PermissionType permission) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     IndexService index = RodaCoreFactory.getIndexService();
     if (selected instanceof SelectedItemsFilter) {

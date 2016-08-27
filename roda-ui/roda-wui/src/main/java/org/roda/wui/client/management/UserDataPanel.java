@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.v2.user.Group;
-import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Tools;
@@ -34,7 +34,7 @@ import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
  * @author Luis Faria
  *
  */
-public class UserDataPanel extends Composite implements HasValueChangeHandlers<RodaSimpleUser> {
+public class UserDataPanel extends Composite implements HasValueChangeHandlers<User> {
 
   interface MyUiBinder extends UiBinder<Widget, UserDataPanel> {
   }
@@ -359,7 +359,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<R
    *
    * @param user
    */
-  public void setUser(RodaSimpleUser user) {
+  public void setUser(User user) {
     this.username.setText(user.getName());
     this.fullname.setText(user.getFullName());
     this.email.setText(user.getEmail());
@@ -404,8 +404,8 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<R
    *
    * @return the user modified by this panel
    */
-  public RodaSimpleUser getUser() {
-    RodaSimpleUser user = new RodaSimpleUser();
+  public User getUser() {
+    User user = new User();
     user.setId(username.getText());
     user.setName(username.getText());
     user.setFullName(fullname.getText());
@@ -597,7 +597,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<R
   }
 
   @Override
-  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<RodaSimpleUser> handler) {
+  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<User> handler) {
     return addHandler(handler, ValueChangeEvent.getType());
   }
 
@@ -609,7 +609,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<R
     ValueChangeEvent.fire(this, getValue());
   }
 
-  public RodaSimpleUser getValue() {
+  public User getValue() {
     return getUser();
   }
 }

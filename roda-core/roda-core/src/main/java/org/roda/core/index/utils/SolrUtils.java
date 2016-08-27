@@ -71,7 +71,7 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
-import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
@@ -113,7 +113,7 @@ public class SolrUtils {
   }
 
   public static <T extends IsIndexed> Long count(SolrClient index, Class<T> classToRetrieve, Filter filter,
-    RodaSimpleUser user, boolean justActive) throws GenericException, RequestNotValidException {
+    User user, boolean justActive) throws GenericException, RequestNotValidException {
     return find(index, classToRetrieve, filter, null, new Sublist(0, 0), null, user, justActive).getTotalCount();
   }
 
@@ -174,7 +174,7 @@ public class SolrUtils {
   }
 
   public static <T extends IsIndexed> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve, Filter filter,
-    Sorter sorter, Sublist sublist, Facets facets, RodaSimpleUser user, boolean justActive)
+    Sorter sorter, Sublist sublist, Facets facets, User user, boolean justActive)
     throws GenericException, RequestNotValidException {
 
     IndexResult<T> ret;
@@ -218,7 +218,7 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToLogEntry(doc));
     } else if (resultClass.equals(Report.class)) {
       ret = resultClass.cast(solrDocumentToJobReport(doc));
-    } else if (resultClass.equals(RODAMember.class) || resultClass.equals(RodaSimpleUser.class)
+    } else if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class)
       || resultClass.equals(Group.class)) {
       ret = resultClass.cast(solrDocumentToRodaMember(doc));
     } else if (resultClass.equals(TransferredResource.class)) {
@@ -259,7 +259,7 @@ public class SolrUtils {
       ret = logEntryToSolrDocument((LogEntry) object);
     } else if (resultClass.equals(Report.class)) {
       ret = jobReportToSolrDocument((Report) object);
-    } else if (resultClass.equals(RODAMember.class) || resultClass.equals(RodaSimpleUser.class)
+    } else if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class)
       || resultClass.equals(Group.class)) {
       ret = rodaMemberToSolrDocument((RODAMember) object);
     } else if (resultClass.equals(TransferredResource.class)) {
@@ -308,8 +308,8 @@ public class SolrUtils {
       indexNames.add(RodaConstants.INDEX_ACTION_LOG);
     } else if (resultClass.equals(Report.class)) {
       indexNames.add(RodaConstants.INDEX_JOB_REPORT);
-    } else if (resultClass.equals(RodaSimpleUser.class)) {
-      LOGGER.warn("Use {} instead of {}", RODAMember.class.getName(), RodaSimpleUser.class.getName());
+    } else if (resultClass.equals(User.class)) {
+      LOGGER.warn("Use {} instead of {}", RODAMember.class.getName(), User.class.getName());
       indexNames.add(RodaConstants.INDEX_MEMBERS);
     } else if (resultClass.equals(Group.class)) {
       LOGGER.warn("Use {} instead of {}", RODAMember.class.getName(), Group.class.getName());
@@ -938,7 +938,7 @@ public class SolrUtils {
    * Roda user > Apache Solr filter query
    * ____________________________________________________________________________________________________________________
    */
-  private static String getFilterQueries(RodaSimpleUser user, boolean justActive) {
+  private static String getFilterQueries(User user, boolean justActive) {
 
     StringBuilder fq = new StringBuilder();
 
@@ -1375,8 +1375,8 @@ public class SolrUtils {
     }
 
     // Add user specific fields
-    if (member instanceof RodaSimpleUser) {
-      RodaSimpleUser user = (RodaSimpleUser) member;
+    if (member instanceof User) {
+      User user = (User) member;
       doc.addField(RodaConstants.MEMBERS_EMAIL, user.getEmail());
     }
 
@@ -1398,7 +1398,7 @@ public class SolrUtils {
     List<String> possibleRoles = objectToListString(doc.get(RodaConstants.MEMBERS_ROLES_ALL));
     roles.addAll(possibleRoles);
     if (isUser) {
-      RodaSimpleUser user = new RodaSimpleUser();
+      User user = new User();
       user.setId(id);
       user.setName(name);
       user.setFullName(fullName);
@@ -1423,7 +1423,7 @@ public class SolrUtils {
     }
   }
 
-  public static SolrInputDocument userToSolrDocument(RodaSimpleUser user) {
+  public static SolrInputDocument userToSolrDocument(User user) {
     SolrInputDocument doc = new SolrInputDocument();
     doc.addField(RodaConstants.MEMBERS_ID, user.getId());
     doc.addField(RodaConstants.MEMBERS_IS_ACTIVE, user.isActive());

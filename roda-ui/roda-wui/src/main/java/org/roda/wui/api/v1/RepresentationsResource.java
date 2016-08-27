@@ -22,7 +22,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
-import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
@@ -51,7 +51,7 @@ public class RepresentationsResource {
     @ApiParam(value = "Choose format in which to get the representation", allowableValues = "json, bin") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     // get user
-    RodaSimpleUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
     // delegate action to controller
     StreamResponse aipRepresentation = Browser.retrieveAIPRepresentation(user, representationUUID, acceptFormat);
 
@@ -67,7 +67,7 @@ public class RepresentationsResource {
     @ApiParam(value = "The part of the representation to download", required = true, allowableValues = "data, metadata, documentation, schemas") @PathParam("part") String part)
     throws RODAException {
     // get user
-    RodaSimpleUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
     // delegate action to controller
     StreamResponse aipRepresentation = Browser.retrieveAIPRepresentationPart(user, representationUUID, part);
 
@@ -115,7 +115,7 @@ public class RepresentationsResource {
     @ApiParam(value = "The ID of the existing representation to delete", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId)
     throws RODAException {
     // get user
-    RodaSimpleUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
     // delegate action to controller
     Browser.deleteRepresentation(user, aipId, representationId);
 
@@ -137,7 +137,7 @@ public class RepresentationsResource {
     @ApiParam(value = "Choose format in which to get the representation", allowableValues = "json, bin") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     // get user
-    RodaSimpleUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
     // delegate action to controller
     StreamResponse descriptiveMetadata = Browser.listRepresentationDescriptiveMetadata(user, representationId, start,
       limit, acceptFormat);
@@ -159,7 +159,7 @@ public class RepresentationsResource {
     throws RODAException {
     try {
       // get user
-      RodaSimpleUser user = UserUtility.getApiUser(request);
+      User user = UserUtility.getApiUser(request);
       // delegate action to controller
       StreamResponse aipDescriptiveMetadata = Browser.retrieveRepresentationDescriptiveMetadata(user, representationId,
         metadataId, acceptFormat, language);
@@ -184,7 +184,7 @@ public class RepresentationsResource {
     @ApiParam(value = "The version of the metadata type used", required = false) @QueryParam("metadataVersion") String metadataVersion)
     throws RODAException {
     // get user
-    RodaSimpleUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
     // delegate action to controller
     DescriptiveMetadata dm = Browser.putRepresentationDescriptiveMetadataFile(user, representationId, metadataId,
       metadataType, metadataVersion, inputStream, fileDetail);
@@ -207,7 +207,7 @@ public class RepresentationsResource {
     @ApiParam(value = "The version of the metadata type used", required = false) @QueryParam("metadataVersion") String metadataVersion)
     throws RODAException {
     // get user
-    RodaSimpleUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
     // delegate action to controller
     DescriptiveMetadata dm = Browser.postRepresentationDescriptiveMetadataFile(user, representationId, metadataId,
       metadataType, metadataVersion, inputStream, fileDetail);
@@ -227,7 +227,7 @@ public class RepresentationsResource {
     @ApiParam(value = "The ID of the existing metadata file to delete", required = true) @PathParam(RodaConstants.API_PATH_PARAM_METADATA_ID) String metadataId)
     throws RODAException {
     // get user
-    RodaSimpleUser user = UserUtility.getApiUser(request);
+    User user = UserUtility.getApiUser(request);
     // delegate action to controller
     Browser.deleteRepresentationDescriptiveMetadataFile(user, representationId, metadataId);
 

@@ -19,7 +19,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.notifications.Notification;
-import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
 
@@ -38,7 +38,7 @@ public class Notifications extends RodaWuiController {
    * ---------------- REST related methods - start -----------------------------
    * ---------------------------------------------------------------------------
    */
-  public static Notification createNotification(RodaSimpleUser user, Notification notification)
+  public static Notification createNotification(User user, Notification notification)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -54,7 +54,7 @@ public class Notifications extends RodaWuiController {
     return notification;
   }
 
-  public static void deleteNotification(RodaSimpleUser user, String notificationId)
+  public static void deleteNotification(User user, String notificationId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -68,7 +68,7 @@ public class Notifications extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "notificationId", notificationId);
   }
 
-  public static List<Notification> retrieveNotifications(RodaSimpleUser user,
+  public static List<Notification> retrieveNotifications(User user,
     IndexResult<Notification> listNotificationsIndexResult) throws AuthorizationDeniedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -89,7 +89,7 @@ public class Notifications extends RodaWuiController {
     return notifications;
   }
 
-  public static void acknowledgeNotification(RodaSimpleUser user, String notificationId, String token, String email)
+  public static void acknowledgeNotification(User user, String notificationId, String token, String email)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 

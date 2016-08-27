@@ -24,7 +24,7 @@ import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
-import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 
 public interface ModelObserver {
 
@@ -59,9 +59,9 @@ public interface ModelObserver {
 
   public void logEntryCreated(LogEntry entry);
 
-  public void userCreated(RodaSimpleUser user);
+  public void userCreated(User user);
 
-  public void userUpdated(RodaSimpleUser user);
+  public void userUpdated(User user);
 
   public void userDeleted(String userID);
 

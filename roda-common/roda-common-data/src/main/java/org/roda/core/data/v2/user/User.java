@@ -15,7 +15,7 @@ import java.util.Set;
  *
  * @author Rui Castro
  */
-public class RodaSimpleUser extends RodaPrincipal {
+public class User extends RodaPrincipal {
   private static final long serialVersionUID = 6514790636010895870L;
 
   /** Email address */
@@ -40,7 +40,7 @@ public class RodaSimpleUser extends RodaPrincipal {
   /**
    * Constructor.
    */
-  public RodaSimpleUser() {
+  public User() {
     this((String) null);
   }
 
@@ -50,34 +50,33 @@ public class RodaSimpleUser extends RodaPrincipal {
    * @param name
    *          the name of the new user.
    */
-  public RodaSimpleUser(final String name) {
+  public User(final String name) {
     this(name, name, false);
-    setActive(true);
   }
 
-  public RodaSimpleUser(final RodaSimpleUser user) {
+  public User(final User user) {
     this(user.getId(), user.getName(), user.getFullName(), user.isActive(), user.getAllRoles(), user.getDirectRoles(),
       user.getAllGroups(), user.getDirectGroups(), user.getEmail(), user.isGuest(), user.getIpAddress(),
       user.getExtra(), user.getResetPasswordToken(), user.getResetPasswordTokenExpirationDate(),
       user.getEmailConfirmationToken(), user.getEmailConfirmationTokenExpirationDate());
   }
 
-  public RodaSimpleUser(final String id, final String name, final boolean guest) {
+  public User(final String id, final String name, final boolean guest) {
     this(id, name, null, guest);
   }
 
-  public RodaSimpleUser(final String id, final String name, final String email, final boolean guest) {
+  public User(final String id, final String name, final String email, final boolean guest) {
     this(id, name, email, guest, "", new HashSet<String>(), new HashSet<String>(), new HashSet<String>(),
       new HashSet<String>());
   }
 
-  public RodaSimpleUser(final String id, final String name, final String email, final boolean guest,
+  public User(final String id, final String name, final String email, final boolean guest,
     final String ipAddress, final Set<String> allRoles, final Set<String> directRoles, final Set<String> allGroups,
     final Set<String> directGroups) {
     this(id, name, email, guest, ipAddress, allRoles, directRoles, allGroups, directGroups, null, null, null, null);
   }
 
-  public RodaSimpleUser(final String id, final String name, final String email, final boolean guest,
+  public User(final String id, final String name, final String email, final boolean guest,
     final String ipAddress, final Set<String> allRoles, final Set<String> directRoles, final Set<String> allGroups,
     final Set<String> directGroups, final String resetPasswordToken, final String resetPasswordTokenExpirationDate,
     final String emailConfirmationToken, final String emailConfirmationTokenExpirationDate) {
@@ -86,7 +85,7 @@ public class RodaSimpleUser extends RodaPrincipal {
       emailConfirmationTokenExpirationDate);
   }
 
-  public RodaSimpleUser(final String id, final String name, final String fullName, final boolean active,
+  public User(final String id, final String name, final String fullName, final boolean active,
     final Set<String> allRoles, final Set<String> directRoles, final Set<String> allGroups,
     final Set<String> directGroups, final String email, final boolean guest, final String ipAddress, final String extra,
     final String resetPasswordToken, final String resetPasswordTokenExpirationDate, final String emailConfirmationToken,
@@ -127,7 +126,7 @@ public class RodaSimpleUser extends RodaPrincipal {
   }
 
   /**
-   * Get {@link RodaSimpleUser}'s extra information.
+   * Get {@link User}'s extra information.
    *
    * @return a {@link String} with user's extra information.
    */
@@ -136,7 +135,7 @@ public class RodaSimpleUser extends RodaPrincipal {
   }
 
   /**
-   * Set {@link RodaSimpleUser}'s extra information.
+   * Set {@link User}'s extra information.
    *
    * @param extra
    *          a {@link String} with user's extra information.
@@ -225,7 +224,7 @@ public class RodaSimpleUser extends RodaPrincipal {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    final RodaSimpleUser other = (RodaSimpleUser) obj;
+    final User other = (User) obj;
     if (email == null) {
       if (other.email != null) {
         return false;
@@ -249,7 +248,7 @@ public class RodaSimpleUser extends RodaPrincipal {
   @Override
   public String toString() {
     final StringBuilder builder = new StringBuilder();
-    builder.append("RodaSimpleUser [");
+    builder.append("User [");
     builder.append(super.toString());
     builder.append(", email=");
     builder.append(email);

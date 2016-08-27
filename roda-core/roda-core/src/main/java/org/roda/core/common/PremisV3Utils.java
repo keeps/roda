@@ -37,7 +37,7 @@ import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.user.RODAMember;
-import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -776,8 +776,8 @@ public final class PremisV3Utils {
       try {
         RODAMember member = index.retrieve(RODAMember.class, username);
         fullName = member.getFullName();
-        if (member instanceof RodaSimpleUser) {
-          RodaSimpleUser user = (RodaSimpleUser) member;
+        if (member instanceof User) {
+          User user = (User) member;
           note = user.getEmail();
         }
       } catch (NotFoundException e) {

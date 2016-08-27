@@ -16,7 +16,7 @@ import org.roda.core.common.UserUtility;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.UserLogin;
 import org.roda.wui.client.common.UserLoginService;
 import org.slf4j.Logger;
@@ -43,14 +43,14 @@ public class UserLoginServiceImpl extends RemoteServiceServlet implements UserLo
     return new UserLoginServiceImpl();
   }
 
-  public RodaSimpleUser getAuthenticatedUser() throws RODAException {
-    RodaSimpleUser user = UserUtility.getUser(this.getThreadLocalRequest());
+  public User getAuthenticatedUser() throws RODAException {
+    User user = UserUtility.getUser(this.getThreadLocalRequest());
     logger.debug("Serving user {}", user);
     return user;
   }
 
-  public RodaSimpleUser login(String username, String password) throws AuthenticationDeniedException, GenericException {
-    RodaSimpleUser user = UserLogin.login(username, password, this.getThreadLocalRequest());
+  public User login(String username, String password) throws AuthenticationDeniedException, GenericException {
+    User user = UserLogin.login(username, password, this.getThreadLocalRequest());
     logger.debug("Logged user {}", user);
     return user;
   }

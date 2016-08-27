@@ -15,7 +15,7 @@ import java.util.List;
 
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
-import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
@@ -51,7 +51,7 @@ public class Register extends Composite {
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 0) {
-        RodaSimpleUser user = new RodaSimpleUser();
+        User user = new User();
         Register register = new Register(user);
         callback.onSuccess(register);
       } else {
@@ -62,10 +62,10 @@ public class Register extends Composite {
 
     @Override
     public void isCurrentUserPermitted(final AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaSimpleUser>() {
+      UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<User>() {
 
         @Override
-        public void onSuccess(RodaSimpleUser user) {
+        public void onSuccess(User user) {
           if (user != null && user.isGuest()) {
             callback.onSuccess(true);
           } else {
@@ -95,7 +95,7 @@ public class Register extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  private RodaSimpleUser user;
+  private User user;
 
   private boolean recaptchaActive = true;
 
@@ -118,7 +118,7 @@ public class Register extends Composite {
    * @param user
    *          the user to edit
    */
-  public Register(RodaSimpleUser user) {
+  public Register(User user) {
     this.user = user;
 
     this.userDataPanel = new UserDataPanel(true, false, false, false);

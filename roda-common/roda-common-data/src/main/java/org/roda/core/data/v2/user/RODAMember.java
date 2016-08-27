@@ -13,24 +13,24 @@ import org.roda.core.data.v2.index.IsIndexed;
 
 public interface RODAMember extends IsIndexed {
 
-  public boolean isActive();
+  boolean isActive();
 
-  public boolean isUser();
+  boolean isUser();
 
-  public String getId();
+  String getId();
 
-  public String getName();
+  String getName();
 
-  public String getFullName();
+  String getFullName();
 
-  public Set<String> getAllGroups();
+  Set<String> getAllGroups();
 
-  public Set<String> getDirectGroups();
+  Set<String> getDirectGroups();
 
-  public Set<String> getAllRoles();
+  Set<String> getAllRoles();
 
-  public Set<String> getDirectRoles();
+  Set<String> getDirectRoles();
 
-  public boolean isNameValid();
+  boolean isNameValid();
 
 }
