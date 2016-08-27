@@ -41,7 +41,6 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RodaSimpleUser;
-import org.roda.core.data.v2.user.User;
 import org.roda.core.plugins.plugins.base.ActionLogCleanerPlugin;
 import org.roda.core.plugins.plugins.base.ReindexRodaEntityPlugin;
 import org.roda.wui.api.controllers.Jobs;
@@ -162,7 +161,7 @@ public class ManagementTasksResource {
     boolean success = true;
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
     try {
-      for (User ldapUser : UserUtility.getLdapUtility().getUsers(new Filter())) {
+      for (RodaSimpleUser ldapUser : UserUtility.getLdapUtility().getUsers(new Filter())) {
         LOGGER.debug("User to be indexed: {}", ldapUser);
         RodaCoreFactory.getModelService().addUser(ldapUser, false, true);
       }

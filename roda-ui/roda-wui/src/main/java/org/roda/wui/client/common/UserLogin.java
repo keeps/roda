@@ -18,7 +18,6 @@ import java.util.Vector;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RodaSimpleUser;
-import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
@@ -210,7 +209,7 @@ public class UserLogin {
 
       public void onSuccess(RodaSimpleUser user) {
         RodaSimpleUser authUser = user;
-        if (member instanceof User && member.getName().equals(authUser.getName())) {
+        if (member instanceof RodaSimpleUser && member.getName().equals(authUser.getName())) {
           onLoginStatusChanged(authUser);
         } else if (member instanceof Group && Arrays.asList(authUser.getAllGroups()).contains(member.getName())) {
           onLoginStatusChanged(authUser);

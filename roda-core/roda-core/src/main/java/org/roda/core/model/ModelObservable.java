@@ -25,7 +25,7 @@ import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
-import org.roda.core.data.v2.user.User;
+import org.roda.core.data.v2.user.RodaSimpleUser;
 
 public abstract class ModelObservable {
   private final List<ModelObserver> observers;
@@ -135,13 +135,13 @@ public abstract class ModelObservable {
     }
   }
 
-  protected void notifyUserCreated(User user) {
+  protected void notifyUserCreated(RodaSimpleUser user) {
     for (ModelObserver observer : observers) {
       observer.userCreated(user);
     }
   }
 
-  protected void notifyUserUpdated(User user) {
+  protected void notifyUserUpdated(RodaSimpleUser user) {
     for (ModelObserver observer : observers) {
       observer.userUpdated(user);
     }

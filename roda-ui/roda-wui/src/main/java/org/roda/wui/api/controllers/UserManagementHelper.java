@@ -22,7 +22,6 @@ import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RodaSimpleUser;
-import org.roda.core.data.v2.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +54,7 @@ public class UserManagementHelper {
     return RodaCoreFactory.getIndexService().retrieve(RodaSimpleUser.class, username);
   }
 
-  protected static User retrieveUser(String username) throws GenericException {
+  protected static RodaSimpleUser retrieveUser(String username) throws GenericException {
     try {
       return UserUtility.getLdapUtility().getUser(username);
     } catch (LdapUtilityException e) {
@@ -83,26 +82,26 @@ public class UserManagementHelper {
     }
   }
 
-  public static void registerUser(User user, String password)
+  public static void registerUser(RodaSimpleUser user, String password)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException {
     RodaCoreFactory.getModelService().registerUser(user, password, true, true);
     RodaCoreFactory.getIndexService().commit(RODAMember.class);
   }
 
-  public static User createUser(User user, String password) throws GenericException, EmailAlreadyExistsException,
+  public static RodaSimpleUser createUser(RodaSimpleUser user, String password) throws GenericException, EmailAlreadyExistsException,
     UserAlreadyExistsException, IllegalOperationException, NotFoundException {
-    User ret = RodaCoreFactory.getModelService().addUser(user, password, true, true);
+    RodaSimpleUser ret = RodaCoreFactory.getModelService().addUser(user, password, true, true);
     RodaCoreFactory.getIndexService().commit(RODAMember.class);
     return ret;
   }
 
-  public static void updateUser(User user, String password)
+  public static void updateUser(RodaSimpleUser user, String password)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     RodaCoreFactory.getModelService().modifyUser(user, password, true, true);
     RodaCoreFactory.getIndexService().commit(RODAMember.class);
   }
 
-  public static void updateMyUser(User user, String password)
+  public static void updateMyUser(RodaSimpleUser user, String password)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     RodaCoreFactory.getModelService().modifyMyUser(user, password, true, true);
     RodaCoreFactory.getIndexService().commit(RODAMember.class);
@@ -128,17 +127,17 @@ public class UserManagementHelper {
     RodaCoreFactory.getIndexService().commit(RODAMember.class);
   }
 
-  public static User confirmUserEmail(String username, String email, String emailConfirmationToken)
+  public static RodaSimpleUser confirmUserEmail(String username, String email, String emailConfirmationToken)
     throws InvalidTokenException, NotFoundException, GenericException {
     return RodaCoreFactory.getModelService().confirmUserEmail(username, email, emailConfirmationToken, true, true);
   }
 
-  public static User requestPasswordReset(String username, String email)
+  public static RodaSimpleUser requestPasswordReset(String username, String email)
     throws IllegalOperationException, NotFoundException, GenericException {
     return RodaCoreFactory.getModelService().requestPasswordReset(username, email, true, true);
   }
 
-  public static User resetUserPassword(String username, String password, String resetPasswordToken)
+  public static RodaSimpleUser resetUserPassword(String username, String password, String resetPasswordToken)
     throws InvalidTokenException, IllegalOperationException, NotFoundException, GenericException {
     return RodaCoreFactory.getModelService().resetUserPassword(username, password, resetPasswordToken, true, true);
   }

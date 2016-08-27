@@ -35,8 +35,16 @@ public abstract class RodaPrincipal implements Serializable, RODAMember {
 
   public RodaPrincipal(final String id, final String name, final Set<String> allRoles, final Set<String> directRoles,
     final Set<String> allGroups, final Set<String> directGroups) {
+    this(id, name, name, true, allRoles, directRoles, allGroups, directGroups);
+  }
+
+  public RodaPrincipal(final String id, final String name, final String fullName, final boolean active,
+    final Set<String> allRoles, final Set<String> directRoles, final Set<String> allGroups,
+    final Set<String> directGroups) {
     this.id = id;
     this.name = name;
+    this.fullName = fullName;
+    this.active = active;
     this.allRoles = allRoles;
     this.directRoles = directRoles;
     this.allGroups = allGroups;
@@ -61,7 +69,7 @@ public abstract class RodaPrincipal implements Serializable, RODAMember {
   @Override
   public String toString() {
     final StringBuilder builder = new StringBuilder();
-    builder.append("RodaGroup [id=");
+    builder.append("RodaPrincipal [id=");
     builder.append(id);
     builder.append(", name=");
     builder.append(name);

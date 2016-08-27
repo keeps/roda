@@ -15,44 +15,26 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.v2.user.Group;
-import org.roda.core.data.v2.user.User;
+import org.roda.core.data.v2.user.RodaSimpleUser;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
-import com.google.gwt.event.logical.shared.SelectionEvent;
-import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.dom.client.*;
+import com.google.gwt.event.logical.shared.*;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
-import com.google.gwt.user.client.ui.TextArea;
-import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.Widget;
-
-import config.i18n.client.ClientGeneratedMessages;
-import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
  *
  */
-public class UserDataPanel extends Composite implements HasValueChangeHandlers<User> {
+public class UserDataPanel extends Composite implements HasValueChangeHandlers<RodaSimpleUser> {
 
   interface MyUiBinder extends UiBinder<Widget, UserDataPanel> {
   }
@@ -377,7 +359,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
    *
    * @param user
    */
-  public void setUser(User user) {
+  public void setUser(RodaSimpleUser user) {
     this.username.setText(user.getName());
     this.fullname.setText(user.getFullName());
     this.email.setText(user.getEmail());
@@ -422,8 +404,8 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
    *
    * @return the user modified by this panel
    */
-  public User getUser() {
-    User user = new User();
+  public RodaSimpleUser getUser() {
+    RodaSimpleUser user = new RodaSimpleUser();
     user.setId(username.getText());
     user.setName(username.getText());
     user.setFullName(fullname.getText());
@@ -615,7 +597,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
   }
 
   @Override
-  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<User> handler) {
+  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<RodaSimpleUser> handler) {
     return addHandler(handler, ValueChangeEvent.getType());
   }
 
@@ -627,7 +609,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     ValueChangeEvent.fire(this, getValue());
   }
 
-  public User getValue() {
+  public RodaSimpleUser getValue() {
     return getUser();
   }
 }

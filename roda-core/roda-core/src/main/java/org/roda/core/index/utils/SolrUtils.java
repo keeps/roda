@@ -72,7 +72,6 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RodaSimpleUser;
-import org.roda.core.data.v2.user.User;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
@@ -219,7 +218,7 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToLogEntry(doc));
     } else if (resultClass.equals(Report.class)) {
       ret = resultClass.cast(solrDocumentToJobReport(doc));
-    } else if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class)
+    } else if (resultClass.equals(RODAMember.class) || resultClass.equals(RodaSimpleUser.class)
       || resultClass.equals(Group.class)) {
       ret = resultClass.cast(solrDocumentToRodaMember(doc));
     } else if (resultClass.equals(TransferredResource.class)) {
@@ -260,7 +259,7 @@ public class SolrUtils {
       ret = logEntryToSolrDocument((LogEntry) object);
     } else if (resultClass.equals(Report.class)) {
       ret = jobReportToSolrDocument((Report) object);
-    } else if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class)
+    } else if (resultClass.equals(RODAMember.class) || resultClass.equals(RodaSimpleUser.class)
       || resultClass.equals(Group.class)) {
       ret = rodaMemberToSolrDocument((RODAMember) object);
     } else if (resultClass.equals(TransferredResource.class)) {
@@ -309,8 +308,8 @@ public class SolrUtils {
       indexNames.add(RodaConstants.INDEX_ACTION_LOG);
     } else if (resultClass.equals(Report.class)) {
       indexNames.add(RodaConstants.INDEX_JOB_REPORT);
-    } else if (resultClass.equals(User.class)) {
-      LOGGER.warn("Use {} instead of {}", RODAMember.class.getName(), User.class.getName());
+    } else if (resultClass.equals(RodaSimpleUser.class)) {
+      LOGGER.warn("Use {} instead of {}", RODAMember.class.getName(), RodaSimpleUser.class.getName());
       indexNames.add(RodaConstants.INDEX_MEMBERS);
     } else if (resultClass.equals(Group.class)) {
       LOGGER.warn("Use {} instead of {}", RODAMember.class.getName(), Group.class.getName());
@@ -1424,7 +1423,7 @@ public class SolrUtils {
     }
   }
 
-  public static SolrInputDocument userToSolrDocument(User user) {
+  public static SolrInputDocument userToSolrDocument(RodaSimpleUser user) {
     SolrInputDocument doc = new SolrInputDocument();
     doc.addField(RodaConstants.MEMBERS_ID, user.getId());
     doc.addField(RodaConstants.MEMBERS_IS_ACTIVE, user.isActive());

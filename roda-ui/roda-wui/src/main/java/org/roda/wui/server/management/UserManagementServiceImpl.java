@@ -22,7 +22,6 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RodaSimpleUser;
-import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.UserManagement;
 import org.roda.wui.client.management.UserManagementService;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
@@ -69,13 +68,13 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public User retrieveUser(String username) throws RODAException {
+  public RodaSimpleUser retrieveUser(String username) throws RODAException {
     RodaSimpleUser user = UserUtility.getUser(getThreadLocalRequest());
     return UserManagement.retrieveUser(user, username);
   }
 
   @Override
-  public void registerUser(User user, String password, String captcha)
+  public void registerUser(RodaSimpleUser user, String password, String captcha)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException, RecaptchaException {
     if (captcha != null) {
       RecaptchaUtils
@@ -86,21 +85,21 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public User createUser(User newUser, String password) throws AuthorizationDeniedException, NotFoundException,
+  public RodaSimpleUser createUser(RodaSimpleUser newUser, String password) throws AuthorizationDeniedException, NotFoundException,
     GenericException, EmailAlreadyExistsException, UserAlreadyExistsException, IllegalOperationException {
     RodaSimpleUser user = UserUtility.getUser(getThreadLocalRequest());
     return UserManagement.createUser(user, newUser, password);
   }
 
   @Override
-  public void updateMyUser(User modifiedUser, String password) throws AuthorizationDeniedException, NotFoundException,
+  public void updateMyUser(RodaSimpleUser modifiedUser, String password) throws AuthorizationDeniedException, NotFoundException,
     AlreadyExistsException, GenericException, IllegalOperationException {
     RodaSimpleUser user = UserUtility.getUser(getThreadLocalRequest());
     UserManagement.updateMyUser(user, modifiedUser, password);
   }
 
   @Override
-  public void updateUser(User modifiedUser, String password)
+  public void updateUser(RodaSimpleUser modifiedUser, String password)
     throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException {
     RodaSimpleUser user = UserUtility.getUser(getThreadLocalRequest());
     UserManagement.updateUser(user, modifiedUser, password);

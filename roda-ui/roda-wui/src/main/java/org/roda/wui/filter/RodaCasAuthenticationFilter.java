@@ -22,7 +22,6 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RodaSimpleUser;
-import org.roda.core.data.v2.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,7 +108,7 @@ public class RodaCasAuthenticationFilter implements Filter {
   // TODO test this
   private void addUserToLdapAndIndex(ServletRequest request, RodaSimpleUser userPrincipal) {
     try {
-      final User user = new User(userPrincipal);
+      final RodaSimpleUser user = new RodaSimpleUser(userPrincipal);
       RodaCoreFactory.getModelService().addUser(user, true, true);
     } catch (RODAException e) {
       logger.error("Error while creating and indexing user", e);

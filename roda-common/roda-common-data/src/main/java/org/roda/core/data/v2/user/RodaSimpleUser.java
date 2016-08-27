@@ -10,20 +10,56 @@ package org.roda.core.data.v2.user;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * This is a user of RODA.
+ *
+ * @author Rui Castro
+ */
 public class RodaSimpleUser extends RodaPrincipal {
   private static final long serialVersionUID = 6514790636010895870L;
 
+  /** Email address */
   private String email;
+  /** Is a guest user? */
   private boolean guest;
+  /** IP address */
   private String ipAddress = "";
 
+  /** LDAP info */
+  private String resetPasswordToken = null;
+  /** LDAP info */
+  private String resetPasswordTokenExpirationDate = null;
+  /** LDAP info */
+  private String emailConfirmationToken = null;
+  /** LDAP info */
+  private String emailConfirmationTokenExpirationDate = null;
+
+  /** LDAP description */
+  private String extra = null;
+
+  /**
+   * Constructor.
+   */
   public RodaSimpleUser() {
-    this(null, null, null, false);
+    this((String) null);
+  }
+
+  /**
+   * Constructs a new user with the given name.
+   *
+   * @param name
+   *          the name of the new user.
+   */
+  public RodaSimpleUser(final String name) {
+    this(name, name, false);
+    setActive(true);
   }
 
   public RodaSimpleUser(final RodaSimpleUser user) {
-    this(user.getId(), user.getName(), user.getEmail(), user.isGuest(), user.getIpAddress(), user.getAllRoles(),
-      user.getDirectRoles(), user.getAllGroups(), user.getDirectGroups());
+    this(user.getId(), user.getName(), user.getFullName(), user.isActive(), user.getAllRoles(), user.getDirectRoles(),
+      user.getAllGroups(), user.getDirectGroups(), user.getEmail(), user.isGuest(), user.getIpAddress(),
+      user.getExtra(), user.getResetPasswordToken(), user.getResetPasswordTokenExpirationDate(),
+      user.getEmailConfirmationToken(), user.getEmailConfirmationTokenExpirationDate());
   }
 
   public RodaSimpleUser(final String id, final String name, final boolean guest) {
@@ -38,10 +74,32 @@ public class RodaSimpleUser extends RodaPrincipal {
   public RodaSimpleUser(final String id, final String name, final String email, final boolean guest,
     final String ipAddress, final Set<String> allRoles, final Set<String> directRoles, final Set<String> allGroups,
     final Set<String> directGroups) {
-    super(id, name, allRoles, directRoles, allGroups, directGroups);
+    this(id, name, email, guest, ipAddress, allRoles, directRoles, allGroups, directGroups, null, null, null, null);
+  }
+
+  public RodaSimpleUser(final String id, final String name, final String email, final boolean guest,
+    final String ipAddress, final Set<String> allRoles, final Set<String> directRoles, final Set<String> allGroups,
+    final Set<String> directGroups, final String resetPasswordToken, final String resetPasswordTokenExpirationDate,
+    final String emailConfirmationToken, final String emailConfirmationTokenExpirationDate) {
+    this(id, name, name, true, allRoles, directRoles, allGroups, directGroups, email, guest, ipAddress, null,
+      resetPasswordToken, resetPasswordTokenExpirationDate, emailConfirmationToken,
+      emailConfirmationTokenExpirationDate);
+  }
+
+  public RodaSimpleUser(final String id, final String name, final String fullName, final boolean active,
+    final Set<String> allRoles, final Set<String> directRoles, final Set<String> allGroups,
+    final Set<String> directGroups, final String email, final boolean guest, final String ipAddress, final String extra,
+    final String resetPasswordToken, final String resetPasswordTokenExpirationDate, final String emailConfirmationToken,
+    final String emailConfirmationTokenExpirationDate) {
+    super(id, name, fullName, active, allRoles, directRoles, allGroups, directGroups);
     this.email = email;
     this.guest = guest;
     this.ipAddress = ipAddress;
+    this.extra = extra;
+    this.resetPasswordToken = resetPasswordToken;
+    this.resetPasswordTokenExpirationDate = resetPasswordTokenExpirationDate;
+    this.emailConfirmationToken = emailConfirmationToken;
+    this.emailConfirmationTokenExpirationDate = emailConfirmationTokenExpirationDate;
   }
 
   public String getEmail() {
@@ -66,6 +124,85 @@ public class RodaSimpleUser extends RodaPrincipal {
 
   public void setIpAddress(final String ipAddress) {
     this.ipAddress = ipAddress;
+  }
+
+  /**
+   * Get {@link RodaSimpleUser}'s extra information.
+   *
+   * @return a {@link String} with user's extra information.
+   */
+  public String getExtra() {
+    return extra;
+  }
+
+  /**
+   * Set {@link RodaSimpleUser}'s extra information.
+   *
+   * @param extra
+   *          a {@link String} with user's extra information.
+   */
+  public void setExtra(final String extra) {
+    this.extra = extra;
+  }
+
+  /**
+   * @return the resetPasswordToken
+   */
+  public String getResetPasswordToken() {
+    return resetPasswordToken;
+  }
+
+  /**
+   * @param resetPasswordToken
+   *          the resetPasswordToken to set
+   */
+  public void setResetPasswordToken(final String resetPasswordToken) {
+    this.resetPasswordToken = resetPasswordToken;
+  }
+
+  /**
+   * @return the resetPasswordTokenExpirationDate
+   */
+  public String getResetPasswordTokenExpirationDate() {
+    return resetPasswordTokenExpirationDate;
+  }
+
+  /**
+   * @param resetPasswordTokenExpirationDate
+   *          the resetPasswordTokenExpirationDate to set
+   */
+  public void setResetPasswordTokenExpirationDate(final String resetPasswordTokenExpirationDate) {
+    this.resetPasswordTokenExpirationDate = resetPasswordTokenExpirationDate;
+  }
+
+  /**
+   * @return the emailConfirmationToken
+   */
+  public String getEmailConfirmationToken() {
+    return emailConfirmationToken;
+  }
+
+  /**
+   * @param emailConfirmationToken
+   *          the emailConfirmationToken to set
+   */
+  public void setEmailConfirmationToken(final String emailConfirmationToken) {
+    this.emailConfirmationToken = emailConfirmationToken;
+  }
+
+  /**
+   * @return the emailConfirmationTokenExpirationDate
+   */
+  public String getEmailConfirmationTokenExpirationDate() {
+    return emailConfirmationTokenExpirationDate;
+  }
+
+  /**
+   * @param emailConfirmationTokenExpirationDate
+   *          the emailConfirmationTokenExpirationDate to set
+   */
+  public void setEmailConfirmationTokenExpirationDate(final String emailConfirmationTokenExpirationDate) {
+    this.emailConfirmationTokenExpirationDate = emailConfirmationTokenExpirationDate;
   }
 
   @Override
@@ -112,16 +249,24 @@ public class RodaSimpleUser extends RodaPrincipal {
   @Override
   public String toString() {
     final StringBuilder builder = new StringBuilder();
-    builder.append("RodaSimpleUser [getId()=");
-    builder.append(getId());
-    builder.append(", getName()=");
-    builder.append(getName());
+    builder.append("RodaSimpleUser [");
+    builder.append(super.toString());
     builder.append(", email=");
     builder.append(email);
     builder.append(", guest=");
     builder.append(guest);
     builder.append(", ipAddress=");
     builder.append(ipAddress);
+    builder.append(", resetPasswordToken=");
+    builder.append(resetPasswordToken);
+    builder.append(", resetPasswordTokenExpirationDate=");
+    builder.append(resetPasswordTokenExpirationDate);
+    builder.append(", emailConfirmationToken=");
+    builder.append(emailConfirmationToken);
+    builder.append(", emailConfirmationTokenExpirationDate=");
+    builder.append(emailConfirmationTokenExpirationDate);
+    builder.append(", extra=");
+    builder.append(extra);
     builder.append("]");
     return builder.toString();
   }

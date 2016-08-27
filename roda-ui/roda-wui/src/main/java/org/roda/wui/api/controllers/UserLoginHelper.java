@@ -17,7 +17,6 @@ import org.roda.core.data.exceptions.EmailUnverifiedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InactiveUserException;
 import org.roda.core.data.v2.user.RodaSimpleUser;
-import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.utils.StringUtils;
 
 /**
@@ -47,7 +46,7 @@ public class UserLoginHelper {
     try {
       final RodaSimpleUser rodaUser = UserUtility.getLdapUtility().getAuthenticatedUser(username, password);
       if (!rodaUser.isActive()) {
-        final User user = UserUtility.getLdapUtility().getUser(rodaUser.getName());
+        final RodaSimpleUser user = UserUtility.getLdapUtility().getUser(rodaUser.getName());
         if (StringUtils.isNotBlank(user.getEmailConfirmationToken())) {
           throw new EmailUnverifiedException("Email is not verified.");
         }

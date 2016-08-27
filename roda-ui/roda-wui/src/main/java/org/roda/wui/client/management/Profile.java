@@ -16,7 +16,6 @@ import java.util.List;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.user.RodaSimpleUser;
-import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
@@ -51,7 +50,7 @@ public class Profile extends Composite {
         }
 
         public void onSuccess(RodaSimpleUser user) {
-          Profile preferences = new Profile(new User(user));
+          Profile preferences = new Profile(new RodaSimpleUser(user));
           callback.onSuccess(preferences);
         }
       });
@@ -86,7 +85,7 @@ public class Profile extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  private final User user;
+  private final RodaSimpleUser user;
 
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
@@ -105,7 +104,7 @@ public class Profile extends Composite {
    * @param user
    *          the user to edit
    */
-  public Profile(User user) {
+  public Profile(RodaSimpleUser user) {
     this.user = user;
 
     this.userDataPanel = new UserDataPanel(true, true, false, false);
@@ -120,7 +119,7 @@ public class Profile extends Composite {
   void buttonApplyHandler(ClickEvent e) {
     if (userDataPanel.isChanged()) {
       if (userDataPanel.isValid()) {
-        final User user = userDataPanel.getUser();
+        final RodaSimpleUser user = userDataPanel.getUser();
         final String password = userDataPanel.getPassword();
 
         UserManagementService.Util.getInstance().updateMyUser(user, password, new AsyncCallback<Void>() {
