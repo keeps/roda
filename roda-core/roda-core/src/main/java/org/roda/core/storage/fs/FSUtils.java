@@ -119,9 +119,9 @@ public final class FSUtils {
         // 20160826 hsilva: this might happen in some filesystems (e.g. XFS)
         // because moving a directory implies also moving its entries. In Ext4
         // this doesn't happen.
-        LOGGER.debug("Copying, as a fallback & instead of moving, from {} to {}", sourcePath, targetPath);
-        copy(sourcePath, targetPath, replaceExisting);
-        deletePathQuietly(sourcePath);
+        LOGGER.debug("Moving recursively, as a fallback & instead of a simple move, from {} to {}", sourcePath,
+          targetPath);
+        moveRecursively(sourcePath, targetPath, replaceExisting);
       } catch (IOException e) {
         throw new GenericException("Error while moving directory from " + sourcePath + " to " + targetPath, e);
       }
@@ -133,6 +133,43 @@ public final class FSUtils {
       } catch (IOException e) {
         throw new GenericException("Error while copying one file into another", e);
       }
+    }
+  }
+
+  private static void moveRecursively(final Path sourcePath, final Path targetPath, final boolean replaceExisting)
+    throws GenericException {
+    final CopyOption[] copyOptions = replaceExisting ? new CopyOption[] {StandardCopyOption.REPLACE_EXISTING}
+      : new CopyOption[] {};
+
+    try {
+      Files.walkFileTree(sourcePath, new SimpleFileVisitor<Path>() {
+
+        @Override
+        public FileVisitResult preVisitDirectory(Path sourceDir, BasicFileAttributes attrs) throws IOException {
+          Path targetDir = targetPath.resolve(sourcePath.relativize(sourceDir));
+          LOGGER.trace("Creating target directory {}", targetDir);
+          Files.createDirectories(targetDir);
+          return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult visitFile(Path sourceFile, BasicFileAttributes attrs) throws IOException {
+          Path targetFile = targetPath.resolve(sourcePath.relativize(sourceFile));
+          LOGGER.trace("Moving file from {} to {}", sourceFile, targetFile);
+          Files.move(sourceFile, targetFile, copyOptions);
+          return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult postVisitDirectory(Path sourceFile, IOException exc) throws IOException {
+          LOGGER.trace("Deleting source directory {}", sourceFile);
+          Files.delete(sourceFile);
+          return FileVisitResult.CONTINUE;
+        }
+      });
+    } catch (IOException e) {
+      throw new GenericException("Error while moving (recursively) directory from " + sourcePath + " to " + targetPath,
+        e);
     }
 
   }
