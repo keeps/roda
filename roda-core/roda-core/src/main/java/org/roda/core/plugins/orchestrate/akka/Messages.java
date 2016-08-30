@@ -36,7 +36,7 @@ public class Messages {
 
     public void logProcessingStarted() {
       if (LOGGER.isTraceEnabled()) {
-        LOGGER.trace("{} Started processing message {} [[{}]]", uuid, getClass().getSimpleName(), toString());
+        LOGGER.trace("{} Started processing message {} [{}]", uuid, getClass().getSimpleName(), toString());
       }
     }
 

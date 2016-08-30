@@ -97,26 +97,45 @@ public class JobStats implements Serializable {
     }
   }
 
+  /**
+   * Increments by one the number of objects processed with failure & decrements
+   * by the same amount the number of objects being processed
+   */
   public void incrementObjectsProcessedWithFailure() {
     this.sourceObjectsProcessedWithFailure += 1;
     this.sourceObjectsBeingProcessed -= 1;
   }
 
+  /**
+   * Increments the number of objects processed with failure & decrements by the
+   * same amount the number of objects being processed
+   */
   public void incrementObjectsProcessedWithFailure(int count) {
     this.sourceObjectsProcessedWithFailure += count;
     this.sourceObjectsBeingProcessed -= count;
   }
 
+  /**
+   * Increments by one the number of objects processed with success & decrements
+   * by the same amount the number of objects being processed
+   */
   public void incrementObjectsProcessedWithSuccess() {
     this.sourceObjectsProcessedWithSuccess += 1;
     this.sourceObjectsBeingProcessed -= 1;
   }
 
+  /**
+   * Increments the number of objects processed with success & decrements by the
+   * same amount the number of objects being processed
+   */
   public void incrementObjectsProcessedWithSuccess(int count) {
     this.sourceObjectsProcessedWithSuccess += count;
     this.sourceObjectsBeingProcessed -= count;
   }
 
+  /**
+   * Increments by one the number of outcome objects with manual intervention
+   */
   public void incrementOutcomeObjectsWithManualIntervention() {
     this.outcomeObjectsWithManualIntervention += 1;
   }

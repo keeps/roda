@@ -51,7 +51,6 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
   private static final Logger LOGGER = LoggerFactory.getLogger(ReindexRodaEntityPlugin.class);
 
   private boolean clearIndexes = true;
-  private boolean recursiveListing = false;
   private Class<T> clazz = null;
   private boolean reindexAll = false;
 
@@ -124,10 +123,6 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
           // do nothing
         }
       }
-
-      if (parameters.get(RodaConstants.PLUGIN_PARAMS_RECURSIVE_LISTING) != null) {
-        recursiveListing = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_RECURSIVE_LISTING));
-      }
     }
   }
 
@@ -152,6 +147,7 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
           jobPluginInfo.setSourceObjectsCount(size);
           for (Class<T> reindexClass : classes) {
             try {
+              LOGGER.debug("Reindexing all {}", reindexClass.getSimpleName());
               index.reindex(storage, reindexClass);
               jobPluginInfo.incrementObjectsProcessedWithSuccess();
             } catch (RODAException | IOException e) {
@@ -161,6 +157,7 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
           }
         } else {
           for (T object : list) {
+            LOGGER.debug("Reindexing {} {}", object.getClass().getSimpleName(), object.getId());
             index.reindex(storage, object);
             jobPluginInfo.incrementObjectsProcessedWithSuccess();
           }
