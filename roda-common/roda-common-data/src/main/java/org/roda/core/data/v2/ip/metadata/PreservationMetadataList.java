@@ -25,6 +25,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @XmlRootElement(name = "preservation_metadata_list")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PreservationMetadataList implements RODAObjectList<PreservationMetadata>, IsRODAObject {
+  private static final long serialVersionUID = 1682622329196597355L;
+
   private List<PreservationMetadata> preservationMetadataList;
 
   public PreservationMetadataList() {
@@ -50,6 +52,12 @@ public class PreservationMetadataList implements RODAObjectList<PreservationMeta
   @Override
   public void addObject(PreservationMetadata preservationMetadata) {
     this.preservationMetadataList.add(preservationMetadata);
+  }
+
+  @Override
+  public String getId() {
+    // 20160901 hsilva: needed because it implements IsRODAObject
+    return "PreservationMetadataList.getId()";
   }
 
 }

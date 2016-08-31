@@ -110,7 +110,7 @@ public class RiskIncidenceRemoverPlugin<T extends IsRODAObject> extends Abstract
         jobPluginInfo.finalizeInfo();
         PluginHelper.updateJobInformation(this, jobPluginInfo);
       } catch (GenericException | NotFoundException | AuthorizationDeniedException | RequestNotValidException e) {
-        LOGGER.error("Could not delete risk incidence");
+        LOGGER.error("Could not delete risk incidence", e);
         jobPluginInfo.incrementObjectsProcessedWithFailure(list.size());
       }
     } catch (JobException e) {
@@ -136,7 +136,7 @@ public class RiskIncidenceRemoverPlugin<T extends IsRODAObject> extends Abstract
 
   @Override
   public Plugin<T> cloneMe() {
-    return new RiskIncidenceRemoverPlugin();
+    return new RiskIncidenceRemoverPlugin<T>();
   }
 
   @Override

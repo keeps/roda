@@ -73,13 +73,16 @@ public class ApiUtils {
       } else if (acceptFormat.equalsIgnoreCase("html")) {
         mediaType = MediaType.TEXT_HTML;
       }
-    } else if (acceptHeaders.contains(MediaType.APPLICATION_XML)) {
-      mediaType = MediaType.APPLICATION_XML;
-    } else if (acceptHeaders.contains(APPLICATION_JS)) {
-      mediaType = APPLICATION_JS;
+    } else if (StringUtils.isNotBlank(acceptHeaders)) {
+      if (acceptHeaders.contains(MediaType.APPLICATION_XML)) {
+        mediaType = MediaType.APPLICATION_XML;
+      } else if (acceptHeaders.contains(APPLICATION_JS)) {
+        mediaType = APPLICATION_JS;
+      }
     }
 
     return mediaType;
+
   }
 
   /**

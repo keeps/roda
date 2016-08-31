@@ -7,20 +7,17 @@
  */
 package org.roda.core.util;
 
+import java.io.IOException;
 import java.io.Serializable;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.roda.core.data.exceptions.RODAException;
-
-import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+import org.roda.core.data.utils.JsonUtils;
 
 /**
  * 20160824 hsilva: I think someone, outside RODA code base, is using this
@@ -36,18 +33,27 @@ public final class RESTClientUtility {
 
   public static <T extends Serializable> T sendPostRequest(T element, Class<T> elementClass, String url,
     String resource, String username, String password) throws RODAException {
-    Client client = ClientBuilder.newClient(new ClientConfig().register(JacksonJaxbJsonProvider.class));
-    HttpAuthenticationFeature authentication = HttpAuthenticationFeature.universal(username, password);
-    client.register(authentication);
+    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+    String basicAuthToken = new String(Base64.encode((username + ":" + password).getBytes()));
+    HttpPost httpPost = new HttpPost(url + resource);
+    httpPost.setHeader("Authorization", "Basic " + basicAuthToken);
+    httpPost.addHeader("content-type", "application/json");
+    httpPost.addHeader("Accept", "application/json");
 
-    WebTarget webTarget = client.target(url).path(resource);
-    Response response = webTarget.request(MediaType.APPLICATION_JSON)
-      .post(Entity.entity(element, MediaType.APPLICATION_JSON));
+    try {
+      httpPost.setEntity(new StringEntity(JsonUtils.getJsonFromObject(element)));
+      HttpResponse response;
+      response = httpClient.execute(httpPost);
+      HttpEntity responseEntity = response.getEntity();
 
-    if (response.getStatus() == 201) {
-      return response.readEntity(elementClass);
-    } else {
-      throw new RODAException("POST Request response was " + response.getStatus());
+      int responseStatusCode = response.getStatusLine().getStatusCode();
+      if (responseStatusCode == 201) {
+        return JsonUtils.getObjectFromJson(responseEntity.getContent(), elementClass);
+      } else {
+        throw new RODAException("POST request response status code: " + responseStatusCode);
+      }
+    } catch (IOException e) {
+      throw new RODAException("Error sending POST request", e);
     }
   }
 

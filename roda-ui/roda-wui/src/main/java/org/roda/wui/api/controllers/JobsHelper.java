@@ -44,6 +44,7 @@ public class JobsHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(JobsHelper.class);
 
   protected static void validateAndSetJobInformation(RodaUser user, Job job) throws RequestNotValidException {
+    LOGGER.debug("Job being validated: {}", job);
     validateJobPluginInformation(job);
 
     // always set a new UUID (even if job already brings one)
