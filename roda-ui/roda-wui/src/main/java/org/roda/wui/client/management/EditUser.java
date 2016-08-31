@@ -130,16 +130,17 @@ public class EditUser extends Composite {
         final User user = userDataPanel.getUser();
         final String password = userDataPanel.getPassword();
 
-        UserManagementService.Util.getInstance().updateUser(user, password, new AsyncCallback<Void>() {
+        UserManagementService.Util.getInstance().updateUser(user, password, userDataPanel.getExtra(),
+          new AsyncCallback<Void>() {
 
-          public void onFailure(Throwable caught) {
-            errorMessage(caught);
-          }
+            public void onFailure(Throwable caught) {
+              errorMessage(caught);
+            }
 
-          public void onSuccess(Void result) {
-            Tools.newHistory(MemberManagement.RESOLVER);
-          }
-        });
+            public void onSuccess(Void result) {
+              Tools.newHistory(MemberManagement.RESOLVER);
+            }
+          });
       }
     } else {
       Tools.newHistory(MemberManagement.RESOLVER);
@@ -150,19 +151,20 @@ public class EditUser extends Composite {
   void buttonDeActivateHandler(ClickEvent e) {
     user.setActive(!user.isActive());
 
-    UserManagementService.Util.getInstance().updateUser(user, null, new AsyncCallback<Void>() {
+    UserManagementService.Util.getInstance().updateUser(user, null, userDataPanel.getExtra(),
+      new AsyncCallback<Void>() {
 
-      @Override
-      public void onSuccess(Void result) {
-        Tools.newHistory(MemberManagement.RESOLVER);
-      }
+        @Override
+        public void onSuccess(Void result) {
+          Tools.newHistory(MemberManagement.RESOLVER);
+        }
 
-      @Override
-      public void onFailure(Throwable caught) {
-        user.setActive(!user.isActive());
-        errorMessage(caught);
-      }
-    });
+        @Override
+        public void onFailure(Throwable caught) {
+          user.setActive(!user.isActive());
+          errorMessage(caught);
+        }
+      });
   }
 
   @UiHandler("buttonRemove")

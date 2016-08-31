@@ -33,6 +33,7 @@ import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.UserManagement;
+import org.roda.wui.client.browse.UserExtraBundle;
 import org.roda.wui.client.management.UserManagementService;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
 import org.slf4j.Logger;
@@ -84,21 +85,22 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public void registerUser(User user, String password, String captcha)
+  public void registerUser(User user, String password, String captcha, UserExtraBundle extra)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException, RecaptchaException {
     if (captcha != null) {
       RecaptchaUtils
         .recaptchaVerify(RodaCoreFactory.getRodaConfiguration().getString(RECAPTCHA_CODE_SECRET_PROPERTY, ""), captcha);
     }
-    UserManagement.registerUser(user, password);
+    UserManagement.registerUser(user, password, extra);
 
   }
 
   @Override
-  public User createUser(User newUser, String password) throws AuthorizationDeniedException, NotFoundException,
-    GenericException, EmailAlreadyExistsException, UserAlreadyExistsException, IllegalOperationException {
+  public User createUser(User newUser, String password, UserExtraBundle extra)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, EmailAlreadyExistsException,
+    UserAlreadyExistsException, IllegalOperationException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
-    return UserManagement.createUser(user, newUser, password);
+    return UserManagement.createUser(user, newUser, password, extra);
   }
 
   @Override
@@ -109,10 +111,10 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public void updateUser(User modifiedUser, String password)
+  public void updateUser(User modifiedUser, String password, UserExtraBundle extra)
     throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
-    UserManagement.updateUser(user, modifiedUser, password);
+    UserManagement.updateUser(user, modifiedUser, password, extra);
   }
 
   @Override

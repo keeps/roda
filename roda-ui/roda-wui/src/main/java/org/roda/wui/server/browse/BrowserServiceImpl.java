@@ -70,6 +70,7 @@ import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.PreservationEventViewBundle;
 import org.roda.wui.client.browse.SupportedMetadataTypeBundle;
+import org.roda.wui.client.browse.UserExtraBundle;
 import org.roda.wui.client.browse.Viewers;
 import org.roda.wui.client.common.search.SearchField;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
@@ -762,6 +763,13 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public void showLogs() throws AuthorizationDeniedException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     Browser.showLogs(user);
+  }
+
+  @Override
+  public UserExtraBundle retrieveUserExtraBundle(String name)
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.retrieveUserExtraBundle(user, name);
   }
 
 }

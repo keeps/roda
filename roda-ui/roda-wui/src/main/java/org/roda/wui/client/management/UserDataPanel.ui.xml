@@ -83,10 +83,7 @@
 				</g:Label>
 				<g:TextBox ui:field="fax" addStyleNames="form-textbox" />
 				-->
-				<g:Label addStyleNames="form-label">
-					<ui:text from='{messages.extra}' />
-				</g:Label>
-				<g:TextArea ui:field="extra" addStyleNames="form-textbox" />
+				<g:FlowPanel ui:field="extra"/>
 				<g:Label styleName="wui-user-data-note">
 					<ui:text from="{messages.userDataNote}" />
 				</g:Label>

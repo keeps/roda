@@ -70,6 +70,7 @@ import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.PreservationEventViewBundle;
 import org.roda.wui.client.browse.SupportedMetadataTypeBundle;
+import org.roda.wui.client.browse.UserExtraBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
 import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
@@ -1905,6 +1906,22 @@ public class Browser extends RodaWuiController {
       RodaConstants.API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID, resourceId);
 
     return reportList;
+  }
+
+  public static UserExtraBundle retrieveUserExtraBundle(RodaUser user, String name)
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    UserExtraBundle extraBudle = BrowserHelper.retrieveUserExtraBundle(name);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "name", name);
+
+    return extraBudle;
   }
 
 }

@@ -131,7 +131,7 @@ public interface BrowserService extends RemoteService {
 
   Job createJob(Job job) throws AuthorizationDeniedException, NotFoundException, RequestNotValidException,
     GenericException, JobAlreadyStartedException;
-  
+
   void stopJob(String jobId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
 
@@ -287,5 +287,8 @@ public interface BrowserService extends RemoteService {
   void updateRiskIncidence(RiskIncidence incidence) throws AuthorizationDeniedException, GenericException;
 
   void showLogs() throws AuthorizationDeniedException;
+
+  UserExtraBundle retrieveUserExtraBundle(String name)
+    throws AuthorizationDeniedException, GenericException, NotFoundException;
 
 }

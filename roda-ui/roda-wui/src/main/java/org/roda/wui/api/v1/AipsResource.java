@@ -219,7 +219,7 @@ public class AipsResource {
   @Path("/{" + RodaConstants.API_PATH_PARAM_AIP_ID + "}/descriptive_metadata/{"
     + RodaConstants.API_PATH_PARAM_METADATA_ID + "}")
   @Produces({"application/json", "application/xml", "text/html"})
-  @ApiOperation(value = "Get descriptive metadata", notes = "Get descriptive metadata (JSON info, XML file or HTML conversion)", response = DescriptiveMetadata.class)
+  @ApiOperation(value = "Get descriptive metadata", notes = "Get descriptive metadata (JSON or XML info, XML file or HTML conversion)", response = DescriptiveMetadata.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = DescriptiveMetadata.class)})
 
   public Response retrieveDescriptiveMetadataFromAIP(
@@ -295,7 +295,6 @@ public class AipsResource {
     DescriptiveMetadata dm = Browser.postAIPDescriptiveMetadataFile(user, aipId, metadataId, metadataType,
       metadataVersion, inputStream, fileDetail);
 
-    // FIXME give a better answer
     return Response.ok(dm, RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON).build();
   }
 

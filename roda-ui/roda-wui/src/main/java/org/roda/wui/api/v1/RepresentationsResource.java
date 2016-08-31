@@ -88,7 +88,7 @@ public class RepresentationsResource {
 
   public Response retrieveRepresentation(
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID) String representationUUID,
-    @ApiParam(value = "Choose format in which to get the representation", allowableValues = "json, xml, bin") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
+    @ApiParam(value = "Choose format in which to get the representation", allowableValues = "json, xml, zip") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 

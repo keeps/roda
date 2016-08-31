@@ -167,59 +167,61 @@ public class Register extends Composite {
           final boolean registerActive = result;
           user.setActive(result);
 
-          UserManagementService.Util.getInstance().registerUser(user, password, recaptcha, new AsyncCallback<Void>() {
+          UserManagementService.Util.getInstance().registerUser(user, password, recaptcha, userDataPanel.getExtra(),
+            new AsyncCallback<Void>() {
 
-            @Override
-            public void onFailure(Throwable caught) {
-              errorMessage(caught);
-            }
-
-            @Override
-            public void onSuccess(Void result) {
-              if (registerActive) {
-                Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
-                  messages.registerSuccessDialogMessageActive(), messages.registerSuccessDialogButton(),
-                  new AsyncCallback<Void>() {
-
-                    @Override
-                    public void onSuccess(Void result) {
-                      Tools.newHistory(Login.RESOLVER);
-                    }
-
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      Tools.newHistory(Login.RESOLVER);
-                    }
-                  });
-              } else {
-                UserManagementService.Util.getInstance().sendEmailVerification(user.getId(), new AsyncCallback<Void>() {
-
-                  @Override
-                  public void onSuccess(Void result) {
-                    Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
-                      messages.registerSuccessDialogMessage(), messages.registerSuccessDialogButton(),
-                      new AsyncCallback<Void>() {
-
-                        @Override
-                        public void onSuccess(Void result) {
-                          Tools.newHistory(Login.RESOLVER);
-                        }
-
-                        @Override
-                        public void onFailure(Throwable caught) {
-                          Tools.newHistory(Login.RESOLVER);
-                        }
-                      });
-                  }
-
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    sendEmailVerificationFailure(caught);
-                  }
-                });
+              @Override
+              public void onFailure(Throwable caught) {
+                errorMessage(caught);
               }
-            }
-          });
+
+              @Override
+              public void onSuccess(Void result) {
+                if (registerActive) {
+                  Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
+                    messages.registerSuccessDialogMessageActive(), messages.registerSuccessDialogButton(),
+                    new AsyncCallback<Void>() {
+
+                      @Override
+                      public void onSuccess(Void result) {
+                        Tools.newHistory(Login.RESOLVER);
+                      }
+
+                      @Override
+                      public void onFailure(Throwable caught) {
+                        Tools.newHistory(Login.RESOLVER);
+                      }
+                    });
+                } else {
+                  UserManagementService.Util.getInstance().sendEmailVerification(user.getId(),
+                    new AsyncCallback<Void>() {
+
+                      @Override
+                      public void onSuccess(Void result) {
+                        Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
+                          messages.registerSuccessDialogMessage(), messages.registerSuccessDialogButton(),
+                          new AsyncCallback<Void>() {
+
+                            @Override
+                            public void onSuccess(Void result) {
+                              Tools.newHistory(Login.RESOLVER);
+                            }
+
+                            @Override
+                            public void onFailure(Throwable caught) {
+                              Tools.newHistory(Login.RESOLVER);
+                            }
+                          });
+                      }
+
+                      @Override
+                      public void onFailure(Throwable caught) {
+                        sendEmailVerificationFailure(caught);
+                      }
+                    });
+                }
+              }
+            });
         }
 
         @Override

@@ -203,4 +203,6 @@ public interface BrowserServiceAsync {
 
   void showLogs(AsyncCallback<Void> asyncCallback);
 
+  void retrieveUserExtraBundle(String name, AsyncCallback<UserExtraBundle> asyncCallback);
+
 }

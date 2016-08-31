@@ -7,6 +7,7 @@
  */
 package org.roda.core.plugins.plugins.risks;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -20,28 +21,29 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RiskIncidenceRemoverPlugin extends AbstractPlugin<AIP> {
+public class RiskIncidenceRemoverPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(RiskIncidenceRemoverPlugin.class);
-
-  private static String riskIds;
-  private static String aipIds;
 
   @Override
   public void init() throws PluginException {
@@ -71,53 +73,48 @@ public class RiskIncidenceRemoverPlugin extends AbstractPlugin<AIP> {
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
-
-    if (parameters.containsKey("riskIds")) {
-      riskIds = parameters.get("riskIds");
-    }
-
-    if (parameters.containsKey("aipIds")) {
-      aipIds = parameters.get("aipIds");
-    }
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
+  public Report execute(IndexService index, ModelService model, StorageService storage, List<T> list)
     throws PluginException {
 
     LOGGER.debug("Removing old risk incidences");
     Report pluginReport = PluginHelper.initPluginReport(this);
 
     try {
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      Filter filter = new Filter();
-      int size = 0;
+      try {
+        Filter filter = new Filter();
 
-      if (riskIds != null) {
-        String[] risks = riskIds.split(",");
-        size = risks.length;
-
-        for (String riskId : risks) {
-          filter.add(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISK_ID, riskId));
+        for (T object : list) {
+          if (object instanceof AIP) {
+            AIP aip = (AIP) object;
+            filter.add(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, aip.getId()));
+          } else if (object instanceof Risk) {
+            Risk risk = (Risk) object;
+            filter.add(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISK_ID, risk.getId()));
+          }
         }
-      } else if (aipIds != null) {
-        String[] aips = aipIds.split(",");
-        size = aips.length;
 
-        for (String aipId : aips) {
-          filter.add(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, aipId));
+        IndexResult<RiskIncidence> incidences = index.find(RiskIncidence.class, filter, Sorter.NONE,
+          new Sublist(0, list.size()));
+
+        for (RiskIncidence incidence : incidences.getResults()) {
+          model.deleteRiskIncidence(incidence.getId(), false);
         }
+
+        jobPluginInfo.incrementObjectsProcessedWithSuccess(list.size());
+        jobPluginInfo.finalizeInfo();
+        PluginHelper.updateJobInformation(this, jobPluginInfo);
+      } catch (GenericException | NotFoundException | AuthorizationDeniedException | RequestNotValidException e) {
+        LOGGER.error("Could not delete risk incidence");
+        jobPluginInfo.incrementObjectsProcessedWithFailure(list.size());
       }
-
-      IndexResult<RiskIncidence> incidences = index.find(RiskIncidence.class, filter, Sorter.NONE,
-        new Sublist(0, size));
-
-      for (RiskIncidence incidence : incidences.getResults()) {
-        model.deleteRiskIncidence(incidence.getId(), false);
-      }
-
-    } catch (GenericException | NotFoundException | AuthorizationDeniedException | RequestNotValidException e) {
-      LOGGER.error("Could not delete risk incidence");
+    } catch (JobException e) {
+      LOGGER.error("Error updating job information", e);
     }
 
     LOGGER.debug("Done removing old risk incidences");
@@ -138,7 +135,7 @@ public class RiskIncidenceRemoverPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Plugin<AIP> cloneMe() {
+  public Plugin<T> cloneMe() {
     return new RiskIncidenceRemoverPlugin();
   }
 
@@ -179,7 +176,10 @@ public class RiskIncidenceRemoverPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public List<Class<AIP>> getObjectClasses() {
-    return Arrays.asList(AIP.class);
+  public List<Class<T>> getObjectClasses() {
+    List<Class<? extends IsRODAObject>> list = new ArrayList<>();
+    list.add(AIP.class);
+    list.add(Risk.class);
+    return (List) list;
   }
 }

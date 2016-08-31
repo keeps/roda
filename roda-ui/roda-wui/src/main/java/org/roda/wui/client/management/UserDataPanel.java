@@ -16,6 +16,9 @@ import java.util.Set;
 
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
+import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.browse.CreateForm;
+import org.roda.wui.client.browse.UserExtraBundle;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Tools;
@@ -41,12 +44,8 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
-import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
-
-import config.i18n.client.ClientGeneratedMessages;
-import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
@@ -117,7 +116,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
   // TextBox fax;
 
   @UiField
-  TextArea extra;
+  FlowPanel extra;
 
   @UiField
   FlowPanel groupSelectPanel;
@@ -140,6 +139,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
   private boolean changed = false;
   private boolean checked = false;
+  private UserExtraBundle userExtraBundle = null;
 
   /**
    * Create a new user data panel
@@ -330,7 +330,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     // country.addKeyUpHandler(keyUpHandler);
     // phoneNumber.addChangeHandler(changeHandler);
     // fax.addChangeHandler(changeHandler);
-    extra.addChangeHandler(changeHandler);
+    // extra.addChangeHandler(changeHandler);
 
     permissionsPanel.addValueChangeHandler(new ValueChangeHandler<List<String>>() {
 
@@ -381,10 +381,23 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     this.username.setText(user.getName());
     this.fullname.setText(user.getFullName());
     this.email.setText(user.getEmail());
-    this.extra.setText(user.getExtra());
 
     this.setMemberGroups(user.getAllGroups());
     this.setPermissions(user.getDirectRoles(), user.getAllRoles());
+
+    BrowserService.Util.getInstance().retrieveUserExtraBundle(user.getName(), new AsyncCallback<UserExtraBundle>() {
+
+      @Override
+      public void onFailure(Throwable caught) {
+        AsyncCallbackUtils.defaultFailureTreatment(caught);
+      }
+
+      @Override
+      public void onSuccess(UserExtraBundle userExtra) {
+        UserDataPanel.this.userExtraBundle = userExtra;
+        createForm(userExtra);
+      }
+    });
   }
 
   private void setPermissions(final Set<String> directRoles, final Set<String> allRoles) {
@@ -428,7 +441,6 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     user.setName(username.getText());
     user.setFullName(fullname.getText());
     user.setEmail(email.getText());
-    user.setExtra(extra.getText());
 
     if (enableGroupSelect) {
       user.setDirectGroups(this.getMemberGroups());
@@ -437,6 +449,11 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     user.setDirectRoles(permissionsPanel.getDirectRoles());
 
     return user;
+  }
+
+  private void createForm(UserExtraBundle bundle) {
+    extra.clear();
+    CreateForm.create(extra, bundle.getValues());
   }
 
   /**
@@ -592,7 +609,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     // country.setText("");
     email.setText("");
     // fax.setText("");
-    extra.setText("");
+    // extra.setText("");
     // phoneNumber.setText("");
   }
 
@@ -629,5 +646,9 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
   public User getValue() {
     return getUser();
+  }
+
+  public UserExtraBundle getExtra() {
+    return userExtraBundle;
   }
 }

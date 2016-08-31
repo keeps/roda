@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -41,6 +42,7 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
+import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.Messages;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.RodaUtils;
@@ -85,7 +87,6 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
-import org.roda.core.data.v2.index.SelectedItemsAll;
 import org.roda.core.data.v2.index.SelectedItemsFilter;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
@@ -119,6 +120,7 @@ import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.index.IndexService;
@@ -148,6 +150,7 @@ import org.roda.wui.client.browse.DescriptiveMetadataViewBundle;
 import org.roda.wui.client.browse.MetadataValue;
 import org.roda.wui.client.browse.PreservationEventViewBundle;
 import org.roda.wui.client.browse.SupportedMetadataTypeBundle;
+import org.roda.wui.client.browse.UserExtraBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
 import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
@@ -442,12 +445,12 @@ public class BrowserHelper {
   }
 
   protected static void validateGetAIPRepresentationParams(String acceptFormat) throws RequestNotValidException {
-    if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)
+    if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP.equals(acceptFormat)
       && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
       throw new RequestNotValidException("Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT
         + "' value. Expected values: " + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON,
-          RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML, RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN));
+          RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML, RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP));
     }
   }
 
@@ -1026,6 +1029,16 @@ public class BrowserHelper {
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     List<String> aipIds = consolidate(user, IndexedAIP.class, selected);
 
+    try {
+      Job job = new Job();
+      job.setName(RiskIncidenceRemoverPlugin.class.getSimpleName() + " " + job.getStartDate());
+      job.setPlugin(RiskIncidenceRemoverPlugin.class.getName());
+      job.setSourceObjects(SelectedItemsList.create(AIP.class, aipIds));
+      Jobs.createJob(user, job);
+    } catch (JobAlreadyStartedException e) {
+      LOGGER.error("Could not delete AIP associated incidences");
+    }
+
     // removeIncidencesOfAIPs(selected, user);
     String parentId = null;
 
@@ -1052,21 +1065,6 @@ public class BrowserHelper {
     }
 
     RodaCoreFactory.getIndexService().commitAIPs();
-
-    try {
-      Map<String, String> parameters = new HashMap<String, String>();
-      parameters.put("aipIds", StringUtils.join(aipIds, ","));
-
-      Job job = new Job();
-      job.setName(RiskIncidenceRemoverPlugin.class.getSimpleName() + " " + job.getStartDate());
-      job.setPlugin(RiskIncidenceRemoverPlugin.class.getName());
-      job.setPluginParameters(parameters);
-      job.setSourceObjects(new SelectedItemsAll<>(AIP.class.getName()));
-      Jobs.createJob(user, job);
-    } catch (JobAlreadyStartedException e) {
-      LOGGER.error("Could not delete AIP assoaciated incidences");
-    }
-
     return parentId;
   }
 
@@ -2000,15 +1998,10 @@ public class BrowserHelper {
       RodaCoreFactory.getModelService().deleteRisk(riskId, true);
     }
 
-    Map<String, String> parameters = new HashMap<String, String>();
-    parameters.put("riskIds", StringUtils.join(idList, ","));
-
     Job job = new Job();
     job.setName(RiskIncidenceRemoverPlugin.class.getSimpleName() + " " + job.getStartDate());
     job.setPlugin(RiskIncidenceRemoverPlugin.class.getName());
-    job.setPluginParameters(parameters);
-    job.setSourceObjects(new SelectedItemsAll<>(AIP.class.getName()));
-
+    job.setSourceObjects(SelectedItemsList.create(Risk.class, idList));
     Jobs.createJob(user, job);
   }
 
@@ -2102,6 +2095,7 @@ public class BrowserHelper {
 
     // map of job id -> (total, accepted)
     Map<String, Pair<Integer, Integer>> jobState = new HashMap<>();
+    List<String> aipsToDelete = new ArrayList<>();
 
     String userAgentId;
     try {
@@ -2147,20 +2141,7 @@ public class BrowserHelper {
       } else {
         // Reject AIP
         model.deleteAIP(aipId);
-
-        try {
-          Map<String, String> parameters = new HashMap<String, String>();
-          parameters.put("aipIds", aipId);
-
-          Job job = new Job();
-          job.setName(RiskIncidenceRemoverPlugin.class.getSimpleName() + " " + job.getStartDate());
-          job.setPlugin(RiskIncidenceRemoverPlugin.class.getName());
-          job.setPluginParameters(parameters);
-          job.setSourceObjects(new SelectedItemsAll<>(AIP.class.getName()));
-          Jobs.createJob(user, job);
-        } catch (JobAlreadyStartedException e) {
-          LOGGER.error("Could not delete AIP assoaciated incidences");
-        }
+        aipsToDelete.add(aipId);
       }
 
       // create job report
@@ -2185,6 +2166,16 @@ public class BrowserHelper {
         jobState.put(jobId, Pair.create(pair.getFirst() + 1, pair.getSecond() + (accept ? 1 : 0)));
       }
 
+    }
+
+    try {
+      Job job = new Job();
+      job.setName(RiskIncidenceRemoverPlugin.class.getSimpleName() + " " + job.getStartDate());
+      job.setPlugin(RiskIncidenceRemoverPlugin.class.getName());
+      job.setSourceObjects(SelectedItemsList.create(AIP.class, aipsToDelete));
+      Jobs.createJob(user, job);
+    } catch (JobAlreadyStartedException e) {
+      LOGGER.error("Could not delete AIP assoaciated incidences");
     }
 
     // update job counters
@@ -2424,6 +2415,58 @@ public class BrowserHelper {
     IndexResult<Report> indexReports = RodaCoreFactory.getIndexService().find(Report.class, filter, sorter,
       new Sublist(0, 1));
     return new Reports(indexReports.getResults());
+  }
+
+  public static UserExtraBundle retrieveUserExtraBundle(String name) {
+    String template = null;
+
+    InputStream templateStream = RodaCoreFactory
+      .getConfigurationFileAsStream(RodaConstants.USERS_TEMPLATE_FOLDER + "/user_extra.xml.hbs");
+    try {
+      template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
+    } catch (IOException e1) {
+      LOGGER.error("Error getting template from stream");
+    }
+
+    Set<MetadataValue> values = new HashSet<>();
+    if (template != null) {
+      values = ServerTools.transform(template);
+    }
+
+    try {
+      User user = UserUtility.getLdapUtility().getUser(name);
+      String userExtra = user.getExtra();
+
+      if (values != null) {
+        for (MetadataValue mv : values) {
+          // clear the auto-generated values
+          // mv.set("value", null);
+          String xpathRaw = mv.get("xpath");
+          if (xpathRaw != null && xpathRaw.length() > 0) {
+            String[] xpaths = xpathRaw.split("##%##");
+            String value;
+            List<String> allValues = new ArrayList<>();
+            for (String xpath : xpaths) {
+              allValues.addAll(ServerTools.applyXpath(userExtra, xpath));
+            }
+            // if any of the values is different, concatenate all values in a
+            // string, otherwise return the value
+            boolean allEqual = allValues.stream().allMatch(s -> s.trim().equals(allValues.get(0).trim()));
+            if (allEqual && !allValues.isEmpty()) {
+              value = allValues.get(0);
+            } else {
+              value = String.join(" / ", allValues);
+            }
+            mv.set("value", value.trim());
+          }
+        }
+      }
+
+    } catch (LdapUtilityException e) {
+      // do nothing
+    }
+
+    return new UserExtraBundle(name, values);
   }
 
 }

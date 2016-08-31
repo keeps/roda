@@ -7,15 +7,24 @@
  */
 package org.roda.wui.api.controllers;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.LdapUtilityException;
+import org.roda.core.common.RodaUtils;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
@@ -31,8 +40,13 @@ import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
+import org.roda.wui.client.browse.MetadataValue;
+import org.roda.wui.client.browse.UserExtraBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Template;
 
 public class UserManagementHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(UserManagementHelper.class);
@@ -91,21 +105,24 @@ public class UserManagementHelper {
     }
   }
 
-  public static void registerUser(User user, String password)
+  public static void registerUser(User user, String password, UserExtraBundle extra)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException {
+    user.setExtra(getUserExtra(user, extra));
     RodaCoreFactory.getModelService().registerUser(user, password, true, true);
     RodaCoreFactory.getIndexService().commit(RODAMember.class);
   }
 
-  public static User createUser(User user, String password) throws GenericException, EmailAlreadyExistsException,
-    UserAlreadyExistsException, IllegalOperationException, NotFoundException {
+  public static User createUser(User user, String password, UserExtraBundle extra) throws GenericException,
+    EmailAlreadyExistsException, UserAlreadyExistsException, IllegalOperationException, NotFoundException {
+    user.setExtra(getUserExtra(user, extra));
     User ret = RodaCoreFactory.getModelService().addUser(user, password, true, true);
     RodaCoreFactory.getIndexService().commit(RODAMember.class);
     return ret;
   }
 
-  public static void updateUser(User user, String password)
+  public static void updateUser(User user, String password, UserExtraBundle extra)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
+    user.setExtra(getUserExtra(user, extra));
     RodaCoreFactory.getModelService().modifyUser(user, password, true, true);
     RodaCoreFactory.getIndexService().commit(RODAMember.class);
   }
@@ -114,6 +131,41 @@ public class UserManagementHelper {
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     RodaCoreFactory.getModelService().modifyMyUser(user, password, true, true);
     RodaCoreFactory.getIndexService().commit(RODAMember.class);
+  }
+
+  private static String getUserExtra(User user, UserExtraBundle extra) throws GenericException {
+    Handlebars handlebars = new Handlebars();
+    Map<String, String> data = new HashMap<>();
+    handlebars.registerHelper("field", (o, options) -> {
+      return options.fn();
+    });
+
+    InputStream templateStream = RodaCoreFactory
+      .getConfigurationFileAsStream(RodaConstants.USERS_TEMPLATE_FOLDER + "/user_extra.xml.hbs");
+    try {
+      String rawTemplate = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
+      Template tmpl = handlebars.compileInline(rawTemplate);
+
+      Set<MetadataValue> values = extra.getValues();
+      if (values != null) {
+        values.forEach(metadataValue -> {
+          String val = metadataValue.get("value");
+          if (val != null) {
+            val = val.replaceAll("\\s", "");
+            if (!"".equals(val)) {
+              data.put(metadataValue.get("name"), metadataValue.get("value"));
+            }
+          }
+        });
+      }
+
+      String result = tmpl.apply(data);
+      return RodaUtils.indentXML(result);
+    } catch (IOException e1) {
+      LOGGER.error("Error getting template from stream");
+    }
+
+    return "";
   }
 
   public static void deleteUser(String username) throws GenericException, AuthorizationDeniedException {

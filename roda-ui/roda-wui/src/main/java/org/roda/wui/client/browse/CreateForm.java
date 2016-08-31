@@ -7,30 +7,40 @@
  */
 package org.roda.wui.client.browse;
 
+import java.util.Date;
+import java.util.Set;
+
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.json.client.*;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONException;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONString;
+import com.google.gwt.json.client.JSONValue;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.TextArea;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.datepicker.client.DateBox;
-
-import java.util.Date;
 
 /**
  * Created by adrapereira on 13-06-2016.
  */
 public class CreateForm {
 
-  public static void create(FlowPanel panel, SupportedMetadataTypeBundle bundle) {
-    for (MetadataValue mv : bundle.getValues()) {
+  public static void create(FlowPanel panel, Set<MetadataValue> bundle) {
+    for (MetadataValue mv : bundle) {
       if (mv.get("hidden") != null && mv.get("hidden").equals("true"))
         continue;
 
       FlowPanel layout = new FlowPanel();
-      layout.addStyleName("metadata-form-field");
+      // layout.addStyleName("metadata-form-field");
       String controlType = mv.get("type");
       if (controlType == null) {
         addTextField(panel, layout, mv);
@@ -51,9 +61,9 @@ public class CreateForm {
             addDatePicker(panel, layout, mv);
             break;
           case "separator":
-              layout.addStyleName("form-separator");
-              addSeparator(panel,layout,mv);
-              break;
+            layout.addStyleName("form-separator");
+            addSeparator(panel, layout, mv);
+            break;
           default:
             addTextField(panel, layout, mv);
             break;
@@ -170,7 +180,7 @@ public class CreateForm {
         mvList.addItem(value);
 
         if (value.equals(mv.get("value"))) {
-          mvList.setSelectedIndex(i+1);
+          mvList.setSelectedIndex(i + 1);
         }
       }
     }
@@ -222,10 +232,10 @@ public class CreateForm {
     });
     String value = mv.get("value");
     if (value != null && value.length() > 0) {
-      try{
+      try {
         Date date = dateTimeFormat.parse(value.trim());
         mvDate.setValue(date);
-      }catch(IllegalArgumentException iae){
+      } catch (IllegalArgumentException iae) {
         mvDate.getTextBox().setValue(value);
       }
     }
@@ -250,7 +260,7 @@ public class CreateForm {
 
     panel.add(layout);
   }
-  
+
   private static void addSeparator(FlowPanel panel, final FlowPanel layout, final MetadataValue mv) {
     Label mvLabel = new Label(getFieldLabel(mv));
     layout.add(mvLabel);

@@ -31,6 +31,7 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
+import org.roda.wui.client.browse.UserExtraBundle;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
 
 import com.google.gwt.core.client.GWT;
@@ -105,7 +106,7 @@ public interface UserManagementService extends RemoteService {
    * @throws EmailAlreadyExistsException
    * @throws RecaptchaException
    */
-  public void registerUser(User user, String password, String captcha)
+  public void registerUser(User user, String password, String captcha, UserExtraBundle extra)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException, RecaptchaException;
 
   /**
@@ -122,8 +123,9 @@ public interface UserManagementService extends RemoteService {
    * @throws UserAlreadyExistsException
    * @throws GenericException
    */
-  public User createUser(User user, String password) throws AuthorizationDeniedException, NotFoundException,
-    EmailAlreadyExistsException, UserAlreadyExistsException, GenericException, IllegalOperationException;
+  public User createUser(User user, String password, UserExtraBundle extra)
+    throws AuthorizationDeniedException, NotFoundException, EmailAlreadyExistsException, UserAlreadyExistsException,
+    GenericException, IllegalOperationException;
 
   /**
    * Modify a user
@@ -137,7 +139,7 @@ public interface UserManagementService extends RemoteService {
    * @throws AlreadyExistsException
    * @throws GenericException
    */
-  public void updateUser(User user, String password)
+  public void updateUser(User user, String password, UserExtraBundle extra)
     throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException;
 
   /**

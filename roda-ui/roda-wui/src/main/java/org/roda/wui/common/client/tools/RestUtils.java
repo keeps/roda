@@ -17,13 +17,13 @@ public class RestUtils {
 
   public static SafeUri createAIPDownloadUri(String aipId) {
 
-    // api/v1/aips/{aip_id}/?acceptFormat=bin
+    // api/v1/aips/{aip_id}/?acceptFormat=zip
     StringBuilder b = new StringBuilder();
     // base uri
     b.append(RodaConstants.API_REST_V1_AIPS).append(UriUtils.encode(aipId)).append(RodaConstants.API_SEP);
     // accept format attribute
     b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
-      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN);
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP);
 
     return UriUtils.fromSafeConstant(b.toString());
   }
@@ -41,21 +41,21 @@ public class RestUtils {
 
   public static SafeUri createRepresentationDownloadUri(String representationUUID) {
 
-    // api/v1/representations/{representation_uuid}/?acceptFormat=bin
+    // api/v1/representations/{representation_uuid}/?acceptFormat=zip
     StringBuilder b = new StringBuilder();
     // base uri
     b.append(RodaConstants.API_REST_V1_REPRESENTATIONS).append(UriUtils.encode(representationUUID))
       .append(RodaConstants.API_SEP);
     // accept format attribute
     b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
-      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN);
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP);
 
     return UriUtils.fromSafeConstant(b.toString());
   }
 
   public static SafeUri createRepresentationPartDownloadUri(String representationUUID, String part) {
 
-    // api/v1/aips/{aip_id}/data/{rep_id}/{part}
+    // api/v1/representations/{representation_uuid}/{part}
     StringBuilder b = new StringBuilder();
     // base uri
     b.append(RodaConstants.API_REST_V1_REPRESENTATIONS).append(UriUtils.encode(representationUUID))
@@ -67,7 +67,6 @@ public class RestUtils {
   public static SafeUri createRepresentationFileDownloadUri(String fileUuid) {
 
     // api/v1/files/{file_uuid}?acceptFormat=bin
-
     StringBuilder b = new StringBuilder();
     // base uri
     b.append(RodaConstants.API_REST_V1_FILES).append(UriUtils.encode(fileUuid));
@@ -80,14 +79,14 @@ public class RestUtils {
 
   public static SafeUri createDescriptiveMetadataDownloadUri(String aipId) {
 
-    // api/v1/aips/{aip_id}/descriptive_metadata/?acceptFormat=bin
+    // api/v1/aips/{aip_id}/descriptive_metadata/?acceptFormat=zip
     StringBuilder b = new StringBuilder();
     // base uri
     b.append(RodaConstants.API_REST_V1_AIPS).append(UriUtils.encode(aipId)).append(RodaConstants.API_SEP)
       .append(RodaConstants.API_DESCRIPTIVE_METADATA).append(RodaConstants.API_SEP);
     // accept format attribute
     b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
-      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN);
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP);
 
     return UriUtils.fromSafeConstant(b.toString());
   }
@@ -143,28 +142,28 @@ public class RestUtils {
 
   public static SafeUri createPreservationMetadataDownloadUri(String aipId) {
 
-    // api/v1/aips/{aip_id}/preservation_metadata/?acceptFormat=bin
+    // api/v1/aips/{aip_id}/preservation_metadata/?acceptFormat=zip
     StringBuilder b = new StringBuilder();
     // base uri
     b.append(RodaConstants.API_REST_V1_AIPS).append(UriUtils.encode(aipId)).append(RodaConstants.API_SEP)
       .append(RodaConstants.API_PRESERVATION_METADATA).append(RodaConstants.API_SEP);
     // accept format attribute
     b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
-      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN);
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP);
 
     return UriUtils.fromSafeConstant(b.toString());
   }
 
-  public static String createPreservationMetadataHTMLUri(String aipId, String repId, int startAgent, int limitAgent,
-    int startEvent, int limitEvent, int startFile, int limitFile) {
-    // api/v1/aips/{aip_id}/descriptive_metadata/{descId}?acceptFormat=xml
+  public static String createRepresentationPreservationMetadataUri(String representationUUID, int startAgent,
+    int limitAgent, int startEvent, int limitEvent, int startFile, int limitFile) {
+    // api/v1/representations/{representation_uuid}/descriptive_metadata/?acceptFormat=zip
     StringBuilder b = new StringBuilder();
     // base uri
-    b.append(RodaConstants.API_REST_V1_AIPS).append(UriUtils.encode(aipId)).append(RodaConstants.API_SEP)
-      .append(RodaConstants.API_PRESERVATION_METADATA).append(RodaConstants.API_SEP).append(repId);
+    b.append(RodaConstants.API_REST_V1_REPRESENTATIONS).append(UriUtils.encode(representationUUID))
+      .append(RodaConstants.API_SEP).append(RodaConstants.API_PRESERVATION_METADATA).append(RodaConstants.API_SEP);
     // accept format attribute
     b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
-      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML);
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP);
 
     // start and limits
     b.append(RodaConstants.API_QUERY_SEP).append("startAgent").append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)

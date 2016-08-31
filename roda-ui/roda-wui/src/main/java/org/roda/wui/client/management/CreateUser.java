@@ -100,17 +100,18 @@ public class CreateUser extends Composite {
       user = userDataPanel.getUser();
       final String password = userDataPanel.getPassword();
 
-      UserManagementService.Util.getInstance().createUser(user, password, new AsyncCallback<User>() {
+      UserManagementService.Util.getInstance().createUser(user, password, userDataPanel.getExtra(),
+        new AsyncCallback<User>() {
 
-        public void onFailure(Throwable caught) {
-          errorMessage(caught);
-        }
+          public void onFailure(Throwable caught) {
+            errorMessage(caught);
+          }
 
-        public void onSuccess(User createdUser) {
-          Tools.newHistory(MemberManagement.RESOLVER);
-        }
+          public void onSuccess(User createdUser) {
+            Tools.newHistory(MemberManagement.RESOLVER);
+          }
 
-      });
+        });
     }
   }
 
@@ -132,4 +133,5 @@ public class CreateUser extends Composite {
       Toast.showError(messages.createUserFailure(caught.getMessage()));
     }
   }
+
 }

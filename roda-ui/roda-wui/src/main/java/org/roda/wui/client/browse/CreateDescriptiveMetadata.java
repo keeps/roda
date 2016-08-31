@@ -215,7 +215,7 @@ public class CreateDescriptiveMetadata extends Composite {
 
   private void createForm(SupportedMetadataTypeBundle bundle) {
     formOrXML.clear();
-    CreateForm.create(formOrXML, bundle);
+    CreateForm.create(formOrXML, bundle.getValues());
   }
 
   public void setInXML(boolean inXML) {
