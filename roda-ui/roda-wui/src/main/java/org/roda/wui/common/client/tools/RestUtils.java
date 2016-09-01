@@ -97,7 +97,7 @@ public class RestUtils {
 
   public static SafeUri createDescriptiveMetadataDownloadUri(String aipId, String descId, String versionId) {
 
-    // api/v1/aips/{aip_id}/descriptive_metadata/{descId}?acceptFormat=xml&version={versionId}
+    // api/v1/aips/{aip_id}/descriptive_metadata/{descId}?acceptFormat=xml&version_id={versionId}
     StringBuilder b = new StringBuilder();
     // base uri
     b.append(RodaConstants.API_REST_V1_AIPS).append(UriUtils.encode(aipId)).append(RodaConstants.API_SEP)
@@ -107,7 +107,7 @@ public class RestUtils {
       .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML);
 
     if (versionId != null) {
-      b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_PARAM_VERSION)
+      b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_PARAM_VERSION_ID)
         .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(versionId);
     }
 
@@ -119,7 +119,7 @@ public class RestUtils {
   }
 
   public static SafeUri createDescriptiveMetadataHTMLUri(String aipId, String descId, String versionId) {
-    // api/v1/aips/{aip_id}/descriptive_metadata/{descId}?acceptFormat=html&version={versionId}
+    // api/v1/aips/{aip_id}/descriptive_metadata/{descId}?acceptFormat=html&version_id={versionId}
     StringBuilder b = new StringBuilder();
     // base uri
     b.append(RodaConstants.API_REST_V1_AIPS).append(UriUtils.encode(aipId)).append(RodaConstants.API_SEP)
@@ -129,7 +129,7 @@ public class RestUtils {
       .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML);
 
     if (versionId != null) {
-      b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_PARAM_VERSION)
+      b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_PARAM_VERSION_ID)
         .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(versionId);
     }
 
@@ -213,18 +213,18 @@ public class RestUtils {
   }
 
   public static SafeUri createTransferredResourceDownloadUri(String resourceId) {
-    // api/v1/transferred/?resourceId={resourceId}
+    // api/v1/transferred/{transferred_resource_uuid}?acceptFormat=bin
     StringBuilder b = new StringBuilder();
     // base uri
-    b.append(RodaConstants.API_REST_V1_RESOURCES).append(RodaConstants.API_QUERY_START)
-      .append(RodaConstants.API_PATH_PARAM_TRANSFERRED_RESOURCE_ID).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
-      .append(resourceId);
+    b.append(RodaConstants.API_REST_V1_RESOURCES).append(resourceId).append(RodaConstants.API_QUERY_START)
+      .append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
+      .append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN);
 
     return UriUtils.fromSafeConstant(b.toString());
   }
 
   public static SafeUri createThemeResourceUri(String resourceId, String defaultResourceId, boolean inline) {
-    // api/v1/theme/?resourceId={resourceId}&defaultResourceId={defaultResourceId}
+    // api/v1/theme/?resource_id={resourceId}&default_resource_od={defaultResourceId}
     StringBuilder b = new StringBuilder();
 
     b.append(RodaConstants.API_REST_V1_THEME).append(RodaConstants.API_QUERY_START)

@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
@@ -22,6 +23,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.transform.TransformerException;
 
@@ -84,7 +86,7 @@ public class RepresentationsResource {
   @Produces({"application/json", "application/zip"})
   @ApiOperation(value = "Get representation", notes = "Get representation", response = Representation.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Representation.class),
-    @ApiResponse(code = 404, message = "Not found", response = Representation.class)})
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response retrieveRepresentation(
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID) String representationUUID,
@@ -124,7 +126,7 @@ public class RepresentationsResource {
   @PUT
   @ApiOperation(value = "Update representation", notes = "Update existing representation", response = Representation.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Representation.class),
-    @ApiResponse(code = 404, message = "Not found", response = Representation.class)})
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response updateRepresentation(Representation representation,
     @ApiParam(value = "Choose format in which to get the representation", allowableValues = "json, xml") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
@@ -142,8 +144,9 @@ public class RepresentationsResource {
   @POST
   @ApiOperation(value = "Create representation", notes = "Create a new representation on an AIP", response = Representation.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Representation.class),
-    @ApiResponse(code = 409, message = "Already exists", response = Representation.class)})
-
+    @ApiResponse(code = 409, message = "Already exists", response = ApiResponseMessage.class)})
+  @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   public Response createRepresentation(
     @ApiParam(value = "The AIP to add the representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @ApiParam(value = "The desired representation ID", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
@@ -164,7 +167,7 @@ public class RepresentationsResource {
   @Path("/{" + RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID + "}")
   @ApiOperation(value = "Delete representation", notes = "Delete representation", response = Void.class)
   @ApiResponses(value = {@ApiResponse(code = 204, message = "OK", response = Void.class),
-    @ApiResponse(code = 404, message = "Not found", response = Void.class)})
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response deleteRepresentation(
     @ApiParam(value = "The ID of the existing representation to delete", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID) String representationUUID)
@@ -220,25 +223,21 @@ public class RepresentationsResource {
     @ApiParam(value = "Choose format in which to get the metadata", allowableValues = "xml, html, json, bin", defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
     @ApiParam(value = "The language for the HTML output", allowableValues = "pt_PT, en_US", defaultValue = RodaConstants.API_QUERY_VALUE_LANG_DEFAULT) @DefaultValue(RodaConstants.API_QUERY_VALUE_LANG_DEFAULT) @QueryParam(RodaConstants.API_QUERY_KEY_LANG) String language)
     throws RODAException {
-    try {
-      String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
-      // get user
-      RodaUser user = UserUtility.getApiUser(request);
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
-      // delegate action to controller
-      EntityResponse aipDescriptiveMetadata = Browser.retrieveRepresentationDescriptiveMetadata(user, representationId,
-        metadataId, acceptFormat, language);
+    // get user
+    RodaUser user = UserUtility.getApiUser(request);
 
-      if (aipDescriptiveMetadata instanceof ObjectResponse) {
-        ObjectResponse<DescriptiveMetadata> dm = (ObjectResponse<DescriptiveMetadata>) aipDescriptiveMetadata;
-        return Response.ok(dm.getObject(), mediaType).build();
-      } else {
-        return ApiUtils.okResponse((StreamResponse) aipDescriptiveMetadata);
-      }
+    // delegate action to controller
+    EntityResponse aipDescriptiveMetadata = Browser.retrieveRepresentationDescriptiveMetadata(user, representationId,
+      metadataId, acceptFormat, language);
 
-    } catch (TransformerException e) {
-      return ApiUtils.errorResponse(e);
+    if (aipDescriptiveMetadata instanceof ObjectResponse) {
+      ObjectResponse<DescriptiveMetadata> dm = (ObjectResponse<DescriptiveMetadata>) aipDescriptiveMetadata;
+      return Response.ok(dm.getObject(), mediaType).build();
+    } else {
+      return ApiUtils.okResponse((StreamResponse) aipDescriptiveMetadata);
     }
   }
 
@@ -247,7 +246,7 @@ public class RepresentationsResource {
     + RodaConstants.API_PATH_PARAM_METADATA_ID + "}")
   @ApiOperation(value = "Update descriptive metadata", notes = "Upload a descriptive metadata file to update an existing one", response = DescriptiveMetadata.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = DescriptiveMetadata.class),
-    @ApiResponse(code = 404, message = "Not found", response = DescriptiveMetadata.class)})
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response updateDescriptiveMetadataOnRepresentation(
     @ApiParam(value = "The ID of the existing Representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID) String representationId,
@@ -271,7 +270,7 @@ public class RepresentationsResource {
     + RodaConstants.API_PATH_PARAM_METADATA_ID + "}")
   @ApiOperation(value = "Create descriptive metadata", notes = "Upload a new descriptive metadata file", response = DescriptiveMetadata.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = DescriptiveMetadata.class),
-    @ApiResponse(code = 409, message = "Already exists", response = DescriptiveMetadata.class)})
+    @ApiResponse(code = 409, message = "Already exists", response = ApiResponseMessage.class)})
 
   public Response createDescriptiveMetadataOnRepresentation(
     @ApiParam(value = "The ID of the existing Representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID) String representationId,

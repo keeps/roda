@@ -191,7 +191,7 @@ public class AipsResource {
   @ApiOperation(value = "List descriptive metadata", notes = "List descriptive metadata", response = DescriptiveMetadata.class, responseContainer = "List")
   @ApiResponses(value = {
     @ApiResponse(code = 200, message = "OK", response = DescriptiveMetadata.class, responseContainer = "List"),
-    @ApiResponse(code = 404, message = "AIP not found", response = DescriptiveMetadata.class, responseContainer = "List")})
+    @ApiResponse(code = 404, message = "AIP not found", response = ApiResponseMessage.class)})
 
   public Response retrieveDescriptiveMetadataListFromAIP(
     @ApiParam(value = "The ID of an existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
@@ -218,13 +218,17 @@ public class AipsResource {
   @GET
   @Path("/{" + RodaConstants.API_PATH_PARAM_AIP_ID + "}/descriptive_metadata/{"
     + RodaConstants.API_PATH_PARAM_METADATA_ID + "}")
-  @Produces({"application/json", "application/xml", "text/html"})
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_HTML,
+    MediaType.APPLICATION_OCTET_STREAM})
   @ApiOperation(value = "Get descriptive metadata", notes = "Get descriptive metadata (JSON or XML info, XML file or HTML conversion)", response = DescriptiveMetadata.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = DescriptiveMetadata.class)})
 
   public Response retrieveDescriptiveMetadataFromAIP(
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @ApiParam(value = "The ID of the existing metadata file to retrieve", required = true) @PathParam(RodaConstants.API_PATH_PARAM_METADATA_ID) String metadataId,
+
+    @ApiParam(value = "The ID of the existing metadata file version to retrieve", required = true) @QueryParam(RodaConstants.API_QUERY_PARAM_VERSION_ID) String versionId,
+
     @ApiParam(value = "Choose format in which to get the metadata", allowableValues = "xml, html, json, bin", defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
     @ApiParam(value = "The language for the HTML output", allowableValues = "pt_PT, en_US", defaultValue = RodaConstants.API_QUERY_VALUE_LANG_DEFAULT) @DefaultValue(RodaConstants.API_QUERY_VALUE_LANG_DEFAULT) @QueryParam(RodaConstants.API_QUERY_KEY_LANG) String language)
     throws RODAException {
@@ -235,8 +239,14 @@ public class AipsResource {
       RodaUser user = UserUtility.getApiUser(request);
 
       // delegate action to controller
-      EntityResponse aipDescriptiveMetadata = Browser.retrieveAIPDescriptiveMetadata(user, aipId, metadataId,
-        acceptFormat, language);
+      EntityResponse aipDescriptiveMetadata;
+      if (versionId == null) {
+        aipDescriptiveMetadata = Browser.retrieveAIPDescriptiveMetadata(user, aipId, metadataId, acceptFormat,
+          language);
+      } else {
+        aipDescriptiveMetadata = Browser.retrieveAIPDescriptiveMetadataVersion(user, aipId, metadataId, versionId,
+          acceptFormat, language);
+      }
 
       if (aipDescriptiveMetadata instanceof ObjectResponse) {
         ObjectResponse<DescriptiveMetadata> dm = (ObjectResponse<DescriptiveMetadata>) aipDescriptiveMetadata;
@@ -255,7 +265,7 @@ public class AipsResource {
     + RodaConstants.API_PATH_PARAM_METADATA_ID + "}")
   @ApiOperation(value = "Update descriptive metadata", notes = "Upload a descriptive metadata file to update an existing one", response = DescriptiveMetadata.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = DescriptiveMetadata.class),
-    @ApiResponse(code = 404, message = "Not found", response = DescriptiveMetadata.class)})
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response updateDescriptiveMetadataOnAIP(
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
@@ -279,7 +289,7 @@ public class AipsResource {
     + RodaConstants.API_PATH_PARAM_METADATA_ID + "}")
   @ApiOperation(value = "Create descriptive metadata", notes = "Upload a new descriptive metadata file", response = DescriptiveMetadata.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = DescriptiveMetadata.class),
-    @ApiResponse(code = 409, message = "Already exists", response = DescriptiveMetadata.class)})
+    @ApiResponse(code = 409, message = "Already exists", response = ApiResponseMessage.class)})
 
   public Response createDescriptiveMetadataOnAIP(
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
@@ -303,7 +313,7 @@ public class AipsResource {
     + RodaConstants.API_PATH_PARAM_METADATA_ID + "}")
   @ApiOperation(value = "Delete descriptive metadata", notes = "Delete an existing descriptive metadata file", response = Void.class)
   @ApiResponses(value = {@ApiResponse(code = 204, message = "OK", response = Void.class),
-    @ApiResponse(code = 404, message = "Not found", response = Void.class)})
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response deleteDescriptiveMetadataFromAIP(
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
@@ -322,7 +332,7 @@ public class AipsResource {
 
   @GET
   @Path("/{" + RodaConstants.API_PATH_PARAM_AIP_ID + "}/preservation_metadata/")
-  @Produces({"application/json", "application/zip", "text/html"})
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, "application/zip"})
   @ApiOperation(value = "Get preservation metadata", notes = "Get preservation metadata (JSON info, ZIP file or HTML conversion).\nOptional query params of **start** and **limit** defined the returned array.", response = PreservationMetadata.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = PreservationMetadata.class)})
 
@@ -378,7 +388,7 @@ public class AipsResource {
     + RodaConstants.API_PATH_PARAM_REPRESENTATION_ID + "}/{" + RodaConstants.API_PATH_PARAM_FILE_UUID + "}")
   @ApiOperation(value = "Update representation preservation file", notes = "Update a preservation file to a representation", response = PreservationMetadata.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = DescriptiveMetadata.class),
-    @ApiResponse(code = 404, message = "Not found", response = DescriptiveMetadata.class)})
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response updatePreservationMetadataOnFile(
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,

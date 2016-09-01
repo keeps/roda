@@ -81,7 +81,7 @@ public class TransferredResource {
 
   @GET
   @Path("/{" + RodaConstants.API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID + "}")
-  @ApiOperation(value = "Get Resource", notes = "Gets a Resource.", response = org.roda.core.data.v2.ip.TransferredResource.class, responseContainer = "List")
+  @ApiOperation(value = "Get Resource", notes = "Gets a Resource.", response = org.roda.core.data.v2.ip.TransferredResource.class)
   public Response getResource(
     @ApiParam(value = "The resource id", required = false) @PathParam(RodaConstants.API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID) String resourceId,
     @ApiParam(value = "Choose format in which to get the resource", allowableValues = "json, xml, bin") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)

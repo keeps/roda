@@ -686,14 +686,13 @@ public class BrowserHelper {
     return ret;
   }
 
-  public static StreamResponse retrieveAIPDescritiveMetadataVersion(String aipId, String metadataId, String versionId,
+  public static EntityResponse retrieveAIPDescritiveMetadataVersion(String aipId, String metadataId, String versionId,
     String acceptFormat, String language)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
 
     final String filename;
     final String mediaType;
     final StreamingOutput stream;
-    StreamResponse ret = null;
 
     ModelService model = RodaCoreFactory.getModelService();
 
@@ -702,7 +701,7 @@ public class BrowserHelper {
     Binary binary = binaryVersion.getBinary();
 
     String fileName = binary.getStoragePath().getName();
-    if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
+    if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
       mediaType = MediaType.TEXT_XML;
       stream = new StreamingOutput() {
         @Override
@@ -710,7 +709,7 @@ public class BrowserHelper {
           IOUtils.copy(binary.getContent().createInputStream(), os);
         }
       };
-      ret = new StreamResponse(fileName, mediaType, stream);
+      return new StreamResponse(fileName, mediaType, stream);
 
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
       filename = fileName + ".html";
@@ -728,13 +727,18 @@ public class BrowserHelper {
         }
 
       };
-      ret = new StreamResponse(filename, mediaType, stream);
+      return new StreamResponse(filename, mediaType, stream);
+    } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
+      || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
 
+      AIP aip = model.retrieveAIP(aipId);
+      List<DescriptiveMetadata> resultList = aip.getDescriptiveMetadata().stream()
+        .filter(dm -> dm.getId().equals(metadataId)).collect(Collectors.toList());
+
+      return new ObjectResponse<DescriptiveMetadata>(acceptFormat, resultList.get(0));
     } else {
       throw new GenericException("Unsupported accept format: " + acceptFormat);
     }
-
-    return ret;
   }
 
   protected static void validateListAIPPreservationMetadataParams(String acceptFormat) throws RequestNotValidException {

@@ -119,8 +119,8 @@ public final class RodaConstants {
   public static final String API_REST_V1_AIPS = "api/v1/aips/";
   public static final String API_REST_V1_REPRESENTATIONS = "api/v1/representations/";
   public static final String API_REST_V1_FILES = "api/v1/files/";
-  public static final String API_REST_V1_RESOURCES = "api/v1/transfers";
-  public static final String API_REST_V1_THEME = "api/v1/theme";
+  public static final String API_REST_V1_RESOURCES = "api/v1/transfers/";
+  public static final String API_REST_V1_THEME = "api/v1/theme/";
   // sub-resources strings
   public static final String API_DATA = "data";
   public static final Object API_FILE = "file";
@@ -157,7 +157,7 @@ public final class RodaConstants {
   public static final String API_PATH_PARAM_FORMAT_ID = "format_id";
   public static final String API_PATH_PARAM_RISK_ID = "risk_id";
   public static final String API_PATH_PARAM_PART = "part";
-  public static final String API_QUERY_PARAM_VERSION = "version";
+  public static final String API_QUERY_PARAM_VERSION_ID = "version_id";
   public static final String API_QUERY_PARAM_NOTIFICATION_TOKEN = "token";
   public static final String API_QUERY_PARAM_RESOURCE_ID = "resource_id";
   public static final String API_QUERY_PARAM_DEFAULT_RESOURCE_ID = "default_resource_id";

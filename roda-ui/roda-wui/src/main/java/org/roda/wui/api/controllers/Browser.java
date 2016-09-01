@@ -444,8 +444,8 @@ public class Browser extends RodaWuiController {
   }
 
   public static EntityResponse retrieveRepresentationDescriptiveMetadata(RodaUser user, String representationId,
-    String metadataId, String acceptFormat, String language) throws AuthorizationDeniedException, GenericException,
-    TransformerException, NotFoundException, RequestNotValidException {
+    String metadataId, String acceptFormat, String language)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // validate input
@@ -469,7 +469,7 @@ public class Browser extends RodaWuiController {
 
   }
 
-  public static StreamResponse retrieveAIPDescriptiveMetadataVersion(RodaUser user, String aipId, String metadataId,
+  public static EntityResponse retrieveAIPDescriptiveMetadataVersion(RodaUser user, String aipId, String metadataId,
     String versionId, String acceptFormat, String language) throws AuthorizationDeniedException, GenericException,
     TransformerException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -483,12 +483,12 @@ public class Browser extends RodaWuiController {
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
     // delegate
-    StreamResponse aipDescritiveMetadata = BrowserHelper.retrieveAIPDescritiveMetadataVersion(aipId, metadataId,
+    EntityResponse aipDescritiveMetadata = BrowserHelper.retrieveAIPDescritiveMetadataVersion(aipId, metadataId,
       versionId, acceptFormat, language);
 
     // register action
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_METADATA_ID,
-      metadataId);
+      metadataId, RodaConstants.API_QUERY_PARAM_VERSION_ID, versionId);
 
     return aipDescritiveMetadata;
 
@@ -1214,7 +1214,7 @@ public class Browser extends RodaWuiController {
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
-      RodaConstants.API_PATH_PARAM_METADATA_ID, descriptiveMetadataId, RodaConstants.API_QUERY_PARAM_VERSION,
+      RodaConstants.API_PATH_PARAM_METADATA_ID, descriptiveMetadataId, RodaConstants.API_QUERY_PARAM_VERSION_ID,
       versionId);
   }
 
@@ -1236,7 +1236,7 @@ public class Browser extends RodaWuiController {
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
-      RodaConstants.API_PATH_PARAM_METADATA_ID, descriptiveMetadataId, RodaConstants.API_QUERY_PARAM_VERSION,
+      RodaConstants.API_PATH_PARAM_METADATA_ID, descriptiveMetadataId, RodaConstants.API_QUERY_PARAM_VERSION_ID,
       versionId);
   }
 
