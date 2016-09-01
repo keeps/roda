@@ -18,7 +18,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsList;
-import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.index.SelectedItemsNone;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -102,10 +102,11 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private SelectedItems<?> selected = null;
+  private SelectedItems<?> selected = new SelectedItemsNone<>();
   private List<PluginInfo> plugins = null;
   private PluginInfo selectedPlugin = null;
-  private String listSelectedClass = AIP.class.getName();
+  private String listSelectedClass = TransferredResource.class.getName();
+  private boolean isIngest = false;
 
   @UiField
   TextBox name;
@@ -143,11 +144,20 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
   public CreateJob(Class<T> classToReceive, final List<PluginType> pluginType) {
     if (classToReceive.getName().equals(TransferredResource.class.getName())) {
       this.selected = IngestTransfer.getInstance().getSelected();
+      isIngest = true;
     } else {
       this.selected = Search.getInstance().getSelected();
+      isIngest = false;
     }
 
     initWidget(uiBinder.createAndBindUi(this));
+
+    boolean isEmpty = updateObjectList();
+
+    if (isEmpty && isIngest) {
+      Tools.newHistory(IngestTransfer.RESOLVER);
+    }
+
     BrowserService.Util.getInstance().retrievePluginsInfo(pluginType, new AsyncCallback<List<PluginInfo>>() {
 
       @Override
@@ -168,8 +178,6 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
 
     name.setText(messages.processNewDefaultName(new Date()));
     workflowOptions.setPlugins(plugins);
-
-    updateObjectList();
     configurePlugins(selected.getSelectedClass());
 
     workflowCategoryList.addStyleName("form-listbox-job");

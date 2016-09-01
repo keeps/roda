@@ -44,7 +44,6 @@ public class CreateForm {
       if (addStyle) {
         layout.addStyleName("metadata-form-field");
       }
-
       String controlType = mv.get("type");
       if (controlType == null) {
         addTextField(panel, layout, mv);

@@ -2473,7 +2473,7 @@ public class BrowserHelper {
       User user = UserUtility.getLdapUtility().getUser(name);
       String userExtra = user.getExtra();
 
-      if (values != null) {
+      if (values != null && userExtra != null) {
         for (MetadataValue mv : values) {
           // clear the auto-generated values
           // mv.set("value", null);

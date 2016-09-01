@@ -67,6 +67,7 @@ public class CreateIngestJob extends CreateJob<TransferredResource> {
           false, 10, 10);
         getTargetPanel().clear();
         getTargetPanel().add(list);
+        isEmpty = ids.isEmpty();
       } else if (selected instanceof SelectedItemsFilter) {
         Filter filter = ((SelectedItemsFilter) selected).getFilter();
         TransferredResourceList list = new TransferredResourceList(filter, null, messages.transferredResourcesTitle(),
@@ -78,6 +79,8 @@ public class CreateIngestJob extends CreateJob<TransferredResource> {
       }
 
       setJobSelectedDescription(messages.createJobSelectedSIP());
+    } else {
+      isEmpty = true;
     }
 
     return isEmpty;

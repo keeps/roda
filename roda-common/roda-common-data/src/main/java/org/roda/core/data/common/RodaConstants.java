@@ -176,6 +176,8 @@ public final class RodaConstants {
   public static final String API_PATH_PARAM_JOB_ID = "jobId";
   public static final String API_PATH_PARAM_JOB_JUST_FAILED = "jobJustFailed";
 
+  public static final String APPLICATION_ZIP = "application/zip";
+
   /*
    * Controllers related
    */
