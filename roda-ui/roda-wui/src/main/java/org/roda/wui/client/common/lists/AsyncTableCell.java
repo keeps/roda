@@ -12,7 +12,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.roda.core.data.adapter.facet.FacetParameter;
@@ -529,9 +528,11 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     SelectedItems<T> ret;
     if (isAllSelected()) {
       Filter filterPlusFacets = new Filter(getFilter());
-      for (FacetParameter facetParameter : getFacets().getParameters().values()) {
-        if (!facetParameter.getValues().isEmpty()) {
-          filterPlusFacets.add(new OneOfManyFilterParameter(facetParameter.getName(), facetParameter.getValues()));
+      if (getFacets() != null) {
+        for (FacetParameter facetParameter : getFacets().getParameters().values()) {
+          if (!facetParameter.getValues().isEmpty()) {
+            filterPlusFacets.add(new OneOfManyFilterParameter(facetParameter.getName(), facetParameter.getValues()));
+          }
         }
       }
 
