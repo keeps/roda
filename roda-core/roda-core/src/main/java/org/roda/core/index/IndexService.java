@@ -443,6 +443,14 @@ public class IndexService {
     SolrUtils.delete(index, classToRetrieve, ids);
   }
 
+  public <T extends IsIndexed> void deleteSilently(Class<T> classToRetrieve, List<String> ids) {
+    try {
+      delete(classToRetrieve, ids);
+    } catch (GenericException | RequestNotValidException e) {
+      // do nothing as we should be quiet
+    }
+  }
+
   public <T extends IsIndexed> void delete(Class<T> classToRetrieve, Filter filter)
     throws GenericException, RequestNotValidException {
     SolrUtils.delete(index, classToRetrieve, filter);

@@ -343,24 +343,31 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   @Override
   public void cleanUnfinishedJobs() {
-    Filter filter = new Filter();
-    filter.add(new OneOfManyFilterParameter(RodaConstants.JOB_STATE,
+    cleanUnfinishedJobs(findUnfinishedJobs());
+  }
+
+  private List<Job> findUnfinishedJobs() {
+    Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.JOB_STATE,
       Arrays.asList(Job.JOB_STATE.STARTED.toString(), Job.JOB_STATE.CREATED.toString())));
     Sublist sublist = new Sublist(0, RodaConstants.DEFAULT_PAGINATION_VALUE);
-    IndexResult<Job> jobs = null;
-    List<Job> jobsToBeCleaned = new ArrayList<>();
+    IndexResult<Job> jobs;
+    List<Job> unfinishedJobs = new ArrayList<>();
     try {
       do {
         jobs = index.find(Job.class, filter, null, sublist);
-        jobsToBeCleaned.addAll(jobs.getResults());
+        unfinishedJobs.addAll(jobs.getResults());
         sublist.setFirstElementIndex(sublist.getFirstElementIndex() + Math.toIntExact(jobs.getLimit()));
       } while (jobs.getTotalCount() > jobs.getOffset() + jobs.getLimit());
     } catch (GenericException | RequestNotValidException e) {
       LOGGER.error("Unable to find Jobs still to be cleaned", e);
     }
+    return unfinishedJobs;
+  }
 
-    if (!jobsToBeCleaned.isEmpty()) {
-      for (Job job : jobsToBeCleaned) {
+  private void cleanUnfinishedJobs(List<Job> unfinishedJobs) {
+    if (!unfinishedJobs.isEmpty()) {
+      List<String> jobsToBeDeletedFromIndex = new ArrayList<>();
+      for (Job job : unfinishedJobs) {
         try {
           Job jobToBeCleaned = model.retrieveJob(job.getId());
           JobsHelper.updateJobInTheStateStartedOrCreated(jobToBeCleaned);
@@ -368,9 +375,14 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
           // cleanup job related objects (aips, sips, etc.)
           JobsHelper.doJobObjectsCleanup(job, RodaCoreFactory.getModelService(), index);
-        } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+        } catch (NotFoundException e) {
+          jobsToBeDeletedFromIndex.add(job.getId());
+        } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
           LOGGER.error("Unable to get/update Job", e);
         }
+      }
+      if (!jobsToBeDeletedFromIndex.isEmpty()) {
+        index.deleteSilently(Job.class, jobsToBeDeletedFromIndex);
       }
     }
   }

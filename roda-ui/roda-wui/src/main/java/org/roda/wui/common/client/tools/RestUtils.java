@@ -228,7 +228,7 @@ public class RestUtils {
     StringBuilder b = new StringBuilder();
 
     b.append(RodaConstants.API_REST_V1_THEME).append(RodaConstants.API_QUERY_START)
-      .append(RodaConstants.API_PATH_PARAM_TRANSFERRED_RESOURCE_ID).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
+      .append(RodaConstants.API_QUERY_PARAM_RESOURCE_ID).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
       .append(resourceId);
 
     if (defaultResourceId != null) {
