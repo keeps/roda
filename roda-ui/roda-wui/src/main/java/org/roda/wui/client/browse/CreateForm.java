@@ -34,13 +34,17 @@ import com.google.gwt.user.datepicker.client.DateBox;
  */
 public class CreateForm {
 
-  public static void create(FlowPanel panel, Set<MetadataValue> bundle) {
+  public static void create(FlowPanel panel, Set<MetadataValue> bundle, boolean addStyle) {
     for (MetadataValue mv : bundle) {
       if (mv.get("hidden") != null && mv.get("hidden").equals("true"))
         continue;
 
       FlowPanel layout = new FlowPanel();
-      // layout.addStyleName("metadata-form-field");
+
+      if (addStyle) {
+        layout.addStyleName("metadata-form-field");
+      }
+
       String controlType = mv.get("type");
       if (controlType == null) {
         addTextField(panel, layout, mv);

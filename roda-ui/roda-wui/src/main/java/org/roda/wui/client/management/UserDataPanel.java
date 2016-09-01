@@ -453,7 +453,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
   private void createForm(UserExtraBundle bundle) {
     extra.clear();
-    CreateForm.create(extra, bundle.getValues());
+    CreateForm.create(extra, bundle.getValues(), false);
   }
 
   /**

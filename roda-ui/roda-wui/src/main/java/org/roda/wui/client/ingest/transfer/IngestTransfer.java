@@ -237,23 +237,15 @@ public class IngestTransfer extends Composite {
 
         if (selected instanceof SelectedItemsList) {
           SelectedItemsList selectedList = (SelectedItemsList) selected;
-          if (selectedList.getIds().size() > 0) {
-            move.setEnabled(true);
-            if (selectedList.getIds().size() == 1) {
-              rename.setEnabled(true);
-            } else {
-              rename.setEnabled(false);
-            }
-          } else {
-            rename.setEnabled(false);
-            move.setEnabled(false);
-          }
+          int size = selectedList.getIds().size();
+          move.setEnabled(size > 0);
+          rename.setEnabled(size == 1 || (size == 0 && resource != null));
         }
       }
 
     });
 
-    rename.setEnabled(false);
+    rename.setEnabled(resource != null);
     move.setEnabled(false);
   }
 
@@ -277,7 +269,6 @@ public class IngestTransfer extends Composite {
       searchPanel.setVisible(false);
       transferredResourceList.setVisible(false);
       download.setVisible(true);
-      rename.setEnabled(true);
       move.setEnabled(true);
     } else {
 
@@ -289,10 +280,10 @@ public class IngestTransfer extends Composite {
       searchPanel.setVisible(true);
       transferredResourceList.setVisible(true);
       download.setVisible(false);
-      rename.setEnabled(false);
       move.setEnabled(false);
     }
 
+    rename.setEnabled(resource != null);
     breadcrumb.updatePath(getBreadcrumbs(r));
     breadcrumb.setVisible(true);
 
@@ -317,6 +308,7 @@ public class IngestTransfer extends Composite {
     itemTitle.addStyleName("browseTitle-allCollections");
     itemIcon.getParent().addStyleName("browseTitle-allCollections-wrapper");
 
+    rename.setEnabled(resource != null);
     searchPanel.setVisible(true);
     transferredResourceList.setVisible(true);
     download.setVisible(false);
@@ -616,8 +608,13 @@ public class IngestTransfer extends Composite {
   void buttonRenameHandler(ClickEvent e) {
     final String transferredResourceId;
 
-    if (resource.isFile()) {
-      transferredResourceId = resource.getUUID();
+    if (SelectedItemsUtils.isEmpty(getSelected())) {
+      if (resource != null) {
+        transferredResourceId = resource.getUUID();
+      } else {
+        Toast.showInfo("Rename failed", "It is not possible to rename the root folder");
+        return;
+      }
     } else {
       if (getSelected() instanceof SelectedItemsList) {
         SelectedItemsList resourceList = (SelectedItemsList) getSelected();
