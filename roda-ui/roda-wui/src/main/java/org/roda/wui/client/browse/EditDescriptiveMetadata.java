@@ -163,8 +163,8 @@ public class EditDescriptiveMetadata extends Composite {
       for (MetadataValue mv : bundle.getValues())
         newValues.add(mv.clone());
     }
-    supportedBundle = new SupportedMetadataTypeBundle(bundle.getType(), bundle.getVersion(), bundle.getId(),
-      bundle.getRawTemplate(), newValues);
+    supportedBundle = new SupportedMetadataTypeBundle(bundle.getId(), bundle.getType(), bundle.getVersion(),
+      bundle.getId(), bundle.getRawTemplate(), newValues);
 
     initWidget(uiBinder.createAndBindUi(this));
     metadataXML = new TextArea();
@@ -203,8 +203,8 @@ public class EditDescriptiveMetadata extends Composite {
                 for (MetadataValue mv : bundle.getValues())
                   newValues.add(mv.clone());
               }
-              supportedBundle = new SupportedMetadataTypeBundle(bundle.getType(), bundle.getVersion(), bundle.getId(),
-                bundle.getRawTemplate(), newValues);
+              supportedBundle = new SupportedMetadataTypeBundle(bundle.getId(), bundle.getType(), bundle.getVersion(),
+                bundle.getId(), bundle.getRawTemplate(), newValues);
               updateFormOrXML();
             }
           });
@@ -415,7 +415,7 @@ public class EditDescriptiveMetadata extends Composite {
 
   private void updateMetadataOnServer(String content) {
     String typeText = type.getSelectedValue();
-    String version = "";
+    String version = null;
 
     if (typeText.contains(RodaConstants.METADATA_VERSION_SEPARATOR)) {
       version = typeText.substring(typeText.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1,

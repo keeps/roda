@@ -1450,21 +1450,22 @@ public class BrowserHelper {
     List<SupportedMetadataTypeBundle> supportedMetadata = new ArrayList<>();
 
     if (types != null) {
-      for (String type : types) {
+      for (String id : types) {
+        String type = id;
         String version = null;
-        if (type.contains(RodaConstants.METADATA_VERSION_SEPARATOR)) {
-          version = type.substring(type.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1, type.length());
-          type = type.substring(0, type.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));
-        }
+        if (id.contains(RodaConstants.METADATA_VERSION_SEPARATOR)) {
+          version = id.substring(id.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1, id.length());
+          type = id.substring(0, id.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));
+        } 
 
-        String key = RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX + type;
+        String key = RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX + id;
         if (version != null) {
           key += "." + version;
         }
 
-        String label = messages.getTranslation(key, type);
+        String label = messages.getTranslation(key, id);
         InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(RodaConstants.METADATA_TEMPLATE_FOLDER
-          + "/" + ((version != null) ? type + RodaConstants.METADATA_VERSION_SEPARATOR + version : type)
+          + "/" + ((version != null) ? id + RodaConstants.METADATA_VERSION_SEPARATOR + version : id)
           + RodaConstants.METADATA_TEMPLATE_EXTENSION);
 
         String template = null;
@@ -1487,7 +1488,7 @@ public class BrowserHelper {
           }
         }
 
-        SupportedMetadataTypeBundle b = new SupportedMetadataTypeBundle(type, version, label, template, values);
+        SupportedMetadataTypeBundle b = new SupportedMetadataTypeBundle(id, type, version, label, template, values);
         supportedMetadata.add(b);
       }
     }

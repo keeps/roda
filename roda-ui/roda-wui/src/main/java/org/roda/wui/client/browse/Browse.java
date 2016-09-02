@@ -1025,8 +1025,8 @@ public class Browse extends Composite {
               public void onFailure(Throwable caught) {
                 if (caught instanceof NotFoundException) {
                   Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-                } else if (!AsyncCallbackUtils.treatCommonFailures(caught)) {
-                  Toast.showError(messages.moveIllegalOperation(caught.getMessage()));
+                } else {
+                  AsyncCallbackUtils.defaultFailureTreatment(caught);
                 }
               }
             });
@@ -1074,8 +1074,8 @@ public class Browse extends Composite {
               public void onFailureImpl(Throwable caught) {
                 if (caught instanceof NotFoundException) {
                   Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-                } else if (!AsyncCallbackUtils.treatCommonFailures(caught)) {
-                  Toast.showError(messages.moveIllegalOperation(caught.getMessage()));
+                } else {
+                  AsyncCallbackUtils.defaultFailureTreatment(caught);
                 }
               }
             });

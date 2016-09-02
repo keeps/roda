@@ -116,6 +116,12 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
+  protected void doUnexpectedFailure(Throwable e) {
+    LOGGER.error("Unexpected failure", e);
+    super.doUnexpectedFailure(e);
+  }
+
+  @Override
   public boolean isCookiesMessageActive() {
     return RodaCoreFactory.getRodaConfiguration().getBoolean(COOKIES_ACTIVE_PROPERTY, false);
   }
@@ -277,8 +283,13 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public IndexedAIP moveAIPInHierarchy(SelectedItems<IndexedAIP> selected, String parentId)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     AlreadyExistsException, ValidationException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.moveAIPInHierarchy(selected, parentId, user);
+    try {
+      RodaUser user = UserUtility.getUser(getThreadLocalRequest());
+      return Browser.moveAIPInHierarchy(selected, parentId, user);
+    } catch (Throwable e) {
+      LOGGER.error("Unexpected error", e);
+      throw e;
+    }
   }
 
   @Override
@@ -305,8 +316,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     // If the bundle has values from the form, we need to update the XML by
     // applying the values of the form to the raw tempalte
     if (bundle.getValues() != null) {
-      SupportedMetadataTypeBundle smtb = new SupportedMetadataTypeBundle(bundle.getType(), bundle.getVersion(),
-        bundle.getId(), bundle.getRawTemplate(), bundle.getValues());
+      SupportedMetadataTypeBundle smtb = new SupportedMetadataTypeBundle(bundle.getId(), bundle.getType(),
+        bundle.getVersion(), bundle.getId(), bundle.getRawTemplate(), bundle.getValues());
       bundle.setXml(Browser.createDescriptiveMetadataPreview(user, aipId, smtb));
     }
 

@@ -23,6 +23,7 @@ import org.roda.core.data.v2.validation.ValidationIssue;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
@@ -158,24 +159,16 @@ public class CreateDescriptiveMetadata extends Composite {
         String value = type.getSelectedValue();
 
         selectedBundle = null;
-        if (value != null && value.length() > 0) {
+        if (StringUtils.isNotBlank(value)) {
           for (SupportedMetadataTypeBundle bundle : metadataTypes) {
-            if (value.contains(RodaConstants.METADATA_VERSION_SEPARATOR) && bundle.getVersion() != null) {
-              String type = value.substring(0, value.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));
-              String version = value.substring(value.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1,
-                value.length());
-              if (bundle.getType().equals(type) && bundle.getVersion().equals(version)) {
-                selectedBundle = bundle;
-                break;
-              }
-            } else if (bundle.getType().equals(value)) {
+            if (bundle.getId().equals(value)) {
               selectedBundle = bundle;
               break;
             }
           }
 
           id.setText(value + ".xml");
-        } else if (value != null) {
+        } else {
           id.setText("");
         }
         updateFormOrXML();
@@ -299,7 +292,7 @@ public class CreateDescriptiveMetadata extends Composite {
     buttonApply.setEnabled(false);
     String idText = id.getText();
     String typeText = selectedBundle != null ? selectedBundle.getType() : messages.otherItem(); // Other
-    String typeVersion = selectedBundle != null ? selectedBundle.getVersion() : "";
+    String typeVersion = selectedBundle != null ? selectedBundle.getVersion() : null;
     String template = selectedBundle != null ? selectedBundle.getTemplate() : null;
     String xmlText = metadataXML.getText();
     boolean hasOverridenTheForm = inXML && !xmlText.equals(metadataTextFromForm);

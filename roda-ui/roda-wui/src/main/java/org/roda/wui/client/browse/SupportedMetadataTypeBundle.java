@@ -14,6 +14,7 @@ public class SupportedMetadataTypeBundle implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
+  private String id;
   private String type;
   private String version;
   private String label;
@@ -24,22 +25,34 @@ public class SupportedMetadataTypeBundle implements Serializable {
     super();
   }
 
-  public SupportedMetadataTypeBundle(String type, String version, String label, String template) {
+  public SupportedMetadataTypeBundle(String id, String type, String version, String label, String template) {
     super();
+    this.id  = id;
     this.type = type;
     this.version = version;
     this.label = label;
     this.template = template;
   }
 
-  public SupportedMetadataTypeBundle(String type, String version, String label, String template,
+  public SupportedMetadataTypeBundle(String id, String type, String version, String label, String template,
     Set<MetadataValue> values) {
     super();
+    this.id = id;
     this.type = type;
     this.version = version;
     this.label = label;
     this.template = template;
     this.values = values;
+  }
+  
+  
+
+  public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
   }
 
   public String getType() {

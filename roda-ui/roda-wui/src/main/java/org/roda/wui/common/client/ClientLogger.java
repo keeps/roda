@@ -321,7 +321,8 @@ public class ClientLogger implements IsSerializable {
         }
       };
 
-      ClientLoggerService.Util.getInstance().error(classname, message, errorcallback);
+      ClientLoggerService.Util.getInstance().error(classname,
+        message + " error: [" + (error.getClass().getName() + "] " + error.getMessage()), errorcallback);
       if (SHOW_ERROR_MESSAGES) {
         Toast.showError(message,
           error.getMessage() + (error.getCause() != null ? "\nCause: " + error.getCause().getMessage() : ""));
