@@ -11,6 +11,6 @@ import org.roda.core.data.common.RodaConstants;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-@JsonIgnoreProperties({RodaConstants.AIP_AIP_ID, RodaConstants.AIP_REPRESENTATION_ID})
+@JsonIgnoreProperties({RodaConstants.DESCRIPTIVE_METADATA_AIP_ID, RodaConstants.DESCRIPTIVE_METADATA_REPRESENTATION_ID})
 public class DescriptiveMetadataMixIn {
 }

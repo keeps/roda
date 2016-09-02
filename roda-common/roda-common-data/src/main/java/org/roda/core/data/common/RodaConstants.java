@@ -331,6 +331,13 @@ public final class RodaConstants {
 
   // AIP types
   public static final String AIP_TYPE_MIXED = "MIXED";
+  
+  /*
+   * Descriptive metadata FIELDS
+   */
+  public static final String DESCRIPTIVE_METADATA_AIP_ID = "aipId";
+  public static final String DESCRIPTIVE_METADATA_REPRESENTATION_ID = "representationId";
+  
   /*
    * Representation FIELDS
    */

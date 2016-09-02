@@ -1120,7 +1120,6 @@ public class SolrUtils {
     SolrInputDocument ret = new SolrInputDocument();
 
     ret.addField(RodaConstants.AIP_ID, aip.getId());
-    ret.addField(RodaConstants.AIP_AIP_ID, aip.getId());
     ret.addField(RodaConstants.AIP_PARENT_ID, aip.getParentId());
     ret.addField(RodaConstants.STATE, aip.getState().toString());
 

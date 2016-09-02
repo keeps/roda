@@ -105,7 +105,7 @@
      installations. See the <uniqueKey> declaration below where <uniqueKey> is set to "id".
    -->   
    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
-   <field name="aipId" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
+   <field name="aipId" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="parentId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="type" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="ancestors" type="string" indexed="true" stored="true" required="false" multiValued="true" /> 
@@ -197,6 +197,7 @@
         is added to the index.  It's used either to index the same field differently,
         or to add multiple fields to the same field for easier/faster searching.  -->
  <copyField source="title" dest="title_sort" />
+ <copyField source="id" dest="aipId" />
  <copyField source="*" dest="search" />
     <!--
    <copyField source="title" dest="text"/>
