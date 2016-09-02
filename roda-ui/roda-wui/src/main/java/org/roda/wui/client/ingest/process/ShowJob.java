@@ -40,6 +40,7 @@ import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.IngestJobReportList;
@@ -310,6 +311,7 @@ public class ShowJob extends Composite {
       FacetUtils.bindFacets(simpleJobReports, facetPanels);
 
       simpleJobReports.addValueChangeHandler(new ValueChangeHandler<IndexResult<Report>>() {
+
         @Override
         public void onValueChange(ValueChangeEvent<IndexResult<Report>> event) {
           reportListPanel.setVisible(event.getValue().getTotalCount() > 0);
@@ -701,16 +703,28 @@ public class ShowJob extends Composite {
   }
 
   private void stop() {
-    BrowserService.Util.getInstance().stopJob(job.getId(), new AsyncCallback<Void>() {
-      @Override
-      public void onFailure(Throwable caught) {
-        // FIXME 20160826 hsilva: do proper handling of the failure
-      }
+    Dialogs.showConfirmDialog(messages.jobStopConfirmDialogTitle(), messages.jobStopConfirmDialogMessage(),
+      messages.dialogCancel(), messages.dialogYes(), new AsyncCallback<Boolean>() {
 
-      @Override
-      public void onSuccess(Void result) {
-        // FIXME 20160826 hsilva: do proper handling of the success
-      }
-    });
+        @Override
+        public void onFailure(Throwable caught) {
+          // nothing to do
+        }
+
+        @Override
+        public void onSuccess(Boolean confirmed) {
+          BrowserService.Util.getInstance().stopJob(job.getId(), new AsyncCallback<Void>() {
+            @Override
+            public void onFailure(Throwable caught) {
+              // FIXME 20160826 hsilva: do proper handling of the failure
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+              // FIXME 20160826 hsilva: do proper handling of the success
+            }
+          });
+        }
+      });
   }
 }

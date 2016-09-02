@@ -423,7 +423,7 @@ public interface ClientMessages extends Messages {
   String confirmButton();
 
   String applyAllButton();
-  
+
   String stopButton();
 
   /*** View representation ***/
@@ -499,9 +499,9 @@ public interface ClientMessages extends Messages {
   String showJobStatusFailedDuringCreation();
 
   String showJobStatusFailedToComplete();
-  
+
   String showJobStatusStopping();
-  
+
   String showJobStatusStopped();
 
   SafeHtml showJobProgressCompletionPercentage(int completionPercentage);
@@ -529,6 +529,10 @@ public interface ClientMessages extends Messages {
   String showTransferredResourceExtended();
 
   String showJobSourceObjects();
+
+  String jobStopConfirmDialogTitle();
+
+  String jobStopConfirmDialogMessage();
 
   /************* Browse ****************/
   String browseLoading();
@@ -1274,7 +1278,7 @@ public interface ClientMessages extends Messages {
   String selectAnItemToMoveDescription();
 
   String searchContext();
-  
+
   String searchAIP();
 
   /***** Browse representations ****/
@@ -1492,7 +1496,7 @@ public interface ClientMessages extends Messages {
   // Content Panel
 
   String authorizationDeniedAlert();
-  
+
   String authorizationDeniedAlertMessage(String message);
 
   String casForwardWarning();

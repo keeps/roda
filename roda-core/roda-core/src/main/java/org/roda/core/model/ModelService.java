@@ -47,6 +47,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.utils.URNUtils;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
@@ -1597,7 +1598,7 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  public void createOrUpdateJob(Job job) throws GenericException {
+  public void createOrUpdateJob(Job job) {
     // create or update job in storage
     try {
       String jobAsJson = JsonUtils.getJsonFromObject(job);
@@ -2293,6 +2294,16 @@ public class ModelService extends ModelObservable {
       StoragePath containerPath = ModelUtils.getContainerPath(objectClass);
       final CloseableIterable<Resource> resourcesIterable = storage.listResourcesUnderContainer(containerPath, false);
       return ResourceParseUtils.convert(getStorage(), resourcesIterable, objectClass);
+    }
+  }
+
+  public boolean hasObjects(Class<? extends IsRODAObject> objectClass)
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
+    if (!TransferredResource.class.equals(objectClass)) {
+      StoragePath storagePath = ModelUtils.getContainerPath(objectClass);
+      return RodaCoreFactory.getStorageService().countResourcesUnderContainer(storagePath, false).intValue() > 0;
+    } else {
+      return false;
     }
   }
 

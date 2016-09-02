@@ -61,9 +61,12 @@ public class RepresentationsResource {
   private HttpServletRequest request;
 
   @GET
+  @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @ApiOperation(value = "List Representations", notes = "Gets a list of representations.", response = Representation.class, responseContainer = "List")
   @ApiResponses(value = {
-    @ApiResponse(code = 200, message = "Successful response", response = Representation.class, responseContainer = "List")})
+    @ApiResponse(code = 200, message = "Successful response", response = Representation.class, responseContainer = "List"),
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response listRepresentations(
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) String start,
@@ -83,7 +86,7 @@ public class RepresentationsResource {
 
   @GET
   @Path("/{" + RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID + "}")
-  @Produces({"application/json", "application/zip"})
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, RodaConstants.APPLICATION_ZIP})
   @ApiOperation(value = "Get representation", notes = "Get representation", response = Representation.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Representation.class),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
@@ -181,11 +184,11 @@ public class RepresentationsResource {
   }
 
   @GET
-  @Path("/{" + RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID + "}/descriptive_metadata/")
+  @Path("/{" + RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID + "}/" + RodaConstants.API_DESCRIPTIVE_METADATA + "/")
   @ApiOperation(value = "List descriptive metadata", notes = "List descriptive metadata", response = DescriptiveMetadata.class, responseContainer = "List")
   @ApiResponses(value = {
     @ApiResponse(code = 200, message = "OK", response = DescriptiveMetadata.class, responseContainer = "List"),
-    @ApiResponse(code = 404, message = "Representation not found", response = DescriptiveMetadata.class, responseContainer = "List")})
+    @ApiResponse(code = 404, message = "Representation not found", response = ApiResponseMessage.class)})
 
   public Response retrieveDescriptiveMetadataListFromRepresentation(
     @ApiParam(value = "The ID of the existing Representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID) String representationId,
@@ -211,11 +214,13 @@ public class RepresentationsResource {
   }
 
   @GET
-  @Path("/{" + RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID + "}/descriptive_metadata/{"
+  @Path("/{" + RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID + "}/" + RodaConstants.API_DESCRIPTIVE_METADATA + "/{"
     + RodaConstants.API_PATH_PARAM_METADATA_ID + "}")
-  @Produces({"application/json", "application/xml", "text/html"})
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_HTML,
+    MediaType.APPLICATION_OCTET_STREAM})
   @ApiOperation(value = "Get descriptive metadata", notes = "Get descriptive metadata (JSON info, XML file or HTML conversion)", response = DescriptiveMetadata.class)
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = DescriptiveMetadata.class)})
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = DescriptiveMetadata.class),
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response retrieveDescriptiveMetadataFromRepresentation(
     @ApiParam(value = "The ID of the existing Representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID) String representationId,
@@ -242,7 +247,7 @@ public class RepresentationsResource {
   }
 
   @PUT
-  @Path("/{" + RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID + "}/descriptive_metadata/{"
+  @Path("/{" + RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID + "}/" + RodaConstants.API_DESCRIPTIVE_METADATA + "/{"
     + RodaConstants.API_PATH_PARAM_METADATA_ID + "}")
   @ApiOperation(value = "Update descriptive metadata", notes = "Upload a descriptive metadata file to update an existing one", response = DescriptiveMetadata.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = DescriptiveMetadata.class),
@@ -251,7 +256,8 @@ public class RepresentationsResource {
   public Response updateDescriptiveMetadataOnRepresentation(
     @ApiParam(value = "The ID of the existing Representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID) String representationId,
     @ApiParam(value = "The ID of the existing metadata file to update", required = true) @PathParam(RodaConstants.API_PATH_PARAM_METADATA_ID) String metadataId,
-    @FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition fileDetail,
+    @FormDataParam(RodaConstants.API_PARAM_FILE) InputStream inputStream,
+    @FormDataParam(RodaConstants.API_PARAM_FILE) FormDataContentDisposition fileDetail,
     @ApiParam(value = "The type of the metadata file (e.g. eadc2014, dc)", required = true) @QueryParam("metadataType") String metadataType,
     @ApiParam(value = "The version of the metadata type used", required = false) @QueryParam("metadataVersion") String metadataVersion)
     throws RODAException {
@@ -266,7 +272,7 @@ public class RepresentationsResource {
   }
 
   @POST
-  @Path("/{" + RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID + "}/descriptive_metadata/{"
+  @Path("/{" + RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID + "}/" + RodaConstants.API_DESCRIPTIVE_METADATA + "/{"
     + RodaConstants.API_PATH_PARAM_METADATA_ID + "}")
   @ApiOperation(value = "Create descriptive metadata", notes = "Upload a new descriptive metadata file", response = DescriptiveMetadata.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = DescriptiveMetadata.class),
@@ -275,7 +281,8 @@ public class RepresentationsResource {
   public Response createDescriptiveMetadataOnRepresentation(
     @ApiParam(value = "The ID of the existing Representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID) String representationId,
     @ApiParam(value = "The suggested ID metadata file to create", required = true) @PathParam(RodaConstants.API_PATH_PARAM_METADATA_ID) String metadataId,
-    @FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition fileDetail,
+    @FormDataParam(RodaConstants.API_PARAM_FILE) InputStream inputStream,
+    @FormDataParam(RodaConstants.API_PARAM_FILE) FormDataContentDisposition fileDetail,
     @ApiParam(value = "The type of the metadata file (e.g. eadc2014, dc)", required = true) @QueryParam("metadataType") String metadataType,
     @ApiParam(value = "The version of the metadata type used", required = false) @QueryParam("metadataVersion") String metadataVersion)
     throws RODAException {
@@ -290,11 +297,11 @@ public class RepresentationsResource {
   }
 
   @DELETE
-  @Path("/{" + RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID + "}/descriptive_metadata/{"
+  @Path("/{" + RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID + "}/" + RodaConstants.API_DESCRIPTIVE_METADATA + "/{"
     + RodaConstants.API_PATH_PARAM_METADATA_ID + "}")
   @ApiOperation(value = "Delete descriptive metadata", notes = "Delete an existing descriptive metadata file", response = Void.class)
   @ApiResponses(value = {@ApiResponse(code = 204, message = "OK", response = Void.class),
-    @ApiResponse(code = 404, message = "Not found", response = Void.class)})
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response deleteDescriptiveMetadataFromRepresentation(
     @ApiParam(value = "The ID of the existing Representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID) String representationId,
@@ -312,10 +319,11 @@ public class RepresentationsResource {
   }
 
   @GET
-  @Path("/{" + RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID + "}/preservation_metadata")
-  @Produces({"application/json", "application/zip"})
+  @Path("/{" + RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID + "}/" + RodaConstants.API_PRESERVATION_METADATA + "/")
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, RodaConstants.APPLICATION_ZIP})
   @ApiOperation(value = "Get representation preservation metadata", notes = "Get representation preservation metadata (JSON info, ZIP file conversion) for a given representation.\nOptional query params of **start** and **limit** defined the returned array.", response = PreservationMetadata.class)
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = PreservationMetadata.class)})
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = PreservationMetadata.class),
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response retrievePreservationMetadataListFromRepresentation(
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID) String representationId,

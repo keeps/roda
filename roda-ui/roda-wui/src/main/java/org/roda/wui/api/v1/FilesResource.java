@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -22,6 +23,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.transform.TransformerException;
 
@@ -57,6 +59,8 @@ public class FilesResource {
   private HttpServletRequest request;
 
   @GET
+  @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @ApiOperation(value = "List Files", notes = "Gets a list of files.", response = File.class, responseContainer = "List")
   @ApiResponses(value = {
     @ApiResponse(code = 200, message = "Successful response", response = File.class, responseContainer = "List")})
@@ -78,7 +82,7 @@ public class FilesResource {
 
   @GET
   @Path("/{" + RodaConstants.API_PATH_PARAM_FILE_UUID + "}")
-  @Produces({"application/json", "application/xml", "application/octetstream"})
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_OCTET_STREAM})
   @ApiOperation(value = "Get file", notes = "Get file", response = File.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = File.class),
     @ApiResponse(code = 404, message = "Not found", response = File.class)})
@@ -106,7 +110,7 @@ public class FilesResource {
   @PUT
   @ApiOperation(value = "Update file", notes = "Update existing file", response = File.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = File.class),
-    @ApiResponse(code = 404, message = "Not found", response = File.class)})
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response update(org.roda.core.data.v2.ip.File file,
     @ApiParam(value = "Choose format in which to get the file", allowableValues = "json, xml") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
@@ -124,13 +128,14 @@ public class FilesResource {
   @POST
   @ApiOperation(value = "Create file", notes = "Create a new representation file", response = File.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = File.class),
-    @ApiResponse(code = 409, message = "Already exists", response = File.class)})
+    @ApiResponse(code = 409, message = "Already exists", response = ApiResponseMessage.class)})
 
   public Response createRepresentationFile(
     @ApiParam(value = "The ID of the AIP where to create the representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @ApiParam(value = "The requested ID for the new representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
     @ApiParam(value = "The requested ID of the new file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_ID) String fileId,
-    @FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition fileDetail,
+    @FormDataParam(RodaConstants.API_PARAM_FILE) InputStream inputStream,
+    @FormDataParam(RodaConstants.API_PARAM_FILE) FormDataContentDisposition fileDetail,
     @ApiParam(value = "Choose format in which to get the file", allowableValues = "json, xml") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
@@ -139,9 +144,9 @@ public class FilesResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    org.roda.core.data.v2.ip.File file;
     try {
-      file = Browser.createFile(user, aipId, representationId, new ArrayList<>(), fileId, inputStream);
+      org.roda.core.data.v2.ip.File file = Browser.createFile(user, aipId, representationId, new ArrayList<>(), fileId,
+        inputStream);
       return Response.ok(file, mediaType).build();
     } catch (IOException e) {
       return ApiUtils.errorResponse(new TransformerException(e.getMessage()));
@@ -153,7 +158,7 @@ public class FilesResource {
   @Path("/{" + RodaConstants.API_PATH_PARAM_FILE_UUID + "}")
   @ApiOperation(value = "Delete file", notes = "Delete representation file", response = Void.class)
   @ApiResponses(value = {@ApiResponse(code = 204, message = "OK", response = Void.class),
-    @ApiResponse(code = 404, message = "Not found", response = Void.class)})
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response delete(
     @ApiParam(value = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileUUID)
@@ -167,10 +172,11 @@ public class FilesResource {
   }
 
   @GET
-  @Path("/{" + RodaConstants.API_PATH_PARAM_FILE_UUID + "}/preservation_metadata/")
-  @Produces({"application/json", "application/zip", "text/html"})
+  @Path("/{" + RodaConstants.API_PATH_PARAM_FILE_UUID + "}/" + RodaConstants.API_PRESERVATION_METADATA + "/")
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, RodaConstants.APPLICATION_ZIP})
   @ApiOperation(value = "Get preservation metadata", notes = "Get preservation metadata (JSON info, ZIP file or HTML conversion).\nOptional query params of **start** and **limit** defined the returned array.", response = PreservationMetadata.class)
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = PreservationMetadata.class)})
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = PreservationMetadata.class),
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response retrievePreservationMetadataListFromAIP(
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileId,

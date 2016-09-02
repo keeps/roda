@@ -170,6 +170,7 @@ public final class RodaConstants {
   public static final String API_QUERY_PARAM_FILEPATH = "filepath";
   public static final String API_QUERY_PARAM_PARENT_ID = "parent_id";
   public static final String API_QUERY_PARAM_TYPE = "type";
+  public static final String API_PARAM_FILE = "file";
   // http headers used
   public static final String API_HTTP_HEADER_ACCEPT = "Accept";
   // job related params
@@ -333,13 +334,13 @@ public final class RodaConstants {
 
   // AIP types
   public static final String AIP_TYPE_MIXED = "MIXED";
-  
+
   /*
    * Descriptive metadata FIELDS
    */
   public static final String DESCRIPTIVE_METADATA_AIP_ID = "aipId";
   public static final String DESCRIPTIVE_METADATA_REPRESENTATION_ID = "representationId";
-  
+
   /*
    * Representation FIELDS
    */

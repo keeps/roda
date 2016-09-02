@@ -17,6 +17,7 @@ import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
@@ -129,12 +130,12 @@ public class Profile extends Composite {
           }
 
           public void onSuccess(Void result) {
-            Tools.newHistory(MemberManagement.RESOLVER);
+            Tools.newHistory(Welcome.RESOLVER);
           }
         });
       }
     } else {
-      Tools.newHistory(MemberManagement.RESOLVER);
+      Tools.newHistory(Welcome.RESOLVER);
     }
   }
 
@@ -144,7 +145,7 @@ public class Profile extends Composite {
   }
 
   private void cancel() {
-    Tools.newHistory(MemberManagement.RESOLVER);
+    Tools.newHistory(Welcome.RESOLVER);
   }
 
   private void errorMessage(Throwable caught) {

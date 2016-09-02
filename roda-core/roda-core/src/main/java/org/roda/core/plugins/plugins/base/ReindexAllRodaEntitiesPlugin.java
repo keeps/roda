@@ -7,9 +7,9 @@
  */
 package org.roda.core.plugins.plugins.base;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -18,6 +18,8 @@ import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.Void;
+import org.roda.core.data.v2.index.SelectedItemsAll;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -71,14 +73,24 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       List<Class<? extends IsRODAObject>> classes = PluginHelper.getReindexObjectClasses();
-      int size = classes.size();
-      jobPluginInfo.setSourceObjectsCount(size);
+      jobPluginInfo.setSourceObjectsCount(classes.size());
+
       for (Class<? extends IsRODAObject> reindexClass : classes) {
+        LOGGER.debug("Reindexing all {}", reindexClass.getSimpleName());
         try {
-          LOGGER.debug("Reindexing all {}", reindexClass.getSimpleName());
-          index.reindex(storage, reindexClass);
+          if (model.hasObjects(reindexClass)) {
+            Job job = new Job();
+            job.setId(UUID.randomUUID().toString());
+            job.setName(ReindexRodaEntityPlugin.class.getSimpleName() + " (" + reindexClass.getSimpleName() + ")");
+            job.setPlugin(ReindexRodaEntityPlugin.class.getName());
+            job.setSourceObjects(SelectedItemsAll.create(reindexClass));
+            job.setPluginType(PluginType.MISC);
+            job.setUsername(PluginHelper.getJobUsername(this, model));
+            PluginHelper.createAndExecuteJob(job, true);
+          }
+
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        } catch (RODAException | IOException e) {
+        } catch (RODAException e) {
           LOGGER.error("Error reindexing (all): {}", reindexClass.getSimpleName(), e);
           jobPluginInfo.incrementObjectsProcessedWithFailure();
         }

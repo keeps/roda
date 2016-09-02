@@ -34,6 +34,7 @@ import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
+import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
@@ -58,7 +59,6 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
-import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
@@ -335,7 +335,7 @@ public final class PluginHelper {
     list.add(Format.class);
     list.add(Notification.class);
     list.add(Risk.class);
-    list.add(LogEntry.class);
+    // list.add(LogEntry.class);
     list.add(Job.class);
     list.add(RiskIncidence.class);
     return list;
@@ -821,6 +821,12 @@ public final class PluginHelper {
     } catch (NotFoundException e) {
       LOGGER.debug("Can't delete ghost or move node. It wasn't found.", e);
     }
+  }
+
+  public static void createAndExecuteJob(Job job, boolean async) throws GenericException, JobAlreadyStartedException {
+    RodaCoreFactory.getModelService().createJob(job);
+    RodaCoreFactory.getPluginOrchestrator().executeJob(job, async);
+    RodaCoreFactory.getIndexService().commit(Job.class);
   }
 
 }

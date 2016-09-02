@@ -22,19 +22,13 @@ import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.IsRODAObject;
-import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
-import org.roda.core.data.v2.log.LogEntry;
-import org.roda.core.data.v2.notifications.Notification;
-import org.roda.core.data.v2.risks.Risk;
-import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
@@ -128,19 +122,19 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
     try {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
-      int size = list.size();
+      pluginReport.setPluginState(PluginState.SUCCESS);
 
-      try {
-        for (T object : list) {
-          LOGGER.debug("Reindexing {} {}", object.getClass().getSimpleName(), object.getId());
+      for (T object : list) {
+        LOGGER.debug("Reindexing {} {}", object.getClass().getSimpleName(), object.getId());
+
+        try {
           index.reindex(storage, object);
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        } catch (RODAException | IOException e) {
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+          LOGGER.error("Error reindexing RODA entity", e);
+          pluginReport.setPluginState(PluginState.FAILURE).setPluginDetails("Reindex did not execute successfully");
         }
-        pluginReport.setPluginState(PluginState.SUCCESS);
-      } catch (RODAException | IOException e) {
-        jobPluginInfo.incrementObjectsProcessedWithFailure(size);
-        LOGGER.error("Error reindexing RODA entity", e);
-        pluginReport.setPluginState(PluginState.FAILURE).setPluginDetails("Reindex did not execute successfully");
       }
 
       jobPluginInfo.finalizeInfo();
