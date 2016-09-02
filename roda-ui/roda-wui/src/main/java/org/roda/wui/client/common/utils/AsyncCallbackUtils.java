@@ -9,8 +9,8 @@ package org.roda.wui.client.common.utils;
 
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.wui.client.common.Dialogs;
-import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.welcome.Welcome;
+import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -23,6 +23,7 @@ import config.i18n.client.ClientMessages;
 public class AsyncCallbackUtils {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private static ClientLogger LOGGER = new ClientLogger(AsyncCallbackUtils.class.getName());
 
   public static final boolean treatCommonFailures(Throwable caught) {
     boolean treatedError = false;
@@ -57,6 +58,7 @@ public class AsyncCallbackUtils {
   public static final void defaultFailureTreatment(Throwable caught) {
     if (!treatCommonFailures(caught)) {
       Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
+      LOGGER.error("Async request error", caught);
     }
   }
 

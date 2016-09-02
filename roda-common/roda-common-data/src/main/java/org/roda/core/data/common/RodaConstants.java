@@ -442,7 +442,6 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_STRING_VALUE = "parameter.string_value";
   public static final String PLUGIN_PARAMS_BOOLEAN_VALUE = "parameter.boolean_value";
   public static final String PLUGIN_PARAMS_CLEAR_INDEXES = "parameter.clear_indexes";
-  public static final String PLUGIN_PARAMS_REINDEX_ALL = "parameter.reindex_all";
   public static final String PLUGIN_PARAMS_OBJECT_CLASS = "parameter.object_class";
   public static final String PLUGIN_PARAMS_CLASS_CANONICAL_NAME = "parameter.class_canonical_name";
   public static final String PLUGIN_PARAMS_SIP_TO_AIP_CLASS = "parameter.sip_to_aip_class";

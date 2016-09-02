@@ -41,6 +41,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LinkingObjectUtils;
+import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsList;
@@ -57,7 +58,10 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -323,6 +327,20 @@ public final class PluginHelper {
 
   /***************** Plugin parameters related *****************/
   /*************************************************************/
+  public static List<Class<? extends IsRODAObject>> getReindexObjectClasses() {
+    List<Class<? extends IsRODAObject>> list = new ArrayList<>();
+    list.add(TransferredResource.class);
+    list.add(AIP.class);
+    // list.add(Agent.class);
+    list.add(Format.class);
+    list.add(Notification.class);
+    list.add(Risk.class);
+    list.add(LogEntry.class);
+    list.add(Job.class);
+    list.add(RiskIncidence.class);
+    return list;
+  }
+
   public static <T extends IsRODAObject> boolean getBooleanFromParameters(Plugin<T> plugin,
     PluginParameter pluginParameter) {
     return verifyIfStepShouldBePerformed(plugin, pluginParameter);

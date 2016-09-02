@@ -52,7 +52,6 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
 
   private boolean clearIndexes = true;
   private Class<T> clazz = null;
-  private boolean reindexAll = false;
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
@@ -63,10 +62,6 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "Clear indexes", PluginParameterType.BOOLEAN,
         "true", false, false, "Clear all indexes before reindexing them."));
-
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_REINDEX_ALL,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_REINDEX_ALL, "Reindex all", PluginParameterType.BOOLEAN, "false",
-        false, false, "Reindex all RODA objects."));
   }
 
   @Override
@@ -99,7 +94,6 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
     ArrayList<PluginParameter> parameters = new ArrayList<PluginParameter>();
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_CLASS_CANONICAL_NAME));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES));
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_REINDEX_ALL));
     return parameters;
   }
 
@@ -109,10 +103,6 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
     if (parameters != null) {
       if (parameters.get(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES) != null) {
         clearIndexes = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES));
-      }
-
-      if (parameters.get(RodaConstants.PLUGIN_PARAMS_REINDEX_ALL) != null) {
-        reindexAll = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_REINDEX_ALL));
       }
 
       if (parameters.get(RodaConstants.PLUGIN_PARAMS_CLASS_CANONICAL_NAME) != null) {
@@ -141,28 +131,11 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
       int size = list.size();
 
       try {
-        if (reindexAll) {
-          List<Class<T>> classes = getObjectClasses();
-          size = classes.size();
-          jobPluginInfo.setSourceObjectsCount(size);
-          for (Class<T> reindexClass : classes) {
-            try {
-              LOGGER.debug("Reindexing all {}", reindexClass.getSimpleName());
-              index.reindex(storage, reindexClass);
-              jobPluginInfo.incrementObjectsProcessedWithSuccess();
-            } catch (RODAException | IOException e) {
-              LOGGER.error("Error reindexing (all): {}", reindexClass.getSimpleName(), e);
-              jobPluginInfo.incrementObjectsProcessedWithFailure();
-            }
-          }
-        } else {
-          for (T object : list) {
-            LOGGER.debug("Reindexing {} {}", object.getClass().getSimpleName(), object.getId());
-            index.reindex(storage, object);
-            jobPluginInfo.incrementObjectsProcessedWithSuccess();
-          }
+        for (T object : list) {
+          LOGGER.debug("Reindexing {} {}", object.getClass().getSimpleName(), object.getId());
+          index.reindex(storage, object);
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
         }
-
         pluginReport.setPluginState(PluginState.SUCCESS);
       } catch (RODAException | IOException e) {
         jobPluginInfo.incrementObjectsProcessedWithFailure(size);
@@ -186,18 +159,12 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
       LOGGER.debug("Clearing indexes");
 
       try {
-        if (reindexAll) {
-          for (Class<T> reindexClass : getObjectClasses()) {
-            index.clearIndexes(SolrUtils.getIndexName(reindexClass));
-          }
+        if (clazz != null) {
+          index.clearIndexes(SolrUtils.getIndexName(clazz));
         } else {
-          if (clazz != null) {
-            index.clearIndexes(SolrUtils.getIndexName(clazz));
-          } else {
-            Job job = PluginHelper.getJob(this, index);
-            Class selectedClass = Class.forName(job.getSourceObjects().getSelectedClass());
-            index.clearIndexes(SolrUtils.getIndexName(selectedClass));
-          }
+          Job job = PluginHelper.getJob(this, index);
+          Class selectedClass = Class.forName(job.getSourceObjects().getSelectedClass());
+          index.clearIndexes(SolrUtils.getIndexName(selectedClass));
         }
       } catch (GenericException | NotFoundException | ClassNotFoundException e) {
         throw new PluginException("Error clearing index", e);
@@ -215,18 +182,13 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
     LOGGER.debug("Optimizing indexes");
 
     try {
-      if (reindexAll) {
-        for (Class<T> reindexClass : getObjectClasses()) {
-          index.optimizeIndexes(SolrUtils.getIndexName(reindexClass));
-        }
+
+      if (clazz != null) {
+        index.optimizeIndexes(SolrUtils.getIndexName(clazz));
       } else {
-        if (clazz != null) {
-          index.optimizeIndexes(SolrUtils.getIndexName(clazz));
-        } else {
-          Job job = PluginHelper.getJob(this, index);
-          Class selectedClass = Class.forName(job.getSourceObjects().getSelectedClass());
-          index.optimizeIndexes(SolrUtils.getIndexName(selectedClass));
-        }
+        Job job = PluginHelper.getJob(this, index);
+        Class selectedClass = Class.forName(job.getSourceObjects().getSelectedClass());
+        index.optimizeIndexes(SolrUtils.getIndexName(selectedClass));
       }
     } catch (GenericException | NotFoundException | ClassNotFoundException e) {
       throw new PluginException("Error optimizing index", e);
@@ -278,17 +240,7 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
 
   @Override
   public List<Class<T>> getObjectClasses() {
-    List<Class<? extends IsRODAObject>> list = new ArrayList<>();
-    list.add(TransferredResource.class);
-    list.add(AIP.class);
-    // list.add(Agent.class);
-    list.add(Format.class);
-    list.add(Notification.class);
-    list.add(Risk.class);
-    list.add(LogEntry.class);
-    list.add(Job.class);
-    list.add(RiskIncidence.class);
-    return (List) list;
+    return (List) PluginHelper.getReindexObjectClasses();
   }
 
 }

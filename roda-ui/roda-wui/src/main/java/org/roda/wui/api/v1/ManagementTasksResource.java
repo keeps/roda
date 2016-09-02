@@ -51,6 +51,7 @@ import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.plugins.plugins.base.ActionLogCleanerPlugin;
+import org.roda.core.plugins.plugins.base.ReindexAllRodaEntitiesPlugin;
 import org.roda.core.plugins.plugins.base.ReindexRodaEntityPlugin;
 import org.roda.wui.api.controllers.Jobs;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
@@ -152,13 +153,9 @@ public class ManagementTasksResource {
   private ApiResponseMessage createJobToReindexAllRODAObjects(RodaUser user, ControllerAssistant controllerAssistant) {
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
     Job job = new Job().setName("Management Task | Reindex 'All RODA Objects' job")
-      .setSourceObjects(SelectedItemsNone.create()).setPlugin(ReindexRodaEntityPlugin.class.getName());
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "true");
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_REINDEX_ALL, "true");
-    job.setPluginParameters(pluginParameters);
+      .setSourceObjects(SelectedItemsNone.create()).setPlugin(ReindexAllRodaEntitiesPlugin.class.getName());
 
-    createJobAndRegisterAction(user, controllerAssistant, response, job, "params", pluginParameters);
+    createJobAndRegisterAction(user, controllerAssistant, response, job, "params", job.getPluginParameters());
 
     return response;
   }
