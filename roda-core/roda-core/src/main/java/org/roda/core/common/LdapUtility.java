@@ -190,9 +190,14 @@ public class LdapUtility {
   private List<String> ldapProtectedGroups = new ArrayList<>();
 
   /**
-   * RODA administrator Distinguished Name (DN).
+   * RODA administrator user Distinguished Name (DN).
    */
   private String rodaAdminDN = null;
+
+  /**
+   * RODA administrator group Distinguished Name (DN).
+   */
+  private String rodaAdministratorsDN = null;
 
   /**
    * Directory where ApacheDS data will be stored.
@@ -269,6 +274,10 @@ public class LdapUtility {
     }
     this.rodaAdminDN = rodaAdminDN;
     this.dataDirectory = dataDirectory;
+  }
+
+  public void setRODAAdministratorsDN(String rodaAdministratorsDN) {
+    this.rodaAdministratorsDN = rodaAdministratorsDN;
   }
 
   /**
@@ -694,7 +703,7 @@ public class LdapUtility {
       entry.add(OU, group.getFullName());
       entry.add(SHADOW_INACTIVE, group.isActive() ? "0" : "1");
       // Add admin to all groups
-      entry.add(UNIQUE_MEMBER, rodaAdminDN);
+      entry.add(UNIQUE_MEMBER, rodaAdministratorsDN);
       // Add user members
       for (String memberName : group.getMemberUserNames()) {
         entry.add(UNIQUE_MEMBER, getUserDN(memberName));
@@ -758,7 +767,7 @@ public class LdapUtility {
       // Remove all members
       entry.removeAttributes(UNIQUE_MEMBER);
       // Add admin to all groups
-      entry.add(UNIQUE_MEMBER, rodaAdminDN);
+      entry.add(UNIQUE_MEMBER, rodaAdministratorsDN);
       // Add user members
       for (String memberName : modifiedGroup.getMemberUserNames()) {
         entry.add(UNIQUE_MEMBER, getUserDN(memberName));
@@ -1116,7 +1125,7 @@ public class LdapUtility {
       final Entry entryRole = service.newEntry(dnRole);
       entryRole.add(OBJECT_CLASS, "organizationalRole", OBJECT_CLASS_TOP);
       entryRole.add(CN, roleName);
-      entryRole.add(ROLE_OCCUPANT, rodaAdminDN);
+      entryRole.add(ROLE_OCCUPANT, rodaAdministratorsDN);
       service.getAdminSession().add(entryRole);
     } catch (final LdapEntryAlreadyExistsException e) {
       throw new RoleAlreadyExistsException("Role " + roleName + " already exists.", e);
@@ -1202,8 +1211,7 @@ public class LdapUtility {
     return rodaPartition;
   }
 
-  private User setUserRolesAndGroups(final CoreSession session, final User user)
-    throws LdapException {
+  private User setUserRolesAndGroups(final CoreSession session, final User user) throws LdapException {
     // Add all roles assigned to this user
     final Set<String> memberRoles = getMemberRoles(session, getUserDN(user.getName()));
     user.setAllRoles(memberRoles);

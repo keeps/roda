@@ -815,10 +815,13 @@ public class RodaCoreFactory {
       final List<String> ldapProtectedUsers = RodaUtils.copyList(rodaConfig.getList("ldap.protectedUsers"));
       final List<String> ldapProtectedGroups = RodaUtils.copyList(rodaConfig.getList("ldap.protectedGroups"));
       final String rodaAdminDN = rodaConfig.getString("ldap.rodaAdminDN");
+      final String rodaAdministratorsDN = rodaConfig.getString("ldap.rodaAdministratorsDN",
+        "cn=administrators,ou=groups,dc=roda,dc=org");
 
       RodaCoreFactory.ldapUtility = new LdapUtility(ldapStartServer, ldapPort, ldapBaseDN, ldapPeopleDN, ldapGroupsDN,
         ldapRolesDN, ldapAdminDN, ldapAdminPassword, ldapPasswordDigestAlgorithm, ldapProtectedUsers,
         ldapProtectedGroups, rodaAdminDN, rodaApacheDSDataDirectory);
+      ldapUtility.setRODAAdministratorsDN(rodaAdministratorsDN);
 
       UserUtility.setLdapUtility(ldapUtility);
 
