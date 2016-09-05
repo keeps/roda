@@ -140,10 +140,12 @@ public class ShowJob extends Composite {
       UserLogin.getInstance().checkRoles(new HistoryResolver[] {Process.RESOLVER}, false, callback);
     }
 
+    @Override
     public List<String> getHistoryPath() {
       return Tools.concat(Process.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
+    @Override
     public String getHistoryToken() {
       return "job";
     }
@@ -154,8 +156,6 @@ public class ShowJob extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  // private ClientLogger logger = new ClientLogger(getClass().getName());
 
   private Job job;
   private final Map<String, PluginInfo> pluginsInfo;
@@ -277,7 +277,7 @@ public class ShowJob extends Composite {
     dateStarted.setText(dateTimeFormat.format(job.getStartDate()));
     update();
 
-    SelectedItems selected = job.getSourceObjects();
+    SelectedItems<?> selected = job.getSourceObjects();
 
     if (isIngest) {
 
@@ -366,17 +366,17 @@ public class ShowJob extends Composite {
     return job != null && !job.isInFinalState();
   }
 
-  private void showIngestSourceObjects(SelectedItems selected) {
+  private void showIngestSourceObjects(SelectedItems<?> selected) {
     if (selected != null) {
       if (selected instanceof SelectedItemsList) {
-        List<String> ids = ((SelectedItemsList) selected).getIds();
+        List<String> ids = ((SelectedItemsList<?>) selected).getIds();
         Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_UUID, ids));
         TransferredResourceList list = new TransferredResourceList(filter, null, messages.transferredResourcesTitle(),
           false, 10, 10);
         selectedList.clear();
         selectedList.add(list);
       } else if (selected instanceof SelectedItemsFilter) {
-        Filter filter = ((SelectedItemsFilter) selected).getFilter();
+        Filter filter = ((SelectedItemsFilter<?>) selected).getFilter();
         TransferredResourceList list = new TransferredResourceList(filter, null, messages.transferredResourcesTitle(),
           false, 10, 10);
         selectedList.clear();
@@ -387,7 +387,7 @@ public class ShowJob extends Composite {
     }
   }
 
-  private void showActionSourceObjects(SelectedItems selected) {
+  private void showActionSourceObjects(SelectedItems<?> selected) {
     if (selected != null) {
       boolean selectable = false;
       boolean justActive = true;
