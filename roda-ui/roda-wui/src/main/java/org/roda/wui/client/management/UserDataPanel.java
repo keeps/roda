@@ -18,6 +18,7 @@ import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.CreateForm;
+import org.roda.wui.client.browse.MetadataValue;
 import org.roda.wui.client.browse.UserExtraBundle;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.common.client.ClientLogger;
@@ -395,6 +396,8 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
       email.removeStyleName("isWrong");
     }
 
+    valid = CreateForm.validate(userExtraBundle.getValues(),extra);
+    
     checked = true;
 
     return valid;

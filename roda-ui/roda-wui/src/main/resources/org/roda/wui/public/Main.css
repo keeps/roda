@@ -384,6 +384,9 @@ pre code {
 .form-label {
 	margin-top: 5px;
 }
+.form-label-mandatory::after{
+	content:" *";
+}
 .form-separator {
 	color: #089de3;
 	font-size: 1.8rem;

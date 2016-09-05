@@ -156,7 +156,8 @@ public class UserManagementHelper {
       }
 
       String result = tmpl.apply(data);
-      return RodaUtils.indentXML(result);
+      //result = RodaUtils.indentXML(result);
+      return result;
     } catch (IOException e1) {
       LOGGER.error("Error getting template from stream");
     }

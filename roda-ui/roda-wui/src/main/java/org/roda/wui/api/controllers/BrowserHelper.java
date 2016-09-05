@@ -2319,7 +2319,7 @@ public class BrowserHelper {
           });
         }
         result = tmpl.apply(data);
-        result = RodaUtils.indentXML(result);
+        //result = RodaUtils.indentXML(result);
       } catch (IOException e) {
         throw new GenericException(e);
       }

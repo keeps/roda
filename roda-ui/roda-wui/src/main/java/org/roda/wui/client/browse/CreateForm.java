@@ -10,6 +10,7 @@ package org.roda.wui.client.browse;
 import java.util.Date;
 import java.util.Set;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -36,6 +37,8 @@ public class CreateForm {
 
   public static void create(FlowPanel panel, Set<MetadataValue> bundle, boolean addStyle) {
     for (MetadataValue mv : bundle) {
+      boolean mandatory = (mv.get("mandatory")!=null && mv.get("mandatory").equalsIgnoreCase("true"))?true:false;
+      
       if (mv.get("hidden") != null && mv.get("hidden").equals("true"))
         continue;
 
@@ -46,29 +49,29 @@ public class CreateForm {
       }
       String controlType = mv.get("type");
       if (controlType == null) {
-        addTextField(panel, layout, mv);
+        addTextField(panel, layout, mv, mandatory);
       } else {
         switch (controlType) {
           case "text":
-            addTextField(panel, layout, mv);
+            addTextField(panel, layout, mv, mandatory);
             break;
           case "textarea":
           case "big-text":
           case "text-area":
-            addTextArea(panel, layout, mv);
+            addTextArea(panel, layout, mv, mandatory);
             break;
           case "list":
-            addList(panel, layout, mv);
+            addList(panel, layout, mv, mandatory);
             break;
           case "date":
-            addDatePicker(panel, layout, mv);
+            addDatePicker(panel, layout, mv, mandatory);
             break;
           case "separator":
             layout.addStyleName("form-separator");
             addSeparator(panel, layout, mv);
             break;
           default:
-            addTextField(panel, layout, mv);
+            addTextField(panel, layout, mv, mandatory);
             break;
         }
       }
@@ -100,17 +103,22 @@ public class CreateForm {
     return result;
   }
 
-  private static void addTextField(FlowPanel panel, final FlowPanel layout, final MetadataValue mv) {
+  private static void addTextField(FlowPanel panel, final FlowPanel layout, final MetadataValue mv, boolean mandatory) {
     // Top label
     Label mvLabel = new Label(getFieldLabel(mv));
     mvLabel.addStyleName("form-label");
-
+    if(mandatory){
+      mvLabel.addStyleName("form-label-mandatory");
+    }
     // Field
     final TextBox mvText = new TextBox();
     mvText.addStyleName("form-textbox");
     if (mv.get("value") != null) {
       mvText.setText(mv.get("value"));
     }
+    if(mv.get("isWrong")!=null && mv.get("isWrong").trim().equalsIgnoreCase("true")){
+      mvText.addStyleName("isWrong");
+    }
     mvText.addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent changeEvent) {
@@ -132,17 +140,22 @@ public class CreateForm {
     panel.add(layout);
   }
 
-  private static void addTextArea(FlowPanel panel, final FlowPanel layout, final MetadataValue mv) {
+  private static void addTextArea(FlowPanel panel, final FlowPanel layout, final MetadataValue mv, boolean mandatory) {
     // Top label
     Label mvLabel = new Label(getFieldLabel(mv));
     mvLabel.addStyleName("form-label");
-
+    if(mandatory){
+      mvLabel.addStyleName("form-label-mandatory");
+    }
     // Field
     final TextArea mvText = new TextArea();
     mvText.addStyleName("form-textbox metadata-form-text-area");
     if (mv.get("value") != null) {
       mvText.setText(mv.get("value"));
     }
+    if(mv.get("isWrong")!=null && mv.get("isWrong").trim().equalsIgnoreCase("true")){
+      mvText.addStyleName("isWrong");
+    }
     mvText.addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent changeEvent) {
@@ -164,13 +177,18 @@ public class CreateForm {
     panel.add(layout);
   }
 
-  private static void addList(FlowPanel panel, final FlowPanel layout, final MetadataValue mv) {
+  private static void addList(FlowPanel panel, final FlowPanel layout, final MetadataValue mv, boolean mandatory) {
     // Top Label
     Label mvLabel = new Label(getFieldLabel(mv));
     mvLabel.addStyleName("form-label");
-
+    if(mandatory){
+      mvLabel.addStyleName("form-label-mandatory");
+    }
     // Field
     final ListBox mvList = new ListBox();
+    if(mv.get("isWrong")!=null && mv.get("isWrong").trim().equalsIgnoreCase("true")){
+      mvList.addStyleName("isWrong");
+    }
     mvList.addStyleName("form-textbox");
 
     String list = mv.get("list");
@@ -240,14 +258,19 @@ public class CreateForm {
     panel.add(layout);
   }
 
-  private static void addDatePicker(FlowPanel panel, final FlowPanel layout, final MetadataValue mv) {
+  private static void addDatePicker(FlowPanel panel, final FlowPanel layout, final MetadataValue mv, boolean mandatory) {
     // Top label
     final DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat("yyyy-MM-dd");
     Label mvLabel = new Label(getFieldLabel(mv));
     mvLabel.addStyleName("form-label");
-
+    if(mandatory){
+      mvLabel.addStyleName("form-label-mandatory");
+    }
     // Field
     final DateBox mvDate = new DateBox();
+    if(mv.get("isWrong")!=null && mv.get("isWrong").trim().equalsIgnoreCase("true")){
+      mvDate.addStyleName("isWrong");
+    }
     mvDate.getDatePicker().setYearAndMonthDropdownVisible(true);
     mvDate.getDatePicker().setYearArrowsVisible(true);
     mvDate.addStyleName("form-textbox");
@@ -316,5 +339,27 @@ public class CreateForm {
     }
 
     panel.add(layout);
+  }
+
+  public static boolean validate(Set<MetadataValue> values, FlowPanel extra) {
+    boolean valid = true;
+    if(values!=null){
+      for(MetadataValue mv : values){
+        String value = mv.get("value");
+        String name = mv.get("name");
+        boolean mandatory = (mv.get("mandatory")!=null && mv.get("mandatory").equalsIgnoreCase("true"))?true:false;
+        if(mandatory && (value==null || value.trim().equalsIgnoreCase(""))){
+          mv.set("isWrong", "true");
+          valid=false;
+        }else{
+          mv.set("isWrong", "false");
+        }
+      }
+    }
+    if(!valid){
+      extra.clear();
+      create(extra, values, true);
+    }
+    return valid;
   }
 }
