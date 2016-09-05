@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/keeps/roda
+ */
 package org.roda.core.common.notifications;
 
 import java.io.BufferedReader;
@@ -71,9 +78,11 @@ public class HTTPNotificationProcessor implements NotificationProcessor {
     HttpResponse response = httpclient.execute(httppost);
     HttpEntity entity = response.getEntity();
     String responseTxt = processEntity(entity);
-    LOGGER.debug("Response: " + responseTxt);
+    LOGGER.debug("HTTP response: {}", responseTxt);
   }
 
+  // FIXME 20160905 hsilva: is this method really needed? and, is this the best
+  // way to implement it (30 lines)?
   private String processEntity(HttpEntity entity) {
     String responseTxt = null;
     if (entity != null) {
@@ -92,22 +101,15 @@ public class HTTPNotificationProcessor implements NotificationProcessor {
           }
 
         } catch (IOException e) {
-          e.printStackTrace();
+          // do nothing
         } finally {
-          if (br != null) {
-            try {
-              br.close();
-            } catch (IOException e) {
-            }
-          }
+          IOUtils.closeQuietly(br);
         }
         responseTxt = sb.toString();
       } catch (UnsupportedOperationException | IOException e1) {
-
+        // do nothing
       } finally {
-        if (is != null) {
-          IOUtils.closeQuietly(is);
-        }
+        IOUtils.closeQuietly(is);
       }
     }
     return responseTxt;

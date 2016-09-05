@@ -21,6 +21,7 @@ import javax.xml.transform.TransformerException;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.EntityResponse;
 import org.roda.core.common.StreamResponse;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.adapter.facet.Facets;
@@ -62,6 +63,8 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.fs.FSPathContentPayload;
+import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.client.browse.BrowseItemBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataVersionsBundle;

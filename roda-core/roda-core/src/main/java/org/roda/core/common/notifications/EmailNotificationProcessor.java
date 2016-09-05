@@ -1,7 +1,15 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/keeps/roda
+ */
 package org.roda.core.common.notifications;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -26,24 +34,26 @@ import com.github.jknack.handlebars.Template;
 
 public class EmailNotificationProcessor implements NotificationProcessor {
   private static final Logger LOGGER = LoggerFactory.getLogger(EmailNotificationProcessor.class);
-  private Map<String,Object> scope;
+  private Map<String, Object> scope;
   private String template;
-  
-  
-  
 
-  public EmailNotificationProcessor( String template, Map<String, Object> scope) {
+  public EmailNotificationProcessor(String template) {
+    this.scope = new HashMap<String, Object>();
+    this.template = template;
+  }
+
+  public EmailNotificationProcessor(String template, Map<String, Object> scope) {
     this.scope = scope;
     this.template = template;
   }
 
   @Override
   public Notification processNotification(Notification notification) throws RODAException {
-    try{
+    try {
       List<String> recipients = notification.getRecipientUsers();
       String templatePath = RodaCoreFactory.getRodaConfigurationAsString("core", "notification", "template_path");
       InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(templatePath + template);
-      String template = IOUtils.toString(templateStream, "UTF-8");
+      String template = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
       IOUtils.closeQuietly(templateStream);
       if (!scope.containsKey("from")) {
         scope.put("from", notification.getFromUser());
@@ -68,12 +78,12 @@ public class EmailNotificationProcessor implements NotificationProcessor {
           LOGGER.warn("SMTP not defined, cannot send emails");
         }
       }
-    }catch(IOException | MessagingException e){
+    } catch (IOException | MessagingException e) {
       throw new GenericException(e);
     }
     return notification;
   }
-  
+
   private String getUpdatedMessageBody(Notification notification, String recipient, String template,
     String templateName, Map<String, Object> scopes) {
 
@@ -98,7 +108,7 @@ public class EmailNotificationProcessor implements NotificationProcessor {
 
     return executeHandlebars(template, templateName, scopes);
   }
-  
+
   private String executeHandlebars(String template, String templateName, Map<String, Object> scopes) {
     Handlebars handlebars = new Handlebars();
     String result = "";
@@ -106,7 +116,7 @@ public class EmailNotificationProcessor implements NotificationProcessor {
       Template templ = handlebars.compileInline(template);
       result = templ.apply(scopes);
     } catch (IOException e) {
-      e.printStackTrace();
+      LOGGER.error("Error executing handlebars", e);
     }
     return result;
   }

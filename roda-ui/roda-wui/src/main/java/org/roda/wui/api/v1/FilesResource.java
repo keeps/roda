@@ -27,6 +27,7 @@ import javax.xml.transform.TransformerException;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.roda.core.common.EntityResponse;
 import org.roda.core.common.StreamResponse;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
@@ -38,7 +39,6 @@ import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
-import org.roda.wui.api.v1.utils.EntityResponse;
 import org.roda.wui.api.v1.utils.ObjectResponse;
 
 import io.swagger.annotations.Api;

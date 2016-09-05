@@ -7,6 +7,7 @@
  */
 package org.roda.wui.api.v1.utils;
 
+import org.roda.core.common.EntityResponse;
 import org.roda.core.data.v2.IsRODAObject;
 
 public class ObjectResponse<T extends IsRODAObject> implements EntityResponse {

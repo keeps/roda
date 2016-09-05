@@ -43,6 +43,7 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ConsumesOutputStream;
 import org.roda.core.common.DownloadUtils;
+import org.roda.core.common.EntityResponse;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.Messages;
@@ -142,7 +143,6 @@ import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.wui.api.v1.utils.ApiUtils;
-import org.roda.wui.api.v1.utils.EntityResponse;
 import org.roda.wui.api.v1.utils.ObjectResponse;
 import org.roda.wui.client.browse.BinaryVersionBundle;
 import org.roda.wui.client.browse.BrowseItemBundle;
@@ -1481,7 +1481,7 @@ public class BrowserHelper {
         Set<MetadataValue> values = null;
         if (templateStream != null) {
           try {
-            template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
+            template = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
             values = ServerTools.transform(template);
             for (MetadataValue mv : values) {
               String generator = mv.get("auto-generate");
@@ -1498,7 +1498,7 @@ public class BrowserHelper {
                 try {
                   labelsMaps.put(locale.toString(), RodaCoreFactory.getI18NMessages(locale).getTranslation(labelI18N));
                 } catch (MissingResourceException e) {
-                  LOGGER.debug("Missing resource: " + labelI18N);
+                  LOGGER.debug("Missing resource: {}", labelI18N);
                 }
                 labels = JsonUtils.getJsonFromObject(labelsMaps);
                 mv.set("label", labels);
@@ -1525,8 +1525,7 @@ public class BrowserHelper {
           }
         }
 
-        SupportedMetadataTypeBundle b = new SupportedMetadataTypeBundle(id, type, version, label, template, values);
-        supportedMetadata.add(b);
+        supportedMetadata.add(new SupportedMetadataTypeBundle(id, type, version, label, template, values));
       }
     }
     return supportedMetadata;
@@ -1926,7 +1925,7 @@ public class BrowserHelper {
       StoragePath storagePath = ModelUtils.getAIPStoragePath(indexedAIP.getId());
       StorageService storage = RodaCoreFactory.getStorageService();
       Directory directory = storage.getDirectory(storagePath);
-      return DownloadUtils.download(storage, directory);
+      return download(directory);
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
       AIP aip = RodaCoreFactory.getModelService().retrieveAIP(indexedAIP.getId());

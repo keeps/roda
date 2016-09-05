@@ -87,10 +87,11 @@ public class RemoveAIPPlugin extends AbstractPlugin<AIP> {
         Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
         if (error != null) {
           reportItem.setPluginState(PluginState.FAILURE)
-            .setPluginDetails("Removal of AIP "+aip.getId()+" did not end successfully: "+error);
+            .setPluginDetails("Removal of AIP " + aip.getId() + " did not end successfully: " + error);
           jobPluginInfo.incrementObjectsProcessedWithFailure();
         } else {
-          reportItem.setPluginState(PluginState.SUCCESS).setPluginDetails("Removal of AIP "+aip.getId()+" ended successfully");
+          reportItem.setPluginState(PluginState.SUCCESS)
+            .setPluginDetails("Removal of AIP " + aip.getId() + " ended successfully");
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
         }
         report.addReport(reportItem);

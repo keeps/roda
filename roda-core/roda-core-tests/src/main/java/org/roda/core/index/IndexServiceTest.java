@@ -19,10 +19,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -793,7 +791,7 @@ public class IndexServiceTest {
     notification.setSentOn(new Date());
     notification.setFromUser("Test Message Index");
     notification.setRecipientUsers(Arrays.asList("recipientuser@example.com"));
-    model.createNotification(notification, new EmailNotificationProcessor("test-email-template.vm", new HashMap<String, Object>()));
+    model.createNotification(notification, new EmailNotificationProcessor("test-email-template.vm"));
     index.commit(Notification.class);
 
     Notification message2 = model.retrieveNotification(notification.getId());

@@ -47,7 +47,7 @@ public class Notifications extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     RodaCoreFactory.getModelService().createNotification(notification,
-      new EmailNotificationProcessor("test-email-template", new HashMap<String, Object>()));
+      new EmailNotificationProcessor("test-email-template"));
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "notification", notification);
