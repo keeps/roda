@@ -111,7 +111,7 @@ public interface UserManagementServiceAsync {
    * @throws GenericException
    * @throws IllegalOperationException
    */
-  public void updateMyUser(User user, String password, AsyncCallback<Void> callback);
+  public void updateMyUser(User user, String password, UserExtraBundle extra, AsyncCallback<Void> callback);
 
   /**
    * Try to remove a user, if user cannot be removed it will be deactivated

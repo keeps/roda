@@ -123,16 +123,17 @@ public class Profile extends Composite {
         final User user = userDataPanel.getUser();
         final String password = userDataPanel.getPassword();
 
-        UserManagementService.Util.getInstance().updateMyUser(user, password, new AsyncCallback<Void>() {
+        UserManagementService.Util.getInstance().updateMyUser(user, password, userDataPanel.getExtra(),
+          new AsyncCallback<Void>() {
 
-          public void onFailure(Throwable caught) {
-            errorMessage(caught);
-          }
+            public void onFailure(Throwable caught) {
+              errorMessage(caught);
+            }
 
-          public void onSuccess(Void result) {
-            Tools.newHistory(Welcome.RESOLVER);
-          }
-        });
+            public void onSuccess(Void result) {
+              Tools.newHistory(Welcome.RESOLVER);
+            }
+          });
       }
     } else {
       Tools.newHistory(Welcome.RESOLVER);

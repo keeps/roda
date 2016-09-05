@@ -203,8 +203,9 @@ public class UserManagement extends RodaWuiController {
     return ret;
   }
 
-  public static void updateMyUser(User user, User modifiedUser, String password) throws AuthorizationDeniedException,
-    NotFoundException, AlreadyExistsException, GenericException, IllegalOperationException {
+  public static void updateMyUser(User user, User modifiedUser, String password, UserExtraBundle extra)
+    throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException,
+    IllegalOperationException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     if (!user.getId().equals(modifiedUser.getId())) {
@@ -215,7 +216,7 @@ public class UserManagement extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     // delegate
-    UserManagementHelper.updateMyUser(modifiedUser, password);
+    UserManagementHelper.updateMyUser(modifiedUser, password, extra);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "user", modifiedUser);

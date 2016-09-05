@@ -103,10 +103,11 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public void updateMyUser(User modifiedUser, String password) throws AuthorizationDeniedException, NotFoundException,
-    AlreadyExistsException, GenericException, IllegalOperationException {
+  public void updateMyUser(User modifiedUser, String password, UserExtraBundle extra)
+    throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException,
+    IllegalOperationException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    UserManagement.updateMyUser(user, modifiedUser, password);
+    UserManagement.updateMyUser(user, modifiedUser, password, extra);
   }
 
   @Override

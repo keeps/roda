@@ -122,8 +122,9 @@ public class UserManagementHelper {
     RodaCoreFactory.getIndexService().commit(RODAMember.class);
   }
 
-  public static void updateMyUser(User user, String password)
+  public static void updateMyUser(User user, String password, UserExtraBundle extra)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
+    user.setExtra(getUserExtra(user, extra));
     RodaCoreFactory.getModelService().modifyMyUser(user, password, true, true);
     RodaCoreFactory.getIndexService().commit(RODAMember.class);
   }

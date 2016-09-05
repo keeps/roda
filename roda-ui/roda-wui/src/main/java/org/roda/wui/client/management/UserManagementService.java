@@ -155,8 +155,8 @@ public interface UserManagementService extends RemoteService {
    * @throws GenericException
    * @throws IllegalOperationException
    */
-  public void updateMyUser(User user, String password) throws AuthorizationDeniedException, NotFoundException,
-    AlreadyExistsException, GenericException, IllegalOperationException;
+  public void updateMyUser(User user, String password, UserExtraBundle extra) throws AuthorizationDeniedException,
+    NotFoundException, AlreadyExistsException, GenericException, IllegalOperationException;
 
   /**
    * Try to remove a user, if user cannot be removed it will be deactivated
