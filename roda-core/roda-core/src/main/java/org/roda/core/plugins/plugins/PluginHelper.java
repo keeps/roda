@@ -59,6 +59,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
@@ -303,10 +304,10 @@ public final class PluginHelper {
   }
 
   public static <T extends IsRODAObject> SimpleJobPluginInfo getInitialJobInformation(Plugin<T> plugin,
-    int sourceObjectsCount) throws JobException {
+    int sourceObjectsBeingProcess) throws JobException {
     SimpleJobPluginInfo jobPluginInfo = plugin.getJobPluginInfo(SimpleJobPluginInfo.class);
     if (jobPluginInfo != null) {
-      jobPluginInfo.setSourceObjectsBeingProcessed(sourceObjectsCount).setSourceObjectsWaitingToBeProcessed(0);
+      jobPluginInfo.setSourceObjectsBeingProcessed(sourceObjectsBeingProcess).setSourceObjectsWaitingToBeProcessed(0);
       return jobPluginInfo;
     } else {
       return new SimpleJobPluginInfo();
@@ -335,7 +336,7 @@ public final class PluginHelper {
     list.add(Format.class);
     list.add(Notification.class);
     list.add(Risk.class);
-    // list.add(LogEntry.class);
+    list.add(LogEntry.class);
     list.add(Job.class);
     list.add(RiskIncidence.class);
     return list;
@@ -501,7 +502,7 @@ public final class PluginHelper {
       outcomeDetailExtension, notify, new Date());
   }
 
-  //used by migration plugin
+  // used by migration plugin
   public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
     ModelService model, IndexService index, PluginState outcome, String outcomeDetailExtension, boolean notify,
     Date eventDate) throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,

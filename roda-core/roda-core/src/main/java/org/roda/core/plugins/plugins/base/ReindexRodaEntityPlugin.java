@@ -16,11 +16,14 @@ import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.jobs.Job;
@@ -29,12 +32,14 @@ import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.orchestrate.JobsHelper;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
@@ -113,10 +118,6 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<T> list)
     throws PluginException {
-    if (clazz != null) {
-      LOGGER.debug("Reindexing Roda {}", clazz.getSimpleName());
-    }
-
     Report pluginReport = PluginHelper.initPluginReport(this);
 
     try {
@@ -124,21 +125,41 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
       PluginHelper.updateJobInformation(this, jobPluginInfo);
       pluginReport.setPluginState(PluginState.SUCCESS);
 
-      for (T object : list) {
-        LOGGER.debug("Reindexing {} {}", object.getClass().getSimpleName(), object.getId());
+      if (clazz != null) {
+        LOGGER.debug("Reindexing Roda {}", clazz.getSimpleName());
 
         try {
-          index.reindex(storage, object);
+          jobPluginInfo.setSourceObjectsCount(1);
+          jobPluginInfo.setSourceObjectsBeingProcessed(1);
+          PluginHelper.updateJobInformation(this, jobPluginInfo);
+
+          JobsHelper.executeJobOnSameRODAObject(model, clazz, PluginHelper.getJobUsername(this, model));
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        } catch (RODAException | IOException e) {
+        } catch (IsStillUpdatingException | RequestNotValidException | AuthorizationDeniedException | NotFoundException
+          | GenericException e) {
           jobPluginInfo.incrementObjectsProcessedWithFailure();
           LOGGER.error("Error reindexing RODA entity", e);
           pluginReport.setPluginState(PluginState.FAILURE).setPluginDetails("Reindex did not execute successfully");
+        }
+      } else {
+
+        for (T object : list) {
+          LOGGER.debug("Reindexing {} {}", object.getClass().getSimpleName(), object.getId());
+
+          try {
+            index.reindex(storage, object);
+            jobPluginInfo.incrementObjectsProcessedWithSuccess();
+          } catch (RODAException | IOException e) {
+            jobPluginInfo.incrementObjectsProcessedWithFailure();
+            LOGGER.error("Error reindexing RODA entity", e);
+            pluginReport.setPluginState(PluginState.FAILURE).setPluginDetails("Reindex did not execute successfully");
+          }
         }
       }
 
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
+
     } catch (JobException e) {
       LOGGER.error("Error reindexing RODA entity", e);
     }
@@ -234,7 +255,9 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
 
   @Override
   public List<Class<T>> getObjectClasses() {
-    return (List) PluginHelper.getReindexObjectClasses();
+    List classList = (List) PluginHelper.getReindexObjectClasses();
+    classList.remove(LogEntry.class);
+    return classList;
   }
 
 }

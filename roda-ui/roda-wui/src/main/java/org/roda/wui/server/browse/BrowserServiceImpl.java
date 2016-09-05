@@ -408,21 +408,26 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     List<PluginInfo> pluginsInfo = new ArrayList<>();
 
     PluginInfo basePlugin = RodaCoreFactory.getPluginManager().getPluginInfo(job.getPlugin());
-    pluginsInfo.add(basePlugin);
 
-    for (PluginParameter parameter : basePlugin.getParameters()) {
-      if (PluginParameterType.PLUGIN_SIP_TO_AIP.equals(parameter.getType())) {
-        String pluginId = job.getPluginParameters().get(parameter.getId());
-        if (pluginId != null) {
-          PluginInfo refPlugin = RodaCoreFactory.getPluginManager().getPluginInfo(pluginId);
-          pluginsInfo.add(refPlugin);
+    if (basePlugin != null) {
+      pluginsInfo.add(basePlugin);
+
+      for (PluginParameter parameter : basePlugin.getParameters()) {
+        if (PluginParameterType.PLUGIN_SIP_TO_AIP.equals(parameter.getType())) {
+          String pluginId = job.getPluginParameters().get(parameter.getId());
+          if (pluginId != null) {
+            PluginInfo refPlugin = RodaCoreFactory.getPluginManager().getPluginInfo(pluginId);
+            pluginsInfo.add(refPlugin);
+          }
         }
       }
     }
 
     // adding all AIP to AIP plugins for job report list
     List<PluginInfo> aipToAipPlugins = RodaCoreFactory.getPluginManager().getPluginsInfo(PluginType.AIP_TO_AIP);
-    pluginsInfo.addAll(aipToAipPlugins);
+    if (aipToAipPlugins != null) {
+      pluginsInfo.addAll(aipToAipPlugins);
+    }
 
     JobBundle bundle = new JobBundle();
     bundle.setJob(job);

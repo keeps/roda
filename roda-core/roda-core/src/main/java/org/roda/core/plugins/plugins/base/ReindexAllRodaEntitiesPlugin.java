@@ -9,26 +9,22 @@ package org.roda.core.plugins.plugins.base;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
-import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.Void;
-import org.roda.core.data.v2.index.SelectedItemsAll;
-import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.index.IndexService;
-import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.orchestrate.JobsHelper;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
@@ -78,17 +74,7 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
       for (Class<? extends IsRODAObject> reindexClass : classes) {
         LOGGER.debug("Reindexing all {}", reindexClass.getSimpleName());
         try {
-          if (model.hasObjects(reindexClass)) {
-            Job job = new Job();
-            job.setId(UUID.randomUUID().toString());
-            job.setName(ReindexRodaEntityPlugin.class.getSimpleName() + " (" + reindexClass.getSimpleName() + ")");
-            job.setPlugin(ReindexRodaEntityPlugin.class.getName());
-            job.setSourceObjects(SelectedItemsAll.create(reindexClass));
-            job.setPluginType(PluginType.MISC);
-            job.setUsername(PluginHelper.getJobUsername(this, model));
-            PluginHelper.createAndExecuteJob(job, true);
-          }
-
+          JobsHelper.executeJobOnSameRODAObject(model, reindexClass, PluginHelper.getJobUsername(this, model));
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
         } catch (RODAException e) {
           LOGGER.error("Error reindexing (all): {}", reindexClass.getSimpleName(), e);
@@ -109,29 +95,13 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
   @Override
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
-
-    try {
-      for (Class<? extends IsRODAObject> reindexClass : PluginHelper.getReindexObjectClasses()) {
-        index.clearIndexes(SolrUtils.getIndexName(reindexClass));
-      }
-    } catch (GenericException e) {
-      throw new PluginException("Error clearing index", e);
-    }
-
+    // Do not need to clear indexes, single jobs already does it by default
     return new Report();
   }
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    LOGGER.debug("Optimizing indexes");
-    try {
-      for (Class<? extends IsRODAObject> reindexClass : PluginHelper.getReindexObjectClasses()) {
-        index.optimizeIndexes(SolrUtils.getIndexName(reindexClass));
-      }
-    } catch (GenericException e) {
-      throw new PluginException("Error optimizing index", e);
-    }
-
+    // Do not need to optimize indexes, single jobs already does it by default
     return new Report();
   }
 
