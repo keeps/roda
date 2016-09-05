@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.UserUtility;
