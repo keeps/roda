@@ -88,7 +88,7 @@ public class RodaMemberList extends BasicAsyncTableCell<RODAMember> {
 
       @Override
       public String getValue(RODAMember member) {
-        return member != null ? StringUtility.prettyPrint(member.getAllGroups()) : null;
+        return member != null ? StringUtility.prettyPrint(member.getDirectGroups()) : null;
       }
     };
 

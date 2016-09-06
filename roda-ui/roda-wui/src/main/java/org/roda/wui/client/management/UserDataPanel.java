@@ -264,7 +264,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     this.fullname.setText(user.getFullName());
     this.email.setText(user.getEmail());
 
-    this.setMemberGroups(user.getAllGroups());
+    this.setMemberGroups(user.getDirectGroups());
     this.setPermissions(user.getDirectRoles(), user.getAllRoles());
 
     BrowserService.Util.getInstance().retrieveUserExtraBundle(user.getName(), new AsyncCallback<UserExtraBundle>() {
