@@ -1315,104 +1315,66 @@ public class ModelService extends ModelObservable {
   /***************** Users/Groups related *****************/
   /********************************************************/
 
-  public void registerUser(User user, String password, boolean useModel, boolean notify)
+  public User registerUser(User user, String password, boolean notify)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException {
-    boolean success = true;
     try {
-      if (useModel) {
-        UserUtility.getLdapUtility().registerUser(user, password);
+      User registeredUser = UserUtility.getLdapUtility().registerUser(user, password);
+      if (notify) {
+        notifyUserCreated(registeredUser);
       }
+      return registeredUser;
     } catch (LdapUtilityException e) {
-      success = false;
       throw new GenericException("Error registering user to LDAP", e);
     } catch (UserAlreadyExistsException e) {
-      success = false;
       throw new UserAlreadyExistsException("User already exists", e);
     } catch (EmailAlreadyExistsException e) {
-      success = false;
       throw new EmailAlreadyExistsException("Email already exists", e);
     }
-    if (success && notify) {
-      notifyUserCreated(user);
-    }
   }
 
-  public User addUser(User user, boolean useModel, boolean notify) throws GenericException, EmailAlreadyExistsException,
+  public User addUser(User user, boolean notify) throws GenericException, EmailAlreadyExistsException,
     UserAlreadyExistsException, IllegalOperationException, NotFoundException {
-    return addUser(user, null, useModel, notify);
+    return addUser(user, null, notify);
   }
 
-  public User addUser(User user, String password, boolean useModel, boolean notify) throws GenericException,
-    EmailAlreadyExistsException, UserAlreadyExistsException, IllegalOperationException, NotFoundException {
-    boolean success = true;
-    User createdUser;
+  public User addUser(User user, String password, boolean notify) throws GenericException, EmailAlreadyExistsException,
+    UserAlreadyExistsException, IllegalOperationException, NotFoundException {
     try {
-      if (useModel) {
-        createdUser = UserUtility.getLdapUtility().addUser(user);
+      User createdUser = UserUtility.getLdapUtility().addUser(user);
 
-        if (password != null) {
-          UserUtility.getLdapUtility().setUserPassword(user.getId(), password);
-        }
-      } else {
-        createdUser = user;
+      if (password != null) {
+        UserUtility.getLdapUtility().setUserPassword(createdUser.getId(), password);
       }
+      if (notify) {
+        notifyUserCreated(createdUser);
+      }
+      return createdUser;
     } catch (LdapUtilityException e) {
-      success = false;
       throw new GenericException("Error adding user to LDAP", e);
     } catch (UserAlreadyExistsException e) {
-      success = false;
       throw new UserAlreadyExistsException("User already exists", e);
     } catch (EmailAlreadyExistsException e) {
-      success = false;
       throw new EmailAlreadyExistsException("Email already exists", e);
     }
-    if (success && notify) {
-      notifyUserCreated(createdUser);
-    }
-    return createdUser;
   }
 
-  public void modifyUser(User user, boolean useModel, boolean notify)
+  public User modifyUser(User user, boolean notify)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
-    modifyUser(user, null, useModel, notify);
+    return modifyUser(user, null, notify);
   }
 
-  public void modifyUser(User user, String password, boolean useModel, boolean notify)
+  public User modifyUser(User user, String password, boolean notify)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
-    boolean success = true;
     try {
-      if (useModel) {
-        if (password != null) {
-          UserUtility.getLdapUtility().setUserPassword(user.getId(), password);
-        }
-
-        UserUtility.getLdapUtility().modifyUser(user);
+      if (password != null) {
+        UserUtility.getLdapUtility().setUserPassword(user.getId(), password);
       }
-    } catch (LdapUtilityException e) {
-      success = false;
-      throw new GenericException("Error modifying user to LDAP", e);
-    } catch (EmailAlreadyExistsException e) {
-      success = false;
-      throw new AlreadyExistsException("User already exists", e);
-    } catch (NotFoundException e) {
-      success = false;
-      throw new NotFoundException("User doesn't exist", e);
-    } catch (IllegalOperationException e) {
-      success = false;
-      throw new AuthorizationDeniedException("Illegal operation", e);
-    }
-    if (success && notify) {
-      notifyUserUpdated(user);
-    }
-  }
 
-  public void modifyMyUser(User user, String password, boolean useModel, boolean notify)
-    throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
-    boolean success = true;
-    try {
-      if (useModel) {
-        UserUtility.getLdapUtility().modifySelfUser(user, password);
+      User modifiedUser = UserUtility.getLdapUtility().modifyUser(user);
+      if (notify) {
+        notifyUserUpdated(modifiedUser);
       }
+      return modifiedUser;
     } catch (LdapUtilityException e) {
       throw new GenericException("Error modifying user to LDAP", e);
     } catch (EmailAlreadyExistsException e) {
@@ -1422,87 +1384,93 @@ public class ModelService extends ModelObservable {
     } catch (IllegalOperationException e) {
       throw new AuthorizationDeniedException("Illegal operation", e);
     }
-    if (success && notify) {
-      notifyUserUpdated(user);
-    }
   }
 
-  public void removeUser(String id, boolean useModel, boolean notify)
-    throws GenericException, AuthorizationDeniedException {
-    boolean success = true;
+  public User modifyMyUser(User user, String password, boolean notify)
+    throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     try {
-      if (useModel) {
-        UserUtility.getLdapUtility().removeUser(id);
+      User modifiedUser = UserUtility.getLdapUtility().modifySelfUser(user, password);
+
+      if (notify) {
+        notifyUserUpdated(modifiedUser);
+      }
+      return modifiedUser;
+    } catch (LdapUtilityException e) {
+      throw new GenericException("Error modifying user to LDAP", e);
+    } catch (EmailAlreadyExistsException e) {
+      throw new AlreadyExistsException("User already exists", e);
+    } catch (NotFoundException e) {
+      throw new NotFoundException("User doesn't exist", e);
+    } catch (IllegalOperationException e) {
+      throw new AuthorizationDeniedException("Illegal operation", e);
+    }
+
+  }
+
+  public void removeUser(String id, boolean notify) throws GenericException, AuthorizationDeniedException {
+    try {
+      UserUtility.getLdapUtility().removeUser(id);
+      if (notify) {
+        notifyUserDeleted(id);
       }
     } catch (LdapUtilityException e) {
-      success = false;
       throw new GenericException("Error removing user from LDAP", e);
     } catch (IllegalOperationException e) {
-      success = false;
       throw new AuthorizationDeniedException("Illegal operation", e);
-    }
-    if (success && notify) {
-      notifyUserDeleted(id);
     }
   }
 
-  public void addGroup(Group group, boolean useModel, boolean notify) throws GenericException, AlreadyExistsException {
-    boolean success = true;
+  public void notifyUserUpdated(User user) {
+    super.notifyUserUpdated(user);
+  }
+
+  public Group addGroup(Group group, boolean notify) throws GenericException, AlreadyExistsException {
     try {
-      if (useModel) {
-        UserUtility.getLdapUtility().addGroup(group);
+      Group addedGroup = UserUtility.getLdapUtility().addGroup(group);
+      if (notify) {
+        notifyGroupCreated(addedGroup);
       }
+      return addedGroup;
     } catch (LdapUtilityException e) {
-      success = false;
       throw new GenericException("Error adding group to LDAP", e);
     } catch (GroupAlreadyExistsException e) {
-      success = false;
       throw new AlreadyExistsException("Group already exists", e);
     }
-    if (success && notify) {
-      notifyGroupCreated(group);
-    }
   }
 
-  public void modifyGroup(Group group, boolean useModel, boolean notify)
+  public Group modifyGroup(final Group group, boolean notify)
     throws GenericException, NotFoundException, AuthorizationDeniedException {
-    boolean success = true;
     try {
-      if (useModel) {
-        UserUtility.getLdapUtility().modifyGroup(group);
+      Group modifiedGroup = UserUtility.getLdapUtility().modifyGroup(group);
+      if (notify) {
+        notifyGroupUpdated(modifiedGroup);
       }
+      return modifiedGroup;
     } catch (LdapUtilityException e) {
-      success = false;
       throw new GenericException("Error modifying group to LDAP", e);
     } catch (NotFoundException e) {
-      success = false;
       throw new NotFoundException("Group doesn't exist", e);
     } catch (IllegalOperationException e) {
-      success = false;
       throw new AuthorizationDeniedException("Illegal operation", e);
     }
-    if (success && notify) {
-      notifyGroupUpdated(group);
+
+  }
+
+  public void removeGroup(String id, boolean notify) throws GenericException, AuthorizationDeniedException {
+    try {
+      UserUtility.getLdapUtility().removeGroup(id);
+      if (notify) {
+        notifyGroupDeleted(id);
+      }
+    } catch (LdapUtilityException e) {
+      throw new GenericException("Error removing group from LDAP", e);
+    } catch (IllegalOperationException e) {
+      throw new AuthorizationDeniedException("Illegal operation", e);
     }
   }
 
-  public void removeGroup(String id, boolean useModel, boolean notify)
-    throws GenericException, AuthorizationDeniedException {
-    boolean success = true;
-    try {
-      if (useModel) {
-        UserUtility.getLdapUtility().removeGroup(id);
-      }
-    } catch (LdapUtilityException e) {
-      success = false;
-      throw new GenericException("Error removing group from LDAP", e);
-    } catch (IllegalOperationException e) {
-      success = false;
-      throw new AuthorizationDeniedException("Illegal operation", e);
-    }
-    if (success && notify) {
-      notifyGroupDeleted(id);
-    }
+  public void notifyGroupUpdated(Group group) {
+    super.notifyGroupUpdated(group);
   }
 
   public User confirmUserEmail(String username, String email, String emailConfirmationToken, boolean useModel,

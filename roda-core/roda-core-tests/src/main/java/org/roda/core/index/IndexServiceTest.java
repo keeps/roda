@@ -531,7 +531,7 @@ public class IndexServiceTest {
         user.setId("USER" + i);
         user.setName("NAMEUSER" + i);
         user.setFullName("NAMEUSER" + i);
-        model.addUser(user, true, true);
+        model.addUser(user, true);
       } else {
         Group group = new Group();
         group.setActive(true);
@@ -542,7 +542,7 @@ public class IndexServiceTest {
         group.setId("GROUP" + i);
         group.setName("NAMEGROUP" + i);
         group.setFullName("NAMEGROUP" + i);
-        model.addGroup(group, true, true);
+        model.addGroup(group, true);
       }
     }
 

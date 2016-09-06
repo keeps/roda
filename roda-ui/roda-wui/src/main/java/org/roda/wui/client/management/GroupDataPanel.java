@@ -126,6 +126,7 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
       }
     };
 
+    groupname.setEnabled(!isEditmode());
     groupname.addKeyDownHandler(new KeyDownHandler() {
 
       @Override
@@ -174,7 +175,7 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
     this.fullname.setText(group.getFullName());
     this.groupSelect.addGroupToBlacklist(group.getId());
 
-    this.setMemberGroups(group.getAllGroups());
+    this.setMemberGroups(group.getDirectGroups());
     this.setPermissions(group.getDirectRoles(), group.getAllRoles());
   }
 

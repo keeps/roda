@@ -114,7 +114,7 @@ public class RodaCasAuthenticationFilter implements Filter {
   private void addUserToLdapAndIndex(ServletRequest request, User userPrincipal) {
     try {
       final User user = new User(userPrincipal);
-      RodaCoreFactory.getModelService().addUser(user, true, true);
+      RodaCoreFactory.getModelService().addUser(user, true);
     } catch (RODAException e) {
       logger.error("Error while creating and indexing user", e);
     }

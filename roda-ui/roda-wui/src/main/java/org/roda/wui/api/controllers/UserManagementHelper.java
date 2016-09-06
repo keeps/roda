@@ -9,7 +9,6 @@ package org.roda.wui.api.controllers;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -100,33 +99,36 @@ public class UserManagementHelper {
     }
   }
 
-  public static void registerUser(User user, String password, UserExtraBundle extra)
+  public static User registerUser(User user, String password, UserExtraBundle extra)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException {
     user.setExtra(getUserExtra(user, extra));
-    RodaCoreFactory.getModelService().registerUser(user, password, true, true);
+    User registeredUser = RodaCoreFactory.getModelService().registerUser(user, password, true);
     RodaCoreFactory.getIndexService().commit(RODAMember.class);
+    return registeredUser;
   }
 
   public static User createUser(User user, String password, UserExtraBundle extra) throws GenericException,
     EmailAlreadyExistsException, UserAlreadyExistsException, IllegalOperationException, NotFoundException {
     user.setExtra(getUserExtra(user, extra));
-    User ret = RodaCoreFactory.getModelService().addUser(user, password, true, true);
+    User addedUser = RodaCoreFactory.getModelService().addUser(user, password, true);
     RodaCoreFactory.getIndexService().commit(RODAMember.class);
-    return ret;
+    return addedUser;
   }
 
-  public static void updateUser(User user, String password, UserExtraBundle extra)
+  public static User updateUser(User user, String password, UserExtraBundle extra)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     user.setExtra(getUserExtra(user, extra));
-    RodaCoreFactory.getModelService().modifyUser(user, password, true, true);
+    User modifiedUser = RodaCoreFactory.getModelService().modifyUser(user, password, true);
     RodaCoreFactory.getIndexService().commit(RODAMember.class);
+    return modifiedUser;
   }
 
-  public static void updateMyUser(User user, String password, UserExtraBundle extra)
+  public static User updateMyUser(User user, String password, UserExtraBundle extra)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     user.setExtra(getUserExtra(user, extra));
-    RodaCoreFactory.getModelService().modifyMyUser(user, password, true, true);
+    User modifiedUser = RodaCoreFactory.getModelService().modifyMyUser(user, password, true);
     RodaCoreFactory.getIndexService().commit(RODAMember.class);
+    return modifiedUser;
   }
 
   private static String getUserExtra(User user, UserExtraBundle extra) throws GenericException {
@@ -139,7 +141,7 @@ public class UserManagementHelper {
     InputStream templateStream = RodaCoreFactory
       .getConfigurationFileAsStream(RodaConstants.USERS_TEMPLATE_FOLDER + "/user_extra.xml.hbs");
     try {
-      String rawTemplate = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
+      String rawTemplate = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
       Template tmpl = handlebars.compileInline(rawTemplate);
 
       Set<MetadataValue> values = extra.getValues();
@@ -166,22 +168,22 @@ public class UserManagementHelper {
   }
 
   public static void deleteUser(String username) throws GenericException, AuthorizationDeniedException {
-    RodaCoreFactory.getModelService().removeUser(username, true, true);
+    RodaCoreFactory.getModelService().removeUser(username, true);
     RodaCoreFactory.getIndexService().commit(RODAMember.class);
   }
 
   public static void createGroup(Group group) throws GenericException, AlreadyExistsException {
-    RodaCoreFactory.getModelService().addGroup(group, true, true);
+    RodaCoreFactory.getModelService().addGroup(group, true);
     RodaCoreFactory.getIndexService().commit(RODAMember.class);
   }
 
   public static void updateGroup(Group group) throws GenericException, NotFoundException, AuthorizationDeniedException {
-    RodaCoreFactory.getModelService().modifyGroup(group, true, true);
+    RodaCoreFactory.getModelService().modifyGroup(group, true);
     RodaCoreFactory.getIndexService().commit(RODAMember.class);
   }
 
   public static void deleteGroup(String groupname) throws GenericException, AuthorizationDeniedException {
-    RodaCoreFactory.getModelService().removeGroup(groupname, true, true);
+    RodaCoreFactory.getModelService().removeGroup(groupname, true);
     RodaCoreFactory.getIndexService().commit(RODAMember.class);
   }
 

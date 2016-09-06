@@ -892,11 +892,11 @@ public class RodaCoreFactory {
     IllegalOperationException, NotFoundException, AlreadyExistsException {
     for (User user : UserUtility.getLdapUtility().getUsers(new Filter())) {
       LOGGER.debug("User to be indexed: {}", user);
-      RodaCoreFactory.getModelService().addUser(user, false, true);
+      RodaCoreFactory.getModelService().notifyUserUpdated(user);
     }
     for (Group group : UserUtility.getLdapUtility().getGroups(new Filter())) {
       LOGGER.debug("Group to be indexed: {}", group);
-      RodaCoreFactory.getModelService().addGroup(group, false, true);
+      RodaCoreFactory.getModelService().notifyGroupUpdated(group);
     }
   }
 

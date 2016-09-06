@@ -23,15 +23,11 @@ import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.formats.Format;
@@ -166,16 +162,15 @@ public class ManagementTasksResource {
     try {
       for (User ldapUser : UserUtility.getLdapUtility().getUsers(new Filter())) {
         LOGGER.debug("User to be indexed: {}", ldapUser);
-        RodaCoreFactory.getModelService().addUser(ldapUser, false, true);
+        RodaCoreFactory.getModelService().notifyUserUpdated(ldapUser);
       }
       for (Group ldapGroup : UserUtility.getLdapUtility().getGroups(new Filter())) {
         LOGGER.debug("Group to be indexed: {}", ldapGroup);
-        RodaCoreFactory.getModelService().addGroup(ldapGroup, false, true);
+        RodaCoreFactory.getModelService().notifyGroupUpdated(ldapGroup);
       }
       response.setMessage("Ended users and groups reindex");
 
-    } catch (NotFoundException | GenericException | AlreadyExistsException | EmailAlreadyExistsException
-      | UserAlreadyExistsException | IllegalOperationException | LdapUtilityException e) {
+    } catch (LdapUtilityException e) {
       LOGGER.error("Error reindexing users and groups", e);
       response.setMessage("Error reindexing users and groups: " + e.getMessage());
       success = false;

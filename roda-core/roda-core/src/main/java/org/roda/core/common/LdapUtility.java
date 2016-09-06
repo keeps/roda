@@ -113,6 +113,9 @@ public class LdapUtility {
   /** Constant: top. */
   private static final String OBJECT_CLASS_TOP = "top";
 
+  /** Constant: groupOfUniqueNames. */
+  private static final String GROUP_OF_UNIQUE_NAMES = "groupOfUniqueNames";
+
   /** Constant: domain. */
   private static final String OBJECT_CLASS_DOMAIN = "domain";
 
@@ -133,6 +136,8 @@ public class LdapUtility {
 
   /** Constant: email. */
   private static final String EMAIL = "email";
+
+  private static final String RODA_DUMMY_USER = "cn=roda,ou=system,dc=roda,dc=org";
 
   /** Start the LDAP server? */
   private boolean ldapStartServer = false;
@@ -698,12 +703,13 @@ public class LdapUtility {
     try {
       final Dn dn = new Dn(getGroupDN(group.getName()));
       final Entry entry = service.newEntry(dn);
-      entry.add(OBJECT_CLASS, "groupOfUniqueNames", OBJECT_CLASS_TOP, OBJECT_CLASS_EXTENSIBLE_OBJECT);
+      entry.add(OBJECT_CLASS, GROUP_OF_UNIQUE_NAMES, OBJECT_CLASS_TOP, OBJECT_CLASS_EXTENSIBLE_OBJECT);
       entry.add(CN, group.getName());
       entry.add(OU, group.getFullName());
       entry.add(SHADOW_INACTIVE, group.isActive() ? "0" : "1");
-      // Add admin to all groups
-      entry.add(UNIQUE_MEMBER, rodaAdministratorsDN);
+      // 20160906 hsilva: this is needed because at least one UNIQUE_MEMBER must
+      // be added to the entry
+      entry.add(UNIQUE_MEMBER, RODA_DUMMY_USER);
       // Add user members
       for (String memberName : group.getMemberUserNames()) {
         entry.add(UNIQUE_MEMBER, getUserDN(memberName));
@@ -760,14 +766,17 @@ public class LdapUtility {
       final CoreSession session = service.getAdminSession();
       final String groupDN = getGroupDN(modifiedGroup.getName());
       final Entry entry = session.lookup(new Dn(groupDN));
-      entry.add(CN, modifiedGroup.getName());
+      // 20160906 hsilva: cannot change CN as it is used as id (as well as the
+      // name)
       entry.removeAttributes(OU);
       entry.add(OU, modifiedGroup.getFullName());
+      entry.removeAttributes(SHADOW_INACTIVE);
       entry.add(SHADOW_INACTIVE, modifiedGroup.isActive() ? "0" : "1");
       // Remove all members
       entry.removeAttributes(UNIQUE_MEMBER);
-      // Add admin to all groups
-      entry.add(UNIQUE_MEMBER, rodaAdministratorsDN);
+      // 20160906 hsilva: this is needed because at least one UNIQUE_MEMBER must
+      // be added to the entry
+      entry.add(UNIQUE_MEMBER, RODA_DUMMY_USER);
       // Add user members
       for (String memberName : modifiedGroup.getMemberUserNames()) {
         entry.add(UNIQUE_MEMBER, getUserDN(memberName));
@@ -1377,7 +1386,7 @@ public class LdapUtility {
           group.addMemberUser(getFirstNameFromDN(memberDN));
         } else if (memberDN.endsWith(getGroupsDN())) {
           group.addMemberGroup(getFirstNameFromDN(memberDN));
-        } else {
+        } else if (!memberDN.equals(RODA_DUMMY_USER)) {
           LOGGER.warn("Member {} outside users and groups", memberDN);
         }
       }
