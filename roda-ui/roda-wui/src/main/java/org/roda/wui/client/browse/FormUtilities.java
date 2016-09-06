@@ -102,7 +102,7 @@ public class FormUtilities {
     return result;
   }
 
-  private static void addTextField(FlowPanel panel, final FlowPanel layout, final MetadataValue mv, boolean mandatory) {
+  private static void addTextField(FlowPanel panel, final FlowPanel layout, final MetadataValue mv, final boolean mandatory) {
     // Top label
     Label mvLabel = new Label(getFieldLabel(mv));
     mvLabel.addStyleName("form-label");
@@ -122,6 +122,11 @@ public class FormUtilities {
       @Override
       public void onChange(ChangeEvent changeEvent) {
         mv.set("value", mvText.getValue());
+        if(mandatory && (mvText.getValue()!=null && !mvText.getValue().trim().equalsIgnoreCase(""))){
+          mvText.removeStyleName("isWrong");
+        } else if(mandatory && (mvText.getValue()==null || mvText.getValue().trim().equalsIgnoreCase(""))){
+          mvText.addStyleName("isWrong");
+        }
       }
     });
 
@@ -139,7 +144,7 @@ public class FormUtilities {
     panel.add(layout);
   }
 
-  private static void addTextArea(FlowPanel panel, final FlowPanel layout, final MetadataValue mv, boolean mandatory) {
+  private static void addTextArea(FlowPanel panel, final FlowPanel layout, final MetadataValue mv, final boolean mandatory) {
     // Top label
     Label mvLabel = new Label(getFieldLabel(mv));
     mvLabel.addStyleName("form-label");
@@ -159,6 +164,11 @@ public class FormUtilities {
       @Override
       public void onChange(ChangeEvent changeEvent) {
         mv.set("value", mvText.getValue());
+        if(mandatory && (mvText.getValue()!=null && !mvText.getValue().trim().equalsIgnoreCase(""))){
+          mvText.removeStyleName("isWrong");
+        }else if(mandatory && (mvText.getValue()==null || mvText.getValue().trim().equalsIgnoreCase(""))){
+          mvText.addStyleName("isWrong");
+        }
       }
     });
 
@@ -176,7 +186,7 @@ public class FormUtilities {
     panel.add(layout);
   }
 
-  private static void addList(FlowPanel panel, final FlowPanel layout, final MetadataValue mv, boolean mandatory) {
+  private static void addList(FlowPanel panel, final FlowPanel layout, final MetadataValue mv, final boolean mandatory) {
     // Top Label
     Label mvLabel = new Label(getFieldLabel(mv));
     mvLabel.addStyleName("form-label");
@@ -235,6 +245,11 @@ public class FormUtilities {
       @Override
       public void onChange(ChangeEvent changeEvent) {
         mv.set("value", mvList.getSelectedValue());
+        if(mandatory && (mvList.getSelectedValue()!=null && !mvList.getSelectedValue().trim().equalsIgnoreCase(""))){
+          mvList.removeStyleName("isWrong");
+        } else if(mandatory && (mvList.getSelectedValue()==null || mvList.getSelectedValue().trim().equalsIgnoreCase(""))){
+          mvList.removeStyleName("isWrong");
+        }
       }
     });
 
@@ -258,7 +273,7 @@ public class FormUtilities {
   }
 
   private static void addDatePicker(FlowPanel panel, final FlowPanel layout, final MetadataValue mv,
-    boolean mandatory) {
+   final boolean mandatory) {
     // Top label
     final DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat("yyyy-MM-dd");
     Label mvLabel = new Label(getFieldLabel(mv));
@@ -296,6 +311,11 @@ public class FormUtilities {
       public void onValueChange(ValueChangeEvent<Date> valueChangeEvent) {
         String newValue = dateTimeFormat.format(mvDate.getValue());
         mv.set("value", newValue);
+        if(mandatory && (newValue!=null && !newValue.trim().equalsIgnoreCase(""))){
+          mvDate.removeStyleName("isWrong");
+        }else if(mandatory && (newValue==null || newValue.trim().equalsIgnoreCase(""))){
+          mvDate.addStyleName("isWrong");
+        }
       }
     });
     mvDate.getTextBox().addValueChangeHandler(new ValueChangeHandler<String>() {
