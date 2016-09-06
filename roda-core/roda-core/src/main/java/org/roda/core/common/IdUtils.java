@@ -41,8 +41,10 @@ public final class IdUtils {
     StringBuilder idBuilder = new StringBuilder();
     idBuilder.append(aipId);
     idBuilder.append(ID_SEPARATOR);
-    idBuilder.append(representationId);
-    idBuilder.append(ID_SEPARATOR);
+    if (representationId != null) {
+      idBuilder.append(representationId);
+      idBuilder.append(ID_SEPARATOR);
+    }
     for (String dir : fileDirectoryPath) {
       idBuilder.append(dir);
       idBuilder.append(ID_SEPARATOR);

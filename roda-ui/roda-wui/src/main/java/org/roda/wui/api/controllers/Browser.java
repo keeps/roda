@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -572,10 +573,9 @@ public class Browser extends RodaWuiController {
     return aipRepresentationPreservationMetadataFile;
   }
 
-  public static void postAIPRepresentationPreservationMetadataFile(User user, String aipId, String representationId,
-    List<String> fileDirectoryPath, String fileId, InputStream is, FormDataContentDisposition fileDetail)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
-    ValidationException, AlreadyExistsException {
+  public static void createOrUpdatePreservationMetadataWithAIP(User user, String aipId, String fileId, InputStream is,
+    FormDataContentDisposition fileDetail, boolean create) throws AuthorizationDeniedException, GenericException,
+    NotFoundException, RequestNotValidException, ValidationException, AlreadyExistsException {
 
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -584,17 +584,63 @@ public class Browser extends RodaWuiController {
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
 
+    String id = fileId == null ? fileDetail.getFileName() : fileId;
+
     // delegate
-    BrowserHelper.createOrUpdateAIPRepresentationPreservationMetadataFile(aipId, representationId, fileDirectoryPath,
-      fileId, is, fileDetail, true);
+    BrowserHelper.createOrUpdateAIPRepresentationPreservationMetadataFile(aipId, null, new ArrayList<>(), id, is,
+      fileDetail, create);
 
     // register action
-    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
-      RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId);
+    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID,
+      aipId);
   }
 
-  public static void putAIPRepresentationPreservationMetadataFile(User user, String aipId, String representationId,
-    List<String> fileDirectoryPath, String fileId, InputStream is, FormDataContentDisposition fileDetail)
+  public static void createOrUpdatePreservationMetadataWithRepresentation(User user, String representationUUID,
+    String fileId, InputStream is, FormDataContentDisposition fileDetail, boolean create)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
+    ValidationException, AlreadyExistsException {
+
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+    IndexedRepresentation rep = BrowserHelper.retrieve(IndexedRepresentation.class, representationUUID);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, rep.getAipId());
+    UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
+
+    String id = fileId == null ? fileDetail.getFileName() : fileId;
+
+    // delegate
+    BrowserHelper.createOrUpdateAIPRepresentationPreservationMetadataFile(rep.getAipId(), rep.getId(),
+      new ArrayList<>(), id, is, fileDetail, create);
+
+    // register action
+    controllerAssistant.registerAction(user, rep.getAipId(), LOG_ENTRY_STATE.SUCCESS,
+      RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID, representationUUID);
+  }
+
+  public static void createOrUpdatePreservationMetadataWithFile(User user, String fileUUID, InputStream is,
+    FormDataContentDisposition fileDetail, boolean create) throws AuthorizationDeniedException, GenericException,
+    NotFoundException, RequestNotValidException, ValidationException, AlreadyExistsException {
+
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+    IndexedFile file = BrowserHelper.retrieve(IndexedFile.class, fileUUID);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, file.getAipId());
+    UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
+
+    // delegate
+    BrowserHelper.createOrUpdateAIPRepresentationPreservationMetadataFile(file.getAipId(), file.getRepresentationId(),
+      file.getPath(), file.getId(), is, fileDetail, create);
+
+    // register action
+    controllerAssistant.registerAction(user, file.getAipId(), LOG_ENTRY_STATE.SUCCESS,
+      RodaConstants.API_PATH_PARAM_FILE_UUID, fileUUID);
+  }
+
+  public static void deletePreservationMetadataWithAIP(User user, String aipId, String id, String type)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     ValidationException, AlreadyExistsException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -605,32 +651,32 @@ public class Browser extends RodaWuiController {
     UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
 
     // delegate
-    BrowserHelper.createOrUpdateAIPRepresentationPreservationMetadataFile(aipId, representationId, fileDirectoryPath,
-      fileId, is, fileDetail, false);
+    BrowserHelper.deletePreservationMetadataFile(PreservationMetadataType.valueOf(type), aipId, null, id, false);
 
     // register action
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
-      RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId);
+      "id", id);
 
   }
 
-  public static void deletePreservationMetadataFile(User user, String aipId, String representationId, String id,
+  public static void deletePreservationMetadataWithRepresentation(User user, String representationUUID, String id,
     String type) throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     ValidationException, AlreadyExistsException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
     controllerAssistant.checkRoles(user);
-    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
+    IndexedRepresentation rep = BrowserHelper.retrieve(IndexedRepresentation.class, representationUUID);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, rep.getAipId());
     UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
 
     // delegate
-    BrowserHelper.deletePreservationMetadataFile(PreservationMetadataType.valueOf(type), aipId, representationId, id,
-      false);
+    BrowserHelper.deletePreservationMetadataFile(PreservationMetadataType.valueOf(type), rep.getAipId(), rep.getId(),
+      id, false);
 
     // register action
-    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
-      RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId, "id", id);
+    controllerAssistant.registerAction(user, rep.getAipId(), LOG_ENTRY_STATE.SUCCESS,
+      RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID, representationUUID, "id", id);
 
   }
 

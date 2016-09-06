@@ -47,7 +47,7 @@ public class JobsResource {
   @GET
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @ApiOperation(value = "List Jobs", notes = "Gets a list of Jobs.", response = Jobs.class, responseContainer = "List")
+  @ApiOperation(value = "List jobs", notes = "Get a list of jobs.", response = Jobs.class, responseContainer = "List")
   public Response listJobs(@QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) String start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam(RodaConstants.API_QUERY_KEY_LIMIT) String limit)
@@ -65,7 +65,7 @@ public class JobsResource {
   @POST
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @ApiOperation(value = "Creates a new Job", notes = "Creates a new Job.", response = Job.class)
+  @ApiOperation(value = "Create a new job", notes = "Create a new job.", response = Job.class)
   public Response createJob(Job job, @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
@@ -82,7 +82,7 @@ public class JobsResource {
   @Path("/{" + RodaConstants.API_PATH_PARAM_JOB_ID + "}")
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @ApiOperation(value = "Starts an already created Job", notes = "Starts Job.", response = Job.class)
+  @ApiOperation(value = "Start an already created job", notes = "Start job.", response = Job.class)
   public Response startJob(@PathParam(RodaConstants.API_PATH_PARAM_JOB_ID) String jobId,
     @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat) throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
@@ -98,7 +98,7 @@ public class JobsResource {
   @GET
   @Path("/{" + RodaConstants.API_PATH_PARAM_JOB_ID + "}")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @ApiOperation(value = "Get Job", notes = "Gets a particular Job.", response = Job.class)
+  @ApiOperation(value = "Get job", notes = "Gets a particular job.", response = Job.class)
   public Response getJob(@PathParam(RodaConstants.API_PATH_PARAM_JOB_ID) String jobId,
     @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat) throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
@@ -114,7 +114,7 @@ public class JobsResource {
   @GET
   @Path("/{" + RodaConstants.API_PATH_PARAM_JOB_ID + "}/stop")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @ApiOperation(value = "Stop Job", notes = "Stops a particular Job.", response = Job.class)
+  @ApiOperation(value = "Stop job", notes = "Stop a particular job.", response = Job.class)
   public Response stopJob(@PathParam(RodaConstants.API_PATH_PARAM_JOB_ID) String jobId,
     @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat) throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
@@ -130,7 +130,7 @@ public class JobsResource {
   @DELETE
   @Path("/{" + RodaConstants.API_PATH_PARAM_JOB_ID + "}")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @ApiOperation(value = "Delete Job", notes = "Delete a particular Job, stoping it if still running.", response = ApiResponseMessage.class)
+  @ApiOperation(value = "Delete job", notes = "Delete a particular job, stoping it if still running.", response = ApiResponseMessage.class)
   public Response deleteJob(@PathParam(RodaConstants.API_PATH_PARAM_JOB_ID) String jobId,
     @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat) throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
@@ -147,7 +147,7 @@ public class JobsResource {
   @Path("/{" + RodaConstants.API_PATH_PARAM_JOB_ID + "}/reports")
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @ApiOperation(value = "List Job reports", notes = "Gets a list of Job reports.", response = Reports.class, responseContainer = "List")
+  @ApiOperation(value = "List job reports", notes = "Get a list of job reports.", response = Reports.class, responseContainer = "List")
   public Response listJobReports(@PathParam(RodaConstants.API_PATH_PARAM_JOB_ID) String jobId,
     @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
     @ApiParam(value = "If just the failed reports should be included in the response or all the job reports", defaultValue = "false") @QueryParam(RodaConstants.API_PATH_PARAM_JOB_JUST_FAILED) boolean justFailed,

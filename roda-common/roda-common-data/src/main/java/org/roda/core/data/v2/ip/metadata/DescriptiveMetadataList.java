@@ -7,13 +7,13 @@
  */
 package org.roda.core.data.v2.ip.metadata;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.RODAObjectList;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -24,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 @XmlRootElement(name = "descriptive_metadata_list")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class DescriptiveMetadataList implements RODAObjectList<DescriptiveMetadata>, IsRODAObject {
+public class DescriptiveMetadataList implements RODAObjectList<DescriptiveMetadata>, Serializable {
   private static final long serialVersionUID = -2795788423413555545L;
 
   private List<DescriptiveMetadata> descriptiveMetadataList;
@@ -52,12 +52,6 @@ public class DescriptiveMetadataList implements RODAObjectList<DescriptiveMetada
   @Override
   public void addObject(DescriptiveMetadata descriptiveMetadata) {
     this.descriptiveMetadataList.add(descriptiveMetadata);
-  }
-
-  @Override
-  public String getId() {
-    // 20160901 hsilva: needed because it implements IsRODAObject
-    return "DescriptiveMetadataList.getId()";
   }
 
 }

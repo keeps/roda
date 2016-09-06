@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response;
 
 import org.roda.core.common.StreamResponse;
 import org.roda.core.common.UserUtility;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
@@ -41,7 +42,7 @@ public class ClassificationPlansResource {
   @GET
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   public Response getClassificationPlan(
-    @ApiParam(value = "Type of classification plan to produce.", allowMultiple = false, allowableValues = "bagit", required = true) @QueryParam("type") String type)
+    @ApiParam(value = "Type of classification plan to produce.", allowMultiple = false, allowableValues = "bagit", required = true) @QueryParam(RodaConstants.API_QUERY_PARAM_TYPE) String type)
     throws RODAException {
 
     // get user

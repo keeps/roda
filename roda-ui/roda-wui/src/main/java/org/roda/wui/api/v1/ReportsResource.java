@@ -22,6 +22,7 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Reports;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
+import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
 
 import io.swagger.annotations.Api;
@@ -43,14 +44,14 @@ public class ReportsResource {
   @Path("/{" + RodaConstants.API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID + "}")
   @ApiOperation(value = "List reports", notes = "List reports", response = Report.class, responseContainer = "List")
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Report.class, responseContainer = "List"),
-    @ApiResponse(code = 404, message = "Transferred resource not found", response = Report.class, responseContainer = "List")})
+    @ApiResponse(code = 404, message = "Transferred resource not found", response = ApiResponseMessage.class)})
 
   public Response getTransferredResourceReports(
     @ApiParam(value = "The ID of the existing transferred resource", required = true) @PathParam(RodaConstants.API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID) String resourceId,
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) String start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam(RodaConstants.API_QUERY_KEY_LIMIT) String limit,
     @ApiParam(value = "Is the indicated ID the original one?", defaultValue = "false") @QueryParam(RodaConstants.API_QUERY_IS_ORIGINAL) boolean isOriginal,
-    @ApiParam(value = "Choose format in which to get the reports", allowableValues = "json") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
+    @ApiParam(value = "Choose format in which to get the reports", allowableValues = RodaConstants.API_LIST_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
@@ -66,12 +67,12 @@ public class ReportsResource {
   @Path("/{" + RodaConstants.API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID + "}/last")
   @ApiOperation(value = "Last report", notes = "Last report", response = Report.class, responseContainer = "List")
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Report.class, responseContainer = "List"),
-    @ApiResponse(code = 404, message = "Transferred resource not found", response = Report.class, responseContainer = "List")})
+    @ApiResponse(code = 404, message = "Transferred resource not found", response = ApiResponseMessage.class)})
 
   public Response getTransferredResourceLastReport(
     @ApiParam(value = "The ID of the existing transferred resource", required = true) @PathParam(RodaConstants.API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID) String resourceId,
     @ApiParam(value = "Is the indicated ID the original one?", defaultValue = "false") @QueryParam(RodaConstants.API_QUERY_IS_ORIGINAL) boolean isOriginal,
-    @ApiParam(value = "Choose format in which to get the reports", allowableValues = "json") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
+    @ApiParam(value = "Choose format in which to get the reports", allowableValues = RodaConstants.API_LIST_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 

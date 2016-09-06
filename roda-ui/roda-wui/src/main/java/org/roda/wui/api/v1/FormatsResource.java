@@ -34,6 +34,8 @@ import org.roda.wui.api.v1.utils.ApiUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 @Path(FormatsResource.ENDPOINT)
 @Api(value = FormatsResource.SWAGGER_ENDPOINT)
@@ -47,11 +49,15 @@ public class FormatsResource {
   @GET
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @ApiOperation(value = "List Formats", notes = "Gets a list of Formats.", response = Format.class, responseContainer = "List")
+  @ApiOperation(value = "List formats", notes = "Get a list of formats.", response = Format.class, responseContainer = "List")
+  @ApiResponses(value = {
+    @ApiResponse(code = 200, message = "Successful response", response = Format.class, responseContainer = "List"),
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
+
   public Response listFormats(
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) String start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam(RodaConstants.API_QUERY_KEY_LIMIT) String limit,
-    @ApiParam(value = "Choose format in which to get the formats", allowableValues = "json, xml", defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
+    @ApiParam(value = "Choose format in which to get the formats", allowableValues = RodaConstants.API_LIST_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
@@ -66,9 +72,12 @@ public class FormatsResource {
   @POST
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @ApiOperation(value = "Creates a new Format", notes = "Creates a new Format.", response = Format.class)
+  @ApiOperation(value = "Create format", notes = "Create a new format.", response = Format.class)
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Format.class),
+    @ApiResponse(code = 409, message = "Already exists", response = ApiResponseMessage.class)})
+
   public Response createFormat(Format format,
-    @ApiParam(value = "Choose format in which to get the format", allowableValues = "json, xml", defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
+    @ApiParam(value = "Choose format in which to get the format", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
@@ -83,9 +92,12 @@ public class FormatsResource {
   @PUT
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @ApiOperation(value = "Updated a Format", notes = "Updates a Format.", response = Format.class)
+  @ApiOperation(value = "Update format", notes = "Update format.", response = Format.class)
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Format.class),
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
+
   public Response updateFormat(Format format,
-    @ApiParam(value = "Choose format in which to get the format", allowableValues = "json, xml", defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
+    @ApiParam(value = "Choose format in which to get the format", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
@@ -100,9 +112,12 @@ public class FormatsResource {
   @GET
   @Path("/{" + RodaConstants.API_PATH_PARAM_FORMAT_ID + "}")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @ApiOperation(value = "Get Format", notes = "Gets a particular Format.", response = Format.class)
+  @ApiOperation(value = "Get format", notes = "Get a format.", response = Format.class)
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Format.class),
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
+
   public Response getFormat(@PathParam(RodaConstants.API_PATH_PARAM_FORMAT_ID) String formatId,
-    @ApiParam(value = "Choose format in which to get the format", allowableValues = "json, xml", defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
+    @ApiParam(value = "Choose format in which to get the format", allowableValues = RodaConstants.API_GET_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
@@ -117,9 +132,12 @@ public class FormatsResource {
   @DELETE
   @Path("/{" + RodaConstants.API_PATH_PARAM_FORMAT_ID + "}")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @ApiOperation(value = "Delete Format", notes = "Delete a particular Format.", response = ApiResponseMessage.class)
+  @ApiOperation(value = "Delete format", notes = "Delete a format.", response = Void.class)
+  @ApiResponses(value = {@ApiResponse(code = 204, message = "OK", response = Void.class),
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
+
   public Response deleteFormat(@PathParam(RodaConstants.API_PATH_PARAM_FORMAT_ID) String formatId,
-    @ApiParam(value = "Choose format in which to get the result", allowableValues = "json, xml", defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
+    @ApiParam(value = "Choose format in which to get the response", allowableValues = RodaConstants.API_DELETE_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 

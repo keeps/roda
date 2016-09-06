@@ -337,8 +337,8 @@ public final class PluginHelper {
     list.add(Notification.class);
     list.add(Risk.class);
     list.add(LogEntry.class);
-    list.add(Job.class);
     list.add(RiskIncidence.class);
+    list.add(Job.class);
     return list;
   }
 

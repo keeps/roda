@@ -35,6 +35,8 @@ import org.roda.wui.api.v1.utils.ApiUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 @Path(RisksResource.ENDPOINT)
 @Api(value = RisksResource.SWAGGER_ENDPOINT)
@@ -48,11 +50,15 @@ public class RisksResource {
   @GET
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @ApiOperation(value = "List Risks", notes = "Gets a list of Risks.", response = Risk.class, responseContainer = "List")
+  @ApiOperation(value = "List risks", notes = "Get a list of risks.", response = Risk.class, responseContainer = "List")
+  @ApiResponses(value = {
+    @ApiResponse(code = 200, message = "Successful response", response = Risk.class, responseContainer = "List"),
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
+
   public Response listRisks(
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) String start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam(RodaConstants.API_QUERY_KEY_LIMIT) String limit,
-    @ApiParam(value = "Choose format in which to get the risks", allowableValues = "json, xml", defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
+    @ApiParam(value = "Choose format in which to get the risks", allowableValues = RodaConstants.API_LIST_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
@@ -67,9 +73,12 @@ public class RisksResource {
   @POST
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @ApiOperation(value = "Creates a new Risk", notes = "Creates a new Risk.", response = Risk.class)
+  @ApiOperation(value = "Create risk", notes = "Create a new risk.", response = Risk.class)
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Risk.class),
+    @ApiResponse(code = 409, message = "Already exists", response = ApiResponseMessage.class)})
+
   public Response createRisk(Risk risk,
-    @ApiParam(value = "Choose format in which to get the risk", allowableValues = "json, xml", defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
+    @ApiParam(value = "Choose format in which to get the risk", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
@@ -84,9 +93,12 @@ public class RisksResource {
   @PUT
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @ApiOperation(value = "Updates a Risk", notes = "Updates a Risk.", response = Risk.class)
-  public Response updateRisk(Risk risk, @QueryParam("message") String updateMessage,
-    @ApiParam(value = "Choose format in which to get the risk", allowableValues = "json, xml", defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
+  @ApiOperation(value = "Update risk", notes = "Update a risk.", response = Risk.class)
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Risk.class),
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
+
+  public Response updateRisk(Risk risk, @QueryParam(RodaConstants.API_QUERY_PARAM_RISK_MESSAGE) String updateMessage,
+    @ApiParam(value = "Choose format in which to get the risk", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
@@ -101,9 +113,12 @@ public class RisksResource {
   @GET
   @Path("/{" + RodaConstants.API_PATH_PARAM_RISK_ID + "}")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @ApiOperation(value = "Get Risk", notes = "Gets a particular Risk.", response = Risk.class)
+  @ApiOperation(value = "Get risk", notes = "Get a risk.", response = Risk.class)
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Risk.class),
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
+
   public Response getRisk(@PathParam(RodaConstants.API_PATH_PARAM_RISK_ID) String riskId,
-    @ApiParam(value = "Choose format in which to get the risk", allowableValues = "json, xml", defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
+    @ApiParam(value = "Choose format in which to get the risk", allowableValues = RodaConstants.API_GET_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
@@ -118,9 +133,12 @@ public class RisksResource {
   @DELETE
   @Path("/{" + RodaConstants.API_PATH_PARAM_RISK_ID + "}")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @ApiOperation(value = "Delete Risk", notes = "Delete a particular Risk.", response = ApiResponseMessage.class)
+  @ApiOperation(value = "Delete risk", notes = "Delete a risk.", response = Void.class)
+  @ApiResponses(value = {@ApiResponse(code = 204, message = "OK", response = Void.class),
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
+
   public Response deleteRisk(@PathParam(RodaConstants.API_PATH_PARAM_RISK_ID) String riskId,
-    @ApiParam(value = "Choose format in which to get the result", allowableValues = "json, xml", defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
+    @ApiParam(value = "Choose format in which to get the response", allowableValues = RodaConstants.API_DELETE_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 

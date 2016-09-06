@@ -151,7 +151,6 @@ public class ManagementTasksResource {
       .setSourceObjects(SelectedItemsNone.create()).setPlugin(ReindexAllRodaEntitiesPlugin.class.getName());
 
     createJobAndRegisterAction(user, controllerAssistant, response, job, "params", job.getPluginParameters());
-
     return response;
   }
 

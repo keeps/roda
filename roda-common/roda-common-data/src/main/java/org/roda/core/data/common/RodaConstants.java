@@ -170,6 +170,9 @@ public final class RodaConstants {
   public static final String API_QUERY_PARAM_FILEPATH = "filepath";
   public static final String API_QUERY_PARAM_PARENT_ID = "parent_id";
   public static final String API_QUERY_PARAM_TYPE = "type";
+  public static final String API_QUERY_PARAM_METADATA_TYPE = "metadataType";
+  public static final String API_QUERY_PARAM_METADATA_VERSION = "metadataVersion";
+  public static final String API_QUERY_PARAM_RISK_MESSAGE = "message";
   public static final String API_PARAM_FILE = "file";
   // http headers used
   public static final String API_HTTP_HEADER_ACCEPT = "Accept";
@@ -178,6 +181,16 @@ public final class RodaConstants {
   public static final String API_PATH_PARAM_JOB_JUST_FAILED = "jobJustFailed";
 
   public static final String APPLICATION_ZIP = "application/zip";
+
+  // api method allowable values
+  public static final String API_LIST_MEDIA_TYPES = "json, xml";
+  public static final String API_GET_MEDIA_TYPES = "json, xml";
+  public static final String API_GET_LIST_MEDIA_TYPES = "json, xml, zip";
+  public static final String API_GET_FILE_MEDIA_TYPES = "json, xml, bin";
+  public static final String API_POST_PUT_MEDIA_TYPES = "json, xml";
+  public static final String API_DELETE_MEDIA_TYPES = "json, xml";
+  public static final String API_GET_DESCRIPTIVE_METADATA_MEDIA_TYPES = "json, xml, html, bin";
+  public static final String API_DESCRIPTIVE_METADATA_LANGUAGES = "pt_PT, en_US";
 
   /*
    * Controllers related
@@ -507,6 +520,8 @@ public final class RodaConstants {
 
   public static final String PLUGIN_CATEGORY_MISC = "misc";
   public static final String PLUGIN_CATEGORY_NOT_LISTABLE = "not_listable";
+
+  public static final String PLUGIN_SELECT_ALL_RODA_OBJECTS = "All";
 
   /* Job Report */
   public static final String JOB_REPORT_ID = "id";

@@ -247,6 +247,8 @@ public class PluginParameterPanel extends Composite {
             objectBox.addItem(classNames.getFirst(), classNames.getSecond());
           }
 
+          objectBox.addItem(RodaConstants.PLUGIN_SELECT_ALL_RODA_OBJECTS, RodaConstants.PLUGIN_SELECT_ALL_RODA_OBJECTS);
+          objectBox.setSelectedIndex(objectBox.getItemCount() - 1);
           value = objectBox.getSelectedValue();
         }
       });

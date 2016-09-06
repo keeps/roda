@@ -94,7 +94,7 @@ public class IndexResource {
    */
   @GET
   @Produces({MediaType.APPLICATION_JSON})
-  @ApiOperation(value = "Find indexed resources.", notes = "Find indexed resources.", response = IsIndexed.class, responseContainer = "List")
+  @ApiOperation(value = "Find indexed resources", notes = "Find indexed resources.", response = IsIndexed.class, responseContainer = "List")
   public <T extends IsIndexed> Response list(
     @ApiParam(value = "Class of resources to return", required = true, example = "org.roda.core.data.v2.ip.IndexedFile") @QueryParam(RodaConstants.API_QUERY_KEY_RETURN_CLASS) final String returnClass,
     @ApiParam(value = "Filter parameters", example = "formatPronom=fmt/19") @QueryParam(RodaConstants.API_QUERY_KEY_FILTER) final List<String> filterParameters,
@@ -164,7 +164,7 @@ public class IndexResource {
   @Path("/find")
   @Consumes({MediaType.APPLICATION_JSON})
   @Produces({MediaType.APPLICATION_JSON})
-  @ApiOperation(value = "Find indexed resources.", notes = "Find indexed resources.", response = IsIndexed.class, responseContainer = "List")
+  @ApiOperation(value = "Find indexed resources", notes = "Find indexed resources.", response = IsIndexed.class, responseContainer = "List")
   public <T extends IsIndexed> Response list(@ApiParam(value = "Find parameters") final FindRequest findRequest)
     throws RODAException {
     final String mediaType = ApiUtils.getMediaType(null, request);
@@ -198,7 +198,7 @@ public class IndexResource {
   @Path("/count")
   @Consumes({MediaType.APPLICATION_JSON})
   @Produces({MediaType.APPLICATION_JSON})
-  @ApiOperation(value = "Count indexed resources.", notes = "Count indexed resources.", response = Long.class)
+  @ApiOperation(value = "Count indexed resources", notes = "Count indexed resources.", response = Long.class)
   public <T extends IsIndexed> Response count(@ApiParam(value = "Count parameters") final CountRequest countRequest)
     throws RODAException {
     final String mediaType = ApiUtils.getMediaType(null, request);

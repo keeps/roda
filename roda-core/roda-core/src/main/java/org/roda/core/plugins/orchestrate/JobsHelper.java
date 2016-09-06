@@ -376,7 +376,7 @@ public final class JobsHelper {
     AuthorizationDeniedException, JobAlreadyStartedException {
     if (TransferredResource.class.equals(clazz)) {
       // TransferredResource does not need a job
-      RodaCoreFactory.getTransferredResourcesScanner().updateAllTransferredResources(null, true);
+      RodaCoreFactory.getTransferredResourcesScanner().updateAllTransferredResources(null, false);
     } else {
       if (model.hasObjects(clazz)) {
         Job job = new Job();

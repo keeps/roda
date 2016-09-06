@@ -30,16 +30,20 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
+import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Resource;
@@ -85,6 +89,7 @@ public class ReindexActionLogPlugin extends AbstractPlugin<LogEntry> {
     if (parameters != null && parameters.get(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES) != null) {
       clearIndexes = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES));
     }
+
     if (parameters != null && parameters.get(RodaConstants.PLUGIN_PARAMS_INT_VALUE) != null) {
       try {
         int dontReindexOlderThanXDays = Integer.parseInt(parameters.get(RodaConstants.PLUGIN_PARAMS_INT_VALUE));
@@ -100,18 +105,30 @@ public class ReindexActionLogPlugin extends AbstractPlugin<LogEntry> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<LogEntry> list)
     throws PluginException {
-    Date firstDayToIndex = calculateFirstDayToIndex();
 
-    reindexActionLogsStillNotInStorage(index, firstDayToIndex);
+    Report pluginReport = PluginHelper.initPluginReport(this);
 
-    reindexActionLogsInStorage(index, model, firstDayToIndex);
+    try {
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, 0);
+      jobPluginInfo.setSourceObjectsCount(0);
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+      pluginReport.setPluginState(PluginState.SUCCESS);
 
-    // FIXME 20160414 hsilva: this should return a better report
-    return new Report();
+      Date firstDayToIndex = calculateFirstDayToIndex();
+      reindexActionLogsStillNotInStorage(index, firstDayToIndex, pluginReport);
+      reindexActionLogsInStorage(index, model, firstDayToIndex, pluginReport);
 
+      jobPluginInfo.finalizeInfo();
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+    } catch (JobException e) {
+      LOGGER.error("Error reindexing RODA entity", e);
+    }
+
+    return pluginReport;
   }
 
-  private void reindexActionLogsInStorage(IndexService index, ModelService model, Date firstDayToIndex) {
+  private void reindexActionLogsInStorage(IndexService index, ModelService model, Date firstDayToIndex,
+    Report pluginReport) {
     CloseableIterable<Resource> actionLogs = null;
 
     try {
@@ -134,13 +151,14 @@ public class ReindexActionLogPlugin extends AbstractPlugin<LogEntry> {
       }
     } catch (IOException | NotFoundException | GenericException | AuthorizationDeniedException
       | RequestNotValidException e) {
+      pluginReport.setPluginState(PluginState.FAILURE).setPluginDetails("Could not reindex action logs from storage");
       LOGGER.error("Error while trying to reindex action logs from storage", e);
     } finally {
       IOUtils.closeQuietly(actionLogs);
     }
   }
 
-  private void reindexActionLogsStillNotInStorage(IndexService index, Date firstDayToIndex) {
+  private void reindexActionLogsStillNotInStorage(IndexService index, Date firstDayToIndex, Report pluginReport) {
     Path logFilesDirectory = RodaCoreFactory.getLogPath();
     DirectoryStream.Filter<Path> logFilesFilter = getLogFilesFilter(firstDayToIndex);
 
@@ -160,6 +178,7 @@ public class ReindexActionLogPlugin extends AbstractPlugin<LogEntry> {
         }
       }
     } catch (IOException e) {
+      pluginReport.setPluginState(PluginState.FAILURE).setPluginDetails("Could not reindex action logs not in storage");
       LOGGER.error("Error while listing action logs for reindexing", e);
     }
   }

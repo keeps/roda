@@ -59,7 +59,7 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
-import org.roda.core.plugins.plugins.base.ReindexRodaEntityPlugin;
+import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StringContentPayload;
 import org.roda.wui.api.controllers.Browser;
@@ -459,8 +459,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public Set<Pair<String, String>> retrieveReindexPluginObjectClasses() {
     // TODO check permissions
     Set<Pair<String, String>> classNames = new HashSet<>();
-    List<?> classes = RodaCoreFactory.getPluginManager().getPlugin(ReindexRodaEntityPlugin.class.getName())
-      .getObjectClasses();
+    List<?> classes = PluginHelper.getReindexObjectClasses();
     classes.remove(Void.class);
 
     for (Object o : classes) {
