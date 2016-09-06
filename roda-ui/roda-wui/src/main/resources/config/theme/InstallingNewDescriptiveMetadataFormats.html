@@ -653,7 +653,8 @@
 
     <ul>
       <li><strong>order</strong> - the order by which the field should be displayed in the metadata editor </li>
-      <li><strong>label</strong> - the label of the field to be shown at the left of the value in the editor</li>
+      <li><strong>label</strong> - the label of the field to be shown at the left of the value in the editor. The format is a JSON map. The keys of the map are the language ID. Example: {"en": "Title", ""pt_PT": "Título"}"</li>
+      <li><strong>labeli18n</strong> - the i18n key for the label of the field (see section "Internationalization of strings" below)</li>
       <li><strong>value</strong> - the predefined value of the field</li>
       <li><strong>mandatory</strong> - If set to true the label is styled in bold to draw attention.</li>
       <li><strong>hidden</strong> - if set to true the field is hidden</li>
@@ -662,10 +663,31 @@
       <ul>
         <li><strong>text </strong>- text field</li>
         <li><strong>text-area </strong>- Text area. Larger than a field text.</li>
-        <li><strong>date - </strong>text field with a date picker</li>
-        <li><strong>list - </strong>list with the possible values (combo box)</li>
+        <li><strong>date </strong>- text field with a date picker</li>
+        <li><strong>list </strong>- list with the possible values (combo box)</li>
         <ul>
-          <li><strong>list - </strong>List with the possible values that a field can have. Usable when type="list". The format is a JSON array. Example: [option A, option B, "option C"]</li>
+          <li><strong>list </strong>- List with the possible values that a field can have. Usable when type="list". The format is a JSON map. The key of the map is the value used in the XML. The value of the map is another map, like the one used for the labels.Example: <pre><code>{"Final": {"en":"Final", "pt_PT":"Final"}, "Revised": {"en":"Revised", "pt_PT":"Verificado"}}</code></pre></li>
+          <li><strong>listi18n </strong>- I18n prefix key. Usable when type="list". All the key starting with the prefix are used to build the list. Example:<br/><pre><code>listi18n="crosswalks.dissemination.html.ead.level"</code></pre><br/>Properties file:<br/>
+          <pre><code>crosswalks.dissemination.html.ead.level.fonds=Fonds
+crosswalks.dissemination.html.ead.level.class=Class
+crosswalks.dissemination.html.ead.level.collection=Collection
+crosswalks.dissemination.html.ead.level.recordgrp=Records group
+crosswalks.dissemination.html.ead.level.subgrp=Sub-group
+crosswalks.dissemination.html.ead.level.subfonds=Subfonds
+crosswalks.dissemination.html.ead.level.series=Series
+crosswalks.dissemination.html.ead.level.subseries=Sub-series
+crosswalks.dissemination.html.ead.level.file=File
+crosswalks.dissemination.html.ead.level.item=Item</code></pre>
+          <br/>
+          Output:<br/>
+          <pre><code>&lt;select&gt;
+&lt;option value="fonds"&gt;Fonds&lt;/option&gt;
+&lt;option value="class"&gt;Class&lt;/option&gt;
+&lt;option value="collection"&gt;Collection&lt;/option&gt;
+&lt;option value="recordgrp"&gt;Records group&lt;/option&gt;
+(...)
+&lt;/select&gt;</code></pre>
+          </li>
         </ul>
       </ul>
       <li><strong>auto-generate </strong>- Fills the value with one of the available auto-value generators. Overrides the value option:</li>
@@ -693,7 +715,7 @@
 
     After adding all the files described on the previous section, one needs to enable them on the repository. In order to acomplish that, the following activies need to be done.
 
-  <h3>Enable the new metadata formath3>
+  <h3>Enable the new metadata format</h3>
 
   <p>
     After you added the previously described files to your configuration folder, you must enable the new format in the RODA main configuration file.
