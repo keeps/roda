@@ -88,7 +88,8 @@ public class UserUtility {
     if (authorization != null && authorization.startsWith("Basic")) {
       String credentials = new String(authorization);
       credentials = credentials.replaceFirst("[B|b]asic ", "");
-      credentials = new String(Base64.getDecoder().decode(credentials), Charset.forName("UTF-8"));
+      credentials = new String(Base64.getDecoder().decode(credentials),
+        Charset.forName(RodaConstants.DEFAULT_ENCODING));
       final String[] values = credentials.split(":", 2);
       if (values[0] != null && values[1] != null) {
         ret = new Pair<String, String>(values[0], values[1]);
@@ -120,8 +121,7 @@ public class UserUtility {
     return getUser(request, true);
   }
 
-  public static void checkRoles(final User rsu, final List<String> rolesToCheck)
-    throws AuthorizationDeniedException {
+  public static void checkRoles(final User rsu, final List<String> rolesToCheck) throws AuthorizationDeniedException {
     if (!rsu.getAllRoles().containsAll(rolesToCheck)) {
       LOGGER.debug("User '{}' roles: {} vs. roles to check: {}", rsu.getId(), rsu.getAllRoles(), rolesToCheck);
       throw new AuthorizationDeniedException(
@@ -146,8 +146,8 @@ public class UserUtility {
     checkRoles(user, invokingMethodInnerClass, null);
   }
 
-  public static void checkRoles(final User user, final Class<?> invokingMethodInnerClass,
-    final Class<?> classToReturn) throws AuthorizationDeniedException {
+  public static void checkRoles(final User user, final Class<?> invokingMethodInnerClass, final Class<?> classToReturn)
+    throws AuthorizationDeniedException {
     final Method method = invokingMethodInnerClass.getEnclosingMethod();
     final String classParam = (classToReturn == null) ? "" : "(" + classToReturn.getSimpleName() + ")";
     final String configKey = String.format("core.roles.%s.%s%s", method.getDeclaringClass().getName(), method.getName(),
@@ -238,8 +238,7 @@ public class UserUtility {
    * @param ids
    * @throws AuthorizationDeniedException
    */
-  public static void checkTransferredResourceAccess(User user, List<String> ids)
-    throws AuthorizationDeniedException {
+  public static void checkTransferredResourceAccess(User user, List<String> ids) throws AuthorizationDeniedException {
     // FIXME administrator workaround
     if ("admin".equalsIgnoreCase(user.getId())) {
       return;
@@ -267,8 +266,8 @@ public class UserUtility {
     }
   }
 
-  public static void checkObjectPermissions(User user, SelectedItems<IndexedAIP> selected,
-    PermissionType permission) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
+  public static void checkObjectPermissions(User user, SelectedItems<IndexedAIP> selected, PermissionType permission)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     IndexService index = RodaCoreFactory.getIndexService();
     if (selected instanceof SelectedItemsFilter) {
       SelectedItemsFilter<IndexedAIP> selectedItems = (SelectedItemsFilter<IndexedAIP>) selected;

@@ -404,6 +404,8 @@ public final class RodaConstants {
   public static final String MEMBERS_FULLNAME = "fullName";
   public static final String MEMBERS_IS_ACTIVE = "isActive";
   public static final String MEMBERS_IS_USER = "isUser";
+  public static final String MEMBERS_GROUPS_DIRECT = "groupsDirect";
+  public static final String MEMBERS_ROLES_DIRECT = "rolesDirect";
   public static final String MEMBERS_GROUPS_ALL = "groupsAll";
   public static final String MEMBERS_ROLES_ALL = "rolesAll";
   public static final String MEMBERS_SEARCH = "search";

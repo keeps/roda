@@ -34,6 +34,7 @@ import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.common.notifications.NotificationProcessor;
 import org.roda.core.common.validation.ValidationUtils;
+import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -1315,6 +1316,15 @@ public class ModelService extends ModelObservable {
   /***************** Users/Groups related *****************/
   /********************************************************/
 
+  public User retrieveUser(String name) throws GenericException {
+    try {
+      return UserUtility.getLdapUtility().getUser(name);
+    } catch (LdapUtilityException e) {
+      // TODO 20160906 hsilva: change this by a more specific exception
+      throw new GenericException("Unable to retrieve user", e);
+    }
+  }
+
   public User registerUser(User user, String password, boolean notify)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException {
     try {
@@ -1332,13 +1342,13 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  public User addUser(User user, boolean notify) throws GenericException, EmailAlreadyExistsException,
+  public User createUser(User user, boolean notify) throws GenericException, EmailAlreadyExistsException,
     UserAlreadyExistsException, IllegalOperationException, NotFoundException {
-    return addUser(user, null, notify);
+    return createUser(user, null, notify);
   }
 
-  public User addUser(User user, String password, boolean notify) throws GenericException, EmailAlreadyExistsException,
-    UserAlreadyExistsException, IllegalOperationException, NotFoundException {
+  public User createUser(User user, String password, boolean notify) throws GenericException,
+    EmailAlreadyExistsException, UserAlreadyExistsException, IllegalOperationException, NotFoundException {
     try {
       User createdUser = UserUtility.getLdapUtility().addUser(user);
 
@@ -1350,7 +1360,7 @@ public class ModelService extends ModelObservable {
       }
       return createdUser;
     } catch (LdapUtilityException e) {
-      throw new GenericException("Error adding user to LDAP", e);
+      throw new GenericException("Error creating user in LDAP", e);
     } catch (UserAlreadyExistsException e) {
       throw new UserAlreadyExistsException("User already exists", e);
     } catch (EmailAlreadyExistsException e) {
@@ -1358,25 +1368,25 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  public User modifyUser(User user, boolean notify)
+  public User updateUser(User user, boolean notify)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
-    return modifyUser(user, null, notify);
+    return updateUser(user, null, notify);
   }
 
-  public User modifyUser(User user, String password, boolean notify)
+  public User updateUser(User user, String password, boolean notify)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     try {
       if (password != null) {
         UserUtility.getLdapUtility().setUserPassword(user.getId(), password);
       }
 
-      User modifiedUser = UserUtility.getLdapUtility().modifyUser(user);
+      User updatedUser = UserUtility.getLdapUtility().modifyUser(user);
       if (notify) {
-        notifyUserUpdated(modifiedUser);
+        notifyUserUpdated(updatedUser);
       }
-      return modifiedUser;
+      return updatedUser;
     } catch (LdapUtilityException e) {
-      throw new GenericException("Error modifying user to LDAP", e);
+      throw new GenericException("Error updating user in LDAP", e);
     } catch (EmailAlreadyExistsException e) {
       throw new AlreadyExistsException("User already exists", e);
     } catch (NotFoundException e) {
@@ -1386,17 +1396,17 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  public User modifyMyUser(User user, String password, boolean notify)
+  public User updateMyUser(User user, String password, boolean notify)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     try {
-      User modifiedUser = UserUtility.getLdapUtility().modifySelfUser(user, password);
+      User updatedUser = UserUtility.getLdapUtility().modifySelfUser(user, password);
 
       if (notify) {
-        notifyUserUpdated(modifiedUser);
+        notifyUserUpdated(updatedUser);
       }
-      return modifiedUser;
+      return updatedUser;
     } catch (LdapUtilityException e) {
-      throw new GenericException("Error modifying user to LDAP", e);
+      throw new GenericException("Error updating user in LDAP", e);
     } catch (EmailAlreadyExistsException e) {
       throw new AlreadyExistsException("User already exists", e);
     } catch (NotFoundException e) {
@@ -1407,14 +1417,14 @@ public class ModelService extends ModelObservable {
 
   }
 
-  public void removeUser(String id, boolean notify) throws GenericException, AuthorizationDeniedException {
+  public void deleteUser(String id, boolean notify) throws GenericException, AuthorizationDeniedException {
     try {
       UserUtility.getLdapUtility().removeUser(id);
       if (notify) {
         notifyUserDeleted(id);
       }
     } catch (LdapUtilityException e) {
-      throw new GenericException("Error removing user from LDAP", e);
+      throw new GenericException("Error deleting user from LDAP", e);
     } catch (IllegalOperationException e) {
       throw new AuthorizationDeniedException("Illegal operation", e);
     }
@@ -1424,30 +1434,47 @@ public class ModelService extends ModelObservable {
     super.notifyUserUpdated(user);
   }
 
-  public Group addGroup(Group group, boolean notify) throws GenericException, AlreadyExistsException {
+  public List<User> listUsers() throws GenericException {
     try {
-      Group addedGroup = UserUtility.getLdapUtility().addGroup(group);
-      if (notify) {
-        notifyGroupCreated(addedGroup);
-      }
-      return addedGroup;
+      return UserUtility.getLdapUtility().getUsers(new Filter());
     } catch (LdapUtilityException e) {
-      throw new GenericException("Error adding group to LDAP", e);
+      throw new GenericException("Unable to list users", e);
+    }
+  }
+
+  public Group retrieveGroup(String name) throws GenericException {
+    try {
+      return UserUtility.getLdapUtility().getGroup(name);
+    } catch (LdapUtilityException e) {
+      // TODO 20160906 hsilva: change this by a more specific exception
+      throw new GenericException("Unable to retrieve group", e);
+    }
+  }
+
+  public Group createGroup(Group group, boolean notify) throws GenericException, AlreadyExistsException {
+    try {
+      Group createdGroup = UserUtility.getLdapUtility().addGroup(group);
+      if (notify) {
+        notifyGroupCreated(createdGroup);
+      }
+      return createdGroup;
+    } catch (LdapUtilityException e) {
+      throw new GenericException("Error creating group in LDAP", e);
     } catch (GroupAlreadyExistsException e) {
       throw new AlreadyExistsException("Group already exists", e);
     }
   }
 
-  public Group modifyGroup(final Group group, boolean notify)
+  public Group updateGroup(final Group group, boolean notify)
     throws GenericException, NotFoundException, AuthorizationDeniedException {
     try {
-      Group modifiedGroup = UserUtility.getLdapUtility().modifyGroup(group);
+      Group updatedGroup = UserUtility.getLdapUtility().modifyGroup(group);
       if (notify) {
-        notifyGroupUpdated(modifiedGroup);
+        notifyGroupUpdated(updatedGroup);
       }
-      return modifiedGroup;
+      return updatedGroup;
     } catch (LdapUtilityException e) {
-      throw new GenericException("Error modifying group to LDAP", e);
+      throw new GenericException("Error updating group in LDAP", e);
     } catch (NotFoundException e) {
       throw new NotFoundException("Group doesn't exist", e);
     } catch (IllegalOperationException e) {
@@ -1456,14 +1483,14 @@ public class ModelService extends ModelObservable {
 
   }
 
-  public void removeGroup(String id, boolean notify) throws GenericException, AuthorizationDeniedException {
+  public void deleteGroup(String id, boolean notify) throws GenericException, AuthorizationDeniedException {
     try {
       UserUtility.getLdapUtility().removeGroup(id);
       if (notify) {
         notifyGroupDeleted(id);
       }
     } catch (LdapUtilityException e) {
-      throw new GenericException("Error removing group from LDAP", e);
+      throw new GenericException("Error deleting group from LDAP", e);
     } catch (IllegalOperationException e) {
       throw new AuthorizationDeniedException("Illegal operation", e);
     }
@@ -1471,6 +1498,14 @@ public class ModelService extends ModelObservable {
 
   public void notifyGroupUpdated(Group group) {
     super.notifyGroupUpdated(group);
+  }
+
+  public List<Group> listGroups() throws GenericException {
+    try {
+      return UserUtility.getLdapUtility().getGroups(new Filter());
+    } catch (LdapUtilityException e) {
+      throw new GenericException("Unable to list groups", e);
+    }
   }
 
   public User confirmUserEmail(String username, String email, String emailConfirmationToken, boolean useModel,

@@ -171,13 +171,7 @@ public class IndexService {
       optimizeAIPs();
       LOGGER.info("{} > Done", new Date().getTime());
     } finally {
-      try {
-        if (aips != null) {
-          aips.close();
-        }
-      } catch (IOException e) {
-        LOGGER.error("Error while freeing up resources", e);
-      }
+      IOUtils.closeQuietly(aips);
     }
   }
 

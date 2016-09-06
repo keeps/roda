@@ -644,17 +644,40 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public void groupCreated(Group group) {
     addDocumentToIndex(RODAMember.class, group);
+    reindexAllMembers();
   }
 
   @Override
   public void groupUpdated(Group group) {
-    groupDeleted(group.getId());
-    groupCreated(group);
+    deleteDocumentFromIndex(RODAMember.class, group.getId());
+    addDocumentToIndex(RODAMember.class, group);
+    reindexAllMembers();
   }
 
   @Override
   public void groupDeleted(String groupID) {
     deleteDocumentFromIndex(RODAMember.class, groupID);
+    reindexAllMembers();
+  }
+
+  private void reindexAllMembers() {
+    try {
+      for (User user : model.listUsers()) {
+        LOGGER.debug("User to be indexed: {}", user);
+        userUpdated(user);
+      }
+    } catch (GenericException e) {
+      LOGGER.error("Unable to re-index all users", e);
+    }
+    try {
+      for (Group group : model.listGroups()) {
+        LOGGER.debug("Group to be indexed: {}", group);
+        deleteDocumentFromIndex(RODAMember.class, group.getId());
+        addDocumentToIndex(RODAMember.class, group);
+      }
+    } catch (GenericException e) {
+      LOGGER.error("Unable to re-index all groups", e);
+    }
   }
 
   @Override

@@ -24,12 +24,15 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.xmlbeans.XmlException;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
 import org.hamcrest.core.Is;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
@@ -51,6 +54,8 @@ import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.log.LogEntryParameter;
+import org.roda.core.data.v2.user.Group;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
@@ -86,6 +91,9 @@ import jersey.repackaged.com.google.common.collect.Lists;
 // @PrepareForTest({})
 @Test(groups = {"all", "travis"})
 public class ModelServiceTest {
+  private static final Logger LOGGER = LoggerFactory.getLogger(ModelServiceTest.class);
+  private static final String ROLE1 = "browse";
+  private static final String ROLE2 = "ingest.submit";
 
   private static Path basePath;
   private static Path logPath;
@@ -95,8 +103,6 @@ public class ModelServiceTest {
   private static Path corporaPath;
   private static StorageService corporaService;
   private static String aipCreator = "admin";
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(ModelServiceTest.class);
 
   @BeforeClass
   public static void setUp() throws IOException, URISyntaxException, GenericException {
@@ -112,7 +118,7 @@ public class ModelServiceTest {
     basePath = TestsHelper.createBaseTempDir(getClass(), true);
 
     boolean deploySolr = false;
-    boolean deployLdap = false;
+    boolean deployLdap = true;
     boolean deployFolderMonitor = false;
     boolean deployOrchestrator = false;
     boolean deployPluginManager = false;
@@ -862,6 +868,81 @@ public class ModelServiceTest {
       Files.createDirectories(logPath);
     } catch (IOException e) {
     }
+  }
+
+  @Test(enabled = false)
+  public void testMemberInheritance() throws RODAException {
+    // create group 1
+    Group group1 = new Group("group1");
+    group1.setActive(true);
+    group1.setFullName("NAMEGROUP1");
+    group1.setDirectRoles(new HashSet<>(Arrays.asList(ROLE1)));
+    model.createGroup(group1, true);
+
+    // gen. asserts for group 1
+    Group retrievedGroup1 = model.retrieveGroup(group1.getId());
+    Assert.assertNotNull(retrievedGroup1);
+
+    // create group 2
+    Group group2 = new Group("group2");
+    group2.setActive(true);
+    group2.setFullName("NAMEGROUP2");
+    group2.setDirectGroups(new HashSet<>(Arrays.asList(group1.getId())));
+    group2.setDirectRoles(new HashSet<>(Arrays.asList(ROLE2)));
+    model.createGroup(group2, true);
+
+    // gen. asserts for group 2
+    Group retrievedGroup2 = model.retrieveGroup(group2.getId());
+    Assert.assertNotNull(retrievedGroup2);
+    MatcherAssert.assertThat(retrievedGroup2.getAllGroups(), Matchers.containsInAnyOrder(group1.getId()));
+    MatcherAssert.assertThat(retrievedGroup2.getAllRoles(), Matchers.containsInAnyOrder(ROLE1, ROLE2));
+
+    // create user 1
+    User user = new User("user1");
+    user.setActive(true);
+    user.setEmail("user1@example.com");
+    user.setGuest(false);
+    user.setFullName("user1");
+    user.addDirectGroup(group2.getId());
+    model.createUser(user, true);
+
+    // gen. asserts for user 1
+    User retrievedUser = model.retrieveUser(user.getId());
+    Assert.assertNotNull(retrievedUser);
+    MatcherAssert.assertThat(retrievedUser.getAllGroups(), Matchers.containsInAnyOrder(group1.getId(), group2.getId()));
+    MatcherAssert.assertThat(retrievedUser.getAllRoles(), Matchers.containsInAnyOrder(ROLE1, ROLE2));
+
+    // create group 3
+    Group group3 = new Group("group3");
+    group3.setActive(true);
+    group3.setFullName("NAMEGROUP3");
+    group3.setDirectGroups(new HashSet<>(Arrays.asList(group2.getId())));
+    model.createGroup(group3, true);
+
+    // modify group 2 groups
+    retrievedGroup2.removeGroup(group1.getId());
+    model.updateGroup(retrievedGroup2, false);
+
+    Group updatedGroup2 = model.retrieveGroup(retrievedGroup2.getId());
+    Assert.assertNotNull(updatedGroup2);
+    MatcherAssert.assertThat(updatedGroup2.getAllGroups(), Matchers.empty());
+    MatcherAssert.assertThat(updatedGroup2.getAllRoles(), Matchers.containsInAnyOrder(ROLE2));
+    MatcherAssert.assertThat(updatedGroup2.getAllRoles(), Matchers.not(Matchers.containsInAnyOrder(ROLE1)));
+
+    Group retrievedGroup3 = model.retrieveGroup(group3.getId());
+    Assert.assertNotNull(retrievedGroup3);
+    MatcherAssert.assertThat(retrievedGroup3.getAllGroups(), Matchers.containsInAnyOrder(group2.getId()));
+    MatcherAssert.assertThat(retrievedGroup3.getAllGroups(), Matchers.not(Matchers.containsInAnyOrder(group1.getId())));
+    MatcherAssert.assertThat(retrievedGroup3.getAllRoles(), Matchers.containsInAnyOrder(ROLE2));
+    MatcherAssert.assertThat(retrievedGroup3.getAllRoles(), Matchers.not(Matchers.containsInAnyOrder(ROLE1)));
+
+    User retrievedUser2 = model.retrieveUser(user.getId());
+    Assert.assertNotNull(retrievedUser2);
+    MatcherAssert.assertThat(retrievedUser2.getAllGroups(), Matchers.containsInAnyOrder(group2.getId()));
+    MatcherAssert.assertThat(retrievedUser2.getAllGroups(), Matchers.not(Matchers.containsInAnyOrder(group1.getId())));
+    MatcherAssert.assertThat(retrievedUser2.getAllRoles(), Matchers.containsInAnyOrder(ROLE2));
+    MatcherAssert.assertThat(retrievedUser2.getAllRoles(), Matchers.not(Matchers.containsInAnyOrder(ROLE1)));
+
   }
 
 }

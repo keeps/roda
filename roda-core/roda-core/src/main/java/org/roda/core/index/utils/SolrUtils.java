@@ -160,8 +160,8 @@ public class SolrUtils {
     return find(index, classToRetrieve, filter, null, new Sublist(0, 0)).getTotalCount();
   }
 
-  public static <T extends IsIndexed> Long count(SolrClient index, Class<T> classToRetrieve, Filter filter,
-    User user, boolean justActive) throws GenericException, RequestNotValidException {
+  public static <T extends IsIndexed> Long count(SolrClient index, Class<T> classToRetrieve, Filter filter, User user,
+    boolean justActive) throws GenericException, RequestNotValidException {
     return find(index, classToRetrieve, filter, null, new Sublist(0, 0), null, user, justActive).getTotalCount();
   }
 
@@ -1410,6 +1410,12 @@ public class SolrUtils {
     doc.addField(RodaConstants.MEMBERS_IS_ACTIVE, member.isActive());
     doc.addField(RodaConstants.MEMBERS_IS_USER, member.isUser());
     doc.addField(RodaConstants.MEMBERS_NAME, member.getName());
+    if (member.getDirectGroups() != null) {
+      doc.addField(RodaConstants.MEMBERS_GROUPS_DIRECT, new ArrayList<String>(member.getDirectGroups()));
+    }
+    if (member.getDirectRoles() != null) {
+      doc.addField(RodaConstants.MEMBERS_ROLES_DIRECT, new ArrayList<String>(member.getDirectRoles()));
+    }
     if (member.getAllGroups() != null) {
       doc.addField(RodaConstants.MEMBERS_GROUPS_ALL, new ArrayList<String>(member.getAllGroups()));
     }
@@ -1438,12 +1444,12 @@ public class SolrUtils {
     final String fullName = objectToString(doc.get(RodaConstants.MEMBERS_FULLNAME), null);
 
     final String email = objectToString(doc.get(RodaConstants.MEMBERS_EMAIL), null);
-    final Set<String> groups = new HashSet<String>();
-    List<String> possibleGroups = objectToListString(doc.get(RodaConstants.MEMBERS_GROUPS_ALL));
-    groups.addAll(possibleGroups);
-    final Set<String> roles = new HashSet<String>();
-    List<String> possibleRoles = objectToListString(doc.get(RodaConstants.MEMBERS_ROLES_ALL));
-    roles.addAll(possibleRoles);
+    final Set<String> directGroups = new HashSet<String>(
+      objectToListString(doc.get(RodaConstants.MEMBERS_GROUPS_DIRECT)));
+    final Set<String> directRoles = new HashSet<String>(
+      objectToListString(doc.get(RodaConstants.MEMBERS_ROLES_DIRECT)));
+    final Set<String> allGroups = new HashSet<String>(objectToListString(doc.get(RodaConstants.MEMBERS_GROUPS_ALL)));
+    final Set<String> allRoles = new HashSet<String>(objectToListString(doc.get(RodaConstants.MEMBERS_ROLES_ALL)));
     if (isUser) {
       User user = new User();
       user.setId(id);
@@ -1452,8 +1458,10 @@ public class SolrUtils {
       user.setEmail(email);
 
       user.setActive(isActive);
-      user.setAllGroups(groups);
-      user.setAllRoles(roles);
+      user.setDirectGroups(directGroups);
+      user.setDirectRoles(directRoles);
+      user.setAllGroups(allGroups);
+      user.setAllRoles(allRoles);
       user.setActive(isActive);
 
       return user;
@@ -1461,48 +1469,15 @@ public class SolrUtils {
       Group group = new Group();
       group.setId(id);
       group.setActive(isActive);
-      group.setAllGroups(groups);
-      group.setAllRoles(roles);
+      group.setDirectGroups(directGroups);
+      group.setDirectRoles(directRoles);
+      group.setAllGroups(allGroups);
+      group.setAllRoles(allRoles);
       group.setActive(isActive);
       group.setName(name);
       group.setFullName(fullName);
       return group;
     }
-  }
-
-  public static SolrInputDocument userToSolrDocument(User user) {
-    SolrInputDocument doc = new SolrInputDocument();
-    doc.addField(RodaConstants.MEMBERS_ID, user.getId());
-    doc.addField(RodaConstants.MEMBERS_IS_ACTIVE, user.isActive());
-    doc.addField(RodaConstants.MEMBERS_IS_USER, user.isUser());
-    doc.addField(RodaConstants.MEMBERS_NAME, user.getName());
-    doc.addField(RodaConstants.MEMBERS_FULLNAME, user.getFullName());
-    doc.addField(RodaConstants.MEMBERS_EMAIL, user.getEmail());
-
-    if (user.getAllGroups() != null) {
-      doc.addField(RodaConstants.MEMBERS_GROUPS_ALL, new ArrayList<String>(user.getAllGroups()));
-    }
-    if (user.getAllRoles() != null) {
-      doc.addField(RodaConstants.MEMBERS_ROLES_ALL, new ArrayList<String>(user.getAllRoles()));
-    }
-
-    return doc;
-  }
-
-  public static SolrInputDocument groupToSolrDocument(Group group) {
-    SolrInputDocument doc = new SolrInputDocument();
-    doc.addField(RodaConstants.MEMBERS_ID, group.getId());
-    doc.addField(RodaConstants.MEMBERS_IS_ACTIVE, group.isActive());
-    doc.addField(RodaConstants.MEMBERS_IS_USER, group.isUser());
-    doc.addField(RodaConstants.MEMBERS_NAME, group.getName());
-    if (group.getAllGroups() != null) {
-      doc.addField(RodaConstants.MEMBERS_GROUPS_ALL, new ArrayList<String>(group.getAllGroups()));
-    }
-    if (group.getAllRoles() != null) {
-      doc.addField(RodaConstants.MEMBERS_ROLES_ALL, new ArrayList<String>(group.getAllRoles()));
-    }
-
-    return doc;
   }
 
   private static IndexedPreservationEvent solrDocumentToIndexedPreservationEvent(SolrDocument doc) {
