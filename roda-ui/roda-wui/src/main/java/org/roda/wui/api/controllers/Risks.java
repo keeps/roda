@@ -7,18 +7,14 @@
  */
 package org.roda.wui.api.controllers;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
-import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
@@ -45,7 +41,7 @@ public class Risks extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    RodaCoreFactory.getModelService().createRisk(risk, false);
+    risk = RodaCoreFactory.getModelService().createRisk(risk, false);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "risk", risk);
@@ -60,7 +56,7 @@ public class Risks extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    RodaCoreFactory.getModelService().updateRisk(risk, updateMessage, false);
+    risk = RodaCoreFactory.getModelService().updateRisk(risk, updateMessage, false);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "risk", risk);
@@ -82,25 +78,48 @@ public class Risks extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "riskId", riskId);
   }
 
-  public static List<IndexedRisk> retrieveRisks(User user, IndexResult<IndexedRisk> listRisksIndexResult)
-    throws AuthorizationDeniedException {
+  public static RiskIncidence createRiskIncidence(User user, RiskIncidence incidence)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    // TODO: The loop bellow could be replaced by the following line, right?
-    // List<IndexedRisk> risks = new
-    // ArrayList<>(listRisksIndexResult.getResults());
-    List<IndexedRisk> risks = new ArrayList<IndexedRisk>();
-    for (IndexedRisk risk : listRisksIndexResult.getResults()) {
-      risks.add(risk);
-    }
+    incidence = RodaCoreFactory.getModelService().createRiskIncidence(incidence, false);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "incidence", incidence);
 
-    return risks;
+    return incidence;
+  }
+
+  public static RiskIncidence updateRiskIncidence(User user, RiskIncidence incidence)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    incidence = RodaCoreFactory.getModelService().updateRiskIncidence(incidence, false);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "incidence", incidence);
+
+    return incidence;
+  }
+
+  public static void deleteRiskIncidence(User user, String incidenceId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    RodaCoreFactory.getModelService().deleteRiskIncidence(incidenceId, false);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "incidenceId", incidenceId);
   }
 
   /*

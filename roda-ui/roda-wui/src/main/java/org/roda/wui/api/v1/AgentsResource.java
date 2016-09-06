@@ -26,7 +26,6 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.agents.Agents;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
@@ -50,9 +49,9 @@ public class AgentsResource {
   @GET
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @ApiOperation(value = "List agents", notes = "Get a list of agents.", response = IndexedPreservationAgent.class, responseContainer = "List")
+  @ApiOperation(value = "List agents", notes = "Get a list of agents.", response = Agents.class, responseContainer = "List")
   @ApiResponses(value = {
-    @ApiResponse(code = 200, message = "Successful response", response = Agent.class, responseContainer = "List"),
+    @ApiResponse(code = 200, message = "Successful response", response = Agents.class, responseContainer = "List"),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response listAgents(

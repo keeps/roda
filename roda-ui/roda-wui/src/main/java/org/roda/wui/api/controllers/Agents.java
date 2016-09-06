@@ -40,7 +40,7 @@ public class Agents extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    RodaCoreFactory.getModelService().createAgent(agent, false);
+    agent = RodaCoreFactory.getModelService().createAgent(agent, false);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "agent", agent);
@@ -55,7 +55,7 @@ public class Agents extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    RodaCoreFactory.getModelService().updateAgent(agent, false);
+    agent = RodaCoreFactory.getModelService().updateAgent(agent, false);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "agent", agent);

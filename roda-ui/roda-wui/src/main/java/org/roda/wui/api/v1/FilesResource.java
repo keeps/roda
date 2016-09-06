@@ -7,7 +7,6 @@
  */
 package org.roda.wui.api.v1;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -62,9 +61,9 @@ public class FilesResource {
   @GET
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @ApiOperation(value = "List Files", notes = "Gets a list of files.", response = File.class, responseContainer = "List")
+  @ApiOperation(value = "List Files", notes = "Gets a list of files.", response = Files.class, responseContainer = "List")
   @ApiResponses(value = {
-    @ApiResponse(code = 200, message = "Successful response", response = File.class, responseContainer = "List"),
+    @ApiResponse(code = 200, message = "Successful response", response = Files.class, responseContainer = "List"),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response listFiles(
@@ -85,8 +84,8 @@ public class FilesResource {
   @GET
   @Path("/{" + RodaConstants.API_PATH_PARAM_FILE_UUID + "}")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_OCTET_STREAM})
-  @ApiOperation(value = "Get file", notes = "Get file", response = File.class)
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = File.class),
+  @ApiOperation(value = "Get file", notes = "Get file", response = org.roda.core.data.v2.ip.File.class)
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = org.roda.core.data.v2.ip.File.class),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response retrieve(
@@ -110,8 +109,8 @@ public class FilesResource {
   }
 
   @PUT
-  @ApiOperation(value = "Update file", notes = "Update existing file", response = File.class)
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = File.class),
+  @ApiOperation(value = "Update file", notes = "Update existing file", response = org.roda.core.data.v2.ip.File.class)
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = org.roda.core.data.v2.ip.File.class),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response update(org.roda.core.data.v2.ip.File file,
@@ -128,8 +127,8 @@ public class FilesResource {
   }
 
   @POST
-  @ApiOperation(value = "Create file", notes = "Create a new representation file", response = File.class)
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = File.class),
+  @ApiOperation(value = "Create file", notes = "Create a new representation file", response = org.roda.core.data.v2.ip.File.class)
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = org.roda.core.data.v2.ip.File.class),
     @ApiResponse(code = 409, message = "Already exists", response = ApiResponseMessage.class)})
 
   public Response createRepresentationFile(
@@ -179,8 +178,8 @@ public class FilesResource {
   @GET
   @Path("/{" + RodaConstants.API_PATH_PARAM_FILE_UUID + "}/" + RodaConstants.API_PRESERVATION_METADATA + "/")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, RodaConstants.APPLICATION_ZIP})
-  @ApiOperation(value = "Get preservation metadata", notes = "Get preservation metadata (JSON info, ZIP file or HTML conversion).\nOptional query params of **start** and **limit** defined the returned array.", response = PreservationMetadata.class)
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = PreservationMetadata.class),
+  @ApiOperation(value = "Get preservation metadata", notes = "Get preservation metadata (JSON info, ZIP file or HTML conversion).\nOptional query params of **start** and **limit** defined the returned array.", response = PreservationMetadataList.class)
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = PreservationMetadataList.class),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response retrievePreservationMetadataListFromAIP(
@@ -199,8 +198,8 @@ public class FilesResource {
       acceptFormat);
 
     if (preservationMetadataList instanceof ObjectResponse) {
-      ObjectResponse<PreservationMetadataList> aip = (ObjectResponse<PreservationMetadataList>) preservationMetadataList;
-      return Response.ok(aip.getObject(), mediaType).build();
+      ObjectResponse<PreservationMetadataList> pmlist = (ObjectResponse<PreservationMetadataList>) preservationMetadataList;
+      return Response.ok(pmlist.getObject(), mediaType).build();
     } else {
       return ApiUtils.okResponse((StreamResponse) preservationMetadataList);
     }

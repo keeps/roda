@@ -1724,7 +1724,7 @@ public class ModelService extends ModelObservable {
     return risk;
   }
 
-  public void updateRisk(Risk risk, String message, boolean commit) throws GenericException {
+  public Risk updateRisk(Risk risk, String message, boolean commit) throws GenericException {
     try {
       risk.setUpdatedOn(new Date());
       String riskAsJson = JsonUtils.getJsonFromObject(risk);
@@ -1741,6 +1741,7 @@ public class ModelService extends ModelObservable {
     }
 
     notifyRiskCreatedOrUpdated(risk, commit);
+    return risk;
   }
 
   public void updateRisks(List<Risk> risks, String message, boolean commit) throws GenericException {
@@ -1823,7 +1824,7 @@ public class ModelService extends ModelObservable {
     return riskIncidence;
   }
 
-  public void updateRiskIncidence(RiskIncidence riskIncidence, boolean commit) throws GenericException {
+  public RiskIncidence updateRiskIncidence(RiskIncidence riskIncidence, boolean commit) throws GenericException {
     try {
       riskIncidence.setRiskId(riskIncidence.getRiskId().replace("[", "").replace("]", ""));
       String riskIncidenceAsJson = JsonUtils.getJsonFromObject(riskIncidence);
@@ -1834,6 +1835,7 @@ public class ModelService extends ModelObservable {
     }
 
     notifyRiskIncidenceCreatedOrUpdated(riskIncidence, commit);
+    return riskIncidence;
   }
 
   public void deleteRiskIncidence(String riskIncidenceId, boolean commit)
@@ -1879,7 +1881,7 @@ public class ModelService extends ModelObservable {
     return agent;
   }
 
-  public void updateAgent(Agent agent, boolean commit) throws GenericException {
+  public Agent updateAgent(Agent agent, boolean commit) throws GenericException {
     try {
       String agentAsJson = JsonUtils.getJsonFromObject(agent);
       StoragePath agentPath = ModelUtils.getAgentStoragePath(agent.getId());
@@ -1889,6 +1891,7 @@ public class ModelService extends ModelObservable {
     }
 
     notifyAgentCreatedOrUpdated(agent, commit);
+    return agent;
   }
 
   public void deleteAgent(String agentId, boolean commit)
@@ -1935,7 +1938,7 @@ public class ModelService extends ModelObservable {
     return format;
   }
 
-  public void updateFormat(Format format, boolean commit) throws GenericException {
+  public Format updateFormat(Format format, boolean commit) throws GenericException {
     try {
       String formatAsJson = JsonUtils.getJsonFromObject(format);
       StoragePath formatPath = ModelUtils.getFormatStoragePath(format.getId());
@@ -1945,6 +1948,7 @@ public class ModelService extends ModelObservable {
     }
 
     notifyFormatCreatedOrUpdated(format, commit);
+    return format;
   }
 
   public void deleteFormat(String formatId, boolean commit)
@@ -2110,7 +2114,7 @@ public class ModelService extends ModelObservable {
     return notification;
   }
 
-  public void updateNotification(Notification notification) throws GenericException {
+  public Notification updateNotification(Notification notification) throws GenericException {
     try {
       String notificationAsJson = JsonUtils.getJsonFromObject(notification);
       StoragePath notificationPath = ModelUtils.getNotificationStoragePath(notification.getId());
@@ -2120,6 +2124,7 @@ public class ModelService extends ModelObservable {
     }
 
     notifyNotificationCreatedOrUpdated(notification);
+    return notification;
   }
 
   public void deleteNotification(String notificationId)

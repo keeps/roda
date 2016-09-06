@@ -21,7 +21,6 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.core.client.GWT;
@@ -39,8 +38,6 @@ import config.i18n.client.ClientMessages;
 
 public class RiskIncidenceList extends BasicAsyncTableCell<RiskIncidence> {
 
-  @SuppressWarnings("unused")
-  private final ClientLogger logger = new ClientLogger(getClass().getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private TextColumn<RiskIncidence> objectColumn;
@@ -123,7 +120,6 @@ public class RiskIncidenceList extends BasicAsyncTableCell<RiskIncidence> {
     detectedOnColumn.setSortable(true);
     detectedByColumn.setSortable(true);
 
-    // TODO externalize strings into constants
     addColumn(objectColumn, messages.riskIncidenceObjectId(), false, false);
     addColumn(riskColumn, messages.riskIncidenceRisk(), false, false);
     addColumn(detectedOnColumn, messages.riskIncidenceDetectedOn(), false, false);
@@ -133,7 +129,6 @@ public class RiskIncidenceList extends BasicAsyncTableCell<RiskIncidence> {
     // define default sorting
     display.getColumnSortList().push(new ColumnSortInfo(objectTypeColumn, true));
     addStyleName("my-collections-table");
-
   }
 
   @Override

@@ -30,7 +30,6 @@ import org.roda.wui.client.common.lists.RiskIncidenceList;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.process.CreateActionJob;
-import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Tools;
@@ -100,9 +99,6 @@ public class RiskIncidenceRegister extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  @SuppressWarnings("unused")
-  private ClientLogger logger = new ClientLogger(getClass().getName());
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
@@ -118,7 +114,7 @@ public class RiskIncidenceRegister extends Composite {
   RiskIncidenceList riskIncidenceList;
 
   @UiField(provided = true)
-  FlowPanel facetDetectedBy;
+  FlowPanel facetDetectedBy, facetStatus;
 
   @UiField
   DateBox inputDateInitial;
@@ -139,7 +135,8 @@ public class RiskIncidenceRegister extends Composite {
    */
 
   public RiskIncidenceRegister() {
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.RISK_INCIDENCE_DETECTED_BY));
+    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.RISK_INCIDENCE_DETECTED_BY),
+      new SimpleFacetParameter(RodaConstants.RISK_INCIDENCE_STATUS));
 
     riskIncidenceList = new RiskIncidenceList(Filter.NULL, facets, messages.riskIncidencesTitle(), false);
 
@@ -148,9 +145,11 @@ public class RiskIncidenceRegister extends Composite {
     searchPanel.setList(riskIncidenceList);
 
     facetDetectedBy = new FlowPanel();
+    facetStatus = new FlowPanel();
 
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
     facetPanels.put(RodaConstants.RISK_INCIDENCE_DETECTED_BY, facetDetectedBy);
+    facetPanels.put(RodaConstants.RISK_INCIDENCE_STATUS, facetStatus);
     FacetUtils.bindFacets(riskIncidenceList, facetPanels);
 
     riskIncidenceList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {

@@ -49,9 +49,9 @@ public class FormatsResource {
   @GET
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @ApiOperation(value = "List formats", notes = "Get a list of formats.", response = Format.class, responseContainer = "List")
+  @ApiOperation(value = "List formats", notes = "Get a list of formats.", response = Formats.class, responseContainer = "List")
   @ApiResponses(value = {
-    @ApiResponse(code = 200, message = "Successful response", response = Format.class, responseContainer = "List"),
+    @ApiResponse(code = 200, message = "Successful response", response = Formats.class, responseContainer = "List"),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response listFormats(

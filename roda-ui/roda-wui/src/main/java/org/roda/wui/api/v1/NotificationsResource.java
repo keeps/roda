@@ -49,9 +49,9 @@ public class NotificationsResource {
   @GET
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @ApiOperation(value = "List notifications", notes = "Get a list of notifications.", response = Notification.class, responseContainer = "List")
+  @ApiOperation(value = "List notifications", notes = "Get a list of notifications.", response = Notifications.class, responseContainer = "List")
   @ApiResponses(value = {
-    @ApiResponse(code = 200, message = "Successful response", response = Notification.class, responseContainer = "List"),
+    @ApiResponse(code = 200, message = "Successful response", response = Notifications.class, responseContainer = "List"),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response listNotifications(
@@ -78,6 +78,7 @@ public class NotificationsResource {
     @ApiResponse(code = 409, message = "Already exists", response = ApiResponseMessage.class)})
 
   public Response createNotification(Notification notification,
+    @ApiParam(value = "Template name", defaultValue = RodaConstants.API_NOTIFICATION_DEFAULT_TEMPLATE) @QueryParam(RodaConstants.API_QUERY_PARAM_TEMPLATE) String template,
     @ApiParam(value = "Choose format in which to get the notification", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
@@ -86,7 +87,8 @@ public class NotificationsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    Notification newNotification = org.roda.wui.api.controllers.Notifications.createNotification(user, notification);
+    Notification newNotification = org.roda.wui.api.controllers.Notifications.createNotification(user, notification,
+      template);
     return Response.ok(newNotification, mediaType).build();
   }
 

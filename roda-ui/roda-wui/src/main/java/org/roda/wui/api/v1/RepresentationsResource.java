@@ -38,6 +38,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.Representations;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataList;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadataList;
 import org.roda.core.data.v2.user.User;
@@ -64,9 +65,9 @@ public class RepresentationsResource {
   @GET
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @ApiOperation(value = "List Representations", notes = "Gets a list of representations.", response = Representation.class, responseContainer = "List")
+  @ApiOperation(value = "List Representations", notes = "Gets a list of representations.", response = Representations.class, responseContainer = "List")
   @ApiResponses(value = {
-    @ApiResponse(code = 200, message = "Successful response", response = Representation.class, responseContainer = "List"),
+    @ApiResponse(code = 200, message = "Successful response", response = Representations.class, responseContainer = "List"),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response listRepresentations(
@@ -192,9 +193,9 @@ public class RepresentationsResource {
 
   @GET
   @Path("/{" + RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID + "}/" + RodaConstants.API_DESCRIPTIVE_METADATA + "/")
-  @ApiOperation(value = "List descriptive metadata", notes = "List descriptive metadata", response = DescriptiveMetadata.class, responseContainer = "List")
+  @ApiOperation(value = "List descriptive metadata", notes = "List descriptive metadata", response = DescriptiveMetadataList.class, responseContainer = "List")
   @ApiResponses(value = {
-    @ApiResponse(code = 200, message = "OK", response = DescriptiveMetadata.class, responseContainer = "List"),
+    @ApiResponse(code = 200, message = "OK", response = DescriptiveMetadataList.class, responseContainer = "List"),
     @ApiResponse(code = 404, message = "Representation not found", response = ApiResponseMessage.class)})
 
   public Response retrieveDescriptiveMetadataListFromRepresentation(
@@ -213,8 +214,8 @@ public class RepresentationsResource {
       acceptFormat);
 
     if (metadataList instanceof ObjectResponse) {
-      ObjectResponse<DescriptiveMetadata> rep = (ObjectResponse<DescriptiveMetadata>) metadataList;
-      return Response.ok(rep.getObject(), mediaType).build();
+      ObjectResponse<DescriptiveMetadataList> dmlist = (ObjectResponse<DescriptiveMetadataList>) metadataList;
+      return Response.ok(dmlist.getObject(), mediaType).build();
     } else {
       return ApiUtils.okResponse((StreamResponse) metadataList);
     }
@@ -335,8 +336,8 @@ public class RepresentationsResource {
   @GET
   @Path("/{" + RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID + "}/" + RodaConstants.API_PRESERVATION_METADATA + "/")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, RodaConstants.APPLICATION_ZIP})
-  @ApiOperation(value = "Get representation preservation metadata", notes = "Get representation preservation metadata (JSON info, ZIP file conversion) for a given representation.\nOptional query params of **start** and **limit** defined the returned array.", response = PreservationMetadata.class)
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = PreservationMetadata.class),
+  @ApiOperation(value = "Get representation preservation metadata", notes = "Get representation preservation metadata (JSON info, ZIP file conversion) for a given representation.\nOptional query params of **start** and **limit** defined the returned array.", response = PreservationMetadataList.class)
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = PreservationMetadataList.class),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response retrievePreservationMetadataListFromRepresentation(
@@ -361,8 +362,8 @@ public class RepresentationsResource {
         representationId, startAgent, limitAgent, startEvent, limitEvent, startFile, limitFile, acceptFormat, language);
 
       if (preservationMetadataList instanceof ObjectResponse) {
-        ObjectResponse<PreservationMetadataList> aip = (ObjectResponse<PreservationMetadataList>) preservationMetadataList;
-        return Response.ok(aip.getObject(), mediaType).build();
+        ObjectResponse<PreservationMetadataList> pmlist = (ObjectResponse<PreservationMetadataList>) preservationMetadataList;
+        return Response.ok(pmlist.getObject(), mediaType).build();
       } else {
         return ApiUtils.okResponse((StreamResponse) preservationMetadataList);
       }

@@ -1133,7 +1133,7 @@ public interface ClientMessages extends Messages {
 
   String riskIncidenceStatusValue(@Select INCIDENCE_STATUS status);
 
-  /*** AGents ***/
+  /*** Agents ***/
 
   String agentName();
 

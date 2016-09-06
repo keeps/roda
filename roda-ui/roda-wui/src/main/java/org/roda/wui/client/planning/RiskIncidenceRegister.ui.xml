@@ -42,6 +42,10 @@
 						<ui:text from='{messages.riskIncidenceDetectedBy}' />
 					</g:Label>
 					<g:FlowPanel ui:field="facetDetectedBy" />
+					<g:Label addStyleNames="h5 sidebar-facet-title">
+						<ui:text from='{messages.riskIncidenceStatus}' />
+					</g:Label>
+					<g:FlowPanel ui:field="facetStatus" />
 				</g:FlowPanel>
 				<g:Label addStyleNames="h5 sidebar-facet-title">
 					<ui:text from='{messages.sidebarFilterDates}' />

@@ -161,7 +161,9 @@ public final class RodaConstants {
   public static final String API_PATH_PARAM_AGENT_ID = "agent_id";
   public static final String API_PATH_PARAM_FORMAT_ID = "format_id";
   public static final String API_PATH_PARAM_RISK_ID = "risk_id";
+  public static final String API_PATH_PARAM_RISK_INCIDENCE_ID = "risk_incidence_id";
   public static final String API_PATH_PARAM_PART = "part";
+
   public static final String API_QUERY_PARAM_VERSION_ID = "version_id";
   public static final String API_QUERY_PARAM_NOTIFICATION_TOKEN = "token";
   public static final String API_QUERY_PARAM_RESOURCE_ID = "resource_id";
@@ -173,6 +175,7 @@ public final class RodaConstants {
   public static final String API_QUERY_PARAM_METADATA_TYPE = "metadataType";
   public static final String API_QUERY_PARAM_METADATA_VERSION = "metadataVersion";
   public static final String API_QUERY_PARAM_RISK_MESSAGE = "message";
+  public static final String API_QUERY_PARAM_TEMPLATE = "template";
   public static final String API_PARAM_FILE = "file";
   // http headers used
   public static final String API_HTTP_HEADER_ACCEPT = "Accept";
@@ -181,6 +184,7 @@ public final class RodaConstants {
   public static final String API_PATH_PARAM_JOB_JUST_FAILED = "jobJustFailed";
 
   public static final String APPLICATION_ZIP = "application/zip";
+  public static final String API_NOTIFICATION_DEFAULT_TEMPLATE = "test-email-template";
 
   // api method allowable values
   public static final String API_LIST_MEDIA_TYPES = "json, xml";

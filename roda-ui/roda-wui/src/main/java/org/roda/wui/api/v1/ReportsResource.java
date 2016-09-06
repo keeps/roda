@@ -18,7 +18,6 @@ import javax.ws.rs.core.Response;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Reports;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
@@ -42,8 +41,8 @@ public class ReportsResource {
 
   @GET
   @Path("/{" + RodaConstants.API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID + "}")
-  @ApiOperation(value = "List reports", notes = "List reports", response = Report.class, responseContainer = "List")
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Report.class, responseContainer = "List"),
+  @ApiOperation(value = "List reports", notes = "List reports", response = Reports.class, responseContainer = "List")
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Reports.class, responseContainer = "List"),
     @ApiResponse(code = 404, message = "Transferred resource not found", response = ApiResponseMessage.class)})
 
   public Response getTransferredResourceReports(
@@ -65,8 +64,8 @@ public class ReportsResource {
 
   @GET
   @Path("/{" + RodaConstants.API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID + "}/last")
-  @ApiOperation(value = "Last report", notes = "Last report", response = Report.class, responseContainer = "List")
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Report.class, responseContainer = "List"),
+  @ApiOperation(value = "Last report", notes = "Last report", response = Reports.class, responseContainer = "List")
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Reports.class, responseContainer = "List"),
     @ApiResponse(code = 404, message = "Transferred resource not found", response = ApiResponseMessage.class)})
 
   public Response getTransferredResourceLastReport(

@@ -62,9 +62,9 @@ public class TransferredResource {
   private HttpServletRequest request;
 
   @GET
-  @ApiOperation(value = "List resources", notes = "Get a list of resources.", response = org.roda.core.data.v2.ip.TransferredResource.class, responseContainer = "List")
+  @ApiOperation(value = "List resources", notes = "Get a list of resources.", response = TransferredResources.class, responseContainer = "List")
   @ApiResponses(value = {
-    @ApiResponse(code = 200, message = "Successful response", response = org.roda.core.data.v2.ip.TransferredResource.class, responseContainer = "List"),
+    @ApiResponse(code = 200, message = "Successful response", response = TransferredResources.class, responseContainer = "List"),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response listTransferredResources(

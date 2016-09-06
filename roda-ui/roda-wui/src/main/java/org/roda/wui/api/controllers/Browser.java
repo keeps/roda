@@ -535,7 +535,7 @@ public class Browser extends RodaWuiController {
 
     // delegate
     EntityResponse aipRepresentationPreservationMetadata = BrowserHelper.retrieveAIPRepresentationPreservationMetadata(
-      aip.getId(), representationId, startAgent, limitAgent, startEvent, limitEvent, startFile, limitFile, acceptFormat,
+      aip.getId(), rep.getId(), startAgent, limitAgent, startEvent, limitEvent, startFile, limitFile, acceptFormat,
       language);
 
     // register action

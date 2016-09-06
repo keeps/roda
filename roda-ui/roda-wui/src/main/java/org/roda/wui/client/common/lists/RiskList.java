@@ -130,7 +130,6 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
     severityColumn.setSortable(true);
     objectCounterColumn.setSortable(true);
 
-    // TODO externalize strings into constants
     addColumn(nameColumn, messages.riskName(), false, false);
     addColumn(categoryColumn, messages.riskCategory(), false, false);
     addColumn(ownerColumn, messages.riskMitigationOwner(), false, false);
@@ -140,7 +139,6 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(severityColumn, false));
-
   }
 
   @Override

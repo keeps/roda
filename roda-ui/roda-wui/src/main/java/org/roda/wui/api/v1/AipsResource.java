@@ -39,6 +39,7 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPs;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataList;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadataList;
 import org.roda.core.data.v2.user.User;
@@ -65,9 +66,9 @@ public class AipsResource {
   @GET
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @ApiOperation(value = "List AIPs", notes = "Gets a list of archival information packages (AIPs).", response = AIP.class, responseContainer = "List")
+  @ApiOperation(value = "List AIPs", notes = "Gets a list of archival information packages (AIPs).", response = AIPs.class, responseContainer = "List")
   @ApiResponses(value = {
-    @ApiResponse(code = 200, message = "Successful response", response = AIP.class, responseContainer = "List"),
+    @ApiResponse(code = 200, message = "Successful response", response = AIPs.class, responseContainer = "List"),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response listAIPs(
@@ -192,9 +193,9 @@ public class AipsResource {
 
   @GET
   @Path("/{" + RodaConstants.API_PATH_PARAM_AIP_ID + "}/" + RodaConstants.API_DESCRIPTIVE_METADATA + "/")
-  @ApiOperation(value = "List descriptive metadata", notes = "List descriptive metadata", response = DescriptiveMetadata.class, responseContainer = "List")
+  @ApiOperation(value = "List descriptive metadata", notes = "List descriptive metadata", response = DescriptiveMetadataList.class, responseContainer = "List")
   @ApiResponses(value = {
-    @ApiResponse(code = 200, message = "OK", response = DescriptiveMetadata.class, responseContainer = "List"),
+    @ApiResponse(code = 200, message = "OK", response = DescriptiveMetadataList.class, responseContainer = "List"),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response retrieveDescriptiveMetadataListFromAIP(
@@ -212,8 +213,8 @@ public class AipsResource {
     EntityResponse metadataList = Browser.listAIPDescriptiveMetadata(user, aipId, start, limit, acceptFormat);
 
     if (metadataList instanceof ObjectResponse) {
-      ObjectResponse<DescriptiveMetadata> aip = (ObjectResponse<DescriptiveMetadata>) metadataList;
-      return Response.ok(aip.getObject(), mediaType).build();
+      ObjectResponse<DescriptiveMetadataList> dmlist = (ObjectResponse<DescriptiveMetadataList>) metadataList;
+      return Response.ok(dmlist.getObject(), mediaType).build();
     } else {
       return ApiUtils.okResponse((StreamResponse) metadataList);
     }
@@ -346,8 +347,8 @@ public class AipsResource {
   @GET
   @Path("/{" + RodaConstants.API_PATH_PARAM_AIP_ID + "}/" + RodaConstants.API_PRESERVATION_METADATA + "/")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, RodaConstants.APPLICATION_ZIP})
-  @ApiOperation(value = "Get preservation metadata", notes = "Get preservation metadata (JSON info, ZIP file or HTML conversion).\nOptional query params of **start** and **limit** defined the returned array.", response = PreservationMetadata.class)
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = PreservationMetadata.class),
+  @ApiOperation(value = "Get preservation metadata", notes = "Get preservation metadata (JSON info, ZIP file or HTML conversion).\nOptional query params of **start** and **limit** defined the returned array.", response = PreservationMetadataList.class)
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = PreservationMetadataList.class),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response retrievePreservationMetadataListFromAIP(
@@ -365,8 +366,8 @@ public class AipsResource {
     EntityResponse preservationMetadataList = Browser.listAIPPreservationMetadata(user, aipId, acceptFormat);
 
     if (preservationMetadataList instanceof ObjectResponse) {
-      ObjectResponse<PreservationMetadataList> aip = (ObjectResponse<PreservationMetadataList>) preservationMetadataList;
-      return Response.ok(aip.getObject(), mediaType).build();
+      ObjectResponse<PreservationMetadataList> pmlist = (ObjectResponse<PreservationMetadataList>) preservationMetadataList;
+      return Response.ok(pmlist.getObject(), mediaType).build();
     } else {
       return ApiUtils.okResponse((StreamResponse) preservationMetadataList);
     }

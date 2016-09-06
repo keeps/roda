@@ -1908,6 +1908,8 @@ public class BrowserHelper {
       return new org.roda.core.data.v2.notifications.Notifications((List<Notification>) result.getResults());
     } else if (objectClass.equals(LogEntry.class)) {
       return new org.roda.core.data.v2.log.LogEntries((List<LogEntry>) result.getResults());
+    } else if (objectClass.equals(RiskIncidence.class)) {
+      return new org.roda.core.data.v2.risks.RiskIncidences((List<RiskIncidence>) result.getResults());
     } else {
       throw new GenericException("Unsupported object class: " + objectClass);
     }
@@ -2319,7 +2321,7 @@ public class BrowserHelper {
           });
         }
         result = tmpl.apply(data);
-        //result = RodaUtils.indentXML(result);
+        // result = RodaUtils.indentXML(result);
       } catch (IOException e) {
         throw new GenericException(e);
       }
