@@ -41,9 +41,12 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
@@ -56,17 +59,32 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
+
+  
   @UiField
   TextBox username;
 
+  @UiField
+  Label usernameError;
+  
   @UiField(provided = true)
   PasswordPanel password;
+  
+  @UiField
+  Label passwordError;
 
   @UiField
   TextBox fullname;
+  
+  @UiField
+  Label fullnameError;
 
   @UiField
   TextBox email;
+  
+  @UiField
+  Label emailError;
 
   @UiField
   FlowPanel extra;
@@ -207,6 +225,11 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
         onChange();
       }
     });
+    
+    usernameError.setVisible(false);
+    passwordError.setVisible(false);
+    fullnameError.setVisible(false);
+    emailError.setVisible(false);
   }
 
   private int setSelected(ListBox listbox, String text) {
@@ -375,8 +398,11 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     if (username.getText().length() == 0) {
       valid = false;
       username.addStyleName("isWrong");
+      usernameError.setText(messages.mandatoryField());
+      usernameError.setVisible(true);
     } else {
       username.removeStyleName("isWrong");
+      usernameError.setVisible(false);
     }
 
     valid &= password.isValid();
@@ -384,16 +410,27 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     if (fullname.getText().length() == 0) {
       valid = false;
       fullname.addStyleName("isWrong");
+      fullnameError.setText(messages.mandatoryField());
+      fullnameError.setVisible(true);
     } else {
       fullname.removeStyleName("isWrong");
+      fullnameError.setVisible(false);
     }
 
-    if (!email.getText()
+    if(email.getText()==null || email.getText().trim().equalsIgnoreCase("")){
+      valid = false;
+      email.addStyleName("isWrong");
+      emailError.setText(messages.mandatoryField());
+      emailError.setVisible(true);
+    }else if (!email.getText()
       .matches("^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[_A-Za-z0-9-]+)")) {
       valid = false;
       email.addStyleName("isWrong");
+      emailError.setText(messages.wrongMailFormat());
+      emailError.setVisible(true);
     } else {
       email.removeStyleName("isWrong");
+      emailError.setVisible(false);
     }
 
     valid = FormUtilities.validate(userExtraBundle.getValues(),extra);

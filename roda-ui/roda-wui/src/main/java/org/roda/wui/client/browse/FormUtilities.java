@@ -10,6 +10,7 @@ package org.roda.wui.client.browse;
 import java.util.Date;
 import java.util.Set;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -29,10 +30,13 @@ import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.datepicker.client.DateBox;
 
+import config.i18n.client.ClientMessages;
+
 /**
  * Created by adrapereira on 13-06-2016.
  */
 public class FormUtilities {
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   public static void create(FlowPanel panel, Set<MetadataValue> bundle, boolean addStyle) {
     for (MetadataValue mv : bundle) {
@@ -115,9 +119,8 @@ public class FormUtilities {
     if (mv.get("value") != null) {
       mvText.setText(mv.get("value"));
     }
-    if (mv.get("isWrong") != null && mv.get("isWrong").trim().equalsIgnoreCase("true")) {
-      mvText.addStyleName("isWrong");
-    }
+    
+    
     mvText.addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent changeEvent) {
@@ -132,7 +135,8 @@ public class FormUtilities {
 
     layout.add(mvLabel);
     layout.add(mvText);
-
+    
+    
     // Description
     String description = mv.get("description");
     if (description != null && description.length() > 0) {
@@ -140,7 +144,13 @@ public class FormUtilities {
       mvDescription.addStyleName("form-help");
       layout.add(mvDescription);
     }
-
+    
+    if (mv.get("error") != null && !mv.get("error").trim().equalsIgnoreCase("")) {
+      Label errorLabel = new Label(mv.get("error"));
+      errorLabel.addStyleName("form-label-error");
+      layout.add(errorLabel);
+      mvText.addStyleName("isWrong");
+    }
     panel.add(layout);
   }
 
@@ -157,9 +167,7 @@ public class FormUtilities {
     if (mv.get("value") != null) {
       mvText.setText(mv.get("value"));
     }
-    if (mv.get("isWrong") != null && mv.get("isWrong").trim().equalsIgnoreCase("true")) {
-      mvText.addStyleName("isWrong");
-    }
+   
     mvText.addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent changeEvent) {
@@ -182,7 +190,12 @@ public class FormUtilities {
       mvDescription.addStyleName("form-help");
       layout.add(mvDescription);
     }
-
+    if (mv.get("error") != null && !mv.get("error").trim().equalsIgnoreCase("")) {
+      Label errorLabel = new Label(mv.get("error"));
+      errorLabel.addStyleName("form-label-error");
+      layout.add(errorLabel);
+      mvText.addStyleName("isWrong");
+    }
     panel.add(layout);
   }
 
@@ -195,9 +208,6 @@ public class FormUtilities {
     }
     // Field
     final ListBox mvList = new ListBox();
-    if (mv.get("isWrong") != null && mv.get("isWrong").trim().equalsIgnoreCase("true")) {
-      mvList.addStyleName("isWrong");
-    }
     mvList.addStyleName("form-textbox");
 
     String list = mv.get("list");
@@ -269,6 +279,12 @@ public class FormUtilities {
       layout.add(mvDescription);
     }
 
+    if (mv.get("error") != null && !mv.get("error").trim().equalsIgnoreCase("")) {
+      Label errorLabel = new Label(mv.get("error"));
+      errorLabel.addStyleName("form-label-error");
+      layout.add(errorLabel);
+      mvList.addStyleName("isWrong");
+    }
     panel.add(layout);
   }
 
@@ -283,9 +299,6 @@ public class FormUtilities {
     }
     // Field
     final DateBox mvDate = new DateBox();
-    if (mv.get("isWrong") != null && mv.get("isWrong").trim().equalsIgnoreCase("true")) {
-      mvDate.addStyleName("isWrong");
-    }
     mvDate.getDatePicker().setYearAndMonthDropdownVisible(true);
     mvDate.getDatePicker().setYearArrowsVisible(true);
     mvDate.addStyleName("form-textbox");
@@ -342,7 +355,12 @@ public class FormUtilities {
       mvDescription.addStyleName("form-help");
       layout.add(mvDescription);
     }
-
+    if (mv.get("error") != null && !mv.get("error").trim().equalsIgnoreCase("")) {
+      Label errorLabel = new Label(mv.get("error"));
+      errorLabel.addStyleName("form-label-error");
+      layout.add(errorLabel);
+      mvDate.addStyleName("isWrong");
+    }
     panel.add(layout);
   }
 
@@ -369,11 +387,9 @@ public class FormUtilities {
         boolean mandatory = (mv.get("mandatory") != null && mv.get("mandatory").equalsIgnoreCase("true")) ? true
           : false;
         if (mandatory && (value == null || value.trim().equalsIgnoreCase(""))) {
-          mv.set("isWrong", "true");
+          mv.set("error", messages.mandatoryField());
           valid = false;
-        } else {
-          mv.set("isWrong", "false");
-        }
+        } 
       }
     }
     if (!valid) {

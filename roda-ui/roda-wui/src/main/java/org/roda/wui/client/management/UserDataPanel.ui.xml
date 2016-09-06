@@ -24,14 +24,17 @@
 					<ui:text from='{messages.username}' />
 				</g:Label>
 				<g:TextBox ui:field="username" addStyleNames="form-textbox" />
+				<g:Label ui:field="usernameError" addStyleNames="form-label-error"></g:Label>
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.password}' />
 				</g:Label>
 				<u:PasswordPanel ui:field="password" />
+				<g:Label ui:field="passwordError" addStyleNames="form-label-error"></g:Label>
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.fullname}' />
 				</g:Label>
 				<g:TextBox ui:field="fullname" addStyleNames="form-textbox" />
+				<g:Label ui:field="fullnameError" addStyleNames="form-label-error"></g:Label>
 				<!-- 
 				<g:Label addStyleNames="form-label">
 					<ui:text from="{messages.jobFunction}" />
@@ -60,6 +63,7 @@
 					<ui:text from='{messages.email}' />
 				</g:Label>
 				<g:TextBox ui:field="email" addStyleNames="form-textbox" />
+				<g:Label ui:field="emailError" addStyleNames="form-label-error"></g:Label>
 				<!--
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.address}' />

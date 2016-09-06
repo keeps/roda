@@ -2248,4 +2248,8 @@ public interface ClientMessages extends Messages {
 
   String preservationEventAgentExtension();
 
+  String mandatoryField();
+
+  String wrongMailFormat();
+
 }
