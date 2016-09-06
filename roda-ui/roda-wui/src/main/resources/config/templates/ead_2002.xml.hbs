@@ -35,7 +35,6 @@
 {{~field name="alliedArea" 				order="320" type="separator" labeli18n="crosswalks.dissemination.html.ead.alliedarea" label="{\"en\": \"Allied materials\", \"pt_PT\": \"Documentação associada\"}"~}}
 {{~field name="originalsloc" 			order="330" type="text-area" labeli18n="crosswalks.dissemination.html.ead.originalsloc" label="{\"en\": \"Existence and location of originals\", \"pt_PT\": \"Existência e localização de originais\"}" xpath="/*:ead/*:archdesc/*:originalsloc/*:p/string()"~}}
 {{~field name="altformavail" 			order="340" type="text-area" labeli18n="crosswalks.dissemination.html.ead.altformavail" label="{\"en\": \"Existence and location of copies\", \"pt_PT\": \"Existência e localização de cópias\"}" xpath="/*:ead/*:archdesc/*:altformavail/*:p/string()"~}}
-{{!-- {{support patterns in relatedmaterial via XSLT}} --}}
 {{~field name="relatedmaterial"         order="350" type="text-area" labeli18n="crosswalks.dissemination.html.ead.relatedmaterials" label="{\"en\": \"Related units of description\", \"pt_PT\": \"Unidades de descrição relacionadas\"}" xpath="/*:ead/*:archdesc/*:relatedmaterial/*:p/string()"~}}
 {{~field name="publicationNotes" 		order="360" type="text-area" labeli18n="crosswalks.dissemination.html.ead.bibliography" label="{\"en\": \"Publication notes\", \"pt_PT\": \"Notas de publicação\"}" xpath="/*:ead/*:archdesc/*:bibliography/*:p/string()"~}}
 {{~field name="notesArea" 				order="370" type="separator" labeli18n="crosswalks.dissemination.html.ead.notesarea" label="{\"en\": \"Notes area\", \"pt_PT\": \"Notas\"}"~}}
@@ -54,12 +53,9 @@
 {{~field name="sources" 				order="500" type="text-area" labeli18n="crosswalks.dissemination.html.ead.sources" label="{\"en\": \"Sources\", \"pt_PT\": \"Fontes\"}" xpath="/*:ead/*:archdesc/*:did/*:note[@type='sourcesDescription']/string()"~}}
 {{~field name="archivistNotes" 			order="510" type="text-area" labeli18n="crosswalks.dissemination.html.ead.archivistNotes" label="{\"en\": \"Archivist notes\", \"pt_PT\": \"Notas do arquivista\"}" xpath="/*:ead/*:archdesc/*:processinfo/*:p/text()[normalize-space()]"~}}
 {{~field name="_publicationStatus" 		hidden="true" order="520" label="{\"en\": \"Publication status\", \"pt_PT\": \"Estado de publicação\"}" xpath="/*:ead/*:archdesc/*:odd[@type='publicationStatus']/string()[normalize-space()]"~}}
-
 {{~field name="materialspec" 			hidden="true" order="1000" type="text-area" labeli18n="crosswalks.dissemination.html.ead.materialspecification" label="{\"en\": \"Material specification\", \"pt_PT\": \"Especificação dos materiais\"}" xpath="/*:ead/*:archdesc/*:did/*:materialspec/string()"~}}
 {{~field name="bioghist" 			hidden="true" order="1010" type="text-area" labeli18n="crosswalks.dissemination.html.ead.administrativeandbiographicalhistory" label="{\"en\": \"Administrative and biographical history\", \"pt_PT\": \"História administrativa e biográfica\"}" xpath="/*:ead/*:archdesc/*:bioghist/*:p/string()"~}}
 {{~field name="quote" 			hidden="true" order="1020" type="text-area" labeli18n="crosswalks.dissemination.html.ead.quoted" label="{\"en\": \"Quote\", \"pt_PT\": \"Citação\"}" xpath="/*:ead/*:archdesc/*:prefercite/*:p/string()"~}}
-
-
 <?xml version="1.0" encoding="utf-8"?>
 <ead xmlns="urn:isbn:1-931666-22-9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:isbn:1-931666-22-9 ../schemas/ead2002.xsd">
 	<eadheader>

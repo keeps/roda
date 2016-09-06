@@ -169,6 +169,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
+import com.google.gwt.core.client.GWT;
 
 /**
  * @author Luis Faria <lfaria@keep.pt>
@@ -1449,6 +1450,7 @@ public class BrowserHelper {
 
   public static List<SupportedMetadataTypeBundle> retrieveSupportedMetadata(User user, IndexedAIP aip, Locale locale)
     throws GenericException {
+    LOGGER.error("retrieveSupportedMetadata");
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     List<String> types = RodaUtils
       .copyList(RodaCoreFactory.getRodaConfiguration().getList(RodaConstants.UI_BROWSER_METADATA_DESCRIPTIVE_TYPES));
@@ -1463,15 +1465,13 @@ public class BrowserHelper {
           version = id.substring(id.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1, id.length());
           type = id.substring(0, id.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));
         }
-
-        String key = RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX + id;
-        if (version != null) {
-          key += "." + version;
+        String key = RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX + type;
+        if(version!=null){
+          key += RodaConstants.METADATA_VERSION_SEPARATOR+version;
         }
-
-        String label = messages.getTranslation(key, id);
+        String label = messages.getTranslation(key, type);
         InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(RodaConstants.METADATA_TEMPLATE_FOLDER
-          + "/" + ((version != null) ? id + RodaConstants.METADATA_VERSION_SEPARATOR + version : id)
+          + "/" + ((version != null) ? type + RodaConstants.METADATA_VERSION_SEPARATOR + version : type)
           + RodaConstants.METADATA_TEMPLATE_EXTENSION);
 
         String template = null;
