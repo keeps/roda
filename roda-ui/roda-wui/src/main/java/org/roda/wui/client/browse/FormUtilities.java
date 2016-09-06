@@ -10,7 +10,6 @@ package org.roda.wui.client.browse;
 import java.util.Date;
 import java.util.Set;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -33,12 +32,12 @@ import com.google.gwt.user.datepicker.client.DateBox;
 /**
  * Created by adrapereira on 13-06-2016.
  */
-public class CreateForm {
+public class FormUtilities {
 
   public static void create(FlowPanel panel, Set<MetadataValue> bundle, boolean addStyle) {
     for (MetadataValue mv : bundle) {
-      boolean mandatory = (mv.get("mandatory")!=null && mv.get("mandatory").equalsIgnoreCase("true"))?true:false;
-      
+      boolean mandatory = (mv.get("mandatory") != null && mv.get("mandatory").equalsIgnoreCase("true")) ? true : false;
+
       if (mv.get("hidden") != null && mv.get("hidden").equals("true"))
         continue;
 
@@ -107,7 +106,7 @@ public class CreateForm {
     // Top label
     Label mvLabel = new Label(getFieldLabel(mv));
     mvLabel.addStyleName("form-label");
-    if(mandatory){
+    if (mandatory) {
       mvLabel.addStyleName("form-label-mandatory");
     }
     // Field
@@ -116,7 +115,7 @@ public class CreateForm {
     if (mv.get("value") != null) {
       mvText.setText(mv.get("value"));
     }
-    if(mv.get("isWrong")!=null && mv.get("isWrong").trim().equalsIgnoreCase("true")){
+    if (mv.get("isWrong") != null && mv.get("isWrong").trim().equalsIgnoreCase("true")) {
       mvText.addStyleName("isWrong");
     }
     mvText.addChangeHandler(new ChangeHandler() {
@@ -144,7 +143,7 @@ public class CreateForm {
     // Top label
     Label mvLabel = new Label(getFieldLabel(mv));
     mvLabel.addStyleName("form-label");
-    if(mandatory){
+    if (mandatory) {
       mvLabel.addStyleName("form-label-mandatory");
     }
     // Field
@@ -153,7 +152,7 @@ public class CreateForm {
     if (mv.get("value") != null) {
       mvText.setText(mv.get("value"));
     }
-    if(mv.get("isWrong")!=null && mv.get("isWrong").trim().equalsIgnoreCase("true")){
+    if (mv.get("isWrong") != null && mv.get("isWrong").trim().equalsIgnoreCase("true")) {
       mvText.addStyleName("isWrong");
     }
     mvText.addChangeHandler(new ChangeHandler() {
@@ -181,12 +180,12 @@ public class CreateForm {
     // Top Label
     Label mvLabel = new Label(getFieldLabel(mv));
     mvLabel.addStyleName("form-label");
-    if(mandatory){
+    if (mandatory) {
       mvLabel.addStyleName("form-label-mandatory");
     }
     // Field
     final ListBox mvList = new ListBox();
-    if(mv.get("isWrong")!=null && mv.get("isWrong").trim().equalsIgnoreCase("true")){
+    if (mv.get("isWrong") != null && mv.get("isWrong").trim().equalsIgnoreCase("true")) {
       mvList.addStyleName("isWrong");
     }
     mvList.addStyleName("form-textbox");
@@ -258,17 +257,18 @@ public class CreateForm {
     panel.add(layout);
   }
 
-  private static void addDatePicker(FlowPanel panel, final FlowPanel layout, final MetadataValue mv, boolean mandatory) {
+  private static void addDatePicker(FlowPanel panel, final FlowPanel layout, final MetadataValue mv,
+    boolean mandatory) {
     // Top label
     final DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat("yyyy-MM-dd");
     Label mvLabel = new Label(getFieldLabel(mv));
     mvLabel.addStyleName("form-label");
-    if(mandatory){
+    if (mandatory) {
       mvLabel.addStyleName("form-label-mandatory");
     }
     // Field
     final DateBox mvDate = new DateBox();
-    if(mv.get("isWrong")!=null && mv.get("isWrong").trim().equalsIgnoreCase("true")){
+    if (mv.get("isWrong") != null && mv.get("isWrong").trim().equalsIgnoreCase("true")) {
       mvDate.addStyleName("isWrong");
     }
     mvDate.getDatePicker().setYearAndMonthDropdownVisible(true);
@@ -343,20 +343,20 @@ public class CreateForm {
 
   public static boolean validate(Set<MetadataValue> values, FlowPanel extra) {
     boolean valid = true;
-    if(values!=null){
-      for(MetadataValue mv : values){
+    if (values != null) {
+      for (MetadataValue mv : values) {
         String value = mv.get("value");
-        String name = mv.get("name");
-        boolean mandatory = (mv.get("mandatory")!=null && mv.get("mandatory").equalsIgnoreCase("true"))?true:false;
-        if(mandatory && (value==null || value.trim().equalsIgnoreCase(""))){
+        boolean mandatory = (mv.get("mandatory") != null && mv.get("mandatory").equalsIgnoreCase("true")) ? true
+          : false;
+        if (mandatory && (value == null || value.trim().equalsIgnoreCase(""))) {
           mv.set("isWrong", "true");
-          valid=false;
-        }else{
+          valid = false;
+        } else {
           mv.set("isWrong", "false");
         }
       }
     }
-    if(!valid){
+    if (!valid) {
       extra.clear();
       create(extra, values, true);
     }
