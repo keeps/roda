@@ -17,6 +17,7 @@ import java.util.Set;
 import org.roda.core.data.v2.user.Group;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.common.client.ClientLogger;
+import org.roda.wui.common.client.tools.StringUtility;
 import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.core.client.GWT;
@@ -36,6 +37,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -50,11 +52,16 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
+  private Group group = new Group();
+
   @UiField
   TextBox groupname;
 
   @UiField
   TextBox fullname;
+
+  @UiField
+  Label usersLabel, usersValue;
 
   @UiField
   FlowPanel permissionsSelectPanel;
@@ -150,10 +157,17 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
    * @param group
    */
   public void setGroup(Group group) {
+    this.group = group;
     this.groupname.setText(group.getName());
     this.fullname.setText(group.getFullName());
+    this.usersValue.setText(StringUtility.prettyPrint(group.getUsers()));
 
     this.setPermissions(group.getDirectRoles(), group.getAllRoles());
+
+    // update visibility
+    this.usersLabel.setVisible(!group.getUsers().isEmpty());
+    this.usersValue.setVisible(!group.getUsers().isEmpty());
+
   }
 
   private void setPermissions(final Set<String> directRoles, final Set<String> allRoles) {
@@ -182,7 +196,6 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
    * @return the group modified by this panel
    */
   public Group getGroup() {
-    Group group = new Group();
     group.setId(groupname.getText());
     group.setName(groupname.getText());
     group.setFullName(fullname.getText());

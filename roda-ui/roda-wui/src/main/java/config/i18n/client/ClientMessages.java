@@ -1693,6 +1693,8 @@ public interface ClientMessages extends Messages {
   String groupName();
 
   String groupFullname();
+  
+  String groupUsers();
 
   String groupDataNote();
 
