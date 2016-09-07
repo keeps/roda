@@ -398,7 +398,7 @@ pre code {
 	padding: 5px 15px !important;
 }
 
-.form-separator:first-child{
+.descriptiveMetadata .form-separator:first-child{
 	margin-top:-15px !important;
 }
 
