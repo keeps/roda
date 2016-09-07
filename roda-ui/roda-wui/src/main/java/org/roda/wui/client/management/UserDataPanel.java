@@ -433,7 +433,9 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
       emailError.setVisible(false);
     }
 
-    valid = FormUtilities.validate(userExtraBundle.getValues(),extra);
+    
+    
+    valid = valid && FormUtilities.validate(userExtraBundle.getValues(),extra);
     
     checked = true;
 

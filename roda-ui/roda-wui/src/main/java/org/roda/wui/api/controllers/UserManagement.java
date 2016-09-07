@@ -292,9 +292,10 @@ public class UserManagement extends RodaWuiController {
   // needed.
   // TODO: The methods that call these methods don't have a User either.
   // TODO: From where should the User come from?
-
-  public static void sendEmailVerification(String servletPath, String username)
+  // return true if notification was sent, false if the mail cannot be sent and the user was activated...
+  public static Notification sendEmailVerification(String servletPath, String username)
     throws GenericException, NotFoundException {
+    Notification ret;
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     User user = UserManagementHelper.retrieveUser(username);
@@ -305,10 +306,12 @@ public class UserManagement extends RodaWuiController {
     if (user.isActive() || user.getEmailConfirmationToken() == null)
       throw new GenericException("User " + username + " is already active or email confirmation token doesn't exist.");
 
-    sendEmailVerification(servletPath, user);
+    ret = sendEmailVerification(servletPath, user);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "user", user);
+    
+    return ret;
   }
 
   public static void confirmUserEmail(String username, String emailConfirmationToken)
@@ -352,9 +355,8 @@ public class UserManagement extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "user", user);
   }
 
-  private static void sendEmailVerification(String servletPath, User user) throws GenericException {
-    try {
-
+  private static Notification sendEmailVerification(String servletPath, User user) throws GenericException {
+    try{
       Notification notification = new Notification();
       notification.setSubject("Registration in RODA");
       notification.setFromUser("RODA Admin");
@@ -372,11 +374,10 @@ public class UserManagement extends RodaWuiController {
       scopes.put("verificationURL", verificationURL);
       scopes.put("verificationCompleteURL", verificationCompleteURL);
 
-      RodaCoreFactory.getModelService().createNotification(notification,
+      return RodaCoreFactory.getModelService().createNotification(notification,
         new EmailNotificationProcessor(RodaConstants.VERIFICATION_EMAIL_TEMPLATE, scopes));
-
-    } catch (GenericException | UnsupportedEncodingException e) {
-      throw new GenericException("Problem sending email");
+    } catch (UnsupportedEncodingException e) {
+      throw new GenericException("Error sending email verification: "+e.getMessage(),e);
     }
   }
 

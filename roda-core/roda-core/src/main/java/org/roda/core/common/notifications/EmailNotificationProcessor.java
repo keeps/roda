@@ -75,11 +75,13 @@ public class EmailNotificationProcessor implements NotificationProcessor {
           emailUtility.sendMail(recipient, modifiedBody);
           LOGGER.debug("Email sent");
         } else {
-          LOGGER.warn("SMTP not defined, cannot send emails");
+          LOGGER.error("SMTP not defined, cannot send emails");
+          throw new RODAException("SMTP not defined, cannot send emails");
         }
       }
     } catch (IOException | MessagingException e) {
-      throw new GenericException(e);
+      LOGGER.error("Error sending email: "+e.getMessage(),e);
+      throw new RODAException(e);
     }
     return notification;
   }

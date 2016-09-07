@@ -2100,17 +2100,21 @@ public class ModelService extends ModelObservable {
     try {
       notification.setId(UUID.randomUUID().toString());
       notification.setAcknowledgeToken(UUID.randomUUID().toString());
-
       notification = processor.processNotification(notification);
-
+      notification.setState(Notification.NOTIFICATION_STATE.COMPLETED);
+    } catch (RODAException e) {
+      notification.setState(Notification.NOTIFICATION_STATE.FAILED);
+      LOGGER.error("Error processing notification: "+e.getMessage());
+    }
+    try{
       String notificationAsJson = JsonUtils.getJsonFromObject(notification);
       StoragePath notificationPath = ModelUtils.getNotificationStoragePath(notification.getId());
       storage.createBinary(notificationPath, new StringContentPayload(notificationAsJson), false);
+      notifyNotificationCreatedOrUpdated(notification);
     } catch (RODAException e) {
       LOGGER.error("Error creating notification in storage", e);
+      throw new GenericException(e);
     }
-
-    notifyNotificationCreatedOrUpdated(notification);
     return notification;
   }
 

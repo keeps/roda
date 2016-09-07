@@ -25,7 +25,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class Notification implements IsIndexed, Serializable {
 
   private static final long serialVersionUID = -585753367605901060L;
-
+  
+  public static enum NOTIFICATION_STATE {
+    CREATED, COMPLETED, FAILED;
+  }
+  
   private String id = null;
   private String subject = null;
   private String body = null;
@@ -35,11 +39,13 @@ public class Notification implements IsIndexed, Serializable {
   private String acknowledgeToken = null;
   private boolean isAcknowledged = false;
   private Map<String, String> acknowledgedUsers = null;
-
+  private NOTIFICATION_STATE state;
+  
   public Notification() {
     super();
     this.sentOn = new Date();
     this.acknowledgedUsers = new HashMap<String, String>();
+    this.state = NOTIFICATION_STATE.CREATED;
   }
 
   public Notification(Notification notification) {
@@ -52,6 +58,7 @@ public class Notification implements IsIndexed, Serializable {
     this.acknowledgeToken = notification.getAcknowledgeToken();
     this.isAcknowledged = notification.isAcknowledged();
     this.acknowledgedUsers = notification.getAcknowledgedUsers();
+    this.state = NOTIFICATION_STATE.CREATED;
   }
 
   public String getId() {
@@ -129,12 +136,14 @@ public class Notification implements IsIndexed, Serializable {
   public void addAcknowledgedUser(String recipientUser, String acknowledgedOn) {
     this.acknowledgedUsers.put(recipientUser, acknowledgedOn);
   }
+  
+  
+  public NOTIFICATION_STATE getState() {
+    return state;
+  }
 
-  @Override
-  public String toString() {
-    return "Notification [id=" + id + ", subject=" + subject + ", body=" + body + ", sentOn=" + sentOn + ", fromUser="
-      + fromUser + ", recipientUsers=" + recipientUsers + ", acknowledgeToken=" + acknowledgeToken + ", isAcknowledged="
-      + isAcknowledged + ", acknowledgedUsers=" + acknowledgedUsers + "]";
+  public void setState(NOTIFICATION_STATE state) {
+    this.state = state;
   }
 
   @JsonIgnore
@@ -143,4 +152,12 @@ public class Notification implements IsIndexed, Serializable {
     return getId();
   }
 
+  @Override
+  public String toString() {
+    return "Notification [id=" + id + ", subject=" + subject + ", body=" + body + ", sentOn=" + sentOn + ", fromUser="
+      + fromUser + ", recipientUsers=" + recipientUsers + ", acknowledgeToken=" + acknowledgeToken + ", isAcknowledged="
+      + isAcknowledged + ", acknowledgedUsers=" + acknowledgedUsers + ", state=" + state + "]";
+  }
+
+  
 }

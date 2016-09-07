@@ -29,6 +29,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.UserExtraBundle;
@@ -224,7 +225,7 @@ public interface UserManagementService extends RemoteService {
    * @throws GenericException
    * @throws NotFoundException
    */
-  public void sendEmailVerification(String username) throws GenericException, NotFoundException;
+  public Notification sendEmailVerification(String username) throws GenericException, NotFoundException;
 
   /**
    * Confirm a user email. If verified user will become active

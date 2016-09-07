@@ -15,6 +15,8 @@ import java.util.List;
 
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.notifications.Notification.NOTIFICATION_STATE;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.Dialogs;
@@ -193,24 +195,54 @@ public class Register extends Composite {
                     });
                 } else {
                   UserManagementService.Util.getInstance().sendEmailVerification(user.getId(),
-                    new AsyncCallback<Void>() {
+                    new AsyncCallback<Notification>() {
 
                       @Override
-                      public void onSuccess(Void result) {
-                        Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
-                          messages.registerSuccessDialogMessage(), messages.registerSuccessDialogButton(),
-                          new AsyncCallback<Void>() {
-
-                            @Override
-                            public void onSuccess(Void result) {
-                              Tools.newHistory(Login.RESOLVER);
-                            }
+                      public void onSuccess(Notification result) {
+                        if(result.getState()==NOTIFICATION_STATE.COMPLETED){
+                          Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
+                            messages.registerSuccessDialogMessage(), messages.registerSuccessDialogButton(),
+                            new AsyncCallback<Void>() {
+  
+                              @Override
+                              public void onSuccess(Void result) {
+                                Tools.newHistory(Login.RESOLVER);
+                              }
+  
+                              @Override
+                              public void onFailure(Throwable caught) {
+                                Tools.newHistory(Login.RESOLVER);
+                              }
+                            });
+                        }else{
+                          //TODO the user "default" group should be configurable...
+                          user.setActive(true);
+                          user.addDirectGroup("users");
+                          UserManagementService.Util.getInstance().updateUser(user, password, userDataPanel.getExtra(), new AsyncCallback<Void>() {
 
                             @Override
                             public void onFailure(Throwable caught) {
-                              Tools.newHistory(Login.RESOLVER);
+                              errorMessage(caught);
                             }
-                          });
+
+                            @Override
+                            public void onSuccess(Void result) {
+                              Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
+                                messages.registerSuccessDialogMessageActive(), messages.registerSuccessDialogButton(),
+                                new AsyncCallback<Void>() {
+      
+                                  @Override
+                                  public void onSuccess(Void result) {
+                                    Tools.newHistory(Login.RESOLVER);
+                                  }
+      
+                                  @Override
+                                  public void onFailure(Throwable caught) {
+                                    Tools.newHistory(Login.RESOLVER);
+                                  }
+                                });
+                            }});
+                        }
                       }
 
                       @Override

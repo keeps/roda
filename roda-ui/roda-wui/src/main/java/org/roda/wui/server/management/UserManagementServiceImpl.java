@@ -29,6 +29,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.UserManagement;
@@ -162,9 +163,9 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public void sendEmailVerification(String username) throws GenericException, NotFoundException {
+  public Notification sendEmailVerification(String username) throws GenericException, NotFoundException {
     String servletPath = retrieveServletUrl(getThreadLocalRequest());
-    UserManagement.sendEmailVerification(servletPath, username);
+    return UserManagement.sendEmailVerification(servletPath, username);
   }
 
   @Override
