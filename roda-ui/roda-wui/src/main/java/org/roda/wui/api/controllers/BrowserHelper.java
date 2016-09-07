@@ -169,7 +169,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
-import com.google.gwt.core.client.GWT;
 
 /**
  * @author Luis Faria <lfaria@keep.pt>
@@ -1466,8 +1465,8 @@ public class BrowserHelper {
           type = id.substring(0, id.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));
         }
         String key = RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX + type;
-        if(version!=null){
-          key += RodaConstants.METADATA_VERSION_SEPARATOR+version;
+        if (version != null) {
+          key += RodaConstants.METADATA_VERSION_SEPARATOR + version;
         }
         String label = messages.getTranslation(key, type);
         InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(RodaConstants.METADATA_TEMPLATE_FOLDER
@@ -2409,8 +2408,23 @@ public class BrowserHelper {
     RodaCoreFactory.getModelService().updateRiskIncidence(incidence, true);
   }
 
-  protected static Reports listTransferredResourcesReports(String resourceId, String start, String limit,
-    boolean isOriginal, String acceptFormat)
+  protected static Reports listReports(String start, String limit)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
+    int startInt = pagingParams.getFirst();
+    int limitInt = pagingParams.getSecond();
+
+    IndexService indexService = RodaCoreFactory.getIndexService();
+    int reportCounter = indexService.count(Report.class, Filter.ALL).intValue();
+    int endInt = limitInt == -1 ? reportCounter : (limitInt > reportCounter ? reportCounter : limitInt);
+
+    Sorter sorter = new Sorter(new SortParameter(RodaConstants.JOB_REPORT_DATE_UPDATE, true));
+    IndexResult<Report> indexReports = indexService.find(Report.class, Filter.ALL, sorter,
+      new Sublist(startInt, endInt));
+    return new Reports(indexReports.getResults());
+  }
+
+  protected static Reports listTransferredResourcesReports(String resourceId, String start, String limit)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
     int startInt = pagingParams.getFirst();
@@ -2420,12 +2434,7 @@ public class BrowserHelper {
     Filter filter = new Filter();
     filter.add(
       new SimpleFilterParameter(RodaConstants.JOB_REPORT_SOURCE_OBJECT_CLASS, TransferredResource.class.getName()));
-
-    if (isOriginal) {
-      filter.add(new SimpleFilterParameter(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ORIGINAL_ID, resourceId));
-    } else {
-      filter.add(new SimpleFilterParameter(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID, resourceId));
-    }
+    filter.add(new SimpleFilterParameter(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID, resourceId));
 
     int reportCounter = indexService.count(Report.class, filter).intValue();
     int endInt = limitInt == -1 ? reportCounter : (limitInt > reportCounter ? reportCounter : limitInt);
@@ -2435,23 +2444,33 @@ public class BrowserHelper {
     return new Reports(indexReports.getResults());
   }
 
-  protected static Reports listTransferredResourcesLastReport(String resourceId, boolean isOriginal,
-    String acceptFormat)
+  protected static Reports listTransferredResourcesReportsWithSIP(String sipId, String start, String limit)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
+    int startInt = pagingParams.getFirst();
+    int limitInt = pagingParams.getSecond();
+
+    IndexService indexService = RodaCoreFactory.getIndexService();
+
+    Filter sipFilter = new Filter();
+    sipFilter.add(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, sipId));
+
+    int aipCounter = indexService.count(IndexedAIP.class, sipFilter).intValue();
+    IndexResult<IndexedAIP> aips = indexService.find(IndexedAIP.class, sipFilter, Sorter.NONE,
+      new Sublist(startInt, aipCounter));
+
+    List<String> aipIds = aips.getResults().stream().map((IndexedAIP aip) -> aip.getId()).collect(Collectors.toList());
 
     Filter filter = new Filter();
-    filter.add(
-      new SimpleFilterParameter(RodaConstants.JOB_REPORT_SOURCE_OBJECT_CLASS, TransferredResource.class.getName()));
+    filter.add(new OneOfManyFilterParameter(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_CLASS,
+      Arrays.asList(AIP.class.getName(), IndexedAIP.class.getName())));
+    filter.add(new OneOfManyFilterParameter(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID, aipIds));
 
-    if (isOriginal) {
-      filter.add(new SimpleFilterParameter(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ORIGINAL_ID, resourceId));
-    } else {
-      filter.add(new SimpleFilterParameter(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID, resourceId));
-    }
+    int reportCounter = indexService.count(Report.class, filter).intValue();
+    int endInt = limitInt == -1 ? reportCounter : (limitInt > reportCounter ? reportCounter : limitInt);
 
     Sorter sorter = new Sorter(new SortParameter(RodaConstants.JOB_REPORT_DATE_UPDATE, true));
-    IndexResult<Report> indexReports = RodaCoreFactory.getIndexService().find(Report.class, filter, sorter,
-      new Sublist(0, 1));
+    IndexResult<Report> indexReports = indexService.find(Report.class, filter, sorter, new Sublist(startInt, endInt));
     return new Reports(indexReports.getResults());
   }
 

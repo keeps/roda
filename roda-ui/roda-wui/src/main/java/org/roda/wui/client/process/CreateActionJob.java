@@ -63,6 +63,10 @@ public class CreateActionJob extends CreateJob<IsIndexed> {
     super(IsIndexed.class, Arrays.asList(pluginTypes));
   }
 
+  public CreateActionJob(SelectedItems items) {
+    super(IsIndexed.class, Arrays.asList(pluginTypes), items);
+  }
+
   @Override
   public boolean updateObjectList() {
 

@@ -11,6 +11,7 @@
 package org.roda.wui.client.common;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -19,9 +20,11 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.index.SelectedItemsNone;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.utils.PluginUtils;
 import org.roda.wui.client.ingest.process.PluginOptionsPanel;
@@ -70,6 +73,26 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
           callback.onSuccess(createIngestJob);
         } else if (historyTokens.get(0).equals("action")) {
           CreateActionJob createActionJob = new CreateActionJob();
+          callback.onSuccess(createActionJob);
+        } else {
+          Tools.newHistory(CreateJob.RESOLVER);
+          callback.onSuccess(null);
+        }
+      } else if (historyTokens.size() == 2) {
+        if (historyTokens.get(0).equals("action")) {
+          SelectedItems items = Browse.getInstance().getSelected();
+          SelectedItemsList list = SelectedItemsList.create(IndexedAIP.class, Arrays.asList(historyTokens.get(1)));
+
+          if (items instanceof SelectedItemsNone) {
+            items = list;
+          } else if (items instanceof SelectedItemsList) {
+            SelectedItemsList itemsList = (SelectedItemsList) items;
+            if (itemsList.getIds().isEmpty()) {
+              items = list;
+            }
+          }
+
+          CreateActionJob createActionJob = new CreateActionJob(items);
           callback.onSuccess(createActionJob);
         } else {
           Tools.newHistory(CreateJob.RESOLVER);
@@ -141,12 +164,23 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
   @UiField
   Button buttonCancel;
 
+  public CreateJob(Class<T> classToReceive, final List<PluginType> pluginType, SelectedItems items) {
+    this.selected = items;
+    getInformation(classToReceive, pluginType);
+  }
+
   public CreateJob(Class<T> classToReceive, final List<PluginType> pluginType) {
+    getInformation(classToReceive, pluginType);
+  }
+
+  private void getInformation(Class<T> classToReceive, final List<PluginType> pluginType) {
     if (classToReceive.getName().equals(TransferredResource.class.getName())) {
       this.selected = IngestTransfer.getInstance().getSelected();
       isIngest = true;
     } else {
-      this.selected = Search.getInstance().getSelected();
+      if (selected instanceof SelectedItemsNone) {
+        this.selected = Search.getInstance().getSelected();
+      }
       isIngest = false;
     }
 

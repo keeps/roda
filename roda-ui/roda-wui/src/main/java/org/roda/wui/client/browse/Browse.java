@@ -31,6 +31,7 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.user.User;
+import org.roda.wui.client.common.CreateJob;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
@@ -1087,7 +1088,9 @@ public class Browse extends Composite {
 
   @UiHandler("newProcess")
   void buttonNewProcessHandler(ClickEvent e) {
-    Toast.showInfo(messages.dialogSorry(), messages.featureNotYetImplemented());
+    if (aipId != null) {
+      Tools.newHistory(CreateJob.RESOLVER, "action", aipId);
+    }
   }
 
   @UiHandler("editPermissions")

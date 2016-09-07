@@ -157,6 +157,7 @@ public final class RodaConstants {
   public static final String API_PATH_PARAM_METADATA_ID = "metadata_id";
   public static final String API_PATH_PARAM_TRANSFERRED_RESOURCE_ID = "transferred_resource_id";
   public static final String API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID = "transferred_resource_uuid";
+  public static final String API_PATH_PARAM_SIP_ID = "sip_id";
   public static final String API_PATH_PARAM_NOTIFICATION_ID = "notification_id";
   public static final String API_PATH_PARAM_AGENT_ID = "agent_id";
   public static final String API_PATH_PARAM_FORMAT_ID = "format_id";
@@ -164,6 +165,7 @@ public final class RodaConstants {
   public static final String API_PATH_PARAM_RISK_INCIDENCE_ID = "risk_incidence_id";
   public static final String API_PATH_PARAM_PART = "part";
 
+  public static final String API_QUERY_PARAM_ID = "id";
   public static final String API_QUERY_PARAM_VERSION_ID = "version_id";
   public static final String API_QUERY_PARAM_NOTIFICATION_TOKEN = "token";
   public static final String API_QUERY_PARAM_RESOURCE_ID = "resource_id";
@@ -195,6 +197,9 @@ public final class RodaConstants {
   public static final String API_DELETE_MEDIA_TYPES = "json, xml";
   public static final String API_GET_DESCRIPTIVE_METADATA_MEDIA_TYPES = "json, xml, html, bin";
   public static final String API_DESCRIPTIVE_METADATA_LANGUAGES = "pt_PT, en_US";
+  public static final String API_GET_REPORTS_ID_OBJECT = "transferred_resource, sip";
+  public static final String API_GET_REPORTS_ID_OBJECT_RESOURCE = "transferred_resource";
+  public static final String API_GET_REPORTS_ID_OBJECT_SIP = "sip";
 
   /*
    * Controllers related

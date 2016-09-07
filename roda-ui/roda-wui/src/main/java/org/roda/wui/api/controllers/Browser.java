@@ -1909,30 +1909,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
   }
 
-  public static Reports listTransferredResourcesReports(User user, String resourceId, String start, String limit,
-    boolean isOriginal, String acceptFormat)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // validate input
-    BrowserHelper.validateListingParams(acceptFormat);
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    // delegate
-    Reports reportList = BrowserHelper.listTransferredResourcesReports(resourceId, start, limit, isOriginal,
-      acceptFormat);
-
-    // register action
-    controllerAssistant.registerAction(user, resourceId, LOG_ENTRY_STATE.SUCCESS,
-      RodaConstants.API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID, resourceId, RodaConstants.API_QUERY_KEY_START, start,
-      RodaConstants.API_QUERY_KEY_LIMIT, limit);
-
-    return reportList;
-  }
-
-  public static Reports listTransferredResourcesLastReport(User user, String resourceId, boolean isOriginal,
+  public static Reports listReports(User user, String id, String resourceOrSip, String start, String limit,
     String acceptFormat)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -1944,11 +1921,22 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     // delegate
-    Reports reportList = BrowserHelper.listTransferredResourcesLastReport(resourceId, isOriginal, acceptFormat);
+    Reports reportList;
+
+    if (id == null || resourceOrSip == null) {
+      reportList = BrowserHelper.listReports(start, limit);
+    } else {
+      if (RodaConstants.API_GET_REPORTS_ID_OBJECT_SIP.equals(resourceOrSip)) {
+        reportList = BrowserHelper.listTransferredResourcesReportsWithSIP(id, start, limit);
+      } else {
+        reportList = BrowserHelper.listTransferredResourcesReports(id, start, limit);
+      }
+    }
 
     // register action
-    controllerAssistant.registerAction(user, resourceId, LOG_ENTRY_STATE.SUCCESS,
-      RodaConstants.API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID, resourceId);
+    controllerAssistant.registerAction(user, id, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_QUERY_PARAM_ID, id,
+      RodaConstants.API_GET_REPORTS_ID_OBJECT, resourceOrSip, RodaConstants.API_QUERY_KEY_START, start,
+      RodaConstants.API_QUERY_KEY_LIMIT, limit);
 
     return reportList;
   }
