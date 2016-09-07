@@ -34,7 +34,6 @@ import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.common.notifications.NotificationProcessor;
 import org.roda.core.common.validation.ValidationUtils;
-import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -1445,7 +1444,7 @@ public class ModelService extends ModelObservable {
 
   public List<User> listUsers() throws GenericException {
     try {
-      return UserUtility.getLdapUtility().getUsers(new Filter());
+      return UserUtility.getLdapUtility().getUsers();
     } catch (LdapUtilityException e) {
       throw new GenericException("Unable to list users", e);
     }
@@ -1506,7 +1505,7 @@ public class ModelService extends ModelObservable {
 
   public List<Group> listGroups() throws GenericException {
     try {
-      return UserUtility.getLdapUtility().getGroups(new Filter());
+      return UserUtility.getLdapUtility().getGroups();
     } catch (LdapUtilityException e) {
       throw new GenericException("Unable to list groups", e);
     }

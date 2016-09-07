@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.sublist.Sublist;
@@ -156,10 +155,6 @@ public class UserUtility {
     checkRoles(user, roles);
   }
 
-  public static User getFullUser(User rsu) throws LdapUtilityException {
-    return UserUtility.getLdapUtility().getUser(rsu.getId());
-  }
-
   public static void setUser(HttpServletRequest request, User rsu) {
     request.getSession(true).setAttribute(RODA_USER, rsu);
   }
@@ -176,27 +171,6 @@ public class UserUtility {
    */
   public static User getGuest() {
     return new User("guest", "guest", true);
-  }
-
-  public static User getClientUser(HttpSession session) {
-    final User rsu;
-    if (session.getAttribute(RODA_USER) != null) {
-      rsu = (User) session.getAttribute(RODA_USER);
-    } else {
-      rsu = null;
-    }
-    return rsu;
-  }
-
-  public static String getClientUserName(HttpSession session) {
-    final String username;
-    if (session.getAttribute(RODA_USER) != null) {
-      username = ((User) session.getAttribute(RODA_USER)).getName();
-    } else {
-      username = null;
-    }
-    return username;
-
   }
 
   public static void checkObjectPermissions(User user, IndexedAIP aip, PermissionType permissionType)

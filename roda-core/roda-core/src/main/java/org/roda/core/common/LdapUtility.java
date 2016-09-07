@@ -64,8 +64,6 @@ import org.apache.directory.server.core.partition.ldif.LdifPartition;
 import org.apache.directory.server.ldap.LdapServer;
 import org.apache.directory.server.protocol.shared.transport.TcpTransport;
 import org.apache.directory.server.xdbm.Index;
-import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
@@ -352,39 +350,19 @@ public class LdapUtility {
   }
 
   /**
-   * Return the users that match the given filter.
-   *
-   * @param filter
-   *          the {@link Filter}.
-   *
+   * Return all users
+   * 
    * @return a list of {@link User}'s.
    *
    * @throws LdapUtilityException
    *           if some error occurs.
    */
-  public List<User> getUsers(final Filter filter) throws LdapUtilityException {
-    return getUsers(filter, null);
-  }
-
-  /**
-   * Return the users that match the given filter, ordered by the given sorter.
-   *
-   * @param filter
-   *          the {@link Filter}.
-   * @param sorter
-   *          the {@link Sorter}.
-   *
-   * @return a list of {@link User}'s.
-   *
-   * @throws LdapUtilityException
-   *           if some error occurs.
-   */
-  public List<User> getUsers(final Filter filter, final Sorter sorter) throws LdapUtilityException {
+  public List<User> getUsers() throws LdapUtilityException {
 
     try {
 
       final CoreSession session = service.getAdminSession();
-      final List<Entry> entries = searchEntries(session, ldapPeopleDN, UID, filter);
+      final List<Entry> entries = searchEntries(session, ldapPeopleDN, UID);
       final List<User> users = new ArrayList<>();
       for (Entry entry : entries) {
 
@@ -612,22 +590,19 @@ public class LdapUtility {
   }
 
   /**
-   * Return groups that match the given {@link Filter}.
-   *
-   * @param filter
-   *          the filter.
-   *
+   * Return all groups
+   * 
    * @return an array of {@link Group}'s.
    *
    * @throws LdapUtilityException
    *           if some error occurred.
    */
-  public List<Group> getGroups(final Filter filter) throws LdapUtilityException {
+  public List<Group> getGroups() throws LdapUtilityException {
 
     try {
 
       final CoreSession session = service.getAdminSession();
-      final List<Entry> entries = searchEntries(session, ldapGroupsDN, CN, filter);
+      final List<Entry> entries = searchEntries(session, ldapGroupsDN, CN);
       final List<Group> groups = new ArrayList<>();
       for (Entry entry : entries) {
         final Group group = getGroupFromEntry(entry);
@@ -1374,19 +1349,14 @@ public class LdapUtility {
     return group;
   }
 
-  // FIXME filter is not being used: see if it is needed
-  private List<Entry> searchEntries(final CoreSession session, final String ctxDN, final String keyAttribute,
-    final Filter filter) throws LdapException {
+  private List<Entry> searchEntries(final CoreSession session, final String ctxDN, final String keyAttribute)
+    throws LdapException {
     final String jndiFilter = String.format("(%s=*)", keyAttribute);
     final Cursor<Entry> cursor = search(session, ctxDN, jndiFilter);
     final List<Entry> entries = new ArrayList<>();
     for (Entry entry : cursor) {
       entries.add(entry);
     }
-
-    // List<Entry> filteredEntries = jndiAdapter.filter(entries);
-    // List<Entry> sortedEntries = jndiAdapter.sort(filteredEntries);
-    // List<Entry> sublistEntries = jndiAdapter.getSublist(sortedEntries);
 
     return entries;
   }

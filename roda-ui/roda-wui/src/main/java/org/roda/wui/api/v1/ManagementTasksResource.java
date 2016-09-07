@@ -19,9 +19,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.UserUtility;
-import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -159,17 +157,17 @@ public class ManagementTasksResource {
     boolean success = true;
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
     try {
-      for (User ldapUser : UserUtility.getLdapUtility().getUsers(new Filter())) {
+      for (User ldapUser : RodaCoreFactory.getModelService().listUsers()) {
         LOGGER.debug("User to be indexed: {}", ldapUser);
         RodaCoreFactory.getModelService().notifyUserUpdated(ldapUser);
       }
-      for (Group ldapGroup : UserUtility.getLdapUtility().getGroups(new Filter())) {
+      for (Group ldapGroup : RodaCoreFactory.getModelService().listGroups()) {
         LOGGER.debug("Group to be indexed: {}", ldapGroup);
         RodaCoreFactory.getModelService().notifyGroupUpdated(ldapGroup);
       }
       response.setMessage("Ended users and groups reindex");
 
-    } catch (LdapUtilityException e) {
+    } catch (GenericException e) {
       LOGGER.error("Error reindexing users and groups", e);
       response.setMessage("Error reindexing users and groups: " + e.getMessage());
       success = false;
