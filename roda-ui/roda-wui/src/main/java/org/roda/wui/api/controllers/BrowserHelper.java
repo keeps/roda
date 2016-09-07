@@ -2476,55 +2476,59 @@ public class BrowserHelper {
   }
 
   public static UserExtraBundle retrieveUserExtraBundle(String name) {
-    String template = null;
-
-    InputStream templateStream = RodaCoreFactory
-      .getConfigurationFileAsStream(RodaConstants.USERS_TEMPLATE_FOLDER + "/user_extra.xml.hbs");
-    try {
-      template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
-    } catch (IOException e1) {
-      LOGGER.error("Error getting template from stream");
-    }
-
-    Set<MetadataValue> values = new HashSet<>();
-    if (template != null) {
-      values = ServerTools.transform(template);
-    }
-
-    try {
-      User user = UserUtility.getLdapUtility().getUser(name);
-      String userExtra = user.getExtra();
-
-      if (values != null && userExtra != null) {
-        for (MetadataValue mv : values) {
-          // clear the auto-generated values
-          // mv.set("value", null);
-          String xpathRaw = mv.get("xpath");
-          if (xpathRaw != null && xpathRaw.length() > 0) {
-            String[] xpaths = xpathRaw.split("##%##");
-            String value;
-            List<String> allValues = new ArrayList<>();
-            for (String xpath : xpaths) {
-              allValues.addAll(ServerTools.applyXpath(userExtra, xpath));
+    if(!RodaConstants.SYSTEM_USERS.contains(name)){
+      String template = null;
+  
+      InputStream templateStream = RodaCoreFactory
+        .getConfigurationFileAsStream(RodaConstants.USERS_TEMPLATE_FOLDER + "/user_extra.xml.hbs");
+      try {
+        template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
+      } catch (IOException e1) {
+        LOGGER.error("Error getting template from stream");
+      }
+  
+      Set<MetadataValue> values = new HashSet<>();
+      if (template != null) {
+        values = ServerTools.transform(template);
+      }
+  
+      try {
+        User user = UserUtility.getLdapUtility().getUser(name);
+        String userExtra = user.getExtra();
+  
+        if (values != null && userExtra != null) {
+          for (MetadataValue mv : values) {
+            // clear the auto-generated values
+            // mv.set("value", null);
+            String xpathRaw = mv.get("xpath");
+            if (xpathRaw != null && xpathRaw.length() > 0) {
+              String[] xpaths = xpathRaw.split("##%##");
+              String value;
+              List<String> allValues = new ArrayList<>();
+              for (String xpath : xpaths) {
+                allValues.addAll(ServerTools.applyXpath(userExtra, xpath));
+              }
+              // if any of the values is different, concatenate all values in a
+              // string, otherwise return the value
+              boolean allEqual = allValues.stream().allMatch(s -> s.trim().equals(allValues.get(0).trim()));
+              if (allEqual && !allValues.isEmpty()) {
+                value = allValues.get(0);
+              } else {
+                value = String.join(" / ", allValues);
+              }
+              mv.set("value", value.trim());
             }
-            // if any of the values is different, concatenate all values in a
-            // string, otherwise return the value
-            boolean allEqual = allValues.stream().allMatch(s -> s.trim().equals(allValues.get(0).trim()));
-            if (allEqual && !allValues.isEmpty()) {
-              value = allValues.get(0);
-            } else {
-              value = String.join(" / ", allValues);
-            }
-            mv.set("value", value.trim());
           }
         }
+  
+      } catch (LdapUtilityException e) {
+        // do nothing
       }
-
-    } catch (LdapUtilityException e) {
-      // do nothing
+  
+      return new UserExtraBundle(name, values);
+    }else{
+      return new UserExtraBundle(name, new HashSet<>());
     }
-
-    return new UserExtraBundle(name, values);
   }
 
 }

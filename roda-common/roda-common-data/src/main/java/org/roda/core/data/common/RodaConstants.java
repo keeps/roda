@@ -868,6 +868,9 @@ public final class RodaConstants {
   public enum RODA_TYPE {
     AIP, REPRESENTATION, FILE, TRANSFERRED_RESOURCE;
   }
+  
+  
+  public static final List<String> SYSTEM_USERS = Arrays.asList("admin","guest");
 
   /** Private empty constructor */
   private RodaConstants() {
