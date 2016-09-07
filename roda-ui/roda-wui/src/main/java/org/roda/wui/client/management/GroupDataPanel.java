@@ -57,12 +57,6 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
   TextBox fullname;
 
   @UiField
-  FlowPanel groupSelectPanel;
-
-  @UiField(provided = true)
-  GroupSelect groupSelect;
-
-  @UiField
   FlowPanel permissionsSelectPanel;
 
   @UiField
@@ -70,8 +64,6 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
 
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
-
-  private boolean enableGroupSelect;
 
   private boolean editmode;
 
@@ -88,8 +80,8 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
    *          editable
    *
    */
-  public GroupDataPanel(boolean editmode, boolean enableGroupSelect) {
-    this(true, editmode, enableGroupSelect);
+  public GroupDataPanel(boolean editmode) {
+    this(true, editmode);
   }
 
   /**
@@ -98,17 +90,12 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
    * @param editmode
    * @param enableGroupSelect
    */
-  public GroupDataPanel(boolean visible, boolean editmode, boolean enableGroupSelect) {
-
-    groupSelect = new GroupSelect(enableGroupSelect);
+  public GroupDataPanel(boolean visible, boolean editmode) {
 
     initWidget(uiBinder.createAndBindUi(this));
 
     this.editmode = editmode;
     super.setVisible(visible);
-    this.enableGroupSelect = enableGroupSelect;
-
-    groupSelectPanel.setVisible(enableGroupSelect);
 
     ChangeHandler changeHandler = new ChangeHandler() {
 
@@ -155,14 +142,6 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
       }
     });
 
-    groupSelect.addValueChangeHandler(new ValueChangeHandler<List<Group>>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<List<Group>> event) {
-        updatePermissions(event.getValue());
-        onChange();
-      }
-    });
   }
 
   /**
@@ -173,9 +152,7 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
   public void setGroup(Group group) {
     this.groupname.setText(group.getName());
     this.fullname.setText(group.getFullName());
-    this.groupSelect.addGroupToBlacklist(group.getId());
 
-    this.setMemberGroups(group.getDirectGroups());
     this.setPermissions(group.getDirectRoles(), group.getAllRoles());
   }
 
@@ -199,14 +176,6 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
     });
   }
 
-  private void updatePermissions(List<Group> groups) {
-    permissionsPanel.clear();
-    permissionsPanel.checkPermissions(new HashSet<String>(permissionsPanel.getUserSelections()), false);
-    for (Group group : groups) {
-      permissionsPanel.checkPermissions(group.getAllRoles(), true);
-    }
-  }
-
   /**
    * Get group defined by this panel. This panel defines: name, fullname
    *
@@ -217,46 +186,9 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
     group.setId(groupname.getText());
     group.setName(groupname.getText());
     group.setFullName(fullname.getText());
-
-    if (enableGroupSelect) {
-      group.setDirectGroups(this.getMemberGroups());
-    }
-
     group.setDirectRoles(permissionsPanel.getDirectRoles());
 
     return group;
-  }
-
-  /**
-   * Set the groups of which this group is member of
-   *
-   * @param groups
-   */
-  public void setMemberGroups(final Set<String> groups) {
-    if (enableGroupSelect) {
-      groupSelect.init(new AsyncCallback<Boolean>() {
-
-        @Override
-        public void onSuccess(Boolean result) {
-          groupSelect.setMemberGroups(groups);
-        }
-
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-          Tools.newHistory(MemberManagement.RESOLVER);
-        }
-      });
-    }
-  }
-
-  /**
-   * Get the groups of which this group is member of
-   *
-   * @return a list of group names
-   */
-  public Set<String> getMemberGroups() {
-    return enableGroupSelect ? groupSelect.getMemberGroups() : null;
   }
 
   /**
@@ -302,13 +234,6 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
    */
   public void setGroupnameReadOnly(boolean readonly) {
     groupname.setReadOnly(readonly);
-  }
-
-  public void setVisible(boolean visible) {
-    super.setVisible(visible);
-    if (enableGroupSelect) {
-      groupSelect.setVisible(visible);
-    }
   }
 
   public void clear() {

@@ -33,14 +33,6 @@
 				</g:Label>
 			</g:FlowPanel>
 		</g:FlowPanel>
-		<g:FlowPanel ui:field="groupSelectPanel" addStyleNames="row full_width no_padding">
-			<g:FlowPanel addStyleNames="col_12">
-				<g:Label styleName="h4">
-					<ui:text from="{messages.groupGroups}" />
-				</g:Label>
-				<u:GroupSelect ui:field="groupSelect" />
-			</g:FlowPanel>
-		</g:FlowPanel>
 		<g:FlowPanel ui:field="permissionsSelectPanel"
 			addStyleNames="row full_width no_padding {style.section}">
 			<g:FlowPanel addStyleNames="col_12">

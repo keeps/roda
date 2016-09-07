@@ -82,12 +82,7 @@ public class UserManagementHelper {
 
   protected static Group retrieveGroup(String groupname)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
-    try {
-      return UserUtility.getLdapUtility().getGroup(groupname);
-    } catch (LdapUtilityException e) {
-      LOGGER.error("Error getting user", e);
-      throw new GenericException("Error getting user: " + e.getMessage());
-    }
+    return UserUtility.getLdapUtility().getGroup(groupname);
   }
 
   protected static List<Group> listAllGroups() throws GenericException {
@@ -158,7 +153,7 @@ public class UserManagementHelper {
       }
 
       String result = tmpl.apply(data);
-      //result = RodaUtils.indentXML(result);
+      // result = RodaUtils.indentXML(result);
       return result;
     } catch (IOException e1) {
       LOGGER.error("Error getting template from stream");

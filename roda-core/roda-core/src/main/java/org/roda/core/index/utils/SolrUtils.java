@@ -997,7 +997,7 @@ public class SolrUtils {
       appendExactMatch(fq, usersKey, user.getId(), true, false);
 
       String groupsKey = RodaConstants.INDEX_PERMISSION_GROUPS_PREFIX + PermissionType.READ;
-      appendValuesUsingOROperatorForQuery(fq, groupsKey, new ArrayList<>(user.getAllGroups()), true);
+      appendValuesUsingOROperatorForQuery(fq, groupsKey, new ArrayList<>(user.getGroups()), true);
 
       fq.append(")");
     }
@@ -1410,14 +1410,9 @@ public class SolrUtils {
     doc.addField(RodaConstants.MEMBERS_IS_ACTIVE, member.isActive());
     doc.addField(RodaConstants.MEMBERS_IS_USER, member.isUser());
     doc.addField(RodaConstants.MEMBERS_NAME, member.getName());
-    if (member.getDirectGroups() != null) {
-      doc.addField(RodaConstants.MEMBERS_GROUPS_DIRECT, new ArrayList<String>(member.getDirectGroups()));
-    }
+
     if (member.getDirectRoles() != null) {
       doc.addField(RodaConstants.MEMBERS_ROLES_DIRECT, new ArrayList<String>(member.getDirectRoles()));
-    }
-    if (member.getAllGroups() != null) {
-      doc.addField(RodaConstants.MEMBERS_GROUPS_ALL, new ArrayList<String>(member.getAllGroups()));
     }
     if (member.getAllRoles() != null) {
       doc.addField(RodaConstants.MEMBERS_ROLES_ALL, new ArrayList<String>(member.getAllRoles()));
@@ -1431,6 +1426,17 @@ public class SolrUtils {
     if (member instanceof User) {
       User user = (User) member;
       doc.addField(RodaConstants.MEMBERS_EMAIL, user.getEmail());
+      if (user.getGroups() != null) {
+        doc.addField(RodaConstants.MEMBERS_GROUPS, new ArrayList<String>(user.getGroups()));
+      }
+    }
+
+    // Add group specific fields
+    if (member instanceof Group) {
+      Group group = (Group) member;
+      if (group.getUsers() != null) {
+        doc.addField(RodaConstants.MEMBERS_USERS, new ArrayList<String>(group.getUsers()));
+      }
     }
 
     return doc;
@@ -1444,38 +1450,35 @@ public class SolrUtils {
     final String fullName = objectToString(doc.get(RodaConstants.MEMBERS_FULLNAME), null);
 
     final String email = objectToString(doc.get(RodaConstants.MEMBERS_EMAIL), null);
-    final Set<String> directGroups = new HashSet<String>(
-      objectToListString(doc.get(RodaConstants.MEMBERS_GROUPS_DIRECT)));
+    final Set<String> groups = new HashSet<String>(objectToListString(doc.get(RodaConstants.MEMBERS_GROUPS)));
+    final Set<String> users = new HashSet<String>(objectToListString(doc.get(RodaConstants.MEMBERS_USERS)));
     final Set<String> directRoles = new HashSet<String>(
       objectToListString(doc.get(RodaConstants.MEMBERS_ROLES_DIRECT)));
-    final Set<String> allGroups = new HashSet<String>(objectToListString(doc.get(RodaConstants.MEMBERS_GROUPS_ALL)));
     final Set<String> allRoles = new HashSet<String>(objectToListString(doc.get(RodaConstants.MEMBERS_ROLES_ALL)));
     if (isUser) {
       User user = new User();
       user.setId(id);
+      user.setActive(isActive);
       user.setName(name);
       user.setFullName(fullName);
-      user.setEmail(email);
-
-      user.setActive(isActive);
-      user.setDirectGroups(directGroups);
       user.setDirectRoles(directRoles);
-      user.setAllGroups(allGroups);
       user.setAllRoles(allRoles);
-      user.setActive(isActive);
+
+      user.setEmail(email);
+      user.setGroups(groups);
 
       return user;
     } else {
       Group group = new Group();
       group.setId(id);
       group.setActive(isActive);
-      group.setDirectGroups(directGroups);
-      group.setDirectRoles(directRoles);
-      group.setAllGroups(allGroups);
-      group.setAllRoles(allRoles);
-      group.setActive(isActive);
       group.setName(name);
       group.setFullName(fullName);
+      group.setDirectRoles(directRoles);
+      group.setAllRoles(allRoles);
+
+      group.setUsers(users);
+
       return group;
     }
   }

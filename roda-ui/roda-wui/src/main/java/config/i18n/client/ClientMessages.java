@@ -1696,8 +1696,6 @@ public interface ClientMessages extends Messages {
 
   String groupDataNote();
 
-  String groupGroups();
-
   String groupPermissions();
 
   // Preferences

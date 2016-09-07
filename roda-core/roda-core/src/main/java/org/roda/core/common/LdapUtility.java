@@ -68,6 +68,7 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.GroupAlreadyExistsException;
 import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.InvalidTokenException;
@@ -398,14 +399,8 @@ public class LdapUtility {
           user.addDirectRole(role);
         }
 
-        // Add all groups to which this user belongs
-        final Set<String> memberGroups = getMemberGroups(session, getUserDN(user.getName()));
-        user.setAllGroups(memberGroups);
-
         // Add groups to which this user belongs
-        for (String groupDN : getDNsOfGroupsContainingMember(session, getUserDN(user.getName()))) {
-          user.addGroup(getFirstNameFromDN(groupDN));
-        }
+        user.setGroups(getUserGroups(session, user.getName()));
 
         users.add(user);
       }
@@ -493,7 +488,7 @@ public class LdapUtility {
       final CoreSession session = service.getAdminSession();
       session.add(getEntryFromUser(user));
       setMemberDirectRoles(session, getUserDN(user.getName()), user.getDirectRoles());
-      setMemberGroups(session, getUserDN(user.getName()), user.getDirectGroups());
+      setMemberGroups(session, getUserDN(user.getName()), user.getGroups());
 
       if (!user.isActive()) {
         try {
@@ -646,15 +641,6 @@ public class LdapUtility {
           group.addDirectRole(role);
         }
 
-        // Add all groups to which this group belongs
-        final Set<String> memberGroups = getMemberGroups(session, getGroupDN(group.getName()));
-        group.setAllGroups(memberGroups);
-
-        // Add groups to which this group belongs
-        for (String groupDN : getDNsOfGroupsContainingMember(session, getGroupDN(group.getName()))) {
-          group.addDirectGroup(getFirstNameFromDN(groupDN));
-        }
-
         groups.add(group);
       }
 
@@ -676,12 +662,15 @@ public class LdapUtility {
    * @throws LdapUtilityException
    *           if the group information could not be retrieved from the LDAP
    *           server.
+   * @throws NotFoundException
    */
-  public Group getGroup(final String name) throws LdapUtilityException {
+  public Group getGroup(final String name) throws GenericException, NotFoundException {
     try {
       return getGroup(service.getAdminSession(), name);
+    } catch (final LdapNoSuchObjectException e) {
+      throw new NotFoundException(name);
     } catch (final LdapException e) {
-      throw new LdapUtilityException("Error searching for group " + name, e);
+      throw new GenericException("Error searching for group " + name, e);
     }
   }
 
@@ -695,8 +684,9 @@ public class LdapUtility {
    *           if a Group with the same name already exists.
    * @throws LdapUtilityException
    *           if something goes wrong with the creation of the new group.
+   * @throws GenericException 
    */
-  public Group addGroup(final Group group) throws GroupAlreadyExistsException, LdapUtilityException {
+  public Group addGroup(final Group group) throws GroupAlreadyExistsException, LdapUtilityException, GenericException {
     if (!group.isNameValid()) {
       throw new LdapUtilityException("'" + group.getName() + "' is not a valid group name.");
     }
@@ -710,20 +700,19 @@ public class LdapUtility {
       // 20160906 hsilva: this is needed because at least one UNIQUE_MEMBER must
       // be added to the entry
       entry.add(UNIQUE_MEMBER, RODA_DUMMY_USER);
+
+      // 20160907 lfaria: commenting members as this should be removed if
+      // possible
+      // TODO 20160907 lfaria: remove commented code
       // Add user members
-      for (String memberName : group.getMemberUserNames()) {
-        entry.add(UNIQUE_MEMBER, getUserDN(memberName));
-      }
-      // Add group members
-      for (String memberName : group.getMemberGroupNames()) {
-        entry.add(UNIQUE_MEMBER, getGroupDN(memberName));
-      }
+      // for (String memberName : group.getMemberUserNames()) {
+      // entry.add(UNIQUE_MEMBER, getUserDN(memberName));
+      // }
 
       final CoreSession session = service.getAdminSession();
       session.add(entry);
 
       setMemberDirectRoles(session, getGroupDN(group.getName()), group.getDirectRoles());
-      setMemberGroups(session, getGroupDN(group.getName()), group.getDirectGroups());
 
     } catch (final LdapEntryAlreadyExistsException e) {
       throw new GroupAlreadyExistsException("Group " + group.getName() + " already exists.", e);
@@ -731,7 +720,12 @@ public class LdapUtility {
       throw new LdapUtilityException("Error adding group " + group.getName(), e);
     }
 
-    final Group newGroup = getGroup(group.getName());
+    Group newGroup;
+    try {
+      newGroup = getGroup(group.getName());
+    } catch (NotFoundException e) {
+      throw new GenericException("The group was not created! " + e.getMessage());
+    }
     if (newGroup == null) {
       throw new LdapUtilityException("The group was not created!");
     } else {
@@ -753,9 +747,10 @@ public class LdapUtility {
    *           if the user is one of the protected users.
    * @throws LdapUtilityException
    *           if some error occurred.
+   * @throws GenericException 
    */
   public Group modifyGroup(final Group modifiedGroup)
-    throws NotFoundException, IllegalOperationException, LdapUtilityException {
+    throws NotFoundException, IllegalOperationException, LdapUtilityException, GenericException {
 
     if (this.ldapProtectedGroups.contains(modifiedGroup.getName())) {
       throw new IllegalOperationException(
@@ -778,17 +773,12 @@ public class LdapUtility {
       // be added to the entry
       entry.add(UNIQUE_MEMBER, RODA_DUMMY_USER);
       // Add user members
-      for (String memberName : modifiedGroup.getMemberUserNames()) {
+      for (String memberName : modifiedGroup.getUsers()) {
         entry.add(UNIQUE_MEMBER, getUserDN(memberName));
-      }
-      // Add group members
-      for (String memberName : modifiedGroup.getMemberGroupNames()) {
-        entry.add(UNIQUE_MEMBER, getGroupDN(memberName));
       }
       session.delete(entry.getDn());
       session.add(entry);
 
-      setMemberGroups(session, groupDN, modifiedGroup.getDirectGroups());
       setMemberDirectRoles(session, groupDN, modifiedGroup.getDirectRoles());
 
     } catch (final LdapNoSuchObjectException e) {
@@ -1231,13 +1221,7 @@ public class LdapUtility {
     }
 
     // Add all groups to which this user belongs
-    final Set<String> memberGroups = getMemberGroups(session, getUserDN(user.getName()));
-    user.setAllGroups(memberGroups);
-
-    // Add groups to which this user belongs
-    for (String groupDN : getDNsOfGroupsContainingMember(session, getUserDN(user.getName()))) {
-      user.addGroup(getFirstNameFromDN(groupDN));
-    }
+    user.setGroups(getUserGroups(session, user.getName()));
 
     return user;
   }
@@ -1257,8 +1241,7 @@ public class LdapUtility {
     }
 
     // Add all groups to which this user belongs
-    final Set<String> memberGroups = getMemberGroups(session, getUserDN(username));
-    user.setAllGroups(memberGroups);
+    user.setGroups(getUserGroups(session, username));
 
     // Add groups to which this user belongs
     for (String groupDN : getDNsOfGroupsContainingMember(session, getUserDN(username))) {
@@ -1356,15 +1339,6 @@ public class LdapUtility {
       group.addDirectRole(role);
     }
 
-    // Add all groups to which this group belongs
-    final Set<String> memberGroups = getMemberGroups(session, getGroupDN(name));
-    group.setAllGroups(memberGroups);
-
-    // Add groups to which this group belongs
-    for (String groupDN : getDNsOfGroupsContainingMember(session, getGroupDN(name))) {
-      group.addDirectGroup(getFirstNameFromDN(groupDN));
-    }
-
     return group;
   }
 
@@ -1385,7 +1359,9 @@ public class LdapUtility {
         if (memberDN.endsWith(getPeopleDN())) {
           group.addMemberUser(getFirstNameFromDN(memberDN));
         } else if (memberDN.endsWith(getGroupsDN())) {
-          group.addMemberGroup(getFirstNameFromDN(memberDN));
+          // 20160907 lfaria: ignoring sub-groups
+          // group.addMemberGroup(getFirstNameFromDN(memberDN));
+          LOGGER.warn("Ignoring sub-group {} connection with group {}", memberDN, group.getId());
         } else if (!memberDN.equals(RODA_DUMMY_USER)) {
           LOGGER.warn("Member {} outside users and groups", memberDN);
         }
@@ -1529,7 +1505,7 @@ public class LdapUtility {
       }
 
       if (modifyRolesAndGroups) {
-        setMemberGroups(session, userDN, modifiedUser.getDirectGroups());
+        setMemberGroups(session, userDN, modifiedUser.getGroups());
         setMemberDirectRoles(session, userDN, modifiedUser.getDirectRoles());
       }
 
@@ -1664,6 +1640,15 @@ public class LdapUtility {
     return groupsDN;
   }
 
+  /**
+   * No longer need to recursively find groups
+   * 
+   * @param session
+   * @param memberDN
+   * @return
+   * @throws LdapException
+   */
+  @Deprecated
   private Set<String> getDNsOfAllActiveGroupsForMember(final CoreSession session, final String memberDN)
     throws LdapException {
     final Set<String> allGroupsDN = new HashSet<>();
@@ -1720,10 +1705,9 @@ public class LdapUtility {
     return directRoles;
   }
 
-  private Set<String> getMemberGroups(final CoreSession session, final String memberDN) throws LdapException {
-    final Set<String> allMemberGroupsDN = getDNsOfAllActiveGroupsForMember(session, memberDN);
-    final Set<String> groups = new HashSet<>();
-    for (String groupDN : allMemberGroupsDN) {
+  private Set<String> getUserGroups(final CoreSession session, final String username) throws LdapException {
+    Set<String> groups = new HashSet<>();
+    for (String groupDN : getDNsOfGroupsContainingMember(session, getUserDN(username))) {
       groups.add(getFirstNameFromDN(groupDN));
     }
     return groups;

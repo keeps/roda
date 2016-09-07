@@ -23,10 +23,6 @@ public interface RODAMember extends IsIndexed {
 
   String getFullName();
 
-  Set<String> getAllGroups();
-
-  Set<String> getDirectGroups();
-
   Set<String> getAllRoles();
 
   Set<String> getDirectRoles();

@@ -870,7 +870,7 @@ public class ModelServiceTest {
     }
   }
 
-  @Test(enabled = false)
+  @Test
   public void testMemberInheritance() throws RODAException {
     // create group 1
     Group group1 = new Group("group1");
@@ -887,15 +887,13 @@ public class ModelServiceTest {
     Group group2 = new Group("group2");
     group2.setActive(true);
     group2.setFullName("NAMEGROUP2");
-    group2.setDirectGroups(new HashSet<>(Arrays.asList(group1.getId())));
     group2.setDirectRoles(new HashSet<>(Arrays.asList(ROLE2)));
     model.createGroup(group2, true);
 
     // gen. asserts for group 2
     Group retrievedGroup2 = model.retrieveGroup(group2.getId());
     Assert.assertNotNull(retrievedGroup2);
-    MatcherAssert.assertThat(retrievedGroup2.getAllGroups(), Matchers.containsInAnyOrder(group1.getId()));
-    MatcherAssert.assertThat(retrievedGroup2.getAllRoles(), Matchers.containsInAnyOrder(ROLE1, ROLE2));
+    MatcherAssert.assertThat(retrievedGroup2.getAllRoles(), Matchers.containsInAnyOrder(ROLE2));
 
     // create user 1
     User user = new User("user1");
@@ -903,43 +901,30 @@ public class ModelServiceTest {
     user.setEmail("user1@example.com");
     user.setGuest(false);
     user.setFullName("user1");
-    user.addDirectGroup(group2.getId());
+    user.addGroup(group1.getId());
+    user.addGroup(group2.getId());
     model.createUser(user, true);
 
     // gen. asserts for user 1
     User retrievedUser = model.retrieveUser(user.getId());
     Assert.assertNotNull(retrievedUser);
-    MatcherAssert.assertThat(retrievedUser.getAllGroups(), Matchers.containsInAnyOrder(group1.getId(), group2.getId()));
+    MatcherAssert.assertThat(retrievedUser.getGroups(), Matchers.containsInAnyOrder(group1.getId(), group2.getId()));
     MatcherAssert.assertThat(retrievedUser.getAllRoles(), Matchers.containsInAnyOrder(ROLE1, ROLE2));
 
-    // create group 3
-    Group group3 = new Group("group3");
-    group3.setActive(true);
-    group3.setFullName("NAMEGROUP3");
-    group3.setDirectGroups(new HashSet<>(Arrays.asList(group2.getId())));
-    model.createGroup(group3, true);
-
     // modify group 2 groups
-    retrievedGroup2.removeGroup(group1.getId());
-    model.updateGroup(retrievedGroup2, false);
+    model.deleteGroup(group1.getId(), false);
 
-    Group updatedGroup2 = model.retrieveGroup(retrievedGroup2.getId());
-    Assert.assertNotNull(updatedGroup2);
-    MatcherAssert.assertThat(updatedGroup2.getAllGroups(), Matchers.empty());
-    MatcherAssert.assertThat(updatedGroup2.getAllRoles(), Matchers.containsInAnyOrder(ROLE2));
-    MatcherAssert.assertThat(updatedGroup2.getAllRoles(), Matchers.not(Matchers.containsInAnyOrder(ROLE1)));
-
-    Group retrievedGroup3 = model.retrieveGroup(group3.getId());
-    Assert.assertNotNull(retrievedGroup3);
-    MatcherAssert.assertThat(retrievedGroup3.getAllGroups(), Matchers.containsInAnyOrder(group2.getId()));
-    MatcherAssert.assertThat(retrievedGroup3.getAllGroups(), Matchers.not(Matchers.containsInAnyOrder(group1.getId())));
-    MatcherAssert.assertThat(retrievedGroup3.getAllRoles(), Matchers.containsInAnyOrder(ROLE2));
-    MatcherAssert.assertThat(retrievedGroup3.getAllRoles(), Matchers.not(Matchers.containsInAnyOrder(ROLE1)));
+    try {
+      model.retrieveGroup(group1.getId());
+      Assert.fail("should have not found exception");
+    } catch (NotFoundException e) {
+      // expected
+    }
 
     User retrievedUser2 = model.retrieveUser(user.getId());
     Assert.assertNotNull(retrievedUser2);
-    MatcherAssert.assertThat(retrievedUser2.getAllGroups(), Matchers.containsInAnyOrder(group2.getId()));
-    MatcherAssert.assertThat(retrievedUser2.getAllGroups(), Matchers.not(Matchers.containsInAnyOrder(group1.getId())));
+    MatcherAssert.assertThat(retrievedUser2.getGroups(), Matchers.containsInAnyOrder(group2.getId()));
+    MatcherAssert.assertThat(retrievedUser2.getGroups(), Matchers.not(Matchers.containsInAnyOrder(group1.getId())));
     MatcherAssert.assertThat(retrievedUser2.getAllRoles(), Matchers.containsInAnyOrder(ROLE2));
     MatcherAssert.assertThat(retrievedUser2.getAllRoles(), Matchers.not(Matchers.containsInAnyOrder(ROLE1)));
 

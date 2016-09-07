@@ -108,9 +108,9 @@
    <field name="name" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="isActive" type="boolean" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="isUser" type="boolean" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="groupsDirect" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+   <field name="groups" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+   <field name="users" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <field name="rolesDirect" type="string" indexed="true" stored="true" required="false" multiValued="true" />
-   <field name="groupsAll" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <field name="rolesAll" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    
    <!-- Users -->

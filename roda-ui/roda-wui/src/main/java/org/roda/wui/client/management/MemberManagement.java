@@ -114,8 +114,7 @@ public class MemberManagement extends Composite {
 
   public MemberManagement() {
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.MEMBERS_IS_ACTIVE),
-      new SimpleFacetParameter(RodaConstants.MEMBERS_IS_USER),
-      new SimpleFacetParameter(RodaConstants.MEMBERS_GROUPS_ALL));
+      new SimpleFacetParameter(RodaConstants.MEMBERS_IS_USER), new SimpleFacetParameter(RodaConstants.MEMBERS_GROUPS));
 
     list = new RodaMemberList(DEFAULT_FILTER, facets, messages.usersAndGroupsTitle(), false);
 
@@ -130,7 +129,7 @@ public class MemberManagement extends Composite {
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
     facetPanels.put(RodaConstants.MEMBERS_IS_ACTIVE, facetIsActive);
     facetPanels.put(RodaConstants.MEMBERS_IS_USER, facetIsUser);
-    facetPanels.put(RodaConstants.MEMBERS_GROUPS_ALL, facetGroups);
+    facetPanels.put(RodaConstants.MEMBERS_GROUPS, facetGroups);
 
     FacetUtils.bindFacets(list, facetPanels);
 

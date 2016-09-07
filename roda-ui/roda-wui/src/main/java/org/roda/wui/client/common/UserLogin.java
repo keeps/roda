@@ -211,7 +211,7 @@ public class UserLogin {
         User authUser = user;
         if (member instanceof User && member.getName().equals(authUser.getName())) {
           onLoginStatusChanged(authUser);
-        } else if (member instanceof Group && Arrays.asList(authUser.getAllGroups()).contains(member.getName())) {
+        } else if (member instanceof Group && Arrays.asList(authUser.getGroups()).contains(member.getName())) {
           onLoginStatusChanged(authUser);
         }
       }
@@ -363,9 +363,9 @@ public class UserLogin {
       });
     }
   }
-  
+
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
-  
+
   public void showSuggestLoginDialog() {
     Dialogs.showConfirmDialog(messages.loginDialogTitle(), messages.casForwardWarning(), messages.loginDialogCancel(),
       messages.loginDialogLogin(), new AsyncCallback<Boolean>() {

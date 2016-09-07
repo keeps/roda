@@ -1442,13 +1442,8 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  public Group retrieveGroup(String name) throws GenericException {
-    try {
-      return UserUtility.getLdapUtility().getGroup(name);
-    } catch (LdapUtilityException e) {
-      // TODO 20160906 hsilva: change this by a more specific exception
-      throw new GenericException("Unable to retrieve group", e);
-    }
+  public Group retrieveGroup(String name) throws GenericException, NotFoundException {
+    return UserUtility.getLdapUtility().getGroup(name);
   }
 
   public Group createGroup(Group group, boolean notify) throws GenericException, AlreadyExistsException {

@@ -61,28 +61,27 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  
   @UiField
   TextBox username;
 
   @UiField
   Label usernameError;
-  
+
   @UiField(provided = true)
   PasswordPanel password;
-  
+
   @UiField
   Label passwordError;
 
   @UiField
   TextBox fullname;
-  
+
   @UiField
   Label fullnameError;
 
   @UiField
   TextBox email;
-  
+
   @UiField
   Label emailError;
 
@@ -225,7 +224,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
         onChange();
       }
     });
-    
+
     usernameError.setVisible(false);
     passwordError.setVisible(false);
     fullnameError.setVisible(false);
@@ -264,7 +263,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     this.fullname.setText(user.getFullName());
     this.email.setText(user.getEmail());
 
-    this.setMemberGroups(user.getDirectGroups());
+    this.setMemberGroups(user.getGroups());
     this.setPermissions(user.getDirectRoles(), user.getAllRoles());
 
     BrowserService.Util.getInstance().retrieveUserExtraBundle(user.getName(), new AsyncCallback<UserExtraBundle>() {
@@ -325,7 +324,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     user.setEmail(email.getText());
 
     if (enableGroupSelect) {
-      user.setDirectGroups(this.getMemberGroups());
+      user.setGroups(this.getMemberGroups());
     }
 
     user.setDirectRoles(permissionsPanel.getDirectRoles());
@@ -417,12 +416,12 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
       fullnameError.setVisible(false);
     }
 
-    if(email.getText()==null || email.getText().trim().equalsIgnoreCase("")){
+    if (email.getText() == null || email.getText().trim().equalsIgnoreCase("")) {
       valid = false;
       email.addStyleName("isWrong");
       emailError.setText(messages.mandatoryField());
       emailError.setVisible(true);
-    }else if (!email.getText()
+    } else if (!email.getText()
       .matches("^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[_A-Za-z0-9-]+)")) {
       valid = false;
       email.addStyleName("isWrong");
@@ -432,11 +431,9 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
       email.removeStyleName("isWrong");
       emailError.setVisible(false);
     }
-
-    
-    
+  
     valid = valid && FormUtilities.validate(userExtraBundle.getValues(),extra);
-    
+
     checked = true;
 
     return valid;

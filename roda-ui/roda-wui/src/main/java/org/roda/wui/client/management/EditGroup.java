@@ -104,7 +104,7 @@ public class EditGroup extends Composite {
   public EditGroup(Group group) {
     this.group = group;
 
-    this.groupDataPanel = new GroupDataPanel(true, true, true);
+    this.groupDataPanel = new GroupDataPanel(true, true);
     this.groupDataPanel.setGroup(group);
 
     initWidget(uiBinder.createAndBindUi(this));

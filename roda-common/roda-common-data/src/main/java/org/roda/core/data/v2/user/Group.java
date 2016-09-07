@@ -7,23 +7,20 @@
  */
 package org.roda.core.data.v2.user;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
  * This is a group in RODA.
  * 
  * @author Rui Castro
+ * @author Luis Faria <lfaria@keep.pt>
  */
 public class Group extends RodaPrincipal {
 
   private static final long serialVersionUID = -4051946961307715630L;
 
-  private List<String> memberUserNames = new ArrayList<String>();
-
-  private List<String> memberGroupNames = new ArrayList<String>();
+  private Set<String> users = new HashSet<>();
 
   /**
    * Constructs a new empty group.
@@ -49,19 +46,9 @@ public class Group extends RodaPrincipal {
    *          the Group to be cloned.
    */
   public Group(Group group) {
-    super(group.getId(), group.getName(), group.getDirectGroups(), group.getAllGroups(), group.getDirectRoles(),
-      group.getAllRoles());
+    super(group.getId(), group.getName(), group.getDirectRoles(), group.getAllRoles());
     setActive(true);
-    setMemberUserNames(group.getMemberUserNames());
-    setMemberGroupNames(group.getMemberGroupNames());
-  }
-
-  /**
-   * @see RODAMember#toString()
-   */
-  public String toString() {
-    return "Group (" + super.toString() + ", memberUserNames=" + this.memberUserNames + ", memberGroupNames="
-      + this.memberGroupNames + ")";
+    setUsers(group.getUsers());
   }
 
   @Override
@@ -72,59 +59,20 @@ public class Group extends RodaPrincipal {
   /**
    * @return the memberUserNames
    */
-  public String[] getMemberUserNames() {
-    return (String[]) memberUserNames.toArray(new String[memberUserNames.size()]);
+  public Set<String> getUsers() {
+    return users;
   }
 
   /**
-   * @param memberUserNames
+   * @param users
    *          the memberUserNames to set
    */
-  public void setMemberUserNames(String[] memberUserNames) {
-    this.memberUserNames.clear();
-    if (memberUserNames != null) {
-      this.memberUserNames.addAll(Arrays.asList(memberUserNames));
+  public void setUsers(Set<String> users) {
+    this.users.clear();
+    if (users != null) {
+      this.users.addAll(users);
     }
   }
-
-  /**
-   * @return the memberGroupNames
-   */
-  public String[] getMemberGroupNames() {
-    return (String[]) memberGroupNames.toArray(new String[memberGroupNames.size()]);
-  }
-
-  /**
-   * Sets the names of the {@link Group}s that belong to this {@link Group}.
-   * <p>
-   * <strong>NOTE:</strong> using this method doesn't change the member groups
-   * when UserManagement.modifyGroup(Group group) is called. Use
-   * {@link RodaPrincipal#addDirectGroup(String)} or
-   * {@link RodaPrincipal#setDirectGroups(Set)} to change the {@link Group}s of
-   * a {@link RodaPrincipal} ({@link User} or {@link Group}).
-   * </p>
-   * 
-   * @param memberGroupNames
-   *          the memberGroupNames to set
-   */
-  public void setMemberGroupNames(String[] memberGroupNames) {
-    this.memberGroupNames.clear();
-    if (memberGroupNames != null) {
-      this.memberGroupNames.addAll(Arrays.asList(memberGroupNames));
-    }
-  }
-
-  /**
-   * Returns the member in position <code>index</code>.
-   * 
-   * @param index
-   *          the <code>index</code> number of the members list.
-   * @return the name of the member in position <code>index</code>.
-   */
-  /*
-   * public String getMemberName(int index) { return memberUserNames.get(index);
-   * }
-   */
 
   /**
    * Adds a new member name to the list of member names.
@@ -134,7 +82,7 @@ public class Group extends RodaPrincipal {
    * @return true if the member was added, false otherwise.
    */
   public boolean addMemberUser(String memberUserName) {
-    return this.memberUserNames.add(memberUserName);
+    return this.users.add(memberUserName);
   }
 
   /**
@@ -145,29 +93,19 @@ public class Group extends RodaPrincipal {
    * @return true if the member was removed, false otherwise.
    */
   public boolean removeMemberUser(String memberUserName) {
-    return this.memberUserNames.remove(memberUserName);
+    return this.users.remove(memberUserName);
   }
 
-  /**
-   * Adds a new group name to the list of member group names.
-   * 
-   * @param memberGroupName
-   *          the name of the new member group to add.
-   * @return true if the member group was added, false otherwise.
-   */
-  public boolean addMemberGroup(String memberGroupName) {
-    return this.memberGroupNames.add(memberGroupName);
-  }
-
-  /**
-   * Removes a member group name to the list of member group names.
-   * 
-   * @param memberGroupName
-   *          the name of the member group to remove.
-   * @return true if the member group was removed, false otherwise.
-   */
-  public boolean removeMemberGroup(String memberGroupName) {
-    return this.memberGroupNames.remove(memberGroupName);
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("Group [");
+    if (users != null) {
+      builder.append("users=");
+      builder.append(users);
+    }
+    builder.append("]");
+    return builder.toString();
   }
 
 }

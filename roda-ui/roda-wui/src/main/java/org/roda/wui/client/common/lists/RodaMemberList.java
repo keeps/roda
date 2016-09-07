@@ -19,6 +19,7 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.user.RODAMember;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.StringUtility;
@@ -88,7 +89,12 @@ public class RodaMemberList extends BasicAsyncTableCell<RODAMember> {
 
       @Override
       public String getValue(RODAMember member) {
-        return member != null ? StringUtility.prettyPrint(member.getDirectGroups()) : null;
+        if (member instanceof User) {
+          User user = (User) member;
+          return StringUtility.prettyPrint(user.getGroups());
+        } else {
+          return null;
+        }
       }
     };
 

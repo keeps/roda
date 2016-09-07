@@ -130,8 +130,8 @@ public class UserUtility {
   }
 
   public static void checkGroup(final User rsu, final String group) throws AuthorizationDeniedException {
-    if (!rsu.getAllGroups().contains(group)) {
-      LOGGER.debug("User '{}' groups: {} vs. group to check: {}", rsu.getId(), rsu.getAllGroups(), group);
+    if (!rsu.getGroups().contains(group)) {
+      LOGGER.debug("User '{}' groups: {} vs. group to check: {}", rsu.getId(), rsu.getGroups(), group);
       throw new AuthorizationDeniedException(
         "The user '" + rsu.getId() + "' does not belong to the group '" + group + "'");
     }
@@ -213,7 +213,7 @@ public class UserUtility {
       return;
     }
 
-    if (!users.contains(user.getId()) && iterativeDisjoint(groups, user.getAllGroups())) {
+    if (!users.contains(user.getId()) && iterativeDisjoint(groups, user.getGroups())) {
       throw new AuthorizationDeniedException(
         "The user '" + user.getId() + "' does not have permissions to " + permissionType);
     }

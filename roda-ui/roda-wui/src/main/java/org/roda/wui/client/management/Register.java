@@ -199,49 +199,52 @@ public class Register extends Composite {
 
                       @Override
                       public void onSuccess(Notification result) {
-                        if(result.getState()==NOTIFICATION_STATE.COMPLETED){
+                        if (result.getState() == NOTIFICATION_STATE.COMPLETED) {
                           Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
                             messages.registerSuccessDialogMessage(), messages.registerSuccessDialogButton(),
                             new AsyncCallback<Void>() {
-  
+
                               @Override
                               public void onSuccess(Void result) {
                                 Tools.newHistory(Login.RESOLVER);
                               }
-  
+
                               @Override
                               public void onFailure(Throwable caught) {
                                 Tools.newHistory(Login.RESOLVER);
                               }
                             });
-                        }else{
-                          //TODO the user "default" group should be configurable...
+                        } else {
+                          // TODO the user "default" group should be
+                          // configurable...
                           user.setActive(true);
-                          user.addDirectGroup("users");
-                          UserManagementService.Util.getInstance().updateUser(user, password, userDataPanel.getExtra(), new AsyncCallback<Void>() {
+                          user.addGroup("users");
+                          UserManagementService.Util.getInstance().updateUser(user, password, userDataPanel.getExtra(),
+                            new AsyncCallback<Void>() {
 
-                            @Override
-                            public void onFailure(Throwable caught) {
-                              errorMessage(caught);
-                            }
+                              @Override
+                              public void onFailure(Throwable caught) {
+                                errorMessage(caught);
+                              }
 
-                            @Override
-                            public void onSuccess(Void result) {
-                              Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
-                                messages.registerSuccessDialogMessageActive(), messages.registerSuccessDialogButton(),
-                                new AsyncCallback<Void>() {
-      
-                                  @Override
-                                  public void onSuccess(Void result) {
-                                    Tools.newHistory(Login.RESOLVER);
-                                  }
-      
-                                  @Override
-                                  public void onFailure(Throwable caught) {
-                                    Tools.newHistory(Login.RESOLVER);
-                                  }
-                                });
-                            }});
+                              @Override
+                              public void onSuccess(Void result) {
+                                Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
+                                  messages.registerSuccessDialogMessageActive(), messages.registerSuccessDialogButton(),
+                                  new AsyncCallback<Void>() {
+
+                                    @Override
+                                    public void onSuccess(Void result) {
+                                      Tools.newHistory(Login.RESOLVER);
+                                    }
+
+                                    @Override
+                                    public void onFailure(Throwable caught) {
+                                      Tools.newHistory(Login.RESOLVER);
+                                    }
+                                  });
+                              }
+                            });
                         }
                       }
 

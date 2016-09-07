@@ -14,9 +14,12 @@ import java.util.Set;
  * This is a user of RODA.
  *
  * @author Rui Castro
+ * @author Luis Faria <lfaria@keep.pt>
  */
 public class User extends RodaPrincipal {
   private static final long serialVersionUID = 6514790636010895870L;
+
+  private Set<String> groups = new HashSet<String>();
 
   /** Email address */
   private String email;
@@ -56,9 +59,9 @@ public class User extends RodaPrincipal {
 
   public User(final User user) {
     this(user.getId(), user.getName(), user.getFullName(), user.isActive(), user.getAllRoles(), user.getDirectRoles(),
-      user.getAllGroups(), user.getDirectGroups(), user.getEmail(), user.isGuest(), user.getIpAddress(),
-      user.getExtra(), user.getResetPasswordToken(), user.getResetPasswordTokenExpirationDate(),
-      user.getEmailConfirmationToken(), user.getEmailConfirmationTokenExpirationDate());
+      user.getGroups(), user.getEmail(), user.isGuest(), user.getIpAddress(), user.getExtra(),
+      user.getResetPasswordToken(), user.getResetPasswordTokenExpirationDate(), user.getEmailConfirmationToken(),
+      user.getEmailConfirmationTokenExpirationDate());
   }
 
   public User(final String id, final String name, final boolean guest) {
@@ -66,31 +69,30 @@ public class User extends RodaPrincipal {
   }
 
   public User(final String id, final String name, final String email, final boolean guest) {
-    this(id, name, email, guest, "", new HashSet<String>(), new HashSet<String>(), new HashSet<String>(),
-      new HashSet<String>());
+    this(id, name, email, guest, "", new HashSet<String>(), new HashSet<String>(), new HashSet<String>());
   }
 
-  public User(final String id, final String name, final String email, final boolean guest,
-    final String ipAddress, final Set<String> allRoles, final Set<String> directRoles, final Set<String> allGroups,
-    final Set<String> directGroups) {
-    this(id, name, email, guest, ipAddress, allRoles, directRoles, allGroups, directGroups, null, null, null, null);
+  public User(final String id, final String name, final String email, final boolean guest, final String ipAddress,
+    final Set<String> allRoles, final Set<String> directRoles, final Set<String> groups) {
+    this(id, name, email, guest, ipAddress, allRoles, directRoles, groups, null, null, null, null);
   }
 
-  public User(final String id, final String name, final String email, final boolean guest,
-    final String ipAddress, final Set<String> allRoles, final Set<String> directRoles, final Set<String> allGroups,
-    final Set<String> directGroups, final String resetPasswordToken, final String resetPasswordTokenExpirationDate,
-    final String emailConfirmationToken, final String emailConfirmationTokenExpirationDate) {
-    this(id, name, name, true, allRoles, directRoles, allGroups, directGroups, email, guest, ipAddress, null,
-      resetPasswordToken, resetPasswordTokenExpirationDate, emailConfirmationToken,
-      emailConfirmationTokenExpirationDate);
+  public User(final String id, final String name, final String email, final boolean guest, final String ipAddress,
+    final Set<String> allRoles, final Set<String> directRoles, final Set<String> groups,
+    final String resetPasswordToken, final String resetPasswordTokenExpirationDate, final String emailConfirmationToken,
+    final String emailConfirmationTokenExpirationDate) {
+    this(id, name, name, true, allRoles, directRoles, groups, email, guest, ipAddress, null, resetPasswordToken,
+      resetPasswordTokenExpirationDate, emailConfirmationToken, emailConfirmationTokenExpirationDate);
   }
 
   public User(final String id, final String name, final String fullName, final boolean active,
-    final Set<String> allRoles, final Set<String> directRoles, final Set<String> allGroups,
-    final Set<String> directGroups, final String email, final boolean guest, final String ipAddress, final String extra,
-    final String resetPasswordToken, final String resetPasswordTokenExpirationDate, final String emailConfirmationToken,
+    final Set<String> allRoles, final Set<String> directRoles, final Set<String> groups, final String email,
+    final boolean guest, final String ipAddress, final String extra, final String resetPasswordToken,
+    final String resetPasswordTokenExpirationDate, final String emailConfirmationToken,
     final String emailConfirmationTokenExpirationDate) {
-    super(id, name, fullName, active, allRoles, directRoles, allGroups, directGroups);
+    super(id, name, fullName, active, allRoles, directRoles);
+    this.groups = groups;
+
     this.email = email;
     this.guest = guest;
     this.ipAddress = ipAddress;
@@ -204,74 +206,152 @@ public class User extends RodaPrincipal {
     this.emailConfirmationTokenExpirationDate = emailConfirmationTokenExpirationDate;
   }
 
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + ((email == null) ? 0 : email.hashCode());
-    result = prime * result + (guest ? 1231 : 1237);
-    return result;
+  public Set<String> getGroups() {
+    return groups;
   }
 
-  @Override
-  public boolean equals(final Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (!super.equals(obj)) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
-      return false;
-    }
-    final User other = (User) obj;
-    if (email == null) {
-      if (other.email != null) {
-        return false;
-      }
-    } else if (!email.equals(other.email)) {
-      return false;
-    }
-    if (guest != other.guest) {
-      return false;
-    }
-    if (ipAddress == null) {
-      if (other.ipAddress != null) {
-        return false;
-      }
-    } else if (!ipAddress.equals(other.ipAddress)) {
-      return false;
-    }
-    return true;
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder builder = new StringBuilder();
-    builder.append("User [");
-    builder.append(super.toString());
-    builder.append(", email=");
-    builder.append(email);
-    builder.append(", guest=");
-    builder.append(guest);
-    builder.append(", ipAddress=");
-    builder.append(ipAddress);
-    builder.append(", resetPasswordToken=");
-    builder.append(resetPasswordToken);
-    builder.append(", resetPasswordTokenExpirationDate=");
-    builder.append(resetPasswordTokenExpirationDate);
-    builder.append(", emailConfirmationToken=");
-    builder.append(emailConfirmationToken);
-    builder.append(", emailConfirmationTokenExpirationDate=");
-    builder.append(emailConfirmationTokenExpirationDate);
-    builder.append(", extra=");
-    builder.append(extra);
-    builder.append("]");
-    return builder.toString();
+  public void setGroups(Set<String> groups) {
+    this.groups = groups;
   }
 
   @Override
   public boolean isUser() {
     return true;
   }
+
+  public void addGroup(String group) {
+    if (groups == null) {
+      groups = new HashSet<String>();
+    }
+    groups.add(group);
+  }
+
+  public void removeGroup(String group) {
+    if (groups.contains(group)) {
+      groups.remove(group);
+    }
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((email == null) ? 0 : email.hashCode());
+    result = prime * result + ((emailConfirmationToken == null) ? 0 : emailConfirmationToken.hashCode());
+    result = prime * result
+      + ((emailConfirmationTokenExpirationDate == null) ? 0 : emailConfirmationTokenExpirationDate.hashCode());
+    result = prime * result + ((extra == null) ? 0 : extra.hashCode());
+    result = prime * result + ((groups == null) ? 0 : groups.hashCode());
+    result = prime * result + (guest ? 1231 : 1237);
+    result = prime * result + ((ipAddress == null) ? 0 : ipAddress.hashCode());
+    result = prime * result + ((resetPasswordToken == null) ? 0 : resetPasswordToken.hashCode());
+    result = prime * result
+      + ((resetPasswordTokenExpirationDate == null) ? 0 : resetPasswordTokenExpirationDate.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (!super.equals(obj))
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    User other = (User) obj;
+    if (email == null) {
+      if (other.email != null)
+        return false;
+    } else if (!email.equals(other.email))
+      return false;
+    if (emailConfirmationToken == null) {
+      if (other.emailConfirmationToken != null)
+        return false;
+    } else if (!emailConfirmationToken.equals(other.emailConfirmationToken))
+      return false;
+    if (emailConfirmationTokenExpirationDate == null) {
+      if (other.emailConfirmationTokenExpirationDate != null)
+        return false;
+    } else if (!emailConfirmationTokenExpirationDate.equals(other.emailConfirmationTokenExpirationDate))
+      return false;
+    if (extra == null) {
+      if (other.extra != null)
+        return false;
+    } else if (!extra.equals(other.extra))
+      return false;
+    if (groups == null) {
+      if (other.groups != null)
+        return false;
+    } else if (!groups.equals(other.groups))
+      return false;
+    if (guest != other.guest)
+      return false;
+    if (ipAddress == null) {
+      if (other.ipAddress != null)
+        return false;
+    } else if (!ipAddress.equals(other.ipAddress))
+      return false;
+    if (resetPasswordToken == null) {
+      if (other.resetPasswordToken != null)
+        return false;
+    } else if (!resetPasswordToken.equals(other.resetPasswordToken))
+      return false;
+    if (resetPasswordTokenExpirationDate == null) {
+      if (other.resetPasswordTokenExpirationDate != null)
+        return false;
+    } else if (!resetPasswordTokenExpirationDate.equals(other.resetPasswordTokenExpirationDate))
+      return false;
+    return true;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("User [");
+    if (groups != null) {
+      builder.append("groups=");
+      builder.append(groups);
+      builder.append(", ");
+    }
+    if (email != null) {
+      builder.append("email=");
+      builder.append(email);
+      builder.append(", ");
+    }
+    builder.append("guest=");
+    builder.append(guest);
+    builder.append(", ");
+    if (ipAddress != null) {
+      builder.append("ipAddress=");
+      builder.append(ipAddress);
+      builder.append(", ");
+    }
+    if (resetPasswordToken != null) {
+      builder.append("resetPasswordToken=");
+      builder.append(resetPasswordToken);
+      builder.append(", ");
+    }
+    if (resetPasswordTokenExpirationDate != null) {
+      builder.append("resetPasswordTokenExpirationDate=");
+      builder.append(resetPasswordTokenExpirationDate);
+      builder.append(", ");
+    }
+    if (emailConfirmationToken != null) {
+      builder.append("emailConfirmationToken=");
+      builder.append(emailConfirmationToken);
+      builder.append(", ");
+    }
+    if (emailConfirmationTokenExpirationDate != null) {
+      builder.append("emailConfirmationTokenExpirationDate=");
+      builder.append(emailConfirmationTokenExpirationDate);
+      builder.append(", ");
+    }
+    if (extra != null) {
+      builder.append("extra=");
+      builder.append(extra);
+    }
+    builder.append("]");
+    return builder.toString();
+  }
+
 }

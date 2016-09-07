@@ -515,6 +515,9 @@ public class IndexServiceTest {
     EmailAlreadyExistsException, UserAlreadyExistsException, IllegalOperationException, NotFoundException {
     Set<String> groups = new HashSet<String>();
     groups.add("administrators");
+    
+    Set<String> users = new HashSet<String>();
+    users.add("admin");
     Set<String> roles = new HashSet<String>();
     roles.add("browse");
 
@@ -522,26 +525,26 @@ public class IndexServiceTest {
       if (i % 2 == 0) {
         User user = new User();
         user.setActive(true);
-        user.setAllGroups(groups);
         user.setAllRoles(roles);
-        user.setDirectGroups(groups);
         user.setDirectRoles(roles);
-        user.setEmail("mail_" + i + "@example.com");
         user.setGuest(false);
         user.setId("USER" + i);
         user.setName("NAMEUSER" + i);
         user.setFullName("NAMEUSER" + i);
+        
+        user.setEmail("mail_" + i + "@example.com");
+        user.setGroups(groups);
         model.createUser(user, true);
       } else {
         Group group = new Group();
         group.setActive(true);
-        group.setAllGroups(groups);
         group.setAllRoles(roles);
-        group.setDirectGroups(groups);
         group.setDirectRoles(roles);
         group.setId("GROUP" + i);
         group.setName("NAMEGROUP" + i);
         group.setFullName("NAMEGROUP" + i);
+        
+        group.setUsers(users);
         model.createGroup(group, true);
       }
     }
