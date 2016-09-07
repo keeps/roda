@@ -250,11 +250,12 @@ public class BrowserHelper {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     DescriptiveMetadataViewBundle bundle = new DescriptiveMetadataViewBundle();
     bundle.setId(descriptiveMetadata.getId());
+    
     if (descriptiveMetadata.getType() != null) {
       try {
         if (descriptiveMetadata.getVersion() != null) {
           bundle.setLabel(messages.getTranslation(RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX
-            + descriptiveMetadata.getType().toLowerCase() + "." + descriptiveMetadata.getVersion().toLowerCase()));
+            + descriptiveMetadata.getType().toLowerCase() + RodaConstants.METADATA_VERSION_SEPARATOR + descriptiveMetadata.getVersion().toLowerCase()));
         } else {
           bundle.setLabel(messages.getTranslation(RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX
             + descriptiveMetadata.getType().toLowerCase()));
