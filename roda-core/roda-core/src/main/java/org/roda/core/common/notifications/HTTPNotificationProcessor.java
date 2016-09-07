@@ -26,6 +26,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.model.ModelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +45,7 @@ public class HTTPNotificationProcessor implements NotificationProcessor {
   }
 
   @Override
-  public Notification processNotification(Notification notification) throws RODAException {
+  public Notification processNotification(ModelService model, Notification notification) throws RODAException {
     try {
       if (scope.containsKey(JOB_KEY)) {
         Job job = (Job) scope.get(JOB_KEY);

@@ -18,7 +18,6 @@ import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.FormUtilities;
-import org.roda.wui.client.browse.MetadataValue;
 import org.roda.wui.client.browse.UserExtraBundle;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.common.client.ClientLogger;
@@ -431,8 +430,8 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
       email.removeStyleName("isWrong");
       emailError.setVisible(false);
     }
-  
-    valid = valid && FormUtilities.validate(userExtraBundle.getValues(),extra);
+
+    valid = valid && FormUtilities.validate(userExtraBundle.getValues(), extra);
 
     checked = true;
 

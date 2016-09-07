@@ -308,26 +308,44 @@ public class UserManagement extends RodaWuiController {
   // needed.
   // TODO: The methods that call these methods don't have a User either.
   // TODO: From where should the User come from?
-  // return true if notification was sent, false if the mail cannot be sent and the user was activated...
+  // return true if notification was sent, false if the mail cannot be sent and
+  // the user was activated...
   public static Notification sendEmailVerification(String servletPath, String username)
     throws GenericException, NotFoundException {
-    Notification ret;
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     User user = UserManagementHelper.retrieveUser(username);
 
-    if (user == null)
+    if (user == null) {
       throw new NotFoundException("User " + username + " doesn't exist.");
+    }
 
-    if (user.isActive() || user.getEmailConfirmationToken() == null)
+    if (user.isActive() || user.getEmailConfirmationToken() == null) {
       throw new GenericException("User " + username + " is already active or email confirmation token doesn't exist.");
+    }
 
-    ret = sendEmailVerification(servletPath, user);
+    Notification notification = sendEmailVerification(servletPath, user);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "user", user);
-    
-    return ret;
+    controllerAssistant.registerAction(user, getLogEntryState(notification), "user", user);
+
+    return notification;
+  }
+
+  private static LOG_ENTRY_STATE getLogEntryState(final Notification notification) {
+    final LOG_ENTRY_STATE logEntryState;
+    switch (notification.getState()) {
+      case COMPLETED:
+        logEntryState = LOG_ENTRY_STATE.SUCCESS;
+        break;
+      case FAILED:
+        logEntryState = LOG_ENTRY_STATE.FAILURE;
+        break;
+      default:
+        logEntryState = LOG_ENTRY_STATE.UNKNOWN;
+        break;
+    }
+    return logEntryState;
   }
 
   public static void confirmUserEmail(String username, String emailConfirmationToken)
@@ -372,7 +390,7 @@ public class UserManagement extends RodaWuiController {
   }
 
   private static Notification sendEmailVerification(String servletPath, User user) throws GenericException {
-    try{
+    try {
       Notification notification = new Notification();
       notification.setSubject("Registration in RODA");
       notification.setFromUser("RODA Admin");
@@ -393,7 +411,7 @@ public class UserManagement extends RodaWuiController {
       return RodaCoreFactory.getModelService().createNotification(notification,
         new EmailNotificationProcessor(RodaConstants.VERIFICATION_EMAIL_TEMPLATE, scopes));
     } catch (UnsupportedEncodingException e) {
-      throw new GenericException("Error sending email verification: "+e.getMessage(),e);
+      throw new GenericException("Error sending email verification", e);
     }
   }
 

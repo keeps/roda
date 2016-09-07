@@ -890,13 +890,13 @@ public class RodaCoreFactory {
   private static void indexUsersAndGroupsFromLDAP()
     throws LdapUtilityException, GenericException, EmailAlreadyExistsException, UserAlreadyExistsException,
     IllegalOperationException, NotFoundException, AlreadyExistsException {
-    for (User user : UserUtility.getLdapUtility().getUsers(new Filter())) {
+    for (User user : model.listUsers()) {
       LOGGER.debug("User to be indexed: {}", user);
-      RodaCoreFactory.getModelService().notifyUserUpdated(user);
+      model.notifyUserUpdated(user);
     }
-    for (Group group : UserUtility.getLdapUtility().getGroups(new Filter())) {
+    for (Group group : model.listGroups()) {
       LOGGER.debug("Group to be indexed: {}", group);
-      RodaCoreFactory.getModelService().notifyGroupUpdated(group);
+      model.notifyGroupUpdated(group);
     }
   }
 

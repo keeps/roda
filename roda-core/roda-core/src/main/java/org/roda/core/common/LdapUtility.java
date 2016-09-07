@@ -408,7 +408,7 @@ public class LdapUtility {
       return users;
 
     } catch (final LdapException e) {
-      throw new LdapUtilityException("Error getting users - " + e.getMessage(), e);
+      throw new LdapUtilityException("Error getting users", e);
     }
   }
 
@@ -435,7 +435,7 @@ public class LdapUtility {
   }
 
   /**
-   * Returns the {@link User} with name <code>email</code> or <code>null</code>
+   * Returns the {@link User} with email <code>email</code> or <code>null</code>
    * if it doesn't exist.
    *
    * @param email
@@ -684,7 +684,7 @@ public class LdapUtility {
    *           if a Group with the same name already exists.
    * @throws LdapUtilityException
    *           if something goes wrong with the creation of the new group.
-   * @throws GenericException 
+   * @throws GenericException
    */
   public Group addGroup(final Group group) throws GroupAlreadyExistsException, LdapUtilityException, GenericException {
     if (!group.isNameValid()) {
@@ -747,7 +747,7 @@ public class LdapUtility {
    *           if the user is one of the protected users.
    * @throws LdapUtilityException
    *           if some error occurred.
-   * @throws GenericException 
+   * @throws GenericException
    */
   public Group modifyGroup(final Group modifiedGroup)
     throws NotFoundException, IllegalOperationException, LdapUtilityException, GenericException {

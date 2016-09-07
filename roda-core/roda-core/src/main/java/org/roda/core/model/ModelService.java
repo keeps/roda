@@ -1316,9 +1316,18 @@ public class ModelService extends ModelObservable {
   /***************** Users/Groups related *****************/
   /********************************************************/
 
-  public User retrieveUser(String name) throws GenericException {
+  public User retrieveUserByName(String name) throws GenericException {
     try {
       return UserUtility.getLdapUtility().getUser(name);
+    } catch (LdapUtilityException e) {
+      // TODO 20160906 hsilva: change this by a more specific exception
+      throw new GenericException("Unable to retrieve user", e);
+    }
+  }
+
+  public User retrieveUserByEmail(String email) throws GenericException {
+    try {
+      return UserUtility.getLdapUtility().getUserWithEmail(email);
     } catch (LdapUtilityException e) {
       // TODO 20160906 hsilva: change this by a more specific exception
       throw new GenericException("Unable to retrieve user", e);
@@ -2095,13 +2104,13 @@ public class ModelService extends ModelObservable {
     try {
       notification.setId(UUID.randomUUID().toString());
       notification.setAcknowledgeToken(UUID.randomUUID().toString());
-      notification = processor.processNotification(notification);
+      notification = processor.processNotification(this, notification);
       notification.setState(Notification.NOTIFICATION_STATE.COMPLETED);
     } catch (RODAException e) {
       notification.setState(Notification.NOTIFICATION_STATE.FAILED);
-      LOGGER.error("Error processing notification: "+e.getMessage());
+      LOGGER.error("Error processing notification", e);
     }
-    try{
+    try {
       String notificationAsJson = JsonUtils.getJsonFromObject(notification);
       StoragePath notificationPath = ModelUtils.getNotificationStoragePath(notification.getId());
       storage.createBinary(notificationPath, new StringContentPayload(notificationAsJson), false);

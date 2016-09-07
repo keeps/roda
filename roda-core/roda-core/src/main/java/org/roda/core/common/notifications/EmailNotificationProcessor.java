@@ -17,15 +17,15 @@ import java.util.UUID;
 import javax.mail.MessagingException;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ConfigurableEmailUtility;
-import org.roda.core.common.LdapUtilityException;
-import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.model.ModelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +48,7 @@ public class EmailNotificationProcessor implements NotificationProcessor {
   }
 
   @Override
-  public Notification processNotification(Notification notification) throws RODAException {
+  public Notification processNotification(ModelService model, Notification notification) throws RODAException {
     try {
       List<String> recipients = notification.getRecipientUsers();
       String templatePath = RodaCoreFactory.getRodaConfigurationAsString("core", "notification", "template_path");
@@ -68,25 +68,23 @@ public class EmailNotificationProcessor implements NotificationProcessor {
       ConfigurableEmailUtility emailUtility = new ConfigurableEmailUtility(notification.getFromUser(),
         notification.getSubject());
       for (String recipient : recipients) {
-        String modifiedBody = getUpdatedMessageBody(notification, recipient, template, template, scope);
+        String modifiedBody = getUpdatedMessageBody(model, notification, recipient, template, template, scope);
         String host = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "host");
-        if (host != null && !host.equals("")) {
+        if (StringUtils.isNotBlank(host)) {
           LOGGER.debug("Sending email ...");
           emailUtility.sendMail(recipient, modifiedBody);
           LOGGER.debug("Email sent");
         } else {
-          LOGGER.error("SMTP not defined, cannot send emails");
-          throw new RODAException("SMTP not defined, cannot send emails");
+          throw new GenericException("SMTP not defined, cannot send emails");
         }
       }
     } catch (IOException | MessagingException e) {
-      LOGGER.error("Error sending email: "+e.getMessage(),e);
-      throw new RODAException(e);
+      throw new GenericException("Error sending e-mail", e);
     }
     return notification;
   }
 
-  private String getUpdatedMessageBody(Notification notification, String recipient, String template,
+  private String getUpdatedMessageBody(ModelService model, Notification notification, String recipient, String template,
     String templateName, Map<String, Object> scopes) {
 
     // update body message with the recipient user and acknowledge URL
@@ -100,11 +98,11 @@ public class EmailNotificationProcessor implements NotificationProcessor {
     scopes.put("recipient", recipient);
 
     try {
-      User user = UserUtility.getLdapUtility().getUserWithEmail(recipient);
+      User user = model.retrieveUserByEmail(recipient);
       if (user != null) {
         scopes.put("recipient", user.getName());
       }
-    } catch (LdapUtilityException e) {
+    } catch (GenericException e) {
       // do nothing
     }
 

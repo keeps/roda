@@ -9,7 +9,8 @@ package org.roda.core.common.notifications;
 
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.model.ModelService;
 
 public interface NotificationProcessor {
-  public Notification processNotification(Notification notification) throws RODAException;
+  public Notification processNotification(ModelService model, Notification notification) throws RODAException;
 }

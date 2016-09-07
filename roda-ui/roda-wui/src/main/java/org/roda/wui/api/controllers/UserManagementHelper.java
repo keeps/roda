@@ -16,8 +16,6 @@ import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.LdapUtilityException;
-import org.roda.core.common.UserUtility;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
@@ -80,26 +78,16 @@ public class UserManagementHelper {
   }
 
   protected static User retrieveUser(String username) throws GenericException {
-    try {
-      return UserUtility.getLdapUtility().getUser(username);
-    } catch (LdapUtilityException e) {
-      LOGGER.error("Error getting user", e);
-      throw new GenericException("Error getting user: " + e.getMessage());
-    }
+    return RodaCoreFactory.getModelService().retrieveUserByName(username);
   }
 
-  protected static Group retrieveGroup(String groupname)
-    throws AuthorizationDeniedException, GenericException, NotFoundException {
-    return UserUtility.getLdapUtility().getGroup(groupname);
+  protected static Group retrieveGroup(String groupname) throws GenericException, NotFoundException {
+    return RodaCoreFactory.getModelService().retrieveGroup(groupname);
+
   }
 
   protected static List<Group> listAllGroups() throws GenericException {
-    try {
-      return UserUtility.getLdapUtility().getGroups(null);
-    } catch (LdapUtilityException e) {
-      LOGGER.error("Error getting user", e);
-      throw new GenericException("Error getting user: " + e.getMessage());
-    }
+    return RodaCoreFactory.getModelService().listGroups();
   }
 
   public static User registerUser(User user, String password, UserExtraBundle extra)

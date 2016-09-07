@@ -906,7 +906,7 @@ public class ModelServiceTest {
     model.createUser(user, true);
 
     // gen. asserts for user 1
-    User retrievedUser = model.retrieveUser(user.getId());
+    User retrievedUser = model.retrieveUserByName(user.getId());
     Assert.assertNotNull(retrievedUser);
     MatcherAssert.assertThat(retrievedUser.getGroups(), Matchers.containsInAnyOrder(group1.getId(), group2.getId()));
     MatcherAssert.assertThat(retrievedUser.getAllRoles(), Matchers.containsInAnyOrder(ROLE1, ROLE2));
@@ -921,7 +921,7 @@ public class ModelServiceTest {
       // expected
     }
 
-    User retrievedUser2 = model.retrieveUser(user.getId());
+    User retrievedUser2 = model.retrieveUserByName(user.getId());
     Assert.assertNotNull(retrievedUser2);
     MatcherAssert.assertThat(retrievedUser2.getGroups(), Matchers.containsInAnyOrder(group2.getId()));
     MatcherAssert.assertThat(retrievedUser2.getGroups(), Matchers.not(Matchers.containsInAnyOrder(group1.getId())));
