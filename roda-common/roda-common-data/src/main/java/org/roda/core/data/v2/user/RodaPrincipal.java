@@ -11,6 +11,8 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public abstract class RodaPrincipal implements Serializable, RODAMember {
   private static final long serialVersionUID = 8254886345679485761L;
 
@@ -163,6 +165,7 @@ public abstract class RodaPrincipal implements Serializable, RODAMember {
   }
 
   // TODO: implement validation...
+  @JsonIgnore
   public boolean isNameValid() {
     return true;
   }

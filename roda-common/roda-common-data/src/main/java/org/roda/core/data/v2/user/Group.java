@@ -10,6 +10,8 @@ package org.roda.core.data.v2.user;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * This is a group in RODA.
  * 
@@ -51,6 +53,7 @@ public class Group extends RodaPrincipal {
     setUsers(group.getUsers());
   }
 
+  @JsonIgnore
   @Override
   public boolean isUser() {
     return false;

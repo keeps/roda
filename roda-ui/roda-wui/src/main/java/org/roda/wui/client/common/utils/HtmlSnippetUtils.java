@@ -18,6 +18,7 @@ import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.ViewRepresentation;
@@ -129,6 +130,10 @@ public class HtmlSnippetUtils {
     }
   }
 
+  public static SafeHtml getSeverityDefinition(int severity, int lowLimit, int highLimit) {
+    return getSeverityDefinition(getSeverityLevel(severity, lowLimit, highLimit));
+  }
+
   public static SafeHtml getSeverityDefinition(SEVERITY_LEVEL level) {
     SafeHtml ret;
     switch (level) {
@@ -148,8 +153,14 @@ public class HtmlSnippetUtils {
     return ret;
   }
 
-  public static SafeHtml getSeverityDefinition(int severity, int lowLimit, int highLimit) {
-    return getSeverityDefinition(getSeverityLevel(severity, lowLimit, highLimit));
+  public static SafeHtml getStatusDefinition(INCIDENCE_STATUS status) {
+    if (status.equals(INCIDENCE_STATUS.UNMITIGATED)) {
+      return SafeHtmlUtils
+        .fromSafeConstant("<span class='label-danger'>" + messages.riskIncidenceStatusValue(status) + "</span>");
+    } else {
+      return SafeHtmlUtils
+        .fromSafeConstant("<span class='label-success'>" + messages.riskIncidenceStatusValue(status) + "</span>");
+    }
   }
 
   public static void addRiskIncidenceObjectLinks(RiskIncidence incidence, final Label objectLabel,

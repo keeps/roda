@@ -212,7 +212,13 @@ public class EditRiskIncidence extends Composite {
 
       @Override
       public void onSuccess(Void result) {
-        Tools.newHistory(RiskIncidenceRegister.RESOLVER, incidence.getAipId());
+        String aipId = RiskIncidenceRegister.getInstance().getAipId();
+
+        if (aipId == null) {
+          Tools.newHistory(RiskIncidenceRegister.RESOLVER);
+        } else {
+          Tools.newHistory(RiskIncidenceRegister.RESOLVER, incidence.getAipId());
+        }
       }
 
     });

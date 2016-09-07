@@ -17,10 +17,10 @@ import java.util.Set;
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.LdapUtilityException;
-import org.roda.core.common.RodaUtils;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
@@ -69,6 +69,14 @@ public class UserManagementHelper {
   protected static IndexResult<RODAMember> findMembers(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     return RodaCoreFactory.getIndexService().find(RODAMember.class, filter, sorter, sublist, facets);
+  }
+
+  protected static IndexResult<RODAMember> findMembers(boolean isUser)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
+    Filter filter = new Filter();
+    filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, Boolean.toString(isUser)));
+    int memberCounter = RodaCoreFactory.getIndexService().count(RODAMember.class, filter).intValue();
+    return RodaCoreFactory.getIndexService().find(RODAMember.class, filter, Sorter.NONE, new Sublist(0, memberCounter));
   }
 
   protected static User retrieveUser(String username) throws GenericException {
@@ -139,17 +147,19 @@ public class UserManagementHelper {
       String rawTemplate = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
       Template tmpl = handlebars.compileInline(rawTemplate);
 
-      Set<MetadataValue> values = extra.getValues();
-      if (values != null) {
-        values.forEach(metadataValue -> {
-          String val = metadataValue.get("value");
-          if (val != null) {
-            val = val.replaceAll("\\s", "");
-            if (!"".equals(val)) {
-              data.put(metadataValue.get("name"), metadataValue.get("value"));
+      if (extra != null) {
+        Set<MetadataValue> values = extra.getValues();
+        if (values != null) {
+          values.forEach(metadataValue -> {
+            String val = metadataValue.get("value");
+            if (val != null) {
+              val = val.replaceAll("\\s", "");
+              if (!"".equals(val)) {
+                data.put(metadataValue.get("name"), metadataValue.get("value"));
+              }
             }
-          }
-        });
+          });
+        }
       }
 
       String result = tmpl.apply(data);

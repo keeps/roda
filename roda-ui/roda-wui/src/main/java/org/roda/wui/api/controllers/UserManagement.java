@@ -128,6 +128,22 @@ public class UserManagement extends RodaWuiController {
     return ret;
   }
 
+  public static IndexResult<RODAMember> findMembers(User user, boolean isUser)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    IndexResult<RODAMember> ret = UserManagementHelper.findMembers(isUser);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "isUser", isUser);
+
+    return ret;
+  }
+
   public static User retrieveUser(User user, String username)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};

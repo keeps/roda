@@ -164,6 +164,7 @@ public final class RodaConstants {
   public static final String API_PATH_PARAM_RISK_ID = "risk_id";
   public static final String API_PATH_PARAM_RISK_INCIDENCE_ID = "risk_incidence_id";
   public static final String API_PATH_PARAM_PART = "part";
+  public static final String API_PATH_PARAM_NAME = "name";
 
   public static final String API_QUERY_PARAM_ID = "id";
   public static final String API_QUERY_PARAM_VERSION_ID = "version_id";
@@ -178,6 +179,7 @@ public final class RodaConstants {
   public static final String API_QUERY_PARAM_METADATA_VERSION = "metadataVersion";
   public static final String API_QUERY_PARAM_RISK_MESSAGE = "message";
   public static final String API_QUERY_PARAM_TEMPLATE = "template";
+  public static final String API_QUERY_PARAM_PASSWORD = "password";
   public static final String API_PARAM_FILE = "file";
   // http headers used
   public static final String API_HTTP_HEADER_ACCEPT = "Accept";
@@ -197,9 +199,14 @@ public final class RodaConstants {
   public static final String API_DELETE_MEDIA_TYPES = "json, xml";
   public static final String API_GET_DESCRIPTIVE_METADATA_MEDIA_TYPES = "json, xml, html, bin";
   public static final String API_DESCRIPTIVE_METADATA_LANGUAGES = "pt_PT, en_US";
+
   public static final String API_GET_REPORTS_ID_OBJECT = "transferred_resource, sip";
   public static final String API_GET_REPORTS_ID_OBJECT_RESOURCE = "transferred_resource";
   public static final String API_GET_REPORTS_ID_OBJECT_SIP = "sip";
+
+  public static final String API_USER_OR_GROUP_MEMBER = "user, group";
+  public static final String API_USER_MEMBER = "user";
+  public static final String API_GROUP_MEMBER = "group";
 
   /*
    * Controllers related

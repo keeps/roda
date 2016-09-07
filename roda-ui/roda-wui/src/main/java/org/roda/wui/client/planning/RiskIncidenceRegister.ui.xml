@@ -16,10 +16,10 @@
 	<g:FlowPanel styleName="wui-risk-register" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1" ui:field="riskRegisterTitle">
-					<ui:text from='{messages.riskRegisterTitle}' />
+				<g:Label styleName="h1" ui:field="riskIncidenceRegisterTitle">
+					<ui:text from='{messages.riskIncidenceRegisterTitle}' />
 				</g:Label>
-				<g:FlowPanel addStyleNames="page-description" ui:field="riskRegisterDescription">
+				<g:FlowPanel addStyleNames="page-description" ui:field="riskIncidenceRegisterDescription">
 				</g:FlowPanel>
 				<commonsearch:SearchPanel ui:field="searchPanel" />
 				<lists:RiskIncidenceList addStyleNames="searchResults"

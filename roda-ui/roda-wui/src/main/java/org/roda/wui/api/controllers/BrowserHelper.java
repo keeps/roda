@@ -123,6 +123,7 @@ import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationReport;
@@ -1910,6 +1911,8 @@ public class BrowserHelper {
       return new org.roda.core.data.v2.log.LogEntries((List<LogEntry>) result.getResults());
     } else if (objectClass.equals(RiskIncidence.class)) {
       return new org.roda.core.data.v2.risks.RiskIncidences((List<RiskIncidence>) result.getResults());
+    } else if (objectClass.equals(RODAMember.class)) {
+      return new org.roda.core.data.v2.user.RODAMembers((List<RODAMember>) result.getResults());
     } else {
       throw new GenericException("Unsupported object class: " + objectClass);
     }

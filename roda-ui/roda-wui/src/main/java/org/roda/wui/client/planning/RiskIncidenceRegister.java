@@ -102,10 +102,10 @@ public class RiskIncidenceRegister extends Composite {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
-  Label riskRegisterTitle;
+  Label riskIncidenceRegisterTitle;
 
   @UiField
-  FlowPanel riskRegisterDescription;
+  FlowPanel riskIncidenceRegisterDescription;
 
   @UiField(provided = true)
   SearchPanel searchPanel;
@@ -127,6 +127,8 @@ public class RiskIncidenceRegister extends Composite {
 
   private static final Filter DEFAULT_FILTER = new Filter(
     new BasicSearchFilterParameter(RodaConstants.RISK_SEARCH, "*"));
+
+  private String aipId = null;
 
   /**
    * Create a risk register page
@@ -179,7 +181,7 @@ public class RiskIncidenceRegister extends Composite {
     });
 
     initWidget(uiBinder.createAndBindUi(this));
-    riskRegisterDescription.add(new HTMLWidgetWrapper("RiskIncidenceRegisterDescription.html"));
+    riskIncidenceRegisterDescription.add(new HTMLWidgetWrapper("RiskIncidenceRegisterDescription.html"));
     buttonRemove.setEnabled(false);
 
     DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
@@ -217,6 +219,7 @@ public class RiskIncidenceRegister extends Composite {
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 0) {
+      setAipId(null);
       riskIncidenceList.setFilter(Filter.ALL);
       riskIncidenceList.refresh();
       callback.onSuccess(this);
@@ -228,6 +231,7 @@ public class RiskIncidenceRegister extends Composite {
       EditRiskIncidence.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else if (historyTokens.size() == 1) {
       final String aipId = historyTokens.get(0);
+      setAipId(aipId);
       riskIncidenceList.setFilter(new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, aipId)));
       riskIncidenceList.refresh();
       callback.onSuccess(this);
@@ -235,6 +239,14 @@ public class RiskIncidenceRegister extends Composite {
       Tools.newHistory(RESOLVER);
       callback.onSuccess(null);
     }
+  }
+
+  public String getAipId() {
+    return aipId;
+  }
+
+  public void setAipId(String id) {
+    aipId = id;
   }
 
 }
