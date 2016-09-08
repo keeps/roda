@@ -1039,13 +1039,12 @@ public class Browse extends Composite {
       }
     } else {
       // Move all selected
-      Filter filter;
+      Filter filter = new Filter();
       boolean showEmptyParentButton;
       if (aipId != null) {
         filter = new Filter(new NotSimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aipId));
         showEmptyParentButton = true;
       } else {
-        filter = new Filter();
         showEmptyParentButton = false;
       }
 

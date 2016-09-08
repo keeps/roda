@@ -21,14 +21,19 @@ import org.roda.core.data.adapter.facet.SimpleFacetParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.CreateJob;
+import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
+import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.search.MainSearch;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.common.client.ClientLogger;
@@ -127,7 +132,7 @@ public class Search extends Composite {
   Button newJobButton;
 
   @UiField(provided = true)
-  Button moveItem;
+  Button moveItem, remove;
 
   boolean justActive = true;
   boolean itemsSelectable = true;
@@ -147,6 +152,7 @@ public class Search extends Composite {
 
     newJobButton = new Button();
     moveItem = new Button();
+    remove = new Button();
 
     // Define facets and facets panels
     Map<FacetParameter, FlowPanel> itemsFacetsMap = new HashMap<FacetParameter, FlowPanel>();
@@ -175,6 +181,11 @@ public class Search extends Composite {
     List<Button> filesSelectionButtons = new ArrayList<>();
 
     itemsSelectionButtons.add(moveItem);
+
+    itemsSelectionButtons.add(remove);
+    representationsSelectionButtons.add(remove);
+    filesSelectionButtons.add(remove);
+
     itemsSelectionButtons.add(newJobButton);
     representationsSelectionButtons.add(newJobButton);
     filesSelectionButtons.add(newJobButton);
@@ -270,6 +281,85 @@ public class Search extends Composite {
       }
     });
 
+  }
+
+  @UiHandler("remove")
+  <T extends IsIndexed> void buttonRemoveHandler(ClickEvent e) {
+    final SelectedItems<T> selected = (SelectedItems<T>) getSelected();
+    final String selectedClass = getSelected().getSelectedClass();
+
+    if (!SelectedItemsUtils.isEmpty(selected)) {
+
+      Dialogs.showConfirmDialog(messages.ingestTransferRemoveFolderConfirmDialogTitle(),
+        messages.ingestTransferRemoveAllSelectedConfirmDialogMessage(),
+        messages.ingestTransferRemoveFolderConfirmDialogCancel(), messages.ingestTransferRemoveFolderConfirmDialogOk(),
+        new AsyncCallback<Boolean>() {
+
+          @Override
+          public void onSuccess(Boolean confirmed) {
+            if (confirmed) {
+              if (IndexedAIP.class.getName().equals(selectedClass)) {
+                final SelectedItems<IndexedAIP> aips = (SelectedItems<IndexedAIP>) selected;
+                BrowserService.Util.getInstance().deleteAIP(aips, new LoadingAsyncCallback<String>() {
+
+                  @Override
+                  public void onFailureImpl(Throwable caught) {
+                    AsyncCallbackUtils.defaultFailureTreatment(caught);
+                    mainSearch.refresh();
+                  }
+
+                  @Override
+                  public void onSuccessImpl(String parentId) {
+                    Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
+                      messages.ingestTransferRemoveAllSuccessMessage());
+                    mainSearch.refresh();
+                  }
+                });
+              } else if (IndexedRepresentation.class.getName().equals(selectedClass)) {
+                final SelectedItems<IndexedRepresentation> reps = (SelectedItems<IndexedRepresentation>) selected;
+                BrowserService.Util.getInstance().deleteRepresentation(reps, new LoadingAsyncCallback<Void>() {
+
+                  @Override
+                  public void onFailureImpl(Throwable caught) {
+                    AsyncCallbackUtils.defaultFailureTreatment(caught);
+                    mainSearch.refresh();
+                  }
+
+                  @Override
+                  public void onSuccessImpl(Void returned) {
+                    Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
+                      messages.ingestTransferRemoveAllSuccessMessage());
+                    mainSearch.refresh();
+                  }
+                });
+              } else if (IndexedFile.class.getName().equals(selectedClass)) {
+                final SelectedItems<IndexedFile> files = (SelectedItems<IndexedFile>) selected;
+                BrowserService.Util.getInstance().deleteFile(files, new LoadingAsyncCallback<Void>() {
+
+                  @Override
+                  public void onFailureImpl(Throwable caught) {
+                    AsyncCallbackUtils.defaultFailureTreatment(caught);
+                    mainSearch.refresh();
+                  }
+
+                  @Override
+                  public void onSuccessImpl(Void returned) {
+                    Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
+                      messages.ingestTransferRemoveAllSuccessMessage());
+                    mainSearch.refresh();
+                  }
+                });
+              }
+            }
+          }
+
+          @Override
+          public void onFailure(Throwable caught) {
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
+          }
+        });
+
+    }
   }
 
 }

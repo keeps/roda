@@ -777,6 +777,34 @@ public class Browser extends RodaWuiController {
     return parentId;
   }
 
+  public static void deleteRepresentation(User user, SelectedItems<IndexedRepresentation> representations)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    BrowserHelper.deleteRepresentation(representations, user);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "selected", representations);
+  }
+
+  public static void deleteFile(User user, SelectedItems<IndexedFile> files)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    BrowserHelper.deleteFile(files, user);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "selected", files);
+  }
+
   public static DescriptiveMetadata createDescriptiveMetadataFile(User user, String aipId, String metadataId,
     String metadataType, String metadataVersion, ContentPayload metadataPayload) throws AuthorizationDeniedException,
     GenericException, ValidationException, NotFoundException, RequestNotValidException, AlreadyExistsException {

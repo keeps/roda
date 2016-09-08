@@ -27,6 +27,8 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.risks.Risk;
@@ -96,6 +98,13 @@ public class RiskIncidenceRemoverPlugin<T extends IsRODAObject> extends Abstract
           } else if (object instanceof Risk) {
             Risk risk = (Risk) object;
             filter.add(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISK_ID, risk.getId()));
+          } else if (object instanceof Representation) {
+            Representation representation = (Representation) object;
+            filter
+              .add(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, representation.getId()));
+          } else if (object instanceof File) {
+            File file = (File) object;
+            filter.add(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_FILE_ID, file.getId()));
           }
         }
 
@@ -180,6 +189,8 @@ public class RiskIncidenceRemoverPlugin<T extends IsRODAObject> extends Abstract
     List<Class<? extends IsRODAObject>> list = new ArrayList<>();
     list.add(AIP.class);
     list.add(Risk.class);
+    list.add(Representation.class);
+    list.add(File.class);
     return (List) list;
   }
 }

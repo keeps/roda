@@ -251,12 +251,13 @@ public class BrowserHelper {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     DescriptiveMetadataViewBundle bundle = new DescriptiveMetadataViewBundle();
     bundle.setId(descriptiveMetadata.getId());
-    
+
     if (descriptiveMetadata.getType() != null) {
       try {
         if (descriptiveMetadata.getVersion() != null) {
-          bundle.setLabel(messages.getTranslation(RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX
-            + descriptiveMetadata.getType().toLowerCase() + RodaConstants.METADATA_VERSION_SEPARATOR + descriptiveMetadata.getVersion().toLowerCase()));
+          bundle.setLabel(messages.getTranslation(
+            RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX + descriptiveMetadata.getType().toLowerCase()
+              + RodaConstants.METADATA_VERSION_SEPARATOR + descriptiveMetadata.getVersion().toLowerCase()));
         } else {
           bundle.setLabel(messages.getTranslation(RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX
             + descriptiveMetadata.getType().toLowerCase()));
@@ -1052,7 +1053,6 @@ public class BrowserHelper {
       LOGGER.error("Could not delete AIP associated incidences");
     }
 
-    // removeIncidencesOfAIPs(selected, user);
     String parentId = null;
 
     for (String aipId : aipIds) {
@@ -1079,6 +1079,59 @@ public class BrowserHelper {
 
     RodaCoreFactory.getIndexService().commitAIPs();
     return parentId;
+  }
+
+  public static void deleteRepresentation(SelectedItems<IndexedRepresentation> selected, User user)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    List<String> representationIds = consolidate(user, IndexedRepresentation.class, selected);
+
+    try {
+      Job job = new Job();
+      job.setName(RiskIncidenceRemoverPlugin.class.getSimpleName() + " " + job.getStartDate());
+      job.setPlugin(RiskIncidenceRemoverPlugin.class.getName());
+      job.setSourceObjects(SelectedItemsList.create(IndexedRepresentation.class, representationIds));
+      Jobs.createJob(user, job);
+    } catch (JobAlreadyStartedException e) {
+      LOGGER.error("Could not delete representation associated incidences");
+    }
+
+    Filter filter = new Filter();
+    filter.add(new OneOfManyFilterParameter(RodaConstants.REPRESENTATION_UUID, representationIds));
+    IndexResult<IndexedRepresentation> reps = RodaCoreFactory.getIndexService().find(IndexedRepresentation.class,
+      filter, Sorter.NONE, new Sublist(0, representationIds.size()));
+
+    for (IndexedRepresentation rep : reps.getResults()) {
+      RodaCoreFactory.getModelService().deleteRepresentation(rep.getAipId(), rep.getId());
+    }
+
+    RodaCoreFactory.getIndexService().commit(IndexedRepresentation.class);
+  }
+
+  public static void deleteFile(SelectedItems<IndexedFile> selected, User user)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    List<String> fileIds = consolidate(user, IndexedFile.class, selected);
+
+    try {
+      Job job = new Job();
+      job.setName(RiskIncidenceRemoverPlugin.class.getSimpleName() + " " + job.getStartDate());
+      job.setPlugin(RiskIncidenceRemoverPlugin.class.getName());
+      job.setSourceObjects(SelectedItemsList.create(IndexedFile.class, fileIds));
+      Jobs.createJob(user, job);
+    } catch (JobAlreadyStartedException e) {
+      LOGGER.error("Could not delete file associated incidences");
+    }
+
+    Filter filter = new Filter();
+    filter.add(new OneOfManyFilterParameter(RodaConstants.FILE_UUID, fileIds));
+    IndexResult<IndexedFile> files = RodaCoreFactory.getIndexService().find(IndexedFile.class, filter, Sorter.NONE,
+      new Sublist(0, fileIds.size()));
+
+    for (IndexedFile file : files.getResults()) {
+      RodaCoreFactory.getModelService().deleteFile(file.getAipId(), file.getRepresentationId(), file.getPath(),
+        file.getId(), true);
+    }
+
+    RodaCoreFactory.getIndexService().commit(IndexedFile.class);
   }
 
   public static String deleteAIPRepresentations(SelectedItems<IndexedAIP> selected, User user)
@@ -2479,9 +2532,9 @@ public class BrowserHelper {
   }
 
   public static UserExtraBundle retrieveUserExtraBundle(String name) {
-    if(!RodaConstants.SYSTEM_USERS.contains(name)){
+    if (!RodaConstants.SYSTEM_USERS.contains(name)) {
       String template = null;
-  
+
       InputStream templateStream = RodaCoreFactory
         .getConfigurationFileAsStream(RodaConstants.USERS_TEMPLATE_FOLDER + "/user_extra.xml.hbs");
       try {
@@ -2489,16 +2542,16 @@ public class BrowserHelper {
       } catch (IOException e1) {
         LOGGER.error("Error getting template from stream");
       }
-  
+
       Set<MetadataValue> values = new HashSet<>();
       if (template != null) {
         values = ServerTools.transform(template);
       }
-  
+
       try {
         User user = UserUtility.getLdapUtility().getUser(name);
         String userExtra = user.getExtra();
-  
+
         if (values != null && userExtra != null) {
           for (MetadataValue mv : values) {
             // clear the auto-generated values
@@ -2523,13 +2576,13 @@ public class BrowserHelper {
             }
           }
         }
-  
+
       } catch (LdapUtilityException e) {
         // do nothing
       }
-  
+
       return new UserExtraBundle(name, values);
-    }else{
+    } else {
       return new UserExtraBundle(name, new HashSet<>());
     }
   }

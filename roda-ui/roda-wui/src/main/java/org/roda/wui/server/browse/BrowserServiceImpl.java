@@ -322,6 +322,20 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
+  public void deleteRepresentation(SelectedItems<IndexedRepresentation> representations)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Browser.deleteRepresentation(user, representations);
+  }
+
+  @Override
+  public void deleteFile(SelectedItems<IndexedFile> files)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Browser.deleteFile(user, files);
+  }
+
+  @Override
   public void createDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     AlreadyExistsException, ValidationException {

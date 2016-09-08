@@ -292,6 +292,8 @@ public interface ClientMessages extends Messages {
 
   String ingestTransferRemoveFolderConfirmDialogMessage(String folderName);
 
+  String ingestTransferRemoveAllSelectedConfirmDialogMessage();
+
   String ingestTransferRemoveSelectedConfirmDialogMessage(Long size);
 
   String ingestTransferRemoveFolderConfirmDialogCancel();
@@ -299,6 +301,8 @@ public interface ClientMessages extends Messages {
   String ingestTransferRemoveFolderConfirmDialogOk();
 
   String ingestTransferRemoveSuccessTitle();
+
+  String ingestTransferRemoveAllSuccessMessage();
 
   String ingestTransferRemoveSuccessMessage(Long size);
 
@@ -1693,7 +1697,7 @@ public interface ClientMessages extends Messages {
   String groupName();
 
   String groupFullname();
-  
+
   String groupUsers();
 
   String groupDataNote();

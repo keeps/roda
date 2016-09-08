@@ -65,6 +65,9 @@
 					<g:Button addStyleNames="btn btn-edit" ui:field="moveItem">
 						<ui:text from='{messages.moveArchivalPackage}' />
 					</g:Button>
+					<g:Button addStyleNames="btn btn-danger btn-ban" ui:field="remove">
+						<ui:text from='{messages.removeArchivalPackage}' />
+					</g:Button>
 					<g:Button addStyleNames="btn btn-play" ui:field="newJobButton">
 						<ui:text from='{messages.newProcessPreservation}' />
 					</g:Button>

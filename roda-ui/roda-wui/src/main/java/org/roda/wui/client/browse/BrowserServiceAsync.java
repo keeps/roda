@@ -66,6 +66,10 @@ public interface BrowserServiceAsync {
 
   void deleteAIP(SelectedItems<IndexedAIP> aips, AsyncCallback<String> callback);
 
+  void deleteRepresentation(SelectedItems<IndexedRepresentation> representations, AsyncCallback<Void> callback);
+
+  void deleteFile(SelectedItems<IndexedFile> representations, AsyncCallback<Void> callback);
+
   void updateDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle, AsyncCallback<Void> callback);
 
   void deleteDescriptiveMetadataFile(String itemId, String descriptiveMetadataId, AsyncCallback<Void> callback);

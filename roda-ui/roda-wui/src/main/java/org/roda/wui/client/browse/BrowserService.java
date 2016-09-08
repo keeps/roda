@@ -87,7 +87,8 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String descId, String type,
-    String version, String localeString) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
+    String version, String localeString)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
   DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String descId, String localeString)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
@@ -102,6 +103,12 @@ public interface BrowserService extends RemoteService {
     NotFoundException, RequestNotValidException, AlreadyExistsException;
 
   String deleteAIP(SelectedItems<IndexedAIP> aips)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
+
+  void deleteRepresentation(SelectedItems<IndexedRepresentation> representations)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
+
+  void deleteFile(SelectedItems<IndexedFile> files)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   void deleteDescriptiveMetadataFile(String itemId, String descriptiveMetadataId)
