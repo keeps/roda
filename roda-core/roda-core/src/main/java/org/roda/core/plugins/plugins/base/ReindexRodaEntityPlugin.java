@@ -43,13 +43,13 @@ import org.slf4j.LoggerFactory;
 
 public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(ReindexRodaEntityPlugin.class);
-  private boolean clearIndexes = true;
+  private boolean clearIndexes = false;
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "Clear indexes", PluginParameterType.BOOLEAN,
-        "true", false, false, "Clear all indexes before reindexing them."));
+        "false", false, false, "Clear all indexes before reindexing them."));
   }
 
   @Override
@@ -151,16 +151,17 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    LOGGER.debug("Optimizing indexes");
+    if (clearIndexes) {
+      LOGGER.debug("Optimizing indexes");
 
-    try {
-      Job job = PluginHelper.getJob(this, index);
-      Class selectedClass = Class.forName(job.getSourceObjects().getSelectedClass());
-      index.optimizeIndexes(SolrUtils.getIndexName(selectedClass));
-    } catch (GenericException | NotFoundException | ClassNotFoundException e) {
-      throw new PluginException("Error optimizing index", e);
+      try {
+        Job job = PluginHelper.getJob(this, index);
+        Class selectedClass = Class.forName(job.getSourceObjects().getSelectedClass());
+        index.optimizeIndexes(SolrUtils.getIndexName(selectedClass));
+      } catch (GenericException | NotFoundException | ClassNotFoundException e) {
+        throw new PluginException("Error optimizing index", e);
+      }
     }
-
     return new Report();
   }
 

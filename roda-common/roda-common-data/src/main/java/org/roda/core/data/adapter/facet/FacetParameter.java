@@ -12,20 +12,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({@Type(value = SimpleFacetParameter.class, name = "SimpleFacetParameter"),
   @Type(value = RangeFacetParameter.class, name = "RangeFacetParameter")})
 public abstract class FacetParameter implements Serializable {
   private static final long serialVersionUID = 4927529408810091855L;
-
   public static final int DEFAULT_MIN_COUNT = 1;
+  public static final SORT DEFAULT_SORT = SORT.INDEX;
+
+  public enum SORT {
+    INDEX, COUNT;
+  }
 
   private String name;
   private List<String> values;
   private int minCount = DEFAULT_MIN_COUNT;
+  private SORT sort = DEFAULT_SORT;
 
   public FacetParameter() {
     this(null);
@@ -44,6 +49,11 @@ public abstract class FacetParameter implements Serializable {
     this.name = name;
     this.values = values;
     this.minCount = minCount;
+  }
+
+  public FacetParameter(final String name, final List<String> values, final int minCount, SORT sort) {
+    this(name, values, minCount);
+    this.sort = sort;
   }
 
   public String getName() {
@@ -70,7 +80,16 @@ public abstract class FacetParameter implements Serializable {
     this.minCount = minCount;
   }
 
+  public SORT getSort() {
+    return sort;
+  }
+
+  public void setSort(SORT sort) {
+    this.sort = sort;
+  }
+
+  @Override
   public String toString() {
-    return "FacetParameter [name=" + name + ", values=" + this.values + "]";
+    return "FacetParameter [name=" + name + ", values=" + values + ", minCount=" + minCount + ", sort=" + sort + "]";
   }
 }

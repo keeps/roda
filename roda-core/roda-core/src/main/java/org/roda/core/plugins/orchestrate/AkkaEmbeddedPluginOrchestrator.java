@@ -39,6 +39,7 @@ import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginOrchestrator;
@@ -122,25 +123,26 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public <T extends IsIndexed> void runPluginFromIndex(Object context, Class<T> classToActOn, Filter filter,
-    Plugin<T> plugin) {
+  public <T extends IsRODAObject, T1 extends IsIndexed> void runPluginFromIndex(Object context, Class<T1> classToActOn,
+    Filter filter, Plugin<T> plugin) {
     try {
       LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
       ActorRef jobStateInfoActor = (ActorRef) context;
       int blockSize = JobsHelper.getBlockSize();
-      IndexResult<T> find;
+      IndexResult<T1> find;
       int offset = 0;
       Plugin<T> innerPlugin;
+      Class<T> modelClassToActOn = (Class<T>) ModelUtils.giveRespectiveModelClass(classToActOn);
 
       jobStateInfoActor.tell(new Messages.PluginBeforeAllExecuteIsReady<>(plugin), ActorRef.noSender());
 
       do {
         find = RodaCoreFactory.getIndexService().find(classToActOn, filter, Sorter.NONE,
           new Sublist(offset, blockSize));
-        innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, classToActOn, (int) find.getLimit());
+        innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, modelClassToActOn, (int) find.getLimit());
         offset += find.getLimit();
-        jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, find.getResults()),
-          ActorRef.noSender());
+        List<T> objects = JobsHelper.getObjectsFromIndexObjects(model, index, modelClassToActOn, find.getResults());
+        jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, objects), ActorRef.noSender());
 
       } while (find.getTotalCount() > find.getOffset() + find.getLimit());
 
@@ -160,7 +162,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
       ActorRef jobStateInfoActor = (ActorRef) context;
       int blockSize = JobsHelper.getBlockSize();
-      List<T> objects = JobsHelper.getObjects(model, index, objectClass, uuids);
+      List<T> objects = JobsHelper.getObjectsFromUUID(model, index, objectClass, uuids);
       Iterator<T> iter = objects.iterator();
       Plugin<T> innerPlugin;
 

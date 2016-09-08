@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.filter.Filter;
@@ -204,7 +205,7 @@ public final class JobsHelper {
     throws NotFoundException, GenericException {
     List<TransferredResource> ret = index.retrieve(TransferredResource.class, uuids);
     if (ret.isEmpty()) {
-      throw new NotFoundException("Could not retrive the Transferred Resources");
+      throw new NotFoundException("Could not retrieve the Transferred Resources");
     }
     return ret;
   }
@@ -230,55 +231,70 @@ public final class JobsHelper {
 
   public static List<Representation> getRepresentations(ModelService model, IndexService index, List<String> uuids)
     throws NotFoundException {
-    List<Representation> representationsToReturn = new ArrayList<>();
 
     if (!uuids.isEmpty()) {
       try {
         List<IndexedRepresentation> retrieve = index.retrieve(IndexedRepresentation.class, uuids);
 
-        for (IndexedRepresentation indexedRepresentation : retrieve) {
-          representationsToReturn
-            .add(model.retrieveRepresentation(indexedRepresentation.getAipId(), indexedRepresentation.getId()));
+        List<Representation> representationsToReturn = getRepresentationFromList(model, retrieve);
+
+        if (representationsToReturn.isEmpty()) {
+          throw new NotFoundException("Could not retrieve the Representations");
         }
 
+        return representationsToReturn;
       } catch (RODAException | RuntimeException e) {
         LOGGER.error("Error while retrieving representations from index", e);
       }
     }
 
-    if (representationsToReturn.isEmpty()) {
-      throw new NotFoundException("Could not retrive the Representations");
-    }
+    throw new NotFoundException("Could not retrieve the Representations");
+  }
 
+  private static List<Representation> getRepresentationFromList(ModelService model,
+    List<IndexedRepresentation> retrieve)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    List<Representation> representationsToReturn = new ArrayList<>();
+    for (IndexedRepresentation indexedRepresentation : retrieve) {
+      representationsToReturn
+        .add(model.retrieveRepresentation(indexedRepresentation.getAipId(), indexedRepresentation.getId()));
+    }
     return representationsToReturn;
   }
 
   public static List<File> getFiles(ModelService model, IndexService index, List<String> uuids)
     throws NotFoundException {
-    List<File> filesToReturn = new ArrayList<>();
-
     if (!uuids.isEmpty()) {
       try {
         List<IndexedFile> retrieve = index.retrieve(IndexedFile.class, uuids);
 
-        for (IndexedFile indexedFile : retrieve) {
-          filesToReturn.add(model.retrieveFile(indexedFile.getAipId(), indexedFile.getRepresentationId(),
-            indexedFile.getPath(), indexedFile.getId()));
+        List<File> filesToReturn = getFilesFromList(model, retrieve);
+
+        if (filesToReturn.isEmpty()) {
+          throw new NotFoundException("Could not retrieve the Files");
         }
+
+        return filesToReturn;
 
       } catch (RODAException | RuntimeException e) {
         LOGGER.error("Error while retrieving files from index", e);
       }
     }
 
-    if (filesToReturn.isEmpty()) {
-      throw new NotFoundException("Could not retrive the Files");
-    }
+    throw new NotFoundException("Could not retrieve the Files");
+  }
 
+  private static List<File> getFilesFromList(ModelService model, List<IndexedFile> retrieve)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    List<File> filesToReturn = new ArrayList<>();
+    for (IndexedFile indexedFile : retrieve) {
+      filesToReturn.add(model.retrieveFile(indexedFile.getAipId(), indexedFile.getRepresentationId(),
+        indexedFile.getPath(), indexedFile.getId()));
+    }
     return filesToReturn;
   }
 
-  public static <T extends IsRODAObject> List<T> getObjects(ModelService model, IndexService index,
+  public static <T extends IsRODAObject> List<T> getObjectsFromUUID(ModelService model, IndexService index,
     Class<T> objectClass, List<String> uuids) throws NotFoundException, GenericException {
     if (AIP.class.equals(objectClass)) {
       return (List<T>) getAIPs(model, index, uuids);
@@ -291,11 +307,25 @@ public final class JobsHelper {
     }
   }
 
+  public static <T extends IsRODAObject, T1 extends IsIndexed> List<T> getObjectsFromIndexObjects(ModelService model,
+    IndexService index, Class<T> objectClass, List<T1> indexObjects)
+    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    if (AIP.class.equals(objectClass)) {
+      return (List<T>) getAIPs(model, index, indexObjects.stream().map(e -> e.getUUID()).collect(Collectors.toList()));
+    } else if (Representation.class.equals(objectClass)) {
+      return (List<T>) getRepresentationFromList(model, (List<IndexedRepresentation>) indexObjects);
+    } else if (File.class.equals(objectClass)) {
+      return (List<T>) getFilesFromList(model, (List<IndexedFile>) indexObjects);
+    } else {
+      return (List<T>) indexObjects;
+    }
+  }
+
   public static <T extends IsRODAObject> List<T> getObjectsFromIndex(IndexService index, Class<T> objectClass,
     List<String> uuids) throws NotFoundException, GenericException {
     List<T> ret = (List<T>) index.retrieve((Class<IsIndexed>) objectClass, uuids);
     if (ret.isEmpty()) {
-      throw new NotFoundException("Could not retrive the " + objectClass.getSimpleName());
+      throw new NotFoundException("Could not retrieve the " + objectClass.getSimpleName());
     }
     return ret;
   }
@@ -382,6 +412,9 @@ public final class JobsHelper {
         Job job = new Job();
         job.setId(UUID.randomUUID().toString());
         job.setName(ReindexRodaEntityPlugin.class.getSimpleName() + " (" + clazz.getSimpleName() + ")");
+        Map<String, String> pluginParameters = new HashMap<>();
+        pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "true");
+        job.setPluginParameters(pluginParameters);
         if (LogEntry.class.equals(clazz)) {
           job.setPlugin(ReindexActionLogPlugin.class.getName());
         } else {

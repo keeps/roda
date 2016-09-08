@@ -14,6 +14,7 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,11 +94,11 @@ public class CommandUtility {
       // Get process exit value
       exitValue = process.waitFor();
 
-      // Closing streams in the hopes of fixing error
-      // "java.io.IOException: Too many open files" in roda-migrator
-      is.close();
+      IOUtils.closeQuietly(is);
 
-      LOGGER.debug("Command {} terminated with value {}", Arrays.toString(args), exitValue);
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Command {} terminated with value {}", Arrays.toString(args), exitValue);
+      }
 
       if (exitValue == 0) {
         return output.toString();
@@ -106,14 +107,10 @@ public class CommandUtility {
           exitValue, output);
       }
 
-    } catch (IOException e) {
-
-      LOGGER.debug("Error executing command " + Arrays.toString(args) + " - " + e.getMessage(), e);
-      throw new CommandException("Error executing command " + Arrays.toString(args) + " - " + e.getMessage(), e);
-
-    } catch (InterruptedException e) {
-
-      LOGGER.debug("Error executing command " + Arrays.toString(args) + " - " + e.getMessage(), e);
+    } catch (IOException | InterruptedException e) {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Error executing command {}", Arrays.toString(args), e);
+      }
       throw new CommandException("Error executing command " + Arrays.toString(args) + " - " + e.getMessage(), e);
     }
   }
@@ -160,12 +157,12 @@ class CaptureOutputThread extends Thread {
       String line = null;
 
       while ((line = reader.readLine()) != null) {
-        outputBuffer.append(line + "\n");
+        outputBuffer.append(line + System.lineSeparator());
         logger.trace(line);
       }
 
     } catch (IOException e) {
-      logger.error("Exception reading from input stream - " + e.getMessage(), e);
+      logger.error("Exception reading from inputstream", e);
     }
 
     output = outputBuffer.toString();

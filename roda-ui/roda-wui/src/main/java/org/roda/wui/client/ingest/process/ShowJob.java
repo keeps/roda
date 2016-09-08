@@ -713,17 +713,19 @@ public class ShowJob extends Composite {
 
         @Override
         public void onSuccess(Boolean confirmed) {
-          BrowserService.Util.getInstance().stopJob(job.getId(), new AsyncCallback<Void>() {
-            @Override
-            public void onFailure(Throwable caught) {
-              // FIXME 20160826 hsilva: do proper handling of the failure
-            }
+          if (confirmed) {
+            BrowserService.Util.getInstance().stopJob(job.getId(), new AsyncCallback<Void>() {
+              @Override
+              public void onFailure(Throwable caught) {
+                // FIXME 20160826 hsilva: do proper handling of the failure
+              }
 
-            @Override
-            public void onSuccess(Void result) {
-              // FIXME 20160826 hsilva: do proper handling of the success
-            }
-          });
+              @Override
+              public void onSuccess(Void result) {
+                // FIXME 20160826 hsilva: do proper handling of the success
+              }
+            });
+          }
         }
       });
   }

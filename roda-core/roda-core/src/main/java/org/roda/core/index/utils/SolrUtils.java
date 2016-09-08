@@ -54,6 +54,7 @@ import org.roda.core.common.MetadataFileUtils;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.data.adapter.facet.FacetParameter;
+import org.roda.core.data.adapter.facet.FacetParameter.SORT;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.facet.RangeFacetParameter;
 import org.roda.core.data.adapter.facet.SimpleFacetParameter;
@@ -948,13 +949,14 @@ public class SolrUtils {
    */
   private static void parseAndConfigureFacets(Facets facets, SolrQuery query) {
     if (facets != null) {
-      query.setFacetSort(FacetParams.FACET_SORT_INDEX);
+      query.setFacetSort(getSolrFacetParameterSortValue(FacetParameter.DEFAULT_SORT));
       if (!"".equals(facets.getQuery())) {
         query.addFacetQuery(facets.getQuery());
       }
       StringBuilder filterQuery = new StringBuilder();
       for (Entry<String, FacetParameter> parameter : facets.getParameters().entrySet()) {
         FacetParameter facetParameter = parameter.getValue();
+        setSolrFacetParameterSort(query, facetParameter);
 
         if (facetParameter instanceof SimpleFacetParameter) {
           setQueryFacetParameter(query, (SimpleFacetParameter) facetParameter);
@@ -971,6 +973,17 @@ public class SolrUtils {
         LOGGER.trace("Query after defining facets: {}", query);
       }
     }
+  }
+
+  private static void setSolrFacetParameterSort(SolrQuery query, FacetParameter facetParameter) {
+    if (FacetParameter.DEFAULT_SORT != facetParameter.getSort()) {
+      query.add(String.format("f.%s.facet.sort", facetParameter.getName()),
+        getSolrFacetParameterSortValue(facetParameter.getSort()));
+    }
+  }
+
+  private static String getSolrFacetParameterSortValue(SORT facetSort) {
+    return facetSort == SORT.INDEX ? FacetParams.FACET_SORT_INDEX : FacetParams.FACET_SORT_COUNT;
   }
 
   private static void setQueryFacetParameter(SolrQuery query, SimpleFacetParameter facetParameter) {
@@ -2215,7 +2228,7 @@ public class SolrUtils {
         ancestors.add(nextAncestorId);
         nextAncestorId = nextAncestor.getParentId();
       } catch (NotFoundException e) {
-        LOGGER.warn("Could not find one ancestor of AIP", e);
+        LOGGER.warn("Could not find one AIP ancestor. Ancestor id: {}", nextAncestorId);
         nextAncestorId = null;
       }
     }

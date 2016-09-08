@@ -81,17 +81,17 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public <T extends IsIndexed> void runPluginFromIndex(Object context, Class<T> classToActOn, Filter filter,
-    Plugin<T> plugin) {
+  public <T extends IsRODAObject, T1 extends IsIndexed> void runPluginFromIndex(Object context, Class<T1> classToActOn,
+    Filter filter, Plugin<T> plugin) {
     try {
 
-      IndexResult<T> find;
+      IndexResult<T1> find;
       int offset = 0;
       do {
         // XXX block size could be recommended by plugin
         find = RodaCoreFactory.getIndexService().find(classToActOn, filter, SORTER, new Sublist(offset, BLOCK_SIZE));
         offset += find.getLimit();
-        submitPlugin(find.getResults(), plugin);
+        // submitPlugin(find.getResults(), plugin);
 
       } while (find.getTotalCount() > find.getOffset() + find.getLimit());
 

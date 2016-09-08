@@ -24,8 +24,8 @@ public interface PluginOrchestrator {
 
   public void shutdown();
 
-  public <T extends IsIndexed> void runPluginFromIndex(Object context, Class<T> classToActOn, Filter filter,
-    Plugin<T> plugin);
+  public <T extends IsRODAObject, T1 extends IsIndexed> void runPluginFromIndex(Object context, Class<T1> classToActOn,
+    Filter filter, Plugin<T> plugin);
 
   public <T extends IsRODAObject> void runPluginOnObjects(Object context, Plugin<T> plugin, Class<T> objectClass,
     List<String> uuids);

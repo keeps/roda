@@ -77,6 +77,10 @@ public class RodaUtils {
 
   }
 
+  /**
+   * @deprecated 20160907 hsilva: not seeing any method using it, so it will be
+   *             removed soon
+   */
   public static String dateToString(Date date) {
     String ret;
     if (date != null) {
@@ -100,6 +104,10 @@ public class RodaUtils {
     return ret;
   }
 
+  /**
+   * @deprecated 20160907 hsilva: not seeing any method using it, so it will be
+   *             removed soon
+   */
   public static Map<String, Object> copyMap(Object object) {
     if (!(object instanceof Map)) {
       return null;
@@ -252,6 +260,10 @@ public class RodaUtils {
     }
   }
 
+  /**
+   * @deprecated 20160907 hsilva: not seeing any method using it, so it will be
+   *             removed soon
+   */
   public static void indentXML(Reader input, Writer output) throws TransformerException {
     Transformer transformer = TransformerFactory.newInstance().newTransformer();
     transformer.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -262,6 +274,10 @@ public class RodaUtils {
     transformer.transform(source, result);
   }
 
+  /**
+   * @deprecated 20160907 hsilva: not seeing any method using it, so it will be
+   *             removed soon
+   */
   public static String indentXML(String xml) throws GenericException {
     Reader input = new StringReader(xml);
     Writer output = new StringWriter();
@@ -274,6 +290,10 @@ public class RodaUtils {
     return output.toString();
   }
 
+  /**
+   * @deprecated 20160907 hsilva: not seeing any method using it, so it will be
+   *             removed soon
+   */
   public static long getPathSize(Path startPath) throws IOException {
     final AtomicLong size = new AtomicLong(0);
 

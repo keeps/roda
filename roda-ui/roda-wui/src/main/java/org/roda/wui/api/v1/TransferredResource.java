@@ -45,7 +45,6 @@ import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.ObjectResponse;
 import org.roda.wui.common.I18nUtility;
-import org.slf4j.LoggerFactory;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -111,19 +110,20 @@ public class TransferredResource {
     }
   }
 
+  /*
+   * 20160909 hsilva: do not change form param strings ("upl")
+   */
   @POST
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @ApiOperation(value = "Create resource", notes = "Create a resource.", response = org.roda.core.data.v2.ip.TransferredResource.class)
   @ApiResponses(value = {
     @ApiResponse(code = 200, message = "OK", response = org.roda.core.data.v2.ip.TransferredResource.class),
     @ApiResponse(code = 409, message = "Already exists", response = ApiResponseMessage.class)})
-
   public Response createResource(
     @ApiParam(value = "The id of the parent") @QueryParam(RodaConstants.TRANSFERRED_RESOURCE_PARENT_UUID) String parentUUID,
     @ApiParam(value = "The name of the directory to create", required = false) @QueryParam(RodaConstants.TRANSFERRED_RESOURCE_DIRECTORY_NAME) String name,
     @ApiParam(value = "Locale", required = false) @QueryParam(RodaConstants.LOCALE) String localeString,
-    @FormDataParam("upl") InputStream inputStream,
-    @FormDataParam("upl") FormDataContentDisposition fileDetail,
+    @FormDataParam("upl") InputStream inputStream, @FormDataParam("upl") FormDataContentDisposition fileDetail,
     @ApiParam(value = "Choose format in which to get the resource", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
@@ -140,10 +140,6 @@ public class TransferredResource {
     } catch (AlreadyExistsException e) {
       return Response.status(Status.CONFLICT).entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
         I18nUtility.getMessage("ui.upload.error.alreadyexists", e.getMessage(), localeString))).build();
-    } catch (Throwable e) {
-      // FIXME 20160909 lfaria: remove this catch
-      LoggerFactory.getLogger("test").error("Error creating resource", e);
-      throw e;
     }
   }
 
