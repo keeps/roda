@@ -13,11 +13,9 @@ package org.roda.wui.client.management;
 import java.util.List;
 
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
-import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -26,7 +24,7 @@ import com.google.gwt.user.client.ui.Widget;
  * @author Luis Faria
  * 
  */
-public class Statistics {
+public class HelpStatistics {
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
@@ -37,12 +35,12 @@ public class Statistics {
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {Statistics.RESOLVER}, false, callback);
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {HelpStatistics.RESOLVER}, false, callback);
     }
 
     @Override
     public String getHistoryToken() {
-      return "statistics";
+      return "help_statistics";
     }
 
     @Override
@@ -51,16 +49,16 @@ public class Statistics {
     }
   };
 
-  private static Statistics instance = null;
+  private static HelpStatistics instance = null;
 
   /**
    * Get the singleton instance
    * 
    * @return the instance
    */
-  public static Statistics getInstance() {
+  public static HelpStatistics getInstance() {
     if (instance == null) {
-      instance = new Statistics();
+      instance = new HelpStatistics();
     }
     return instance;
   }
@@ -69,26 +67,14 @@ public class Statistics {
 
   private HTMLWidgetWrapper layout;
 
-  private Statistics() {
+  private HelpStatistics() {
     initialized = false;
   }
 
   private void init() {
     if (!initialized) {
       initialized = true;
-      layout = new HTMLWidgetWrapper("Statistics.html", new AsyncCallback<Void>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          Toast.showError(caught);
-        }
-
-        @Override
-        public void onSuccess(Void result) {
-          JavascriptUtils.runTextFill(".textfill");
-          JavascriptUtils.runHighlighter();
-        }
-      });
+      layout = new HTMLWidgetWrapper("HelpStatistics.html");
       layout.addStyleName("wui-home");
     }
   }
@@ -98,7 +84,7 @@ public class Statistics {
       init();
       callback.onSuccess(layout);
     } else {
-      Tools.newHistory(Statistics.RESOLVER.getHistoryPath());
+      Tools.newHistory(HelpStatistics.RESOLVER.getHistoryPath());
       callback.onSuccess(null);
     }
   }

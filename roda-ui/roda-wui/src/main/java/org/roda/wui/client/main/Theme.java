@@ -80,11 +80,12 @@ public class Theme extends Composite {
 
       @Override
       public void onSuccess(Void result) {
-        JavascriptUtils.runHighlighter();    
+        JavascriptUtils.runHighlighter();
+        JavascriptUtils.runTextFill(".textfill");
       }
     });
     layout.addStyleName("wui-home");
     initWidget(layout);
   }
-  
+
 }

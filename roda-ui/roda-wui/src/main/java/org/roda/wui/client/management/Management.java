@@ -40,7 +40,8 @@ public class Management {
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
       UserLogin.getInstance().checkRoles(new HistoryResolver[] {MemberManagement.RESOLVER, UserLog.RESOLVER,
-        NotificationRegister.RESOLVER, ActionProcess.RESOLVER, Statistics.RESOLVER}, false, callback);
+        NotificationRegister.RESOLVER, ActionProcess.RESOLVER, Statistics.RESOLVER, HelpStatistics.RESOLVER}, false,
+        callback);
     }
 
     public List<String> getHistoryPath() {
@@ -107,6 +108,8 @@ public class Management {
         CreateJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(Statistics.RESOLVER.getHistoryToken())) {
         Statistics.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      } else if (historyTokens.get(0).equals(HelpStatistics.RESOLVER.getHistoryToken())) {
+        HelpStatistics.RESOLVER.resolve(Tools.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals("help")) {
         callback.onSuccess(getHelp());
       } else {
