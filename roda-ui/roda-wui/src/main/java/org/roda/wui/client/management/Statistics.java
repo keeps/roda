@@ -85,7 +85,6 @@ public class Statistics {
 
         @Override
         public void onSuccess(Void result) {
-          JavascriptUtils.runTextFill(".textfill");
           JavascriptUtils.runHighlighter();
         }
       });

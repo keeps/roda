@@ -66,6 +66,7 @@
 
         function initViewText(element, data) {
             element.text(data[element.data("view-field")]);
+            element.parent().textfill({widthOnly: true});
         }
 
         function initViewFacetChart(element, data) {
