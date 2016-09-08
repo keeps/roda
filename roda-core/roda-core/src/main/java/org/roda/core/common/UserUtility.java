@@ -213,31 +213,38 @@ public class UserUtility {
    * @throws AuthorizationDeniedException
    */
   public static void checkTransferredResourceAccess(User user, List<String> ids) throws AuthorizationDeniedException {
-    // FIXME administrator workaround
-    if ("admin".equalsIgnoreCase(user.getId())) {
-      return;
-    } else {
-      for (String id : ids) {
-
-        if (id == null && !"admin".equals(user.getName())) {
-          throw new AuthorizationDeniedException(
-            "The user '" + user.getId() + "' does not have permissions to create resource in root!");
-        } else {
-          try {
-            IndexService index = RodaCoreFactory.getIndexService();
-            TransferredResource parent = index.retrieve(TransferredResource.class, id);
-            if (!Paths.get(parent.getRelativePath()).getName(0).toString().equalsIgnoreCase(user.getName())) {
-              throw new AuthorizationDeniedException("The user '" + user.getId()
-                + "' does not have permissions to access to transferred resource " + id + " !");
-            }
-          } catch (GenericException | NotFoundException e) {
-            throw new AuthorizationDeniedException("The user '" + user.getId()
-              + "' does not have permissions to access to transferred resource " + id + " !");
-          }
-
-        }
-      }
-    }
+    // FIXME provide a better method for ensuring that producers don't change
+    // others files
+    // if ("admin".equalsIgnoreCase(user.getId())) {
+    // return;
+    // } else {
+    // for (String id : ids) {
+    //
+    // if (id == null && !"admin".equals(user.getName())) {
+    // throw new AuthorizationDeniedException(
+    // "The user '" + user.getId() + "' does not have permissions to create
+    // resource in root!");
+    // } else {
+    // try {
+    // IndexService index = RodaCoreFactory.getIndexService();
+    // TransferredResource parent = index.retrieve(TransferredResource.class,
+    // id);
+    // if
+    // (!Paths.get(parent.getRelativePath()).getName(0).toString().equalsIgnoreCase(user.getName()))
+    // {
+    // throw new AuthorizationDeniedException("The user '" + user.getId()
+    // + "' does not have permissions to access to transferred resource " + id +
+    // " !");
+    // }
+    // } catch (GenericException | NotFoundException e) {
+    // throw new AuthorizationDeniedException("The user '" + user.getId()
+    // + "' does not have permissions to access to transferred resource " + id +
+    // " !");
+    // }
+    //
+    // }
+    // }
+    // }
   }
 
   public static void checkObjectPermissions(User user, SelectedItems<IndexedAIP> selected, PermissionType permission)
