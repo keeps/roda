@@ -210,7 +210,7 @@ public class FormUtilities {
     final ListBox mvList = new ListBox();
     mvList.addStyleName("form-textbox");
 
-    String list = mv.get("list");
+    String list = mv.get("options");
     mvList.addItem("");
     if (list != null) {
       JSONArray jsonArray = JSONParser.parseLenient(list).isArray();

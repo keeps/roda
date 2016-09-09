@@ -1,7 +1,7 @@
 {{!-- uncomment the following fields to add more properties to the user --}}
 {{!--
 {{~field name="identificationArea" 		order="10" type="separator" label="{\"en\": \"Identification\", \"pt_PT\": \"Identificação\"}"~}}
-{{~field name="idType" 					order="20" type="list" list="[\"ID Card\",\"Passport\",\"Citizen Card\"]" label="{'en': 'Document of identification', 'pt_PT': 'Documento de identificação'}" xpath="//*:idType/string()"~}}
+{{~field name="idType" 					order="20" type="list" options="[\"ID Card\",\"Passport\",\"Citizen Card\"]" label="{'en': 'Document of identification', 'pt_PT': 'Documento de identificação'}" xpath="//*:idType/string()"~}}
 {{~field name="idNumber" 				order='30' label="{'en': 'Identification number','pt_PT': 'Número de identificação'}" xpath="//*:idNumber/string()"~}}
 {{~field name="idDate" 					order='40' type='date' label="{'en': 'Date of issue', 'pt_PT': 'Data de emissão'}" xpath="//*:idDate/string()"~}}
 {{~field name="idLocality" 				order='50' label="{'en': 'Locality of issue', 'pt_PT': 'Local de emissão'}" xpath="//*:idLocality/string()"~}}
@@ -12,7 +12,7 @@
 {{~field name="postalCode" 				order='90' label="{'en': 'Postal code', 'pt_PT': 'Código postal'}" xpath="//*:postalCode/string()"~}}
 {{~field name="locality" 				order='100' label="{'en': 'Locality', 'pt_PT': 'Localidade'}" xpath="//*:locality/string()"~}}
 {{~field name="country" 				order='110' label="{'en': 'Country of residence', 'pt_PT': 'País de residência'}" xpath="//*:country/string()"~}}
-{{~field name="businessCategory" 		order="112" type="list" list="[\"Public service\",\"Art and culture\",\"Social care\",\"Architecture and engineering\",\"Commerce and services\",\"Legal services\",\"Financial services\",\"Consulting services\",\"Education\",\"Research\",\"Higher education\",\"Industry\",\"Creative industries\",\"Social media\",\"Information services\"]" label="{'en': 'Area of activity', 'pt_PT': 'Área de actividade'}" xpath="//*:businessCategory/string()"~}}
+{{~field name="businessCategory" 		order="112" type="list" options="[\"Public service\",\"Art and culture\",\"Social care\",\"Architecture and engineering\",\"Commerce and services\",\"Legal services\",\"Financial services\",\"Consulting services\",\"Education\",\"Research\",\"Higher education\",\"Industry\",\"Creative industries\",\"Social media\",\"Information services\"]" label="{'en': 'Area of activity', 'pt_PT': 'Área de actividade'}" xpath="//*:businessCategory/string()"~}}
 {{~field name="contactArea" 			order="115" type="separator" label="{\"en\": \"Contacts\", \"pt_PT\": \"Contactos\"}"~}}
 {{~field name="phoneNumber" 			order='120' label="{'en': 'Phone number', 'pt_PT': 'Contacto telefónico'}" xpath="//*:phoneNumber/string()"~}}
 {{~field name="fax" 					order='130' label="{'en': 'Fax', 'pt_PT': 'Fax'}" xpath="//*:fax/string()"~}}

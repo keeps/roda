@@ -1554,7 +1554,7 @@ public class BrowserHelper {
                 labels = JsonUtils.getJsonFromObject(labelsMaps);
                 mv.set("label", labels);
               }
-              String i18nPrefix = mv.get("listi18n");
+              String i18nPrefix = mv.get("optionsI18n");
               if (i18nPrefix != null) {
                 try {
                   Map<String, String> terms = messages.getTranslations(i18nPrefix, String.class, false);
@@ -1564,7 +1564,7 @@ public class BrowserHelper {
                     term.put(locale.toString(), entry.getValue());
                     i18nMap.put(entry.getKey().replace(i18nPrefix + ".", ""), term);
                   }
-                  mv.set("list", JsonUtils.getJsonFromObject(i18nMap));
+                  mv.set("options", JsonUtils.getJsonFromObject(i18nMap));
                 } catch (MissingResourceException e) {
                   LOGGER.error(e.getMessage(), e);
                 }
