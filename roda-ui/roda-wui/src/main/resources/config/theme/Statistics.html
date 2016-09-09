@@ -12,7 +12,7 @@
 	<h2>Catalogue</h2>
 
 	<div class="row full_width">
-		<div class="col_4 col_card">
+		<div class="col_4 stat_col_card">
 			<h4>Number of intellectual entities</h4>
 			<div class="textfill">
 				<span class="statistic" data-source="index"
@@ -21,17 +21,54 @@
 			</div>
 		</div>
 		<div class="col_8 chart_col_card">
-			<h4>Distribution of description levels</h4>
+			<h4>Distribution of description levels (top 10)</h4>
 			<canvas class="statistic" data-source="index"
 				data-source-class="org.roda.core.data.v2.ip.IndexedAIP"
 				data-source-facets="level" data-view="chart"
-				data-view-field="facetResults" data-view-type="pie"
-				data-view-locale="en"></canvas>
+				data-view-field="facetResults" data-view-type="pie" data-view-limit="10"></canvas>
 		</div>
 	</div>
 
 	<div class="row full_width">
-		<div class="col_4 col_card">
+		<div class="col_6 chart_col_card">
+			<h4>User move actions (top 10)</h4>
+			<canvas class="statistic" data-source="index"
+				data-source-class="org.roda.core.data.v2.log.LogEntry"
+				data-source-facets="username" data-view="chart"
+				data-source-filters="actionMethod=moveAIPInHierarchy"
+				data-view-field="facetResults" data-view-type="pie" data-view-limit="10"></canvas>
+		</div>
+		<div class="col_6 chart_col_card">
+			<h4>User descriptive metadata creations (top 10)</h4>
+			<canvas class="statistic" data-source="index"
+				data-source-class="org.roda.core.data.v2.log.LogEntry"
+				data-source-facets="username" data-view="chart"
+				data-source-filters="actionMethod=createDescriptiveMetadataFile"
+				data-view-field="facetResults" data-view-type="pie" data-view-limit="10"></canvas>
+		</div>
+	</div>
+
+	<div class="row full_width">
+		<div class="col_6 chart_col_card">
+			<h4>User descriptive metadata updates (top 10)</h4>
+			<canvas class="statistic" data-source="index"
+				data-source-class="org.roda.core.data.v2.log.LogEntry"
+				data-source-facets="username" data-view="chart"
+				data-source-filters="actionMethod=updateDescriptiveMetadataFile"
+				data-view-field="facetResults" data-view-type="pie" data-view-limit="10"></canvas>
+		</div>
+		<div class="col_6 chart_col_card">
+			<h4>User descriptive metadata deletes (top 10)</h4>
+			<canvas class="statistic" data-source="index"
+				data-source-class="org.roda.core.data.v2.log.LogEntry"
+				data-source-facets="username" data-view="chart"
+				data-source-filters="actionMethod=deleteAIPDescriptiveMetadataFile"
+				data-view-field="facetResults" data-view-type="pie" data-view-limit="10"></canvas>
+		</div>
+	</div>
+
+	<div class="row full_width">
+		<div class="col_4 stat_col_card">
 			<h4>Number of representations</h4>
 			<div class="textfill">
 				<span class="statistic" data-source="index"
@@ -44,13 +81,12 @@
 			<canvas class="statistic" data-source="index"
 				data-source-class="org.roda.core.data.v2.ip.IndexedRepresentation"
 				data-source-facets="type" data-view="chart"
-				data-view-field="facetResults" data-view-type="bar"
-				data-view-locale="en"></canvas>
+				data-view-field="facetResults" data-view-type="bar"></canvas>
 		</div>
 	</div>
 
 	<div class="row full_width">
-		<div class="col_4 col_card">
+		<div class="col_4 stat_col_card">
 			<h4>Number of files</h4>
 			<div class="textfill">
 				<span class="statistic" data-source="index"
@@ -59,34 +95,29 @@
 			</div>
 		</div>
 		<div class="col_8 chart_col_card">
-			<h4>Distribution of file formats</h4>
-			<canvas class="statistic" data-source="index"
-				data-source-class="org.roda.core.data.v2.ip.IndexedFile"
-				data-source-facets="fileFormat" data-view="chart"
-				data-view-field="facetResults" data-view-type="bar"
-				data-view-locale="en"></canvas>
-		</div>
-	</div>
-	<div class="row full_width">
-		<div class="col_4"></div>
-		<div class="col_8 chart_col_card">
-			<h4>Distribution of file mimetypes</h4>
+			<h4>Distribution of file PRONOMs (top 10)</h4>
 			<canvas class="statistic" data-source="index"
 				data-source-class="org.roda.core.data.v2.ip.IndexedFile"
 				data-source-facets="formatPronom" data-view="chart"
-				data-view-field="facetResults" data-view-type="bar"
-				data-view-locale="en"></canvas>
+				data-view-field="facetResults" data-view-type="horizontalBar" data-view-limit="10"></canvas>
 		</div>
 	</div>
 	<div class="row full_width">
-		<div class="col_4"></div>
-		<div class="col_8 chart_col_card">
-			<h4>Distribution of file PRONOMs</h4>
+		<div class="col_12 chart_col_card">
+			<h4>Distribution of file formats (top 10)</h4>
+			<canvas class="statistic" data-source="index"
+				data-source-class="org.roda.core.data.v2.ip.IndexedFile"
+				data-source-facets="fileFormat" data-view="chart"
+				data-view-field="facetResults" data-view-type="horizontalBar" data-view-limit="10"></canvas>
+		</div>
+	</div>
+	<div class="row full_width">
+		<div class="col_12 chart_col_card">
+			<h4>Distribution of file mimetypes (top 10)</h4>
 			<canvas class="statistic" data-source="index"
 				data-source-class="org.roda.core.data.v2.ip.IndexedFile"
 				data-source-facets="formatMimetype" data-view="chart"
-				data-view-field="facetResults" data-view-type="bar"
-				data-view-locale="en"></canvas>
+				data-view-field="facetResults" data-view-type="horizontalBar" data-view-limit="10"></canvas>
 		</div>
 	</div>
 
@@ -94,44 +125,112 @@
 	<h2>Processes</h2>
 
 	<div class="row full_width">
-		<div class="col_4 col_card">
-			<h4>Number of processes</h4>
+		<div class="col_4 stat_col_card">
+			<h4>Number of action processes</h4>
 			<div class="textfill">
 				<span class="statistic" data-source="index"
 					data-source-class="org.roda.core.data.v2.jobs.Job" data-view="text"
+					data-source-filters="!pluginType=INGEST"
 					data-view-field="totalCount"></span>
 			</div>
 		</div>
-		<div class="col_4 col_card">
-			<h4>Distribution of process status</h4>
+		<div class="col_4 chart_col_card">
+			<h4>Distribution of action process status</h4>
+			<canvas class="statistic" data-source="index"
+				data-source-class="org.roda.core.data.v2.jobs.Job"
+				data-source-facets="state" data-view="chart"
+				data-source-filters="!pluginType=INGEST"
+				data-view-field="facetResults" data-view-type="pie"></canvas>
+		</div>
+		<div class="col_4 chart_col_card">
+			<h4>Distribution of action process type</h4>
+			<canvas class="statistic" data-source="index"
+				data-source-class="org.roda.core.data.v2.jobs.Job"
+				data-source-facets="pluginType" data-view="chart"
+				data-source-filters="!pluginType=INGEST"
+				data-view-field="facetResults" data-view-type="pie"></canvas>
+		</div>
+	</div>
+
+	<div class="row full_width">
+		<div class="col_4 stat_col_card">
+			<h4>Number of ingest processes</h4>
 			<div class="textfill">
 				<span class="statistic" data-source="index"
-					data-source-class="org.roda.core.data.v2.jobs.Job"
-					data-source-facets="state" data-view="chart"
-					data-view-field="facetResults" data-view-type="bar"></span>
+					data-source-class="org.roda.core.data.v2.jobs.Job" data-view="text"
+					data-source-filters="pluginType=INGEST"
+					data-view-field="totalCount"></span>
 			</div>
 		</div>
-		<div class="col_4 col_card">
-			<h4>Distribution of process type</h4>
+		<div class="col_4 chart_col_card">
+			<h4>Distribution of process status</h4>
+			<canvas class="statistic" data-source="index"
+				data-source-class="org.roda.core.data.v2.jobs.Job"
+				data-source-facets="state" data-view="chart"
+				data-source-filters="pluginType=INGEST"
+				data-view-field="facetResults" data-view-type="pie"></canvas>
+		</div>
+		<div class="col_4 chart_col_card">
+			<h4>Number of appraisal actions (top 10)</h4>
+			<canvas class="statistic" data-source="index"
+				data-source-class="org.roda.core.data.v2.log.LogEntry"
+				data-source-facets="username" data-view="chart"
+				data-source-filters="actionMethod=appraisal"
+				data-view-field="facetResults" data-view-type="pie" data-view-limit="10"></canvas>
+		</div>
+	</div>
+	
+	<div class="row full_width">
+		<div class="col_4 stat_col_card">
+			<h4>Number of reports</h4>
 			<div class="textfill">
 				<span class="statistic" data-source="index"
-					data-source-class="org.roda.core.data.v2.jobs.Job"
-					data-source-facets="pluginType" data-view="chart"
-					data-view-field="facetResults" data-view-type="bar"></span>
+					data-source-class="org.roda.core.data.v2.jobs.Report" data-view="text"
+					data-view-field="totalCount"></span>
 			</div>
+		</div>
+		<div class="col_4 chart_col_card">
+			<h4>Distribution of report plugin (top 10)</h4>
+			<canvas class="statistic" data-source="index"
+				data-source-class="org.roda.core.data.v2.jobs.Report"
+				data-source-facets="pluginName" data-view="chart"
+				data-source-filters="!plugin=org.roda.core.plugins.plugins.ingest.AutoAcceptSIPPlugin"
+				data-view-field="facetResults" data-view-type="pie" data-view-limit="10"></canvas>
+		</div>
+		<div class="col_4 chart_col_card">
+			<h4>Distribution of report plugin state</h4>
+			<canvas class="statistic" data-source="index"
+				data-source-class="org.roda.core.data.v2.jobs.Report"
+				data-source-facets="pluginState" data-view="chart"
+				data-view-field="facetResults" data-view-type="pie"></canvas>
+		</div>
+	</div>
+
+	<div class="row full_width">
+		<div class="col_12 chart_col_card">
+			<h4>Users that started more processes (top 5)</h4>
+			<canvas class="statistic" data-source="index"
+				data-source-class="org.roda.core.data.v2.log.LogEntry"
+				data-source-facets="username" data-view="chart"
+				data-source-filters="actionMethod=createJob"
+				data-view-field="facetResults" data-view-type="bar"
+				data-view-limit="5"></canvas>
 		</div>
 	</div>
 
 	<h2>Users</h2>
 
 	<div class="row full_width">
-		<div class="col_4 col_card">
+		<div class="col_4 stat_col_card">
 			<h4>Number of users</h4>
 			<div class="textfill">
-				<p>TODO show members filtering by users.</p>
+				<span class="statistic" data-source="index"
+					data-source-class="org.roda.core.data.v2.user.RODAMember"
+					data-view="text" data-source-filters="isUser=true"
+					data-view-field="totalCount"></span>
 			</div>
 		</div>
-		<div class="col_4 col_card">
+		<div class="col_4 stat_col_card">
 			<h4>Number of authentications</h4>
 			<div class="textfill">
 				<span class="statistic" data-source="index"
@@ -146,8 +245,148 @@
 				data-source-class="org.roda.core.data.v2.log.LogEntry"
 				data-source-filters="actionComponent=org.roda.wui.api.controllers.UserLogin, actionMethod=login"
 				data-source-facets="state" data-view="chart"
-				data-view-field="facetResults" data-view-type="pie"
-				data-view-locale="en"></canvas>
+				data-view-field="facetResults" data-view-type="pie"></canvas>
+		</div>
+	</div>
+	
+	<h2>Transferred resources</h2>
+
+	<div class="row full_width">
+		<div class="col_4 stat_col_card">
+			<h4>Number of transferred resources</h4>
+			<div class="textfill">
+				<span class="statistic" data-source="index"
+					data-source-class="org.roda.core.data.v2.ip.TransferredResource" data-view="text"
+					data-view-field="totalCount"></span>
+			</div>
+		</div>
+		<div class="col_4 stat_col_card">
+			<h4>Successful ingestions</h4>
+			<div class="textfill">
+				<span class="statistic" data-source="index"
+					data-source-class="org.roda.core.data.v2.ip.TransferredResource" data-view="text"
+					data-view-field="totalCount" data-source-filters="ancestors=PROCESSED/SUCCESSFULLY_INGESTED"></span> 
+			</div>
+		</div>
+		<div class="col_4 stat_col_card">
+			<h4>Failed ingestions</h4>
+			<div class="textfill">
+				<span class="statistic" data-source="index"
+					data-source-class="org.roda.core.data.v2.ip.TransferredResource" data-view="text"
+					data-view-field="totalCount"  data-source-filters="ancestors=PROCESSED/UNSUCCESSFULLY_INGESTED"></span>
+			</div>
+		</div>
+	</div>
+
+	<h2>Preservation events</h2>
+
+	<div class="row full_width">
+		<div class="col_4 stat_col_card">
+			<h4>Number of preservation events</h4>
+			<div class="textfill">
+				<span class="statistic" data-source="index"
+					data-source-class="org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent" data-view="text"
+					data-view-field="totalCount"></span>
+			</div>
+		</div>
+		<div class="col_8 chart_col_card">
+			<h4>Preservation agents by type (top 5)</h4>
+			<canvas class="statistic" data-source="index"
+				data-source-class="org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent"
+				data-source-facets="eventType" data-view="chart"
+				data-view-field="facetResults" data-view-type="pie" data-view-limit="5"></canvas>
+		</div>
+		
+	</div>
+	<div class="row full_width">
+		<div class="col_12 chart_col_card">
+			<h4>Preservation agents by agent (top 5)</h4>
+			<canvas class="statistic" data-source="index"
+				data-source-class="org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent"
+				data-source-facets="linkingAgentIdentifier" data-view="chart"
+				data-view-field="facetResults" data-view-type="horizontalBar" data-label-function="agentLabel"
+				data-view-limit="5"></canvas>
+				<script type="text/javascript">
+		            function agentLabel(label) {
+		            	var agent = JSON.parse(label);
+		            	var valueArray = agent.value.split('@');
+		            	var updatedValue = valueArray[0].substring(valueArray[0].lastIndexOf(".")  + 1);
+		            	updatedValue = updatedValue.substring(updatedValue.lastIndexOf(":") + 1);
+
+		            	if(valueArray.length != 1) {
+		            		updatedValue += "@" + valueArray[1];
+		            	}
+
+		            	return updatedValue;
+		            }
+				</script>
+		</div>
+	</div>
+
+	<h2>Risks</h2>
+
+	<div class="row full_width">
+		<div class="col_4 stat_col_card">
+			<h4>Number of risks</h4>
+			<div class="textfill">
+				<span class="statistic" data-source="index"
+					data-source-class="org.roda.core.data.v2.risks.IndexedRisk" data-view="text"
+					data-view-field="totalCount"></span>
+			</div>
+		</div>
+		<div class="col_8 chart_col_card">
+			<h4>Risks by post-mitigation severity</h4>
+			<canvas class="statistic" data-source="index"
+				data-source-class="org.roda.core.data.v2.risks.IndexedRisk"
+				data-source-facets="posMitigationSeverityLevel" data-view="chart"
+				data-view-field="facetResults" data-view-type="pie"></canvas>
+		</div>
+	</div>
+
+	<h2>Risk incidences</h2>
+
+	<div class="row full_width">
+		<div class="col_4 stat_col_card">
+			<h4>Number of risk incidences</h4>
+			<div class="textfill">
+				<span class="statistic" data-source="index"
+					data-source-class="org.roda.core.data.v2.risks.RiskIncidence" data-view="text"
+					data-view-field="totalCount"></span>
+			</div>
+		</div>
+		<div class="col_4 chart_col_card">
+			<h4>Risk incidence by severity</h4>
+			<canvas class="statistic" data-source="index"
+				data-source-class="org.roda.core.data.v2.risks.RiskIncidence"
+				data-source-facets="severity" data-view="chart"
+				data-view-field="facetResults" data-view-type="pie"></canvas>
+		</div>
+		<div class="col_4 chart_col_card">
+			<h4>Risk incidence by status</h4>
+			<canvas class="statistic" data-source="index"
+				data-source-class="org.roda.core.data.v2.risks.RiskIncidence"
+				data-source-facets="status" data-view="chart"
+				data-view-field="facetResults" data-view-type="pie"></canvas>
+		</div>
+	</div>
+
+	<h2>Notification</h2>
+
+	<div class="row full_width">
+		<div class="col_4 stat_col_card">
+			<h4>Number of notifications</h4>
+			<div class="textfill">
+				<span class="statistic" data-source="index"
+					data-source-class="org.roda.core.data.v2.notifications.Notification" data-view="text"
+					data-view-field="totalCount"></span>
+			</div>
+		</div>
+		<div class="col_8 chart_col_card">
+			<h4>Acknowledged notifications</h4>
+			<canvas class="statistic" data-source="index"
+				data-source-class="org.roda.core.data.v2.notifications.Notification"
+				data-source-facets="isAcknowledged" data-view="chart"
+				data-view-field="facetResults" data-view-type="pie"></canvas>
 		</div>
 	</div>
 </div>

@@ -1,4 +1,7 @@
 (function($) {
+	
+	Chart.defaults.global.defaultFontFamily = "Ubuntu";
+	Chart.defaults.global.defaultFontColor = "#222";
 
 	$.fn.statistic = function() {
 		var matchedObject = this;
@@ -59,17 +62,16 @@
 			var start = $(element).data("source-start") || 0;
 			var limit = $(element).data("source-limit") || 0;
 			var facetLimit = $(element).data("view-limit") || 100;
-			var locale = $(element).data("view-locale") || "en";
 			var onlyActive = $(element).data("source-onlyActive") || "false";
 
-			var locale = document.locale;
+			var lang = document.locale;
 
 			$.ajax(
 					{
 						url : "/api/v1/index?returnClass=" + returnClass + "&"
 								+ filterParams + "&" + facetParams + "&start="
 								+ start + "&limit=" + limit + "&facetLimit="
-								+ facetLimit + "&locale=" + locale +  "&onlyActive=" + onlyActive
+								+ facetLimit + "&lang=" + lang +  "&onlyActive=" + onlyActive
 					}).done(function(data) {
 				viewCallback(element, data);
 			});
@@ -96,7 +98,8 @@
 					"radar" : facetRadarChartOptions,
 					"polarArea" : facetPolarAreaChartOptions,
 					"pie" : facetPieChartOptions,
-					"doughnut" : facetDoughnutChartOptions
+					"doughnut" : facetDoughnutChartOptions,
+					"horizontalBar" : facetHorizontalBarChartOptions,
 				};
 				if (type in facetDataSourceCallbacks) {
 					chartOptionsCallback = facetDataSourceCallbacks[type];
@@ -152,6 +155,16 @@
 			});
 			return options;
 		}
+		
+		function facetHorizontalBarChartOptions(data, element) {
+			var options = facetCommonChartOptions("horizontalBar", data, element);
+			options.data.datasets.forEach(function(dataset) {
+				$.extend(dataset, {
+					borderWidth : 1
+				});
+			});
+			return options;
+		}
 
 		function facetRadarChartOptions(data, element) {
 			var options = facetCommonChartOptions("radar", data, element);
@@ -189,6 +202,7 @@
 
 		function facetCommonChartOptions(type, data, element) {
 			var options = {};
+			var labelFunction = $(element).data("label-function");
 			var facet = data && data.facetResults
 					&& data.facetResults.length > 0 ? data.facetResults[0]
 					: null;
@@ -197,7 +211,11 @@
 					type : type,
 					data : {
 						labels : facet.values.map(function(value) {
-							return value.label;
+							if(labelFunction) {
+								return executeFunctionByName(window, labelFunction, value.label);
+							} else {
+								return value.label;
+							}
 						}),
 						datasets : [ {
 							label : facet.field,
@@ -213,14 +231,24 @@
 					options : {
 						legend : {
 							display : true,
-							position : 'bottom'
+							position : 'bottom',
+							boxWidth: 10
 						}
 					}
 				};
 
 				if (type == "bar") {
 					options.options.legend.display = false;
+					//options.options.xAxes.display = true;
+					//options.options.yAxes.display = true;
+					//options.options.scales.yAxes.ticks.beginAtZero = true;
+				} else if (type == "horizontalBar") {
+					options.options.legend.display = false;
+					//options.options.xAxes.display = true;
+					//options.options.yAxes.display = true;
+					//options.options.scales.xAxes.ticks.beginAtZero = true;
 				}
+			
 			}
 
 			return options;
@@ -231,7 +259,7 @@
 			if (args.length == 1 && Array.isArray(args[0])) {
 				args = args[0];
 			}
-			functionByName(context, functionName).apply(context, args);
+			return functionByName(context, functionName).apply(context, args);
 		}
 
 		function functionByName(context, functionName) {

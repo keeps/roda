@@ -5224,3 +5224,7 @@ td.datePickerMonth, td.datePickerYear {
     border-color: #eee;
     padding: 0em 2em 1.5em 2em;
 }
+.stat_col_card {
+	background: #eee; 
+	padding: 0 2em 4em 2em;
+}

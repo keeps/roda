@@ -96,7 +96,7 @@ public class IndexResource {
    */
   @GET
   @Produces({MediaType.APPLICATION_JSON})
-  @ApiOperation(value = "Find indexed resources", notes = "Find indexed resources.", response = IsIndexed.class, responseContainer = "List")
+  @ApiOperation(value = "Find indexed resources", notes = "Find indexed resources.", response = IndexResult.class, responseContainer = "List")
   public <T extends IsIndexed> Response list(
     @ApiParam(value = "Class of resources to return", required = true, example = "org.roda.core.data.v2.ip.IndexedFile") @QueryParam(RodaConstants.API_QUERY_KEY_RETURN_CLASS) final String returnClass,
     @ApiParam(value = "Filter parameters", example = "formatPronom=fmt/19") @QueryParam(RodaConstants.API_QUERY_KEY_FILTER) final List<String> filterParameters,
@@ -105,7 +105,7 @@ public class IndexResource {
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam(RodaConstants.API_QUERY_KEY_LIMIT) final Integer limit,
     @ApiParam(value = "Facets to return", example = "formatPronom") @QueryParam(RodaConstants.API_QUERY_KEY_FACET) final List<String> facetAttributes,
     @ApiParam(value = "Facet limit", example = "100") @QueryParam(RodaConstants.API_QUERY_KEY_FACET_LIMIT) final Integer facetLimit,
-    @ApiParam(value = "Locale", example = "en", defaultValue = "en") @QueryParam(RodaConstants.API_QUERY_KEY_LOCALE) final String localeString,
+    @ApiParam(value = "Language", example = "en", defaultValue = "en") @QueryParam(RodaConstants.API_QUERY_KEY_LANG) final String localeString,
     @ApiParam(value = "Return only active resources?", defaultValue = "true") @QueryParam(RodaConstants.API_QUERY_KEY_ONLY_ACTIVE) final Boolean onlyActive)
     throws RODAException {
     final String mediaType = ApiUtils.getMediaType(null, request);
