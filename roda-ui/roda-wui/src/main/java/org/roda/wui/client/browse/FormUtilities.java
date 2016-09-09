@@ -106,7 +106,8 @@ public class FormUtilities {
     return result;
   }
 
-  private static void addTextField(FlowPanel panel, final FlowPanel layout, final MetadataValue mv, final boolean mandatory) {
+  private static void addTextField(FlowPanel panel, final FlowPanel layout, final MetadataValue mv,
+    final boolean mandatory) {
     // Top label
     Label mvLabel = new Label(getFieldLabel(mv));
     mvLabel.addStyleName("form-label");
@@ -119,15 +120,14 @@ public class FormUtilities {
     if (mv.get("value") != null) {
       mvText.setText(mv.get("value"));
     }
-    
-    
+
     mvText.addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent changeEvent) {
         mv.set("value", mvText.getValue());
-        if(mandatory && (mvText.getValue()!=null && !mvText.getValue().trim().equalsIgnoreCase(""))){
+        if (mandatory && (mvText.getValue() != null && !mvText.getValue().trim().equalsIgnoreCase(""))) {
           mvText.removeStyleName("isWrong");
-        } else if(mandatory && (mvText.getValue()==null || mvText.getValue().trim().equalsIgnoreCase(""))){
+        } else if (mandatory && (mvText.getValue() == null || mvText.getValue().trim().equalsIgnoreCase(""))) {
           mvText.addStyleName("isWrong");
         }
       }
@@ -135,8 +135,7 @@ public class FormUtilities {
 
     layout.add(mvLabel);
     layout.add(mvText);
-    
-    
+
     // Description
     String description = mv.get("description");
     if (description != null && description.length() > 0) {
@@ -144,7 +143,7 @@ public class FormUtilities {
       mvDescription.addStyleName("form-help");
       layout.add(mvDescription);
     }
-    
+
     if (mv.get("error") != null && !mv.get("error").trim().equalsIgnoreCase("")) {
       Label errorLabel = new Label(mv.get("error"));
       errorLabel.addStyleName("form-label-error");
@@ -154,7 +153,8 @@ public class FormUtilities {
     panel.add(layout);
   }
 
-  private static void addTextArea(FlowPanel panel, final FlowPanel layout, final MetadataValue mv, final boolean mandatory) {
+  private static void addTextArea(FlowPanel panel, final FlowPanel layout, final MetadataValue mv,
+    final boolean mandatory) {
     // Top label
     Label mvLabel = new Label(getFieldLabel(mv));
     mvLabel.addStyleName("form-label");
@@ -167,14 +167,14 @@ public class FormUtilities {
     if (mv.get("value") != null) {
       mvText.setText(mv.get("value"));
     }
-   
+
     mvText.addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent changeEvent) {
         mv.set("value", mvText.getValue());
-        if(mandatory && (mvText.getValue()!=null && !mvText.getValue().trim().equalsIgnoreCase(""))){
+        if (mandatory && (mvText.getValue() != null && !mvText.getValue().trim().equalsIgnoreCase(""))) {
           mvText.removeStyleName("isWrong");
-        }else if(mandatory && (mvText.getValue()==null || mvText.getValue().trim().equalsIgnoreCase(""))){
+        } else if (mandatory && (mvText.getValue() == null || mvText.getValue().trim().equalsIgnoreCase(""))) {
           mvText.addStyleName("isWrong");
         }
       }
@@ -199,7 +199,8 @@ public class FormUtilities {
     panel.add(layout);
   }
 
-  private static void addList(FlowPanel panel, final FlowPanel layout, final MetadataValue mv, final boolean mandatory) {
+  private static void addList(FlowPanel panel, final FlowPanel layout, final MetadataValue mv,
+    final boolean mandatory) {
     // Top Label
     Label mvLabel = new Label(getFieldLabel(mv));
     mvLabel.addStyleName("form-label");
@@ -255,9 +256,11 @@ public class FormUtilities {
       @Override
       public void onChange(ChangeEvent changeEvent) {
         mv.set("value", mvList.getSelectedValue());
-        if(mandatory && (mvList.getSelectedValue()!=null && !mvList.getSelectedValue().trim().equalsIgnoreCase(""))){
+        if (mandatory
+          && (mvList.getSelectedValue() != null && !mvList.getSelectedValue().trim().equalsIgnoreCase(""))) {
           mvList.removeStyleName("isWrong");
-        } else if(mandatory && (mvList.getSelectedValue()==null || mvList.getSelectedValue().trim().equalsIgnoreCase(""))){
+        } else if (mandatory
+          && (mvList.getSelectedValue() == null || mvList.getSelectedValue().trim().equalsIgnoreCase(""))) {
           mvList.removeStyleName("isWrong");
         }
       }
@@ -289,7 +292,7 @@ public class FormUtilities {
   }
 
   private static void addDatePicker(FlowPanel panel, final FlowPanel layout, final MetadataValue mv,
-   final boolean mandatory) {
+    final boolean mandatory) {
     // Top label
     final DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat("yyyy-MM-dd");
     Label mvLabel = new Label(getFieldLabel(mv));
@@ -324,9 +327,9 @@ public class FormUtilities {
       public void onValueChange(ValueChangeEvent<Date> valueChangeEvent) {
         String newValue = dateTimeFormat.format(mvDate.getValue());
         mv.set("value", newValue);
-        if(mandatory && (newValue!=null && !newValue.trim().equalsIgnoreCase(""))){
+        if (mandatory && (newValue != null && !newValue.trim().equalsIgnoreCase(""))) {
           mvDate.removeStyleName("isWrong");
-        }else if(mandatory && (newValue==null || newValue.trim().equalsIgnoreCase(""))){
+        } else if (mandatory && (newValue == null || newValue.trim().equalsIgnoreCase(""))) {
           mvDate.addStyleName("isWrong");
         }
       }
@@ -339,7 +342,11 @@ public class FormUtilities {
         try {
           Date date = dateTimeFormat.parse(value.trim());
           mvDate.setValue(date);
+          mv.set("value", value);
         } catch (IllegalArgumentException iae) {
+          if (event.getValue() == null || event.getValue().trim().equalsIgnoreCase("")) {
+            mv.set("value", null);
+          }
           mvDate.getTextBox().setValue(value);
         }
       }
@@ -389,7 +396,7 @@ public class FormUtilities {
         if (mandatory && (value == null || value.trim().equalsIgnoreCase(""))) {
           mv.set("error", messages.mandatoryField());
           valid = false;
-        } 
+        }
       }
     }
     if (!valid) {
