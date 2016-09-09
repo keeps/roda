@@ -132,6 +132,7 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
     usernameColumn.setSortable(true);
     durationColumn.setSortable(true);
     addressColumn.setSortable(true);
+    stateColumn.setSortable(true);
 
     // TODO externalize strings into constants
 
@@ -161,6 +162,7 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
     columnSortingKeyMap.put(usernameColumn, Arrays.asList(RodaConstants.LOG_USERNAME));
     columnSortingKeyMap.put(durationColumn, Arrays.asList(RodaConstants.LOG_DURATION));
     columnSortingKeyMap.put(addressColumn, Arrays.asList(RodaConstants.LOG_ADDRESS));
+    columnSortingKeyMap.put(stateColumn, Arrays.asList(RodaConstants.LOG_STATE));
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
