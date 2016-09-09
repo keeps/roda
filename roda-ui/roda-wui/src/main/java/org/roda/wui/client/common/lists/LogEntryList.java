@@ -19,14 +19,19 @@ import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.StringUtils;
+import org.roda.wui.common.client.tools.Humanize;
 
 import com.google.gwt.cell.client.DateCell;
+import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
@@ -46,11 +51,10 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
   private Column<LogEntry, Date> dateColumn;
   private TextColumn<LogEntry> actionComponentColumn;
   private TextColumn<LogEntry> actionMethodColumn;
-  // private Column<LogEntry, String> relatedObjectColumn;
   private TextColumn<LogEntry> usernameColumn;
   private TextColumn<LogEntry> durationColumn;
   private TextColumn<LogEntry> addressColumn;
-  private TextColumn<LogEntry> stateColumn;
+  private Column<LogEntry, SafeHtml> stateColumn;
 
   public LogEntryList() {
     this(null, null, null, false);
@@ -90,26 +94,6 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
       }
     };
 
-    // relatedObjectColumn = new Column<LogEntry, String>(new
-    // ClickableTextCell()) {
-    //
-    // @Override
-    // public String getValue(LogEntry logEntry) {
-    // return logEntry != null ? logEntry.getRelatedObjectID() : null;
-    // }
-    // };
-    //
-    // relatedObjectColumn.setFieldUpdater(new FieldUpdater<LogEntry, String>()
-    // {
-    //
-    // @Override
-    // public void update(int index, LogEntry logEntry, String value) {
-    // if (logEntry != null && logEntry.getRelatedObjectID() != null) {
-    // Tools.newHistory(Browse.getViewItemHistoryToken(logEntry.getRelatedObjectID()));
-    // }
-    // }
-    // });
-
     usernameColumn = new TextColumn<LogEntry>() {
 
       @Override
@@ -122,8 +106,7 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
 
       @Override
       public String getValue(LogEntry logEntry) {
-        // FIXME
-        return logEntry != null ? logEntry.getDuration() + " ms" : null;
+        return logEntry != null ? Humanize.durationMillisToShortDHMS(logEntry.getDuration()) : null;
       }
     };
 
@@ -135,11 +118,10 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
       }
     };
 
-    stateColumn = new TextColumn<LogEntry>() {
-
+    stateColumn = new Column<LogEntry, SafeHtml>(new SafeHtmlCell()) {
       @Override
-      public String getValue(LogEntry logEntry) {
-        return logEntry != null ? logEntry.getState().toString() : null;
+      public SafeHtml getValue(LogEntry logEntry) {
+        return HtmlSnippetUtils.getLogEntryStateHtml(logEntry.getState());
       }
     };
 

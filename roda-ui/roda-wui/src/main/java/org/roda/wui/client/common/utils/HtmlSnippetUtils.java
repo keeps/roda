@@ -16,6 +16,7 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
@@ -161,6 +162,31 @@ public class HtmlSnippetUtils {
       return SafeHtmlUtils
         .fromSafeConstant("<span class='label-success'>" + messages.riskIncidenceStatusValue(status) + "</span>");
     }
+  }
+
+  public static SafeHtml getLogEntryStateHtml(LOG_ENTRY_STATE state) {
+    String labelClass;
+
+    switch (state) {
+      case SUCCESS:
+        labelClass = "label-success";
+        break;
+        
+      case FAILURE:
+        labelClass = "label-danger";
+        break;
+        
+      case UNAUTHORIZED:
+        labelClass = "label-warning";
+        break;
+
+      default:
+        labelClass = "label-default";
+        break;
+    }
+
+    return SafeHtmlUtils
+      .fromSafeConstant("<span class='" + labelClass + "'>" + messages.logEntryStateValue(state) + "</span>");
   }
 
   public static void addRiskIncidenceObjectLinks(RiskIncidence incidence, final Label objectLabel,

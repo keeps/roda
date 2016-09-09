@@ -16,6 +16,7 @@ import java.util.List;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
 import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
 
@@ -763,6 +764,8 @@ public interface ClientMessages extends Messages {
   String durationDHMSLongMinutes(int minutes, int seconds);
 
   String durationDHMSLongSeconds(int seconds);
+  
+  String durationDHMSShortMillis(int millis);
 
   String objectPermission(@Select PermissionType permissionType);
 
@@ -1358,6 +1361,8 @@ public interface ClientMessages extends Messages {
   String logEntryUser();
 
   String logEntryParameters();
+
+  String logEntryStateValue(@Select LOG_ENTRY_STATE state);
 
   /*** Notifications ***/
 

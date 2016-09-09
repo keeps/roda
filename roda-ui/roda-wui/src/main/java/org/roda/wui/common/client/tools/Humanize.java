@@ -114,6 +114,7 @@ public class Humanize {
    * converts time (in milliseconds) to human-readable format "<dd:>hh:mm:ss"
    */
   public static String durationMillisToShortDHMS(long duration) {
+    int millis = (int) (duration % ONE_SECOND);
     duration /= ONE_SECOND;
     int seconds = (int) (duration % SECONDS);
     duration /= SECONDS;
@@ -130,8 +131,10 @@ public class Humanize {
       ret = messages.durationDHMSShortHours(hours, minutes, seconds);
     } else if (minutes > 0) {
       ret = messages.durationDHMSShortMinutes(minutes, seconds);
-    } else {
+    } else if(seconds > 0){
       ret = messages.durationDHMSShortSeconds(seconds);
+    } else {
+      ret = messages.durationDHMSShortMillis(millis);
     }
 
     return ret;
