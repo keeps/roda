@@ -331,7 +331,7 @@ public class ViewRepresentation extends Composite {
     filesList = new SimpleFileList(defaultFilter, justActive, null, null, selectable);
 
     searchPanel = new SearchPanel(defaultFilter, RodaConstants.FILE_SEARCH,
-      messages.viewRepresentationSearchPlaceHolder(), false, false);
+      messages.viewRepresentationSearchPlaceHolder(), false, false, false);
     searchPanel.setList(filesList);
     searchPanel.setDefaultFilterIncremental(false);
 

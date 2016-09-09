@@ -198,7 +198,8 @@ public class MainSearch extends Composite {
 
     defaultFilters();
 
-    searchPanel = new SearchPanel(filter_aips, RodaConstants.AIP_SEARCH, messages.searchPlaceHolder(), true, true);
+    searchPanel = new SearchPanel(filter_aips, RodaConstants.AIP_SEARCH, messages.searchPlaceHolder(), true, true,
+      false);
     searchPanel.setDefaultFilterIncremental(false);
 
     searchAdvancedFieldOptionsAIP = new ListBox();

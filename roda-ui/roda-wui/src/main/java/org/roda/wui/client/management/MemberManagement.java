@@ -119,7 +119,7 @@ public class MemberManagement extends Composite {
     list = new RodaMemberList(DEFAULT_FILTER, facets, messages.usersAndGroupsTitle(), false);
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.MEMBERS_SEARCH,
-      messages.usersAndGroupsSearchPlaceHolder(), false, false);
+      messages.usersAndGroupsSearchPlaceHolder(), false, false, false);
     searchPanel.setList(list);
 
     facetIsActive = new FlowPanel();

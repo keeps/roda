@@ -29,13 +29,13 @@ public class SelectAipDialog extends DefaultSelectDialog<IndexedAIP, Void> {
   private static final Facets DEFAULT_FACETS = null;
   private static final Boolean SELECTABLE = Boolean.FALSE;
 
-  public SelectAipDialog(String title) {
-    this(title, DEFAULT_FILTER_AIP, DEFAULT_JUST_ACTIVE);
+  public SelectAipDialog(String title, boolean hidePreFilters) {
+    this(title, DEFAULT_FILTER_AIP, DEFAULT_JUST_ACTIVE, hidePreFilters);
   }
 
-  public SelectAipDialog(String title, Filter filter, boolean justActive) {
+  public SelectAipDialog(String title, Filter filter, boolean justActive, boolean hidePreFilters) {
     super(title, filter, RodaConstants.AIP_SEARCH,
-      new AIPList(filter, justActive, DEFAULT_FACETS, messages.selectAipSearchResults(), SELECTABLE));
+      new AIPList(filter, justActive, DEFAULT_FACETS, messages.selectAipSearchResults(), SELECTABLE), hidePreFilters);
 
   }
 }

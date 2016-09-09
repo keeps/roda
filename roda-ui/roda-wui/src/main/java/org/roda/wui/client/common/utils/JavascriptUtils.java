@@ -291,10 +291,6 @@ public class JavascriptUtils {
   }-*/;
 
   public static native void runTextFill(String selector) /*-{
-		$wnd.jQuery(selector).textfill({
-			success : function() {
-				$wnd.console.log("teste");
-			}
-		});
+		$wnd.jQuery(selector).textfill({});
   }-*/;
 }

@@ -137,7 +137,7 @@ public class UserLog extends Composite {
     logList = new LogEntryList(Filter.NULL, facets, messages.logsTitle(), false);
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.LOG_SEARCH, messages.userLogSearchPlaceHolder(), false,
-      false);
+      false, false);
     searchPanel.setList(logList);
 
     facetComponents = new FlowPanel();

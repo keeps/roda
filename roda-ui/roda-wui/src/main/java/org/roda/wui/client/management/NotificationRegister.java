@@ -133,7 +133,7 @@ public class NotificationRegister extends Composite {
     notificationList = new NotificationList(Filter.NULL, facets, messages.notificationsTitle(), false);
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.NOTIFICATION_SEARCH,
-      messages.messageSearchPlaceHolder(), false, false);
+      messages.messageSearchPlaceHolder(), false, false, false);
     searchPanel.setList(notificationList);
 
     facetRecipientUsers = new FlowPanel();

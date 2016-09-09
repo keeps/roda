@@ -25,8 +25,8 @@ import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AgentList;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
-import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
+import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
@@ -141,7 +141,7 @@ public class AgentRegister extends Composite {
     agentList = new AgentList(Filter.NULL, facets, messages.agentsTitle(), true);
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.AGENT_SEARCH, messages.agentRegisterSearchPlaceHolder(),
-      false, false);
+      false, false, false);
     searchPanel.setList(agentList);
 
     agentList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {

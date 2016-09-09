@@ -23,7 +23,7 @@ public class SelectAgentDialog extends DefaultSelectDialog<Agent, Void> {
   }
 
   public SelectAgentDialog(String title, Filter filter) {
-    super(title, filter, RodaConstants.AGENT_SEARCH, new AgentList(filter, null, title, false));
+    super(title, filter, RodaConstants.AGENT_SEARCH, new AgentList(filter, null, title, false), false);
   }
 
 }

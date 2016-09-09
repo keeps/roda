@@ -93,7 +93,7 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
   private AsyncTableCell<?, ?> list;
 
   public SearchPanel(Filter defaultFilter, String allFilter, String placeholder, boolean showSearchInputListBox,
-    boolean showSearchAdvancedDisclosureButton) {
+    boolean showSearchAdvancedDisclosureButton, boolean hidePreFilters) {
     this.defaultFilter = defaultFilter;
     this.allFilter = allFilter;
 
@@ -145,7 +145,9 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
       searchPanel.addStyleName("searchPanelAdvanced");
     }
 
-    drawSearchPreFilters();
+    if (!hidePreFilters) {
+      drawSearchPreFilters();
+    }
   }
 
   private void drawSearchPreFilters() {
@@ -339,6 +341,11 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
 
   public void addSearchAdvancedFieldAddHandler(ClickHandler handler) {
     searchAdvancedFieldOptionsAdd.addClickHandler(handler);
+  }
+
+  public void hidePreFilters() {
+    searchPreFilters.clear();
+    searchPreFilters.setVisible(false);
   }
 
   @UiHandler("searchAdvancedGo")

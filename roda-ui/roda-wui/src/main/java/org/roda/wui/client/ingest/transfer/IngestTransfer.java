@@ -195,7 +195,7 @@ public class IngestTransfer extends Composite {
     transferredResourceList = new TransferredResourceList(Filter.NULL, facets, messages.ingestTransferList(), true);
 
     searchPanel = new SearchPanel(Filter.NULL, RodaConstants.TRANSFERRED_RESOURCE_SEARCH,
-      messages.ingestTransferSearchPlaceHolder(), false, false);
+      messages.ingestTransferSearchPlaceHolder(), false, false, false);
     searchPanel.setList(transferredResourceList);
     searchPanel.setDefaultFilterIncremental(true);
 

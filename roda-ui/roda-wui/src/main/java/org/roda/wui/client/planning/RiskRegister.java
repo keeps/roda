@@ -166,7 +166,7 @@ public class RiskRegister extends Composite {
     riskList = new RiskList(Filter.NULL, facets, messages.risksTitle(), true);
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.RISK_SEARCH, messages.riskRegisterSearchPlaceHolder(),
-      false, false);
+      false, false, false);
     searchPanel.setList(riskList);
 
     facetCategories = new FlowPanel();

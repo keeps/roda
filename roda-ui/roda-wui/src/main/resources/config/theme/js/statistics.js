@@ -204,9 +204,19 @@
 								return rgbaRandomOpaqueColorAsString();
 							})
 						} ]
+
+					},
+					legend : {
+						display : true,
+						position : "bottom"
 					}
 				};
+
+				if (type == "bar") {
+					options.legend.display = false;
+				}
 			}
+
 			return options;
 		}
 
@@ -300,6 +310,7 @@
 function rgbRandomColor(mix) {
 	// for pastel colors, mix with white:
 	// mix = {red: 255, green: 255, blue: 255};
+
 	var red = Math.random() * 256;
 	var green = Math.random() * 256;
 	var blue = Math.random() * 256;

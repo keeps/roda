@@ -143,7 +143,7 @@ public class RiskIncidenceRegister extends Composite {
     riskIncidenceList = new RiskIncidenceList(Filter.NULL, facets, messages.riskIncidencesTitle(), false);
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.RISK_INCIDENCE_SEARCH,
-      messages.riskIncidenceRegisterSearchPlaceHolder(), false, false);
+      messages.riskIncidenceRegisterSearchPlaceHolder(), false, false, false);
     searchPanel.setList(riskIncidenceList);
 
     facetDetectedBy = new FlowPanel();

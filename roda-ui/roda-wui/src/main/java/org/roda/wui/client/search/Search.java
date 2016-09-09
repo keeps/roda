@@ -19,10 +19,12 @@ import java.util.Map;
 import org.roda.core.data.adapter.facet.FacetParameter;
 import org.roda.core.data.adapter.facet.SimpleFacetParameter;
 import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.NotSimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
+import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
@@ -245,9 +247,21 @@ public class Search extends Composite {
     boolean showEmptyParentButton;
 
     filter = new Filter();
+
+    if (selected instanceof SelectedItemsList) {
+      SelectedItemsList<IndexedAIP> list = (SelectedItemsList<IndexedAIP>) selected;
+      for (String id : list.getIds()) {
+        filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_ANCESTORS, id));
+        filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_ID, id));
+      }
+    } else {
+      filter = Filter.NULL;
+    }
+
     showEmptyParentButton = false;
 
-    SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter, mainSearch.isJustActive());
+    SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter, mainSearch.isJustActive(),
+      true);
     selectAipDialog.setEmptyParentButtonVisible(showEmptyParentButton);
     selectAipDialog.showAndCenter();
     selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {

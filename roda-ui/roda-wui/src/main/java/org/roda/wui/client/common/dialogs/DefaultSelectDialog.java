@@ -51,10 +51,12 @@ public class DefaultSelectDialog<T extends IsIndexed, O> extends DialogBox imple
   @UiField(provided = true)
   AsyncTableCell<T, O> searchResultsPanel;
 
-  public DefaultSelectDialog(String title, Filter filter, String searchField, AsyncTableCell<T, O> searchResultsPanel) {
+  public DefaultSelectDialog(String title, Filter filter, String searchField, AsyncTableCell<T, O> searchResultsPanel,
+    boolean hidePreFilters) {
     this.searchResultsPanel = searchResultsPanel;
 
-    searchPanel = new SearchPanel(filter, searchField, messages.selectAipSearchPlaceHolder(), false, false);
+    searchPanel = new SearchPanel(filter, searchField, messages.selectAipSearchPlaceHolder(), false, false,
+      hidePreFilters);
     searchPanel.setList(searchResultsPanel);
     searchPanel.setDefaultFilterIncremental(true);
 
@@ -79,6 +81,10 @@ public class DefaultSelectDialog<T extends IsIndexed, O> extends DialogBox imple
 
     show();
     center();
+  }
+
+  public void hidePreFilters() {
+    searchPanel.hidePreFilters();
   }
 
   @UiHandler("cancelButton")

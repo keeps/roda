@@ -15,7 +15,7 @@ import org.roda.wui.client.common.lists.RodaMemberList;
 public class MemberSelectDialog extends DefaultSelectDialog<RODAMember, Void> {
 
   public MemberSelectDialog(String title, Filter filter) {
-    super(title, filter, RodaConstants.MEMBERS_NAME, new RodaMemberList(filter, null, title, false));
+    super(title, filter, RodaConstants.MEMBERS_NAME, new RodaMemberList(filter, null, title, false), false);
   }
 
 }

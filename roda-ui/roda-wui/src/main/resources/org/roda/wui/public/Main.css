@@ -106,8 +106,6 @@ ul {
 	padding: 0 2em;
 }
 
-
-
 .associative-label {
     display: inline;
     margin-right: 0.5rem;
@@ -5219,4 +5217,10 @@ td.datePickerMonth, td.datePickerYear {
 #statistics pre > code {
     max-height: none;
     overflow: auto;
+}
+.chart_col_card {
+	border-width: 2px;
+	border-style: solid;
+    border-color: #eee;
+    padding: 1.5em 2em;
 }

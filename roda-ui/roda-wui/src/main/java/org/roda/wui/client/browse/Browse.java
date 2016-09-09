@@ -253,7 +253,7 @@ public class Browse extends Composite {
     aipList = new AIPList(Filter.NULL, justActive, FACETS, summary, selectable);
 
     searchPanel = new SearchPanel(COLLECTIONS_FILTER, RodaConstants.AIP_SEARCH, messages.searchPlaceHolder(), false,
-      false);
+      false, false);
     searchPanel.setDefaultFilterIncremental(true);
     searchPanel.setList(aipList);
 
@@ -994,10 +994,11 @@ public class Browse extends Composite {
       // Move this item
 
       if (aipId != null && itemBundle != null) {
-        Filter filter = new Filter(new NotSimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aipId));
+        Filter filter = new Filter(new NotSimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aipId),
+          new NotSimpleFilterParameter(RodaConstants.AIP_ID, aipId));
         // TODO add also OR new NotSimpleFilterParameter(RodaConstants.AIP_ID,
         // aipId)
-        SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter, justActive);
+        SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter, justActive, false);
         if (itemBundle.getAip().getParentID() != null) {
           selectAipDialog.setEmptyParentButtonVisible(true);
         }
@@ -1041,14 +1042,25 @@ public class Browse extends Composite {
       // Move all selected
       Filter filter = new Filter();
       boolean showEmptyParentButton;
+
       if (aipId != null) {
-        filter = new Filter(new NotSimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aipId));
+        filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aipId));
+        filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_ID, aipId));
         showEmptyParentButton = true;
       } else {
+        if (selected instanceof SelectedItemsList) {
+          SelectedItemsList<IndexedAIP> list = (SelectedItemsList<IndexedAIP>) selected;
+          for (String id : list.getIds()) {
+            filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_ANCESTORS, id));
+            filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_ID, id));
+          }
+        } else {
+          filter = Filter.NULL;
+        }
         showEmptyParentButton = false;
       }
 
-      SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter, justActive);
+      SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter, justActive, true);
       selectAipDialog.setEmptyParentButtonVisible(showEmptyParentButton);
       selectAipDialog.showAndCenter();
       selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {

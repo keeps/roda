@@ -16,7 +16,7 @@ public class SelectDialogFactory {
   public SelectDialog getSelectDialog(Class actualClass, String title, Filter filter) throws NotFoundException {
     if (actualClass.getSimpleName().equals("AIP")) {
       boolean justActive = true;
-      return new SelectAipDialog(title, filter, justActive);
+      return new SelectAipDialog(title, filter, justActive, false);
     } else if (actualClass.getSimpleName().equals("Format")) {
       return new SelectFormatDialog(title, filter);
     } else if (actualClass.getSimpleName().equals("Agent")) {
