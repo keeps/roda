@@ -5222,5 +5222,5 @@ td.datePickerMonth, td.datePickerYear {
 	border-width: 2px;
 	border-style: solid;
     border-color: #eee;
-    padding: 1.5em 2em;
+    padding: 0em 2em 1.5em 2em;
 }

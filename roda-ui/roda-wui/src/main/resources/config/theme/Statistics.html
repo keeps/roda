@@ -1,6 +1,14 @@
 <div id="statistics" class="static-page max-width">
 	<h1>Statistics</h1>
 
+	<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+		eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+		minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+		aliquip ex ea commodo consequat. Duis aute irure dolor in
+		reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+		pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+		culpa qui officia deserunt mollit anim id est laborum.</p>
+
 	<h2>Catalogue</h2>
 
 	<div class="row full_width">
@@ -17,7 +25,8 @@
 			<canvas class="statistic" data-source="index"
 				data-source-class="org.roda.core.data.v2.ip.IndexedAIP"
 				data-source-facets="level" data-view="chart"
-				data-view-field="facetResults" data-view-type="pie"></canvas>
+				data-view-field="facetResults" data-view-type="pie"
+				data-view-locale="en"></canvas>
 		</div>
 	</div>
 
@@ -35,7 +44,8 @@
 			<canvas class="statistic" data-source="index"
 				data-source-class="org.roda.core.data.v2.ip.IndexedRepresentation"
 				data-source-facets="type" data-view="chart"
-				data-view-field="facetResults" data-view-type="bar"></canvas>
+				data-view-field="facetResults" data-view-type="bar"
+				data-view-locale="en"></canvas>
 		</div>
 	</div>
 
@@ -53,10 +63,30 @@
 			<canvas class="statistic" data-source="index"
 				data-source-class="org.roda.core.data.v2.ip.IndexedFile"
 				data-source-facets="fileFormat" data-view="chart"
-				data-view-field="facetResults" 
-				data-view-type="bar" 
-				data-view-sort="DESC" 
-				data-view-limit="10"></canvas>
+				data-view-field="facetResults" data-view-type="bar"
+				data-view-locale="en"></canvas>
+		</div>
+	</div>
+	<div class="row full_width">
+		<div class="col_4"></div>
+		<div class="col_8 chart_col_card">
+			<h4>Distribution of file mimetypes</h4>
+			<canvas class="statistic" data-source="index"
+				data-source-class="org.roda.core.data.v2.ip.IndexedFile"
+				data-source-facets="formatPronom" data-view="chart"
+				data-view-field="facetResults" data-view-type="bar"
+				data-view-locale="en"></canvas>
+		</div>
+	</div>
+	<div class="row full_width">
+		<div class="col_4"></div>
+		<div class="col_8 chart_col_card">
+			<h4>Distribution of file PRONOMs</h4>
+			<canvas class="statistic" data-source="index"
+				data-source-class="org.roda.core.data.v2.ip.IndexedFile"
+				data-source-facets="formatMimetype" data-view="chart"
+				data-view-field="facetResults" data-view-type="bar"
+				data-view-locale="en"></canvas>
 		</div>
 	</div>
 
@@ -116,7 +146,8 @@
 				data-source-class="org.roda.core.data.v2.log.LogEntry"
 				data-source-filters="actionComponent=org.roda.wui.api.controllers.UserLogin, actionMethod=login"
 				data-source-facets="state" data-view="chart"
-				data-view-field="facetResults" data-view-type="pie"></canvas>
+				data-view-field="facetResults" data-view-type="pie"
+				data-view-locale="en"></canvas>
 		</div>
 	</div>
 </div>

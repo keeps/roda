@@ -58,6 +58,8 @@
 
 			var start = $(element).data("source-start") || 0;
 			var limit = $(element).data("source-limit") || 0;
+			var facetLimit = $(element).data("view-limit") || 100;
+			var locale = $(element).data("view-locale") || "en";
 			var onlyActive = $(element).data("source-onlyActive") || "false";
 
 			var locale = document.locale;
@@ -66,8 +68,8 @@
 					{
 						url : "/api/v1/index?returnClass=" + returnClass + "&"
 								+ filterParams + "&" + facetParams + "&start="
-								+ start + "&limit=" + limit + "&onlyActive="
-								+ onlyActive
+								+ start + "&limit=" + limit + "&facetLimit="
+								+ facetLimit + "&locale=" + locale +  "&onlyActive=" + onlyActive
 					}).done(function(data) {
 				viewCallback(element, data);
 			});
@@ -208,14 +210,16 @@
 						} ]
 
 					},
-					legend : {
-						display : true,
-						position : "bottom"
+					options : {
+						legend : {
+							display : true,
+							position : 'bottom'
+						}
 					}
 				};
 
 				if (type == "bar") {
-					options.legend.display = false;
+					options.options.legend.display = false;
 				}
 			}
 

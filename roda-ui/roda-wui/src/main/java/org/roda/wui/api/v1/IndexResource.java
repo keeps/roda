@@ -24,6 +24,7 @@ import javax.ws.rs.core.Response;
 
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.adapter.facet.FacetParameter;
+import org.roda.core.data.adapter.facet.FacetParameter.SORT;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.facet.SimpleFacetParameter;
 import org.roda.core.data.adapter.filter.Filter;
@@ -41,6 +42,7 @@ import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.CountRequest;
 import org.roda.wui.api.v1.utils.FindRequest;
+import org.roda.wui.common.I18nUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,6 +104,8 @@ public class IndexResource {
     @ApiParam(value = "Index of the first element to return (0-based index)", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) final Integer start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam(RodaConstants.API_QUERY_KEY_LIMIT) final Integer limit,
     @ApiParam(value = "Facets to return", example = "formatPronom") @QueryParam(RodaConstants.API_QUERY_KEY_FACET) final List<String> facetAttributes,
+    @ApiParam(value = "Facet limit", example = "100") @QueryParam(RodaConstants.API_QUERY_KEY_FACET_LIMIT) final Integer facetLimit,
+    @ApiParam(value = "Locale", example = "en", defaultValue = "en") @QueryParam(RodaConstants.API_QUERY_KEY_LOCALE) final String localeString,
     @ApiParam(value = "Return only active resources?", defaultValue = "true") @QueryParam(RodaConstants.API_QUERY_KEY_ONLY_ACTIVE) final Boolean onlyActive)
     throws RODAException {
     final String mediaType = ApiUtils.getMediaType(null, request);
@@ -136,13 +140,14 @@ public class IndexResource {
 
       final Set<FacetParameter> facetParameters = new HashSet<>();
       for (String facetAttribute : facetAttributes) {
-        facetParameters.add(new SimpleFacetParameter(facetAttribute));
+        facetParameters.add(new SimpleFacetParameter(facetAttribute, facetLimit, SORT.COUNT));
       }
       final Facets facets = new Facets(facetParameters);
 
       final boolean paramOnlyActive = onlyActive == null ? DEFAULT_ONLY_ACTIVE : onlyActive;
 
-      final IndexResult<T> result = Browser.find(classToReturn, filter, sorter, sublist, facets, user, paramOnlyActive);
+      IndexResult<T> indexResult = Browser.find(classToReturn, filter, sorter, sublist, facets, user, paramOnlyActive);
+      final IndexResult<T> result = I18nUtility.translate(indexResult, classToReturn, localeString);
 
       return Response.ok(result, mediaType).build();
 

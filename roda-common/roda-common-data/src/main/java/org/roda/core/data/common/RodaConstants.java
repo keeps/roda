@@ -148,6 +148,8 @@ public final class RodaConstants {
   public static final String API_QUERY_KEY_FACET = "facet";
   public static final String API_QUERY_KEY_FILTER = "filter";
   public static final String API_QUERY_KEY_SORT = "sort";
+  public static final String API_QUERY_KEY_FACET_LIMIT = "facetLimit";
+  public static final String API_QUERY_KEY_LOCALE = "locale";
   // "http path param" related strings
   public static final String API_PATH_PARAM_AIP_ID = "aip_id";
   public static final String API_PATH_PARAM_REPRESENTATION_ID = "representation_id";
@@ -875,9 +877,8 @@ public final class RodaConstants {
   public enum RODA_TYPE {
     AIP, REPRESENTATION, FILE, TRANSFERRED_RESOURCE;
   }
-  
-  
-  public static final List<String> SYSTEM_USERS = Arrays.asList("admin","guest");
+
+  public static final List<String> SYSTEM_USERS = Arrays.asList("admin", "guest");
 
   /** Private empty constructor */
   private RodaConstants() {
