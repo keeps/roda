@@ -12,19 +12,29 @@
 	<xsl:param name="i18n.identityarea" />	
 	<xsl:param name="i18n.reference" />
 	<xsl:param name="i18n.title" />
-	<xsl:param name="i18n.repositorycode" />
-	<xsl:param name="i18n.unitdate" />
 	<xsl:param name="i18n.initialdate" />
 	<xsl:param name="i18n.finaldate" />
+	<xsl:param name="i18n.unitdate" />
+	<xsl:param name="i18n.countrycode" />
 	<xsl:param name="i18n.level" />
+	<xsl:param name="i18n.materialspec" />
+	<xsl:param name="i18n.origination" />
+	<xsl:param name="i18n.physicaldescription" />
 	<xsl:param name="i18n.extent" />
+	<xsl:param name="i18n.dimensions" />
+	<xsl:param name="i18n.physfacet" />
+	<xsl:param name="i18n.quote" />
+	
 	
 	<xsl:param name="i18n.contextarea" />	
+	<xsl:param name="i18n.bioghist" />
 	<xsl:param name="i18n.creator" />	
 	<xsl:param name="i18n.producer" />	
-	<xsl:param name="i18n.repository" />	
+	<xsl:param name="i18n.repositorycode" />
+	<xsl:param name="i18n.repository" />
 	<xsl:param name="i18n.custodialhistory" />
 	<xsl:param name="i18n.acquisitioninformation" />
+	
 	
 	<xsl:param name="i18n.contentarea" />	
 	<xsl:param name="i18n.description" />
@@ -32,46 +42,36 @@
 	<xsl:param name="i18n.accruals" />
 	<xsl:param name="i18n.arrangement" />
 	
+	
 	<xsl:param name="i18n.accessarea" />	
+	<xsl:param name="i18n.administrativeandbiographicalhistory" />
 	<xsl:param name="i18n.accessrestrictions" />
 	<xsl:param name="i18n.userestrict" />
 	<xsl:param name="i18n.languages" />
 	<xsl:param name="i18n.languagesMaterial" />
+	
 	
 	<xsl:param name="i18n.alliedarea" />	
 	<xsl:param name="i18n.originalsloc" />
 	<xsl:param name="i18n.altformavail" />
 	<xsl:param name="i18n.relatedmaterials" />
 	<xsl:param name="i18n.bibliography" />
+	<xsl:param name="i18n.otherfindaids" />
+	
 	
 	<xsl:param name="i18n.notesarea" />	
 	<xsl:param name="i18n.notes" />
 	
+	
 	<xsl:param name="i18n.descriptioncontrolarea" />
 	<xsl:param name="i18n.rules" />
-	<xsl:param name="i18n.statusDescription" />
-	<xsl:param name="i18n.levelOfDetail" />
-	<xsl:param name="i18n.processDates" />
+	<xsl:param name="i18n.statusdescription" />
+	<xsl:param name="i18n.levelofdetail" />
+	<xsl:param name="i18n.processdates" />
 	<xsl:param name="i18n.sources" />
 	<xsl:param name="i18n.archivistNotes" />
 	
-	
-	<xsl:param name="i18n.titletype" />
-	
-	<xsl:param name="i18n.acquisitionnumber" />
-	<xsl:param name="i18n.origination" />
-	<xsl:param name="i18n.acquisitiondate" />
-	<xsl:param name="i18n.materialspecification" />
-	<xsl:param name="i18n.physicaldescription" />
-	<xsl:param name="i18n.dateofinitialphysicaldescription" />
-	<xsl:param name="i18n.dateoffinalphysicaldescription" />
-	<xsl:param name="i18n.dimensions" />
-	<xsl:param name="i18n.facetorappearance" />
-	<xsl:param name="i18n.quote" />
-	<xsl:param name="i18n.administrativeandbiographicalhistory" />
-	
-	<xsl:param name="i18n.physicalcharacteristicsandtechnicalrequirements" />
-	<xsl:param name="i18n.otherfindaids" />
+
 	<xsl:template match="/">
 		<div class="descriptiveMetadata">
 			<xsl:if test="//ead:did/ead:unitid/text()|//ead:did/ead:unittitle/text()|//ead:did/ead:unitid/@repositorycode|//ead:did/ead:unitdate/text()|//ead:did/ead:unitdate/@normal|//ead:archdesc/@level|//ead:extent">
@@ -94,28 +94,6 @@
 					</div>
 					<div class="value">
 						<xsl:value-of select="//ead:did/ead:unittitle/text()" />
-					</div>
-				</div>
-			</xsl:if>
-			<xsl:if test="//ead:did/ead:unitid/@repositorycode">
-				<div class="field">
-					<div class="label">
-						<xsl:value-of select="$i18n.repositorycode" />
-					</div>
-					<div class="value">
-						<xsl:value-of select="//ead:did/ead:unitid/@repositorycode" />
-					</div>
-				</div>
-			</xsl:if>
-			<xsl:if test="//ead:did/ead:unitdate/text()">
-				<div class="field">
-					<div class="label">
-						<xsl:value-of select="$i18n.unitdate" />
-					</div>
-					<div class="value">
-						<span class="value">
-							<xsl:value-of select="//ead:did/ead:unitdate/text()" />
-						</span>
 					</div>
 				</div>
 			</xsl:if>
@@ -185,6 +163,28 @@
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:if>
+			<xsl:if test="//ead:did/ead:unitdate/text()">
+				<div class="field">
+					<div class="label">
+						<xsl:value-of select="$i18n.unitdate" />
+					</div>
+					<div class="value">
+						<span class="value">
+							<xsl:value-of select="//ead:did/ead:unitdate/text()" />
+						</span>
+					</div>
+				</div>
+			</xsl:if>
+			<xsl:if test="//ead:did/ead:unitid/@countrycode">
+				<div class="field">
+					<div class="label">
+						<xsl:value-of select="$i18n.countrycode" />
+					</div>
+					<div class="value">
+						<xsl:value-of select="//ead:did/ead:unitid/@countrycode" />
+					</div>
+				</div>
+			</xsl:if>
 			<xsl:if test="//ead:archdesc/@level">
 				<div class="field">
 					<div class="label">
@@ -192,6 +192,36 @@
 					</div>
 					<div class="value">
 						<xsl:value-of select="//ead:archdesc/@level" />
+					</div>
+				</div>
+			</xsl:if>
+			<xsl:if test="//ead:materialspec/text()">
+				<div class="field">
+					<div class="label">
+						<xsl:value-of select="$i18n.materialspec" />
+					</div>
+					<div class="value">
+						<xsl:value-of select="//ead:materialspec/text()" />
+					</div>
+				</div>
+			</xsl:if>
+			<xsl:if test="//ead:origination/text()">
+				<div class="field">
+					<div class="label">
+						<xsl:value-of select="$i18n.origination" />
+					</div>
+					<div class="value">
+						<xsl:value-of select="//ead:origination/text()" />
+					</div>
+				</div>
+			</xsl:if>
+			<xsl:if test="//ead:physdesc/ead:p/text()">
+				<div class="field">
+					<div class="label">
+						<xsl:value-of select="$i18n.physicaldescription" />
+					</div>
+					<div class="value">
+						<xsl:value-of select="//ead:physdesc/ead:p/text()" />
 					</div>
 				</div>
 			</xsl:if>
@@ -214,8 +244,73 @@
 					</div>
 				</xsl:if>
 			</xsl:for-each>
+			<xsl:for-each select="//ead:dimensions">
+				<xsl:if test="./text()">
+					<div class="field">
+					
+						<div class="label">
+							<xsl:value-of select="$i18n.dimensions" />
+						</div>
+						<div class="value">
+							<span class="value">
+								<xsl:value-of select="./text()" />
+							</span>
+							<xsl:if test="./@unit">
+								<span class="unit">
+									<xsl:value-of select="./@unit" />
+								</span>
+							</xsl:if>
+						</div>
+					</div>
+				</xsl:if>
+			</xsl:for-each>
+			<xsl:for-each select="//ead:physfacet">
+				<xsl:if test="./text()">
+					<div class="field">
+						<div class="label">
+							<xsl:value-of select="$i18n.physfacet" />
+						</div>
+						<div class="value">
+							<span class="value">
+								<xsl:value-of select="./text()" />
+							</span>
+							<xsl:if test="./@unit">
+								<span class="unit">
+									<xsl:value-of select="./@unit" />
+								</span>
+							</xsl:if>
+						</div>
+					</div>
+				</xsl:if>
+			</xsl:for-each>
+			<xsl:if test="//ead:prefercite/ead:p/text()">
+				<div class="field">
+					<div class="label">
+						<xsl:value-of select="$i18n.quote" />
+					</div>
+					<div class="value"><xsl:value-of select="//ead:prefercite/ead:p/text()" /></div>
+				</div>
+			</xsl:if>
+			
+			
+			
+			
+			
+			
+			
+			
 			<xsl:if test="//ead:did/ead:origination[@label='creator']/ead:name/text()|//ead:did/ead:origination[@label='producer']/ead:name/text()|//ead:did/ead:repository/ead:corpname/text()|//ead:custodhist/ead:p/text()|//ead:acqinfo/ead:p/text()">
 				<div class="form-separator"><xsl:value-of select="$i18n.contextarea" /></div>
+			</xsl:if>
+			<xsl:if test="//ead:bioghist/ead:p/text()">
+				<div class="field">
+					<div class="label">
+						<xsl:value-of select="$i18n.bioghist" />
+					</div>
+					<div class="value">
+						<xsl:value-of select="//ead:bioghist/ead:p/text()" />
+					</div>
+				</div>
 			</xsl:if>
 			<xsl:if test="//ead:did/ead:origination[@label='creator']/ead:name/text()">
 				<div class="field">
@@ -234,6 +329,16 @@
 					</div>
 					<div class="value">
 						<xsl:value-of select="//ead:did/ead:origination[@label='producer']/ead:name/text()" />
+					</div>
+				</div>
+			</xsl:if>
+			<xsl:if test="//ead:did/ead:unitid/@repositorycode">
+				<div class="field">
+					<div class="label">
+						<xsl:value-of select="$i18n.repositorycode" />
+					</div>
+					<div class="value">
+						<xsl:value-of select="//ead:did/ead:unitid/@repositorycode" />
 					</div>
 				</div>
 			</xsl:if>
@@ -269,6 +374,12 @@
 					</div>
 				</div>
 			</xsl:if>
+			
+			
+			
+
+
+
 			<xsl:if test="//ead:scopecontent/ead:p/text()|//ead:appraisal/ead:p/text()|//ead:accruals/ead:p/text()|//ead:arrangement/ead:p/text()|ead:arrangement/ead:table">
 				<div class="form-separator"><xsl:value-of select="$i18n.contentarea" /></div>
 			</xsl:if>
@@ -331,8 +442,7 @@
 								</tr>
 							</thead>
 							<tbody>
-								<xsl:for-each
-									select="ead:arrangement/ead:table/ead:tgroup/ead:tbody/ead:row">
+								<xsl:for-each select="ead:arrangement/ead:table/ead:tgroup/ead:tbody/ead:row">
 									<tr>
 										<xsl:for-each select="ead:entry">
 											<td>
@@ -349,8 +459,29 @@
 					</div>
 				</div>
 			</xsl:if>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
 			<xsl:if test="//ead:accessrestrict/ead:p/text()|//ead:userestrict/ead:p/text()|//ead:did/ead:langmaterial/text()">
 				<div class="form-separator"><xsl:value-of select="$i18n.accessarea" /></div>
+			</xsl:if>
+			
+			<xsl:if test="//ead:phystech/ead:p/text()">
+				<div class="field">
+					<div class="label">
+						<xsl:value-of select="$i18n.administrativeandbiographicalhistory" />
+					</div>
+					<div class="value">
+						<xsl:value-of select="//ead:phystech/ead:p/text()" />
+					</div>
+				</div>
 			</xsl:if>
 			<xsl:if test="//ead:accessrestrict/ead:p/text()">
 				<div class="field">
@@ -453,19 +584,38 @@
 					</div>
 				</div>
 			</xsl:if>
-			<xsl:if test="//ead:note[@type='generalNote']/ead:p/text()">
+			<xsl:if test="//ead:otherfindaid/ead:p/text()">
+				<div class="field">
+					<div class="label">
+						<xsl:value-of select="$i18n.otherfindaids" />
+					</div>
+					<div class="value">
+						<xsl:value-of select="//ead:otherfindaid/ead:p/text()" />
+					</div>
+				</div>
+			</xsl:if>
+			
+			
+			
+			
+			<xsl:if test="//ead:note/ead:p/text()">
 				<div class="form-separator"><xsl:value-of select="$i18n.notesarea" /></div>
 			</xsl:if>
-			<xsl:if test="//ead:note[@type='generalNote']/ead:p/text()">
+			<xsl:if test="//ead:note/ead:p/text()">
 				<div class="field">
 					<div class="label">
 						<xsl:value-of select="$i18n.notes" />
 					</div>
 					<div class="value prewrap">
-						<xsl:value-of select="//ead:note[@type='generalNote']/ead:p/text()" />
+						<xsl:value-of select="//ead:note/ead:p/text()" />
 					</div>
 				</div>
 			</xsl:if>
+			
+			
+			
+			
+			
 			<xsl:if test="//ead:profiledesc/ead:descrules|//ead:odd[@type='statusDescription']/ead:p|//ead:odd[@type='levelOfDetail']/ead:p|//ead:processinfo/ead:p/ead:date|//ead:did/ead:note[@type='sourcesDescription']/ead:p|//ead:processinfo/ead:p[not(*)]">
 				<div class="form-separator"><xsl:value-of select="$i18n.descriptioncontrolarea" /></div>
 			</xsl:if>
@@ -485,7 +635,7 @@
 				<xsl:if test="./text()">
 					<div class="field">
 						<div class="label">
-							<xsl:value-of select="$i18n.statusDescription" />
+							<xsl:value-of select="$i18n.statusdescription" />
 						</div>
 						<div class="value">
 							<xsl:value-of select="./text()" />
@@ -497,7 +647,7 @@
 				<xsl:if test="./text()">
 					<div class="field">
 						<div class="label">
-							<xsl:value-of select="$i18n.levelOfDetail" />
+							<xsl:value-of select="$i18n.levelofdetail" />
 						</div>
 						<div class="value">
 							<xsl:value-of select="./text()" />
@@ -509,7 +659,7 @@
 				<xsl:if test="./text()">
 					<div class="field">
 						<div class="label">
-							<xsl:value-of select="$i18n.processDates" />
+							<xsl:value-of select="$i18n.processdates" />
 						</div>
 						<div class="value">
 							<xsl:value-of select="./text()" />

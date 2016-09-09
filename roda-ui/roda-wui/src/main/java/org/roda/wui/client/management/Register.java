@@ -167,95 +167,107 @@ public class Register extends Composite {
         public void onSuccess(Boolean result) {
           final boolean registerActive = result;
           user.setActive(result);
+          BrowserService.Util.getInstance().getRegisterDefaultGroups(new AsyncCallback<List<String>>() {
+            @Override
+            public void onFailure(Throwable caught) {
+              errorMessage(caught);
+            }
 
-          UserManagementService.Util.getInstance().registerUser(user, password, recaptcha, userDataPanel.getExtra(),
-            new AsyncCallback<Void>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                errorMessage(caught);
-              }
-
-              @Override
-              public void onSuccess(Void result) {
-                if (registerActive) {
-                  Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
-                    messages.registerSuccessDialogMessageActive(), messages.registerSuccessDialogButton(),
-                    new AsyncCallback<Void>() {
-
-                      @Override
-                      public void onSuccess(Void result) {
-                        Tools.newHistory(Login.RESOLVER);
-                      }
-
-                      @Override
-                      public void onFailure(Throwable caught) {
-                        Tools.newHistory(Login.RESOLVER);
-                      }
-                    });
-                } else {
-                  UserManagementService.Util.getInstance().sendEmailVerification(user.getId(),
-                    new AsyncCallback<Notification>() {
-
-                      @Override
-                      public void onSuccess(Notification result) {
-                        if (result.getState() == NOTIFICATION_STATE.COMPLETED) {
-                          Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
-                            messages.registerSuccessDialogMessage(), messages.registerSuccessDialogButton(),
-                            new AsyncCallback<Void>() {
-
-                              @Override
-                              public void onSuccess(Void result) {
-                                Tools.newHistory(Login.RESOLVER);
-                              }
-
-                              @Override
-                              public void onFailure(Throwable caught) {
-                                Tools.newHistory(Login.RESOLVER);
-                              }
-                            });
-                        } else {
-                          // TODO the user "default" group should be
-                          // configurable...
-                          user.setActive(true);
-                          user.addGroup("users");
-                          UserManagementService.Util.getInstance().updateUser(user, password, userDataPanel.getExtra(),
-                            new AsyncCallback<Void>() {
-
-                              @Override
-                              public void onFailure(Throwable caught) {
-                                errorMessage(caught);
-                              }
-
-                              @Override
-                              public void onSuccess(Void result) {
-                                Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
-                                  messages.registerSuccessDialogMessageActive(), messages.registerSuccessDialogButton(),
-                                  new AsyncCallback<Void>() {
-
-                                    @Override
-                                    public void onSuccess(Void result) {
-                                      Tools.newHistory(Login.RESOLVER);
-                                    }
-
-                                    @Override
-                                    public void onFailure(Throwable caught) {
-                                      Tools.newHistory(Login.RESOLVER);
-                                    }
-                                  });
-                              }
-                            });
-                        }
-                      }
-
-                      @Override
-                      public void onFailure(Throwable caught) {
-                        sendEmailVerificationFailure(caught);
-                      }
-                    });
+            @Override
+            public void onSuccess(List<String> groups) {
+              if (groups != null && groups.size() > 0) {
+                for (String group : groups) {
+                  user.addGroup(group);
                 }
               }
-            });
+              UserManagementService.Util.getInstance().registerUser(user, password, recaptcha, userDataPanel.getExtra(),
+                new AsyncCallback<Void>() {
+
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    errorMessage(caught);
+                  }
+
+                  @Override
+                  public void onSuccess(Void result) {
+                    if (registerActive) {
+                      Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
+                        messages.registerSuccessDialogMessageActive(), messages.registerSuccessDialogButton(),
+                        new AsyncCallback<Void>() {
+
+                          @Override
+                          public void onSuccess(Void result) {
+                            Tools.newHistory(Login.RESOLVER);
+                          }
+
+                          @Override
+                          public void onFailure(Throwable caught) {
+                            Tools.newHistory(Login.RESOLVER);
+                          }
+                        });
+                    } else {
+                      UserManagementService.Util.getInstance().sendEmailVerification(user.getId(),
+                        new AsyncCallback<Notification>() {
+
+                          @Override
+                          public void onSuccess(Notification result) {
+                            if (result.getState() == NOTIFICATION_STATE.COMPLETED) {
+                              Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
+                                messages.registerSuccessDialogMessage(), messages.registerSuccessDialogButton(),
+                                new AsyncCallback<Void>() {
+
+                                  @Override
+                                  public void onSuccess(Void result) {
+                                    Tools.newHistory(Login.RESOLVER);
+                                  }
+
+                                  @Override
+                                  public void onFailure(Throwable caught) {
+                                    Tools.newHistory(Login.RESOLVER);
+                                  }
+                                });
+                            } else {
+                              // TODO the user "default" group should be
+                              // configurable...
+                              user.setActive(true);
+
+                              UserManagementService.Util.getInstance().updateUser(user, password,
+                                userDataPanel.getExtra(), new AsyncCallback<Void>() {
+                                  @Override
+                                  public void onFailure(Throwable caught) {
+                                    errorMessage(caught);
+                                  }
+
+                                  @Override
+                                  public void onSuccess(Void result) {
+                                    Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
+                                      messages.registerSuccessDialogMessageActive(),
+                                      messages.registerSuccessDialogButton(), new AsyncCallback<Void>() {
+                                        @Override
+                                        public void onSuccess(Void result) {
+                                          Tools.newHistory(Login.RESOLVER);
+                                        }
+
+                                        @Override
+                                        public void onFailure(Throwable caught) {
+                                          Tools.newHistory(Login.RESOLVER);
+                                        }
+                                      });
+                                  }
+                                });
+                            }
+                          }
+
+                          @Override
+                          public void onFailure(Throwable caught) {
+                            sendEmailVerificationFailure(caught);
+                          }
+                        });
+                    }
+                  }
+                });
+            }
+          });
         }
 
         @Override

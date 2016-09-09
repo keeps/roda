@@ -1,12 +1,19 @@
 {{~field name="title"		order='2' auto-generate='title' labeli18n="crosswalks.dissemination.html.dc.title" label="{\"en\": \"Title\"}" xpath="//*:title/string()"}}
 {{~field name="id" 			order='1' auto-generate='id' labeli18n="crosswalks.dissemination.html.dc.identifier" label="{\"en\": \"ID\"}" xpath="//*:identifier/string()"}}
-{{~field name="creator" 	labeli18n="crosswalks.dissemination.html.dc.creator" label="{\"en\": \"Creator\"}" xpath="//*:creator/string()"}}
+{{~field name="creator" 	order='5' labeli18n="crosswalks.dissemination.html.dc.creator" label="{\"en\": \"Creator\"}" xpath="//*:creator/string()"}}
 {{~field name="dateInitial" order='3' type='date' labeli18n="crosswalks.dissemination.html.dc.date.initial" label="{\"en\": \"Initial date\"}" xpath="//*:date[1]/string()"}}
 {{~field name="dateFinal" 	order='4' type='date' labeli18n="crosswalks.dissemination.html.dc.date.final" label="{\"en\": \"Final date\"}" xpath="//*:date[2]/string()"}}
-{{~field name="description" type='text-area' labeli18n="crosswalks.dissemination.html.dc.description" label="{\"en\": \"Description\"}" xpath="//*:description/string()"}}
-{{~field name="producer" 	labeli18n="crosswalks.dissemination.html.dc.publisher" label="{\"en\": \"Producer\"}" xpath="//*:publisher/string()"}}
-{{~field name="rights" 		labeli18n="crosswalks.dissemination.html.dc.rights" label="{\"en\": \"Rights\"}" xpath="//*:rights/string()"}}
-{{~field name="language" 	auto-generate='language' labeli18n="crosswalks.dissemination.html.dc.language" label="{\"en\": \"Language\"}" xpath="//*:language/string()"~}}
+{{~field name="description" order='6' type='text-area' labeli18n="crosswalks.dissemination.html.dc.description" label="{\"en\": \"Description\"}" xpath="//*:description/string()"}}
+{{~field name="producer" 	order='7' labeli18n="crosswalks.dissemination.html.dc.publisher" label="{\"en\": \"Producer\"}" xpath="//*:publisher/string()"}}
+{{~field name="contributor"  order='8' labeli18n="crosswalks.dissemination.html.dc.contributor" label="{\"en\": \"Contributor\"}" xpath="//*:contributor/string()"}}
+{{~field name="rights" 		order='9' labeli18n="crosswalks.dissemination.html.dc.rights" label="{\"en\": \"Rights\"}" xpath="//*:rights/string()"}}
+{{~field name="language" 	order='10' auto-generate='language' labeli18n="crosswalks.dissemination.html.dc.language" label="{\"en\": \"Language\"}" xpath="//*:language/string()"~}}
+{{~field name="coverage" 	order='11' labeli18n="crosswalks.dissemination.html.dc.coverage" label="{\"en\": \"Coverage\"}" xpath="//*:coverage/string()"~}}
+{{~field name="format" 	order='12' labeli18n="crosswalks.dissemination.html.dc.format" label="{\"en\": \"Format\"}" xpath="//*:format/string()"~}}
+{{~field name="relation" 	order='13' labeli18n="crosswalks.dissemination.html.dc.relation" label="{\"en\": \"Relation\"}" xpath="//*:relation/string()"~}}
+{{~field name="source" 	order='14' labeli18n="crosswalks.dissemination.html.dc.source" label="{\"en\": \"Source\"}" xpath="//*:source/string()"~}}
+{{~field name="subject" 	order='15' labeli18n="crosswalks.dissemination.html.dc.subject" label="{\"en\": \"Subject\"}" xpath="//*:subject/string()"~}}
+{{~field name="type" 	order='16' labeli18n="crosswalks.dissemination.html.dc.type" label="{\"en\": \"Type\"}" xpath="//*:type/string()"~}}
 <?xml version="1.0"?>
 <simpledc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	  xsi:noNamespaceSchemaLocation="../schemas/dc.xsd">
@@ -17,6 +24,14 @@
 	<date>{{dateFinal}}</date>
 	<description>{{description}}</description>
 	<publisher>{{producer}}</publisher>
+	<contributor>{{contributor}}</contributor>
 	<rights>{{rights}}</rights>
 	<language>{{language}}</language>
+	<coverage>{{coverage}}</coverage>
+	<format>{{format}}</format>
+	<relation>{{relation}}</relation>
+	<subject>{{subject}}</subject>
+	<type>{{type}}</type>
+	<source>{{source}}</source>
 </simpledc>
+    

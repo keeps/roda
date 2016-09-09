@@ -158,6 +158,8 @@ public interface BrowserService extends RemoteService {
   boolean isCookiesMessageActive();
 
   boolean isRegisterActive();
+  
+  List<String> getRegisterDefaultGroups();
 
   /**
    * Get Google Analytics account id

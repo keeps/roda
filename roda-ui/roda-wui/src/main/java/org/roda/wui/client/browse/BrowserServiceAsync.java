@@ -108,6 +108,8 @@ public interface BrowserServiceAsync {
   void isCookiesMessageActive(AsyncCallback<Boolean> callback);
 
   void isRegisterActive(AsyncCallback<Boolean> callback);
+  
+  void getRegisterDefaultGroups(AsyncCallback<List<String>> callback);
 
   void retrieveGoogleAnalyticsAccount(AsyncCallback<String> callback);
 

@@ -396,6 +396,10 @@ pre code {
 	padding: 5px 15px !important;
 }
 
+.panelDescriptiveMetadata .form-separator:first-child{
+	margin-top:0px !important;
+}
+
 .descriptiveMetadata .form-separator:first-child{
 	margin-top:-15px !important;
 }
