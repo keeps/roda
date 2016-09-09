@@ -19,6 +19,7 @@ import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -76,6 +77,7 @@ public class Statistics {
   private void init() {
     if (!initialized) {
       initialized = true;
+      JavascriptUtils.expose("locale", LocaleInfo.getCurrentLocale().getLocaleName());
       layout = new HTMLWidgetWrapper("Statistics.html", new AsyncCallback<Void>() {
 
         @Override

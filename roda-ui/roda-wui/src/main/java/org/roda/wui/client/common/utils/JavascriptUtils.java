@@ -8,6 +8,7 @@
 package org.roda.wui.client.common.utils;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.i18n.client.LocaleInfo;
 
 public class JavascriptUtils {
 
@@ -292,5 +293,9 @@ public class JavascriptUtils {
 
   public static native void runTextFill(String selector) /*-{
 		$wnd.jQuery(selector).textfill({});
+  }-*/;
+
+  public static native void expose(String key, String value) /*-{
+		$doc[key] = value;
   }-*/;
 }

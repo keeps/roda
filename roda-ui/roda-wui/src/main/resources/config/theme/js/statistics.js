@@ -60,6 +60,8 @@
 			var limit = $(element).data("source-limit") || 0;
 			var onlyActive = $(element).data("source-onlyActive") || "false";
 
+			var locale = document.locale;
+
 			$.ajax(
 					{
 						url : "/api/v1/index?returnClass=" + returnClass + "&"
