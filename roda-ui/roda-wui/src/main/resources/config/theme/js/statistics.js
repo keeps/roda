@@ -2,6 +2,7 @@
 	
 	Chart.defaults.global.defaultFontFamily = "Ubuntu";
 	Chart.defaults.global.defaultFontColor = "#222";
+	Chart.defaults.global.elements.arc.borderColor = "#eee";
 
 	$.fn.statistic = function() {
 		var matchedObject = this;
@@ -241,14 +242,33 @@
 					options.options.legend.display = false;
 					//options.options.xAxes.display = true;
 					//options.options.yAxes.display = true;
-					//options.options.scales.yAxes.ticks.beginAtZero = true;
+					options.options.scales = {
+					    yAxes: [{
+					      id: 'y-axis-0',
+					      ticks: {
+					        beginAtZero: true
+					      }
+					    }]
+					};
 				} else if (type == "horizontalBar") {
 					options.options.legend.display = false;
 					//options.options.xAxes.display = true;
 					//options.options.yAxes.display = true;
-					//options.options.scales.xAxes.ticks.beginAtZero = true;
+					options.options.scales = {
+					xAxes: [{
+					      id: 'x-axis-0',
+					      ticks: {
+					        beginAtZero: true
+					      }
+					    }]
+					};
 				}
 			
+			} 
+			
+			if(facet.values.length == 0) {
+				$(element).before('<i class="fa fa-pie-chart fa-4x" style="color: #ddd"></i>');
+				$(element).hide();
 			}
 
 			return options;
