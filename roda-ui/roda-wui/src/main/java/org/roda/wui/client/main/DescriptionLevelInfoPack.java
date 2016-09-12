@@ -11,27 +11,18 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.roda.core.data.descriptionLevels.DescriptionLevel;
-import org.roda.core.data.descriptionLevels.DescriptionLevelInfo;
 
 public class DescriptionLevelInfoPack implements Serializable {
 
   private static final long serialVersionUID = 3476633742750492225L;
 
-  public List<DescriptionLevelInfo> descriptionLevelsInfo;
   public List<DescriptionLevel> descriptionLevels;
-  public List<DescriptionLevel> rootDescriptionLevels;
-  public List<DescriptionLevel> representationDescriptionLevels;
-  public List<DescriptionLevel> allButRepresentationDescriptionLevels;
+  
+  public String ghostClass;
+  
+  public String defaultClass;
 
   public DescriptionLevelInfoPack() {
-  }
-
-  public List<DescriptionLevelInfo> getDescriptionLevelsInfo() {
-    return descriptionLevelsInfo;
-  }
-
-  public void setDescriptionLevelsInfo(List<DescriptionLevelInfo> descriptionLevelsInfo) {
-    this.descriptionLevelsInfo = descriptionLevelsInfo;
   }
 
   public List<DescriptionLevel> getDescriptionLevels() {
@@ -42,28 +33,21 @@ public class DescriptionLevelInfoPack implements Serializable {
     this.descriptionLevels = descriptionLevels;
   }
 
-  public List<DescriptionLevel> getRootDescriptionLevels() {
-    return rootDescriptionLevels;
+  public String getGhostClass() {
+    return ghostClass;
   }
 
-  public void setRootDescriptionLevels(List<DescriptionLevel> rootDescriptionLevels) {
-    this.rootDescriptionLevels = rootDescriptionLevels;
+  public void setGhostClass(String ghostClass) {
+    this.ghostClass = ghostClass;
   }
 
-  public List<DescriptionLevel> getRepresentationDescriptionLevels() {
-    return representationDescriptionLevels;
+  public String getDefaultClass() {
+    return defaultClass;
   }
 
-  public void setRepresentationDescriptionLevels(List<DescriptionLevel> representationDescriptionLevels) {
-    this.representationDescriptionLevels = representationDescriptionLevels;
+  public void setDefaultClass(String defaultClass) {
+    this.defaultClass = defaultClass;
   }
-
-  public List<DescriptionLevel> getAllButRepresentationDescriptionLevels() {
-    return allButRepresentationDescriptionLevels;
-  }
-
-  public void setAllButRepresentationDescriptionLevels(List<DescriptionLevel> allButRepresentationDescriptionLevels) {
-    this.allButRepresentationDescriptionLevels = allButRepresentationDescriptionLevels;
-  }
-
+  
+  
 }

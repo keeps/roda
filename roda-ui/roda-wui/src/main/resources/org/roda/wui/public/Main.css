@@ -893,26 +893,6 @@ pre code {
     transform: translate(0, 0);
 }
 
-.description-level:before {
-    content: "\f187";
-}
-
-.description-level-organizational:before {
-    content: "\f0f7";
-}
-
-.description-level-categorization:before {
-    content: "\f0c9";
-}
-
-.description-level-intellectual_entity:before {
-    content: "\f114";
-}
-
-.description-level-representational:before {
-    content: "\f016";
-}
-
 /**********************************************
 				GWT
 ************************************************/

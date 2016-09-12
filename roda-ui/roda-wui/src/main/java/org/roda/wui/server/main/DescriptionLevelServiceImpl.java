@@ -10,7 +10,7 @@ package org.roda.wui.server.main;
 import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.descriptionLevels.DescriptionLevelManager;
+import org.roda.core.common.DescriptionLevelManager;
 import org.roda.wui.client.main.DescriptionLevelInfoPack;
 import org.roda.wui.client.main.DescriptionLevelService;
 import org.slf4j.Logger;
@@ -36,12 +36,11 @@ public class DescriptionLevelServiceImpl extends RemoteServiceServlet implements
 
     DescriptionLevelInfoPack pack = new DescriptionLevelInfoPack();
 
-    pack.setDescriptionLevelsInfo(descriptionLevelManager.getDescriptionLevelsInfo());
     pack.setDescriptionLevels(descriptionLevelManager.getDescriptionLevels());
-    pack.setRootDescriptionLevels(descriptionLevelManager.getRootDescriptionLevels());
-    pack.setRepresentationDescriptionLevels(descriptionLevelManager.getRepresentationsDescriptionLevels());
-    pack.setAllButRepresentationDescriptionLevels(descriptionLevelManager.getAllButRepresentationsDescriptionLevels());
-
+    
+    pack.setDefaultClass(descriptionLevelManager.getDefaultClass());
+    
+    pack.setGhostClass(descriptionLevelManager.getGhostClass());
     return pack;
   }
 

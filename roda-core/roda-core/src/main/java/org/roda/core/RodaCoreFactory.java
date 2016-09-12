@@ -58,6 +58,7 @@ import org.reflections.scanners.ResourcesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
+import org.roda.core.common.DescriptionLevelManager;
 import org.roda.core.common.LdapUtility;
 import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.Messages;
@@ -80,7 +81,6 @@ import org.roda.core.data.common.RodaConstants.NodeType;
 import org.roda.core.data.common.RodaConstants.PreservationAgentType;
 import org.roda.core.data.common.RodaConstants.SolrType;
 import org.roda.core.data.common.RodaConstants.StorageType;
-import org.roda.core.data.descriptionLevels.DescriptionLevelManager;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
@@ -525,21 +525,33 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void loadDescriptionLevelInformation() {
-    Properties descriptionLevelConfiguration = new Properties();
-    try {
-      descriptionLevelConfiguration.load(getConfigurationFile(RodaConstants.CORE_DESCRIPTION_LEVELS_FILE).openStream());
-    } catch (IOException e) {
-      // do nothing and instantiate description level manager from empty
-      // properties object
-    }
-    LOGGER.trace("Description level configurations being loaded: {}", descriptionLevelConfiguration);
-    try {
-      descriptionLevelManager = new DescriptionLevelManager(descriptionLevelConfiguration);
-    } catch (RequestNotValidException e) {
-      LOGGER.error("Error loading description levels", e);
-      instantiatedWithoutErrors = false;
-    }
+  private static void loadDescriptionLevelInformation() throws ConfigurationException {
+      Path config = RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_DESCRIPTION_LEVELS_FILE);
+      PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration();
+      propertiesConfiguration.setDelimiterParsingDisabled(true);
+      propertiesConfiguration.setEncoding("UTF-8");
+      if (Files.exists(config)) {
+        LOGGER.trace("Loading configuration from file {}", config);
+        propertiesConfiguration.load(config.toFile());
+        RodaPropertiesReloadStrategy rodaPropertiesReloadStrategy = new RodaPropertiesReloadStrategy();
+        rodaPropertiesReloadStrategy.setRefreshDelay(5000);
+        propertiesConfiguration.setReloadingStrategy(rodaPropertiesReloadStrategy);
+      } else {
+        InputStream inputStream = RodaCoreFactory.class
+          .getResourceAsStream("/" + RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_DESCRIPTION_LEVELS_FILE);
+        if (inputStream != null) {
+          LOGGER.trace("Loading configuration from classpath {}", RodaConstants.CORE_DESCRIPTION_LEVELS_FILE);
+          propertiesConfiguration.load(inputStream);
+        } else {
+          LOGGER.trace("Configuration {} doesn't exist", RodaConstants.CORE_DESCRIPTION_LEVELS_FILE);
+        }
+      }
+      try {
+        descriptionLevelManager = new DescriptionLevelManager(propertiesConfiguration);
+      } catch (RequestNotValidException e) {
+        LOGGER.error("Error loading description levels", e);
+        instantiatedWithoutErrors = false;
+      }
   }
 
   private static void instantiateStorageAndModel() throws GenericException {

@@ -8,8 +8,7 @@
 package org.roda.core.data.descriptionLevels;
 
 import java.io.Serializable;
-
-import org.roda.core.data.exceptions.RequestNotValidException;
+import java.util.Map;
 
 /**
  * 
@@ -23,101 +22,85 @@ public class DescriptionLevel implements Serializable {
 
   // description level
   private String level = null;
+  private Map<String, String> labels;
+  private String iconClass;
 
-  /**
-   * Constructs an empty (<strong>invalid</strong>) {@link DescriptionLevel}.
-   * <p>
-   * <strong>This method should not be used. All the possible values for a
-   * {@link DescriptionLevel} are already defined as constant values.</strong>
-   * </p>
-   */
   public DescriptionLevel() {
+    super();
   }
 
-  /**
-   * Constructs a {@link DescriptionLevel} clonning an existing
-   * {@link DescriptionLevel}.
-   * 
-   * @param dLevel
-   *          the {@link DescriptionLevel} to clone.
-   * 
-   * @throws InvalidDescriptionLevel
-   *           if the specified level is not one of the allowed levels.
-   */
-  public DescriptionLevel(DescriptionLevel dLevel) throws RequestNotValidException {
-    this(dLevel.getLevel());
+  public String getLevel() {
+    return level;
   }
 
-  /**
-   * Constructs a new {@link DescriptionLevel} of the specified level.
-   * 
-   * @param level
-   *          the level of this {@link DescriptionLevel}.
-   * 
-   * @throws InvalidDescriptionLevel
-   *           if the specified level is not one of the allowed levels.
-   */
-  public DescriptionLevel(String level) throws RequestNotValidException {
-    setLevel(level);
+  public void setLevel(String level) {
+    this.level = level;
+  }
+
+  public Map<String, String> getLabels() {
+    return labels;
+  }
+
+  public void setLabels(Map<String, String> labels) {
+    this.labels = labels;
+  }
+  
+  public String getIconClass() {
+    return iconClass;
+  }
+
+  public void setIconClass(String iconClass) {
+    this.iconClass = iconClass;
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
+    result = prime * result + ((iconClass == null) ? 0 : iconClass.hashCode());
+    result = prime * result + ((labels == null) ? 0 : labels.hashCode());
     result = prime * result + ((level == null) ? 0 : level.hashCode());
     return result;
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) {
+    if (this == obj)
       return true;
-    }
-    if (obj == null) {
+    if (obj == null)
       return false;
-    }
-    if (!(obj instanceof DescriptionLevel)) {
+    if (getClass() != obj.getClass())
       return false;
-    }
     DescriptionLevel other = (DescriptionLevel) obj;
-    if (level == null) {
-      if (other.level != null) {
+    if (iconClass == null) {
+      if (other.iconClass != null)
         return false;
-      }
-    } else if (!level.equals(other.level)) {
+    } else if (!iconClass.equals(other.iconClass))
       return false;
-    }
+    if (labels == null) {
+      if (other.labels != null)
+        return false;
+    } else if (!labels.equals(other.labels))
+      return false;
+    if (level == null) {
+      if (other.level != null)
+        return false;
+    } else if (!level.equals(other.level))
+      return false;
     return true;
   }
 
-  /**
-   * @see Object#toString()
-   */
+  
+  @Override
   public String toString() {
-    return getLevel();
+    return "DescriptionLevel [level=" + level + ", labels=" + labels + ", iconClass=" + iconClass + "]";
   }
 
-  /**
-   * @return the level
-   */
-  public String getLevel() {
-    return level;
-  }
-
-  /**
-   * Sets the level (it gets trimmed in the process)
-   * 
-   * @param level
-   *          the level to set.
-   * @throws InvalidDescriptionLevel
-   *           if the specified level is null or empty {@link String}.
-   */
-  public void setLevel(String level) throws RequestNotValidException {
-    if (level != null && !"".equals(level.trim().toLowerCase())) {
-      this.level = level.trim().toLowerCase();
-    } else {
-      throw new RequestNotValidException("Invalid level: '" + level + "'");
+  public String getLabel(String locale) {
+    String label = null;
+    if (labels != null) {
+      label = labels.get(locale);
     }
-  }
+    return label;
+}
 }

@@ -9,9 +9,8 @@ package org.roda.wui.common.client.tools;
 
 import java.util.List;
 
+import org.roda.core.common.DescriptionLevelManager;
 import org.roda.core.data.descriptionLevels.DescriptionLevel;
-import org.roda.core.data.descriptionLevels.DescriptionLevelCategory;
-import org.roda.core.data.descriptionLevels.DescriptionLevelInfo;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.main.DescriptionLevelInfoPack;
 import org.roda.wui.client.main.DescriptionLevelServiceAsync;
@@ -34,11 +33,11 @@ public class DescriptionLevelUtils {
     super();
   }
 
-  public static List<DescriptionLevelInfo> DESCRIPTION_LEVELS_INFO;
   public static List<DescriptionLevel> DESCRIPTION_LEVELS;
-  public static List<DescriptionLevel> ROOT_DESCRIPTION_LEVELS;
-  public static List<DescriptionLevel> REPRESENTATION_DESCRIPTION_LEVELS;
-  public static List<DescriptionLevel> ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS;
+  
+  public static String GHOST_CLASS;
+  
+  public static String DEFAULT_CLASS;
 
   public static void load(final AsyncCallback<Void> callback) {
     DescriptionLevelServiceAsync.INSTANCE.getAllDescriptionLevels(new AsyncCallback<DescriptionLevelInfoPack>() {
@@ -51,24 +50,22 @@ public class DescriptionLevelUtils {
 
       @Override
       public void onSuccess(DescriptionLevelInfoPack result) {
-        DESCRIPTION_LEVELS_INFO = result.getDescriptionLevelsInfo();
         DESCRIPTION_LEVELS = result.getDescriptionLevels();
-        ROOT_DESCRIPTION_LEVELS = result.getRootDescriptionLevels();
-        REPRESENTATION_DESCRIPTION_LEVELS = result.getRepresentationDescriptionLevels();
-        ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS = result.getAllButRepresentationDescriptionLevels();
+        GHOST_CLASS = result.getGhostClass();
+        DEFAULT_CLASS = result.getDefaultClass();
         callback.onSuccess(null);
       }
     });
   }
 
-  public static DescriptionLevelInfo getDescriptionLevel(String level) {
-    DescriptionLevelInfo ret = null;
-    if (DESCRIPTION_LEVELS_INFO == null) {
+  public static DescriptionLevel getDescriptionLevel(String level) {
+    DescriptionLevel ret = null;
+    if (DESCRIPTION_LEVELS == null) {
       logger.error("Requiring a description level while their are not yet loaded");
       return null;
     }
 
-    for (DescriptionLevelInfo descriptionLevel : DESCRIPTION_LEVELS_INFO) {
+    for (DescriptionLevel descriptionLevel : DESCRIPTION_LEVELS) {
       if (descriptionLevel.getLevel().equals(level)) {
         ret = descriptionLevel;
         break;
@@ -92,13 +89,23 @@ public class DescriptionLevelUtils {
   public static SafeHtml getElementLevelIconSafeHtml(String level, boolean showText) {
     //Shortcut for when the AIP is a ghost
     if(level.equals("ghost")){
-      return SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-snapchat-ghost\" aria-hidden=\"true\"></i>");
+      StringBuilder b = new StringBuilder();
+      b.append("<i class='").append(GHOST_CLASS).append("' aria-hidden=\"true\"></i>");
+      return SafeHtmlUtils.fromSafeConstant(b.toString());
     }
-    final DescriptionLevelInfo levelInfo = DescriptionLevelUtils.getDescriptionLevel(level);
+    final DescriptionLevel levelInfo = DescriptionLevelUtils.getDescriptionLevel(level);
 
+    if(levelInfo==null){
+      StringBuilder b = new StringBuilder();
+      b.append("<i class='").append(DEFAULT_CLASS).append("' aria-hidden=\"true\"></i>");
+      if (showText && level != null && level.length() > 0) {
+        b.append("&nbsp;");
+        b.append(level);
+      }
+      return SafeHtmlUtils.fromSafeConstant(b.toString());
+    }
     StringBuilder b = new StringBuilder();
-    DescriptionLevelCategory category = levelInfo != null ? levelInfo.getCategory() : null;
-    b.append("<i class='").append(getElementLevelIconClasses(category));
+    b.append("<i class='").append(levelInfo.getIconClass()+"'");
     if (levelInfo != null) {
       String label = levelInfo.getLabel(LocaleInfo.getCurrentLocale().getLocaleName());
       if (StringUtils.isNotBlank(label)) {
@@ -114,14 +121,5 @@ public class DescriptionLevelUtils {
     return SafeHtmlUtils.fromSafeConstant(b.toString());
   }
 
-  public static String getElementLevelIconClasses(DescriptionLevelCategory descriptionLevelCategory) {
-    String ret;
-    if (descriptionLevelCategory != null) {
-      ret = "description-level description-level-" + descriptionLevelCategory.getCategory();
-    } else {
-      ret = "description-level";
-    }
-    return ret;
-  }
 
 }
