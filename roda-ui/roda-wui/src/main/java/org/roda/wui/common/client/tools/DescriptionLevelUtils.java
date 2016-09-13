@@ -9,14 +9,12 @@ package org.roda.wui.common.client.tools;
 
 import java.util.List;
 
-import org.roda.core.common.DescriptionLevelManager;
 import org.roda.core.data.descriptionLevels.DescriptionLevel;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.main.DescriptionLevelInfoPack;
 import org.roda.wui.client.main.DescriptionLevelServiceAsync;
 import org.roda.wui.common.client.ClientLogger;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -34,9 +32,9 @@ public class DescriptionLevelUtils {
   }
 
   public static List<DescriptionLevel> DESCRIPTION_LEVELS;
-  
+
   public static String GHOST_CLASS;
-  
+
   public static String DEFAULT_CLASS;
 
   public static void load(final AsyncCallback<Void> callback) {
@@ -87,39 +85,40 @@ public class DescriptionLevelUtils {
   }
 
   public static SafeHtml getElementLevelIconSafeHtml(String level, boolean showText) {
-    //Shortcut for when the AIP is a ghost
-    if(level.equals("ghost")){
+    SafeHtml ret = null;
+    if (level.equals("ghost")) {
       StringBuilder b = new StringBuilder();
       b.append("<i class='").append(GHOST_CLASS).append("' aria-hidden=\"true\"></i>");
-      return SafeHtmlUtils.fromSafeConstant(b.toString());
+      ret = SafeHtmlUtils.fromSafeConstant(b.toString());
+    } else {
+      DescriptionLevel levelInfo = DescriptionLevelUtils.getDescriptionLevel(level);
+      if (levelInfo == null) {
+        StringBuilder b = new StringBuilder();
+        b.append("<i class='").append(DEFAULT_CLASS).append("' aria-hidden=\"true\"></i>");
+        appendLevel(b, showText, level);
+        ret = SafeHtmlUtils.fromSafeConstant(b.toString());
+      } else {
+        StringBuilder b = new StringBuilder();
+        b.append("<i class='").append(levelInfo.getIconClass() + "'");
+        if (levelInfo != null) {
+          String label = levelInfo.getLabel(LocaleInfo.getCurrentLocale().getLocaleName());
+          if (StringUtils.isNotBlank(label)) {
+            b.append(" alt='").append(levelInfo.getLabel(LocaleInfo.getCurrentLocale().getLocaleName())).append("'");
+          }
+        }
+        b.append("'>");
+        b.append("</i>");
+        appendLevel(b, showText, level);
+        ret = SafeHtmlUtils.fromSafeConstant(b.toString());
+      }
     }
-    final DescriptionLevel levelInfo = DescriptionLevelUtils.getDescriptionLevel(level);
+    return ret;
+  }
 
-    if(levelInfo==null){
-      StringBuilder b = new StringBuilder();
-      b.append("<i class='").append(DEFAULT_CLASS).append("' aria-hidden=\"true\"></i>");
-      if (showText && level != null && level.length() > 0) {
-        b.append("&nbsp;");
-        b.append(level);
-      }
-      return SafeHtmlUtils.fromSafeConstant(b.toString());
-    }
-    StringBuilder b = new StringBuilder();
-    b.append("<i class='").append(levelInfo.getIconClass()+"'");
-    if (levelInfo != null) {
-      String label = levelInfo.getLabel(LocaleInfo.getCurrentLocale().getLocaleName());
-      if (StringUtils.isNotBlank(label)) {
-        b.append(" alt='").append(levelInfo.getLabel(LocaleInfo.getCurrentLocale().getLocaleName())).append("'");
-      }
-    }
-    b.append("'>");
-    b.append("</i>");
+  private static void appendLevel(StringBuilder b, boolean showText, String level) {
     if (showText && level != null && level.length() > 0) {
       b.append("&nbsp;");
       b.append(level);
     }
-    return SafeHtmlUtils.fromSafeConstant(b.toString());
   }
-
-
 }
