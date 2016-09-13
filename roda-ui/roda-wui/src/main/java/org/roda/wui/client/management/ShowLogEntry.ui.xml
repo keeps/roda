@@ -67,6 +67,12 @@
 								</g:Label>
 								<g:FlowPanel styleName="value" ui:field="logParametersValue" />
 							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="logStateLabel">
+									<ui:text from='{messages.logEntryState}' />
+								</g:Label>
+								<g:HTML styleName="value" ui:field="logStateValue" />
+							</g:FlowPanel>
 						</g:FlowPanel>
 					</g:FlowPanel>
 				</g:FlowPanel>

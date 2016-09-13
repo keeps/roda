@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.data.adapter.facet.FacetParameter;
+import org.roda.core.data.adapter.facet.FacetParameter.SORT;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.facet.SimpleFacetParameter;
 import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
@@ -122,6 +124,9 @@ public class UserLog extends Composite {
 
   @UiField(provided = true)
   FlowPanel facetUsers;
+  
+  @UiField(provided = true)
+  FlowPanel facetStates;
 
   private static final Filter DEFAULT_FILTER = new Filter(
     new BasicSearchFilterParameter(RodaConstants.LOG_SEARCH, "*"));
@@ -132,8 +137,15 @@ public class UserLog extends Composite {
    * @param user
    */
   public UserLog() {
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.LOG_ACTION_COMPONENT),
-      new SimpleFacetParameter(RodaConstants.LOG_ACTION_METHOD), new SimpleFacetParameter(RodaConstants.LOG_USERNAME));
+    FacetParameter fp1 = new SimpleFacetParameter(RodaConstants.LOG_ACTION_COMPONENT);
+    fp1.setSort(SORT.COUNT);
+    FacetParameter fp2 = new SimpleFacetParameter(RodaConstants.LOG_ACTION_METHOD);
+    fp2.setSort(SORT.COUNT);
+    FacetParameter fp3 = new SimpleFacetParameter(RodaConstants.LOG_USERNAME);
+    fp3.setSort(SORT.COUNT);
+    FacetParameter fp4 = new SimpleFacetParameter(RodaConstants.LOG_STATE);
+    fp4.setSort(SORT.COUNT);
+    Facets facets = new Facets(fp1,fp2,fp3,fp4);
     logList = new LogEntryList(Filter.NULL, facets, messages.logsTitle(), false);
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.LOG_SEARCH, messages.userLogSearchPlaceHolder(), false,
@@ -143,11 +155,14 @@ public class UserLog extends Composite {
     facetComponents = new FlowPanel();
     facetMethods = new FlowPanel();
     facetUsers = new FlowPanel();
+    facetStates = new FlowPanel();
 
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
     facetPanels.put(RodaConstants.LOG_ACTION_COMPONENT, facetComponents);
     facetPanels.put(RodaConstants.LOG_ACTION_METHOD, facetMethods);
     facetPanels.put(RodaConstants.LOG_USERNAME, facetUsers);
+    facetPanels.put(RodaConstants.LOG_STATE, facetStates);
+    
     FacetUtils.bindFacets(logList, facetPanels);
 
     logList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {

@@ -58,7 +58,7 @@ public class UserManagement extends RodaWuiController {
     Long count = UserManagementHelper.countLogEntries(filter);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "filter", filter.toString());
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "filter", filter.toString());
 
     return count;
   }
@@ -74,7 +74,7 @@ public class UserManagement extends RodaWuiController {
     IndexResult<LogEntry> ret = UserManagementHelper.findLogEntries(filter, sorter, sublist, facets);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "filter", filter, "sorter", sorter, "sublist",
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "filter", filter, "sorter", sorter, "sublist",
       sublist);
 
     return ret;
@@ -90,7 +90,7 @@ public class UserManagement extends RodaWuiController {
     LogEntry ret = UserManagementHelper.retrieveLogEntry(logEntryId);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "logEntryId", logEntryId);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "logEntryId", logEntryId);
 
     return ret;
   }
@@ -106,7 +106,7 @@ public class UserManagement extends RodaWuiController {
     Long count = UserManagementHelper.countMembers(filter);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "filter", filter.toString());
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "filter", filter.toString());
 
     return count;
   }
@@ -122,7 +122,7 @@ public class UserManagement extends RodaWuiController {
     IndexResult<RODAMember> ret = UserManagementHelper.findMembers(filter, sorter, sublist, facets);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "filter", filter, "sorter", sorter, "sublist",
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "filter", filter, "sorter", sorter, "sublist",
       sublist);
 
     return ret;
@@ -139,7 +139,7 @@ public class UserManagement extends RodaWuiController {
     IndexResult<RODAMember> ret = UserManagementHelper.findMembers(isUser);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "isUser", isUser);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "isUser", isUser);
 
     return ret;
   }
@@ -155,7 +155,7 @@ public class UserManagement extends RodaWuiController {
     User ret = UserManagementHelper.retrieveUser(username);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "username", username);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "username", username);
 
     return ret;
   }
@@ -171,7 +171,7 @@ public class UserManagement extends RodaWuiController {
     Group ret = UserManagementHelper.retrieveGroup(groupname);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "groupname", groupname);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "groupname", groupname);
 
     return ret;
   }
@@ -199,7 +199,7 @@ public class UserManagement extends RodaWuiController {
     UserManagementHelper.registerUser(user, password, extra);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "user", user);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "user", user);
   }
 
   public static User createUser(User user, User newUser, String password, UserExtraBundle extra)
@@ -214,7 +214,7 @@ public class UserManagement extends RodaWuiController {
     User ret = UserManagementHelper.createUser(newUser, password, extra);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "user", newUser);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "user", newUser);
 
     return ret;
   }
@@ -235,7 +235,7 @@ public class UserManagement extends RodaWuiController {
     UserManagementHelper.updateMyUser(modifiedUser, password, extra);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "user", modifiedUser);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "user", modifiedUser);
   }
 
   public static void updateUser(User user, User modifiedUser, String password, UserExtraBundle extra)
@@ -249,7 +249,7 @@ public class UserManagement extends RodaWuiController {
     UserManagementHelper.updateUser(modifiedUser, password, extra);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "user", modifiedUser);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "user", modifiedUser);
   }
 
   public static void deleteUser(User user, String username) throws AuthorizationDeniedException, GenericException {
@@ -261,7 +261,7 @@ public class UserManagement extends RodaWuiController {
     UserManagementHelper.deleteUser(username);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "username", username);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "username", username);
   }
 
   public static void createGroup(User user, Group group)
@@ -275,7 +275,7 @@ public class UserManagement extends RodaWuiController {
     UserManagementHelper.createGroup(group);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "group", group);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "group", group);
   }
 
   public static void updateGroup(User user, Group group)
@@ -289,7 +289,7 @@ public class UserManagement extends RodaWuiController {
     UserManagementHelper.updateGroup(group);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "group", group);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "group", group);
   }
 
   public static void deleteGroup(User user, String groupname) throws AuthorizationDeniedException, GenericException {
@@ -301,7 +301,7 @@ public class UserManagement extends RodaWuiController {
     UserManagementHelper.deleteGroup(groupname);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "groupname", groupname);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "groupname", groupname);
   }
 
   // TODO: Methods bellow this line should also checkRoles? If so, a User is
@@ -355,7 +355,7 @@ public class UserManagement extends RodaWuiController {
     User user = UserManagementHelper.confirmUserEmail(username, null, emailConfirmationToken);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "user", user);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "user", user);
   }
 
   public static void requestPasswordReset(String servletPath, String usernameOrEmail)
@@ -376,7 +376,7 @@ public class UserManagement extends RodaWuiController {
     sendRecoverLoginEmail(servletPath, user);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "user", user);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "user", user);
   }
 
   public static void resetUserPassword(String username, String password, String resetPasswordToken)
@@ -386,7 +386,7 @@ public class UserManagement extends RodaWuiController {
     User user = UserManagementHelper.resetUserPassword(username, password, resetPasswordToken);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.UNKNOWN, "user", user);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "user", user);
   }
 
   private static Notification sendEmailVerification(String servletPath, User user) throws GenericException {

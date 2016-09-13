@@ -40,6 +40,12 @@
 				</g:FlowPanel>
 				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 					<g:Label addStyleNames="h5 sidebar-facet-title">
+						<ui:text from="{messages.logEntryState}" />
+					</g:Label>
+					<g:FlowPanel ui:field="facetStates" />
+				</g:FlowPanel>
+				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+					<g:Label addStyleNames="h5 sidebar-facet-title">
 						<ui:text from='{messages.logUsers}' />
 					</g:Label>
 					<g:FlowPanel ui:field="facetUsers" />

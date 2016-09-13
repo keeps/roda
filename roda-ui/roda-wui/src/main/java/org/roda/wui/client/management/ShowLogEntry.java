@@ -15,7 +15,9 @@ import java.util.List;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.StringUtils;
+import org.roda.wui.common.HTMLUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 
@@ -113,6 +115,12 @@ public class ShowLogEntry extends Composite {
   
   @UiField
   FlowPanel logParametersValue;
+  
+  @UiField
+  Label logStateLabel;
+  
+  @UiField
+  HTML logStateValue;
 
   @UiField
   Button buttonCancel;
@@ -167,6 +175,10 @@ public class ShowLogEntry extends Composite {
       logParametersLabel.setVisible(false);
       logParametersValue.setVisible(false);
     }
+    
+    logStateValue.setHTML(HtmlSnippetUtils.getLogEntryStateHtml(logEntry.getState()));
+    logStateLabel.setVisible(logEntry.getState()!=null);
+    logStateValue.setVisible(logEntry.getState()!=null);
 
   }
 
