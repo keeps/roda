@@ -32,6 +32,12 @@ public class DescriptionLevelManager implements Serializable {
 
   private static final String GHOST_LEVEL_ICON = "level.ghost.icon";
   private static final String DEFAULT_LEVEL_ICON = "level.default.icon";
+  
+  private static final String REPRESENTATION_ICON = "level.representation.icon";
+  private static final String REPRESENTATION_FOLDER_ICON = "level.representation.folder.icon";
+  private static final String REPRESENTATION_FILE_ICON = "level.representation.file.icon";
+
+  
   private static final String LEVELS_WITH_REPRESENTATION = "levels_with_representation";
   private static final String LOCALES2 = "locales";
   private static final String LEVELS_ORDERED = "levels_ordered";
@@ -44,6 +50,9 @@ public class DescriptionLevelManager implements Serializable {
   private static List<DescriptionLevel> ALL_BUT_REPRESENTATION_LEVELS = new ArrayList<DescriptionLevel>();
   private static String GHOST_CLASS;
   private static String DEFAULT_CLASS;
+  private static String REPRESENTATION_CLASS;
+  private static String REPRESENTATION_FOLDER_CLASS;
+  private static String REPRESENTATION_FILE_CLASS;
 
   public DescriptionLevelManager(Configuration descriptionLevels) throws RequestNotValidException {
     loadDescriptionLevelHierarchy(descriptionLevels);
@@ -97,6 +106,24 @@ public class DescriptionLevelManager implements Serializable {
     } else {
       GHOST_CLASS = "fa fa-snapshat";
     }
+    
+    if(configuration.containsKey(REPRESENTATION_ICON)){
+      REPRESENTATION_CLASS = configuration.getString(REPRESENTATION_ICON);
+    }else{
+      REPRESENTATION_CLASS = "fa fa-picture-o";
+    }
+    
+    if(configuration.containsKey(REPRESENTATION_FOLDER_ICON)){
+      REPRESENTATION_FOLDER_CLASS = configuration.getString(REPRESENTATION_FOLDER_ICON);
+    }else{
+      REPRESENTATION_FOLDER_CLASS = "fa fa-folder-o";
+    }
+    
+    if(configuration.containsKey(REPRESENTATION_FILE_ICON)){
+      REPRESENTATION_FILE_CLASS = configuration.getString(REPRESENTATION_FILE_ICON);
+    }else{
+      REPRESENTATION_FILE_CLASS = "fa fa-file-o";
+    }
   }
 
   public List<DescriptionLevel> getAllButRepresentationsDescriptionLevels() {
@@ -109,5 +136,17 @@ public class DescriptionLevelManager implements Serializable {
 
   public String getGhostClass() {
     return GHOST_CLASS;
+  }
+
+  public String getRepresentationClass() {
+    return REPRESENTATION_CLASS;
+  }
+
+  public String getRepresentationFileClass() {
+    return REPRESENTATION_FILE_CLASS;
+  }
+
+  public String getRepresentationFolderClass() {
+    return REPRESENTATION_FOLDER_CLASS;
   }
 }

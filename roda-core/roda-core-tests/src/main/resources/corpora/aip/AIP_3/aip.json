@@ -4,8 +4,8 @@
   "type": "MIXED",
   "permissions": {},
   "descriptiveMetadata": [{
-    "id": "ead-c.xml",
-    "type": "ead-c"
+    "id": "ead.xml",
+    "type": "ead"
   }],
   "representations": [{
     "id": "representation_1",

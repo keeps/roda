@@ -19,6 +19,7 @@ import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.descriptionLevels.DescriptionLevel;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -36,6 +37,7 @@ import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.Tools;
@@ -463,12 +465,9 @@ public class ViewRepresentation extends Composite {
     IndexedRepresentation rep = selectRepresentation(representations, representationUUID);
 
     // AIP breadcrumb
-    fullBreadcrumb
-      .add(
-        new BreadcrumbItem(
-          getBreadcrumbLabel((aip.getTitle() != null) ? aip.getTitle() : aip.getId(),
-            RodaConstants.VIEW_REPRESENTATION_DESCRIPTION_LEVEL),
-          Tools.concat(Browse.RESOLVER.getHistoryPath(), aipId)));
+    fullBreadcrumb.add(
+      new BreadcrumbItem(getBreadcrumbLabel((aip.getTitle() != null) ? aip.getTitle() : aip.getId(), aip.getLevel()),
+        Tools.concat(Browse.RESOLVER.getHistoryPath(), aipId)));
 
     if (file != null) {
       List<String> filePath = file.getPath();
@@ -552,14 +551,25 @@ public class ViewRepresentation extends Composite {
 
   private SafeHtml getElementLevelIconSafeHtml(String level) {
     SafeHtml icon;
-    if (level.equals(RodaConstants.VIEW_REPRESENTATION_DESCRIPTION_LEVEL)) {
-      icon = SafeHtmlUtils.fromSafeConstant("<i class='description-level description-level-representational'></i>");
-    } else if (level.equals(RodaConstants.VIEW_REPRESENTATION_REPRESENTATION)) {
-      icon = SafeHtmlUtils.fromSafeConstant("<i class='fa fa-files-o'></i>");
-    } else if (level.equals(RodaConstants.VIEW_REPRESENTATION_FOLDER)) {
-      icon = SafeHtmlUtils.fromSafeConstant("<i class='fa fa-folder-o'></i>");
+    if (level == null) {
+      icon = SafeHtmlUtils.fromSafeConstant("<i class='" + DescriptionLevelUtils.DEFAULT_CLASS + "'></i>");
     } else {
-      icon = SafeHtmlUtils.fromSafeConstant("<i class='fa fa-file-o'></i>");
+      if (level.equals(RodaConstants.VIEW_REPRESENTATION_REPRESENTATION)) {
+        icon = SafeHtmlUtils.fromSafeConstant("<i class='" + DescriptionLevelUtils.REPRESENTATION_CLASS + "'></i>");
+      } else if (level.equals(RodaConstants.VIEW_REPRESENTATION_FOLDER)) {
+        icon = SafeHtmlUtils
+          .fromSafeConstant("<i class='" + DescriptionLevelUtils.REPRESENTATION_FOLDER_CLASS + "'></i>");
+      } else if (level.equals(RodaConstants.VIEW_REPRESENTATION_FILE)) {
+        icon = SafeHtmlUtils
+          .fromSafeConstant("<i class='" + DescriptionLevelUtils.REPRESENTATION_FILE_CLASS + "'></i>");
+      } else {
+        DescriptionLevel l = DescriptionLevelUtils.getDescriptionLevel(level);
+        if (l != null) {
+          icon = SafeHtmlUtils.fromSafeConstant("<i class='" + l.getIconClass() + "'></i>");
+        } else {
+          icon = SafeHtmlUtils.fromSafeConstant("<i class='" + DescriptionLevelUtils.DEFAULT_CLASS + "'></i>");
+        }
+      }
     }
     return icon;
   }

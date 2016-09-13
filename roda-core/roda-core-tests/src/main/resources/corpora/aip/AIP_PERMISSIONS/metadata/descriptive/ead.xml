@@ -1,5 +1,17 @@
 
-<ead-c xmlns="http://roda.dgarq.gov.pt/2008/EADCSchema" level="fonds">
+<ead xmlns="urn:isbn:1-931666-22-9">
+	<eadheader>
+      <eadid />
+      <filedesc>
+         <titlestmt>
+            <titleproper />
+         </titlestmt>
+      </filedesc>
+      <profiledesc>
+         <descrules>Rules</descrules>
+      </profiledesc>
+   </eadheader>
+   <archdesc level="fonds">
 	<did>
 		<langmaterial>
 			<language>Thai</language>
@@ -214,5 +226,6 @@
 			direitos de autor e direitos conexos.Documentação de origem e
 			natureza pública.</p>
 	</userestrict>
-</ead-c>
+	</archdesc>
+</ead>
             

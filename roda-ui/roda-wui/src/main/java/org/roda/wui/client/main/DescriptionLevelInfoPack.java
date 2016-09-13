@@ -21,6 +21,12 @@ public class DescriptionLevelInfoPack implements Serializable {
   public String ghostClass;
   
   public String defaultClass;
+    
+  public String representationClass;
+  
+  public String representationFolderClass;
+  
+  public String representationFileClass;
 
   public DescriptionLevelInfoPack() {
   }
@@ -47,6 +53,30 @@ public class DescriptionLevelInfoPack implements Serializable {
 
   public void setDefaultClass(String defaultClass) {
     this.defaultClass = defaultClass;
+  }
+
+  public String getRepresentationClass() {
+    return representationClass;
+  }
+
+  public void setRepresentationClass(String representationClass) {
+    this.representationClass = representationClass;
+  }
+
+  public String getRepresentationFolderClass() {
+    return representationFolderClass;
+  }
+
+  public void setRepresentationFolderClass(String representationFolderClass) {
+    this.representationFolderClass = representationFolderClass;
+  }
+
+  public String getRepresentationFileClass() {
+    return representationFileClass;
+  }
+
+  public void setRepresentationFileClass(String representationFileClass) {
+    this.representationFileClass = representationFileClass;
   }
   
   

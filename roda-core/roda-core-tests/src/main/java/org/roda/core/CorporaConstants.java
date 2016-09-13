@@ -37,8 +37,8 @@ public final class CorporaConstants {
   public static final String DATE_CREATED = "2015-06-06T15:30:00.000+0000";
   public static final String DATE_MODIFIED = "2015-06-06T16:30:00.000+0000";
 
-  public static final String DESCRIPTIVE_METADATA_ID = "ead-c.xml";
-  public static final String DESCRIPTIVE_METADATA_TYPE = "ead-c";
+  public static final String DESCRIPTIVE_METADATA_ID = "ead.xml";
+  public static final String DESCRIPTIVE_METADATA_TYPE = "ead_2002";
   public static final String DESCRIPTIVE_METADATA_ID_EAD3 = "ead_3.xml";
   public static final String DESCRIPTIVE_METADATA_ID_EADUNKNOWN = "ead_unknown.xml";
 
@@ -116,7 +116,7 @@ public final class CorporaConstants {
   public static final String HTML_DESCRIPTIVE_METADATA = "descriptiveMetadata";
   public static final String HTML_LEVEL = "level";
   public static final String HTML_FONDS = "fonds";
-  public static final String HTML_REPOSITORY_CODE = "odd.ead-c.did.unitid.repositorycode_txt";
+  public static final String HTML_REPOSITORY_CODE = "odd.ead.did.unitid.repositorycode_txt";
   public static final String HTML_PT_KEEPS = "PT-KEEPS";
   public static final String HTML_PREMIS = "premis";
   public static final String HTML_PRESERVATION_LEVEL = "preservationLevel";

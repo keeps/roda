@@ -113,7 +113,7 @@ public class ValidationUtilsTest {
 
   @Test(enabled = false)
   public void testValidateDescriptiveMetadataBuggy() throws RODAException {
-    // buggy aip have acqinfo2 instead of acqinfo in ead-c.xml
+    // buggy aip have acqinfo2 instead of acqinfo in ead.xml
     final String aipId = UUID.randomUUID().toString();
     try {
       model.createAIP(aipId, corporaService,
@@ -140,7 +140,7 @@ public class ValidationUtilsTest {
   public void testValidateAIPBuggy() throws ValidationException, RequestNotValidException, GenericException,
     AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
     // TODO AIP changed, so the corpora also needs to be changed
-    // buggy aip have acqinfo2 instead of acqinfo in ead-c.xml
+    // buggy aip have acqinfo2 instead of acqinfo in ead.xml
     final String aipId = UUID.randomUUID().toString();
     final AIP aip = model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_BUGGY_ID),

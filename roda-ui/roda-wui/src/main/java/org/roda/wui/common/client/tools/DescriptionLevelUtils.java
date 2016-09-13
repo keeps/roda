@@ -36,6 +36,11 @@ public class DescriptionLevelUtils {
   public static String GHOST_CLASS;
 
   public static String DEFAULT_CLASS;
+  
+  public static String REPRESENTATION_CLASS;
+  public static String REPRESENTATION_FOLDER_CLASS;
+  public static String REPRESENTATION_FILE_CLASS;
+  
 
   public static void load(final AsyncCallback<Void> callback) {
     DescriptionLevelServiceAsync.INSTANCE.getAllDescriptionLevels(new AsyncCallback<DescriptionLevelInfoPack>() {
@@ -51,6 +56,9 @@ public class DescriptionLevelUtils {
         DESCRIPTION_LEVELS = result.getDescriptionLevels();
         GHOST_CLASS = result.getGhostClass();
         DEFAULT_CLASS = result.getDefaultClass();
+        REPRESENTATION_CLASS = result.getRepresentationClass();
+        REPRESENTATION_FOLDER_CLASS = result.getRepresentationFolderClass();
+        REPRESENTATION_FILE_CLASS = result.getRepresentationFileClass();
         callback.onSuccess(null);
       }
     });
