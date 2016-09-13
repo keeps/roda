@@ -2,7 +2,8 @@
 	
 	Chart.defaults.global.defaultFontFamily = "Ubuntu";
 	Chart.defaults.global.defaultFontColor = "#222";
-	Chart.defaults.global.elements.arc.borderColor = "#eee";
+	Chart.defaults.global.elements.arc.borderColor = "#fff";
+	Chart.defaults.global.elements.arc.borderWidth = "1";
 
 	$.fn.statistic = function() {
 		var matchedObject = this;
