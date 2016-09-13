@@ -72,13 +72,13 @@ public class AkkaJobActor extends AkkaBaseActor {
 
       try {
         if (job.getSourceObjects() instanceof SelectedItemsAll<?>) {
-          runOnAll(job, plugin, jobStateInfoActor);
+          runOnAll(job, plugin);
         } else if (job.getSourceObjects() instanceof SelectedItemsNone<?>) {
-          super.getPluginOrchestrator().runPlugin(jobStateInfoActor, plugin);
+          super.getPluginOrchestrator().runPlugin(getSelf(), plugin);
         } else if (job.getSourceObjects() instanceof SelectedItemsList<?>) {
-          runFromList(job, plugin, jobStateInfoActor);
+          runFromList(job, plugin);
         } else if (job.getSourceObjects() instanceof SelectedItemsFilter<?>) {
-          runFromFilter(job, plugin, jobStateInfoActor);
+          runFromFilter(job, plugin);
         }
       } catch (Exception e) {
         LOGGER.error("Error while invoking orchestration method", e);
@@ -87,34 +87,30 @@ public class AkkaJobActor extends AkkaBaseActor {
       }
 
     } else {
-      LOGGER.error("Received a message that it doesn't know how to process ({})...", msg.getClass().getName());
+      LOGGER.error("Received a message that don't know how to process ({})...", msg.getClass().getName());
       unhandled(msg);
     }
   }
 
-  private <T extends IsRODAObject> void runOnAll(Job job, Plugin<T> plugin, ActorRef jobStateInfoActor)
-    throws GenericException {
+  private <T extends IsRODAObject> void runOnAll(Job job, Plugin<T> plugin) throws GenericException {
     // get class
     Class<IsRODAObject> sourceObjectsClass = JobsHelper
       .getSelectedClassFromString(job.getSourceObjects().getSelectedClass());
 
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllObjects(jobStateInfoActor, plugin,
-      (Class<T>) sourceObjectsClass);
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllObjects(getSelf(), plugin, (Class<T>) sourceObjectsClass);
   }
 
-  private <T extends IsRODAObject> void runFromList(Job job, Plugin<T> plugin, ActorRef jobStateInfoActor)
-    throws GenericException {
+  private <T extends IsRODAObject> void runFromList(Job job, Plugin<T> plugin) throws GenericException {
     // get class
     Class<IsRODAObject> sourceObjectsClass = JobsHelper
       .getSelectedClassFromString(job.getSourceObjects().getSelectedClass());
 
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnObjects(jobStateInfoActor, plugin,
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnObjects(getSelf(), plugin,
       (Class<T>) ModelUtils.giveRespectiveModelClass(sourceObjectsClass),
       ((SelectedItemsList<IsRODAObject>) job.getSourceObjects()).getIds());
   }
 
-  private void runFromFilter(Job job, Plugin<?> plugin, ActorRef jobStateInfoActor)
-    throws GenericException, RequestNotValidException {
+  private void runFromFilter(Job job, Plugin<?> plugin) throws GenericException, RequestNotValidException {
     // cast
     SelectedItemsFilter<?> selectedItems = (SelectedItemsFilter<?>) job.getSourceObjects();
 
@@ -127,7 +123,7 @@ public class AkkaJobActor extends AkkaBaseActor {
     JobsHelper.updateJobObjectsCount(plugin, super.getModel(), objectsCount);
 
     // execute
-    super.getPluginOrchestrator().runPluginFromIndex(jobStateInfoActor, sourceObjectsClass, selectedItems.getFilter(),
+    super.getPluginOrchestrator().runPluginFromIndex(getSelf(), sourceObjectsClass, selectedItems.getFilter(),
       (Plugin) plugin);
   }
 

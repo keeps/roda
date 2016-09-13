@@ -55,7 +55,11 @@ import org.slf4j.LoggerFactory;
 public final class JobsHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(JobsHelper.class);
 
+  private static final String NUMBER_OF_JOB_WORKERS_PROPERTY = "core.orchestrator.nr_of_jobs_workers";
+  private static final String BLOCK_SIZE_PROPERTY = "core.orchestrator.block_size";
   private static final int DEFAULT_BLOCK_SIZE = 100;
+  private static final String SYNC_TIMEOUT_PROPERTY = "core.orchestrator.sync_timeout";
+  private static final int DEFAULT_SYNC_TIMEOUT = 600;
 
   private JobsHelper() {
 
@@ -68,16 +72,29 @@ public final class JobsHelper {
       defaultMaxNumberOfJobsInParallel);
   }
 
+  public static void setNumberOfJobsWorkers(int numberOfJobWorkers) {
+    RodaCoreFactory.getRodaConfiguration().setProperty(NUMBER_OF_JOB_WORKERS_PROPERTY, numberOfJobWorkers);
+  }
+
   public static int getNumberOfJobsWorkers() {
     int defaultNumberOfJobsWorkers = Runtime.getRuntime().availableProcessors() + 1;
-
-    return RodaCoreFactory.getRodaConfiguration().getInt("core.orchestrator.nr_of_jobs_workers",
-      defaultNumberOfJobsWorkers);
+    return RodaCoreFactory.getRodaConfiguration().getInt(NUMBER_OF_JOB_WORKERS_PROPERTY, defaultNumberOfJobsWorkers);
   }
 
   public static int getBlockSize() {
-    String key = "core.orchestrator.block_size";
-    return RodaCoreFactory.getRodaConfiguration().getInt(key, DEFAULT_BLOCK_SIZE);
+    return RodaCoreFactory.getRodaConfiguration().getInt(BLOCK_SIZE_PROPERTY, DEFAULT_BLOCK_SIZE);
+  }
+
+  public static void setBlockSize(int blockSize) {
+    RodaCoreFactory.getRodaConfiguration().setProperty(BLOCK_SIZE_PROPERTY, blockSize);
+  }
+
+  public static int getSyncTimeout() {
+    return RodaCoreFactory.getRodaConfiguration().getInt(SYNC_TIMEOUT_PROPERTY, DEFAULT_SYNC_TIMEOUT);
+  }
+
+  public static void setSyncTimeout(int syncTimeout) {
+    RodaCoreFactory.getRodaConfiguration().setProperty(SYNC_TIMEOUT_PROPERTY, syncTimeout);
   }
 
   public static <T extends IsRODAObject> void updateJobState(Plugin<T> plugin, ModelService model, JOB_STATE state,

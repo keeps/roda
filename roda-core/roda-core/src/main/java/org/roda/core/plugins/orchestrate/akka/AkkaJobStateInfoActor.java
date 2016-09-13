@@ -184,7 +184,7 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
     // INFO 20160630 hsilva: the following test is needed because messages can
     // be out of order and a plugin might already arrived to the end
     if (jobInfo.isDone()) {
-      getSender().tell(new Messages.PluginAfterAllExecuteIsReady(plugin), getSelf());
+      workersRouter.tell(new Messages.PluginAfterAllExecuteIsReady(plugin), getSelf());
     }
     message.logProcessingEnded();
   }
@@ -203,7 +203,7 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
     message.logProcessingStarted();
     jobInfo.setDone(message.getPlugin());
     if (jobInfo.isDone() && jobInfo.isInitEnded()) {
-      getSender().tell(new Messages.PluginAfterAllExecuteIsReady(plugin), getSelf());
+      workersRouter.tell(new Messages.PluginAfterAllExecuteIsReady(plugin), getSelf());
     }
     message.logProcessingEnded();
   }

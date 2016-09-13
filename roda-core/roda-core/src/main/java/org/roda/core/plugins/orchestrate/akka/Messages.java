@@ -70,12 +70,17 @@ public class Messages {
 
     @Override
     public String toString() {
-      return "JobInfoMessage [plugin=" + plugin + ", jobPluginInfo=" + jobPluginInfo + "]";
+      return "JobInfoUpdated [plugin=" + plugin + ", jobPluginInfo=" + jobPluginInfo + "]";
     }
   }
 
   public static abstract class JobPartialUpdate extends AbstractMessage {
     private static final long serialVersionUID = 4722216970884172260L;
+
+    @Override
+    public String toString() {
+      return "JobPartialUpdate []";
+    }
   }
 
   public static class JobSourceObjectsUpdated extends JobPartialUpdate {
@@ -94,7 +99,7 @@ public class Messages {
 
     @Override
     public String toString() {
-      return "JobSourceObjectsUpdate [oldToNewIds=" + oldToNewIds + "]";
+      return "JobSourceObjectsUpdated [oldToNewIds=" + oldToNewIds + "]";
     }
   }
 
@@ -134,7 +139,7 @@ public class Messages {
 
     @Override
     public String toString() {
-      return "JobIsDone [plugin=" + plugin + ", state=" + state + "]";
+      return "JobStateUpdated [plugin=" + plugin + ", state=" + state + ", stateDatails=" + stateDatails + "]";
     }
   }
 

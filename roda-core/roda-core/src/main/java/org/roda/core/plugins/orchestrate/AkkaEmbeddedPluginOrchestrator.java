@@ -127,26 +127,28 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     Filter filter, Plugin<T> plugin) {
     try {
       LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
-      ActorRef jobStateInfoActor = (ActorRef) context;
+      ActorRef jobActor = (ActorRef) context;
+      ActorRef jobStateInfoActor = getJobContextInformation(PluginHelper.getJobId(plugin));
       int blockSize = JobsHelper.getBlockSize();
       IndexResult<T1> find;
       int offset = 0;
       Plugin<T> innerPlugin;
       Class<T> modelClassToActOn = (Class<T>) ModelUtils.giveRespectiveModelClass(classToActOn);
 
-      jobStateInfoActor.tell(new Messages.PluginBeforeAllExecuteIsReady<>(plugin), ActorRef.noSender());
+      jobStateInfoActor.tell(new Messages.PluginBeforeAllExecuteIsReady<>(plugin), jobActor);
 
       do {
         find = RodaCoreFactory.getIndexService().find(classToActOn, filter, Sorter.NONE,
           new Sublist(offset, blockSize));
-        innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, modelClassToActOn, (int) find.getLimit());
+        innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, modelClassToActOn, (int) find.getLimit(),
+          jobActor);
         offset += find.getLimit();
         List<T> objects = JobsHelper.getObjectsFromIndexObjects(model, index, modelClassToActOn, find.getResults());
-        jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, objects), ActorRef.noSender());
+        jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, objects), jobActor);
 
       } while (find.getTotalCount() > find.getOffset() + find.getLimit());
 
-      jobStateInfoActor.tell(new Messages.JobInitEnded(), ActorRef.noSender());
+      jobStateInfoActor.tell(new Messages.JobInitEnded(), jobActor);
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin from index", e);
@@ -160,30 +162,31 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     List<String> uuids) {
     try {
       LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
-      ActorRef jobStateInfoActor = (ActorRef) context;
+      ActorRef jobActor = (ActorRef) context;
+      ActorRef jobStateInfoActor = getJobContextInformation(PluginHelper.getJobId(plugin));
       int blockSize = JobsHelper.getBlockSize();
       List<T> objects = JobsHelper.getObjectsFromUUID(model, index, objectClass, uuids);
       Iterator<T> iter = objects.iterator();
       Plugin<T> innerPlugin;
 
-      jobStateInfoActor.tell(new Messages.PluginBeforeAllExecuteIsReady<>(plugin), ActorRef.noSender());
+      jobStateInfoActor.tell(new Messages.PluginBeforeAllExecuteIsReady<>(plugin), jobActor);
 
       List<T> block = new ArrayList<T>();
       while (iter.hasNext()) {
         if (block.size() == blockSize) {
-          innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, objectClass, blockSize);
-          jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, block), ActorRef.noSender());
+          innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, objectClass, blockSize, jobActor);
+          jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, block), jobActor);
           block = new ArrayList<>();
         }
         block.add(iter.next());
       }
 
       if (!block.isEmpty()) {
-        innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, objectClass, block.size());
-        jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, block), ActorRef.noSender());
+        innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, objectClass, block.size(), jobActor);
+        jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, block), jobActor);
       }
 
-      jobStateInfoActor.tell(new Messages.JobInitEnded(), ActorRef.noSender());
+      jobStateInfoActor.tell(new Messages.JobInitEnded(), jobActor);
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on RODA Objects ({})", objectClass.getSimpleName(), e);
@@ -196,20 +199,21 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   public <T extends IsRODAObject> void runPluginOnAllObjects(Object context, Plugin<T> plugin, Class<T> objectClass) {
     try {
       LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
-      ActorRef jobStateInfoActor = (ActorRef) context;
+      ActorRef jobActor = (ActorRef) context;
+      ActorRef jobStateInfoActor = getJobContextInformation(PluginHelper.getJobId(plugin));
       int blockSize = JobsHelper.getBlockSize();
       CloseableIterable<OptionalWithCause<T>> objects = model.list(objectClass);
       Iterator<OptionalWithCause<T>> iter = objects.iterator();
       Plugin<T> innerPlugin;
 
-      jobStateInfoActor.tell(new Messages.PluginBeforeAllExecuteIsReady<>(plugin), ActorRef.noSender());
+      jobStateInfoActor.tell(new Messages.PluginBeforeAllExecuteIsReady<>(plugin), jobActor);
 
       List<T> block = new ArrayList<T>();
       while (iter.hasNext()) {
         if (block.size() == blockSize) {
 
-          innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, objectClass, blockSize);
-          jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, block), ActorRef.noSender());
+          innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, objectClass, blockSize, jobActor);
+          jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, block), jobActor);
           block = new ArrayList<>();
         }
 
@@ -222,11 +226,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       }
 
       if (!block.isEmpty()) {
-        innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, objectClass, block.size());
-        jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, block), ActorRef.noSender());
+        innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, objectClass, block.size(), jobActor);
+        jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, block), jobActor);
       }
 
-      jobStateInfoActor.tell(new Messages.JobInitEnded(), ActorRef.noSender());
+      jobStateInfoActor.tell(new Messages.JobInitEnded(), jobActor);
       IOUtils.closeQuietly(objects);
 
     } catch (Exception e) {
@@ -240,12 +244,13 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   public <T extends IsRODAObject> void runPlugin(Object context, Plugin<T> plugin) {
     try {
       LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
-      ActorRef jobStateInfoActor = (ActorRef) context;
+      ActorRef jobActor = (ActorRef) context;
+      ActorRef jobStateInfoActor = getJobContextInformation(PluginHelper.getJobId(plugin));
 
-      initJobPluginInfo(plugin, 0);
-      jobStateInfoActor.tell(new Messages.PluginBeforeAllExecuteIsReady<>(plugin), ActorRef.noSender());
-      jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(plugin, Collections.emptyList()), ActorRef.noSender());
-      jobStateInfoActor.tell(new Messages.JobInitEnded(), ActorRef.noSender());
+      initJobPluginInfo(plugin, 0, jobActor);
+      jobStateInfoActor.tell(new Messages.PluginBeforeAllExecuteIsReady<>(plugin), jobActor);
+      jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(plugin, Collections.emptyList()), jobActor);
+      jobStateInfoActor.tell(new Messages.JobInitEnded(), jobActor);
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin", e);
@@ -254,7 +259,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   // FIXME 20160629 hsilva: rename method
-  private <T extends IsRODAObject> void initJobPluginInfo(Plugin<T> plugin, int objectsCount)
+  private <T extends IsRODAObject> void initJobPluginInfo(Plugin<T> plugin, int objectsCount, ActorRef jobActor)
     throws InvalidParameterException, PluginException {
 
     // keep track of each job/plugin relation
@@ -263,11 +268,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       ActorRef jobStateInfoActor = runningJobs.get(jobId);
       if (PluginType.INGEST == plugin.getType()) {
         IngestJobPluginInfo jobPluginInfo = new IngestJobPluginInfo();
-        initJobPluginInfo(plugin, jobId, jobStateInfoActor, jobPluginInfo, objectsCount);
+        initJobPluginInfo(plugin, jobId, jobActor, jobStateInfoActor, jobPluginInfo, objectsCount);
         plugin.injectJobPluginInfo(jobPluginInfo);
       } else if (PluginType.MISC == plugin.getType() || PluginType.AIP_TO_AIP == plugin.getType()) {
         SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo();
-        initJobPluginInfo(plugin, jobId, jobStateInfoActor, jobPluginInfo, objectsCount);
+        initJobPluginInfo(plugin, jobId, jobActor, jobStateInfoActor, jobPluginInfo, objectsCount);
         plugin.injectJobPluginInfo(jobPluginInfo);
       }
     } else {
@@ -277,21 +282,21 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   private <T extends IsRODAObject> Plugin<T> getNewPluginInstanceAndInitJobPluginInfo(Plugin<T> plugin,
-    Class<T> pluginClass, int objectsCount) throws InvalidParameterException, PluginException {
+    Class<T> pluginClass, int objectsCount, ActorRef jobActor) throws InvalidParameterException, PluginException {
     Plugin<T> innerPlugin = RodaCoreFactory.getPluginManager().getPlugin(plugin.getClass().getName(), pluginClass);
     innerPlugin.setParameterValues(plugin.getParameterValues());
 
     // keep track of each job/plugin relation
     String jobId = PluginHelper.getJobId(innerPlugin);
     if (jobId != null && runningJobs.get(jobId) != null) {
-      ActorRef jobStateInfoActor = runningJobs.get(jobId);
+      ActorRef jobStateInfoActor = getJobContextInformation(PluginHelper.getJobId(plugin));
       if (PluginType.INGEST == plugin.getType()) {
         IngestJobPluginInfo jobPluginInfo = new IngestJobPluginInfo();
-        initJobPluginInfo(innerPlugin, jobId, jobStateInfoActor, jobPluginInfo, objectsCount);
+        initJobPluginInfo(innerPlugin, jobId, jobActor, jobStateInfoActor, jobPluginInfo, objectsCount);
         innerPlugin.injectJobPluginInfo(jobPluginInfo);
       } else {
         SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo();
-        initJobPluginInfo(innerPlugin, jobId, jobStateInfoActor, jobPluginInfo, objectsCount);
+        initJobPluginInfo(innerPlugin, jobId, jobActor, jobStateInfoActor, jobPluginInfo, objectsCount);
         innerPlugin.injectJobPluginInfo(jobPluginInfo);
       }
     } else {
@@ -302,12 +307,12 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   }
 
-  private <T extends IsRODAObject> void initJobPluginInfo(Plugin<T> innerPlugin, String jobId,
+  private <T extends IsRODAObject> void initJobPluginInfo(Plugin<T> innerPlugin, String jobId, ActorRef jobActor,
     ActorRef jobStateInfoActor, JobPluginInfo jobPluginInfo, int objectsCount) {
     jobPluginInfo.setSourceObjectsCount(objectsCount);
     jobPluginInfo.setSourceObjectsWaitingToBeProcessed(objectsCount);
 
-    jobStateInfoActor.tell(new Messages.JobInfoUpdated(innerPlugin, jobPluginInfo), ActorRef.noSender());
+    jobStateInfoActor.tell(new Messages.JobInfoUpdated(innerPlugin, jobPluginInfo), jobActor);
   }
 
   @Override
@@ -321,7 +326,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       if (async) {
         jobWorkersRouter.tell(job, ActorRef.noSender());
       } else {
-        Timeout timeout = new Timeout(Duration.create(10, "minutes"));
+        int timeoutInSeconds = JobsHelper.getSyncTimeout();
+        Timeout timeout = new Timeout(Duration.create(timeoutInSeconds, "seconds"));
         Future<Object> future = Patterns.ask(jobWorkersRouter, job, timeout);
         try {
           Await.result(future, timeout.duration());
@@ -393,8 +399,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   public <T extends IsRODAObject> void updateJob(Plugin<T> plugin, JobPartialUpdate partialUpdate) {
     String jobId = PluginHelper.getJobId(plugin);
     if (jobId != null && runningJobs.get(jobId) != null) {
-      ActorRef jobInfoActor = runningJobs.get(jobId);
-      jobInfoActor.tell(partialUpdate, ActorRef.noSender());
+      ActorRef jobStateInfoActor = runningJobs.get(jobId);
+      jobStateInfoActor.tell(partialUpdate, ActorRef.noSender());
       if (partialUpdate instanceof JobStateUpdated && Job.isFinalState(((JobStateUpdated) partialUpdate).getState())) {
         runningJobs.remove(jobId);
       }
@@ -410,12 +416,16 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     runningJobs.put(jobId, (ActorRef) object);
   }
 
+  public ActorRef getJobContextInformation(String jobId) {
+    return runningJobs.get(jobId);
+  }
+
   @Override
   public <T extends IsRODAObject> void updateJobInformation(Plugin<T> plugin, JobPluginInfo info) throws JobException {
     String jobId = PluginHelper.getJobId(plugin);
     if (jobId != null && runningJobs.get(jobId) != null) {
-      ActorRef jobInfoActor = runningJobs.get(jobId);
-      jobInfoActor.tell(new Messages.JobInfoUpdated(plugin, info), ActorRef.noSender());
+      ActorRef jobStateInfoActor = runningJobs.get(jobId);
+      jobStateInfoActor.tell(new Messages.JobInfoUpdated(plugin, info), ActorRef.noSender());
     } else {
       throw new JobException("Job id or job information is null");
     }

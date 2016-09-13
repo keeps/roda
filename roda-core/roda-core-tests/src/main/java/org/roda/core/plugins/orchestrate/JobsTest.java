@@ -21,6 +21,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.SelectedItems;
+import org.roda.core.data.v2.index.SelectedItemsAll;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.index.SelectedItemsNone;
 import org.roda.core.data.v2.ip.AIP;
@@ -28,6 +29,7 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.plugins.DummyPlugin;
 import org.roda.core.plugins.plugins.PluginThatFailsDuringInit;
@@ -44,9 +46,6 @@ import org.testng.annotations.Test;
 @Test(groups = {"all", "travis"})
 public class JobsTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(JobsTest.class);
-
-  private static final String NUMBER_OF_JOB_WORKERS_PROPERTY = "core.orchestrator.nr_of_jobs_workers";
-  private static final String BLOCK_SIZE_PROPERTY = "core.orchestrator.block_size";
 
   private static Path basePath;
 
@@ -131,15 +130,35 @@ public class JobsTest {
     int originalBlockSize = JobsHelper.getBlockSize();
 
     // setting new/test value for the number of job workers & block size
-    RodaCoreFactory.getRodaConfiguration().setProperty(NUMBER_OF_JOB_WORKERS_PROPERTY, 1);
-    RodaCoreFactory.getRodaConfiguration().setProperty(BLOCK_SIZE_PROPERTY, 1);
+    JobsHelper.setNumberOfJobsWorkers(1);
+    JobsHelper.setBlockSize(1);
 
     TestsHelper.executeJob(PluginThatStopsItself.class, PluginType.MISC,
       (SelectedItems) SelectedItemsList.create(AIP.class, aips), JOB_STATE.STOPPED);
 
     // resetting number of job workers & block size
-    RodaCoreFactory.getRodaConfiguration().setProperty(NUMBER_OF_JOB_WORKERS_PROPERTY, originalNumberOfJobWorkers);
-    RodaCoreFactory.getRodaConfiguration().setProperty(BLOCK_SIZE_PROPERTY, originalBlockSize);
+    JobsHelper.setNumberOfJobsWorkers(originalNumberOfJobWorkers);
+    JobsHelper.setBlockSize(originalBlockSize);
+  }
+
+  /**
+   * 20160914 hsilva: this method tests orchestration to ensure that, even if
+   * there are no objects to pass to the plugin, the job comes to an end (i.e.
+   * complete state)
+   */
+  @Test
+  public void testJobRunningInContainerWithNoObjectsInIt()
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+
+    int originalSyncTimeout = JobsHelper.getSyncTimeout();
+    // set sync timeout as the method execute() will do nothing as well as
+    // receive nothing. and if some problem exists with job state transitions 5
+    // seconds will be enough as a timeout will be thrown
+    JobsHelper.setSyncTimeout(5);
+    TestsHelper.executeJob(DummyPlugin.class, PluginType.MISC, (SelectedItems) SelectedItemsAll.create(Risk.class),
+      JOB_STATE.COMPLETED);
+
+    JobsHelper.setSyncTimeout(originalSyncTimeout);
 
   }
 
