@@ -794,7 +794,11 @@ public class IndexServiceTest {
     notification.setSentOn(new Date());
     notification.setFromUser("Test Message Index");
     notification.setRecipientUsers(Arrays.asList("recipientuser@example.com"));
-    model.createNotification(notification, new EmailNotificationProcessor("test-email-template.vm"));
+    try{
+      //createNotification must throw an exception because SMTP is not configured in tests...
+      model.createNotification(notification, new EmailNotificationProcessor("test-email-template.vm"));
+    }catch(GenericException e){
+    }
     index.commit(Notification.class);
 
     Notification message2 = model.retrieveNotification(notification.getId());

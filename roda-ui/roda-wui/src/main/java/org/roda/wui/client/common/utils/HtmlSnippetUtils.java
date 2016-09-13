@@ -7,6 +7,10 @@
  */
 package org.roda.wui.client.common.utils;
 
+import java.util.List;
+
+import org.roda.core.data.v2.index.FacetFieldResult;
+import org.roda.core.data.v2.index.FacetValue;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
@@ -16,6 +20,7 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
 import org.roda.core.data.v2.risks.RiskIncidence;
@@ -171,11 +176,11 @@ public class HtmlSnippetUtils {
       case SUCCESS:
         labelClass = "label-success";
         break;
-        
+
       case FAILURE:
         labelClass = "label-danger";
         break;
-        
+
       case UNAUTHORIZED:
         labelClass = "label-warning";
         break;
@@ -236,6 +241,31 @@ public class HtmlSnippetUtils {
         }
       });
     }
+  }
+
+  public static SafeHtml getLogEntryComponent(LogEntry entry, List<FacetFieldResult> facets) {
+    String html = null;
+    if (facets != null) {
+      for (FacetFieldResult ffr : facets) {
+        if (ffr.getField().equalsIgnoreCase("actionComponent")) {
+          if (ffr.getValues() != null) {
+            for (FacetValue fv : ffr.getValues()) {
+              if (fv.getValue().equalsIgnoreCase(entry.getActionComponent())) {
+                html = fv.getLabel();
+                break;
+              }
+            }
+          }
+        }
+        if (html != null) {
+          break;
+        }
+      }
+    }
+    if (html == null) {
+      html = entry.getActionComponent();
+    }
+    return SafeHtmlUtils.fromSafeConstant(html);
   }
 
 }

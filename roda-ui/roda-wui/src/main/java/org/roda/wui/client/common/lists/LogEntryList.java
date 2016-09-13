@@ -18,8 +18,8 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.FacetFieldResult;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
@@ -31,8 +31,8 @@ import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
-import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
@@ -49,13 +49,15 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private Column<LogEntry, Date> dateColumn;
-  private TextColumn<LogEntry> actionComponentColumn;
+  private Column<LogEntry, SafeHtml> actionComponentColumn;
   private TextColumn<LogEntry> actionMethodColumn;
   private TextColumn<LogEntry> usernameColumn;
   private TextColumn<LogEntry> durationColumn;
   private TextColumn<LogEntry> addressColumn;
   private Column<LogEntry, SafeHtml> stateColumn;
 
+  private List<FacetFieldResult> facetResult;
+  
   public LogEntryList() {
     this(null, null, null, false);
   }
@@ -74,11 +76,10 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
       }
     };
 
-    actionComponentColumn = new TextColumn<LogEntry>() {
-
+    actionComponentColumn = new Column<LogEntry, SafeHtml>(new SafeHtmlCell()) {
       @Override
-      public String getValue(LogEntry logEntry) {
-        return logEntry != null ? logEntry.getActionComponent() : null;
+      public SafeHtml getValue(LogEntry entry) {
+        return HtmlSnippetUtils.getLogEntryComponent(entry,facetResult);
       }
     };
 
@@ -152,7 +153,7 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
 
   @Override
   protected void getData(Sublist sublist, ColumnSortList columnSortList,
-    AsyncCallback<IndexResult<LogEntry>> callback) {
+    final AsyncCallback<IndexResult<LogEntry>> callback) {
     Filter filter = getFilter();
 
     Map<Column<LogEntry, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<LogEntry, ?>, List<String>>();
@@ -168,6 +169,22 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
 
     // UserManagementService.Util.getInstance().findLogEntries(filter, sorter,
     // sublist, getFacets(), callback);
+    
+    BrowserService.Util.getInstance().find(LogEntry.class.getName(), filter, sorter, sublist, getFacets(),
+      LocaleInfo.getCurrentLocale().getLocaleName(), getJustActive(), new AsyncCallback<IndexResult<LogEntry>>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+         callback.onFailure(caught);
+          
+        }
+
+        @Override
+        public void onSuccess(IndexResult<LogEntry> result) {
+          setFacets(result.getFacetResults());
+          callback.onSuccess(result);
+        }});
+    
     BrowserService.Util.getInstance().find(LogEntry.class.getName(), filter, sorter, sublist, getFacets(),
       LocaleInfo.getCurrentLocale().getLocaleName(), getJustActive(), callback);
   }
@@ -177,4 +194,8 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
     return DefaultSelectionEventManager.<LogEntry> createBlacklistManager(3);
   }
 
+  
+  public void setFacets(List<FacetFieldResult> facets){
+    facetResult = facets;
+  }
 }
