@@ -96,13 +96,16 @@ public class PreservationEventList extends BasicAsyncTableCell<IndexedPreservati
       public SafeHtml getValue(IndexedPreservationEvent event) {
         SafeHtml ret = null;
         if (event != null) {
-          String outcome = event.getEventOutcome();
-          if (PluginState.SUCCESS.toString().equalsIgnoreCase(outcome)) {
-            ret = SafeHtmlUtils.fromSafeConstant("<span class='label-success'>" + outcome.toLowerCase() + "</span>");
-          } else if (PluginState.FAILURE.toString().equalsIgnoreCase(outcome)) {
-            ret = SafeHtmlUtils.fromSafeConstant("<span class='label-danger'>" + outcome.toLowerCase() + "</span>");
+          PluginState outcome = PluginState.valueOf(event.getEventOutcome());
+          if (PluginState.SUCCESS.equals(outcome)) {
+            ret = SafeHtmlUtils
+              .fromSafeConstant("<span class='label-success'>" + messages.pluginStateMessage(outcome) + "</span>");
+          } else if (PluginState.FAILURE.equals(outcome)) {
+            ret = SafeHtmlUtils
+              .fromSafeConstant("<span class='label-danger'>" + messages.pluginStateMessage(outcome) + "</span>");
           } else {
-            ret = SafeHtmlUtils.fromString(outcome);
+            ret = SafeHtmlUtils
+              .fromSafeConstant("<span class='label-warning'>" + messages.pluginStateMessage(outcome) + "</span>");
           }
         }
         return ret;
@@ -118,7 +121,7 @@ public class PreservationEventList extends BasicAsyncTableCell<IndexedPreservati
     addColumn(eventDateTimeColumn, messages.preservationEventListHeaderDate(), true, false, 11);
     addColumn(eventTypeColumn, messages.preservationEventListHeaderType(), false, false, 13);
     addColumn(eventDetailColumn, messages.preservationEventListHeaderDetail(), false, false);
-    addColumn(eventOutcomeColumn, messages.preservationEventListHeaderOutcome(), true, false, 7);
+    addColumn(eventOutcomeColumn, messages.preservationEventListHeaderOutcome(), true, false, 9);
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(eventDateTimeColumn, false));

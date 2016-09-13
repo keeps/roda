@@ -234,13 +234,13 @@ public class ShowPreservationEvent extends Composite {
     outcomeDetailHeader.setVisible(StringUtils.isNotBlank(event.getEventOutcomeDetailNote())
       || StringUtils.isNotBlank(event.getEventOutcomeDetailExtension()));
 
-    String eventOutcome = event.getEventOutcome();
-    eventOutcomeLabel.setText(eventOutcome.toLowerCase().replace('_', ' '));
-    if (PluginState.SUCCESS.toString().equalsIgnoreCase(eventOutcome)) {
+    PluginState eventOutcome = PluginState.valueOf(event.getEventOutcome());
+    eventOutcomeLabel.setText(messages.pluginStateMessage(eventOutcome));
+    if (PluginState.SUCCESS.equals(eventOutcome)) {
       eventOutcomeLabel.setStyleName("label-success");
-    } else if (PluginState.FAILURE.toString().equalsIgnoreCase(eventOutcome)) {
+    } else if (PluginState.FAILURE.equals(eventOutcome)) {
       eventOutcomeLabel.setStyleName("label-danger");
-    } else if (PluginState.PARTIAL_SUCCESS.toString().equalsIgnoreCase(eventOutcome)) {
+    } else if (PluginState.PARTIAL_SUCCESS.equals(eventOutcome)) {
       eventOutcomeLabel.setStyleName("label-warning");
     }
 

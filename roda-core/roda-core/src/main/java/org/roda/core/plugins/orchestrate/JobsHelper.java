@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.roda.core.RodaCoreFactory;
@@ -28,15 +27,12 @@ import org.roda.core.data.common.RodaConstants.NodeType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.IsStillUpdatingException;
-import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.index.SelectedItemsAll;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
@@ -48,15 +44,11 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.JobStats;
-import org.roda.core.data.v2.jobs.PluginType;
-import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.akka.Messages;
 import org.roda.core.plugins.plugins.PluginHelper;
-import org.roda.core.plugins.plugins.base.ReindexActionLogPlugin;
-import org.roda.core.plugins.plugins.base.ReindexRodaEntityPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -397,33 +389,6 @@ public final class JobsHelper {
         modelService.deleteAIP(indexedAIP.getId());
       } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
         LOGGER.error("Error doing deleting AIP during Job cleanup", e);
-      }
-    }
-  }
-
-  public static <T extends IsRODAObject> void executeJobOnSameRODAObject(ModelService model, Class<T> clazz,
-    String username) throws IsStillUpdatingException, NotFoundException, GenericException, RequestNotValidException,
-    AuthorizationDeniedException, JobAlreadyStartedException {
-    if (TransferredResource.class.equals(clazz)) {
-      // TransferredResource does not need a job
-      RodaCoreFactory.getTransferredResourcesScanner().updateAllTransferredResources(null, false);
-    } else {
-      if (model.hasObjects(clazz)) {
-        Job job = new Job();
-        job.setId(UUID.randomUUID().toString());
-        job.setName(ReindexRodaEntityPlugin.class.getSimpleName() + " (" + clazz.getSimpleName() + ")");
-        Map<String, String> pluginParameters = new HashMap<>();
-        pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "true");
-        job.setPluginParameters(pluginParameters);
-        if (LogEntry.class.equals(clazz)) {
-          job.setPlugin(ReindexActionLogPlugin.class.getName());
-        } else {
-          job.setPlugin(ReindexRodaEntityPlugin.class.getName());
-        }
-        job.setSourceObjects(SelectedItemsAll.create(clazz));
-        job.setPluginType(PluginType.MISC);
-        job.setUsername(username);
-        PluginHelper.createAndExecuteJob(job, true);
       }
     }
   }

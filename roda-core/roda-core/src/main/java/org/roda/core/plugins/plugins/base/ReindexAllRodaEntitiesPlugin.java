@@ -12,7 +12,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.InvalidParameterException;
@@ -20,19 +22,21 @@ import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.Void;
+import org.roda.core.data.v2.index.SelectedItemsAll;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.orchestrate.JobsHelper;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
@@ -133,8 +137,33 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
   private void reindexRODAObject(ModelService model, Class<? extends IsRODAObject> reindexClass,
     SimpleJobPluginInfo jobPluginInfo) {
     LOGGER.debug("Creating job to reindexing all {}", reindexClass.getSimpleName());
+
     try {
-      JobsHelper.executeJobOnSameRODAObject(model, reindexClass, PluginHelper.getJobUsername(this, model));
+      if (TransferredResource.class.equals(reindexClass)) {
+        // TransferredResource does not need a job
+        RodaCoreFactory.getTransferredResourcesScanner().updateAllTransferredResources(null, false);
+      } else {
+        if (model.hasObjects(reindexClass)) {
+          Job job = new Job();
+          job.setId(UUID.randomUUID().toString());
+          job.setName(ReindexRodaEntityPlugin.class.getSimpleName() + " (" + reindexClass.getSimpleName() + ")");
+          Map<String, String> pluginParameters = new HashMap<>();
+          pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "true");
+          job.setPluginParameters(pluginParameters);
+
+          if (LogEntry.class.equals(reindexClass)) {
+            job.setPlugin(ReindexActionLogPlugin.class.getName());
+          } else {
+            job.setPlugin(ReindexRodaEntityPlugin.class.getName());
+          }
+
+          job.setSourceObjects(SelectedItemsAll.create(reindexClass));
+          job.setPluginType(PluginType.MISC);
+          job.setUsername(PluginHelper.getJobUsername(this, model));
+          PluginHelper.createAndExecuteJob(job, true);
+        }
+      }
+
       jobPluginInfo.incrementObjectsProcessedWithSuccess();
     } catch (RODAException e) {
       LOGGER.error("Error creating job to reindex all {}", reindexClass.getSimpleName(), e);

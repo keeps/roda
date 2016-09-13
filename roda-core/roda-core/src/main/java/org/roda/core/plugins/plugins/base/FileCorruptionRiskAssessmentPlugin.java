@@ -104,13 +104,13 @@ public class FileCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
       try {
         for (AIP aip : list) {
           boolean aipFailed = false;
+          List<String> passedFiles = new ArrayList<String>();
+          List<String> failedFiles = new ArrayList<String>();
 
           for (Representation r : aip.getRepresentations()) {
             LOGGER.debug("Checking fixity for files in representation {} of AIP {}", r.getId(), aip.getId());
 
             try {
-              List<String> passedFiles = new ArrayList<String>();
-              List<String> failedFiles = new ArrayList<String>();
               boolean recursive = true;
               CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(), r.getId(),
                 recursive);
@@ -153,11 +153,13 @@ public class FileCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
                         LOGGER.debug("Could not check fixity", e);
                       }
 
+                      String fileEntry = file.getRepresentationId()
+                        + (file.getPath().isEmpty() ? "" : '/' + String.join("/", file.getPath())) + '/' + file.getId();
+
                       if (passedFixity) {
-                        // TODO support file path
-                        passedFiles.add(file.getId());
+                        passedFiles.add(fileEntry);
                       } else {
-                        failedFiles.add(file.getId());
+                        failedFiles.add(fileEntry);
                         aipFailed = true;
                         createRiskAndIncidence(model, file, risks.get(0));
                       }
@@ -177,10 +179,11 @@ public class FileCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
             Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
 
             if (aipFailed) {
-              reportItem.setPluginState(PluginState.FAILURE)
-                .setPluginDetails("Fixity checking did not run successfully");
+              reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(
+                "Fixity checking did not run successfully. The following files are corrupt: " + failedFiles);
               jobPluginInfo.incrementObjectsProcessedWithFailure();
-              PluginHelper.createPluginEvent(this, aip.getId(), model, index, PluginState.FAILURE, "", true);
+              PluginHelper.createPluginEvent(this, aip.getId(), model, index, PluginState.FAILURE,
+                "The following file have failed the corruption test: " + failedFiles.toString(), true);
             } else {
               reportItem.setPluginState(PluginState.SUCCESS).setPluginDetails("Fixity checking ran successfully");
               jobPluginInfo.incrementObjectsProcessedWithSuccess();

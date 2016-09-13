@@ -505,6 +505,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
           LOGGER.error("Could not run VeraPDF successfully");
           reportState = PluginState.FAILURE;
           reportItem.setPluginDetails(e.getMessage());
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
         } finally {
           reportItem.setPluginState(reportState);
           report.addReport(reportItem);
@@ -568,6 +569,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
           this, aip.getId(), model, index, Arrays.asList(PluginHelper.getLinkingIdentifier(aip.getId(),
             representationId, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE)),
           null, pluginState, outcomeDetails, notify);
+      index.reindexAIP(aip);
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
       | ValidationException | AlreadyExistsException e) {
       LOGGER.error("Error creating event: " + e.getMessage(), e);

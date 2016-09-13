@@ -240,8 +240,6 @@
 
 				if (type == "bar") {
 					options.options.legend.display = false;
-					//options.options.xAxes.display = true;
-					//options.options.yAxes.display = true;
 					options.options.scales = {
 					    yAxes: [{
 					      id: 'y-axis-0',
@@ -252,8 +250,6 @@
 					};
 				} else if (type == "horizontalBar") {
 					options.options.legend.display = false;
-					//options.options.xAxes.display = true;
-					//options.options.yAxes.display = true;
 					options.options.scales = {
 					xAxes: [{
 					      id: 'x-axis-0',
