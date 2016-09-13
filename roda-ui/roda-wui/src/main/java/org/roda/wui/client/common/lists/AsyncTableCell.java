@@ -282,7 +282,6 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
   private void getData(Filter filter, Sublist sublist, ColumnSortList columnSortList,
     AsyncCallback<IndexResult<T>> callback) {
-    GWT.log("FILTER " + ((filter != null) ? filter.toString() : "NULL"));
     if (filter == null) {
       callback.onSuccess(null);
     } else {

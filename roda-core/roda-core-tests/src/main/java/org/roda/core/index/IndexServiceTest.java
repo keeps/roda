@@ -515,7 +515,7 @@ public class IndexServiceTest {
     EmailAlreadyExistsException, UserAlreadyExistsException, IllegalOperationException, NotFoundException {
     Set<String> groups = new HashSet<String>();
     groups.add("administrators");
-    
+
     Set<String> users = new HashSet<String>();
     users.add("admin");
     Set<String> roles = new HashSet<String>();
@@ -531,7 +531,7 @@ public class IndexServiceTest {
         user.setId("USER" + i);
         user.setName("NAMEUSER" + i);
         user.setFullName("NAMEUSER" + i);
-        
+
         user.setEmail("mail_" + i + "@example.com");
         user.setGroups(groups);
         model.createUser(user, true);
@@ -543,7 +543,7 @@ public class IndexServiceTest {
         group.setId("GROUP" + i);
         group.setName("NAMEGROUP" + i);
         group.setFullName("NAMEGROUP" + i);
-        
+
         group.setUsers(users);
         model.createGroup(group, true);
       }
@@ -794,10 +794,12 @@ public class IndexServiceTest {
     notification.setSentOn(new Date());
     notification.setFromUser("Test Message Index");
     notification.setRecipientUsers(Arrays.asList("recipientuser@example.com"));
-    try{
-      //createNotification must throw an exception because SMTP is not configured in tests...
+    try {
+      // createNotification must throw an exception because SMTP is not
+      // configured in tests...
       model.createNotification(notification, new EmailNotificationProcessor("test-email-template.vm"));
-    }catch(GenericException e){
+      Assert.fail("createNotification must throw an exception because SMTP is not configured in tests");
+    } catch (GenericException e) {
     }
     index.commit(Notification.class);
 
