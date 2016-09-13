@@ -27,6 +27,7 @@ public class CommandException extends RODAException {
    *          the error message.
    */
   public CommandException(String message) {
+    super(message);
   }
 
   /**

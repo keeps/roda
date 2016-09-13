@@ -36,8 +36,8 @@ import org.slf4j.LoggerFactory;
  * @author Rui Castro
  * @author Vladislav Korecký <vladislav_korecky@gordic.cz>
  * 
- * @deprecated 20160824 hsilva: not seeing any method using it, so it will be
- *             removed soon
+ * @since 20160909 hsilva: RODA is not using any of these methods, but external
+ *        plugins are
  */
 public final class ZipUtility {
 
@@ -135,7 +135,7 @@ public final class ZipUtility {
         String entryName = zipEntry.getName();
         // String entryName = jarEntry.getName();
 
-        LOGGER.debug("Extracting " + entryName);
+        LOGGER.debug("Extracting {}", entryName);
 
         File newFile = new File(outputDir, entryName);
 
@@ -222,7 +222,7 @@ public final class ZipUtility {
       // ZipEntry(relativeFile.toString()));
       jarOutputStream.putNextEntry(new JarEntry(relativeFile));
 
-      LOGGER.trace("Adding " + relativeFile);
+      LOGGER.trace("Adding {}", relativeFile);
 
       int length;
       while ((length = in.read(buffer)) > 0) {
@@ -281,8 +281,8 @@ public final class ZipUtility {
         zos.closeEntry();
         // close the InputStream
         fis.close();
-      } catch (IOException ioe) {
-        System.out.println("IOException :" + ioe);
+      } catch (IOException e) {
+        LOGGER.error("Error adding file/folder to zip", e);
       }
     }
   }

@@ -94,7 +94,7 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
       LOGGER.info("Setting job '{}' ({}) state to {}. Details: {}", job.getName(), job.getId(), message.getState(),
         message.getStateDatails().orElse("NO DETAILS"));
     } catch (NotFoundException | GenericException e) {
-      LOGGER.error("Unable to get Job from index to log its state change", e);
+      LOGGER.warn("Unable to get Job from index to log its state change. Reason: {}", e.getMessage());
     }
     JobsHelper.updateJobState(p, super.getModel(), message.getState(), message.getStateDatails());
     if (Job.isFinalState(message.getState())) {

@@ -106,7 +106,7 @@ public class FileCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
           boolean aipFailed = false;
 
           for (Representation r : aip.getRepresentations()) {
-            LOGGER.debug("Checking fixity for files in representation " + r.getId() + " of AIP " + aip.getId());
+            LOGGER.debug("Checking fixity for files in representation {} of AIP {}", r.getId(), aip.getId());
 
             try {
               List<String> passedFiles = new ArrayList<String>();
@@ -169,7 +169,7 @@ public class FileCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
               IOUtils.closeQuietly(allFiles);
               model.notifyAIPUpdated(aip.getId());
             } catch (IOException | RODAException | XmlException e) {
-              LOGGER.error("Error processing Representation " + r.getId() + " - " + e.getMessage(), e);
+              LOGGER.error("Error processing Representation {}", r.getId(), e);
             }
           }
 

@@ -105,8 +105,9 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
       pluginReport.setPluginState(PluginState.SUCCESS);
 
       for (T object : list) {
-        // LOGGER.debug("Reindexing {} {}", object.getClass().getSimpleName(),
-        // object.getId());
+        if (LOGGER.isTraceEnabled()) {
+          LOGGER.trace("Reindexing {} {}", object.getClass().getSimpleName(), object.getId());
+        }
 
         try {
           index.reindex(storage, object);

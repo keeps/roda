@@ -21,6 +21,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -109,6 +110,7 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
 
       if (clazz == null) {
         List<Class<? extends IsRODAObject>> classes = PluginHelper.getReindexObjectClasses();
+        classes.remove(Job.class);
         jobPluginInfo.setSourceObjectsCount(classes.size());
         for (Class<? extends IsRODAObject> reindexClass : classes) {
           reindexRODAObject(model, reindexClass, jobPluginInfo);
@@ -130,12 +132,12 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
 
   private void reindexRODAObject(ModelService model, Class<? extends IsRODAObject> reindexClass,
     SimpleJobPluginInfo jobPluginInfo) {
-    LOGGER.debug("Reindexing all {}", reindexClass.getSimpleName());
+    LOGGER.debug("Creating job to reindexing all {}", reindexClass.getSimpleName());
     try {
       JobsHelper.executeJobOnSameRODAObject(model, reindexClass, PluginHelper.getJobUsername(this, model));
       jobPluginInfo.incrementObjectsProcessedWithSuccess();
     } catch (RODAException e) {
-      LOGGER.error("Error reindexing (all): {}", reindexClass.getSimpleName(), e);
+      LOGGER.error("Error creating job to reindex all {}", reindexClass.getSimpleName(), e);
       jobPluginInfo.incrementObjectsProcessedWithFailure();
     }
   }

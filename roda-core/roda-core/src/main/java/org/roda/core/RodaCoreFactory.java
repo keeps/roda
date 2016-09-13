@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -526,32 +525,32 @@ public class RodaCoreFactory {
   }
 
   private static void loadDescriptionLevelInformation() throws ConfigurationException {
-      Path config = RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_DESCRIPTION_LEVELS_FILE);
-      PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration();
-      propertiesConfiguration.setDelimiterParsingDisabled(true);
-      propertiesConfiguration.setEncoding("UTF-8");
-      if (Files.exists(config)) {
-        LOGGER.trace("Loading configuration from file {}", config);
-        propertiesConfiguration.load(config.toFile());
-        RodaPropertiesReloadStrategy rodaPropertiesReloadStrategy = new RodaPropertiesReloadStrategy();
-        rodaPropertiesReloadStrategy.setRefreshDelay(5000);
-        propertiesConfiguration.setReloadingStrategy(rodaPropertiesReloadStrategy);
+    Path config = RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_DESCRIPTION_LEVELS_FILE);
+    PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration();
+    propertiesConfiguration.setDelimiterParsingDisabled(true);
+    propertiesConfiguration.setEncoding(RodaConstants.DEFAULT_ENCODING);
+    if (Files.exists(config)) {
+      LOGGER.trace("Loading configuration from file {}", config);
+      propertiesConfiguration.load(config.toFile());
+      RodaPropertiesReloadStrategy rodaPropertiesReloadStrategy = new RodaPropertiesReloadStrategy();
+      rodaPropertiesReloadStrategy.setRefreshDelay(5000);
+      propertiesConfiguration.setReloadingStrategy(rodaPropertiesReloadStrategy);
+    } else {
+      InputStream inputStream = RodaCoreFactory.class
+        .getResourceAsStream("/" + RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_DESCRIPTION_LEVELS_FILE);
+      if (inputStream != null) {
+        LOGGER.trace("Loading configuration from classpath {}", RodaConstants.CORE_DESCRIPTION_LEVELS_FILE);
+        propertiesConfiguration.load(inputStream);
       } else {
-        InputStream inputStream = RodaCoreFactory.class
-          .getResourceAsStream("/" + RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_DESCRIPTION_LEVELS_FILE);
-        if (inputStream != null) {
-          LOGGER.trace("Loading configuration from classpath {}", RodaConstants.CORE_DESCRIPTION_LEVELS_FILE);
-          propertiesConfiguration.load(inputStream);
-        } else {
-          LOGGER.trace("Configuration {} doesn't exist", RodaConstants.CORE_DESCRIPTION_LEVELS_FILE);
-        }
+        LOGGER.trace("Configuration {} doesn't exist", RodaConstants.CORE_DESCRIPTION_LEVELS_FILE);
       }
-      try {
-        descriptionLevelManager = new DescriptionLevelManager(propertiesConfiguration);
-      } catch (RequestNotValidException e) {
-        LOGGER.error("Error loading description levels", e);
-        instantiatedWithoutErrors = false;
-      }
+    }
+    try {
+      descriptionLevelManager = new DescriptionLevelManager(propertiesConfiguration);
+    } catch (RequestNotValidException e) {
+      LOGGER.error("Error loading description levels", e);
+      instantiatedWithoutErrors = false;
+    }
   }
 
   private static void instantiateStorageAndModel() throws GenericException {
@@ -1029,7 +1028,7 @@ public class RodaCoreFactory {
     Path config = RodaCoreFactory.getConfigPath().resolve(configurationFile);
     PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration();
     propertiesConfiguration.setDelimiterParsingDisabled(true);
-    propertiesConfiguration.setEncoding("UTF-8");
+    propertiesConfiguration.setEncoding(RodaConstants.DEFAULT_ENCODING);
 
     if (Files.exists(config)) {
       LOGGER.trace("Loading configuration from file {}", config);

@@ -175,11 +175,10 @@ public class Register extends Composite {
 
             @Override
             public void onSuccess(List<String> groups) {
-              if (groups != null && groups.size() > 0) {
-                for (String group : groups) {
-                  user.addGroup(group);
-                }
+              for (String group : groups) {
+                user.addGroup(group);
               }
+
               UserManagementService.Util.getInstance().registerUser(user, password, recaptcha, userDataPanel.getExtra(),
                 new AsyncCallback<Void>() {
 
