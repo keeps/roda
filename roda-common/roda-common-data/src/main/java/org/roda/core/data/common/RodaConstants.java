@@ -503,7 +503,6 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_DO_PRODUCER_AUTHORIZATION_CHECK = "parameter.do_producer_authorization_check";
   public static final String PLUGIN_PARAMS_DO_AUTO_ACCEPT = "parameter.do_auto_accept";
   public static final String PLUGIN_PARAMS_EMAIL_NOTIFICATION = "parameter.email_notification";
-  public static final String PLUGIN_PARAMS_HTTP_NOTIFICATION = "ingest.http_notification";
   public static final String PLUGIN_PARAMS_CREATES_PLUGIN_EVENT = "createsPluginEvent";
   public static final String PLUGIN_PARAMS_CREATE_SUBMISSION = "parameter.create_submission";
   public static final String PLUGIN_PARAMS_USERNAME = "parameter.username";
@@ -721,6 +720,10 @@ public final class RodaConstants {
   public static final String NOTIFICATION_FILE_EXTENSION = ".json";
   public static final String NOTIFICATION_SEARCH = "search";
   public static final String NOTIFICATION_VARIOUS_RECIPIENT_USERS = "various-recipient-users";
+  
+  public static final String NOTIFICATION_HTTP_ENDPOINT = "ingest.http_notification.endpoint";
+  public static final String NOTIFICATION_HTTP_TIMEOUT = "ingest.http_notification.timeout";
+
 
   /* View representation */
   public static final String VIEW_REPRESENTATION_DESCRIPTION_LEVEL = "description-level-representation";

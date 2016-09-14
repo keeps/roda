@@ -385,7 +385,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     }
 
     String httpNotifications = RodaCoreFactory.getRodaConfiguration()
-      .getString(RodaConstants.PLUGIN_PARAMS_HTTP_NOTIFICATION, "");
+      .getString(RodaConstants.NOTIFICATION_HTTP_ENDPOINT, "");
     if (StringUtils.isNotBlank(httpNotifications)) {
       Notification notification = new Notification();
       String outcome = PluginState.SUCCESS.toString();
