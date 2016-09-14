@@ -7,8 +7,6 @@
  */
 package org.roda.wui.client.main;
 
-import java.util.List;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -16,8 +14,6 @@ public interface DescriptionLevelServiceAsync {
 
   DescriptionLevelServiceAsync INSTANCE = GWT.create(DescriptionLevelService.class);
 
-  void getDescriptionLevels(AsyncCallback<List<String>> callback);
-
-  void getAllDescriptionLevels(AsyncCallback<DescriptionLevelInfoPack> callback);
+  void getDescriptionLevelConfiguration(AsyncCallback<DescriptionLevelConfiguration> callback);
 
 }

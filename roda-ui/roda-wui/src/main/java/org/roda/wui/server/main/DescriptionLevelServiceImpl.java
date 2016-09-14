@@ -7,11 +7,14 @@
  */
 package org.roda.wui.server.main;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.DescriptionLevelManager;
-import org.roda.wui.client.main.DescriptionLevelInfoPack;
+import org.roda.core.common.RodaUtils;
+import org.roda.core.data.common.RodaConstants;
+import org.roda.wui.client.main.DescriptionLevelConfiguration;
 import org.roda.wui.client.main.DescriptionLevelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,32 +26,32 @@ public class DescriptionLevelServiceImpl extends RemoteServiceServlet implements
   private static final long serialVersionUID = 1133363430147430537L;
 
   @SuppressWarnings("unused")
-  private static final Logger logger = LoggerFactory.getLogger(DescriptionLevelServiceImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DescriptionLevelServiceImpl.class);
 
   @Override
-  public List<String> getDescriptionLevels() {
-    return RodaCoreFactory.getDescriptionLevelManager().getLevels();
-  }
-
-  @Override
-  public DescriptionLevelInfoPack getAllDescriptionLevels() {
-    DescriptionLevelManager descriptionLevelManager = RodaCoreFactory.getDescriptionLevelManager();
-
-    DescriptionLevelInfoPack pack = new DescriptionLevelInfoPack();
-
-    pack.setDescriptionLevels(descriptionLevelManager.getDescriptionLevels());
-
-    pack.setDefaultClass(descriptionLevelManager.getDefaultClass());
-
-    pack.setGhostClass(descriptionLevelManager.getGhostClass());
-
-    pack.setRepresentationClass(descriptionLevelManager.getRepresentationClass());
-
-    pack.setRepresentationFileClass(descriptionLevelManager.getRepresentationFileClass());
-
-    pack.setRepresentationFolderClass(descriptionLevelManager.getRepresentationFolderClass());
-
-    return pack;
+  public DescriptionLevelConfiguration getDescriptionLevelConfiguration() {
+    DescriptionLevelConfiguration dlc = new DescriptionLevelConfiguration();
+    dlc.setClassificationPlanLevels(RodaUtils
+      .copyList(RodaCoreFactory.getRodaConfiguration().getList(RodaConstants.LEVELS_CLASSIFICATION_PLAN)));
+    dlc.setDefaultClass(RodaCoreFactory.getRodaConfiguration().getString(RodaConstants.LEVELS_ICONS_DEFAULT));
+    dlc.setGhostClass(RodaCoreFactory.getRodaConfiguration().getString(RodaConstants.LEVELS_ICONS_GHOST));
+    Map<String, String> icons = new HashMap<String, String>();
+    Iterator<String> iconKeys = RodaCoreFactory.getRodaConfiguration().getKeys(RodaConstants.LEVELS_ICONS_PREFIX);
+    if (iconKeys != null) {
+      while (iconKeys.hasNext()) {
+        String iconKey = iconKeys.next();
+        String level = iconKey.replace(RodaConstants.LEVELS_ICONS_PREFIX+".", "");
+        icons.put(level,
+          RodaCoreFactory.getRodaConfiguration().getString(iconKey));
+      }
+    }
+    dlc.setLevelIcons(icons);
+    dlc.setRepresentationClass(
+      RodaCoreFactory.getRodaConfiguration().getString(RodaConstants.LEVELS_ICONS_REPRESENTATION));
+    dlc.setRepresentationFileClass(RodaCoreFactory.getRodaConfiguration().getString(RodaConstants.LEVELS_ICONS_FILE));
+    dlc.setRepresentationFolderClass(
+      RodaCoreFactory.getRodaConfiguration().getString(RodaConstants.LEVELS_ICONS_FOLDER));
+    return dlc;
   }
 
 }

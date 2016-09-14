@@ -22,7 +22,7 @@ public class DescriptionLevel implements Serializable {
 
   // description level
   private String level = null;
-  private Map<String, String> labels;
+  private String label;
   private String iconClass;
 
   public DescriptionLevel() {
@@ -37,14 +37,14 @@ public class DescriptionLevel implements Serializable {
     this.level = level;
   }
 
-  public Map<String, String> getLabels() {
-    return labels;
+  public String getLabel() {
+    return label;
   }
 
-  public void setLabels(Map<String, String> labels) {
-    this.labels = labels;
+  public void setLabel(String label) {
+    this.label = label;
   }
-  
+
   public String getIconClass() {
     return iconClass;
   }
@@ -58,7 +58,7 @@ public class DescriptionLevel implements Serializable {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((iconClass == null) ? 0 : iconClass.hashCode());
-    result = prime * result + ((labels == null) ? 0 : labels.hashCode());
+    result = prime * result + ((label == null) ? 0 : label.hashCode());
     result = prime * result + ((level == null) ? 0 : level.hashCode());
     return result;
   }
@@ -77,10 +77,10 @@ public class DescriptionLevel implements Serializable {
         return false;
     } else if (!iconClass.equals(other.iconClass))
       return false;
-    if (labels == null) {
-      if (other.labels != null)
+    if (label == null) {
+      if (other.label != null)
         return false;
-    } else if (!labels.equals(other.labels))
+    } else if (!label.equals(other.label))
       return false;
     if (level == null) {
       if (other.level != null)
@@ -90,17 +90,11 @@ public class DescriptionLevel implements Serializable {
     return true;
   }
 
-  
   @Override
   public String toString() {
-    return "DescriptionLevel [level=" + level + ", labels=" + labels + ", iconClass=" + iconClass + "]";
+    return "DescriptionLevel [level=" + level + ", label=" + label + ", iconClass=" + iconClass + "]";
   }
 
-  public String getLabel(String locale) {
-    String label = null;
-    if (labels != null) {
-      label = labels.get(locale);
-    }
-    return label;
-}
+  
+  
 }

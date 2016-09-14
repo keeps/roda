@@ -57,7 +57,6 @@ import org.reflections.scanners.ResourcesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
-import org.roda.core.common.DescriptionLevelManager;
 import org.roda.core.common.LdapUtility;
 import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.Messages;
@@ -180,7 +179,6 @@ public class RodaCoreFactory {
   private static Map<String, Map<String, String>> rodaPropertiesCache = null;
   private static Map<String, Schema> rodaSchemasCache = new HashMap<String, Schema>();
   private static Map<Locale, Messages> i18nMessages = new HashMap<Locale, Messages>();
-  private static DescriptionLevelManager descriptionLevelManager = null;
 
   /** Private empty constructor */
   private RodaCoreFactory() {
@@ -263,10 +261,6 @@ public class RodaCoreFactory {
         // instantiate solr and index service
         instantiateSolrAndIndexService();
         LOGGER.debug("Finished instantiating solr & index");
-
-        // load description level information
-        loadDescriptionLevelInformation();
-        LOGGER.debug("Finished loading description levels");
 
         // instantiate plugin manager
         instantiatePluginManager();
@@ -521,35 +515,6 @@ public class RodaCoreFactory {
         LOGGER.error("Error instantiating PluginManager", e);
         instantiatedWithoutErrors = false;
       }
-    }
-  }
-
-  private static void loadDescriptionLevelInformation() throws ConfigurationException {
-    Path config = RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_DESCRIPTION_LEVELS_FILE);
-    PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration();
-    propertiesConfiguration.setDelimiterParsingDisabled(true);
-    propertiesConfiguration.setEncoding(RodaConstants.DEFAULT_ENCODING);
-    if (Files.exists(config)) {
-      LOGGER.trace("Loading configuration from file {}", config);
-      propertiesConfiguration.load(config.toFile());
-      RodaPropertiesReloadStrategy rodaPropertiesReloadStrategy = new RodaPropertiesReloadStrategy();
-      rodaPropertiesReloadStrategy.setRefreshDelay(5000);
-      propertiesConfiguration.setReloadingStrategy(rodaPropertiesReloadStrategy);
-    } else {
-      InputStream inputStream = RodaCoreFactory.class
-        .getResourceAsStream("/" + RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_DESCRIPTION_LEVELS_FILE);
-      if (inputStream != null) {
-        LOGGER.trace("Loading configuration from classpath {}", RodaConstants.CORE_DESCRIPTION_LEVELS_FILE);
-        propertiesConfiguration.load(inputStream);
-      } else {
-        LOGGER.trace("Configuration {} doesn't exist", RodaConstants.CORE_DESCRIPTION_LEVELS_FILE);
-      }
-    }
-    try {
-      descriptionLevelManager = new DescriptionLevelManager(propertiesConfiguration);
-    } catch (RequestNotValidException e) {
-      LOGGER.error("Error loading description levels", e);
-      instantiatedWithoutErrors = false;
     }
   }
 
@@ -1287,10 +1252,6 @@ public class RodaCoreFactory {
     // i18n is cached and that cache is re-done when changes occur to
     // roda-*.properties (for convenience)
     getRodaConfiguration().getString("");
-  }
-
-  public static DescriptionLevelManager getDescriptionLevelManager() {
-    return descriptionLevelManager;
   }
 
   /*

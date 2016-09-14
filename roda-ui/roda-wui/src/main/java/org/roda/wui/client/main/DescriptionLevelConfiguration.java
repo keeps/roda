@@ -9,34 +9,35 @@ package org.roda.wui.client.main;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
-import org.roda.core.data.descriptionLevels.DescriptionLevel;
-
-public class DescriptionLevelInfoPack implements Serializable {
+public class DescriptionLevelConfiguration implements Serializable {
 
   private static final long serialVersionUID = 3476633742750492225L;
 
-  public List<DescriptionLevel> descriptionLevels;
-  
-  public String ghostClass;
-  
-  public String defaultClass;
-    
-  public String representationClass;
-  
-  public String representationFolderClass;
-  
-  public String representationFileClass;
+  private List<String> classificationPlanLevels;
 
-  public DescriptionLevelInfoPack() {
+  private String ghostClass;
+
+  private String defaultClass;
+
+  private String representationClass;
+
+  private String representationFolderClass;
+
+  private String representationFileClass;
+
+  private Map<String, String> levelIcons;
+
+  public DescriptionLevelConfiguration() {
   }
 
-  public List<DescriptionLevel> getDescriptionLevels() {
-    return descriptionLevels;
+  public List<String> getClassificationPlanLevels() {
+    return classificationPlanLevels;
   }
 
-  public void setDescriptionLevels(List<DescriptionLevel> descriptionLevels) {
-    this.descriptionLevels = descriptionLevels;
+  public void setClassificationPlanLevels(List<String> classificationPlanLevels) {
+    this.classificationPlanLevels = classificationPlanLevels;
   }
 
   public String getGhostClass() {
@@ -78,6 +79,12 @@ public class DescriptionLevelInfoPack implements Serializable {
   public void setRepresentationFileClass(String representationFileClass) {
     this.representationFileClass = representationFileClass;
   }
-  
-  
+
+  public Map<String, String> getLevelIcons() {
+    return levelIcons;
+  }
+
+  public void setLevelIcons(Map<String, String> levelIcons) {
+    this.levelIcons = levelIcons;
+  }
 }

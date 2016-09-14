@@ -7,15 +7,10 @@
  */
 package org.roda.wui.client.main;
 
-import java.util.List;
-
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 @RemoteServiceRelativePath("descriptionlevel")
 public interface DescriptionLevelService extends RemoteService {
-
-  List<String> getDescriptionLevels();
-
-  DescriptionLevelInfoPack getAllDescriptionLevels();
+  DescriptionLevelConfiguration getDescriptionLevelConfiguration();
 }

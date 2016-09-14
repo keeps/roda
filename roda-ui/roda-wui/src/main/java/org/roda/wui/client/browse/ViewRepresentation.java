@@ -19,7 +19,6 @@ import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.descriptionLevels.DescriptionLevel;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -550,28 +549,7 @@ public class ViewRepresentation extends Composite {
   }
 
   private SafeHtml getElementLevelIconSafeHtml(String level) {
-    SafeHtml icon;
-    if (level == null) {
-      icon = SafeHtmlUtils.fromSafeConstant("<i class='" + DescriptionLevelUtils.DEFAULT_CLASS + "'></i>");
-    } else {
-      if (level.equals(RodaConstants.VIEW_REPRESENTATION_REPRESENTATION)) {
-        icon = SafeHtmlUtils.fromSafeConstant("<i class='" + DescriptionLevelUtils.REPRESENTATION_CLASS + "'></i>");
-      } else if (level.equals(RodaConstants.VIEW_REPRESENTATION_FOLDER)) {
-        icon = SafeHtmlUtils
-          .fromSafeConstant("<i class='" + DescriptionLevelUtils.REPRESENTATION_FOLDER_CLASS + "'></i>");
-      } else if (level.equals(RodaConstants.VIEW_REPRESENTATION_FILE)) {
-        icon = SafeHtmlUtils
-          .fromSafeConstant("<i class='" + DescriptionLevelUtils.REPRESENTATION_FILE_CLASS + "'></i>");
-      } else {
-        DescriptionLevel l = DescriptionLevelUtils.getDescriptionLevel(level);
-        if (l != null) {
-          icon = SafeHtmlUtils.fromSafeConstant("<i class='" + l.getIconClass() + "'></i>");
-        } else {
-          icon = SafeHtmlUtils.fromSafeConstant("<i class='" + DescriptionLevelUtils.DEFAULT_CLASS + "'></i>");
-        }
-      }
-    }
-    return icon;
+    return DescriptionLevelUtils.getElementLevelIconSafeHtml(level, false);
   }
 
   @UiHandler("downloadFileButton")

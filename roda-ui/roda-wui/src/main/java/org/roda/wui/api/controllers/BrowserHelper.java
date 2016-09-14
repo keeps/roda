@@ -157,6 +157,7 @@ import org.roda.wui.client.planning.MitigationPropertiesBundle;
 import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
 import org.roda.wui.common.HTMLUtils;
+import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.server.RodaStreamingOutput;
 import org.roda.wui.common.server.ServerTools;
 import org.roda.wui.server.common.XMLSimilarityIgnoreElements;
@@ -1419,8 +1420,7 @@ public class BrowserHelper {
       ObjectNode root = mapper.createObjectNode();
 
       ArrayNode array = mapper.createArrayNode();
-      List<DescriptionLevel> descriptionLevels = RodaCoreFactory.getDescriptionLevelManager()
-        .getAllButRepresentationsDescriptionLevels();
+      List<DescriptionLevel> descriptionLevels = DescriptionLevelUtils.getAllButRepresentationsDescriptionLevels();
       List<String> descriptionsLevels = descriptionLevels.stream().map(d -> d.getLevel()).collect(Collectors.toList());
 
       Filter allButRepresentationsFilter = new Filter(

@@ -9,19 +9,23 @@ package org.roda.wui.common.client.tools;
 
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.descriptionLevels.DescriptionLevel;
-import org.roda.wui.client.common.utils.StringUtils;
-import org.roda.wui.client.main.DescriptionLevelInfoPack;
+import org.roda.wui.client.main.DescriptionLevelConfiguration;
 import org.roda.wui.client.main.DescriptionLevelServiceAsync;
 import org.roda.wui.common.client.ClientLogger;
 
-import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTMLPanel;
 
+import config.i18n.client.ClientMessages;
+
 public class DescriptionLevelUtils {
+
+  private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   private static final String TOP_ICON = "<span class='roda-logo'></span>";
 
@@ -31,53 +35,54 @@ public class DescriptionLevelUtils {
     super();
   }
 
-  public static List<DescriptionLevel> DESCRIPTION_LEVELS;
-
-  public static String GHOST_CLASS;
-
-  public static String DEFAULT_CLASS;
-  
-  public static String REPRESENTATION_CLASS;
-  public static String REPRESENTATION_FOLDER_CLASS;
-  public static String REPRESENTATION_FILE_CLASS;
-  
+  public static DescriptionLevelConfiguration LEVELS_CONFIGURATION;
 
   public static void load(final AsyncCallback<Void> callback) {
-    DescriptionLevelServiceAsync.INSTANCE.getAllDescriptionLevels(new AsyncCallback<DescriptionLevelInfoPack>() {
+    DescriptionLevelServiceAsync.INSTANCE
+      .getDescriptionLevelConfiguration(new AsyncCallback<DescriptionLevelConfiguration>() {
 
-      @Override
-      public void onFailure(Throwable caught) {
-        logger.error("Error getting all the description levels!", caught);
-        callback.onFailure(caught);
-      }
+        @Override
+        public void onFailure(Throwable caught) {
+          logger.error("Error getting the description level configuration!", caught);
+          callback.onFailure(caught);
+        }
 
-      @Override
-      public void onSuccess(DescriptionLevelInfoPack result) {
-        DESCRIPTION_LEVELS = result.getDescriptionLevels();
-        GHOST_CLASS = result.getGhostClass();
-        DEFAULT_CLASS = result.getDefaultClass();
-        REPRESENTATION_CLASS = result.getRepresentationClass();
-        REPRESENTATION_FOLDER_CLASS = result.getRepresentationFolderClass();
-        REPRESENTATION_FILE_CLASS = result.getRepresentationFileClass();
-        callback.onSuccess(null);
-      }
-    });
+        @Override
+        public void onSuccess(DescriptionLevelConfiguration result) {
+          LEVELS_CONFIGURATION = result;
+          callback.onSuccess(null);
+        }
+      });
   }
 
-  public static DescriptionLevel getDescriptionLevel(String level) {
-    DescriptionLevel ret = null;
-    if (DESCRIPTION_LEVELS == null) {
+  public static DescriptionLevel getDescriptionLevel(String levelString) {
+    if (LEVELS_CONFIGURATION == null) {
       logger.error("Requiring a description level while their are not yet loaded");
       return null;
     }
-
-    for (DescriptionLevel descriptionLevel : DESCRIPTION_LEVELS) {
-      if (descriptionLevel.getLevel().equals(level)) {
-        ret = descriptionLevel;
-        break;
-      }
+    DescriptionLevel level = new DescriptionLevel();
+    level.setLabel(levelString);
+    if (levelString == null) {
+      level.setIconClass("");
+    } else if (LEVELS_CONFIGURATION.getLevelIcons().containsKey(levelString)) {
+      level.setIconClass(LEVELS_CONFIGURATION.getLevelIcons().get(levelString));
+    } else if (levelString.equalsIgnoreCase("ghost")) {
+      level.setIconClass(LEVELS_CONFIGURATION.getGhostClass());
+    } else if ((levelString.equalsIgnoreCase(RodaConstants.VIEW_REPRESENTATION_REPRESENTATION))) {
+      level.setIconClass(LEVELS_CONFIGURATION.getRepresentationClass());
+    } else if ((levelString.equalsIgnoreCase(RodaConstants.VIEW_REPRESENTATION_FOLDER))) {
+      level.setIconClass(LEVELS_CONFIGURATION.getRepresentationFolderClass());
+    } else if ((levelString.equalsIgnoreCase(RodaConstants.VIEW_REPRESENTATION_FILE))) {
+      level.setIconClass(LEVELS_CONFIGURATION.getRepresentationFileClass());
+    } else {
+      level.setIconClass(LEVELS_CONFIGURATION.getDefaultClass());
     }
-    return ret;
+    String label = messages.levelLabel(levelString);
+    if (label == null) {
+      label = levelString;
+    }
+    level.setLabel(label);
+    return level;
   }
 
   public static SafeHtml getTopIconSafeHtml() {
@@ -92,34 +97,16 @@ public class DescriptionLevelUtils {
     return new HTMLPanel(getElementLevelIconSafeHtml(level, false));
   }
 
-  public static SafeHtml getElementLevelIconSafeHtml(String level, boolean showText) {
+  public static SafeHtml getElementLevelIconSafeHtml(String levelString, boolean showText) {
     SafeHtml ret = null;
-    if (level.equals("ghost")) {
-      StringBuilder b = new StringBuilder();
-      b.append("<i class='").append(GHOST_CLASS).append("' aria-hidden=\"true\"></i>");
-      ret = SafeHtmlUtils.fromSafeConstant(b.toString());
-    } else {
-      DescriptionLevel levelInfo = DescriptionLevelUtils.getDescriptionLevel(level);
-      if (levelInfo == null) {
-        StringBuilder b = new StringBuilder();
-        b.append("<i class='").append(DEFAULT_CLASS).append("' aria-hidden=\"true\"></i>");
-        appendLevel(b, showText, level);
-        ret = SafeHtmlUtils.fromSafeConstant(b.toString());
-      } else {
-        StringBuilder b = new StringBuilder();
-        b.append("<i class='").append(levelInfo.getIconClass() + "'");
-        if (levelInfo != null) {
-          String label = levelInfo.getLabel(LocaleInfo.getCurrentLocale().getLocaleName());
-          if (StringUtils.isNotBlank(label)) {
-            b.append(" alt='").append(levelInfo.getLabel(LocaleInfo.getCurrentLocale().getLocaleName())).append("'");
-          }
-        }
-        b.append("'>");
-        b.append("</i>");
-        appendLevel(b, showText, level);
-        ret = SafeHtmlUtils.fromSafeConstant(b.toString());
-      }
-    }
+
+    DescriptionLevel level = getDescriptionLevel(levelString);
+    StringBuilder b = new StringBuilder();
+    b.append("<i class='");
+    b.append(level.getIconClass());
+    b.append("'></i>");
+    appendLevel(b, showText, level.getLabel());
+    ret = SafeHtmlUtils.fromSafeConstant(b.toString());
     return ret;
   }
 
@@ -128,5 +115,10 @@ public class DescriptionLevelUtils {
       b.append("&nbsp;");
       b.append(level);
     }
+  }
+
+  public static List<DescriptionLevel> getAllButRepresentationsDescriptionLevels() {
+    // TODO Auto-generated method stub
+    return null;
   }
 }
