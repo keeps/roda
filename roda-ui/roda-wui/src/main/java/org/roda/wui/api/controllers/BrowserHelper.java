@@ -68,7 +68,6 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.common.RodaConstants.RODA_TYPE;
-import org.roda.core.data.descriptionLevels.DescriptionLevel;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -157,7 +156,6 @@ import org.roda.wui.client.planning.MitigationPropertiesBundle;
 import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
 import org.roda.wui.common.HTMLUtils;
-import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.server.RodaStreamingOutput;
 import org.roda.wui.common.server.ServerTools;
 import org.roda.wui.server.common.XMLSimilarityIgnoreElements;
@@ -1420,8 +1418,8 @@ public class BrowserHelper {
       ObjectNode root = mapper.createObjectNode();
 
       ArrayNode array = mapper.createArrayNode();
-      List<DescriptionLevel> descriptionLevels = DescriptionLevelUtils.getAllButRepresentationsDescriptionLevels();
-      List<String> descriptionsLevels = descriptionLevels.stream().map(d -> d.getLevel()).collect(Collectors.toList());
+      List<String> descriptionsLevels = RodaUtils
+        .copyList(RodaCoreFactory.getRodaConfiguration().getList(RodaConstants.LEVELS_CLASSIFICATION_PLAN));
 
       Filter allButRepresentationsFilter = new Filter(
         new OneOfManyFilterParameter(RodaConstants.AIP_LEVEL, descriptionsLevels));
