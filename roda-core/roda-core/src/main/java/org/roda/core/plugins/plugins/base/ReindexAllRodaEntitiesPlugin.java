@@ -18,6 +18,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.IsRODAObject;
@@ -117,7 +118,12 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
         classes.remove(Job.class);
         jobPluginInfo.setSourceObjectsCount(classes.size());
         for (Class<? extends IsRODAObject> reindexClass : classes) {
-          reindexRODAObject(model, reindexClass, jobPluginInfo);
+          Report reportItem = reindexRODAObject(model, reindexClass, jobPluginInfo);
+
+          if (reportItem != null) {
+            pluginReport.addReport(reportItem);
+            PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+          }
         }
       } else {
         jobPluginInfo.setSourceObjectsCount(1);
@@ -134,41 +140,58 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
     return pluginReport;
   }
 
-  private void reindexRODAObject(ModelService model, Class<? extends IsRODAObject> reindexClass,
+  private Report reindexRODAObject(ModelService model, Class<? extends IsRODAObject> reindexClass,
     SimpleJobPluginInfo jobPluginInfo) {
     LOGGER.debug("Creating job to reindexing all {}", reindexClass.getSimpleName());
+    Report report;
 
-    try {
-      if (TransferredResource.class.equals(reindexClass)) {
-        // TransferredResource does not need a job
+    if (TransferredResource.class.equals(reindexClass)) {
+      // TransferredResource does not need a job
+      try {
         RodaCoreFactory.getTransferredResourcesScanner().updateAllTransferredResources(null, false);
-      } else {
-        if (model.hasObjects(reindexClass)) {
-          Job job = new Job();
-          job.setId(UUID.randomUUID().toString());
-          job.setName(ReindexRodaEntityPlugin.class.getSimpleName() + " (" + reindexClass.getSimpleName() + ")");
-          Map<String, String> pluginParameters = new HashMap<>();
-          pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "true");
-          job.setPluginParameters(pluginParameters);
+        jobPluginInfo.incrementObjectsProcessedWithSuccess();
+      } catch (IsStillUpdatingException e) {
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
+      }
+    } else {
+      if (model.hasObjects(reindexClass)) {
+        Job job = new Job();
+        job.setId(UUID.randomUUID().toString());
+        job.setName(ReindexRodaEntityPlugin.class.getSimpleName() + " (" + reindexClass.getSimpleName() + ")");
 
-          if (LogEntry.class.equals(reindexClass)) {
-            job.setPlugin(ReindexActionLogPlugin.class.getName());
-          } else {
-            job.setPlugin(ReindexRodaEntityPlugin.class.getName());
-          }
+        Map<String, String> pluginParameters = new HashMap<>();
+        pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "true");
+        job.setPluginParameters(pluginParameters);
 
-          job.setSourceObjects(SelectedItemsAll.create(reindexClass));
-          job.setPluginType(PluginType.MISC);
+        if (LogEntry.class.equals(reindexClass)) {
+          job.setPlugin(ReindexActionLogPlugin.class.getName());
+        } else {
+          job.setPlugin(ReindexRodaEntityPlugin.class.getName());
+        }
+
+        job.setSourceObjects(SelectedItemsAll.create(reindexClass));
+        job.setPluginType(PluginType.MISC);
+
+        report = PluginHelper.initPluginReportItem(this, job.getId(), Job.class);
+
+        try {
           job.setUsername(PluginHelper.getJobUsername(this, model));
           PluginHelper.createAndExecuteJob(job, true);
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+          report.setPluginState(PluginState.SUCCESS).setPluginDetails(job.getName() + " ran successfully");
+        } catch (RODAException e) {
+          LOGGER.error("Error creating job to reindex all {}", reindexClass.getSimpleName(), e);
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+          report.setPluginState(PluginState.FAILURE).setPluginDetails(job.getName() + " did not run successfully");
         }
-      }
 
-      jobPluginInfo.incrementObjectsProcessedWithSuccess();
-    } catch (RODAException e) {
-      LOGGER.error("Error creating job to reindex all {}", reindexClass.getSimpleName(), e);
-      jobPluginInfo.incrementObjectsProcessedWithFailure();
+        return report;
+      } else {
+        jobPluginInfo.incrementObjectsProcessedWithSuccess();
+      }
     }
+
+    return null;
   }
 
   @Override

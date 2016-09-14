@@ -301,15 +301,5 @@
 			<groupId>org.glassfish.jersey.bundles</groupId>
 			<artifactId>jaxrs-ri</artifactId>
 		</dependency>
-		<dependency>
-			<artifactId>gui</artifactId>
-			<groupId>org.verapdf</groupId>
-			<version>0.8.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.ghost4j</groupId>
-			<artifactId>ghost4j</artifactId>
-			<version>1.0.0</version>
-		</dependency>
 	</dependencies>
 </project>

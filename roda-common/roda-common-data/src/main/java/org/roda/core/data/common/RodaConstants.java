@@ -287,6 +287,10 @@ public final class RodaConstants {
   public static final String STORAGE_CONTAINER_AGENT = "agent";
   public static final String STORAGE_CONTAINER_FORMAT = "format";
   public static final String STORAGE_CONTAINER_NOTIFICATION = "notification";
+  public static final String STORAGE_CONTAINER_PRESERVATION_AGENTS = "agents";
+
+  public static final String STORAGE_HISTORY_CONTAINER_DATA = "data";
+  public static final String STORAGE_HISTORY_CONTAINER_METADATA = "metadata";
 
   /*
    * STORAGE DIRECTORIES
@@ -514,6 +518,7 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_OUTPUT_ARGUMENTS = "parameter.output_arguments";
   public static final String PLUGIN_PARAMS_REPORTING_CLASS = "parameter.reporting_class";
   public static final String PLUGIN_PARAMS_HAS_COMPRESSION = "parameter.has_compression";
+  public static final String PLUGIN_PARAMS_HAS_SINGLE_REQUEST = "parameter.has_single_request";
 
   public static final String PLUGIN_CLASS_DIGITAL_SIGNATURE = "org.roda.core.plugins.plugins.validation.DigitalSignaturePlugin";
   public static final String PLUGIN_CLASS_VERAPDF = "org.roda.core.plugins.plugins.validation.VeraPDFPlugin";

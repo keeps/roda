@@ -17,6 +17,7 @@ import javax.ws.rs.core.Response;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Reports;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
@@ -62,8 +63,8 @@ public class ReportsResource {
 
   @GET
   @Path("/last")
-  @ApiOperation(value = "Last report", notes = "Last report", response = Reports.class, responseContainer = "List")
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Reports.class, responseContainer = "List"),
+  @ApiOperation(value = "Last report", notes = "Last report", response = Report.class)
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Report.class),
     @ApiResponse(code = 404, message = "Transferred resource or SIP not found", response = ApiResponseMessage.class)})
 
   public Response getTransferredResourceLastReport(
@@ -77,8 +78,8 @@ public class ReportsResource {
     User user = UserUtility.getApiUser(request);
 
     // get last job reports of a transferred resource or SIP or all
-    Reports lastReports = Browser.listReports(user, id, resourceOrSip, "0", "1", acceptFormat);
-    return Response.ok(lastReports, mediaType).build();
+    Report lastReport = Browser.lastReport(user, id, resourceOrSip, acceptFormat);
+    return Response.ok(lastReport, mediaType).build();
   }
 
 }

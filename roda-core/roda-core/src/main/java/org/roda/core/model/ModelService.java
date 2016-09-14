@@ -2321,17 +2321,19 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  public boolean hasObjects(Class<? extends IsRODAObject> objectClass)
-    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
-    if (!TransferredResource.class.equals(objectClass)) {
-      StoragePath storagePath = ModelUtils.getContainerPath(objectClass);
-      try {
-        return RodaCoreFactory.getStorageService().countResourcesUnderContainer(storagePath, false).intValue() > 0;
-      } catch (NotFoundException e) {
-        // 20160913 hsilva: we want to handle the non-existence of a container
-        return false;
+  public boolean hasObjects(Class<? extends IsRODAObject> objectClass) {
+    try {
+      if (!TransferredResource.class.equals(objectClass)) {
+        StoragePath storagePath = ModelUtils.getContainerPath(objectClass);
+        try {
+          return RodaCoreFactory.getStorageService().countResourcesUnderContainer(storagePath, false).intValue() > 0;
+        } catch (NotFoundException e) {
+          // 20160913 hsilva: we want to handle the non-existence of a container
+        }
       }
-    } else {
+
+      return false;
+    } catch (RODAException e) {
       return false;
     }
   }

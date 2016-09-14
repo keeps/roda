@@ -56,6 +56,7 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Reports;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.risks.IndexedRisk;
@@ -1967,6 +1968,39 @@ public class Browser extends RodaWuiController {
       RodaConstants.API_QUERY_KEY_LIMIT, limit);
 
     return reportList;
+  }
+
+  public static Report lastReport(User user, String id, String resourceOrSip, String acceptFormat)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // validate input
+    BrowserHelper.validateListingParams(acceptFormat);
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    String start = "0";
+    String limit = "1";
+    Reports reportList;
+
+    if (id == null || resourceOrSip == null) {
+      reportList = BrowserHelper.listReports(start, limit);
+    } else {
+      if (RodaConstants.API_GET_REPORTS_ID_OBJECT_SIP.equals(resourceOrSip)) {
+        reportList = BrowserHelper.listTransferredResourcesReportsWithSIP(id, start, limit);
+      } else {
+        reportList = BrowserHelper.listTransferredResourcesReports(id, start, limit);
+      }
+    }
+
+    // register action
+    controllerAssistant.registerAction(user, id, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_QUERY_PARAM_ID, id,
+      RodaConstants.API_GET_REPORTS_ID_OBJECT, resourceOrSip, RodaConstants.API_QUERY_KEY_START, start,
+      RodaConstants.API_QUERY_KEY_LIMIT, limit);
+
+    return reportList.getReports().get(0);
   }
 
   public static UserExtraBundle retrieveUserExtraBundle(User user, String name)
