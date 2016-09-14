@@ -503,7 +503,7 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_DO_PRODUCER_AUTHORIZATION_CHECK = "parameter.do_producer_authorization_check";
   public static final String PLUGIN_PARAMS_DO_AUTO_ACCEPT = "parameter.do_auto_accept";
   public static final String PLUGIN_PARAMS_EMAIL_NOTIFICATION = "parameter.email_notification";
-  public static final String PLUGIN_PARAMS_HTTP_NOTIFICATION = "parameter.http_notification";
+  public static final String PLUGIN_PARAMS_HTTP_NOTIFICATION = "ingest.http_notification";
   public static final String PLUGIN_PARAMS_CREATES_PLUGIN_EVENT = "createsPluginEvent";
   public static final String PLUGIN_PARAMS_CREATE_SUBMISSION = "parameter.create_submission";
   public static final String PLUGIN_PARAMS_USERNAME = "parameter.username";
@@ -883,6 +883,15 @@ public final class RodaConstants {
   }
 
   public static final List<String> SYSTEM_USERS = Arrays.asList("admin", "guest");
+  
+  /* Description level configuration Constants */
+  public static final String LEVELS_CLASSIFICATION_PLAN = "levels.classificationplan";
+  public static final String LEVELS_ICONS_PREFIX = "levels.icon";
+  public static final String LEVELS_ICONS_GHOST = "levels.internal.icon.ghost";
+  public static final String LEVELS_ICONS_DEFAULT = "levels.internal.icon.default";
+  public static final String LEVELS_ICONS_REPRESENTATION = "levels.internal.icon.representation";
+  public static final String LEVELS_ICONS_FOLDER = "levels.internal.icon.representation.folder";
+  public static final String LEVELS_ICONS_FILE = "levels.internal.icon.representation.file";
 
   /** Private empty constructor */
   private RodaConstants() {

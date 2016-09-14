@@ -380,11 +380,12 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
       long duration = (new Date().getTime() - job.getStartDate().getTime()) / 1000;
       scopes.put("duration", duration + " seconds");
-      model.createNotification(notification, new EmailNotificationProcessor(RodaConstants.INGEST_EMAIL_TEMPLATE, scopes));
+      model.createNotification(notification,
+        new EmailNotificationProcessor(RodaConstants.INGEST_EMAIL_TEMPLATE, scopes));
     }
 
-    String httpNotifications = PluginHelper.getStringFromParameters(this,
-      getPluginParameter(RodaConstants.PLUGIN_PARAMS_HTTP_NOTIFICATION));
+    String httpNotifications = RodaCoreFactory.getRodaConfiguration()
+      .getString(RodaConstants.PLUGIN_PARAMS_HTTP_NOTIFICATION, "");
     if (StringUtils.isNotBlank(httpNotifications)) {
       Notification notification = new Notification();
       String outcome = PluginState.SUCCESS.toString();
@@ -392,6 +393,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       if (jobStats.getSourceObjectsProcessedWithFailure() > 0) {
         outcome = PluginState.FAILURE.toString();
       }
+
       notification.setSubject("RODA ingest process finished - " + outcome);
       notification.setFromUser(this.getClass().getSimpleName());
       notification.setRecipientUsers(Arrays.asList(httpNotifications));
