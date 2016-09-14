@@ -32,6 +32,7 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
@@ -76,7 +77,7 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
     actionComponentColumn = new Column<LogEntry, SafeHtml>(new SafeHtmlCell()) {
       @Override
       public SafeHtml getValue(LogEntry entry) {
-        return HtmlSnippetUtils.getLogEntryComponent(entry, getResult().getFacetResults());
+        return SafeHtmlUtils.fromSafeConstant(translate("actionComponent", entry.getActionComponent()));
       }
     };
 

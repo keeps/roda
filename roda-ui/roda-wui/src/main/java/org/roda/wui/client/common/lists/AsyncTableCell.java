@@ -21,6 +21,8 @@ import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import org.roda.core.data.adapter.sort.SortParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.v2.index.FacetFieldResult;
+import org.roda.core.data.v2.index.FacetValue;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
@@ -103,7 +105,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
   private Class<T> selectedClass;
   private final O object;
-  
+
   private IndexResult<T> result;
 
   public AsyncTableCell() {
@@ -142,20 +144,23 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     this.dataProvider = new MyAsyncDataProvider<T>(display, new IndexResultDataProvider<T>() {
 
       @Override
-      public void getData(Sublist sublist, ColumnSortList columnSortList, final AsyncCallback<IndexResult<T>> callback) {
-        AsyncTableCell.this.getData(AsyncTableCell.this.getFilter(), sublist, columnSortList, new AsyncCallback<IndexResult<T>>() {
+      public void getData(Sublist sublist, ColumnSortList columnSortList,
+        final AsyncCallback<IndexResult<T>> callback) {
+        AsyncTableCell.this.getData(AsyncTableCell.this.getFilter(), sublist, columnSortList,
+          new AsyncCallback<IndexResult<T>>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-           callback.onFailure(caught);
-            
-          }
+            @Override
+            public void onFailure(Throwable caught) {
+              callback.onFailure(caught);
 
-          @Override
-          public void onSuccess(IndexResult<T> result) {
-            setResult(result);
-            callback.onSuccess(result);
-          }});
+            }
+
+            @Override
+            public void onSuccess(IndexResult<T> result) {
+              setResult(result);
+              callback.onSuccess(result);
+            }
+          });
       }
     }) {
 
@@ -695,8 +700,33 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   public IndexResult<T> getResult() {
     return result;
   }
-  
+
   public void setResult(IndexResult<T> result) {
     this.result = result;
+  }
+
+  public String translate(String fieldName, String fieldValue) {
+    String translation = null;
+    if (this.result != null && this.result.getFacetResults() != null) {
+      for (FacetFieldResult ffr : this.result.getFacetResults()) {
+        if (ffr.getField().equalsIgnoreCase(fieldName)) {
+          if (ffr.getValues() != null) {
+            for (FacetValue fv : ffr.getValues()) {
+              if (fv.getValue().equalsIgnoreCase(fieldValue)) {
+                translation = fv.getLabel();
+                break;
+              }
+            }
+          }
+        }
+        if (translation != null) {
+          break;
+        }
+      }
+    }
+    if (translation == null) {
+      translation = fieldValue;
+    }
+    return translation;
   }
 }
