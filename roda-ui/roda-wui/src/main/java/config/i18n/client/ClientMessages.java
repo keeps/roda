@@ -2265,4 +2265,6 @@ public interface ClientMessages extends Messages {
 
   String wrongMailFormat();
 
+  String fileAlreadyExists();
+
 }

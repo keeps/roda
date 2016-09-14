@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.validation.ValidationException;
@@ -137,6 +138,9 @@ public class CreateDescriptiveMetadata extends Composite {
 
   @UiField
   HTML errors;
+  
+  @UiField
+  HTML idError;
 
   /**
    * Create a new panel to edit a user
@@ -314,7 +318,11 @@ public class CreateDescriptiveMetadata extends Composite {
           if (caught instanceof ValidationException) {
             ValidationException e = (ValidationException) caught;
             updateErrors(e);
+          } else if(caught instanceof AlreadyExistsException){
+            idError.setVisible(true);
+            idError.setHTML(SafeHtmlUtils.fromSafeConstant(messages.fileAlreadyExists()));
           } else {
+            idError.setVisible(false);
             AsyncCallbackUtils.defaultFailureTreatment(caught);
           }
           buttonApply.setEnabled(true);
