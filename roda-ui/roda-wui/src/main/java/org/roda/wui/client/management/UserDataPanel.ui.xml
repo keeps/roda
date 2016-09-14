@@ -19,19 +19,23 @@
 
 	<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width no_padding">
+			
 			<g:FlowPanel addStyleNames="wui-data-panel">
+				<g:FlowPanel addStyleNames="wui-error-panel">
+					<g:HTML ui:field="errors"></g:HTML>
+				</g:FlowPanel>
 				<g:Label addStyleNames="form-label">
-					<ui:text from='{messages.username}' />
+					<ui:text from='{messages.username}' /> *
 				</g:Label>
 				<g:TextBox ui:field="username" addStyleNames="form-textbox" />
 				<g:Label ui:field="usernameError" addStyleNames="form-label-error"></g:Label>
 				<g:Label addStyleNames="form-label">
-					<ui:text from='{messages.password}' />
+					<ui:text from='{messages.password}' /> *
 				</g:Label>
 				<u:PasswordPanel ui:field="password" />
 				<g:Label ui:field="passwordError" addStyleNames="form-label-error"></g:Label>
 				<g:Label addStyleNames="form-label">
-					<ui:text from='{messages.fullname}' />
+					<ui:text from='{messages.fullname}' /> *
 				</g:Label>
 				<g:TextBox ui:field="fullname" addStyleNames="form-textbox" />
 				<g:Label ui:field="fullnameError" addStyleNames="form-label-error"></g:Label>
@@ -60,7 +64,7 @@
 				<g:TextBox ui:field="nif" addStyleNames="form-textbox" />
 				 -->
 				<g:Label addStyleNames="form-label">
-					<ui:text from='{messages.email}' />
+					<ui:text from='{messages.email}' /> *
 				</g:Label>
 				<g:TextBox ui:field="email" addStyleNames="form-textbox" />
 				<g:Label ui:field="emailError" addStyleNames="form-label-error"></g:Label>

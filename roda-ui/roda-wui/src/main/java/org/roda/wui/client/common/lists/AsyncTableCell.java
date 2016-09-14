@@ -103,6 +103,8 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
   private Class<T> selectedClass;
   private final O object;
+  
+  private IndexResult<T> result;
 
   public AsyncTableCell() {
     this(null, false, null, null, false, 20, 100, null);
@@ -140,8 +142,20 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     this.dataProvider = new MyAsyncDataProvider<T>(display, new IndexResultDataProvider<T>() {
 
       @Override
-      public void getData(Sublist sublist, ColumnSortList columnSortList, AsyncCallback<IndexResult<T>> callback) {
-        AsyncTableCell.this.getData(AsyncTableCell.this.getFilter(), sublist, columnSortList, callback);
+      public void getData(Sublist sublist, ColumnSortList columnSortList, final AsyncCallback<IndexResult<T>> callback) {
+        AsyncTableCell.this.getData(AsyncTableCell.this.getFilter(), sublist, columnSortList, new AsyncCallback<IndexResult<T>>() {
+
+          @Override
+          public void onFailure(Throwable caught) {
+           callback.onFailure(caught);
+            
+          }
+
+          @Override
+          public void onSuccess(IndexResult<T> result) {
+            setResult(result);
+            callback.onSuccess(result);
+          }});
       }
     }) {
 
@@ -678,4 +692,11 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     addColumn(column, SafeHtmlUtils.fromString(headerText), nowrap, alignRight, fixedSize);
   }
 
+  public IndexResult<T> getResult() {
+    return result;
+  }
+  
+  public void setResult(IndexResult<T> result) {
+    this.result = result;
+  }
 }

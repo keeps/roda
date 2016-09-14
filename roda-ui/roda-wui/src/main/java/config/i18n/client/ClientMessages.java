@@ -2258,6 +2258,10 @@ public interface ClientMessages extends Messages {
   String preservationEventAgentExtension();
 
   String mandatoryField();
+  
+  String isAMandatoryField(String field);
+  
+  String isNotValid(String field);
 
   String wrongMailFormat();
 

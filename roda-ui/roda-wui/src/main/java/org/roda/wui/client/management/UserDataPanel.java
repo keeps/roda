@@ -10,10 +10,12 @@
  */
 package org.roda.wui.client.management;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.glassfish.jersey.internal.Errors;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.BrowserService;
@@ -24,6 +26,7 @@ import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dev.shell.Messages;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -40,6 +43,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
@@ -110,6 +114,9 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
   private boolean changed = true;
   private boolean checked = false;
   private UserExtraBundle userExtraBundle = null;
+  
+  @UiField
+  HTML errors;
 
   /**
    * Create a new user data panel
@@ -157,6 +164,8 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     this.editmode = editmode;
     super.setVisible(visible);
     this.enableGroupSelect = enableGroupSelect;
+    
+    errors.setVisible(false);
 
     groupSelectPanel.setVisible(enableGroupSelect);
     permissionsSelectPanel.setVisible(enablePermissions);
@@ -391,51 +400,67 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
    * @return true if valid
    */
   public boolean isValid() {
-    boolean valid = true;
-
+    List<String> errorList = new ArrayList<String>();
     if (username.getText().length() == 0) {
-      valid = false;
       username.addStyleName("isWrong");
       usernameError.setText(messages.mandatoryField());
       usernameError.setVisible(true);
+      errorList.add(messages.isAMandatoryField(messages.username()));
     } else {
       username.removeStyleName("isWrong");
       usernameError.setVisible(false);
     }
 
-    valid &= password.isValid();
+    if(!password.isValid()){
+      errorList.add(messages.isNotValid(messages.password()));
+    }
 
     if (fullname.getText().length() == 0) {
-      valid = false;
       fullname.addStyleName("isWrong");
       fullnameError.setText(messages.mandatoryField());
       fullnameError.setVisible(true);
+      errorList.add(messages.isAMandatoryField(messages.fullname()));
+
     } else {
       fullname.removeStyleName("isWrong");
       fullnameError.setVisible(false);
     }
 
     if (email.getText() == null || email.getText().trim().equalsIgnoreCase("")) {
-      valid = false;
       email.addStyleName("isWrong");
       emailError.setText(messages.mandatoryField());
       emailError.setVisible(true);
+      errorList.add(messages.isAMandatoryField(messages.email()));
     } else if (!email.getText()
       .matches("^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[_A-Za-z0-9-]+)")) {
-      valid = false;
       email.addStyleName("isWrong");
       emailError.setText(messages.wrongMailFormat());
       emailError.setVisible(true);
+      errorList.add(messages.isNotValid(messages.email()));
     } else {
       email.removeStyleName("isWrong");
       emailError.setVisible(false);
     }
-
-    valid = valid && FormUtilities.validate(userExtraBundle.getValues(), extra);
+    
+    List<String> extraErrors = FormUtilities.validate(userExtraBundle.getValues(), extra);
+    
+    errorList.addAll(extraErrors);
 
     checked = true;
-
-    return valid;
+    
+    GWT.log("ERRORS: "+errorList.size());
+    if(errorList.size()>0){
+      errors.setVisible(true);
+      String errorString = "";
+      for(String error : errorList){
+        errorString+="<span class='error'>"+error+"</span>";
+        errorString+="<br/>";
+      }
+      errors.setHTML(errorString);
+    }else{
+      errors.setVisible(false);
+    }
+    return errorList.size()==0?true:false;
   }
 
   /**

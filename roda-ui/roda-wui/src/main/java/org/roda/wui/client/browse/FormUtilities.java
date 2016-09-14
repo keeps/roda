@@ -7,7 +7,9 @@
  */
 package org.roda.wui.client.browse;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import com.google.gwt.core.client.GWT;
@@ -103,6 +105,7 @@ public class FormUtilities {
         // do nothing
       }
     }
+    mv.set("l", result);
     return result;
   }
 
@@ -386,23 +389,23 @@ public class FormUtilities {
     panel.add(layout);
   }
 
-  public static boolean validate(Set<MetadataValue> values, FlowPanel extra) {
-    boolean valid = true;
+  public static List<String> validate(Set<MetadataValue> values, FlowPanel extra) {
+    List<String> errors = new ArrayList<String>();
     if (values != null) {
       for (MetadataValue mv : values) {
         String value = mv.get("value");
         boolean mandatory = (mv.get("mandatory") != null && mv.get("mandatory").equalsIgnoreCase("true")) ? true
           : false;
         if (mandatory && (value == null || value.trim().equalsIgnoreCase(""))) {
-          mv.set("error", messages.mandatoryField());
-          valid = false;
+          String labels = mv.get("l");
+          errors.add(messages.isAMandatoryField(labels));
         }
       }
     }
-    if (!valid) {
+    if (errors.size() > 0) {
       extra.clear();
       create(extra, values, true);
     }
-    return valid;
+    return errors;
   }
 }

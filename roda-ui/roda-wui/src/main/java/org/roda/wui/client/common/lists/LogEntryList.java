@@ -18,7 +18,6 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.FacetFieldResult;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.wui.client.browse.BrowserService;
@@ -56,8 +55,6 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
   private TextColumn<LogEntry> addressColumn;
   private Column<LogEntry, SafeHtml> stateColumn;
 
-  private List<FacetFieldResult> facetResult;
-  
   public LogEntryList() {
     this(null, null, null, false);
   }
@@ -79,7 +76,7 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
     actionComponentColumn = new Column<LogEntry, SafeHtml>(new SafeHtmlCell()) {
       @Override
       public SafeHtml getValue(LogEntry entry) {
-        return HtmlSnippetUtils.getLogEntryComponent(entry,facetResult);
+        return HtmlSnippetUtils.getLogEntryComponent(entry, getResult().getFacetResults());
       }
     };
 
@@ -169,22 +166,7 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
 
     // UserManagementService.Util.getInstance().findLogEntries(filter, sorter,
     // sublist, getFacets(), callback);
-    
-    BrowserService.Util.getInstance().find(LogEntry.class.getName(), filter, sorter, sublist, getFacets(),
-      LocaleInfo.getCurrentLocale().getLocaleName(), getJustActive(), new AsyncCallback<IndexResult<LogEntry>>() {
 
-        @Override
-        public void onFailure(Throwable caught) {
-         callback.onFailure(caught);
-          
-        }
-
-        @Override
-        public void onSuccess(IndexResult<LogEntry> result) {
-          setFacets(result.getFacetResults());
-          callback.onSuccess(result);
-        }});
-    
     BrowserService.Util.getInstance().find(LogEntry.class.getName(), filter, sorter, sublist, getFacets(),
       LocaleInfo.getCurrentLocale().getLocaleName(), getJustActive(), callback);
   }
@@ -194,8 +176,4 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
     return DefaultSelectionEventManager.<LogEntry> createBlacklistManager(3);
   }
 
-  
-  public void setFacets(List<FacetFieldResult> facets){
-    facetResult = facets;
-  }
 }
