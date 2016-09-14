@@ -147,11 +147,19 @@ public class FormUtilities {
       layout.add(mvDescription);
     }
 
+    
     if (mv.get("error") != null && !mv.get("error").trim().equalsIgnoreCase("")) {
+      if(mv.get("name").equalsIgnoreCase("idNumber")){
+        GWT.log("Adding error...");
+      }
       Label errorLabel = new Label(mv.get("error"));
       errorLabel.addStyleName("form-label-error");
       layout.add(errorLabel);
       mvText.addStyleName("isWrong");
+    }else{
+      if(mv.get("name").equalsIgnoreCase("idNumber")){
+        GWT.log("ERROR not added");
+      }
     }
     panel.add(layout);
   }
@@ -285,6 +293,9 @@ public class FormUtilities {
       layout.add(mvDescription);
     }
 
+    if(mv.get("name").equalsIgnoreCase("idNumber")){
+      GWT.log("ERROR: "+mv.get("error"));
+    }
     if (mv.get("error") != null && !mv.get("error").trim().equalsIgnoreCase("")) {
       Label errorLabel = new Label(mv.get("error"));
       errorLabel.addStyleName("form-label-error");
@@ -397,15 +408,22 @@ public class FormUtilities {
         boolean mandatory = (mv.get("mandatory") != null && mv.get("mandatory").equalsIgnoreCase("true")) ? true
           : false;
         if (mandatory && (value == null || value.trim().equalsIgnoreCase(""))) {
+          if(mv.get("name").equalsIgnoreCase("idNumber")){
+            GWT.log("MANDATORY AND EMPTY");
+          }
           String labels = mv.get("l");
           errors.add(messages.isAMandatoryField(labels));
+          mv.set("error", messages.mandatoryField());
+        }else{
+          if(mv.get("name").equalsIgnoreCase("idNumber")){
+            GWT.log("ERROR: NULL");
+          }
+          mv.set("error", null);
         }
       }
     }
-    if (errors.size() > 0) {
-      extra.clear();
-      create(extra, values, true);
-    }
+    extra.clear();
+    create(extra, values, true);
     return errors;
   }
 }

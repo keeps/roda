@@ -410,7 +410,7 @@ public class UserManagement extends RodaWuiController {
 
       return RodaCoreFactory.getModelService().createNotification(notification,
         new EmailNotificationProcessor(RodaConstants.VERIFICATION_EMAIL_TEMPLATE, scopes));
-    } catch (UnsupportedEncodingException e) {
+    } catch (UnsupportedEncodingException | AuthorizationDeniedException e) {
       throw new GenericException("Error sending email verification", e);
     }
   }

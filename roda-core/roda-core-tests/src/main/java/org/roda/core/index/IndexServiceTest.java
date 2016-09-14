@@ -64,6 +64,7 @@ import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.notifications.Notification.NOTIFICATION_STATE;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
@@ -794,13 +795,9 @@ public class IndexServiceTest {
     notification.setSentOn(new Date());
     notification.setFromUser("Test Message Index");
     notification.setRecipientUsers(Arrays.asList("recipientuser@example.com"));
-    try {
-      // createNotification must throw an exception because SMTP is not
-      // configured in tests...
-      model.createNotification(notification, new EmailNotificationProcessor("test-email-template.vm"));
-      Assert.fail("createNotification must throw an exception because SMTP is not configured in tests");
-    } catch (GenericException e) {
-    }
+    Notification n = model.createNotification(notification, new EmailNotificationProcessor("test-email-template.vm"));
+    // notification state must be FAILED because SMTP is not configured on test environment
+    Assert.assertEquals(n.getState(), NOTIFICATION_STATE.FAILED);
     index.commit(Notification.class);
 
     Notification message2 = model.retrieveNotification(notification.getId());

@@ -77,7 +77,7 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
     actionComponentColumn = new Column<LogEntry, SafeHtml>(new SafeHtmlCell()) {
       @Override
       public SafeHtml getValue(LogEntry entry) {
-        return SafeHtmlUtils.fromSafeConstant(translate("actionComponent", entry.getActionComponent()));
+        return SafeHtmlUtils.fromSafeConstant(translate(RodaConstants.LOG_ACTION_COMPONENT, entry.getActionComponent()));
       }
     };
 

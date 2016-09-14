@@ -15,7 +15,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.glassfish.jersey.internal.Errors;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.BrowserService;
@@ -26,7 +25,6 @@ import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dev.shell.Messages;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -114,7 +112,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
   private boolean changed = true;
   private boolean checked = false;
   private UserExtraBundle userExtraBundle = null;
-  
+
   @UiField
   HTML errors;
 
@@ -164,7 +162,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     this.editmode = editmode;
     super.setVisible(visible);
     this.enableGroupSelect = enableGroupSelect;
-    
+
     errors.setVisible(false);
 
     groupSelectPanel.setVisible(enableGroupSelect);
@@ -411,7 +409,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
       usernameError.setVisible(false);
     }
 
-    if(!password.isValid()){
+    if (!password.isValid()) {
       errorList.add(messages.isNotValid(messages.password()));
     }
 
@@ -441,26 +439,26 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
       email.removeStyleName("isWrong");
       emailError.setVisible(false);
     }
-    
+
     List<String> extraErrors = FormUtilities.validate(userExtraBundle.getValues(), extra);
-    
+
     errorList.addAll(extraErrors);
 
     checked = true;
-    
-    GWT.log("ERRORS: "+errorList.size());
-    if(errorList.size()>0){
+
+    GWT.log("ERRORS: " + errorList.size());
+    if (errorList.size() > 0) {
       errors.setVisible(true);
       String errorString = "";
-      for(String error : errorList){
-        errorString+="<span class='error'>"+error+"</span>";
-        errorString+="<br/>";
+      for (String error : errorList) {
+        errorString += "<span class='error'>" + error + "</span>";
+        errorString += "<br/>";
       }
       errors.setHTML(errorString);
-    }else{
+    } else {
       errors.setVisible(false);
     }
-    return errorList.size()==0?true:false;
+    return errorList.size() == 0 ? true : false;
   }
 
   /**

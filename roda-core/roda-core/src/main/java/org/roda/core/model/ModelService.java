@@ -2096,10 +2096,12 @@ public class ModelService extends ModelObservable {
   }
 
   /***************** Notification related *****************/
-  /************************************************/
+  /**
+   * @throws AuthorizationDeniedException
+   **********************************************/
 
   public Notification createNotification(Notification notification, NotificationProcessor processor)
-    throws GenericException {
+    throws GenericException, AuthorizationDeniedException {
     try {
       notification.setId(UUID.randomUUID().toString());
       notification.setAcknowledgeToken(UUID.randomUUID().toString());
@@ -2107,27 +2109,28 @@ public class ModelService extends ModelObservable {
       notification.setState(Notification.NOTIFICATION_STATE.COMPLETED);
     } catch (RODAException e) {
       notification.setState(Notification.NOTIFICATION_STATE.FAILED);
-      LOGGER.error("Error processing notification", e);
     }
     try {
       String notificationAsJson = JsonUtils.getJsonFromObject(notification);
       StoragePath notificationPath = ModelUtils.getNotificationStoragePath(notification.getId());
       storage.createBinary(notificationPath, new StringContentPayload(notificationAsJson), false);
       notifyNotificationCreatedOrUpdated(notification);
-    } catch (RODAException e) {
+    } catch (NotFoundException | RequestNotValidException | AlreadyExistsException e) {
       LOGGER.error("Error creating notification in storage", e);
       throw new GenericException(e);
     }
     return notification;
   }
 
-  public Notification updateNotification(Notification notification) throws GenericException {
+  public Notification updateNotification(Notification notification)
+    throws GenericException, NotFoundException, AuthorizationDeniedException {
     try {
       String notificationAsJson = JsonUtils.getJsonFromObject(notification);
       StoragePath notificationPath = ModelUtils.getNotificationStoragePath(notification.getId());
       storage.updateBinaryContent(notificationPath, new StringContentPayload(notificationAsJson), false, true);
-    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
+    } catch (GenericException | RequestNotValidException e) {
       LOGGER.error("Error updating notification in storage", e);
+      throw new GenericException(e);
     }
 
     notifyNotificationCreatedOrUpdated(notification);
@@ -2135,24 +2138,27 @@ public class ModelService extends ModelObservable {
   }
 
   public void deleteNotification(String notificationId)
-    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
-
-    StoragePath notificationPath = ModelUtils.getNotificationStoragePath(notificationId);
-    storage.deleteResource(notificationPath);
-    notifyNotificationDeleted(notificationId);
+    throws GenericException, NotFoundException, AuthorizationDeniedException {
+    try {
+      StoragePath notificationPath = ModelUtils.getNotificationStoragePath(notificationId);
+      storage.deleteResource(notificationPath);
+      notifyNotificationDeleted(notificationId);
+    } catch (RequestNotValidException e) {
+      LOGGER.error("Error deleting notification", e);
+      throw new GenericException(e);
+    }
   }
 
   public Notification retrieveNotification(String notificationId)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-
-    StoragePath notificationPath = ModelUtils.getNotificationStoragePath(notificationId);
-    Binary binary = storage.getBinary(notificationPath);
-    Notification ret;
+    throws GenericException, NotFoundException, AuthorizationDeniedException {
     InputStream inputStream = null;
+    Notification ret;
     try {
+      StoragePath notificationPath = ModelUtils.getNotificationStoragePath(notificationId);
+      Binary binary = storage.getBinary(notificationPath);
       inputStream = binary.getContent().createInputStream();
       ret = JsonUtils.getObjectFromJson(inputStream, Notification.class);
-    } catch (IOException e) {
+    } catch (IOException | RequestNotValidException e) {
       throw new GenericException("Error reading notification", e);
     } finally {
       IOUtils.closeQuietly(inputStream);
@@ -2161,7 +2167,7 @@ public class ModelService extends ModelObservable {
   }
 
   public void acknowledgeNotification(String notificationId, String token)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    throws GenericException, NotFoundException, AuthorizationDeniedException {
 
     Notification notification = this.retrieveNotification(notificationId);
     String ackToken = token.substring(0, 36);
