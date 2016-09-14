@@ -201,9 +201,8 @@ public class CreateDescriptiveMetadata extends Composite {
           }
 
           type.addItem(messages.otherItem(), "");
-
-          type.setSelectedIndex(type.getItemCount() - 1);
-
+          type.setSelectedIndex(0);
+          selectedBundle = metadataTypes.get(0);
           updateFormOrXML();
         }
       });
