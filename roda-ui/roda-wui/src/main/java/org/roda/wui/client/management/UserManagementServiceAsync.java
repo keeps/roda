@@ -81,7 +81,7 @@ public interface UserManagementServiceAsync {
    * @throws RecaptchaException
    */
   public void registerUser(User user, String password, String captcha, UserExtraBundle extra,
-    AsyncCallback<Void> callback);
+    AsyncCallback<User> callback);
 
   void createUser(User user, String password, UserExtraBundle extra, AsyncCallback<User> callback);
 

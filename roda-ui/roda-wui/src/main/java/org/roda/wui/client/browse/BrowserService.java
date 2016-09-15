@@ -156,11 +156,7 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
   boolean isCookiesMessageActive();
-
-  boolean isRegisterActive();
   
-  List<String> getRegisterDefaultGroups();
-
   /**
    * Get Google Analytics account id
    */

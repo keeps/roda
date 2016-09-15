@@ -9,21 +9,21 @@ package org.roda.core.common;
 
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.SelectedItems;
@@ -31,7 +31,6 @@ import org.roda.core.data.v2.index.SelectedItemsFilter;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
-import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.utils.ModelUtils;
@@ -41,6 +40,8 @@ import org.slf4j.LoggerFactory;
 public class UserUtility {
   private static final Logger LOGGER = LoggerFactory.getLogger(UserUtility.class);
   public static final String RODA_USER = "RODA_USER";
+  private static String REGISTER_ACTIVE_PROPERTY = "ui.register.active";
+  private static String REGISTER_DEFAULT_GROUPS = "ui.register.defaultGroups";
 
   private static LdapUtility LDAP_UTILITY;
 
@@ -269,6 +270,14 @@ public class UserUtility {
       }
     }
 
+  }
+
+  public static User resetGroupsAndRoles(User user) {
+    user.setAllRoles(new HashSet<String>());
+    user.setGroups(
+      new HashSet<String>(RodaUtils.copyList(RodaCoreFactory.getRodaConfiguration().getList(REGISTER_DEFAULT_GROUPS))));
+    user.setActive(RodaCoreFactory.getRodaConfiguration().getBoolean(REGISTER_ACTIVE_PROPERTY));
+    return user;
   }
 
 }

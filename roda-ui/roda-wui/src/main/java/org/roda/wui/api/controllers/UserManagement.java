@@ -191,15 +191,17 @@ public class UserManagement extends RodaWuiController {
     return ret;
   }
 
-  public static void registerUser(User user, String password, UserExtraBundle extra)
+  public static User registerUser(User user, String password, UserExtraBundle extra)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // delegate
-    UserManagementHelper.registerUser(user, password, extra);
+    User ret = UserManagementHelper.registerUser(user, password, extra);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "user", user);
+    
+    return ret;
   }
 
   public static User createUser(User user, User newUser, String password, UserExtraBundle extra)

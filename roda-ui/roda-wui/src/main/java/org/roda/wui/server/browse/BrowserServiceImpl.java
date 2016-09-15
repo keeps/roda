@@ -100,9 +100,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   private static final Logger LOGGER = LoggerFactory.getLogger(BrowserServiceImpl.class);
 
   private static String COOKIES_ACTIVE_PROPERTY = "ui.cookies.active";
-  private static String REGISTER_ACTIVE_PROPERTY = "ui.register.active";
-  private static String REGISTER_DEFAULT_GROUPS = "ui.register.defaultGroups";
-  
+
   private static String GANALYTICS_ACCOUNT_CODE = null;
   private static String GRECAPTCHA_ACCOUNT_CODE = null;
 
@@ -126,16 +124,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public boolean isCookiesMessageActive() {
     return RodaCoreFactory.getRodaConfiguration().getBoolean(COOKIES_ACTIVE_PROPERTY, false);
-  }
-
-  @Override
-  public boolean isRegisterActive() {
-    return RodaCoreFactory.getRodaConfiguration().getBoolean(REGISTER_ACTIVE_PROPERTY, false);
-  }
-  
-  @Override
-  public List<String> getRegisterDefaultGroups(){
-    return  RodaUtils.copyList(RodaCoreFactory.getRodaConfiguration().getList(REGISTER_DEFAULT_GROUPS));
   }
 
   @Override

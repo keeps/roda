@@ -202,6 +202,7 @@ public class CreateDescriptiveMetadata extends Composite {
 
           type.addItem(messages.otherItem(), "");
           type.setSelectedIndex(0);
+          id.setText(metadataTypes.get(0).getType() + ".xml");
           selectedBundle = metadataTypes.get(0);
           updateFormOrXML();
         }
