@@ -666,8 +666,9 @@
         <li><strong>date </strong>- text field with a date picker</li>
         <li><strong>list </strong>- list with the possible values (combo box)</li>
         <ul>
-          <li><strong>list </strong>- List with the possible values that a field can have. Usable when type="list". The format is a JSON map. The key of the map is the value used in the XML. The value of the map is another map, like the one used for the labels.Example: <pre><code>{"Final": {"en":"Final", "pt_PT":"Final"}, "Revised": {"en":"Revised", "pt_PT":"Verificado"}}</code></pre></li>
-          <li><strong>listi18n </strong>- I18n prefix key. Usable when type="list". All the key starting with the prefix are used to build the list. Example:<br/><pre><code>listi18n="crosswalks.dissemination.html.ead.level"</code></pre><br/>Properties file:<br/>
+          <li><strong>options </strong>- List with the possible values that a field can have. This list is a JSonArray. Example: <code>options="[\"final\",\"revised\",\"draft\"]"</code></pre></li>
+          <li><strong>optionsLabels </strong>- Map with the labels for each option. The key must match one of the options specified in the "options" list. The entry is another map, mapping a language (key) to a label (value). Example: <code>optionsLabels="{\"final\": {\"en\":\"Final\", \"pt_PT\":\"Final\"},\"revised\": {\"en\":\"Revised\", \"pt_PT\":\"Verificado\"},\"draft\": {\"en\":\"Draft\", \"pt_PT\":\"Rascunho\"}}"</code></li>
+          <li><strong>optionsLabelI18nKeyPrefix </strong>- I18n prefix key.  All the key starting with the prefix are used to build the list. Example:<br/><pre><code>optionsLabelI18nKeyPrefix="crosswalks.dissemination.html.ead.level"</code></pre><br/>Properties file:<br/>
           <pre><code>crosswalks.dissemination.html.ead.level.fonds=Fonds
 crosswalks.dissemination.html.ead.level.class=Class
 crosswalks.dissemination.html.ead.level.collection=Collection
@@ -687,6 +688,20 @@ crosswalks.dissemination.html.ead.level.item=Item</code></pre>
 &lt;option value="recordgrp"&gt;Records group&lt;/option&gt;
 (...)
 &lt;/select&gt;</code></pre>
+          </li>
+          <br/>
+          <li><strong>Full example of a "list" field</strong>:
+          <pre><code>{{~field 
+name="statusDescription"
+order="470" 
+type="list" 
+value="final"
+options="[\"final\",\"revised\",\"draft\"]"
+optionsLabels="{\"final\": {\"en\":\"Final\", \"pt_PT\":\"Final\"},\"revised\": {\"en\":\"Revised\", \"pt_PT\":\"Verificado\"},\"draft\": {\"en\":\"Draft\", \"pt_PT\":\"Rascunho\"}}"
+optionsLabelI18nKeyPrefix="crosswalks.dissemination.html.ead.statusDescription" 
+label="{\"en\": \"Status description\", \"pt_PT\": \"Estado da descrição\"}" 
+xpath="/*:ead/*:archdesc/*:odd[@type='statusDescription']/*:p/string()"
+~}}</code></pre>
           </li>
         </ul>
       </ul>
