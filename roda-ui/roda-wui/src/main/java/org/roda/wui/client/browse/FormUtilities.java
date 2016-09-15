@@ -147,19 +147,11 @@ public class FormUtilities {
       layout.add(mvDescription);
     }
 
-    
     if (mv.get("error") != null && !mv.get("error").trim().equalsIgnoreCase("")) {
-      if(mv.get("name").equalsIgnoreCase("idNumber")){
-        GWT.log("Adding error...");
-      }
       Label errorLabel = new Label(mv.get("error"));
       errorLabel.addStyleName("form-label-error");
       layout.add(errorLabel);
       mvText.addStyleName("isWrong");
-    }else{
-      if(mv.get("name").equalsIgnoreCase("idNumber")){
-        GWT.log("ERROR not added");
-      }
     }
     panel.add(layout);
   }
@@ -222,8 +214,15 @@ public class FormUtilities {
     final ListBox mvList = new ListBox();
     mvList.addStyleName("form-textbox");
 
-    String list = mv.get("options");
+    String options = mv.get("options");
+    JSONArray optionsArray = null;
+    if (options != null) {
+      optionsArray = JSONParser.parseLenient(options).isArray();
+    }
+
+    String list = mv.get("optionsLabels");
     mvList.addItem("");
+    
     if (list != null) {
       JSONArray jsonArray = JSONParser.parseLenient(list).isArray();
       if (jsonArray != null) {
@@ -240,24 +239,48 @@ public class FormUtilities {
         if (jsonObject != null) {
           String loc = LocaleInfo.getCurrentLocale().getLocaleName();
           int i = 0;
-          for (String key : jsonObject.keySet()) {
-            JSONValue entry = jsonObject.get(key);
-            if (entry.isObject() != null) {
-              JSONValue jsonValue = entry.isObject().get(loc);
-              String value = null;
-              if (jsonValue != null) {
-                value = jsonValue.isString().stringValue();
-              } else {
-                value = entry.isObject().get(entry.isObject().keySet().iterator().next()).isString().stringValue();
-              }
-              if (value != null) {
-                mvList.addItem(value, key);
-                if (key.equals(mv.get("value"))) {
-                  mvList.setSelectedIndex(i + 1);
+          
+          if(optionsArray!=null){
+            for (int pos=0;pos<optionsArray.size();pos++) {
+              String key = optionsArray.get(pos).isString().stringValue();
+              JSONValue entry = jsonObject.get(key);
+              if (entry.isObject() != null) {
+                JSONValue jsonValue = entry.isObject().get(loc);
+                String value = null;
+                if (jsonValue != null) {
+                  value = jsonValue.isString().stringValue();
+                } else {
+                  value = entry.isObject().get(entry.isObject().keySet().iterator().next()).isString().stringValue();
+                }
+                if (value != null) {
+                  mvList.addItem(value, key);
+                  if (key.equals(mv.get("value"))) {
+                    mvList.setSelectedIndex(i + 1);
+                  }
                 }
               }
+              i++;
             }
-            i++;
+          }else{
+            for (String key : jsonObject.keySet()) {
+              JSONValue entry = jsonObject.get(key);
+              if (entry.isObject() != null) {
+                JSONValue jsonValue = entry.isObject().get(loc);
+                String value = null;
+                if (jsonValue != null) {
+                  value = jsonValue.isString().stringValue();
+                } else {
+                  value = entry.isObject().get(entry.isObject().keySet().iterator().next()).isString().stringValue();
+                }
+                if (value != null) {
+                  mvList.addItem(value, key);
+                  if (key.equals(mv.get("value"))) {
+                    mvList.setSelectedIndex(i + 1);
+                  }
+                }
+              }
+              i++;
+            }
           }
         }
       }
@@ -293,9 +316,6 @@ public class FormUtilities {
       layout.add(mvDescription);
     }
 
-    if(mv.get("name").equalsIgnoreCase("idNumber")){
-      GWT.log("ERROR: "+mv.get("error"));
-    }
     if (mv.get("error") != null && !mv.get("error").trim().equalsIgnoreCase("")) {
       Label errorLabel = new Label(mv.get("error"));
       errorLabel.addStyleName("form-label-error");
@@ -408,16 +428,10 @@ public class FormUtilities {
         boolean mandatory = (mv.get("mandatory") != null && mv.get("mandatory").equalsIgnoreCase("true")) ? true
           : false;
         if (mandatory && (value == null || value.trim().equalsIgnoreCase(""))) {
-          if(mv.get("name").equalsIgnoreCase("idNumber")){
-            GWT.log("MANDATORY AND EMPTY");
-          }
           String labels = mv.get("l");
           errors.add(messages.isAMandatoryField(labels));
           mv.set("error", messages.mandatoryField());
-        }else{
-          if(mv.get("name").equalsIgnoreCase("idNumber")){
-            GWT.log("ERROR: NULL");
-          }
+        } else {
           mv.set("error", null);
         }
       }

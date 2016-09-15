@@ -1552,19 +1552,32 @@ public class BrowserHelper {
                 labels = JsonUtils.getJsonFromObject(labelsMaps);
                 mv.set("label", labels);
               }
-              String i18nPrefix = mv.get("optionsI18n");
+
+              String i18nPrefix = mv.get("optionsLabelI18nKeyPrefix");
               if (i18nPrefix != null) {
-                try {
-                  Map<String, String> terms = messages.getTranslations(i18nPrefix, String.class, false);
-                  Map<String, Map<String, String>> i18nMap = new HashMap<String, Map<String, String>>();
-                  for (Map.Entry<String, String> entry : terms.entrySet()) {
-                    Map<String, String> term = new HashMap<String, String>();
-                    term.put(locale.toString(), entry.getValue());
-                    i18nMap.put(entry.getKey().replace(i18nPrefix + ".", ""), term);
+                Map<String, String> terms = messages.getTranslations(i18nPrefix, String.class, false);
+                if (terms.size() > 0) {
+                  try {
+                    String options = mv.get("options");
+                    List<String> optionsList = JsonUtils.getListFromJson(options, String.class);
+
+                    if (optionsList != null) {
+                      Map<String, Map<String, String>> i18nMap = new HashMap<String, Map<String, String>>();
+                      for (int i = 0; i < optionsList.size(); i++) {
+                        String value = optionsList.get(i);
+                        String translation = terms.get(i18nPrefix + "." + value);
+                        if (translation == null) {
+                          translation = value;
+                        }
+                        Map<String, String> term = new HashMap<String, String>();
+                        term.put(locale.toString(), translation);
+                        i18nMap.put(value, term);
+                      }
+                      mv.set("optionsLabels", JsonUtils.getJsonFromObject(i18nMap));
+                    }
+                  } catch (MissingResourceException e) {
+                    LOGGER.error(e.getMessage(), e);
                   }
-                  mv.set("options", JsonUtils.getJsonFromObject(i18nMap));
-                } catch (MissingResourceException e) {
-                  LOGGER.error(e.getMessage(), e);
                 }
               }
 
