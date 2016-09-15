@@ -27,7 +27,7 @@
 
 				<g:TextBox ui:field="id" addStyleNames="form-textbox" />
 				
-				<g:HTML visible="false" ui:field="idError" addStyleNames="error" />
+				<g:HTML visible="false" ui:field="idError" addStyleNames="error metadata-edit-errors" />
 				
 				<g:Label styleName="form-label">
 					<ui:text from='{messages.editDescriptiveMetadataFormLabel}' />

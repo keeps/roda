@@ -202,12 +202,15 @@ public class CreateDescriptiveMetadata extends Composite {
 
           type.addItem(messages.otherItem(), "");
           type.setSelectedIndex(0);
-          id.setText(metadataTypes.get(0).getType() + ".xml");
           selectedBundle = metadataTypes.get(0);
+          if (selectedBundle.getVersion() != null) {
+            id.setText(selectedBundle.getType() + RodaConstants.METADATA_VERSION_SEPARATOR + selectedBundle.getVersion()+".xml");
+          } else {
+            id.setText(selectedBundle.getType()+".xml");
+          }
           updateFormOrXML();
         }
       });
-
   }
 
   private void createForm(SupportedMetadataTypeBundle bundle) {
@@ -318,9 +321,11 @@ public class CreateDescriptiveMetadata extends Composite {
           if (caught instanceof ValidationException) {
             ValidationException e = (ValidationException) caught;
             updateErrors(e);
+            idError.setVisible(false);
           } else if(caught instanceof AlreadyExistsException){
             idError.setVisible(true);
             idError.setHTML(SafeHtmlUtils.fromSafeConstant(messages.fileAlreadyExists()));
+            errors.setVisible(false);
           } else {
             idError.setVisible(false);
             AsyncCallbackUtils.defaultFailureTreatment(caught);
