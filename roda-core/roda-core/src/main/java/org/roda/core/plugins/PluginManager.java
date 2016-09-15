@@ -91,6 +91,13 @@ public class PluginManager {
     return defaultPluginManager;
   }
 
+  public <T extends IsRODAObject> void registerPlugin(Plugin<T> plugin) throws PluginException {
+    plugin.init();
+    externalPluginChache.put(plugin.getClass().getName(), plugin);
+    processAndCachePluginInformation(plugin);
+    LOGGER.debug("Plugin added dynamically started {} (version {})", plugin.getName(), plugin.getVersion());
+  }
+
   /**
    * Returns all {@link Plugin}s present in all jars.
    * 

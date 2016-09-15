@@ -51,6 +51,7 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
     LOGGER.debug("Starting AkkaJobStateInfoActor router with {} actors", numberOfJobsWorkers);
     Props workersProps = new RoundRobinPool(numberOfJobsWorkers).props(Props.create(AkkaWorkerActor.class));
     workersRouter = getContext().actorOf(workersProps, "WorkersRouter");
+    // 20160914 hsilva: watch child events, so when they stop we can react
     getContext().watch(workersRouter);
   }
 

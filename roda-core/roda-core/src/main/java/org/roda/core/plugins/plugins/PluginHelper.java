@@ -824,9 +824,9 @@ public final class PluginHelper {
     }
   }
 
-  public static void createAndExecuteJob(Job job, boolean async) throws GenericException, JobAlreadyStartedException {
+  public static void createAndExecuteJob(Job job) throws GenericException, JobAlreadyStartedException {
     RodaCoreFactory.getModelService().createJob(job);
-    RodaCoreFactory.getPluginOrchestrator().executeJob(job, async);
+    RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
     RodaCoreFactory.getIndexService().commit(Job.class);
   }
 

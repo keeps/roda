@@ -109,7 +109,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   @Override
   public void shutdown() {
-    LOGGER.info("Going to shutdown actor system");
+    LOGGER.info("Going to shutdown actor system (which will be done asynchronously)");
     Future<Terminated> terminate = workersSystem.terminate();
     terminate.onComplete(new OnComplete<Terminated>() {
       public void onComplete(Throwable failure, Terminated result) {

@@ -176,7 +176,7 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
 
         try {
           job.setUsername(PluginHelper.getJobUsername(this, model));
-          PluginHelper.createAndExecuteJob(job, true);
+          PluginHelper.createAndExecuteJob(job);
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
           report.setPluginState(PluginState.SUCCESS).setPluginDetails(job.getName() + " ran successfully");
         } catch (RODAException e) {
