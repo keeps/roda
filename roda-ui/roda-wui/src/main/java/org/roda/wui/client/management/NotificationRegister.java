@@ -115,13 +115,13 @@ public class NotificationRegister extends Composite {
 
   @UiField(provided = true)
   FlowPanel facetRecipientUsers;
-  
+
   @UiField(provided = true)
   FlowPanel facetState;
 
   @UiField(provided = true)
   FlowPanel facetAcknowledged;
-  
+
   private static final Filter DEFAULT_FILTER = new Filter(
     new BasicSearchFilterParameter(RodaConstants.NOTIFICATION_SEARCH, "*"));
 
@@ -132,7 +132,8 @@ public class NotificationRegister extends Composite {
    */
   public NotificationRegister() {
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.NOTIFICATION_RECIPIENT_USERS),
-      new SimpleFacetParameter(RodaConstants.NOTIFICATION_IS_ACKNOWLEDGED),new SimpleFacetParameter(RodaConstants.NOTIFICATION_STATE));
+      new SimpleFacetParameter(RodaConstants.NOTIFICATION_IS_ACKNOWLEDGED),
+      new SimpleFacetParameter(RodaConstants.NOTIFICATION_STATE));
     notificationList = new NotificationList(Filter.NULL, facets, messages.notificationsTitle(), false);
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.NOTIFICATION_SEARCH,
