@@ -7,6 +7,9 @@
  */
 package org.roda.core.plugins.plugins.base;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -27,9 +30,6 @@ import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class FixAncestorsPlugin extends AbstractPlugin<Void> {
   private static final Logger LOGGER = LoggerFactory.getLogger(FixAncestorsPlugin.class);
@@ -69,7 +69,7 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
 
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<Void> list)
-      throws PluginException {
+    throws PluginException {
     try {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, 0);
       PluginHelper.updateJobInformation(this, jobPluginInfo);
@@ -78,7 +78,8 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
 
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException |JobException | NotFoundException e) {
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | JobException
+      | NotFoundException e) {
       LOGGER.error("Error while fixing the ancestors.", e);
     }
     return PluginHelper.initPluginReport(this);
@@ -107,17 +108,17 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "XXXXXXXXXX";
+    return "Fixed the ancestor hierarchy";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "XXXXXXXXXXXXXXXXXXXXXXXX";
+    return "Fixed the ancestor hierarchy successfully";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "XXXXXXXXXXXXXXXXXXXXXXXXXX";
+    return "Fix of the ancestor hierarchy failed";
   }
 
   @Override

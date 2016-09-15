@@ -37,6 +37,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.common.Pair;
@@ -1971,7 +1972,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static Report lastReport(User user, String id, String resourceOrSip, String acceptFormat)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    throws RODAException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // validate input
@@ -2000,7 +2001,11 @@ public class Browser extends RodaWuiController {
       RodaConstants.API_GET_REPORTS_ID_OBJECT, resourceOrSip, RodaConstants.API_QUERY_KEY_START, start,
       RodaConstants.API_QUERY_KEY_LIMIT, limit);
 
-    return reportList.getReports().get(0);
+    if (reportList.getReports().isEmpty()) {
+      throw new RODAException();
+    } else {
+      return reportList.getReports().get(0);
+    }
   }
 
   public static UserExtraBundle retrieveUserExtraBundle(User user, String name)

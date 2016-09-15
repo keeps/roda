@@ -266,17 +266,17 @@ public class ReindexActionLogPlugin extends AbstractPlugin<LogEntry> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "XXXXXXXXXX";
+    return "Reindexed action logs";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "XXXXXXXXXXXXXXXXXXXXXXXX";
+    return "Reindexed action logs successfully";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "XXXXXXXXXXXXXXXXXXXXXXXXXX";
+    return "Reindex of action logs failed";
   }
 
   @Override

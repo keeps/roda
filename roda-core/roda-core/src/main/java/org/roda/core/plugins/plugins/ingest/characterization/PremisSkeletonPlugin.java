@@ -57,7 +57,7 @@ public class PremisSkeletonPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticName() {
-    return "Create file fixity information";
+    return "Create fixity information";
   }
 
   @Override

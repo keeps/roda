@@ -58,8 +58,8 @@ import org.roda.core.util.FileUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FileCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(FileCorruptionRiskAssessmentPlugin.class);
+public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(AIPCorruptionRiskAssessmentPlugin.class);
 
   private static List<String> risks;
   static {
@@ -79,7 +79,7 @@ public class FileCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "File corruption risk assessment";
+    return "AIP corruption risk assessment";
   }
 
   @Override
@@ -233,7 +233,7 @@ public class FileCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public Plugin<AIP> cloneMe() {
-    return new FileCorruptionRiskAssessmentPlugin();
+    return new AIPCorruptionRiskAssessmentPlugin();
   }
 
   @Override
@@ -254,17 +254,17 @@ public class FileCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "XXXXXXXXXX";
+    return "Computed the fixity information of files inside AIPs";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "XXXXXXXXXXXXXXXXXXXXXXXX";
+    return "Tested the fixity information of files inside AIPs successfully";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "XXXXXXXXXXXXXXXXXXXXXXXXXX";
+    return "Test of the fixity information of files inside AIPs failed";
   }
 
   @Override

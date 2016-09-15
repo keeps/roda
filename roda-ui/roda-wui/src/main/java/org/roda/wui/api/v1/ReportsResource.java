@@ -78,8 +78,13 @@ public class ReportsResource {
     User user = UserUtility.getApiUser(request);
 
     // get last job reports of a transferred resource or SIP or all
-    Report lastReport = Browser.lastReport(user, id, resourceOrSip, acceptFormat);
-    return Response.ok(lastReport, mediaType).build();
+    try {
+      Report lastReport = Browser.lastReport(user, id, resourceOrSip, acceptFormat);
+      return Response.ok(lastReport, mediaType).build();
+    } catch (RODAException e) {
+      return Response.ok(new ApiResponseMessage(ApiResponseMessage.ERROR, "Error getting the last report"), mediaType)
+        .build();
+    }
   }
 
 }

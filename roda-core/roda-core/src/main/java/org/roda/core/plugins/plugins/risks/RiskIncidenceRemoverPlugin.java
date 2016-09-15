@@ -64,7 +64,7 @@ public class RiskIncidenceRemoverPlugin<T extends IsRODAObject> extends Abstract
 
   @Override
   public String getDescription() {
-    return "Removes all risk incidences with removed risks";
+    return "Removes all risk incidences related to removed AIPs or risks";
   }
 
   @Override
@@ -166,17 +166,17 @@ public class RiskIncidenceRemoverPlugin<T extends IsRODAObject> extends Abstract
 
   @Override
   public String getPreservationEventDescription() {
-    return "XXXXXXXXXX";
+    return "Removed all risk incidences";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "XXXXXXXXXXXXXXXXXXXXXXXX";
+    return "Removed all risk incidences successfully";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "XXXXXXXXXXXXXXXXXXXXXXXXXX";
+    return "Remove of risk incidences failed";
   }
 
   @Override

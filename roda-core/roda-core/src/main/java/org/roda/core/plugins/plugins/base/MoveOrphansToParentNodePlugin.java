@@ -127,17 +127,17 @@ public class MoveOrphansToParentNodePlugin extends AbstractPlugin<IndexedAIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "XXXXXXXXXX";
+    return "Moved orphan AIPs to a new parent";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "XXXXXXXXXXXXXXXXXXXXXXXX";
+    return "Moved orphan AIPs to a new parent successfully";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "XXXXXXXXXXXXXXXXXXXXXXXXXX";
+    return "Move of orphan AIPs to a new parent failed";
   }
 
   @Override
