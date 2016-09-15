@@ -729,4 +729,15 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     }
     return translation;
   }
+
+  public boolean hasElementsSelected() {
+    SelectedItems<T> selected = getSelected();
+
+    if (selected instanceof SelectedItemsList) {
+      SelectedItemsList<T> list = (SelectedItemsList<T>) selected;
+      return !list.getIds().isEmpty();
+    }
+
+    return true;
+  }
 }

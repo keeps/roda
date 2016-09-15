@@ -547,15 +547,11 @@ public class MainSearch extends Composite {
   public SelectedItems<?> getSelected() {
     SelectedItems<?> selected = null;
 
-    if (itemsSearchResultPanel != null && itemsSearchAdvancedFieldsPanel.isVisible()) {
+    if (itemsSearchResultPanel != null && itemsSearchResultPanel.hasElementsSelected()) {
       selected = itemsSearchResultPanel.getSelected();
-    }
-
-    if (representationsSearchResultPanel != null && representationsSearchAdvancedFieldsPanel.isVisible()) {
+    } else if (representationsSearchResultPanel != null && representationsSearchResultPanel.hasElementsSelected()) {
       selected = representationsSearchResultPanel.getSelected();
-    }
-
-    if (filesSearchResultPanel != null && filesSearchAdvancedFieldsPanel.isVisible()) {
+    } else if (filesSearchResultPanel != null && filesSearchResultPanel.hasElementsSelected()) {
       selected = filesSearchResultPanel.getSelected();
     }
 
@@ -582,19 +578,13 @@ public class MainSearch extends Composite {
   }
 
   public void refresh() {
-
-    if (itemsSearchResultPanel != null && itemsSearchAdvancedFieldsPanel.isVisible()) {
+    if (itemsSearchResultPanel != null && itemsSearchResultPanel.hasElementsSelected()) {
       itemsSearchResultPanel.refresh();
-    }
-
-    if (representationsSearchResultPanel != null && representationsSearchAdvancedFieldsPanel.isVisible()) {
+    } else if (representationsSearchResultPanel != null && representationsSearchResultPanel.hasElementsSelected()) {
       representationsSearchResultPanel.refresh();
-    }
-
-    if (filesSearchResultPanel != null && filesSearchAdvancedFieldsPanel.isVisible()) {
+    } else if (filesSearchResultPanel != null && filesSearchResultPanel.hasElementsSelected()) {
       filesSearchResultPanel.refresh();
     }
-
   }
 
   private void setButtons(Map<Button, Boolean> buttonsMap) {

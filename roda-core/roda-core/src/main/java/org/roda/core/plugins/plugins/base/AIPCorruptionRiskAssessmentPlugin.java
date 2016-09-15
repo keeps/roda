@@ -12,9 +12,11 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
@@ -31,6 +33,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.OptionalWithCause;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
@@ -44,6 +47,8 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
 import org.roda.core.data.v2.validation.ValidationException;
+import org.roda.core.data.v2.validation.ValidationIssue;
+import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
@@ -105,7 +110,7 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
         for (AIP aip : list) {
           boolean aipFailed = false;
           List<String> passedFiles = new ArrayList<String>();
-          List<String> failedFiles = new ArrayList<String>();
+          Map<String, Pair<String, String>> failedFiles = new HashMap<>();
 
           for (Representation r : aip.getRepresentations()) {
             LOGGER.debug("Checking fixity for files in representation {} of AIP {}", r.getId(), aip.getId());
@@ -124,6 +129,9 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
                     Binary currentFileBinary = storage.getBinary(storagePath);
                     Binary premisFile = model.retrievePreservationFile(file);
                     List<Fixity> fixities = PremisV3Utils.extractFixities(premisFile);
+
+                    String fileEntry = file.getRepresentationId()
+                      + (file.getPath().isEmpty() ? "" : '/' + String.join("/", file.getPath())) + '/' + file.getId();
 
                     if (fixities != null) {
                       boolean passedFixity = true;
@@ -144,6 +152,7 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
 
                           if (!f.getMessageDigest().trim().equalsIgnoreCase(checksum.trim())) {
                             passedFixity = false;
+                            failedFiles.put(fileEntry, new Pair<>(f.getMessageDigest().trim(), checksum.trim()));
                             break;
                           }
                         }
@@ -153,15 +162,11 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
                         LOGGER.debug("Could not check fixity", e);
                       }
 
-                      String fileEntry = file.getRepresentationId()
-                        + (file.getPath().isEmpty() ? "" : '/' + String.join("/", file.getPath())) + '/' + file.getId();
-
                       if (passedFixity) {
                         passedFiles.add(fileEntry);
                       } else {
-                        failedFiles.add(fileEntry);
                         aipFailed = true;
-                        createRiskAndIncidence(model, file, risks.get(0));
+                        createIncidence(model, file, risks.get(0));
                       }
                     }
                   }
@@ -179,11 +184,19 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
             Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
 
             if (aipFailed) {
-              reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(
-                "Fixity checking did not run successfully. The following files are corrupt: " + failedFiles);
+              ValidationReport validationReport = new ValidationReport();
+
+              for (Entry<String, Pair<String, String>> entry : failedFiles.entrySet()) {
+                ValidationIssue issue = new ValidationIssue(entry.getKey() + " (Checksums: ["
+                  + entry.getValue().getFirst() + ", " + entry.getValue().getSecond() + "])");
+                validationReport.addIssue(issue);
+              }
+
+              reportItem.setPluginState(PluginState.FAILURE).setHtmlPluginDetails(true)
+                .setPluginDetails(validationReport.toHtml(false, false, false, "Corrupted files and their checksums"));
               jobPluginInfo.incrementObjectsProcessedWithFailure();
               PluginHelper.createPluginEvent(this, aip.getId(), model, index, PluginState.FAILURE,
-                "The following file have failed the corruption test: " + failedFiles.toString(), true);
+                validationReport.toHtml(false, false, false, "Corrupted files and their checksums"), true);
             } else {
               reportItem.setPluginState(PluginState.SUCCESS).setPluginDetails("Fixity checking ran successfully");
               jobPluginInfo.incrementObjectsProcessedWithSuccess();
@@ -214,7 +227,7 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
     return report;
   }
 
-  private void createRiskAndIncidence(ModelService model, File file, String riskId) throws RequestNotValidException,
+  private void createIncidence(ModelService model, File file, String riskId) throws RequestNotValidException,
     GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
     Risk risk = PluginHelper.createRiskIfNotExists(model, 0, risks.get(0), getClass());
     RiskIncidence incidence = new RiskIncidence();
