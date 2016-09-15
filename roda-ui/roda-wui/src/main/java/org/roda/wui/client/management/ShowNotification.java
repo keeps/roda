@@ -16,6 +16,7 @@ import java.util.List;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 
@@ -113,6 +114,12 @@ public class ShowNotification extends Composite {
 
   @UiField
   HTML acknowledgedUsersValue;
+  
+  @UiField
+  Label stateLabel;
+  
+  @UiField
+  HTML stateValue;
 
   @UiField
   Label notAcknowledgedUsersKey;
@@ -157,6 +164,9 @@ public class ShowNotification extends Composite {
         .setHTML(SafeHtmlUtils.fromSafeConstant(notAcknowledgedUsersValue.getHTML() + "<p>" + user + "</p>"));
     }
 
+    stateValue.setHTML(HtmlSnippetUtils.getNotificationStateHTML(notification.getState()));
+    stateLabel.setVisible(notification.getState()!=null);
+    stateValue.setVisible(notification.getState()!=null);
   }
 
   @UiHandler("buttonCancel")

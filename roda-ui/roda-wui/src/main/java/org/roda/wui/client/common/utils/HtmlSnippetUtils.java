@@ -22,6 +22,8 @@ import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
+import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.notifications.Notification.NOTIFICATION_STATE;
 import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
@@ -124,6 +126,31 @@ public class HtmlSnippetUtils {
         break;
     }
     return pluginStateHTML;
+  }
+  public static SafeHtml getNotificationStateHTML(NOTIFICATION_STATE state){
+    GWT.log("STATE1: "+state);
+    String label = messages.notificationStateValue(state) ;
+    GWT.log("STATE2: "+label);
+    return getNotificationStateHTML(state,label);
+  }
+  public static SafeHtml getNotificationStateHTML(NOTIFICATION_STATE state, String label) {
+    SafeHtml notificationStateHTML;
+    switch (state) {
+      case COMPLETED:
+        notificationStateHTML = SafeHtmlUtils
+          .fromSafeConstant("<span class='label-success'>" + label+ "</span>");
+        break;
+      case FAILED:
+        notificationStateHTML = SafeHtmlUtils
+          .fromSafeConstant("<span class='label-danger'>" + label + "</span>");
+        break;
+      case CREATED:
+      default:
+        notificationStateHTML = SafeHtmlUtils
+          .fromSafeConstant("<span class='label-default'>" + label + "</span>");
+        break;
+    }
+    return notificationStateHTML;
   }
 
   public static SEVERITY_LEVEL getSeverityLevel(int severity, int lowLimit, int highLimit) {

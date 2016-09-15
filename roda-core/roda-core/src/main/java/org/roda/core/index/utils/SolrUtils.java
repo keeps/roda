@@ -1981,7 +1981,7 @@ public class SolrUtils {
     doc.addField(RodaConstants.NOTIFICATION_IS_ACKNOWLEDGED, notification.isAcknowledged());
     doc.addField(RodaConstants.NOTIFICATION_ACKNOWLEDGED_USERS,
       JsonUtils.getJsonFromObject(notification.getAcknowledgedUsers()));
-
+    doc.addField(RodaConstants.NOTIFICATION_STATE, notification.getState().toString());
     return doc;
   }
 
@@ -1998,7 +1998,8 @@ public class SolrUtils {
     notification.setAcknowledged(objectToBoolean(doc.get(RodaConstants.NOTIFICATION_IS_ACKNOWLEDGED), Boolean.FALSE));
     notification.setAcknowledgedUsers(
       JsonUtils.getMapFromJson(objectToString(doc.get(RodaConstants.NOTIFICATION_ACKNOWLEDGED_USERS))));
-
+    notification
+      .setState(Notification.NOTIFICATION_STATE.valueOf(objectToString(doc.get(RodaConstants.NOTIFICATION_STATE))));
     return notification;
   }
 

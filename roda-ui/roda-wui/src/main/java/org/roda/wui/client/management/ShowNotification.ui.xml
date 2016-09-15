@@ -50,6 +50,12 @@
 								<g:Label styleName="value" ui:field="notificationFromUser" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="stateLabel">
+									<ui:text from='{messages.notificationState}' />
+								</g:Label>
+								<g:HTML styleName="value" ui:field="stateValue" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
 								<g:Label styleName="label">
 									<ui:text from='{messages.notificationIsAcknowledged}' />
 								</g:Label>

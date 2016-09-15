@@ -716,6 +716,8 @@ public final class RodaConstants {
   public static final String NOTIFICATION_ACKNOWLEDGE_TOKEN = "acknowledgeToken";
   public static final String NOTIFICATION_IS_ACKNOWLEDGED = "isAcknowledged";
   public static final String NOTIFICATION_ACKNOWLEDGED_USERS = "acknowledgedUsers";
+  public static final String NOTIFICATION_STATE = "state";
+
 
   public static final String NOTIFICATION_FILE_EXTENSION = ".json";
   public static final String NOTIFICATION_SEARCH = "search";

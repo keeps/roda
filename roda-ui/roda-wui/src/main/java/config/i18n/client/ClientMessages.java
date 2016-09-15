@@ -17,6 +17,7 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
+import org.roda.core.data.v2.notifications.Notification.NOTIFICATION_STATE;
 import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
 import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
 
@@ -1389,6 +1390,8 @@ public interface ClientMessages extends Messages {
   String notificationAcknowledgedUsers();
 
   String notificationNotAcknowledgedUsers();
+  
+  String notificationState();
 
   /*** Browse Constants **/
 
@@ -2242,6 +2245,8 @@ public interface ClientMessages extends Messages {
   String aipLevel();
 
   String pluginStateMessage(@Select PluginState state);
+  
+  String notificationStateValue(@Select NOTIFICATION_STATE state);
 
   String isAcknowledged(@Select String isAcknowledged);
 
@@ -2268,4 +2273,5 @@ public interface ClientMessages extends Messages {
   String fileAlreadyExists();
   
   String levelLabel(@Select String levelString);
+
 }

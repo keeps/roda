@@ -34,6 +34,12 @@
 				</g:FlowPanel>
 				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 					<g:Label addStyleNames="h5 sidebar-facet-title">
+						<ui:text from='{messages.notificationState}' />
+					</g:Label>
+					<g:FlowPanel ui:field="facetState" />
+				</g:FlowPanel>
+				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+					<g:Label addStyleNames="h5 sidebar-facet-title">
 						<ui:text from='{messages.notificationAcknowledged}' />
 					</g:Label>
 					<g:FlowPanel ui:field="facetAcknowledged" />

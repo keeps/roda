@@ -112,6 +112,7 @@
    <field name="recipientUsers" type="string" indexed="true" stored="true" required="true" multiValued="true" />
    <field name="acknowledgeToken" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="isAcknowledged" type="boolean" indexed="true" stored="true" required="true" multiValued="false" />
+   <field name="state" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    
    <field name="acknowledgedUsers" type="string" indexed="false" stored="true" required="false" multiValued="false" />
    

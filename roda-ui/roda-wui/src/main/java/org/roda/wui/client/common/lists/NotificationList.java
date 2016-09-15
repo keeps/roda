@@ -21,6 +21,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.SafeHtmlCell;
@@ -51,6 +52,7 @@ public class NotificationList extends BasicAsyncTableCell<Notification> {
   private Column<Notification, Date> sentOn;
   private TextColumn<Notification> subject;
   private Column<Notification, SafeHtml> acknowledged;
+  private Column<Notification, SafeHtml> state;
 
   public NotificationList() {
     this(null, null, null, false);
@@ -111,17 +113,30 @@ public class NotificationList extends BasicAsyncTableCell<Notification> {
       }
     };
 
+    state = new Column<Notification, SafeHtml>(new SafeHtmlCell()) {
+      @Override
+      public SafeHtml getValue(Notification notification) {
+        SafeHtml ret = null;
+        if (notification != null) {
+          ret = HtmlSnippetUtils.getNotificationStateHTML(notification.getState(),
+            translate(RodaConstants.NOTIFICATION_STATE, notification.getState().toString()));
+        }
+        return ret;
+      }
+    };
+
     fromUser.setSortable(true);
     // recipientUser.setSortable(true);
     sentOn.setSortable(true);
     subject.setSortable(true);
     acknowledged.setSortable(true);
-
+    state.setSortable(true);
     // TODO externalize strings into constants
 
     addColumn(fromUser, messages.notificationFrom(), true, false);
     addColumn(sentOn, messages.notificationSentOn(), true, false, 13);
     addColumn(subject, messages.notificationSubject(), true, false);
+    addColumn(state, messages.notificationState(), true, false, 10);
     addColumn(acknowledged, messages.notificationAck(), true, false, 5);
 
     // default sorting
@@ -142,6 +157,7 @@ public class NotificationList extends BasicAsyncTableCell<Notification> {
     columnSortingKeyMap.put(sentOn, Arrays.asList(RodaConstants.NOTIFICATION_SENT_ON));
     columnSortingKeyMap.put(subject, Arrays.asList(RodaConstants.NOTIFICATION_SUBJECT));
     columnSortingKeyMap.put(acknowledged, Arrays.asList(RodaConstants.NOTIFICATION_IS_ACKNOWLEDGED));
+    columnSortingKeyMap.put(state, Arrays.asList(RodaConstants.NOTIFICATION_STATE));
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
