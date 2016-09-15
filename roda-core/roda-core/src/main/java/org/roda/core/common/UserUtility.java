@@ -17,7 +17,6 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
@@ -42,6 +41,7 @@ public class UserUtility {
   public static final String RODA_USER = "RODA_USER";
   private static String REGISTER_ACTIVE_PROPERTY = "ui.register.active";
   private static String REGISTER_DEFAULT_GROUPS = "ui.register.defaultGroups";
+  private static String REGISTER_DEFAULT_ROLES = "ui.register.defaultRoles";
 
   private static LdapUtility LDAP_UTILITY;
 
@@ -273,9 +273,19 @@ public class UserUtility {
   }
 
   public static User resetGroupsAndRoles(User user) {
-    user.setAllRoles(new HashSet<String>());
-    user.setGroups(
-      new HashSet<String>(RodaUtils.copyList(RodaCoreFactory.getRodaConfiguration().getList(REGISTER_DEFAULT_GROUPS))));
+    List<Object> defaultRoles = RodaCoreFactory.getRodaConfiguration().getList(REGISTER_DEFAULT_ROLES);
+    List<Object> defaultGroups = RodaCoreFactory.getRodaConfiguration().getList(REGISTER_DEFAULT_GROUPS);
+
+    if (defaultRoles != null && defaultRoles.size() > 0) {
+      user.setDirectRoles(new HashSet<String>(RodaUtils.copyList(defaultRoles)));
+    } else {
+      user.setDirectRoles(new HashSet<String>());
+    }
+    if (defaultGroups != null && defaultGroups.size() > 0) {
+      user.setGroups(new HashSet<String>(RodaUtils.copyList(defaultGroups)));
+    } else {
+      user.setGroups(new HashSet<String>());
+    }
     user.setActive(RodaCoreFactory.getRodaConfiguration().getBoolean(REGISTER_ACTIVE_PROPERTY));
     return user;
   }

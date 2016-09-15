@@ -208,10 +208,7 @@ public class Register extends Composite {
                           }
                         });
                     } else {
-                      // TODO the user "default" group should be
-                      // configurable...
                       user.setActive(true);
-
                       UserManagementService.Util.getInstance().updateUser(user, password,
                         userDataPanel.getExtra(), new AsyncCallback<Void>() {
                           @Override
