@@ -187,7 +187,7 @@ public class Register extends Composite {
                   }
                 });
             } else {
-              UserManagementService.Util.getInstance().sendEmailVerification(user.getId(),
+              UserManagementService.Util.getInstance().sendEmailVerification(user.getId(), false,
                 new AsyncCallback<Notification>() {
 
                   @Override

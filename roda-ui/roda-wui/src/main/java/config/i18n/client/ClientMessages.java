@@ -1317,6 +1317,22 @@ public interface ClientMessages extends Messages {
 
   String systemCurrentlyUnavailableMessage();
 
+  String loginResendEmail();
+
+  String loginResendEmailSuccessDialogTitle();
+
+  String loginResendEmailSuccessDialogMessage();
+
+  String loginResendEmailSuccessDialogButton();
+
+  String loginResendEmailFailureDialogTitle();
+
+  String loginResendEmailFailureDialogMessage();
+
+  String loginResendEmailFailureDialogButton();
+
+  String loginResendEmailVerificationFailure();
+
   /*** More Search ***/
 
   String searchDescriptionLevels();
