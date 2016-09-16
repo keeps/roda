@@ -284,6 +284,20 @@ public class FormUtilities {
           }
         }
       }
+    }else{
+      if(optionsArray!=null){
+        int i = 0;
+        for (int pos=0;pos<optionsArray.size();pos++) {
+          String key = optionsArray.get(pos).isString().stringValue();
+          if (key != null) {
+            mvList.addItem(key, key);
+            if (key.equals(mv.get("value"))) {
+              mvList.setSelectedIndex(i + 1);
+            }
+          }
+          i++;
+        }
+      }
     }
 
     mvList.addChangeHandler(new ChangeHandler() {
