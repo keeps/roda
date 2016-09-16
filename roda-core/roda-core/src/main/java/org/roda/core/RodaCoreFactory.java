@@ -781,22 +781,23 @@ public class RodaCoreFactory {
 
       final boolean ldapStartServer = rodaConfig.getBoolean("ldap.startServer", false);
       final int ldapPort = rodaConfig.getInt("ldap.port", RodaConstants.CORE_LDAP_DEFAULT_PORT);
-      final String ldapBaseDN = rodaConfig.getString("ldap.baseDN");
-      final String ldapPeopleDN = rodaConfig.getString("ldap.peopleDN");
-      final String ldapGroupsDN = rodaConfig.getString("ldap.groupsDN");
-      final String ldapRolesDN = rodaConfig.getString("ldap.rolesDN");
-      final String ldapAdminDN = rodaConfig.getString("ldap.adminDN");
-      final String ldapAdminPassword = rodaConfig.getString("ldap.adminPassword");
-      final String ldapPasswordDigestAlgorithm = rodaConfig.getString("ldap.passwordDigestAlgorithm");
+      final String ldapBaseDN = rodaConfig.getString("ldap.baseDN", "dc=roda,dc=org");
+      final String ldapPeopleDN = rodaConfig.getString("ldap.peopleDN", "ou=users,dc=roda,dc=org");
+      final String ldapGroupsDN = rodaConfig.getString("ldap.groupsDN", "ou=groups,dc=roda,dc=org");
+      final String ldapRolesDN = rodaConfig.getString("ldap.rolesDN", "ou=groups,dc=roda,dc=org");
+      final String ldapAdminDN = rodaConfig.getString("ldap.adminDN", "ou=groups,dc=roda,dc=org");
+      final String ldapAdminPassword = rodaConfig.getString("ldap.adminPassword", "roda");
+      final String ldapPasswordDigestAlgorithm = rodaConfig.getString("ldap.passwordDigestAlgorithm", "MD5");
       final List<String> ldapProtectedUsers = RodaUtils.copyList(rodaConfig.getList("ldap.protectedUsers"));
       final List<String> ldapProtectedGroups = RodaUtils.copyList(rodaConfig.getList("ldap.protectedGroups"));
-      final String rodaAdminDN = rodaConfig.getString("ldap.rodaAdminDN");
+      final String rodaGuestDN = rodaConfig.getString("ldap.rodaGuestDN", "uid=guest,ou=users,dc=roda,dc=org");
+      final String rodaAdminDN = rodaConfig.getString("ldap.rodaAdminDN", "uid=admin,ou=users,dc=roda,dc=org");
       final String rodaAdministratorsDN = rodaConfig.getString("ldap.rodaAdministratorsDN",
         "cn=administrators,ou=groups,dc=roda,dc=org");
 
       RodaCoreFactory.ldapUtility = new LdapUtility(ldapStartServer, ldapPort, ldapBaseDN, ldapPeopleDN, ldapGroupsDN,
         ldapRolesDN, ldapAdminDN, ldapAdminPassword, ldapPasswordDigestAlgorithm, ldapProtectedUsers,
-        ldapProtectedGroups, rodaAdminDN, rodaApacheDSDataDirectory);
+        ldapProtectedGroups, rodaGuestDN, rodaAdminDN, rodaApacheDSDataDirectory);
       ldapUtility.setRODAAdministratorsDN(rodaAdministratorsDN);
 
       UserUtility.setLdapUtility(ldapUtility);
