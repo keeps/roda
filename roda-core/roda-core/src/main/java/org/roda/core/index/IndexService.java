@@ -73,21 +73,21 @@ public class IndexService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IndexService.class);
 
-  private final SolrClient index;
+  private final SolrClient solrClient;
   private final ModelService model;
   private final IndexModelObserver observer;
 
   public IndexService(SolrClient index, ModelService model) {
     super();
-    this.index = index;
+    this.solrClient = index;
     this.model = model;
 
-    observer = new IndexModelObserver(this.index, this.model);
+    observer = new IndexModelObserver(this.getSolrClient(), this.model);
     model.addModelObserver(observer);
   }
 
   public IndexedAIP getParent(IndexedAIP aip) throws NotFoundException, GenericException {
-    return SolrUtils.retrieve(index, IndexedAIP.class, aip.getParentID());
+    return SolrUtils.retrieve(getSolrClient(), IndexedAIP.class, aip.getParentID());
   }
 
   public List<IndexedAIP> retrieveAncestors(IndexedAIP aip) throws GenericException {
@@ -116,37 +116,37 @@ public class IndexService {
 
   public <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter)
     throws GenericException, RequestNotValidException {
-    return SolrUtils.count(index, returnClass, filter);
+    return SolrUtils.count(getSolrClient(), returnClass, filter);
   }
 
   public <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter, Sublist sublist)
     throws GenericException, RequestNotValidException {
-    return SolrUtils.find(index, returnClass, filter, sorter, sublist, Facets.NONE);
+    return SolrUtils.find(getSolrClient(), returnClass, filter, sorter, sublist, Facets.NONE);
 
   }
 
   public <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter, Sublist sublist,
     Facets facets) throws GenericException, RequestNotValidException {
-    return SolrUtils.find(index, returnClass, filter, sorter, sublist, facets);
+    return SolrUtils.find(getSolrClient(), returnClass, filter, sorter, sublist, facets);
   }
 
   public <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter, Sublist sublist,
     Facets facets, User user, boolean justActive) throws GenericException, RequestNotValidException {
-    return SolrUtils.find(index, returnClass, filter, sorter, sublist, facets, user, justActive);
+    return SolrUtils.find(getSolrClient(), returnClass, filter, sorter, sublist, facets, user, justActive);
   }
 
   public <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, User user, boolean justActive)
     throws GenericException, RequestNotValidException {
-    return SolrUtils.count(index, returnClass, filter, user, justActive);
+    return SolrUtils.count(getSolrClient(), returnClass, filter, user, justActive);
   }
 
   public <T extends IsIndexed> T retrieve(Class<T> returnClass, String id) throws NotFoundException, GenericException {
-    return SolrUtils.retrieve(index, returnClass, id);
+    return SolrUtils.retrieve(getSolrClient(), returnClass, id);
   }
 
   public <T extends IsIndexed> List<T> retrieve(Class<T> returnClass, List<String> ids)
     throws NotFoundException, GenericException {
-    return SolrUtils.retrieve(index, returnClass, ids);
+    return SolrUtils.retrieve(getSolrClient(), returnClass, ids);
   }
 
   public void reindexAIPs()
@@ -190,11 +190,11 @@ public class IndexService {
 
   public void optimizeAIPs() throws GenericException {
     try {
-      index.optimize(RodaConstants.INDEX_AIP);
-      index.optimize(RodaConstants.INDEX_FILE);
-      index.optimize(RodaConstants.INDEX_REPRESENTATION);
-      index.optimize(RodaConstants.INDEX_PRESERVATION_EVENTS);
-      index.optimize(RodaConstants.INDEX_PRESERVATION_AGENTS);
+      getSolrClient().optimize(RodaConstants.INDEX_AIP);
+      getSolrClient().optimize(RodaConstants.INDEX_FILE);
+      getSolrClient().optimize(RodaConstants.INDEX_REPRESENTATION);
+      getSolrClient().optimize(RodaConstants.INDEX_PRESERVATION_EVENTS);
+      getSolrClient().optimize(RodaConstants.INDEX_PRESERVATION_AGENTS);
     } catch (SolrServerException | IOException e) {
       throw new GenericException("Error while optimizing indexes", e);
     }
@@ -382,15 +382,15 @@ public class IndexService {
   public void deleteActionLog(Date until) throws SolrServerException, IOException {
     String dateString = DateUtil.getThreadLocalDateFormat().format(until);
     String query = RodaConstants.LOG_DATETIME + ":[* TO " + dateString + "]";
-    index.deleteByQuery(RodaConstants.INDEX_ACTION_LOG, query);
-    index.commit(RodaConstants.INDEX_ACTION_LOG);
+    getSolrClient().deleteByQuery(RodaConstants.INDEX_ACTION_LOG, query);
+    getSolrClient().commit(RodaConstants.INDEX_ACTION_LOG);
 
   }
 
   public void clearIndex(String indexName) throws GenericException {
     try {
-      index.deleteByQuery(indexName, "*:*");
-      index.commit(indexName);
+      getSolrClient().deleteByQuery(indexName, "*:*");
+      getSolrClient().commit(indexName);
     } catch (SolrServerException | IOException e) {
       LOGGER.error("Error cleaning up index {}", indexName, e);
       throw new GenericException("Error cleaning up index " + indexName, e);
@@ -405,7 +405,7 @@ public class IndexService {
 
   public void optimizeIndex(String indexName) throws GenericException {
     try {
-      index.optimize(indexName);
+      getSolrClient().optimize(indexName);
     } catch (SolrServerException | IOException e) {
       throw new GenericException("Error while optimizing indexes", e);
     }
@@ -419,22 +419,22 @@ public class IndexService {
 
   @SafeVarargs
   public final void commit(Class<? extends IsIndexed>... classToCommit) throws GenericException {
-    SolrUtils.commit(index, classToCommit);
+    SolrUtils.commit(getSolrClient(), classToCommit);
   }
 
   public <T extends IsIndexed> List<String> suggest(Class<T> returnClass, String field, String query)
     throws GenericException {
-    return SolrUtils.suggest(index, returnClass, field, query);
+    return SolrUtils.suggest(getSolrClient(), returnClass, field, query);
   }
 
   public <T extends IsIndexed> void execute(Class<T> classToRetrieve, Filter filter, IndexRunnable<T> indexRunnable)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException {
-    SolrUtils.execute(index, classToRetrieve, filter, indexRunnable);
+    SolrUtils.execute(getSolrClient(), classToRetrieve, filter, indexRunnable);
   }
 
   public <T extends IsIndexed> void delete(Class<T> classToRetrieve, List<String> ids)
     throws GenericException, RequestNotValidException {
-    SolrUtils.delete(index, classToRetrieve, ids);
+    SolrUtils.delete(getSolrClient(), classToRetrieve, ids);
   }
 
   public <T extends IsIndexed> void deleteSilently(Class<T> classToRetrieve, List<String> ids) {
@@ -447,12 +447,16 @@ public class IndexService {
 
   public <T extends IsIndexed> void delete(Class<T> classToRetrieve, Filter filter)
     throws GenericException, RequestNotValidException {
-    SolrUtils.delete(index, classToRetrieve, filter);
+    SolrUtils.delete(getSolrClient(), classToRetrieve, filter);
   }
 
   public <T extends IsIndexed> void create(Class<T> classToCreate, T instance)
     throws GenericException, RequestNotValidException {
-    SolrUtils.create(index, classToCreate, instance);
+    SolrUtils.create(getSolrClient(), classToCreate, instance);
+  }
+
+  public SolrClient getSolrClient() {
+    return solrClient;
   }
 
 }

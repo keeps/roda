@@ -11,6 +11,7 @@ import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNotNull;
 import static org.testng.AssertJUnit.assertTrue;
 
+import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -26,6 +27,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.hamcrest.collection.IsCollectionWithSize;
@@ -38,6 +40,7 @@ import org.roda.core.common.notifications.EmailNotificationProcessor;
 import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
+import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -57,6 +60,7 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
@@ -72,7 +76,10 @@ import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
+import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
+import org.roda.core.plugins.orchestrate.JobsHelper;
+import org.roda.core.plugins.orchestrate.akka.Messages;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -796,7 +803,8 @@ public class IndexServiceTest {
     notification.setFromUser("Test Message Index");
     notification.setRecipientUsers(Arrays.asList("recipientuser@example.com"));
     Notification n = model.createNotification(notification, new EmailNotificationProcessor("test-email-template.vm"));
-    // notification state must be FAILED because SMTP is not configured on test environment
+    // notification state must be FAILED because SMTP is not configured on test
+    // environment
     Assert.assertEquals(n.getState(), NOTIFICATION_STATE.FAILED);
     index.commit(Notification.class);
 
@@ -822,6 +830,54 @@ public class IndexServiceTest {
     assertEquals(message4.getSubject(), "Message New Subject");
 
     model.deleteNotification(notification.getId());
+
+  }
+
+  @Test
+  public void testIteration() throws RODAException, SolrServerException, IOException {
+
+    // populate index
+    for (int i = 0; i < 10000; i++) {
+      String id = "id_" + i;
+      AIP aip = new AIP();
+      aip.setId(id);
+      aip.setState(AIPState.ACTIVE);
+      aip.setDescriptiveMetadata(new ArrayList<>());
+      aip.setRepresentations(new ArrayList<>());
+      aip.setPermissions(new Permissions());
+
+      index.getSolrClient().add(SolrUtils.getIndexName(AIP.class).get(0),
+        SolrUtils.aipToSolrInputDocument(aip, new ArrayList<>(), model, true));
+
+      index.commit(IndexedAIP.class);
+
+    }
+
+    List<String> results = new ArrayList<>();
+
+    IndexResult<IndexedAIP> find;
+    int offset = 0;
+    int blockSize = 100;
+    do {
+      find = RodaCoreFactory.getIndexService().find(IndexedAIP.class, Filter.ALL, Sorter.NONE,
+        new Sublist(offset, blockSize));
+      offset += find.getLimit();
+
+      // Add all ids to result list
+      results.addAll(find.getResults().stream().map(aip -> aip.getId()).collect(Collectors.toList()));
+
+    } while (find.getTotalCount() > find.getOffset() + find.getLimit());
+
+    // check if they are all there
+    for (int i = 0; i < 10000; i++) {
+      String id = "id_" + i;
+      Assert.assertTrue(results.contains(id), "Could not find expected id: " + id);
+    }
+
+    // check if none is repeated
+    Set<String> set = new HashSet<>();
+    set.addAll(results);
+    Assert.assertEquals(results.size(), set.size());
 
   }
 }
