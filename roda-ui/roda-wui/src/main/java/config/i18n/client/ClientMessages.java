@@ -1305,6 +1305,8 @@ public interface ClientMessages extends Messages {
 
   String loginPassword();
 
+  String loginResendEmail();
+
   String loginRecoverPassword();
 
   String fillUsernameAndPasswordMessage();
@@ -1316,6 +1318,20 @@ public interface ClientMessages extends Messages {
   String inactiveUserMessage();
 
   String systemCurrentlyUnavailableMessage();
+
+  String loginResendEmailSuccessDialogTitle();
+
+  String loginResendEmailSuccessDialogMessage();
+
+  String loginResendEmailSuccessDialogButton();
+
+  String loginResendEmailFailureDialogTitle();
+
+  String loginResendEmailFailureDialogMessage();
+
+  String loginResendEmailFailureDialogButton();
+
+  String loginResendEmailVerificationFailure();
 
   /*** More Search ***/
 

@@ -222,10 +222,13 @@ public interface UserManagementService extends RemoteService {
    *
    * @param username
    *          the name of the user
+   * @param generateNewToken
+   *          generate a new token before sending the email?
    * @throws GenericException
    * @throws NotFoundException
    */
-  public Notification sendEmailVerification(String username) throws GenericException, NotFoundException;
+  public Notification sendEmailVerification(String username, boolean generateNewToken)
+    throws GenericException, NotFoundException;
 
   /**
    * Confirm a user email. If verified user will become active
