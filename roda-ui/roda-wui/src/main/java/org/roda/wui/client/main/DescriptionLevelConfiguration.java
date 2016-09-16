@@ -14,6 +14,8 @@ import java.util.Map;
 public class DescriptionLevelConfiguration implements Serializable {
 
   private static final long serialVersionUID = 3476633742750492225L;
+  
+  private Map<String,String> translations;
 
   private List<String> classificationPlanLevels;
 
@@ -87,4 +89,13 @@ public class DescriptionLevelConfiguration implements Serializable {
   public void setLevelIcons(Map<String, String> levelIcons) {
     this.levelIcons = levelIcons;
   }
+
+  public Map<String, String> getTranslations() {
+    return translations;
+  }
+
+  public void setTranslations(Map<String, String> translations) {
+    this.translations = translations;
+  }
+  
 }

@@ -8,6 +8,7 @@
 package org.roda.wui.common.client.tools;
 
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.descriptionLevels.DescriptionLevel;
@@ -16,6 +17,7 @@ import org.roda.wui.client.main.DescriptionLevelServiceAsync;
 import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -39,7 +41,7 @@ public class DescriptionLevelUtils {
 
   public static void load(final AsyncCallback<Void> callback) {
     DescriptionLevelServiceAsync.INSTANCE
-      .getDescriptionLevelConfiguration(new AsyncCallback<DescriptionLevelConfiguration>() {
+      .getDescriptionLevelConfiguration(LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<DescriptionLevelConfiguration>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -61,7 +63,6 @@ public class DescriptionLevelUtils {
       return null;
     }
     DescriptionLevel level = new DescriptionLevel();
-    level.setLabel(levelString);
     if (levelString == null) {
       level.setIconClass("");
     } else if (LEVELS_CONFIGURATION.getLevelIcons().containsKey(levelString)) {
@@ -77,7 +78,8 @@ public class DescriptionLevelUtils {
     } else {
       level.setIconClass(LEVELS_CONFIGURATION.getDefaultClass());
     }
-    String label = messages.levelLabel(levelString);
+    Map<String,String> translations = LEVELS_CONFIGURATION.getTranslations();
+    String label = translations.get(levelString);
     if (label == null) {
       label = levelString;
     }

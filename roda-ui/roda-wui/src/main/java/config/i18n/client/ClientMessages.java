@@ -2272,6 +2272,4 @@ public interface ClientMessages extends Messages {
 
   String fileAlreadyExists();
   
-  String levelLabel(@Select String levelString);
-
 }

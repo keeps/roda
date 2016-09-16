@@ -10,12 +10,15 @@ package org.roda.wui.server.main;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.wui.client.main.DescriptionLevelConfiguration;
 import org.roda.wui.client.main.DescriptionLevelService;
+import org.roda.wui.common.server.ServerTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,9 +30,9 @@ public class DescriptionLevelServiceImpl extends RemoteServiceServlet implements
 
   @SuppressWarnings("unused")
   private static final Logger LOGGER = LoggerFactory.getLogger(DescriptionLevelServiceImpl.class);
-
+  
   @Override
-  public DescriptionLevelConfiguration getDescriptionLevelConfiguration() {
+  public DescriptionLevelConfiguration getDescriptionLevelConfiguration(String localeString) {
     DescriptionLevelConfiguration dlc = new DescriptionLevelConfiguration();
     dlc.setClassificationPlanLevels(RodaUtils
       .copyList(RodaCoreFactory.getRodaConfiguration().getList(RodaConstants.LEVELS_CLASSIFICATION_PLAN)));
@@ -51,6 +54,15 @@ public class DescriptionLevelServiceImpl extends RemoteServiceServlet implements
     dlc.setRepresentationFileClass(RodaCoreFactory.getRodaConfiguration().getString(RodaConstants.LEVELS_ICONS_FILE));
     dlc.setRepresentationFolderClass(
       RodaCoreFactory.getRodaConfiguration().getString(RodaConstants.LEVELS_ICONS_FOLDER));
+
+    
+    Messages messages = RodaCoreFactory.getI18NMessages(ServerTools.parseLocale(localeString));
+    Map<String,String> translations = messages.getTranslations(RodaConstants.LEVEL_I18N_PREFIX, String.class, false);
+    Map<String,String> levelsLabels = new HashMap<String,String>();
+    for(Map.Entry<String, String> entry : translations.entrySet()){
+      levelsLabels.put(entry.getKey().replace(RodaConstants.LEVEL_I18N_PREFIX+".", ""), entry.getValue());
+    }
+    dlc.setTranslations(levelsLabels);
     return dlc;
   }
 

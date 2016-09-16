@@ -14,6 +14,6 @@ public interface DescriptionLevelServiceAsync {
 
   DescriptionLevelServiceAsync INSTANCE = GWT.create(DescriptionLevelService.class);
 
-  void getDescriptionLevelConfiguration(AsyncCallback<DescriptionLevelConfiguration> callback);
+  void getDescriptionLevelConfiguration(String localeString, AsyncCallback<DescriptionLevelConfiguration> callback);
 
 }

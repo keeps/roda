@@ -897,6 +897,7 @@ public final class RodaConstants {
   public static final String LEVELS_ICONS_REPRESENTATION = "levels.internal.icon.representation";
   public static final String LEVELS_ICONS_FOLDER = "levels.internal.icon.representation.folder";
   public static final String LEVELS_ICONS_FILE = "levels.internal.icon.representation.file";
+  public static final String LEVEL_I18N_PREFIX = "level";
 
   /** Private empty constructor */
   private RodaConstants() {
