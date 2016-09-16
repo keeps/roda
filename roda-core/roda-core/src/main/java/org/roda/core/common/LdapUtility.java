@@ -25,6 +25,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.directory.api.ldap.model.cursor.Cursor;
 import org.apache.directory.api.ldap.model.entry.Attribute;
+import org.apache.directory.api.ldap.model.entry.DefaultAttribute;
 import org.apache.directory.api.ldap.model.entry.DefaultEntry;
 import org.apache.directory.api.ldap.model.entry.DefaultModification;
 import org.apache.directory.api.ldap.model.entry.Entry;
@@ -194,6 +195,11 @@ public class LdapUtility {
   private List<String> ldapProtectedGroups = new ArrayList<>();
 
   /**
+   * RODA guest user Distinguished Name (DN).
+   */
+  private String rodaGuestDN = null;
+
+  /**
    * RODA administrator user Distinguished Name (DN).
    */
   private String rodaAdminDN = null;
@@ -245,6 +251,8 @@ public class LdapUtility {
    * @param ldapProtectedGroups
    *          list of protected groups. Groups in the protected list cannot be
    *          modified.
+   * @param rodaGuestDN
+   *          the DN (Distinguished Name) of the RODA guest.
    * @param rodaAdminDN
    *          the DN (Distinguished Name) of the RODA administrator.
    * @param dataDirectory
@@ -253,7 +261,8 @@ public class LdapUtility {
   public LdapUtility(final boolean ldapStartServer, final int ldapPort, final String ldapRootDN,
     final String ldapPeopleDN, final String ldapGroupsDN, final String ldapRolesDN, final String ldapAdminDN,
     final String ldapAdminPassword, final String ldapPasswordDigestAlgorithm, final List<String> ldapProtectedUsers,
-    final List<String> ldapProtectedGroups, final String rodaAdminDN, final Path dataDirectory) {
+    final List<String> ldapProtectedGroups, final String rodaGuestDN, final String rodaAdminDN,
+    final Path dataDirectory) {
     this.ldapStartServer = ldapStartServer;
     this.ldapPort = ldapPort;
     this.ldapRootDN = ldapRootDN;
@@ -276,6 +285,7 @@ public class LdapUtility {
       this.ldapProtectedGroups.addAll(ldapProtectedGroups);
       LOGGER.debug("Protected groups: {}", this.ldapProtectedGroups);
     }
+    this.rodaGuestDN = rodaGuestDN;
     this.rodaAdminDN = rodaAdminDN;
     this.dataDirectory = dataDirectory;
   }
@@ -533,8 +543,9 @@ public class LdapUtility {
   public void setUserPassword(final String username, final String password)
     throws IllegalOperationException, NotFoundException, LdapUtilityException {
 
-    if (this.ldapProtectedUsers.contains(username)) {
-      throw new IllegalOperationException("User (" + username + ") is protected and cannot be modified.");
+    final String userDN = getUserDN(username);
+    if (this.rodaGuestDN.equals(userDN) || this.ldapProtectedUsers.contains(username)) {
+      throw new IllegalOperationException(String.format("User (%s) is protected and cannot be modified.", username));
     }
 
     setUserPasswordUnchecked(username, password);
@@ -579,7 +590,9 @@ public class LdapUtility {
    *           if some error occurred.
    */
   public void removeUser(final String username) throws IllegalOperationException, LdapUtilityException {
-    if (this.ldapProtectedUsers.contains(username)) {
+    final String userDN = getUserDN(username);
+    if (this.rodaAdminDN.equals(userDN) || this.rodaGuestDN.equals(userDN)
+      || this.ldapProtectedUsers.contains(username)) {
       throw new IllegalOperationException(userMessage(username, " is protected and cannot be removed."));
     }
     try {
@@ -660,6 +673,7 @@ public class LdapUtility {
    * @throws LdapUtilityException
    *           if something goes wrong with the creation of the new group.
    * @throws GenericException
+   *           if something goes wrong with the creation of the new group.
    */
   public Group addGroup(final Group group) throws GroupAlreadyExistsException, LdapUtilityException, GenericException {
     if (!group.isNameValid()) {
@@ -695,7 +709,7 @@ public class LdapUtility {
       throw new LdapUtilityException("Error adding group " + group.getName(), e);
     }
 
-    Group newGroup;
+    final Group newGroup;
     try {
       newGroup = getGroup(group.getName());
     } catch (NotFoundException e) {
@@ -723,13 +737,14 @@ public class LdapUtility {
    * @throws LdapUtilityException
    *           if some error occurred.
    * @throws GenericException
+   *           if some error occurred.
    */
   public Group modifyGroup(final Group modifiedGroup)
     throws NotFoundException, IllegalOperationException, LdapUtilityException, GenericException {
 
     if (this.ldapProtectedGroups.contains(modifiedGroup.getName())) {
       throw new IllegalOperationException(
-        "Group (" + modifiedGroup.getName() + ") is protected and cannot be modified.");
+        String.format("Group (%s) is protected and cannot be modified.", modifiedGroup.getName()));
     }
 
     try {
@@ -776,7 +791,7 @@ public class LdapUtility {
    *           if some error occurred.
    */
   public void removeGroup(final String groupname) throws LdapUtilityException, IllegalOperationException {
-    if (this.ldapProtectedGroups.contains(groupname)) {
+    if (this.rodaAdministratorsDN.equals(getGroupDN(groupname)) || this.ldapProtectedGroups.contains(groupname)) {
       throw new IllegalOperationException("Group (" + groupname + ") is protected and cannot be removed.");
     }
     try {
@@ -1095,14 +1110,22 @@ public class LdapUtility {
    */
   public void addRole(final String roleName) throws RoleAlreadyExistsException, LdapUtilityException {
     try {
-      final Dn dnRole = new Dn(getRoleDN(roleName));
-      final Entry entryRole = service.newEntry(dnRole);
+      final CoreSession session = service.getAdminSession();
+      final String roleDN = getRoleDN(roleName);
+      final Entry entryRole = service.newEntry(new Dn(roleDN));
       entryRole.add(OBJECT_CLASS, "organizationalRole", OBJECT_CLASS_TOP);
       entryRole.add(CN, roleName);
       entryRole.add(ROLE_OCCUPANT, rodaAdministratorsDN);
-      service.getAdminSession().add(entryRole);
-    } catch (final LdapEntryAlreadyExistsException e) {
-      throw new RoleAlreadyExistsException("Role " + roleName + " already exists.", e);
+      try {
+        session.add(entryRole);
+      } catch (final LdapEntryAlreadyExistsException e) {
+        // Assign role to RODA administrators group
+        final Set<String> roles = getMemberDirectRoles(session, this.rodaAdministratorsDN);
+        if (!roles.contains(roleName)) {
+          addMemberToRoleOrGroup(service.getAdminSession(), roleDN, this.rodaAdministratorsDN, ROLE_OCCUPANT);
+        }
+        throw new RoleAlreadyExistsException("Role " + roleName + " already exists.", e);
+      }
     } catch (final LdapException e) {
       throw new LdapUtilityException("Error adding role '" + roleName + "'", e);
     }
@@ -1264,12 +1287,17 @@ public class LdapUtility {
   }
 
   private Entry getEntryFromUser(final User user) throws LdapException {
-    final Entry entry = service.newEntry(new Dn(getUserDN(user.getName())));
+    final String userDN = getUserDN(user.getName());
+    final Entry entry = service.newEntry(new Dn(userDN));
     entry.add(OBJECT_CLASS, "inetOrgPerson", "organizationalPerson", "person", OBJECT_CLASS_TOP,
       OBJECT_CLASS_EXTENSIBLE_OBJECT);
     entry.add(UID, user.getName());
     entry.add(CN, user.getFullName());
-    entry.add(SHADOW_INACTIVE, user.isActive() ? "0" : "1");
+    if (this.rodaAdminDN.equals(userDN) || this.rodaGuestDN.equals(userDN)) {
+      entry.add(SHADOW_INACTIVE, "0");
+    } else {
+      entry.add(SHADOW_INACTIVE, user.isActive() ? "0" : "1");
+    }
     if (StringUtils.isNotBlank(user.getFullName())) {
       final String[] names = user.getFullName().split(" ");
       if (names.length > 0) {
@@ -1351,13 +1379,11 @@ public class LdapUtility {
 
   private List<Entry> searchEntries(final CoreSession session, final String ctxDN, final String keyAttribute)
     throws LdapException {
-    final String jndiFilter = String.format("(%s=*)", keyAttribute);
-    final Cursor<Entry> cursor = search(session, ctxDN, jndiFilter);
+    final Cursor<Entry> cursor = search(session, ctxDN, String.format("(%s=*)", keyAttribute));
     final List<Entry> entries = new ArrayList<>();
     for (Entry entry : cursor) {
       entries.add(entry);
     }
-
     return entries;
   }
 
@@ -1509,31 +1535,16 @@ public class LdapUtility {
       new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, USER_PASSWORD, passwordDigest));
   }
 
-  private void addMemberToGroup(final CoreSession session, final String groupDN, final String memberDN)
-    throws LdapException {
-    addMemberToRoleOrGroup(session, groupDN, memberDN, UNIQUE_MEMBER);
-  }
-
-  private void removeMemberFromGroup(final CoreSession session, final String groupDN, final String memberDN)
-    throws LdapException {
-    removeMemberFromRoleOrGroup(session, groupDN, memberDN, UNIQUE_MEMBER);
-  }
-
-  private void addMemberToRole(final CoreSession session, final String roleDN, final String memberDN)
-    throws LdapException {
-    addMemberToRoleOrGroup(session, roleDN, memberDN, ROLE_OCCUPANT);
-  }
-
-  private void removeMemberFromRole(final CoreSession session, final String roleDN, final String memberDN)
-    throws LdapException {
-    removeMemberFromRoleOrGroup(session, roleDN, memberDN, ROLE_OCCUPANT);
-  }
-
   private void addMemberToRoleOrGroup(final CoreSession session, final String dn, final String memberDN,
     final String attributeName) throws LdapException {
     final Entry entry = session.lookup(new Dn(dn), attributeName);
-    final Attribute attribute = entry.get(attributeName);
-    attribute.add(memberDN);
+    Attribute attribute = entry.get(attributeName);
+    if (attribute == null) {
+      entry.add(attributeName, memberDN);
+      attribute = entry.get(attributeName);
+    } else {
+      attribute.add(memberDN);
+    }
     final ModifyRequestImpl modifyRequestImpl = new ModifyRequestImpl();
     modifyRequestImpl.setName(entry.getDn());
     modifyRequestImpl.replace(attribute);
@@ -1544,24 +1555,26 @@ public class LdapUtility {
     final String attributeName) throws LdapException {
     final Entry entry = session.lookup(new Dn(dn), attributeName);
     final Attribute attribute = entry.get(attributeName);
-    attribute.remove(memberDN);
-    final ModifyRequestImpl modifyRequestImpl = new ModifyRequestImpl();
-    modifyRequestImpl.setName(entry.getDn());
-    modifyRequestImpl.replace(attribute);
-    session.modify(modifyRequestImpl);
+    if (attribute != null) {
+      attribute.remove(memberDN);
+      final ModifyRequestImpl modifyRequestImpl = new ModifyRequestImpl();
+      modifyRequestImpl.setName(entry.getDn());
+      modifyRequestImpl.replace(attribute);
+      session.modify(modifyRequestImpl);
+    }
   }
 
   private void removeMember(final CoreSession session, final String memberDN) throws LdapException {
     // For each group the member is in, remove that member from the group
     final Set<String> directMemberGroupsDN = getDNsOfGroupsContainingMember(session, memberDN);
     for (String groupDN : directMemberGroupsDN) {
-      removeMemberFromGroup(session, groupDN, memberDN);
+      removeMemberFromRoleOrGroup(session, groupDN, memberDN, UNIQUE_MEMBER);
     }
     // For each role the member owns, remove that member from the
     // roleOccupant
     final Set<String> directMemberRolesDN = getDNsOfDirectRolesForMember(session, memberDN);
     for (String roleDN : directMemberRolesDN) {
-      removeMemberFromRole(session, roleDN, memberDN);
+      removeMemberFromRoleOrGroup(session, roleDN, memberDN, ROLE_OCCUPANT);
     }
     session.delete(new Dn(memberDN));
   }
@@ -1643,6 +1656,23 @@ public class LdapUtility {
     return rolesDN;
   }
 
+  /**
+   * Get all roles.
+   * 
+   * @param session
+   *          the session.
+   * @return a {@link Set} with all role names.
+   * @throws LdapException
+   *           if some error occurs.
+   */
+  private Set<String> getRoles(final CoreSession session) throws LdapException {
+    final Set<String> roles = new HashSet<>();
+    for (Entry entry : searchEntries(session, getRolesDN(), CN)) {
+      roles.add(getFirstNameFromDN(entry.getDn()));
+    }
+    return roles;
+  }
+
   private Set<String> getDNsOfAllRolesForMember(final CoreSession session, final String memberDN) throws LdapException {
     final Set<String> directMemberRolesDN = getDNsOfDirectRolesForMember(session, memberDN);
     final Set<String> allMemberRolesDN = new HashSet<>();
@@ -1707,8 +1737,14 @@ public class LdapUtility {
    */
   private void setMemberDirectRoles(final CoreSession session, final String memberDN, final Set<String> roles)
     throws LdapException {
+
     final Set<String> oldRoles = getMemberDirectRoles(session, memberDN);
-    final Set<String> newRoles = (roles == null) ? new HashSet<>() : new HashSet<>(roles);
+    final Set<String> newRoles;
+    if (this.rodaAdministratorsDN.equals(memberDN)) {
+      newRoles = getRoles(session);
+    } else {
+      newRoles = (roles == null) ? new HashSet<>() : new HashSet<>(roles);
+    }
 
     // removing from oldRoles all the roles in newRoles, oldRoles
     // becomes the Set of roles that the user doesn't want to own
@@ -1718,7 +1754,7 @@ public class LdapUtility {
 
     // remove user from the roles in oldRoles
     for (String role : tempOldRoles) {
-      removeMemberFromRole(session, getRoleDN(role), memberDN);
+      removeMemberFromRoleOrGroup(session, getRoleDN(role), memberDN, ROLE_OCCUPANT);
     }
 
     // removing from newRoles all the roles in oldRoles, newRoles
@@ -1727,7 +1763,7 @@ public class LdapUtility {
 
     // add member to the roles in newRoles
     for (String role : newRoles) {
-      addMemberToRole(session, getRoleDN(role), memberDN);
+      addMemberToRoleOrGroup(session, getRoleDN(role), memberDN, ROLE_OCCUPANT);
     }
   }
 
@@ -1760,16 +1796,21 @@ public class LdapUtility {
 
     // remove user from the groups in oldgroups
     for (String groupDN : tempOldgroupDNs) {
-      removeMemberFromGroup(session, groupDN, memberDN);
+      removeMemberFromRoleOrGroup(session, groupDN, memberDN, UNIQUE_MEMBER);
     }
 
     // removing all the groups in oldgroups, newgroups becomes the Set
     // of the new groups that the user wants to bellong to.
     newgroupDNs.removeAll(oldgroupDNs);
 
+    // RODA admin MUST belong to administrators group.
+    if (this.rodaAdminDN.equals(memberDN)) {
+      newgroupDNs.add(this.rodaAdministratorsDN);
+    }
+
     // add user to the groups in newgroups
     for (String groupDN : newgroupDNs) {
-      addMemberToGroup(session, groupDN, memberDN);
+      addMemberToRoleOrGroup(session, groupDN, memberDN, UNIQUE_MEMBER);
     }
 
   }
