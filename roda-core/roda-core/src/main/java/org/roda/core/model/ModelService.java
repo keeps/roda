@@ -2103,26 +2103,23 @@ public class ModelService extends ModelObservable {
    * @throws AuthorizationDeniedException
    **********************************************/
 
-  public Notification createNotification(Notification notification, NotificationProcessor processor)
+  public Notification createNotification(final Notification notification, final NotificationProcessor processor)
     throws GenericException, AuthorizationDeniedException {
+
+    notification.setId(UUID.randomUUID().toString());
+    notification.setAcknowledgeToken(UUID.randomUUID().toString());
+    Notification processedNotification = processor.processNotification(this, notification);
+
     try {
-      notification.setId(UUID.randomUUID().toString());
-      notification.setAcknowledgeToken(UUID.randomUUID().toString());
-      notification = processor.processNotification(this, notification);
-      notification.setState(Notification.NOTIFICATION_STATE.COMPLETED);
-    } catch (RODAException e) {
-      notification.setState(Notification.NOTIFICATION_STATE.FAILED);
-    }
-    try {
-      String notificationAsJson = JsonUtils.getJsonFromObject(notification);
-      StoragePath notificationPath = ModelUtils.getNotificationStoragePath(notification.getId());
+      String notificationAsJson = JsonUtils.getJsonFromObject(processedNotification);
+      StoragePath notificationPath = ModelUtils.getNotificationStoragePath(processedNotification.getId());
       storage.createBinary(notificationPath, new StringContentPayload(notificationAsJson), false);
-      notifyNotificationCreatedOrUpdated(notification);
+      notifyNotificationCreatedOrUpdated(processedNotification);
     } catch (NotFoundException | RequestNotValidException | AlreadyExistsException e) {
       LOGGER.error("Error creating notification in storage", e);
       throw new GenericException(e);
     }
-    return notification;
+    return processedNotification;
   }
 
   public Notification updateNotification(Notification notification)

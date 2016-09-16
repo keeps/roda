@@ -321,13 +321,33 @@ public class ClientLogger implements IsSerializable {
         }
       };
 
-      ClientLoggerService.Util.getInstance().error(classname,
-        message + " error: [" + (error.getClass().getName() + "] " + error.getMessage()), errorcallback);
+      String errorDetails = extractErrorDetails(error);
+
+      ClientLoggerService.Util.getInstance().error(classname, message + ", error: " + errorDetails, errorcallback);
       if (SHOW_ERROR_MESSAGES) {
         Toast.showError(message,
           error.getMessage() + (error.getCause() != null ? "\nCause: " + error.getCause().getMessage() : ""));
       }
     }
+  }
+
+  private String extractErrorDetails(final Throwable error) {
+    StringBuilder b = new StringBuilder();
+
+    Throwable e = error;
+    while (e != null) {
+      b.append("[").append(e.getClass().getName()).append("] ").append(e.getMessage());
+      StackTraceElement[] stackTrace = e.getStackTrace();
+      if (stackTrace != null) {
+        for (StackTraceElement stackTraceElement : stackTrace) {
+          b.append("\n").append(stackTraceElement.toString());
+        }
+      }
+
+      e = e.getCause();
+    }
+
+    return b.toString();
   }
 
   /**

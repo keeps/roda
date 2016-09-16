@@ -17,7 +17,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpPost;
@@ -25,8 +24,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.notifications.Notification;
@@ -50,30 +47,29 @@ public class HTTPNotificationProcessor implements NotificationProcessor {
   }
 
   @Override
-  public Notification processNotification(ModelService model, Notification notification) throws RODAException {
-    try {
-      if (scope.containsKey(JOB_KEY)) {
-        Job job = (Job) scope.get(JOB_KEY);
-        String content = createNotificationContent(job);
-        notification.setBody(content);
-        if (endpoint != null) {
-          LOGGER.debug("Sending notification via HTTP ...");
-          int timeout = RodaCoreFactory.getRodaConfiguration().getInt(RodaConstants.NOTIFICATION_HTTP_TIMEOUT, 10000);
-          boolean success = post(endpoint, content, timeout);
-          if(success){
-            LOGGER.debug("Notification sent");
-            notification.setState(NOTIFICATION_STATE.COMPLETED);
-          }else{
-            LOGGER.debug("Notification not sent");
-            notification.setState(NOTIFICATION_STATE.FAILED);
-          }
+  public Notification processNotification(ModelService model, Notification notification) {
+
+    if (scope.containsKey(JOB_KEY)) {
+      Job job = (Job) scope.get(JOB_KEY);
+      String content = createNotificationContent(job);
+      notification.setBody(content);
+      if (endpoint != null) {
+        LOGGER.debug("Sending notification via HTTP ...");
+        int timeout = RodaCoreFactory.getRodaConfiguration().getInt(RodaConstants.NOTIFICATION_HTTP_TIMEOUT, 10000);
+        boolean success = post(endpoint, content, timeout);
+
+        if (success) {
+          LOGGER.debug("Notification sent");
+          notification.setState(NOTIFICATION_STATE.COMPLETED);
         } else {
-          LOGGER.warn("No endpoint, cannot send notification.");
+          LOGGER.debug("Notification not sent");
+          notification.setState(NOTIFICATION_STATE.FAILED);
         }
+      } else {
+        LOGGER.warn("No endpoint, cannot send notification.");
       }
-    } catch (IOException e) {
-      throw new GenericException(e.getMessage(), e);
     }
+
     return notification;
   }
 
@@ -82,7 +78,7 @@ public class HTTPNotificationProcessor implements NotificationProcessor {
     return JsonUtils.getJsonFromObject(job);
   }
 
-  private boolean post(String endpoint, String content, int timeout) throws ClientProtocolException, IOException {
+  private boolean post(String endpoint, String content, int timeout) {
     boolean success = true;
     RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(timeout).setConnectTimeout(timeout)
       .setConnectionRequestTimeout(timeout).build();
@@ -90,18 +86,23 @@ public class HTTPNotificationProcessor implements NotificationProcessor {
     HttpClient httpclient = HttpClients.createDefault();
     HttpPost httppost = new HttpPost(endpoint);
     httppost.setConfig(requestConfig);
-    httppost.setEntity(new StringEntity(content));
+    try {
+      httppost.setEntity(new StringEntity(content));
 
-    HttpResponse response = httpclient.execute(httppost);
-    if(response.getStatusLine().getStatusCode()!=HttpStatus.SC_OK){
+      HttpResponse response = httpclient.execute(httppost);
+      if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+        success = false;
+      } else {
+        HttpEntity entity = response.getEntity();
+        String responseTxt = processEntity(entity);
+        LOGGER.debug("HTTP response: {}", responseTxt);
+      }
+    } catch (IOException e) {
+      LOGGER.debug("HTTP POST error: {}", e.getMessage());
       success = false;
-    }else{
-      HttpEntity entity = response.getEntity();
-      String responseTxt = processEntity(entity);
-      LOGGER.debug("HTTP response: {}", responseTxt);
     }
     return success;
-    
+
   }
 
   // FIXME 20160905 hsilva: is this method really needed? and, is this the best

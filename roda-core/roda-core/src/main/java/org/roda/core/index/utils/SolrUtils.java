@@ -1988,18 +1988,19 @@ public class SolrUtils {
   public static Notification solrDocumentToNotification(SolrDocument doc) {
     Notification notification = new Notification();
 
-    notification.setId(objectToString(doc.get(RodaConstants.NOTIFICATION_ID)));
-    notification.setSubject(objectToString(doc.get(RodaConstants.NOTIFICATION_SUBJECT)));
-    notification.setBody(objectToString(doc.get(RodaConstants.NOTIFICATION_BODY)));
+    notification.setId(objectToString(doc.get(RodaConstants.NOTIFICATION_ID), null));
+    notification.setSubject(objectToString(doc.get(RodaConstants.NOTIFICATION_SUBJECT), null));
+    notification.setBody(objectToString(doc.get(RodaConstants.NOTIFICATION_BODY), null));
     notification.setSentOn(objectToDate(doc.get(RodaConstants.NOTIFICATION_SENT_ON)));
-    notification.setFromUser(objectToString(doc.get(RodaConstants.NOTIFICATION_FROM_USER)));
+    notification.setFromUser(objectToString(doc.get(RodaConstants.NOTIFICATION_FROM_USER), null));
     notification.setRecipientUsers(objectToListString(doc.get(RodaConstants.NOTIFICATION_RECIPIENT_USERS)));
-    notification.setAcknowledgeToken(objectToString(doc.get(RodaConstants.NOTIFICATION_ACKNOWLEDGE_TOKEN)));
+    notification.setAcknowledgeToken(objectToString(doc.get(RodaConstants.NOTIFICATION_ACKNOWLEDGE_TOKEN), null));
     notification.setAcknowledged(objectToBoolean(doc.get(RodaConstants.NOTIFICATION_IS_ACKNOWLEDGED), Boolean.FALSE));
     notification.setAcknowledgedUsers(
-      JsonUtils.getMapFromJson(objectToString(doc.get(RodaConstants.NOTIFICATION_ACKNOWLEDGED_USERS))));
-    notification
-      .setState(Notification.NOTIFICATION_STATE.valueOf(objectToString(doc.get(RodaConstants.NOTIFICATION_STATE))));
+      JsonUtils.getMapFromJson(objectToString(doc.get(RodaConstants.NOTIFICATION_ACKNOWLEDGED_USERS), "")));
+
+    notification.setState(Notification.NOTIFICATION_STATE.valueOf(
+      objectToString(doc.get(RodaConstants.NOTIFICATION_STATE), Notification.NOTIFICATION_STATE.COMPLETED.toString())));
     return notification;
   }
 
