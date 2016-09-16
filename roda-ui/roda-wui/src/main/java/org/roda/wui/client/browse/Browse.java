@@ -31,7 +31,6 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.user.User;
-import org.roda.wui.client.common.CreateJob;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
@@ -47,6 +46,7 @@ import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.management.UserLog;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
+import org.roda.wui.client.process.CreateJob;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
@@ -996,8 +996,6 @@ public class Browse extends Composite {
       if (aipId != null && itemBundle != null) {
         Filter filter = new Filter(new NotSimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aipId),
           new NotSimpleFilterParameter(RodaConstants.AIP_ID, aipId));
-        // TODO add also OR new NotSimpleFilterParameter(RodaConstants.AIP_ID,
-        // aipId)
         SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter, justActive, false);
         if (itemBundle.getAip().getParentID() != null) {
           selectAipDialog.setEmptyParentButtonVisible(true);
@@ -1048,15 +1046,17 @@ public class Browse extends Composite {
         filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_ID, aipId));
         showEmptyParentButton = true;
       } else {
-        if (selected instanceof SelectedItemsList) {
-          SelectedItemsList<IndexedAIP> list = (SelectedItemsList<IndexedAIP>) selected;
-          for (String id : list.getIds()) {
-            filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_ANCESTORS, id));
-            filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_ID, id));
-          }
-        } else {
-          filter = Filter.NULL;
-        }
+        // if (selected instanceof SelectedItemsList) {
+        // SelectedItemsList<IndexedAIP> list = (SelectedItemsList<IndexedAIP>)
+        // selected;
+        // for (String id : list.getIds()) {
+        // filter.add(new
+        // NotSimpleFilterParameter(RodaConstants.AIP_ANCESTORS, id));
+        // filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_ID, id));
+        // }
+        // } else {
+        filter = Filter.NULL;
+        // }
         showEmptyParentButton = false;
       }
 

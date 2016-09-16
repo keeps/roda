@@ -65,6 +65,12 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
     super.setSelectedClass(LogEntry.class);
   }
 
+  public LogEntryList(Filter filter, Facets facets, String summary, boolean selectable, int pageSize,
+    int incrementPage) {
+    super(filter, facets, summary, selectable, pageSize, incrementPage);
+    super.setSelectedClass(LogEntry.class);
+  }
+
   @Override
   protected void configureDisplay(CellTable<LogEntry> display) {
     dateColumn = new Column<LogEntry, Date>(new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM))) {
@@ -77,7 +83,8 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
     actionComponentColumn = new Column<LogEntry, SafeHtml>(new SafeHtmlCell()) {
       @Override
       public SafeHtml getValue(LogEntry entry) {
-        return SafeHtmlUtils.fromSafeConstant(translate(RodaConstants.LOG_ACTION_COMPONENT, entry.getActionComponent()));
+        return SafeHtmlUtils
+          .fromSafeConstant(translate(RodaConstants.LOG_ACTION_COMPONENT, entry.getActionComponent()));
       }
     };
 

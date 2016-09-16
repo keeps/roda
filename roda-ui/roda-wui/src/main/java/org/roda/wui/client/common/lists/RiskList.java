@@ -47,7 +47,6 @@ import config.i18n.client.ClientMessages;
  */
 public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
 
-  private static final int PAGE_SIZE = 20;
   private Filter filter;
 
   private static ClientMessages messages = GWT.create(ClientMessages.class);
@@ -65,6 +64,12 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
 
   public RiskList(Filter filter, Facets facets, String summary, boolean selectable) {
     super(filter, facets, summary, selectable);
+    super.setSelectedClass(IndexedRisk.class);
+    this.filter = filter;
+  }
+
+  public RiskList(Filter filter, Facets facets, String summary, boolean selectable, int pageSize, int incrementPage) {
+    super(filter, facets, summary, selectable, pageSize, incrementPage);
     super.setSelectedClass(IndexedRisk.class);
     this.filter = filter;
   }
@@ -180,11 +185,6 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
     }
 
     refresh();
-  }
-
-  @Override
-  protected int getInitialPageSize() {
-    return PAGE_SIZE;
   }
 
 }

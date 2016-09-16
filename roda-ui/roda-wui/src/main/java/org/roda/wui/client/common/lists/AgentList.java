@@ -40,8 +40,6 @@ import config.i18n.client.ClientMessages;
  */
 public class AgentList extends BasicAsyncTableCell<Agent> {
 
-  private static final int PAGE_SIZE = 20;
-
   // private final ClientLogger logger = new ClientLogger(getClass().getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -54,6 +52,11 @@ public class AgentList extends BasicAsyncTableCell<Agent> {
 
   public AgentList(Filter filter, Facets facets, String summary, boolean selectable) {
     super(filter, facets, summary, selectable);
+    super.setSelectedClass(Agent.class);
+  }
+
+  public AgentList(Filter filter, Facets facets, String summary, boolean selectable, int pageSize, int incrementPage) {
+    super(filter, facets, summary, selectable, pageSize, incrementPage);
     super.setSelectedClass(Agent.class);
   }
 
@@ -111,11 +114,6 @@ public class AgentList extends BasicAsyncTableCell<Agent> {
         return item.getId();
       }
     };
-  }
-
-  @Override
-  protected int getInitialPageSize() {
-    return PAGE_SIZE;
   }
 
 }

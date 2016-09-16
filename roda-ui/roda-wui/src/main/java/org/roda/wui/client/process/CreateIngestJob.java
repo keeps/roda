@@ -25,7 +25,6 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.CreateJob;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.lists.TransferredResourceList;
 import org.roda.wui.common.client.tools.Tools;

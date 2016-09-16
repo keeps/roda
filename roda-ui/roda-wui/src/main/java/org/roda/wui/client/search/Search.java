@@ -19,18 +19,15 @@ import java.util.Map;
 import org.roda.core.data.adapter.facet.FacetParameter;
 import org.roda.core.data.adapter.facet.SimpleFacetParameter;
 import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.filter.NotSimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
-import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.CreateJob;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
@@ -38,6 +35,7 @@ import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.search.MainSearch;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.process.CreateJob;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
@@ -248,15 +246,17 @@ public class Search extends Composite {
 
     filter = new Filter();
 
-    if (selected instanceof SelectedItemsList) {
-      SelectedItemsList<IndexedAIP> list = (SelectedItemsList<IndexedAIP>) selected;
-      for (String id : list.getIds()) {
-        filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_ANCESTORS, id));
-        filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_ID, id));
-      }
-    } else {
-      filter = Filter.NULL;
-    }
+    // if (selected instanceof SelectedItemsList) {
+    // SelectedItemsList<IndexedAIP> list = (SelectedItemsList<IndexedAIP>)
+    // selected;
+    // for (String id : list.getIds()) {
+    // filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_ANCESTORS,
+    // id));
+    // filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_ID, id));
+    // }
+    // } else {
+    filter = Filter.NULL;
+    // }
 
     showEmptyParentButton = false;
 

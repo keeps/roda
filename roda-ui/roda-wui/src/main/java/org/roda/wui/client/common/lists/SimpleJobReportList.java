@@ -69,9 +69,27 @@ public class SimpleJobReportList extends BasicAsyncTableCell<Report> {
     this(null, null, null, new HashMap<String, PluginInfo>(), false);
   }
 
+  public SimpleJobReportList(Filter filter, Facets facets, String summary, boolean selectable) {
+    this(filter, facets, summary, new HashMap<String, PluginInfo>(), selectable);
+    super.setSelectedClass(Report.class);
+  }
+
+  public SimpleJobReportList(Filter filter, Facets facets, String summary, boolean selectable, int pageSize,
+    int incrementPage) {
+    this(filter, facets, summary, new HashMap<String, PluginInfo>(), selectable, pageSize, incrementPage);
+    super.setSelectedClass(Report.class);
+  }
+
   public SimpleJobReportList(Filter filter, Facets facets, String summary, Map<String, PluginInfo> pluginsInfo,
     boolean selectable) {
     super(filter, facets, summary, selectable);
+    super.setSelectedClass(Report.class);
+    this.pluginsInfo = pluginsInfo;
+  }
+
+  public SimpleJobReportList(Filter filter, Facets facets, String summary, Map<String, PluginInfo> pluginsInfo,
+    boolean selectable, int pageSize, int incrementPage) {
+    super(filter, facets, summary, selectable, pageSize, incrementPage);
     super.setSelectedClass(Report.class);
     this.pluginsInfo = pluginsInfo;
   }

@@ -7,7 +7,6 @@
  */
 package org.roda.core.plugins.plugins.base;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -24,11 +23,8 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.SelectedItemsAll;
-import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.PluginParameter;
-import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -46,14 +42,6 @@ import org.slf4j.LoggerFactory;
 
 public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
   private static final Logger LOGGER = LoggerFactory.getLogger(ReindexAllRodaEntitiesPlugin.class);
-  private Class<? extends IsRODAObject> clazz = null;
-
-  private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
-  static {
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLASS_CANONICAL_NAME,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_CLASS_CANONICAL_NAME, "RODA Object",
-        PluginParameterType.RODA_OBJECT, AIP.class.getName(), false, false, "RODA object to reindex."));
-  }
 
   @Override
   public void init() throws PluginException {
@@ -81,27 +69,8 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public List<PluginParameter> getParameters() {
-    ArrayList<PluginParameter> parameters = new ArrayList<PluginParameter>();
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_CLASS_CANONICAL_NAME));
-    return parameters;
-  }
-
-  @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
-    if (parameters != null) {
-      if (parameters.get(RodaConstants.PLUGIN_PARAMS_CLASS_CANONICAL_NAME) != null) {
-        try {
-          String classCanonicalName = parameters.get(RodaConstants.PLUGIN_PARAMS_CLASS_CANONICAL_NAME);
-          if (!RodaConstants.PLUGIN_SELECT_ALL_RODA_OBJECTS.equals(classCanonicalName)) {
-            clazz = (Class<? extends IsRODAObject>) Class.forName(classCanonicalName);
-          }
-        } catch (ClassNotFoundException e) {
-          // do nothing
-        }
-      }
-    }
   }
 
   @Override
@@ -113,21 +82,16 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      if (clazz == null) {
-        List<Class<? extends IsRODAObject>> classes = PluginHelper.getReindexObjectClasses();
-        classes.remove(Job.class);
-        jobPluginInfo.setSourceObjectsCount(classes.size());
-        for (Class<? extends IsRODAObject> reindexClass : classes) {
-          Report reportItem = reindexRODAObject(model, reindexClass, jobPluginInfo);
+      List<Class<? extends IsRODAObject>> classes = PluginHelper.getReindexObjectClasses();
+      classes.remove(Job.class);
+      jobPluginInfo.setSourceObjectsCount(classes.size());
 
-          if (reportItem != null) {
-            pluginReport.addReport(reportItem);
-            PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
-          }
+      for (Class<? extends IsRODAObject> reindexClass : classes) {
+        Report reportItem = reindexRODAObject(model, reindexClass, jobPluginInfo);
+        if (reportItem != null) {
+          pluginReport.addReport(reportItem);
+          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
         }
-      } else {
-        jobPluginInfo.setSourceObjectsCount(1);
-        reindexRODAObject(model, clazz, jobPluginInfo);
       }
 
       pluginReport.setPluginState(PluginState.SUCCESS);

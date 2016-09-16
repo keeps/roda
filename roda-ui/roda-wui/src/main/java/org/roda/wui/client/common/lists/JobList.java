@@ -73,6 +73,11 @@ public class JobList extends BasicAsyncTableCell<Job> {
     super.setSelectedClass(Job.class);
   }
 
+  public JobList(Filter filter, Facets facets, String summary, boolean selectable, int pageSize, int incrementPage) {
+    super(filter, facets, summary, selectable, pageSize, incrementPage);
+    super.setSelectedClass(Job.class);
+  }
+
   @Override
   protected void configureDisplay(CellTable<Job> display) {
 

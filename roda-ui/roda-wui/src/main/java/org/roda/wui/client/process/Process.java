@@ -13,7 +13,6 @@ package org.roda.wui.client.process;
 import java.util.Arrays;
 import java.util.List;
 
-import org.roda.wui.client.common.CreateJob;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.common.client.BadHistoryTokenException;
@@ -76,6 +75,8 @@ public class Process {
       CreateJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else if (historyTokens.get(0).equals(ShowJob.RESOLVER.getHistoryToken())) {
       ShowJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+    } else if (historyTokens.size() == 1 && historyTokens.get(0).equals(CreateActionJob.RESOLVER.getHistoryToken())) {
+      CreateActionJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {
       callback.onFailure(new BadHistoryTokenException(historyTokens.get(0)));
     }

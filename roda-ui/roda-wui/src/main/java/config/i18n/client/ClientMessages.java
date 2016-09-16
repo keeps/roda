@@ -252,11 +252,31 @@ public interface ClientMessages extends Messages {
 
   String inspectFile();
 
+  String allPlugins();
+
   String allIntellectualEntities();
 
   String allRepresentations();
 
   String allFiles();
+
+  String allRisks();
+
+  String allRiskIncidences();
+
+  String allFormats();
+
+  String allNotifications();
+
+  String allLogEntries();
+
+  String allJobs();
+
+  String allJobReports();
+
+  String allTransferredResources();
+
+  String allOfAObject(@Select String objectClass);
 
   String selectItems();
 
@@ -492,6 +512,8 @@ public interface ClientMessages extends Messages {
 
   String processNewMissingMandatoryInfoDialogMessage(List<String> missingPluginNames);
 
+  String pluginCategories();
+
   String showPluginCategories(@Select String category);
 
   /************* Ingest process show ****************/
@@ -718,6 +740,10 @@ public interface ClientMessages extends Messages {
 
   String renameTransferredResourcesDialogTitle();
 
+  String selectRepresentationSearchResults();
+
+  String selectFileSearchResults();
+
   /************* Move Item ****************/
 
   String moveItemTitle();
@@ -765,7 +791,7 @@ public interface ClientMessages extends Messages {
   String durationDHMSLongMinutes(int minutes, int seconds);
 
   String durationDHMSLongSeconds(int seconds);
-  
+
   String durationDHMSShortMillis(int millis);
 
   String objectPermission(@Select PermissionType permissionType);
@@ -1406,7 +1432,7 @@ public interface ClientMessages extends Messages {
   String notificationAcknowledgedUsers();
 
   String notificationNotAcknowledgedUsers();
-  
+
   String notificationState();
 
   /*** Browse Constants **/
@@ -2261,7 +2287,7 @@ public interface ClientMessages extends Messages {
   String aipLevel();
 
   String pluginStateMessage(@Select PluginState state);
-  
+
   String notificationStateValue(@Select NOTIFICATION_STATE state);
 
   String isAcknowledged(@Select String isAcknowledged);
@@ -2279,13 +2305,13 @@ public interface ClientMessages extends Messages {
   String preservationEventAgentExtension();
 
   String mandatoryField();
-  
+
   String isAMandatoryField(String field);
-  
+
   String isNotValid(String field);
 
   String wrongMailFormat();
 
   String fileAlreadyExists();
-  
+
 }

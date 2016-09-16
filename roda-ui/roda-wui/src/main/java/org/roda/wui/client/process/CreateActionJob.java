@@ -10,31 +10,50 @@
  */
 package org.roda.wui.client.process;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.Void;
-import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.SelectedItems;
-import org.roda.core.data.v2.index.SelectedItemsFilter;
+import org.roda.core.data.v2.index.SelectedItemsAll;
 import org.roda.core.data.v2.index.SelectedItemsList;
+import org.roda.core.data.v2.index.SelectedItemsNone;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.risks.IndexedRisk;
+import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.CreateJob;
-import org.roda.wui.client.common.lists.AIPList;
-import org.roda.wui.client.common.lists.RepresentationList;
-import org.roda.wui.client.common.lists.SimpleFileList;
-import org.roda.wui.client.search.Search;
+import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.DefaultSelectDialog;
+import org.roda.wui.client.common.dialogs.SelectDialogFactory;
+import org.roda.wui.client.common.lists.BasicAsyncTableCell;
+import org.roda.wui.client.common.lists.ListFactory;
+import org.roda.wui.client.common.utils.PluginUtils;
+import org.roda.wui.client.ingest.process.PluginOptionsPanel;
+import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -42,8 +61,20 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
 
@@ -51,128 +82,354 @@ import config.i18n.client.ClientMessages;
  * @author Luis Faria
  * 
  */
-public class CreateActionJob extends CreateJob<IsIndexed> {
+public class CreateActionJob extends Composite {
 
-  @SuppressWarnings("unused")
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static PluginType[] pluginTypes = {PluginType.AIP_TO_AIP, PluginType.MISC};
+  public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  public CreateActionJob() {
-    super(IsIndexed.class, Arrays.asList(pluginTypes));
-  }
-
-  public CreateActionJob(SelectedItems items) {
-    super(IsIndexed.class, Arrays.asList(pluginTypes), items);
-  }
-
-  @Override
-  public boolean updateObjectList() {
-
-    SelectedItems<?> selected = getSelected();
-    boolean selectable = false;
-    boolean justActive = true;
-    boolean isEmpty = false;
-
-    if (selected != null) {
-      getTargetPanel().clear();
-
-      if (selected instanceof SelectedItemsList) {
-        List<String> ids = ((SelectedItemsList<?>) selected).getIds();
-
-        if (ids.size() == 0) {
-          final ListBox list = new ListBox();
-          list.addItem(messages.allIntellectualEntities(), AIP.class.getName());
-          list.addItem(messages.allRepresentations(), Representation.class.getName());
-          list.addItem(messages.allFiles(), File.class.getName());
-          list.addItem(messages.selectItems(), "select");
-          list.addItem(messages.noInputObjects(), Void.class.getName());
-
-          list.addStyleName("form-selectbox");
-          list.addStyleName("form-textbox-small");
-          setSelectedClass(list.getSelectedValue());
-
-          list.addChangeHandler(new ChangeHandler() {
-
-            @Override
-            public void onChange(ChangeEvent event) {
-              if (list.getSelectedValue().equals("select")) {
-                Tools.newHistory(Search.RESOLVER);
-              } else {
-                setSelectedClass(list.getSelectedValue());
-                getWorkflowList().clear();
-                getCategoryList().clear();
-                configurePlugins(list.getSelectedValue());
-              }
-            }
-
-          });
-
-          getTargetPanel().add(list);
-          setJobSelectedDescription(messages.createJobSelectObject());
-          return true;
-        }
-
-        if (IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
-          Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.AIP_ID, ids));
-          AIPList list = new AIPList(filter, justActive, null, messages.aipsTitle(), selectable, 10, 10);
-          getTargetPanel().add(list);
-          setJobSelectedDescription(messages.createJobSelectedAIP());
-        }
-
-        if (IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
-          Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.REPRESENTATION_UUID, ids));
-          RepresentationList list = new RepresentationList(filter, justActive, null, messages.representationsTitle(),
-            selectable, 10, 10);
-          getTargetPanel().add(list);
-          setJobSelectedDescription(messages.createJobSelectedRepresentation());
-        }
-
-        if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
-          Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.FILE_UUID, ids));
-          SimpleFileList list = new SimpleFileList(filter, justActive, null, messages.filesTitle(), selectable, 10, 10);
-          getTargetPanel().add(list);
-          setJobSelectedDescription(messages.createJobSelectedFile());
-        }
-
-      } else if (getSelected() instanceof SelectedItemsFilter) {
-        Filter filter = ((SelectedItemsFilter<?>) getSelected()).getFilter();
-
-        if (IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
-          AIPList list = new AIPList(filter, justActive, null, messages.aipsTitle(), selectable, 10, 10);
-          getTargetPanel().add(list);
-          setJobSelectedDescription(messages.createJobSelectedAIP());
-        }
-
-        if (IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
-          RepresentationList list = new RepresentationList(filter, justActive, null, messages.representationsTitle(),
-            selectable, 10, 10);
-          getTargetPanel().add(list);
-          setJobSelectedDescription(messages.createJobSelectedRepresentation());
-        }
-
-        if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
-          SimpleFileList list = new SimpleFileList(filter, justActive, null, messages.filesTitle(), selectable, 10, 10);
-          getTargetPanel().add(list);
-          setJobSelectedDescription(messages.createJobSelectedFile());
-        }
-
+    @Override
+    public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
+      if (historyTokens.size() == 0) {
+        CreateActionJob createActionJob = new CreateActionJob();
+        callback.onSuccess(createActionJob);
       } else {
-        isEmpty = true;
+        Tools.newHistory(CreateActionJob.RESOLVER);
+        callback.onSuccess(null);
       }
     }
 
-    return isEmpty;
+    @Override
+    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {Process.RESOLVER}, false, callback);
+    }
+
+    public List<String> getHistoryPath() {
+      return Tools.concat(Process.RESOLVER.getHistoryPath(), getHistoryToken());
+    }
+
+    public String getHistoryToken() {
+      return "create_job";
+    }
+  };
+
+  public interface MyUiBinder extends UiBinder<Widget, CreateActionJob> {
   }
 
-  @Override
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
+
+  private SelectedItems selected = new SelectedItemsNone();
+  private List<PluginInfo> plugins = null;
+  private PluginInfo selectedPlugin = null;
+  private Map<String, String> rodaMap;
+
+  private static PluginType[] pluginTypes = {PluginType.AIP_TO_AIP, PluginType.MISC, PluginType.AIP_TO_SIP};
+
+  @UiField
+  TextBox name;
+
+  @UiField
+  Label workflowListTitle;
+
+  @UiField
+  Label workflowCategoryLabel;
+
+  @UiField
+  FlowPanel workflowCategoryList;
+
+  @UiField
+  ListBox workflowList;
+
+  @UiField
+  Label workflowListDescription, workflowListDescriptionCategories;
+
+  @UiField
+  FlowPanel workflowPanel;
+
+  @UiField
+  PluginOptionsPanel workflowOptions;
+
+  @UiField
+  Label selectedObject;
+
+  @UiField
+  ListBox targetList;
+
+  @UiField
+  FlowPanel targetListPanel;
+
+  @UiField
+  Button buttonCreate;
+
+  @UiField
+  Button buttonCancel;
+
+  @UiField
+  Button buttonSelect;
+
+  public CreateActionJob() {
+    initWidget(uiBinder.createAndBindUi(this));
+
+    BrowserService.Util.getInstance().retrievePluginsInfo(Arrays.asList(pluginTypes),
+      new AsyncCallback<List<PluginInfo>>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          // do nothing
+        }
+
+        @Override
+        public void onSuccess(List<PluginInfo> pluginsInfo) {
+          init(pluginsInfo);
+        }
+      });
+  }
+
+  public void init(List<PluginInfo> plugins) {
+    this.plugins = plugins;
+
+    name.setText(messages.processNewDefaultName(new Date()));
+    workflowOptions.setPlugins(plugins);
+    configurePlugins();
+
+    workflowList.setVisibleItemCount(20);
+
+    workflowCategoryList.addStyleName("form-listbox-job");
+    workflowList.addChangeHandler(new ChangeHandler() {
+
+      @Override
+      public void onChange(ChangeEvent event) {
+        String selectedPluginId = workflowList.getSelectedValue();
+        if (selectedPluginId != null) {
+          CreateActionJob.this.selectedPlugin = lookupPlugin(selectedPluginId);
+        }
+
+        updateWorkflowOptions();
+      }
+    });
+  }
+
+  public void configurePlugins() {
+    List<String> categoriesOnListBox = new ArrayList<String>();
+
+    if (plugins != null) {
+      PluginUtils.sortByName(plugins);
+
+      for (PluginInfo pluginInfo : plugins) {
+        if (pluginInfo != null) {
+
+          List<String> pluginCategories = pluginInfo.getCategories();
+
+          if (pluginCategories != null) {
+            for (String category : pluginCategories) {
+              if (!categoriesOnListBox.contains(category)
+                && !category.equals(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)) {
+
+                CheckBox box = new CheckBox();
+                box.setText(messages.showPluginCategories(category));
+                box.setName(category);
+                box.addStyleName("form-checkbox-job");
+
+                box.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+                  @Override
+                  public void onValueChange(ValueChangeEvent<Boolean> event) {
+                    workflowList.clear();
+                    boolean noChecks = true;
+
+                    if (plugins != null) {
+                      PluginUtils.sortByName(plugins);
+                      for (PluginInfo pluginInfo : plugins) {
+                        if (pluginInfo != null) {
+                          List<String> categories = pluginInfo.getCategories();
+
+                          if (categories != null) {
+                            for (int i = 0; i < workflowCategoryList.getWidgetCount(); i++) {
+                              CheckBox checkbox = (CheckBox) workflowCategoryList.getWidget(i);
+
+                              if (checkbox.getValue()) {
+                                noChecks = false;
+
+                                if (categories.contains(checkbox.getName())
+                                  && !categories.contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)) {
+                                  workflowList.addItem(
+                                    messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()),
+                                    pluginInfo.getId());
+                                }
+
+                              }
+                            }
+
+                            if (noChecks) {
+                              if (!pluginInfo.getCategories().contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)) {
+                                workflowList.addItem(
+                                  messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()),
+                                  pluginInfo.getId());
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+
+                    String selectedPluginId = workflowList.getSelectedValue();
+                    if (selectedPluginId != null) {
+                      CreateActionJob.this.selectedPlugin = lookupPlugin(selectedPluginId);
+                    }
+
+                    updateWorkflowOptions();
+                  }
+
+                });
+
+                workflowCategoryList.add(box);
+                categoriesOnListBox.add(category);
+              }
+            }
+
+            if (!pluginCategories.contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)) {
+              workflowList.addItem(messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()),
+                pluginInfo.getId());
+            }
+          }
+
+        } else {
+          GWT.log("Got a null plugin");
+        }
+      }
+
+      String selectedPluginId = workflowList.getSelectedValue();
+      if (selectedPluginId != null) {
+        CreateActionJob.this.selectedPlugin = lookupPlugin(selectedPluginId);
+      }
+
+      updateWorkflowOptions();
+    }
+  }
+
+  protected void updateWorkflowOptions() {
+    if (selectedPlugin == null) {
+      workflowListDescription.setText("");
+      workflowListDescriptionCategories.setText("");
+      workflowListDescription.setVisible(false);
+      workflowListDescriptionCategories.setVisible(false);
+      workflowOptions.setPluginInfo(null);
+    } else {
+      String pluginName = messages.pluginLabel(selectedPlugin.getName(), selectedPlugin.getVersion());
+      name.setText(pluginName);
+      workflowListTitle.setText(pluginName);
+
+      String description = selectedPlugin.getDescription();
+      if (description != null && description.length() > 0) {
+        workflowListDescription.setText(description);
+
+        String categories = messages.pluginCategories() + ": ";
+        for (String category : selectedPlugin.getCategories()) {
+          categories += category + ", ";
+        }
+
+        workflowListDescriptionCategories.setText(categories.substring(0, categories.length() - 2));
+        workflowListDescription.setVisible(true);
+        workflowListDescriptionCategories.setVisible(true);
+      } else {
+        workflowListDescription.setVisible(false);
+        workflowListDescriptionCategories.setVisible(false);
+      }
+
+      if (selectedPlugin.getParameters().size() == 0) {
+        workflowPanel.setVisible(false);
+      } else {
+        workflowPanel.setVisible(true);
+        workflowOptions.setPluginInfo(selectedPlugin);
+      }
+
+      targetList.clear();
+      rodaMap = getPluginNames(selectedPlugin.getObjectClasses());
+      for (Entry<String, String> objectClass : rodaMap.entrySet()) {
+        targetList.addItem(messages.allOfAObject(objectClass.getKey()), objectClass.getKey());
+      }
+
+      targetList.addChangeHandler(new ChangeHandler() {
+        @Override
+        public void onChange(ChangeEvent event) {
+          targetListPanel.clear();
+          defineTargetInformation(targetList.getSelectedValue());
+        }
+      });
+
+      targetListPanel.clear();
+      defineTargetInformation(targetList.getSelectedValue());
+    }
+  }
+
+  private Map<String, String> getPluginNames(Set<String> objectClasses) {
+    Map<String, String> objectMap = new HashMap<String, String>();
+    for (String objectClass : objectClasses) {
+      if (AIP.class.getName().equals(objectClass) || IndexedAIP.class.getName().equals(objectClass)) {
+        objectMap.put(AIP.class.getName(), IndexedAIP.class.getName());
+      } else if (Representation.class.getName().equals(objectClass)
+        || IndexedRepresentation.class.getName().equals(objectClass)) {
+        objectMap.put(Representation.class.getName(), IndexedRepresentation.class.getName());
+      } else if (File.class.getName().equals(objectClass) || IndexedFile.class.getName().equals(objectClass)) {
+        objectMap.put(File.class.getName(), IndexedFile.class.getName());
+      } else if (Risk.class.getName().equals(objectClass) || IndexedRisk.class.getName().equals(objectClass)) {
+        objectMap.put(Risk.class.getName(), IndexedRisk.class.getName());
+      } else if (RiskIncidence.class.getName().equals(objectClass)) {
+        objectMap.put(RiskIncidence.class.getName(), RiskIncidence.class.getName());
+      } else if (Format.class.getName().equals(objectClass)) {
+        objectMap.put(Format.class.getName(), Format.class.getName());
+      } else if (Notification.class.getName().equals(objectClass)) {
+        objectMap.put(Notification.class.getName(), Notification.class.getName());
+      } else if (Job.class.getName().equals(objectClass)) {
+        objectMap.put(Job.class.getName(), Job.class.getName());
+      } else if (Report.class.getName().equals(objectClass)) {
+        objectMap.put(Report.class.getName(), Report.class.getName());
+      } else if (LogEntry.class.getName().equals(objectClass)) {
+        objectMap.put(LogEntry.class.getName(), LogEntry.class.getName());
+      } else if (TransferredResource.class.getName().equals(objectClass)) {
+        objectMap.put(TransferredResource.class.getName(), TransferredResource.class.getName());
+      } else if (org.roda.core.data.v2.Void.class.getName().equals(objectClass)) {
+        objectMap.put(org.roda.core.data.v2.Void.class.getName(), org.roda.core.data.v2.Void.class.getName());
+      }
+    }
+    return objectMap;
+  }
+
+  private PluginInfo lookupPlugin(String selectedPluginId) {
+    PluginInfo p = null;
+    if (plugins != null && selectedPluginId != null) {
+      for (PluginInfo pluginInfo : plugins) {
+        if (pluginInfo != null && pluginInfo.getId().equals(selectedPluginId)) {
+          p = pluginInfo;
+          break;
+        }
+      }
+    }
+    return p;
+  }
+
+  private void defineTargetInformation(String objectClassName) {
+    ListFactory listFactory = new ListFactory();
+    try {
+      BasicAsyncTableCell list = listFactory.getList(objectClassName, "", Filter.ALL, 10, 10);
+      selected = new SelectedItemsAll(objectClassName);
+      targetListPanel.add(list);
+      targetListPanel.setVisible(true);
+    } catch (RODAException e) {
+      targetListPanel.setVisible(false);
+    }
+  }
+
+  @UiHandler("buttonCreate")
   public void buttonCreateHandler(ClickEvent e) {
     getButtonCreate().setEnabled(false);
     String jobName = getName().getText();
 
-    BrowserService.Util.getInstance().createProcess(jobName, getSelected(), getSelectedPlugin().getId(),
-      getWorkflowOptions().getValue(), getSelectedClass(), new AsyncCallback<Job>() {
+    if (selected == null || selected instanceof SelectedItemsNone) {
+      selected = new SelectedItemsAll(targetList.getSelectedValue());
+    }
+
+    BrowserService.Util.getInstance().createProcess(jobName, selected, getSelectedPlugin().getId(),
+      getWorkflowOptions().getValue(), selected.getSelectedClass(), new AsyncCallback<Job>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -189,9 +446,81 @@ public class CreateActionJob extends CreateJob<IsIndexed> {
 
   }
 
-  @Override
-  public void cancel() {
+  @UiHandler("buttonSelect")
+  public void buttonSelectHandler(ClickEvent e) {
+    SelectDialogFactory factory = new SelectDialogFactory();
+    try {
+      final DefaultSelectDialog<?, ?> dialog = factory.getSelectDialog(targetList.getSelectedValue(),
+        targetList.getSelectedItemText(), Filter.ALL, true);
+      dialog.showAndCenter();
+      dialog.addValueChangeHandler(new ValueChangeHandler() {
+        @Override
+        public void onValueChange(ValueChangeEvent event) {
+          targetListPanel.clear();
+          ListFactory listFactory = new ListFactory();
+
+          try {
+            selected = dialog.getList().getSelected();
+            Filter filter = new Filter(dialog.getList().getFilter());
+
+            if (selected instanceof SelectedItemsList) {
+              SelectedItemsList selectedList = (SelectedItemsList) selected;
+              filter.add(new OneOfManyFilterParameter("id", selectedList.getIds()));
+            }
+
+            BasicAsyncTableCell list = listFactory.getList(targetList.getSelectedValue(), dialog.getTitle(), filter, 10,
+              10);
+            targetListPanel.add(list);
+          } catch (RODAException e) {
+            // do nothing
+          }
+        }
+      });
+    } catch (NotFoundException e1) {
+      // do nothing
+    }
+  }
+
+  @UiHandler("buttonCancel")
+  public void cancel(ClickEvent e) {
     Tools.newHistory(ActionProcess.RESOLVER);
+  }
+
+  public SelectedItems<?> getSelected() {
+    return selected;
+  }
+
+  public PluginInfo getSelectedPlugin() {
+    return selectedPlugin;
+  }
+
+  public void setSelectedPlugin(PluginInfo selectedPlugin) {
+    this.selectedPlugin = selectedPlugin;
+  }
+
+  public Button getButtonCreate() {
+    return this.buttonCreate;
+  }
+
+  public TextBox getName() {
+    return this.name;
+  }
+
+  public ListBox getWorkflowList() {
+    return workflowList;
+  }
+
+  public PluginOptionsPanel getWorkflowOptions() {
+    return this.workflowOptions;
+  }
+
+  public void setCategoryListBoxVisible(boolean visible) {
+    workflowCategoryLabel.setVisible(visible);
+    workflowCategoryList.setVisible(visible);
+  }
+
+  public FlowPanel getCategoryList() {
+    return workflowCategoryList;
   }
 
 }

@@ -13,9 +13,9 @@ package org.roda.wui.client.management;
 import java.util.Arrays;
 import java.util.List;
 
-import org.roda.wui.client.common.CreateJob;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.process.ActionProcess;
+import org.roda.wui.client.process.CreateJob;
 import org.roda.wui.common.client.BadHistoryTokenException;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
@@ -40,8 +40,7 @@ public class Management {
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
       UserLogin.getInstance().checkRoles(new HistoryResolver[] {MemberManagement.RESOLVER, UserLog.RESOLVER,
-        NotificationRegister.RESOLVER, ActionProcess.RESOLVER, Statistics.RESOLVER, HelpStatistics.RESOLVER}, false,
-        callback);
+        NotificationRegister.RESOLVER, ActionProcess.RESOLVER, Statistics.RESOLVER}, false, callback);
     }
 
     public List<String> getHistoryPath() {
@@ -108,8 +107,6 @@ public class Management {
         CreateJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(Statistics.RESOLVER.getHistoryToken())) {
         Statistics.RESOLVER.resolve(Tools.tail(historyTokens), callback);
-      } else if (historyTokens.get(0).equals(HelpStatistics.RESOLVER.getHistoryToken())) {
-        HelpStatistics.RESOLVER.resolve(Tools.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals("help")) {
         callback.onSuccess(getHelp());
       } else {

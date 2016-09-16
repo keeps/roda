@@ -23,12 +23,10 @@ import org.roda.core.data.adapter.filter.NotSimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
-import org.roda.wui.client.common.CreateJob;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.JobList;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.management.Management;
-import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Tools;
@@ -203,16 +201,13 @@ public class ActionProcess extends Composite {
 
   @UiHandler("newJob")
   void handleNewJobAction(ClickEvent e) {
-    Search.getInstance().clearSelected();
-    Tools.newHistory(CreateJob.RESOLVER, "action");
+    Tools.newHistory(CreateActionJob.RESOLVER);
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 0) {
       jobList.refresh();
       callback.onSuccess(this);
-    } else if (historyTokens.size() == 1 && historyTokens.get(0).equals(CreateActionJob.RESOLVER.getHistoryToken())) {
-      CreateActionJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(ShowJob.RESOLVER.getHistoryToken())) {
       ShowJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {

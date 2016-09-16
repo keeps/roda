@@ -10,6 +10,7 @@ package org.roda.wui.client.common.dialogs;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.wui.client.common.lists.AsyncTableCell;
+import org.roda.wui.client.common.lists.BasicAsyncTableCell;
 import org.roda.wui.client.common.search.SearchPanel;
 
 import com.google.gwt.core.client.GWT;
@@ -116,6 +117,10 @@ public class DefaultSelectDialog<T extends IsIndexed, O> extends DialogBox imple
 
   public T getValue() {
     return searchResultsPanel.getSelectionModel().getSelectedObject();
+  }
+
+  public BasicAsyncTableCell<T> getList() {
+    return (BasicAsyncTableCell<T>) searchResultsPanel;
   }
 
   public void setEmptyParentButtonVisible(boolean visible) {

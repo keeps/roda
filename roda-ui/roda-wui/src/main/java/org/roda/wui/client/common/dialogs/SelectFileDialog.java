@@ -11,34 +11,35 @@ import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.wui.client.common.lists.AIPList;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.wui.client.common.lists.SimpleFileList;
 
 import com.google.gwt.core.client.GWT;
 
 import config.i18n.client.ClientMessages;
 
-public class SelectAipDialog extends DefaultSelectDialog<IndexedAIP, Void> {
+public class SelectFileDialog extends DefaultSelectDialog<IndexedFile, Void> {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private static final Filter DEFAULT_FILTER_AIP = new Filter(
-    new BasicSearchFilterParameter(RodaConstants.AIP_SEARCH, "*"));
+  private static final Filter DEFAULT_FILTER_FILE = new Filter(
+    new BasicSearchFilterParameter(RodaConstants.FILE_SEARCH, "*"));
 
   private static final Boolean DEFAULT_JUST_ACTIVE = Boolean.TRUE;
   private static final Facets DEFAULT_FACETS = null;
   private static final Boolean SELECTABLE = Boolean.FALSE;
 
-  public SelectAipDialog(String title, boolean hidePreFilters) {
-    this(title, DEFAULT_FILTER_AIP, DEFAULT_JUST_ACTIVE, hidePreFilters);
+  public SelectFileDialog(String title, boolean hidePreFilters) {
+    this(title, DEFAULT_FILTER_FILE, DEFAULT_JUST_ACTIVE, hidePreFilters);
   }
 
-  public SelectAipDialog(String title, Filter filter, boolean justActive, boolean hidePreFilters) {
+  public SelectFileDialog(String title, Filter filter, boolean justActive, boolean hidePreFilters) {
     this(title, filter, justActive, hidePreFilters, SELECTABLE);
   }
 
-  public SelectAipDialog(String title, Filter filter, boolean justActive, boolean hidePreFilters, boolean selectable) {
-    super(title, filter, RodaConstants.AIP_SEARCH,
-      new AIPList(filter, justActive, DEFAULT_FACETS, messages.selectAipSearchResults(), selectable), hidePreFilters);
+  public SelectFileDialog(String title, Filter filter, boolean justActive, boolean hidePreFilters, boolean selectable) {
+    super(title, filter, RodaConstants.FILE_SEARCH,
+      new SimpleFileList(filter, justActive, DEFAULT_FACETS, messages.selectFileSearchResults(), selectable),
+      hidePreFilters);
   }
 }

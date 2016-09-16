@@ -472,6 +472,8 @@ public final class RodaConstants {
   public static final String JOB_OUTCOME_OBJECTS_CLASS = "outcomeObjectsClass";
   public static final String JOB_FILE_EXTENSION = ".json";
 
+  public static final String JOB_SEARCH = "search";
+
   /* Plugins related parameters */
   public static final String PLUGIN_PARAMS_JOB_ID = "job.id";
 
@@ -718,14 +720,12 @@ public final class RodaConstants {
   public static final String NOTIFICATION_ACKNOWLEDGED_USERS = "acknowledgedUsers";
   public static final String NOTIFICATION_STATE = "state";
 
-
   public static final String NOTIFICATION_FILE_EXTENSION = ".json";
   public static final String NOTIFICATION_SEARCH = "search";
   public static final String NOTIFICATION_VARIOUS_RECIPIENT_USERS = "various-recipient-users";
-  
+
   public static final String NOTIFICATION_HTTP_ENDPOINT = "ingest.http_notification.endpoint";
   public static final String NOTIFICATION_HTTP_TIMEOUT = "ingest.http_notification.timeout";
-
 
   /* View representation */
   public static final String VIEW_REPRESENTATION_DESCRIPTION_LEVEL = "description-level-representation";
@@ -888,7 +888,7 @@ public final class RodaConstants {
   }
 
   public static final List<String> SYSTEM_USERS = Arrays.asList("admin", "guest");
-  
+
   /* Description level configuration Constants */
   public static final String LEVELS_CLASSIFICATION_PLAN = "levels.classificationplan";
   public static final String LEVELS_ICONS_PREFIX = "levels.icon";

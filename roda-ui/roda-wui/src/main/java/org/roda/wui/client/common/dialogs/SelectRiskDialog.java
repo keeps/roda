@@ -23,7 +23,11 @@ public class SelectRiskDialog extends DefaultSelectDialog<IndexedRisk, Void> {
   }
 
   public SelectRiskDialog(String title, Filter filter) {
-    super(title, filter, RodaConstants.RISK_SEARCH, new RiskList(filter, null, title, false), false);
+    this(title, filter, false);
+  }
+
+  public SelectRiskDialog(String title, Filter filter, boolean selectable) {
+    super(title, filter, RodaConstants.RISK_SEARCH, new RiskList(filter, null, title, selectable), false);
   }
 
 }

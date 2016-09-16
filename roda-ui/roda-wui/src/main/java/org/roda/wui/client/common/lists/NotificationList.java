@@ -45,8 +45,6 @@ public class NotificationList extends BasicAsyncTableCell<Notification> {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private static final int PAGE_SIZE = 20;
-
   private TextColumn<Notification> fromUser;
   // private TextColumn<Message> recipientUser;
   private Column<Notification, Date> sentOn;
@@ -63,6 +61,12 @@ public class NotificationList extends BasicAsyncTableCell<Notification> {
     super.setSelectedClass(Notification.class);
   }
 
+  public NotificationList(Filter filter, Facets facets, String summary, boolean selectable, int pageSize,
+    int incrementPage) {
+    super(filter, facets, summary, selectable, pageSize, incrementPage);
+    super.setSelectedClass(Notification.class);
+  }
+
   @Override
   protected void configureDisplay(CellTable<Notification> display) {
     fromUser = new TextColumn<Notification>() {
@@ -72,13 +76,6 @@ public class NotificationList extends BasicAsyncTableCell<Notification> {
         return notification != null ? notification.getFromUser() : null;
       }
     };
-
-    /*
-     * recipientUser = new TextColumn<Message>() {
-     * 
-     * @Override public String getValue(Message message) { return message !=
-     * null ? message.getRecipientUsers().toArray().toString() : null; } };
-     */
 
     sentOn = new Column<Notification, Date>(new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM))) {
       @Override
@@ -126,7 +123,6 @@ public class NotificationList extends BasicAsyncTableCell<Notification> {
     };
 
     fromUser.setSortable(true);
-    // recipientUser.setSortable(true);
     sentOn.setSortable(true);
     subject.setSortable(true);
     acknowledged.setSortable(true);
@@ -152,8 +148,6 @@ public class NotificationList extends BasicAsyncTableCell<Notification> {
 
     Map<Column<Notification, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<Notification, ?>, List<String>>();
     columnSortingKeyMap.put(fromUser, Arrays.asList(RodaConstants.NOTIFICATION_FROM_USER));
-    // columnSortingKeyMap.put(recipientUser,
-    // Arrays.asList(RodaConstants.MESSAGE_RECIPIENT_USERS));
     columnSortingKeyMap.put(sentOn, Arrays.asList(RodaConstants.NOTIFICATION_SENT_ON));
     columnSortingKeyMap.put(subject, Arrays.asList(RodaConstants.NOTIFICATION_SUBJECT));
     columnSortingKeyMap.put(acknowledged, Arrays.asList(RodaConstants.NOTIFICATION_IS_ACKNOWLEDGED));
@@ -175,11 +169,6 @@ public class NotificationList extends BasicAsyncTableCell<Notification> {
         return item.getId();
       }
     };
-  }
-
-  @Override
-  protected int getInitialPageSize() {
-    return PAGE_SIZE;
   }
 
 }

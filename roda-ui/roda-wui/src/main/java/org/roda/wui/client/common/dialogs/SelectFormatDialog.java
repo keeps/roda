@@ -23,7 +23,10 @@ public class SelectFormatDialog extends DefaultSelectDialog<Format, Void> {
   }
 
   public SelectFormatDialog(String title, Filter filter) {
-    super(title, filter, RodaConstants.FORMAT_SEARCH, new FormatList(filter, null, title, false), false);
+    this(title, filter, false);
+  }
 
+  public SelectFormatDialog(String title, Filter filter, boolean selectable) {
+    super(title, filter, RodaConstants.FORMAT_SEARCH, new FormatList(filter, null, title, selectable), false);
   }
 }

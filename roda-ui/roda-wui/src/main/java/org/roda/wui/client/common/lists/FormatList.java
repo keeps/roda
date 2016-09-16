@@ -40,8 +40,6 @@ import config.i18n.client.ClientMessages;
  */
 public class FormatList extends BasicAsyncTableCell<Format> {
 
-  private static final int PAGE_SIZE = 20;
-
   // private final ClientLogger logger = new ClientLogger(getClass().getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -54,6 +52,11 @@ public class FormatList extends BasicAsyncTableCell<Format> {
 
   public FormatList(Filter filter, Facets facets, String summary, boolean selectable) {
     super(filter, facets, summary, selectable);
+    super.setSelectedClass(Format.class);
+  }
+
+  public FormatList(Filter filter, Facets facets, String summary, boolean selectable, int pageSize, int incrementPage) {
+    super(filter, facets, summary, selectable, pageSize, incrementPage);
     super.setSelectedClass(Format.class);
   }
 
@@ -92,7 +95,7 @@ public class FormatList extends BasicAsyncTableCell<Format> {
   @Override
   protected void getData(Sublist sublist, ColumnSortList columnSortList, AsyncCallback<IndexResult<Format>> callback) {
     Filter filter = getFilter();
-    
+
     Map<Column<Format, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<Format, ?>, List<String>>();
     columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.FORMAT_NAME_SORT));
     columnSortingKeyMap.put(categoryColumn, Arrays.asList(RodaConstants.FORMAT_CATEGORY_SORT));
@@ -113,11 +116,6 @@ public class FormatList extends BasicAsyncTableCell<Format> {
         return item.getId();
       }
     };
-  }
-
-  @Override
-  protected int getInitialPageSize() {
-    return PAGE_SIZE;
   }
 
 }

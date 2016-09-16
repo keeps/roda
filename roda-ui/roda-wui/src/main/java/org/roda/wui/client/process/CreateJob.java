@@ -8,7 +8,7 @@
 /**
  * 
  */
-package org.roda.wui.client.common;
+package org.roda.wui.client.process;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,12 +26,10 @@ import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.PluginUtils;
 import org.roda.wui.client.ingest.process.PluginOptionsPanel;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
-import org.roda.wui.client.process.CreateActionJob;
-import org.roda.wui.client.process.CreateIngestJob;
-import org.roda.wui.client.process.Process;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
@@ -72,8 +70,8 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
           CreateIngestJob createIngestJob = new CreateIngestJob();
           callback.onSuccess(createIngestJob);
         } else if (historyTokens.get(0).equals("action")) {
-          CreateActionJob createActionJob = new CreateActionJob();
-          callback.onSuccess(createActionJob);
+          CreateSearchActionJob createSearchActionJob = new CreateSearchActionJob();
+          callback.onSuccess(createSearchActionJob);
         } else {
           Tools.newHistory(CreateJob.RESOLVER);
           callback.onSuccess(null);
@@ -92,8 +90,8 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
             }
           }
 
-          CreateActionJob createActionJob = new CreateActionJob(items);
-          callback.onSuccess(createActionJob);
+          CreateSearchActionJob createSearchActionJob = new CreateSearchActionJob(items);
+          callback.onSuccess(createSearchActionJob);
         } else {
           Tools.newHistory(CreateJob.RESOLVER);
           callback.onSuccess(null);

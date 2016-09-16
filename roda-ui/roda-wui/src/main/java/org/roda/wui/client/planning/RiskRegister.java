@@ -31,7 +31,7 @@ import org.roda.wui.client.common.lists.RiskList;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.process.CreateActionJob;
+import org.roda.wui.client.process.CreateSearchActionJob;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
@@ -254,8 +254,8 @@ public class RiskRegister extends Composite {
       EditRisk.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(RiskHistory.RESOLVER.getHistoryToken())) {
       RiskHistory.RESOLVER.resolve(Tools.tail(historyTokens), callback);
-    } else if (historyTokens.size() == 1 && historyTokens.get(0).equals(CreateActionJob.RESOLVER.getHistoryToken())) {
-      CreateActionJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+    } else if (historyTokens.size() == 1 && historyTokens.get(0).equals(CreateSearchActionJob.RESOLVER.getHistoryToken())) {
+      CreateSearchActionJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {
       Tools.newHistory(RESOLVER);
       callback.onSuccess(null);
