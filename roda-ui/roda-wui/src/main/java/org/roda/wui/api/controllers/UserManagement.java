@@ -10,9 +10,11 @@ package org.roda.wui.api.controllers;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.notifications.EmailNotificationProcessor;
@@ -40,6 +42,7 @@ import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.UserExtraBundle;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
+import org.w3c.util.DateParser;
 
 public class UserManagement extends RodaWuiController {
 
@@ -200,7 +203,7 @@ public class UserManagement extends RodaWuiController {
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "user", user);
-    
+
     return ret;
   }
 
@@ -312,21 +315,33 @@ public class UserManagement extends RodaWuiController {
   // TODO: From where should the User come from?
   // return true if notification was sent, false if the mail cannot be sent and
   // the user was activated...
-  public static Notification sendEmailVerification(String servletPath, String username)
-    throws GenericException, NotFoundException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+  public static Notification sendEmailVerification(final String servletPath, final String username,
+    final boolean generateNewToken) throws GenericException, NotFoundException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     User user = UserManagementHelper.retrieveUser(username);
 
-    if (user == null) {
-      throw new NotFoundException("User " + username + " doesn't exist.");
+    if (generateNewToken) {
+      final UUID uuidToken = UUID.randomUUID();
+      final Calendar calendar = Calendar.getInstance();
+      calendar.add(Calendar.DAY_OF_MONTH, 1);
+      final String isoDateNoMillis = DateParser.getIsoDateNoMillis(calendar.getTime());
+
+      user.setEmailConfirmationToken(uuidToken.toString());
+      user.setEmailConfirmationTokenExpirationDate(isoDateNoMillis);
+
+      try {
+        user = UserManagementHelper.updateUser(user, null, null);
+      } catch (final AlreadyExistsException | AuthorizationDeniedException e) {
+        throw new GenericException("Error updating email confirmation token - " + e.getMessage(), e);
+      }
     }
 
     if (user.isActive() || user.getEmailConfirmationToken() == null) {
       throw new GenericException("User " + username + " is already active or email confirmation token doesn't exist.");
     }
 
-    Notification notification = sendEmailVerification(servletPath, user);
+    final Notification notification = sendEmailVerification(servletPath, user);
 
     // register action
     controllerAssistant.registerAction(user, getLogEntryState(notification), "user", user);

@@ -22,7 +22,8 @@
 			<g:Button ui:field="recover" addStyleNames="btn btn-link login-link"><ui:text from='{messages.loginRecoverPassword}' /></g:Button>
 		    <g:Button ui:field="register" addStyleNames="btn btn-link login-link"><ui:text from='{messages.loginRegister}' /></g:Button>
 		    <g:Button ui:field="login" addStyleNames="btn btn-play login-button"><ui:text from='{messages.loginLogin}' /></g:Button>
-		</g:FlowPanel>		
+			<g:Button ui:field="resendEmail" addStyleNames="btn btn-link login-link" visible="false"><ui:text from='{messages.loginResendEmail}' /></g:Button>
+		</g:FlowPanel>
 	</g:FlowPanel>
 
 </ui:UiBinder>

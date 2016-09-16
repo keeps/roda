@@ -162,9 +162,10 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public Notification sendEmailVerification(String username) throws GenericException, NotFoundException {
-    String servletPath = retrieveServletUrl(getThreadLocalRequest());
-    return UserManagement.sendEmailVerification(servletPath, username);
+  public Notification sendEmailVerification(final String username, final boolean generateNewToken)
+    throws GenericException, NotFoundException {
+    final String servletPath = retrieveServletUrl(getThreadLocalRequest());
+    return UserManagement.sendEmailVerification(servletPath, username, generateNewToken);
   }
 
   @Override

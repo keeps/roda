@@ -16,14 +16,18 @@ import java.util.List;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.EmailUnverifiedException;
 import org.roda.core.data.exceptions.InactiveUserException;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.User;
+import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.management.RecoverLogin;
 import org.roda.wui.client.management.Register;
+import org.roda.wui.client.management.UserManagementService;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -35,6 +39,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
@@ -108,6 +113,9 @@ public class Login extends Composite {
   @UiField
   Label error;
 
+  @UiField
+  Button resendEmail;
+
   private String service = null;
 
   private Login() {
@@ -128,6 +136,7 @@ public class Login extends Composite {
     username.setText("");
     password.setText("");
     error.setText("");
+    resendEmail.setVisible(false);
     service = Tools.join(historyTokens, Tools.HISTORY_SEP);
     callback.onSuccess(this);
   }
@@ -157,6 +166,54 @@ public class Login extends Composite {
     tryToLoginWhenEnterIsPressed(event);
   }
 
+  @UiHandler("resendEmail")
+  void handleResendEmail(final ClickEvent e) {
+
+    UserManagementService.Util.getInstance().sendEmailVerification(username.getText(), true,
+      new AsyncCallback<Notification>() {
+
+        @Override
+        public void onSuccess(final Notification result) {
+          if (result.getState() == Notification.NOTIFICATION_STATE.COMPLETED) {
+            Dialogs.showInformationDialog(messages.loginResendEmailSuccessDialogTitle(),
+              messages.loginResendEmailSuccessDialogMessage(), messages.loginResendEmailSuccessDialogButton(),
+              new AsyncCallback<Void>() {
+
+                @Override
+                public void onSuccess(final Void result) {
+                  Tools.newHistory(Login.RESOLVER);
+                }
+
+                @Override
+                public void onFailure(final Throwable caught) {
+                  Tools.newHistory(Login.RESOLVER);
+                }
+              });
+          } else {
+            Dialogs.showInformationDialog(messages.loginResendEmailFailureDialogTitle(),
+              messages.loginResendEmailFailureDialogMessage(), messages.loginResendEmailFailureDialogButton(),
+              new AsyncCallback<Void>() {
+
+                @Override
+                public void onSuccess(final Void result) {
+                  Tools.newHistory(Login.RESOLVER);
+                }
+
+                @Override
+                public void onFailure(final Throwable caught) {
+                  Tools.newHistory(Login.RESOLVER);
+                }
+              });
+          }
+        }
+
+        @Override
+        public void onFailure(final Throwable caught) {
+          Toast.showError(messages.loginResendEmailVerificationFailure());
+        }
+      });
+  }
+
   private void tryToLoginWhenEnterIsPressed(KeyPressEvent event) {
     if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
       doLogin();
@@ -179,6 +236,7 @@ public class Login extends Composite {
         public void onFailure(Throwable caught) {
           if (caught instanceof EmailUnverifiedException) {
             error.setText(messages.emailUnverifiedMessage());
+            resendEmail.setVisible(true);
           } else if (caught instanceof InactiveUserException) {
             error.setText(messages.inactiveUserMessage());
           } else if (caught instanceof AuthenticationDeniedException) {

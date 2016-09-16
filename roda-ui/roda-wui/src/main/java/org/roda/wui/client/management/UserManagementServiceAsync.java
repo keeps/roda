@@ -176,10 +176,12 @@ public interface UserManagementServiceAsync {
    *
    * @param username
    *          the name of the user
+   * @param generateNewToken
+   *          generate a new token before sending the email?
    * @throws GenericException
    * @throws NotFoundException
    */
-  public void sendEmailVerification(String username, AsyncCallback<Notification> callback);
+  public void sendEmailVerification(String username, boolean generateNewToken, AsyncCallback<Notification> callback);
 
   /**
    * Verify a user email. If verified user will become active
