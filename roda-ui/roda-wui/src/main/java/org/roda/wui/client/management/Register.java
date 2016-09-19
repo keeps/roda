@@ -170,8 +170,8 @@ public class Register extends Composite {
           }
 
           @Override
-          public void onSuccess(User result) {
-            if (result.isActive()) {
+          public void onSuccess(final User registeredUser) {
+            if (registeredUser.isActive()) {
               Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
                 messages.registerSuccessDialogMessageActive(), messages.registerSuccessDialogButton(),
                 new AsyncCallback<Void>() {
@@ -187,7 +187,7 @@ public class Register extends Composite {
                   }
                 });
             } else {
-              UserManagementService.Util.getInstance().sendEmailVerification(user.getId(),
+              UserManagementService.Util.getInstance().sendEmailVerification(registeredUser.getId(),
                 new AsyncCallback<Notification>() {
 
                   @Override
@@ -208,8 +208,8 @@ public class Register extends Composite {
                           }
                         });
                     } else {
-                      user.setActive(true);
-                      UserManagementService.Util.getInstance().updateUser(user, password,
+                      registeredUser.setActive(true);
+                      UserManagementService.Util.getInstance().updateUser(registeredUser, password,
                         userDataPanel.getExtra(), new AsyncCallback<Void>() {
                           @Override
                           public void onFailure(Throwable caught) {
