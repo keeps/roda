@@ -101,9 +101,7 @@ public class UserManagementHelper {
   public static User registerUser(User user, String password, UserExtraBundle extra, String servletPath)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException {
     user.setExtra(getUserExtra(user, extra));
-    user = UserUtility.resetGroupsAndRoles(user);
-    // if user is not active, send notification
-    
+    user = UserUtility.resetGroupsAndRoles(user);    
 
     User registeredUser = RodaCoreFactory.getModelService().registerUser(user, password, true);
     RodaCoreFactory.getIndexService().commit(RODAMember.class);
