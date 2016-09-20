@@ -853,8 +853,10 @@ public class RodaCoreFactory {
     }
     for (final String role : roles) {
       try {
-        RodaCoreFactory.ldapUtility.addRole(role);
-        LOGGER.info("Created LDAP role {}", role);
+        if (!role.trim().equalsIgnoreCase("")) {
+          RodaCoreFactory.ldapUtility.addRole(role);
+          LOGGER.info("Created LDAP role {}", role);
+        }
       } catch (final RoleAlreadyExistsException e) {
         LOGGER.info("Role {} already exists.", role);
         LOGGER.trace(e.getMessage(), e);
@@ -1163,7 +1165,15 @@ public class RodaCoreFactory {
   }
 
   public static List<String> getRodaConfigurationAsList(String... keyParts) {
-    return Arrays.asList(rodaConfiguration.getStringArray(getConfigurationKey(keyParts)));
+    String[] array = rodaConfiguration.getStringArray(getConfigurationKey(keyParts));
+    List<String> res = Arrays.asList(array);
+    List<String> clean = new ArrayList<String>();
+    for(String s : res){
+      if(s!=null && !s.trim().equalsIgnoreCase("")){
+        clean.add(s);
+      }
+    }
+    return clean;
   }
 
   public static int getRodaConfigurationAsInt(String... keyParts) {
@@ -1172,7 +1182,6 @@ public class RodaCoreFactory {
 
   public static List<String> getFixityAlgorithms() {
     List<String> algorithms = RodaCoreFactory.getRodaConfigurationAsList("core", "premis", "fixity", "algorithms");
-
     if (algorithms == null || algorithms.isEmpty()) {
       algorithms = RodaConstants.DEFAULT_ALGORITHMS;
     }

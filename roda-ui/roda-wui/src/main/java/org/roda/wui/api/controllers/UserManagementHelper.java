@@ -9,13 +9,18 @@ package org.roda.wui.api.controllers;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.LdapUtilityException;
+import org.roda.core.common.UserUtility;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
@@ -33,11 +38,14 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.notifications.Notification.NOTIFICATION_STATE;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.MetadataValue;
 import org.roda.wui.client.browse.UserExtraBundle;
+import org.roda.wui.common.server.ServerTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,11 +98,31 @@ public class UserManagementHelper {
     return RodaCoreFactory.getModelService().listGroups();
   }
 
-  public static User registerUser(User user, String password, UserExtraBundle extra)
+  public static User registerUser(User user, String password, UserExtraBundle extra, String servletPath)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException {
     user.setExtra(getUserExtra(user, extra));
+    user = UserUtility.resetGroupsAndRoles(user);
+    // if user is not active, send notification
+    
+
     User registeredUser = RodaCoreFactory.getModelService().registerUser(user, password, true);
     RodaCoreFactory.getIndexService().commit(RODAMember.class);
+    
+    
+    if (!user.isActive()) {
+      try {
+        boolean generateNewToken = false;
+        Notification notification = UserManagement.sendEmailVerification(servletPath, user.getName(), generateNewToken);
+        if (notification.getState() == NOTIFICATION_STATE.FAILED) {
+          registeredUser.setActive(true);
+          boolean notify = true;
+          RodaCoreFactory.getModelService().updateUser(registeredUser, password, notify);
+        }
+      } catch (NotFoundException | AlreadyExistsException | AuthorizationDeniedException e) {
+        LOGGER.error("Error updating user: "+e.getMessage(),e);
+        throw new GenericException(e);
+      }
+    }
     return registeredUser;
   }
 
@@ -195,4 +223,77 @@ public class UserManagementHelper {
     return RodaCoreFactory.getModelService().resetUserPassword(username, password, resetPasswordToken, true, true);
   }
 
+  public static UserExtraBundle retrieveUserExtraBundle(String name) {
+    if (!RodaConstants.SYSTEM_USERS.contains(name)) {
+      String template = null;
+
+      InputStream templateStream = RodaCoreFactory
+        .getConfigurationFileAsStream(RodaConstants.USERS_TEMPLATE_FOLDER + "/user_extra.xml.hbs");
+      try {
+        template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
+      } catch (IOException e1) {
+        LOGGER.error("Error getting template from stream");
+      }
+
+      Set<MetadataValue> values = new HashSet<>();
+      if (template != null) {
+        values = ServerTools.transform(template);
+      }
+
+      try {
+        User user = UserUtility.getLdapUtility().getUser(name);
+        String userExtra = user.getExtra();
+
+        if (values != null && userExtra != null) {
+          for (MetadataValue mv : values) {
+            // clear the auto-generated values
+            // mv.set("value", null);
+            String xpathRaw = mv.get("xpath");
+            if (xpathRaw != null && xpathRaw.length() > 0) {
+              String[] xpaths = xpathRaw.split("##%##");
+              String value;
+              List<String> allValues = new ArrayList<>();
+              for (String xpath : xpaths) {
+                allValues.addAll(ServerTools.applyXpath(userExtra, xpath));
+              }
+              // if any of the values is different, concatenate all values in a
+              // string, otherwise return the value
+              boolean allEqual = allValues.stream().allMatch(s -> s.trim().equals(allValues.get(0).trim()));
+              if (allEqual && !allValues.isEmpty()) {
+                value = allValues.get(0);
+              } else {
+                value = String.join(" / ", allValues);
+              }
+              mv.set("value", value.trim());
+            }
+          }
+        }
+
+      } catch (LdapUtilityException e) {
+        // do nothing
+      }
+
+      return new UserExtraBundle(name, values);
+    } else {
+      return new UserExtraBundle(name, new HashSet<>());
+    }
+  }
+
+  public static UserExtraBundle retrieveDefaultExtraBundle() {
+    String template = null;
+
+    InputStream templateStream = RodaCoreFactory
+      .getConfigurationFileAsStream(RodaConstants.USERS_TEMPLATE_FOLDER + "/user_extra.xml.hbs");
+    try {
+      template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
+    } catch (IOException e1) {
+      LOGGER.error("Error getting template from stream");
+    }
+
+    Set<MetadataValue> values = new HashSet<>();
+    if (template != null) {
+      values = ServerTools.transform(template);
+    }
+    return new UserExtraBundle("", values);
+  }
 }

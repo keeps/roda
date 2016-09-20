@@ -122,10 +122,12 @@ public class UserUtility {
   }
 
   public static void checkRoles(final User rsu, final List<String> rolesToCheck) throws AuthorizationDeniedException {
-    if (!rsu.getAllRoles().containsAll(rolesToCheck)) {
-      LOGGER.debug("User '{}' roles: {} vs. roles to check: {}", rsu.getId(), rsu.getAllRoles(), rolesToCheck);
-      throw new AuthorizationDeniedException(
-        "The user '" + rsu.getId() + "' does not have all needed permissions: " + rolesToCheck);
+    if(rolesToCheck.size()>0){
+      if (!rsu.getAllRoles().containsAll(rolesToCheck)) {
+        LOGGER.debug("User '{}' roles: {} vs. roles to check: {}", rsu.getId(), rsu.getAllRoles(), rolesToCheck);
+        throw new AuthorizationDeniedException(
+          "The user '" + rsu.getId() + "' does not have all needed permissions: " + rolesToCheck);
+      }
     }
   }
 
@@ -152,8 +154,13 @@ public class UserUtility {
     final String classParam = (classToReturn == null) ? "" : "(" + classToReturn.getSimpleName() + ")";
     final String configKey = String.format("core.roles.%s.%s%s", method.getDeclaringClass().getName(), method.getName(),
       classParam);
-    final List<String> roles = RodaCoreFactory.getRodaConfigurationAsList(configKey);
-    checkRoles(user, roles);
+    if(RodaCoreFactory.getRodaConfiguration().containsKey(configKey)){
+      final List<String> roles = RodaCoreFactory.getRodaConfigurationAsList(configKey);
+      checkRoles(user, roles);
+    }else{
+      LOGGER.error("User "+user.getName() +" doesn not have permission key "+configKey);
+      throw new AuthorizationDeniedException("Unknown role status: "+configKey);
+    }
   }
 
   public static void setUser(HttpServletRequest request, User rsu) {

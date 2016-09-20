@@ -32,6 +32,7 @@ import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
+import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.controllers.UserManagement;
 import org.roda.wui.client.browse.UserExtraBundle;
 import org.roda.wui.client.management.UserManagementService;
@@ -91,7 +92,8 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
       RecaptchaUtils
         .recaptchaVerify(RodaCoreFactory.getRodaConfiguration().getString(RECAPTCHA_CODE_SECRET_PROPERTY, ""), captcha);
     }
-    return UserManagement.registerUser(user, password, extra);
+    String servletPath = retrieveServletUrl(getThreadLocalRequest());
+    return UserManagement.registerUser(user, password, extra, servletPath);
   }
 
   @Override
@@ -160,13 +162,14 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
     User user = UserUtility.getUser(getThreadLocalRequest());
     return UserManagement.retrieveLogEntry(user, logEntryId);
   }
-
+  
   @Override
   public Notification sendEmailVerification(final String username, final boolean generateNewToken)
-    throws GenericException, NotFoundException {
-    final String servletPath = retrieveServletUrl(getThreadLocalRequest());
-    return UserManagement.sendEmailVerification(servletPath, username, generateNewToken);
-  }
+     throws GenericException, NotFoundException {
+     final String servletPath = retrieveServletUrl(getThreadLocalRequest());
+     return UserManagement.sendEmailVerification(servletPath, username, generateNewToken);
+   }
+
 
   @Override
   public void confirmUserEmail(String username, String emailConfirmationToken)
@@ -223,6 +226,20 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
     }
 
     return url;
+  }
+
+  
+  @Override
+  public UserExtraBundle retrieveUserExtraBundle(String name)
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return UserManagement.retrieveUserExtraBundle(user, name);
+  }
+  
+  @Override
+  public UserExtraBundle retrieveDefaultExtraBundle() throws AuthorizationDeniedException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return UserManagement.retrieveUserExtraBundle(user);
   }
 
 }

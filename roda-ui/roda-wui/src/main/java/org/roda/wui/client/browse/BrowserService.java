@@ -293,7 +293,4 @@ public interface BrowserService extends RemoteService {
 
   void showLogs() throws AuthorizationDeniedException;
 
-  UserExtraBundle retrieveUserExtraBundle(String name)
-    throws AuthorizationDeniedException, GenericException, NotFoundException;
-
 }

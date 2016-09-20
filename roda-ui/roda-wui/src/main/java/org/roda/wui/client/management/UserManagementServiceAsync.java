@@ -244,4 +244,8 @@ public interface UserManagementServiceAsync {
   public void resetUserPassword(String username, String password, String resetPasswordToken,
     AsyncCallback<Void> callback);
 
+  void retrieveDefaultExtraBundle(AsyncCallback<UserExtraBundle> asyncCallback);
+
+  void retrieveUserExtraBundle(String name, AsyncCallback<UserExtraBundle> asyncCallback);
+
 }

@@ -36,6 +36,7 @@ import org.roda.wui.client.browse.UserExtraBundle;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
@@ -292,5 +293,15 @@ public interface UserManagementService extends RemoteService {
    */
   public void resetUserPassword(String username, String password, String resetPasswordToken)
     throws InvalidTokenException, IllegalOperationException, NotFoundException, GenericException;
+  
+  /**
+   * Retrieve the default extra bundle
+   *
+   * @throws AuthorizationDeniedException
+   */
+  public UserExtraBundle retrieveDefaultExtraBundle() throws AuthorizationDeniedException;
+  
+  public UserExtraBundle retrieveUserExtraBundle(String name) throws AuthorizationDeniedException, GenericException, NotFoundException;
+
 
 }

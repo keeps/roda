@@ -15,10 +15,9 @@ import java.util.List;
 
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
-import org.roda.core.data.v2.notifications.Notification;
-import org.roda.core.data.v2.notifications.Notification.NOTIFICATION_STATE;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.browse.UserExtraBundle;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.main.Login;
@@ -53,8 +52,7 @@ public class Register extends Composite {
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 0) {
-        User user = new User();
-        Register register = new Register(user);
+        Register register = new Register();
         callback.onSuccess(register);
       } else {
         Tools.newHistory(this);
@@ -97,8 +95,6 @@ public class Register extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  private User user;
-
   private boolean recaptchaActive = true;
 
   private RecaptchaWidget recaptchaWidget;
@@ -120,11 +116,22 @@ public class Register extends Composite {
    * @param user
    *          the user to edit
    */
-  public Register(User user) {
-    this.user = user;
+  public Register() {
 
     this.userDataPanel = new UserDataPanel(true, false, false, false);
-    this.userDataPanel.setUser(user);
+
+    UserManagementService.Util.getInstance().retrieveDefaultExtraBundle(new AsyncCallback<UserExtraBundle>() {
+      @Override
+      public void onFailure(Throwable caught) {
+        GWT.log(caught.getMessage());
+        errorMessage(caught);
+      }
+
+      @Override
+      public void onSuccess(UserExtraBundle result) {
+        setExtra(result);
+      }
+    });
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -147,6 +154,10 @@ public class Register extends Composite {
     });
   }
 
+  void setExtra(UserExtraBundle b) {
+    this.userDataPanel.setExtraBundle(b);
+  }
+
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
     if (userDataPanel.isValid()) {
@@ -155,7 +166,7 @@ public class Register extends Composite {
         recaptchaResponse = recaptchaWidget.getResponse();
       }
 
-      user = userDataPanel.getUser();
+      User user = userDataPanel.getUser();
       user.setActive(false);
 
       final String password = userDataPanel.getPassword();
@@ -166,6 +177,7 @@ public class Register extends Composite {
 
           @Override
           public void onFailure(Throwable caught) {
+            GWT.log("ERROR: "+caught.getMessage());
             errorMessage(caught);
           }
 
@@ -187,58 +199,18 @@ public class Register extends Composite {
                   }
                 });
             } else {
-              UserManagementService.Util.getInstance().sendEmailVerification(registeredUser.getId(), false,
-                new AsyncCallback<Notification>() {
+              Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
+                messages.registerSuccessDialogMessage(), messages.registerSuccessDialogButton(),
+                new AsyncCallback<Void>() {
 
                   @Override
-                  public void onSuccess(Notification result) {
-                    if (result.getState() == NOTIFICATION_STATE.COMPLETED) {
-                      Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
-                        messages.registerSuccessDialogMessage(), messages.registerSuccessDialogButton(),
-                        new AsyncCallback<Void>() {
-
-                          @Override
-                          public void onSuccess(Void result) {
-                            Tools.newHistory(Login.RESOLVER);
-                          }
-
-                          @Override
-                          public void onFailure(Throwable caught) {
-                            Tools.newHistory(Login.RESOLVER);
-                          }
-                        });
-                    } else {
-                      registeredUser.setActive(true);
-                      UserManagementService.Util.getInstance().updateUser(registeredUser, password,
-                        userDataPanel.getExtra(), new AsyncCallback<Void>() {
-                          @Override
-                          public void onFailure(Throwable caught) {
-                            errorMessage(caught);
-                          }
-
-                          @Override
-                          public void onSuccess(Void result) {
-                            Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
-                              messages.registerSuccessDialogMessageActive(),
-                              messages.registerSuccessDialogButton(), new AsyncCallback<Void>() {
-                                @Override
-                                public void onSuccess(Void result) {
-                                  Tools.newHistory(Login.RESOLVER);
-                                }
-
-                                @Override
-                                public void onFailure(Throwable caught) {
-                                  Tools.newHistory(Login.RESOLVER);
-                                }
-                              });
-                          }
-                        });
-                    }
+                  public void onSuccess(Void result) {
+                    Tools.newHistory(Login.RESOLVER);
                   }
 
                   @Override
                   public void onFailure(Throwable caught) {
-                    sendEmailVerificationFailure(caught);
+                    Tools.newHistory(Login.RESOLVER);
                   }
                 });
             }

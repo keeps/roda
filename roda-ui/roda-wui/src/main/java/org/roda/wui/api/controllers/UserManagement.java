@@ -194,12 +194,12 @@ public class UserManagement extends RodaWuiController {
     return ret;
   }
 
-  public static User registerUser(User user, String password, UserExtraBundle extra)
+  public static User registerUser(User user, String password, UserExtraBundle extra, String servletPath)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // delegate
-    User ret = UserManagementHelper.registerUser(user, password, extra);
+    User ret = UserManagementHelper.registerUser(user, password, extra, servletPath);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "user", user);
@@ -318,7 +318,6 @@ public class UserManagement extends RodaWuiController {
   public static Notification sendEmailVerification(final String servletPath, final String username,
     final boolean generateNewToken) throws GenericException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
     User user = UserManagementHelper.retrieveUser(username);
 
     if (generateNewToken) {
@@ -457,6 +456,37 @@ public class UserManagement extends RodaWuiController {
     } catch (Exception e) {
       throw new GenericException("Problem sending email");
     }
+  }
+
+  public static UserExtraBundle retrieveUserExtraBundle(User user, String name)
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    UserExtraBundle extraBudle = UserManagementHelper.retrieveUserExtraBundle(name);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "name", name);
+
+    return extraBudle;
+  }
+
+  public static UserExtraBundle retrieveUserExtraBundle(User user) throws AuthorizationDeniedException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check permissions
+    controllerAssistant.checkRoles(user);
+    
+    // delegate
+    UserExtraBundle extraBudle = UserManagementHelper.retrieveDefaultExtraBundle();
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
+
+    return extraBudle;
   }
 
 }

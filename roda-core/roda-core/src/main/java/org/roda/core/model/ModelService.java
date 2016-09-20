@@ -1338,7 +1338,6 @@ public class ModelService extends ModelObservable {
   public User registerUser(User user, String password, boolean notify)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException {
     try {
-      user = UserUtility.resetGroupsAndRoles(user);
       User registeredUser = UserUtility.getLdapUtility().registerUser(user, password);
       if (notify) {
         notifyUserCreated(registeredUser);

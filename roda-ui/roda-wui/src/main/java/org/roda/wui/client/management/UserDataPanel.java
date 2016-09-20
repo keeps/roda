@@ -17,7 +17,6 @@ import java.util.Set;
 
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.FormUtilities;
 import org.roda.wui.client.browse.UserExtraBundle;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -272,19 +271,25 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     this.setMemberGroups(user.getGroups());
     this.setPermissions(user.getDirectRoles(), user.getAllRoles());
 
-    BrowserService.Util.getInstance().retrieveUserExtraBundle(user.getName(), new AsyncCallback<UserExtraBundle>() {
+    UserManagementService.Util.getInstance().retrieveUserExtraBundle(user.getName(),
+      new AsyncCallback<UserExtraBundle>() {
 
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-      }
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
 
-      @Override
-      public void onSuccess(UserExtraBundle userExtra) {
-        UserDataPanel.this.userExtraBundle = userExtra;
-        createForm(userExtra);
-      }
-    });
+        @Override
+        public void onSuccess(UserExtraBundle userExtra) {
+          UserDataPanel.this.userExtraBundle = userExtra;
+          createForm(userExtra);
+        }
+      });
+  }
+  
+  public void setExtraBundle(UserExtraBundle bundle){
+    UserDataPanel.this.userExtraBundle = bundle;
+    createForm(bundle);
   }
 
   private void setPermissions(final Set<String> directRoles, final Set<String> allRoles) {
@@ -337,7 +342,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     return user;
   }
 
-  private void createForm(UserExtraBundle bundle) {
+  public void createForm(UserExtraBundle bundle) {
     extra.clear();
     FormUtilities.create(extra, bundle.getValues(), false);
 

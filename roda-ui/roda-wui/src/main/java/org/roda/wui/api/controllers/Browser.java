@@ -2007,21 +2007,4 @@ public class Browser extends RodaWuiController {
       return reportList.getReports().get(0);
     }
   }
-
-  public static UserExtraBundle retrieveUserExtraBundle(User user, String name)
-    throws AuthorizationDeniedException, GenericException, NotFoundException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check permissions
-    controllerAssistant.checkRoles(user);
-
-    // delegate
-    UserExtraBundle extraBudle = BrowserHelper.retrieveUserExtraBundle(name);
-
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "name", name);
-
-    return extraBudle;
-  }
-
 }

@@ -805,12 +805,4 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     User user = UserUtility.getUser(getThreadLocalRequest());
     Browser.showLogs(user);
   }
-
-  @Override
-  public UserExtraBundle retrieveUserExtraBundle(String name)
-    throws AuthorizationDeniedException, GenericException, NotFoundException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.retrieveUserExtraBundle(user, name);
-  }
-
 }
