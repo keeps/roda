@@ -27,14 +27,14 @@
 				<g:FlowPanel addStyleNames="form-listbox" ui:field="workflowCategoryList" />
 
 				<g:FlowPanel addStyleNames="col_4 col_padding">
-					<g:Label addStyleNames="form-label">
+					<g:Label addStyleNames="form-label h4">
 						<ui:text from='{messages.createJobWorkflow}' />
 					</g:Label>
 					<g:ListBox addStyleNames="form-listbox listbox_col"
 						ui:field="workflowList" />
 				</g:FlowPanel>
 				<g:FlowPanel addStyleNames="col_7 col_padding">
-					<g:Label addStyleNames="form-label" ui:field="workflowListTitle" />
+					<g:Label addStyleNames="form-label h4" ui:field="workflowListTitle" />
 					<g:Label addStyleNames="p plugin-description" ui:field="workflowListDescription" />
 					<g:Label addStyleNames="p plugin-description" ui:field="workflowListDescriptionCategories" />
 
@@ -46,7 +46,7 @@
 
 
 				<g:FlowPanel addStyleNames="col_10 col_padding">
-					<g:Label addStyleNames="form-label" ui:field="selectedObject">
+					<g:Label addStyleNames="form-label h4" ui:field="selectedObject">
 						<ui:text from='{messages.createJobSelectObject}' />
 					</g:Label>
 					<g:ListBox addStyleNames="form-listbox" ui:field="targetList" />

@@ -271,6 +271,7 @@ public class CreateActionJob extends Composite {
                       }
                     }
 
+                    workflowList.setSelectedIndex(0);
                     String selectedPluginId = workflowList.getSelectedValue();
                     if (selectedPluginId != null) {
                       CreateActionJob.this.selectedPlugin = lookupPlugin(selectedPluginId);
@@ -322,9 +323,9 @@ public class CreateActionJob extends Composite {
       if (description != null && description.length() > 0) {
         workflowListDescription.setText(description);
 
-        String categories = messages.pluginCategories() + ": ";
+        String categories = messages.createJobCategoryWorkflow() + ": ";
         for (String category : selectedPlugin.getCategories()) {
-          categories += category + ", ";
+          categories += messages.showPluginCategories(category) + ", ";
         }
 
         workflowListDescriptionCategories.setText(categories.substring(0, categories.length() - 2));
@@ -346,6 +347,7 @@ public class CreateActionJob extends Composite {
       rodaMap = getPluginNames(selectedPlugin.getObjectClasses());
       for (Entry<String, String> objectClass : rodaMap.entrySet()) {
         targetList.addItem(messages.allOfAObject(objectClass.getKey()), objectClass.getKey());
+        buttonSelect.setVisible(!(objectClass.getKey().equals(org.roda.core.data.v2.Void.class.getName())));
       }
 
       targetList.addChangeHandler(new ChangeHandler() {

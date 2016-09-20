@@ -512,8 +512,6 @@ public interface ClientMessages extends Messages {
 
   String processNewMissingMandatoryInfoDialogMessage(List<String> missingPluginNames);
 
-  String pluginCategories();
-
   String showPluginCategories(@Select String category);
 
   /************* Ingest process show ****************/
