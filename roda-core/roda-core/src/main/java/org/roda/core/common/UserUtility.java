@@ -122,7 +122,7 @@ public class UserUtility {
   }
 
   public static void checkRoles(final User rsu, final List<String> rolesToCheck) throws AuthorizationDeniedException {
-    if(rolesToCheck.size()>0){
+    if (!rolesToCheck.isEmpty()) {
       if (!rsu.getAllRoles().containsAll(rolesToCheck)) {
         LOGGER.debug("User '{}' roles: {} vs. roles to check: {}", rsu.getId(), rsu.getAllRoles(), rolesToCheck);
         throw new AuthorizationDeniedException(
@@ -154,12 +154,14 @@ public class UserUtility {
     final String classParam = (classToReturn == null) ? "" : "(" + classToReturn.getSimpleName() + ")";
     final String configKey = String.format("core.roles.%s.%s%s", method.getDeclaringClass().getName(), method.getName(),
       classParam);
-    if(RodaCoreFactory.getRodaConfiguration().containsKey(configKey)){
+    if (RodaCoreFactory.getRodaConfiguration().containsKey(configKey)) {
       final List<String> roles = RodaCoreFactory.getRodaConfigurationAsList(configKey);
       checkRoles(user, roles);
-    }else{
-      LOGGER.error("User "+user.getName() +" doesn not have permission key "+configKey);
-      throw new AuthorizationDeniedException("Unknown role status: "+configKey);
+    } else {
+      LOGGER.error("Unable to determine which roles the user '{}' needs because the config. key '{}' is not defined",
+        user.getName(), configKey);
+      throw new AuthorizationDeniedException(
+        "Unable to determine which roles the user needs because the config. key '" + configKey + "' is not defined");
     }
   }
 

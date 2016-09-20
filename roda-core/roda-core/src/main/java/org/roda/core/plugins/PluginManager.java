@@ -17,6 +17,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -136,7 +137,7 @@ public class PluginManager {
     List<PluginInfo> pluginsInfo = new ArrayList<PluginInfo>();
 
     for (PluginType pluginType : pluginTypes) {
-      pluginsInfo.addAll(pluginInfoPerType.getOrDefault(pluginType, new ArrayList<>()));
+      pluginsInfo.addAll(pluginInfoPerType.getOrDefault(pluginType, Collections.emptyList()));
     }
 
     return pluginsInfo;
@@ -450,16 +451,15 @@ public class PluginManager {
     } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException
       | RuntimeException e) {
 
-      LOGGER.error(jarFile.getFileName() + " error loading plugin - " + e.getMessage(), e);
+      LOGGER.error("Error loading plugin from {}", jarFile.getFileName(), e);
 
     } finally {
 
       if (jar != null) {
-
         try {
           jar.close();
         } catch (IOException e) {
-          LOGGER.debug("Error closing jar - " + e.getMessage(), e);
+          LOGGER.debug("Error closing jar {}", jarFile.getFileName(), e);
         }
       }
     }

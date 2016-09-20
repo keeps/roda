@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,6 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -115,9 +115,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
-
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
@@ -165,7 +162,6 @@ public class RodaCoreFactory {
   private static AkkaDistributedPluginOrchestrator akkaDistributedPluginOrchestrator;
   private static AkkaDistributedPluginWorker akkaDistributedPluginWorker;
   private static boolean FEATURE_DISTRIBUTED_AKKA = false;
-  private static Config akkaConfig;
 
   private static LdapUtility ldapUtility;
   private static Path rodaApacheDSDataDirectory = null;
@@ -262,15 +258,19 @@ public class RodaCoreFactory {
         instantiateSolrAndIndexService();
         LOGGER.debug("Finished instantiating solr & index");
 
-        // instantiate plugin manager
-        instantiatePluginManager();
-        LOGGER.debug("Finished instantiating plugin manager");
-
         instantiateNodeSpecificObjects(nodeType);
         LOGGER.debug("Finished instantiating node specific objects");
 
         instantiateDefaultObjects();
         LOGGER.debug("Finished instantiating default objects");
+
+        // instantiate plugin manager
+        // 20160920 hsilva: this must be the last thing to be instantiated as
+        // problems may araise when instantiating objects at the same time the
+        // plugin manager is loading both internal & external plugins (it looks
+        // like Reflections is the blame)
+        instantiatePluginManager();
+        LOGGER.debug("Finished instantiating plugin manager");
 
         instantiated = true;
 
@@ -498,7 +498,7 @@ public class RodaCoreFactory {
           e.getMessage());
         instantiatedWithoutErrors = false;
       } finally {
-        IOUtils.closeQuietly(originStream);
+        RodaUtils.closeQuietly(originStream);
       }
     }
   }
@@ -653,10 +653,6 @@ public class RodaCoreFactory {
   }
 
   private static void instantiateNodeSpecificObjects(NodeType nodeType) {
-    // FIXME 20160531 hsilva: this should be moved to somewhere closely to
-    // Akka instantiation code
-    loadAkkaConfiguration();
-
     if (nodeType == NodeType.MASTER) {
       instantiateMasterNodeSpecificObjects();
     } else if (nodeType == NodeType.WORKER) {
@@ -667,25 +663,6 @@ public class RodaCoreFactory {
       LOGGER.error("Unknown node type '{}'", nodeType);
       instantiatedWithoutErrors = false;
     }
-  }
-
-  private static void loadAkkaConfiguration() {
-    InputStream originStream = RodaCoreFactory.class.getClassLoader().getResourceAsStream(
-      RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_ORCHESTRATOR_FOLDER + "/application.conf");
-
-    try {
-      String configAsString = IOUtils.toString(originStream, Charset.forName(RodaConstants.DEFAULT_ENCODING));
-      akkaConfig = ConfigFactory.parseString(configAsString);
-    } catch (IOException e) {
-      LOGGER.error("Could not load Akka configuration", e);
-    } finally {
-      IOUtils.closeQuietly(originStream);
-    }
-
-  }
-
-  public static Config getAkkaConfiguration() {
-    return akkaConfig;
   }
 
   private static void instantiateMasterNodeSpecificObjects() {
@@ -810,7 +787,7 @@ public class RodaCoreFactory {
           final InputStream ldifInputStream = RodaCoreFactory
             .getConfigurationFileAsStream(RodaConstants.CORE_LDAP_FOLDER + "/" + ldifFileName);
           ldifs.add(IOUtils.toString(ldifInputStream, RodaConstants.DEFAULT_ENCODING));
-          IOUtils.closeQuietly(ldifInputStream);
+          RodaUtils.closeQuietly(ldifInputStream);
         }
 
         RodaCoreFactory.ldapUtility.initDirectoryService(ldifs);
@@ -853,7 +830,7 @@ public class RodaCoreFactory {
     }
     for (final String role : roles) {
       try {
-        if (!role.trim().equalsIgnoreCase("")) {
+        if (StringUtils.isNotBlank(role)) {
           RodaCoreFactory.ldapUtility.addRole(role);
           LOGGER.info("Created LDAP role {}", role);
         }
@@ -1131,7 +1108,7 @@ public class RodaCoreFactory {
             } catch (SAXException e) {
               LOGGER.error("Error while loading XML Schema", e);
             } finally {
-              IOUtils.closeQuietly(schemaStream);
+              RodaUtils.closeQuietly(schemaStream);
             }
           }
         }
@@ -1166,14 +1143,7 @@ public class RodaCoreFactory {
 
   public static List<String> getRodaConfigurationAsList(String... keyParts) {
     String[] array = rodaConfiguration.getStringArray(getConfigurationKey(keyParts));
-    List<String> res = Arrays.asList(array);
-    List<String> clean = new ArrayList<String>();
-    for(String s : res){
-      if(s!=null && !s.trim().equalsIgnoreCase("")){
-        clean.add(s);
-      }
-    }
-    return clean;
+    return Arrays.asList(array).stream().filter(v -> StringUtils.isNotBlank(v)).collect(Collectors.toList());
   }
 
   public static int getRodaConfigurationAsInt(String... keyParts) {

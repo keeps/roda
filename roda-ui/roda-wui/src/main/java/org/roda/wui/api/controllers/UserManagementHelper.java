@@ -9,7 +9,6 @@ package org.roda.wui.api.controllers;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -101,12 +100,11 @@ public class UserManagementHelper {
   public static User registerUser(User user, String password, UserExtraBundle extra, String servletPath)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException {
     user.setExtra(getUserExtra(user, extra));
-    user = UserUtility.resetGroupsAndRoles(user);    
+    user = UserUtility.resetGroupsAndRoles(user);
 
     User registeredUser = RodaCoreFactory.getModelService().registerUser(user, password, true);
     RodaCoreFactory.getIndexService().commit(RODAMember.class);
-    
-    
+
     if (!user.isActive()) {
       try {
         boolean generateNewToken = false;
@@ -117,7 +115,7 @@ public class UserManagementHelper {
           RodaCoreFactory.getModelService().updateUser(registeredUser, password, notify);
         }
       } catch (NotFoundException | AlreadyExistsException | AuthorizationDeniedException e) {
-        LOGGER.error("Error updating user: "+e.getMessage(),e);
+        LOGGER.error("Error updating user", e);
         throw new GenericException(e);
       }
     }
@@ -240,9 +238,9 @@ public class UserManagementHelper {
       InputStream templateStream = RodaCoreFactory
         .getConfigurationFileAsStream(RodaConstants.USERS_TEMPLATE_FOLDER + "/user_extra.xml.hbs");
       try {
-        template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
-      } catch (IOException e1) {
-        LOGGER.error("Error getting template from stream");
+        template = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
+      } catch (IOException e) {
+        LOGGER.error("Error getting template from stream", e);
       }
 
       Set<MetadataValue> values = new HashSet<>();
@@ -295,9 +293,9 @@ public class UserManagementHelper {
     InputStream templateStream = RodaCoreFactory
       .getConfigurationFileAsStream(RodaConstants.USERS_TEMPLATE_FOLDER + "/user_extra.xml.hbs");
     try {
-      template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
-    } catch (IOException e1) {
-      LOGGER.error("Error getting template from stream");
+      template = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
+    } catch (IOException e) {
+      LOGGER.error("Error getting template from stream", e);
     }
 
     Set<MetadataValue> values = new HashSet<>();

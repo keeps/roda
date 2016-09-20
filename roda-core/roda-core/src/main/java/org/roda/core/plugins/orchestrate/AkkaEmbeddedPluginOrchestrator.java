@@ -7,6 +7,8 @@
  */
 package org.roda.core.plugins.orchestrate;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,6 +19,7 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.RodaUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
@@ -53,6 +56,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
@@ -94,12 +98,30 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     runningJobs = new HashMap<>();
 
-    Config akkaConfig = RodaCoreFactory.getAkkaConfiguration();
+    Config akkaConfig = getAkkaConfiguration();
     workersSystem = ActorSystem.create("WorkersSystem", akkaConfig);
 
     Props jobsProps = new RoundRobinPool(maxNumberOfJobsInParallel).props(Props.create(AkkaJobActor.class));
     jobWorkersRouter = workersSystem.actorOf(jobsProps, "JobWorkersRouter");
 
+  }
+
+  private Config getAkkaConfiguration() {
+    InputStream originStream = RodaCoreFactory
+      .getConfigurationFileAsStream(RodaConstants.CORE_ORCHESTRATOR_FOLDER + "/application.conf");
+
+    Config akkaConfig = null;
+
+    try {
+      String configAsString = IOUtils.toString(originStream, RodaConstants.DEFAULT_ENCODING);
+      akkaConfig = ConfigFactory.parseString(configAsString);
+    } catch (IOException e) {
+      LOGGER.error("Could not load Akka configuration", e);
+    } finally {
+      RodaUtils.closeQuietly(originStream);
+    }
+
+    return akkaConfig;
   }
 
   @Override

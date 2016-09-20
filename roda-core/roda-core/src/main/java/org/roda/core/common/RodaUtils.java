@@ -78,6 +78,53 @@ public class RodaUtils {
   }
 
   /**
+   * Closes an input stream quietly (i.e. no exception is thrown) while
+   * inspecting its class. The inspection is done to avoid closing streams
+   * associates with jar files that may cause later errors like
+   * 
+   * <pre>
+   * Caused by: java.io.IOException: Stream closed
+   * </pre>
+   * 
+   * So, all streams whose class name does not start with
+   * <code>sun.net.www.protocol.jar.JarURLConnection</code> will be closed
+   * 
+   * @since 2016-09-20
+   */
+  public static void closeQuietly(InputStream inputstream) {
+    try {
+      close(inputstream);
+    } catch (IOException e) {
+      // do nothing as we should be quiet
+    }
+  }
+
+  /**
+   * Closes an input stream while inspecting its class. The inspection is done
+   * to avoid closing streams associates with jar files that may cause later
+   * errors like
+   * 
+   * <pre>
+   * Caused by: java.io.IOException: Stream closed
+   * </pre>
+   * 
+   * So, all streams whose class name does not start with
+   * <code>sun.net.www.protocol.jar.JarURLConnection</code> will be closed
+   * 
+   * @throws IOException
+   * 
+   * @since 2016-09-20
+   */
+  public static void close(InputStream inputstream) throws IOException {
+    if (inputstream != null) {
+      String inputstreamClassName = inputstream.getClass().getName();
+      if (!inputstreamClassName.startsWith("sun.net.www.protocol.jar.JarURLConnection")) {
+        inputstream.close();
+      }
+    }
+  }
+
+  /**
    * @deprecated 20160907 hsilva: not seeing any method using it, so it will be
    *             removed soon
    */
