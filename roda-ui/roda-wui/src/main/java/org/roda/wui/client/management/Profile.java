@@ -131,6 +131,7 @@ public class Profile extends Composite {
             }
 
             public void onSuccess(Void result) {
+              UserLogin.getInstance().updateLoggedUser(user);
               Tools.newHistory(Welcome.RESOLVER);
             }
           });

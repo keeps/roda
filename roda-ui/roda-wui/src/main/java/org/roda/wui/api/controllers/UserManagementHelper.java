@@ -143,9 +143,21 @@ public class UserManagementHelper {
   public static User updateMyUser(User user, String password, UserExtraBundle extra)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     user.setExtra(getUserExtra(user, extra));
+    
+    User currentUser = RodaCoreFactory.getModelService().retrieveUserByName(user.getName());
+    user = resetUser(user,currentUser);
+    
     User modifiedUser = RodaCoreFactory.getModelService().updateMyUser(user, password, true);
     RodaCoreFactory.getIndexService().commit(RODAMember.class);
     return modifiedUser;
+  }
+
+  private static User resetUser(User newUser, User oldUser) {
+    newUser.setActive(oldUser.isActive());
+    newUser.setDirectRoles(oldUser.getDirectRoles());
+    newUser.setAllRoles(oldUser.getAllRoles());
+    newUser.setGroups(oldUser.getGroups());
+    return newUser;
   }
 
   private static String getUserExtra(User user, UserExtraBundle extra) throws GenericException {

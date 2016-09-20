@@ -382,4 +382,7 @@ public class UserLogin {
       });
   }
 
+  public void updateLoggedUser(User u) {
+    getUserRequest.setCached(u);
+  }
 }
