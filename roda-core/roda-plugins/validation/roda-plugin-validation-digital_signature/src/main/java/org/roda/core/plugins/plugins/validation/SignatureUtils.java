@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.common.certification;
+package org.roda.core.plugins.plugins.validation;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;

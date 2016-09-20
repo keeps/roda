@@ -11,7 +11,6 @@
 package org.roda.wui.client.process;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -122,7 +121,7 @@ public class CreateActionJob extends Composite {
   private PluginInfo selectedPlugin = null;
   private Map<String, String> rodaMap;
 
-  private static PluginType[] pluginTypes = {PluginType.AIP_TO_AIP, PluginType.MISC, PluginType.AIP_TO_SIP};
+  private static List<PluginType> pluginTypes = PluginUtils.getPluginTypesWithoutIngest();
 
   @UiField
   TextBox name;
@@ -169,19 +168,18 @@ public class CreateActionJob extends Composite {
   public CreateActionJob() {
     initWidget(uiBinder.createAndBindUi(this));
 
-    BrowserService.Util.getInstance().retrievePluginsInfo(Arrays.asList(pluginTypes),
-      new AsyncCallback<List<PluginInfo>>() {
+    BrowserService.Util.getInstance().retrievePluginsInfo(pluginTypes, new AsyncCallback<List<PluginInfo>>() {
 
-        @Override
-        public void onFailure(Throwable caught) {
-          // do nothing
-        }
+      @Override
+      public void onFailure(Throwable caught) {
+        // do nothing
+      }
 
-        @Override
-        public void onSuccess(List<PluginInfo> pluginsInfo) {
-          init(pluginsInfo);
-        }
-      });
+      @Override
+      public void onSuccess(List<PluginInfo> pluginsInfo) {
+        init(pluginsInfo);
+      }
+    });
   }
 
   public void init(List<PluginInfo> plugins) {
@@ -463,11 +461,19 @@ public class CreateActionJob extends Composite {
 
           try {
             selected = dialog.getList().getSelected();
-            Filter filter = new Filter(dialog.getList().getFilter());
+            Filter filter = new Filter();
 
             if (selected instanceof SelectedItemsList) {
               SelectedItemsList selectedList = (SelectedItemsList) selected;
-              filter.add(new OneOfManyFilterParameter("id", selectedList.getIds()));
+
+              if (Representation.class.getName().equals(targetList.getSelectedValue())
+                || File.class.getName().equals(targetList.getSelectedValue())) {
+                filter.add(new OneOfManyFilterParameter(RodaConstants.OBJECT_GENERIC_UUID, selectedList.getIds()));
+              } else {
+                filter.add(new OneOfManyFilterParameter(RodaConstants.OBJECT_GENERIC_ID, selectedList.getIds()));
+              }
+            } else {
+              filter = new Filter(dialog.getList().getFilter());
             }
 
             BasicAsyncTableCell list = listFactory.getList(targetList.getSelectedValue(), dialog.getTitle(), filter, 10,

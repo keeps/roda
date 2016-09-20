@@ -17,10 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.roda.common.certification.ODFSignatureUtils;
-import org.roda.common.certification.OOXMLSignatureUtils;
-import org.roda.common.certification.PDFSignatureUtils;
-import org.roda.common.certification.SignatureUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;

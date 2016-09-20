@@ -10,7 +10,6 @@
  */
 package org.roda.wui.client.process;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.adapter.filter.Filter;
@@ -38,6 +37,7 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.SimpleFileList;
+import org.roda.wui.client.common.utils.PluginUtils;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
@@ -59,16 +59,16 @@ public class CreateSearchActionJob extends CreateJob<IsIndexed> {
 
   @SuppressWarnings("unused")
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static PluginType[] pluginTypes = {PluginType.AIP_TO_AIP, PluginType.MISC, PluginType.AIP_TO_SIP};
+  private static List<PluginType> pluginTypes = PluginUtils.getPluginTypesWithoutIngest();
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   public CreateSearchActionJob() {
-    super(IsIndexed.class, Arrays.asList(pluginTypes));
+    super(IsIndexed.class, pluginTypes);
   }
 
   public CreateSearchActionJob(SelectedItems items) {
-    super(IsIndexed.class, Arrays.asList(pluginTypes), items);
+    super(IsIndexed.class, pluginTypes, items);
   }
 
   @Override

@@ -15,19 +15,50 @@
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						<manifest>
-							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-						</manifest>
-						<manifestEntries>
-							<RODA-Plugin>org.roda.core.plugins.plugins.validation.DigitalSignaturePlugin
-								org.roda.core.plugins.plugins.validation.DigitalSignatureDIPPlugin</RODA-Plugin>
-						</manifestEntries>
-					</archive>
-				</configuration>
+				<artifactId>maven-shade-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>uber-jar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<shadedArtifactAttached>true</shadedArtifactAttached>
+							<shadedClassifierName>jar-with-dependencies</shadedClassifierName>
+							<createDependencyReducedPom>false</createDependencyReducedPom>
+							<transformers>
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<manifestEntries>
+										<RODA-Plugin>org.roda.core.plugins.plugins.validation.DigitalSignaturePlugin org.roda.core.plugins.plugins.validation.DigitalSignatureDIPPlugin</RODA-Plugin>
+									</manifestEntries>
+								</transformer>
+							</transformers>
+							<relocations>
+								<relocation>
+				                  <pattern>org.bouncycastle</pattern>
+				                  <shadedPattern>org.bouncycastle_147</shadedPattern>
+				                </relocation>
+				                <relocation>
+				                  <pattern>com.itextpdf</pattern>
+				                  <shadedPattern>com.itextpdf_532</shadedPattern>
+				                </relocation>
+				            </relocations>
+							<filters>
+								<filter>
+									<artifact>*:*</artifact>
+									<excludes>
+										<exclude>META-INF/*.SF</exclude>
+										<exclude>META-INF/*.DSA</exclude>
+										<exclude>META-INF/*.RSA</exclude>
+										<exclude>META-INF/*.EC</exclude>
+									</excludes>
+								</filter>
+							</filters>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -45,19 +76,64 @@
 	</build>
 	<dependencies>
 		<dependency>
-			<!-- 20160811 hsilva: this dependencies and its dependencies must be shaded 
-				as they conflict with ApacheDS dependencies -->
-			<groupId>org.roda-project</groupId>
-			<artifactId>roda-common-certification</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.roda-project</groupId>
 			<artifactId>roda-plugin-common</artifactId>
+			<exclusions>
+				<exclusion>
+			      	<groupId>org.apache.directory.server</groupId>
+					<artifactId>apacheds-all</artifactId>
+			    </exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.roda-project</groupId>
 			<artifactId>roda-core-tests</artifactId>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+			      	<groupId>org.apache.directory.server</groupId>
+					<artifactId>apacheds-all</artifactId>
+			    </exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk15on</artifactId>
+			<version>1.47</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcmail-jdk15on</artifactId>
+			<version>1.47</version>
+		</dependency>
+		<dependency>
+			<groupId>org.roda-project</groupId>
+			<artifactId>roda-common-data</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>itextpdf</artifactId>
+			<version>5.3.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.santuario</groupId>
+			<artifactId>xmlsec</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>xalan</groupId>
+			<artifactId>xalan</artifactId>
 		</dependency>
 	</dependencies>
 </project>

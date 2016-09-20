@@ -7,11 +7,14 @@
  */
 package org.roda.wui.client.common.utils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 import org.roda.core.data.v2.jobs.PluginInfo;
+import org.roda.core.data.v2.jobs.PluginType;
 
 public class PluginUtils {
 
@@ -36,6 +39,12 @@ public class PluginUtils {
         return ret;
       }
     });
+  }
+
+  public static List<PluginType> getPluginTypesWithoutIngest() {
+    List<PluginType> types = new ArrayList<>(Arrays.asList(PluginType.values()));
+    types.remove(PluginType.INGEST);
+    return types;
   }
 
 }

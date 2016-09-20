@@ -14,22 +14,18 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.UnrecoverableKeyException;
+import java.security.cert.CertStoreException;
 import java.security.cert.CertificateException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.bouncycastle.cms.CMSException;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.roda.common.certification.ODFSignatureUtils;
-import org.roda.common.certification.OOXMLSignatureUtils;
-import org.roda.common.certification.PDFSignatureUtils;
-import org.roda.common.certification.SignatureUtility;
-import org.roda.common.certification.SignatureUtils;
 import org.roda.core.RodaCoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,19 +45,14 @@ public class DigitalSignatureDIPPluginUtils {
     KEYSTORE_PATH = path;
   }
 
-  public static void addElementToRepresentationZip(ZipOutputStream zout, Path file, String name) {
-    try {
-      ZipEntry entry = new ZipEntry(name);
-      InputStream in = new FileInputStream(file.toString());
-      zout.putNextEntry(entry);
-      byte[] data = IOUtils.toByteArray(in);
-      zout.write(data);
-      zout.closeEntry();
-      IOUtils.closeQuietly(in);
-
-    } catch (IOException e) {
-      LOGGER.debug("Problems adding element to the representation zip");
-    }
+  public static void addElementToRepresentationZip(ZipOutputStream zout, Path file, String name) throws IOException {
+    ZipEntry entry = new ZipEntry(name);
+    InputStream in = new FileInputStream(file.toString());
+    zout.putNextEntry(entry);
+    byte[] data = IOUtils.toByteArray(in);
+    zout.write(data);
+    zout.closeEntry();
+    IOUtils.closeQuietly(in);
   }
 
   public static Path runZipDigitalSigner(Path input) {
@@ -111,33 +102,31 @@ public class DigitalSignatureDIPPluginUtils {
       LOGGER.error("Cannot load keystore " + KEYSTORE_PATH, e);
     } catch (KeyStoreException | NoSuchAlgorithmException | NoSuchProviderException e) {
       LOGGER.error("Error initializing SignatureUtility", e);
-    } catch (UnrecoverableKeyException | CMSException | OperatorCreationException e) {
+    } catch (UnrecoverableKeyException | CMSException | InvalidAlgorithmParameterException e) {
       LOGGER.error("Error running initSign of SignatureUtility", e);
+    } catch (CertStoreException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
     }
 
     return null;
   }
 
-  public static Path addEmbeddedSignature(Path input, String fileFormat, String mimetype) {
-    try {
-      String generalFileFormat = SignatureUtils.canHaveEmbeddedSignature(fileFormat, mimetype);
-      if (generalFileFormat.equals("pdf")) {
-        String reason = RodaCoreFactory.getRodaConfigurationAsString("core", "signature", "reason");
-        String location = RodaCoreFactory.getRodaConfigurationAsString("core", "signature", "location");
-        String contact = RodaCoreFactory.getRodaConfigurationAsString("core", "signature", "contact");
+  public static Path addEmbeddedSignature(Path input, String fileFormat, String mimetype) throws Exception {
+    String generalFileFormat = SignatureUtils.canHaveEmbeddedSignature(fileFormat, mimetype);
+    if (generalFileFormat.equals("pdf")) {
+      String reason = RodaCoreFactory.getRodaConfigurationAsString("core", "signature", "reason");
+      String location = RodaCoreFactory.getRodaConfigurationAsString("core", "signature", "location");
+      String contact = RodaCoreFactory.getRodaConfigurationAsString("core", "signature", "contact");
 
-        return PDFSignatureUtils.runDigitalSignatureSign(input, KEYSTORE_PATH, KEYSTORE_ALIAS, KEYSTORE_PASSWORD,
-          reason, location, contact);
-      } else if (generalFileFormat.equals("ooxml")) {
-        return OOXMLSignatureUtils.runDigitalSignatureSign(input, KEYSTORE_PATH, KEYSTORE_ALIAS, KEYSTORE_PASSWORD,
-          fileFormat);
-      } else if (generalFileFormat.equals("odf")) {
-        return ODFSignatureUtils.runDigitalSignatureSign(input, KEYSTORE_PATH, KEYSTORE_ALIAS, KEYSTORE_PASSWORD,
-          fileFormat);
-      }
-    } catch (Exception e) {
-      LOGGER.warn("Problems running digital signature embedded signature");
-      e.printStackTrace();
+      return PDFSignatureUtils.runDigitalSignatureSign(input, KEYSTORE_PATH, KEYSTORE_ALIAS, KEYSTORE_PASSWORD, reason,
+        location, contact);
+    } else if (generalFileFormat.equals("ooxml")) {
+      return OOXMLSignatureUtils.runDigitalSignatureSign(input, KEYSTORE_PATH, KEYSTORE_ALIAS, KEYSTORE_PASSWORD,
+        fileFormat);
+    } else if (generalFileFormat.equals("odf")) {
+      return ODFSignatureUtils.runDigitalSignatureSign(input, KEYSTORE_PATH, KEYSTORE_ALIAS, KEYSTORE_PASSWORD,
+        fileFormat);
     }
 
     return null;

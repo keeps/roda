@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.roda.common.certification.PDFSignatureUtils;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
@@ -59,6 +58,7 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.plugins.ingest.TransferredResourceToAIPPlugin;
 import org.roda.core.plugins.plugins.validation.DigitalSignatureDIPPlugin;
 import org.roda.core.plugins.plugins.validation.DigitalSignatureDIPPluginUtils;
+import org.roda.core.plugins.plugins.validation.PDFSignatureUtils;
 import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;

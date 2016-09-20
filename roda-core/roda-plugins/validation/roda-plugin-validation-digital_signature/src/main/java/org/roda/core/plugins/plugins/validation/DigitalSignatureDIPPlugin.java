@@ -8,7 +8,6 @@
 package org.roda.core.plugins.plugins.validation;
 
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,6 +24,7 @@ import org.roda.core.common.IdUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.File;
@@ -40,6 +40,7 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DirectResourceAccess;
@@ -99,117 +100,130 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
     String aipId = null;
     Report report = PluginHelper.initPluginReport(this);
 
-    for (Representation representation : list) {
-      String newRepresentationID = UUID.randomUUID().toString();
-      aipId = representation.getAipId();
-      boolean notify = true;
-      // FIXME 20160516 hsilva: see how to set initial initialOutcomeObjectState
-      Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(), Representation.class);
+    try {
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      try {
-        LOGGER.debug("Processing representation {}", representation);
-        boolean recursive = true;
-        CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(representation.getAipId(),
-          representation.getId(), recursive);
+      for (Representation representation : list) {
+        String newRepresentationID = UUID.randomUUID().toString();
+        aipId = representation.getAipId();
+        boolean notify = true;
+        // FIXME 20160516 hsilva: see how to set initial
+        // initialOutcomeObjectState
+        Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(), Representation.class);
 
-        newRepresentations.add(newRepresentationID);
+        try {
+          LOGGER.debug("Processing representation {}", representation);
+          boolean recursive = true;
+          CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(representation.getAipId(),
+            representation.getId(), recursive);
 
-        model.createRepresentation(aipId, newRepresentationID, false, representation.getType(), notify);
-        List<String> filePath = null;
-        Path resultFile = null;
-        List<OptionalWithCause<File>> fileList = IteratorUtils.toList(allFiles.iterator());
-        int countFiles = fileList.size();
-        String newFileId = representation.getId() + ".zip";
+          newRepresentations.add(newRepresentationID);
 
-        if (countFiles > 1) {
-          Path representationZipFile = Files.createTempFile("rep", ".zip");
-          OutputStream os = new FileOutputStream(representationZipFile.toString());
-          ZipOutputStream zout = new ZipOutputStream(os);
+          model.createRepresentation(aipId, newRepresentationID, false, representation.getType(), notify);
+          List<String> filePath = null;
+          Path resultFile = null;
+          List<OptionalWithCause<File>> fileList = IteratorUtils.toList(allFiles.iterator());
+          int countFiles = fileList.size();
+          String newFileId = representation.getId() + ".zip";
 
-          for (OptionalWithCause<File> oFile : fileList) {
+          if (countFiles > 1) {
+            Path representationZipFile = Files.createTempFile("rep", ".zip");
+            OutputStream os = new FileOutputStream(representationZipFile.toString());
+            ZipOutputStream zout = new ZipOutputStream(os);
+
+            for (OptionalWithCause<File> oFile : fileList) {
+              if (oFile.isPresent()) {
+                File file = oFile.get();
+                LOGGER.debug("Processing file {}", file);
+                IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
+                String fileMimetype = ifile.getFileFormat().getMimeType();
+                String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
+
+                if (!file.isDirectory()) {
+                  StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
+                  DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
+                  LOGGER.debug("Running DigitalSignaturePluginDIP on {}", file.getId());
+
+                  if (doEmbeddedSignature == true) {
+                    Path embeddedFile = DigitalSignatureDIPPluginUtils.addEmbeddedSignature(directAccess.getPath(),
+                      fileFormat, fileMimetype);
+                    DigitalSignatureDIPPluginUtils.addElementToRepresentationZip(zout, embeddedFile,
+                      ifile.getOriginalName());
+                  } else {
+                    DigitalSignatureDIPPluginUtils.addElementToRepresentationZip(zout, directAccess.getPath(),
+                      ifile.getOriginalName());
+                  }
+
+                  IOUtils.closeQuietly(directAccess);
+                  if (filePath == null) {
+                    filePath = file.getPath();
+                  }
+                }
+              } else {
+                LOGGER.error("Cannot process representation file", oFile.getCause());
+              }
+            }
+
+            zout.finish();
+            IOUtils.closeQuietly(zout);
+            IOUtils.closeQuietly(os);
+            resultFile = DigitalSignatureDIPPluginUtils.runZipDigitalSigner(representationZipFile);
+
+          } else if (countFiles == 1) {
+            OptionalWithCause<File> oFile = fileList.get(0);
             if (oFile.isPresent()) {
               File file = oFile.get();
-              LOGGER.debug("Processing file {}", file);
               IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
               String fileMimetype = ifile.getFileFormat().getMimeType();
               String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
+              StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
+              DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
+              filePath = file.getPath();
 
-              if (!file.isDirectory()) {
-                StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
-                DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
-                LOGGER.debug("Running DigitalSignaturePluginDIP on {}", file.getId());
-
-                if (doEmbeddedSignature == true) {
-                  Path embeddedFile = DigitalSignatureDIPPluginUtils.addEmbeddedSignature(directAccess.getPath(),
-                    fileFormat, fileMimetype);
-                  DigitalSignatureDIPPluginUtils.addElementToRepresentationZip(zout, embeddedFile,
-                    ifile.getOriginalName());
-                } else {
-                  DigitalSignatureDIPPluginUtils.addElementToRepresentationZip(zout, directAccess.getPath(),
-                    ifile.getOriginalName());
-                }
-
-                IOUtils.closeQuietly(directAccess);
-                if (filePath == null)
-                  filePath = file.getPath();
+              if (doEmbeddedSignature == true) {
+                newFileId = file.getId();
+                resultFile = DigitalSignatureDIPPluginUtils.addEmbeddedSignature(directAccess.getPath(), fileFormat,
+                  fileMimetype);
+              } else {
+                resultFile = DigitalSignatureDIPPluginUtils.runZipDigitalSigner(directAccess.getPath());
               }
+
+              IOUtils.closeQuietly(directAccess);
             } else {
               LOGGER.error("Cannot process representation file", oFile.getCause());
             }
           }
 
-          zout.finish();
-          IOUtils.closeQuietly(zout);
-          IOUtils.closeQuietly(os);
-          resultFile = DigitalSignatureDIPPluginUtils.runZipDigitalSigner(representationZipFile);
+          // add zip file (or single file) on a new representation
+          LOGGER.debug("Running digital signer on representation");
+          ContentPayload payload = new FSPathContentPayload(resultFile);
+          model.createFile(aipId, newRepresentationID, filePath, newFileId, payload, notify);
 
-        } else if (countFiles == 1) {
-          OptionalWithCause<File> oFile = fileList.get(0);
-          if (oFile.isPresent()) {
-            File file = oFile.get();
-            IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
-            String fileMimetype = ifile.getFileFormat().getMimeType();
-            String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
-            StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
-            DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
-            filePath = file.getPath();
+          IOUtils.closeQuietly(allFiles);
+          reportItem.setPluginState(PluginState.SUCCESS);
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
 
-            if (doEmbeddedSignature == true) {
-              newFileId = file.getId();
-              resultFile = DigitalSignatureDIPPluginUtils.addEmbeddedSignature(directAccess.getPath(), fileFormat,
-                fileMimetype);
-            } else {
-              resultFile = DigitalSignatureDIPPluginUtils.runZipDigitalSigner(directAccess.getPath());
-            }
-
-            IOUtils.closeQuietly(directAccess);
-          } else {
-            LOGGER.error("Cannot process representation file", oFile.getCause());
-          }
+        } catch (Exception e) {
+          LOGGER.error("Error processing Representation " + representation.getId() + ": " + e.getMessage(), e);
+          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+        } finally {
+          report.addReport(reportItem);
+          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
         }
-
-        // add zip file (or single file) on a new representation
-        LOGGER.debug("Running digital signer on representation");
-        ContentPayload payload = new FSPathContentPayload(resultFile);
-        model.createFile(aipId, newRepresentationID, filePath, newFileId, payload, notify);
-
-        IOUtils.closeQuietly(allFiles);
-        reportItem.setPluginState(PluginState.SUCCESS);
-        // AbstractConvertPluginUtils.reIndexingRepresentationAfterConversion(this,
-        // index, model, storage, aipId, newRepresentationID);
-
-      } catch (RODAException | IOException | RuntimeException e) {
-        LOGGER.error("Error processing Representation " + representation.getId() + ": " + e.getMessage(), e);
-        reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
-      } finally {
-        report.addReport(reportItem);
       }
-    }
 
-    try {
-      model.notifyAIPUpdated(aipId);
-    } catch (RODAException e) {
-      LOGGER.error("Error notifying update of AIP on DigitalSignatureDIPPlugin ", e);
+      try {
+        model.notifyAIPUpdated(aipId);
+      } catch (RODAException e) {
+        LOGGER.error("Error notifying update of AIP on DigitalSignatureDIPPlugin ", e);
+      }
+
+      jobPluginInfo.finalizeInfo();
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+    } catch (JobException e) {
+      LOGGER.error("Could not update Job information");
     }
 
     return report;

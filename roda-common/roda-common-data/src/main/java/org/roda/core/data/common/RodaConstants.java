@@ -390,6 +390,10 @@ public final class RodaConstants {
   /*
    * OTHER FIELDS
    */
+
+  public static final String OBJECT_GENERIC_ID = "id";
+  public static final String OBJECT_GENERIC_UUID = "uuid";
+
   public static final String OBJECT_PERMISSIONS_PRODUCERS_USERS = "producersUsers";
   public static final String OBJECT_PERMISSIONS_PRODUCERS_GROUPS = "producersGroups";
   public static final String OBJECT_PERMISSIONS_MODIFY_USERS = "modifyUsers";
