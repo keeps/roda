@@ -103,8 +103,9 @@
    <!-- Only remove the "id" field if you have a very good reason to. While not strictly
      required, it is highly recommended. A <uniqueKey> is present in almost all Solr 
      installations. See the <uniqueKey> declaration below where <uniqueKey> is set to "id".
-   -->   
-   <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+   -->
+   <field name="uuid" type="string" indexed="true" stored="true" required="true" multiValued="false" />   
+   <field name="id" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="subject" type="text_general" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="body" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="sentOn" type="tdate" indexed="true" stored="true" required="true" multiValued="false" /> 
@@ -172,7 +173,7 @@
  <!-- Field to use to determine and enforce document uniqueness. 
       Unless this field is marked with required="false", it will be a required field
    -->
- <uniqueKey>id</uniqueKey>
+ <uniqueKey>uuid</uniqueKey>
 
   <!-- copyField commands copy one field to another at the time a document
         is added to the index.  It's used either to index the same field differently,

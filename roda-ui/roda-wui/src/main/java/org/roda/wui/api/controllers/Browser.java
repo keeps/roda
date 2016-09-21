@@ -972,9 +972,9 @@ public class Browser extends RodaWuiController {
     BrowserHelper.deleteRepresentationFile(fileUUID);
 
     // register action
-    controllerAssistant.registerAction(user, aip.getId(), LOG_ENTRY_STATE.SUCCESS, RodaConstants.FILE_AIPID,
+    controllerAssistant.registerAction(user, aip.getId(), LOG_ENTRY_STATE.SUCCESS, RodaConstants.FILE_AIP_ID,
       file.getAipId(), RodaConstants.FILE_REPRESENTATION_ID, file.getRepresentationId(), RodaConstants.FILE_PATH,
-      file.getPath(), RodaConstants.FILE_FILEID, file.getId());
+      file.getPath(), RodaConstants.FILE_FILE_ID, file.getId());
   }
 
   public static EntityResponse retrieveAIPRepresentationFile(User user, String fileUuid, String acceptFormat)
@@ -997,7 +997,7 @@ public class Browser extends RodaWuiController {
     // register action
     controllerAssistant.registerAction(user, file.getAipId(), LOG_ENTRY_STATE.SUCCESS,
       RodaConstants.FILE_REPRESENTATION_ID, file.getRepresentationId(), RodaConstants.FILE_PATH, file.getPath(),
-      RodaConstants.FILE_FILEID, file.getId());
+      RodaConstants.FILE_FILE_ID, file.getId());
 
     return aipRepresentationFile;
   }

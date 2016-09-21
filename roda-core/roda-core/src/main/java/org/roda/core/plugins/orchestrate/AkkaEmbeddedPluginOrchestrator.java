@@ -23,6 +23,7 @@ import org.roda.core.common.RodaUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
+import org.roda.core.data.adapter.sort.SortParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
@@ -152,23 +153,30 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       ActorRef jobActor = (ActorRef) context;
       ActorRef jobStateInfoActor = getJobContextInformation(PluginHelper.getJobId(plugin));
       int blockSize = JobsHelper.getBlockSize();
-      IndexResult<T1> find;
-      int offset = 0;
       Plugin<T> innerPlugin;
       Class<T> modelClassToActOn = (Class<T>) ModelUtils.giveRespectiveModelClass(classToActOn);
 
       jobStateInfoActor.tell(new Messages.PluginBeforeAllExecuteIsReady<>(plugin), jobActor);
 
-      do {
-        find = RodaCoreFactory.getIndexService().find(classToActOn, filter, Sorter.NONE,
-          new Sublist(offset, blockSize));
-        innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, modelClassToActOn, (int) find.getLimit(),
-          jobActor);
-        offset += find.getLimit();
-        List<T> objects = JobsHelper.getObjectsFromIndexObjects(model, index, modelClassToActOn, find.getResults());
-        jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, objects), jobActor);
+      Iterator<T1> findAllIterator = RodaCoreFactory.getIndexService()
+        .findAll(classToActOn, filter, new Sorter(new SortParameter(RodaConstants.INDEX_UUID, true))).iterator();
 
-      } while (find.getTotalCount() > find.getOffset() + find.getLimit());
+      List<T1> indexObjects = new ArrayList<T1>();
+      List<T> modelObjects;
+      while (findAllIterator.hasNext()) {
+        if (indexObjects.size() == blockSize) {
+          innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, modelClassToActOn, blockSize, jobActor);
+          modelObjects = JobsHelper.getObjectsFromIndexObjects(model, index, modelClassToActOn, indexObjects);
+          jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, modelObjects), jobActor);
+          indexObjects = new ArrayList<T1>();
+        }
+        indexObjects.add(findAllIterator.next());
+      }
+      if (!indexObjects.isEmpty()) {
+        innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, modelClassToActOn, blockSize, jobActor);
+        modelObjects = JobsHelper.getObjectsFromIndexObjects(model, index, modelClassToActOn, indexObjects);
+        jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, modelObjects), jobActor);
+      }
 
       jobStateInfoActor.tell(new Messages.JobInitEnded(), jobActor);
 

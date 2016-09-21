@@ -58,6 +58,7 @@ import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
@@ -121,7 +122,16 @@ public class IndexService {
   public <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter, Sublist sublist)
     throws GenericException, RequestNotValidException {
     return SolrUtils.find(getSolrClient(), returnClass, filter, sorter, sublist, Facets.NONE);
+  }
 
+  public <T extends IsIndexed> IterableIndexResult<T> findAll(Class<T> returnClass, Filter filter, Sorter sorter)
+    throws GenericException, RequestNotValidException {
+    return new IterableIndexResult<T>(getSolrClient(), returnClass, filter, sorter, Facets.NONE, true);
+  }
+
+  public <T extends IsIndexed> IterableIndexResult<T> findAll(Class<T> returnClass, Filter filter, Sorter sorter,
+    boolean removeDuplicates) throws GenericException, RequestNotValidException {
+    return new IterableIndexResult<T>(getSolrClient(), returnClass, filter, sorter, Facets.NONE, removeDuplicates);
   }
 
   public <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter, Sublist sublist,

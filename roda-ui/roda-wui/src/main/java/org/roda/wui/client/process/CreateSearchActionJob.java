@@ -132,7 +132,7 @@ public class CreateSearchActionJob extends CreateJob<IsIndexed> {
         }
 
         if (IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
-          Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.REPRESENTATION_UUID, ids));
+          Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids));
           RepresentationList list = new RepresentationList(filter, justActive, null, messages.representationsTitle(),
             selectable, 10, 10);
           getTargetPanel().add(list);
@@ -140,7 +140,7 @@ public class CreateSearchActionJob extends CreateJob<IsIndexed> {
         }
 
         if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
-          Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.FILE_UUID, ids));
+          Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids));
           SimpleFileList list = new SimpleFileList(filter, justActive, null, messages.filesTitle(), selectable, 10, 10);
           getTargetPanel().add(list);
           setJobSelectedDescription(messages.createJobSelectedFile());

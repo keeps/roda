@@ -154,6 +154,7 @@ public class RodaCoreFactory {
   private static boolean TEST_DEPLOY_ORCHESTRATOR = true;
   private static boolean TEST_DEPLOY_PLUGIN_MANAGER = true;
   private static boolean TEST_DEPLOY_DEFAULT_RESOURCES = true;
+  private static SolrType TEST_SOLR_TYPE = null;
 
   // Orchestrator related objects
   private static PluginManager pluginManager;
@@ -214,6 +215,13 @@ public class RodaCoreFactory {
     TEST_DEPLOY_DEFAULT_RESOURCES = deployDefaultResources;
     instantiated = false;
     instantiate(NodeType.TEST);
+  }
+
+  public static void instantiateTest(boolean deploySolr, boolean deployLdap, boolean deployTransferredResourcesScanner,
+    boolean deployOrchestrator, boolean deployPluginManager, boolean deployDefaultResources, SolrType solrType) {
+    TEST_SOLR_TYPE = solrType;
+    instantiateTest(deploySolr, deployLdap, deployTransferredResourcesScanner, deployOrchestrator, deployPluginManager,
+      deployDefaultResources);
   }
 
   public static void instantiateTest() {
@@ -609,6 +617,9 @@ public class RodaCoreFactory {
   private static SolrClient instantiateSolr(Path solrHome) {
     SolrType solrType = SolrType.valueOf(
       getRodaConfiguration().getString(RodaConstants.CORE_SOLR_TYPE, RodaConstants.DEFAULT_SOLR_TYPE.toString()));
+    if (TEST_SOLR_TYPE != null) {
+      solrType = TEST_SOLR_TYPE;
+    }
 
     if (solrType == RodaConstants.SolrType.HTTP) {
       String solrBaseUrl = getRodaConfiguration().getString(RodaConstants.CORE_SOLR_HTTP_URL,
@@ -616,7 +627,7 @@ public class RodaCoreFactory {
       return new HttpSolrClient(solrBaseUrl);
     } else if (solrType == RodaConstants.SolrType.HTTP_CLOUD) {
       String solrCloudZooKeeperUrls = getRodaConfiguration().getString(RodaConstants.CORE_SOLR_HTTP_CLOUD_URLS,
-        "zkServerA:2181,zkServerB:2181,zkServerC:2181/solr");
+        "localhost:2181,localhost:2182,localhost:2183");
       return new CloudSolrClient(solrCloudZooKeeperUrls);
     } else {
       // default to Embedded

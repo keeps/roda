@@ -264,19 +264,10 @@ public final class RodaConstants {
   public static final String INDEX_FORMAT = "Format";
   public static final String INDEX_NOTIFICATION = "Notification";
   public static final String INDEX_RISK_INCIDENCE = "RiskIncidence";
-  // FIXME not in use. are the following to remove?
-  // public static final String INDEX_DESCRIPTIVE_METADATA =
-  // "DescriptiveMetadata";
-  // public static final String INDEX_NOTIFICATIONS = "Notification";
-  // public static final String INDEX_PRESERVATION_PLANS = "PreservationPlan";
-  // public static final String INDEX_PRESERVATION_RISKS = "PreservationRisk";
-  // public static final String INDEX_USER_LOG = "UserLog";
-  // public static final String INDEX_CHARACTERIZATION = "Characterization";
 
   /*
    * STORAGE CONTAINERS
    */
-  // public static final String STORAGE_CONTAINER_SIP = "SIP";
   public static final String STORAGE_CONTAINER_AIP = "aip";
   public static final String STORAGE_CONTAINER_PRESERVATION = "preservation";
   public static final String STORAGE_CONTAINER_ACTIONLOG = "action-log";
@@ -331,6 +322,11 @@ public final class RodaConstants {
   public static final String INDEX_PERMISSION_GROUPS_PREFIX = "permission_groups_";
 
   /*
+   * Index common fields
+   */
+  public static final String INDEX_UUID = "uuid";
+
+  /*
    * AIP FIELDS
    */
   public static final String AIP_ID = "id";
@@ -378,7 +374,6 @@ public final class RodaConstants {
   /*
    * Representation FIELDS
    */
-  public static final String REPRESENTATION_UUID = "uuid";
   public static final String REPRESENTATION_ID = "id";
   public static final String REPRESENTATION_AIP_ID = "aipId";
   public static final String REPRESENTATION_ORIGINAL = "original";
@@ -434,7 +429,6 @@ public final class RodaConstants {
   public static final String MEMBERS_EMAIL = "email";
 
   public static final String TRANSFERRED_RESOURCE_ID = "id";
-  public static final String TRANSFERRED_RESOURCE_UUID = "uuid";
   public static final String TRANSFERRED_RESOURCE_FULLPATH = "fullPath";
   public static final String TRANSFERRED_RESOURCE_PARENT_ID = "parentId";
   public static final String TRANSFERRED_RESOURCE_PARENT_UUID = "parentUUID";
@@ -574,14 +568,12 @@ public final class RodaConstants {
   public static final String JOB_REPORT_FILE_EXTENSION = ".json";
   public static final String JOB_REPORT_SEARCH = "search";
 
-  public static final String FILE_UUID = "uuid";
   public static final String FILE_PATH = "path";
   public static final String FILE_PARENT_UUID = "parentUUID";
-  public static final String FILE_AIPID = "aipId";
+  public static final String FILE_AIP_ID = "aipId";
   public static final String FILE_FORMAT_MIMETYPE = "formatMimetype";
   public static final String FILE_FORMAT_VERSION = "formatVersion";
-  public static final String FILE_ID = "id";
-  public static final String FILE_FILEID = "fileId";
+  public static final String FILE_FILE_ID = "fileId";
   public static final String FILE_REPRESENTATION_UUID = "representationUUID";
   public static final String FILE_REPRESENTATION_ID = "representationId";
   public static final String FILE_STORAGE_PATH = "storagePath";

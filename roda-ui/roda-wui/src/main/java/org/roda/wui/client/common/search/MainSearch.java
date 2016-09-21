@@ -127,8 +127,8 @@ public class MainSearch extends Composite {
   private static Map<String, SearchField> fileFields = new HashMap<String, SearchField>();
 
   static {
-    fileFields.put(RodaConstants.FILE_FILEID,
-      new SearchField(RodaConstants.FILE_FILEID, Arrays.asList(RodaConstants.FILE_FILEID),
+    fileFields.put(RodaConstants.FILE_FILE_ID,
+      new SearchField(RodaConstants.FILE_FILE_ID, Arrays.asList(RodaConstants.FILE_FILE_ID),
         messages.searchFileFieldFilename(), RodaConstants.SEARCH_FIELD_TYPE_TEXT));
     fileFields.put(RodaConstants.FILE_FILEFORMAT,
       new SearchField(RodaConstants.FILE_FILEFORMAT, Arrays.asList(RodaConstants.FILE_FILEFORMAT),

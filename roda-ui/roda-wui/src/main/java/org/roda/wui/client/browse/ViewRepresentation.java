@@ -324,7 +324,7 @@ public class ViewRepresentation extends Composite {
     } else {
       defaultFilter = new Filter(new EmptyKeyFilterParameter(RodaConstants.FILE_PARENT_UUID));
     }
-    defaultFilter.add(new SimpleFilterParameter(RodaConstants.FILE_AIPID, aipId));
+    defaultFilter.add(new SimpleFilterParameter(RodaConstants.FILE_AIP_ID, aipId));
     defaultFilter.add(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, representationUUID));
 
     boolean selectable = false;

@@ -370,7 +370,7 @@ public class ShowJob extends Composite {
     if (selected != null) {
       if (selected instanceof SelectedItemsList) {
         List<String> ids = ((SelectedItemsList<?>) selected).getIds();
-        Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_UUID, ids));
+        Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids));
         TransferredResourceList list = new TransferredResourceList(filter, null, messages.transferredResourcesTitle(),
           false, 10, 10);
         selectedList.clear();
@@ -400,21 +400,15 @@ public class ShowJob extends Composite {
           selectedListPanel.setVisible(false);
         }
 
+        Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids));
         if (IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
-          Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.AIP_ID, ids));
           AIPList list = new AIPList(filter, justActive, null, messages.aipsTitle(), selectable, 10, 10);
           selectedList.add(list);
-        }
-
-        if (IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
-          Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.REPRESENTATION_UUID, ids));
+        } else if (IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
           RepresentationList list = new RepresentationList(filter, justActive, null, messages.representationsTitle(),
             selectable, 10, 10);
           selectedList.add(list);
-        }
-
-        if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
-          Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.FILE_UUID, ids));
+        } else if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
           SimpleFileList list = new SimpleFileList(filter, justActive, null, messages.filesTitle(), selectable, 10, 10);
           selectedList.add(list);
         }
@@ -425,15 +419,11 @@ public class ShowJob extends Composite {
         if (IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
           AIPList list = new AIPList(filter, justActive, null, messages.aipsTitle(), selectable, 10, 10);
           selectedList.add(list);
-        }
-
-        if (IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
+        } else if (IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
           RepresentationList list = new RepresentationList(filter, justActive, null, messages.representationsTitle(),
             selectable, 10, 10);
           selectedList.add(list);
-        }
-
-        if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
+        } else if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
           SimpleFileList list = new SimpleFileList(filter, justActive, null, messages.filesTitle(), selectable, 10, 10);
           selectedList.add(list);
         }
@@ -445,14 +435,10 @@ public class ShowJob extends Composite {
         if (AIP.class.getName().equals(selected.getSelectedClass())
           || IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
           objectLabel.setText(messages.allIntellectualEntities());
-        }
-
-        if (Representation.class.getName().equals(selected.getSelectedClass())
+        } else if (Representation.class.getName().equals(selected.getSelectedClass())
           || IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
           objectLabel.setText(messages.allRepresentations());
-        }
-
-        if (File.class.getName().equals(selected.getSelectedClass())
+        } else if (File.class.getName().equals(selected.getSelectedClass())
           || IndexedFile.class.getName().equals(selected.getSelectedClass())) {
           objectLabel.setText(messages.allFiles());
         }

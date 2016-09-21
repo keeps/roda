@@ -510,7 +510,7 @@ public class IndexModelObserver implements ModelObserver {
   public void aipDeleted(String aipId, boolean deleteIncidences) {
     deleteDocumentFromIndex(IndexedAIP.class, aipId);
     deleteDocumentsFromIndex(IndexedRepresentation.class, RodaConstants.REPRESENTATION_AIP_ID, aipId);
-    deleteDocumentsFromIndex(IndexedFile.class, RodaConstants.FILE_AIPID, aipId);
+    deleteDocumentsFromIndex(IndexedFile.class, RodaConstants.FILE_AIP_ID, aipId);
     deleteDocumentsFromIndex(IndexedPreservationEvent.class, RodaConstants.PRESERVATION_EVENT_AIP_ID, aipId);
 
     if (deleteIncidences) {

@@ -61,7 +61,7 @@ public class CreateIngestJob extends CreateJob<TransferredResource> {
     if (selected != null) {
       if (selected instanceof SelectedItemsList) {
         List<String> ids = ((SelectedItemsList) selected).getIds();
-        Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_UUID, ids));
+        Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids));
         TransferredResourceList list = new TransferredResourceList(filter, null, messages.transferredResourcesTitle(),
           false, 10, 10);
         getTargetPanel().clear();

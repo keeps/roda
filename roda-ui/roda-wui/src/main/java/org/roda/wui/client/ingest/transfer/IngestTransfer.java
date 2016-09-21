@@ -678,23 +678,22 @@ public class IngestTransfer extends Composite {
       boolean isFile = resource.isFile();
 
       if (isFile) {
-        filter
-          .add(new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_UUID, resources.get(0).getParentUUID()));
+        filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, resources.get(0).getParentUUID()));
       } else {
         filter.add(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, Boolean.FALSE.toString()));
 
         for (TransferredResource resource : resources) {
-          filter.add(new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_UUID, resource.getUUID()));
+          filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, resource.getUUID()));
           filter.add(
             new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS, resource.getRelativePath()));
-          filter.add(new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_UUID, resource.getParentUUID()));
+          filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, resource.getParentUUID()));
         }
       }
     } else {
       filter.add(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, Boolean.FALSE.toString()));
 
       for (TransferredResource resource : resources) {
-        filter.add(new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_UUID, resource.getUUID()));
+        filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, resource.getUUID()));
       }
     }
 

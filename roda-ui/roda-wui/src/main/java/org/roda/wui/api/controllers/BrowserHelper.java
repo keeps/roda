@@ -1090,7 +1090,7 @@ public class BrowserHelper {
     }
 
     Filter filter = new Filter();
-    filter.add(new OneOfManyFilterParameter(RodaConstants.REPRESENTATION_UUID, representationIds));
+    filter.add(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, representationIds));
     IndexResult<IndexedRepresentation> reps = RodaCoreFactory.getIndexService().find(IndexedRepresentation.class,
       filter, Sorter.NONE, new Sublist(0, representationIds.size()));
 
@@ -1116,7 +1116,7 @@ public class BrowserHelper {
     }
 
     Filter filter = new Filter();
-    filter.add(new OneOfManyFilterParameter(RodaConstants.FILE_UUID, fileIds));
+    filter.add(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, fileIds));
     IndexResult<IndexedFile> files = RodaCoreFactory.getIndexService().find(IndexedFile.class, filter, Sorter.NONE,
       new Sublist(0, fileIds.size()));
 
@@ -2283,7 +2283,7 @@ public class BrowserHelper {
 
   public static IndexedFile retrieveFileById(User user, String fileId)
     throws GenericException, RequestNotValidException {
-    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_FILEID, fileId));
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_FILE_ID, fileId));
     IndexResult<IndexedFile> files = RodaCoreFactory.getIndexService().find(IndexedFile.class, filter, Sorter.NONE,
       new Sublist(0, 1));
 
@@ -2359,8 +2359,7 @@ public class BrowserHelper {
 
   public static String renameTransferredResource(String transferredResourceId, String newName) throws GenericException,
     RequestNotValidException, AlreadyExistsException, IsStillUpdatingException, NotFoundException {
-    Filter filter = new Filter(
-      new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_UUID, transferredResourceId));
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.INDEX_UUID, transferredResourceId));
     IndexResult<TransferredResource> resources = RodaCoreFactory.getIndexService().find(TransferredResource.class,
       filter, Sorter.NONE, new Sublist(0, 1));
 
@@ -2382,7 +2381,7 @@ public class BrowserHelper {
 
     if (selected instanceof SelectedItemsList) {
       SelectedItemsList selectedList = (SelectedItemsList) selected;
-      filter.add(new OneOfManyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_UUID, selectedList.getIds()));
+      filter.add(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, selectedList.getIds()));
       counter = selectedList.getIds().size();
     } else if (selected instanceof SelectedItemsFilter) {
       SelectedItemsFilter selectedFilter = (SelectedItemsFilter) selected;
@@ -2414,8 +2413,7 @@ public class BrowserHelper {
     if (selected instanceof SelectedItemsList) {
       SelectedItemsList selectedList = (SelectedItemsList) selected;
 
-      Filter filter = new Filter(
-        new OneOfManyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_UUID, selectedList.getIds()));
+      Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, selectedList.getIds()));
       IndexResult<TransferredResource> iresults = RodaCoreFactory.getIndexService().find(TransferredResource.class,
         filter, Sorter.NONE, new Sublist(0, selectedList.getIds().size()));
       return iresults.getResults();
