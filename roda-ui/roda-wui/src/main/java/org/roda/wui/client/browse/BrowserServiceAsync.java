@@ -18,7 +18,6 @@ import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
-import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
@@ -143,17 +142,9 @@ public interface BrowserServiceAsync {
 
   void updateRisk(Risk risk, String message, AsyncCallback<Void> asyncCallback);
 
-  void createAgent(Agent agent, AsyncCallback<Agent> asyncCallback);
-
-  void updateAgent(Agent agent, AsyncCallback<Void> asyncCallback);
-
   void createFormat(Format format, AsyncCallback<Format> asyncCallback);
 
   void updateFormat(Format format, AsyncCallback<Void> asyncCallback);
-
-  void retrieveFormats(String agentId, AsyncCallback<List<Format>> asyncCallback);
-
-  void retrieveRequiredAgents(String agentId, AsyncCallback<List<Agent>> asyncCallback);
 
   void revertRiskVersion(String riskId, String versionId, String message, AsyncCallback<Void> callback);
 
@@ -173,8 +164,6 @@ public interface BrowserServiceAsync {
   void retrieveAllMitigationProperties(AsyncCallback<MitigationPropertiesBundle> asyncCallback);
 
   void deleteRisk(SelectedItems<IndexedRisk> selected, AsyncCallback<Void> asyncCallback);
-
-  void deleteAgent(SelectedItems<Agent> selected, AsyncCallback<Void> asyncCallback);
 
   void deleteFormat(SelectedItems<Format> selected, AsyncCallback<Void> asyncCallback);
 

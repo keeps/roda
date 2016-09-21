@@ -49,7 +49,6 @@ import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.IsRODAObject;
-import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.ip.AIP;
@@ -1868,63 +1867,6 @@ public class ModelService extends ModelObservable {
     return ret;
   }
 
-  /***************** Agent related *****************/
-  /************************************************/
-
-  public Agent createAgent(Agent agent, boolean commit) throws GenericException {
-    try {
-      agent.setId(UUID.randomUUID().toString());
-      String agentAsJson = JsonUtils.getJsonFromObject(agent);
-      StoragePath agentPath = ModelUtils.getAgentStoragePath(agent.getId());
-      storage.createBinary(agentPath, new StringContentPayload(agentAsJson), false);
-    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException
-      | AlreadyExistsException e) {
-      LOGGER.error("Error creating agent in storage", e);
-    }
-
-    notifyAgentCreatedOrUpdated(agent, commit);
-    return agent;
-  }
-
-  public Agent updateAgent(Agent agent, boolean commit) throws GenericException {
-    try {
-      String agentAsJson = JsonUtils.getJsonFromObject(agent);
-      StoragePath agentPath = ModelUtils.getAgentStoragePath(agent.getId());
-      storage.updateBinaryContent(agentPath, new StringContentPayload(agentAsJson), false, true);
-    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
-      LOGGER.error("Error updating agent in storage", e);
-    }
-
-    notifyAgentCreatedOrUpdated(agent, commit);
-    return agent;
-  }
-
-  public void deleteAgent(String agentId, boolean commit)
-    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
-
-    StoragePath agentPath = ModelUtils.getAgentStoragePath(agentId);
-    storage.deleteResource(agentPath);
-    notifyAgentDeleted(agentId, commit);
-  }
-
-  public Agent retrieveAgent(String agentId)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-
-    StoragePath agentPath = ModelUtils.getAgentStoragePath(agentId);
-    Binary binary = storage.getBinary(agentPath);
-    Agent ret;
-    InputStream inputStream = null;
-    try {
-      inputStream = binary.getContent().createInputStream();
-      ret = JsonUtils.getObjectFromJson(inputStream, Agent.class);
-    } catch (IOException e) {
-      throw new GenericException("Error reading agent", e);
-    } finally {
-      IOUtils.closeQuietly(inputStream);
-    }
-    return ret;
-  }
-
   /***************** Format related *****************/
   /************************************************/
 
@@ -1980,121 +1922,6 @@ public class ModelService extends ModelObservable {
       IOUtils.closeQuietly(inputStream);
     }
     return ret;
-  }
-
-  /***************** Format-Agent related *****************/
-  /************************************************/
-
-  public List<Format> retrieveFormatsFromAgent(String agentId) {
-    try {
-      Agent agent = retrieveAgent(agentId);
-      return retrieveFormatsFromAgent(agent);
-    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
-      LOGGER.error("Error getting agent formats");
-      return new ArrayList<Format>();
-    }
-  }
-
-  public List<Format> retrieveFormatsFromAgent(Agent agent) {
-    try {
-      CloseableIterable<Resource> allFormats = storage.listResourcesUnderDirectory(ModelUtils.getFormatContainerPath(),
-        true);
-      List<Format> formats = new ArrayList<Format>();
-
-      for (Resource resource : allFormats) {
-        String resourceName = resource.getStoragePath().getName();
-        Format format = this.retrieveFormat(resourceName.substring(0, resourceName.lastIndexOf('.')));
-
-        if (agent.getFormatIds().contains(format.getId())) {
-          formats.add(format);
-        }
-
-        for (int i = 0; i < format.getPronoms().size() && formats.isEmpty(); i++) {
-          if (agent.getPronoms().contains(format.getPronoms().get(i))) {
-            formats.add(format);
-          }
-        }
-
-        for (int i = 0; i < format.getMimetypes().size() && formats.isEmpty(); i++) {
-          if (agent.getMimetypes().contains(format.getMimetypes().get(i))) {
-            formats.add(format);
-          }
-        }
-
-        for (int i = 0; i < format.getExtensions().size() && formats.isEmpty(); i++) {
-          if (agent.getExtensions().contains(format.getExtensions().get(i))) {
-            formats.add(format);
-          }
-        }
-
-        for (int i = 0; i < format.getUtis().size() && formats.isEmpty(); i++) {
-          if (agent.getUtis().contains(format.getUtis().get(i))) {
-            formats.add(format);
-          }
-        }
-      }
-
-      return formats;
-    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
-      LOGGER.error("Error getting agent formats");
-      return new ArrayList<Format>();
-    }
-  }
-
-  public List<Agent> retrieveAgentsFromFormat(String formatId) {
-    try {
-      Format format = retrieveFormat(formatId);
-      return retrieveAgentsFromFormat(format);
-    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
-      LOGGER.error("Error getting format agents");
-      return new ArrayList<Agent>();
-    }
-  }
-
-  public List<Agent> retrieveAgentsFromFormat(Format format) {
-    try {
-      CloseableIterable<Resource> allAgents = storage.listResourcesUnderDirectory(ModelUtils.getAgentContainerPath(),
-        true);
-      List<Agent> agents = new ArrayList<Agent>();
-
-      for (Resource resource : allAgents) {
-        String resourceName = resource.getStoragePath().getName();
-        Agent agent = this.retrieveAgent(resourceName.substring(0, resourceName.lastIndexOf('.')));
-
-        if (agent.getFormatIds().contains(format.getId())) {
-          agents.add(agent);
-        }
-
-        for (int i = 0; i < format.getPronoms().size() && agents.isEmpty(); i++) {
-          if (agent.getPronoms().contains(format.getPronoms().get(i))) {
-            agents.add(agent);
-          }
-        }
-
-        for (int i = 0; i < format.getMimetypes().size() && agents.isEmpty(); i++) {
-          if (agent.getMimetypes().contains(format.getMimetypes().get(i))) {
-            agents.add(agent);
-          }
-        }
-
-        for (int i = 0; i < format.getExtensions().size() && agents.isEmpty(); i++) {
-          if (agent.getExtensions().contains(format.getExtensions().get(i))) {
-            agents.add(agent);
-          }
-        }
-
-        for (int i = 0; i < format.getUtis().size() && agents.isEmpty(); i++) {
-          if (agent.getUtis().contains(format.getUtis().get(i))) {
-            agents.add(agent);
-          }
-        }
-      }
-
-      return agents;
-    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
-      LOGGER.error("Error getting format agents");
-      return new ArrayList<Agent>();
-    }
   }
 
   /***************** Notification related *****************/

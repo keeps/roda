@@ -39,7 +39,6 @@ import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.common.RODAObjectList;
 import org.roda.core.data.v2.formats.Format;
@@ -73,7 +72,6 @@ import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.PreservationEventViewBundle;
 import org.roda.wui.client.browse.SupportedMetadataTypeBundle;
-import org.roda.wui.client.browse.UserExtraBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
 import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
@@ -1359,20 +1357,6 @@ public class Browser extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "format", format);
   }
 
-  public static void updateAgent(User user, Agent agent)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    // delegate
-    BrowserHelper.updateAgent(agent, false);
-
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "agent", agent);
-  }
-
   public static Risk createRisk(User user, Risk risk)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -1401,54 +1385,6 @@ public class Browser extends RodaWuiController {
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "format", format);
-
-    return ret;
-  }
-
-  public static Agent createAgent(User user, Agent agent)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    // delegate
-    Agent ret = BrowserHelper.createAgent(agent, false);
-
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "agent", agent);
-
-    return ret;
-  }
-
-  public static List<Format> retrieveFormats(User user, String agentId)
-    throws AuthorizationDeniedException, NotFoundException, GenericException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    // delegate
-    List<Format> ret = BrowserHelper.retrieveFormats(agentId);
-
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "agentId", agentId);
-
-    return ret;
-  }
-
-  public static List<Agent> retrieveRequiredAgents(User user, String agentId)
-    throws AuthorizationDeniedException, NotFoundException, GenericException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    // delegate
-    List<Agent> ret = BrowserHelper.retrieveRequiredAgents(agentId);
-
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "agentId", agentId);
 
     return ret;
   }
@@ -1689,20 +1625,6 @@ public class Browser extends RodaWuiController {
 
     // delegate
     BrowserHelper.deleteRisk(user, selected);
-
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "selected", selected);
-  }
-
-  public static void deleteAgent(User user, SelectedItems<Agent> selected)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    // delegate
-    BrowserHelper.deleteAgent(user, selected);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "selected", selected);

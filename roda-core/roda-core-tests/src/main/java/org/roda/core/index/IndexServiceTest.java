@@ -52,7 +52,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
-import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
@@ -78,8 +77,6 @@ import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
-import org.roda.core.plugins.orchestrate.JobsHelper;
-import org.roda.core.plugins.orchestrate.akka.Messages;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -655,81 +652,6 @@ public class IndexServiceTest {
 
     } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
       e.printStackTrace();
-      assertTrue(false);
-    }
-  }
-
-  @Test
-  public void testAgentIndex() {
-    try {
-      Agent agent = new Agent();
-      agent.setName("Acrobat reader");
-      agent.setType("Software");
-      agent.setDescription("Agent description");
-      agent.setCategory("Desktop publishing");
-      agent.setVersion("1.7");
-      agent.setLicense("Proprietary");
-      agent.setPopularity(5);
-      agent.setDeveloper("Adobe Systems");
-      agent.setInitialRelease(new Date());
-      agent.setWebsite("acrobat.adobe.com");
-      agent.setDownload("https://get.adobe.com/br/reader/");
-      agent.setProvenanceInformation("https://en.wikipedia.org/wiki/Adobe_Acrobat");
-
-      List<String> platforms = new ArrayList<String>();
-      platforms.add("Windows");
-      platforms.add("MAC OS X");
-      platforms.add("Linux");
-      agent.setPlatforms(platforms);
-
-      List<String> extensions = new ArrayList<String>();
-      extensions.add(".pdf");
-      agent.setExtensions(extensions);
-
-      List<String> mimetypes = new ArrayList<String>();
-      mimetypes.add("application/pdf");
-      agent.setMimetypes(mimetypes);
-
-      List<String> pronoms = new ArrayList<String>();
-      pronoms.add("fmt/100");
-      agent.setPronoms(pronoms);
-
-      List<String> utis = new ArrayList<String>();
-      utis.add("com.adobe.pdf");
-      agent.setUtis(utis);
-
-      List<String> formatIds = new ArrayList<String>();
-      formatIds.add("format1");
-      agent.setFormatIds(formatIds);
-
-      model.createAgent(agent, false);
-
-      Agent agent2 = model.retrieveAgent(agent.getId());
-      assertNotNull(agent2);
-      assertEquals(agent.getId(), agent2.getId());
-      assertEquals(agent.getName(), agent2.getName());
-
-      index.commit(Agent.class);
-
-      IndexResult<Agent> find = index.find(Agent.class, null, null, new Sublist(0, 10));
-      assertEquals(1, find.getTotalCount());
-
-      Agent agent3 = index.retrieve(Agent.class, agent.getId());
-      assertNotNull(agent3);
-      assertEquals(agent.getId(), agent3.getId());
-      assertEquals(agent.getName(), agent3.getName());
-
-      agent3.setName("Agent New Name");
-      model.updateAgent(agent3, false);
-
-      Agent agent4 = index.retrieve(Agent.class, agent.getId());
-      assertNotNull(agent4);
-      assertEquals(agent.getId(), agent4.getId());
-      assertEquals(agent4.getName(), "Agent New Name");
-
-      model.deleteAgent(agent.getId(), false);
-
-    } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
       assertTrue(false);
     }
   }

@@ -33,7 +33,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
-import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexRunnable;
@@ -977,30 +976,6 @@ public class IndexModelObserver implements ModelObserver {
     if (commit) {
       try {
         SolrUtils.commit(index, RiskIncidence.class);
-      } catch (GenericException e) {
-        LOGGER.warn("Commit did not run as expected");
-      }
-    }
-  }
-
-  public void agentCreatedOrUpdated(Agent agent, boolean commit) {
-    addDocumentToIndex(Agent.class, agent);
-
-    if (commit) {
-      try {
-        SolrUtils.commit(index, Agent.class);
-      } catch (GenericException e) {
-        LOGGER.warn("Commit did not run as expected");
-      }
-    }
-  }
-
-  public void agentDeleted(String agentId, boolean commit) {
-    deleteDocumentFromIndex(Agent.class, agentId);
-
-    if (commit) {
-      try {
-        SolrUtils.commit(index, Agent.class);
       } catch (GenericException e) {
         LOGGER.warn("Commit did not run as expected");
       }

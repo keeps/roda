@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -20,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -45,7 +43,6 @@ import org.roda.core.common.ConsumesOutputStream;
 import org.roda.core.common.DownloadUtils;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.common.IdUtils;
-import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.Messages;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.RodaUtils;
@@ -79,7 +76,6 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.LinkingObjectUtils;
-import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.common.RODAObjectList;
@@ -151,7 +147,6 @@ import org.roda.wui.client.browse.DescriptiveMetadataViewBundle;
 import org.roda.wui.client.browse.MetadataValue;
 import org.roda.wui.client.browse.PreservationEventViewBundle;
 import org.roda.wui.client.browse.SupportedMetadataTypeBundle;
-import org.roda.wui.client.browse.UserExtraBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
 import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
@@ -1783,17 +1778,6 @@ public class BrowserHelper {
     RodaCoreFactory.getIndexService().commit(IndexedRisk.class);
   }
 
-  public static Agent createAgent(Agent agent, boolean commit) throws GenericException, RequestNotValidException {
-    Agent createdAgent = RodaCoreFactory.getModelService().createAgent(agent, commit);
-    RodaCoreFactory.getIndexService().commit(Agent.class);
-    return createdAgent;
-  }
-
-  public static void updateAgent(Agent agent, boolean commit) throws GenericException, RequestNotValidException {
-    RodaCoreFactory.getModelService().updateAgent(agent, commit);
-    RodaCoreFactory.getIndexService().commit(Agent.class);
-  }
-
   public static Format createFormat(Format format, boolean commit) throws GenericException, RequestNotValidException {
     Format createdFormat = RodaCoreFactory.getModelService().createFormat(format, commit);
     RodaCoreFactory.getIndexService().commit(Format.class);
@@ -1803,21 +1787,6 @@ public class BrowserHelper {
   public static void updateFormat(Format format, boolean commit) throws GenericException, RequestNotValidException {
     RodaCoreFactory.getModelService().updateFormat(format, commit);
     RodaCoreFactory.getIndexService().commit(Format.class);
-  }
-
-  public static List<Format> retrieveFormats(String agentId) throws NotFoundException, GenericException {
-    return RodaCoreFactory.getModelService().retrieveFormatsFromAgent(agentId);
-  }
-
-  public static List<Agent> retrieveRequiredAgents(String agentId) throws NotFoundException, GenericException {
-    Agent agent = RodaCoreFactory.getIndexService().retrieve(Agent.class, agentId);
-    List<Agent> agentList = new ArrayList<Agent>();
-
-    for (String otherAgentId : agent.getAgentsRequired()) {
-      agentList.add(RodaCoreFactory.getIndexService().retrieve(Agent.class, otherAgentId));
-    }
-
-    return agentList;
   }
 
   public static RiskVersionsBundle retrieveRiskVersions(String riskId)
@@ -1967,8 +1936,6 @@ public class BrowserHelper {
       return new org.roda.core.data.v2.ip.TransferredResources((List<TransferredResource>) result.getResults());
     } else if (objectClass.equals(Format.class)) {
       return new org.roda.core.data.v2.formats.Formats((List<Format>) result.getResults());
-    } else if (objectClass.equals(Agent.class)) {
-      return new org.roda.core.data.v2.agents.Agents((List<Agent>) result.getResults());
     } else if (objectClass.equals(Notification.class)) {
       return new org.roda.core.data.v2.notifications.Notifications((List<Notification>) result.getResults());
     } else if (objectClass.equals(LogEntry.class)) {
@@ -2108,14 +2075,6 @@ public class BrowserHelper {
     job.setPlugin(RiskIncidenceRemoverPlugin.class.getName());
     job.setSourceObjects(SelectedItemsList.create(Risk.class, idList));
     Jobs.createJob(user, job);
-  }
-
-  public static void deleteAgent(User user, SelectedItems<Agent> selected)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
-    List<String> idList = consolidate(user, Agent.class, selected);
-    for (String agentId : idList) {
-      RodaCoreFactory.getModelService().deleteAgent(agentId, true);
-    }
   }
 
   public static void deleteFormat(User user, SelectedItems<Format> selected)

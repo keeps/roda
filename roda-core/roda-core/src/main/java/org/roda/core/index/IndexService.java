@@ -37,7 +37,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
-import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
@@ -241,10 +240,6 @@ public class IndexService {
     observer.riskIncidenceCreatedOrUpdated(riskIncidence, false);
   }
 
-  public void reindexAgent(Agent agent) {
-    observer.agentCreatedOrUpdated(agent, false);
-  }
-
   public void reindexFormat(Format format) {
     observer.formatCreatedOrUpdated(format, false);
   }
@@ -314,8 +309,6 @@ public class IndexService {
   public <T extends Serializable> void reindex(Class<T> objectClass, T object) {
     if (AIP.class.equals(objectClass) || IndexedAIP.class.equals(objectClass)) {
       reindexAIP(AIP.class.cast(object));
-    } else if (Agent.class.equals(objectClass)) {
-      reindexAgent(Agent.class.cast(object));
     } else if (Format.class.equals(objectClass)) {
       reindexFormat(Format.class.cast(object));
     } else if (Notification.class.equals(objectClass)) {

@@ -35,7 +35,6 @@ import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.Void;
-import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
@@ -70,7 +69,6 @@ import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.PreservationEventViewBundle;
 import org.roda.wui.client.browse.SupportedMetadataTypeBundle;
-import org.roda.wui.client.browse.UserExtraBundle;
 import org.roda.wui.client.browse.Viewers;
 import org.roda.wui.client.common.search.SearchField;
 import org.roda.wui.client.common.utils.Tree;
@@ -579,13 +577,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void updateAgent(Agent agent)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.updateAgent(user, agent);
-  }
-
-  @Override
   public Risk createRisk(Risk risk)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
@@ -597,27 +588,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.createFormat(user, format);
-  }
-
-  @Override
-  public Agent createAgent(Agent agent)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.createAgent(user, agent);
-  }
-
-  @Override
-  public List<Format> retrieveFormats(String agentId)
-    throws AuthorizationDeniedException, NotFoundException, GenericException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.retrieveFormats(user, agentId);
-  }
-
-  @Override
-  public List<Agent> retrieveRequiredAgents(String agentId)
-    throws AuthorizationDeniedException, NotFoundException, GenericException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.retrieveRequiredAgents(user, agentId);
   }
 
   @Override
@@ -681,13 +651,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     User user = UserUtility.getUser(getThreadLocalRequest());
 
     Browser.deleteRisk(user, selected);
-  }
-
-  @Override
-  public void deleteAgent(SelectedItems<Agent> selected)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.deleteAgent(user, selected);
   }
 
   @Override

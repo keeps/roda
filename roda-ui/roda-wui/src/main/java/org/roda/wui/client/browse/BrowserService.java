@@ -24,7 +24,6 @@ import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
@@ -156,7 +155,7 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
   boolean isCookiesMessageActive();
-  
+
   /**
    * Get Google Analytics account id
    */
@@ -208,22 +207,11 @@ public interface BrowserService extends RemoteService {
   void updateFormat(Format format)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
-  void updateAgent(Agent agent)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
-
   Risk createRisk(Risk risk)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
   Format createFormat(Format format)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
-
-  Agent createAgent(Agent agent)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
-
-  List<Format> retrieveFormats(String agentId) throws AuthorizationDeniedException, NotFoundException, GenericException;
-
-  List<Agent> retrieveRequiredAgents(String agentId)
-    throws AuthorizationDeniedException, NotFoundException, GenericException;
 
   void revertRiskVersion(String riskId, String versionId, String message)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IOException;
@@ -249,9 +237,6 @@ public interface BrowserService extends RemoteService {
 
   void deleteRisk(SelectedItems<IndexedRisk> selected) throws AuthorizationDeniedException, GenericException,
     RequestNotValidException, NotFoundException, InvalidParameterException, JobAlreadyStartedException;
-
-  void deleteAgent(SelectedItems<Agent> selected)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
   void deleteFormat(SelectedItems<Format> selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;

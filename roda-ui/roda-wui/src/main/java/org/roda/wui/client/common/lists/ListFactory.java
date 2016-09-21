@@ -9,7 +9,6 @@ package org.roda.wui.client.common.lists;
 
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
@@ -52,8 +51,6 @@ public class ListFactory {
       return new SimpleFileList(filter, true, null, messages.selectFileSearchResults(), false, pageSize, incrementPage);
     } else if (actualClass.equals(Format.class.getName())) {
       return new FormatList(filter, null, title, false, pageSize, incrementPage);
-    } else if (actualClass.equals(Agent.class.getName())) {
-      return new AgentList(filter, null, title, false, pageSize, incrementPage);
     } else if (actualClass.equals(IndexedRisk.class.getName()) || actualClass.equals(Risk.class.getName())) {
       return new RiskList(filter, null, title, false, pageSize, incrementPage);
     } else if (actualClass.equals(RiskIncidence.class.getName())) {

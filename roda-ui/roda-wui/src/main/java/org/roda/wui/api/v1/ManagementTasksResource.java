@@ -27,7 +27,6 @@ import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
-import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsAll;
@@ -106,8 +105,6 @@ public class ManagementTasksResource {
       response = createJobToReindex(user, controllerAssistant, params, Risk.class);
     } else if ("riskincidence".equals(entity)) {
       response = createJobToReindex(user, controllerAssistant, params, RiskIncidence.class);
-    } else if ("agent".equals(entity)) {
-      response = createJobToReindex(user, controllerAssistant, params, Agent.class);
     } else if ("format".equals(entity)) {
       response = createJobToReindex(user, controllerAssistant, params, Format.class);
     } else if ("notification".equals(entity)) {

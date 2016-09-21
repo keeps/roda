@@ -24,7 +24,6 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
-import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.SelectedItems;
@@ -616,9 +615,7 @@ public final class ModelUtils {
   }
 
   public static <T extends Serializable> StoragePath getContainerPath(Class<T> clazz) throws RequestNotValidException {
-    if (clazz.equals(Agent.class)) {
-      return getAgentContainerPath();
-    } else if (clazz.equals(Format.class)) {
+    if (clazz.equals(Format.class)) {
       return getFormatContainerPath();
     } else if (clazz.equals(Notification.class)) {
       return getNotificationContainerPath();

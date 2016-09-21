@@ -9,7 +9,6 @@ package org.roda.wui.client.common.dialogs;
 
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
@@ -47,8 +46,6 @@ public class SelectDialogFactory {
       return new SelectFileDialog(title, filter, justActive, false, selectable);
     } else if (actualClass.equals(Format.class.getName())) {
       return new SelectFormatDialog(title, filter, selectable);
-    } else if (actualClass.equals(Agent.class.getName())) {
-      return new SelectAgentDialog(title, filter, selectable);
     } else if (actualClass.equals(IndexedRisk.class.getName()) || actualClass.equals(Risk.class.getName())) {
       return new SelectRiskDialog(title, filter, selectable);
     } else if (actualClass.equals(Job.class.getName())) {

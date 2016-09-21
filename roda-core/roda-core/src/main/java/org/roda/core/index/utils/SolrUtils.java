@@ -80,7 +80,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.NotSupportedException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
-import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.FacetFieldResult;
 import org.roda.core.data.v2.index.IndexResult;
@@ -276,8 +275,6 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToJob(doc));
     } else if (resultClass.equals(Risk.class) || resultClass.equals(IndexedRisk.class)) {
       ret = resultClass.cast(solrDocumentToRisk(doc));
-    } else if (resultClass.equals(Agent.class)) {
-      ret = resultClass.cast(solrDocumentToAgent(doc));
     } else if (resultClass.equals(Format.class)) {
       ret = resultClass.cast(solrDocumentToFormat(doc));
     } else if (resultClass.equals(Notification.class)) {
@@ -317,8 +314,6 @@ public class SolrUtils {
       ret = jobToSolrDocument((Job) object);
     } else if (resultClass.equals(Risk.class) || resultClass.equals(IndexedRisk.class)) {
       ret = riskToSolrDocument((Risk) object);
-    } else if (resultClass.equals(Agent.class)) {
-      ret = agentToSolrDocument((Agent) object);
     } else if (resultClass.equals(Format.class)) {
       ret = formatToSolrDocument((Format) object);
     } else if (resultClass.equals(Notification.class)) {
@@ -374,8 +369,6 @@ public class SolrUtils {
       indexNames.add(RodaConstants.INDEX_FILE);
     } else if (resultClass.equals(Risk.class) || resultClass.equals(IndexedRisk.class)) {
       indexNames.add(RodaConstants.INDEX_RISK);
-    } else if (resultClass.equals(Agent.class)) {
-      indexNames.add(RodaConstants.INDEX_AGENT);
     } else if (resultClass.equals(Format.class)) {
       indexNames.add(RodaConstants.INDEX_FORMAT);
     } else if (resultClass.equals(Notification.class)) {
@@ -1861,60 +1854,6 @@ public class SolrUtils {
 
     risk.setObjectsSize(objectToInteger(doc.get(RodaConstants.RISK_OBJECTS_SIZE), 0));
     return risk;
-  }
-
-  public static SolrInputDocument agentToSolrDocument(Agent agent) {
-    SolrInputDocument doc = new SolrInputDocument();
-
-    doc.addField(RodaConstants.AGENT_ID, agent.getId());
-    doc.addField(RodaConstants.AGENT_NAME, agent.getName());
-    doc.addField(RodaConstants.AGENT_TYPE, agent.getType());
-    doc.addField(RodaConstants.AGENT_DESCRIPTION, agent.getDescription());
-    doc.addField(RodaConstants.AGENT_CATEGORY, agent.getCategory());
-    doc.addField(RodaConstants.AGENT_VERSION, agent.getVersion());
-    doc.addField(RodaConstants.AGENT_LICENSE, agent.getLicense());
-    doc.addField(RodaConstants.AGENT_POPULARITY, agent.getPopularity());
-    doc.addField(RodaConstants.AGENT_DEVELOPER, agent.getDeveloper());
-    doc.addField(RodaConstants.AGENT_INITIAL_RELEASE, agent.getInitialRelease());
-    doc.addField(RodaConstants.AGENT_WEBSITE, agent.getWebsite());
-    doc.addField(RodaConstants.AGENT_DOWNLOAD, agent.getDownload());
-    doc.addField(RodaConstants.AGENT_PROVENANCE_INFORMATION, agent.getProvenanceInformation());
-    doc.addField(RodaConstants.AGENT_PLATFORMS, agent.getPlatforms());
-    doc.addField(RodaConstants.AGENT_EXTENSIONS, agent.getExtensions());
-    doc.addField(RodaConstants.AGENT_MIMETYPES, agent.getMimetypes());
-    doc.addField(RodaConstants.AGENT_PRONOMS, agent.getPronoms());
-    doc.addField(RodaConstants.AGENT_UTIS, agent.getUtis());
-    doc.addField(RodaConstants.AGENT_FORMAT_IDS, agent.getFormatIds());
-    doc.addField(RodaConstants.AGENT_AGENTS_REQUIRED, agent.getAgentsRequired());
-
-    return doc;
-  }
-
-  public static Agent solrDocumentToAgent(SolrDocument doc) {
-    Agent agent = new Agent();
-
-    agent.setId(objectToString(doc.get(RodaConstants.AGENT_ID)));
-    agent.setName(objectToString(doc.get(RodaConstants.AGENT_NAME)));
-    agent.setType(objectToString(doc.get(RodaConstants.AGENT_TYPE)));
-    agent.setDescription(objectToString(doc.get(RodaConstants.AGENT_DESCRIPTION)));
-    agent.setCategory(objectToString(doc.get(RodaConstants.AGENT_CATEGORY)));
-    agent.setVersion(objectToString(doc.get(RodaConstants.AGENT_VERSION)));
-    agent.setLicense(objectToString(doc.get(RodaConstants.AGENT_LICENSE)));
-    agent.setPopularity(objectToInteger(doc.get(RodaConstants.AGENT_POPULARITY), 3));
-    agent.setDeveloper(objectToString(doc.get(RodaConstants.AGENT_DEVELOPER)));
-    agent.setInitialRelease(objectToDate(doc.get(RodaConstants.AGENT_INITIAL_RELEASE)));
-    agent.setWebsite(objectToString(doc.get(RodaConstants.AGENT_WEBSITE)));
-    agent.setDownload(objectToString(doc.get(RodaConstants.AGENT_DOWNLOAD)));
-    agent.setProvenanceInformation(objectToString(doc.get(RodaConstants.AGENT_PROVENANCE_INFORMATION)));
-    agent.setPlatforms(objectToListString(doc.get(RodaConstants.AGENT_PLATFORMS)));
-    agent.setExtensions(objectToListString(doc.get(RodaConstants.AGENT_EXTENSIONS)));
-    agent.setMimetypes(objectToListString(doc.get(RodaConstants.AGENT_MIMETYPES)));
-    agent.setPronoms(objectToListString(doc.get(RodaConstants.AGENT_PRONOMS)));
-    agent.setUtis(objectToListString(doc.get(RodaConstants.AGENT_UTIS)));
-    agent.setFormatIds(objectToListString(doc.get(RodaConstants.AGENT_FORMAT_IDS)));
-    agent.setAgentsRequired(objectToListString(doc.get(RodaConstants.AGENT_AGENTS_REQUIRED)));
-
-    return agent;
   }
 
   public static SolrInputDocument formatToSolrDocument(Format format) {
