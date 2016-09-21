@@ -80,8 +80,6 @@ public interface UserManagementService extends RemoteService {
    */
   public Group getGroup(String groupname) throws RODAException;
 
-  public List<Group> listAllGroups() throws AuthorizationDeniedException, GenericException;
-
   /**
    * Get a user
    *
@@ -203,20 +201,7 @@ public interface UserManagementService extends RemoteService {
    */
   public void deleteGroup(String groupname) throws AuthorizationDeniedException, GenericException;
 
-  /**
-   * Get the number log entries
-   *
-   * @param filter
-   * @return
-   * @throws RODAException
-   */
-  public Long retrieveLogEntriesCount(Filter filter) throws RODAException;
 
-  public IndexResult<LogEntry> findLogEntries(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException;
-
-  public LogEntry retrieveLogEntry(String logEntryId)
-    throws AuthorizationDeniedException, GenericException, NotFoundException;
 
   /**
    * Send the email challenge to a user email

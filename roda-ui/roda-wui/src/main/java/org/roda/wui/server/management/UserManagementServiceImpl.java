@@ -13,10 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
-import org.roda.core.data.adapter.facet.Facets;
-import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.sort.Sorter;
-import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
@@ -25,14 +21,10 @@ import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.InvalidTokenException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
-import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
-import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.controllers.UserManagement;
 import org.roda.wui.client.browse.UserExtraBundle;
 import org.roda.wui.client.management.UserManagementService;
@@ -71,12 +63,6 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   public Group getGroup(String groupname) throws AuthorizationDeniedException, GenericException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return UserManagement.retrieveGroup(user, groupname);
-  }
-
-  @Override
-  public List<Group> listAllGroups() throws AuthorizationDeniedException, GenericException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    return UserManagement.listAllGroups(user);
   }
 
   @Override
@@ -144,32 +130,11 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public Long retrieveLogEntriesCount(Filter filter) throws RODAException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    return UserManagement.countLogEntries(user, filter);
-  }
-
-  @Override
-  public IndexResult<LogEntry> findLogEntries(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    return UserManagement.findLogEntries(user, filter, sorter, sublist, facets);
-  }
-
-  @Override
-  public LogEntry retrieveLogEntry(String logEntryId)
-    throws AuthorizationDeniedException, GenericException, NotFoundException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    return UserManagement.retrieveLogEntry(user, logEntryId);
-  }
-  
-  @Override
   public Notification sendEmailVerification(final String username, final boolean generateNewToken)
-     throws GenericException, NotFoundException {
-     final String servletPath = retrieveServletUrl(getThreadLocalRequest());
-     return UserManagement.sendEmailVerification(servletPath, username, generateNewToken);
-   }
-
+    throws GenericException, NotFoundException {
+    final String servletPath = retrieveServletUrl(getThreadLocalRequest());
+    return UserManagement.sendEmailVerification(servletPath, username, generateNewToken);
+  }
 
   @Override
   public void confirmUserEmail(String username, String emailConfirmationToken)
@@ -228,14 +193,13 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
     return url;
   }
 
-  
   @Override
   public UserExtraBundle retrieveUserExtraBundle(String name)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return UserManagement.retrieveUserExtraBundle(user, name);
   }
-  
+
   @Override
   public UserExtraBundle retrieveDefaultExtraBundle() throws AuthorizationDeniedException {
     User user = UserUtility.getUser(getThreadLocalRequest());

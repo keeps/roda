@@ -7,17 +7,26 @@
  */
 package org.roda.wui.client.management;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import org.roda.core.data.adapter.facet.Facets;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.SimpleFilterParameter;
+import org.roda.core.data.adapter.sort.SortParameter;
+import org.roda.core.data.adapter.sort.Sorter;
+import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.user.Group;
+import org.roda.core.data.v2.user.RODAMember;
+import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.common.client.ClientLogger;
-import org.roda.wui.common.client.widgets.LoadingPopup;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -25,6 +34,7 @@ import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -91,6 +101,7 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Lis
       return group;
     }
 
+    @Override
     public int compareTo(GroupCheckbox groupCheckbox) {
       return sortingkeyword.compareTo(groupCheckbox.sortingkeyword);
     }
@@ -125,8 +136,6 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Lis
 
   private boolean enabled;
 
-  private final LoadingPopup loading;
-
   /**
    * Create a new group selection widget
    *
@@ -138,55 +147,62 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Lis
     this.blacklist = new Vector<String>();
     this.userSelections = new HashMap<String, Group>();
 
-    loading = new LoadingPopup(this);
-
     enabled = true;
 
     this.addStyleName("groups");
   }
 
   public void init(final AsyncCallback<Boolean> callback) {
-    loading.show();
-    UserManagementService.Util.getInstance().listAllGroups(new AsyncCallback<List<Group>>() {
-      @Override
-      public void onFailure(Throwable caught) {
-        loading.hide();
-        callback.onFailure(caught);
-      }
 
-      @Override
-      public void onSuccess(List<Group> allGroups) {
-        for (Group group : allGroups) {
-          if (!blacklist.contains(group.getId())) {
-            GroupCheckbox groupCheckbox = new GroupCheckbox(group, group.getFullName(), group.getId());
-            groups.add(groupCheckbox);
-          }
+    // TODO use RodaMemberList instead of a list of checkboxes
+
+    boolean isUser = false;
+    boolean justActive = true;
+    Filter filter = new Filter();
+
+    filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, Boolean.toString(isUser)));
+
+    Sorter sorter = new Sorter(new SortParameter(RodaConstants.MEMBERS_FULLNAME, false));
+
+    BrowserService.Util.getInstance().find(RODAMember.class.getName(), filter, sorter, Sublist.ALL, Facets.NONE,
+      LocaleInfo.getCurrentLocale().getLocaleName(), justActive, new AsyncCallback<IndexResult<RODAMember>>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          callback.onFailure(caught);
         }
 
-        Collections.sort(groups);
-
-        for (final GroupCheckbox groupCheckbox : groups) {
-          GroupSelect.this.add(groupCheckbox);
-          groupCheckbox.addValueChangeHandler(new ValueChangeHandler<Group>() {
-
-            @Override
-            public void onValueChange(ValueChangeEvent<Group> event) {
-              if (userSelections.keySet().contains(event.getValue().getId())) {
-                userSelections.remove(event.getValue().getId());
-              } else {
-                userSelections.put(event.getValue().getId(), event.getValue());
-              }
-              onChange();
+        @Override
+        public void onSuccess(IndexResult<RODAMember> members) {
+          for (RODAMember member : members.getResults()) {
+            if (member instanceof Group) {
+              Group group = (Group) member;
+              GroupCheckbox groupCheckbox = new GroupCheckbox(group, group.getFullName(), group.getId());
+              groups.add(groupCheckbox);
             }
-          });
+          }
+
+          for (final GroupCheckbox groupCheckbox : groups) {
+            GroupSelect.this.add(groupCheckbox);
+            groupCheckbox.addValueChangeHandler(new ValueChangeHandler<Group>() {
+
+              @Override
+              public void onValueChange(ValueChangeEvent<Group> event) {
+                if (userSelections.keySet().contains(event.getValue().getId())) {
+                  userSelections.remove(event.getValue().getId());
+                } else {
+                  userSelections.put(event.getValue().getId(), event.getValue());
+                }
+                onChange();
+              }
+            });
+          }
+          callback.onSuccess(true);
         }
-        loading.hide();
-        callback.onSuccess(true);
-      }
-    });
+      });
   }
 
-  public HashMap<String, Group> getUserSelections() {
+  public Map<String, Group> getUserSelections() {
     return userSelections;
   }
 

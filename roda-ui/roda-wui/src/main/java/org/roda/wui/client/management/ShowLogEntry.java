@@ -14,10 +14,10 @@ import java.util.List;
 
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryParameter;
+import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.StringUtils;
-import org.roda.wui.common.HTMLUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 
@@ -50,19 +50,22 @@ public class ShowLogEntry extends Composite {
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
         String logEntryId = historyTokens.get(0);
-        UserManagementService.Util.getInstance().retrieveLogEntry(logEntryId, new AsyncCallback<LogEntry>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            callback.onFailure(caught);
-          }
+        BrowserService.Util.getInstance().retrieve(LogEntry.class.getSimpleName(), logEntryId,
+          new AsyncCallback<LogEntry>() {
 
-          @Override
-          public void onSuccess(LogEntry result) {
-            ShowLogEntry logEntryPanel = new ShowLogEntry(result);
-            callback.onSuccess(logEntryPanel);
-          }
-        });
+            @Override
+            public void onFailure(Throwable caught) {
+              callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(LogEntry result) {
+              ShowLogEntry logEntryPanel = new ShowLogEntry(result);
+              callback.onSuccess(logEntryPanel);
+            }
+          });
+
       } else {
         Tools.newHistory(UserLog.RESOLVER);
         callback.onSuccess(null);
@@ -93,32 +96,32 @@ public class ShowLogEntry extends Composite {
   Label logIdLabel, logIdValue;
 
   @UiField
-  Label logComponentLabel,logComponentValue;
+  Label logComponentLabel, logComponentValue;
 
   @UiField
-  Label logMethodLabel,logMethodValue;
+  Label logMethodLabel, logMethodValue;
 
   @UiField
-  Label logAddressLabel,logAddressValue;
+  Label logAddressLabel, logAddressValue;
 
   @UiField
-  Label logDatetimeLabel,logDatetimeValue;
+  Label logDatetimeLabel, logDatetimeValue;
 
   @UiField
   Label logRelatedObjectLabel, logRelatedObjectValue;
 
   @UiField
-  Label logUsernameLabel,logUsernameValue;
+  Label logUsernameLabel, logUsernameValue;
 
   @UiField
   Label logParametersLabel;
-  
+
   @UiField
   FlowPanel logParametersValue;
-  
+
   @UiField
   Label logStateLabel;
-  
+
   @UiField
   HTML logStateValue;
 
@@ -135,7 +138,7 @@ public class ShowLogEntry extends Composite {
     logIdValue.setText(logEntry.getId());
     logIdLabel.setVisible(StringUtils.isNotBlank(logEntry.getId()));
     logIdValue.setVisible(StringUtils.isNotBlank(logEntry.getId()));
-    
+
     logComponentValue.setText(logEntry.getActionComponent());
     logComponentLabel.setVisible(StringUtils.isNotBlank(logEntry.getActionComponent()));
     logComponentValue.setVisible(StringUtils.isNotBlank(logEntry.getActionComponent()));
@@ -143,19 +146,18 @@ public class ShowLogEntry extends Composite {
     logMethodValue.setText(logEntry.getActionMethod());
     logMethodLabel.setVisible(StringUtils.isNotBlank(logEntry.getActionMethod()));
     logMethodValue.setVisible(StringUtils.isNotBlank(logEntry.getActionMethod()));
-    
+
     logAddressValue.setText(logEntry.getAddress());
     logAddressLabel.setVisible(StringUtils.isNotBlank(logEntry.getAddress()));
     logAddressValue.setVisible(StringUtils.isNotBlank(logEntry.getAddress()));
 
     logDatetimeValue.setText(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_FULL).format(logEntry.getDatetime()));
-    logDatetimeLabel.setVisible(logEntry.getDatetime()!=null);
-    logDatetimeValue.setVisible(logEntry.getDatetime()!=null);
+    logDatetimeLabel.setVisible(logEntry.getDatetime() != null);
+    logDatetimeValue.setVisible(logEntry.getDatetime() != null);
 
     logRelatedObjectValue.setText(logEntry.getRelatedObjectID());
     logRelatedObjectLabel.setVisible(StringUtils.isNotBlank(logEntry.getRelatedObjectID()));
     logRelatedObjectValue.setVisible(StringUtils.isNotBlank(logEntry.getRelatedObjectID()));
-
 
     logUsernameValue.setText(logEntry.getUsername());
     logUsernameLabel.setVisible(StringUtils.isNotBlank(logEntry.getUsername()));
@@ -163,7 +165,7 @@ public class ShowLogEntry extends Composite {
 
     List<LogEntryParameter> parameters = logEntry.getParameters();
 
-    if (parameters != null && parameters.size()>0) {
+    if (parameters != null && parameters.size() > 0) {
       for (LogEntryParameter par : parameters) {
         HTML parPanel = new HTML();
         parPanel.setHTML(messages.logParameter(par.getName(), par.getValue()));
@@ -171,14 +173,14 @@ public class ShowLogEntry extends Composite {
       }
       logParametersLabel.setVisible(true);
       logParametersValue.setVisible(true);
-    }else{
+    } else {
       logParametersLabel.setVisible(false);
       logParametersValue.setVisible(false);
     }
-    
+
     logStateValue.setHTML(HtmlSnippetUtils.getLogEntryStateHtml(logEntry.getState()));
-    logStateLabel.setVisible(logEntry.getState()!=null);
-    logStateValue.setVisible(logEntry.getState()!=null);
+    logStateLabel.setVisible(logEntry.getState() != null);
+    logStateValue.setVisible(logEntry.getState() != null);
 
   }
 

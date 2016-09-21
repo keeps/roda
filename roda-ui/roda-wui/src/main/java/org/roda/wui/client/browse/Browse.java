@@ -303,27 +303,30 @@ public class Browse extends Composite {
 
     });
 
-    BrowserService.Util.getInstance().showLogs(new AsyncCallback<Void>() {
+    UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<User>() {
 
       @Override
       public void onFailure(Throwable caught) {
-        logs.setVisible(false);
+        AsyncCallbackUtils.defaultFailureTreatment(caught);
       }
 
       @Override
-      public void onSuccess(Void visible) {
-        logs.setVisible(true);
+      public void onSuccess(User user) {
+        onPermissionsUpdate(user);
       }
     });
+
   }
 
   protected void onPermissionsUpdate(User user) {
-    // FIXME
-    if (user.hasRole(RodaConstants.REPOSITORY_PERMISSIONS_METADATA_EDITOR)) {
-      createItem.setVisible(true);
+    if (user != null) {
+      logs.setVisible(user.hasRole(RodaConstants.REPOSITORY_PERMISSIONS_LOG_ENTRY_READ));
+      createItem.setVisible(user.hasRole(RodaConstants.REPOSITORY_PERMISSIONS_DESCRIPTIVE_METADATA_UPDATE));
     } else {
+      logs.setVisible(false);
       createItem.setVisible(false);
     }
+
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {

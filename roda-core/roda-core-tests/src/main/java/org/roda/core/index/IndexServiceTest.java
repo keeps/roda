@@ -524,7 +524,7 @@ public class IndexServiceTest {
     Set<String> users = new HashSet<String>();
     users.add("admin");
     Set<String> roles = new HashSet<String>();
-    roles.add("browse");
+    roles.add(RodaConstants.REPOSITORY_PERMISSIONS_DESCRIPTIVE_METADATA_UPDATE);
 
     for (int i = 0; i < 5; i++) {
       if (i % 2 == 0) {

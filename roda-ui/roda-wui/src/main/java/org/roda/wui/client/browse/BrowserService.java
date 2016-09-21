@@ -276,6 +276,4 @@ public interface BrowserService extends RemoteService {
 
   void updateRiskIncidence(RiskIncidence incidence) throws AuthorizationDeniedException, GenericException;
 
-  void showLogs() throws AuthorizationDeniedException;
-
 }

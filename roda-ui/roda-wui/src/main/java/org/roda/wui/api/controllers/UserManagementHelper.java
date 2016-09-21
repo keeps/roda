@@ -20,11 +20,6 @@ import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.UserUtility;
-import org.roda.core.data.adapter.facet.Facets;
-import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.filter.SimpleFilterParameter;
-import org.roda.core.data.adapter.sort.Sorter;
-import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -33,10 +28,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.InvalidTokenException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
-import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.notifications.Notification.NOTIFICATION_STATE;
 import org.roda.core.data.v2.user.Group;
@@ -53,36 +45,6 @@ import com.github.jknack.handlebars.Template;
 
 public class UserManagementHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(UserManagementHelper.class);
-
-  protected static Long countLogEntries(Filter filter) throws GenericException, RequestNotValidException {
-    return RodaCoreFactory.getIndexService().count(LogEntry.class, filter);
-  }
-
-  protected static IndexResult<LogEntry> findLogEntries(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
-    throws GenericException, RequestNotValidException {
-    return RodaCoreFactory.getIndexService().find(LogEntry.class, filter, sorter, sublist, facets);
-  }
-
-  public static LogEntry retrieveLogEntry(String logEntryId) throws GenericException, NotFoundException {
-    return RodaCoreFactory.getIndexService().retrieve(LogEntry.class, logEntryId);
-  }
-
-  protected static Long countMembers(Filter filter) throws GenericException, RequestNotValidException {
-    return RodaCoreFactory.getIndexService().count(RODAMember.class, filter);
-  }
-
-  protected static IndexResult<RODAMember> findMembers(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    return RodaCoreFactory.getIndexService().find(RODAMember.class, filter, sorter, sublist, facets);
-  }
-
-  protected static IndexResult<RODAMember> findMembers(boolean isUser)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    Filter filter = new Filter();
-    filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, Boolean.toString(isUser)));
-    int memberCounter = RodaCoreFactory.getIndexService().count(RODAMember.class, filter).intValue();
-    return RodaCoreFactory.getIndexService().find(RODAMember.class, filter, Sorter.NONE, new Sublist(0, memberCounter));
-  }
 
   protected static User retrieveUser(String username) throws GenericException {
     return RodaCoreFactory.getModelService().retrieveUserByName(username);
@@ -141,10 +103,10 @@ public class UserManagementHelper {
   public static User updateMyUser(User user, String password, UserExtraBundle extra)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     user.setExtra(getUserExtra(user, extra));
-    
+
     User currentUser = RodaCoreFactory.getModelService().retrieveUserByName(user.getName());
-    user = resetUser(user,currentUser);
-    
+    user = resetUser(user, currentUser);
+
     User modifiedUser = RodaCoreFactory.getModelService().updateMyUser(user, password, true);
     RodaCoreFactory.getIndexService().commit(RODAMember.class);
     return modifiedUser;

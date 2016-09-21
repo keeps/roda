@@ -342,7 +342,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     if (bundle.getValues() != null) {
       SupportedMetadataTypeBundle smtb = new SupportedMetadataTypeBundle(bundle.getId(), bundle.getType(),
         bundle.getVersion(), bundle.getId(), bundle.getRawTemplate(), bundle.getValues());
-      bundle.setXml(Browser.createDescriptiveMetadataPreview(user, aipId, smtb));
+      bundle.setXml(Browser.retrieveDescriptiveMetadataPreview(user, aipId, smtb));
     }
 
     String metadataId = bundle.getId();
@@ -360,7 +360,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     RequestNotValidException {
 
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.createDescriptiveMetadataPreview(user, aipId, bundle);
+    return Browser.retrieveDescriptiveMetadataPreview(user, aipId, bundle);
   }
 
   @Override
@@ -763,9 +763,4 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     Browser.updateRiskIncidence(user, incidence);
   }
 
-  @Override
-  public void showLogs() throws AuthorizationDeniedException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.showLogs(user);
-  }
 }

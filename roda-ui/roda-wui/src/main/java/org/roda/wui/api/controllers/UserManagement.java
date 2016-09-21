@@ -18,10 +18,6 @@ import java.util.UUID;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.notifications.EmailNotificationProcessor;
-import org.roda.core.data.adapter.facet.Facets;
-import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.sort.Sorter;
-import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -30,14 +26,10 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.InvalidTokenException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
-import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.Group;
-import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.UserExtraBundle;
 import org.roda.wui.common.ControllerAssistant;
@@ -48,103 +40,6 @@ public class UserManagement extends RodaWuiController {
 
   private UserManagement() {
     super();
-  }
-
-  public static Long countLogEntries(User user, Filter filter)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    // delegate
-    Long count = UserManagementHelper.countLogEntries(filter);
-
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "filter", filter.toString());
-
-    return count;
-  }
-
-  public static IndexResult<LogEntry> findLogEntries(User user, Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    // delegate
-    IndexResult<LogEntry> ret = UserManagementHelper.findLogEntries(filter, sorter, sublist, facets);
-
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "filter", filter, "sorter", sorter, "sublist",
-      sublist);
-
-    return ret;
-  }
-
-  public static LogEntry retrieveLogEntry(User user, String logEntryId)
-    throws GenericException, AuthorizationDeniedException, NotFoundException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    // delegate
-    LogEntry ret = UserManagementHelper.retrieveLogEntry(logEntryId);
-
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "logEntryId", logEntryId);
-
-    return ret;
-  }
-
-  public static Long countMembers(User user, Filter filter)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    // delegate
-    Long count = UserManagementHelper.countMembers(filter);
-
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "filter", filter.toString());
-
-    return count;
-  }
-
-  public static IndexResult<RODAMember> findMembers(User user, Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    // delegate
-    IndexResult<RODAMember> ret = UserManagementHelper.findMembers(filter, sorter, sublist, facets);
-
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "filter", filter, "sorter", sorter, "sublist",
-      sublist);
-
-    return ret;
-  }
-
-  public static IndexResult<RODAMember> findMembers(User user, boolean isUser)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    // delegate
-    IndexResult<RODAMember> ret = UserManagementHelper.findMembers(isUser);
-
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "isUser", isUser);
-
-    return ret;
   }
 
   public static User retrieveUser(User user, String username)

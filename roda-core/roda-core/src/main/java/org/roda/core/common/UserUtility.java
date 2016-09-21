@@ -9,6 +9,7 @@ package org.roda.core.common;
 
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashSet;
@@ -122,12 +123,12 @@ public class UserUtility {
   }
 
   public static void checkRoles(final User rsu, final List<String> rolesToCheck) throws AuthorizationDeniedException {
-    if (!rolesToCheck.isEmpty()) {
-      if (!rsu.getAllRoles().containsAll(rolesToCheck)) {
-        LOGGER.debug("User '{}' roles: {} vs. roles to check: {}", rsu.getId(), rsu.getAllRoles(), rolesToCheck);
-        throw new AuthorizationDeniedException(
-          "The user '" + rsu.getId() + "' does not have all needed permissions: " + rolesToCheck);
-      }
+    if (!rolesToCheck.isEmpty() && !rsu.getAllRoles().containsAll(rolesToCheck)) {
+      List<String> missingRoles = new ArrayList<String>(rolesToCheck);
+      missingRoles.removeAll(rsu.getAllRoles());
+
+      throw new AuthorizationDeniedException("The user '" + rsu.getId() + "' does not have all needed permissions",
+        missingRoles);
     }
   }
 

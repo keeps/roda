@@ -37,6 +37,7 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.SimpleFileList;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.PluginUtils;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.tools.Tools;
@@ -186,7 +187,7 @@ public class CreateSearchActionJob extends CreateJob<IsIndexed> {
 
         @Override
         public void onFailure(Throwable caught) {
-          Toast.showError(messages.dialogFailure(), caught.getMessage());
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
           getButtonCreate().setEnabled(true);
         }
 

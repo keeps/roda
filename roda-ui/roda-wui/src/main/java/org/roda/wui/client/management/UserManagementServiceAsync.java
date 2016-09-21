@@ -52,7 +52,6 @@ public interface UserManagementServiceAsync {
    */
   void getGroup(String groupname, AsyncCallback<Group> callback);
 
-  void listAllGroups(AsyncCallback<List<Group>> callback);
 
   /**
    * Get a user
@@ -157,19 +156,6 @@ public interface UserManagementServiceAsync {
    */
   public void deleteGroup(String groupname, AsyncCallback<Void> callback);
 
-  /**
-   * Get the number log entries
-   *
-   * @param filter
-   * @return
-   * @throws RODAException
-   */
-  public void retrieveLogEntriesCount(Filter filter, AsyncCallback<Long> callback);
-
-  public void findLogEntries(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
-    AsyncCallback<IndexResult<LogEntry>> callback);
-
-  void retrieveLogEntry(String logEntryId, AsyncCallback<LogEntry> callback);
 
   /**
    * Resend the email challenge to a user email

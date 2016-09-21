@@ -133,8 +133,16 @@ public class TransferredResource {
 
     // delegate action to controller
     try {
-      org.roda.core.data.v2.ip.TransferredResource transferredResource = Browser.createTransferredResource(user,
-        parentUUID, fileDetail.getFileName(), inputStream, name, true);
+
+      org.roda.core.data.v2.ip.TransferredResource transferredResource;
+      String fileName = fileDetail.getFileName();
+      boolean forceCommit = true;
+      if (name == null) {
+        transferredResource = Browser.createTransferredResourceFile(user, parentUUID, fileName, inputStream,
+          forceCommit);
+      } else {
+        transferredResource = Browser.createTransferredResourcesFolder(user, parentUUID, name, forceCommit);
+      }
 
       return Response.ok(transferredResource, mediaType).build();
     } catch (AlreadyExistsException e) {

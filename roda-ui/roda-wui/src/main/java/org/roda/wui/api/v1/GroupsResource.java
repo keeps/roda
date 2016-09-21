@@ -22,11 +22,19 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.roda.core.common.UserUtility;
+import org.roda.core.data.adapter.facet.Facets;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.SimpleFilterParameter;
+import org.roda.core.data.adapter.sort.Sorter;
+import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.user.Group;
+import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RODAMembers;
 import org.roda.core.data.v2.user.User;
+import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.controllers.UserManagement;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
@@ -65,7 +73,15 @@ public class GroupsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    RODAMembers members = new RODAMembers(UserManagement.findMembers(user, false).getResults());
+    boolean isUser = false;
+    boolean justActive = false;
+    Filter filter = new Filter();
+    filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, Boolean.toString(isUser)));
+
+    IndexResult<RODAMember> find = Browser.find(RODAMember.class, filter, Sorter.NONE, Sublist.ALL, Facets.NONE, user,
+      justActive);
+
+    RODAMembers members = new RODAMembers(find.getResults());
     return Response.ok(members, mediaType).build();
   }
 

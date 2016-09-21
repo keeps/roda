@@ -364,7 +364,8 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
         @Override
         public void onFailure(Throwable caught) {
-          Tools.newHistory(MemberManagement.RESOLVER);
+//          Tools.newHistory(MemberManagement.RESOLVER);
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
         }
       });
     }

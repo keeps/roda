@@ -1179,29 +1179,6 @@ public class Browser extends RodaWuiController {
     return classificationPlan;
   }
 
-  public static TransferredResource createTransferredResource(User user, String parentUUID, String fileName,
-    InputStream inputStream, String name, boolean forceCommit) throws AuthorizationDeniedException, GenericException,
-    AlreadyExistsException, RequestNotValidException, NotFoundException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check permissions
-    controllerAssistant.checkRoles(user);
-
-    TransferredResource transferredResource;
-    if (name == null) {
-      transferredResource = Browser.createTransferredResourceFile(user, parentUUID, fileName, inputStream, forceCommit);
-    } else {
-      transferredResource = Browser.createTransferredResourcesFolder(user, parentUUID, name, forceCommit);
-    }
-
-    // register action
-    // TODO: what params should be registered?
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "parentUUID", parentUUID,
-      "transferredResourceUUID", transferredResource.getUUID());
-
-    return transferredResource;
-  }
-
   public static boolean retrieveScanUpdateStatus() {
     // TODO: should this method use ControllerAssistant to checkRoles and
     // registerAction? Where is User?
@@ -1719,7 +1696,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static String createDescriptiveMetadataPreview(User user, String aipId, SupportedMetadataTypeBundle bundle)
+  public static String retrieveDescriptiveMetadataPreview(User user, String aipId, SupportedMetadataTypeBundle bundle)
     throws AuthorizationDeniedException, GenericException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1848,17 +1825,6 @@ public class Browser extends RodaWuiController {
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "incidence", incidence);
-  }
-
-  public static void showLogs(User user) throws AuthorizationDeniedException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-    UserUtility.checkRoles(user, "administration.user");
-
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
   }
 
   public static Reports listReports(User user, String id, String resourceOrSip, String start, String limit,

@@ -11,27 +11,7 @@ objectClass: top
 objectClass: groupOfUniqueNames
 cn: administrators
 uniqueMember: uid=admin,ou=users,dc=roda,dc=org
-uniqueMember: uid=roda-ingest-task,ou=users,dc=roda,dc=org
-uniqueMember: uid=roda-preservation-task,ou=users,dc=roda,dc=org
 ou: Administrators
-shadowInactive: 0
-
-dn: cn=producers,ou=groups,dc=roda,dc=org
-objectClass: extensibleObject
-objectClass: top
-objectClass: groupOfUniqueNames
-cn: producers
-uniqueMember: cn=administrators,ou=groups,dc=roda,dc=org
-ou: Producers
-shadowInactive: 0
-
-dn: cn=archivists,ou=groups,dc=roda,dc=org
-objectClass: extensibleObject
-objectClass: top
-objectClass: groupOfUniqueNames
-cn: archivists
-uniqueMember: cn=administrators,ou=groups,dc=roda,dc=org
-ou: Archivists
 shadowInactive: 0
 
 dn: cn=users,ou=groups,dc=roda,dc=org
@@ -39,9 +19,7 @@ objectClass: extensibleObject
 objectClass: top
 objectClass: groupOfUniqueNames
 cn: users
-uniqueMember: cn=administrators,ou=groups,dc=roda,dc=org
-uniqueMember: cn=producers,ou=groups,dc=roda,dc=org
-uniqueMember: cn=archivists,ou=groups,dc=roda,dc=org
+uniqueMember: uid=admin,ou=users,dc=roda,dc=org
 ou: Users
 shadowInactive: 0
 
@@ -50,11 +28,6 @@ objectClass: extensibleObject
 objectClass: top
 objectClass: groupOfUniqueNames
 cn: guests
-uniqueMember: cn=administrators,ou=groups,dc=roda,dc=org
-uniqueMember: cn=producers,ou=groups,dc=roda,dc=org
-uniqueMember: cn=archivists,ou=groups,dc=roda,dc=org
-uniqueMember: cn=users,ou=groups,dc=roda,dc=org
 uniqueMember: uid=guest,ou=users,dc=roda,dc=org
 ou: Guests
 shadowInactive: 0
-

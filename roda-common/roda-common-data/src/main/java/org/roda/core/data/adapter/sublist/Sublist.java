@@ -15,6 +15,7 @@ import java.io.Serializable;
 public class Sublist implements Serializable {
   private static final long serialVersionUID = 5274598970369555552L;
   public static final Sublist NONE = new Sublist(0, 0);
+  public static final Sublist ALL = new Sublist(0, Integer.MAX_VALUE);
 
   private int firstElementIndex = 0;
   private int maximumElementCount = 10;

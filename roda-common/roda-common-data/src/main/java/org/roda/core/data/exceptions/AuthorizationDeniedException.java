@@ -7,6 +7,9 @@
  */
 package org.roda.core.data.exceptions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Luis Faria <lfaria@keep.pt>
  * 
@@ -14,6 +17,8 @@ package org.roda.core.data.exceptions;
 public class AuthorizationDeniedException extends RODAException {
 
   private static final long serialVersionUID = -6744205569453461540L;
+
+  private List<String> missingRoles = new ArrayList<>();
 
   public AuthorizationDeniedException() {
     super();
@@ -23,6 +28,11 @@ public class AuthorizationDeniedException extends RODAException {
     super(message);
   }
 
+  public AuthorizationDeniedException(String message, List<String> missingRoles) {
+    super(message);
+    setMissingRoles(missingRoles);
+  }
+
   public AuthorizationDeniedException(String message, Throwable cause) {
     super(message, cause);
   }
@@ -30,8 +40,13 @@ public class AuthorizationDeniedException extends RODAException {
   public AuthorizationDeniedException(Throwable cause) {
     super(cause);
   }
-  
-  
 
+  public List<String> getMissingRoles() {
+    return missingRoles;
+  }
+
+  public void setMissingRoles(List<String> missingRoles) {
+    this.missingRoles = missingRoles;
+  }
 
 }

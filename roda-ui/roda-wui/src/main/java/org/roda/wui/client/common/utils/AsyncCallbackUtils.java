@@ -7,11 +7,13 @@
  */
 package org.roda.wui.client.common.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
-import org.roda.wui.common.client.ClientLoggerService;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -37,12 +39,27 @@ public class AsyncCallbackUtils {
       }
       treatedError = true;
     } else if (caught instanceof AuthorizationDeniedException) {
-      Dialogs.showInformationDialog(messages.authorizationDeniedAlert(),
-        messages.authorizationDeniedAlertMessage(caught.getMessage()), messages.dialogOk(), new AsyncCallback<Void>() {
+      AuthorizationDeniedException authExp = (AuthorizationDeniedException) caught;
+
+      String message;
+      if (authExp.getMissingRoles().isEmpty()) {
+        message = messages.authorizationDeniedAlertMessageException(authExp.getMessage());
+      } else {
+        List<String> missingRolesTranslation = new ArrayList<>();
+        for (String missingRole : authExp.getMissingRoles()) {
+          missingRolesTranslation.add(messages.role(missingRole));
+        }
+        message = messages.authorizationDeniedAlertMessageMissingRoles(missingRolesTranslation);
+      }
+
+      Dialogs.showInformationDialog(messages.authorizationDeniedAlert(), message, messages.dialogOk(),
+        new AsyncCallback<Void>() {
 
           @Override
           public void onSuccess(Void result) {
-            Tools.newHistory(Welcome.RESOLVER);
+            // Tools.newHistory(Welcome.RESOLVER);
+            // stay on the same page because this could be an action made by a
+            // button
           }
 
           @Override

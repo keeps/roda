@@ -404,7 +404,52 @@ public final class RodaConstants {
   public static final String OBJECT_PERMISSIONS_GRANT_GROUPS = "grantGroups";
   public static final String OBJECT_PERMISSIONS_USER_GROUP = "users";
 
-  public static final String REPOSITORY_PERMISSIONS_METADATA_EDITOR = "administration.metadata_editor";
+  // TODO create constants for all roles
+  // aip.appraisal
+  // aip.create
+  // aip.delete
+  // aip.read
+  // aip.update
+
+  // representation.create
+  // representation.delete
+  // representation.read
+  // representation.update
+
+  // descriptive_metadata.create
+  // descriptive_metadata.delete
+  // descriptive_metadata.read
+  // descriptive_metadata.update
+  public static final String REPOSITORY_PERMISSIONS_DESCRIPTIVE_METADATA_UPDATE = "descriptive_metadata.update";
+
+  // preservation_metadata.create
+  // preservation_metadata.delete
+  // preservation_metadata.read
+
+  // transfer.create
+  // transfer.delete
+  // transfer.read
+  // transfer.update
+
+  // job.manage
+  // job.read
+
+  // member.manage
+  // member.read
+
+  // notification.manage
+  // notification.read
+  //
+  // log_entry.delete
+  // log_entry.read
+  public static final String REPOSITORY_PERMISSIONS_LOG_ENTRY_READ = "log_entry.read";
+
+  // risk.manage
+  // risk.read
+
+  // format.manage
+  // format.read
+
   public static final String LOG_ACTION_COMPONENT = "actionComponent";
   public static final String LOG_ACTION_METHOD = "actionMethod";
   public static final String LOG_ADDRESS = "address";

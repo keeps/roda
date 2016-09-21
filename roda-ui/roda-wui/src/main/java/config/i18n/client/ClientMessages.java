@@ -1549,7 +1549,9 @@ public interface ClientMessages extends Messages {
 
   String authorizationDeniedAlert();
 
-  String authorizationDeniedAlertMessage(String message);
+  String authorizationDeniedAlertMessageMissingRoles(List<String> missingRoles);
+
+  String authorizationDeniedAlertMessageException(String message);
 
   String casForwardWarning();
 

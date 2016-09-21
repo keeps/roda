@@ -92,8 +92,8 @@ import jersey.repackaged.com.google.common.collect.Lists;
 @Test(groups = {"all", "travis"})
 public class ModelServiceTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(ModelServiceTest.class);
-  private static final String ROLE1 = "browse";
-  private static final String ROLE2 = "ingest.submit";
+  private static final String ROLE1 = RodaConstants.REPOSITORY_PERMISSIONS_DESCRIPTIVE_METADATA_UPDATE;
+  private static final String ROLE2 = RodaConstants.REPOSITORY_PERMISSIONS_LOG_ENTRY_READ;
 
   private static Path basePath;
   private static Path logPath;
