@@ -135,7 +135,7 @@ public class AIPList extends BasicAsyncTableCell<IndexedAIP> {
     // define default sorting
     display.getColumnSortList().push(new ColumnSortInfo(datesColumn, false));
 
-    display.setColumnWidth(levelColumn, 5.0, Unit.EM);
+    display.setColumnWidth(levelColumn, 7.0, Unit.EM);
     display.setColumnWidth(datesColumn, 13.0, Unit.EM);
     display.setColumnWidth(hasRepresentationsColumn, 3.0, Unit.EM);
 

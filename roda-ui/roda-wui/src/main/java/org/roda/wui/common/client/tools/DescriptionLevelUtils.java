@@ -67,7 +67,7 @@ public class DescriptionLevelUtils {
       level.setIconClass("");
     } else if (LEVELS_CONFIGURATION.getLevelIcons().containsKey(levelString)) {
       level.setIconClass(LEVELS_CONFIGURATION.getLevelIcons().get(levelString));
-    } else if (levelString.equalsIgnoreCase("ghost")) {
+    } else if (levelString.equalsIgnoreCase(RodaConstants.AIP_GHOST)) {
       level.setIconClass(LEVELS_CONFIGURATION.getGhostClass());
     } else if ((levelString.equalsIgnoreCase(RodaConstants.VIEW_REPRESENTATION_REPRESENTATION))) {
       level.setIconClass(LEVELS_CONFIGURATION.getRepresentationClass());

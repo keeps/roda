@@ -1113,7 +1113,7 @@ public class SolrUtils {
 
     String level;
     if (ghost) {
-      level = "ghost";
+      level = RodaConstants.AIP_GHOST;
     } else
       level = levels.isEmpty() ? null : levels.get(0);
 

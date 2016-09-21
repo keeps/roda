@@ -665,7 +665,7 @@ public class Browse extends Composite {
             getViewItemHistoryToken(ancestor.getId()));
           ret.add(1, ancestorBreadcrumb);
         } else {
-          SafeHtml breadcrumbLabel = SafeHtmlUtils.fromSafeConstant("<i class='fa fa-question-circle'></i>");
+          SafeHtml breadcrumbLabel = DescriptionLevelUtils.getElementLevelIconSafeHtml(RodaConstants.AIP_GHOST, false);
           BreadcrumbItem unknownAncestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel, new Command() {
 
             @Override

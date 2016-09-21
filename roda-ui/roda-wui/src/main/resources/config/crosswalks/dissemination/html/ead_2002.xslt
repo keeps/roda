@@ -186,14 +186,28 @@
 				</div>
 			</xsl:if>
 			<xsl:if test="//ead:archdesc/@level">
-				<div class="field">
-					<div class="label">
-						<xsl:value-of select="$i18n.level" />
-					</div>
-					<div class="value">
-						<xsl:value-of select="//ead:archdesc/@level" />
-					</div>
-				</div>
+				<xsl:choose>
+					<xsl:when test="//ead:archdesc/@level = 'otherlevel'">
+						<div class="field">
+							<div class="label">
+								<xsl:value-of select="$i18n.level" />
+							</div>
+							<div class="value">
+								<xsl:value-of select="//ead:archdesc/@otherlevel" />
+							</div>
+						</div>
+					</xsl:when>
+					<xsl:otherwise>
+						<div class="field">
+							<div class="label">
+								<xsl:value-of select="$i18n.level" />
+							</div>
+							<div class="value">
+								<xsl:value-of select="//ead:archdesc/@level" />
+							</div>
+						</div>
+					</xsl:otherwise>
+				</xsl:choose>
 			</xsl:if>
 			<xsl:if test="//ead:materialspec/text()">
 				<div class="field">
