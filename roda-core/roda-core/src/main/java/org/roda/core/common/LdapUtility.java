@@ -1280,7 +1280,7 @@ public class LdapUtility {
 
     user.setActive("0".equalsIgnoreCase(getEntryAttributeAsString(entry, SHADOW_INACTIVE)));
 
-    user.setEmail(entry.get(EMAIL).getString());
+    user.setEmail(getEntryAttributeAsString(entry, EMAIL));
     user.setGuest(false);
 
     user.setExtra(getEntryAttributeAsString(entry, "description"));
@@ -1835,7 +1835,11 @@ public class LdapUtility {
 
     // add user to the groups in newgroups
     for (String groupDN : newgroupDNs) {
-      addMemberToRoleOrGroup(session, groupDN, memberDN, UNIQUE_MEMBER);
+      try {
+        addMemberToRoleOrGroup(session, groupDN, memberDN, UNIQUE_MEMBER);
+      } catch (final LdapNoSuchObjectException e) {
+        LOGGER.debug("Group {} doesn't exist", groupDN);
+      }
     }
 
   }
@@ -2050,7 +2054,7 @@ public class LdapUtility {
         admin = addUser(admin);
       }
       admin.setActive(true);
-      modifyUser(session, admin, password, true, true);
+      modifyUser(session, admin, password, false, true);
 
       Group administrators;
       try {

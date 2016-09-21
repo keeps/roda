@@ -1367,6 +1367,12 @@ public class RodaCoreFactory {
       final String passwordConfirmation = readPassword("Repeat admin password");
       if (password.equals(passwordConfirmation)) {
         RodaCoreFactory.ldapUtility.resetAdminAccess(password);
+        try {
+          indexUsersAndGroupsFromLDAP();
+        } catch (final Exception e) {
+          LOGGER.warn("Error reindexing users and groups - " + e.getMessage(), e);
+          System.err.println("Error reindexing users and groups (" + e.getMessage() + ").");
+        }
         System.out.println("Password for 'admin' changed successfully.");
       } else {
         throw new GenericException("Passwords don't match.");
@@ -1399,6 +1405,11 @@ public class RodaCoreFactory {
     // System.err.println("java -jar x.jar premisskeleton");
   }
 
+  private static void printResetUsage() {
+    System.err.println("Reset command parameters:");
+    System.err.println("\tadmin - resets admin user password and grant it all permissions.");
+  }
+
   private static void mainMasterTasks(final List<String> args) throws GenericException, RequestNotValidException {
     if ("index".equals(args.get(0))) {
       if ("list".equals(args.get(1)) && ("users".equals(args.get(2)) || "groups".equals(args.get(2)))) {
@@ -1422,8 +1433,16 @@ public class RodaCoreFactory {
     }
     if ("reset".equals(args.get(0))) {
       final List<String> resetParams = args.subList(1, args.size());
-      if (resetParams.contains("user-admin")) {
-        resetAdminAccess();
+      if (resetParams.isEmpty()) {
+        printResetUsage();
+      } else {
+        final String resetParam = resetParams.get(0);
+        if ("admin".equals(resetParam)) {
+          resetAdminAccess();
+        } else {
+          System.err.println("ERROR: Unknown parameter '" + resetParam + "'");
+          printResetUsage();
+        }
       }
     } else {
       printMainUsage();
