@@ -55,7 +55,7 @@ public class RemoveAIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getDescription() {
-    return "Permanently remove AIP(s) from the repository storage.";
+    return "Permanently removes selected AIP(s) from the repository. Data, metadata and event history will be deleted permanently. WARNING: This operation cannot be undone. Use with extreme care.";
   }
 
   @Override

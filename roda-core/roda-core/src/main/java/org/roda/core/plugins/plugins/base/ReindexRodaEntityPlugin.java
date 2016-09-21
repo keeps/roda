@@ -64,12 +64,12 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
 
   @Override
   public String getName() {
-    return "Reindex Roda entity";
+    return "Rebuild index(es)";
   }
 
   @Override
   public String getDescription() {
-    return "Reset entities index and recreate it from data existing in the storage.";
+    return "Clears the selected index and recreates it from actual physical data that exists on the storage. This task aims to fix inconsistencies between what is shown in the graphical user interface of the repository and what is actually kept at the storage layer. Such inconsistencies may occur for various reasons, e.g. index corruption, ungraceful shutdown of the repository, etc.";
   }
 
   @Override

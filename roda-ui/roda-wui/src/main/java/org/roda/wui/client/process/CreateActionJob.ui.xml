@@ -35,7 +35,7 @@
 				</g:FlowPanel>
 				<g:FlowPanel addStyleNames="col_7 col_padding">
 					<g:Label addStyleNames="form-label h4" ui:field="workflowListTitle" />
-					<g:Label addStyleNames="p plugin-description" ui:field="workflowListDescription" />
+					<g:FlowPanel ui:field="workflowListDescription"></g:FlowPanel>
 					<g:Label addStyleNames="p plugin-description" ui:field="workflowListDescriptionCategories" />
 
 					<g:FlowPanel styleName="panel" ui:field="workflowPanel">

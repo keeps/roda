@@ -83,7 +83,7 @@ public class DigitalSignatureTest {
     basePath = TestsHelper.createBaseTempDir(this.getClass(), true);
 
     boolean deploySolr = true;
-    boolean deployLdap = true;
+    boolean deployLdap = false;
     boolean deployFolderMonitor = true;
     boolean deployOrchestrator = true;
     boolean deployPluginManager = true;

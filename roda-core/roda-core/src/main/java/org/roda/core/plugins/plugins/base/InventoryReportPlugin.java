@@ -136,7 +136,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getDescription() {
-    return "This action creates a report in CSV format that includes a listing of all files and their attributes that exist in the repository storage (AIPs). The report will be stored in a folder in the server side. To get it, you will need access to the server.";
+    return "Creates a report in CSV format that includes a listing of all AIP and its inner files (data and metadata) which also includes some of their technical properties (e.g. sipId, aipId, representationId, filePath, SHA-256, MD5, SHA-1). The report will be stored in a folder on the server side as defined by the user. To obtain the report, one needs access to the storage layer of the repository server.\nThis report may be used to validate the completeness and correctness of an ingest process.";
   }
 
   @Override

@@ -49,7 +49,7 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getName() {
-    return "Log entries cleaner";
+    return "Activity log truncation";
   }
 
   @Override
@@ -59,7 +59,8 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getDescription() {
-    return "Removes from the index all log entries older than " + deleteOlderThanXDays + " days.";
+    return "Removes all entries in the activity log that are older than " + deleteOlderThanXDays
+      + " days. The log is preserved as external physical files, however older entries will not be displayed on the graphical user interface. To access older log entries one needs access to the storage layer of the repository server.\nIf log entries were never deleted, it would eventually fill the index with rarely used information. Activity log truncation automatically frees index space and improves performance of the repository as a whole.";
   }
 
   @Override

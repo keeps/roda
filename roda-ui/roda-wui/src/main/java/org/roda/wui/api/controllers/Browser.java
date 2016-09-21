@@ -1621,20 +1621,6 @@ public class Browser extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "selected", selected);
   }
 
-  public static void deleteRiskIncidences(User user, String id, SelectedItems<RiskIncidence> incidences)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    // delegate
-    BrowserHelper.deleteRiskIncidences(user, id, incidences);
-
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "incidences", incidences);
-  }
-
   public static void updateRiskCounters(User user)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -1894,5 +1880,20 @@ public class Browser extends RodaWuiController {
     } else {
       return reportList.getReports().get(0);
     }
+  }
+
+  public static void deleteRiskIncidences(User user, SelectedItems<RiskIncidence> selected)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException,
+    InvalidParameterException, JobAlreadyStartedException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    BrowserHelper.deleteRiskIncidences(user, selected);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "selected", selected);
   }
 }

@@ -649,7 +649,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public void deleteRisk(SelectedItems<IndexedRisk> selected) throws AuthorizationDeniedException, GenericException,
     RequestNotValidException, NotFoundException, InvalidParameterException, JobAlreadyStartedException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-
     Browser.deleteRisk(user, selected);
   }
 
@@ -690,13 +689,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     } else {
       return new SelectedItemsAll<>(selectedClass);
     }
-  }
-
-  @Override
-  public void deleteRiskIncidences(String id, SelectedItems<RiskIncidence> incidences)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.deleteRiskIncidences(user, id, incidences);
   }
 
   @Override
@@ -763,4 +755,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     Browser.updateRiskIncidence(user, incidence);
   }
 
+  @Override
+  public void deleteRiskIncidences(SelectedItems<RiskIncidence> selected)
+    throws JobAlreadyStartedException, AuthorizationDeniedException, GenericException, RequestNotValidException,
+    NotFoundException, InvalidParameterException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Browser.deleteRiskIncidences(user, selected);
+  }
 }

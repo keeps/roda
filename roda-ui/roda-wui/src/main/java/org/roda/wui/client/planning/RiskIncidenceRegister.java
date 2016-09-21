@@ -24,23 +24,28 @@ import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchPanel;
-import org.roda.wui.client.process.CreateSearchActionJob;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -98,7 +103,6 @@ public class RiskIncidenceRegister extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
@@ -123,7 +127,7 @@ public class RiskIncidenceRegister extends Composite {
   DateBox inputDateFinal;
 
   @UiField
-  Button buttonAdd, buttonRemove;
+  Button buttonRemove;
 
   private static final Filter DEFAULT_FILTER = new Filter(
     new BasicSearchFilterParameter(RodaConstants.RISK_SEARCH, "*"));
@@ -140,7 +144,7 @@ public class RiskIncidenceRegister extends Composite {
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.RISK_INCIDENCE_DETECTED_BY),
       new SimpleFacetParameter(RodaConstants.RISK_INCIDENCE_STATUS));
 
-    riskIncidenceList = new RiskIncidenceList(Filter.NULL, facets, messages.riskIncidencesTitle(), false);
+    riskIncidenceList = new RiskIncidenceList(Filter.NULL, facets, messages.riskIncidencesTitle(), true);
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.RISK_INCIDENCE_SEARCH,
       messages.riskIncidenceRegisterSearchPlaceHolder(), false, false, false);
@@ -223,8 +227,6 @@ public class RiskIncidenceRegister extends Composite {
       riskIncidenceList.setFilter(Filter.ALL);
       riskIncidenceList.refresh();
       callback.onSuccess(this);
-    } else if (historyTokens.size() == 1 && historyTokens.get(0).equals(CreateSearchActionJob.RESOLVER.getHistoryToken())) {
-      CreateSearchActionJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(ShowRiskIncidence.RESOLVER.getHistoryToken())) {
       ShowRiskIncidence.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(EditRiskIncidence.RESOLVER.getHistoryToken())) {
@@ -247,6 +249,54 @@ public class RiskIncidenceRegister extends Composite {
 
   public void setAipId(String id) {
     aipId = id;
+  }
+
+  @UiHandler("buttonRemove")
+  void buttonRemoveRiskHandler(ClickEvent e) {
+
+    final SelectedItems<RiskIncidence> selected = riskIncidenceList.getSelected();
+
+    SelectedItemsUtils.size(RiskIncidence.class, selected, new AsyncCallback<Long>() {
+
+      @Override
+      public void onFailure(Throwable caught) {
+        AsyncCallbackUtils.defaultFailureTreatment(caught);
+      }
+
+      @Override
+      public void onSuccess(final Long size) {
+        Dialogs.showConfirmDialog(messages.riskRemoveFolderConfirmDialogTitle(),
+          messages.riskRemoveSelectedConfirmDialogMessage(size), messages.riskRemoveFolderConfirmDialogCancel(),
+          messages.riskRemoveFolderConfirmDialogOk(), new AsyncCallback<Boolean>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+              AsyncCallbackUtils.defaultFailureTreatment(caught);
+            }
+
+            @Override
+            public void onSuccess(Boolean confirmed) {
+              if (confirmed) {
+                buttonRemove.setEnabled(false);
+                BrowserService.Util.getInstance().deleteRiskIncidences(selected, new AsyncCallback<Void>() {
+
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    AsyncCallbackUtils.defaultFailureTreatment(caught);
+                    riskIncidenceList.refresh();
+                  }
+
+                  @Override
+                  public void onSuccess(Void result) {
+                    Toast.showInfo(messages.riskRemoveSuccessTitle(), messages.riskRemoveSuccessMessage(size));
+                    riskIncidenceList.refresh();
+                  }
+                });
+              }
+            }
+          });
+      }
+    });
   }
 
 }

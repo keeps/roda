@@ -45,7 +45,7 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
   }
 
   public static String getStaticName() {
-    return "Fix the ancestor hierarchy";
+    return "AIP ancestor hierarchy fix";
   }
 
   @Override
@@ -54,7 +54,7 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
   }
 
   public static String getStaticDescription() {
-    return "Attempts to fix the ancestor hierarchy of the AIPs, removing ghosts and merging AIPs with the same Ingest SIP ID.";
+    return "Attempts to fix the ancestor hierarchy of the AIPs in the catalogue by removing ghosts (i.e. AIPs with nonexistent ancestors in the catalogue) and merging AIPs with the same Ingest SIP identifier.\nThis task aims to fix problems that may occur when SIPs are ingested but not all the necessary items to construct the catalogue hierarchy have been received or properly ingested.";
   }
 
   @Override

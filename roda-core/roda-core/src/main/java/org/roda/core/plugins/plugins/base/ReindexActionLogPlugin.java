@@ -70,12 +70,12 @@ public class ReindexActionLogPlugin extends AbstractPlugin<LogEntry> {
 
   @Override
   public String getName() {
-    return "Reindex actions log";
+    return "Rebuild log index";
   }
 
   @Override
   public String getDescription() {
-    return "Reset action log index and recreate it from data existing in the storage.";
+    return "Clears the activity log index and rebuilds it from actual physical data existing on the storage. This task aims to fix inconsistencies between what is shown in the graphical user interface of the repository and what is actually kept at the storage layer. Such inconsistencies may occur for various reasons, e.g. index corruption, ungraceful shutdown of the repository, etc.";
   }
 
   @Override

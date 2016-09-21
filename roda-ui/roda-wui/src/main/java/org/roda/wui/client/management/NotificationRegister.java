@@ -25,7 +25,6 @@ import org.roda.core.data.v2.notifications.Notification;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.NotificationList;
 import org.roda.wui.client.common.search.SearchPanel;
-import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Tools;
@@ -92,10 +91,6 @@ public class NotificationRegister extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
-  @SuppressWarnings("unused")
-  private ClientLogger logger = new ClientLogger(getClass().getName());
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
@@ -162,8 +157,6 @@ public class NotificationRegister extends Composite {
     });
 
     initWidget(uiBinder.createAndBindUi(this));
-
-    // FIXME a revision should be done on the description
     notificationDescription.add(new HTMLWidgetWrapper("NotificationDescription.html"));
 
     DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
@@ -173,7 +166,6 @@ public class NotificationRegister extends Composite {
       public void onValueChange(ValueChangeEvent<Date> event) {
         updateDateFilter();
       }
-
     };
 
     inputDateInitial.setFormat(dateFormat);

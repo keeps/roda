@@ -13,10 +13,10 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
-import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -27,8 +27,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
-
-import config.i18n.client.ClientMessages;
 
 public class CreateRisk extends Composite {
 
@@ -58,7 +56,6 @@ public class CreateRisk extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
   Button buttonApply;
@@ -88,7 +85,7 @@ public class CreateRisk extends Composite {
       BrowserService.Util.getInstance().createRisk(risk, new AsyncCallback<Risk>() {
 
         public void onFailure(Throwable caught) {
-          errorMessage(caught);
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
         }
 
         @Override
@@ -107,10 +104,6 @@ public class CreateRisk extends Composite {
 
   private void cancel() {
     Tools.newHistory(RiskRegister.RESOLVER);
-  }
-
-  private void errorMessage(Throwable caught) {
-    Toast.showError(messages.createRiskFailure(caught.getMessage()));
   }
 
 }

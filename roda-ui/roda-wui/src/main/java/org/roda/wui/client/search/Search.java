@@ -36,7 +36,6 @@ import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.search.MainSearch;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.process.CreateJob;
-import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
@@ -99,11 +98,7 @@ public class Search extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  @SuppressWarnings("unused")
-  private ClientLogger logger = new ClientLogger(getClass().getName());
 
   @UiField
   FlowPanel searchDescription;
@@ -223,7 +218,7 @@ public class Search extends Composite {
   }
 
   @UiHandler("newJobButton")
-  void buttonStartIngestHandler(ClickEvent e) {
+  void buttonStartHandler(ClickEvent e) {
     Tools.newHistory(CreateJob.RESOLVER, "action");
   }
 
@@ -235,7 +230,6 @@ public class Search extends Composite {
     return mainSearch.getSelected();
   }
 
-  @SuppressWarnings("unchecked")
   @UiHandler("moveItem")
   void buttonMoveItemHandler(ClickEvent e) {
     final SelectedItems<IndexedAIP> selected = (SelectedItems<IndexedAIP>) getSelected();

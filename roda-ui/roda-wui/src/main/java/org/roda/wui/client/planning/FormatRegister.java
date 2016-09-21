@@ -28,7 +28,6 @@ import org.roda.wui.client.common.lists.FormatList;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
@@ -98,10 +97,6 @@ public class FormatRegister extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
-  @SuppressWarnings("unused")
-  private ClientLogger logger = new ClientLogger(getClass().getName());
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
@@ -182,7 +177,6 @@ public class FormatRegister extends Composite {
       public void onValueChange(ValueChangeEvent<Date> event) {
         updateDateFilter();
       }
-
     };
 
     inputDateInitial.setFormat(dateFormat);

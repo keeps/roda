@@ -2085,21 +2085,6 @@ public class BrowserHelper {
     }
   }
 
-  public static void deleteRiskIncidences(User user, String riskId, SelectedItems<RiskIncidence> incidences)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
-    List<String> idList = consolidate(user, RiskIncidence.class, incidences);
-
-    Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.RISK_INCIDENCE_ID, idList));
-    IndexResult<RiskIncidence> incidenceList = RodaCoreFactory.getIndexService().find(RiskIncidence.class, filter, null,
-      new Sublist(0, idList.size()));
-
-    for (RiskIncidence incidence : incidenceList.getResults()) {
-      RodaCoreFactory.getModelService().deleteRiskIncidence(incidence.getId(), false);
-    }
-
-    RodaCoreFactory.getIndexService().commit(RiskIncidence.class);
-  }
-
   public static void updateRiskCounters() throws GenericException, RequestNotValidException, NotFoundException {
     IndexResult<RiskIncidence> find = RodaCoreFactory.getIndexService().find(RiskIncidence.class, Filter.ALL,
       Sorter.NONE, new Sublist(0, 0), new Facets(new SimpleFacetParameter(RodaConstants.RISK_INCIDENCE_RISK_ID)));
@@ -2497,5 +2482,14 @@ public class BrowserHelper {
     Sorter sorter = new Sorter(new SortParameter(RodaConstants.JOB_REPORT_DATE_UPDATE, true));
     IndexResult<Report> indexReports = indexService.find(Report.class, filter, sorter, new Sublist(startInt, endInt));
     return new Reports(indexReports.getResults());
+  }
+
+  public static void deleteRiskIncidences(User user, SelectedItems<RiskIncidence> selected)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
+    InvalidParameterException, JobAlreadyStartedException {
+    List<String> idList = consolidate(user, RiskIncidence.class, selected);
+    for (String incidenceId : idList) {
+      RodaCoreFactory.getModelService().deleteRiskIncidence(incidenceId, true);
+    }
   }
 }

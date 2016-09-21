@@ -146,8 +146,8 @@ public class EditRisk extends Composite {
     if (caught instanceof NotFoundException) {
       Toast.showError(messages.editRiskNotFound(risk.getName()));
       cancel();
-    } else if (!AsyncCallbackUtils.treatCommonFailures(caught)) {
-      Toast.showError(messages.editRiskFailure(caught.getMessage()));
+    } else {
+      AsyncCallbackUtils.defaultFailureTreatment(caught);
     }
   }
 
@@ -155,7 +155,7 @@ public class EditRisk extends Composite {
   void buttonRemoveHandler(ClickEvent e) {
     SelectedItems<RiskIncidence> incidences = riskDataPanel.getSelectedIncidences();
 
-    BrowserService.Util.getInstance().deleteRiskIncidences(risk.getId(), incidences, new AsyncCallback<Void>() {
+    BrowserService.Util.getInstance().deleteRiskIncidences(incidences, new AsyncCallback<Void>() {
 
       @Override
       public void onFailure(Throwable caught) {

@@ -115,8 +115,7 @@ public class NotificationList extends BasicAsyncTableCell<Notification> {
       public SafeHtml getValue(Notification notification) {
         SafeHtml ret = null;
         if (notification != null) {
-          ret = HtmlSnippetUtils.getNotificationStateHTML(notification.getState(),
-            translate(RodaConstants.NOTIFICATION_STATE, notification.getState().toString()));
+          ret = HtmlSnippetUtils.getNotificationStateHTML(notification.getState());
         }
         return ret;
       }
@@ -132,8 +131,8 @@ public class NotificationList extends BasicAsyncTableCell<Notification> {
     addColumn(fromUser, messages.notificationFrom(), true, false);
     addColumn(sentOn, messages.notificationSentOn(), true, false, 13);
     addColumn(subject, messages.notificationSubject(), true, false);
-    addColumn(state, messages.notificationState(), true, false, 10);
-    addColumn(acknowledged, messages.notificationAck(), true, false, 5);
+    addColumn(state, messages.notificationState(), true, false, 7);
+    addColumn(acknowledged, messages.notificationAck(), true, false, 7);
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(sentOn, false));

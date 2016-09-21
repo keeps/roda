@@ -84,6 +84,16 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
   }
 
   @Override
+  public String getName() {
+    return "Risk association";
+  }
+
+  @Override
+  public String getDescription() {
+    return "Associates selected items to existing risks in the Risk registry (as risk incidences).\nThis task is convenient when the preservation expert wants to associate a set of items (e.g. AIPs, representations or files) to a risk to be mitigated in the near future.\nAs an example, if the designated community of the repository provides feedback that a given format under a certain collection is not being displayed properly on the graphical user interface of the repository, then the preservation expert may want to mark these files to be targeted by a preservation action (e.g. generate new representations for access purposes).";
+  }
+
+  @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
 
@@ -320,16 +330,6 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
   @Override
   public boolean areParameterValuesValid() {
     return true;
-  }
-
-  @Override
-  public String getName() {
-    return "Risk association plugin";
-  }
-
-  @Override
-  public String getDescription() {
-    return "Job responsible to associate risk with objects";
   }
 
   @Override

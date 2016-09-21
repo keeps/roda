@@ -57,7 +57,7 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticName() {
-    return "Format identification (Siegfried)";
+    return "AIP file format identification (Siegfried)";
   }
 
   @Override
@@ -66,7 +66,7 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticDescription() {
-    return "Identification of format and version of files included inside the information package using Siegfried (a signature-based file format identification tool that supports PRONOM and Mimetypes).";
+    return "Identifies the file format and version of data files included in Information Packages using the Siegfried tool (a signature-based file format identification tool that supports PRONOM identifiers and Mimetypes).\nThe task updates PREMIS objects metadata in the Information Package to store the results of format identification. A PREMIS event is also recorded after the task is run.";
   }
 
   @Override

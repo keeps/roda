@@ -87,8 +87,6 @@ public class ShowNotification extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
-  @SuppressWarnings("unused")
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
@@ -114,10 +112,10 @@ public class ShowNotification extends Composite {
 
   @UiField
   HTML acknowledgedUsersValue;
-  
+
   @UiField
   Label stateLabel;
-  
+
   @UiField
   HTML stateValue;
 
@@ -165,8 +163,8 @@ public class ShowNotification extends Composite {
     }
 
     stateValue.setHTML(HtmlSnippetUtils.getNotificationStateHTML(notification.getState()));
-    stateLabel.setVisible(notification.getState()!=null);
-    stateValue.setVisible(notification.getState()!=null);
+    stateLabel.setVisible(notification.getState() != null);
+    stateValue.setVisible(notification.getState() != null);
   }
 
   @UiHandler("buttonCancel")

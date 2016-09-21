@@ -89,7 +89,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "Export AIP(s)";
+    return "AIP batch export";
   }
 
   @Override

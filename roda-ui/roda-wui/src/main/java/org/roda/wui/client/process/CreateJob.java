@@ -188,6 +188,8 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
 
     if (isEmpty && isIngest) {
       Tools.newHistory(IngestTransfer.RESOLVER);
+    } else if (isEmpty && !isIngest) {
+      Tools.newHistory(Search.RESOLVER);
     }
 
     BrowserService.Util.getInstance().retrievePluginsInfo(pluginType, new AsyncCallback<List<PluginInfo>>() {
@@ -328,6 +330,7 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
       if (selectedPluginId != null) {
         CreateJob.this.selectedPlugin = lookupPlugin(selectedPluginId);
       }
+
       updateWorkflowOptions();
     }
   }

@@ -165,12 +165,12 @@ public interface BrowserServiceAsync {
 
   void deleteRisk(SelectedItems<IndexedRisk> selected, AsyncCallback<Void> asyncCallback);
 
+  void deleteRiskIncidences(SelectedItems<RiskIncidence> selected, AsyncCallback<Void> asyncCallback);
+
   void deleteFormat(SelectedItems<Format> selected, AsyncCallback<Void> asyncCallback);
 
   void createProcess(String jobName, SelectedItems<?> selected, String id, Map<String, String> value,
     String selectedClass, AsyncCallback<Job> asyncCallback);
-
-  void deleteRiskIncidences(String id, SelectedItems<RiskIncidence> incidences, AsyncCallback<Void> asyncCallback);
 
   void updateRiskCounters(AsyncCallback<Void> asyncCallback);
 
@@ -191,6 +191,5 @@ public interface BrowserServiceAsync {
   void deleteFile(String fileUUID, AsyncCallback<Void> callback);
 
   void updateRiskIncidence(RiskIncidence incidence, AsyncCallback<Void> asyncCallback);
-
 
 }

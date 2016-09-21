@@ -12,10 +12,7 @@ package org.roda.wui.client.process;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.roda.core.data.adapter.filter.Filter;
@@ -23,7 +20,6 @@ import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsAll;
 import org.roda.core.data.v2.index.SelectedItemsList;
@@ -34,16 +30,11 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
-import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.log.LogEntry;
-import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
-import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.DefaultSelectDialog;
@@ -116,10 +107,9 @@ public class CreateActionJob extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private SelectedItems selected = new SelectedItemsNone();
+  private SelectedItems selected;
   private List<PluginInfo> plugins = null;
   private PluginInfo selectedPlugin = null;
-  private Map<String, String> rodaMap;
 
   private static List<PluginType> pluginTypes = PluginUtils.getPluginTypesWithoutIngest();
 
@@ -139,7 +129,10 @@ public class CreateActionJob extends Composite {
   ListBox workflowList;
 
   @UiField
-  Label workflowListDescription, workflowListDescriptionCategories;
+  FlowPanel workflowListDescription;
+
+  @UiField
+  Label workflowListDescriptionCategories;
 
   @UiField
   FlowPanel workflowPanel;
@@ -166,6 +159,11 @@ public class CreateActionJob extends Composite {
   Button buttonSelect;
 
   public CreateActionJob() {
+    this(new SelectedItemsNone());
+  }
+
+  public CreateActionJob(SelectedItems items) {
+    selected = items;
     initWidget(uiBinder.createAndBindUi(this));
 
     BrowserService.Util.getInstance().retrievePluginsInfo(pluginTypes, new AsyncCallback<List<PluginInfo>>() {
@@ -190,7 +188,6 @@ public class CreateActionJob extends Composite {
     configurePlugins();
 
     workflowList.setVisibleItemCount(20);
-
     workflowCategoryList.addStyleName("form-listbox-job");
     workflowList.addChangeHandler(new ChangeHandler() {
 
@@ -253,7 +250,6 @@ public class CreateActionJob extends Composite {
                                     messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()),
                                     pluginInfo.getId());
                                 }
-
                               }
                             }
 
@@ -277,7 +273,6 @@ public class CreateActionJob extends Composite {
 
                     updateWorkflowOptions();
                   }
-
                 });
 
                 workflowCategoryList.add(box);
@@ -307,7 +302,7 @@ public class CreateActionJob extends Composite {
 
   protected void updateWorkflowOptions() {
     if (selectedPlugin == null) {
-      workflowListDescription.setText("");
+      workflowListDescription.clear();
       workflowListDescriptionCategories.setText("");
       workflowListDescription.setVisible(false);
       workflowListDescriptionCategories.setVisible(false);
@@ -319,7 +314,15 @@ public class CreateActionJob extends Composite {
 
       String description = selectedPlugin.getDescription();
       if (description != null && description.length() > 0) {
-        workflowListDescription.setText(description);
+        String[] split = description.split("\\r?\\n");
+        workflowListDescription.clear();
+
+        for (String s : split) {
+          Label descriptionLine = new Label(s);
+          descriptionLine.addStyleName("p");
+          descriptionLine.addStyleName("plugin-description");
+          workflowListDescription.add(descriptionLine);
+        }
 
         String categories = messages.createJobCategoryWorkflow() + ": ";
         for (String category : selectedPlugin.getCategories()) {
@@ -342,10 +345,10 @@ public class CreateActionJob extends Composite {
       }
 
       targetList.clear();
-      rodaMap = getPluginNames(selectedPlugin.getObjectClasses());
-      for (Entry<String, String> objectClass : rodaMap.entrySet()) {
-        targetList.addItem(messages.allOfAObject(objectClass.getKey()), objectClass.getKey());
-        buttonSelect.setVisible(!(objectClass.getKey().equals(org.roda.core.data.v2.Void.class.getName())));
+      List<String> rodaClasses = getPluginNames(selectedPlugin.getObjectClasses());
+      for (String objectClass : rodaClasses) {
+        targetList.addItem(messages.allOfAObject(objectClass), objectClass);
+        buttonSelect.setVisible(!(objectClass.equals(org.roda.core.data.v2.Void.class.getName())));
       }
 
       targetList.addChangeHandler(new ChangeHandler() {
@@ -361,37 +364,23 @@ public class CreateActionJob extends Composite {
     }
   }
 
-  private Map<String, String> getPluginNames(Set<String> objectClasses) {
-    Map<String, String> objectMap = new HashMap<String, String>();
+  private List<String> getPluginNames(Set<String> objectClasses) {
+    List<String> objectList = new ArrayList<String>();
     for (String objectClass : objectClasses) {
       if (AIP.class.getName().equals(objectClass) || IndexedAIP.class.getName().equals(objectClass)) {
-        objectMap.put(AIP.class.getName(), IndexedAIP.class.getName());
+        objectList.add(AIP.class.getName());
       } else if (Representation.class.getName().equals(objectClass)
         || IndexedRepresentation.class.getName().equals(objectClass)) {
-        objectMap.put(Representation.class.getName(), IndexedRepresentation.class.getName());
+        objectList.add(Representation.class.getName());
       } else if (File.class.getName().equals(objectClass) || IndexedFile.class.getName().equals(objectClass)) {
-        objectMap.put(File.class.getName(), IndexedFile.class.getName());
+        objectList.add(File.class.getName());
       } else if (Risk.class.getName().equals(objectClass) || IndexedRisk.class.getName().equals(objectClass)) {
-        objectMap.put(Risk.class.getName(), IndexedRisk.class.getName());
-      } else if (RiskIncidence.class.getName().equals(objectClass)) {
-        objectMap.put(RiskIncidence.class.getName(), RiskIncidence.class.getName());
-      } else if (Format.class.getName().equals(objectClass)) {
-        objectMap.put(Format.class.getName(), Format.class.getName());
-      } else if (Notification.class.getName().equals(objectClass)) {
-        objectMap.put(Notification.class.getName(), Notification.class.getName());
-      } else if (Job.class.getName().equals(objectClass)) {
-        objectMap.put(Job.class.getName(), Job.class.getName());
-      } else if (Report.class.getName().equals(objectClass)) {
-        objectMap.put(Report.class.getName(), Report.class.getName());
-      } else if (LogEntry.class.getName().equals(objectClass)) {
-        objectMap.put(LogEntry.class.getName(), LogEntry.class.getName());
-      } else if (TransferredResource.class.getName().equals(objectClass)) {
-        objectMap.put(TransferredResource.class.getName(), TransferredResource.class.getName());
-      } else if (org.roda.core.data.v2.Void.class.getName().equals(objectClass)) {
-        objectMap.put(org.roda.core.data.v2.Void.class.getName(), org.roda.core.data.v2.Void.class.getName());
+        objectList.add(Risk.class.getName());
+      } else {
+        objectList.add(objectClass);
       }
     }
-    return objectMap;
+    return objectList;
   }
 
   private PluginInfo lookupPlugin(String selectedPluginId) {
@@ -424,7 +413,9 @@ public class CreateActionJob extends Composite {
     getButtonCreate().setEnabled(false);
     String jobName = getName().getText();
 
-    if (selected == null || selected instanceof SelectedItemsNone) {
+    if (org.roda.core.data.v2.Void.class.getName().equals(targetList.getSelectedValue())) {
+      selected = new SelectedItemsNone();
+    } else if (selected == null || selected instanceof SelectedItemsNone) {
       selected = new SelectedItemsAll(targetList.getSelectedValue());
     }
 
@@ -465,15 +456,7 @@ public class CreateActionJob extends Composite {
 
             if (selected instanceof SelectedItemsList) {
               SelectedItemsList selectedList = (SelectedItemsList) selected;
-
-              if (Representation.class.getName().equals(targetList.getSelectedValue())
-                || File.class.getName().equals(targetList.getSelectedValue())) {
-                filter.add(new OneOfManyFilterParameter(RodaConstants.OBJECT_GENERIC_UUID, selectedList.getIds()));
-              } else {
-                filter.add(new OneOfManyFilterParameter(RodaConstants.OBJECT_GENERIC_ID, selectedList.getIds()));
-              }
-            } else {
-              filter = new Filter(dialog.getList().getFilter());
+              filter.add(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, selectedList.getIds()));
             }
 
             BasicAsyncTableCell list = listFactory.getList(targetList.getSelectedValue(), dialog.getTitle(), filter, 10,

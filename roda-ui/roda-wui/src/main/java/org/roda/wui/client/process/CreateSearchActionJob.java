@@ -15,24 +15,15 @@ import java.util.List;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.Void;
-import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsFilter;
 import org.roda.core.data.v2.index.SelectedItemsList;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
-import org.roda.core.data.v2.notifications.Notification;
-import org.roda.core.data.v2.risks.Risk;
-import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.RepresentationList;
@@ -44,11 +35,8 @@ import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.ListBox;
 
 import config.i18n.client.ClientMessages;
 
@@ -78,7 +66,7 @@ public class CreateSearchActionJob extends CreateJob<IsIndexed> {
     SelectedItems<?> selected = getSelected();
     boolean selectable = false;
     boolean justActive = true;
-    boolean isEmpty = false;
+    boolean isEmpty = true;
 
     if (selected != null) {
       getTargetPanel().clear();
@@ -86,91 +74,48 @@ public class CreateSearchActionJob extends CreateJob<IsIndexed> {
       if (selected instanceof SelectedItemsList) {
         List<String> ids = ((SelectedItemsList<?>) selected).getIds();
 
-        if (ids.size() == 0) {
-          final ListBox list = new ListBox();
-          list.addItem(messages.allIntellectualEntities(), AIP.class.getName());
-          list.addItem(messages.allRepresentations(), Representation.class.getName());
-          list.addItem(messages.allFiles(), File.class.getName());
-          list.addItem(messages.allRisks(), Risk.class.getName());
-          list.addItem(messages.allRiskIncidences(), RiskIncidence.class.getName());
-          list.addItem(messages.allFormats(), Format.class.getName());
-          list.addItem(messages.allNotifications(), Notification.class.getName());
-          list.addItem(messages.allJobs(), Job.class.getName());
-          list.addItem(messages.allTransferredResources(), TransferredResource.class.getName());
-          list.addItem(messages.selectItems(), "select");
-          list.addItem(messages.noInputObjects(), Void.class.getName());
-
-          list.addStyleName("form-selectbox");
-          list.addStyleName("form-textbox-small");
-          setSelectedClass(list.getSelectedValue());
-
-          list.addChangeHandler(new ChangeHandler() {
-
-            @Override
-            public void onChange(ChangeEvent event) {
-              if (list.getSelectedValue().equals("select")) {
-                Tools.newHistory(Search.RESOLVER);
-              } else {
-                setSelectedClass(list.getSelectedValue());
-                getWorkflowList().clear();
-                getCategoryList().clear();
-                configurePlugins(list.getSelectedValue());
-              }
-            }
-
-          });
-
-          getTargetPanel().add(list);
-          setJobSelectedDescription(messages.createJobSelectObject());
-          return true;
-        }
-
         if (IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
-          Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.AIP_ID, ids));
+          Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids));
           AIPList list = new AIPList(filter, justActive, null, messages.aipsTitle(), selectable, 10, 10);
           getTargetPanel().add(list);
           setJobSelectedDescription(messages.createJobSelectedAIP());
-        }
-
-        if (IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
+          return false;
+        } else if (IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
           Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids));
           RepresentationList list = new RepresentationList(filter, justActive, null, messages.representationsTitle(),
             selectable, 10, 10);
           getTargetPanel().add(list);
           setJobSelectedDescription(messages.createJobSelectedRepresentation());
-        }
-
-        if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
+          return false;
+        } else if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
           Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids));
           SimpleFileList list = new SimpleFileList(filter, justActive, null, messages.filesTitle(), selectable, 10, 10);
           getTargetPanel().add(list);
           setJobSelectedDescription(messages.createJobSelectedFile());
+          return false;
         }
 
-      } else if (getSelected() instanceof SelectedItemsFilter) {
+      } else if (selected instanceof SelectedItemsFilter) {
         Filter filter = ((SelectedItemsFilter<?>) getSelected()).getFilter();
 
         if (IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
           AIPList list = new AIPList(filter, justActive, null, messages.aipsTitle(), selectable, 10, 10);
           getTargetPanel().add(list);
           setJobSelectedDescription(messages.createJobSelectedAIP());
-        }
-
-        if (IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
+          return false;
+        } else if (IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
           RepresentationList list = new RepresentationList(filter, justActive, null, messages.representationsTitle(),
             selectable, 10, 10);
           getTargetPanel().add(list);
           setJobSelectedDescription(messages.createJobSelectedRepresentation());
-        }
-
-        if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
+          return false;
+        } else if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
           SimpleFileList list = new SimpleFileList(filter, justActive, null, messages.filesTitle(), selectable, 10, 10);
           getTargetPanel().add(list);
           setJobSelectedDescription(messages.createJobSelectedFile());
+          return false;
         }
 
-      } else {
-        isEmpty = true;
       }
     }
 

@@ -48,7 +48,6 @@ import org.roda.wui.client.management.UserLog;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.client.process.CreateJob;
 import org.roda.wui.client.search.Search;
-import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -156,11 +155,7 @@ public class Browse extends Composite {
 
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
-  @SuppressWarnings("unused")
-  private ClientLogger logger = new ClientLogger(getClass().getName());
-
   private String aipId;
-
   private BrowseItemBundle itemBundle;
 
   @UiField
@@ -240,7 +235,6 @@ public class Browse extends Composite {
   private List<HandlerRegistration> handlers;
 
   boolean justActive = true;
-
   boolean searchable = false;
 
   private Browse() {

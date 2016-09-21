@@ -13,6 +13,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
@@ -138,7 +139,7 @@ public class EditFormat extends Composite {
       Toast.showError(messages.editFormatNotFound(format.getName()));
       cancel();
     } else {
-      Toast.showError(messages.editFormatFailure(caught.getMessage()));
+      AsyncCallbackUtils.defaultFailureTreatment(caught);
     }
   }
 

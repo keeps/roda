@@ -245,9 +245,6 @@ public interface BrowserService extends RemoteService {
     Map<String, String> value, String selectedClass) throws AuthorizationDeniedException, RequestNotValidException,
     NotFoundException, GenericException, JobAlreadyStartedException;
 
-  void deleteRiskIncidences(String id, SelectedItems<RiskIncidence> incidences)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
-
   void updateRiskCounters()
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
@@ -276,4 +273,7 @@ public interface BrowserService extends RemoteService {
 
   void updateRiskIncidence(RiskIncidence incidence) throws AuthorizationDeniedException, GenericException;
 
+  void deleteRiskIncidences(SelectedItems<RiskIncidence> selected)
+    throws JobAlreadyStartedException, AuthorizationDeniedException, GenericException, RequestNotValidException,
+    NotFoundException, InvalidParameterException;
 }

@@ -27,6 +27,7 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.lists.TransferredResourceList;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -98,8 +99,8 @@ public class CreateIngestJob extends CreateJob<TransferredResource> {
 
           @Override
           public void onFailure(Throwable caught) {
-            Toast.showError(messages.dialogFailure(), caught.getMessage());
             getButtonCreate().setEnabled(true);
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
           }
 
           @Override
@@ -121,13 +122,12 @@ public class CreateIngestJob extends CreateJob<TransferredResource> {
 
           @Override
           public void onFailure(Throwable caught) {
-            Toast.showError(caught.getMessage());
             getButtonCreate().setEnabled(true);
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
           }
 
           @Override
           public void onSuccess(Void result) {
-            // do nothing
             getButtonCreate().setEnabled(true);
           }
         });
@@ -139,5 +139,4 @@ public class CreateIngestJob extends CreateJob<TransferredResource> {
   public void cancel() {
     Tools.newHistory(IngestProcess.RESOLVER);
   }
-
 }

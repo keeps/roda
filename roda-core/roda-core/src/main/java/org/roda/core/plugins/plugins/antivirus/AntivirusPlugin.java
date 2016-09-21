@@ -74,7 +74,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticName() {
-    return "Virus check";
+    return "AIP Virus check";
   }
 
   @Override
@@ -83,7 +83,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticDescription() {
-    return "Scans an information package for malicious software using the Antivirus application ClamAV.";
+    return "Scans Information Package(s) for malicious software using the Antivirus application ClamAV. Clam AntiVirus (ClamAV) is a free and open-source, cross-platform antivirus software toolkit able to detect many types of malicious software, including viruses.\nIf malicious software is detected a report will be generated and a PREMIS event will record this occurrence.";
   }
 
   @Override

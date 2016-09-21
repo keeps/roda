@@ -48,7 +48,7 @@ public class MoveOrphansToParentNodePlugin extends AbstractPlugin<IndexedAIP> {
 
   @Override
   public String getDescription() {
-    return "Moves orphan AIP(s) (not root level nodes) to a new parent";
+    return "Moves selected AIP(s) that are also orphans, i.e. AIPs whose direct ancestor in the catalogue hierarchy does not exist (except root level nodes) to a new parent node defined by the user.\nThis task aims to fix problems that may occur when SIPs are ingested but not all the necessary items to construct the catalogue hierarchy have been received or properly ingested.";
   }
 
   @Override
