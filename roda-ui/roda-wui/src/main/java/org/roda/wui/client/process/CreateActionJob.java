@@ -367,14 +367,13 @@ public class CreateActionJob extends Composite {
   private List<String> getPluginNames(Set<String> objectClasses) {
     List<String> objectList = new ArrayList<String>();
     for (String objectClass : objectClasses) {
-      if (AIP.class.getName().equals(objectClass) || IndexedAIP.class.getName().equals(objectClass)) {
+      if (IndexedAIP.class.getName().equals(objectClass)) {
         objectList.add(AIP.class.getName());
-      } else if (Representation.class.getName().equals(objectClass)
-        || IndexedRepresentation.class.getName().equals(objectClass)) {
+      } else if (IndexedRepresentation.class.getName().equals(objectClass)) {
         objectList.add(Representation.class.getName());
-      } else if (File.class.getName().equals(objectClass) || IndexedFile.class.getName().equals(objectClass)) {
+      } else if (IndexedFile.class.getName().equals(objectClass)) {
         objectList.add(File.class.getName());
-      } else if (Risk.class.getName().equals(objectClass) || IndexedRisk.class.getName().equals(objectClass)) {
+      } else if (IndexedRisk.class.getName().equals(objectClass)) {
         objectList.add(Risk.class.getName());
       } else {
         objectList.add(objectClass);

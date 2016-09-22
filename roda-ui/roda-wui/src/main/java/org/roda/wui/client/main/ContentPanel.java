@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.wui.client.browse.Browse;
-import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.ingest.Ingest;
@@ -137,11 +136,13 @@ public class ContentPanel extends SimplePanel {
 
                 public void onFailure(Throwable caught) {
                   if (caught instanceof BadHistoryTokenException) {
-                    Dialogs.showInformationDialog(messages.notFoundError(), messages.pageNotFound(caught.getMessage()),
-                      messages.dialogOk());
-                    if (currWidget == null) {
-                      Tools.newHistory(Welcome.RESOLVER);
-                    }
+                    // Dialogs.showInformationDialog(messages.notFoundError(),
+                    // messages.pageNotFound(caught.getMessage()),
+                    // messages.dialogOk());
+                    // if (currWidget == null) {
+                    // Tools.newHistory(Welcome.RESOLVER);
+                    // }
+                    Tools.newHistory(Theme.RESOLVER, "Error404.html");
                   } else {
                     AsyncCallbackUtils.defaultFailureTreatment(caught);
                   }
@@ -165,13 +166,15 @@ public class ContentPanel extends SimplePanel {
       }
     }
     if (!foundit) {
-      Dialogs.showInformationDialog(messages.notFoundError(), messages.pageNotFound(historyTokens.get(0)),
-        messages.dialogOk());
-      if (currWidget == null) {
-        Tools.newHistory(Welcome.RESOLVER);
-      } else {
-        Tools.newHistory(currHistoryPath);
-      }
+      // Dialogs.showInformationDialog(messages.notFoundError(),
+      // messages.pageNotFound(historyTokens.get(0)),
+      // messages.dialogOk());
+      // if (currWidget == null) {
+      // Tools.newHistory(Welcome.RESOLVER);
+      // } else {
+      // Tools.newHistory(currHistoryPath);
+      // }
+      Tools.newHistory(Theme.RESOLVER, "Error404.html");
     }
 
   }
@@ -195,7 +198,7 @@ public class ContentPanel extends SimplePanel {
 
     if (!resolved) {
       String lastToken = historyTokens.get(historyTokens.size() - 1);
-      
+
       // TODO generalize suffix approach
       if (lastToken.endsWith(".html")) {
         lastToken = lastToken.substring(0, lastToken.length() - ".html".length());
@@ -203,16 +206,15 @@ public class ContentPanel extends SimplePanel {
 
       // transform camel case to spaces
       lastToken = lastToken.replaceAll("([A-Z])", " $1");
-      
+
       // upper-case
       lastToken = lastToken.toUpperCase();
-            
+
       tokenI18N = lastToken;
     }
 
     // title.setText(tokenI18N);
     Window.setTitle(messages.windowTitle(tokenI18N));
   }
-
 
 }

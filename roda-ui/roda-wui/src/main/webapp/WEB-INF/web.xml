@@ -190,7 +190,7 @@
 
 	<error-page>
 		<error-code>404</error-code>
-		<location>/error_page_not_found.html</location>
+		<location>/error_404.html</location>
 	</error-page>
 	<security-constraint>
 		<web-resource-collection>

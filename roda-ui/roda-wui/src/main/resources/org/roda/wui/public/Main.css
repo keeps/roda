@@ -5233,3 +5233,26 @@ td.datePickerMonth, td.datePickerYear {
 	background: #eee; 
 	padding: 0 2em 4em 2em;
 }
+
+
+/**********************************************
+				ERROR 404 PAGE
+************************************************/
+
+#main404 h1 {
+	font-size: 24rem;
+    line-height: 1.2;
+    letter-spacing: -.1rem;
+    text-align: center;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+    color: white;
+}
+#main404 p {
+	margin-bottom: 0.5em;
+    font-size: 2.3rem;
+    line-height: 1.5em;
+    text-align: center;
+}
+#main404 a {
+	font-size: 1.8rem;
+}
