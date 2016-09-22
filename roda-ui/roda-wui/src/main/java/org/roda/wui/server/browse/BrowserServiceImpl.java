@@ -255,8 +255,9 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
       String fieldsNames = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "fields");
       String fieldType = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "type");
       String fieldLabelI18N = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "i18n");
-      String fieldsTermsKey = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "prefix");
-
+      List<String> fieldsValues = RodaCoreFactory.getRodaConfigurationAsList("ui", "search", "fields", field, "values");
+      String fieldI18NPrefix = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field,
+        "i18nPrefix");
       boolean fieldFixed = Boolean
         .valueOf(RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "fixed"));
 
@@ -273,11 +274,12 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
         }
         searchField.setFixed(fieldFixed);
 
-        if (fieldsTermsKey != null) {
-          Map<String, String> labels = messages.getTranslations(fieldsTermsKey, String.class, false);
+        if (fieldsValues != null) {
+          Map<String, String> labels = messages.getTranslations(fieldI18NPrefix, String.class, false);
           Tree<String> terms = new Tree<String>(field, field);
-          for (Map.Entry<String, String> entry : labels.entrySet()) {
-            terms.addChild(entry.getValue(), entry.getKey().replace(fieldsTermsKey + ".", ""));
+          terms.addChild("", "");
+          for (String value : fieldsValues) {
+            terms.addChild(labels.get(fieldI18NPrefix + "." + value), value);
           }
           searchField.setTerms(terms);
         }
