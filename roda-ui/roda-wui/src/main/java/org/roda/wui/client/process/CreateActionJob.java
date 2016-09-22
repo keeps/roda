@@ -337,7 +337,7 @@ public class CreateActionJob extends Composite {
         workflowListDescriptionCategories.setVisible(false);
       }
 
-      if (selectedPlugin.getParameters().size() == 0) {
+      if (selectedPlugin.getParameters().isEmpty()) {
         workflowPanel.setVisible(false);
       } else {
         workflowPanel.setVisible(true);

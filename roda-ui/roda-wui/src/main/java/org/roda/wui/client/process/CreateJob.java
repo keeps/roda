@@ -148,7 +148,10 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
   ListBox workflowList;
 
   @UiField
-  Label workflowListDescription;
+  FlowPanel workflowListDescription;
+
+  @UiField
+  Label workflowListDescriptionCategories, workflowListTitle;
 
   @UiField
   FlowPanel workflowPanel;
@@ -215,6 +218,7 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
     configurePlugins(selected.getSelectedClass());
 
     workflowCategoryList.addStyleName("form-listbox-job");
+    workflowList.setVisibleItemCount(20);
     workflowList.addChangeHandler(new ChangeHandler() {
 
       @Override
@@ -299,6 +303,7 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
                       }
                     }
 
+                    workflowList.setSelectedIndex(0);
                     String selectedPluginId = workflowList.getSelectedValue();
                     if (selectedPluginId != null) {
                       CreateJob.this.selectedPlugin = lookupPlugin(selectedPluginId);
@@ -337,17 +342,39 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
 
   protected void updateWorkflowOptions() {
     if (selectedPlugin == null) {
-      workflowListDescription.setText("");
+      workflowListDescription.clear();
+      workflowListDescriptionCategories.setText("");
       workflowListDescription.setVisible(false);
+      workflowListDescriptionCategories.setVisible(false);
       workflowOptions.setPluginInfo(null);
     } else {
-      name.setText(selectedPlugin.getName());
+      String pluginName = messages.pluginLabel(selectedPlugin.getName(), selectedPlugin.getVersion());
+      name.setText(pluginName);
+      workflowListTitle.setText(pluginName);
+
       String description = selectedPlugin.getDescription();
       if (description != null && description.length() > 0) {
-        workflowListDescription.setText(description);
+        String[] split = description.split("\\r?\\n");
+        workflowListDescription.clear();
+
+        for (String s : split) {
+          Label descriptionLine = new Label(s);
+          descriptionLine.addStyleName("p");
+          descriptionLine.addStyleName("plugin-description");
+          workflowListDescription.add(descriptionLine);
+        }
+
+        String categories = messages.createJobCategoryWorkflow() + ": ";
+        for (String category : selectedPlugin.getCategories()) {
+          categories += messages.showPluginCategories(category) + ", ";
+        }
+
+        workflowListDescriptionCategories.setText(categories.substring(0, categories.length() - 2));
         workflowListDescription.setVisible(true);
+        workflowListDescriptionCategories.setVisible(true);
       } else {
         workflowListDescription.setVisible(false);
+        workflowListDescriptionCategories.setVisible(false);
       }
 
       if (selectedPlugin.getParameters().size() == 0) {
