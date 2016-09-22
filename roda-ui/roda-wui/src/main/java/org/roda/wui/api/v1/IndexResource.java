@@ -41,6 +41,7 @@ import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.CountRequest;
+import org.roda.wui.api.v1.utils.ExtraMediaType;
 import org.roda.wui.api.v1.utils.FindRequest;
 import org.roda.wui.common.I18nUtility;
 import org.slf4j.Logger;
@@ -95,7 +96,7 @@ public class IndexResource {
    *           if some error occurs.
    */
   @GET
-  @Produces({MediaType.APPLICATION_JSON})
+  @Produces({MediaType.APPLICATION_JSON, ExtraMediaType.TEXT_CSV})
   @ApiOperation(value = "Find indexed resources", notes = "Find indexed resources.", response = IndexResult.class, responseContainer = "List")
   public <T extends IsIndexed> Response list(
     @ApiParam(value = "Class of resources to return", required = true, example = "org.roda.core.data.v2.ip.IndexedFile") @QueryParam(RodaConstants.API_QUERY_KEY_RETURN_CLASS) final String returnClass,
@@ -104,7 +105,7 @@ public class IndexResource {
     @ApiParam(value = "Index of the first element to return (0-based index)", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) final Integer start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam(RodaConstants.API_QUERY_KEY_LIMIT) final Integer limit,
     @ApiParam(value = "Facets to return", example = "formatPronom") @QueryParam(RodaConstants.API_QUERY_KEY_FACET) final List<String> facetAttributes,
-    @ApiParam(value = "Facet limit", example = "100") @QueryParam(RodaConstants.API_QUERY_KEY_FACET_LIMIT) final Integer facetLimit,
+    @ApiParam(value = "Facet limit", example = "100", defaultValue = "100") @QueryParam(RodaConstants.API_QUERY_KEY_FACET_LIMIT) Integer facetLimit,
     @ApiParam(value = "Language", example = "en", defaultValue = "en") @QueryParam(RodaConstants.API_QUERY_KEY_LANG) final String localeString,
     @ApiParam(value = "Return only active resources?", defaultValue = "true") @QueryParam(RodaConstants.API_QUERY_KEY_ONLY_ACTIVE) final Boolean onlyActive)
     throws RODAException {
@@ -138,6 +139,9 @@ public class IndexResource {
 
       final Sublist sublist = new Sublist(start == null ? DEFAULT_START : start, limit == null ? DEFAULT_LIMIT : limit);
 
+      if (facetLimit == null) {
+        facetLimit = 100;
+      }
       final Set<FacetParameter> facetParameters = new HashSet<>();
       for (String facetAttribute : facetAttributes) {
         facetParameters.add(new SimpleFacetParameter(facetAttribute, facetLimit, SORT.COUNT));
@@ -146,13 +150,18 @@ public class IndexResource {
 
       final boolean paramOnlyActive = onlyActive == null ? DEFAULT_ONLY_ACTIVE : onlyActive;
 
-      IndexResult<T> indexResult = Browser.find(classToReturn, filter, sorter, sublist, facets, user, paramOnlyActive);
-      final IndexResult<T> result = I18nUtility.translate(indexResult, classToReturn, localeString);
-
-      return Response.ok(result, mediaType).build();
+      if (ExtraMediaType.TEXT_CSV.equals(mediaType)) {
+        final String csv = Browser.findCSV(classToReturn, filter, sorter, sublist, facets, user, paramOnlyActive);
+        return Response.ok(csv, mediaType).build();
+      } else {
+        IndexResult<T> indexResult = Browser.find(classToReturn, filter, sorter, sublist, facets, user,
+          paramOnlyActive);
+        indexResult = I18nUtility.translate(indexResult, classToReturn, localeString);
+        return Response.ok(indexResult, mediaType).build();
+      }
 
     } catch (final ClassNotFoundException e) {
-      throw new InvalidParameterException("Invalid parameter " + RodaConstants.API_QUERY_KEY_RETURN_CLASS, e);
+      throw new InvalidParameterException("Invalid value for classToReturn '" + returnClass + "'", e);
     }
   }
 
@@ -168,7 +177,7 @@ public class IndexResource {
   @POST
   @Path("/find")
   @Consumes({MediaType.APPLICATION_JSON})
-  @Produces({MediaType.APPLICATION_JSON})
+  @Produces({MediaType.APPLICATION_JSON, ExtraMediaType.TEXT_CSV})
   @ApiOperation(value = "Find indexed resources", notes = "Find indexed resources.", response = IsIndexed.class, responseContainer = "List")
   public <T extends IsIndexed> Response list(@ApiParam(value = "Find parameters") final FindRequest findRequest)
     throws RODAException {
@@ -180,10 +189,15 @@ public class IndexResource {
       @SuppressWarnings("unchecked")
       final Class<T> classToReturn = (Class<T>) Class.forName(findRequest.classToReturn);
 
-      final IndexResult<T> result = Browser.find(classToReturn, findRequest.filter, findRequest.sorter,
-        findRequest.sublist, findRequest.facets, user, findRequest.onlyActive);
-
-      return Response.ok(result, mediaType).build();
+      if (ExtraMediaType.TEXT_CSV.equals(mediaType)) {
+        final String csv = Browser.findCSV(classToReturn, findRequest.filter, findRequest.sorter, findRequest.sublist,
+          findRequest.facets, user, findRequest.onlyActive);
+        return Response.ok(csv, mediaType).build();
+      } else {
+        final IndexResult<T> result = Browser.find(classToReturn, findRequest.filter, findRequest.sorter,
+          findRequest.sublist, findRequest.facets, user, findRequest.onlyActive);
+        return Response.ok(result, mediaType).build();
+      }
 
     } catch (final ClassNotFoundException e) {
       throw new InvalidParameterException("Invalid value for classToReturn '" + findRequest.classToReturn + "'", e);

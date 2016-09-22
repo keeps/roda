@@ -388,6 +388,12 @@ public class BrowserHelper {
     return RodaCoreFactory.getIndexService().find(returnClass, filter, sorter, sublist, facets, user, justActive);
   }
 
+  protected static <T extends IsIndexed> String findCSV(final Class<T> returnClass, final Filter filter,
+    final Sorter sorter, final Sublist sublist, final Facets facets, final User user, final boolean justActive)
+    throws GenericException, RequestNotValidException {
+    return RodaCoreFactory.getIndexService().findCSV(returnClass, filter, sorter, sublist, facets, user, justActive);
+  }
+
   protected static <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, User user)
     throws GenericException, RequestNotValidException {
     boolean justActive = false;
