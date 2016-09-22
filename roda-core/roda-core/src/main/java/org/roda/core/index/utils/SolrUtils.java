@@ -270,7 +270,11 @@ public class SolrUtils {
     try {
 
       final QueryResponse response = index.query(getIndexName(classToRetrieve).get(0), query);
-      return new CSVQueryResponse(response).toCSVString();
+      if (facets.getParameters().isEmpty()) {
+        return new CSVQueryResponse(response).toCSV();
+      } else {
+        return new CSVFacetResults(processFacetFields(facets, response.getFacetFields())).toCSV();
+      }
 
     } catch (final SolrServerException | IOException e) {
       throw new GenericException("Could not query index", e);

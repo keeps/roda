@@ -9,46 +9,45 @@ package org.roda.core.index.utils;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.Collection;
+import java.util.List;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
+import org.roda.core.data.v2.index.FacetFieldResult;
+import org.roda.core.data.v2.index.FacetValue;
 
 /**
- * This class wraps a {@link QueryResponse} and produces CSV text with the
- * results.
+ * This class wraps a list of {@link FacetFieldResult} and produces CSV text
+ * with the facet results.
  *
  * @author Rui Castro <rui.castro@gmail.com>
  */
-class CSVQueryResponse {
+class CSVFacetResults {
 
   /**
    * The {@link QueryResponse} with the results.
    */
-  private final QueryResponse response;
+  private final List<FacetFieldResult> facetResults;
   /**
-   * Cached CSV text result.
+   * Cached CSV text.
    */
   private String csvCache;
 
   /**
    * Constructor.
    *
-   * @param response
-   *          the {@link QueryResponse} with the results.
+   * @param facetResults
+   *          the {@link FacetFieldResult}s.
    */
-  CSVQueryResponse(final QueryResponse response) {
-    this.response = response;
+  CSVFacetResults(final List<FacetFieldResult> facetResults) {
+    this.facetResults = facetResults;
     this.csvCache = null;
   }
 
   /**
-   * Constructs a {@link String} of CSV text with the {@link QueryResponse}
-   * results.
-   *
+   * Constructs a {@link String} of CSV text with the {@link FacetFieldResult}s.
+   * 
    * @return a {@link String} of CSV text.
    * @throws IOException
    *           if some I/O error occurs.
@@ -61,27 +60,24 @@ class CSVQueryResponse {
   }
 
   /**
-   * Transforms the {@link QueryResponse} into a {@link String} with CSV text.
-   *
+   * Transforms the {@link QueryResponse} facets into a {@link String} with CSV
+   * text.
+   * 
    * @return {@link String} with CSV text
    * @throws IOException
    *           if some I/O error occurs.
    */
   private String buildCSV() throws IOException {
     try (StringWriter strWriter = new StringWriter()) {
-      final SolrDocumentList docList = response.getResults();
 
-      if (!docList.isEmpty()) {
-        final Collection<String> fieldNames = docList.get(0).getFieldNames();
-        fieldNames.removeIf("_version_"::equals);
-        final String[] headers = fieldNames.toArray(new String[fieldNames.size()]);
-        final CSVPrinter printer = CSVFormat.DEFAULT.withHeader(headers).print(strWriter);
+      if (!this.facetResults.isEmpty()) {
+        final CSVPrinter printer = CSVFormat.DEFAULT.withHeader("field", "label", "value", "count").print(strWriter);
 
-        for (SolrDocument doc : docList) {
-          for (String field : fieldNames) {
-            printer.print(doc.getFieldValue(field));
+        for (FacetFieldResult facet : this.facetResults) {
+          final String field = facet.getField();
+          for (FacetValue value : facet.getValues()) {
+            printer.printRecord(field, value.getLabel(), value.getValue(), value.getCount());
           }
-          printer.println();
         }
       }
 
