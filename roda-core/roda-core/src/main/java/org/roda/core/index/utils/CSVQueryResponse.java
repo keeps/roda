@@ -11,14 +11,11 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Collection;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.supercsv.cellprocessor.Optional;
-import org.supercsv.cellprocessor.ift.CellProcessor;
-import org.supercsv.io.CsvMapWriter;
-import org.supercsv.io.ICsvMapWriter;
-import org.supercsv.prefs.CsvPreference;
 
 /**
  * This class wraps a {@link QueryResponse} and produces CSV text with the
@@ -71,43 +68,25 @@ class CSVQueryResponse {
    *           if some I/O error occurs.
    */
   private String responseToCSV() throws IOException {
-    final StringWriter strWriter = new StringWriter();
-    try (ICsvMapWriter mapWriter = new CsvMapWriter(strWriter, CsvPreference.STANDARD_PREFERENCE)) {
-
+    try (StringWriter strWriter = new StringWriter()) {
       final SolrDocumentList docList = response.getResults();
 
       if (!docList.isEmpty()) {
         final Collection<String> fieldNames = docList.get(0).getFieldNames();
         fieldNames.removeIf("_version_"::equals);
         final String[] headers = fieldNames.toArray(new String[fieldNames.size()]);
-        mapWriter.writeHeader(headers);
-
-        final CellProcessor[] processors = getProcessors(docList.get(0));
+        final CSVPrinter printer = CSVFormat.DEFAULT.withHeader(headers).print(strWriter);
 
         for (SolrDocument doc : docList) {
-          mapWriter.write(doc.getFieldValueMap(), headers, processors);
+          for (String field : fieldNames) {
+            printer.print(doc.getFieldValue(field));
+          }
+          printer.println();
         }
       }
 
-      mapWriter.flush();
       return strWriter.toString();
     }
   }
 
-  /**
-   * Return the {@link CellProcessor}s for the {@link SolrDocument}.
-   *
-   * @param doc
-   *          the {@link SolrDocument}.
-   * @return an array of {@link CellProcessor}.
-   */
-  private CellProcessor[] getProcessors(final SolrDocument doc) {
-
-    final Collection<String> fieldNames = doc.getFieldNames();
-    final CellProcessor[] processors = new CellProcessor[fieldNames.size()];
-    for (int i = 0; i < fieldNames.size(); i++) {
-      processors[i] = new Optional();
-    }
-    return processors;
-  }
 }
