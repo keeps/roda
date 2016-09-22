@@ -21,6 +21,9 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-source-plugin</artifactId>
+						<configuration>
+							<excludeResources>true</excludeResources>
+						</configuration>
 					</plugin>
 				</plugins>
 			</build>

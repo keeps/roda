@@ -27,6 +27,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.sort.SortParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
@@ -124,16 +125,6 @@ public class IndexService {
     return SolrUtils.find(getSolrClient(), returnClass, filter, sorter, sublist, Facets.NONE);
   }
 
-  public <T extends IsIndexed> IterableIndexResult<T> findAll(Class<T> returnClass, Filter filter, Sorter sorter)
-    throws GenericException, RequestNotValidException {
-    return new IterableIndexResult<T>(getSolrClient(), returnClass, filter, sorter, Facets.NONE, true);
-  }
-
-  public <T extends IsIndexed> IterableIndexResult<T> findAll(Class<T> returnClass, Filter filter, Sorter sorter,
-    boolean removeDuplicates) throws GenericException, RequestNotValidException {
-    return new IterableIndexResult<T>(getSolrClient(), returnClass, filter, sorter, Facets.NONE, removeDuplicates);
-  }
-
   public <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter, Sublist sublist,
     Facets facets) throws GenericException, RequestNotValidException {
     return SolrUtils.find(getSolrClient(), returnClass, filter, sorter, sublist, facets);
@@ -142,6 +133,25 @@ public class IndexService {
   public <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter, Sublist sublist,
     Facets facets, User user, boolean justActive) throws GenericException, RequestNotValidException {
     return SolrUtils.find(getSolrClient(), returnClass, filter, sorter, sublist, facets, user, justActive);
+  }
+
+  public <T extends IsIndexed> IterableIndexResult<T> findAll(Class<T> returnClass, Filter filter) {
+    return findAll(returnClass, filter, new Sorter(new SortParameter(RodaConstants.INDEX_UUID, true)), true);
+  }
+
+  public <T extends IsIndexed> IterableIndexResult<T> findAll(Class<T> returnClass, Filter filter,
+    boolean removeDuplicates) {
+    return findAll(returnClass, filter, new Sorter(new SortParameter(RodaConstants.INDEX_UUID, true)),
+      removeDuplicates);
+  }
+
+  public <T extends IsIndexed> IterableIndexResult<T> findAll(Class<T> returnClass, Filter filter, Sorter sorter) {
+    return findAll(returnClass, filter, sorter, true);
+  }
+
+  public <T extends IsIndexed> IterableIndexResult<T> findAll(Class<T> returnClass, Filter filter, Sorter sorter,
+    boolean removeDuplicates) {
+    return new IterableIndexResult<T>(getSolrClient(), returnClass, filter, sorter, Facets.NONE, removeDuplicates);
   }
 
   public <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, User user, boolean justActive)

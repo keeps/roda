@@ -25,7 +25,6 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import org.roda.core.data.adapter.sort.SortParameter;
 import org.roda.core.data.adapter.sort.Sorter;
-import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -36,12 +35,12 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
-import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
@@ -384,44 +383,32 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     cleanUnfinishedJobs(findUnfinishedJobs());
   }
 
-  private List<Job> findUnfinishedJobs() {
+  private IterableIndexResult<Job> findUnfinishedJobs() {
     Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.JOB_STATE,
       Arrays.asList(Job.JOB_STATE.STARTED.toString(), Job.JOB_STATE.CREATED.toString())));
-    Sublist sublist = new Sublist(0, RodaConstants.DEFAULT_PAGINATION_VALUE);
-    IndexResult<Job> jobs;
-    List<Job> unfinishedJobs = new ArrayList<>();
-    try {
-      do {
-        jobs = index.find(Job.class, filter, null, sublist);
-        unfinishedJobs.addAll(jobs.getResults());
-        sublist.setFirstElementIndex(sublist.getFirstElementIndex() + Math.toIntExact(jobs.getLimit()));
-      } while (jobs.getTotalCount() > jobs.getOffset() + jobs.getLimit());
-    } catch (GenericException | RequestNotValidException e) {
-      LOGGER.error("Unable to find Jobs still to be cleaned", e);
-    }
-    return unfinishedJobs;
+
+    return index.findAll(Job.class, filter);
+
   }
 
-  private void cleanUnfinishedJobs(List<Job> unfinishedJobs) {
-    if (!unfinishedJobs.isEmpty()) {
-      List<String> jobsToBeDeletedFromIndex = new ArrayList<>();
-      for (Job job : unfinishedJobs) {
-        try {
-          Job jobToBeCleaned = model.retrieveJob(job.getId());
-          JobsHelper.updateJobInTheStateStartedOrCreated(jobToBeCleaned);
-          model.createOrUpdateJob(jobToBeCleaned);
+  private void cleanUnfinishedJobs(IterableIndexResult<Job> unfinishedJobs) {
+    List<String> jobsToBeDeletedFromIndex = new ArrayList<>();
+    for (Job job : unfinishedJobs) {
+      try {
+        Job jobToBeCleaned = model.retrieveJob(job.getId());
+        JobsHelper.updateJobInTheStateStartedOrCreated(jobToBeCleaned);
+        model.createOrUpdateJob(jobToBeCleaned);
 
-          // cleanup job related objects (aips, sips, etc.)
-          JobsHelper.doJobObjectsCleanup(job, RodaCoreFactory.getModelService(), index);
-        } catch (NotFoundException e) {
-          jobsToBeDeletedFromIndex.add(job.getId());
-        } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
-          LOGGER.error("Unable to get/update Job", e);
-        }
+        // cleanup job related objects (aips, sips, etc.)
+        JobsHelper.doJobObjectsCleanup(job, model, index);
+      } catch (NotFoundException e) {
+        jobsToBeDeletedFromIndex.add(job.getId());
+      } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
+        LOGGER.error("Unable to get/update Job", e);
       }
-      if (!jobsToBeDeletedFromIndex.isEmpty()) {
-        index.deleteSilently(Job.class, jobsToBeDeletedFromIndex);
-      }
+    }
+    if (!jobsToBeDeletedFromIndex.isEmpty()) {
+      index.deleteSilently(Job.class, jobsToBeDeletedFromIndex);
     }
   }
 
