@@ -211,6 +211,28 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
+  public static <T extends IsIndexed> String findCSV(final Class<T> classToReturn, final Filter filter,
+    final Sorter sorter, final Sublist sublist, final Facets facets, final User user, final boolean justActive)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user, classToReturn);
+
+    // TODO check permissions for each class
+
+    // delegate
+    final String ret = BrowserHelper.findCSV(classToReturn, filter, sorter, sublist, facets, user, justActive);
+
+    // register action
+
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "class", classToReturn.getSimpleName(),
+      RodaConstants.CONTROLLER_FILTER_PARAM, filter, RodaConstants.CONTROLLER_SORTER_PARAM, sorter,
+      RodaConstants.CONTROLLER_SUBLIST_PARAM, sublist);
+
+    return ret;
+  }
+
   public static <T extends IsIndexed> Long count(final User user, final Class<T> classToReturn, final Filter filter)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};

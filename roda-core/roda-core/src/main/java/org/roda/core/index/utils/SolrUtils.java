@@ -11,24 +11,12 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.*;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.io.IOUtils;
@@ -41,11 +29,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.SolrInputField;
+import org.apache.solr.common.*;
 import org.apache.solr.common.params.FacetParams;
 import org.apache.solr.common.util.DateUtil;
 import org.apache.solr.handler.loader.XMLLoader;
@@ -58,51 +42,19 @@ import org.roda.core.data.adapter.facet.FacetParameter.SORT;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.facet.RangeFacetParameter;
 import org.roda.core.data.adapter.facet.SimpleFacetParameter;
-import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
-import org.roda.core.data.adapter.filter.DateIntervalFilterParameter;
-import org.roda.core.data.adapter.filter.DateRangeFilterParameter;
-import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
-import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.filter.FilterParameter;
-import org.roda.core.data.adapter.filter.LongRangeFilterParameter;
-import org.roda.core.data.adapter.filter.NotSimpleFilterParameter;
-import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
-import org.roda.core.data.adapter.filter.OrFiltersParameters;
-import org.roda.core.data.adapter.filter.SimpleFilterParameter;
+import org.roda.core.data.adapter.filter.*;
 import org.roda.core.data.adapter.sort.SortParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.DateGranularity;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.NotSupportedException;
-import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.*;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.formats.Format;
-import org.roda.core.data.v2.index.FacetFieldResult;
-import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.IndexRunnable;
-import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.index.SelectedItems;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.AIPState;
-import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.index.*;
+import org.roda.core.data.v2.ip.*;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
-import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
-import org.roda.core.data.v2.ip.metadata.FileFormat;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
-import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
-import org.roda.core.data.v2.ip.metadata.OtherMetadata;
+import org.roda.core.data.v2.ip.metadata.*;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
@@ -253,6 +205,35 @@ public class SolrUtils {
     }
 
     return ret;
+  }
+
+  public static <T extends IsIndexed> String findCSV(final SolrClient index, final Class<T> classToRetrieve,
+    final Filter filter, final Sorter sorter, final Sublist sublist, final Facets facets, final User user,
+    final boolean justActive) throws GenericException, RequestNotValidException {
+
+    final SolrQuery query = new SolrQuery();
+    query.setParam("q.op", DEFAULT_QUERY_PARSER_OPERATOR);
+    query.setQuery(parseFilter(filter));
+    query.setSorts(parseSorter(sorter));
+    query.setStart(sublist.getFirstElementIndex());
+    query.setRows(sublist.getMaximumElementCount());
+    parseAndConfigureFacets(facets, query);
+    if (hasPermissionFilters(classToRetrieve)) {
+      query.addFilterQuery(getFilterQueries(user, justActive));
+    }
+
+    try {
+
+      final QueryResponse response = index.query(getIndexName(classToRetrieve).get(0), query);
+      return new CSVQueryResponse(response).toCSVString();
+
+    } catch (final SolrServerException | IOException e) {
+      throw new GenericException("Could not query index", e);
+    } catch (final SolrException e) {
+      throw new RequestNotValidException(e.getMessage());
+    } catch (final RuntimeException e) {
+      throw new GenericException("Unexpected exception while querying index", e);
+    }
   }
 
   /*

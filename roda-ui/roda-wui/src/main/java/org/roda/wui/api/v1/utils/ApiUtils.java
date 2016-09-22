@@ -12,11 +12,7 @@ import java.net.URISyntaxException;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.CacheControl;
-import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.*;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang.StringUtils;
@@ -59,7 +55,7 @@ public class ApiUtils {
    *          String with request headers
    * @return media type
    */
-  public static String getMediaType(String acceptFormat, String acceptHeaders) {
+  public static String getMediaType(final String acceptFormat, final String acceptHeaders) {
     final String APPLICATION_JS = "application/javascript; charset=UTF-8";
 
     String mediaType = MediaType.APPLICATION_JSON + "; charset=UTF-8";
@@ -79,6 +75,8 @@ public class ApiUtils {
         mediaType = MediaType.APPLICATION_XML;
       } else if (acceptHeaders.contains(APPLICATION_JS)) {
         mediaType = APPLICATION_JS;
+      } else if (acceptHeaders.contains(ExtraMediaType.TEXT_CSV)) {
+        mediaType = ExtraMediaType.TEXT_CSV;
       }
     }
 

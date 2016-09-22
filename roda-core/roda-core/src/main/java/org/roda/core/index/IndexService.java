@@ -7,17 +7,9 @@
  */
 package org.roda.core.index;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Serializable;
+import java.io.*;
 import java.nio.file.NoSuchFileException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrClient;
@@ -31,11 +23,7 @@ import org.roda.core.data.adapter.sort.SortParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.IsStillUpdatingException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.*;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
@@ -43,12 +31,7 @@ import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.*;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -152,6 +135,12 @@ public class IndexService {
   public <T extends IsIndexed> IterableIndexResult<T> findAll(Class<T> returnClass, Filter filter, Sorter sorter,
     boolean removeDuplicates) {
     return new IterableIndexResult<T>(getSolrClient(), returnClass, filter, sorter, Facets.NONE, removeDuplicates);
+  }
+
+  public <T extends IsIndexed> String findCSV(final Class<T> returnClass, final Filter filter, final Sorter sorter,
+    final Sublist sublist, final Facets facets, final User user, final boolean justActive)
+    throws GenericException, RequestNotValidException {
+    return SolrUtils.findCSV(index, returnClass, filter, sorter, sublist, facets, user, justActive);
   }
 
   public <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, User user, boolean justActive)
