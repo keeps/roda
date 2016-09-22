@@ -120,7 +120,7 @@ public class ApiUtils {
   }
 
   public static Response okResponse(StreamResponse streamResponse, CacheControl cacheControl, Date lastModifiedDate,
-                                    boolean inline) {
+    boolean inline) {
     return Response.ok(streamResponse.getStream(), streamResponse.getMediaType())
       .header(HttpHeaders.CONTENT_DISPOSITION,
         contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + "\"" + streamResponse.getFilename() + "\"")
