@@ -12,11 +12,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import javax.xml.transform.TransformerException;
 
@@ -30,15 +26,7 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.IsStillUpdatingException;
-import org.roda.core.data.exceptions.JobAlreadyStartedException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.*;
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.common.RODAObjectList;
@@ -46,15 +34,8 @@ import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.ip.*;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
-import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Report;
@@ -68,12 +49,7 @@ import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.wui.api.v1.utils.ApiUtils;
-import org.roda.wui.client.browse.BrowseItemBundle;
-import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
-import org.roda.wui.client.browse.DescriptiveMetadataVersionsBundle;
-import org.roda.wui.client.browse.PreservationEventViewBundle;
-import org.roda.wui.client.browse.SupportedMetadataTypeBundle;
-import org.roda.wui.client.browse.UserExtraBundle;
+import org.roda.wui.client.browse.*;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
 import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
@@ -203,6 +179,28 @@ public class Browser extends RodaWuiController {
 
     // delegate
     final IndexResult<T> ret = BrowserHelper.find(classToReturn, filter, sorter, sublist, facets, user, justActive);
+
+    // register action
+
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "class", classToReturn.getSimpleName(),
+      RodaConstants.CONTROLLER_FILTER_PARAM, filter, RodaConstants.CONTROLLER_SORTER_PARAM, sorter,
+      RodaConstants.CONTROLLER_SUBLIST_PARAM, sublist);
+
+    return ret;
+  }
+
+  public static <T extends IsIndexed> String findCSV(final Class<T> classToReturn, final Filter filter,
+    final Sorter sorter, final Sublist sublist, final Facets facets, final User user, final boolean justActive)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user, classToReturn);
+
+    // TODO check permissions for each class
+
+    // delegate
+    final String ret = BrowserHelper.findCSV(classToReturn, filter, sorter, sublist, facets, user, justActive);
 
     // register action
 
