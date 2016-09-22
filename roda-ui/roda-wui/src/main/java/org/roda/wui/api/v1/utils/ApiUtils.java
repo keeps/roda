@@ -12,7 +12,11 @@ import java.net.URISyntaxException;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.*;
+import javax.ws.rs.core.CacheControl;
+import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang.StringUtils;
@@ -116,7 +120,7 @@ public class ApiUtils {
   }
 
   public static Response okResponse(StreamResponse streamResponse, CacheControl cacheControl, Date lastModifiedDate,
-    boolean inline) {
+                                    boolean inline) {
     return Response.ok(streamResponse.getStream(), streamResponse.getMediaType())
       .header(HttpHeaders.CONTENT_DISPOSITION,
         contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + "\"" + streamResponse.getFilename() + "\"")
