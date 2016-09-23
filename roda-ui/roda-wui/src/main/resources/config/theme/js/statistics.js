@@ -16,8 +16,10 @@
 			matchedObject.each(function() {
 				var element = $(this);
 
+				inheritDataAttributes(element);
+
 				var view = element.data("view");
-				var viewCallback;
+				var viewCallback = function() {};
 				if (view == "chart") {
 					var viewField = element.data("view-field");
 					if (viewField == "facetResults") {
@@ -27,9 +29,9 @@
 					}
 				} else if (view == "text") {
 					viewCallback = initViewText;
+				} else if (view == "download") {
+					viewCallback = initViewDownload;
 				} else {
-					viewCallback = function() {
-					};
 					console.log("Unknown view '" + view + "'");
 				}
 
@@ -46,17 +48,36 @@
 			});
 		}
 
-		function fetchIndexData(element, viewCallback) {
+		function inheritDataAttributes(element) {
+			var attributes = [
+				"source", "source-class", "source-facets", "source-start", "source-limit", "source-onlyActive",
+				"view", "view-field", "view-limit", "view-type", "view-filename", "view-type-function",
+				"function"
+			];
+			var ref = element.data("ref");
+			if (ref) {
+				var refElement = document.getElementById(ref);
+				refElement = refElement ? $(refElement) : refElement;
+				if (refElement) {
+					refElement = $(refElement);
+					attributes.forEach(function(attribute){
+						element.data(attribute, element.data(attribute) || refElement.data(attribute));
+					});
+				}
+			}
+		}
+
+		function buildDataUrl(element) {
 			var returnClass = $(element).data("source-class");
 
 			var filters = $(element).data("source-filters") ? $(element).data(
-					"source-filters").split(/\s*[ ,]\s*/) : [];
+				"source-filters").split(/\s*[ ,]\s*/) : [];
 			var filterParams = filters.map(function(filter) {
 				return "filter=" + filter
 			}).join("&");
 
 			var facets = $(element).data("source-facets") ? $(element).data(
-					"source-facets").split(/\s*[ ,]\s*/) : [];
+				"source-facets").split(/\s*[ ,]\s*/) : [];
 			var facetParams = facets.map(function(facet) {
 				return "facet=" + facet
 			}).join("&");
@@ -68,13 +89,16 @@
 
 			var lang = document.locale;
 
-			$.ajax(
-					{
-						url : "/api/v1/index?returnClass=" + returnClass + "&"
-								+ filterParams + "&" + facetParams + "&start="
-								+ start + "&limit=" + limit + "&facetLimit="
-								+ facetLimit + "&lang=" + lang +  "&onlyActive=" + onlyActive
-					}).done(function(data) {
+			return "/api/v1/index?returnClass=" + returnClass + "&"
+				+ filterParams + "&" + facetParams + "&start="
+				+ start + "&limit=" + limit + "&facetLimit="
+				+ facetLimit + "&lang=" + lang +  "&onlyActive=" + onlyActive;
+		}
+
+		function fetchIndexData(element, viewCallback) {
+			$.ajax({
+				url : buildDataUrl(element)
+			}).done(function(data) {
 				viewCallback(element, data);
 			});
 		}
@@ -83,6 +107,25 @@
 			element.text(data[element.data("view-field")]);
 			element.parent().textfill({
 				widthOnly : true
+			});
+		}
+
+		function initViewDownload(element, data) {
+			var url = buildDataUrl(element);
+			var filename = element.data("view-filename") || "export.csv";
+			element.click(function(){
+				var type = 'text/csv';
+				$.ajax({
+					accepts: {
+						text: type
+					},
+					url: url,
+					processData: false,
+					dataType: 'text',
+					success: function(data){
+						saveAs(new Blob([data], {type: type}), filename);
+					}
+				});
 			});
 		}
 
