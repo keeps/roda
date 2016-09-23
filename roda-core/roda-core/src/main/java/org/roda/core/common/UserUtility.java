@@ -68,7 +68,7 @@ public class UserUtility {
       try {
         user = UserUtility.getLdapUtility().getAuthenticatedUser(credentials.getFirst(), credentials.getSecond());
         user.setIpAddress(request.getRemoteAddr());
-      } catch (AuthenticationDeniedException | ServiceException e) {
+      } catch (AuthenticationDeniedException | GenericException e) {
         throw new AuthorizationDeniedException("Unable to authenticate user!");
       }
     } else {

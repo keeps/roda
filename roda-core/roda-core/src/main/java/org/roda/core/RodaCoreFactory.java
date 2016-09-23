@@ -1243,8 +1243,7 @@ public class RodaCoreFactory {
       if ("users_and_groups".equalsIgnoreCase(entity)) {
         try {
           indexUsersAndGroupsFromLDAP();
-        } catch (EmailAlreadyExistsException | UserAlreadyExistsException | IllegalOperationException | GenericException
-          | NotFoundException | AlreadyExistsException e) {
+        } catch (IllegalOperationException | GenericException | NotFoundException | AlreadyExistsException e) {
           LOGGER.error("Unable to reindex users & groups from LDAP.", e);
         }
       }

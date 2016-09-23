@@ -87,7 +87,7 @@ public class CreateGroup extends Composite {
   public CreateGroup(Group group) {
     this.group = group;
 
-    this.groupDataPanel = new GroupDataPanel(true, true);
+    this.groupDataPanel = new GroupDataPanel(true, false);
     this.groupDataPanel.setGroup(group);
 
     initWidget(uiBinder.createAndBindUi(this));

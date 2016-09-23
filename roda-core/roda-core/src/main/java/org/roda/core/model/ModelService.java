@@ -1320,11 +1320,7 @@ public class ModelService extends ModelObservable {
 
   public User retrieveAuthenticatedUser(String name, String password)
     throws GenericException, AuthenticationDeniedException {
-    try {
-      return UserUtility.getLdapUtility().getAuthenticatedUser(name, password);
-    } catch (ServiceException e) {
-      throw new GenericException("Unable to retrieve user", e);
-    }
+    return UserUtility.getLdapUtility().getAuthenticatedUser(name, password);
   }
 
   public User retrieveUserByName(String name) throws GenericException {
