@@ -25,7 +25,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.directory.api.ldap.model.cursor.Cursor;
 import org.apache.directory.api.ldap.model.entry.Attribute;
-import org.apache.directory.api.ldap.model.entry.DefaultAttribute;
 import org.apache.directory.api.ldap.model.entry.DefaultEntry;
 import org.apache.directory.api.ldap.model.entry.DefaultModification;
 import org.apache.directory.api.ldap.model.entry.Entry;
@@ -521,7 +520,7 @@ public class LdapUtility {
    */
   public User modifyUser(final User modifiedUser)
     throws NotFoundException, IllegalOperationException, EmailAlreadyExistsException, LdapUtilityException {
-    modifyUser(service.getAdminSession(), modifiedUser, null, true);
+    modifyUser(service.getAdminSession(), modifiedUser, null, true, false);
     return getUser(modifiedUser.getName());
   }
 
@@ -574,7 +573,7 @@ public class LdapUtility {
    */
   public User modifySelfUser(final User modifiedUser, final String newPassword)
     throws NotFoundException, EmailAlreadyExistsException, IllegalOperationException, LdapUtilityException {
-    modifyUser(service.getAdminSession(), modifiedUser, newPassword, false);
+    modifyUser(service.getAdminSession(), modifiedUser, newPassword, false, false);
     return getUser(modifiedUser.getName());
   }
 
@@ -741,8 +740,32 @@ public class LdapUtility {
    */
   public Group modifyGroup(final Group modifiedGroup)
     throws NotFoundException, IllegalOperationException, LdapUtilityException, GenericException {
+    return modifyGroup(modifiedGroup, false);
+  }
 
-    if (this.ldapProtectedGroups.contains(modifiedGroup.getName())) {
+  /**
+   * Modify the {@link Group}'s information.
+   *
+   * @param modifiedGroup
+   *          the {@link Group} to modify.
+   * @param force
+   *          ignore protected groups configuration.
+   *
+   * @return the modified {@link Group}.
+   *
+   * @throws NotFoundException
+   *           if the group with being modified doesn't exist.
+   * @throws IllegalOperationException
+   *           if the user is one of the protected users.
+   * @throws LdapUtilityException
+   *           if some error occurred.
+   * @throws GenericException
+   *           if some error occurred.
+   */
+  public Group modifyGroup(final Group modifiedGroup, final boolean force)
+    throws NotFoundException, IllegalOperationException, LdapUtilityException, GenericException {
+
+    if (!force && this.ldapProtectedGroups.contains(modifiedGroup.getName())) {
       throw new IllegalOperationException(
         String.format("Group (%s) is protected and cannot be modified.", modifiedGroup.getName()));
     }
@@ -1257,7 +1280,7 @@ public class LdapUtility {
 
     user.setActive("0".equalsIgnoreCase(getEntryAttributeAsString(entry, SHADOW_INACTIVE)));
 
-    user.setEmail(entry.get(EMAIL).getString());
+    user.setEmail(getEntryAttributeAsString(entry, EMAIL));
     user.setGuest(false);
 
     user.setExtra(getEntryAttributeAsString(entry, "description"));
@@ -1460,6 +1483,8 @@ public class LdapUtility {
    * @param modifyRolesAndGroups
    *          <code>true</code> if User's groups and roles should be updated
    *          also.
+   * @param force
+   *          ignore protected users configuration.
    *
    * @throws NotFoundException
    *           if the {@link User} being modified doesn't exist.
@@ -1471,10 +1496,10 @@ public class LdapUtility {
    *           if some error occurred.
    */
   private void modifyUser(final CoreSession session, final User modifiedUser, final String newPassword,
-    final boolean modifyRolesAndGroups)
+    final boolean modifyRolesAndGroups, final boolean force)
     throws NotFoundException, IllegalOperationException, EmailAlreadyExistsException, LdapUtilityException {
 
-    if (this.ldapProtectedUsers.contains(modifiedUser.getName())) {
+    if (!force && this.ldapProtectedUsers.contains(modifiedUser.getName())) {
       throw new IllegalOperationException("User (" + modifiedUser.getName() + ") is protected and cannot be modified.");
     }
 
@@ -1810,7 +1835,11 @@ public class LdapUtility {
 
     // add user to the groups in newgroups
     for (String groupDN : newgroupDNs) {
-      addMemberToRoleOrGroup(session, groupDN, memberDN, UNIQUE_MEMBER);
+      try {
+        addMemberToRoleOrGroup(session, groupDN, memberDN, UNIQUE_MEMBER);
+      } catch (final LdapNoSuchObjectException e) {
+        LOGGER.debug("Group {} doesn't exist", groupDN);
+      }
     }
 
   }
@@ -2007,6 +2036,41 @@ public class LdapUtility {
       value = attribute.getString();
     }
     return value;
+  }
+
+  public void resetAdminAccess(final String password) throws LdapUtilityException, GenericException {
+    try {
+
+      final CoreSession session = this.service.getAdminSession();
+
+      final String adminName = getFirstNameFromDN(this.rodaAdminDN);
+      final String administratorsName = getFirstNameFromDN(this.rodaAdministratorsDN);
+
+      User admin;
+      try {
+        admin = getUser(session, adminName);
+      } catch (final LdapNoSuchObjectException e) {
+        admin = new User(adminName);
+        admin = addUser(admin);
+      }
+      admin.setActive(true);
+      modifyUser(session, admin, password, false, true);
+
+      Group administrators;
+      try {
+        administrators = getGroup(session, administratorsName);
+      } catch (final LdapNoSuchObjectException e) {
+        administrators = addGroup(new Group(administratorsName));
+        administrators.setActive(true);
+      }
+      administrators.setDirectRoles(getRoles(session));
+      administrators.addMemberUser(adminName);
+      modifyGroup(administrators, true);
+
+    } catch (final UserAlreadyExistsException | EmailAlreadyExistsException | NotFoundException
+      | IllegalOperationException | GroupAlreadyExistsException | LdapException e) {
+      throw new LdapUtilityException(e.getMessage(), e);
+    }
   }
 
 }
