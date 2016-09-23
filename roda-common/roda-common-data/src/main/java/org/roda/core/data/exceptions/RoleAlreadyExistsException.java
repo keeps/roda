@@ -8,12 +8,12 @@
 package org.roda.core.data.exceptions;
 
 /**
- * Thrown to indicate that a role with the same name already exists
- * when a new one is trying to be created.
+ * Thrown to indicate that a role with the same name already exists when a new
+ * one is trying to be created.
  * 
  * @author Rui Castro <rui.castro@gmail.com>
  */
-public class RoleAlreadyExistsException extends RODAServiceException {
+public class RoleAlreadyExistsException extends AlreadyExistsException {
 
   private static final long serialVersionUID = -6214944667650454428L;
 
@@ -24,7 +24,8 @@ public class RoleAlreadyExistsException extends RODAServiceException {
   }
 
   /**
-   * Constructs a new {@link RoleAlreadyExistsException} with the given error message.
+   * Constructs a new {@link RoleAlreadyExistsException} with the given error
+   * message.
    *
    * @param message
    *          the error message
@@ -45,8 +46,8 @@ public class RoleAlreadyExistsException extends RODAServiceException {
   }
 
   /**
-   * Constructs a new {@link RoleAlreadyExistsException} with the given error message
-   * and cause exception.
+   * Constructs a new {@link RoleAlreadyExistsException} with the given error
+   * message and cause exception.
    *
    * @param message
    *          the error message

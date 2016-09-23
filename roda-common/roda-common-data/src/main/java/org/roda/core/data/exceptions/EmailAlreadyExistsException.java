@@ -12,7 +12,7 @@ package org.roda.core.data.exceptions;
  * 
  * @author Rui Castro
  */
-public class EmailAlreadyExistsException extends UserRegistrationException {
+public class EmailAlreadyExistsException extends AlreadyExistsException {
   private static final long serialVersionUID = 3392813159441368655L;
 
   /**

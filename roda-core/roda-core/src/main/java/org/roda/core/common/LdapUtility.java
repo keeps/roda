@@ -672,10 +672,8 @@ public class LdapUtility {
    *           if a Group with the same name already exists.
    * @throws GenericException
    *           if something goes wrong with the creation of the new group.
-   * @throws GenericException
-   *           if something goes wrong with the creation of the new group.
    */
-  public Group addGroup(final Group group) throws GroupAlreadyExistsException, GenericException, GenericException {
+  public Group addGroup(final Group group) throws GroupAlreadyExistsException, GenericException {
     if (!group.isNameValid()) {
       throw new GenericException("'" + group.getName() + "' is not a valid group name.");
     }
@@ -780,11 +778,11 @@ public class LdapUtility {
    *
    * @throws AuthenticationDeniedException
    *           if the provided credentials are not valid.
-   * @throws ServiceException
+   * @throws GenericException
    *           if some error occurred.
    */
   public User getAuthenticatedUser(final String username, final String password)
-    throws AuthenticationDeniedException, ServiceException {
+    throws AuthenticationDeniedException, GenericException {
 
     if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
       throw new AuthenticationDeniedException("Username and password cannot be blank!");
@@ -803,7 +801,7 @@ public class LdapUtility {
     } catch (final LdapAuthenticationException e) {
       throw new AuthenticationDeniedException(e.getMessage(), e);
     } catch (final LdapException e) {
-      throw new ServiceException(e.getMessage(), ServiceException.INTERNAL_SERVER_ERROR, e);
+      throw new GenericException(e.getMessage(), e);
     }
   }
 
@@ -1361,11 +1359,11 @@ public class LdapUtility {
    *           if some error occurred.
    */
   private Group modifyGroup(final Group modifiedGroup, final boolean force)
-          throws NotFoundException, IllegalOperationException, GenericException, GenericException {
+    throws NotFoundException, IllegalOperationException, GenericException, GenericException {
 
     if (!force && this.ldapProtectedGroups.contains(modifiedGroup.getName())) {
       throw new IllegalOperationException(
-              String.format("Group (%s) is protected and cannot be modified.", modifiedGroup.getName()));
+        String.format("Group (%s) is protected and cannot be modified.", modifiedGroup.getName()));
     }
 
     try {
