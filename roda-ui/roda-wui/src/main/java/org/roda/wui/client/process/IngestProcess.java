@@ -191,7 +191,9 @@ public class IngestProcess extends Composite {
     DateRangeFilterParameter filterParameter = new DateRangeFilterParameter(RodaConstants.JOB_START_DATE, dateInitial,
       dateFinal, RodaConstants.DateGranularity.DAY);
 
-    jobList.setFilter(new Filter(filterParameter));
+    Filter filter = new Filter(filterParameter);
+    filter.add(new SimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INGEST.toString()));
+    jobList.setFilter(filter);
   }
 
   @UiHandler("newJob")

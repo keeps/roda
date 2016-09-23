@@ -196,3 +196,24 @@ minimum_perc = 50
 source_file = roda-ui/roda-wui/src/main/resources/config/theme/InstallingNewDescriptiveMetadataFormats.html
 source_lang = en
 type = HTML
+
+[roda2.statisticshtml]
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/Statistics_<lang>.html
+minimum_perc = 50
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/Statistics.html
+source_lang = en
+type = HTML
+
+[roda2.helpstatisticshtml]
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/HelpStatistics_<lang>.html
+minimum_perc = 50
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/HelpStatistics.html
+source_lang = en
+type = HTML
+
+[roda2.error404html]
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/Error404_<lang>.html
+minimum_perc = 50
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/Error404.html
+source_lang = en
+type = HTML
