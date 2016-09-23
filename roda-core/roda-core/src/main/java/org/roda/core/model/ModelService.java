@@ -29,6 +29,7 @@ import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.LdapUtilityException;
+import org.roda.core.common.ServiceException;
 import org.roda.core.common.UserUtility;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
@@ -36,6 +37,7 @@ import org.roda.core.common.notifications.NotificationProcessor;
 import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
@@ -1316,6 +1318,15 @@ public class ModelService extends ModelObservable {
 
   /***************** Users/Groups related *****************/
   /********************************************************/
+
+  public User retrieveAuthenticatedUser(String name, String password)
+    throws GenericException, AuthenticationDeniedException {
+    try {
+      return UserUtility.getLdapUtility().getAuthenticatedUser(name, password);
+    } catch (ServiceException e) {
+      throw new GenericException("Unable to retrieve user", e);
+    }
+  }
 
   public User retrieveUserByName(String name) throws GenericException {
     try {
