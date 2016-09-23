@@ -13,7 +13,7 @@ package org.roda.core.data.exceptions;
  * 
  * @author Rui Castro
  */
-public class UserAlreadyExistsException extends UserManagementException {
+public class UserAlreadyExistsException extends AlreadyExistsException {
 
   private static final long serialVersionUID = 6493339963861919270L;
 

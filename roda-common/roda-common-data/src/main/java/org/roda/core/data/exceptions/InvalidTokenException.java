@@ -14,7 +14,7 @@ package org.roda.core.data.exceptions;
  * 
  * @author Rui Castro
  */
-public class InvalidTokenException extends UserRegistrationException {
+public class InvalidTokenException extends RODAException {
   private static final long serialVersionUID = -182450030953675819L;
 
   /**

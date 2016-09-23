@@ -134,7 +134,7 @@ public class EditUser extends Composite {
           new AsyncCallback<Void>() {
 
             public void onFailure(Throwable caught) {
-              errorMessage(caught);
+              errorMessage(caught, user);
             }
 
             public void onSuccess(Void result) {
@@ -162,7 +162,7 @@ public class EditUser extends Composite {
         @Override
         public void onFailure(Throwable caught) {
           user.setActive(!user.isActive());
-          errorMessage(caught);
+          errorMessage(caught, null);
         }
       });
   }
@@ -178,7 +178,7 @@ public class EditUser extends Composite {
 
       @Override
       public void onFailure(Throwable caught) {
-        errorMessage(caught);
+        errorMessage(caught, null);
       }
     });
   }
@@ -192,12 +192,13 @@ public class EditUser extends Composite {
     Tools.newHistory(MemberManagement.RESOLVER);
   }
 
-  private void errorMessage(Throwable caught) {
+  private void errorMessage(Throwable caught, User modifiedUser) {
     if (caught instanceof NotFoundException) {
       Toast.showError(messages.editUserNotFound(user.getName()));
       cancel();
     } else if (caught instanceof AlreadyExistsException) {
-      Toast.showError(messages.editUserEmailAlreadyExists(user.getEmail()));
+      String email = (modifiedUser != null) ? modifiedUser.getEmail() : user.getEmail();
+      Toast.showError(messages.editUserEmailAlreadyExists(email));
     } else {
       Toast.showError(messages.editUserFailure(EditUser.this.user.getName(), caught.getMessage()));
     }

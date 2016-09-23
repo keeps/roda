@@ -82,10 +82,6 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
    *
    * @param editmode
    *          if group name should be editable
-   * @param enableGroupSelect
-   *          if the list of groups to which the group belong to should be
-   *          editable
-   *
    */
   public GroupDataPanel(boolean editmode) {
     this(true, editmode);
@@ -95,7 +91,6 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
    *
    * @param visible
    * @param editmode
-   * @param enableGroupSelect
    */
   public GroupDataPanel(boolean visible, boolean editmode) {
 

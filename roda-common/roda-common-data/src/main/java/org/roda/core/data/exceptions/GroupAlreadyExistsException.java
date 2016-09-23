@@ -15,7 +15,7 @@ import org.roda.core.data.v2.user.Group;
  * 
  * @author Rui Castro
  */
-public class GroupAlreadyExistsException extends RODAServiceException {
+public class GroupAlreadyExistsException extends AlreadyExistsException {
 
   private static final long serialVersionUID = 6493339963861919270L;
 

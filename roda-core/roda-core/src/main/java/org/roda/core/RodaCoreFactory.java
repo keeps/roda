@@ -7,8 +7,11 @@
  */
 package org.roda.core;
 
+import java.io.BufferedReader;
+import java.io.Console;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -58,7 +61,6 @@ import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
 import org.roda.core.common.LdapUtility;
-import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.UserUtility;
@@ -848,15 +850,12 @@ public class RodaCoreFactory {
       } catch (final RoleAlreadyExistsException e) {
         LOGGER.info("Role {} already exists.", role);
         LOGGER.trace(e.getMessage(), e);
-      } catch (final LdapUtilityException e) {
-        throw new GenericException("Error creating role '" + role + "'", e);
       }
     }
   }
 
-  private static void indexUsersAndGroupsFromLDAP()
-    throws LdapUtilityException, GenericException, EmailAlreadyExistsException, UserAlreadyExistsException,
-    IllegalOperationException, NotFoundException, AlreadyExistsException {
+  private static void indexUsersAndGroupsFromLDAP() throws GenericException, EmailAlreadyExistsException,
+    UserAlreadyExistsException, IllegalOperationException, NotFoundException, AlreadyExistsException {
     for (User user : model.listUsers()) {
       LOGGER.debug("User to be indexed: {}", user);
       model.notifyUserUpdated(user);
@@ -1255,8 +1254,7 @@ public class RodaCoreFactory {
       if ("users_and_groups".equalsIgnoreCase(entity)) {
         try {
           indexUsersAndGroupsFromLDAP();
-        } catch (EmailAlreadyExistsException | UserAlreadyExistsException | IllegalOperationException
-          | LdapUtilityException | GenericException | NotFoundException | AlreadyExistsException e) {
+        } catch (IllegalOperationException | GenericException | NotFoundException | AlreadyExistsException e) {
           LOGGER.error("Unable to reindex users & groups from LDAP.", e);
         }
       }
@@ -1337,6 +1335,54 @@ public class RodaCoreFactory {
     }
   }
 
+  private static String readPasswordFromConsole(final Console console) throws IOException {
+    final String password = new String(console.readPassword("New admin password: "));
+    final String passwordConfirmation = new String(console.readPassword("Repeat admin password: "));
+    if (password.equals(passwordConfirmation)) {
+      return password;
+    } else {
+      throw new IOException("Passwords don't match.");
+    }
+  }
+
+  private static String readPassword(final String message) throws IOException {
+    final Console console = System.console();
+    if (console == null) {
+      final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+      System.out.print(String.format("%s (INSECURE - password will be shown): ", message));
+      return reader.readLine();
+    } else {
+      return new String(console.readPassword("%s: ", message));
+    }
+  }
+
+  private static void resetAdminAccess() throws GenericException {
+    try {
+      final String password = readPassword("New admin password");
+      final String passwordConfirmation = readPassword("Repeat admin password");
+      if (password.equals(passwordConfirmation)) {
+        RodaCoreFactory.ldapUtility.resetAdminAccess(password);
+        try {
+          indexUsersAndGroupsFromLDAP();
+        } catch (final Exception e) {
+          LOGGER.warn("Error reindexing users and groups - " + e.getMessage(), e);
+          System.err.println("Error reindexing users and groups (" + e.getMessage() + ").");
+        }
+        System.out.println("Password for 'admin' changed successfully.");
+      } else {
+        throw new GenericException("Passwords don't match.");
+      }
+    } catch (final IOException e) {
+      throw new GenericException(e.getMessage(), e);
+    } finally {
+      try {
+        RodaCoreFactory.shutdown();
+      } catch (final Exception e) {
+        e.printStackTrace(System.err);
+      }
+    }
+  }
+
   private static void printMainUsage() {
     // System.err.println("WARNING: if using Apache Solr embedded, the index
     // related commands");
@@ -1354,10 +1400,15 @@ public class RodaCoreFactory {
     // System.err.println("java -jar x.jar premisskeleton");
   }
 
-  private static void mainMasterTasks(List<String> args) throws GenericException, RequestNotValidException {
+  private static void printResetUsage() {
+    System.err.println("Reset command parameters:");
+    System.err.println("\tadmin - resets admin user password and grant it all permissions.");
+  }
+
+  private static void mainMasterTasks(final List<String> args) throws GenericException, RequestNotValidException {
     if ("index".equals(args.get(0))) {
       if ("list".equals(args.get(1)) && ("users".equals(args.get(2)) || "groups".equals(args.get(2)))) {
-        Filter filter = new Filter(
+        final Filter filter = new Filter(
           new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, "users".equals(args.get(2)) ? "true" : "false"));
         printIndexMembers(args, filter, null, new Sublist(0, 10000), null);
       } else if ("list".equals(args.get(1)) && ("sips".equals(args.get(2)))) {
@@ -1374,13 +1425,28 @@ public class RodaCoreFactory {
       } else if ("reindex".equals(args.get(1))) {
         runReindex(args);
       }
+    }
+    if ("reset".equals(args.get(0))) {
+      final List<String> resetParams = args.subList(1, args.size());
+      if (resetParams.isEmpty()) {
+        printResetUsage();
+      } else {
+        final String resetParam = resetParams.get(0);
+        if ("admin".equals(resetParam)) {
+          resetAdminAccess();
+        } else {
+          System.err.println("ERROR: Unknown parameter '" + resetParam + "'");
+          printResetUsage();
+        }
+      }
     } else {
       printMainUsage();
     }
   }
 
-  public static void main(String[] argsArray) throws InterruptedException, GenericException, RequestNotValidException {
-    List<String> args = Arrays.asList(argsArray);
+  public static void main(final String[] argsArray)
+    throws InterruptedException, GenericException, RequestNotValidException {
+    final List<String> args = Arrays.asList(argsArray);
 
     instantiate();
     if (getNodeType() == NodeType.MASTER) {

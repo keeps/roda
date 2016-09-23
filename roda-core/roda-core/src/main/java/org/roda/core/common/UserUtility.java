@@ -69,7 +69,7 @@ public class UserUtility {
       try {
         user = UserUtility.getLdapUtility().getAuthenticatedUser(credentials.getFirst(), credentials.getSecond());
         user.setIpAddress(request.getRemoteAddr());
-      } catch (AuthenticationDeniedException | ServiceException e) {
+      } catch (AuthenticationDeniedException | GenericException e) {
         throw new AuthorizationDeniedException("Unable to authenticate user!");
       }
     } else {
@@ -87,7 +87,7 @@ public class UserUtility {
     Pair<String, String> ret = null;
     String authorization = request.getHeader("Authorization");
     if (authorization != null && authorization.startsWith("Basic")) {
-      String credentials = new String(authorization);
+      String credentials = authorization;
       credentials = credentials.replaceFirst("[B|b]asic ", "");
       credentials = new String(Base64.getDecoder().decode(credentials),
         Charset.forName(RodaConstants.DEFAULT_ENCODING));
@@ -106,7 +106,7 @@ public class UserUtility {
       if (!rsu.isGuest()) {
         try {
           user = UserUtility.getLdapUtility().getUser(rsu.getId());
-        } catch (LdapUtilityException e) {
+        } catch (GenericException e) {
           LOGGER.error("Could not login", e);
         }
       } else {
