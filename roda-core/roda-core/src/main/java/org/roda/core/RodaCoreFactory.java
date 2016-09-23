@@ -61,7 +61,6 @@ import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
 import org.roda.core.common.LdapUtility;
-import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.UserUtility;
@@ -852,15 +851,12 @@ public class RodaCoreFactory {
       } catch (final RoleAlreadyExistsException e) {
         LOGGER.info("Role {} already exists.", role);
         LOGGER.trace(e.getMessage(), e);
-      } catch (final LdapUtilityException e) {
-        throw new GenericException("Error creating role '" + role + "'", e);
       }
     }
   }
 
-  private static void indexUsersAndGroupsFromLDAP()
-    throws LdapUtilityException, GenericException, EmailAlreadyExistsException, UserAlreadyExistsException,
-    IllegalOperationException, NotFoundException, AlreadyExistsException {
+  private static void indexUsersAndGroupsFromLDAP() throws GenericException, EmailAlreadyExistsException,
+    UserAlreadyExistsException, IllegalOperationException, NotFoundException, AlreadyExistsException {
     for (User user : model.listUsers()) {
       LOGGER.debug("User to be indexed: {}", user);
       model.notifyUserUpdated(user);
@@ -1259,8 +1255,8 @@ public class RodaCoreFactory {
       if ("users_and_groups".equalsIgnoreCase(entity)) {
         try {
           indexUsersAndGroupsFromLDAP();
-        } catch (EmailAlreadyExistsException | UserAlreadyExistsException | IllegalOperationException
-          | LdapUtilityException | GenericException | NotFoundException | AlreadyExistsException e) {
+        } catch (EmailAlreadyExistsException | UserAlreadyExistsException | IllegalOperationException | GenericException
+          | NotFoundException | AlreadyExistsException e) {
           LOGGER.error("Unable to reindex users & groups from LDAP.", e);
         }
       }
@@ -1378,7 +1374,7 @@ public class RodaCoreFactory {
       } else {
         throw new GenericException("Passwords don't match.");
       }
-    } catch (final IOException | LdapUtilityException e) {
+    } catch (final IOException e) {
       throw new GenericException(e.getMessage(), e);
     } finally {
       try {

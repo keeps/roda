@@ -10,9 +10,6 @@
  */
 package org.roda.wui.client.management;
 
-import java.util.List;
-
-import org.roda.core.common.LdapUtilityException;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
@@ -22,12 +19,6 @@ import org.roda.core.data.exceptions.InvalidTokenException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
-import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.facet.Facets;
-import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.sort.Sorter;
-import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
@@ -51,7 +42,6 @@ public interface UserManagementServiceAsync {
    * @throws RODAException
    */
   void getGroup(String groupname, AsyncCallback<Group> callback);
-
 
   /**
    * Get a user
@@ -156,7 +146,6 @@ public interface UserManagementServiceAsync {
    */
   public void deleteGroup(String groupname, AsyncCallback<Void> callback);
 
-
   /**
    * Resend the email challenge to a user email
    *
@@ -174,10 +163,9 @@ public interface UserManagementServiceAsync {
    *
    * @param username
    *          the name of the user
-   * @param token
+   * @param emailConfirmationToken
    *          the token used in email verification
    * @throws InvalidTokenException
-   * @throws LdapUtilityException
    * @throws NotFoundException
    */
   public void confirmUserEmail(String username, String emailConfirmationToken, AsyncCallback<Void> callback);
@@ -207,7 +195,6 @@ public interface UserManagementServiceAsync {
    * @throws GenericException
    * @throws NotFoundException
    * @throws IllegalOperationException
-   * @throws LdapUtilityException
    * @throws RecaptchaException
    */
   public void requestPasswordReset(String usernameOrEmail, String captcha, AsyncCallback<Void> callback);
@@ -224,7 +211,6 @@ public interface UserManagementServiceAsync {
    *          requestPasswordReset(String, String)
    * @throws InvalidTokenException
    * @throws IllegalOperationException
-   * @throws LdapUtilityException
    * @throws NotFoundException
    */
   public void resetUserPassword(String username, String password, String resetPasswordToken,

@@ -10,9 +10,6 @@
  */
 package org.roda.wui.client.management;
 
-import java.util.List;
-
-import org.roda.core.common.LdapUtilityException;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
@@ -21,14 +18,7 @@ import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.InvalidTokenException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
-import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.facet.Facets;
-import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.sort.Sorter;
-import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
@@ -36,7 +26,6 @@ import org.roda.wui.client.browse.UserExtraBundle;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
@@ -255,7 +244,6 @@ public interface UserManagementService extends RemoteService {
    * @throws GenericException
    * @throws NotFoundException
    * @throws IllegalOperationException
-   * @throws LdapUtilityException
    * @throws RecaptchaException
    */
   public void requestPasswordReset(String usernameOrEmail, String captcha)
