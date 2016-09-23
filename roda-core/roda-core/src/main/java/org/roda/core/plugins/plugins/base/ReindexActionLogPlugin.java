@@ -115,8 +115,8 @@ public class ReindexActionLogPlugin extends AbstractPlugin<LogEntry> {
       pluginReport.setPluginState(PluginState.SUCCESS);
 
       Date firstDayToIndex = calculateFirstDayToIndex();
-      reindexActionLogsStillNotInStorage(index, firstDayToIndex, pluginReport);
-      reindexActionLogsInStorage(index, model, firstDayToIndex, pluginReport);
+      reindexActionLogsStillNotInStorage(index, firstDayToIndex, pluginReport, jobPluginInfo);
+      reindexActionLogsInStorage(index, model, firstDayToIndex, pluginReport, jobPluginInfo);
 
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
@@ -128,9 +128,10 @@ public class ReindexActionLogPlugin extends AbstractPlugin<LogEntry> {
   }
 
   private void reindexActionLogsInStorage(IndexService index, ModelService model, Date firstDayToIndex,
-    Report pluginReport) {
+    Report pluginReport, SimpleJobPluginInfo jobPluginInfo) {
     CloseableIterable<Resource> actionLogs = null;
 
+    int total = jobPluginInfo.getSourceObjectsCount();
     try {
       boolean recursive = false;
       actionLogs = model.getStorage()
@@ -138,43 +139,52 @@ public class ReindexActionLogPlugin extends AbstractPlugin<LogEntry> {
 
       for (Resource resource : actionLogs) {
         if (resource instanceof Binary && isToIndex(resource.getStoragePath().getName(), firstDayToIndex)) {
+          total += 1;
           LOGGER.debug("Going to reindex '{}'", resource.getStoragePath());
           Binary b = (Binary) resource;
-          BufferedReader br = new BufferedReader(new InputStreamReader(b.getContent().createInputStream()));
           try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(b.getContent().createInputStream()));
             index.reindexActionLog(br);
-          } catch (GenericException e) {
+            jobPluginInfo.incrementObjectsProcessedWithSuccess();
+          } catch (IOException | GenericException e) {
             LOGGER.error("Error while trying to reindex action log '" + resource.getStoragePath() + "' from storage",
               e);
+            jobPluginInfo.incrementObjectsProcessedWithFailure();
           }
         }
       }
-    } catch (IOException | NotFoundException | GenericException | AuthorizationDeniedException
-      | RequestNotValidException e) {
+    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
       pluginReport.setPluginState(PluginState.FAILURE).setPluginDetails("Could not reindex action logs from storage");
       LOGGER.error("Error while trying to reindex action logs from storage", e);
     } finally {
       IOUtils.closeQuietly(actionLogs);
+      jobPluginInfo.setSourceObjectsCount(total);
     }
   }
 
-  private void reindexActionLogsStillNotInStorage(IndexService index, Date firstDayToIndex, Report pluginReport) {
+  private void reindexActionLogsStillNotInStorage(IndexService index, Date firstDayToIndex, Report pluginReport,
+    SimpleJobPluginInfo jobPluginInfo) {
     Path logFilesDirectory = RodaCoreFactory.getLogPath();
     DirectoryStream.Filter<Path> logFilesFilter = getLogFilesFilter(firstDayToIndex);
 
+    int total = jobPluginInfo.getSourceObjectsCount();
     try {
       BufferedReader br = null;
       InputStream logFileInputStream;
       for (Path logFile : Files.newDirectoryStream(logFilesDirectory, logFilesFilter)) {
+        total += 1;
         LOGGER.debug("Going to reindex '{}'", logFile);
         try {
           logFileInputStream = Files.newInputStream(logFile);
           br = new BufferedReader(new InputStreamReader(logFileInputStream));
           index.reindexActionLog(br);
-        } catch (GenericException e) {
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        } catch (IOException | GenericException e) {
           LOGGER.error("Error reindexing action log", e);
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
         } finally {
           IOUtils.closeQuietly(br);
+          jobPluginInfo.setSourceObjectsCount(total);
         }
       }
     } catch (IOException e) {
