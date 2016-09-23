@@ -18,7 +18,6 @@ import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -211,7 +210,7 @@ public class UserManagementHelper {
       }
 
       try {
-        User user = UserUtility.getLdapUtility().getUser(name);
+        User user = RodaCoreFactory.getModelService().retrieveUserByName(name);
         String userExtra = user.getExtra();
 
         if (values != null && userExtra != null) {
@@ -239,7 +238,7 @@ public class UserManagementHelper {
           }
         }
 
-      } catch (LdapUtilityException e) {
+      } catch (GenericException e) {
         // do nothing
       }
 

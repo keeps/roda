@@ -646,10 +646,11 @@ public class LdapUtility {
    *
    * @return a Group if the group exists, otherwise <code>null</code>.
    *
-   * @throws LdapUtilityException
+   * @throws GenericException
    *           if the group information could not be retrieved from the LDAP
    *           server.
    * @throws NotFoundException
+   *           if the group doesn't exist.
    */
   public Group getGroup(final String name) throws GenericException, NotFoundException {
     try {
@@ -741,66 +742,6 @@ public class LdapUtility {
   public Group modifyGroup(final Group modifiedGroup)
     throws NotFoundException, IllegalOperationException, LdapUtilityException, GenericException {
     return modifyGroup(modifiedGroup, false);
-  }
-
-  /**
-   * Modify the {@link Group}'s information.
-   *
-   * @param modifiedGroup
-   *          the {@link Group} to modify.
-   * @param force
-   *          ignore protected groups configuration.
-   *
-   * @return the modified {@link Group}.
-   *
-   * @throws NotFoundException
-   *           if the group with being modified doesn't exist.
-   * @throws IllegalOperationException
-   *           if the user is one of the protected users.
-   * @throws LdapUtilityException
-   *           if some error occurred.
-   * @throws GenericException
-   *           if some error occurred.
-   */
-  public Group modifyGroup(final Group modifiedGroup, final boolean force)
-    throws NotFoundException, IllegalOperationException, LdapUtilityException, GenericException {
-
-    if (!force && this.ldapProtectedGroups.contains(modifiedGroup.getName())) {
-      throw new IllegalOperationException(
-        String.format("Group (%s) is protected and cannot be modified.", modifiedGroup.getName()));
-    }
-
-    try {
-      final CoreSession session = service.getAdminSession();
-      final String groupDN = getGroupDN(modifiedGroup.getName());
-      final Entry entry = session.lookup(new Dn(groupDN));
-      // 20160906 hsilva: cannot change CN as it is used as id (as well as the
-      // name)
-      entry.removeAttributes(OU);
-      entry.add(OU, modifiedGroup.getFullName());
-      entry.removeAttributes(SHADOW_INACTIVE);
-      entry.add(SHADOW_INACTIVE, modifiedGroup.isActive() ? "0" : "1");
-      // Remove all members
-      entry.removeAttributes(UNIQUE_MEMBER);
-      // 20160906 hsilva: this is needed because at least one UNIQUE_MEMBER must
-      // be added to the entry
-      entry.add(UNIQUE_MEMBER, RODA_DUMMY_USER);
-      // Add user members
-      for (String memberName : modifiedGroup.getUsers()) {
-        entry.add(UNIQUE_MEMBER, getUserDN(memberName));
-      }
-      session.delete(entry.getDn());
-      session.add(entry);
-
-      setMemberDirectRoles(session, groupDN, modifiedGroup.getDirectRoles());
-
-    } catch (final LdapNoSuchObjectException e) {
-      throw new NotFoundException("Group " + modifiedGroup.getName() + " doesn't exist.", e);
-    } catch (final LdapException e) {
-      throw new LdapUtilityException("Error modifying group " + modifiedGroup.getName(), e);
-    }
-
-    return getGroup(modifiedGroup.getName());
   }
 
   /**
@@ -1398,6 +1339,66 @@ public class LdapUtility {
     }
 
     return group;
+  }
+
+  /**
+   * Modify the {@link Group}'s information.
+   *
+   * @param modifiedGroup
+   *          the {@link Group} to modify.
+   * @param force
+   *          ignore protected groups configuration.
+   *
+   * @return the modified {@link Group}.
+   *
+   * @throws NotFoundException
+   *           if the group with being modified doesn't exist.
+   * @throws IllegalOperationException
+   *           if the user is one of the protected users.
+   * @throws LdapUtilityException
+   *           if some error occurred.
+   * @throws GenericException
+   *           if some error occurred.
+   */
+  private Group modifyGroup(final Group modifiedGroup, final boolean force)
+          throws NotFoundException, IllegalOperationException, LdapUtilityException, GenericException {
+
+    if (!force && this.ldapProtectedGroups.contains(modifiedGroup.getName())) {
+      throw new IllegalOperationException(
+              String.format("Group (%s) is protected and cannot be modified.", modifiedGroup.getName()));
+    }
+
+    try {
+      final CoreSession session = service.getAdminSession();
+      final String groupDN = getGroupDN(modifiedGroup.getName());
+      final Entry entry = session.lookup(new Dn(groupDN));
+      // 20160906 hsilva: cannot change CN as it is used as id (as well as the
+      // name)
+      entry.removeAttributes(OU);
+      entry.add(OU, modifiedGroup.getFullName());
+      entry.removeAttributes(SHADOW_INACTIVE);
+      entry.add(SHADOW_INACTIVE, modifiedGroup.isActive() ? "0" : "1");
+      // Remove all members
+      entry.removeAttributes(UNIQUE_MEMBER);
+      // 20160906 hsilva: this is needed because at least one UNIQUE_MEMBER must
+      // be added to the entry
+      entry.add(UNIQUE_MEMBER, RODA_DUMMY_USER);
+      // Add user members
+      for (String memberName : modifiedGroup.getUsers()) {
+        entry.add(UNIQUE_MEMBER, getUserDN(memberName));
+      }
+      session.delete(entry.getDn());
+      session.add(entry);
+
+      setMemberDirectRoles(session, groupDN, modifiedGroup.getDirectRoles());
+
+    } catch (final LdapNoSuchObjectException e) {
+      throw new NotFoundException("Group " + modifiedGroup.getName() + " doesn't exist.", e);
+    } catch (final LdapException e) {
+      throw new LdapUtilityException("Error modifying group " + modifiedGroup.getName(), e);
+    }
+
+    return getGroup(modifiedGroup.getName());
   }
 
   private List<Entry> searchEntries(final CoreSession session, final String ctxDN, final String keyAttribute)

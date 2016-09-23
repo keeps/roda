@@ -9,8 +9,7 @@ package org.roda.wui.api.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.roda.core.common.LdapUtilityException;
-import org.roda.core.common.ServiceException;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.EmailUnverifiedException;
@@ -43,21 +42,16 @@ public class UserLoginHelper {
    */
   public static User login(final String username, final String password, final HttpServletRequest request)
     throws GenericException, AuthenticationDeniedException {
-    try {
-      final User rodaUser = UserUtility.getLdapUtility().getAuthenticatedUser(username, password);
-      if (!rodaUser.isActive()) {
-        final User user = UserUtility.getLdapUtility().getUser(rodaUser.getName());
-        if (StringUtils.isNotBlank(user.getEmailConfirmationToken())) {
-          throw new EmailUnverifiedException("Email is not verified.");
-        }
-        throw new InactiveUserException("User is not active.");
+    final User user = RodaCoreFactory.getModelService().retrieveAuthenticatedUser(username, password);
+    if (!user.isActive()) {
+      if (StringUtils.isNotBlank(user.getEmailConfirmationToken())) {
+        throw new EmailUnverifiedException("Email is not verified.");
       }
-      rodaUser.setIpAddress(request.getRemoteAddr());
-      UserUtility.setUser(request, rodaUser);
-      return rodaUser;
-    } catch (final ServiceException | LdapUtilityException e) {
-      throw new GenericException(e.getMessage(), e);
+      throw new InactiveUserException("User is not active.");
     }
+    user.setIpAddress(request.getRemoteAddr());
+    UserUtility.setUser(request, user);
+    return user;
   }
 
 }
