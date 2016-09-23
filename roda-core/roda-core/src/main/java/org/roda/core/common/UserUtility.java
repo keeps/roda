@@ -86,7 +86,7 @@ public class UserUtility {
     Pair<String, String> ret = null;
     String authorization = request.getHeader("Authorization");
     if (authorization != null && authorization.startsWith("Basic")) {
-      String credentials = new String(authorization);
+      String credentials = authorization;
       credentials = credentials.replaceFirst("[B|b]asic ", "");
       credentials = new String(Base64.getDecoder().decode(credentials),
         Charset.forName(RodaConstants.DEFAULT_ENCODING));
