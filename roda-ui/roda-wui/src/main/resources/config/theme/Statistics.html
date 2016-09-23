@@ -16,10 +16,20 @@
 		</div>
 		<div class="col_8 chart_col_card">
 			<h4>Distribution of description levels (top 10)</h4>
-			<canvas class="statistic" data-source="index"
-				data-source-class="org.roda.core.data.v2.ip.IndexedAIP"
-				data-source-facets="level" data-view="chart"
-				data-view-field="facetResults" data-view-type="pie" data-view-limit="10"></canvas>
+			<canvas id="stat-desc-levels" class="statistic"
+					data-source="index"
+					data-source-class="org.roda.core.data.v2.ip.IndexedAIP"
+					data-source-facets="level"
+					data-view="chart"
+					data-view-field="facetResults"
+					data-view-type="pie"
+					data-view-limit="10"></canvas>
+			<span class="statistic btn"
+				  data-ref="stat-desc-levels"
+				  data-view="download"
+				  data-view-filename="description-levels.csv">
+        		<i class="fa fa-download" aria-hidden="true"></i>
+    		</span>
 		</div>
 	</div>
 
@@ -76,6 +86,14 @@
 				data-source-class="org.roda.core.data.v2.ip.IndexedRepresentation"
 				data-source-facets="type" data-view="chart"
 				data-view-field="facetResults" data-view-type="horizontalBar"></canvas>
+			<span class="statistic btn"
+				  data-source="index"
+				  data-source-class="org.roda.core.data.v2.ip.IndexedRepresentation"
+				  data-source-facets="type"
+				  data-view="download"
+				  data-view-filename="representation-types.csv">
+        		<i class="fa fa-download" aria-hidden="true"></i>
+    		</span>
 		</div>
 	</div>
 
