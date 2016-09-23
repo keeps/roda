@@ -105,7 +105,7 @@ public class UserUtility {
       if (!rsu.isGuest()) {
         try {
           user = UserUtility.getLdapUtility().getUser(rsu.getId());
-        } catch (LdapUtilityException e) {
+        } catch (GenericException e) {
           LOGGER.error("Could not login", e);
         }
       } else {

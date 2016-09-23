@@ -28,7 +28,6 @@ import java.util.UUID;
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
-import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.ServiceException;
 import org.roda.core.common.UserUtility;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -1329,21 +1328,11 @@ public class ModelService extends ModelObservable {
   }
 
   public User retrieveUserByName(String name) throws GenericException {
-    try {
-      return UserUtility.getLdapUtility().getUser(name);
-    } catch (LdapUtilityException e) {
-      // TODO 20160906 hsilva: change this by a more specific exception
-      throw new GenericException("Unable to retrieve user", e);
-    }
+    return UserUtility.getLdapUtility().getUser(name);
   }
 
   public User retrieveUserByEmail(String email) throws GenericException {
-    try {
-      return UserUtility.getLdapUtility().getUserWithEmail(email);
-    } catch (LdapUtilityException e) {
-      // TODO 20160906 hsilva: change this by a more specific exception
-      throw new GenericException("Unable to retrieve user", e);
-    }
+    return UserUtility.getLdapUtility().getUserWithEmail(email);
   }
 
   public User registerUser(User user, String password, boolean notify)
@@ -1354,8 +1343,6 @@ public class ModelService extends ModelObservable {
         notifyUserCreated(registeredUser);
       }
       return registeredUser;
-    } catch (LdapUtilityException e) {
-      throw new GenericException("Error registering user to LDAP", e);
     } catch (UserAlreadyExistsException e) {
       throw new UserAlreadyExistsException("User already exists", e);
     } catch (EmailAlreadyExistsException e) {
@@ -1380,8 +1367,6 @@ public class ModelService extends ModelObservable {
         notifyUserCreated(createdUser);
       }
       return createdUser;
-    } catch (LdapUtilityException e) {
-      throw new GenericException("Error creating user in LDAP", e);
     } catch (UserAlreadyExistsException e) {
       throw new UserAlreadyExistsException("User already exists", e);
     } catch (EmailAlreadyExistsException e) {
@@ -1406,8 +1391,6 @@ public class ModelService extends ModelObservable {
         notifyUserUpdated(updatedUser);
       }
       return updatedUser;
-    } catch (LdapUtilityException e) {
-      throw new GenericException("Error updating user in LDAP", e);
     } catch (EmailAlreadyExistsException e) {
       throw new AlreadyExistsException("User already exists", e);
     } catch (NotFoundException e) {
@@ -1426,8 +1409,6 @@ public class ModelService extends ModelObservable {
         notifyUserUpdated(updatedUser);
       }
       return updatedUser;
-    } catch (LdapUtilityException e) {
-      throw new GenericException("Error updating user in LDAP", e);
     } catch (EmailAlreadyExistsException e) {
       throw new AlreadyExistsException("User already exists", e);
     } catch (NotFoundException e) {
@@ -1444,8 +1425,6 @@ public class ModelService extends ModelObservable {
       if (notify) {
         notifyUserDeleted(id);
       }
-    } catch (LdapUtilityException e) {
-      throw new GenericException("Error deleting user from LDAP", e);
     } catch (IllegalOperationException e) {
       throw new AuthorizationDeniedException("Illegal operation", e);
     }
@@ -1456,11 +1435,7 @@ public class ModelService extends ModelObservable {
   }
 
   public List<User> listUsers() throws GenericException {
-    try {
-      return UserUtility.getLdapUtility().getUsers();
-    } catch (LdapUtilityException e) {
-      throw new GenericException("Unable to list users", e);
-    }
+    return UserUtility.getLdapUtility().getUsers();
   }
 
   public Group retrieveGroup(String name) throws GenericException, NotFoundException {
@@ -1474,8 +1449,6 @@ public class ModelService extends ModelObservable {
         notifyGroupCreated(createdGroup);
       }
       return createdGroup;
-    } catch (LdapUtilityException e) {
-      throw new GenericException("Error creating group in LDAP", e);
     } catch (GroupAlreadyExistsException e) {
       throw new AlreadyExistsException("Group already exists", e);
     }
@@ -1489,8 +1462,6 @@ public class ModelService extends ModelObservable {
         notifyGroupUpdated(updatedGroup);
       }
       return updatedGroup;
-    } catch (LdapUtilityException e) {
-      throw new GenericException("Error updating group in LDAP", e);
     } catch (NotFoundException e) {
       throw new NotFoundException("Group doesn't exist", e);
     } catch (IllegalOperationException e) {
@@ -1505,8 +1476,6 @@ public class ModelService extends ModelObservable {
       if (notify) {
         notifyGroupDeleted(id);
       }
-    } catch (LdapUtilityException e) {
-      throw new GenericException("Error deleting group from LDAP", e);
     } catch (IllegalOperationException e) {
       throw new AuthorizationDeniedException("Illegal operation", e);
     }
@@ -1517,11 +1486,7 @@ public class ModelService extends ModelObservable {
   }
 
   public List<Group> listGroups() throws GenericException {
-    try {
-      return UserUtility.getLdapUtility().getGroups();
-    } catch (LdapUtilityException e) {
-      throw new GenericException("Unable to list groups", e);
-    }
+    return UserUtility.getLdapUtility().getGroups();
   }
 
   public User confirmUserEmail(String username, String email, String emailConfirmationToken, boolean useModel,
@@ -1533,9 +1498,6 @@ public class ModelService extends ModelObservable {
         user = UserUtility.getLdapUtility().confirmUserEmail(username, email, emailConfirmationToken);
       }
       success = true;
-    } catch (LdapUtilityException e) {
-      success = false;
-      throw new GenericException("Error on password reset", e);
     } catch (NotFoundException e) {
       success = false;
       throw new NotFoundException("User doesn't exist", e);
@@ -1558,9 +1520,6 @@ public class ModelService extends ModelObservable {
         user = UserUtility.getLdapUtility().requestPasswordReset(username, email);
       }
       success = true;
-    } catch (LdapUtilityException e) {
-      success = false;
-      throw new GenericException("Error requesting password reset", e);
     } catch (NotFoundException e) {
       success = false;
       throw new NotFoundException("User doesn't exist", e);
@@ -1583,9 +1542,6 @@ public class ModelService extends ModelObservable {
         user = UserUtility.getLdapUtility().resetUserPassword(username, password, resetPasswordToken);
       }
       success = true;
-    } catch (LdapUtilityException e) {
-      success = false;
-      throw new GenericException("Error on password reset", e);
     } catch (NotFoundException e) {
       success = false;
       throw new NotFoundException("User doesn't exist", e);

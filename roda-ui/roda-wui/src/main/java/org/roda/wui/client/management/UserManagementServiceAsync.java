@@ -12,7 +12,6 @@ package org.roda.wui.client.management;
 
 import java.util.List;
 
-import org.roda.core.common.LdapUtilityException;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
@@ -188,10 +187,9 @@ public interface UserManagementServiceAsync {
    *
    * @param username
    *          the name of the user
-   * @param token
+   * @param emailConfirmationToken
    *          the token used in email verification
    * @throws InvalidTokenException
-   * @throws LdapUtilityException
    * @throws NotFoundException
    */
   public void confirmUserEmail(String username, String emailConfirmationToken, AsyncCallback<Void> callback);
@@ -221,7 +219,6 @@ public interface UserManagementServiceAsync {
    * @throws GenericException
    * @throws NotFoundException
    * @throws IllegalOperationException
-   * @throws LdapUtilityException
    * @throws RecaptchaException
    */
   public void requestPasswordReset(String usernameOrEmail, String captcha, AsyncCallback<Void> callback);
@@ -238,7 +235,6 @@ public interface UserManagementServiceAsync {
    *          requestPasswordReset(String, String)
    * @throws InvalidTokenException
    * @throws IllegalOperationException
-   * @throws LdapUtilityException
    * @throws NotFoundException
    */
   public void resetUserPassword(String username, String password, String resetPasswordToken,

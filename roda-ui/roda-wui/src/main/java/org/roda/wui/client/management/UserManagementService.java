@@ -12,7 +12,6 @@ package org.roda.wui.client.management;
 
 import java.util.List;
 
-import org.roda.core.common.LdapUtilityException;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
@@ -36,7 +35,6 @@ import org.roda.wui.client.browse.UserExtraBundle;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
@@ -270,7 +268,6 @@ public interface UserManagementService extends RemoteService {
    * @throws GenericException
    * @throws NotFoundException
    * @throws IllegalOperationException
-   * @throws LdapUtilityException
    * @throws RecaptchaException
    */
   public void requestPasswordReset(String usernameOrEmail, String captcha)
