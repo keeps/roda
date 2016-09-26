@@ -51,20 +51,19 @@ public class ShowLogEntry extends Composite {
       if (historyTokens.size() == 1) {
         String logEntryId = historyTokens.get(0);
 
-        BrowserService.Util.getInstance().retrieve(LogEntry.class.getSimpleName(), logEntryId,
-          new AsyncCallback<LogEntry>() {
+        BrowserService.Util.getInstance().retrieve(LogEntry.class.getName(), logEntryId, new AsyncCallback<LogEntry>() {
 
-            @Override
-            public void onFailure(Throwable caught) {
-              callback.onFailure(caught);
-            }
+          @Override
+          public void onFailure(Throwable caught) {
+            callback.onFailure(caught);
+          }
 
-            @Override
-            public void onSuccess(LogEntry result) {
-              ShowLogEntry logEntryPanel = new ShowLogEntry(result);
-              callback.onSuccess(logEntryPanel);
-            }
-          });
+          @Override
+          public void onSuccess(LogEntry result) {
+            ShowLogEntry logEntryPanel = new ShowLogEntry(result);
+            callback.onSuccess(logEntryPanel);
+          }
+        });
 
       } else {
         Tools.newHistory(UserLog.RESOLVER);

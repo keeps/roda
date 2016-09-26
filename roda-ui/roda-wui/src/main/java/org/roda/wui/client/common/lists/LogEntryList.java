@@ -172,16 +172,9 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
-    // UserManagementService.Util.getInstance().findLogEntries(filter, sorter,
-    // sublist, getFacets(), callback);
 
     BrowserService.Util.getInstance().find(LogEntry.class.getName(), filter, sorter, sublist, getFacets(),
       LocaleInfo.getCurrentLocale().getLocaleName(), getJustActive(), callback);
-  }
-
-  @Override
-  protected CellPreviewEvent.Handler<LogEntry> getSelectionEventManager() {
-    return DefaultSelectionEventManager.<LogEntry> createBlacklistManager(3);
   }
 
 }
