@@ -13,14 +13,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.data.adapter.facet.Facets;
-import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.sort.Sorter;
-import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.log.LogEntry;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -30,7 +27,6 @@ import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
-import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.CellTable;
@@ -38,9 +34,6 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.view.client.CellPreviewEvent;
-import com.google.gwt.view.client.DefaultSelectionEventManager;
 
 import config.i18n.client.ClientMessages;
 
@@ -61,14 +54,12 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
   }
 
   public LogEntryList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(filter, facets, summary, selectable);
-    super.setSelectedClass(LogEntry.class);
+    super(LogEntry.class, filter, facets, summary, selectable);
   }
 
   public LogEntryList(Filter filter, Facets facets, String summary, boolean selectable, int pageSize,
     int incrementPage) {
-    super(filter, facets, summary, selectable, pageSize, incrementPage);
-    super.setSelectedClass(LogEntry.class);
+    super(LogEntry.class, filter, facets, summary, selectable, pageSize, incrementPage);
   }
 
   @Override
@@ -157,10 +148,7 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
   }
 
   @Override
-  protected void getData(Sublist sublist, ColumnSortList columnSortList,
-    final AsyncCallback<IndexResult<LogEntry>> callback) {
-    Filter filter = getFilter();
-
+  protected Sorter getSorter(ColumnSortList columnSortList) {
     Map<Column<LogEntry, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<LogEntry, ?>, List<String>>();
     columnSortingKeyMap.put(dateColumn, Arrays.asList(RodaConstants.LOG_DATETIME));
     columnSortingKeyMap.put(actionComponentColumn, Arrays.asList(RodaConstants.LOG_ACTION_COMPONENT));
@@ -169,12 +157,7 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
     columnSortingKeyMap.put(durationColumn, Arrays.asList(RodaConstants.LOG_DURATION));
     columnSortingKeyMap.put(addressColumn, Arrays.asList(RodaConstants.LOG_ADDRESS));
     columnSortingKeyMap.put(stateColumn, Arrays.asList(RodaConstants.LOG_STATE));
-
-    Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
-
-
-    BrowserService.Util.getInstance().find(LogEntry.class.getName(), filter, sorter, sublist, getFacets(),
-      LocaleInfo.getCurrentLocale().getLocaleName(), getJustActive(), callback);
+    return createSorter(columnSortList, columnSortingKeyMap);
   }
 
 }

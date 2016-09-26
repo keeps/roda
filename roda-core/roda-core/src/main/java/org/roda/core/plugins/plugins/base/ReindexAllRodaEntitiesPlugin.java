@@ -22,7 +22,7 @@ import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.Void;
-import org.roda.core.data.v2.index.SelectedItemsAll;
+import org.roda.core.data.v2.index.select.SelectedItemsAll;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;

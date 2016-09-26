@@ -10,11 +10,11 @@ package org.roda.core.plugins.orchestrate;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;

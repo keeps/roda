@@ -18,6 +18,7 @@
 
 	<!-- Inherit required libraries -->
 	<inherits name="com.bytebybyte.gwt.fontawesome.FontAwesomeLib" />
+	<inherits name="com.github.nmorel.gwtjackson.GwtJackson" />
 
 	<!-- Inherit sub-projects -->
 	<!-- TODO: Remove the Common sub-module -->

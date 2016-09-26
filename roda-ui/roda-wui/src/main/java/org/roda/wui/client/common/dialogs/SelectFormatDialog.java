@@ -7,10 +7,10 @@
  */
 package org.roda.wui.client.common.dialogs;
 
-import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
-import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.formats.Format;
+import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
+import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.wui.client.common.lists.FormatList;
 
 public class SelectFormatDialog extends DefaultSelectDialog<Format, Void> {

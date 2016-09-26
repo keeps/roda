@@ -13,14 +13,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.data.adapter.facet.Facets;
-import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.sort.Sorter;
-import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.Humanize.DHMSFormat;
@@ -29,7 +26,6 @@ import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -38,7 +34,6 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import config.i18n.client.ClientMessages;
 
@@ -69,13 +64,11 @@ public class JobList extends BasicAsyncTableCell<Job> {
   }
 
   public JobList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(filter, facets, summary, selectable);
-    super.setSelectedClass(Job.class);
+    super(Job.class, filter, true, facets, summary, selectable);
   }
 
   public JobList(Filter filter, Facets facets, String summary, boolean selectable, int pageSize, int incrementPage) {
-    super(filter, facets, summary, selectable, pageSize, incrementPage);
-    super.setSelectedClass(Job.class);
+    super(Job.class, filter, true, facets, summary, selectable, pageSize, incrementPage);
   }
 
   @Override
@@ -240,9 +233,7 @@ public class JobList extends BasicAsyncTableCell<Job> {
   }
 
   @Override
-  protected void getData(Sublist sublist, ColumnSortList columnSortList, AsyncCallback<IndexResult<Job>> callback) {
-    Filter filter = getFilter();
-
+  protected Sorter getSorter(ColumnSortList columnSortList) {
     Map<Column<Job, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<Job, ?>, List<String>>();
     columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.JOB_NAME));
     columnSortingKeyMap.put(startDateColumn, Arrays.asList(RodaConstants.JOB_START_DATE));
@@ -258,12 +249,7 @@ public class JobList extends BasicAsyncTableCell<Job> {
     columnSortingKeyMap.put(objectsWaitingCountColumn,
       Arrays.asList(RodaConstants.JOB_SOURCE_OBJECTS_WAITING_TO_BE_PROCESSED));
     columnSortingKeyMap.put(usernameColumn, Arrays.asList(RodaConstants.JOB_USERNAME));
-
-    Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
-
-    boolean justActive = true;
-    BrowserService.Util.getInstance().find(Job.class.getName(), filter, sorter, sublist, getFacets(),
-      LocaleInfo.getCurrentLocale().getLocaleName(), justActive, callback);
+    return createSorter(columnSortList, columnSortingKeyMap);
   }
 
 }

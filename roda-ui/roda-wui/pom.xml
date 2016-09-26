@@ -339,6 +339,12 @@
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.github.nmorel.gwtjackson</groupId>
+			<artifactId>gwt-jackson</artifactId>
+			<version>0.13.0</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<pluginManagement>

@@ -10,8 +10,9 @@ package org.roda.wui.client.common.lists;
 import java.io.Serializable;
 import java.util.Date;
 
-import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.sort.Sorter;
+import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 
 import com.google.gwt.user.cellview.client.CellTable;
@@ -27,6 +28,8 @@ public abstract class MyAsyncDataProvider<T extends Serializable> extends AsyncD
   private final IndexResultDataProvider<T> dataProvider;
   private int rowCount;
   private Date date;
+  private Sublist sublist;
+  private Sorter sorter;
 
   public MyAsyncDataProvider(CellTable<T> display, IndexResultDataProvider<T> dataProvider) {
     super();
@@ -60,7 +63,9 @@ public abstract class MyAsyncDataProvider<T extends Serializable> extends AsyncD
     // Query the data asynchronously.
     final int start = range.getStart();
     int length = range.getLength();
-    dataProvider.getData(new Sublist(start, length), columnSortList, new AsyncCallback<IndexResult<T>>() {
+    sublist = new Sublist(start, length);
+    sorter = dataProvider.getSorter(columnSortList);
+    dataProvider.getData(sublist, sorter, new AsyncCallback<IndexResult<T>>() {
 
       @Override
       public void onFailure(Throwable caught) {
@@ -111,6 +116,14 @@ public abstract class MyAsyncDataProvider<T extends Serializable> extends AsyncD
 
   public Date getDate() {
     return date;
+  }
+
+  public Sublist getSublist() {
+    return sublist;
+  }
+
+  public Sorter getSorter() {
+    return sorter;
   }
 
 }

@@ -16,10 +16,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.filter.NotSimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.SelectedItems;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
+import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;

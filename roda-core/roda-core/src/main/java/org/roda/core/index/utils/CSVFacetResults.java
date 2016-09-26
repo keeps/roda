@@ -14,8 +14,8 @@ import java.util.List;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.roda.core.data.v2.index.FacetFieldResult;
-import org.roda.core.data.v2.index.FacetValue;
+import org.roda.core.data.v2.index.facet.FacetFieldResult;
+import org.roda.core.data.v2.index.facet.FacetValue;
 
 /**
  * This class wraps a list of {@link FacetFieldResult} and produces CSV text

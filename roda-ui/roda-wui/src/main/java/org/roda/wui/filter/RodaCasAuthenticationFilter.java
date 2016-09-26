@@ -22,9 +22,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.jasig.cas.client.util.CommonUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
-import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.slf4j.Logger;
@@ -129,7 +129,7 @@ public class RodaCasAuthenticationFilter implements Filter {
 
   private boolean userExists(String name) {
     boolean exist;
-    org.roda.core.data.adapter.filter.Filter filter = new org.roda.core.data.adapter.filter.Filter();
+    org.roda.core.data.v2.index.filter.Filter filter = new org.roda.core.data.v2.index.filter.Filter();
     filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_ID, name));
     filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, "true"));
     try {

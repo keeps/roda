@@ -15,11 +15,11 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.httpclient.HttpStatus;
-import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
-import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;

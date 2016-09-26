@@ -11,6 +11,8 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import org.roda.core.data.v2.index.facet.FacetFieldResult;
+
 public class IndexResult<T extends Serializable> implements Serializable {
 
   private static final long serialVersionUID = -7896294396414765557L;

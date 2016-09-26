@@ -15,12 +15,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.data.adapter.facet.Facets;
-import org.roda.core.data.adapter.facet.SimpleFacetParameter;
-import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
-import org.roda.core.data.adapter.filter.DateRangeFilterParameter;
-import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
+import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
+import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
+import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.NotificationList;

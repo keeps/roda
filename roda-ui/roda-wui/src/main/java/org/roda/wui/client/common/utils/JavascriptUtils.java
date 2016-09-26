@@ -298,4 +298,11 @@ public class JavascriptUtils {
   public static native void expose(String key, String value) /*-{
 		$doc[key] = value;
   }-*/;
+
+  public static native void postJSON(String url, String json) /*-{
+		$wnd.jQuery().form(url, json).attr('target', '_blank').submit()
+				.remove();
+
+  }-*/;
+
 }

@@ -21,9 +21,9 @@ import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;

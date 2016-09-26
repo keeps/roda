@@ -13,14 +13,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.data.adapter.facet.Facets;
-import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.sort.Sorter;
-import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.notifications.Notification;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 
 import com.google.gwt.cell.client.DateCell;
@@ -28,7 +25,6 @@ import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
-import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.CellTable;
@@ -36,7 +32,6 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.view.client.ProvidesKey;
 
 import config.i18n.client.ClientMessages;
@@ -57,14 +52,12 @@ public class NotificationList extends BasicAsyncTableCell<Notification> {
   }
 
   public NotificationList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(filter, facets, summary, selectable);
-    super.setSelectedClass(Notification.class);
+    super(Notification.class, filter, false, facets, summary, selectable);
   }
 
   public NotificationList(Filter filter, Facets facets, String summary, boolean selectable, int pageSize,
     int incrementPage) {
-    super(filter, facets, summary, selectable, pageSize, incrementPage);
-    super.setSelectedClass(Notification.class);
+    super(Notification.class, filter, false, facets, summary, selectable, pageSize, incrementPage);
   }
 
   @Override
@@ -141,10 +134,7 @@ public class NotificationList extends BasicAsyncTableCell<Notification> {
   }
 
   @Override
-  protected void getData(Sublist sublist, ColumnSortList columnSortList,
-    AsyncCallback<IndexResult<Notification>> callback) {
-    Filter filter = getFilter();
-
+  protected Sorter getSorter(ColumnSortList columnSortList) {
     Map<Column<Notification, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<Notification, ?>, List<String>>();
     columnSortingKeyMap.put(fromUser, Arrays.asList(RodaConstants.NOTIFICATION_FROM_USER));
     columnSortingKeyMap.put(sentOn, Arrays.asList(RodaConstants.NOTIFICATION_SENT_ON));
@@ -152,11 +142,7 @@ public class NotificationList extends BasicAsyncTableCell<Notification> {
     columnSortingKeyMap.put(acknowledged, Arrays.asList(RodaConstants.NOTIFICATION_IS_ACKNOWLEDGED));
     columnSortingKeyMap.put(state, Arrays.asList(RodaConstants.NOTIFICATION_STATE));
 
-    Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
-
-    boolean justActive = false;
-    BrowserService.Util.getInstance().find(Notification.class.getName(), filter, sorter, sublist, getFacets(),
-      LocaleInfo.getCurrentLocale().getLocaleName(), justActive, callback);
+    return createSorter(columnSortList, columnSortingKeyMap);
   }
 
   @Override

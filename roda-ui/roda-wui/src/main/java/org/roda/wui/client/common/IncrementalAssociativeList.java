@@ -11,13 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
-import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.filter.FilterParameter;
-import org.roda.core.data.adapter.filter.NotSimpleFilterParameter;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.NamedIndexedModel;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.FilterParameter;
+import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.wui.client.common.dialogs.SelectDialog;
 import org.roda.wui.client.common.dialogs.SelectDialogFactory;
 import org.roda.wui.client.common.utils.StringUtils;

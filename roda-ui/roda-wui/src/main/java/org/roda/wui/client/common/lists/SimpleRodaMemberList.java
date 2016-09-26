@@ -12,26 +12,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.data.adapter.facet.Facets;
-import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.sort.Sorter;
-import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.user.RODAMember;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.view.client.ProvidesKey;
 
 import config.i18n.client.ClientMessages;
@@ -54,8 +49,7 @@ public class SimpleRodaMemberList extends BasicAsyncTableCell<RODAMember> {
   }
 
   public SimpleRodaMemberList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(filter, facets, summary, selectable);
-    super.setSelectedClass(RODAMember.class);
+    super(RODAMember.class, filter, facets, summary, selectable);
   }
 
   @Override
@@ -98,19 +92,13 @@ public class SimpleRodaMemberList extends BasicAsyncTableCell<RODAMember> {
   }
 
   @Override
-  protected void getData(Sublist sublist, ColumnSortList columnSortList,
-    AsyncCallback<IndexResult<RODAMember>> callback) {
-    Filter filter = getFilter();
-
+  protected Sorter getSorter(ColumnSortList columnSortList) {
     Map<Column<RODAMember, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<RODAMember, ?>, List<String>>();
     columnSortingKeyMap.put(typeColumn, Arrays.asList(RodaConstants.MEMBERS_IS_USER));
     columnSortingKeyMap.put(idColumn, Arrays.asList(RodaConstants.MEMBERS_ID));
     columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.MEMBERS_NAME));
 
-    Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
-
-    BrowserService.Util.getInstance().find(RODAMember.class.getName(), filter, sorter, sublist, getFacets(),
-      LocaleInfo.getCurrentLocale().getLocaleName(), getJustActive(), callback);
+    return createSorter(columnSortList, columnSortingKeyMap);
   }
 
   @Override

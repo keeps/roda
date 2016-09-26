@@ -12,26 +12,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.data.adapter.facet.Facets;
-import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.sort.Sorter;
-import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Humanize;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 
 import config.i18n.client.ClientMessages;
@@ -55,14 +50,13 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
   }
 
   public RepresentationList(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable) {
-    super(filter, justActive, facets, summary, selectable);
-    super.setSelectedClass(IndexedRepresentation.class);
+    super(IndexedRepresentation.class, filter, justActive, facets, summary, selectable);
   }
 
   public RepresentationList(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable,
     int initialPageSize, int pageSizeIncrement) {
-    super(filter, justActive, facets, summary, selectable, initialPageSize, pageSizeIncrement);
-    super.setSelectedClass(IndexedRepresentation.class);
+    super(IndexedRepresentation.class, filter, justActive, facets, summary, selectable, initialPageSize,
+      pageSizeIncrement);
   }
 
   @Override
@@ -168,10 +162,7 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
   }
 
   @Override
-  protected void getData(Sublist sublist, ColumnSortList columnSortList,
-    AsyncCallback<IndexResult<IndexedRepresentation>> callback) {
-    Filter filter = getFilter();
-    
+  protected Sorter getSorter(ColumnSortList columnSortList) {
     Map<Column<IndexedRepresentation, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedRepresentation, ?>, List<String>>();
     columnSortingKeyMap.put(idColumn, Arrays.asList(RodaConstants.REPRESENTATION_ID));
     columnSortingKeyMap.put(originalColumn, Arrays.asList(RodaConstants.REPRESENTATION_ORIGINAL));
@@ -183,10 +174,7 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
     columnSortingKeyMap.put(numberOfSchemasFilesColumn,
       Arrays.asList(RodaConstants.REPRESENTATION_NUMBER_OF_SCHEMA_FILES));
 
-    Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
-
-    BrowserService.Util.getInstance().find(IndexedRepresentation.class.getName(), filter, sorter, sublist, getFacets(),
-      LocaleInfo.getCurrentLocale().getLocaleName(), getJustActive(), callback);
+    return createSorter(columnSortList, columnSortingKeyMap);
   }
 
 }

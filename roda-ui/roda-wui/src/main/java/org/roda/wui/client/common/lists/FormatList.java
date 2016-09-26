@@ -12,23 +12,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.data.adapter.facet.Facets;
-import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.sort.Sorter;
-import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.formats.Format;
-import org.roda.core.data.v2.index.IndexResult;
-import org.roda.wui.client.browse.BrowserService;
+import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.sort.Sorter;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.view.client.ProvidesKey;
 
 import config.i18n.client.ClientMessages;
@@ -51,13 +46,11 @@ public class FormatList extends BasicAsyncTableCell<Format> {
   }
 
   public FormatList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(filter, facets, summary, selectable);
-    super.setSelectedClass(Format.class);
+    super(Format.class, filter, facets, summary, selectable);
   }
 
   public FormatList(Filter filter, Facets facets, String summary, boolean selectable, int pageSize, int incrementPage) {
-    super(filter, facets, summary, selectable, pageSize, incrementPage);
-    super.setSelectedClass(Format.class);
+    super(Format.class, filter, facets, summary, selectable, pageSize, incrementPage);
   }
 
   @Override
@@ -93,18 +86,12 @@ public class FormatList extends BasicAsyncTableCell<Format> {
   }
 
   @Override
-  protected void getData(Sublist sublist, ColumnSortList columnSortList, AsyncCallback<IndexResult<Format>> callback) {
-    Filter filter = getFilter();
-
+  protected Sorter getSorter(ColumnSortList columnSortList) {
     Map<Column<Format, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<Format, ?>, List<String>>();
     columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.FORMAT_NAME_SORT));
     columnSortingKeyMap.put(categoryColumn, Arrays.asList(RodaConstants.FORMAT_CATEGORY_SORT));
 
-    Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
-
-    boolean justActive = false;
-    BrowserService.Util.getInstance().find(Format.class.getName(), filter, sorter, sublist, getFacets(),
-      LocaleInfo.getCurrentLocale().getLocaleName(), justActive, callback);
+    return createSorter(columnSortList, columnSortingKeyMap);
   }
 
   @Override

@@ -7,12 +7,12 @@
  */
 package org.roda.wui.client.common.lists;
 
-import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.index.SelectedItems;
-import org.roda.core.data.v2.index.SelectedItemsFilter;
-import org.roda.core.data.v2.index.SelectedItemsList;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsFilter;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.wui.client.browse.BrowserService;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;

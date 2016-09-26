@@ -7,10 +7,10 @@
  */
 package org.roda.wui.client.common.lists;
 
-import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;

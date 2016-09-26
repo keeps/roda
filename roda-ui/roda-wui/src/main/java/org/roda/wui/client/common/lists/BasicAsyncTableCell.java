@@ -7,30 +7,32 @@
  */
 package org.roda.wui.client.common.lists;
 
-import org.roda.core.data.adapter.facet.Facets;
-import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.core.data.v2.index.filter.Filter;
 
 public abstract class BasicAsyncTableCell<T extends IsIndexed> extends AsyncTableCell<T, Void> {
-  public BasicAsyncTableCell() {
-    super();
+  public BasicAsyncTableCell(Class<T> classToReturn) {
+    super(classToReturn);
   }
 
-  public BasicAsyncTableCell(Filter filter, Facets facets, String summary, boolean selectable, int initialPageSize,
-    int pageSizeIncrement) {
-    super(filter, false, facets, summary, selectable, initialPageSize, pageSizeIncrement, null);
-  }
-
-  public BasicAsyncTableCell(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable,
+  public BasicAsyncTableCell(Class<T> classToReturn, Filter filter, Facets facets, String summary, boolean selectable,
     int initialPageSize, int pageSizeIncrement) {
-    super(filter, justActive, facets, summary, selectable, initialPageSize, pageSizeIncrement, null);
+    super(classToReturn, filter, false, facets, summary, selectable, initialPageSize, pageSizeIncrement, null);
   }
 
-  public BasicAsyncTableCell(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable) {
-    super(filter, justActive, facets, summary, selectable, null);
+  public BasicAsyncTableCell(Class<T> classToReturn, Filter filter, boolean justActive, Facets facets, String summary,
+    boolean selectable, int initialPageSize, int pageSizeIncrement) {
+    super(classToReturn, filter, justActive, facets, summary, selectable, initialPageSize, pageSizeIncrement, null);
   }
 
-  public BasicAsyncTableCell(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(filter, false, facets, summary, selectable, null);
+  public BasicAsyncTableCell(Class<T> classToReturn, Filter filter, boolean justActive, Facets facets, String summary,
+    boolean selectable) {
+    super(classToReturn, filter, justActive, facets, summary, selectable, null);
   }
+
+  public BasicAsyncTableCell(Class<T> classToReturn, Filter filter, Facets facets, String summary, boolean selectable) {
+    super(classToReturn, filter, false, facets, summary, selectable, null);
+  }
+
 }

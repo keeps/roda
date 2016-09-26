@@ -13,14 +13,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.data.adapter.facet.Facets;
-import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.sort.Sorter;
-import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Humanize;
 
@@ -28,14 +25,12 @@ import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import config.i18n.client.ClientMessages;
 
@@ -59,13 +54,12 @@ public class TransferredResourceList extends BasicAsyncTableCell<TransferredReso
   }
 
   public TransferredResourceList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(filter, facets, summary, selectable);
-    super.setSelectedClass(TransferredResource.class);
+    super(TransferredResource.class, filter, facets, summary, selectable);
   }
 
   public TransferredResourceList(Filter filter, Facets facets, String summary, boolean selectable, int initialPageSize,
     int pageSizeIncrement) {
-    super(filter, facets, summary, selectable, initialPageSize, pageSizeIncrement);
+    super(TransferredResource.class, filter, facets, summary, selectable, initialPageSize, pageSizeIncrement);
   }
 
   @Override
@@ -128,21 +122,14 @@ public class TransferredResourceList extends BasicAsyncTableCell<TransferredReso
   }
 
   @Override
-  protected void getData(Sublist sublist, ColumnSortList columnSortList,
-    AsyncCallback<IndexResult<TransferredResource>> callback) {
-    Filter filter = getFilter();
-
+  protected Sorter getSorter(ColumnSortList columnSortList) {
     Map<Column<TransferredResource, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<TransferredResource, ?>, List<String>>();
     columnSortingKeyMap.put(isFileColumn, Arrays.asList(RodaConstants.TRANSFERRED_RESOURCE_ISFILE));
     columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.TRANSFERRED_RESOURCE_NAME));
     columnSortingKeyMap.put(sizeColumn, Arrays.asList(RodaConstants.TRANSFERRED_RESOURCE_SIZE));
     columnSortingKeyMap.put(creationDateColumn, Arrays.asList(RodaConstants.TRANSFERRED_RESOURCE_DATE));
 
-    Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
-
-    boolean justActive = false;
-    BrowserService.Util.getInstance().find(TransferredResource.class.getName(), filter, sorter, sublist, getFacets(),
-      LocaleInfo.getCurrentLocale().getLocaleName(), justActive, callback);
+    return createSorter(columnSortList, columnSortingKeyMap);
   }
 
 }

@@ -13,21 +13,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.data.adapter.facet.Facets;
-import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.sort.Sorter;
-import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.Report.PluginState;
-import org.roda.wui.client.browse.BrowserService;
 
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.CellTable;
@@ -35,7 +31,6 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import config.i18n.client.ClientMessages;
 
@@ -60,8 +55,7 @@ public class PreservationEventList extends BasicAsyncTableCell<IndexedPreservati
   }
 
   public PreservationEventList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(filter, facets, summary, selectable);
-    super.setSelectedClass(IndexedPreservationEvent.class);
+    super(IndexedPreservationEvent.class, filter, facets, summary, selectable);
   }
 
   @Override
@@ -129,10 +123,7 @@ public class PreservationEventList extends BasicAsyncTableCell<IndexedPreservati
   }
 
   @Override
-  protected void getData(Sublist sublist, ColumnSortList columnSortList,
-    AsyncCallback<IndexResult<IndexedPreservationEvent>> callback) {
-    Filter filter = getFilter();
-
+  protected Sorter getSorter(ColumnSortList columnSortList) {
     Map<Column<IndexedPreservationEvent, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedPreservationEvent, ?>, List<String>>();
     columnSortingKeyMap.put(eventDateTimeColumn, Arrays.asList(RodaConstants.PRESERVATION_EVENT_DATETIME));
     // TODO an event can now have multiple agents... sort by agent id should
@@ -143,11 +134,7 @@ public class PreservationEventList extends BasicAsyncTableCell<IndexedPreservati
     columnSortingKeyMap.put(eventDetailColumn, Arrays.asList(RodaConstants.PRESERVATION_EVENT_DETAIL));
     columnSortingKeyMap.put(eventOutcomeColumn, Arrays.asList(RodaConstants.PRESERVATION_EVENT_OUTCOME));
 
-    Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
-
-    boolean justActive = false;
-    BrowserService.Util.getInstance().find(IndexedPreservationEvent.class.getName(), filter, sorter, sublist,
-      getFacets(), LocaleInfo.getCurrentLocale().getLocaleName(), justActive, callback);
+    return createSorter(columnSortList, columnSortingKeyMap);
   }
 
 }

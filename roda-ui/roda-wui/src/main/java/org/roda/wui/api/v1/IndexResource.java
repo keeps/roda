@@ -23,26 +23,26 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.roda.core.common.UserUtility;
-import org.roda.core.data.adapter.facet.FacetParameter;
-import org.roda.core.data.adapter.facet.FacetParameter.SORT;
-import org.roda.core.data.adapter.facet.Facets;
-import org.roda.core.data.adapter.facet.SimpleFacetParameter;
-import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.filter.SimpleFilterParameter;
-import org.roda.core.data.adapter.sort.SortParameter;
-import org.roda.core.data.adapter.sort.Sorter;
-import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.index.CountRequest;
+import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.facet.FacetParameter;
+import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
+import org.roda.core.data.v2.index.facet.FacetParameter.SORT;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.sort.SortParameter;
+import org.roda.core.data.v2.index.sort.Sorter;
+import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiUtils;
-import org.roda.wui.api.v1.utils.CountRequest;
 import org.roda.wui.api.v1.utils.ExtraMediaType;
-import org.roda.wui.api.v1.utils.FindRequest;
 import org.roda.wui.common.I18nUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -179,7 +179,7 @@ public class IndexResource {
   @Consumes({MediaType.APPLICATION_JSON})
   @Produces({MediaType.APPLICATION_JSON, ExtraMediaType.TEXT_CSV})
   @ApiOperation(value = "Find indexed resources", notes = "Find indexed resources.", response = IsIndexed.class, responseContainer = "List")
-  public <T extends IsIndexed> Response list(@ApiParam(value = "Find parameters") final FindRequest findRequest)
+  public <T extends IsIndexed> Response find(@ApiParam(value = "Find parameters") final FindRequest findRequest)
     throws RODAException {
     final String mediaType = ApiUtils.getMediaType(null, request);
     final User user = UserUtility.getApiUser(request);

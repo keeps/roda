@@ -9,8 +9,8 @@ package org.roda.wui.client.common.utils;
 
 import java.util.List;
 
-import org.roda.core.data.v2.index.FacetFieldResult;
-import org.roda.core.data.v2.index.FacetValue;
+import org.roda.core.data.v2.index.facet.FacetFieldResult;
+import org.roda.core.data.v2.index.facet.FacetValue;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;

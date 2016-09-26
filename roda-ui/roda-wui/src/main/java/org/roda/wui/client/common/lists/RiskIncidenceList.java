@@ -13,14 +13,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.data.adapter.facet.Facets;
-import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.sort.Sorter;
-import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 
 import com.google.gwt.cell.client.DateCell;
@@ -28,14 +25,12 @@ import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
-import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import config.i18n.client.ClientMessages;
 
@@ -50,19 +45,13 @@ public class RiskIncidenceList extends BasicAsyncTableCell<RiskIncidence> {
   private TextColumn<RiskIncidence> detectedByColumn;
   private Column<RiskIncidence, SafeHtml> statusColumn;
 
-  public RiskIncidenceList() {
-    super(null, null, null, false);
-  }
-
   public RiskIncidenceList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(filter, facets, summary, selectable);
-    super.setSelectedClass(RiskIncidence.class);
+    super(RiskIncidence.class, filter, true, facets, summary, selectable);
   }
 
   public RiskIncidenceList(Filter filter, Facets facets, String summary, boolean selectable, int initialPageSize,
     int pageSizeIncrement) {
-    super(filter, facets, summary, selectable, initialPageSize, pageSizeIncrement);
-    super.setSelectedClass(RiskIncidence.class);
+    super(RiskIncidence.class, filter, true, facets, summary, selectable, initialPageSize, pageSizeIncrement);
   }
 
   @Override
@@ -150,10 +139,7 @@ public class RiskIncidenceList extends BasicAsyncTableCell<RiskIncidence> {
   }
 
   @Override
-  protected void getData(Sublist sublist, ColumnSortList columnSortList,
-    AsyncCallback<IndexResult<RiskIncidence>> callback) {
-    Filter filter = getFilter();
-
+  protected Sorter getSorter(ColumnSortList columnSortList) {
     Map<Column<RiskIncidence, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<RiskIncidence, ?>, List<String>>();
     columnSortingKeyMap.put(objectColumn, Arrays.asList(RodaConstants.RISK_INCIDENCE_AIP_ID,
       RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, RodaConstants.RISK_INCIDENCE_FILE_ID));
@@ -163,10 +149,7 @@ public class RiskIncidenceList extends BasicAsyncTableCell<RiskIncidence> {
     columnSortingKeyMap.put(statusColumn, Arrays.asList(RodaConstants.RISK_INCIDENCE_STATUS));
     columnSortingKeyMap.put(objectTypeColumn, Arrays.asList(RodaConstants.RISK_INCIDENCE_OBJECT_CLASS));
 
-    Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
-
-    BrowserService.Util.getInstance().find(RiskIncidence.class.getName(), filter, sorter, sublist, getFacets(),
-      LocaleInfo.getCurrentLocale().getLocaleName(), true, callback);
+    return createSorter(columnSortList, columnSortingKeyMap);
   }
 
 }

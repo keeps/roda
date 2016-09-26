@@ -14,22 +14,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.roda.core.data.adapter.facet.FacetParameter;
-import org.roda.core.data.adapter.facet.Facets;
-import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
-import org.roda.core.data.adapter.sort.SortParameter;
-import org.roda.core.data.adapter.sort.Sorter;
-import org.roda.core.data.adapter.sublist.Sublist;
-import org.roda.core.data.v2.index.FacetFieldResult;
-import org.roda.core.data.v2.index.FacetValue;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.index.SelectedItems;
-import org.roda.core.data.v2.index.SelectedItemsFilter;
-import org.roda.core.data.v2.index.SelectedItemsList;
+import org.roda.core.data.v2.index.facet.FacetFieldResult;
+import org.roda.core.data.v2.index.facet.FacetParameter;
+import org.roda.core.data.v2.index.facet.FacetValue;
+import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
+import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsFilter;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.index.sort.SortParameter;
+import org.roda.core.data.v2.index.sort.Sorter;
+import org.roda.core.data.v2.index.sublist.Sublist;
+import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.common.client.ClientLogger;
+import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.MyCellTableResources;
 import org.roda.wui.common.client.widgets.wcag.AccessibleCellTable;
 import org.roda.wui.common.client.widgets.wcag.AccessibleSimplePager;
@@ -39,10 +41,13 @@ import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.CellTable;
@@ -58,6 +63,7 @@ import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -75,6 +81,9 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   implements HasValueChangeHandlers<IndexResult<T>> {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+
+  private final Class<T> classToReturn;
+  private final O object;
 
   private final MyAsyncDataProvider<T> dataProvider;
   private final SingleSelectionModel<T> selectionModel;
@@ -103,24 +112,22 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   private int initialPageSize = 20;
   private int pageSizeIncrement = 100;
 
-  private Class<T> selectedClass;
-  private final O object;
-
   private IndexResult<T> result;
 
-  public AsyncTableCell() {
-    this(null, false, null, null, false, 20, 100, null);
+  public AsyncTableCell(Class<T> classToReturn) {
+    this(classToReturn, null, false, null, null, false, 20, 100, null);
   }
 
-  public AsyncTableCell(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable,
-    O object) {
-    this(filter, justActive, facets, summary, selectable, 20, 100, object);
+  public AsyncTableCell(Class<T> classToReturn, Filter filter, boolean justActive, Facets facets, String summary,
+    boolean selectable, O object) {
+    this(classToReturn, filter, justActive, facets, summary, selectable, 20, 100, object);
   }
 
-  public AsyncTableCell(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable,
-    int initialPageSize, int pageSizeIncrement, O object) {
+  public AsyncTableCell(Class<T> classToReturn, Filter filter, boolean justActive, Facets facets, String summary,
+    boolean selectable, int initialPageSize, int pageSizeIncrement, O object) {
     super();
 
+    this.classToReturn = classToReturn;
     this.initialPageSize = initialPageSize;
     this.pageSizeIncrement = pageSizeIncrement;
     this.object = object;
@@ -144,9 +151,8 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     this.dataProvider = new MyAsyncDataProvider<T>(display, new IndexResultDataProvider<T>() {
 
       @Override
-      public void getData(Sublist sublist, ColumnSortList columnSortList,
-        final AsyncCallback<IndexResult<T>> callback) {
-        AsyncTableCell.this.getData(AsyncTableCell.this.getFilter(), sublist, columnSortList,
+      public void getData(Sublist sublist, Sorter sorter, final AsyncCallback<IndexResult<T>> callback) {
+        AsyncTableCell.this.getData(AsyncTableCell.this.getFilter(), sublist, sorter,
           new AsyncCallback<IndexResult<T>>() {
 
             @Override
@@ -161,6 +167,11 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
               callback.onSuccess(result);
             }
           });
+      }
+
+      @Override
+      public Sorter getSorter(ColumnSortList columnSortList) {
+        return AsyncTableCell.this.getSorter(columnSortList);
       }
     }) {
 
@@ -186,6 +197,18 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     add(display);
     add(resultsPager);
     add(pageSizePager);
+    Button csvDownload = new Button(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-download' aria-hidden='true'></i>"),
+      new ClickHandler() {
+
+        @Override
+        public void onClick(ClickEvent event) {
+          RestUtils.requestCSVExport(getClassToReturn(), getFilter(), dataProvider.getSorter(),
+            dataProvider.getSublist(), getFacets(), getJustActive());
+        }
+      });
+    csvDownload.addStyleName("btn");
+
+    add(csvDownload);
 
     selectionModel = new SingleSelectionModel<>(getKeyProvider());
 
@@ -283,6 +306,10 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     configureDisplay(display);
   }
 
+  public Class<T> getClassToReturn() {
+    return classToReturn;
+  }
+
   protected abstract void configureDisplay(CellTable<T> display);
 
   protected int getInitialPageSize() {
@@ -299,17 +326,20 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     };
   }
 
-  private void getData(Filter filter, Sublist sublist, ColumnSortList columnSortList,
-    AsyncCallback<IndexResult<T>> callback) {
+  private void getData(Filter filter, Sublist sublist, Sorter sorter, AsyncCallback<IndexResult<T>> callback) {
     if (filter == null) {
       callback.onSuccess(null);
     } else {
-      getData(sublist, columnSortList, callback);
+      getData(sublist, sorter, callback);
     }
   }
 
-  protected abstract void getData(Sublist sublist, ColumnSortList columnSortList,
-    AsyncCallback<IndexResult<T>> callback);
+  protected void getData(Sublist sublist, Sorter sorter, AsyncCallback<IndexResult<T>> callback) {
+    BrowserService.Util.getInstance().find(getClassToReturn().getName(), getFilter(), sorter, sublist, getFacets(),
+      LocaleInfo.getCurrentLocale().getLocaleName(), getJustActive(), callback);
+  }
+
+  protected abstract Sorter getSorter(ColumnSortList columnSortList);
 
   protected int getPageSizePagerIncrement() {
     return pageSizeIncrement;
@@ -554,7 +584,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
         }
       }
 
-      ret = new SelectedItemsFilter<T>(filterPlusFacets, selectedClass.getName(), getJustActive());
+      ret = new SelectedItemsFilter<T>(filterPlusFacets, getClassToReturn().getName(), getJustActive());
     } else {
       List<String> ids = new ArrayList<>();
 
@@ -562,7 +592,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
         ids.add(item.getUUID());
       }
 
-      ret = new SelectedItemsList<T>(ids, selectedClass.getName());
+      ret = new SelectedItemsList<T>(ids, getClassToReturn().getName());
     }
 
     return ret;
@@ -658,14 +688,6 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
   public List<CheckboxSelectionListener<T>> getListeners() {
     return this.listeners;
-  }
-
-  public Class<T> getSelectedClass() {
-    return this.selectedClass;
-  }
-
-  public void setSelectedClass(Class<T> selectedClass) {
-    this.selectedClass = selectedClass;
   }
 
   protected void addColumn(Column<T, ?> column, SafeHtml headerHTML, boolean nowrap, boolean alignRight) {

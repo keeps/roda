@@ -121,11 +121,13 @@ public final class RodaConstants {
   public static final String API_REST_V1_FILES = "api/v1/files/";
   public static final String API_REST_V1_RESOURCES = "api/v1/transfers/";
   public static final String API_REST_V1_THEME = "api/v1/theme/";
+  public static final String API_REST_V1_INDEX = "api/v1/index/";
   // sub-resources strings
   public static final String API_DATA = "data";
   public static final Object API_FILE = "file";
   public static final String API_DESCRIPTIVE_METADATA = "descriptive_metadata";
   public static final String API_PRESERVATION_METADATA = "preservation_metadata";
+  public static final String API_FIND = "find";
   // "http query string" related strings
   public static final String API_QUERY_START = "?";
   public static final String API_QUERY_ASSIGN_SYMBOL = "=";
