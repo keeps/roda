@@ -46,6 +46,7 @@ import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
+import org.roda.wui.api.v1.utils.ExtraMediaType;
 import org.roda.wui.api.v1.utils.ObjectResponse;
 
 import io.swagger.annotations.Api;
@@ -88,7 +89,7 @@ public class AipsResource {
 
   @GET
   @Path("/{" + RodaConstants.API_PATH_PARAM_AIP_ID + "}")
-  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, RodaConstants.APPLICATION_ZIP})
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_ZIP})
   @ApiOperation(value = "Get AIP", notes = "Get AIP information", response = AIP.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = AIP.class),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
@@ -346,7 +347,7 @@ public class AipsResource {
 
   @GET
   @Path("/{" + RodaConstants.API_PATH_PARAM_AIP_ID + "}/" + RodaConstants.API_PRESERVATION_METADATA + "/")
-  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, RodaConstants.APPLICATION_ZIP})
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_ZIP})
   @ApiOperation(value = "Get preservation metadata", notes = "Get preservation metadata (JSON info, ZIP file or HTML conversion).\nOptional query params of **start** and **limit** defined the returned array.", response = PreservationMetadataList.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = PreservationMetadataList.class),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})

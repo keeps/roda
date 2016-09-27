@@ -14,22 +14,13 @@ import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.common.client.widgets.Toast;
 
 import com.github.nmorel.gwtjackson.client.ObjectMapper;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.RequestException;
-import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.safehtml.shared.UriUtils;
 import com.google.gwt.user.client.ui.Button;
@@ -275,7 +266,7 @@ public class RestUtils {
   private static FindRequestMapper FIND_REQUEST_MAPPER = GWT.create(FindRequestMapper.class);
 
   public static <T extends IsIndexed> Widget requestCSVExport(Button button, Class<T> classToReturn, Filter filter,
-    Sorter sorter, Sublist sublist, Facets facets, boolean onlyActive, boolean exportFacets) {
+    Sorter sorter, Sublist sublist, Facets facets, boolean onlyActive, boolean exportFacets, String filename) {
     // api/v1/index/findFORM?type=csv
 
     String url = RodaConstants.API_REST_V1_INDEX + "findFORM";
@@ -290,6 +281,7 @@ public class RestUtils {
     layout.add(new Hidden("findRequest", FIND_REQUEST_MAPPER.write(request)));
     layout.add(new Hidden("type", "csv"));
     layout.add(new Hidden("exportFacets", Boolean.toString(exportFacets)));
+    layout.add(new Hidden("filename", filename));
     button.addClickHandler(new ClickHandler() {
 
       @Override

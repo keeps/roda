@@ -138,6 +138,7 @@ public final class RodaConstants {
   public static final String API_QUERY_VALUE_ACCEPT_FORMAT_HTML = "html";
   public static final String API_QUERY_VALUE_ACCEPT_FORMAT_JSON = "json";
   public static final String API_QUERY_VALUE_ACCEPT_FORMAT_ZIP = "zip";
+  public static final String API_QUERY_VALUE_ACCEPT_FORMAT_CSV = "csv";
   public static final String API_QUERY_KEY_LANG = "lang";
   public static final String API_QUERY_VALUE_LANG_DEFAULT = RodaConstants.API_QUERY_VALUE_LANG_PT_PT;
   public static final String API_QUERY_VALUE_LANG_PT_PT = "pt_PT";
@@ -184,13 +185,18 @@ public final class RodaConstants {
   public static final String API_QUERY_PARAM_TEMPLATE = "template";
   public static final String API_QUERY_PARAM_PASSWORD = "password";
   public static final String API_PARAM_FILE = "file";
+  public static final String API_FORM_PARAM_FIND_REQUEST = "findRequest";
+  public static final String API_FORM_PARAM_EXPORT_FACETS = "exportFacets";
+  public static final String API_FORM_PARAM_TYPE = "type";
+  public static final String API_FORM_PARAM_FILENAME = "filename";
   // http headers used
   public static final String API_HTTP_HEADER_ACCEPT = "Accept";
   // job related params
   public static final String API_PATH_PARAM_JOB_ID = "jobId";
   public static final String API_PATH_PARAM_JOB_JUST_FAILED = "jobJustFailed";
 
-  public static final String APPLICATION_ZIP = "application/zip";
+  public static final String API_DEFAULT_CSV_FILENAME = "export.csv";
+  public static final String API_DEFAULT_JSON_FILENAME = "export.json";
   public static final String API_NOTIFICATION_DEFAULT_TEMPLATE = "test-email-template";
 
   // api method allowable values
@@ -305,7 +311,6 @@ public final class RodaConstants {
   /*
    * OTHER METADATA TYPES
    */
-  public static final String OTHER_METADATA_TYPE_RISK_INCIDENCE = "RiskIncidence";
   public static final String OTHER_METADATA_TYPE_SIEGFRIED = "Siegfried";
   public static final String OTHER_METADATA_TYPE_APACHE_TIKA = "ApacheTika";
   public static final String OTHER_METADATA_TYPE_DIGITAL_SIGNATURE = "DigitalSignature";
@@ -477,7 +482,6 @@ public final class RodaConstants {
   public static final String MEMBERS_ROLES_DIRECT = "rolesDirect";
   public static final String MEMBERS_ROLES_ALL = "rolesAll";
   public static final String MEMBERS_SEARCH = "search";
-
   public static final String MEMBERS_EMAIL = "email";
 
   public static final String TRANSFERRED_RESOURCE_ID = "id";
@@ -588,7 +592,6 @@ public final class RodaConstants {
   public static final String PLUGIN_CATEGORY_INGEST = "ingest";
   public static final String PLUGIN_CATEGORY_REPLICATION = "replication";
   public static final String PLUGIN_CATEGORY_MANAGEMENT = "management";
-
   public static final String PLUGIN_CATEGORY_MISC = "misc";
   public static final String PLUGIN_CATEGORY_NOT_LISTABLE = "not_listable";
 
@@ -702,32 +705,6 @@ public final class RodaConstants {
   public static final String RISK_INCIDENCE_FILE_EXTENSION = ".json";
   public static final String RISK_INCIDENCE_SEARCH = "search";
 
-  /* Agents */
-  public static final String AGENT_ID = "id";
-  public static final String AGENT_NAME = "name";
-  public static final String AGENT_TYPE = "type";
-  public static final String AGENT_DESCRIPTION = "description";
-  public static final String AGENT_CATEGORY = "category";
-  public static final String AGENT_VERSION = "version";
-  public static final String AGENT_LICENSE = "license";
-  public static final String AGENT_POPULARITY = "popularity";
-  public static final String AGENT_DEVELOPER = "developer";
-  public static final String AGENT_INITIAL_RELEASE = "initialRelease";
-  public static final String AGENT_WEBSITE = "website";
-  public static final String AGENT_DOWNLOAD = "download";
-  public static final String AGENT_PROVENANCE_INFORMATION = "provenanceInformation";
-  public static final String AGENT_PLATFORMS = "platforms";
-  public static final String AGENT_EXTENSIONS = "extensions";
-  public static final String AGENT_MIMETYPES = "mimetypes";
-  public static final String AGENT_PRONOMS = "pronoms";
-  public static final String AGENT_UTIS = "utis";
-  public static final String AGENT_FORMAT_IDS = "formatIds";
-  public static final String AGENT_AGENTS_REQUIRED = "agentsRequired";
-
-  public static final String AGENT_FILE_EXTENSION = ".json";
-
-  public static final String AGENT_SEARCH = "search";
-
   /* Formats */
   public static final String FORMAT_ID = "id";
   public static final String FORMAT_NAME = "name";
@@ -749,7 +726,6 @@ public final class RodaConstants {
   public static final String FORMAT_UTIS = "utis";
 
   public static final String FORMAT_FILE_EXTENSION = ".json";
-
   public static final String FORMAT_SEARCH = "search";
 
   /* Messages */

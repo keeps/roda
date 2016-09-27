@@ -37,6 +37,7 @@ public class SeleniumUtils {
   public static void main(String[] args) throws InterruptedException, IOException {
     if (args.length != 2) {
       System.err.println("Number of arguments not correct");
+      commandHelp();
       System.exit(0);
     }
 
@@ -425,5 +426,9 @@ public class SeleniumUtils {
 
     IOUtils.closeQuietly(in);
     return content.toString();
+  }
+
+  private static void commandHelp() {
+    System.out.println("program <roda_url> <path_to_chrome_driver>");
   }
 }

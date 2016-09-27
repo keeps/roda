@@ -195,7 +195,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
     csvDownloadButton = new Button(messages.tableDownloadCSV());
     Widget csvDownloadRequestWidget = RestUtils.requestCSVExport(csvDownloadButton, getClassToReturn(), getFilter(),
-      dataProvider.getSorter(), dataProvider.getSublist(), getFacets(), getJustActive(), false);
+      dataProvider.getSorter(), dataProvider.getSublist(), getFacets(), getJustActive(), false, summary + ".csv");
     csvDownloadButton.addStyleName("btn btn-link");
 
     createSelectAllPanel();

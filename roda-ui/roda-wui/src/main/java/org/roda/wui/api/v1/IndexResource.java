@@ -220,34 +220,52 @@ public class IndexResource {
   @POST
   @Path("/findFORM")
   @Consumes({MediaType.APPLICATION_FORM_URLENCODED})
-  public <T extends IsIndexed> Response findFORM(@FormParam("findRequest") final String findRequestString,
-    @FormParam("type") String type, @FormParam("exportFacets") boolean exportFacets) throws RODAException {
+  public <T extends IsIndexed> Response findFORM(
+    @FormParam(RodaConstants.API_FORM_PARAM_FIND_REQUEST) final String findRequestString,
+    @FormParam(RodaConstants.API_FORM_PARAM_TYPE) String type,
+    @FormParam(RodaConstants.API_FORM_PARAM_FILENAME) String filename,
+    @FormParam(RodaConstants.API_FORM_PARAM_EXPORT_FACETS) boolean exportFacets) throws RODAException {
 
     final User user = UserUtility.getApiUser(request);
     FindRequest findRequest = JsonUtils.getObjectFromJson(findRequestString, FindRequest.class);
-    @SuppressWarnings("unchecked")
-    Class<T> classToReturn;
+
     try {
-      classToReturn = (Class<T>) Class.forName(findRequest.classToReturn);
+      @SuppressWarnings("unchecked")
+      Class<T> classToReturn = (Class<T>) Class.forName(findRequest.classToReturn);
 
-      // TODO put type "csv" into constants
-
-      if (type.equals("csv")) {
+      if (type.equals(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_CSV)) {
         final String csv = Browser.findCSV(classToReturn, findRequest.filter, findRequest.sorter, findRequest.sublist,
           findRequest.facets, user, findRequest.onlyActive, exportFacets);
-        
-        // TODO put name of downloaded csv as a form parameter
 
-        return ApiUtils.okResponse(new StreamResponse("export.csv", ExtraMediaType.TEXT_CSV, new StreamingOutput() {
+        if (filename.isEmpty()) {
+          filename = RodaConstants.API_DEFAULT_CSV_FILENAME;
+        }
 
+        return ApiUtils.okResponse(new StreamResponse(filename, ExtraMediaType.TEXT_CSV, new StreamingOutput() {
           @Override
           public void write(OutputStream output) throws IOException, WebApplicationException {
             IOUtils.write(csv, output, Charset.forName("UTF-8"));
           }
         }));
+      } else if (type.equals(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON)) {
+        IndexResult<T> find = Browser.find(classToReturn, findRequest.filter, findRequest.sorter, findRequest.sublist,
+          findRequest.facets, user, findRequest.onlyActive);
+
+        final String json = exportFacets ? JsonUtils.getJsonFromObject(find.getFacetResults())
+          : JsonUtils.getJsonFromObject(find.getResults());
+
+        if (filename.isEmpty()) {
+          filename = RodaConstants.API_DEFAULT_JSON_FILENAME;
+        }
+
+        return ApiUtils.okResponse(new StreamResponse(filename, MediaType.APPLICATION_JSON, new StreamingOutput() {
+          @Override
+          public void write(OutputStream output) throws IOException, WebApplicationException {
+            IOUtils.write(json, output, Charset.forName("UTF-8"));
+          }
+        }));
       } else {
-        // TODO support JSON type
-        throw new GenericException("type not yet supported:" + type);
+        throw new GenericException("Type not yet supported: " + type);
       }
     } catch (ClassNotFoundException e) {
       throw new GenericException(e);
