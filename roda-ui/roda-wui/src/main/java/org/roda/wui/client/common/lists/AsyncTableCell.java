@@ -41,8 +41,6 @@ import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -68,6 +66,7 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.CellPreviewEvent.Handler;
 import com.google.gwt.view.client.DefaultSelectionEventManager;
@@ -91,6 +90,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
   private final AccessibleSimplePager resultsPager;
   private final PageSizePager pageSizePager;
+  private Button csvDownloadButton;
   private final CellTable<T> display;
 
   private FlowPanel selectAllPanel;
@@ -111,6 +111,9 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
   private int initialPageSize = 20;
   private int pageSizeIncrement = 100;
+
+  private Timer autoUpdateTimer = null;
+  private int autoUpdateTimerMillis = 0;
 
   private IndexResult<T> result;
 
@@ -191,24 +194,18 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     pageSizePager = new PageSizePager(getPageSizePagerIncrement());
     pageSizePager.setDisplay(display);
 
+    csvDownloadButton = new Button(messages.tableDownloadCSV());
+    Widget csvDownloadRequestWidget = RestUtils.requestCSVExport(csvDownloadButton, getClassToReturn(), getFilter(),
+      dataProvider.getSorter(), dataProvider.getSublist(), getFacets(), getJustActive(), false);
+    csvDownloadButton.addStyleName("btn btn-link");
+
     createSelectAllPanel();
 
     add(selectAllPanel);
     add(display);
     add(resultsPager);
     add(pageSizePager);
-    Button csvDownload = new Button(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-download' aria-hidden='true'></i>"),
-      new ClickHandler() {
-
-        @Override
-        public void onClick(ClickEvent event) {
-          RestUtils.requestCSVExport(getClassToReturn(), getFilter(), dataProvider.getSorter(),
-            dataProvider.getSublist(), getFacets(), getJustActive());
-        }
-      });
-    csvDownload.addStyleName("btn");
-
-    add(csvDownload);
+    add(csvDownloadRequestWidget);
 
     selectionModel = new SingleSelectionModel<>(getKeyProvider());
 
@@ -367,9 +364,6 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   public void update() {
     dataProvider.update();
   }
-
-  private Timer autoUpdateTimer = null;
-  private int autoUpdateTimerMillis = 0;
 
   public void autoUpdate(int periodMillis) {
     if (autoUpdateTimer != null) {

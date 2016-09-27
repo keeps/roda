@@ -7,33 +7,43 @@
  */
 package org.roda.wui.api.v1;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 
+import org.apache.commons.io.IOUtils;
+import org.roda.core.common.StreamResponse;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.FacetParameter;
+import org.roda.core.data.v2.index.facet.FacetParameter.SORT;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
-import org.roda.core.data.v2.index.facet.FacetParameter.SORT;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.SortParameter;
@@ -151,7 +161,10 @@ public class IndexResource {
       final boolean paramOnlyActive = onlyActive == null ? DEFAULT_ONLY_ACTIVE : onlyActive;
 
       if (ExtraMediaType.TEXT_CSV.equals(mediaType)) {
-        final String csv = Browser.findCSV(classToReturn, filter, sorter, sublist, facets, user, paramOnlyActive);
+        // TODO put export facets in parameter and change client requests
+        boolean exportFacets = !facets.getParameters().isEmpty();
+        final String csv = Browser.findCSV(classToReturn, filter, sorter, sublist, facets, user, paramOnlyActive,
+          exportFacets);
         return Response.ok(csv, mediaType).build();
       } else {
         IndexResult<T> indexResult = Browser.find(classToReturn, filter, sorter, sublist, facets, user,
@@ -179,8 +192,8 @@ public class IndexResource {
   @Consumes({MediaType.APPLICATION_JSON})
   @Produces({MediaType.APPLICATION_JSON, ExtraMediaType.TEXT_CSV})
   @ApiOperation(value = "Find indexed resources", notes = "Find indexed resources.", response = IsIndexed.class, responseContainer = "List")
-  public <T extends IsIndexed> Response find(@ApiParam(value = "Find parameters") final FindRequest findRequest)
-    throws RODAException {
+  public <T extends IsIndexed> Response find(@ApiParam(value = "Find parameters") final FindRequest findRequest,
+    @QueryParam("exportFacets") boolean exportFacets) throws RODAException {
     final String mediaType = ApiUtils.getMediaType(null, request);
     final User user = UserUtility.getApiUser(request);
 
@@ -191,7 +204,7 @@ public class IndexResource {
 
       if (ExtraMediaType.TEXT_CSV.equals(mediaType)) {
         final String csv = Browser.findCSV(classToReturn, findRequest.filter, findRequest.sorter, findRequest.sublist,
-          findRequest.facets, user, findRequest.onlyActive);
+          findRequest.facets, user, findRequest.onlyActive, exportFacets);
         return Response.ok(csv, mediaType).build();
       } else {
         final IndexResult<T> result = Browser.find(classToReturn, findRequest.filter, findRequest.sorter,
@@ -201,6 +214,43 @@ public class IndexResource {
 
     } catch (final ClassNotFoundException e) {
       throw new InvalidParameterException("Invalid value for classToReturn '" + findRequest.classToReturn + "'", e);
+    }
+  }
+
+  @POST
+  @Path("/findFORM")
+  @Consumes({MediaType.APPLICATION_FORM_URLENCODED})
+  public <T extends IsIndexed> Response findFORM(@FormParam("findRequest") final String findRequestString,
+    @FormParam("type") String type, @FormParam("exportFacets") boolean exportFacets) throws RODAException {
+
+    final User user = UserUtility.getApiUser(request);
+    FindRequest findRequest = JsonUtils.getObjectFromJson(findRequestString, FindRequest.class);
+    @SuppressWarnings("unchecked")
+    Class<T> classToReturn;
+    try {
+      classToReturn = (Class<T>) Class.forName(findRequest.classToReturn);
+
+      // TODO put type "csv" into constants
+
+      if (type.equals("csv")) {
+        final String csv = Browser.findCSV(classToReturn, findRequest.filter, findRequest.sorter, findRequest.sublist,
+          findRequest.facets, user, findRequest.onlyActive, exportFacets);
+        
+        // TODO put name of downloaded csv as a form parameter
+
+        return ApiUtils.okResponse(new StreamResponse("export.csv", ExtraMediaType.TEXT_CSV, new StreamingOutput() {
+
+          @Override
+          public void write(OutputStream output) throws IOException, WebApplicationException {
+            IOUtils.write(csv, output, Charset.forName("UTF-8"));
+          }
+        }));
+      } else {
+        // TODO support JSON type
+        throw new GenericException("type not yet supported:" + type);
+      }
+    } catch (ClassNotFoundException e) {
+      throw new GenericException(e);
     }
   }
 

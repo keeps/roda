@@ -155,9 +155,9 @@ public class IndexService {
   }
 
   public <T extends IsIndexed> String findCSV(final Class<T> returnClass, final Filter filter, final Sorter sorter,
-    final Sublist sublist, final Facets facets, final User user, final boolean justActive)
+    final Sublist sublist, final Facets facets, final User user, final boolean justActive, final boolean exportFacets)
     throws GenericException, RequestNotValidException {
-    return SolrUtils.findCSV(getSolrClient(), returnClass, filter, sorter, sublist, facets, user, justActive);
+    return SolrUtils.findCSV(getSolrClient(), returnClass, filter, sorter, sublist, facets, user, justActive, exportFacets);
   }
 
   public <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, User user, boolean justActive)

@@ -2314,4 +2314,6 @@ public interface ClientMessages extends Messages {
 
   String fileAlreadyExists();
 
+  SafeHtml tableDownloadCSV();
+
 }

@@ -299,10 +299,4 @@ public class JavascriptUtils {
 		$doc[key] = value;
   }-*/;
 
-  public static native void postJSON(String url, String json) /*-{
-		$wnd.jQuery().form(url, json).attr('target', '_blank').submit()
-				.remove();
-
-  }-*/;
-
 }

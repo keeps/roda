@@ -274,41 +274,33 @@ public class RestUtils {
 
   private static FindRequestMapper FIND_REQUEST_MAPPER = GWT.create(FindRequestMapper.class);
 
-  public static <T extends IsIndexed> void requestCSVExport(Class<T> classToReturn, Filter filter, Sorter sorter,
-    Sublist sublist, Facets facets, boolean onlyActive) {
-    // api/v1/index/find
+  public static <T extends IsIndexed> Widget requestCSVExport(Button button, Class<T> classToReturn, Filter filter,
+    Sorter sorter, Sublist sublist, Facets facets, boolean onlyActive, boolean exportFacets) {
+    // api/v1/index/findFORM?type=csv
 
-    String url = RodaConstants.API_REST_V1_INDEX + RodaConstants.API_FIND;
-
+    String url = RodaConstants.API_REST_V1_INDEX + "findFORM";
     FindRequest request = new FindRequest(classToReturn.getName(), filter, sorter, sublist, facets, onlyActive);
 
-    // RequestBuilder builder = new RequestBuilder(RequestBuilder.POST,
-    // URL.encode(url));
-    // builder.setHeader("Content-Type", "application/json");
-    // builder.setHeader("Accept", "text/csv");
-    // builder.setRequestData(FIND_REQUEST_MAPPER.write(request));
-    // builder.setCallback(new RequestCallback() {
-    //
-    // @Override
-    // public void onResponseReceived(Request request, Response response) {
-    // // TODO Auto-generated method stub
-    // Toast.showInfo("X", "got response: " + response.getText());
-    //
-    // }
-    //
-    // @Override
-    // public void onError(Request request, Throwable exception) {
-    // Toast.showError(exception);
-    // }
-    // });
-    // try {
-    // builder.send();
-    // } catch (RequestException e) {
-    // AsyncCallbackUtils.defaultFailureTreatment(e);
-    // }
+    final FormPanel form = new FormPanel();
+    form.setAction(URL.encode(url));
+    form.setMethod(FormPanel.METHOD_POST);
+    form.setEncoding(FormPanel.ENCODING_URLENCODED);
+    FlowPanel layout = new FlowPanel();
+    form.setWidget(layout);
+    layout.add(new Hidden("findRequest", FIND_REQUEST_MAPPER.write(request)));
+    layout.add(new Hidden("type", "csv"));
+    layout.add(new Hidden("exportFacets", Boolean.toString(exportFacets)));
+    button.addClickHandler(new ClickHandler() {
 
-    JavascriptUtils.postJSON(url, FIND_REQUEST_MAPPER.write(request));
+      @Override
+      public void onClick(ClickEvent event) {
+        form.submit();
+      }
+    });
+    form.addStyleName("wrapping-form");
+    layout.add(button);
 
+    return form;
   }
 
 }

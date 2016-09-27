@@ -5264,3 +5264,20 @@ td.datePickerMonth, td.datePickerYear {
 #main404 a {
 	font-size: 1.8rem;
 }
+
+/***************************************
+ DOWNLOAD CSV
+****************************************/
+
+.wrapping-form {
+	display: inline-block;
+	
+}
+
+.wrapping-form .btn-link { 
+	padding: 2px;
+}
+
+.my-asyncdatagrid .wrapping-form {
+	float: right;
+} 

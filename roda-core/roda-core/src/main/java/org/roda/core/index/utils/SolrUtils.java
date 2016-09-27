@@ -257,7 +257,7 @@ public class SolrUtils {
 
   public static <T extends IsIndexed> String findCSV(final SolrClient index, final Class<T> classToRetrieve,
     final Filter filter, final Sorter sorter, final Sublist sublist, final Facets facets, final User user,
-    final boolean justActive) throws GenericException, RequestNotValidException {
+    final boolean justActive, final boolean exportFacets) throws GenericException, RequestNotValidException {
 
     final SolrQuery query = new SolrQuery();
     query.setParam("q.op", DEFAULT_QUERY_PARSER_OPERATOR);
@@ -273,7 +273,7 @@ public class SolrUtils {
     try {
 
       final QueryResponse response = index.query(getIndexName(classToRetrieve).get(0), query);
-      if (facets.getParameters().isEmpty()) {
+      if (!exportFacets) {
         return new CSVQueryResponse(response).toCSV();
       } else {
         return new CSVFacetResults(processFacetFields(facets, response.getFacetFields())).toCSV();
