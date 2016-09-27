@@ -50,7 +50,7 @@
 
     function inheritDataAttributes(element) {
       var attributes = [
-        "source", "source-class", "source-facets", "source-start", "source-limit", "source-onlyActive",
+        "source", "source-class", "source-filters", "source-facets", "source-start", "source-limit", "source-onlyActive",
         "view", "view-field", "view-limit", "view-type", "view-filename", "view-type-function",
         "function"
       ];
