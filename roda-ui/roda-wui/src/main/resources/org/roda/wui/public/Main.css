@@ -5201,7 +5201,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 .plugin-description {
 	font-size: 90%;
-	font-weight: 300;
+	font-weight: 330;
 	padding-bottom: 10px;
 }
 .btn-separator {
@@ -5238,13 +5238,11 @@ td.datePickerMonth, td.datePickerYear {
     padding: 0em 2em 1.5em 2em;
     position: relative;
 }
-
 .chart_col_card .toolbarLink {
 	position: absolute;
 	top: 0;
 	right: 0;
 }
-
 .stat_col_card {
 	background: #eee; 
 	padding: 0 2em 4em 2em;

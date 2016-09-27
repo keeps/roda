@@ -562,6 +562,8 @@ public class IngestTransfer extends Composite {
                       Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
                         messages.ingestTransferRemoveSuccessMessage(size));
                       transferredResourceList.refresh();
+                      move.setEnabled(false);
+                      rename.setEnabled(false);
                     }
                   });
                 }

@@ -457,4 +457,3 @@ function rgbaRandomOpaqueColorAsString() {
   color.alpha = 1;
   return rgbaRandomColorAsString(color);
 }
-
