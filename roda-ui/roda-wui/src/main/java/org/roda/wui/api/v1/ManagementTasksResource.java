@@ -154,10 +154,16 @@ public class ManagementTasksResource {
     boolean success = true;
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
     try {
+      // clear index
+      RodaCoreFactory.getIndexService().clearIndex(RodaConstants.INDEX_MEMBERS);
+
+      // index users
       for (User ldapUser : RodaCoreFactory.getModelService().listUsers()) {
         LOGGER.debug("User to be indexed: {}", ldapUser);
         RodaCoreFactory.getModelService().notifyUserUpdated(ldapUser);
       }
+
+      // index groups
       for (Group ldapGroup : RodaCoreFactory.getModelService().listGroups()) {
         LOGGER.debug("Group to be indexed: {}", ldapGroup);
         RodaCoreFactory.getModelService().notifyGroupUpdated(ldapGroup);
