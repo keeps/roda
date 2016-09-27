@@ -390,7 +390,9 @@ public interface ClientMessages extends Messages {
 
   String createJobWorkflow();
 
-  String createJobCategoryWorkflow();
+  String createJobCategorySelect();
+
+  SafeHtml createJobCategoryWorkflow(List<String> categoryLabels);
 
   String allCategoryItem();
 

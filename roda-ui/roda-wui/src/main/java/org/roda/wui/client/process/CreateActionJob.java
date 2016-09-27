@@ -53,6 +53,7 @@ import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -61,6 +62,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
@@ -132,7 +134,7 @@ public class CreateActionJob extends Composite {
   FlowPanel workflowListDescription;
 
   @UiField
-  Label workflowListDescriptionCategories;
+  HTML workflowListDescriptionCategories;
 
   @UiField
   FlowPanel workflowPanel;
@@ -324,12 +326,14 @@ public class CreateActionJob extends Composite {
           workflowListDescription.add(descriptionLine);
         }
 
-        String categories = messages.createJobCategoryWorkflow() + ": ";
+        List<String> categoryTranslations = new ArrayList<>();
         for (String category : selectedPlugin.getCategories()) {
-          categories += messages.showPluginCategories(category) + ", ";
+          categoryTranslations.add(messages.showPluginCategories(category));
         }
 
-        workflowListDescriptionCategories.setText(categories.substring(0, categories.length() - 2));
+        SafeHtml categories = messages.createJobCategoryWorkflow(categoryTranslations);
+
+        workflowListDescriptionCategories.setHTML(categories);
         workflowListDescription.setVisible(true);
         workflowListDescriptionCategories.setVisible(true);
       } else {
