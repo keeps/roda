@@ -1213,7 +1213,7 @@ public class Browser extends RodaWuiController {
 
   }
 
-  public static StreamResponse retrieveClassificationPlan(User user, String type)
+  public static StreamResponse retrieveClassificationPlan(User user)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1221,10 +1221,10 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     // delegate
-    StreamResponse classificationPlan = BrowserHelper.retrieveClassificationPlan(type, user);
+    StreamResponse classificationPlan = BrowserHelper.retrieveClassificationPlan(user);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, CLASSIFICATION_PLAN_TYPE_PARAMETER, type);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
 
     return classificationPlan;
   }

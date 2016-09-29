@@ -1412,7 +1412,7 @@ public class BrowserHelper {
   }
 
   // TODO Limit access to SDO accessible by user
-  public static StreamResponse retrieveClassificationPlan(String type, User user)
+  public static StreamResponse retrieveClassificationPlan(User user)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     try {
       JsonFactory factory = new JsonFactory();

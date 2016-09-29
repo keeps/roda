@@ -436,6 +436,9 @@ pre code {
     border: 0;
     border-left: 2px solid #089de3;
 }
+.panelDescriptiveMetadata .fieldTextBox, .panelDescriptiveMetadata .form-textbox {
+	border-left: 0;
+}
 
 .form-listbox {
     color: #58595b;
@@ -2115,6 +2118,11 @@ td.datePickerMonth, td.datePickerYear {
 .metadata-form-field {
     padding-top: 10px;
     padding-bottom: 5px;
+}
+
+.panelDescriptiveMetadata .metadata-form-field {
+    padding-top: 0px;
+    padding-bottom: 0px;
 }
 
 .content .metadata-form-textbox {
