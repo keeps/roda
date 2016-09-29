@@ -29,24 +29,26 @@
 					<ui:text from='{messages.createJobCategorySelect}' />
 				</g:Label>
 				<g:FlowPanel addStyleNames="form-listbox" ui:field="workflowCategoryList" />
-				
-				
-				<g:FlowPanel addStyleNames="col_4 col_padding">
-					<g:Label addStyleNames="form-label h4">
-						<ui:text from='{messages.createJobWorkflow}' />
-					</g:Label>
-					<g:ListBox addStyleNames="form-listbox listbox_col"
-						ui:field="workflowList" />
-				</g:FlowPanel>
-				<g:FlowPanel addStyleNames="col_7 col_padding">
-					<g:Label addStyleNames="form-label h4" ui:field="workflowListTitle" />
-					<g:FlowPanel ui:field="workflowListDescription"></g:FlowPanel>
-					<g:HTML addStyleNames="p plugin-description" ui:field="workflowListDescriptionCategories" />
 
-					<g:FlowPanel styleName="panel" ui:field="workflowPanel">
-						<p:PluginOptionsPanel styleName="panel-body" ui:field="workflowOptions" />
+				<g:FlowPanel addStyleNames="clearfix">
+					<g:FlowPanel addStyleNames="pull-left plugin-list">
+						<g:Label addStyleNames="form-label h4">
+							<ui:text from='{messages.createJobWorkflow}' />
+						</g:Label>
+						<g:FlowPanel ui:field="workflowList" />
+					</g:FlowPanel>
+					<g:FlowPanel addStyleNames="pull-right plugin-details">
+						<g:Label addStyleNames="form-label h5" ui:field="workflowListTitle" />
+						<g:FlowPanel ui:field="workflowListDescription"></g:FlowPanel>
+						<g:HTML addStyleNames="p plugin-description" ui:field="workflowListDescriptionCategories" />
+
+						<g:FlowPanel styleName="panel" ui:field="workflowPanel">
+							<p:PluginOptionsPanel styleName="panel-body"
+								ui:field="workflowOptions" />
+						</g:FlowPanel>
 					</g:FlowPanel>
 				</g:FlowPanel>
+
 			</g:FlowPanel>
 
 			<g:FlowPanel addStyleNames="col_2 last sidebar">

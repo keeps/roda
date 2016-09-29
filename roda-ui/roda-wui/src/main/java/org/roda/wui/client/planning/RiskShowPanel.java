@@ -9,12 +9,15 @@
 package org.roda.wui.client.planning;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
+import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
@@ -133,22 +136,35 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
   Label riskMitigationRelatedEventIdentifierValueKey, riskMitigationRelatedEventIdentifierValueValue;
 
   @UiField(provided = true)
+  SearchPanel searchPanel;
+
+  @UiField(provided = true)
   RiskIncidenceList incidenceList;
 
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   public RiskShowPanel() {
-    incidenceList = new RiskIncidenceList(null, null, messages.riskIncidences(), false);
+    incidenceList = new RiskIncidenceList(null, null, messages.riskIncidences(), true);
+
+    searchPanel = new SearchPanel(new Filter(new BasicSearchFilterParameter(RodaConstants.RISK_SEARCH, "*")),
+      RodaConstants.RISK_INCIDENCE_SEARCH, messages.riskIncidenceRegisterSearchPlaceHolder(), false, false, false);
+    searchPanel.setList(incidenceList);
+
     initWidget(uiBinder.createAndBindUi(this));
   }
 
   public RiskShowPanel(Risk risk, boolean hasTitle) {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISK_ID, risk.getId()));
-    incidenceList = new RiskIncidenceList(filter, null, messages.riskIncidences(), false);
+    incidenceList = new RiskIncidenceList(filter, null, messages.riskIncidences(), true);
+
+    searchPanel = new SearchPanel(
+      new Filter(new BasicSearchFilterParameter(RodaConstants.RISK_SEARCH, "*"),
+        new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISK_ID, risk.getId())),
+      RodaConstants.RISK_INCIDENCE_SEARCH, messages.riskIncidenceRegisterSearchPlaceHolder(), false, false, false);
+    searchPanel.setList(incidenceList);
 
     incidenceList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
-
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
         final RiskIncidence selected = incidenceList.getSelectionModel().getSelectedObject();
@@ -328,5 +344,13 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
   @Override
   public HandlerRegistration addValueChangeHandler(ValueChangeHandler<Risk> handler) {
     return addHandler(handler, ValueChangeEvent.getType());
+  }
+
+  public SelectedItems<RiskIncidence> getSelectedIncidences() {
+    return incidenceList.getSelected();
+  }
+
+  public void refreshList() {
+    incidenceList.refresh();
   }
 }

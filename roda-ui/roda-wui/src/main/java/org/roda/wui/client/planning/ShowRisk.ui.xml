@@ -33,6 +33,17 @@
 						<ui:text from='{messages.cancelButton}' />
 					</g:Button>
 				</g:FlowPanel>
+				<g:FlowPanel>
+					<g:Label addStyleNames="h4">
+						<ui:text from='{messages.sidebarRiskIncidencesTitle}' />
+					</g:Label>
+					<g:Button addStyleNames="btn btn-danger btn-ban" ui:field="buttonRemove">
+						<ui:text from='{messages.removeButton}' />
+					</g:Button>
+					<g:Button addStyleNames="btn btn-play" ui:field="buttonProcess">
+						<ui:text from='{messages.newProcessPreservation}' />
+					</g:Button>
+				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>

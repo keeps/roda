@@ -12,13 +12,17 @@ package org.roda.wui.client.planning;
 
 import java.util.List;
 
+import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -29,6 +33,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
+
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
@@ -58,6 +64,7 @@ public class ShowRisk extends Composite {
   };
 
   private static ShowRisk instance = null;
+  private static ClientMessages messages = GWT.create(ClientMessages.class);
 
   public static ShowRisk getInstance() {
     if (instance == null) {
@@ -82,6 +89,12 @@ public class ShowRisk extends Composite {
 
   @UiField
   Button buttonCancel;
+
+  @UiField
+  Button buttonRemove;
+
+  @UiField
+  Button buttonProcess;
 
   private Risk risk;
 
@@ -152,6 +165,31 @@ public class ShowRisk extends Composite {
   @UiHandler("buttonCancel")
   void handleButtonCancel(ClickEvent e) {
     cancel();
+  }
+
+  @UiHandler("buttonRemove")
+  void handleButtonRemove(ClickEvent e) {
+    SelectedItems<RiskIncidence> incidences = riskShowPanel.getSelectedIncidences();
+
+    BrowserService.Util.getInstance().deleteRiskIncidences(incidences, new AsyncCallback<Void>() {
+
+      @Override
+      public void onFailure(Throwable caught) {
+        AsyncCallbackUtils.defaultFailureTreatment(caught);
+      }
+
+      @Override
+      public void onSuccess(Void result) {
+        riskShowPanel.refreshList();
+        Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(), messages.ingestTransferRemoveAllSuccessMessage());
+      }
+
+    });
+  }
+
+  @UiHandler("buttonProcess")
+  void handleButtonProcess(ClickEvent e) {
+    Toast.showInfo("Info", "This feature is not yet implemented");
   }
 
   private void cancel() {

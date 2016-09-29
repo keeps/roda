@@ -66,16 +66,6 @@ public interface ClientMessages extends Messages {
 
   String formatsTitle();
 
-  String newAgentTitle();
-
-  String createAgentTitle();
-
-  String editAgentTitle();
-
-  String showAgentTitle();
-
-  String agentsTitle();
-
   String newRiskTitle();
 
   String createRiskTitle();
@@ -134,11 +124,11 @@ public interface ClientMessages extends Messages {
 
   String sidebarPreservationTitle();
 
-  String sidebarAgentsTitle();
-
   String sidebarFormatsTitle();
 
   String sidebarRisksTitle();
+
+  String sidebarRiskIncidencesTitle();
 
   String sidebarAppraisalTitle();
 
@@ -870,36 +860,6 @@ public interface ClientMessages extends Messages {
 
   String editIncidenceFailure(String errorMessage);
 
-  /************* Agent register ****************/
-
-  String agentRegisterTitle();
-
-  String agentRegisterProcessButton();
-
-  String agentRegisterSearchPlaceHolder();
-
-  String createAgentFailure(String message);
-
-  String editAgentNotFound(String name);
-
-  String editAgentFailure(String message);
-
-  String agentRemoveFolderConfirmDialogTitle();
-
-  String agentRemoveSelectedConfirmDialogMessage(Long size);
-
-  String agentRemoveFolderConfirmDialogCancel();
-
-  String agentRemoveFolderConfirmDialogOk();
-
-  String agentRemoveSuccessTitle();
-
-  String agentRemoveSuccessMessage(Long size);
-
-  String agentListItems(String item);
-
-  String getAgentsDialogName();
-
   /************* Format register ****************/
 
   String getFormatsDialogName();
@@ -1166,44 +1126,6 @@ public interface ClientMessages extends Messages {
   String riskIncidenceMitigatedDescription();
 
   String riskIncidenceStatusValue(@Select INCIDENCE_STATUS status);
-
-  /*** Agents ***/
-
-  String agentName();
-
-  String agentType();
-
-  String agentDescription();
-
-  String agentCategory();
-
-  String agentVersion();
-
-  String agentLicense();
-
-  String agentInitialRelease();
-
-  String agentPopularity();
-
-  String agentWebsite();
-
-  String agentDownload();
-
-  String agentProvenanceInformation();
-
-  String agentPlatforms();
-
-  String agentExtensions();
-
-  String agentMimetypes();
-
-  String agentPronoms();
-
-  String agentUtis();
-
-  String agentFormats();
-
-  String agentRequiredAgents();
 
   /*** Formats ***/
 

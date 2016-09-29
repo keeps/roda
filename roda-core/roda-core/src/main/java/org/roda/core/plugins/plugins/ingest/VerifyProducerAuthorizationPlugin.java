@@ -7,29 +7,21 @@
  */
 package org.roda.core.plugins.plugins.ingest;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.XMLUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
-import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
-import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -41,8 +33,8 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
-import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,35 +89,47 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
     Report report = PluginHelper.initPluginReport(this);
     Job currentJob = getJob(index);
 
-    for (AIP aip : list) {
-      LOGGER.debug("Checking producer authorization for AIPingest.submitP {}", aip.getId());
+    try {
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+      for (AIP aip : list) {
+        LOGGER.debug("Checking producer authorization for AIPingest.submitP {}", aip.getId());
 
-      reportItem.setPluginState(PluginState.SUCCESS)
-        .setPluginDetails(String.format("Done with checking producer authorization for AIP %s", aip.getId()));
+        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
 
-      if (currentJob != null) {
-        processAIPPermissions(index, model, currentJob, aip, reportItem);
-      } else {
-        reportItem.setPluginState(PluginState.FAILURE).setPluginDetails("Unable to determine Job");
+        reportItem.setPluginState(PluginState.SUCCESS)
+          .setPluginDetails(String.format("Done with checking producer authorization for AIP %s", aip.getId()));
+
+        if (currentJob != null) {
+          processAIPPermissions(index, model, currentJob, aip, reportItem);
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        } else {
+          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails("Unable to determine Job");
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+        }
+
+        try {
+          boolean notify = true;
+          PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(),
+            reportItem.getPluginDetails(), notify);
+        } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
+          | ValidationException | AlreadyExistsException e) {
+          throw new PluginException("Error while creating the event", e);
+        }
+
+        LOGGER.debug("Done with checking producer authorization for AIP {}", aip.getId());
+
+        report.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+
       }
 
-      try {
-        boolean notify = true;
-        PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(),
-          reportItem.getPluginDetails(), notify);
-      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
-        | ValidationException | AlreadyExistsException e) {
-        throw new PluginException("Error while creating the event", e);
-      }
-
-      LOGGER.debug("Done with checking producer authorization for AIP {}", aip.getId());
-
-      report.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
-
+      jobPluginInfo.finalizeInfo();
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+    } catch (JobException e) {
+      throw new PluginException("A job exception has occurred", e);
     }
 
     return report;
@@ -134,11 +138,10 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
   private void processAIPPermissions(IndexService index, ModelService model, Job currentJob, AIP aip,
     Report reportItem) {
     try {
-      AIP parentAIP = null;
       String jobCreatorUsername = currentJob.getUsername();
       if (aip.getParentId() != null) {
         try {
-          parentAIP = model.retrieveAIP(aip.getParentId());
+          AIP parentAIP = model.retrieveAIP(aip.getParentId());
           Set<PermissionType> userPermissions = parentAIP.getPermissions().getUserPermissions(jobCreatorUsername);
           LOGGER.trace("Checking if user '{}' has permissions on parent AIP '{}' ({})", jobCreatorUsername,
             parentAIP.getId(), userPermissions);

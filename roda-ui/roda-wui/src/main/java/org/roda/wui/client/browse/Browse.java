@@ -986,6 +986,7 @@ public class Browse extends Composite {
   @UiHandler("moveItem")
   void buttonMoveItemHandler(ClickEvent e) {
     final SelectedItems<IndexedAIP> selected = aipList.getSelected();
+    int counter = 0;
 
     if (SelectedItemsUtils.isEmpty(selected)) {
       // Move this item
@@ -1043,23 +1044,27 @@ public class Browse extends Composite {
         filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_ID, aipId));
         showEmptyParentButton = true;
       } else {
-        // if (selected instanceof SelectedItemsList) {
-        // SelectedItemsList<IndexedAIP> list = (SelectedItemsList<IndexedAIP>)
-        // selected;
-        // for (String id : list.getIds()) {
-        // filter.add(new
-        // NotSimpleFilterParameter(RodaConstants.AIP_ANCESTORS, id));
-        // filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_ID, id));
-        // }
-        // } else {
-        filter = Filter.ALL;
-        // }
+        if (selected instanceof SelectedItemsList) {
+          SelectedItemsList<IndexedAIP> list = (SelectedItemsList<IndexedAIP>) selected;
+          counter = list.getIds().size();
+          if (counter <= RodaConstants.DIALOG_FILTER_LIMIT_NUMBER) {
+            for (String id : list.getIds()) {
+              filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_ANCESTORS, id));
+              filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_ID, id));
+            }
+          }
+        } else {
+          filter = Filter.ALL;
+        }
         showEmptyParentButton = false;
       }
 
       SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter, justActive, true);
       selectAipDialog.setEmptyParentButtonVisible(showEmptyParentButton);
       selectAipDialog.showAndCenter();
+      if (counter > 0 && counter <= RodaConstants.DIALOG_FILTER_LIMIT_NUMBER) {
+        selectAipDialog.addStyleName("object-dialog");
+      }
       selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
 
         @Override
@@ -1089,6 +1094,7 @@ public class Browse extends Composite {
               }
             });
         }
+
       });
 
     }

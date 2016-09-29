@@ -388,7 +388,6 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       Arrays.asList(Job.JOB_STATE.STARTED.toString(), Job.JOB_STATE.CREATED.toString())));
 
     return index.findAll(Job.class, filter);
-
   }
 
   private void cleanUnfinishedJobs(IterableIndexResult<Job> unfinishedJobs) {

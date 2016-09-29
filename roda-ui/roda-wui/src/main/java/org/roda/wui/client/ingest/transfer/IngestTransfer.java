@@ -684,22 +684,29 @@ public class IngestTransfer extends Composite {
       } else {
         filter.add(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, Boolean.FALSE.toString()));
 
-        for (TransferredResource resource : resources) {
-          filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, resource.getUUID()));
-          filter.add(
-            new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS, resource.getRelativePath()));
-          filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, resource.getParentUUID()));
+        if (resources.size() <= RodaConstants.DIALOG_FILTER_LIMIT_NUMBER) {
+          for (TransferredResource resource : resources) {
+            filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, resource.getUUID()));
+            filter.add(
+              new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS, resource.getRelativePath()));
+            filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, resource.getParentUUID()));
+          }
         }
       }
     } else {
       filter.add(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, Boolean.FALSE.toString()));
 
-      for (TransferredResource resource : resources) {
-        filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, resource.getUUID()));
+      if (resources.size() <= RodaConstants.DIALOG_FILTER_LIMIT_NUMBER) {
+        for (TransferredResource resource : resources) {
+          filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, resource.getUUID()));
+        }
       }
     }
 
     SelectTransferResourceDialog dialog = new SelectTransferResourceDialog(messages.selectParentTitle(), filter);
+    if (resources.size() <= RodaConstants.DIALOG_FILTER_LIMIT_NUMBER) {
+      dialog.addStyleName("object-dialog");
+    }
     dialog.setEmptyParentButtonVisible(true);
     dialog.showAndCenter();
     dialog.addValueChangeHandler(new ValueChangeHandler<TransferredResource>() {

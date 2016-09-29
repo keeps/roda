@@ -18,6 +18,9 @@ import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.Void;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -71,17 +74,29 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<Void> list)
     throws PluginException {
     try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, 0);
+      int counter = index.count(IndexedAIP.class,
+        new Filter(new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.TRUE.toString()))).intValue();
+
+      // XXX 20160929 Is it really needed? (it is there to be possible to get
+      // 100% done reports)
+      if (counter == 0) {
+        counter = index.count(IndexedAIP.class, Filter.ALL).intValue();
+      }
+
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, counter);
+      jobPluginInfo.setSourceObjectsCount(counter);
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       PluginHelper.fixParents(this, index, model);
 
+      jobPluginInfo.incrementObjectsProcessedWithSuccess(counter);
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | JobException
       | NotFoundException e) {
       LOGGER.error("Error while fixing the ancestors.", e);
     }
+
     return PluginHelper.initPluginReport(this);
   }
 

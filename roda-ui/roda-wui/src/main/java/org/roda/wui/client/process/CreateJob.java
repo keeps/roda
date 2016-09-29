@@ -35,9 +35,8 @@ import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -45,13 +44,13 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -147,7 +146,7 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
   FlowPanel workflowCategoryList;
 
   @UiField
-  ListBox workflowList;
+  FlowPanel workflowList;
 
   @UiField
   FlowPanel workflowListDescription;
@@ -223,18 +222,6 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
     configurePlugins(selected.getSelectedClass());
 
     workflowCategoryList.addStyleName("form-listbox-job");
-    workflowList.setVisibleItemCount(20);
-    workflowList.addChangeHandler(new ChangeHandler() {
-
-      @Override
-      public void onChange(ChangeEvent event) {
-        String selectedPluginId = workflowList.getSelectedValue();
-        if (selectedPluginId != null) {
-          CreateJob.this.selectedPlugin = lookupPlugin(selectedPluginId);
-        }
-        updateWorkflowOptions();
-      }
-    });
   }
 
   public abstract boolean updateObjectList();
@@ -245,7 +232,9 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
     if (plugins != null) {
       PluginUtils.sortByName(plugins);
 
-      for (PluginInfo pluginInfo : plugins) {
+      for (int p = 0; p < plugins.size(); p++) {
+        PluginInfo pluginInfo = plugins.get(p);
+
         if (pluginInfo != null) {
 
           List<String> pluginCategories = pluginInfo.getCategories();
@@ -271,7 +260,8 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
 
                     if (plugins != null) {
                       PluginUtils.sortByName(plugins);
-                      for (PluginInfo pluginInfo : plugins) {
+                      for (int p = 0; p < plugins.size(); p++) {
+                        PluginInfo pluginInfo = plugins.get(p);
                         if (pluginInfo != null) {
                           List<String> categories = pluginInfo.getCategories();
 
@@ -286,9 +276,11 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
                                   && !categories.contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)
                                   && ((!isSelectedEmpty() && pluginInfo.hasObjectClass(selectedClass))
                                     || (isSelectedEmpty() && pluginInfo.hasObjectClass(listSelectedClass)))) {
-                                  workflowList.addItem(
-                                    messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()),
-                                    pluginInfo.getId());
+                                  Anchor anchor = addAnchorToWorkflowList(pluginInfo);
+                                  if (i == 0) {
+                                    CreateJob.this.selectedPlugin = lookupPlugin(pluginInfo.getId());
+                                    anchor.addStyleName("plugin-list-item-selected");
+                                  }
                                 }
 
                               }
@@ -298,9 +290,11 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
                               if (!pluginInfo.getCategories().contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)
                                 && ((!isSelectedEmpty() && pluginInfo.hasObjectClass(selectedClass))
                                   || (isSelectedEmpty() && pluginInfo.hasObjectClass(listSelectedClass)))) {
-                                workflowList.addItem(
-                                  messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()),
-                                  pluginInfo.getId());
+                                Anchor anchor = addAnchorToWorkflowList(pluginInfo);
+                                if (p == 0) {
+                                  CreateJob.this.selectedPlugin = lookupPlugin(pluginInfo.getId());
+                                  anchor.addStyleName("plugin-list-item-selected");
+                                }
                               }
                             }
                           }
@@ -308,11 +302,6 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
                       }
                     }
 
-                    workflowList.setSelectedIndex(0);
-                    String selectedPluginId = workflowList.getSelectedValue();
-                    if (selectedPluginId != null) {
-                      CreateJob.this.selectedPlugin = lookupPlugin(selectedPluginId);
-                    }
                     updateWorkflowOptions();
                   }
 
@@ -326,8 +315,11 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
             if (!pluginCategories.contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)
               && ((!isSelectedEmpty() && pluginInfo.hasObjectClass(selectedClass))
                 || (isSelectedEmpty() && pluginInfo.hasObjectClass(listSelectedClass)))) {
-              workflowList.addItem(messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()),
-                pluginInfo.getId());
+              Anchor anchor = addAnchorToWorkflowList(pluginInfo);
+              if (p == 0) {
+                CreateJob.this.selectedPlugin = lookupPlugin(pluginInfo.getId());
+                anchor.addStyleName("plugin-list-item-selected");
+              }
             }
           }
 
@@ -336,13 +328,39 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
         }
       }
 
-      String selectedPluginId = workflowList.getSelectedValue();
-      if (selectedPluginId != null) {
-        CreateJob.this.selectedPlugin = lookupPlugin(selectedPluginId);
-      }
-
       updateWorkflowOptions();
     }
+  }
+
+  private Anchor addAnchorToWorkflowList(PluginInfo pluginInfo) {
+    Anchor anchor = new Anchor();
+    anchor.addStyleName("plugin-list-item");
+    anchor.setText(messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()));
+    anchor.getElement().setAttribute("data-id", pluginInfo.getId());
+    anchor.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        Anchor anchor = (Anchor) event.getSource();
+        String selectedPluginId = anchor.getElement().getAttribute("data-id");
+
+        for (int i = 0; i < workflowList.getWidgetCount(); i++) {
+          Widget w = workflowList.getWidget(i);
+          w.removeStyleName("plugin-list-item-selected");
+        }
+
+        if (selectedPluginId != null) {
+          CreateJob.this.selectedPlugin = lookupPlugin(selectedPluginId);
+          anchor.addStyleName("plugin-list-item-selected");
+        }
+
+        updateWorkflowOptions();
+      }
+
+    });
+
+    workflowList.add(anchor);
+    return anchor;
   }
 
   protected void updateWorkflowOptions() {
@@ -445,7 +463,7 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
     return this.name;
   }
 
-  public ListBox getWorkflowList() {
+  public FlowPanel getWorkflowList() {
     return workflowList;
   }
 

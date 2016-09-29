@@ -16,7 +16,13 @@ import java.util.List;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
 
+import com.google.gwt.core.client.GWT;
+
+import config.i18n.client.ClientMessages;
+
 public class PluginUtils {
+
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   public static void sortByName(List<PluginInfo> list) {
     Collections.sort(list, new Comparator<PluginInfo>() {

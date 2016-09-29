@@ -22,7 +22,9 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.FacetParameter;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
@@ -235,29 +237,31 @@ public class Search extends Composite {
     final SelectedItems<IndexedAIP> selected = (SelectedItems<IndexedAIP>) getSelected();
 
     // Move all selected
-    Filter filter;
+    Filter filter = new Filter();
     boolean showEmptyParentButton;
+    int counter = 0;
 
-    filter = new Filter();
-
-    // if (selected instanceof SelectedItemsList) {
-    // SelectedItemsList<IndexedAIP> list = (SelectedItemsList<IndexedAIP>)
-    // selected;
-    // for (String id : list.getIds()) {
-    // filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_ANCESTORS,
-    // id));
-    // filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_ID, id));
-    // }
-    // } else {
-    filter = Filter.ALL;
-    // }
+    if (selected instanceof SelectedItemsList) {
+      SelectedItemsList<IndexedAIP> list = (SelectedItemsList<IndexedAIP>) selected;
+      counter = list.getIds().size();
+      if (counter <= RodaConstants.DIALOG_FILTER_LIMIT_NUMBER) {
+        for (String id : list.getIds()) {
+          filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_ANCESTORS, id));
+          filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_ID, id));
+        }
+      }
+    } else {
+      filter = Filter.ALL;
+    }
 
     showEmptyParentButton = false;
-
     SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter, mainSearch.isJustActive(),
       true);
     selectAipDialog.setEmptyParentButtonVisible(showEmptyParentButton);
     selectAipDialog.showAndCenter();
+    if (counter > 0 && counter <= RodaConstants.DIALOG_FILTER_LIMIT_NUMBER) {
+      selectAipDialog.addStyleName("object-dialog");
+    }
     selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
 
       @Override

@@ -51,6 +51,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -58,6 +59,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
@@ -128,7 +130,7 @@ public class CreateActionJob extends Composite {
   FlowPanel workflowCategoryList;
 
   @UiField
-  ListBox workflowList;
+  FlowPanel workflowList;
 
   @UiField
   FlowPanel workflowListDescription;
@@ -189,20 +191,7 @@ public class CreateActionJob extends Composite {
     workflowOptions.setPlugins(plugins);
     configurePlugins();
 
-    workflowList.setVisibleItemCount(20);
     workflowCategoryList.addStyleName("form-listbox-job");
-    workflowList.addChangeHandler(new ChangeHandler() {
-
-      @Override
-      public void onChange(ChangeEvent event) {
-        String selectedPluginId = workflowList.getSelectedValue();
-        if (selectedPluginId != null) {
-          CreateActionJob.this.selectedPlugin = lookupPlugin(selectedPluginId);
-        }
-
-        updateWorkflowOptions();
-      }
-    });
   }
 
   public void configurePlugins() {
@@ -211,9 +200,10 @@ public class CreateActionJob extends Composite {
     if (plugins != null) {
       PluginUtils.sortByName(plugins);
 
-      for (PluginInfo pluginInfo : plugins) {
-        if (pluginInfo != null) {
+      for (int p = 0; p < plugins.size(); p++) {
+        PluginInfo pluginInfo = plugins.get(p);
 
+        if (pluginInfo != null) {
           List<String> pluginCategories = pluginInfo.getCategories();
 
           if (pluginCategories != null) {
@@ -235,7 +225,9 @@ public class CreateActionJob extends Composite {
 
                     if (plugins != null) {
                       PluginUtils.sortByName(plugins);
-                      for (PluginInfo pluginInfo : plugins) {
+
+                      for (int p = 0; p < plugins.size(); p++) {
+                        PluginInfo pluginInfo = plugins.get(p);
                         if (pluginInfo != null) {
                           List<String> categories = pluginInfo.getCategories();
 
@@ -248,29 +240,27 @@ public class CreateActionJob extends Composite {
 
                                 if (categories.contains(checkbox.getName())
                                   && !categories.contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)) {
-                                  workflowList.addItem(
-                                    messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()),
-                                    pluginInfo.getId());
+                                  Anchor anchor = addAnchorToWorkflowList(pluginInfo);
+                                  if (i == 0) {
+                                    CreateActionJob.this.selectedPlugin = lookupPlugin(pluginInfo.getId());
+                                    anchor.addStyleName("plugin-list-item-selected");
+                                  }
                                 }
                               }
                             }
 
                             if (noChecks) {
                               if (!pluginInfo.getCategories().contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)) {
-                                workflowList.addItem(
-                                  messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()),
-                                  pluginInfo.getId());
+                                Anchor anchor = addAnchorToWorkflowList(pluginInfo);
+                                if (p == 0) {
+                                  CreateActionJob.this.selectedPlugin = lookupPlugin(pluginInfo.getId());
+                                  anchor.addStyleName("plugin-list-item-selected");
+                                }
                               }
                             }
                           }
                         }
                       }
-                    }
-
-                    workflowList.setSelectedIndex(0);
-                    String selectedPluginId = workflowList.getSelectedValue();
-                    if (selectedPluginId != null) {
-                      CreateActionJob.this.selectedPlugin = lookupPlugin(selectedPluginId);
                     }
 
                     updateWorkflowOptions();
@@ -283,8 +273,11 @@ public class CreateActionJob extends Composite {
             }
 
             if (!pluginCategories.contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)) {
-              workflowList.addItem(messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()),
-                pluginInfo.getId());
+              Anchor anchor = addAnchorToWorkflowList(pluginInfo);
+              if (p == 0) {
+                CreateActionJob.this.selectedPlugin = lookupPlugin(pluginInfo.getId());
+                anchor.addStyleName("plugin-list-item-selected");
+              }
             }
           }
 
@@ -293,13 +286,39 @@ public class CreateActionJob extends Composite {
         }
       }
 
-      String selectedPluginId = workflowList.getSelectedValue();
-      if (selectedPluginId != null) {
-        CreateActionJob.this.selectedPlugin = lookupPlugin(selectedPluginId);
-      }
-
       updateWorkflowOptions();
     }
+  }
+
+  private Anchor addAnchorToWorkflowList(PluginInfo pluginInfo) {
+    Anchor anchor = new Anchor();
+    anchor.addStyleName("plugin-list-item");
+    anchor.setText(messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()));
+    anchor.getElement().setAttribute("data-id", pluginInfo.getId());
+    anchor.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        Anchor anchor = (Anchor) event.getSource();
+        String selectedPluginId = anchor.getElement().getAttribute("data-id");
+
+        for (int i = 0; i < workflowList.getWidgetCount(); i++) {
+          Widget w = workflowList.getWidget(i);
+          w.removeStyleName("plugin-list-item-selected");
+        }
+
+        if (selectedPluginId != null) {
+          CreateActionJob.this.selectedPlugin = lookupPlugin(selectedPluginId);
+          anchor.addStyleName("plugin-list-item-selected");
+        }
+
+        updateWorkflowOptions();
+      }
+
+    });
+
+    workflowList.add(anchor);
+    return anchor;
   }
 
   protected void updateWorkflowOptions() {
@@ -500,7 +519,7 @@ public class CreateActionJob extends Composite {
     return this.name;
   }
 
-  public ListBox getWorkflowList() {
+  public FlowPanel getWorkflowList() {
     return workflowList;
   }
 
