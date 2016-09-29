@@ -50,7 +50,6 @@ import org.slf4j.LoggerFactory;
 public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(VerifyProducerAuthorizationPlugin.class);
 
-  private static final String CREATE_TOP_LEVEL_AIP_PERMISSION = "create.top.level.aip";
   private static final String NO_PERMISSION_TO_CREATE_UNDER_AIP = "The user doesn't have permission to create under AIP";
   private static final String PARENT_AIP_NOT_FOUND = "The parent of the AIP was not found";
   private static final String NO_AIP_PERMISSION = "The user doesn't have access to the parent AIP";
@@ -157,9 +156,8 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
         }
       } else {
         RODAMember member = index.retrieve(RODAMember.class, jobCreatorUsername);
-        if (member.getAllRoles().contains(CREATE_TOP_LEVEL_AIP_PERMISSION) || member.getName().equals("admin")) {
-          LOGGER
-            .debug("User have CREATE_TOP_LEVEL_AIP_PERMISSION permission.");
+        if (member.getAllRoles().contains(RodaConstants.REPOSITORY_PERMISSIONS_AIP_CREATE_TOP)) {
+          LOGGER.debug("User have CREATE_TOP_LEVEL_AIP_PERMISSION permission.");
         } else {
           reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(NO_CREATE_TOP_LEVEL_AIP_PERMISSION);
           LOGGER.debug("User doesn't have CREATE_TOP_LEVEL_AIP_PERMISSION permission...");

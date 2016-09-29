@@ -733,6 +733,35 @@ public class Browser extends RodaWuiController {
 
   public static AIP createAIP(User user, String parentId, String type) throws AuthorizationDeniedException,
     GenericException, NotFoundException, RequestNotValidException, AlreadyExistsException {
+    if (parentId == null) {
+      return createAIPTop(user, type);
+    } else {
+      return createAIPBelow(user, parentId, type);
+    }
+  }
+
+  public static AIP createAIPTop(User user, String type) throws AuthorizationDeniedException, GenericException,
+    NotFoundException, RequestNotValidException, AlreadyExistsException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+    Permissions permissions = new Permissions();
+
+    permissions.setUserPermissions(user.getId(), new HashSet<PermissionType>(Arrays.asList(PermissionType.values())));
+
+    // delegate
+    String parentId = null;
+    AIP aip = BrowserHelper.createAIP(user, parentId, type, permissions);
+
+    // register action
+    controllerAssistant.registerAction(user, aip.getId(), LOG_ENTRY_STATE.SUCCESS);
+
+    return aip;
+  }
+
+  public static AIP createAIPBelow(User user, String parentId, String type) throws AuthorizationDeniedException,
+    GenericException, NotFoundException, RequestNotValidException, AlreadyExistsException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -752,7 +781,7 @@ public class Browser extends RodaWuiController {
         permissions.setGroupPermissions(name, parentPermissions.getGroupPermissions(name));
       }
     } else {
-      // TODO check user role to create top-level AIPs
+      throw new RequestNotValidException("Creating AIP that should be below another with a null parentId");
     }
 
     permissions.setUserPermissions(user.getId(), new HashSet<PermissionType>(Arrays.asList(PermissionType.values())));

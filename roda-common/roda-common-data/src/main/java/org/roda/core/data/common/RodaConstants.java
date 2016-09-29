@@ -405,7 +405,9 @@ public final class RodaConstants {
 
   // TODO create constants for all roles
   // aip.appraisal
-  // aip.create
+  // aip.create.top aip.create.below
+  public static final String REPOSITORY_PERMISSIONS_AIP_CREATE_TOP = "aip.create.top";
+  public static final String REPOSITORY_PERMISSIONS_AIP_CREATE_BELOW = "aip.create.below";
   // aip.delete
   // aip.read
   // aip.update
@@ -448,6 +450,8 @@ public final class RodaConstants {
 
   // format.manage
   // format.read
+  
+  
 
   public static final String LOG_ACTION_COMPONENT = "actionComponent";
   public static final String LOG_ACTION_METHOD = "actionMethod";
