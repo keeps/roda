@@ -2318,4 +2318,7 @@ public interface ClientMessages extends Messages {
 
   SafeHtml tableDownloadCSV();
 
+  String showMore();
+
+  String showLess();
 }

@@ -655,10 +655,20 @@
       <li><strong>order</strong> - the order by which the field should be displayed in the metadata editor </li>
       <li><strong>label</strong> - the label of the field to be shown at the left of the value in the editor. The format is a JSON map. The keys of the map are the language ID. Example: {"en": "Title", ""pt_PT": "Título"}"</li>
       <li><strong>labeli18n</strong> - the i18n key for the label of the field (see section "Internationalization of strings" below)</li>
+      <li><strong>description</strong> - a text with some help related to the field</li>
       <li><strong>value</strong> - the predefined value of the field</li>
       <li><strong>mandatory</strong> - If set to true the label is styled in bold to draw attention.</li>
       <li><strong>hidden</strong> - if set to true the field is hidden</li>
       <li><strong>xpath</strong> - the xpath of the metadata XML document to which this field should bind to</li>
+      <li><strong>auto-generate </strong>- Fills the value with one of the available auto-value generators. Overrides the value option:</li>
+      <ul>
+        <li><strong>now </strong>- the current date in the format year/month/day</li>
+        <li><strong>id </strong>- generates an identifier</li>
+        <li><strong>title</strong> - generates a title</li>
+        <li><strong>level</strong> - adds the current description level</li>
+        <li><strong>parentid</strong> - adds the parent's id, if it exists</li>
+        <li><strong>language</strong> - adds the system language, based on the locale. Example: "português" or "English"</li>
+      </ul>
       <li><strong>type </strong>- the type of the field. The possible values are:</li>
       <ul>
         <li><strong>text </strong>- text field</li>
@@ -705,26 +715,14 @@ xpath="/*:ead/*:archdesc/*:odd[@type='statusDescription']/*:p/string()"
           </li>
         </ul>
       </ul>
-      <li><strong>auto-generate </strong>- Fills the value with one of the available auto-value generators. Overrides the value option:</li>
-      <ul>
-        <li><strong>now </strong>- the current date in the format year/month/day</li>
-        <li><strong>id </strong>- generates an identifier</li>
-        <li><strong>title</strong> - generates a title</li>
-        <li><strong>level</strong> - adds the current description level</li>
-        <li><strong>parentid</strong> - adds the parent's id, if it exists</li>
-        <li><strong>language</strong> - adds the system language, based on the locale. Example: "português" or "English"</li>
-      </ul>
+      
     </ul>
-
+	<br/>
+	<br/>
     <p>
       The following is an example of how the tags can be used:
     </p>
-    <p>
-      <pre><code>
-{{~file name="title" order="1" type="text" label="Template title" mandatory="true" auto-generate="title"~}}
-</code></pre></p>
-
-  </p>
+    <p><pre><code>{{~file name="title" order="1" type="text" label="Template title" mandatory="true" auto-generate="title"~}}</code></pre></p></p>
 
   <h2>Activate the new format</h2>
 

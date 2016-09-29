@@ -55,7 +55,6 @@ import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy.KeyboardSelectionPolicy;
 import com.google.gwt.user.cellview.client.Header;
-import com.google.gwt.user.cellview.client.PageSizePager;
 import com.google.gwt.user.cellview.client.SafeHtmlHeader;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.client.Random;
@@ -89,7 +88,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   private final AsyncHandler columnSortHandler;
 
   private final AccessibleSimplePager resultsPager;
-  private final PageSizePager pageSizePager;
+  private final RodaPageSizePager pageSizePager;
   private Button csvDownloadButton;
   private final CellTable<T> display;
 
@@ -191,7 +190,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
       (SimplePager.ImageButtonsConstants) GWT.create(SimplePager.ImageButtonsConstants.class));
     resultsPager.setDisplay(display);
 
-    pageSizePager = new PageSizePager(getPageSizePagerIncrement());
+    pageSizePager = new RodaPageSizePager(getPageSizePagerIncrement());
     pageSizePager.setDisplay(display);
 
     csvDownloadButton = new Button(messages.tableDownloadCSV());
