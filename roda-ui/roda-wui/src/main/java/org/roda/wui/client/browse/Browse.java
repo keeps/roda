@@ -1052,7 +1052,7 @@ public class Browse extends Composite {
         // filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_ID, id));
         // }
         // } else {
-        filter = Filter.NULL;
+        filter = Filter.ALL;
         // }
         showEmptyParentButton = false;
       }
