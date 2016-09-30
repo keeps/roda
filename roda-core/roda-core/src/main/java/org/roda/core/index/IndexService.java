@@ -15,6 +15,7 @@ import java.io.Serializable;
 import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -157,7 +158,8 @@ public class IndexService {
   public <T extends IsIndexed> String findCSV(final Class<T> returnClass, final Filter filter, final Sorter sorter,
     final Sublist sublist, final Facets facets, final User user, final boolean justActive, final boolean exportFacets)
     throws GenericException, RequestNotValidException {
-    return SolrUtils.findCSV(getSolrClient(), returnClass, filter, sorter, sublist, facets, user, justActive, exportFacets);
+    return SolrUtils.findCSV(getSolrClient(), returnClass, filter, sorter, sublist, facets, user, justActive,
+      exportFacets);
   }
 
   public <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, User user, boolean justActive)
@@ -476,6 +478,39 @@ public class IndexService {
 
   public SolrClient getSolrClient() {
     return solrClient;
+  }
+
+  public <T extends Serializable> CloseableIterable<OptionalWithCause<T>> listTransferredResource()
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+
+    int counter = RodaCoreFactory.getIndexService().count(TransferredResource.class, Filter.ALL).intValue();
+    IndexResult<T> resources = (IndexResult<T>) RodaCoreFactory.getIndexService().find(TransferredResource.class,
+      Filter.ALL, Sorter.NONE, new Sublist(0, counter));
+    Iterator<T> it = resources.getResults().iterator();
+
+    CloseableIterable<OptionalWithCause<T>> resourceIterable = new CloseableIterable<OptionalWithCause<T>>() {
+      @Override
+      public Iterator<OptionalWithCause<T>> iterator() {
+        return new Iterator<OptionalWithCause<T>>() {
+
+          @Override
+          public boolean hasNext() {
+            return it.hasNext();
+          }
+
+          @Override
+          public OptionalWithCause<T> next() {
+            return OptionalWithCause.of(it.next());
+          }
+        };
+      }
+
+      @Override
+      public void close() throws IOException {
+      }
+    };
+
+    return resourceIterable;
   }
 
 }

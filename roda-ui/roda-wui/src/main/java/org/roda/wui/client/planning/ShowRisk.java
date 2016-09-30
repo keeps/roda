@@ -108,12 +108,14 @@ public class ShowRisk extends Composite {
     this.risk = new Risk();
     this.riskShowPanel = new RiskShowPanel();
     initWidget(uiBinder.createAndBindUi(this));
+    buttonProcess.setVisible(false);
   }
 
   public ShowRisk(Risk risk) {
     this.risk = risk;
     this.riskShowPanel = new RiskShowPanel(risk, true);
     initWidget(uiBinder.createAndBindUi(this));
+    buttonProcess.setVisible(false);
 
     BrowserService.Util.getInstance().hasRiskVersions(risk.getId(), new AsyncCallback<Boolean>() {
 

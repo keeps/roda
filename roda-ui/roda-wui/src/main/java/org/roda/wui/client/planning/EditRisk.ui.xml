@@ -30,7 +30,7 @@
 				</g:FlowPanel>
 				<g:FlowPanel>
 					<g:Label addStyleNames="h4"><ui:text from='{messages.riskIncidences}' /></g:Label>
-					<g:Button addStyleNames="btn btn-ban" ui:field="buttonRemove">
+					<g:Button addStyleNames="btn btn-danger btn-ban" ui:field="buttonRemove">
 						<ui:text from='{messages.removeButton}' />
 					</g:Button>
 				</g:FlowPanel>

@@ -144,8 +144,12 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    // do nothing
-    return null;
+    try {
+      index.commit(RiskIncidence.class);
+    } catch (GenericException e) {
+      LOGGER.error("Error commiting risk incidences to index");
+    }
+    return new Report();
   }
 
   public <T extends Serializable> Report executePlugin(IndexService index, ModelService model, StorageService storage,
@@ -176,7 +180,6 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
 
         jobPluginInfo = jobInfo.getFirst();
         pluginReport = jobInfo.getSecond();
-
       }
 
       jobPluginInfo.finalizeInfo();
@@ -209,7 +212,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
           incidence.setStatus(INCIDENCE_STATUS.UNMITIGATED);
           incidence.setSeverity(Risk.SEVERITY_LEVEL.valueOf(severity));
           incidence.setDescription(incidenceDescription);
-          model.createRiskIncidence(incidence, true);
+          model.createRiskIncidence(incidence, false);
         } catch (GenericException e) {
           state = PluginState.FAILURE;
         }

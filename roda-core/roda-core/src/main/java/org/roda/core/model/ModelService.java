@@ -2138,6 +2138,9 @@ public class ModelService extends ModelObservable {
       return listRepresentations(objectClass);
     } else if (File.class.equals(objectClass)) {
       return listFiles(objectClass);
+    } else if (TransferredResource.class.equals(objectClass)) {
+      // FIXME 20160930 it uses index but it should not(?)
+      return RodaCoreFactory.getIndexService().listTransferredResource();
     } else {
       StoragePath containerPath = ModelUtils.getContainerPath(objectClass);
       final CloseableIterable<Resource> resourcesIterable = storage.listResourcesUnderContainer(containerPath, false);

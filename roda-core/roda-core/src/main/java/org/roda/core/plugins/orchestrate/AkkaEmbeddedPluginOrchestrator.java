@@ -171,8 +171,10 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         }
         indexObjects.add(findAllIterator.next());
       }
+
       if (!indexObjects.isEmpty()) {
-        innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, modelClassToActOn, blockSize, jobActor);
+        innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, modelClassToActOn, indexObjects.size(),
+          jobActor);
         modelObjects = JobsHelper.getObjectsFromIndexObjects(model, index, modelClassToActOn, indexObjects);
         jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, modelObjects), jobActor);
       }
