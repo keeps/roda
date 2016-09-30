@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.risks;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.roda.core.data.v2.index.IsIndexed;
 
 public class IndexedRisk extends Risk implements IsIndexed {
@@ -36,4 +37,18 @@ public class IndexedRisk extends Risk implements IsIndexed {
     return getId();
   }
 
+  @Override
+  public String toString() {
+    return "IndexedRisk [super=" + super.toString() + ", objectsSize=" + objectsSize + "]";
+  }
+
+  @Override
+  public String[] toCsvHeaders() {
+    return ArrayUtils.addAll(super.toCsvHeaders(), new String[] {"objectsSize"});
+  }
+
+  @Override
+  public Object[] toCsvValues() {
+    return ArrayUtils.addAll(super.toCsvHeaders(), new Object[] {objectsSize});
+  }
 }

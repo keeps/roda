@@ -106,6 +106,16 @@ public class LogEntry implements IsIndexed {
   }
 
   @Override
+  public String[] toCsvHeaders() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Object[] toCsvValues() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;

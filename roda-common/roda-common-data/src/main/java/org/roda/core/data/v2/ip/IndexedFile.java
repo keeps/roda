@@ -340,4 +340,14 @@ public class IndexedFile implements IsIndexed {
       + ", storagePath=" + storagePath + ", ancestors=" + ancestors + ", otherProperties=" + otherProperties + "]";
   }
 
+  @Override
+  public String[] toCsvHeaders() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Object[] toCsvValues() {
+    throw new UnsupportedOperationException();
+  }
+
 }

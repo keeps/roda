@@ -199,6 +199,19 @@ public class RiskIncidence implements IsIndexed, Serializable {
       + ", mitigatedDescription=" + mitigatedDescription + "]";
   }
 
+  @Override
+  public String[] toCsvHeaders() {
+    return new String[] {"id", "aipId", "representationId", "filePath", "fileId", "objectClass", "riskId",
+      "description", "byPlugin", "status", "severity", "detectedOn", "detectedBy", "mitigatedOn", "mitigatedBy",
+      "mitigatedDescription"};
+  }
+
+  @Override
+  public Object[] toCsvValues() {
+    return new Object[] {id, aipId, representationId, filePath, fileId, objectClass, riskId, description, byPlugin,
+      status, severity, detectedOn, detectedBy, mitigatedOn, mitigatedBy, mitigatedDescription};
+  }
+
   @JsonIgnore
   @Override
   public String getUUID() {

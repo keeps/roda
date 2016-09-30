@@ -111,4 +111,14 @@ public class Group extends RodaPrincipal {
     return builder.toString();
   }
 
+  @Override
+  public String[] toCsvHeaders() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Object[] toCsvValues() {
+    throw new UnsupportedOperationException();
+  }
+
 }

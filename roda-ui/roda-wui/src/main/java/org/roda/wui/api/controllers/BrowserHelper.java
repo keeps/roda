@@ -123,6 +123,7 @@ import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.plugins.PluginHelper;
@@ -383,11 +384,9 @@ public class BrowserHelper {
     return RodaCoreFactory.getIndexService().find(returnClass, filter, sorter, sublist, facets, user, justActive);
   }
 
-  protected static <T extends IsIndexed> String findCSV(final Class<T> returnClass, final Filter filter,
-    final Sorter sorter, final Sublist sublist, final Facets facets, final User user, final boolean justActive,
-    final boolean exportFacets) throws GenericException, RequestNotValidException {
-    return RodaCoreFactory.getIndexService().findCSV(returnClass, filter, sorter, sublist, facets, user, justActive,
-      exportFacets);
+  protected static <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
+    final Sorter sorter, final Sublist sublist, final User user, final boolean justActive) {
+    return RodaCoreFactory.getIndexService().findAll(returnClass, filter, sorter, sublist, user, justActive, true);
   }
 
   protected static <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, User user)

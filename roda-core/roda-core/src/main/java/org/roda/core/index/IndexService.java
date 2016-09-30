@@ -136,30 +136,31 @@ public class IndexService {
     return SolrUtils.find(getSolrClient(), returnClass, filter, sorter, sublist, facets, user, justActive);
   }
 
-  public <T extends IsIndexed> IterableIndexResult<T> findAll(Class<T> returnClass, Filter filter) {
+  public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter) {
     return findAll(returnClass, filter, new Sorter(new SortParameter(RodaConstants.INDEX_UUID, true)), true);
   }
 
-  public <T extends IsIndexed> IterableIndexResult<T> findAll(Class<T> returnClass, Filter filter,
-    boolean removeDuplicates) {
+  public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
+    final boolean removeDuplicates) {
     return findAll(returnClass, filter, new Sorter(new SortParameter(RodaConstants.INDEX_UUID, true)),
       removeDuplicates);
   }
 
-  public <T extends IsIndexed> IterableIndexResult<T> findAll(Class<T> returnClass, Filter filter, Sorter sorter) {
+  public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
+    final Sorter sorter) {
     return findAll(returnClass, filter, sorter, true);
   }
 
-  public <T extends IsIndexed> IterableIndexResult<T> findAll(Class<T> returnClass, Filter filter, Sorter sorter,
-    boolean removeDuplicates) {
-    return new IterableIndexResult<T>(getSolrClient(), returnClass, filter, sorter, Facets.NONE, removeDuplicates);
+  public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
+    final Sorter sorter, final boolean removeDuplicates) {
+    return findAll(returnClass, filter, sorter, Sublist.ALL, null, true, removeDuplicates);
   }
 
-  public <T extends IsIndexed> String findCSV(final Class<T> returnClass, final Filter filter, final Sorter sorter,
-    final Sublist sublist, final Facets facets, final User user, final boolean justActive, final boolean exportFacets)
-    throws GenericException, RequestNotValidException {
-    return SolrUtils.findCSV(getSolrClient(), returnClass, filter, sorter, sublist, facets, user, justActive,
-      exportFacets);
+  public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
+    final Sorter sorter, final Sublist sublist, final User user, final boolean justActive,
+    final boolean removeDuplicates) {
+    return new IterableIndexResult<>(getSolrClient(), returnClass, filter, sorter, sublist, Facets.NONE, user,
+      justActive, removeDuplicates);
   }
 
   public <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, User user, boolean justActive)

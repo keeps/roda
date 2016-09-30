@@ -133,4 +133,14 @@ public class IndexedRepresentation extends Representation implements IsIndexed {
       + numberOfSchemaFiles + ", ancestors=" + ancestors + "]";
   }
 
+  @Override
+  public String[] toCsvHeaders() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Object[] toCsvValues() {
+    throw new UnsupportedOperationException();
+  }
+
 }

@@ -64,6 +64,7 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
+import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.wui.api.v1.utils.ApiUtils;
@@ -211,25 +212,24 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static <T extends IsIndexed> String findCSV(final Class<T> classToReturn, final Filter filter,
-    final Sorter sorter, final Sublist sublist, final Facets facets, final User user, final boolean justActive,
-    final boolean exportFacets) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+  public static <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> classToReturn, final Filter filter,
+    final Sorter sorter, final Sublist sublist, final User user, final boolean justActive)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
     controllerAssistant.checkRoles(user, classToReturn);
 
     // delegate
-    final String ret = BrowserHelper.findCSV(classToReturn, filter, sorter, sublist, facets, user, justActive,
-      exportFacets);
+    final IterableIndexResult<T> result = BrowserHelper.findAll(classToReturn, filter, sorter, sublist, user,
+      justActive);
 
     // register action
-    // TODO put exportFacets in log
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "class", classToReturn.getSimpleName(),
       RodaConstants.CONTROLLER_FILTER_PARAM, filter, RodaConstants.CONTROLLER_SORTER_PARAM, sorter,
-      RodaConstants.CONTROLLER_SUBLIST_PARAM, sublist);
+      RodaConstants.CONTROLLER_SUBLIST_PARAM, sublist, "justActive", justActive);
 
-    return ret;
+    return result;
   }
 
   public static <T extends IsIndexed> Long count(final User user, final Class<T> classToReturn, final Filter filter)

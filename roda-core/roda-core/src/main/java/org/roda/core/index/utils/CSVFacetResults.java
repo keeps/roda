@@ -23,7 +23,7 @@ import org.roda.core.data.v2.index.facet.FacetValue;
  *
  * @author Rui Castro <rui.castro@gmail.com>
  */
-class CSVFacetResults {
+public class CSVFacetResults {
 
   /**
    * The {@link QueryResponse} with the results.
@@ -40,7 +40,7 @@ class CSVFacetResults {
    * @param facetResults
    *          the {@link FacetFieldResult}s.
    */
-  CSVFacetResults(final List<FacetFieldResult> facetResults) {
+  public CSVFacetResults(final List<FacetFieldResult> facetResults) {
     this.facetResults = facetResults;
     this.csvCache = null;
   }
@@ -52,7 +52,7 @@ class CSVFacetResults {
    * @throws IOException
    *           if some I/O error occurs.
    */
-  String toCSV() throws IOException {
+  public String toCSV() throws IOException {
     if (this.csvCache == null) {
       this.csvCache = buildCSV();
     }
