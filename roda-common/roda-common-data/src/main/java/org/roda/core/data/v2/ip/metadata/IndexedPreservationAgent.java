@@ -88,6 +88,16 @@ public class IndexedPreservationAgent implements IsIndexed {
   }
 
   @Override
+  public String[] toCsvHeaders() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Object[] toCsvValues() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public String getUUID() {
     return getId();
   }

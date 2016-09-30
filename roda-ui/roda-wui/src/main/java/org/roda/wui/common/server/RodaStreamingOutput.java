@@ -10,23 +10,26 @@ package org.roda.wui.common.server;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.StreamingOutput;
 
 import org.roda.core.common.ConsumesOutputStream;
+import org.roda.core.common.StreamResponse;
 
 public class RodaStreamingOutput implements StreamingOutput {
   private final ConsumesOutputStream outputHandler;
 
-  public RodaStreamingOutput(ConsumesOutputStream outputHandler) {
-    super();
+  public RodaStreamingOutput(final ConsumesOutputStream outputHandler) {
     this.outputHandler = outputHandler;
   }
 
   @Override
-  public void write(OutputStream output) throws IOException, WebApplicationException {
+  public void write(final OutputStream output) throws IOException {
     outputHandler.consumeOutputStream(output);
 
+  }
+
+  public StreamResponse toStreamResponse() {
+    return new StreamResponse(outputHandler.getFileName(), outputHandler.getMediaType(), this);
   }
 
 }

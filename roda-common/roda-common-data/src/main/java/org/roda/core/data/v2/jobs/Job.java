@@ -219,6 +219,16 @@ public class Job implements IsIndexed, Serializable {
       + sourceObjects + ", outcomeObjectsClass=" + outcomeObjectsClass + "]";
   }
 
+  @Override
+  public String[] toCsvHeaders() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Object[] toCsvValues() {
+    throw new UnsupportedOperationException();
+  }
+
   @JsonIgnore
   @Override
   public String getUUID() {

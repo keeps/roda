@@ -25,11 +25,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class Notification implements IsIndexed, Serializable {
 
   private static final long serialVersionUID = -585753367605901060L;
-  
+
   public static enum NOTIFICATION_STATE {
     CREATED, COMPLETED, FAILED;
   }
-  
+
   private String id = null;
   private String subject = null;
   private String body = null;
@@ -40,7 +40,7 @@ public class Notification implements IsIndexed, Serializable {
   private boolean isAcknowledged = false;
   private Map<String, String> acknowledgedUsers = null;
   private NOTIFICATION_STATE state;
-  
+
   public Notification() {
     super();
     this.sentOn = new Date();
@@ -136,8 +136,7 @@ public class Notification implements IsIndexed, Serializable {
   public void addAcknowledgedUser(String recipientUser, String acknowledgedOn) {
     this.acknowledgedUsers.put(recipientUser, acknowledgedOn);
   }
-  
-  
+
   public NOTIFICATION_STATE getState() {
     return state;
   }
@@ -159,5 +158,15 @@ public class Notification implements IsIndexed, Serializable {
       + isAcknowledged + ", acknowledgedUsers=" + acknowledgedUsers + ", state=" + state + "]";
   }
 
-  
+  @Override
+  public String[] toCsvHeaders() {
+    return new String[] {"id", "subject", "body", "sentOn", "fromUser", "recipientUsers", "acknowledgeToken",
+      "isAcknowledged", "acknowledgedUsers", "state"};
+  }
+
+  @Override
+  public Object[] toCsvValues() {
+    return new Object[] {id, subject, body, sentOn, fromUser, recipientUsers, acknowledgeToken, isAcknowledged,
+      acknowledgedUsers, state};
+  }
 }

@@ -330,6 +330,21 @@ public class Report implements Serializable, IsIndexed {
       + ", pluginDetails=" + pluginDetails + ", htmlPluginDetails=" + htmlPluginDetails + ", reports=" + reports + "]";
   }
 
+  @Override
+  public String[] toCsvHeaders() {
+    return new String[] {"id", "jobId", "sourceObjectId", "sourceObjectClass", "sourceObjectOriginalId",
+      "outcomeObjectId", "outcomeObjectClass", "outcomeObjectState", "title", "dateCreated", "dateUpdated",
+      "completionPercentage", "stepsCompleted", "totalSteps", "plugin", "pluginName", "pluginVersion", "pluginState",
+      "pluginDetails", "htmlPluginDetails", "reports"};
+  }
+
+  @Override
+  public Object[] toCsvValues() {
+    return new Object[] {id, jobId, sourceObjectId, sourceObjectClass, sourceObjectOriginalId, outcomeObjectId,
+      outcomeObjectClass, outcomeObjectState, title, dateCreated, dateUpdated, completionPercentage, stepsCompleted,
+      totalSteps, plugin, pluginName, pluginVersion, pluginState, pluginDetails, htmlPluginDetails, reports};
+  }
+
   @JsonIgnore
   @Override
   public String getUUID() {

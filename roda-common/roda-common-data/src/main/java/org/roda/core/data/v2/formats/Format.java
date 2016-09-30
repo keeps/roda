@@ -170,6 +170,16 @@ public class Format extends NamedIndexedModel implements IsIndexed, Serializable
       + ", mimetypes=" + mimetypes + ", pronoms=" + pronoms + ", utis=" + utis + "]";
   }
 
+  @Override
+  public String[] toCsvHeaders() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Object[] toCsvValues() {
+    throw new UnsupportedOperationException();
+  }
+
   public List<String> getCategories() {
     return categories;
   }

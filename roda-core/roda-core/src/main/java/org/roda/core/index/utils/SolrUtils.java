@@ -282,7 +282,7 @@ public class SolrUtils {
     } catch (final SolrServerException | IOException e) {
       throw new GenericException("Could not query index", e);
     } catch (final SolrException e) {
-      throw new RequestNotValidException(e.getMessage());
+      throw new RequestNotValidException(e.getMessage(), e);
     } catch (final RuntimeException e) {
       throw new GenericException("Unexpected exception while querying index", e);
     }

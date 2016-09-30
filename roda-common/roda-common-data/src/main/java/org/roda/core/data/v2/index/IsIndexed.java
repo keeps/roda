@@ -11,6 +11,20 @@ import org.roda.core.data.v2.IsRODAObject;
 
 public interface IsIndexed extends IsRODAObject {
 
-  public String getUUID();
+  String getUUID();
+
+  /**
+   * Return the CSV header names for this object.
+   * 
+   * @return an array of String with the header names.
+   */
+  String[] toCsvHeaders();
+
+  /**
+   * Return the CSV values for this object.
+   *
+   * @return an array of Object with the CSV values.
+   */
+  Object[] toCsvValues();
 
 }

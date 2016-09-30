@@ -294,27 +294,49 @@ public class IndexedAIP implements IsIndexed {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
 
     IndexedAIP that = (IndexedAIP) o;
 
-    if (id != null ? !id.equals(that.id) : that.id != null) return false;
-    if (state != that.state) return false;
-    if (level != null ? !level.equals(that.level) : that.level != null) return false;
-    if (title != null ? !title.equals(that.title) : that.title != null) return false;
-    if (dateInitial != null ? !dateInitial.equals(that.dateInitial) : that.dateInitial != null) return false;
-    if (dateFinal != null ? !dateFinal.equals(that.dateFinal) : that.dateFinal != null) return false;
-    if (description != null ? !description.equals(that.description) : that.description != null) return false;
-    if (parentID != null ? !parentID.equals(that.parentID) : that.parentID != null) return false;
-    if (ancestors != null ? !ancestors.equals(that.ancestors) : that.ancestors != null) return false;
-    if (permissions != null ? !permissions.equals(that.permissions) : that.permissions != null) return false;
-    if (numberOfSubmissionFiles != null ? !numberOfSubmissionFiles.equals(that.numberOfSubmissionFiles) : that.numberOfSubmissionFiles != null) return false;
-    if (numberOfDocumentationFiles != null ? !numberOfDocumentationFiles.equals(that.numberOfDocumentationFiles) : that.numberOfDocumentationFiles != null) return false;
-    if (numberOfSchemaFiles != null ? !numberOfSchemaFiles.equals(that.numberOfSchemaFiles) : that.numberOfSchemaFiles != null) return false;
-    if (hasRepresentations != null ? !hasRepresentations.equals(that.hasRepresentations) : that.hasRepresentations != null) return false;
-    if (ghost != null ? !ghost.equals(that.ghost) : that.ghost != null) return false;
-    if (ingestSIPId != null ? !ingestSIPId.equals(that.ingestSIPId) : that.ingestSIPId != null) return false;
+    if (id != null ? !id.equals(that.id) : that.id != null)
+      return false;
+    if (state != that.state)
+      return false;
+    if (level != null ? !level.equals(that.level) : that.level != null)
+      return false;
+    if (title != null ? !title.equals(that.title) : that.title != null)
+      return false;
+    if (dateInitial != null ? !dateInitial.equals(that.dateInitial) : that.dateInitial != null)
+      return false;
+    if (dateFinal != null ? !dateFinal.equals(that.dateFinal) : that.dateFinal != null)
+      return false;
+    if (description != null ? !description.equals(that.description) : that.description != null)
+      return false;
+    if (parentID != null ? !parentID.equals(that.parentID) : that.parentID != null)
+      return false;
+    if (ancestors != null ? !ancestors.equals(that.ancestors) : that.ancestors != null)
+      return false;
+    if (permissions != null ? !permissions.equals(that.permissions) : that.permissions != null)
+      return false;
+    if (numberOfSubmissionFiles != null ? !numberOfSubmissionFiles.equals(that.numberOfSubmissionFiles)
+      : that.numberOfSubmissionFiles != null)
+      return false;
+    if (numberOfDocumentationFiles != null ? !numberOfDocumentationFiles.equals(that.numberOfDocumentationFiles)
+      : that.numberOfDocumentationFiles != null)
+      return false;
+    if (numberOfSchemaFiles != null ? !numberOfSchemaFiles.equals(that.numberOfSchemaFiles)
+      : that.numberOfSchemaFiles != null)
+      return false;
+    if (hasRepresentations != null ? !hasRepresentations.equals(that.hasRepresentations)
+      : that.hasRepresentations != null)
+      return false;
+    if (ghost != null ? !ghost.equals(that.ghost) : that.ghost != null)
+      return false;
+    if (ingestSIPId != null ? !ingestSIPId.equals(that.ingestSIPId) : that.ingestSIPId != null)
+      return false;
     return ingestJobId != null ? ingestJobId.equals(that.ingestJobId) : that.ingestJobId == null;
 
   }
@@ -343,25 +365,23 @@ public class IndexedAIP implements IsIndexed {
 
   @Override
   public String toString() {
-    return "IndexedAIP{" +
-            "id='" + id + '\'' +
-            ", state=" + state +
-            ", level='" + level + '\'' +
-            ", title='" + title + '\'' +
-            ", dateInitial=" + dateInitial +
-            ", dateFinal=" + dateFinal +
-            ", description='" + description + '\'' +
-            ", parentID='" + parentID + '\'' +
-            ", ancestors=" + ancestors +
-            ", permissions=" + permissions +
-            ", numberOfSubmissionFiles=" + numberOfSubmissionFiles +
-            ", numberOfDocumentationFiles=" + numberOfDocumentationFiles +
-            ", numberOfSchemaFiles=" + numberOfSchemaFiles +
-            ", hasRepresentations=" + hasRepresentations +
-            ", ghost=" + ghost +
-            ", ingestSIPId='" + ingestSIPId + '\'' +
-            ", ingestJobId='" + ingestJobId + '\'' +
-            '}';
+    return "IndexedAIP{" + "id='" + id + '\'' + ", state=" + state + ", level='" + level + '\'' + ", title='" + title
+      + '\'' + ", dateInitial=" + dateInitial + ", dateFinal=" + dateFinal + ", description='" + description + '\''
+      + ", parentID='" + parentID + '\'' + ", ancestors=" + ancestors + ", permissions=" + permissions
+      + ", numberOfSubmissionFiles=" + numberOfSubmissionFiles + ", numberOfDocumentationFiles="
+      + numberOfDocumentationFiles + ", numberOfSchemaFiles=" + numberOfSchemaFiles + ", hasRepresentations="
+      + hasRepresentations + ", ghost=" + ghost + ", ingestSIPId='" + ingestSIPId + '\'' + ", ingestJobId='"
+      + ingestJobId + '\'' + '}';
+  }
+
+  @Override
+  public String[] toCsvHeaders() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Object[] toCsvValues() {
+    throw new UnsupportedOperationException();
   }
 
   @Override

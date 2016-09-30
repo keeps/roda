@@ -10,6 +10,7 @@ package org.roda.core.data.v2.ip.metadata;
 import java.util.Date;
 import java.util.List;
 
+import org.roda.core.data.exceptions.NotImplementedException;
 import org.roda.core.data.v2.index.IsIndexed;
 
 public class IndexedPreservationEvent implements IsIndexed {
@@ -139,6 +140,16 @@ public class IndexedPreservationEvent implements IsIndexed {
       + ", eventOutcome=" + eventOutcome + ", eventOutcomeDetailExtension=" + eventOutcomeDetailExtension
       + ", eventOutcomeDetailNote=" + eventOutcomeDetailNote + ", linkingAgentIds=" + linkingAgentIds
       + ", outcomeObjectIds=" + outcomeObjectIds + ", sourcesObjectIds=" + sourcesObjectIds + "]";
+  }
+
+  @Override
+  public String[] toCsvHeaders() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Object[] toCsvValues() {
+    throw new UnsupportedOperationException();
   }
 
   @Override

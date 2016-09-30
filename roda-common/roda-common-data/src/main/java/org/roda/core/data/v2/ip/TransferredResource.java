@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
- *
+ * <p>
  * https://github.com/keeps/roda
  */
 package org.roda.core.data.v2.ip;
@@ -237,4 +237,15 @@ public class TransferredResource implements IsIndexed {
       + ", file=" + file + "]";
   }
 
+  @Override
+  public String[] toCsvHeaders() {
+    return new String[] {"uuid", "id", "fullPath", "relativePath", "parentId", "parentUUID", "ancestorsPaths", "size",
+      "creationDate", "lastScanDate", "name", "file"};
+  }
+
+  @Override
+  public Object[] toCsvValues() {
+    return new Object[] {uuid, id, fullPath, relativePath, parentId, parentUUID, ancestorsPaths, size, creationDate,
+      lastScanDate, name, file};
+  }
 }
