@@ -16,7 +16,9 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
+import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.StringUtils;
@@ -156,13 +158,21 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
 
   public RiskShowPanel(Risk risk, boolean hasTitle) {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISK_ID, risk.getId()));
-    incidenceList = new RiskIncidenceList(filter, null, messages.riskIncidences(), true);
+    incidenceList = new RiskIncidenceList(filter, null, messages.riskIncidences(), hasTitle);
 
     searchPanel = new SearchPanel(
       new Filter(new BasicSearchFilterParameter(RodaConstants.RISK_SEARCH, "*"),
         new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISK_ID, risk.getId())),
       RodaConstants.RISK_INCIDENCE_SEARCH, messages.riskIncidenceRegisterSearchPlaceHolder(), false, false, false);
     searchPanel.setList(incidenceList);
+
+    incidenceList.addCheckboxSelectionListener(new CheckboxSelectionListener<RiskIncidence>() {
+
+      @Override
+      public void onSelectionChange(SelectedItems<RiskIncidence> selected) {
+        ShowRisk.getInstance().enableProcessButton(!(SelectedItemsUtils.isEmpty(selected)));
+      }
+    });
 
     incidenceList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
       @Override

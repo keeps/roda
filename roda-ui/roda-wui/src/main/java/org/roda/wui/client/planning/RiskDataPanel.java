@@ -11,9 +11,6 @@ package org.roda.wui.client.planning;
 import java.util.Date;
 import java.util.List;
 
-import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
@@ -38,7 +35,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
@@ -133,12 +129,6 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
 
   @UiField
   TextBox mitigationRelatedEventIdentifierValue;
-
-  @UiField
-  Label incidenceListLabel;
-
-  @UiField
-  FlowPanel incidenceListPanel;
 
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
@@ -326,11 +316,7 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
       preMitigationSeverityValue
         .setHTML(HtmlSnippetUtils.getSeverityDefinition(0, severityLowLimit, severityHighLimit));
       this.id.setVisible(false);
-      incidenceListLabel.setVisible(false);
     } else {
-      Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISK_ID, risk.getId()));
-      incidenceList = new RiskIncidenceList(filter, null, messages.riskIncidences(), true);
-      incidenceListPanel.add(incidenceList);
       this.idBox.setVisible(false);
       setRisk(risk);
     }

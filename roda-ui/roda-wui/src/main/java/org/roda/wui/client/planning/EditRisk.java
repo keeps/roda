@@ -11,10 +11,8 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
-import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -90,9 +88,6 @@ public class EditRisk extends Composite {
   @UiField
   Button buttonCancel;
 
-  @UiField
-  Button buttonRemove;
-
   @UiField(provided = true)
   RiskDataPanel riskDataPanel;
 
@@ -149,25 +144,6 @@ public class EditRisk extends Composite {
     } else {
       AsyncCallbackUtils.defaultFailureTreatment(caught);
     }
-  }
-
-  @UiHandler("buttonRemove")
-  void buttonRemoveHandler(ClickEvent e) {
-    SelectedItems<RiskIncidence> incidences = riskDataPanel.getSelectedIncidences();
-
-    BrowserService.Util.getInstance().deleteRiskIncidences(incidences, new AsyncCallback<Void>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        errorMessage(caught);
-      }
-
-      @Override
-      public void onSuccess(Void result) {
-        Tools.newHistory(ShowRisk.RESOLVER, risk.getId());
-      }
-
-    });
   }
 
 }

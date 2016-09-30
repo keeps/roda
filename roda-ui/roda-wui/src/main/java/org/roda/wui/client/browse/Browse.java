@@ -285,14 +285,8 @@ public class Browse extends Composite {
       @Override
       public void onSelectionChange(SelectedItems<IndexedAIP> selected) {
         boolean empty = SelectedItemsUtils.isEmpty(selected);
-
-        if (empty) {
-          moveItem.setEnabled(false);
-          editPermissions.setEnabled(false);
-        } else {
-          moveItem.setEnabled(true);
-          editPermissions.setEnabled(true);
-        }
+        moveItem.setEnabled(!empty);
+        editPermissions.setEnabled(!empty);
       }
 
     });

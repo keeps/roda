@@ -110,12 +110,14 @@ public class ShowRisk extends Composite {
     this.risk = new Risk();
     this.riskShowPanel = new RiskShowPanel();
     initWidget(uiBinder.createAndBindUi(this));
+    buttonProcess.setEnabled(false);
   }
 
   public ShowRisk(Risk risk) {
     this.risk = risk;
     this.riskShowPanel = new RiskShowPanel(risk, true);
     initWidget(uiBinder.createAndBindUi(this));
+    buttonProcess.setEnabled(false);
 
     BrowserService.Util.getInstance().hasRiskVersions(risk.getId(), new AsyncCallback<Boolean>() {
 
@@ -144,8 +146,8 @@ public class ShowRisk extends Composite {
 
         @Override
         public void onSuccess(IndexedRisk result) {
-          ShowRisk riskPanel = new ShowRisk(result);
-          callback.onSuccess(riskPanel);
+          instance = new ShowRisk(result);
+          callback.onSuccess(instance);
         }
       });
     } else {
@@ -198,6 +200,10 @@ public class ShowRisk extends Composite {
 
   private void cancel() {
     Tools.newHistory(RiskRegister.RESOLVER);
+  }
+
+  public void enableProcessButton(boolean enable) {
+    buttonProcess.setEnabled(enable);
   }
 
 }

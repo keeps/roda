@@ -138,11 +138,6 @@
 					<ui:text from='{messages.riskPostMitigationNotes}' />
 				</g:Label>
 				<g:TextArea ui:field="posMitigationNotes" addStyleNames="form-textbox" />
-
-				<g:Label styleName="h4" ui:field="incidenceListLabel">
-					<ui:text from='{messages.riskIncidences}' />
-				</g:Label>
-				<g:FlowPanel ui:field="incidenceListPanel"></g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>
