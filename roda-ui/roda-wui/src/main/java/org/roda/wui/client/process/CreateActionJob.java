@@ -391,16 +391,23 @@ public class CreateActionJob extends Composite {
     List<String> objectList = new ArrayList<String>();
     for (String objectClass : objectClasses) {
       if (IndexedAIP.class.getName().equals(objectClass)) {
-        objectList.add(AIP.class.getName());
+        objectList = addIfNotExists(objectList, AIP.class.getName());
       } else if (IndexedRepresentation.class.getName().equals(objectClass)) {
-        objectList.add(Representation.class.getName());
+        objectList = addIfNotExists(objectList, Representation.class.getName());
       } else if (IndexedFile.class.getName().equals(objectClass)) {
-        objectList.add(File.class.getName());
+        objectList = addIfNotExists(objectList, File.class.getName());
       } else if (IndexedRisk.class.getName().equals(objectClass)) {
-        objectList.add(Risk.class.getName());
+        objectList = addIfNotExists(objectList, Risk.class.getName());
       } else {
-        objectList.add(objectClass);
+        objectList = addIfNotExists(objectList, objectClass);
       }
+    }
+    return objectList;
+  }
+
+  private List<String> addIfNotExists(List<String> objectList, String value) {
+    if (!objectList.contains(value)) {
+      objectList.add(value);
     }
     return objectList;
   }
