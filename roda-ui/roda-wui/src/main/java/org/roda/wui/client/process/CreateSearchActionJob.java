@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -24,9 +25,12 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.lists.AIPList;
+import org.roda.wui.client.common.lists.BasicAsyncTableCell;
 import org.roda.wui.client.common.lists.RepresentationList;
+import org.roda.wui.client.common.lists.RiskIncidenceList;
 import org.roda.wui.client.common.lists.SimpleFileList;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.PluginUtils;
@@ -70,53 +74,35 @@ public class CreateSearchActionJob extends CreateJob<IsIndexed> {
 
     if (selected != null) {
       getTargetPanel().clear();
+      Filter filter = Filter.ALL;
+      BasicAsyncTableCell list = null;
 
       if (selected instanceof SelectedItemsList) {
         List<String> ids = ((SelectedItemsList<?>) selected).getIds();
-
-        if (IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
-          Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids));
-          AIPList list = new AIPList(filter, justActive, null, messages.aipsTitle(), selectable, 10, 10);
-          getTargetPanel().add(list);
-          setJobSelectedDescription(messages.createJobSelectedAIP());
-          return false;
-        } else if (IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
-          Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids));
-          RepresentationList list = new RepresentationList(filter, justActive, null, messages.representationsTitle(),
-            selectable, 10, 10);
-          getTargetPanel().add(list);
-          setJobSelectedDescription(messages.createJobSelectedRepresentation());
-          return false;
-        } else if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
-          Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids));
-          SimpleFileList list = new SimpleFileList(filter, justActive, null, messages.filesTitle(), selectable, 10, 10);
-          getTargetPanel().add(list);
-          setJobSelectedDescription(messages.createJobSelectedFile());
-          return false;
-        }
+        filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids));
 
       } else if (selected instanceof SelectedItemsFilter) {
-        Filter filter = ((SelectedItemsFilter<?>) getSelected()).getFilter();
-
-        if (IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
-          AIPList list = new AIPList(filter, justActive, null, messages.aipsTitle(), selectable, 10, 10);
-          getTargetPanel().add(list);
-          setJobSelectedDescription(messages.createJobSelectedAIP());
-          return false;
-        } else if (IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
-          RepresentationList list = new RepresentationList(filter, justActive, null, messages.representationsTitle(),
-            selectable, 10, 10);
-          getTargetPanel().add(list);
-          setJobSelectedDescription(messages.createJobSelectedRepresentation());
-          return false;
-        } else if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
-          SimpleFileList list = new SimpleFileList(filter, justActive, null, messages.filesTitle(), selectable, 10, 10);
-          getTargetPanel().add(list);
-          setJobSelectedDescription(messages.createJobSelectedFile());
-          return false;
-        }
-
+        filter = ((SelectedItemsFilter<?>) getSelected()).getFilter();
       }
+
+      if (IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
+        list = new AIPList(filter, justActive, null, messages.aipsTitle(), selectable, 10, 10);
+      } else if (IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
+        list = new RepresentationList(filter, justActive, null, messages.representationsTitle(), selectable, 10, 10);
+      } else if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
+        list = new SimpleFileList(filter, justActive, null, messages.filesTitle(), selectable, 10, 10);
+      } else if (RiskIncidence.class.getName().equals(selected.getSelectedClass())) {
+        list = new RiskIncidenceList(filter, Facets.NONE, messages.showRiskIncidenceTitle(), selectable, 10, 10);
+      }
+
+      // TODO 20160930 add new classes
+
+      if (list != null) {
+        getTargetPanel().add(list);
+      }
+
+      setJobSelectedDescription(messages.createJobSelectObject());
+      return false;
     }
 
     return isEmpty;

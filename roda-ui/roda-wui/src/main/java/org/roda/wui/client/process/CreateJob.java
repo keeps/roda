@@ -26,6 +26,7 @@ import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.PluginUtils;
 import org.roda.wui.client.ingest.process.PluginOptionsPanel;
@@ -71,7 +72,8 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
           CreateIngestJob createIngestJob = new CreateIngestJob();
           callback.onSuccess(createIngestJob);
         } else if (historyTokens.get(0).equals("action")) {
-          CreateSearchActionJob createSearchActionJob = new CreateSearchActionJob();
+          LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+          CreateSearchActionJob createSearchActionJob = new CreateSearchActionJob(selectedItems.getSelectedItems());
           callback.onSuccess(createSearchActionJob);
         } else {
           Tools.newHistory(CreateJob.RESOLVER);
@@ -232,8 +234,8 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
     if (plugins != null) {
       PluginUtils.sortByName(plugins);
 
-      for (int p = 0; p < plugins.size(); p++) {
-        PluginInfo pluginInfo = plugins.get(p);
+      int pluginAdded = 0;
+      for (PluginInfo pluginInfo : plugins) {
 
         if (pluginInfo != null) {
 
@@ -260,8 +262,8 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
 
                     if (plugins != null) {
                       PluginUtils.sortByName(plugins);
-                      for (int p = 0; p < plugins.size(); p++) {
-                        PluginInfo pluginInfo = plugins.get(p);
+                      int pluginAdded = 0;
+                      for (PluginInfo pluginInfo : plugins) {
                         if (pluginInfo != null) {
                           List<String> categories = pluginInfo.getCategories();
 
@@ -291,9 +293,10 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
                                 && ((!isSelectedEmpty() && pluginInfo.hasObjectClass(selectedClass))
                                   || (isSelectedEmpty() && pluginInfo.hasObjectClass(listSelectedClass)))) {
                                 Anchor anchor = addAnchorToWorkflowList(pluginInfo);
-                                if (p == 0) {
+                                if (pluginAdded == 0) {
                                   CreateJob.this.selectedPlugin = lookupPlugin(pluginInfo.getId());
                                   anchor.addStyleName("plugin-list-item-selected");
+                                  pluginAdded++;
                                 }
                               }
                             }
@@ -316,9 +319,10 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
               && ((!isSelectedEmpty() && pluginInfo.hasObjectClass(selectedClass))
                 || (isSelectedEmpty() && pluginInfo.hasObjectClass(listSelectedClass)))) {
               Anchor anchor = addAnchorToWorkflowList(pluginInfo);
-              if (p == 0) {
+              if (pluginAdded == 0) {
                 CreateJob.this.selectedPlugin = lookupPlugin(pluginInfo.getId());
                 anchor.addStyleName("plugin-list-item-selected");
+                pluginAdded++;
               }
             }
           }

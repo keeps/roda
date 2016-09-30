@@ -17,9 +17,11 @@ import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.management.MemberManagement;
+import org.roda.wui.client.process.CreateJob;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
@@ -108,14 +110,12 @@ public class ShowRisk extends Composite {
     this.risk = new Risk();
     this.riskShowPanel = new RiskShowPanel();
     initWidget(uiBinder.createAndBindUi(this));
-    buttonProcess.setVisible(false);
   }
 
   public ShowRisk(Risk risk) {
     this.risk = risk;
     this.riskShowPanel = new RiskShowPanel(risk, true);
     initWidget(uiBinder.createAndBindUi(this));
-    buttonProcess.setVisible(false);
 
     BrowserService.Util.getInstance().hasRiskVersions(risk.getId(), new AsyncCallback<Boolean>() {
 
@@ -191,7 +191,9 @@ public class ShowRisk extends Composite {
 
   @UiHandler("buttonProcess")
   void handleButtonProcess(ClickEvent e) {
-    Toast.showInfo("Info", "This feature is not yet implemented");
+    LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+    selectedItems.setSelectedItems(riskShowPanel.getSelectedIncidences());
+    Tools.newHistory(CreateJob.RESOLVER, "action");
   }
 
   private void cancel() {

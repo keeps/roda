@@ -1057,25 +1057,29 @@ public class BrowserHelper {
     String parentId = null;
 
     for (String aipId : aipIds) {
-      AIP aip = RodaCoreFactory.getModelService().retrieveAIP(aipId);
-      parentId = aip.getParentId();
-      RodaCoreFactory.getModelService().deleteAIP(aip.getId());
+      try {
+        AIP aip = RodaCoreFactory.getModelService().retrieveAIP(aipId);
+        parentId = aip.getParentId();
+        RodaCoreFactory.getModelService().deleteAIP(aip.getId());
 
-      Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
-      RodaCoreFactory.getIndexService().execute(IndexedAIP.class, filter, new IndexRunnable<IndexedAIP>() {
+        Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
+        RodaCoreFactory.getIndexService().execute(IndexedAIP.class, filter, new IndexRunnable<IndexedAIP>() {
 
-        @Override
-        public void run(IndexedAIP item)
-          throws GenericException, RequestNotValidException, AuthorizationDeniedException {
-          try {
-            // UserUtility.checkObjectPermissions(user, item,
-            // PermissionType.DELETE);
-            RodaCoreFactory.getModelService().deleteAIP(item.getId());
-          } catch (NotFoundException e) {
-            // already deleted, ignore
+          @Override
+          public void run(IndexedAIP item)
+            throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+            try {
+              // UserUtility.checkObjectPermissions(user, item,
+              // PermissionType.DELETE);
+              RodaCoreFactory.getModelService().deleteAIP(item.getId());
+            } catch (NotFoundException e) {
+              // already deleted, ignore
+            }
           }
-        }
-      });
+        });
+      } catch (NotFoundException e) {
+        // already deleted, ignore
+      }
     }
 
     RodaCoreFactory.getIndexService().commitAIPs();
