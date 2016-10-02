@@ -70,17 +70,13 @@ public class IndexedAIP implements IsIndexed {
    * Constructs a new SimpleDescriptionObject with the given arguments.
    * 
    * @param id
-   * @param lastModifiedDate
-   * @param createdDate
    * @param state
    * @param level
-   * @param id
    * @param title
    * @param dateInitial
    * @param dateFinal
    * @param description
    * @param parentID
-   * @param subElementsCount
    */
   public IndexedAIP(String id, AIPState state, String level, String title, Date dateInitial, Date dateFinal,
     String description, String parentID, List<String> ancestors, Permissions permissions, Long numberOfSubmissionFiles,
@@ -376,12 +372,16 @@ public class IndexedAIP implements IsIndexed {
 
   @Override
   public String[] toCsvHeaders() {
-    throw new UnsupportedOperationException();
+    return new String[] {"id", "state", "level", "title", "dateFinal", "dateFinal", "description", "parentID",
+      "ancestors", "permissions", "numberOfSubmissionFiles", "numberOfDocumentationFiles", "numberOfSchemaFiles",
+      "hasRepresentations", "ghost", "ingestSIPId", "ingestJobId"};
   }
 
   @Override
   public Object[] toCsvValues() {
-    throw new UnsupportedOperationException();
+    return new Object[] {id, state, level, title, dateFinal, dateFinal, description, parentID, ancestors, permissions,
+      numberOfSubmissionFiles, numberOfDocumentationFiles, numberOfSchemaFiles, hasRepresentations, ghost, ingestSIPId,
+      ingestJobId};
   }
 
   @Override

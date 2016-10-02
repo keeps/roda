@@ -135,12 +135,14 @@ public class IndexedRepresentation extends Representation implements IsIndexed {
 
   @Override
   public String[] toCsvHeaders() {
-    throw new UnsupportedOperationException();
+    return new String[] {"uuid", "sizeInBytes", "numberOfDataFiles", "numberOfDocumentationFiles",
+      "numberOfSchemaFiles", "ancestors"};
   }
 
   @Override
   public Object[] toCsvValues() {
-    throw new UnsupportedOperationException();
+    return new Object[] {uuid, sizeInBytes, numberOfDataFiles, numberOfDocumentationFiles, numberOfSchemaFiles,
+      ancestors};
   }
 
 }

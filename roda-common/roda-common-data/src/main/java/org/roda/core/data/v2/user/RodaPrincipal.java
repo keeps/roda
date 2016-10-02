@@ -62,14 +62,14 @@ public abstract class RodaPrincipal implements Serializable, RODAMember {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(final Object obj) {
     if (this == obj)
       return true;
     if (obj == null)
       return false;
     if (getClass() != obj.getClass())
       return false;
-    RodaPrincipal other = (RodaPrincipal) obj;
+    final RodaPrincipal other = (RodaPrincipal) obj;
     if (active != other.active)
       return false;
     if (allRoles == null) {
@@ -99,8 +99,6 @@ public abstract class RodaPrincipal implements Serializable, RODAMember {
       return false;
     return true;
   }
-  
-  
 
   @Override
   public String toString() {
@@ -156,8 +154,6 @@ public abstract class RodaPrincipal implements Serializable, RODAMember {
     this.directRoles = directRoles;
   }
 
-  
-
   @Override
   public String getUUID() {
     // TODO needs prefix to distinguish from user?
@@ -181,13 +177,20 @@ public abstract class RodaPrincipal implements Serializable, RODAMember {
     directRoles.add(role);
   }
 
-  
-
   public void removeDirectRole(String role) {
     if (directRoles.contains(role)) {
       directRoles.remove(role);
     }
   }
 
+  @Override
+  public String[] toCsvHeaders() {
+    return new String[] {"id", "name", "fullName", "isActive", "isUser", "allRoles", "directRoles"};
+  }
+
+  @Override
+  public Object[] toCsvValues() {
+    return new Object[] {id, name, fullName, isActive(), isUser(), allRoles, directRoles};
+  }
 
 }

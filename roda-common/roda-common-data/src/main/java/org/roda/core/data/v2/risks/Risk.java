@@ -303,22 +303,6 @@ public class Risk extends NamedIndexedModel implements IsRODAObject {
       + updatedOn + ", updatedBy=" + updatedBy + "]";
   }
 
-  public String[] toCsvHeaders() {
-    return new String[] {"id", "name", "description", "identifiedOn", "identifiedBy", "category", "notes",
-      "preMitigationProbability", "preMitigationImpact", "preMitigationSeverity", "preMitigationNotes",
-      "posMitigationProbability", "posMitigationImpact", "posMitigationSeverity", "posMitigationNotes",
-      "mitigationStrategy", "mitigationOwnerType", "mitigationOwner", "mitigationRelatedEventIdentifierType",
-      "mitigationRelatedEventIdentifierValue", "createdOn", "createdBy", "updatedOn", "updatedBy"};
-  }
-
-  public Object[] toCsvValues() {
-    return new Object[] {getId(), getName(), description, identifiedOn, identifiedBy, category, notes,
-      preMitigationProbability, preMitigationImpact, preMitigationSeverity, preMitigationNotes,
-      posMitigationProbability, posMitigationImpact, posMitigationSeverity, posMitigationNotes, mitigationStrategy,
-      mitigationOwnerType, mitigationOwner, mitigationRelatedEventIdentifierType, mitigationRelatedEventIdentifierValue,
-      createdOn, createdBy, updatedOn, updatedBy};
-  }
-
   @JsonIgnore
   @Override
   public String getUUID() {

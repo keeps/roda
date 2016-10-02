@@ -7,7 +7,6 @@
  */
 package org.roda.core.data.v2.risks;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.roda.core.data.v2.index.IsIndexed;
 
 public class IndexedRisk extends Risk implements IsIndexed {
@@ -42,13 +41,21 @@ public class IndexedRisk extends Risk implements IsIndexed {
     return "IndexedRisk [super=" + super.toString() + ", objectsSize=" + objectsSize + "]";
   }
 
-  @Override
   public String[] toCsvHeaders() {
-    return ArrayUtils.addAll(super.toCsvHeaders(), new String[] {"objectsSize"});
+    return new String[] {"id", "name", "description", "identifiedOn", "identifiedBy", "category", "notes",
+      "preMitigationProbability", "preMitigationImpact", "preMitigationSeverity", "preMitigationNotes",
+      "posMitigationProbability", "posMitigationImpact", "posMitigationSeverity", "posMitigationNotes",
+      "mitigationStrategy", "mitigationOwnerType", "mitigationOwner", "mitigationRelatedEventIdentifierType",
+      "mitigationRelatedEventIdentifierValue", "createdOn", "createdBy", "updatedOn", "updatedBy", "objectsSize"};
   }
 
-  @Override
   public Object[] toCsvValues() {
-    return ArrayUtils.addAll(super.toCsvHeaders(), new Object[] {objectsSize});
+    return new Object[] {getId(), getName(), getDescription(), getIdentifiedOn(), getIdentifiedBy(), getCategory(),
+      getNotes(), getPreMitigationProbability(), getPreMitigationImpact(), getPreMitigationSeverity(),
+      getPreMitigationNotes(), getPosMitigationProbability(), getPosMitigationImpact(), getPosMitigationSeverity(),
+      getPreMitigationNotes(), getMitigationStrategy(), getMitigationOwnerType(), getMitigationOwner(),
+      getMitigationRelatedEventIdentifierType(), getMitigationRelatedEventIdentifierValue(), getCreatedOn(),
+      getCreatedBy(), getUpdatedOn(), getUpdatedBy(), objectsSize};
   }
+
 }

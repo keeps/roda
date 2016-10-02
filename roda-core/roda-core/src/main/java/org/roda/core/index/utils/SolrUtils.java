@@ -255,39 +255,6 @@ public class SolrUtils {
     return ret;
   }
 
-  public static <T extends IsIndexed> String findCSV(final SolrClient index, final Class<T> classToRetrieve,
-    final Filter filter, final Sorter sorter, final Sublist sublist, final Facets facets, final User user,
-    final boolean justActive, final boolean exportFacets) throws GenericException, RequestNotValidException {
-
-    final SolrQuery query = new SolrQuery();
-    query.setParam("q.op", DEFAULT_QUERY_PARSER_OPERATOR);
-    query.setQuery(parseFilter(filter));
-    query.setSorts(parseSorter(sorter));
-    query.setStart(sublist.getFirstElementIndex());
-    query.setRows(sublist.getMaximumElementCount());
-    parseAndConfigureFacets(facets, query);
-    if (hasPermissionFilters(classToRetrieve)) {
-      query.addFilterQuery(getFilterQueries(user, justActive));
-    }
-
-    try {
-
-      final QueryResponse response = index.query(getIndexName(classToRetrieve).get(0), query);
-      if (!exportFacets) {
-        return new CSVQueryResponse(response).toCSV();
-      } else {
-        return new CSVFacetResults(processFacetFields(facets, response.getFacetFields())).toCSV();
-      }
-
-    } catch (final SolrServerException | IOException e) {
-      throw new GenericException("Could not query index", e);
-    } catch (final SolrException e) {
-      throw new RequestNotValidException(e.getMessage(), e);
-    } catch (final RuntimeException e) {
-      throw new GenericException("Unexpected exception while querying index", e);
-    }
-  }
-
   /*
    * "Internal" helper methods
    * ____________________________________________________________________________________________________________________

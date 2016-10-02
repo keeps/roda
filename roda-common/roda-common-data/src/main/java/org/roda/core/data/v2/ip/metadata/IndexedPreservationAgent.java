@@ -89,12 +89,12 @@ public class IndexedPreservationAgent implements IsIndexed {
 
   @Override
   public String[] toCsvHeaders() {
-    throw new UnsupportedOperationException();
+    return new String[] {"id", "name", "type", "note", "extension", "roles"};
   }
 
   @Override
   public Object[] toCsvValues() {
-    throw new UnsupportedOperationException();
+    return new Object[] {id, name, type, note, extension, roles};
   }
 
   @Override

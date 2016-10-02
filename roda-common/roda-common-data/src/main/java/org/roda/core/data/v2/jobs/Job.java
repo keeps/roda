@@ -221,12 +221,14 @@ public class Job implements IsIndexed, Serializable {
 
   @Override
   public String[] toCsvHeaders() {
-    throw new UnsupportedOperationException();
+    return new String[] {"id", "name", "username", "startDate", "endDate", "state", "stateDetails", "jobStats",
+      "plugin", "pluginType", "pluginParameters", "sourceObjects", "outcomeObjectsClass"};
   }
 
   @Override
   public Object[] toCsvValues() {
-    throw new UnsupportedOperationException();
+    return new Object[] {id, name, username, startDate, endDate, state, stateDetails, jobStats, plugin, pluginType,
+      pluginParameters, sourceObjects, outcomeObjectsClass};
   }
 
   @JsonIgnore
