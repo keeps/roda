@@ -26,7 +26,7 @@ import org.roda.core.index.utils.IterableIndexResult;
 public class ResultsCSVOutputStream<T extends IsIndexed> extends CSVOutputStream {
 
   /** The results to write to output stream. */
-  private IterableIndexResult<T> results;
+  private final IterableIndexResult<T> results;
 
   /**
    * Constructor.
@@ -53,15 +53,16 @@ public class ResultsCSVOutputStream<T extends IsIndexed> extends CSVOutputStream
 
   @Override
   public void consumeOutputStream(final OutputStream out) throws IOException {
+    final OutputStreamWriter writer = new OutputStreamWriter(out);
     CSVPrinter printer = null;
     boolean isFirst = true;
     for (final T result : this.results) {
       if (isFirst) {
-        printer = CSVFormat.DEFAULT.withHeader(result.toCsvHeaders()).print(new OutputStreamWriter(out));
+        printer = CSVFormat.DEFAULT.withHeader(result.toCsvHeaders()).print(writer);
         isFirst = false;
       }
       printer.printRecord(result.toCsvValues());
     }
-
+    writer.flush();
   }
 }

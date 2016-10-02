@@ -66,16 +66,17 @@ public class IterableIndexResult<T extends IsIndexed> implements Iterable<T> {
   public IterableIndexResult(final SolrClient solrClient, final Class<T> returnClass, final Filter filter,
     final Sorter sorter, final Sublist sublist, final Facets facets, final User user, final boolean justActive,
     final boolean removeDuplicates) {
-    // TODO implement sublist support
     this.solrClient = solrClient;
     this.returnClass = returnClass;
     this.filter = filter;
     this.sorter = sorter;
     this.facets = facets;
+    // TODO implement sublist support
     this.sublist = new Sublist(0, PAGE_SIZE);
     this.user = user;
     this.justActive = justActive;
-    this.removeDuplicates = removeDuplicates;
+    // TODO fix bug with UUIDs and re-enable this.
+    this.removeDuplicates = false;
 
     getResults(this.sublist);
   }
@@ -121,7 +122,7 @@ public class IterableIndexResult<T extends IsIndexed> implements Iterable<T> {
 
       @Override
       public T next() {
-        T t = indexResultObjects.get(currentObjectInPartialList);
+        final T t = indexResultObjects.get(currentObjectInPartialList);
         currentObject += 1;
         currentObjectInPartialList += 1;
         if (LOGGER.isTraceEnabled()) {

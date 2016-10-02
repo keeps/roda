@@ -172,12 +172,15 @@ public class Format extends NamedIndexedModel implements IsIndexed, Serializable
 
   @Override
   public String[] toCsvHeaders() {
-    throw new UnsupportedOperationException();
+    return new String[] {"id", "name", "definition", "categories", "latestVersion", "popularity", "developer",
+      "initialRelease", "standard", "isOpenFormat", "websites", "provenanceInformation", "extensions", "mimetypes",
+      "pronoms", "utis"};
   }
 
   @Override
   public Object[] toCsvValues() {
-    throw new UnsupportedOperationException();
+    return new Object[] {getId(), getName(), definition, categories, latestVersion, popularity, developer,
+      initialRelease, standard, isOpenFormat, websites, provenanceInformation, extensions, mimetypes, pronoms, utis};
   }
 
   public List<String> getCategories() {

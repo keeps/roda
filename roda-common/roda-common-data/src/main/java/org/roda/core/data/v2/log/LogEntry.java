@@ -77,8 +77,6 @@ public class LogEntry implements IsIndexed {
    *          the action.
    * @param parameters
    *          the action parameters.
-   * @param description
-   *          the description of the action.
    * @param relatedObjectID
    *          the ID of the object related with this action.
    */
@@ -107,12 +105,14 @@ public class LogEntry implements IsIndexed {
 
   @Override
   public String[] toCsvHeaders() {
-    throw new UnsupportedOperationException();
+    return new String[] {"id", "address", "datetime", "username", "actionComponent", "actionMethod", "relatedObjectID",
+      "duration", "parameters", "state"};
   }
 
   @Override
   public Object[] toCsvValues() {
-    throw new UnsupportedOperationException();
+    return new Object[] {id, address, datetime, username, actionComponent, actionMethod, relatedObjectID, duration,
+      parameters, state};
   }
 
   @Override

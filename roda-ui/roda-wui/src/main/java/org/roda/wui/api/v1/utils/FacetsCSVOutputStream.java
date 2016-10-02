@@ -52,8 +52,8 @@ public class FacetsCSVOutputStream extends CSVOutputStream {
 
   @Override
   public void consumeOutputStream(final OutputStream out) throws IOException {
-    final CSVPrinter printer = CSVFormat.DEFAULT.withHeader("field", "label", "value", "count")
-      .print(new OutputStreamWriter(out));
+    final OutputStreamWriter writer = new OutputStreamWriter(out);
+    final CSVPrinter printer = CSVFormat.DEFAULT.withHeader("field", "label", "value", "count").print(writer);
 
     for (FacetFieldResult facet : this.facets) {
       final String field = facet.getField();
@@ -62,6 +62,7 @@ public class FacetsCSVOutputStream extends CSVOutputStream {
       }
     }
 
+    writer.flush();
   }
 
 }

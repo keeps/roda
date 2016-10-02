@@ -10,7 +10,6 @@ package org.roda.core.data.v2.ip.metadata;
 import java.util.Date;
 import java.util.List;
 
-import org.roda.core.data.exceptions.NotImplementedException;
 import org.roda.core.data.v2.index.IsIndexed;
 
 public class IndexedPreservationEvent implements IsIndexed {
@@ -144,12 +143,15 @@ public class IndexedPreservationEvent implements IsIndexed {
 
   @Override
   public String[] toCsvHeaders() {
-    throw new UnsupportedOperationException();
+    return new String[] {"aipId", "representationId", "fileId", "id", "eventDateTime", "eventDetail", "eventType",
+      "eventOutcome", "eventOutcomeDetailExtension", "eventOutcomeDetailNote", "linkingAgentIds", "outcomeObjectIds",
+      "sourcesObjectIds"};
   }
 
   @Override
   public Object[] toCsvValues() {
-    throw new UnsupportedOperationException();
+    return new Object[] {aipId, representationId, fileId, id, eventDateTime, eventDetail, eventType, eventOutcome,
+      eventOutcomeDetailExtension, eventOutcomeDetailNote, linkingAgentIds, outcomeObjectIds, sourcesObjectIds};
   }
 
   @Override

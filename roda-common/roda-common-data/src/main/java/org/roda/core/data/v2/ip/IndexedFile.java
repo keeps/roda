@@ -342,12 +342,16 @@ public class IndexedFile implements IsIndexed {
 
   @Override
   public String[] toCsvHeaders() {
-    throw new UnsupportedOperationException();
+    return new String[] {"uuid", "parentUUID", "aipId", "representationId", "representationUUID", "path", "id",
+      "fileFormat", "originalName", "size", "isDirectory", "creatingApplicationName", "creatingApplicationVersion",
+      "dateCreatedByApplication", "hash", "storagePath", "ancestors", "otherProperties"};
   }
 
   @Override
   public Object[] toCsvValues() {
-    throw new UnsupportedOperationException();
+    return new Object[] {uuid, parentUUID, aipId, representationId, representationUUID, path, id, fileFormat,
+      originalName, size, isDirectory, creatingApplicationName, creatingApplicationVersion, dateCreatedByApplication,
+      hash, storagePath, ancestors, otherProperties};
   }
 
 }

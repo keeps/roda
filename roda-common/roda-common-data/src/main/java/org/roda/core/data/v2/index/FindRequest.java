@@ -29,12 +29,37 @@ public class FindRequest extends CountRequest {
   public Facets facets;
   /** Return only active resources? */
   public boolean onlyActive;
+  /** For CSV results, export only facets? */
+  public boolean exportFacets;
+  /** The filename for exported CSV. */
+  public String filename;
 
   /**
    * Constructor.
    */
   public FindRequest() {
     this(null, new Filter(), new Sorter(), new Sublist(), new Facets(), true);
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param classToReturn
+   *          Class name of resources to return.
+   * @param filter
+   *          Filter.
+   * @param sorter
+   *          Sorter.
+   * @param sublist
+   *          Sublist (paging).
+   * @param facets
+   *          Facets to return.
+   * @param onlyActive
+   *          Return only active resources?
+   */
+  public FindRequest(final String classToReturn, final Filter filter, final Sorter sorter, final Sublist sublist,
+    final Facets facets, final boolean onlyActive) {
+    this(classToReturn, filter, sorter, sublist, facets, onlyActive, false, "export.csv");
   }
 
   /**
@@ -52,14 +77,20 @@ public class FindRequest extends CountRequest {
    *          Facets to return.
    * @param onlyActive
    *          Return only active resources?
+   * @param exportFacets
+   *          for CSV results, export only facets?
+   * @param filename
+   *          the filename for exported CSV.
    */
   public FindRequest(final String classToReturn, final Filter filter, final Sorter sorter, final Sublist sublist,
-    final Facets facets, final boolean onlyActive) {
+    final Facets facets, final boolean onlyActive, final boolean exportFacets, final String filename) {
     super(classToReturn, filter);
     this.sorter = sorter;
     this.sublist = sublist;
     this.facets = facets;
     this.onlyActive = onlyActive;
+    this.exportFacets = exportFacets;
+    this.filename = filename;
   }
 
 }

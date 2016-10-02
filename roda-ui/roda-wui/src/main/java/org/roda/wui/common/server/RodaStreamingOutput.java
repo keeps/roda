@@ -25,7 +25,6 @@ public class RodaStreamingOutput implements StreamingOutput {
   @Override
   public void write(final OutputStream output) throws IOException {
     outputHandler.consumeOutputStream(output);
-
   }
 
   public StreamResponse toStreamResponse() {
