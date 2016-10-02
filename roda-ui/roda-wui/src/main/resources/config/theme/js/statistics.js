@@ -89,7 +89,15 @@
 
       var lang = document.locale;
 
-      return "/api/v1/index?returnClass=" + returnClass + "&" + filterParams + "&" + facetParams + "&start=" + start + "&limit=" + limit + "&facetLimit=" + facetLimit + "&lang=" + lang + "&onlyActive=" + onlyActive;
+      return "/api/v1/index?returnClass=" +
+          returnClass + "&" +
+          filterParams + "&" +
+          facetParams +
+          "&start=" + start +
+          "&limit=" + limit +
+          "&facetLimit=" + facetLimit +
+          "&lang=" + lang +
+          "&onlyActive=" + onlyActive;
     }
 
     function fetchIndexData(element, viewCallback) {
@@ -109,7 +117,14 @@
 
     function initViewDownload(element, data) {
       var url = buildDataUrl(element);
-      var filename = element.data("view-filename") || "export.csv";
+      if (element.data("view-field") == "facetResults") {
+        url = url + "&exportFacets=true";
+        var filename = element.data("view-filename");
+        if (filename) {
+          url = url + "&filename=" + filename;
+        }
+      }
+
       element.click(function() {
         var type = 'text/csv';
         $.ajax({
