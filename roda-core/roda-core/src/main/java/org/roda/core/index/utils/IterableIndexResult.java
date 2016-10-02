@@ -75,8 +75,7 @@ public class IterableIndexResult<T extends IsIndexed> implements Iterable<T> {
     this.sublist = new Sublist(0, PAGE_SIZE);
     this.user = user;
     this.justActive = justActive;
-    // TODO fix bug with UUIDs and re-enable this.
-    this.removeDuplicates = false;
+    this.removeDuplicates = removeDuplicates;
 
     getResults(this.sublist);
   }
