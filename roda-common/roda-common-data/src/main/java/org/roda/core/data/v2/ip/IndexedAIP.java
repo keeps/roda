@@ -372,14 +372,14 @@ public class IndexedAIP implements IsIndexed {
 
   @Override
   public String[] toCsvHeaders() {
-    return new String[] {"id", "state", "level", "title", "dateFinal", "dateFinal", "description", "parentID",
+    return new String[] {"id", "state", "level", "title", "dateInitial", "dateFinal", "description", "parentID",
       "ancestors", "permissions", "numberOfSubmissionFiles", "numberOfDocumentationFiles", "numberOfSchemaFiles",
       "hasRepresentations", "ghost", "ingestSIPId", "ingestJobId"};
   }
 
   @Override
   public Object[] toCsvValues() {
-    return new Object[] {id, state, level, title, dateFinal, dateFinal, description, parentID, ancestors, permissions,
+    return new Object[] {id, state, level, title, dateInitial, dateFinal, description, parentID, ancestors, permissions,
       numberOfSubmissionFiles, numberOfDocumentationFiles, numberOfSchemaFiles, hasRepresentations, ghost, ingestSIPId,
       ingestJobId};
   }
