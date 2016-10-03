@@ -22,6 +22,7 @@ public class Group extends RodaPrincipal {
 
   private static final long serialVersionUID = -4051946961307715630L;
 
+  /** Users that belong to this group. */
   private Set<String> users = new HashSet<>();
 
   /**
@@ -37,7 +38,7 @@ public class Group extends RodaPrincipal {
    * @param name
    *          the name of the group.
    */
-  public Group(String name) {
+  public Group(final String name) {
     super(name, name);
   }
 
@@ -47,7 +48,7 @@ public class Group extends RodaPrincipal {
    * @param group
    *          the Group to be cloned.
    */
-  public Group(Group group) {
+  public Group(final Group group) {
     super(group.getId(), group.getName(), group.getDirectRoles(), group.getAllRoles());
     setActive(true);
     setUsers(group.getUsers());
@@ -70,7 +71,7 @@ public class Group extends RodaPrincipal {
    * @param users
    *          the memberUserNames to set
    */
-  public void setUsers(Set<String> users) {
+  public void setUsers(final Set<String> users) {
     this.users.clear();
     if (users != null) {
       this.users.addAll(users);
@@ -84,7 +85,7 @@ public class Group extends RodaPrincipal {
    *          the name of the new member to add.
    * @return true if the member was added, false otherwise.
    */
-  public boolean addMemberUser(String memberUserName) {
+  public boolean addMemberUser(final String memberUserName) {
     return this.users.add(memberUserName);
   }
 
@@ -95,13 +96,43 @@ public class Group extends RodaPrincipal {
    *          the name of the member to remove.
    * @return true if the member was removed, false otherwise.
    */
-  public boolean removeMemberUser(String memberUserName) {
+  public boolean removeMemberUser(final String memberUserName) {
     return this.users.remove(memberUserName);
   }
 
   @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((users == null) ? 0 : users.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    final Group other = (Group) obj;
+    if (users == null) {
+      if (other.users != null) {
+        return false;
+      }
+    } else if (!users.equals(other.users)) {
+      return false;
+    }
+    return true;
+  }
+
+  @Override
   public String toString() {
-    StringBuilder builder = new StringBuilder();
+    final StringBuilder builder = new StringBuilder();
     builder.append("Group [");
     if (users != null) {
       builder.append("users=");

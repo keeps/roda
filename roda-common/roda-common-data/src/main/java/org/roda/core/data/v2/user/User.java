@@ -19,25 +19,26 @@ import java.util.Set;
 public class User extends RodaPrincipal {
   private static final long serialVersionUID = 6514790636010895870L;
 
+  /** Groups this user belongs to. */
   private Set<String> groups = new HashSet<String>();
 
-  /** Email address */
+  /** Email address. */
   private String email;
   /** Is a guest user? */
   private boolean guest;
-  /** IP address */
+  /** IP address. */
   private String ipAddress = "";
 
-  /** LDAP info */
+  /** LDAP info. */
   private String resetPasswordToken = null;
-  /** LDAP info */
+  /** LDAP info. */
   private String resetPasswordTokenExpirationDate = null;
-  /** LDAP info */
+  /** LDAP info. */
   private String emailConfirmationToken = null;
-  /** LDAP info */
+  /** LDAP info. */
   private String emailConfirmationTokenExpirationDate = null;
 
-  /** LDAP description */
+  /** LDAP description. */
   private String extra = null;
 
   /**
@@ -210,7 +211,7 @@ public class User extends RodaPrincipal {
     return groups;
   }
 
-  public void setGroups(Set<String> groups) {
+  public void setGroups(final Set<String> groups) {
     this.groups = groups;
   }
 
@@ -219,14 +220,14 @@ public class User extends RodaPrincipal {
     return true;
   }
 
-  public void addGroup(String group) {
+  public void addGroup(final String group) {
     if (groups == null) {
       groups = new HashSet<String>();
     }
     groups.add(group);
   }
 
-  public void removeGroup(String group) {
+  public void removeGroup(final String group) {
     if (groups.contains(group)) {
       groups.remove(group);
     }
@@ -251,14 +252,14 @@ public class User extends RodaPrincipal {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(final Object obj) {
     if (this == obj)
       return true;
     if (!super.equals(obj))
       return false;
     if (getClass() != obj.getClass())
       return false;
-    User other = (User) obj;
+    final User other = (User) obj;
     if (email == null) {
       if (other.email != null)
         return false;
@@ -306,7 +307,7 @@ public class User extends RodaPrincipal {
 
   @Override
   public String toString() {
-    StringBuilder builder = new StringBuilder();
+    final StringBuilder builder = new StringBuilder();
     builder.append("User [");
     if (groups != null) {
       builder.append("groups=");

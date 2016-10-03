@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.ip;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.v2.index.IsIndexed;
@@ -131,6 +132,18 @@ public class IndexedRepresentation extends Representation implements IsIndexed {
     return "IndexedRepresentation [uuid=" + uuid + ", sizeInBytes=" + sizeInBytes + ", numberOfDataFiles="
       + numberOfDataFiles + ", numberOfDocumentationFiles=" + numberOfDocumentationFiles + ", numberOfSchemaFiles="
       + numberOfSchemaFiles + ", ancestors=" + ancestors + "]";
+  }
+
+  @Override
+  public List<String> toCsvHeaders() {
+    return Arrays.asList("uuid", "sizeInBytes", "numberOfDataFiles", "numberOfDocumentationFiles",
+      "numberOfSchemaFiles", "ancestors");
+  }
+
+  @Override
+  public List<Object> toCsvValues() {
+    return Arrays.asList(uuid, sizeInBytes, numberOfDataFiles, numberOfDocumentationFiles, numberOfSchemaFiles,
+      ancestors);
   }
 
 }

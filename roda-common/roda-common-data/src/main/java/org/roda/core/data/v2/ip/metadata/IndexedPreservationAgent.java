@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.ip.metadata;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.v2.index.IsIndexed;
@@ -85,6 +86,16 @@ public class IndexedPreservationAgent implements IsIndexed {
   public String toString() {
     return "IndexedPreservationAgent [id=" + id + ", name=" + name + ", type=" + type + ", note=" + note
       + ", extension=" + extension + ", roles=" + roles + "]";
+  }
+
+  @Override
+  public List<String> toCsvHeaders() {
+    return Arrays.asList("id", "name", "type", "note", "extension", "roles");
+  }
+
+  @Override
+  public List<Object> toCsvValues() {
+    return Arrays.asList(id, name, type, note, extension, roles);
   }
 
   @Override

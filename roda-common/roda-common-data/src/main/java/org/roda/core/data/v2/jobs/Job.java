@@ -8,8 +8,10 @@
 package org.roda.core.data.v2.jobs;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -217,6 +219,18 @@ public class Job implements IsIndexed, Serializable {
       + endDate + ", state=" + state + ", stateDetails=" + stateDetails + ", jobStats=" + jobStats + ", plugin="
       + plugin + ", pluginType=" + pluginType + ", pluginParameters=" + pluginParameters + ", sourceObjects="
       + sourceObjects + ", outcomeObjectsClass=" + outcomeObjectsClass + "]";
+  }
+
+  @Override
+  public List<String> toCsvHeaders() {
+    return Arrays.asList("id", "name", "username", "startDate", "endDate", "state", "stateDetails", "jobStats",
+      "plugin", "pluginType", "pluginParameters", "sourceObjects", "outcomeObjectsClass");
+  }
+
+  @Override
+  public List<Object> toCsvValues() {
+    return Arrays.asList(id, name, username, startDate, endDate, state, stateDetails, jobStats, plugin, pluginType,
+      pluginParameters, sourceObjects, outcomeObjectsClass);
   }
 
   @JsonIgnore

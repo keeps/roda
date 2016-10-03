@@ -9,6 +9,7 @@ package org.roda.core.data.v2.jobs;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -328,6 +329,21 @@ public class Report implements Serializable, IsIndexed {
       + completionPercentage + ", stepsCompleted=" + stepsCompleted + ", totalSteps=" + totalSteps + ", plugin="
       + plugin + ", pluginName=" + pluginName + ", pluginVersion=" + pluginVersion + ", pluginState=" + pluginState
       + ", pluginDetails=" + pluginDetails + ", htmlPluginDetails=" + htmlPluginDetails + ", reports=" + reports + "]";
+  }
+
+  @Override
+  public List<String> toCsvHeaders() {
+    return Arrays.asList("id", "jobId", "sourceObjectId", "sourceObjectClass", "sourceObjectOriginalId",
+      "outcomeObjectId", "outcomeObjectClass", "outcomeObjectState", "title", "dateCreated", "dateUpdated",
+      "completionPercentage", "stepsCompleted", "totalSteps", "plugin", "pluginName", "pluginVersion", "pluginState",
+      "pluginDetails", "htmlPluginDetails", "reports");
+  }
+
+  @Override
+  public List<Object> toCsvValues() {
+    return Arrays.asList(id, jobId, sourceObjectId, sourceObjectClass, sourceObjectOriginalId, outcomeObjectId,
+      outcomeObjectClass, outcomeObjectState, title, dateCreated, dateUpdated, completionPercentage, stepsCompleted,
+      totalSteps, plugin, pluginName, pluginVersion, pluginState, pluginDetails, htmlPluginDetails, reports);
   }
 
   @JsonIgnore

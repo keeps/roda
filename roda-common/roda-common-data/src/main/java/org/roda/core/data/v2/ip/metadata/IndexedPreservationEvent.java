@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.ip.metadata;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -139,6 +140,19 @@ public class IndexedPreservationEvent implements IsIndexed {
       + ", eventOutcome=" + eventOutcome + ", eventOutcomeDetailExtension=" + eventOutcomeDetailExtension
       + ", eventOutcomeDetailNote=" + eventOutcomeDetailNote + ", linkingAgentIds=" + linkingAgentIds
       + ", outcomeObjectIds=" + outcomeObjectIds + ", sourcesObjectIds=" + sourcesObjectIds + "]";
+  }
+
+  @Override
+  public List<String> toCsvHeaders() {
+    return Arrays.asList("aipId", "representationId", "fileId", "id", "eventDateTime", "eventDetail", "eventType",
+      "eventOutcome", "eventOutcomeDetailExtension", "eventOutcomeDetailNote", "linkingAgentIds", "outcomeObjectIds",
+      "sourcesObjectIds");
+  }
+
+  @Override
+  public List<Object> toCsvValues() {
+    return Arrays.asList(aipId, representationId, fileId, id, eventDateTime, eventDetail, eventType, eventOutcome,
+      eventOutcomeDetailExtension, eventOutcomeDetailNote, linkingAgentIds, outcomeObjectIds, sourcesObjectIds);
   }
 
   @Override

@@ -25,6 +25,7 @@ import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
+import org.roda.core.data.v2.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +47,8 @@ public class IterableIndexResult<T extends IsIndexed> implements Iterable<T> {
   private Sorter sorter;
   private Sublist sublist;
   private Facets facets;
+  private User user;
+  private boolean justActive;
 
   private boolean removeDuplicates = true;
   private Set<String> uniqueUUIDs = new HashSet<>();
@@ -55,22 +58,31 @@ public class IterableIndexResult<T extends IsIndexed> implements Iterable<T> {
   private int currentObjectInPartialList = 0;
   private long totalObjects = -1;
 
-  public IterableIndexResult(SolrClient solrClient, Class<T> returnClass, Filter filter, Sorter sorter, Facets facets,
-    boolean removeDuplicates) {
+  public IterableIndexResult(final SolrClient solrClient, final Class<T> returnClass, final Filter filter,
+    final Sorter sorter, final Facets facets, final boolean removeDuplicates) {
+    this(solrClient, returnClass, filter, sorter, Sublist.ALL, facets, null, true, removeDuplicates);
+  }
+
+  public IterableIndexResult(final SolrClient solrClient, final Class<T> returnClass, final Filter filter,
+    final Sorter sorter, final Sublist sublist, final Facets facets, final User user, final boolean justActive,
+    final boolean removeDuplicates) {
     this.solrClient = solrClient;
     this.returnClass = returnClass;
     this.filter = filter;
     this.sorter = sorter;
     this.facets = facets;
+    // TODO implement sublist support
     this.sublist = new Sublist(0, PAGE_SIZE);
+    this.user = user;
+    this.justActive = justActive;
     this.removeDuplicates = removeDuplicates;
 
-    getResults(sublist);
+    getResults(this.sublist);
   }
 
-  private void getResults(Sublist sublist) {
+  private void getResults(final Sublist sublist) {
     try {
-      indexResult = SolrUtils.find(solrClient, returnClass, filter, sorter, sublist, facets);
+      indexResult = SolrUtils.find(solrClient, returnClass, filter, sorter, sublist, facets, user, justActive);
       if (totalObjects == -1) {
         totalObjects = indexResult.getTotalCount();
       }
@@ -109,7 +121,7 @@ public class IterableIndexResult<T extends IsIndexed> implements Iterable<T> {
 
       @Override
       public T next() {
-        T t = indexResultObjects.get(currentObjectInPartialList);
+        final T t = indexResultObjects.get(currentObjectInPartialList);
         currentObject += 1;
         currentObjectInPartialList += 1;
         if (LOGGER.isTraceEnabled()) {

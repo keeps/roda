@@ -279,7 +279,8 @@ public class RestUtils {
     // api/v1/index/findFORM?type=csv
 
     String url = RodaConstants.API_REST_V1_INDEX + "findFORM";
-    FindRequest request = new FindRequest(classToReturn.getName(), filter, sorter, sublist, facets, onlyActive);
+    FindRequest request = new FindRequest(classToReturn.getName(), filter, sorter, sublist, facets, onlyActive,
+      exportFacets, "export.csv");
 
     final FormPanel form = new FormPanel();
     form.setAction(URL.encode(url));
@@ -289,7 +290,6 @@ public class RestUtils {
     form.setWidget(layout);
     layout.add(new Hidden("findRequest", FIND_REQUEST_MAPPER.write(request)));
     layout.add(new Hidden("type", "csv"));
-    layout.add(new Hidden("exportFacets", Boolean.toString(exportFacets)));
     button.addClickHandler(new ClickHandler() {
 
       @Override

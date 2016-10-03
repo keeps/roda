@@ -7,10 +7,26 @@
  */
 package org.roda.core.data.v2.index;
 
+import java.util.List;
+
 import org.roda.core.data.v2.IsRODAObject;
 
 public interface IsIndexed extends IsRODAObject {
 
-  public String getUUID();
+  String getUUID();
+
+  /**
+   * Return CSV header names for this object.
+   * 
+   * @return a {@link List} of {@link String} with the header names.
+   */
+  List<String> toCsvHeaders();
+
+  /**
+   * Return CSV values for this object.
+   *
+   * @return a {@link List} of {@link Object} with the CSV values.
+   */
+  List<Object> toCsvValues();
 
 }

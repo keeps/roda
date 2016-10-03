@@ -8,7 +8,9 @@
 package org.roda.core.data.v2.user;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -62,14 +64,14 @@ public abstract class RodaPrincipal implements Serializable, RODAMember {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(final Object obj) {
     if (this == obj)
       return true;
     if (obj == null)
       return false;
     if (getClass() != obj.getClass())
       return false;
-    RodaPrincipal other = (RodaPrincipal) obj;
+    final RodaPrincipal other = (RodaPrincipal) obj;
     if (active != other.active)
       return false;
     if (allRoles == null) {
@@ -99,8 +101,6 @@ public abstract class RodaPrincipal implements Serializable, RODAMember {
       return false;
     return true;
   }
-  
-  
 
   @Override
   public String toString() {
@@ -156,8 +156,6 @@ public abstract class RodaPrincipal implements Serializable, RODAMember {
     this.directRoles = directRoles;
   }
 
-  
-
   @Override
   public String getUUID() {
     // TODO needs prefix to distinguish from user?
@@ -181,13 +179,20 @@ public abstract class RodaPrincipal implements Serializable, RODAMember {
     directRoles.add(role);
   }
 
-  
-
   public void removeDirectRole(String role) {
     if (directRoles.contains(role)) {
       directRoles.remove(role);
     }
   }
 
+  @Override
+  public List<String> toCsvHeaders() {
+    return Arrays.asList("id", "name", "fullName", "isActive", "isUser", "allRoles", "directRoles");
+  }
+
+  @Override
+  public List<Object> toCsvValues() {
+    return Arrays.asList(id, name, fullName, isActive(), isUser(), allRoles, directRoles);
+  }
 
 }

@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.ip;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -338,6 +339,20 @@ public class IndexedFile implements IsIndexed {
       + isDirectory + ", creatingApplicationName=" + creatingApplicationName + ", creatingApplicationVersion="
       + creatingApplicationVersion + ", dateCreatedByApplication=" + dateCreatedByApplication + ", hash=" + hash
       + ", storagePath=" + storagePath + ", ancestors=" + ancestors + ", otherProperties=" + otherProperties + "]";
+  }
+
+  @Override
+  public List<String> toCsvHeaders() {
+    return Arrays.asList("uuid", "parentUUID", "aipId", "representationId", "representationUUID", "path", "id",
+      "fileFormat", "originalName", "size", "isDirectory", "creatingApplicationName", "creatingApplicationVersion",
+      "dateCreatedByApplication", "hash", "storagePath", "ancestors", "otherProperties");
+  }
+
+  @Override
+  public List<Object> toCsvValues() {
+    return Arrays.asList(uuid, parentUUID, aipId, representationId, representationUUID, path, id, fileFormat,
+      originalName, size, isDirectory, creatingApplicationName, creatingApplicationVersion, dateCreatedByApplication,
+      hash, storagePath, ancestors, otherProperties);
   }
 
 }

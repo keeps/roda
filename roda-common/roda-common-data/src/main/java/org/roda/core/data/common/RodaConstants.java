@@ -151,6 +151,8 @@ public final class RodaConstants {
   public static final String API_QUERY_KEY_FILTER = "filter";
   public static final String API_QUERY_KEY_SORT = "sort";
   public static final String API_QUERY_KEY_FACET_LIMIT = "facetLimit";
+  public static final String API_QUERY_KEY_EXPORT_FACETS = "exportFacets";
+  public static final String API_QUERY_KEY_FILENAME = "filename";
   // "http path param" related strings
   public static final String API_PATH_PARAM_AIP_ID = "aip_id";
   public static final String API_PATH_PARAM_REPRESENTATION_ID = "representation_id";
