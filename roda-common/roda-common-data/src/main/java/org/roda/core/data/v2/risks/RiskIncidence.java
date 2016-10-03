@@ -9,6 +9,7 @@ package org.roda.core.data.v2.risks;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -200,16 +201,16 @@ public class RiskIncidence implements IsIndexed, Serializable {
   }
 
   @Override
-  public String[] toCsvHeaders() {
-    return new String[] {"id", "aipId", "representationId", "filePath", "fileId", "objectClass", "riskId",
+  public List<String> toCsvHeaders() {
+    return Arrays.asList("id", "aipId", "representationId", "filePath", "fileId", "objectClass", "riskId",
       "description", "byPlugin", "status", "severity", "detectedOn", "detectedBy", "mitigatedOn", "mitigatedBy",
-      "mitigatedDescription"};
+      "mitigatedDescription");
   }
 
   @Override
-  public Object[] toCsvValues() {
-    return new Object[] {id, aipId, representationId, filePath, fileId, objectClass, riskId, description, byPlugin,
-      status, severity, detectedOn, detectedBy, mitigatedOn, mitigatedBy, mitigatedDescription};
+  public List<Object> toCsvValues() {
+    return Arrays.asList(id, aipId, representationId, filePath, fileId, objectClass, riskId, description, byPlugin,
+      status, severity, detectedOn, detectedBy, mitigatedOn, mitigatedBy, mitigatedDescription);
   }
 
   @JsonIgnore

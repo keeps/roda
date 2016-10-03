@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.ip;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -371,17 +372,17 @@ public class IndexedAIP implements IsIndexed {
   }
 
   @Override
-  public String[] toCsvHeaders() {
-    return new String[] {"id", "state", "level", "title", "dateInitial", "dateFinal", "description", "parentID",
+  public List<String> toCsvHeaders() {
+    return Arrays.asList("id", "state", "level", "title", "dateInitial", "dateFinal", "description", "parentID",
       "ancestors", "permissions", "numberOfSubmissionFiles", "numberOfDocumentationFiles", "numberOfSchemaFiles",
-      "hasRepresentations", "ghost", "ingestSIPId", "ingestJobId"};
+      "hasRepresentations", "ghost", "ingestSIPId", "ingestJobId");
   }
 
   @Override
-  public Object[] toCsvValues() {
-    return new Object[] {id, state, level, title, dateInitial, dateFinal, description, parentID, ancestors, permissions,
+  public List<Object> toCsvValues() {
+    return Arrays.asList(id, state, level, title, dateInitial, dateFinal, description, parentID, ancestors, permissions,
       numberOfSubmissionFiles, numberOfDocumentationFiles, numberOfSchemaFiles, hasRepresentations, ghost, ingestSIPId,
-      ingestJobId};
+      ingestJobId);
   }
 
   @Override

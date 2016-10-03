@@ -8,6 +8,7 @@
 package org.roda.core.data.v2.notifications;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -159,14 +160,14 @@ public class Notification implements IsIndexed, Serializable {
   }
 
   @Override
-  public String[] toCsvHeaders() {
-    return new String[] {"id", "subject", "body", "sentOn", "fromUser", "recipientUsers", "acknowledgeToken",
-      "isAcknowledged", "acknowledgedUsers", "state"};
+  public List<String> toCsvHeaders() {
+    return Arrays.asList("id", "subject", "body", "sentOn", "fromUser", "recipientUsers", "acknowledgeToken",
+      "isAcknowledged", "acknowledgedUsers", "state");
   }
 
   @Override
-  public Object[] toCsvValues() {
-    return new Object[] {id, subject, body, sentOn, fromUser, recipientUsers, acknowledgeToken, isAcknowledged,
-      acknowledgedUsers, state};
+  public List<Object> toCsvValues() {
+    return Arrays.asList(id, subject, body, sentOn, fromUser, recipientUsers, acknowledgeToken, isAcknowledged,
+      acknowledgedUsers, state);
   }
 }

@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.ip;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -238,14 +239,14 @@ public class TransferredResource implements IsIndexed {
   }
 
   @Override
-  public String[] toCsvHeaders() {
-    return new String[] {"uuid", "id", "fullPath", "relativePath", "parentId", "parentUUID", "ancestorsPaths", "size",
-      "creationDate", "lastScanDate", "name", "file"};
+  public List<String> toCsvHeaders() {
+    return Arrays.asList("uuid", "id", "fullPath", "relativePath", "parentId", "parentUUID", "ancestorsPaths", "size",
+      "creationDate", "lastScanDate", "name", "file");
   }
 
   @Override
-  public Object[] toCsvValues() {
-    return new Object[] {uuid, id, fullPath, relativePath, parentId, parentUUID, ancestorsPaths, size, creationDate,
-      lastScanDate, name, file};
+  public List<Object> toCsvValues() {
+    return Arrays.asList(uuid, id, fullPath, relativePath, parentId, parentUUID, ancestorsPaths, size, creationDate,
+      lastScanDate, name, file);
   }
 }

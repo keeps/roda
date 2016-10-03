@@ -7,6 +7,8 @@
  */
 package org.roda.core.data.v2.index;
 
+import java.util.List;
+
 import org.roda.core.data.v2.IsRODAObject;
 
 public interface IsIndexed extends IsRODAObject {
@@ -16,15 +18,15 @@ public interface IsIndexed extends IsRODAObject {
   /**
    * Return CSV header names for this object.
    * 
-   * @return an array of String with the header names.
+   * @return a {@link List} of {@link String} with the header names.
    */
-  String[] toCsvHeaders();
+  List<String> toCsvHeaders();
 
   /**
    * Return CSV values for this object.
    *
-   * @return an array of Object with the CSV values.
+   * @return a {@link List} of {@link Object} with the CSV values.
    */
-  Object[] toCsvValues();
+  List<Object> toCsvValues();
 
 }
