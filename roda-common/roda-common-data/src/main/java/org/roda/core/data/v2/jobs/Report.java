@@ -9,6 +9,7 @@ package org.roda.core.data.v2.jobs;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -331,18 +332,18 @@ public class Report implements Serializable, IsIndexed {
   }
 
   @Override
-  public String[] toCsvHeaders() {
-    return new String[] {"id", "jobId", "sourceObjectId", "sourceObjectClass", "sourceObjectOriginalId",
+  public List<String> toCsvHeaders() {
+    return Arrays.asList("id", "jobId", "sourceObjectId", "sourceObjectClass", "sourceObjectOriginalId",
       "outcomeObjectId", "outcomeObjectClass", "outcomeObjectState", "title", "dateCreated", "dateUpdated",
       "completionPercentage", "stepsCompleted", "totalSteps", "plugin", "pluginName", "pluginVersion", "pluginState",
-      "pluginDetails", "htmlPluginDetails", "reports"};
+      "pluginDetails", "htmlPluginDetails", "reports");
   }
 
   @Override
-  public Object[] toCsvValues() {
-    return new Object[] {id, jobId, sourceObjectId, sourceObjectClass, sourceObjectOriginalId, outcomeObjectId,
+  public List<Object> toCsvValues() {
+    return Arrays.asList(id, jobId, sourceObjectId, sourceObjectClass, sourceObjectOriginalId, outcomeObjectId,
       outcomeObjectClass, outcomeObjectState, title, dateCreated, dateUpdated, completionPercentage, stepsCompleted,
-      totalSteps, plugin, pluginName, pluginVersion, pluginState, pluginDetails, htmlPluginDetails, reports};
+      totalSteps, plugin, pluginName, pluginVersion, pluginState, pluginDetails, htmlPluginDetails, reports);
   }
 
   @JsonIgnore

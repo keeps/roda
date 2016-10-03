@@ -9,6 +9,9 @@ package org.roda.core.data.v2.risks;
 
 import org.roda.core.data.v2.index.IsIndexed;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class IndexedRisk extends Risk implements IsIndexed {
 
   private static final long serialVersionUID = 2864416437668370485L;
@@ -41,21 +44,21 @@ public class IndexedRisk extends Risk implements IsIndexed {
     return "IndexedRisk [super=" + super.toString() + ", objectsSize=" + objectsSize + "]";
   }
 
-  public String[] toCsvHeaders() {
-    return new String[] {"id", "name", "description", "identifiedOn", "identifiedBy", "category", "notes",
+  public List<String> toCsvHeaders() {
+    return Arrays.asList("id", "name", "description", "identifiedOn", "identifiedBy", "category", "notes",
       "preMitigationProbability", "preMitigationImpact", "preMitigationSeverity", "preMitigationNotes",
       "posMitigationProbability", "posMitigationImpact", "posMitigationSeverity", "posMitigationNotes",
       "mitigationStrategy", "mitigationOwnerType", "mitigationOwner", "mitigationRelatedEventIdentifierType",
-      "mitigationRelatedEventIdentifierValue", "createdOn", "createdBy", "updatedOn", "updatedBy", "objectsSize"};
+      "mitigationRelatedEventIdentifierValue", "createdOn", "createdBy", "updatedOn", "updatedBy", "objectsSize");
   }
 
-  public Object[] toCsvValues() {
-    return new Object[] {getId(), getName(), getDescription(), getIdentifiedOn(), getIdentifiedBy(), getCategory(),
-      getNotes(), getPreMitigationProbability(), getPreMitigationImpact(), getPreMitigationSeverity(),
+  public List<Object> toCsvValues() {
+    return Arrays.asList(new Object[] {getId(), getName(), getDescription(), getIdentifiedOn(), getIdentifiedBy(),
+      getCategory(), getNotes(), getPreMitigationProbability(), getPreMitigationImpact(), getPreMitigationSeverity(),
       getPreMitigationNotes(), getPosMitigationProbability(), getPosMitigationImpact(), getPosMitigationSeverity(),
       getPreMitigationNotes(), getMitigationStrategy(), getMitigationOwnerType(), getMitigationOwner(),
       getMitigationRelatedEventIdentifierType(), getMitigationRelatedEventIdentifierValue(), getCreatedOn(),
-      getCreatedBy(), getUpdatedOn(), getUpdatedBy(), objectsSize};
+      getCreatedBy(), getUpdatedOn(), getUpdatedBy(), objectsSize});
   }
 
 }

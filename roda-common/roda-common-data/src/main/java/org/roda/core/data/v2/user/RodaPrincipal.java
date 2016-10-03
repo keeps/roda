@@ -8,7 +8,9 @@
 package org.roda.core.data.v2.user;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -184,13 +186,13 @@ public abstract class RodaPrincipal implements Serializable, RODAMember {
   }
 
   @Override
-  public String[] toCsvHeaders() {
-    return new String[] {"id", "name", "fullName", "isActive", "isUser", "allRoles", "directRoles"};
+  public List<String> toCsvHeaders() {
+    return Arrays.asList("id", "name", "fullName", "isActive", "isUser", "allRoles", "directRoles");
   }
 
   @Override
-  public Object[] toCsvValues() {
-    return new Object[] {id, name, fullName, isActive(), isUser(), allRoles, directRoles};
+  public List<Object> toCsvValues() {
+    return Arrays.asList(id, name, fullName, isActive(), isUser(), allRoles, directRoles);
   }
 
 }

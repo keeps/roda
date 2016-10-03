@@ -9,6 +9,7 @@ package org.roda.core.data.v2.formats;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -171,16 +172,16 @@ public class Format extends NamedIndexedModel implements IsIndexed, Serializable
   }
 
   @Override
-  public String[] toCsvHeaders() {
-    return new String[] {"id", "name", "definition", "categories", "latestVersion", "popularity", "developer",
+  public List<String> toCsvHeaders() {
+    return Arrays.asList("id", "name", "definition", "categories", "latestVersion", "popularity", "developer",
       "initialRelease", "standard", "isOpenFormat", "websites", "provenanceInformation", "extensions", "mimetypes",
-      "pronoms", "utis"};
+      "pronoms", "utis");
   }
 
   @Override
-  public Object[] toCsvValues() {
-    return new Object[] {getId(), getName(), definition, categories, latestVersion, popularity, developer,
-      initialRelease, standard, isOpenFormat, websites, provenanceInformation, extensions, mimetypes, pronoms, utis};
+  public List<Object> toCsvValues() {
+    return Arrays.asList(getId(), getName(), definition, categories, latestVersion, popularity, developer,
+      initialRelease, standard, isOpenFormat, websites, provenanceInformation, extensions, mimetypes, pronoms, utis);
   }
 
   public List<String> getCategories() {

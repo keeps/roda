@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.log;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -104,15 +105,15 @@ public class LogEntry implements IsIndexed {
   }
 
   @Override
-  public String[] toCsvHeaders() {
-    return new String[] {"id", "address", "datetime", "username", "actionComponent", "actionMethod", "relatedObjectID",
-      "duration", "parameters", "state"};
+  public List<String> toCsvHeaders() {
+    return Arrays.asList("id", "address", "datetime", "username", "actionComponent", "actionMethod", "relatedObjectID",
+      "duration", "parameters", "state");
   }
 
   @Override
-  public Object[] toCsvValues() {
-    return new Object[] {id, address, datetime, username, actionComponent, actionMethod, relatedObjectID, duration,
-      parameters, state};
+  public List<Object> toCsvValues() {
+    return Arrays.asList(id, address, datetime, username, actionComponent, actionMethod, relatedObjectID, duration,
+      parameters, state);
   }
 
   @Override
