@@ -25,6 +25,8 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.SelectionChangeEvent;
+import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
 import config.i18n.client.ClientMessages;
 
@@ -82,6 +84,20 @@ public class DefaultSelectDialog<T extends IsIndexed, O> extends DialogBox imple
 
     show();
     center();
+  }
+
+  public void setSingleSelectionMode() {
+    selectButton.setVisible(false);
+    searchResultsPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
+
+      @Override
+      public void onSelectionChange(SelectionChangeEvent event) {
+        if (DefaultSelectDialog.this.searchResultsPanel.getSelectionModel().getSelectedObject() != null) {
+          onChange();
+          hide();
+        }
+      }
+    });
   }
 
   public void hidePreFilters() {

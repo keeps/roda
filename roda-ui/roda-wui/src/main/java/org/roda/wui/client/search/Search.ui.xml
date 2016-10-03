@@ -4,7 +4,8 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client" xmlns:search="urn:import:org.roda.wui.client.search"
 	xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
-	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search" xmlns:d="urn:import:com.google.gwt.user.datepicker.client">
+	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search"
+	xmlns:d="urn:import:com.google.gwt.user.datepicker.client">
 
 	<ui:style>
 	</ui:style>
@@ -24,20 +25,6 @@
 				<commonsearch:MainSearch ui:field="mainSearch" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
-				<g:FlowPanel styleName="sidebar-group" ui:field="itemsFacets">
-					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-						<g:Label addStyleNames="h5 sidebar-facet-title">
-							<ui:text from='{messages.searchDescriptionLevels}' />
-						</g:Label>
-						<g:FlowPanel ui:field="facetDescriptionLevels" />
-					</g:FlowPanel>
-					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-						<g:Label addStyleNames="h5 sidebar-facet-title">
-							<ui:text from='{messages.searchRepresentations}' />
-						</g:Label>
-						<g:FlowPanel ui:field="facetHasRepresentations" />
-					</g:FlowPanel>
-				</g:FlowPanel>
 				<g:FlowPanel styleName="sidebar-group" ui:field="filesFacets">
 					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 						<g:Label addStyleNames="h5 sidebar-facet-title">
@@ -71,6 +58,20 @@
 					<g:Button addStyleNames="btn btn-play" ui:field="newJobButton">
 						<ui:text from='{messages.newProcessPreservation}' />
 					</g:Button>
+				</g:FlowPanel>
+				<g:FlowPanel styleName="sidebar-group" ui:field="itemsFacets">
+					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+						<g:Label addStyleNames="h5 sidebar-facet-title">
+							<ui:text from='{messages.searchDescriptionLevels}' />
+						</g:Label>
+						<g:FlowPanel ui:field="facetDescriptionLevels" />
+					</g:FlowPanel>
+					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+						<g:Label addStyleNames="h5 sidebar-facet-title">
+							<ui:text from='{messages.searchRepresentations}' />
+						</g:Label>
+						<g:FlowPanel ui:field="facetHasRepresentations" />
+					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>

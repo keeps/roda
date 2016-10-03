@@ -260,6 +260,7 @@ public class Search extends Composite {
     showEmptyParentButton = false;
     SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter, mainSearch.isJustActive(),
       true);
+    selectAipDialog.setSingleSelectionMode();
     selectAipDialog.setEmptyParentButtonVisible(showEmptyParentButton);
     selectAipDialog.showAndCenter();
     if (counter > 0 && counter <= RodaConstants.DIALOG_FILTER_LIMIT_NUMBER) {

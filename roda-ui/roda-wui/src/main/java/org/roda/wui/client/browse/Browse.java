@@ -21,6 +21,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
@@ -50,6 +51,7 @@ import org.roda.wui.client.process.CreateJob;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
+import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.RestErrorOverlayType;
 import org.roda.wui.common.client.tools.RestUtils;
@@ -151,7 +153,8 @@ public class Browse extends Composite {
   }
 
   private static final Filter COLLECTIONS_FILTER = new Filter(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
-  private static final Facets FACETS = Facets.NONE;
+  private static final Facets FACETS = new Facets(new SimpleFacetParameter(RodaConstants.AIP_LEVEL),
+    new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS));
 
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
@@ -230,6 +233,15 @@ public class Browse extends Composite {
   @UiField
   Button searchAIP;
 
+  @UiField
+  FlowPanel itemsFacets;
+
+  @UiField(provided = true)
+  FlowPanel facetDescriptionLevels;
+
+  @UiField(provided = true)
+  FlowPanel facetHasRepresentations;
+
   private boolean viewingTop;
 
   private List<HandlerRegistration> handlers;
@@ -250,6 +262,15 @@ public class Browse extends Composite {
       false, false);
     searchPanel.setDefaultFilterIncremental(true);
     searchPanel.setList(aipList);
+
+    facetDescriptionLevels = new FlowPanel();
+    facetHasRepresentations = new FlowPanel();
+
+    Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
+    facetPanels.put(RodaConstants.AIP_LEVEL, facetDescriptionLevels);
+    facetPanels.put(RodaConstants.AIP_HAS_REPRESENTATIONS, facetHasRepresentations);
+
+    FacetUtils.bindFacets(aipList, facetPanels);
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -275,8 +296,9 @@ public class Browse extends Composite {
         }
 
         fondsPanelTitle.setVisible(searchable);
-        searchPanel.setVisible(searchable);
+        searchPanel.setVisible(viewingTop || searchable);
         aipList.setVisible(viewingTop || searchable);
+        // itemsFacets.setVisible(viewingTop);
       }
     });
 
@@ -933,32 +955,32 @@ public class Browse extends Composite {
             messages.ingestTransferRemoveFolderConfirmDialogCancel(),
             messages.ingestTransferRemoveFolderConfirmDialogOk(), new AsyncCallback<Boolean>() {
 
-              @Override
-              public void onSuccess(Boolean confirmed) {
-                if (confirmed) {
-                  BrowserService.Util.getInstance().deleteAIP(selected, new LoadingAsyncCallback<String>() {
+            @Override
+            public void onSuccess(Boolean confirmed) {
+              if (confirmed) {
+                BrowserService.Util.getInstance().deleteAIP(selected, new LoadingAsyncCallback<String>() {
 
-                    @Override
-                    public void onFailureImpl(Throwable caught) {
-                      AsyncCallbackUtils.defaultFailureTreatment(caught);
-                      aipList.refresh();
-                    }
+                  @Override
+                  public void onFailureImpl(Throwable caught) {
+                    AsyncCallbackUtils.defaultFailureTreatment(caught);
+                    aipList.refresh();
+                  }
 
-                    @Override
-                    public void onSuccessImpl(String parentId) {
-                      Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
-                        messages.ingestTransferRemoveSuccessMessage(size));
-                      aipList.refresh();
-                    }
-                  });
-                }
+                  @Override
+                  public void onSuccessImpl(String parentId) {
+                    Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
+                      messages.ingestTransferRemoveSuccessMessage(size));
+                    aipList.refresh();
+                  }
+                });
               }
+            }
 
-              @Override
-              public void onFailure(Throwable caught) {
-                AsyncCallbackUtils.defaultFailureTreatment(caught);
-              }
-            });
+            @Override
+            public void onFailure(Throwable caught) {
+              AsyncCallbackUtils.defaultFailureTreatment(caught);
+            }
+          });
         }
 
       });
@@ -992,6 +1014,7 @@ public class Browse extends Composite {
         if (itemBundle.getAip().getParentID() != null) {
           selectAipDialog.setEmptyParentButtonVisible(true);
         }
+        selectAipDialog.setSingleSelectionMode();
         selectAipDialog.showAndCenter();
         selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
 
@@ -1069,24 +1092,24 @@ public class Browse extends Composite {
           BrowserService.Util.getInstance().moveAIPInHierarchy(selected, parentId,
             new LoadingAsyncCallback<IndexedAIP>() {
 
-              @Override
-              public void onSuccessImpl(IndexedAIP result) {
-                if (result != null) {
-                  Tools.newHistory(Browse.RESOLVER, result.getId());
-                } else {
-                  Tools.newHistory(Browse.RESOLVER);
-                }
+            @Override
+            public void onSuccessImpl(IndexedAIP result) {
+              if (result != null) {
+                Tools.newHistory(Browse.RESOLVER, result.getId());
+              } else {
+                Tools.newHistory(Browse.RESOLVER);
               }
+            }
 
-              @Override
-              public void onFailureImpl(Throwable caught) {
-                if (caught instanceof NotFoundException) {
-                  Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-                } else {
-                  AsyncCallbackUtils.defaultFailureTreatment(caught);
-                }
+            @Override
+            public void onFailureImpl(Throwable caught) {
+              if (caught instanceof NotFoundException) {
+                Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+              } else {
+                AsyncCallbackUtils.defaultFailureTreatment(caught);
               }
-            });
+            }
+          });
         }
 
       });

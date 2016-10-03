@@ -137,8 +137,21 @@
 						<ui:text from='{messages.searchAIP}' />
 					</g:Button>
 				</g:FlowPanel>
+				<g:FlowPanel styleName="sidebar-group" ui:field="itemsFacets">
+					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+						<g:Label addStyleNames="h5 sidebar-facet-title">
+							<ui:text from='{messages.searchDescriptionLevels}' />
+						</g:Label>
+						<g:FlowPanel ui:field="facetDescriptionLevels" />
+					</g:FlowPanel>
+					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+						<g:Label addStyleNames="h5 sidebar-facet-title">
+							<ui:text from='{messages.searchRepresentations}' />
+						</g:Label>
+						<g:FlowPanel ui:field="facetHasRepresentations" />
+					</g:FlowPanel>
+				</g:FlowPanel>
 			</g:FlowPanel>
-
 		</g:FlowPanel>
 	</g:FlowPanel>
 </ui:UiBinder>
