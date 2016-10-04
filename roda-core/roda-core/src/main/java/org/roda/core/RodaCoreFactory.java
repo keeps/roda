@@ -811,6 +811,7 @@ public class RodaCoreFactory {
       }
 
       createRoles(rodaConfig);
+      indexUsersAndGroupsFromLDAP();
 
     } catch (final Exception e) {
       LOGGER.error("Error starting up embedded ApacheDS", e);
