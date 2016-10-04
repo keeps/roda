@@ -9,14 +9,13 @@ package org.roda.wui.client.common.dialogs;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.formats.Format;
-import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.wui.client.common.lists.FormatList;
+import org.roda.wui.client.common.search.SearchFilters;
 
 public class SelectFormatDialog extends DefaultSelectDialog<Format, Void> {
 
-  private static final Filter DEFAULT_FILTER_FORMAT = new Filter(
-    new BasicSearchFilterParameter(RodaConstants.FORMAT_SEARCH, "*"));
+  private static final Filter DEFAULT_FILTER_FORMAT = SearchFilters.defaultFilter(Format.class.getName());
 
   public SelectFormatDialog(String title) {
     this(title, DEFAULT_FILTER_FORMAT);

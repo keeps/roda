@@ -16,7 +16,6 @@ import java.util.List;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.facet.Facets;
-import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -26,6 +25,7 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.FormatList;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
+import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.common.client.HistoryResolver;
@@ -123,8 +123,8 @@ public class FormatRegister extends Composite {
   @UiField
   Button startProcess;
 
-  private static final Filter DEFAULT_FILTER = new Filter(
-    new BasicSearchFilterParameter(RodaConstants.FORMAT_SEARCH, "*"));
+  private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(Format.class.getName());
+  private static final String ALL_FILTER = SearchFilters.allFilter(Format.class.getName());
 
   /**
    * Create a format register page
@@ -135,8 +135,8 @@ public class FormatRegister extends Composite {
     Facets facets = null;
     formatList = new FormatList(Filter.NULL, facets, messages.formatsTitle(), true);
 
-    searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.FORMAT_SEARCH,
-      messages.formatRegisterSearchPlaceHolder(), false, false, false);
+    searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, messages.formatRegisterSearchPlaceHolder(), false, false,
+      false);
     searchPanel.setList(formatList);
 
     formatList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
@@ -243,31 +243,31 @@ public class FormatRegister extends Composite {
           messages.formatRemoveSelectedConfirmDialogMessage(size), messages.formatRemoveFolderConfirmDialogCancel(),
           messages.formatRemoveFolderConfirmDialogOk(), new AsyncCallback<Boolean>() {
 
-            @Override
-            public void onFailure(Throwable caught) {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
+          @Override
+          public void onFailure(Throwable caught) {
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
+          }
+
+          @Override
+          public void onSuccess(Boolean confirmed) {
+            if (confirmed) {
+              BrowserService.Util.getInstance().deleteFormat(selected, new AsyncCallback<Void>() {
+
+                @Override
+                public void onFailure(Throwable caught) {
+                  AsyncCallbackUtils.defaultFailureTreatment(caught);
+                  formatList.refresh();
+                }
+
+                @Override
+                public void onSuccess(Void result) {
+                  Toast.showInfo(messages.formatRemoveSuccessTitle(), messages.formatRemoveSuccessMessage(size));
+                  formatList.refresh();
+                }
+              });
             }
-
-            @Override
-            public void onSuccess(Boolean confirmed) {
-              if (confirmed) {
-                BrowserService.Util.getInstance().deleteFormat(selected, new AsyncCallback<Void>() {
-
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    AsyncCallbackUtils.defaultFailureTreatment(caught);
-                    formatList.refresh();
-                  }
-
-                  @Override
-                  public void onSuccess(Void result) {
-                    Toast.showInfo(messages.formatRemoveSuccessTitle(), messages.formatRemoveSuccessMessage(size));
-                    formatList.refresh();
-                  }
-                });
-              }
-            }
-          });
+          }
+        });
       }
     });
   }

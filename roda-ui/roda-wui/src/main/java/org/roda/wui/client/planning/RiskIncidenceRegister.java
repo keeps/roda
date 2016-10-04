@@ -18,7 +18,6 @@ import java.util.Map;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
-import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -30,6 +29,7 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
+import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.common.client.HistoryResolver;
@@ -129,8 +129,8 @@ public class RiskIncidenceRegister extends Composite {
   @UiField
   Button buttonRemove;
 
-  private static final Filter DEFAULT_FILTER = new Filter(
-    new BasicSearchFilterParameter(RodaConstants.RISK_SEARCH, "*"));
+  private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(RiskIncidence.class.getName());
+  private static final String ALL_FILTER = SearchFilters.allFilter(RiskIncidence.class.getName());
 
   private String aipId = null;
 
@@ -146,8 +146,8 @@ public class RiskIncidenceRegister extends Composite {
 
     riskIncidenceList = new RiskIncidenceList(Filter.NULL, facets, messages.riskIncidencesTitle(), true);
 
-    searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.RISK_INCIDENCE_SEARCH,
-      messages.riskIncidenceRegisterSearchPlaceHolder(), false, false, false);
+    searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, messages.riskIncidenceRegisterSearchPlaceHolder(), false,
+      false, false);
     searchPanel.setList(riskIncidenceList);
 
     facetDetectedBy = new FlowPanel();
@@ -269,32 +269,32 @@ public class RiskIncidenceRegister extends Composite {
           messages.riskRemoveSelectedConfirmDialogMessage(size), messages.riskRemoveFolderConfirmDialogCancel(),
           messages.riskRemoveFolderConfirmDialogOk(), new AsyncCallback<Boolean>() {
 
-            @Override
-            public void onFailure(Throwable caught) {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
+          @Override
+          public void onFailure(Throwable caught) {
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
+          }
+
+          @Override
+          public void onSuccess(Boolean confirmed) {
+            if (confirmed) {
+              buttonRemove.setEnabled(false);
+              BrowserService.Util.getInstance().deleteRiskIncidences(selected, new AsyncCallback<Void>() {
+
+                @Override
+                public void onFailure(Throwable caught) {
+                  AsyncCallbackUtils.defaultFailureTreatment(caught);
+                  riskIncidenceList.refresh();
+                }
+
+                @Override
+                public void onSuccess(Void result) {
+                  Toast.showInfo(messages.riskRemoveSuccessTitle(), messages.riskRemoveSuccessMessage(size));
+                  riskIncidenceList.refresh();
+                }
+              });
             }
-
-            @Override
-            public void onSuccess(Boolean confirmed) {
-              if (confirmed) {
-                buttonRemove.setEnabled(false);
-                BrowserService.Util.getInstance().deleteRiskIncidences(selected, new AsyncCallback<Void>() {
-
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    AsyncCallbackUtils.defaultFailureTreatment(caught);
-                    riskIncidenceList.refresh();
-                  }
-
-                  @Override
-                  public void onSuccess(Void result) {
-                    Toast.showInfo(messages.riskRemoveSuccessTitle(), messages.riskRemoveSuccessMessage(size));
-                    riskIncidenceList.refresh();
-                  }
-                });
-              }
-            }
-          });
+          }
+        });
       }
     });
   }

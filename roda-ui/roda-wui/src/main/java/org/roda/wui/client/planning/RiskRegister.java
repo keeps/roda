@@ -18,7 +18,6 @@ import java.util.Map;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
-import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -29,6 +28,7 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.RiskList;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
+import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.process.CreateSearchActionJob;
@@ -144,8 +144,8 @@ public class RiskRegister extends Composite {
   @UiField
   Button buttonRefresh;
 
-  private static final Filter DEFAULT_FILTER = new Filter(
-    new BasicSearchFilterParameter(RodaConstants.RISK_SEARCH, "*"));
+  private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(IndexedRisk.class.getName());
+  private static final String ALL_FILTER = SearchFilters.allFilter(IndexedRisk.class.getName());
 
   /**
    * Create a risk register page
@@ -160,8 +160,8 @@ public class RiskRegister extends Composite {
 
     riskList = new RiskList(Filter.NULL, facets, messages.risksTitle(), true);
 
-    searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.RISK_SEARCH, messages.riskRegisterSearchPlaceHolder(),
-      false, false, false);
+    searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, messages.riskRegisterSearchPlaceHolder(), false, false,
+      false);
     searchPanel.setList(riskList);
 
     facetCategories = new FlowPanel();
@@ -299,31 +299,31 @@ public class RiskRegister extends Composite {
           messages.riskRemoveSelectedConfirmDialogMessage(size), messages.riskRemoveFolderConfirmDialogCancel(),
           messages.riskRemoveFolderConfirmDialogOk(), new AsyncCallback<Boolean>() {
 
-            @Override
-            public void onFailure(Throwable caught) {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
+          @Override
+          public void onFailure(Throwable caught) {
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
+          }
+
+          @Override
+          public void onSuccess(Boolean confirmed) {
+            if (confirmed) {
+              BrowserService.Util.getInstance().deleteRisk(selected, new AsyncCallback<Void>() {
+
+                @Override
+                public void onFailure(Throwable caught) {
+                  AsyncCallbackUtils.defaultFailureTreatment(caught);
+                  riskList.refresh();
+                }
+
+                @Override
+                public void onSuccess(Void result) {
+                  Toast.showInfo(messages.riskRemoveSuccessTitle(), messages.riskRemoveSuccessMessage(size));
+                  riskList.refresh();
+                }
+              });
             }
-
-            @Override
-            public void onSuccess(Boolean confirmed) {
-              if (confirmed) {
-                BrowserService.Util.getInstance().deleteRisk(selected, new AsyncCallback<Void>() {
-
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    AsyncCallbackUtils.defaultFailureTreatment(caught);
-                    riskList.refresh();
-                  }
-
-                  @Override
-                  public void onSuccess(Void result) {
-                    Toast.showInfo(messages.riskRemoveSuccessTitle(), messages.riskRemoveSuccessMessage(size));
-                    riskList.refresh();
-                  }
-                });
-              }
-            }
-          });
+          }
+        });
       }
     });
   }

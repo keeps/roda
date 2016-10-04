@@ -8,15 +8,14 @@
 package org.roda.wui.client.common.dialogs;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.common.lists.JobList;
+import org.roda.wui.client.common.search.SearchFilters;
 
 public class SelectJobDialog extends DefaultSelectDialog<Job, Void> {
 
-  private static final Filter DEFAULT_FILTER_JOB = new Filter(
-    new BasicSearchFilterParameter(RodaConstants.JOB_SEARCH, "*"));
+  private static final Filter DEFAULT_FILTER_JOB = SearchFilters.defaultFilter(Job.class.getName());
 
   public SelectJobDialog(String title) {
     this(title, DEFAULT_FILTER_JOB);

@@ -9,10 +9,10 @@ package org.roda.wui.client.common.dialogs;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.facet.Facets;
-import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.common.lists.TransferredResourceList;
+import org.roda.wui.client.common.search.SearchFilters;
 
 import com.google.gwt.core.client.GWT;
 
@@ -22,8 +22,7 @@ public class SelectTransferResourceDialog extends DefaultSelectDialog<Transferre
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private static final Filter DEFAULT_FILTER = new Filter(
-    new BasicSearchFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_SEARCH, "*"));
+  private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(TransferredResource.class.getName());
 
   private static final Facets DEFAULT_FACETS = null;
   private static final Boolean SELECTABLE = Boolean.FALSE;

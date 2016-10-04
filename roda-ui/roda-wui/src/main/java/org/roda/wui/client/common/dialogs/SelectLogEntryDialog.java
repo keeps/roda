@@ -8,15 +8,14 @@
 package org.roda.wui.client.common.dialogs;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.wui.client.common.lists.LogEntryList;
+import org.roda.wui.client.common.search.SearchFilters;
 
 public class SelectLogEntryDialog extends DefaultSelectDialog<LogEntry, Void> {
 
-  private static final Filter DEFAULT_FILTER_LOG = new Filter(
-    new BasicSearchFilterParameter(RodaConstants.LOG_SEARCH, "*"));
+  private static final Filter DEFAULT_FILTER_LOG = SearchFilters.defaultFilter(LogEntry.class.getName());
 
   public SelectLogEntryDialog(String title) {
     this(title, DEFAULT_FILTER_LOG);

@@ -19,6 +19,7 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
+import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.StringUtils;
@@ -146,11 +147,14 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
+  private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(RiskIncidence.class.getName());
+  private static final String ALL_FILTER = SearchFilters.allFilter(RiskIncidence.class.getName());
+
   public RiskShowPanel() {
     incidenceList = new RiskIncidenceList(null, null, messages.riskIncidences(), true);
 
-    searchPanel = new SearchPanel(new Filter(new BasicSearchFilterParameter(RodaConstants.RISK_SEARCH, "*")),
-      RodaConstants.RISK_INCIDENCE_SEARCH, messages.riskIncidenceRegisterSearchPlaceHolder(), false, false, false);
+    searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, messages.riskIncidenceRegisterSearchPlaceHolder(), false,
+      false, false);
     searchPanel.setList(incidenceList);
 
     initWidget(uiBinder.createAndBindUi(this));
@@ -163,7 +167,7 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
     searchPanel = new SearchPanel(
       new Filter(new BasicSearchFilterParameter(RodaConstants.RISK_SEARCH, "*"),
         new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISK_ID, risk.getId())),
-      RodaConstants.RISK_INCIDENCE_SEARCH, messages.riskIncidenceRegisterSearchPlaceHolder(), false, false, false);
+      ALL_FILTER, messages.riskIncidenceRegisterSearchPlaceHolder(), false, false, false);
     searchPanel.setList(incidenceList);
 
     incidenceList.addCheckboxSelectionListener(new CheckboxSelectionListener<RiskIncidence>() {

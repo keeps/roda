@@ -34,37 +34,39 @@ public class ListFactory {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
+  @SuppressWarnings("unchecked")
   public <T extends IsIndexed> BasicAsyncTableCell<T> getList(Class<T> actualClass, String title, Filter filter,
-    int pageSize, int incrementPage) throws RODAException {
-    return (BasicAsyncTableCell<T>) getList(actualClass.getName(), title, filter, pageSize, incrementPage);
+    boolean selectable, int pageSize, int incrementPage) throws RODAException {
+    return (BasicAsyncTableCell<T>) getList(actualClass.getName(), title, filter, selectable, pageSize, incrementPage);
   }
 
-  public BasicAsyncTableCell<?> getList(String actualClass, String title, Filter filter, int pageSize,
-    int incrementPage) throws RODAException {
+  public BasicAsyncTableCell<?> getList(String actualClass, String title, Filter filter, boolean selectable,
+    int pageSize, int incrementPage) throws RODAException {
     if (actualClass.equals(AIP.class.getName()) || actualClass.equals(IndexedAIP.class.getName())) {
-      return new AIPList(filter, true, null, messages.selectAipSearchResults(), false, pageSize, incrementPage);
+      return new AIPList(filter, true, null, messages.selectAipSearchResults(), selectable, pageSize, incrementPage);
     } else if (actualClass.equals(Representation.class.getName())
       || actualClass.equals(IndexedRepresentation.class.getName())) {
-      return new RepresentationList(filter, true, null, messages.selectRepresentationSearchResults(), false, pageSize,
-        incrementPage);
+      return new RepresentationList(filter, true, null, messages.selectRepresentationSearchResults(), selectable,
+        pageSize, incrementPage);
     } else if (actualClass.equals(File.class.getName()) || actualClass.equals(IndexedFile.class.getName())) {
-      return new SimpleFileList(filter, true, null, messages.selectFileSearchResults(), false, pageSize, incrementPage);
+      return new SimpleFileList(filter, true, null, messages.selectFileSearchResults(), selectable, pageSize,
+        incrementPage);
     } else if (actualClass.equals(Format.class.getName())) {
-      return new FormatList(filter, null, title, false, pageSize, incrementPage);
+      return new FormatList(filter, null, title, selectable, pageSize, incrementPage);
     } else if (actualClass.equals(IndexedRisk.class.getName()) || actualClass.equals(Risk.class.getName())) {
-      return new RiskList(filter, null, title, false, pageSize, incrementPage);
+      return new RiskList(filter, null, title, selectable, pageSize, incrementPage);
     } else if (actualClass.equals(RiskIncidence.class.getName())) {
-      return new RiskIncidenceList(filter, null, title, false, pageSize, incrementPage);
+      return new RiskIncidenceList(filter, null, title, selectable, pageSize, incrementPage);
     } else if (actualClass.equals(Job.class.getName())) {
-      return new JobList(filter, null, title, false, pageSize, incrementPage);
+      return new JobList(filter, null, title, selectable, pageSize, incrementPage);
     } else if (actualClass.equals(Report.class.getName())) {
-      return new SimpleJobReportList(filter, null, title, false, pageSize, incrementPage);
+      return new SimpleJobReportList(filter, null, title, selectable, pageSize, incrementPage);
     } else if (actualClass.equals(TransferredResource.class.getName())) {
-      return new TransferredResourceList(filter, null, title, false, pageSize, incrementPage);
+      return new TransferredResourceList(filter, null, title, selectable, pageSize, incrementPage);
     } else if (actualClass.equals(Notification.class.getName())) {
-      return new NotificationList(filter, null, title, false, pageSize, incrementPage);
+      return new NotificationList(filter, null, title, selectable, pageSize, incrementPage);
     } else if (actualClass.equals(LogEntry.class.getName())) {
-      return new LogEntryList(filter, null, title, false, pageSize, incrementPage);
+      return new LogEntryList(filter, null, title, selectable, pageSize, incrementPage);
     } else {
       throw new RODAException();
     }

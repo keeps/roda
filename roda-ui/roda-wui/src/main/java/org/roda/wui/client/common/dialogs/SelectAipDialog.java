@@ -9,10 +9,10 @@ package org.roda.wui.client.common.dialogs;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.facet.Facets;
-import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.common.lists.AIPList;
+import org.roda.wui.client.common.search.SearchFilters;
 
 import com.google.gwt.core.client.GWT;
 
@@ -22,8 +22,7 @@ public class SelectAipDialog extends DefaultSelectDialog<IndexedAIP, Void> {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private static final Filter DEFAULT_FILTER_AIP = new Filter(
-    new BasicSearchFilterParameter(RodaConstants.AIP_SEARCH, "*"));
+  private static final Filter DEFAULT_FILTER_AIP = SearchFilters.defaultFilter(IndexedAIP.class.getName());
 
   private static final Boolean DEFAULT_JUST_ACTIVE = Boolean.TRUE;
   private static final Facets DEFAULT_FACETS = null;

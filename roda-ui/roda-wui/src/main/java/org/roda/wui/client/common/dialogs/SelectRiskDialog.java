@@ -8,15 +8,14 @@
 package org.roda.wui.client.common.dialogs;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.wui.client.common.lists.RiskList;
+import org.roda.wui.client.common.search.SearchFilters;
 
 public class SelectRiskDialog extends DefaultSelectDialog<IndexedRisk, Void> {
 
-  private static final Filter DEFAULT_FILTER_RISK = new Filter(
-    new BasicSearchFilterParameter(RodaConstants.RISK_SEARCH, "*"));
+  private static final Filter DEFAULT_FILTER_RISK = SearchFilters.defaultFilter(IndexedRisk.class.getName());
 
   public SelectRiskDialog(String title) {
     this(title, DEFAULT_FILTER_RISK);

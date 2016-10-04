@@ -17,16 +17,16 @@ import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.facet.FacetParameter;
+import org.roda.core.data.v2.index.facet.FacetParameter.SORT;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
-import org.roda.core.data.v2.index.facet.FacetParameter.SORT;
-import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.LogEntryList;
+import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
@@ -124,12 +124,12 @@ public class UserLog extends Composite {
 
   @UiField(provided = true)
   FlowPanel facetUsers;
-  
+
   @UiField(provided = true)
   FlowPanel facetStates;
 
-  private static final Filter DEFAULT_FILTER = new Filter(
-    new BasicSearchFilterParameter(RodaConstants.LOG_SEARCH, "*"));
+  private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(LogEntry.class.getName());
+  private static final String ALL_FILTER = SearchFilters.allFilter(LogEntry.class.getName());
 
   /**
    * Create a new user log
@@ -145,11 +145,10 @@ public class UserLog extends Composite {
     fp3.setSort(SORT.COUNT);
     FacetParameter fp4 = new SimpleFacetParameter(RodaConstants.LOG_STATE);
     fp4.setSort(SORT.COUNT);
-    Facets facets = new Facets(fp1,fp2,fp3,fp4);
+    Facets facets = new Facets(fp1, fp2, fp3, fp4);
     logList = new LogEntryList(Filter.NULL, facets, messages.logsTitle(), false);
 
-    searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.LOG_SEARCH, messages.userLogSearchPlaceHolder(), false,
-      false, false);
+    searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, messages.userLogSearchPlaceHolder(), false, false, false);
     searchPanel.setList(logList);
 
     facetComponents = new FlowPanel();
@@ -162,7 +161,7 @@ public class UserLog extends Composite {
     facetPanels.put(RodaConstants.LOG_ACTION_METHOD, facetMethods);
     facetPanels.put(RodaConstants.LOG_USERNAME, facetUsers);
     facetPanels.put(RodaConstants.LOG_STATE, facetStates);
-    
+
     FacetUtils.bindFacets(logList, facetPanels);
 
     logList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {

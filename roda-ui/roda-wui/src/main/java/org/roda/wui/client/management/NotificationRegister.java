@@ -18,12 +18,12 @@ import java.util.Map;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
-import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.NotificationList;
+import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
@@ -117,8 +117,8 @@ public class NotificationRegister extends Composite {
   @UiField(provided = true)
   FlowPanel facetAcknowledged;
 
-  private static final Filter DEFAULT_FILTER = new Filter(
-    new BasicSearchFilterParameter(RodaConstants.NOTIFICATION_SEARCH, "*"));
+  private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(Notification.class.getName());
+  private static final String ALL_FILTER = SearchFilters.allFilter(Notification.class.getName());
 
   /**
    * Create a new notification
@@ -131,8 +131,7 @@ public class NotificationRegister extends Composite {
       new SimpleFacetParameter(RodaConstants.NOTIFICATION_STATE));
     notificationList = new NotificationList(Filter.NULL, facets, messages.notificationsTitle(), false);
 
-    searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.NOTIFICATION_SEARCH,
-      messages.messageSearchPlaceHolder(), false, false, false);
+    searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, messages.messageSearchPlaceHolder(), false, false, false);
     searchPanel.setList(notificationList);
 
     facetRecipientUsers = new FlowPanel();

@@ -14,11 +14,11 @@ import java.util.Map;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
-import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.RodaMemberList;
+import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
@@ -109,8 +109,8 @@ public class MemberManagement extends Composite {
   @UiField
   Button buttonAddGroup;
 
-  private static final Filter DEFAULT_FILTER = new Filter(
-    new BasicSearchFilterParameter(RodaConstants.MEMBERS_SEARCH, "*"));
+  private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(RODAMember.class.getName());
+  private static final String ALL_FILTER = SearchFilters.allFilter(RODAMember.class.getName());
 
   public MemberManagement() {
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.MEMBERS_IS_ACTIVE),
@@ -118,8 +118,8 @@ public class MemberManagement extends Composite {
 
     list = new RodaMemberList(DEFAULT_FILTER, facets, messages.usersAndGroupsTitle(), false);
 
-    searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.MEMBERS_SEARCH,
-      messages.usersAndGroupsSearchPlaceHolder(), false, false, false);
+    searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, messages.usersAndGroupsSearchPlaceHolder(), false, false,
+      false);
     searchPanel.setList(list);
 
     facetIsActive = new FlowPanel();

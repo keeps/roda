@@ -6,7 +6,7 @@
 	xmlns:p="urn:import:org.roda.wui.client.ingest.process" xmlns:lists="urn:import:org.roda.wui.client.common.lists">
 
 	<ui:style>
-	
+
 	</ui:style>
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
@@ -37,7 +37,7 @@
 						<g:Label addStyleNames="form-label h5" ui:field="workflowListTitle" />
 						<g:FlowPanel ui:field="workflowListDescription"></g:FlowPanel>
 						<g:HTML addStyleNames="p plugin-description" ui:field="workflowListDescriptionCategories" />
-	
+
 						<g:FlowPanel styleName="panel" ui:field="workflowPanel">
 							<p:PluginOptionsPanel styleName="panel-body"
 								ui:field="workflowOptions" />
@@ -51,12 +51,12 @@
 						<ui:text from='{messages.createJobSelectObject}' />
 					</g:Label>
 					<g:ListBox addStyleNames="form-listbox" ui:field="targetList" />
-					<g:Button addStyleNames="btn btn-separator" ui:field="buttonSelect">
-						<ui:text from='{messages.selectItems}' />
-					</g:Button>
+					<!-- <g:Button addStyleNames="btn btn-separator" ui:field="buttonSelect"> -->
+					<!-- <ui:text from='{messages.selectItems}' /> -->
+					<!-- </g:Button> -->
 				</g:FlowPanel>
 				<g:FlowPanel addStyleNames="full_width">
-					<g:FlowPanel ui:field="targetListPanel"/>
+					<g:FlowPanel ui:field="targetListPanel" />
 				</g:FlowPanel>
 
 			</g:FlowPanel>
