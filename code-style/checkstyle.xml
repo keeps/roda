@@ -43,8 +43,8 @@
 		<module name="LeftCurly" />
 		<module name="NeedBraces" />
 		<module name="RightCurly" />
-		<module name="AvoidInlineConditionals" />
-		<module name="DoubleCheckedLocking" />
+		<!--<module name="AvoidInlineConditionals" />-->
+		<!--<module name="DoubleCheckedLocking" />-->
 		<module name="EmptyStatement" />
 		<module name="EqualsHashCode" />
 		<module name="HiddenField">
@@ -55,7 +55,7 @@
 		<module name="InnerAssignment" />
 		<module name="MagicNumber" />
 		<module name="MissingSwitchDefault" />
-		<module name="RedundantThrows" />
+		<!--<module name="RedundantThrows" />-->
 		<module name="SimplifyBooleanExpression" />
 		<module name="SimplifyBooleanReturn" />
 		<module name="FinalClass" />
@@ -89,7 +89,12 @@
 		</module>
 		<module name="Indentation">
 			<property name="basicOffset" value="2" />
+			<property name="braceAdjustment" value="0" />
 			<property name="caseIndent" value="2" />
+			<property name="throwsIndent" value="2" />
+			<property name="arrayInitIndent" value="2" />
+			<property name="lineWrappingIndentation" value="2" />
+			<property name="forceStrictCondition" value="false" />
 		</module>
 	</module>
 	<module name="FileLength" />
