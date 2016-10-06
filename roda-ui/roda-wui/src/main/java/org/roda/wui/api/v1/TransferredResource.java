@@ -136,7 +136,7 @@ public class TransferredResource {
 
       org.roda.core.data.v2.ip.TransferredResource transferredResource;
       String fileName = fileDetail.getFileName();
-      boolean forceCommit = true;
+      boolean forceCommit = false;
       if (name == null) {
         transferredResource = Browser.createTransferredResourceFile(user, parentUUID, fileName, inputStream,
           forceCommit);

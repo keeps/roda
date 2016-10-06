@@ -203,7 +203,7 @@ public class RestUtils {
   }
 
   public static String createTransferredResourceUploadUri(String parentUUID, String locale) {
-    // api/v1/transferred/?parentUUID={parentUUID}&locale={locale}
+    // api/v1/transfers/?parentUUID={parentUUID}&locale={locale}
     StringBuilder b = new StringBuilder();
     // base uri
     b.append(RodaConstants.API_REST_V1_RESOURCES);

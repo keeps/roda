@@ -7,32 +7,17 @@
  */
 package org.roda.core.plugins.plugins.base;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -44,9 +29,6 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
-import org.roda.core.storage.Binary;
-import org.roda.core.storage.DefaultStoragePath;
-import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,14 +91,16 @@ public class ReindexActionLogPlugin extends AbstractPlugin<LogEntry> {
     Report pluginReport = PluginHelper.initPluginReport(this);
 
     try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, 0);
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
       jobPluginInfo.setSourceObjectsCount(0);
       PluginHelper.updateJobInformation(this, jobPluginInfo);
       pluginReport.setPluginState(PluginState.SUCCESS);
 
-      Date firstDayToIndex = calculateFirstDayToIndex();
-      reindexActionLogsStillNotInStorage(index, firstDayToIndex, pluginReport, jobPluginInfo);
-      reindexActionLogsInStorage(index, model, firstDayToIndex, pluginReport, jobPluginInfo);
+      Date firstDayToIndex = PluginHelper.calculateFirstDayToIndex(dontReindexOlderThanXDays);
+      jobPluginInfo = PluginHelper.reindexActionLogsStillNotInStorage(index, firstDayToIndex, pluginReport,
+        jobPluginInfo, dontReindexOlderThanXDays);
+      jobPluginInfo = PluginHelper.reindexActionLogsInStorage(index, model, firstDayToIndex, pluginReport,
+        jobPluginInfo, dontReindexOlderThanXDays);
 
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
@@ -125,103 +109,6 @@ public class ReindexActionLogPlugin extends AbstractPlugin<LogEntry> {
     }
 
     return pluginReport;
-  }
-
-  private void reindexActionLogsInStorage(IndexService index, ModelService model, Date firstDayToIndex,
-    Report pluginReport, SimpleJobPluginInfo jobPluginInfo) {
-    CloseableIterable<Resource> actionLogs = null;
-
-    int total = jobPluginInfo.getSourceObjectsCount();
-    try {
-      boolean recursive = false;
-      actionLogs = model.getStorage()
-        .listResourcesUnderContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG), recursive);
-
-      for (Resource resource : actionLogs) {
-        if (resource instanceof Binary && isToIndex(resource.getStoragePath().getName(), firstDayToIndex)) {
-          total += 1;
-          LOGGER.debug("Going to reindex '{}'", resource.getStoragePath());
-          Binary b = (Binary) resource;
-          try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(b.getContent().createInputStream()));
-            index.reindexActionLog(br);
-            jobPluginInfo.incrementObjectsProcessedWithSuccess();
-          } catch (IOException | GenericException e) {
-            LOGGER.error("Error while trying to reindex action log '" + resource.getStoragePath() + "' from storage",
-              e);
-            jobPluginInfo.incrementObjectsProcessedWithFailure();
-          }
-        }
-      }
-    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
-      pluginReport.setPluginState(PluginState.FAILURE).setPluginDetails("Could not reindex action logs from storage");
-      LOGGER.error("Error while trying to reindex action logs from storage", e);
-    } finally {
-      IOUtils.closeQuietly(actionLogs);
-      jobPluginInfo.setSourceObjectsCount(total);
-    }
-  }
-
-  private void reindexActionLogsStillNotInStorage(IndexService index, Date firstDayToIndex, Report pluginReport,
-    SimpleJobPluginInfo jobPluginInfo) {
-    Path logFilesDirectory = RodaCoreFactory.getLogPath();
-    DirectoryStream.Filter<Path> logFilesFilter = getLogFilesFilter(firstDayToIndex);
-
-    int total = jobPluginInfo.getSourceObjectsCount();
-    try {
-      BufferedReader br = null;
-      InputStream logFileInputStream;
-      for (Path logFile : Files.newDirectoryStream(logFilesDirectory, logFilesFilter)) {
-        total += 1;
-        LOGGER.debug("Going to reindex '{}'", logFile);
-        try {
-          logFileInputStream = Files.newInputStream(logFile);
-          br = new BufferedReader(new InputStreamReader(logFileInputStream));
-          index.reindexActionLog(br);
-          jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        } catch (IOException | GenericException e) {
-          LOGGER.error("Error reindexing action log", e);
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
-        } finally {
-          IOUtils.closeQuietly(br);
-          jobPluginInfo.setSourceObjectsCount(total);
-        }
-      }
-    } catch (IOException e) {
-      pluginReport.setPluginState(PluginState.FAILURE).setPluginDetails("Could not reindex action logs not in storage");
-      LOGGER.error("Error while listing action logs for reindexing", e);
-    }
-  }
-
-  private Date calculateFirstDayToIndex() {
-    Calendar cal = Calendar.getInstance();
-    cal.add(Calendar.DAY_OF_YEAR, -1 * dontReindexOlderThanXDays);
-    Date firstDayToIndex = cal.getTime();
-    return firstDayToIndex;
-  }
-
-  private DirectoryStream.Filter<Path> getLogFilesFilter(Date firstDayToIndex) {
-    return new DirectoryStream.Filter<Path>() {
-      public boolean accept(Path file) throws IOException {
-        return isToIndex(file.getFileName().toString(), firstDayToIndex);
-      }
-    };
-  }
-
-  private boolean isToIndex(String fileName, Date firstDayToIndex) {
-    boolean isToIndex = false;
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-    String fileNameWithoutExtension = fileName.replaceFirst(".log$", "");
-    try {
-      Date logDate = sdf.parse(fileNameWithoutExtension);
-      if (dontReindexOlderThanXDays == 0 || logDate.after(firstDayToIndex)) {
-        isToIndex = true;
-      }
-
-    } catch (ParseException e) {
-      // do nothing and carry on
-    }
-    return isToIndex;
   }
 
   @Override
@@ -291,7 +178,7 @@ public class ReindexActionLogPlugin extends AbstractPlugin<LogEntry> {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_MANAGEMENT);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
   }
 
   @Override

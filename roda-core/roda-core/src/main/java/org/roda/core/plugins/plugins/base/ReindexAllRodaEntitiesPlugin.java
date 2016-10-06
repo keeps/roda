@@ -28,7 +28,6 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
-import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
@@ -126,13 +125,7 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
         Map<String, String> pluginParameters = new HashMap<>();
         pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "true");
         job.setPluginParameters(pluginParameters);
-
-        if (LogEntry.class.equals(reindexClass)) {
-          job.setPlugin(ReindexActionLogPlugin.class.getName());
-        } else {
-          job.setPlugin(ReindexRodaEntityPlugin.class.getName());
-        }
-
+        job.setPlugin(ReindexRodaEntityPlugin.class.getName());
         job.setSourceObjects(SelectedItemsAll.create(reindexClass));
         job.setPluginType(PluginType.MISC);
 

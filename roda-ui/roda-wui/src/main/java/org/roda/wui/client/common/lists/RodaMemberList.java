@@ -52,6 +52,11 @@ public class RodaMemberList extends BasicAsyncTableCell<RODAMember> {
     super(RODAMember.class, filter, facets, summary, selectable);
   }
 
+  public RodaMemberList(Filter filter, Facets facets, String summary, boolean selectable, int pageSize,
+    int incrementPage) {
+    super(RODAMember.class, filter, facets, summary, selectable, pageSize, incrementPage);
+  }
+
   @Override
   protected void configureDisplay(CellTable<RODAMember> display) {
     typeColumn = new Column<RODAMember, SafeHtml>(new SafeHtmlCell()) {

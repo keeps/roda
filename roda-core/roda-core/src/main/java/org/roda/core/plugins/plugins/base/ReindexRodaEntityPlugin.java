@@ -10,17 +10,21 @@ package org.roda.core.plugins.plugins.base;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -29,6 +33,9 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.user.Group;
+import org.roda.core.data.v2.user.RODAMember;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
@@ -44,6 +51,8 @@ import org.slf4j.LoggerFactory;
 public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(ReindexRodaEntityPlugin.class);
   private boolean clearIndexes = false;
+  private int dontReindexOlderThanXDays = RodaCoreFactory.getRodaConfigurationAsInt(0, "core", "actionlogs",
+    "delete_older_than_x_days");
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
@@ -91,6 +100,17 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
       if (parameters.get(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES) != null) {
         clearIndexes = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES));
       }
+
+      if (parameters.get(RodaConstants.PLUGIN_PARAMS_INT_VALUE) != null) {
+        try {
+          int dontReindexOlderThanXDays = Integer.parseInt(parameters.get(RodaConstants.PLUGIN_PARAMS_INT_VALUE));
+          if (dontReindexOlderThanXDays > 0) {
+            this.dontReindexOlderThanXDays = dontReindexOlderThanXDays;
+          }
+        } catch (NumberFormatException e) {
+          // do nothing
+        }
+      }
     }
   }
 
@@ -104,25 +124,53 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
       PluginHelper.updateJobInformation(this, jobPluginInfo);
       pluginReport.setPluginState(PluginState.SUCCESS);
 
-      for (T object : list) {
-        if (LOGGER.isTraceEnabled()) {
-          LOGGER.trace("Reindexing {} {}", object.getClass().getSimpleName(), object.getId());
-        }
+      if (PluginHelper.getJob(this, model).getSourceObjects().getSelectedClass().equals(LogEntry.class.getName())) {
+        jobPluginInfo.setSourceObjectsCount(0);
+        Date firstDayToIndex = PluginHelper.calculateFirstDayToIndex(dontReindexOlderThanXDays);
+        jobPluginInfo = PluginHelper.reindexActionLogsStillNotInStorage(index, firstDayToIndex, pluginReport,
+          jobPluginInfo, dontReindexOlderThanXDays);
+        jobPluginInfo = PluginHelper.reindexActionLogsInStorage(index, model, firstDayToIndex, pluginReport,
+          jobPluginInfo, dontReindexOlderThanXDays);
+      } else if (PluginHelper.getJob(this, model).getSourceObjects().getSelectedClass()
+        .equals(RODAMember.class.getName())) {
+        jobPluginInfo.setSourceObjectsCount(0);
+        List<User> users = RodaCoreFactory.getModelService().listUsers();
+        List<Group> groups = RodaCoreFactory.getModelService().listGroups();
 
-        try {
-          index.reindex(storage, object);
+        jobPluginInfo.setSourceObjectsCount(users.size() + groups.size());
+
+        for (User ldapUser : users) {
+          LOGGER.debug("User to be indexed: {}", ldapUser);
+          RodaCoreFactory.getModelService().notifyUserUpdated(ldapUser);
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        } catch (RODAException | IOException e) {
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
-          LOGGER.error("Error reindexing RODA entity", e);
-          pluginReport.setPluginState(PluginState.FAILURE).setPluginDetails("Reindex did not execute successfully");
+        }
+        for (Group ldapGroup : groups) {
+          LOGGER.debug("Group to be indexed: {}", ldapGroup);
+          RodaCoreFactory.getModelService().notifyGroupUpdated(ldapGroup);
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        }
+      } else {
+        for (T object : list) {
+          if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Reindexing {} {}", object.getClass().getSimpleName(), object.getId());
+          }
+
+          try {
+            index.reindex(storage, object);
+            jobPluginInfo.incrementObjectsProcessedWithSuccess();
+          } catch (RODAException | IOException e) {
+            jobPluginInfo.incrementObjectsProcessedWithFailure();
+            LOGGER.error("Error reindexing RODA entity", e);
+            pluginReport.setPluginState(PluginState.FAILURE).setPluginDetails("Reindex did not execute successfully");
+          }
         }
       }
 
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-    } catch (JobException e) {
+    } catch (JobException | NotFoundException | GenericException | RequestNotValidException
+      | AuthorizationDeniedException e) {
       LOGGER.error("Error reindexing RODA entity", e);
     }
 
@@ -209,9 +257,7 @@ public class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlu
 
   @Override
   public List<Class<T>> getObjectClasses() {
-    List classList = (List) PluginHelper.getReindexObjectClasses();
-    classList.remove(LogEntry.class);
-    return classList;
+    return (List) PluginHelper.getReindexObjectClasses();
   }
 
 }

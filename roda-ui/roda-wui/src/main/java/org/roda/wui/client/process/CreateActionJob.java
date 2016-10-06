@@ -19,6 +19,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -427,6 +428,7 @@ public class CreateActionJob extends Composite {
   private void defineTargetInformation(String objectClassName) {
     ListFactory listFactory = new ListFactory();
     try {
+      buttonCreate.setEnabled(org.roda.core.data.v2.Void.class.getName().equals(objectClassName));
       BasicAsyncTableCell<?> list = listFactory.getList(objectClassName, "", Filter.ALL, true, 10, 10);
       SearchPanel searchPanel = new SearchPanel(SearchFilters.defaultFilter(objectClassName),
         SearchFilters.allFilter(objectClassName), "", false, false, true);
@@ -456,16 +458,11 @@ public class CreateActionJob extends Composite {
   public void buttonCreateHandler(ClickEvent e) {
     getButtonCreate().setEnabled(false);
     String jobName = getName().getText();
-
-    // if
-    // (org.roda.core.data.v2.Void.class.getName().equals(targetList.getSelectedValue()))
-    // {
-    // selected = new SelectedItemsNone();
-    // } else if (selected == null || selected instanceof SelectedItemsNone) {
-    // selected = new SelectedItemsAll(targetList.getSelectedValue());
-    // }
-
     SelectedItems selected = list.getSelected();
+
+    if (org.roda.core.data.v2.Void.class.getName().equals(targetList.getSelectedValue())) {
+      selected = new SelectedItemsNone();
+    }
 
     BrowserService.Util.getInstance().createProcess(jobName, selected, getSelectedPlugin().getId(),
       getWorkflowOptions().getValue(), selected.getSelectedClass(), new AsyncCallback<Job>() {

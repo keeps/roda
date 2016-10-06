@@ -7,12 +7,19 @@
  */
 package org.roda.core.plugins.plugins;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.PremisV3Utils;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.RODA_TYPE;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -63,6 +71,7 @@ import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -72,8 +81,10 @@ import org.roda.core.plugins.orchestrate.IngestJobPluginInfo;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.orchestrate.akka.Messages;
+import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
@@ -332,7 +343,7 @@ public final class PluginHelper {
     List<Class<? extends IsRODAObject>> list = new ArrayList<>();
     list.add(TransferredResource.class);
     list.add(AIP.class);
-    // list.add(Agent.class);
+    list.add(RODAMember.class);
     list.add(Format.class);
     list.add(Notification.class);
     list.add(Risk.class);
@@ -828,6 +839,110 @@ public final class PluginHelper {
     RodaCoreFactory.getModelService().createJob(job);
     RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
     RodaCoreFactory.getIndexService().commit(Job.class);
+  }
+
+  /******* ACTION LOG REINDEX METHODS ******/
+
+  public static SimpleJobPluginInfo reindexActionLogsInStorage(IndexService index, ModelService model,
+    Date firstDayToIndex, Report pluginReport, SimpleJobPluginInfo jobPluginInfo, int dontReindexOlderThanXDays) {
+    CloseableIterable<Resource> actionLogs = null;
+
+    int total = jobPluginInfo.getSourceObjectsCount();
+    try {
+      boolean recursive = false;
+      actionLogs = model.getStorage()
+        .listResourcesUnderContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG), recursive);
+
+      for (Resource resource : actionLogs) {
+        if (resource instanceof Binary
+          && isToIndex(resource.getStoragePath().getName(), firstDayToIndex, dontReindexOlderThanXDays)) {
+          total += 1;
+          LOGGER.debug("Going to reindex '{}'", resource.getStoragePath());
+          Binary b = (Binary) resource;
+          try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(b.getContent().createInputStream()));
+            index.reindexActionLog(br);
+            jobPluginInfo.incrementObjectsProcessedWithSuccess();
+          } catch (IOException | GenericException e) {
+            LOGGER.error("Error while trying to reindex action log '" + resource.getStoragePath() + "' from storage",
+              e);
+            jobPluginInfo.incrementObjectsProcessedWithFailure();
+          }
+        }
+      }
+    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
+      pluginReport.setPluginState(PluginState.FAILURE).setPluginDetails("Could not reindex action logs from storage");
+      LOGGER.error("Error while trying to reindex action logs from storage", e);
+    } finally {
+      IOUtils.closeQuietly(actionLogs);
+      jobPluginInfo.setSourceObjectsCount(total);
+    }
+
+    return jobPluginInfo;
+  }
+
+  public static SimpleJobPluginInfo reindexActionLogsStillNotInStorage(IndexService index, Date firstDayToIndex,
+    Report pluginReport, SimpleJobPluginInfo jobPluginInfo, int dontReindexOlderThanXDays) {
+    Path logFilesDirectory = RodaCoreFactory.getLogPath();
+    DirectoryStream.Filter<Path> logFilesFilter = getLogFilesFilter(firstDayToIndex, dontReindexOlderThanXDays);
+
+    int total = jobPluginInfo.getSourceObjectsCount();
+    try {
+      BufferedReader br = null;
+      InputStream logFileInputStream;
+      for (Path logFile : Files.newDirectoryStream(logFilesDirectory, logFilesFilter)) {
+        total += 1;
+        LOGGER.debug("Going to reindex '{}'", logFile);
+        try {
+          logFileInputStream = Files.newInputStream(logFile);
+          br = new BufferedReader(new InputStreamReader(logFileInputStream));
+          index.reindexActionLog(br);
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        } catch (IOException | GenericException e) {
+          LOGGER.error("Error reindexing action log", e);
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+        } finally {
+          IOUtils.closeQuietly(br);
+          jobPluginInfo.setSourceObjectsCount(total);
+        }
+      }
+    } catch (IOException e) {
+      pluginReport.setPluginState(PluginState.FAILURE).setPluginDetails("Could not reindex action logs not in storage");
+      LOGGER.error("Error while listing action logs for reindexing", e);
+    }
+
+    return jobPluginInfo;
+  }
+
+  public static Date calculateFirstDayToIndex(int dontReindexOlderThanXDays) {
+    Calendar cal = Calendar.getInstance();
+    cal.add(Calendar.DAY_OF_YEAR, -1 * dontReindexOlderThanXDays);
+    Date firstDayToIndex = cal.getTime();
+    return firstDayToIndex;
+  }
+
+  public static DirectoryStream.Filter<Path> getLogFilesFilter(Date firstDayToIndex, int dontReindexOlderThanXDays) {
+    return new DirectoryStream.Filter<Path>() {
+      public boolean accept(Path file) throws IOException {
+        return isToIndex(file.getFileName().toString(), firstDayToIndex, dontReindexOlderThanXDays);
+      }
+    };
+  }
+
+  public static boolean isToIndex(String fileName, Date firstDayToIndex, int dontReindexOlderThanXDays) {
+    boolean isToIndex = false;
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    String fileNameWithoutExtension = fileName.replaceFirst(".log$", "");
+    try {
+      Date logDate = sdf.parse(fileNameWithoutExtension);
+      if (dontReindexOlderThanXDays == 0 || logDate.after(firstDayToIndex)) {
+        isToIndex = true;
+      }
+
+    } catch (ParseException e) {
+      // do nothing and carry on
+    }
+    return isToIndex;
   }
 
 }

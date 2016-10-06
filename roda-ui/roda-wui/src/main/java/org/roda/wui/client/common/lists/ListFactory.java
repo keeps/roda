@@ -25,6 +25,7 @@ import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.data.v2.user.RODAMember;
 
 import com.google.gwt.core.client.GWT;
 
@@ -67,6 +68,8 @@ public class ListFactory {
       return new NotificationList(filter, null, title, selectable, pageSize, incrementPage);
     } else if (actualClass.equals(LogEntry.class.getName())) {
       return new LogEntryList(filter, null, title, selectable, pageSize, incrementPage);
+    } else if (actualClass.equals(RODAMember.class.getName())) {
+      return new RodaMemberList(filter, null, title, selectable, pageSize, incrementPage);
     } else {
       throw new RODAException();
     }

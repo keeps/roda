@@ -69,6 +69,7 @@ import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
+import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationReport;
@@ -2140,7 +2141,13 @@ public class ModelService extends ModelObservable {
       return listFiles(objectClass);
     } else if (TransferredResource.class.equals(objectClass)) {
       // FIXME 20160930 it uses index but it should not(?)
-      return RodaCoreFactory.getIndexService().listTransferredResource();
+      return RodaCoreFactory.getIndexService().list(TransferredResource.class);
+    } else if (RODAMember.class.equals(objectClass)) {
+      // FIXME 20160930 it uses index but it should not(?)
+      return RodaCoreFactory.getIndexService().list(RODAMember.class);
+    } else if (LogEntry.class.equals(objectClass)) {
+      // FIXME 20160930 it uses index but it should not(?)
+      return RodaCoreFactory.getIndexService().list(LogEntry.class);
     } else {
       StoragePath containerPath = ModelUtils.getContainerPath(objectClass);
       final CloseableIterable<Resource> resourcesIterable = storage.listResourcesUnderContainer(containerPath, false);
@@ -2150,7 +2157,9 @@ public class ModelService extends ModelObservable {
 
   public boolean hasObjects(Class<? extends IsRODAObject> objectClass) {
     try {
-      if (!TransferredResource.class.equals(objectClass)) {
+      if (LogEntry.class.equals(objectClass) || RODAMember.class.equals(objectClass)) {
+        return true;
+      } else if (!TransferredResource.class.equals(objectClass)) {
         StoragePath storagePath = ModelUtils.getContainerPath(objectClass);
         try {
           return RodaCoreFactory.getStorageService().countResourcesUnderContainer(storagePath, false).intValue() > 0;
