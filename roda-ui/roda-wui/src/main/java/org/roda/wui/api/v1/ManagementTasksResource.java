@@ -18,7 +18,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -40,11 +39,11 @@ import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.core.data.v2.user.Group;
+import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.plugins.plugins.base.ActionLogCleanerPlugin;
 import org.roda.core.plugins.plugins.base.reindex.ReindexAllRodaEntitiesPlugin;
-import org.roda.core.plugins.plugins.base.reindex.ReindexRodaEntityPlugin;
 import org.roda.wui.api.controllers.Jobs;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.common.ControllerAssistant;
@@ -69,7 +68,7 @@ public class ManagementTasksResource {
   @Path("/index/reindex")
   public Response executeIndexReindexTask(
     @ApiParam(value = "", allowableValues = "ALL,aip,job,risk,riskincidence,agent,format,notification,actionlogs,transferred_resources,users_and_groups", defaultValue = "aip") @QueryParam("entity") String entity,
-    @QueryParam("params") List<String> params) throws AuthorizationDeniedException {
+    @QueryParam("params") List<String> params) throws AuthorizationDeniedException, NotFoundException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // get user & check permissions
@@ -95,7 +94,7 @@ public class ManagementTasksResource {
   }
 
   private Response executeReindex(User user, ControllerAssistant controllerAssistant, String entity,
-    List<String> params) {
+    List<String> params) throws NotFoundException {
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
     if ("aip".equals(entity)) {
       response = createJobToReindex(user, controllerAssistant, params, AIP.class);
@@ -114,7 +113,7 @@ public class ManagementTasksResource {
     } else if ("actionlogs".equals(entity)) {
       response = createJobToReindex(user, controllerAssistant, params, LogEntry.class);
     } else if ("users_and_groups".equals(entity)) {
-      response = reindexUsersAndGroups(user, controllerAssistant, params);
+      response = createJobToReindex(user, controllerAssistant, params, RODAMember.class);
     } else if ("ALL".equals(entity)) {
       response = createJobToReindexAllRODAObjects(user, controllerAssistant);
     }
@@ -122,21 +121,25 @@ public class ManagementTasksResource {
   }
 
   private <T extends IsRODAObject> ApiResponseMessage createJobToReindex(User user,
-    ControllerAssistant controllerAssistant, List<String> params, Class<T> classToCreate) {
+    ControllerAssistant controllerAssistant, List<String> params, Class<T> classToCreate) throws NotFoundException {
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
 
     SelectedItems<?> create;
-    if (params.isEmpty()) {
-      create = SelectedItemsAll.create(classToCreate);
+    if (TransferredResource.class.equals(classToCreate) || LogEntry.class.equals(classToCreate)
+      || RODAMember.class.equals(classToCreate)) {
+      create = SelectedItemsNone.create();
     } else {
-      create = SelectedItemsList.create(classToCreate, params);
+      if (params.isEmpty()) {
+        create = SelectedItemsAll.create(classToCreate);
+      } else {
+        create = SelectedItemsList.create(classToCreate, params);
+      }
     }
 
     Job job = new Job().setName("Management Task | Reindex '" + classToCreate.getSimpleName() + "' job")
-      .setSourceObjects(create).setPlugin(ReindexRodaEntityPlugin.class.getName());
+      .setSourceObjects(create).setPlugin(PluginHelper.getReindexPluginName(classToCreate));
 
     createJobAndRegisterAction(user, controllerAssistant, response, job);
-
     return response;
   }
 
@@ -146,38 +149,6 @@ public class ManagementTasksResource {
       .setSourceObjects(SelectedItemsNone.create()).setPlugin(ReindexAllRodaEntitiesPlugin.class.getName());
 
     createJobAndRegisterAction(user, controllerAssistant, response, job, "params", job.getPluginParameters());
-    return response;
-  }
-
-  private ApiResponseMessage reindexUsersAndGroups(User user, ControllerAssistant controllerAssistant,
-    List<String> params) {
-    boolean success = true;
-    ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
-    try {
-      // clear index
-      RodaCoreFactory.getIndexService().clearIndex(RodaConstants.INDEX_MEMBERS);
-
-      // index users
-      for (User ldapUser : RodaCoreFactory.getModelService().listUsers()) {
-        LOGGER.debug("User to be indexed: {}", ldapUser);
-        RodaCoreFactory.getModelService().notifyUserUpdated(ldapUser);
-      }
-
-      // index groups
-      for (Group ldapGroup : RodaCoreFactory.getModelService().listGroups()) {
-        LOGGER.debug("Group to be indexed: {}", ldapGroup);
-        RodaCoreFactory.getModelService().notifyGroupUpdated(ldapGroup);
-      }
-      response.setMessage("Ended users and groups reindex");
-
-    } catch (GenericException e) {
-      LOGGER.error("Error reindexing users and groups", e);
-      response.setMessage("Error reindexing users and groups: " + e.getMessage());
-      success = false;
-    }
-
-    controllerAssistant.registerAction(user, success ? LOG_ENTRY_STATE.SUCCESS : LOG_ENTRY_STATE.FAILURE);
-
     return response;
   }
 
