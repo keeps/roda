@@ -2157,9 +2157,10 @@ public class ModelService extends ModelObservable {
 
   public boolean hasObjects(Class<? extends IsRODAObject> objectClass) {
     try {
-      if (LogEntry.class.equals(objectClass) || RODAMember.class.equals(objectClass)) {
+      if (LogEntry.class.equals(objectClass) || RODAMember.class.equals(objectClass)
+        || TransferredResource.class.equals(objectClass)) {
         return true;
-      } else if (!TransferredResource.class.equals(objectClass)) {
+      } else {
         StoragePath storagePath = ModelUtils.getContainerPath(objectClass);
         try {
           return RodaCoreFactory.getStorageService().countResourcesUnderContainer(storagePath, false).intValue() > 0;

@@ -134,6 +134,20 @@ public class JobStats implements Serializable {
   }
 
   /**
+   * Increments the number of objects count
+   */
+  public void incrementObjectsCount() {
+    this.sourceObjectsCount += 1;
+  }
+
+  /**
+   * Increments the number of objects count
+   */
+  public void incrementObjectsCount(int count) {
+    this.sourceObjectsCount += count;
+  }
+
+  /**
    * Increments by one the number of outcome objects with manual intervention
    */
   public void incrementOutcomeObjectsWithManualIntervention() {

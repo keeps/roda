@@ -35,6 +35,11 @@ public class PluginParameter implements Serializable {
     BOOLEAN,
 
     /**
+     * Integer box
+     */
+    INTEGER,
+
+    /**
      * String which will be translated into the canonical class name of sip to
      * aip plugin
      */

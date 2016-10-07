@@ -45,7 +45,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
@@ -278,10 +277,10 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
                                   && !categories.contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)
                                   && ((!isSelectedEmpty() && pluginInfo.hasObjectClass(selectedClass))
                                     || (isSelectedEmpty() && pluginInfo.hasObjectClass(listSelectedClass)))) {
-                                  Anchor anchor = addAnchorToWorkflowList(pluginInfo);
+                                  Widget pluginItem = addPluginItemWidgetToWorkflowList(pluginInfo);
                                   if (i == 0) {
                                     CreateJob.this.selectedPlugin = lookupPlugin(pluginInfo.getId());
-                                    anchor.addStyleName("plugin-list-item-selected");
+                                    pluginItem.addStyleName("plugin-list-item-selected");
                                   }
                                 }
 
@@ -292,10 +291,10 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
                               if (!pluginInfo.getCategories().contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)
                                 && ((!isSelectedEmpty() && pluginInfo.hasObjectClass(selectedClass))
                                   || (isSelectedEmpty() && pluginInfo.hasObjectClass(listSelectedClass)))) {
-                                Anchor anchor = addAnchorToWorkflowList(pluginInfo);
+                                Widget pluginItem = addPluginItemWidgetToWorkflowList(pluginInfo);
                                 if (pluginAdded == 0) {
                                   CreateJob.this.selectedPlugin = lookupPlugin(pluginInfo.getId());
-                                  anchor.addStyleName("plugin-list-item-selected");
+                                  pluginItem.addStyleName("plugin-list-item-selected");
                                   pluginAdded++;
                                 }
                               }
@@ -318,10 +317,10 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
             if (!pluginCategories.contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)
               && ((!isSelectedEmpty() && pluginInfo.hasObjectClass(selectedClass))
                 || (isSelectedEmpty() && pluginInfo.hasObjectClass(listSelectedClass)))) {
-              Anchor anchor = addAnchorToWorkflowList(pluginInfo);
+              Widget pluginItem = addPluginItemWidgetToWorkflowList(pluginInfo);
               if (pluginAdded == 0) {
                 CreateJob.this.selectedPlugin = lookupPlugin(pluginInfo.getId());
-                anchor.addStyleName("plugin-list-item-selected");
+                pluginItem.addStyleName("plugin-list-item-selected");
                 pluginAdded++;
               }
             }
@@ -336,35 +335,54 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
     }
   }
 
-  private Anchor addAnchorToWorkflowList(PluginInfo pluginInfo) {
-    Anchor anchor = new Anchor();
-    anchor.addStyleName("plugin-list-item");
-    anchor.setText(messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()));
-    anchor.getElement().setAttribute("data-id", pluginInfo.getId());
-    anchor.addClickHandler(new ClickHandler() {
+  private Widget addPluginItemWidgetToWorkflowList(PluginInfo pluginInfo) {
+    FlowPanel panel = new FlowPanel();
+    panel.addStyleName("plugin-list-item");
+    panel.getElement().setAttribute("data-id", pluginInfo.getId());
+
+    panel.addDomHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
-        Anchor anchor = (Anchor) event.getSource();
-        String selectedPluginId = anchor.getElement().getAttribute("data-id");
+        FlowPanel panel = (FlowPanel) event.getSource();
+        String selectedPluginId = panel.getElement().getAttribute("data-id");
 
         for (int i = 0; i < workflowList.getWidgetCount(); i++) {
-          Widget w = workflowList.getWidget(i);
-          w.removeStyleName("plugin-list-item-selected");
+          Widget panelWidget = workflowList.getWidget(i);
+          panelWidget.removeStyleName("plugin-list-item-selected");
         }
 
         if (selectedPluginId != null) {
           CreateJob.this.selectedPlugin = lookupPlugin(selectedPluginId);
-          anchor.addStyleName("plugin-list-item-selected");
+          panel.addStyleName("plugin-list-item-selected");
         }
 
         updateWorkflowOptions();
       }
 
-    });
+    }, ClickEvent.getType());
 
-    workflowList.add(anchor);
-    return anchor;
+    FlowPanel itemImage = new FlowPanel();
+    itemImage.addStyleName("fa");
+    itemImage.addStyleName("plugin-list-item-icon");
+    if (pluginInfo.getCategories().isEmpty()) {
+      itemImage.addStyleName("plugin-list-item-icon-default");
+    } else {
+      itemImage.addStyleName("plugin-list-item-icon-" + pluginInfo.getCategories().get(0));
+      itemImage.setTitle(pluginInfo.getCategories().get(0));
+    }
+
+    Label label = new Label();
+    String labelContent = messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion());
+    label.setText(labelContent);
+    label.setTitle(labelContent);
+    label.addStyleName("plugin-list-item-label");
+
+    panel.add(itemImage);
+    panel.add(label);
+
+    workflowList.add(panel);
+    return panel;
   }
 
   protected void updateWorkflowOptions() {

@@ -41,6 +41,8 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.risks.IndexedRisk;
+import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.util.ClassLoaderUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -373,6 +375,11 @@ public class PluginManager {
       objectClasses.add(IndexedFile.class);
     } else if (objectClasses.contains(IndexedFile.class)) {
       objectClasses.add(File.class);
+    }
+    if (objectClasses.contains(Risk.class)) {
+      objectClasses.add(IndexedRisk.class);
+    } else if (objectClasses.contains(IndexedRisk.class)) {
+      objectClasses.add(Risk.class);
     }
     pluginObjectClasses.put(plugin.getClass().getName(), objectClasses);
 

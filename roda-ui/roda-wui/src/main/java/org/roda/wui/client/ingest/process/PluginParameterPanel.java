@@ -43,6 +43,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.IntegerBox;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RadioButton;
@@ -84,10 +85,10 @@ public class PluginParameterPanel extends Composite {
       createSelectRiskLayout();
     } else if (PluginParameterType.SEVERITY.equals(parameter.getType())) {
       createSelectSeverityLayout();
-    } else if (PluginParameterType.SEVERITY.equals(parameter.getType())) {
-      createSelectSeverityLayout();
     } else if (PluginParameterType.RODA_OBJECT.equals(parameter.getType())) {
       createSelectRodaObjectLayout();
+    } else if (PluginParameterType.INTEGER.equals(parameter.getType())) {
+      createIntegerLayout();
     } else {
       logger
         .warn("Unsupported plugin parameter type: " + parameter.getType() + ". Reverting to default parameter editor.");
@@ -323,6 +324,31 @@ public class PluginParameterPanel extends Composite {
 
         radioGroup.addStyleName("form-radiogroup");
         parameterName.addStyleName("form-label");
+      }
+    });
+  }
+
+  private void createIntegerLayout() {
+    Label parameterName = new Label(parameter.getName());
+    IntegerBox parameterBox = new IntegerBox();
+    if (parameter.getDefaultValue() != null) {
+      parameterBox.setText(parameter.getDefaultValue());
+      value = parameter.getDefaultValue();
+    }
+
+    layout.add(parameterName);
+    layout.add(parameterBox);
+    addHelp();
+
+    parameterName.addStyleName("form-label");
+    parameterBox.addStyleName("form-textbox");
+
+    // binding change
+    parameterBox.addChangeHandler(new ChangeHandler() {
+
+      @Override
+      public void onChange(ChangeEvent event) {
+        value = ((IntegerBox) event.getSource()).getValue().toString();
       }
     });
   }

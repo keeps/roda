@@ -5,10 +5,11 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.plugins.base;
+package org.roda.core.plugins.plugins.base.reindex;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,10 +19,14 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobException;
+import org.roda.core.data.v2.Void;
+import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
-import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.user.Group;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
@@ -33,12 +38,17 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ReindexActionLogPlugin extends AbstractPlugin<LogEntry> {
+public class ReindexRodaMemberPlugin extends AbstractPlugin<Void> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ReindexActionLogPlugin.class);
-  private boolean clearIndexes = true;
-  private int dontReindexOlderThanXDays = RodaCoreFactory.getRodaConfigurationAsInt(0, "core", "actionlogs",
-    "delete_older_than_x_days");
+  private static final Logger LOGGER = LoggerFactory.getLogger(ReindexRodaMemberPlugin.class);
+  private boolean clearIndexes = false;
+
+  private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
+  static {
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "Clear indexes", PluginParameterType.BOOLEAN,
+        "false", false, false, "Clear all indexes before reindexing them."));
+  }
 
   @Override
   public void init() throws PluginException {
@@ -52,12 +62,12 @@ public class ReindexActionLogPlugin extends AbstractPlugin<LogEntry> {
 
   @Override
   public String getName() {
-    return "Rebuild log index";
+    return "Rebuild users and groups index";
   }
 
   @Override
   public String getDescription() {
-    return "Clears the activity log index and rebuilds it from actual physical data existing on the storage. This task aims to fix inconsistencies between what is shown in the graphical user interface of the repository and what is actually kept at the storage layer. Such inconsistencies may occur for various reasons, e.g. index corruption, ungraceful shutdown of the repository, etc.";
+    return "Clears the index and recreates it from actual physical data that exists on the storage. This task aims to fix inconsistencies between what is shown in the graphical user interface of the repository and what is actually kept at the storage layer. Such inconsistencies may occur for various reasons, e.g. index corruption, ungraceful shutdown of the repository, etc.";
   }
 
   @Override
@@ -66,26 +76,22 @@ public class ReindexActionLogPlugin extends AbstractPlugin<LogEntry> {
   }
 
   @Override
+  public List<PluginParameter> getParameters() {
+    ArrayList<PluginParameter> parameters = new ArrayList<PluginParameter>();
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES));
+    return parameters;
+  }
+
+  @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
-    if (parameters != null && parameters.get(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES) != null) {
+    if (parameters != null && parameters.containsKey(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES)) {
       clearIndexes = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES));
-    }
-
-    if (parameters != null && parameters.get(RodaConstants.PLUGIN_PARAMS_INT_VALUE) != null) {
-      try {
-        int dontReindexOlderThanXDays = Integer.parseInt(parameters.get(RodaConstants.PLUGIN_PARAMS_INT_VALUE));
-        if (dontReindexOlderThanXDays > 0) {
-          this.dontReindexOlderThanXDays = dontReindexOlderThanXDays;
-        }
-      } catch (NumberFormatException e) {
-        // do nothing
-      }
     }
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<LogEntry> list)
+  public Report execute(IndexService index, ModelService model, StorageService storage, List<Void> list)
     throws PluginException {
 
     Report pluginReport = PluginHelper.initPluginReport(this);
@@ -96,15 +102,26 @@ public class ReindexActionLogPlugin extends AbstractPlugin<LogEntry> {
       PluginHelper.updateJobInformation(this, jobPluginInfo);
       pluginReport.setPluginState(PluginState.SUCCESS);
 
-      Date firstDayToIndex = PluginHelper.calculateFirstDayToIndex(dontReindexOlderThanXDays);
-      jobPluginInfo = PluginHelper.reindexActionLogsStillNotInStorage(index, firstDayToIndex, pluginReport,
-        jobPluginInfo, dontReindexOlderThanXDays);
-      jobPluginInfo = PluginHelper.reindexActionLogsInStorage(index, model, firstDayToIndex, pluginReport,
-        jobPluginInfo, dontReindexOlderThanXDays);
+      List<User> users = model.listUsers();
+      List<Group> groups = model.listGroups();
+
+      jobPluginInfo.setSourceObjectsCount(users.size() + groups.size());
+
+      for (User ldapUser : users) {
+        LOGGER.debug("User to be indexed: {}", ldapUser);
+        RodaCoreFactory.getModelService().notifyUserUpdated(ldapUser);
+        jobPluginInfo.incrementObjectsProcessedWithSuccess();
+      }
+
+      for (Group ldapGroup : groups) {
+        LOGGER.debug("Group to be indexed: {}", ldapGroup);
+        RodaCoreFactory.getModelService().notifyGroupUpdated(ldapGroup);
+        jobPluginInfo.incrementObjectsProcessedWithSuccess();
+      }
 
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException e) {
+    } catch (JobException | GenericException e) {
       LOGGER.error("Error reindexing RODA entity", e);
     }
 
@@ -117,7 +134,7 @@ public class ReindexActionLogPlugin extends AbstractPlugin<LogEntry> {
     if (clearIndexes) {
       LOGGER.debug("Clearing indexes");
       try {
-        index.clearIndex(RodaConstants.INDEX_ACTION_LOG);
+        index.clearIndex(RodaConstants.INDEX_MEMBERS);
       } catch (GenericException e) {
         throw new PluginException("Error clearing index", e);
       }
@@ -132,7 +149,7 @@ public class ReindexActionLogPlugin extends AbstractPlugin<LogEntry> {
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     LOGGER.debug("Optimizing indexes");
     try {
-      index.optimizeIndex(RodaConstants.INDEX_ACTION_LOG);
+      index.optimizeIndex(RodaConstants.INDEX_MEMBERS);
     } catch (GenericException e) {
       throw new PluginException("Error optimizing index", e);
     }
@@ -141,8 +158,8 @@ public class ReindexActionLogPlugin extends AbstractPlugin<LogEntry> {
   }
 
   @Override
-  public Plugin<LogEntry> cloneMe() {
-    return new ReindexActionLogPlugin();
+  public Plugin<Void> cloneMe() {
+    return new ReindexRodaMemberPlugin();
   }
 
   @Override
@@ -178,12 +195,12 @@ public class ReindexActionLogPlugin extends AbstractPlugin<LogEntry> {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_REINDEX);
   }
 
   @Override
-  public List<Class<LogEntry>> getObjectClasses() {
-    return Arrays.asList(LogEntry.class);
+  public List<Class<Void>> getObjectClasses() {
+    return Arrays.asList(Void.class);
   }
 
 }

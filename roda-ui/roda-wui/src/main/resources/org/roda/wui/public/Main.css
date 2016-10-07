@@ -5207,16 +5207,94 @@ td.datePickerMonth, td.datePickerYear {
 .btn-separator {
 	margin-left: 10px;
 }
+
+
 .plugin-list-item {
-	display: block;
+    display: block;
+	width: 100%;
+	height: 30px;
+    line-height: 30px;
+	overflow: hidden;
+	border: none;
+}
+
+
+.plugin-list-item-icon {
+    display: inherit;
+	width: 30px;
+	height: 30px;
+    line-height: 30px;
+    padding: 0;
+    margin: 0;
+    float: left;
+    text-align: center;
+    color: #222;
+}
+
+
+.plugin-list-item-icon-risk_management:before {
+	content: "\f071";
+}
+
+.plugin-list-item-icon-management:before {
+	content: "\f0f0";
+}
+
+.plugin-list-item-icon-reindex:before {
+	content: "\f021";
+}
+
+.plugin-list-item-icon-conversion:before {
+	content: "\f085";
+}
+
+.plugin-list-item-icon-characterization:before {
+	content: "\f129";
+}
+
+.plugin-list-item-icon-validation:before {
+	content: "\f00c";
+}
+
+.plugin-list-item-icon-feature_extraction:before {
+	content: "\f129";
+}
+
+.plugin-list-item-icon-identification:before {
+	content: "\f0eb";
+}
+
+.plugin-list-item-icon-ingest:before {
+	content: "\f085";
+}
+
+.plugin-list-item-icon-replication:before {
+	content: "\f0c5";
+}
+
+.plugin-list-item-icon-misc:before {
+	content: "\f0ae";
+}
+
+.plugin-list-item-icon-default:before {
+	content: "\f0ae";
+}
+
+
+.plugin-list-item-label {
+    color: #089de3;
 	overflow: hidden;
 	border: none;
     white-space: nowrap;
     text-overflow: ellipsis;
-    height: 2em;
-    line-height: 2em;
-    padding-left: 0.5em;
+    height: 30px;
+    line-height: 30px;    
+    padding: 0;
+    margin: 0;
+    display: inherit;
 }
+
+
 .plugin-list-item-selected {
 	background-color: #eee;
 }

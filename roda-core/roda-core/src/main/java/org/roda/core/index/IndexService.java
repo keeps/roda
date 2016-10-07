@@ -18,7 +18,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrClient;
@@ -64,6 +63,7 @@ import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Resource;
@@ -318,15 +318,18 @@ public class IndexService {
     try {
       if (AIP.class.equals(object.getClass())) {
         reindexAIP((AIP) object);
-      } else if (TransferredResource.class.equals(object.getClass())) {
-        TransferredResource resource = (TransferredResource) object;
-        String folderUUID = null;
-        if (!resource.isFile()) {
-          folderUUID = UUID.nameUUIDFromBytes(resource.getRelativePath().getBytes()).toString();
-        } else {
-          folderUUID = UUID.nameUUIDFromBytes(resource.getParentPath().getBytes()).toString();
-        }
-        RodaCoreFactory.getTransferredResourcesScanner().updateAllTransferredResources(folderUUID, true);
+        // } else if (TransferredResource.class.equals(object.getClass())) {
+        // TransferredResource resource = (TransferredResource) object;
+        // String folderUUID = null;
+        // if (!resource.isFile()) {
+        // folderUUID =
+        // UUID.nameUUIDFromBytes(resource.getRelativePath().getBytes()).toString();
+        // } else {
+        // folderUUID =
+        // UUID.nameUUIDFromBytes(resource.getParentPath().getBytes()).toString();
+        // }
+        // RodaCoreFactory.getTransferredResourcesScanner().updateAllTransferredResources(folderUUID,
+        // true);
       } else {
         reindex((Class<T>) object.getClass(), object);
       }
@@ -394,6 +397,32 @@ public class IndexService {
       br.close();
     } catch (IOException e) {
       throw new GenericException("Error reading log", e);
+    }
+  }
+
+  public SimpleJobPluginInfo reindexActionLog(BufferedReader br, SimpleJobPluginInfo jobPluginInfo)
+    throws GenericException {
+    String line;
+    try {
+      while ((line = br.readLine()) != null) {
+        jobPluginInfo.incrementObjectsCount();
+
+        try {
+          LogEntry entry = JsonUtils.getObjectFromJson(line, LogEntry.class);
+          if (entry != null) {
+            reindexActionLog(entry);
+            jobPluginInfo.incrementObjectsProcessedWithSuccess();
+          }
+
+        } catch (GenericException e) {
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+        }
+      }
+      br.close();
+    } catch (IOException e) {
+      throw new GenericException("Error reading log", e);
+    } finally {
+      return jobPluginInfo;
     }
   }
 
