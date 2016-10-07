@@ -33,9 +33,9 @@ import org.slf4j.LoggerFactory;
 /**
  * CAS authentication filter.
  */
-public class RodaCasAuthenticationFilter implements Filter {
+public class CasAuthenticationFilter implements Filter {
   /** Logger. */
-  private static final Logger LOGGER = LoggerFactory.getLogger(RodaCasAuthenticationFilter.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CasAuthenticationFilter.class);
 
   /** URL to logout in CAS service. */
   private String casLogoutURL;
@@ -43,7 +43,7 @@ public class RodaCasAuthenticationFilter implements Filter {
   /**
    * Default constructor.
    */
-  public RodaCasAuthenticationFilter() {
+  public CasAuthenticationFilter() {
     // do nothing
   }
 
