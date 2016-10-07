@@ -28,9 +28,9 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
-public class RodaInternalAuthenticationFilter implements Filter {
+public class InternalAuthenticationFilter implements Filter {
   /** Logger. */
-  private static final Logger LOGGER = LoggerFactory.getLogger(RodaInternalAuthenticationFilter.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(InternalAuthenticationFilter.class);
 
   @Override
   public void init(final FilterConfig config) throws ServletException {
