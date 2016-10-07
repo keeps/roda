@@ -36,7 +36,7 @@
 					<g:Button addStyleNames="btn btn-plus" ui:field="buttonAdd">
 						<ui:text from='{messages.newButton}' />
 					</g:Button>
-					<g:Button addStyleNames="btn btn-ban" ui:field="buttonRemove">
+					<g:Button addStyleNames="btn btn-danger btn-ban" ui:field="buttonRemove">
 						<ui:text from='{messages.removeButton}' />
 					</g:Button>
 				</g:FlowPanel>

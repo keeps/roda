@@ -13,6 +13,7 @@ package org.roda.wui.client.process;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -25,12 +26,15 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.BasicAsyncTableCell;
+import org.roda.wui.client.common.lists.FormatList;
 import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
+import org.roda.wui.client.common.lists.RiskList;
 import org.roda.wui.client.common.lists.SimpleFileList;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.PluginUtils;
@@ -91,8 +95,12 @@ public class CreateSearchActionJob extends CreateJob<IsIndexed> {
         list = new RepresentationList(filter, justActive, null, messages.representationsTitle(), selectable, 10, 10);
       } else if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
         list = new SimpleFileList(filter, justActive, null, messages.filesTitle(), selectable, 10, 10);
+      } else if (IndexedRisk.class.getName().equals(selected.getSelectedClass())) {
+        list = new RiskList(filter, Facets.NONE, messages.showRiskTitle(), selectable, 10, 10);
       } else if (RiskIncidence.class.getName().equals(selected.getSelectedClass())) {
         list = new RiskIncidenceList(filter, Facets.NONE, messages.showRiskIncidenceTitle(), selectable, 10, 10);
+      } else if (Format.class.getName().equals(selected.getSelectedClass())) {
+        list = new FormatList(filter, Facets.NONE, messages.showFormatTitle(), selectable, 10, 10);
       }
 
       // TODO 20160930 add new classes

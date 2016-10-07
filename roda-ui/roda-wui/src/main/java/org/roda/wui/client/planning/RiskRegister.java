@@ -24,6 +24,7 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.Dialogs;
+import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.RiskList;
@@ -31,6 +32,7 @@ import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.process.CreateJob;
 import org.roda.wui.client.process.CreateSearchActionJob;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
@@ -190,11 +192,8 @@ public class RiskRegister extends Composite {
       @Override
       public void onSelectionChange(SelectedItems<IndexedRisk> selected) {
         boolean empty = SelectedItemsUtils.isEmpty(selected);
-        if (empty) {
-          buttonRemove.setEnabled(false);
-        } else {
-          buttonRemove.setEnabled(true);
-        }
+        buttonRemove.setEnabled(!empty);
+        startProcess.setEnabled(!empty);
       }
 
     });
@@ -202,6 +201,7 @@ public class RiskRegister extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
     riskRegisterDescription.add(new HTMLWidgetWrapper("RiskRegisterDescription.html"));
     buttonRemove.setEnabled(false);
+    startProcess.setEnabled(false);
 
     DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
     ValueChangeHandler<Date> valueChangeHandler = new ValueChangeHandler<Date>() {
@@ -299,33 +299,40 @@ public class RiskRegister extends Composite {
           messages.riskRemoveSelectedConfirmDialogMessage(size), messages.riskRemoveFolderConfirmDialogCancel(),
           messages.riskRemoveFolderConfirmDialogOk(), new AsyncCallback<Boolean>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            AsyncCallbackUtils.defaultFailureTreatment(caught);
-          }
-
-          @Override
-          public void onSuccess(Boolean confirmed) {
-            if (confirmed) {
-              BrowserService.Util.getInstance().deleteRisk(selected, new AsyncCallback<Void>() {
-
-                @Override
-                public void onFailure(Throwable caught) {
-                  AsyncCallbackUtils.defaultFailureTreatment(caught);
-                  riskList.refresh();
-                }
-
-                @Override
-                public void onSuccess(Void result) {
-                  Toast.showInfo(messages.riskRemoveSuccessTitle(), messages.riskRemoveSuccessMessage(size));
-                  riskList.refresh();
-                }
-              });
+            @Override
+            public void onFailure(Throwable caught) {
+              AsyncCallbackUtils.defaultFailureTreatment(caught);
             }
-          }
-        });
+
+            @Override
+            public void onSuccess(Boolean confirmed) {
+              if (confirmed) {
+                BrowserService.Util.getInstance().deleteRisk(selected, new AsyncCallback<Void>() {
+
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    AsyncCallbackUtils.defaultFailureTreatment(caught);
+                    riskList.refresh();
+                  }
+
+                  @Override
+                  public void onSuccess(Void result) {
+                    Toast.showInfo(messages.riskRemoveSuccessTitle(), messages.riskRemoveSuccessMessage(size));
+                    riskList.refresh();
+                  }
+                });
+              }
+            }
+          });
       }
     });
+  }
+
+  @UiHandler("startProcess")
+  void handleButtonProcess(ClickEvent e) {
+    LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+    selectedItems.setSelectedItems(riskList.getSelected());
+    Tools.newHistory(CreateJob.RESOLVER, "action");
   }
 
 }

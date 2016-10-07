@@ -21,6 +21,7 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.Dialogs;
+import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.FormatList;
@@ -28,6 +29,7 @@ import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.process.CreateJob;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
@@ -155,11 +157,8 @@ public class FormatRegister extends Composite {
       @Override
       public void onSelectionChange(SelectedItems<Format> selected) {
         boolean empty = SelectedItemsUtils.isEmpty(selected);
-        if (empty) {
-          buttonRemove.setEnabled(false);
-        } else {
-          buttonRemove.setEnabled(true);
-        }
+        buttonRemove.setEnabled(!empty);
+        startProcess.setEnabled(!empty);
       }
 
     });
@@ -167,8 +166,8 @@ public class FormatRegister extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
 
     formatRegisterDescription.add(new HTMLWidgetWrapper("FormatRegisterDescription.html"));
-
     buttonRemove.setEnabled(false);
+    startProcess.setEnabled(false);
 
     DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
     ValueChangeHandler<Date> valueChangeHandler = new ValueChangeHandler<Date>() {
@@ -243,32 +242,39 @@ public class FormatRegister extends Composite {
           messages.formatRemoveSelectedConfirmDialogMessage(size), messages.formatRemoveFolderConfirmDialogCancel(),
           messages.formatRemoveFolderConfirmDialogOk(), new AsyncCallback<Boolean>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            AsyncCallbackUtils.defaultFailureTreatment(caught);
-          }
-
-          @Override
-          public void onSuccess(Boolean confirmed) {
-            if (confirmed) {
-              BrowserService.Util.getInstance().deleteFormat(selected, new AsyncCallback<Void>() {
-
-                @Override
-                public void onFailure(Throwable caught) {
-                  AsyncCallbackUtils.defaultFailureTreatment(caught);
-                  formatList.refresh();
-                }
-
-                @Override
-                public void onSuccess(Void result) {
-                  Toast.showInfo(messages.formatRemoveSuccessTitle(), messages.formatRemoveSuccessMessage(size));
-                  formatList.refresh();
-                }
-              });
+            @Override
+            public void onFailure(Throwable caught) {
+              AsyncCallbackUtils.defaultFailureTreatment(caught);
             }
-          }
-        });
+
+            @Override
+            public void onSuccess(Boolean confirmed) {
+              if (confirmed) {
+                BrowserService.Util.getInstance().deleteFormat(selected, new AsyncCallback<Void>() {
+
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    AsyncCallbackUtils.defaultFailureTreatment(caught);
+                    formatList.refresh();
+                  }
+
+                  @Override
+                  public void onSuccess(Void result) {
+                    Toast.showInfo(messages.formatRemoveSuccessTitle(), messages.formatRemoveSuccessMessage(size));
+                    formatList.refresh();
+                  }
+                });
+              }
+            }
+          });
       }
     });
+  }
+
+  @UiHandler("startProcess")
+  void handleButtonProcess(ClickEvent e) {
+    LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+    selectedItems.setSelectedItems(formatList.getSelected());
+    Tools.newHistory(CreateJob.RESOLVER, "action");
   }
 }

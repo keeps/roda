@@ -19,7 +19,7 @@
 			<g:TextBox ui:field="usernameOrEmail" addStyleNames="fieldTextBox"></g:TextBox>
 		</g:FlowPanel>
 		<g:FlowPanel addStyleNames="recover-buttons">
-			<g:Button ui:field="cancel" addStyleNames="btn btn-link recover-link">
+			<g:Button ui:field="cancel" addStyleNames="btn btn-link btn-default recover-link">
 				<ui:text from='{messages.recoverLoginCancel}' />
 			</g:Button>
 			<g:Button ui:field="recover" addStyleNames="btn btn-play recover-button">
