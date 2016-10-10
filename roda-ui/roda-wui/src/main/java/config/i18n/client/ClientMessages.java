@@ -54,6 +54,8 @@ public interface ClientMessages extends Messages {
 
   String editIncidenceTitle();
 
+  String editIncidencesTitle();
+
   String showRiskIncidenceTitle();
 
   String newFormatTitle();

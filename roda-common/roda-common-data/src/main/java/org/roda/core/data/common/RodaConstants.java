@@ -211,8 +211,9 @@ public final class RodaConstants {
   public static final String API_GET_DESCRIPTIVE_METADATA_MEDIA_TYPES = "json, xml, html, bin";
   public static final String API_DESCRIPTIVE_METADATA_LANGUAGES = "pt_PT, en_US";
 
-  public static final String API_GET_REPORTS_ID_OBJECT = "transferred_resource, sip";
-  public static final String API_GET_REPORTS_ID_OBJECT_RESOURCE = "transferred_resource";
+  public static final String API_GET_REPORTS_ID_OBJECT = "transferred_resource_uuid, transferred_resource_path, sip";
+  public static final String API_GET_REPORTS_ID_OBJECT_RESOURCE_UUID = "transferred_resource_uuid";
+  public static final String API_GET_REPORTS_ID_OBJECT_RESOURCE_PATH = "transferred_resource_path";
   public static final String API_GET_REPORTS_ID_OBJECT_SIP = "sip";
 
   public static final String API_USER_OR_GROUP_MEMBER = "user, group";

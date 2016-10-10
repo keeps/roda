@@ -175,6 +175,7 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
       @Override
       public void onSelectionChange(SelectedItems<RiskIncidence> selected) {
         ShowRisk.getInstance().enableProcessButton(!(SelectedItemsUtils.isEmpty(selected)));
+        ShowRisk.getInstance().enableEditIncidenceButton(!(SelectedItemsUtils.isEmpty(selected)));
       }
     });
 

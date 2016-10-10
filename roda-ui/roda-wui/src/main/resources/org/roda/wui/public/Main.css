@@ -1264,6 +1264,10 @@ td.datePickerMonth, td.datePickerYear {
         margin-left: 80px;
         padding-right: 20px;
     }
+    
+    .sidebar_actions_wrapper.sticky {
+		/* position: fixed; */
+	}
 }
 
 @media (max-width: 768px) {
@@ -5413,3 +5417,5 @@ td.datePickerMonth, td.datePickerYear {
 	display: none;
 	max-width: 100px;
 }
+
+

@@ -17,6 +17,10 @@ public class SelectedItemsAll<T extends IsRODAObject> implements SelectedItems<T
     return new SelectedItemsAll<>(classToCreate.getName());
   }
 
+  public static <T extends IsRODAObject> SelectedItemsAll<T> create(String classToCreate) {
+    return new SelectedItemsAll<>(classToCreate);
+  }
+
   private String selectedClass;
 
   public SelectedItemsAll() {

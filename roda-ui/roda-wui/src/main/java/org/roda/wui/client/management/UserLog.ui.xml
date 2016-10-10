@@ -7,7 +7,7 @@
 	xmlns:lists="urn:import:org.roda.wui.client.common.lists">
 
 	<ui:style>
-
+	
 	</ui:style>
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
@@ -26,40 +26,42 @@
 			</g:FlowPanel>
 
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
-				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+				<g:FlowPanel addStyleNames="sidebar_actions_wrapper sticky">
+					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+						<g:Label addStyleNames="h5 sidebar-facet-title">
+							<ui:text from='{messages.logComponents}' />
+						</g:Label>
+						<g:FlowPanel ui:field="facetComponents" />
+					</g:FlowPanel>
+					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+						<g:Label addStyleNames="h5 sidebar-facet-title">
+							<ui:text from='{messages.logMethods}' />
+						</g:Label>
+						<g:FlowPanel ui:field="facetMethods" />
+					</g:FlowPanel>
+					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+						<g:Label addStyleNames="h5 sidebar-facet-title">
+							<ui:text from="{messages.logEntryState}" />
+						</g:Label>
+						<g:FlowPanel ui:field="facetStates" />
+					</g:FlowPanel>
+					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+						<g:Label addStyleNames="h5 sidebar-facet-title">
+							<ui:text from='{messages.logUsers}' />
+						</g:Label>
+						<g:FlowPanel ui:field="facetUsers" />
+					</g:FlowPanel>
 					<g:Label addStyleNames="h5 sidebar-facet-title">
-						<ui:text from='{messages.logComponents}' />
+						<ui:text from='{messages.sidebarFilterDates}' />
 					</g:Label>
-					<g:FlowPanel ui:field="facetComponents" />
+					<d:DateBox
+						addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
+						ui:field="inputDateInitial" />
+					<g:Label addStyleNames="sidebar-facet-date-separator">-</g:Label>
+					<d:DateBox
+						addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
+						ui:field="inputDateFinal" />
 				</g:FlowPanel>
-				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-					<g:Label addStyleNames="h5 sidebar-facet-title">
-						<ui:text from='{messages.logMethods}' />
-					</g:Label>
-					<g:FlowPanel ui:field="facetMethods" />
-				</g:FlowPanel>
-				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-					<g:Label addStyleNames="h5 sidebar-facet-title">
-						<ui:text from="{messages.logEntryState}" />
-					</g:Label>
-					<g:FlowPanel ui:field="facetStates" />
-				</g:FlowPanel>
-				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-					<g:Label addStyleNames="h5 sidebar-facet-title">
-						<ui:text from='{messages.logUsers}' />
-					</g:Label>
-					<g:FlowPanel ui:field="facetUsers" />
-				</g:FlowPanel>
-				<g:Label addStyleNames="h5 sidebar-facet-title">
-					<ui:text from='{messages.sidebarFilterDates}' />
-				</g:Label>
-				<d:DateBox
-					addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
-					ui:field="inputDateInitial" />
-				<g:Label addStyleNames="sidebar-facet-date-separator">-</g:Label>
-				<d:DateBox
-					addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
-					ui:field="inputDateFinal" />
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>

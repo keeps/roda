@@ -319,18 +319,6 @@ public class IndexService {
     try {
       if (AIP.class.equals(object.getClass())) {
         reindexAIP((AIP) object);
-        // } else if (TransferredResource.class.equals(object.getClass())) {
-        // TransferredResource resource = (TransferredResource) object;
-        // String folderUUID = null;
-        // if (!resource.isFile()) {
-        // folderUUID =
-        // UUID.nameUUIDFromBytes(resource.getRelativePath().getBytes()).toString();
-        // } else {
-        // folderUUID =
-        // UUID.nameUUIDFromBytes(resource.getParentPath().getBytes()).toString();
-        // }
-        // RodaCoreFactory.getTransferredResourcesScanner().updateAllTransferredResources(folderUUID,
-        // true);
       } else {
         reindex((Class<T>) object.getClass(), object);
       }

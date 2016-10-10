@@ -6,17 +6,16 @@
 	xmlns:lists="urn:import:org.roda.wui.client.common.lists">
 
 	<ui:style>
-		.other-producer-label {
+	.other-producer-label {
 		margin-left: 5px;
 		font-weight: 200;
 		margin-bottom: 2px;
-		}
-
-		.other-producer-input {
+	}
+	
+	.other-producer-input {
 		margin-left: 5px;
-		padding:
-		4px;
-		}
+		padding: 4px;
+	}
 	</ui:style>
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
@@ -32,45 +31,47 @@
 				<lists:JobList ui:field="jobList" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
-				<g:FlowPanel styleName="sidebar-group">
-					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+				<g:FlowPanel addStyleNames="sidebar_actions_wrapper sticky">
+					<g:FlowPanel styleName="sidebar-group">
+						<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+							<g:Label addStyleNames="h5 sidebar-facet-title">
+								<ui:text from='{messages.processJobTypes}' />
+							</g:Label>
+							<g:FlowPanel ui:field="jobTypeFacets" />
+						</g:FlowPanel>
+						<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+							<g:Label addStyleNames="h5 sidebar-facet-title">
+								<ui:text from='{messages.processStatus}' />
+							</g:Label>
+							<g:FlowPanel ui:field="stateFacets" />
+						</g:FlowPanel>
+						<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+							<g:Label addStyleNames="h5 sidebar-facet-title">
+								<ui:text from='{messages.processCreators}' />
+							</g:Label>
+							<g:FlowPanel ui:field="producerFacets" />
+						</g:FlowPanel>
+						<!-- <g:Label addStyleNames="{style.other-producer-label}">Other producer:</g:Label> 
+							<g:TextBox addStyleNames="fieldTextBox {style.other-producer-input}" /> -->
 						<g:Label addStyleNames="h5 sidebar-facet-title">
-							<ui:text from='{messages.processJobTypes}' />
+							<ui:text from='{messages.sidebarFilterDates}' />
 						</g:Label>
-						<g:FlowPanel ui:field="jobTypeFacets" />
+						<d:DateBox
+							addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
+							ui:field="inputDateInitial" />
+						<g:Label addStyleNames="sidebar-facet-date-separator">-</g:Label>
+						<d:DateBox
+							addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
+							ui:field="inputDateFinal" />
 					</g:FlowPanel>
-					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-						<g:Label addStyleNames="h5 sidebar-facet-title">
-							<ui:text from='{messages.processStatus}' />
+					<g:FlowPanel>
+						<g:Label addStyleNames="h4">
+							<ui:text from='{messages.sidebarActionsTitle}' />
 						</g:Label>
-						<g:FlowPanel ui:field="stateFacets" />
+						<g:Button addStyleNames="btn btn-plus" ui:field="newJob">
+							<ui:text from='{messages.newProcessPreservation}' />
+						</g:Button>
 					</g:FlowPanel>
-					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-						<g:Label addStyleNames="h5 sidebar-facet-title">
-							<ui:text from='{messages.processCreators}' />
-						</g:Label>
-						<g:FlowPanel ui:field="producerFacets" />
-					</g:FlowPanel>
-					<!-- <g:Label addStyleNames="{style.other-producer-label}">Other producer:</g:Label> 
-						<g:TextBox addStyleNames="fieldTextBox {style.other-producer-input}" /> -->
-					<g:Label addStyleNames="h5 sidebar-facet-title">
-						<ui:text from='{messages.sidebarFilterDates}' />
-					</g:Label>
-					<d:DateBox
-						addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
-						ui:field="inputDateInitial" />
-					<g:Label addStyleNames="sidebar-facet-date-separator">-</g:Label>
-					<d:DateBox
-						addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
-						ui:field="inputDateFinal" />
-				</g:FlowPanel>
-				<g:FlowPanel>
-					<g:Label addStyleNames="h4">
-						<ui:text from='{messages.sidebarActionsTitle}' />
-					</g:Label>
-					<g:Button addStyleNames="btn btn-plus" ui:field="newJob">
-						<ui:text from='{messages.newProcessPreservation}' />
-					</g:Button>
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>

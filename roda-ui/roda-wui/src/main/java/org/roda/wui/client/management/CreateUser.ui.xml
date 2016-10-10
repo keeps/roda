@@ -17,7 +17,7 @@
 			</g:FlowPanel>
 
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
-				<g:FlowPanel>
+				<g:FlowPanel addStyleNames="sidebar_actions_wrapper sticky">
 					<g:Label addStyleNames="h4">
 						<ui:text from="{messages.actions}" />
 					</g:Label>

@@ -81,14 +81,13 @@
 			</g:FlowPanel>
 
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
-				<g:FlowPanel>
+				<g:FlowPanel addStyleNames="sidebar_actions_wrapper sticky">
 					<g:Label addStyleNames="h4">
 						<ui:text from='{messages.sidebarActionsTitle}' />
 					</g:Label>
 					<g:Button addStyleNames="btn btn-default btn-times-circle" ui:field="buttonBack">
 						<ui:text from='{messages.backButton}' />
 					</g:Button>
-
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>

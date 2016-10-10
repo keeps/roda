@@ -8,7 +8,7 @@
 	xmlns:lists="urn:import:org.roda.wui.client.common.lists">
 
 	<ui:style>
-
+	
 	</ui:style>
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
@@ -26,34 +26,37 @@
 					ui:field="formatList" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
-				<g:Label addStyleNames="h5 sidebar-facet-title">
-					<ui:text from='{messages.sidebarFilterDates}' />
-				</g:Label>
-				<d:DateBox
-					addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
-					ui:field="inputDateInitial" />
-				<g:Label addStyleNames="sidebar-facet-date-separator">-</g:Label>
-				<d:DateBox
-					addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
-					ui:field="inputDateFinal" />
-				<g:FlowPanel ui:field="formatsSidebar">
-					<g:Label addStyleNames="h4">
-						<ui:text from='{messages.sidebarFormatsTitle}' />
+				<g:FlowPanel addStyleNames="sidebar_actions_wrapper sticky">
+					<g:Label addStyleNames="h5 sidebar-facet-title">
+						<ui:text from='{messages.sidebarFilterDates}' />
 					</g:Label>
-					<g:Button addStyleNames="btn btn-plus" ui:field="buttonAdd">
-						<ui:text from='{messages.newButton}' />
-					</g:Button>
-					<g:Button addStyleNames="btn btn-danger btn-ban" ui:field="buttonRemove">
-						<ui:text from='{messages.removeButton}' />
-					</g:Button>
-				</g:FlowPanel>
-				<g:FlowPanel>
-					<g:Label addStyleNames="h4">
-						<ui:text from='{messages.sidebarActionsTitle}' />
-					</g:Label>
-					<g:Button addStyleNames="btn btn-play" ui:field="startProcess">
-						<ui:text from='{messages.formatRegisterProcessButton}' />
-					</g:Button>
+					<d:DateBox
+						addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
+						ui:field="inputDateInitial" />
+					<g:Label addStyleNames="sidebar-facet-date-separator">-</g:Label>
+					<d:DateBox
+						addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
+						ui:field="inputDateFinal" />
+					<g:FlowPanel ui:field="formatsSidebar">
+						<g:Label addStyleNames="h4">
+							<ui:text from='{messages.sidebarFormatsTitle}' />
+						</g:Label>
+						<g:Button addStyleNames="btn btn-plus" ui:field="buttonAdd">
+							<ui:text from='{messages.newButton}' />
+						</g:Button>
+						<g:Button addStyleNames="btn btn-danger btn-ban"
+							ui:field="buttonRemove">
+							<ui:text from='{messages.removeButton}' />
+						</g:Button>
+					</g:FlowPanel>
+					<g:FlowPanel>
+						<g:Label addStyleNames="h4">
+							<ui:text from='{messages.sidebarActionsTitle}' />
+						</g:Label>
+						<g:Button addStyleNames="btn btn-play" ui:field="startProcess">
+							<ui:text from='{messages.formatRegisterProcessButton}' />
+						</g:Button>
+					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>

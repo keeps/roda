@@ -19,6 +19,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsAll;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
@@ -113,6 +114,7 @@ public class CreateActionJob extends Composite {
   private BasicAsyncTableCell list = null;
   private List<PluginInfo> plugins = null;
   private PluginInfo selectedPlugin = null;
+  private boolean isListEmpty = true;
 
   private static List<PluginType> pluginTypes = PluginUtils.getPluginTypesWithoutIngest();
 
@@ -158,14 +160,8 @@ public class CreateActionJob extends Composite {
   @UiField
   Button buttonCancel;
 
-  // @UiField
-  // Button buttonSelect;
-
   public CreateActionJob() {
-    // selected = items;
     initWidget(uiBinder.createAndBindUi(this));
-
-    buttonCreate.setEnabled(false);
 
     BrowserService.Util.getInstance().retrievePluginsInfo(pluginTypes, new AsyncCallback<List<PluginInfo>>() {
 
@@ -338,7 +334,7 @@ public class CreateActionJob extends Composite {
   }
 
   protected void updateWorkflowOptions() {
-    buttonCreate.setEnabled(false);
+    isListEmpty = true;
     if (selectedPlugin == null) {
       workflowListDescription.clear();
       workflowListDescriptionCategories.setText("");
@@ -388,7 +384,6 @@ public class CreateActionJob extends Composite {
       List<String> rodaClasses = getPluginNames(selectedPlugin.getObjectClasses());
       for (String objectClass : rodaClasses) {
         targetList.addItem(messages.allOfAObject(objectClass), objectClass);
-        // buttonSelect.setVisible(!(objectClass.equals(org.roda.core.data.v2.Void.class.getName())));
       }
 
       targetList.addChangeHandler(new ChangeHandler() {
@@ -446,12 +441,11 @@ public class CreateActionJob extends Composite {
   private void defineTargetInformation(String objectClassName) {
     ListFactory listFactory = new ListFactory();
     try {
-      buttonCreate.setEnabled(org.roda.core.data.v2.Void.class.getName().equals(objectClassName));
+      isListEmpty = true;
       BasicAsyncTableCell<?> list = listFactory.getList(objectClassName, "", Filter.ALL, true, 10, 10);
       SearchPanel searchPanel = new SearchPanel(SearchFilters.defaultFilter(objectClassName),
         SearchFilters.allFilter(objectClassName), "", false, false, true);
       searchPanel.setList(list);
-      // selected = new SelectedItemsAll(objectClassName);
       targetListPanel.add(searchPanel);
       targetListPanel.add(list);
       targetListPanel.setVisible(true);
@@ -462,7 +456,7 @@ public class CreateActionJob extends Composite {
         @Override
         public void onSelectionChange(SelectedItems selected) {
           boolean empty = SelectedItemsUtils.isEmpty(selected);
-          buttonCreate.setEnabled(!empty);
+          isListEmpty = empty;
         }
       });
 
@@ -480,6 +474,8 @@ public class CreateActionJob extends Composite {
 
     if (org.roda.core.data.v2.Void.class.getName().equals(targetList.getSelectedValue())) {
       selected = new SelectedItemsNone();
+    } else if (isListEmpty) {
+      selected = SelectedItemsAll.create(targetList.getSelectedValue());
     }
 
     BrowserService.Util.getInstance().createProcess(jobName, selected, getSelectedPlugin().getId(),
@@ -500,53 +496,10 @@ public class CreateActionJob extends Composite {
 
   }
 
-  // @UiHandler("buttonSelect")
-  // public void buttonSelectHandler(ClickEvent e) {
-  // SelectDialogFactory factory = new SelectDialogFactory();
-  // try {
-  // final DefaultSelectDialog<?, ?> dialog =
-  // factory.getSelectDialog(targetList.getSelectedValue(),
-  // targetList.getSelectedItemText(), Filter.ALL, true);
-  // dialog.showAndCenter();
-  // dialog.addValueChangeHandler(new ValueChangeHandler() {
-  // @Override
-  // public void onValueChange(ValueChangeEvent event) {
-  // targetListPanel.clear();
-  // ListFactory listFactory = new ListFactory();
-  //
-  // try {
-  // selected = dialog.getList().getSelected();
-  // Filter filter = new Filter();
-  //
-  // if (selected instanceof SelectedItemsList) {
-  // SelectedItemsList selectedList = (SelectedItemsList) selected;
-  // filter.add(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID,
-  // selectedList.getIds()));
-  // }
-  //
-  // BasicAsyncTableCell list =
-  // listFactory.getList(targetList.getSelectedValue(), dialog.getTitle(),
-  // filter, 10,
-  // 10);
-  // targetListPanel.add(list);
-  // } catch (RODAException e) {
-  // // do nothing
-  // }
-  // }
-  // });
-  // } catch (NotFoundException e1) {
-  // // do nothing
-  // }
-  // }
-
   @UiHandler("buttonCancel")
   public void cancel(ClickEvent e) {
     Tools.newHistory(ActionProcess.RESOLVER);
   }
-
-  // public SelectedItems<?> getSelected() {
-  // return selected;
-  // }
 
   public PluginInfo getSelectedPlugin() {
     return selectedPlugin;

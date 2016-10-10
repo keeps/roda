@@ -9,7 +9,7 @@
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<ui:style>
-
+	
 	</ui:style>
 
 	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
@@ -25,36 +25,38 @@
 					ui:field="list" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
-				<g:FlowPanel>
-					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-						<g:Label addStyleNames="h5 sidebar-facet-title">
-							<ui:text from='{messages.userStatus}' />
-						</g:Label>
-						<g:FlowPanel ui:field="facetIsActive" />
+				<g:FlowPanel addStyleNames="sidebar_actions_wrapper sticky">
+					<g:FlowPanel>
+						<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+							<g:Label addStyleNames="h5 sidebar-facet-title">
+								<ui:text from='{messages.userStatus}' />
+							</g:Label>
+							<g:FlowPanel ui:field="facetIsActive" />
+						</g:FlowPanel>
+						<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+							<g:Label addStyleNames="h5 sidebar-facet-title">
+								<ui:text from='{messages.userType}' />
+							</g:Label>
+							<g:FlowPanel ui:field="facetIsUser" />
+						</g:FlowPanel>
+						<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+							<g:Label addStyleNames="h5 sidebar-facet-title">
+								<ui:text from='{messages.userGroups}' />
+							</g:Label>
+							<g:FlowPanel ui:field="facetGroups" />
+						</g:FlowPanel>
 					</g:FlowPanel>
-					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-						<g:Label addStyleNames="h5 sidebar-facet-title">
-							<ui:text from='{messages.userType}' />
+					<g:FlowPanel>
+						<g:Label addStyleNames="h5">
+							<ui:text from='{messages.sidebarActionsTitle}' />
 						</g:Label>
-						<g:FlowPanel ui:field="facetIsUser" />
+						<g:Button addStyleNames="btn btn-plus" ui:field="buttonAddUser">
+							<ui:text from='{messages.addUserButton}' />
+						</g:Button>
+						<g:Button addStyleNames="btn btn-plus" ui:field="buttonAddGroup">
+							<ui:text from='{messages.addGroupButton}' />
+						</g:Button>
 					</g:FlowPanel>
-					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-						<g:Label addStyleNames="h5 sidebar-facet-title">
-							<ui:text from='{messages.userGroups}' />
-						</g:Label>
-						<g:FlowPanel ui:field="facetGroups" />
-					</g:FlowPanel>
-				</g:FlowPanel>
-				<g:FlowPanel>
-					<g:Label addStyleNames="h5">
-						<ui:text from='{messages.sidebarActionsTitle}' />
-					</g:Label>
-					<g:Button addStyleNames="btn btn-plus" ui:field="buttonAddUser">
-						<ui:text from='{messages.addUserButton}' />
-					</g:Button>
-					<g:Button addStyleNames="btn btn-plus" ui:field="buttonAddGroup">
-						<ui:text from='{messages.addGroupButton}' />
-					</g:Button>
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>

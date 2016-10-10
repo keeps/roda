@@ -13,11 +13,18 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIPState;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
+@XmlRootElement(name = "report")
+@JsonInclude(JsonInclude.Include.ALWAYS)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Report implements Serializable, IsIndexed {
   private static final long serialVersionUID = 4316398565678538090L;
 

@@ -12,22 +12,30 @@ package org.roda.wui.client.planning;
 
 import java.util.List;
 
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
+import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.EditMultipleRiskIncidenceDialog;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.process.CreateJob;
+import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -98,6 +106,9 @@ public class ShowRisk extends Composite {
   @UiField
   Button buttonProcess;
 
+  @UiField
+  Button buttonEditIncidence;
+
   private Risk risk;
 
   /**
@@ -111,6 +122,8 @@ public class ShowRisk extends Composite {
     this.riskShowPanel = new RiskShowPanel();
     initWidget(uiBinder.createAndBindUi(this));
     buttonProcess.setEnabled(false);
+    buttonEditIncidence.setVisible(false);
+    buttonEditIncidence.setEnabled(false);
   }
 
   public ShowRisk(Risk risk) {
@@ -118,6 +131,8 @@ public class ShowRisk extends Composite {
     this.riskShowPanel = new RiskShowPanel(risk, true);
     initWidget(uiBinder.createAndBindUi(this));
     buttonProcess.setEnabled(false);
+    buttonEditIncidence.setVisible(false);
+    buttonEditIncidence.setEnabled(false);
 
     BrowserService.Util.getInstance().hasRiskVersions(risk.getId(), new AsyncCallback<Boolean>() {
 
@@ -134,7 +149,6 @@ public class ShowRisk extends Composite {
   }
 
   void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-
     if (historyTokens.size() == 1) {
       String riskId = historyTokens.get(0);
       BrowserService.Util.getInstance().retrieve(IndexedRisk.class.getName(), riskId, new AsyncCallback<IndexedRisk>() {
@@ -187,7 +201,6 @@ public class ShowRisk extends Composite {
         riskShowPanel.refreshList();
         Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(), messages.ingestTransferRemoveAllSuccessMessage());
       }
-
     });
   }
 
@@ -198,12 +211,54 @@ public class ShowRisk extends Composite {
     Tools.newHistory(CreateJob.RESOLVER, "action");
   }
 
+  @UiHandler("buttonEditIncidence")
+  void handleButtonEditIncidence(ClickEvent e) {
+    final SelectedItems selected = riskShowPanel.getSelectedIncidences();
+    EditMultipleRiskIncidenceDialog dialog = new EditMultipleRiskIncidenceDialog(selected);
+    dialog.setSingleSelectionMode();
+    dialog.showAndCenter();
+    dialog.addValueChangeHandler(new ValueChangeHandler<RiskIncidence>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<RiskIncidence> event) {
+        final RiskIncidence parentAIP = event.getValue();
+        final String parentId = (parentAIP != null) ? parentAIP.getId() : null;
+
+        BrowserService.Util.getInstance().moveAIPInHierarchy(selected, parentId,
+          new LoadingAsyncCallback<IndexedAIP>() {
+
+            @Override
+            public void onSuccessImpl(IndexedAIP result) {
+              if (result != null) {
+                Tools.newHistory(Browse.RESOLVER, result.getId());
+              } else {
+                Tools.newHistory(Search.RESOLVER);
+              }
+            }
+
+            @Override
+            public void onFailureImpl(Throwable caught) {
+              if (caught instanceof NotFoundException) {
+                Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+              } else {
+                AsyncCallbackUtils.defaultFailureTreatment(caught);
+              }
+            }
+          });
+      }
+    });
+  }
+
   private void cancel() {
     Tools.newHistory(RiskRegister.RESOLVER);
   }
 
   public void enableProcessButton(boolean enable) {
     buttonProcess.setEnabled(enable);
+  }
+
+  public void enableEditIncidenceButton(boolean enable) {
+    buttonEditIncidence.setEnabled(enable);
   }
 
 }

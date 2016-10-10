@@ -23,6 +23,7 @@ import javax.xml.transform.TransformerException;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.EntityResponse;
+import org.roda.core.common.IdUtils;
 import org.roda.core.common.StreamResponse;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
@@ -1916,6 +1917,9 @@ public class Browser extends RodaWuiController {
       if (RodaConstants.API_GET_REPORTS_ID_OBJECT_SIP.equals(resourceOrSip)) {
         reportList = BrowserHelper.listTransferredResourcesReportsWithSIP(id, start, limit);
       } else {
+        if (RodaConstants.API_GET_REPORTS_ID_OBJECT_RESOURCE_PATH.equals(resourceOrSip)) {
+          id = IdUtils.getTransferredResourceUUID(id);
+        }
         reportList = BrowserHelper.listTransferredResourcesReports(id, start, limit);
       }
     }

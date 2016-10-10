@@ -19,30 +19,37 @@
 			</g:FlowPanel>
 
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
-				<g:FlowPanel>
-					<g:Label addStyleNames="h4">
-						<ui:text from='{messages.sidebarActionsTitle}' />
-					</g:Label>
-					<g:Button addStyleNames="btn btn-clock" ui:field="buttonHistory">
-						<ui:text from='{messages.riskHistoryButton}' />
-					</g:Button>
-					<g:Button addStyleNames="btn btn-edit" ui:field="buttonEdit">
-						<ui:text from='{messages.editButton}' />
-					</g:Button>
-					<g:Button addStyleNames="btn btn-default btn-times-circle" ui:field="buttonCancel">
-						<ui:text from='{messages.cancelButton}' />
-					</g:Button>
-				</g:FlowPanel>
-				<g:FlowPanel>
-					<g:Label addStyleNames="h4">
-						<ui:text from='{messages.riskIncidences}' />
-					</g:Label>
-					<g:Button addStyleNames="btn btn-danger btn-ban" ui:field="buttonRemove">
-						<ui:text from='{messages.removeButton}' />
-					</g:Button>
-					<g:Button addStyleNames="btn btn-play" ui:field="buttonProcess">
-						<ui:text from='{messages.newProcessPreservation}' />
-					</g:Button>
+				<g:FlowPanel addStyleNames="sidebar_actions_wrapper sticky">
+					<g:FlowPanel>
+						<g:Label addStyleNames="h4">
+							<ui:text from='{messages.sidebarActionsTitle}' />
+						</g:Label>
+						<g:Button addStyleNames="btn btn-clock" ui:field="buttonHistory">
+							<ui:text from='{messages.riskHistoryButton}' />
+						</g:Button>
+						<g:Button addStyleNames="btn btn-edit" ui:field="buttonEdit">
+							<ui:text from='{messages.editButton}' />
+						</g:Button>
+						<g:Button addStyleNames="btn btn-default btn-times-circle"
+							ui:field="buttonCancel">
+							<ui:text from='{messages.cancelButton}' />
+						</g:Button>
+					</g:FlowPanel>
+					<g:FlowPanel>
+						<g:Label addStyleNames="h4">
+							<ui:text from='{messages.riskIncidences}' />
+						</g:Label>
+						<g:Button addStyleNames="btn btn-edit" ui:field="buttonEditIncidence">
+							<ui:text from='{messages.editButton}' />
+						</g:Button>
+						<g:Button addStyleNames="btn btn-danger btn-ban"
+							ui:field="buttonRemove">
+							<ui:text from='{messages.removeButton}' />
+						</g:Button>
+						<g:Button addStyleNames="btn btn-play" ui:field="buttonProcess">
+							<ui:text from='{messages.newProcessPreservation}' />
+						</g:Button>
+					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>

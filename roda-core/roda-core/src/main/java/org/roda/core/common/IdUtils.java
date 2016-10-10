@@ -7,6 +7,7 @@
  */
 package org.roda.core.common;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 
@@ -128,6 +129,14 @@ public final class IdUtils {
       UUID
         .nameUUIDFromBytes(getFileId(aipId, representationId, fileDirectoryPath, fileId, null, ID_SEPARATOR).getBytes())
         .toString());
+  }
+
+  public static String getTransferredResourceUUID(Path relativeToBase) {
+    return getTransferredResourceUUID(relativeToBase.toString());
+  }
+
+  public static String getTransferredResourceUUID(String relativeToBase) {
+    return UUID.nameUUIDFromBytes(relativeToBase.getBytes()).toString();
   }
 
 }

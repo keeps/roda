@@ -25,6 +25,7 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.IdUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
@@ -129,14 +130,6 @@ public class TransferredResourcesScanner {
     return ret;
   }
 
-  private static String getTransferredResourceUUID(Path relativeToBase) {
-    return UUID.nameUUIDFromBytes(relativeToBase.toString().getBytes()).toString();
-  }
-
-  private static String getTransferredResourceUUID(String relativeToBase) {
-    return UUID.nameUUIDFromBytes(relativeToBase.getBytes()).toString();
-  }
-
   protected static TransferredResource createTransferredResource(Path resourcePath, BasicFileAttributes attr, long size,
     Path basePath, Date lastScanDate) {
     Path relativeToBase = basePath.relativize(resourcePath);
@@ -149,7 +142,7 @@ public class TransferredResourcesScanner {
     tr.setFullPath(resourcePath.toString());
     String id = relativeToBase.toString();
     tr.setId(id);
-    tr.setUUID(getTransferredResourceUUID(relativeToBase));
+    tr.setUUID(IdUtils.getTransferredResourceUUID(relativeToBase));
     tr.setName(resourcePath.getFileName().toString());
 
     tr.setRelativePath(relativeToBase.toString());
@@ -280,7 +273,7 @@ public class TransferredResourcesScanner {
 
         FSUtils.move(Paths.get(resource.getFullPath()), newResourcePath, replaceExisting);
         oldToNewTransferredResourceIds.put(resource.getUUID(),
-          getTransferredResourceUUID(basePath.relativize(newResourcePath)));
+          IdUtils.getTransferredResourceUUID(basePath.relativize(newResourcePath)));
         resourcesToIndex.add(resource);
       } else {
         notFoundResources = true;
@@ -288,7 +281,7 @@ public class TransferredResourcesScanner {
     }
 
     if (reindexResources) {
-      updateAllTransferredResources(getTransferredResourceUUID(newRelativePath), true);
+      updateAllTransferredResources(IdUtils.getTransferredResourceUUID(newRelativePath), true);
       reindexOldResourcesParentsAfterMove(resourcesToIndex, areResourcesFromSameFolder);
     }
 

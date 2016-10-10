@@ -8,7 +8,7 @@
 	xmlns:lists="urn:import:org.roda.wui.client.common.lists">
 
 	<ui:style>
-
+	
 	</ui:style>
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
@@ -19,41 +19,45 @@
 				<g:Label styleName="h1" ui:field="riskIncidenceRegisterTitle">
 					<ui:text from='{messages.riskIncidenceRegisterTitle}' />
 				</g:Label>
-				<g:FlowPanel addStyleNames="page-description" ui:field="riskIncidenceRegisterDescription">
+				<g:FlowPanel addStyleNames="page-description"
+					ui:field="riskIncidenceRegisterDescription">
 				</g:FlowPanel>
 				<commonsearch:SearchPanel ui:field="searchPanel" />
 				<lists:RiskIncidenceList addStyleNames="searchResults"
 					ui:field="riskIncidenceList" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
-				<g:FlowPanel ui:field="risksSidebar">
-					<g:Label addStyleNames="h4">
-						<ui:text from='{messages.sidebarRisksTitle}' />
-					</g:Label>
-					<g:Button addStyleNames="btn btn-danger btn-ban" ui:field="buttonRemove">
-						<ui:text from='{messages.removeButton}' />
-					</g:Button>
-				</g:FlowPanel>
-				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+				<g:FlowPanel addStyleNames="sidebar_actions_wrapper sticky">
+					<g:FlowPanel ui:field="risksSidebar">
+						<g:Label addStyleNames="h4">
+							<ui:text from='{messages.sidebarRisksTitle}' />
+						</g:Label>
+						<g:Button addStyleNames="btn btn-danger btn-ban"
+							ui:field="buttonRemove">
+							<ui:text from='{messages.removeButton}' />
+						</g:Button>
+					</g:FlowPanel>
+					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+						<g:Label addStyleNames="h5 sidebar-facet-title">
+							<ui:text from='{messages.riskIncidenceDetectedBy}' />
+						</g:Label>
+						<g:FlowPanel ui:field="facetDetectedBy" />
+						<g:Label addStyleNames="h5 sidebar-facet-title">
+							<ui:text from='{messages.riskIncidenceStatus}' />
+						</g:Label>
+						<g:FlowPanel ui:field="facetStatus" />
+					</g:FlowPanel>
 					<g:Label addStyleNames="h5 sidebar-facet-title">
-						<ui:text from='{messages.riskIncidenceDetectedBy}' />
+						<ui:text from='{messages.sidebarFilterDates}' />
 					</g:Label>
-					<g:FlowPanel ui:field="facetDetectedBy" />
-					<g:Label addStyleNames="h5 sidebar-facet-title">
-						<ui:text from='{messages.riskIncidenceStatus}' />
-					</g:Label>
-					<g:FlowPanel ui:field="facetStatus" />
+					<d:DateBox
+						addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
+						ui:field="inputDateInitial" />
+					<g:Label addStyleNames="sidebar-facet-date-separator">-</g:Label>
+					<d:DateBox
+						addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
+						ui:field="inputDateFinal" />
 				</g:FlowPanel>
-				<g:Label addStyleNames="h5 sidebar-facet-title">
-					<ui:text from='{messages.sidebarFilterDates}' />
-				</g:Label>
-				<d:DateBox
-					addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
-					ui:field="inputDateInitial" />
-				<g:Label addStyleNames="sidebar-facet-date-separator">-</g:Label>
-				<d:DateBox
-					addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
-					ui:field="inputDateFinal" />
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>
