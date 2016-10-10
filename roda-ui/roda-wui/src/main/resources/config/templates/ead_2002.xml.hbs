@@ -84,16 +84,18 @@
       	{{~#if title~}}
       	<unitid {{#if countryCode}}countrycode="{{countryCode}}"{{/if}} {{#if repositoryCode}}repositorycode="{{repositoryCode}}"{{/if}}>{{id}}</unitid>
       	{{~/if~}}
-      	{{~#if descDate~}}
-			{{~#if dateInitial~}}
-				{{~#if dateFinal~}}
-					<unitdate label="UnitDates" normal='{{dateInitial}}/{{dateFinal}}'>{{#if descDate}}{{descDate}}{{/if}}</unitdate>
-				{{~^~}}
-					<unitdate label="UnitDateInitial" normal="{{dateInitial}}">{{#if descDate}}{{descDate}}{{/if}}</unitdate>
-				{{~/if~}}
+		{{~#if dateInitial~}}
+			{{~#if dateFinal~}}
+				<unitdate label="UnitDates" normal='{{dateInitial}}/{{dateFinal}}'>{{#if descDate}}{{descDate}}{{/if}}</unitdate>
 			{{~^~}}
-				{{~#if dateFinal~}}
-					<unitdate label="UnitDateFinal" normal="{{dateFinal}}">{{#if descDate}}{{descDate}}{{/if}}</unitdate>
+				<unitdate label="UnitDateInitial" normal="{{dateInitial}}">{{#if descDate}}{{descDate}}{{/if}}</unitdate>
+			{{~/if~}}
+		{{~^~}}
+			{{~#if dateFinal~}}
+				<unitdate label="UnitDateFinal" normal="{{dateFinal}}">{{#if descDate}}{{descDate}}{{/if}}</unitdate>
+			{{~^~}}
+				{{~#if descDate~}}
+					<unitdate label="UnitDates">{{descDate}}</unitdate>
 				{{~/if~}}
 			{{~/if~}}
 		{{~/if~}}
