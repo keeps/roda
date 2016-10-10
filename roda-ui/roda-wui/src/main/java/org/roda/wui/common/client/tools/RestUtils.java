@@ -271,7 +271,7 @@ public class RestUtils {
 
     String url = RodaConstants.API_REST_V1_INDEX + "findFORM";
     FindRequest request = new FindRequest(classToReturn.getName(), filter, sorter, sublist, facets, onlyActive,
-      exportFacets, "export.csv");
+      exportFacets, filename);
 
     final FormPanel form = new FormPanel();
     form.setAction(URL.encode(url));
