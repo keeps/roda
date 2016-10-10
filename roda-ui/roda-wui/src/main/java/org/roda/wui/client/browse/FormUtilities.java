@@ -88,15 +88,25 @@ public class FormUtilities {
     String rawLabel = mv.get("label");
     if (rawLabel != null && rawLabel.length() > 0) {
       String loc = LocaleInfo.getCurrentLocale().getLocaleName();
+      GWT.log("LOC: "+loc);
       try {
         JSONObject jsonObject = JSONParser.parseLenient(rawLabel).isObject();
         JSONValue jsonValue = jsonObject.get(loc);
         if (jsonValue != null) {
-          JSONString jsonString = jsonObject.get(loc).isString();
+          JSONString jsonString = jsonValue.isString();
           if (jsonString != null) {
             result = jsonString.stringValue();
           }
         } else {
+          if(loc.contains("_")){
+            jsonValue = jsonObject.get(loc.split("_")[0]);
+            if (jsonValue != null) {
+              JSONString jsonString = jsonValue.isString();
+              if (jsonString != null) {
+                result = jsonString.stringValue();
+              }
+            }
+          }
           // label for the desired language doesn't exist
           // do nothing
         }
