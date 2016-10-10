@@ -218,8 +218,10 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
         if (result.getTotalCount() >= 1) {
           IndexedAIP indexedAIP = result.getResults().get(0);
           parent = indexedAIP.getId();
-        } else
-          throw new NotFoundException();
+        } else {
+          IndexedAIP aip = index.retrieve(IndexedAIP.class, ancestor);
+          parent = aip.getId();
+        }
       } catch (NotFoundException e) {
         Job currentJob = PluginHelper.getJob(this, index);
         if (currentJob == null) {
