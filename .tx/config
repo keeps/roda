@@ -217,3 +217,11 @@ minimum_perc = 50
 source_file = roda-ui/roda-wui/src/main/resources/config/theme/Error404.html
 source_lang = en
 type = HTML
+
+[roda2.editriskincidencedescriptionhtml]
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/EditRiskIncidenceDescription_<lang>.html
+minimum_perc = 50
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/EditRiskIncidenceDescription.html
+source_lang = en
+type = HTML
+

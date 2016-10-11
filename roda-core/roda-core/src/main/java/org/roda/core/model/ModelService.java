@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
@@ -265,6 +266,7 @@ public class ModelService extends ModelObservable {
     AIPState state = AIPState.ACTIVE;
     Directory directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
     String id = directory.getStoragePath().getName();
+    permissions = this.addParentPermissions(permissions, parentId);
 
     AIP aip = new AIP(id, parentId, type, state, permissions, createdBy);
 
@@ -301,6 +303,7 @@ public class ModelService extends ModelObservable {
 
     Directory directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
     String id = directory.getStoragePath().getName();
+    permissions = this.addParentPermissions(permissions, parentId);
 
     AIP aip = new AIP(id, parentId, type, state, permissions, createdBy);
     createAIPMetadata(aip);
@@ -318,9 +321,11 @@ public class ModelService extends ModelObservable {
 
     Directory directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
     String id = directory.getStoragePath().getName();
+    permissions = this.addParentPermissions(permissions, parentId);
 
     AIP aip = new AIP(id, parentId, type, state, permissions, createdBy).setIngestSIPIds(ingestSIPIds)
       .setIngestJobId(ingestJobId);
+
     createAIPMetadata(aip);
 
     if (notify) {
@@ -348,6 +353,31 @@ public class ModelService extends ModelObservable {
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
     notifyAipUpdated(aip);
     return aip;
+  }
+
+  private Permissions addParentPermissions(Permissions permissions, String parentId)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    if (parentId != null) {
+      AIP parentAIP = this.retrieveAIP(parentId);
+      Set<String> parentGroupnames = parentAIP.getPermissions().getGroupnames();
+      Set<String> parentUsernames = parentAIP.getPermissions().getUsernames();
+      Set<String> groupnames = permissions.getGroupnames();
+      Set<String> usernames = permissions.getUsernames();
+
+      for (String user : parentUsernames) {
+        if (!usernames.contains(user)) {
+          permissions.setUserPermissions(user, parentAIP.getPermissions().getUserPermissions(user));
+        }
+      }
+
+      for (String group : parentGroupnames) {
+        if (!groupnames.contains(group)) {
+          permissions.setGroupPermissions(group, parentAIP.getPermissions().getGroupPermissions(group));
+        }
+      }
+    }
+
+    return permissions;
   }
 
   // TODO support asReference
