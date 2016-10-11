@@ -138,7 +138,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
         // Status is UPDATE or the AIP is a ghost
         if (IPEnums.IPStatus.UPDATE == sip.getStatus()) {
           IndexResult<IndexedAIP> result = index.find(IndexedAIP.class,
-            new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, sip.getId())), Sorter.NONE,
+            new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_IDS, sip.getId())), Sorter.NONE,
             new Sublist(0, 1));
           if (result.getTotalCount() == 1) {
             IndexedAIP indexedAIP = result.getResults().get(0);
@@ -160,8 +160,8 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
                 Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE,
                 Permissions.PermissionType.GRANT)));
             // Create the permissions object for the user that created the job
-            aip = EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, jobUsername, fullPermissions, model, storage, sip.getId(),
-              reportItem.getJobId(), computedParentId);
+            aip = EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, jobUsername, fullPermissions, model, storage,
+              Arrays.asList(sip.getId()), reportItem.getJobId(), computedParentId);
           } else {
             throw new GenericException("Unknown IP Status: " + sip.getStatus());
           }
@@ -210,7 +210,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
 
     for (String ancestor : ancestors) {
       try {
-        Filter ancestorFilter = new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, ancestor));
+        Filter ancestorFilter = new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_IDS, ancestor));
         if (!StringUtils.isBlank(forcedParent)) {
           ancestorFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, forcedParent));
         }
@@ -234,7 +234,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
           new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
             Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE, Permissions.PermissionType.GRANT)));
         boolean isGhost = true;
-        AIP ghostAIP = model.createAIP(parent, "", permissions, true, ancestor, isGhost, username);
+        AIP ghostAIP = model.createAIP(parent, "", permissions, true, Arrays.asList(ancestor), isGhost, username);
         parent = ghostAIP.getId();
       }
     }

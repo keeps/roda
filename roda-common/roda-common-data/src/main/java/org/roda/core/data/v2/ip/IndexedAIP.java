@@ -44,7 +44,7 @@ public class IndexedAIP implements IsIndexed {
   private Boolean hasRepresentations;
   private Boolean ghost;
 
-  private String ingestSIPId;
+  private List<String> ingestSIPIds;
   private String ingestJobId;
 
   /**
@@ -255,12 +255,12 @@ public class IndexedAIP implements IsIndexed {
     this.permissions = permissions;
   }
 
-  public String getIngestSIPId() {
-    return ingestSIPId;
+  public List<String> getIngestSIPIds() {
+    return ingestSIPIds;
   }
 
-  public IndexedAIP setIngestSIPId(String ingestSIPId) {
-    this.ingestSIPId = ingestSIPId;
+  public IndexedAIP setIngestSIPIds(List<String> ingestSIPIds) {
+    this.ingestSIPIds = ingestSIPIds;
     return this;
   }
 
@@ -332,7 +332,7 @@ public class IndexedAIP implements IsIndexed {
       return false;
     if (ghost != null ? !ghost.equals(that.ghost) : that.ghost != null)
       return false;
-    if (ingestSIPId != null ? !ingestSIPId.equals(that.ingestSIPId) : that.ingestSIPId != null)
+    if (ingestSIPIds != null ? !ingestSIPIds.equals(that.ingestSIPIds) : that.ingestSIPIds != null)
       return false;
     return ingestJobId != null ? ingestJobId.equals(that.ingestJobId) : that.ingestJobId == null;
 
@@ -355,7 +355,7 @@ public class IndexedAIP implements IsIndexed {
     result = 31 * result + (numberOfSchemaFiles != null ? numberOfSchemaFiles.hashCode() : 0);
     result = 31 * result + (hasRepresentations != null ? hasRepresentations.hashCode() : 0);
     result = 31 * result + (ghost != null ? ghost.hashCode() : 0);
-    result = 31 * result + (ingestSIPId != null ? ingestSIPId.hashCode() : 0);
+    result = 31 * result + (ingestSIPIds != null ? ingestSIPIds.hashCode() : 0);
     result = 31 * result + (ingestJobId != null ? ingestJobId.hashCode() : 0);
     return result;
   }
@@ -367,7 +367,7 @@ public class IndexedAIP implements IsIndexed {
       + ", parentID='" + parentID + '\'' + ", ancestors=" + ancestors + ", permissions=" + permissions
       + ", numberOfSubmissionFiles=" + numberOfSubmissionFiles + ", numberOfDocumentationFiles="
       + numberOfDocumentationFiles + ", numberOfSchemaFiles=" + numberOfSchemaFiles + ", hasRepresentations="
-      + hasRepresentations + ", ghost=" + ghost + ", ingestSIPId='" + ingestSIPId + '\'' + ", ingestJobId='"
+      + hasRepresentations + ", ghost=" + ghost + ", ingestSIPId='" + ingestSIPIds + '\'' + ", ingestJobId='"
       + ingestJobId + '\'' + '}';
   }
 
@@ -381,7 +381,7 @@ public class IndexedAIP implements IsIndexed {
   @Override
   public List<Object> toCsvValues() {
     return Arrays.asList(id, state, level, title, dateInitial, dateFinal, description, parentID, ancestors, permissions,
-      numberOfSubmissionFiles, numberOfDocumentationFiles, numberOfSchemaFiles, hasRepresentations, ghost, ingestSIPId,
+      numberOfSubmissionFiles, numberOfDocumentationFiles, numberOfSchemaFiles, hasRepresentations, ghost, ingestSIPIds,
       ingestJobId);
   }
 

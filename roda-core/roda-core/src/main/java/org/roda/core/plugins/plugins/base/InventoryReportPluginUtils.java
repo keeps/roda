@@ -99,7 +99,7 @@ public class InventoryReportPluginUtils {
     Map<String, String> fixities = null;
     for (String fieldName : fields) {
       if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_SIP_ID)) {
-        fileInfo.add(aip.getIngestSIPId());
+        fileInfo.add(FSUtils.asString(aip.getIngestSIPIds()));
       } else if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_AIP_ID)) {
         fileInfo.add(aip.getId());
       } else if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_REPRESENTATION_ID)) {
@@ -145,7 +145,7 @@ public class InventoryReportPluginUtils {
     List<Fixity> fixities = null;
     for (String fieldName : fields) {
       if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_SIP_ID)) {
-        fileInfo.add(aip.getIngestSIPId());
+        fileInfo.add(FSUtils.asString(aip.getIngestSIPIds()));
       } else if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_AIP_ID)) {
         fileInfo.add(file.getAipId());
       } else if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_REPRESENTATION_ID)) {
@@ -230,7 +230,7 @@ public class InventoryReportPluginUtils {
     Map<String, String> fixities = null;
     for (String fieldName : fields) {
       if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_SIP_ID)) {
-        fileInfo.add(aip.getIngestSIPId());
+        fileInfo.add(FSUtils.asString(aip.getIngestSIPIds()));
       } else if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_AIP_ID)) {
         fileInfo.add(otherMetadata.getAipId());
       } else if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_REPRESENTATION_ID)) {
@@ -262,7 +262,8 @@ public class InventoryReportPluginUtils {
           fileInfo.add("");
         }
       } else if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FILE_TYPE)) {
-        fileInfo.add(InventoryReportPlugin.CSV_LINE_TYPE.METADATA_OTHER.toString()+"_"+otherMetadata.getType().toUpperCase());
+        fileInfo.add(
+          InventoryReportPlugin.CSV_LINE_TYPE.METADATA_OTHER.toString() + "_" + otherMetadata.getType().toUpperCase());
       } else {
         fileInfo.add("");
       }

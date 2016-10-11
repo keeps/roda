@@ -34,7 +34,7 @@ public class AIP implements IsRODAObject {
 
   private List<Representation> representations;
 
-  private String ingestSIPId = "";
+  private List<String> ingestSIPIds;
   private String ingestJobId = "";
 
   private Boolean ghost = null;
@@ -172,12 +172,12 @@ public class AIP implements IsRODAObject {
     this.representations = representations;
   }
 
-  public String getIngestSIPId() {
-    return ingestSIPId;
+  public List<String> getIngestSIPIds() {
+    return ingestSIPIds;
   }
 
-  public AIP setIngestSIPId(String ingestSIPId) {
-    this.ingestSIPId = ingestSIPId;
+  public AIP setIngestSIPIds(List<String> ingestSIPIds) {
+    this.ingestSIPIds = ingestSIPIds;
     return this;
   }
 
@@ -287,7 +287,7 @@ public class AIP implements IsRODAObject {
       return false;
     if (representations != null ? !representations.equals(aip.representations) : aip.representations != null)
       return false;
-    if (ingestSIPId != null ? !ingestSIPId.equals(aip.ingestSIPId) : aip.ingestSIPId != null)
+    if (ingestSIPIds != null ? !ingestSIPIds.equals(aip.ingestSIPIds) : aip.ingestSIPIds != null)
       return false;
     if (ingestJobId != null ? !ingestJobId.equals(aip.ingestJobId) : aip.ingestJobId != null)
       return false;
@@ -304,7 +304,7 @@ public class AIP implements IsRODAObject {
     result = 31 * result + (permissions != null ? permissions.hashCode() : 0);
     result = 31 * result + (descriptiveMetadata != null ? descriptiveMetadata.hashCode() : 0);
     result = 31 * result + (representations != null ? representations.hashCode() : 0);
-    result = 31 * result + (ingestSIPId != null ? ingestSIPId.hashCode() : 0);
+    result = 31 * result + (ingestSIPIds != null ? ingestSIPIds.hashCode() : 0);
     result = 31 * result + (ingestJobId != null ? ingestJobId.hashCode() : 0);
     result = 31 * result + (ghost != null ? ghost.hashCode() : 0);
     return result;
@@ -314,7 +314,7 @@ public class AIP implements IsRODAObject {
   public String toString() {
     return "AIP{" + "id='" + id + '\'' + ", parentId='" + parentId + '\'' + ", type='" + type + '\'' + ", state="
       + state + ", permissions=" + permissions + ", descriptiveMetadata=" + descriptiveMetadata + ", representations="
-      + representations + ", ingestSIPId='" + ingestSIPId + '\'' + ", ingestJobId='" + ingestJobId + '\'' + ", ghost="
+      + representations + ", ingestSIPId='" + ingestSIPIds + '\'' + ", ingestJobId='" + ingestJobId + '\'' + ", ghost="
       + ghost + ", format=" + format + ", relationships=" + relationships + ", createdOn=" + createdOn + ", createdBy="
       + createdBy + ", updatedOn=" + updatedOn + ", updatedBy=" + updatedBy + '}';
   }

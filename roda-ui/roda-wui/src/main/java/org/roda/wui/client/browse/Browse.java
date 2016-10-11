@@ -55,6 +55,7 @@ import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.RestErrorOverlayType;
 import org.roda.wui.common.client.tools.RestUtils;
+import org.roda.wui.common.client.tools.StringUtility;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
@@ -511,7 +512,7 @@ public class Browse extends Composite {
       itemIcon.getParent().removeStyleName("browseTitle-allCollections-wrapper");
       itemId.setText(aip.getId());
       itemId.addStyleName("browseItemId");
-      sipId.setText(aip.getIngestSIPId());
+      sipId.setText(StringUtility.prettyPrint(aip.getIngestSIPIds()));
       sipId.addStyleName("browseSipId");
 
       final List<Pair<String, HTML>> descriptiveMetadataContainers = new ArrayList<Pair<String, HTML>>();
@@ -955,32 +956,32 @@ public class Browse extends Composite {
             messages.ingestTransferRemoveFolderConfirmDialogCancel(),
             messages.ingestTransferRemoveFolderConfirmDialogOk(), new AsyncCallback<Boolean>() {
 
-            @Override
-            public void onSuccess(Boolean confirmed) {
-              if (confirmed) {
-                BrowserService.Util.getInstance().deleteAIP(selected, new LoadingAsyncCallback<String>() {
+              @Override
+              public void onSuccess(Boolean confirmed) {
+                if (confirmed) {
+                  BrowserService.Util.getInstance().deleteAIP(selected, new LoadingAsyncCallback<String>() {
 
-                  @Override
-                  public void onFailureImpl(Throwable caught) {
-                    AsyncCallbackUtils.defaultFailureTreatment(caught);
-                    aipList.refresh();
-                  }
+                    @Override
+                    public void onFailureImpl(Throwable caught) {
+                      AsyncCallbackUtils.defaultFailureTreatment(caught);
+                      aipList.refresh();
+                    }
 
-                  @Override
-                  public void onSuccessImpl(String parentId) {
-                    Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
-                      messages.ingestTransferRemoveSuccessMessage(size));
-                    aipList.refresh();
-                  }
-                });
+                    @Override
+                    public void onSuccessImpl(String parentId) {
+                      Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
+                        messages.ingestTransferRemoveSuccessMessage(size));
+                      aipList.refresh();
+                    }
+                  });
+                }
               }
-            }
 
-            @Override
-            public void onFailure(Throwable caught) {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
-            }
-          });
+              @Override
+              public void onFailure(Throwable caught) {
+                AsyncCallbackUtils.defaultFailureTreatment(caught);
+              }
+            });
         }
 
       });
@@ -1092,24 +1093,24 @@ public class Browse extends Composite {
           BrowserService.Util.getInstance().moveAIPInHierarchy(selected, parentId,
             new LoadingAsyncCallback<IndexedAIP>() {
 
-            @Override
-            public void onSuccessImpl(IndexedAIP result) {
-              if (result != null) {
-                Tools.newHistory(Browse.RESOLVER, result.getId());
-              } else {
-                Tools.newHistory(Browse.RESOLVER);
+              @Override
+              public void onSuccessImpl(IndexedAIP result) {
+                if (result != null) {
+                  Tools.newHistory(Browse.RESOLVER, result.getId());
+                } else {
+                  Tools.newHistory(Browse.RESOLVER);
+                }
               }
-            }
 
-            @Override
-            public void onFailureImpl(Throwable caught) {
-              if (caught instanceof NotFoundException) {
-                Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-              } else {
-                AsyncCallbackUtils.defaultFailureTreatment(caught);
+              @Override
+              public void onFailureImpl(Throwable caught) {
+                if (caught instanceof NotFoundException) {
+                  Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+                } else {
+                  AsyncCallbackUtils.defaultFailureTreatment(caught);
+                }
               }
-            }
-          });
+            });
         }
 
       });

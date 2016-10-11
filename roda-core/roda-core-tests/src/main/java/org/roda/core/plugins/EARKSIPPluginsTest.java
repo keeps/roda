@@ -241,7 +241,7 @@ public class EARKSIPPluginsTest {
     Assert.assertEquals(findRootChildren.getTotalCount(), 2L);
 
     IndexResult<IndexedAIP> findSpecificAIP = index.find(IndexedAIP.class,
-      new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, "026106")), null, new Sublist(0, 1));
+      new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_IDS, "026106")), null, new Sublist(0, 1));
     Assert.assertEquals(findSpecificAIP.getTotalCount(), 1L);
     IndexedAIP specificAIP = findSpecificAIP.getResults().get(0);
     Assert.assertEquals(specificAIP.getAncestors().size(), 4);

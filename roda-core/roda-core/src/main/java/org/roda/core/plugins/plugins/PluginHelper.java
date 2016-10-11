@@ -41,6 +41,7 @@ import org.roda.core.data.v2.LinkingObjectUtils;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
@@ -781,7 +782,7 @@ public final class PluginHelper {
     index.execute(IndexedAIP.class,
       new Filter(new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.TRUE.toString())), ghost -> {
         Filter nonGhostsFilter = new Filter(
-          new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, ghost.getIngestSIPId()),
+          new OneOfManyFilterParameter(RodaConstants.INGEST_SIP_IDS, ghost.getIngestSIPIds()),
           new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.FALSE.toString()));
         if (!StringUtils.isBlank(forcedParent)) {
           nonGhostsFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, forcedParent));
@@ -790,7 +791,7 @@ public final class PluginHelper {
         IndexResult<IndexedAIP> result = index.find(IndexedAIP.class, nonGhostsFilter, Sorter.NONE, new Sublist(0, 1));
 
         if (result.getTotalCount() > 1) {
-          LOGGER.debug("Couldn't find non-ghost AIP with ingest SIP id {}", ghost.getIngestSIPId());
+          LOGGER.debug("Couldn't find non-ghost AIP with ingest SIP ids {}", ghost.getIngestSIPIds());
         } else if (result.getTotalCount() == 1) {
           IndexedAIP newParentIAIP = result.getResults().get(0);
           moveChildrenAIPsAndDelete(plugin, index, model, ghost.getId(), newParentIAIP.getId(), forcedParent);
@@ -798,7 +799,7 @@ public final class PluginHelper {
           // check if there are other ghosts with the same sip id and from the
           // same job, move all of this ghost children
           Filter otherGhostsFilter = new Filter(
-            new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, ghost.getIngestSIPId()),
+            new OneOfManyFilterParameter(RodaConstants.INGEST_SIP_IDS, ghost.getIngestSIPIds()),
             new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.TRUE.toString()));
           if (!StringUtils.isBlank(forcedParent)) {
             otherGhostsFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, forcedParent));

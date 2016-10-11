@@ -2473,7 +2473,7 @@ public class BrowserHelper {
     IndexService indexService = RodaCoreFactory.getIndexService();
 
     Filter sipFilter = new Filter();
-    sipFilter.add(new SimpleFilterParameter(RodaConstants.INGEST_SIP_ID, sipId));
+    sipFilter.add(new SimpleFilterParameter(RodaConstants.INGEST_SIP_IDS, sipId));
 
     int aipCounter = indexService.count(IndexedAIP.class, sipFilter).intValue();
     IndexResult<IndexedAIP> aips = indexService.find(IndexedAIP.class, sipFilter, Sorter.NONE,

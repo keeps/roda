@@ -150,7 +150,7 @@
    
    <!-- AIP -->
    <field name="state" type="string" default="false" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="ingestSIPId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="ingestSIPIds" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <field name="ingestJobId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <dynamicField name="permission_users_*" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <dynamicField name="permission_groups_*" type="string" indexed="true" stored="true" required="false" multiValued="true" />

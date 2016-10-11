@@ -119,7 +119,7 @@
    <field name="numberOfDocumentationFiles" type="long" indexed="true" stored="true" />
    <field name="numberOfSchemaFiles" type="long" indexed="true" stored="true" />
    
-   <field name="ingestSIPId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="ingestSIPIds" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <field name="ingestJobId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    
    <field name="level" type="string" indexed="true" stored="true" required="false" multiValued="false" />

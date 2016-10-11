@@ -344,7 +344,7 @@ public final class RodaConstants {
   public static final String AIP_PARENT_ID = "parentId";
   public static final String AIP_ANCESTORS = "ancestors";
   public static final String STATE = "state";
-  public static final String INGEST_SIP_ID = "ingestSIPId";
+  public static final String INGEST_SIP_IDS = "ingestSIPIds";
   public static final String INGEST_JOB_ID = "ingestJobId";
 
   public static final String AIP_DESCRIPTIVE_METADATA_ID = "descriptiveMetadataId";

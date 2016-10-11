@@ -101,7 +101,7 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
             String parentId = PluginHelper.computeParentId(this, index, bag.getBagInfoTxt().get("parent"));
 
             AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bag, bagitPath, model, "metadata.xml",
-              transferredResource.getName(), reportItem.getJobId(), parentId, username);
+              Arrays.asList(transferredResource.getName()), reportItem.getJobId(), parentId, username);
 
             PluginHelper.createSubmission(model, createSubmission, bagitPath, aipCreated.getId());
 

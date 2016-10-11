@@ -67,10 +67,10 @@ import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetParameter;
+import org.roda.core.data.v2.index.facet.FacetParameter.SORT;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.facet.RangeFacetParameter;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
-import org.roda.core.data.v2.index.facet.FacetParameter.SORT;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
 import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
@@ -176,7 +176,7 @@ public class SolrUtils {
         throw new NotFoundException("Could not find document " + id);
       }
     } catch (SolrServerException | IOException e) {
-      throw new GenericException("Could not retrieve AIP from index", e);
+      throw new GenericException("Could not retrieve object from index", e);
     }
     return ret;
   }
@@ -1092,7 +1092,7 @@ public class SolrUtils {
     final AIPState state = AIPState
       .valueOf(objectToString(doc.get(RodaConstants.STATE), AIPState.getDefault().toString()));
     final String parentId = objectToString(doc.get(RodaConstants.AIP_PARENT_ID), null);
-    final String ingestSIPId = objectToString(doc.get(RodaConstants.INGEST_SIP_ID), "");
+    final List<String> ingestSIPIds = objectToListString(doc.get(RodaConstants.INGEST_SIP_IDS));
     final String ingestJobId = objectToString(doc.get(RodaConstants.INGEST_JOB_ID), "");
     final List<String> ancestors = objectToListString(doc.get(RodaConstants.AIP_ANCESTORS));
     final List<String> levels = objectToListString(doc.get(RodaConstants.AIP_LEVEL));
@@ -1119,7 +1119,7 @@ public class SolrUtils {
 
     return new IndexedAIP(id, state, level, title, dateInitial, dateFinal, description, parentId, ancestors,
       permissions, numberOfSubmissionFiles, numberOfDocumentationFiles, numberOfSchemaFiles, hasRepresentations, ghost)
-        .setIngestSIPId(ingestSIPId).setIngestJobId(ingestJobId);
+        .setIngestSIPIds(ingestSIPIds).setIngestJobId(ingestJobId);
   }
 
   public static SolrInputDocument aipToSolrInputDocument(AIP aip, List<String> ancestors, ModelService model,
@@ -1132,7 +1132,7 @@ public class SolrUtils {
     ret.addField(RodaConstants.AIP_PARENT_ID, aip.getParentId());
     ret.addField(RodaConstants.STATE, aip.getState().toString());
 
-    ret.addField(RodaConstants.INGEST_SIP_ID, aip.getIngestSIPId());
+    ret.addField(RodaConstants.INGEST_SIP_IDS, aip.getIngestSIPIds());
     ret.addField(RodaConstants.INGEST_JOB_ID, aip.getIngestJobId());
 
     // set ancestors
@@ -1247,7 +1247,7 @@ public class SolrUtils {
 
     // indexing active state and permissions
     doc.addField(RodaConstants.STATE, aip.getState().toString());
-    doc.addField(RodaConstants.INGEST_SIP_ID, aip.getIngestSIPId());
+    doc.addField(RodaConstants.INGEST_SIP_IDS, aip.getIngestSIPIds());
     doc.addField(RodaConstants.INGEST_JOB_ID, aip.getIngestJobId());
     doc.addField(RodaConstants.REPRESENTATION_ANCESTORS, ancestors);
     setPermissions(aip.getPermissions(), doc);
@@ -1287,7 +1287,7 @@ public class SolrUtils {
 
     // indexing AIP inherited info
     doc.addField(RodaConstants.STATE, aip.getState().toString());
-    doc.addField(RodaConstants.INGEST_SIP_ID, aip.getIngestSIPId());
+    doc.addField(RodaConstants.INGEST_SIP_IDS, aip.getIngestSIPIds());
     doc.addField(RodaConstants.INGEST_JOB_ID, aip.getIngestJobId());
     doc.addField(RodaConstants.FILE_ANCESTORS, ancestors);
     setPermissions(aip.getPermissions(), doc);
