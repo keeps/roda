@@ -41,7 +41,7 @@
 		</init-param>
 		<init-param>
 			<param-name>casServerLoginUrl</param-name>
-			<param-value>http://localhost:8080/cas/login</param-value>
+			<param-value>https://localhost:8443/cas/login</param-value>
 		</init-param>
 		<init-param>
 			<param-name>serverName</param-name>
@@ -62,7 +62,7 @@
 		</init-param>
 		<init-param>
 			<param-name>casServerUrlPrefix</param-name>
-			<param-value>http://localhost:8080/cas</param-value>
+			<param-value>https://localhost:8443/cas</param-value>
 		</init-param>
 		<init-param>
 			<param-name>serverName</param-name>
@@ -96,7 +96,7 @@
 		</init-param>
 		<init-param>
 			<param-name>casServerUrlPrefix</param-name>
-			<param-value>http://localhost:8080/cas</param-value>
+			<param-value>https://localhost:8443/cas</param-value>
 		</init-param>
 	</filter>
 	<filter-mapping>
