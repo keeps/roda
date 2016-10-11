@@ -236,6 +236,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     emailError.setVisible(false);
   }
 
+  @SuppressWarnings("unused")
   private int setSelected(ListBox listbox, String text) {
     int index = -1;
     if (text != null) {
@@ -286,8 +287,8 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
         }
       });
   }
-  
-  public void setExtraBundle(UserExtraBundle bundle){
+
+  public void setExtraBundle(UserExtraBundle bundle) {
     UserDataPanel.this.userExtraBundle = bundle;
     createForm(bundle);
   }
@@ -364,7 +365,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
         @Override
         public void onFailure(Throwable caught) {
-//          Tools.newHistory(MemberManagement.RESOLVER);
+          // Tools.newHistory(MemberManagement.RESOLVER);
           AsyncCallbackUtils.defaultFailureTreatment(caught);
         }
       });
@@ -436,7 +437,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
       emailError.setVisible(true);
       errorList.add(messages.isAMandatoryField(messages.email()));
     } else if (!email.getText()
-      .matches("^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[_A-Za-z0-9-]+)")) {
+      .matches("^[_A-Za-z0-9-%+]+(\\.[_A-Za-z0-9-%+]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[_A-Za-z0-9-]+)")) {
       email.addStyleName("isWrong");
       emailError.setText(messages.wrongMailFormat());
       emailError.setVisible(true);
