@@ -1266,7 +1266,7 @@ td.datePickerMonth, td.datePickerYear {
     }
     
     .sidebar_actions_wrapper.sticky {
-		/* position: fixed; */
+		position: fixed; 
 	}
 }
 
