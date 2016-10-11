@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -1946,6 +1947,22 @@ public class Browser extends RodaWuiController {
 
     // delegate
     BrowserHelper.deleteRiskIncidences(user, selected);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "selected", selected);
+  }
+
+  public static void updateMultipleIncidences(User user, SelectedItems<RiskIncidence> selected, String status,
+    String severity, Date mitigatedOn, String mitigatedBy, String mitigatedDescription)
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    BrowserHelper.updateMultipleIncidences(user, selected, status, severity, mitigatedOn, mitigatedBy,
+      mitigatedDescription);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "selected", selected);

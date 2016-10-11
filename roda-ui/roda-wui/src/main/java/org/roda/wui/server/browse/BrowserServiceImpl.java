@@ -10,6 +10,7 @@ package org.roda.wui.server.browse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -763,5 +764,13 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     NotFoundException, InvalidParameterException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Browser.deleteRiskIncidences(user, selected);
+  }
+
+  @Override
+  public void updateMultipleIncidences(SelectedItems<RiskIncidence> selected, String status, String severity,
+    Date mitigatedOn, String mitigatedBy, String mitigatedDescription)
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Browser.updateMultipleIncidences(user, selected, status, severity, mitigatedOn, mitigatedBy, mitigatedDescription);
   }
 }

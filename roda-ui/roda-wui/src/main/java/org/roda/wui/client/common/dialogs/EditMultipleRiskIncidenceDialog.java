@@ -7,11 +7,12 @@
  */
 package org.roda.wui.client.common.dialogs;
 
+import java.util.Date;
+
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
 import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
+import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -23,8 +24,10 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
@@ -42,7 +45,9 @@ public class EditMultipleRiskIncidenceDialog<T extends IsIndexed, O> extends Dia
   }
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  private SelectedItems incidences = SelectedItemsNone.create();
+
+  @UiField
+  FlowPanel titlePanel;
 
   @UiField
   ListBox status, severity;
@@ -62,8 +67,7 @@ public class EditMultipleRiskIncidenceDialog<T extends IsIndexed, O> extends Dia
   @UiField
   Button selectButton;
 
-  public EditMultipleRiskIncidenceDialog(SelectedItems selectedIncidences) {
-    incidences = selectedIncidences;
+  public EditMultipleRiskIncidenceDialog() {
     setWidget(binder.createAndBindUi(this));
 
     DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
@@ -79,14 +83,25 @@ public class EditMultipleRiskIncidenceDialog<T extends IsIndexed, O> extends Dia
       severity.addItem(messages.severityLevel(iseverity), iseverity.toString());
     }
 
+    titlePanel.add(new HTMLWidgetWrapper("EditRiskIncidenceDescription.html", new AsyncCallback<Void>() {
+
+      @Override
+      public void onFailure(Throwable caught) {
+        // do nothing
+      }
+
+      @Override
+      public void onSuccess(Void result) {
+        center();
+      }
+    }));
+
     setAutoHideEnabled(false);
     setModal(true);
     setGlassEnabled(true);
     setAnimationEnabled(false);
 
     setText(messages.editIncidencesTitle());
-
-    center();
   }
 
   public void showAndCenter() {
@@ -98,10 +113,6 @@ public class EditMultipleRiskIncidenceDialog<T extends IsIndexed, O> extends Dia
     center();
   }
 
-  public void setSingleSelectionMode() {
-    selectButton.setVisible(false);
-  }
-
   @UiHandler("cancelButton")
   void buttonCancelHandler(ClickEvent e) {
     hide();
@@ -109,6 +120,7 @@ public class EditMultipleRiskIncidenceDialog<T extends IsIndexed, O> extends Dia
 
   @UiHandler("selectButton")
   void buttonSelectHandler(ClickEvent e) {
+    ValueChangeEvent.fire(this, null);
     hide();
   }
 
@@ -117,4 +129,23 @@ public class EditMultipleRiskIncidenceDialog<T extends IsIndexed, O> extends Dia
     return addHandler(handler, ValueChangeEvent.getType());
   }
 
+  public String getStatus() {
+    return status.getSelectedValue();
+  }
+
+  public String getSeverity() {
+    return severity.getSelectedValue();
+  }
+
+  public Date getMitigatedOn() {
+    return mitigatedOn.getValue();
+  }
+
+  public String getMitigatedBy() {
+    return mitigatedBy.getValue();
+  }
+
+  public String getMitigatedDescription() {
+    return mitigatedDescription.getValue();
+  }
 }

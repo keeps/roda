@@ -117,7 +117,9 @@ import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
@@ -2500,6 +2502,47 @@ public class BrowserHelper {
     List<String> idList = consolidate(user, RiskIncidence.class, selected);
     for (String incidenceId : idList) {
       RodaCoreFactory.getModelService().deleteRiskIncidence(incidenceId, true);
+    }
+  }
+
+  public static void updateMultipleIncidences(User user, SelectedItems<RiskIncidence> selected, String status,
+    String severity, Date mitigatedOn, String mitigatedBy, String mitigatedDescription)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    IndexService index = RodaCoreFactory.getIndexService();
+    ModelService model = RodaCoreFactory.getModelService();
+
+    if (selected instanceof SelectedItemsList) {
+      SelectedItemsList list = (SelectedItemsList) selected;
+      List<String> ids = list.getIds();
+
+      for (String id : ids) {
+        RiskIncidence incidence = RodaCoreFactory.getModelService().retrieveRiskIncidence(id);
+        incidence.setStatus(INCIDENCE_STATUS.valueOf(status));
+        incidence.setSeverity(SEVERITY_LEVEL.valueOf(severity));
+        incidence.setMitigatedOn(mitigatedOn);
+        incidence.setMitigatedBy(mitigatedBy);
+        incidence.setMitigatedDescription(mitigatedDescription);
+        model.updateRiskIncidence(incidence, false);
+      }
+
+      index.commit(RiskIncidence.class);
+    } else if (selected instanceof SelectedItemsFilter) {
+      SelectedItemsFilter filter = (SelectedItemsFilter) selected;
+
+      int counter = index.count(RiskIncidence.class, filter.getFilter()).intValue();
+      IndexResult<RiskIncidence> incidences = index.find(RiskIncidence.class, filter.getFilter(), Sorter.NONE,
+        new Sublist(0, counter));
+
+      for (RiskIncidence incidence : incidences.getResults()) {
+        incidence.setStatus(INCIDENCE_STATUS.valueOf(status));
+        incidence.setSeverity(SEVERITY_LEVEL.valueOf(severity));
+        incidence.setMitigatedOn(mitigatedOn);
+        incidence.setMitigatedBy(mitigatedBy);
+        incidence.setMitigatedDescription(mitigatedDescription);
+        model.updateRiskIncidence(incidence, false);
+      }
+
+      index.commit(RiskIncidence.class);
     }
   }
 }

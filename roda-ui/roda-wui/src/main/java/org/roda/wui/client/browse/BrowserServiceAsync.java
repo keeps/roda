@@ -10,6 +10,7 @@
  */
 package org.roda.wui.client.browse;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -191,5 +192,8 @@ public interface BrowserServiceAsync {
   void deleteFile(String fileUUID, AsyncCallback<Void> callback);
 
   void updateRiskIncidence(RiskIncidence incidence, AsyncCallback<Void> asyncCallback);
+
+  void updateMultipleIncidences(SelectedItems<RiskIncidence> selected, String status, String severity, Date mitigatedOn,
+    String mitigatedBy, String mitigatedDescription, AsyncCallback<Void> loadingAsyncCallback);
 
 }

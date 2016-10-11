@@ -8,6 +8,7 @@
 package org.roda.wui.client.browse;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -276,4 +277,8 @@ public interface BrowserService extends RemoteService {
   void deleteRiskIncidences(SelectedItems<RiskIncidence> selected)
     throws JobAlreadyStartedException, AuthorizationDeniedException, GenericException, RequestNotValidException,
     NotFoundException, InvalidParameterException;
+
+  void updateMultipleIncidences(SelectedItems<RiskIncidence> selected, String status, String severity, Date mitigatedOn,
+    String mitigatedBy, String mitigatedDescription)
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException;
 }

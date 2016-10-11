@@ -22,6 +22,7 @@
 	<g:FlowPanel addStyleNames="selectAip wui-dialog-confirm wrapper skip_padding">
 		<g:FlowPanel addStyleNames="wui-dialog-layout">
 			<g:FlowPanel>
+				<g:FlowPanel addStyleNames="page-description" ui:field="titlePanel"></g:FlowPanel>
 				<g:FlowPanel>
 					<g:Label addStyleNames="form-label"><ui:text from='{messages.riskIncidenceStatus}' /></g:Label>
 					<g:ListBox ui:field="status" addStyleNames="form-selectbox form-textbox-small form-risk-mitigation-margin" />
