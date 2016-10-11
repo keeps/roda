@@ -455,8 +455,8 @@ public class PluginManager {
 
       }
 
-    } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException
-      | RuntimeException e) {
+    } catch (IOException | ClassNotFoundException | NoClassDefFoundError | InstantiationException
+      | IllegalAccessException | RuntimeException e) {
 
       LOGGER.error("Error loading plugin from {}", jarFile.getFileName(), e);
 
