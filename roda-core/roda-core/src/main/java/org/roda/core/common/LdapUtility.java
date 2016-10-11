@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -1120,7 +1121,7 @@ public class LdapUtility {
     // It will be recreated again.
     // TODO: this is a workaround for this issue
     // https://issues.apache.org/jira/browse/DIRSERVER-1954
-    if (!FileUtils.deleteQuietly(systemPartitionPath)) {
+    if (systemPartitionPath.exists() && !FileUtils.deleteQuietly(systemPartitionPath)) {
       LOGGER.warn("Could not delete ApacheDS system partition directory: {}", systemPartitionPath);
     }
 

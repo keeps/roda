@@ -846,10 +846,10 @@ public class RodaCoreFactory {
       try {
         if (StringUtils.isNotBlank(role)) {
           RodaCoreFactory.ldapUtility.addRole(role);
-          LOGGER.info("Created LDAP role {}", role);
+          LOGGER.debug("Created LDAP role {}", role);
         }
       } catch (final RoleAlreadyExistsException e) {
-        LOGGER.info("Role {} already exists.", role);
+        LOGGER.debug("Role {} already exists.", role);
         LOGGER.trace(e.getMessage(), e);
       }
     }
