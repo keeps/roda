@@ -193,11 +193,6 @@ public class UserUtility {
     LOGGER.debug("Checking if user '{}' has permissions to {} object {} (object read permissions: {} & {})",
       user.getId(), permissionType, aip.getId(), users, groups);
 
-    // FIXME
-    if ("admin".equalsIgnoreCase(user.getId())) {
-      return;
-    }
-
     if (!users.contains(user.getId()) && iterativeDisjoint(groups, user.getGroups())) {
       throw new AuthorizationDeniedException(
         "The user '" + user.getId() + "' does not have permissions to " + permissionType);

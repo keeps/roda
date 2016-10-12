@@ -9,8 +9,8 @@ package org.roda.core.plugins.plugins.ingest;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
+import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -21,12 +21,14 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.user.RODAMember;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -44,8 +46,10 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
 
   private static final String NO_PERMISSION_TO_CREATE_UNDER_AIP = "The user doesn't have permission to create under AIP";
   private static final String PARENT_AIP_NOT_FOUND = "The parent of the AIP was not found";
-  private static final String NO_AIP_PERMISSION = "The user doesn't have access to the parent AIP";
-  private static final String AIP_PERMISSIONS_SUCCESSFULLY_VERIFIED = "The user permissions are valid and the AIP permissions were updated";
+  // private static final String NO_AIP_PERMISSION = "The user doesn't have
+  // access to the parent AIP";
+  // private static final String AIP_PERMISSIONS_SUCCESSFULLY_VERIFIED = "The
+  // user permissions are valid and the AIP permissions were updated";
   private static final String NO_CREATE_TOP_LEVEL_AIP_PERMISSION = "The user doesn't have CREATE_TOP_LEVEL_AIP_PERMISSION permission";
 
   private boolean hasFreeAccess = false;
@@ -141,21 +145,14 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
       String jobCreatorUsername = currentJob.getUsername();
       if (aip.getParentId() != null) {
         try {
-          AIP parentAIP = model.retrieveAIP(aip.getParentId());
-          Set<PermissionType> userPermissions = parentAIP.getPermissions().getUserPermissions(jobCreatorUsername);
-          LOGGER.trace("Checking if user '{}' has permissions on parent AIP '{}' ({})", jobCreatorUsername,
-            parentAIP.getId(), userPermissions);
-          if (userPermissions.contains(PermissionType.CREATE)) {
-            LOGGER.debug("User '{}' has CREATE permission on parent AIP.", jobCreatorUsername);
-          } else {
-            LOGGER.debug("User '{}' doesn't have CREATE permission on parent... Error...", jobCreatorUsername);
-            reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(NO_PERMISSION_TO_CREATE_UNDER_AIP);
-          }
+          IndexedAIP parentAIP = index.retrieve(IndexedAIP.class, aip.getParentId());
+          User user = index.retrieve(User.class, jobCreatorUsername);
+          UserUtility.checkObjectPermissions(user, parentAIP, PermissionType.CREATE);
         } catch (NotFoundException nfe) {
           reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(PARENT_AIP_NOT_FOUND);
         } catch (AuthorizationDeniedException e) {
-          LOGGER.debug("User doesn't have access to parent... Error...");
-          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(NO_AIP_PERMISSION);
+          LOGGER.debug("User '{}' doesn't have CREATE permission on parent... Error...", jobCreatorUsername);
+          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(NO_PERMISSION_TO_CREATE_UNDER_AIP);
         }
       } else {
         RODAMember member = index.retrieve(RODAMember.class, jobCreatorUsername);
@@ -166,7 +163,7 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
           LOGGER.debug("User doesn't have CREATE_TOP_LEVEL_AIP_PERMISSION permission...");
         }
       }
-    } catch (GenericException | RequestNotValidException | NotFoundException e) {
+    } catch (GenericException | NotFoundException e) {
       reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
     }
   }
