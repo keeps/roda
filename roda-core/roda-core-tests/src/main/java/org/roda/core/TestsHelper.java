@@ -104,7 +104,7 @@ public final class TestsHelper {
     }
 
     Job jobUpdated = RodaCoreFactory.getModelService().retrieveJob(job.getId());
-    MatcherAssert.assertThat(jobUpdated.getState(), Is.is(expectedJobState));
+    MatcherAssert.assertThat(jobUpdated.getStateDetails(), jobUpdated.getState(), Is.is(expectedJobState));
     return jobUpdated;
 
   }
