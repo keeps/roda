@@ -27,7 +27,7 @@ import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.MemberSelectDialog;
-import org.roda.wui.client.common.lists.SelectedItemsUtils;
+import org.roda.wui.client.common.lists.ClientSelectedItemsUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
@@ -76,7 +76,7 @@ public class EditPermissions extends Composite {
           }
         });
 
-      } else if (historyTokens.size() == 0 && !SelectedItemsUtils.isEmpty(Browse.getInstance().getSelected())) {
+      } else if (historyTokens.isEmpty() && !ClientSelectedItemsUtils.isEmpty(Browse.getInstance().getSelected())) {
         final SelectedItems<IndexedAIP> selected = Browse.getInstance().getSelected();
         BrowserService.Util.getInstance().retrieve(IndexedAIP.class.getName(), selected,
           new AsyncCallback<List<IndexedAIP>>() {

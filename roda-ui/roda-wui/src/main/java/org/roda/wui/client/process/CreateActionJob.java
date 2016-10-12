@@ -36,8 +36,8 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.BasicAsyncTableCell;
+import org.roda.wui.client.common.lists.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.lists.ListFactory;
-import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.PluginUtils;
@@ -455,7 +455,7 @@ public class CreateActionJob extends Composite {
       this.list.addCheckboxSelectionListener(new CheckboxSelectionListener() {
         @Override
         public void onSelectionChange(SelectedItems selected) {
-          boolean empty = SelectedItemsUtils.isEmpty(selected);
+          boolean empty = ClientSelectedItemsUtils.isEmpty(selected);
           isListEmpty = empty;
         }
       });

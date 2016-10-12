@@ -31,7 +31,7 @@ import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.SelectTransferResourceDialog;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
-import org.roda.wui.client.common.lists.SelectedItemsUtils;
+import org.roda.wui.client.common.lists.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.lists.TransferredResourceList;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -227,7 +227,7 @@ public class IngestTransfer extends Composite {
 
       @Override
       public void onSelectionChange(SelectedItems<TransferredResource> selected) {
-        boolean empty = SelectedItemsUtils.isEmpty(selected);
+        boolean empty = ClientSelectedItemsUtils.isEmpty(selected);
 
         remove.setText(empty ? messages.ingestTransferButtonRemoveWholeFolder()
           : messages.ingestTransferButtonRemoveSelectedItems());
@@ -406,7 +406,7 @@ public class IngestTransfer extends Composite {
     uploadFiles.setEnabled(resource == null || !resource.isFile());
     createFolder.setEnabled(resource == null || !resource.isFile());
 
-    boolean empty = SelectedItemsUtils.isEmpty(transferredResourceList.getSelected());
+    boolean empty = ClientSelectedItemsUtils.isEmpty(transferredResourceList.getSelected());
 
     remove.setEnabled(resource != null || !empty);
     startIngest.setEnabled(resource != null || !empty);
@@ -485,7 +485,7 @@ public class IngestTransfer extends Composite {
 
     final SelectedItems<TransferredResource> selected = transferredResourceList.getSelected();
 
-    if (SelectedItemsUtils.isEmpty(selected)) {
+    if (ClientSelectedItemsUtils.isEmpty(selected)) {
       // Remove the whole folder
 
       if (resource != null) {
@@ -527,7 +527,7 @@ public class IngestTransfer extends Composite {
     } else {
       // Remove all selected resources
 
-      SelectedItemsUtils.size(TransferredResource.class, selected, new AsyncCallback<Long>() {
+      ClientSelectedItemsUtils.size(TransferredResource.class, selected, new AsyncCallback<Long>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -586,7 +586,7 @@ public class IngestTransfer extends Composite {
     if (selected instanceof SelectedItemsList) {
       SelectedItemsList selectedset = (SelectedItemsList) selected;
 
-      if (SelectedItemsUtils.isEmpty(selectedset) && resource != null) {
+      if (ClientSelectedItemsUtils.isEmpty(selectedset) && resource != null) {
         selected = new SelectedItemsList(Arrays.asList(resource.getUUID()), TransferredResource.class.getName());
       }
     }
@@ -610,7 +610,7 @@ public class IngestTransfer extends Composite {
   void buttonRenameHandler(ClickEvent e) {
     final String transferredResourceId;
 
-    if (SelectedItemsUtils.isEmpty(getSelected())) {
+    if (ClientSelectedItemsUtils.isEmpty(getSelected())) {
       if (resource != null) {
         transferredResourceId = resource.getUUID();
       } else {

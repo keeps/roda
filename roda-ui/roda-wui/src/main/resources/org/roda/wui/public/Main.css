@@ -3157,6 +3157,8 @@ td.datePickerMonth, td.datePickerYear {
     overflow: hidden !important;
     max-width: 250px;
     height: 28px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .search-field-left-panel .search-field-input-panel {

@@ -27,8 +27,8 @@ import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
+import org.roda.wui.client.common.lists.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.lists.RiskList;
-import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -191,7 +191,7 @@ public class RiskRegister extends Composite {
 
       @Override
       public void onSelectionChange(SelectedItems<IndexedRisk> selected) {
-        boolean empty = SelectedItemsUtils.isEmpty(selected);
+        boolean empty = ClientSelectedItemsUtils.isEmpty(selected);
         buttonRemove.setEnabled(!empty);
         startProcess.setEnabled(!empty);
       }
@@ -286,7 +286,7 @@ public class RiskRegister extends Composite {
 
     final SelectedItems<IndexedRisk> selected = riskList.getSelected();
 
-    SelectedItemsUtils.size(IndexedRisk.class, selected, new AsyncCallback<Long>() {
+    ClientSelectedItemsUtils.size(IndexedRisk.class, selected, new AsyncCallback<Long>() {
 
       @Override
       public void onFailure(Throwable caught) {

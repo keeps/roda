@@ -33,9 +33,9 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.ViewRepresentation;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
+import org.roda.wui.client.common.lists.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.SearchFileList;
-import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.ListboxUtils;
 import org.roda.wui.common.client.tools.FacetUtils;
@@ -476,7 +476,7 @@ public class MainSearch extends Composite {
 
       @Override
       public void onSelectionChange(SelectedItems<IndexedAIP> selected) {
-        setButtonsEnabled(itemsSelectionButtons, !(SelectedItemsUtils.isEmpty(selected)));
+        setButtonsEnabled(itemsSelectionButtons, !(ClientSelectedItemsUtils.isEmpty(selected)));
       }
     });
   }
@@ -508,7 +508,7 @@ public class MainSearch extends Composite {
 
         @Override
         public void onSelectionChange(SelectedItems<IndexedRepresentation> selected) {
-          setButtonsEnabled(representationsSelectionButtons, !(SelectedItemsUtils.isEmpty(selected)));
+          setButtonsEnabled(representationsSelectionButtons, !(ClientSelectedItemsUtils.isEmpty(selected)));
         }
       });
   }
@@ -539,7 +539,7 @@ public class MainSearch extends Composite {
 
       @Override
       public void onSelectionChange(SelectedItems<IndexedFile> selected) {
-        setButtonsEnabled(filesSelectionButtons, !(SelectedItemsUtils.isEmpty(selected)));
+        setButtonsEnabled(filesSelectionButtons, !(ClientSelectedItemsUtils.isEmpty(selected)));
       }
     });
   }

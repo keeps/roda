@@ -77,8 +77,7 @@ public interface BrowserServiceAsync {
   void createDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle newBundle,
     AsyncCallback<Void> asyncCallback);
 
-  void retrieveDescriptiveMetadataPreview(String aipId, SupportedMetadataTypeBundle bundle,
-    AsyncCallback<String> async);
+  void retrieveDescriptiveMetadataPreview(SupportedMetadataTypeBundle bundle, AsyncCallback<String> async);
 
   void createTransferredResourcesFolder(String parent, String folderName, AsyncCallback<String> callback);
 

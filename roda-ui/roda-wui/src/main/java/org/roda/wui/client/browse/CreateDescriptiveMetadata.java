@@ -138,7 +138,7 @@ public class CreateDescriptiveMetadata extends Composite {
 
   @UiField
   HTML errors;
-  
+
   @UiField
   HTML idError;
 
@@ -204,9 +204,10 @@ public class CreateDescriptiveMetadata extends Composite {
           type.setSelectedIndex(0);
           selectedBundle = metadataTypes.get(0);
           if (selectedBundle.getVersion() != null) {
-            id.setText(selectedBundle.getType() + RodaConstants.METADATA_VERSION_SEPARATOR + selectedBundle.getVersion()+".xml");
+            id.setText(selectedBundle.getType() + RodaConstants.METADATA_VERSION_SEPARATOR + selectedBundle.getVersion()
+              + ".xml");
           } else {
-            id.setText(selectedBundle.getType()+".xml");
+            id.setText(selectedBundle.getType() + ".xml");
           }
           updateFormOrXML();
         }
@@ -277,21 +278,20 @@ public class CreateDescriptiveMetadata extends Composite {
   }
 
   private void updateMetadataXML() {
-    BrowserService.Util.getInstance().retrieveDescriptiveMetadataPreview(aipId, selectedBundle,
-      new AsyncCallback<String>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
+    BrowserService.Util.getInstance().retrieveDescriptiveMetadataPreview(selectedBundle, new AsyncCallback<String>() {
+      @Override
+      public void onFailure(Throwable caught) {
+        AsyncCallbackUtils.defaultFailureTreatment(caught);
+      }
 
-        @Override
-        public void onSuccess(String preview) {
-          formOrXML.clear();
-          metadataXML.setText(preview);
-          formOrXML.add(metadataXML);
-          metadataTextFromForm = preview;
-        }
-      });
+      @Override
+      public void onSuccess(String preview) {
+        formOrXML.clear();
+        metadataXML.setText(preview);
+        formOrXML.add(metadataXML);
+        metadataTextFromForm = preview;
+      }
+    });
   }
 
   @UiHandler("buttonApply")
@@ -322,7 +322,7 @@ public class CreateDescriptiveMetadata extends Composite {
             ValidationException e = (ValidationException) caught;
             updateErrors(e);
             idError.setVisible(false);
-          } else if(caught instanceof AlreadyExistsException){
+          } else if (caught instanceof AlreadyExistsException) {
             idError.setVisible(true);
             idError.setHTML(SafeHtmlUtils.fromSafeConstant(messages.fileAlreadyExists()));
             errors.setVisible(false);

@@ -24,8 +24,8 @@ import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
+import org.roda.wui.client.common.lists.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.lists.FormatList;
-import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -156,7 +156,7 @@ public class FormatRegister extends Composite {
 
       @Override
       public void onSelectionChange(SelectedItems<Format> selected) {
-        boolean empty = SelectedItemsUtils.isEmpty(selected);
+        boolean empty = ClientSelectedItemsUtils.isEmpty(selected);
         buttonRemove.setEnabled(!empty);
         startProcess.setEnabled(!empty);
       }
@@ -229,7 +229,7 @@ public class FormatRegister extends Composite {
 
     final SelectedItems<Format> selected = formatList.getSelected();
 
-    SelectedItemsUtils.size(Format.class, selected, new AsyncCallback<Long>() {
+    ClientSelectedItemsUtils.size(Format.class, selected, new AsyncCallback<Long>() {
 
       @Override
       public void onFailure(Throwable caught) {

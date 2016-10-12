@@ -328,6 +328,7 @@ public final class RodaConstants {
   /*
    * Permissions
    */
+  public static final String ADMINISTRATORS = "administrators";
   public static final String INDEX_PERMISSION_USERS_PREFIX = "permission_users_";
   public static final String INDEX_PERMISSION_GROUPS_PREFIX = "permission_groups_";
 
@@ -923,6 +924,7 @@ public final class RodaConstants {
 
   /* Dialog filter limit */
   public static final int DIALOG_FILTER_LIMIT_NUMBER = 120;
+  
 
   /** Private empty constructor */
   private RodaConstants() {

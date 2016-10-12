@@ -122,7 +122,7 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     AlreadyExistsException, ValidationException;
 
-  String retrieveDescriptiveMetadataPreview(String aipId, SupportedMetadataTypeBundle bundle)
+  String retrieveDescriptiveMetadataPreview(SupportedMetadataTypeBundle bundle)
     throws AuthorizationDeniedException, GenericException, ValidationException, NotFoundException,
     RequestNotValidException;
 

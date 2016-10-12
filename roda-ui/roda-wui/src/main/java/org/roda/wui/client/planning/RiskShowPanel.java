@@ -17,8 +17,8 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
+import org.roda.wui.client.common.lists.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
-import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
@@ -174,8 +174,8 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
 
       @Override
       public void onSelectionChange(SelectedItems<RiskIncidence> selected) {
-        ShowRisk.getInstance().enableProcessButton(!(SelectedItemsUtils.isEmpty(selected)));
-        ShowRisk.getInstance().enableEditIncidenceButton(!(SelectedItemsUtils.isEmpty(selected)));
+        ShowRisk.getInstance().enableProcessButton(!(ClientSelectedItemsUtils.isEmpty(selected)));
+        ShowRisk.getInstance().enableEditIncidenceButton(!(ClientSelectedItemsUtils.isEmpty(selected)));
       }
     });
 

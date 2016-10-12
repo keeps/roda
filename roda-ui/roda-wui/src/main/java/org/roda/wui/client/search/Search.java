@@ -35,7 +35,7 @@ import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
-import org.roda.wui.client.common.lists.SelectedItemsUtils;
+import org.roda.wui.client.common.lists.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.search.MainSearch;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.process.CreateJob;
@@ -304,7 +304,7 @@ public class Search extends Composite {
     final SelectedItems<T> selected = (SelectedItems<T>) getSelected();
     final String selectedClass = getSelected().getSelectedClass();
 
-    if (!SelectedItemsUtils.isEmpty(selected)) {
+    if (!ClientSelectedItemsUtils.isEmpty(selected)) {
 
       Dialogs.showConfirmDialog(messages.ingestTransferRemoveFolderConfirmDialogTitle(),
         messages.ingestTransferRemoveAllSelectedConfirmDialogMessage(),

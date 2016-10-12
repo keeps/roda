@@ -24,6 +24,8 @@ import java.util.TreeSet;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.lang3.StringUtils;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.MetadataValue;
@@ -69,6 +71,7 @@ public class ServerTools {
 
     return locale;
   }
+ 
 
   /**
    * Encode XML entities and unicode control chars

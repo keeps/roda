@@ -22,6 +22,7 @@ import org.apache.commons.configuration.Configuration;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
+import org.roda.core.common.SelectedItemsUtils;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -169,24 +170,13 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     return Browser.retrieveDescriptiveMetadataEditBundle(user, aipId, descId, locale);
   }
 
-  @SuppressWarnings("unchecked")
-  private <T extends IsIndexed> Class<T> parseClass(String classNameToReturn) throws GenericException {
-    Class<T> classToReturn;
-    try {
-      classToReturn = (Class<T>) Class.forName(classNameToReturn);
-    } catch (ClassNotFoundException e) {
-      throw new GenericException("Could not find class " + classNameToReturn);
-    }
-    return classToReturn;
-  }
-
   @Override
   public <T extends IsIndexed> IndexResult<T> find(String classNameToReturn, Filter filter, Sorter sorter,
     Sublist sublist, Facets facets, String localeString, boolean justActive)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     try {
       User user = UserUtility.getUser(getThreadLocalRequest());
-      Class<T> classToReturn = parseClass(classNameToReturn);
+      Class<T> classToReturn = SelectedItemsUtils.parseClass(classNameToReturn);
       IndexResult<T> result = Browser.find(classToReturn, filter, sorter, sublist, facets, user, justActive);
       return I18nUtility.translate(result, classToReturn, localeString);
     } catch (RuntimeException e) {
@@ -203,7 +193,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public <T extends IsIndexed> Long count(String classNameToReturn, Filter filter)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Class<T> classToReturn = parseClass(classNameToReturn);
+    Class<T> classToReturn = SelectedItemsUtils.parseClass(classNameToReturn);
     return Browser.count(user, classToReturn, filter);
   }
 
@@ -211,7 +201,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public <T extends IsIndexed> T retrieve(String classNameToReturn, String id)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Class<T> classToReturn = parseClass(classNameToReturn);
+    Class<T> classToReturn = SelectedItemsUtils.parseClass(classNameToReturn);
     return Browser.retrieve(user, classToReturn, id);
   }
 
@@ -219,7 +209,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public <T extends IsIndexed> List<T> retrieve(String classNameToReturn, SelectedItems<T> selectedItems)
     throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Class<T> classToReturn = parseClass(classNameToReturn);
+    Class<T> classToReturn = SelectedItemsUtils.parseClass(classNameToReturn);
     return Browser.retrieve(user, classToReturn, selectedItems);
   }
 
@@ -227,7 +217,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public <T extends IsIndexed> void delete(String classNameToReturn, SelectedItems<T> ids)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Class<T> classToReturn = parseClass(classNameToReturn);
+    Class<T> classToReturn = SelectedItemsUtils.parseClass(classNameToReturn);
     Browser.delete(user, classToReturn, ids);
   }
 
@@ -235,7 +225,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public <T extends IsIndexed> List<String> suggest(String classNameToReturn, String field, String query)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Class<T> classToReturn = parseClass(classNameToReturn);
+    Class<T> classToReturn = SelectedItemsUtils.parseClass(classNameToReturn);
     return Browser.suggest(user, classToReturn, field, query);
   }
 
@@ -345,7 +335,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     if (bundle.getValues() != null) {
       SupportedMetadataTypeBundle smtb = new SupportedMetadataTypeBundle(bundle.getId(), bundle.getType(),
         bundle.getVersion(), bundle.getId(), bundle.getRawTemplate(), bundle.getValues());
-      bundle.setXml(Browser.retrieveDescriptiveMetadataPreview(user, aipId, smtb));
+      bundle.setXml(Browser.retrieveDescriptiveMetadataPreview(user, smtb));
     }
 
     String metadataId = bundle.getId();
@@ -358,12 +348,12 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public String retrieveDescriptiveMetadataPreview(String aipId, SupportedMetadataTypeBundle bundle)
+  public String retrieveDescriptiveMetadataPreview(SupportedMetadataTypeBundle bundle)
     throws AuthorizationDeniedException, GenericException, ValidationException, NotFoundException,
     RequestNotValidException {
 
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.retrieveDescriptiveMetadataPreview(user, aipId, bundle);
+    return Browser.retrieveDescriptiveMetadataPreview(user, bundle);
   }
 
   @Override

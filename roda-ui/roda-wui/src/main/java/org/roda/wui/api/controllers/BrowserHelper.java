@@ -363,6 +363,7 @@ public class BrowserHelper {
             xmlDiff.overrideDifferenceListener(new XMLSimilarityIgnoreElements("schemaLocation"));
             similar = xmlDiff.identical() || xmlDiff.similar();
           } catch (SAXException e) {
+            LOGGER.warn("Could not check if template can loose info", e);
           }
         }
       }
@@ -1163,7 +1164,7 @@ public class BrowserHelper {
           public void run(IndexedAIP item)
             throws GenericException, RequestNotValidException, AuthorizationDeniedException {
             try {
-              UserUtility.checkObjectPermissions(user, item, PermissionType.DELETE);
+              UserUtility.checkAIPPermissions(user, item, PermissionType.DELETE);
               for (Representation rep : aip.getRepresentations()) {
                 RodaCoreFactory.getModelService().deleteRepresentation(aipId, rep.getId());
               }
@@ -1509,7 +1510,6 @@ public class BrowserHelper {
 
   public static List<SupportedMetadataTypeBundle> retrieveSupportedMetadata(User user, IndexedAIP aip, Locale locale)
     throws GenericException {
-    LOGGER.error("retrieveSupportedMetadata");
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     List<String> types = RodaUtils
       .copyList(RodaCoreFactory.getRodaConfiguration().getList(RodaConstants.UI_BROWSER_METADATA_DESCRIPTIVE_TYPES));

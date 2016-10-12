@@ -38,7 +38,7 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
-import org.roda.wui.client.common.lists.SelectedItemsUtils;
+import org.roda.wui.client.common.lists.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
@@ -307,7 +307,7 @@ public class Browse extends Composite {
 
       @Override
       public void onSelectionChange(SelectedItems<IndexedAIP> selected) {
-        boolean empty = SelectedItemsUtils.isEmpty(selected);
+        boolean empty = ClientSelectedItemsUtils.isEmpty(selected);
         moveItem.setEnabled(!empty);
         editPermissions.setEnabled(!empty);
       }
@@ -896,7 +896,7 @@ public class Browse extends Composite {
 
     final SelectedItems<IndexedAIP> selected = aipList.getSelected();
 
-    if (SelectedItemsUtils.isEmpty(selected)) {
+    if (ClientSelectedItemsUtils.isEmpty(selected)) {
       // Remove the whole folder
 
       if (aipId != null) {
@@ -941,7 +941,7 @@ public class Browse extends Composite {
     } else {
       // Remove all selected
 
-      SelectedItemsUtils.size(IndexedAIP.class, selected, new AsyncCallback<Long>() {
+      ClientSelectedItemsUtils.size(IndexedAIP.class, selected, new AsyncCallback<Long>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -1005,7 +1005,7 @@ public class Browse extends Composite {
     final SelectedItems<IndexedAIP> selected = aipList.getSelected();
     int counter = 0;
 
-    if (SelectedItemsUtils.isEmpty(selected)) {
+    if (ClientSelectedItemsUtils.isEmpty(selected)) {
       // Move this item
 
       if (aipId != null && itemBundle != null) {
@@ -1129,7 +1129,7 @@ public class Browse extends Composite {
   void buttonEditPermissionsHandler(ClickEvent e) {
     final SelectedItems<IndexedAIP> selected = aipList.getSelected();
 
-    if (SelectedItemsUtils.isEmpty(selected)) {
+    if (ClientSelectedItemsUtils.isEmpty(selected)) {
       if (aipId != null) {
         Tools.newHistory(RESOLVER, EditPermissions.RESOLVER.getHistoryToken(), aipId);
       }

@@ -147,7 +147,7 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
         try {
           IndexedAIP parentAIP = index.retrieve(IndexedAIP.class, aip.getParentId());
           User user = index.retrieve(User.class, jobCreatorUsername);
-          UserUtility.checkObjectPermissions(user, parentAIP, PermissionType.CREATE);
+          UserUtility.checkAIPPermissions(user, parentAIP, PermissionType.CREATE);
         } catch (NotFoundException nfe) {
           reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(PARENT_AIP_NOT_FOUND);
         } catch (AuthorizationDeniedException e) {

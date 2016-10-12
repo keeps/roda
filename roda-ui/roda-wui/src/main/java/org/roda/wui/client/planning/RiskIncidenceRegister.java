@@ -27,8 +27,8 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
+import org.roda.wui.client.common.lists.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
-import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -174,7 +174,7 @@ public class RiskIncidenceRegister extends Composite {
 
       @Override
       public void onSelectionChange(SelectedItems<RiskIncidence> selected) {
-        boolean empty = SelectedItemsUtils.isEmpty(selected);
+        boolean empty = ClientSelectedItemsUtils.isEmpty(selected);
         if (empty) {
           buttonRemove.setEnabled(false);
         } else {
@@ -256,7 +256,7 @@ public class RiskIncidenceRegister extends Composite {
 
     final SelectedItems<RiskIncidence> selected = riskIncidenceList.getSelected();
 
-    SelectedItemsUtils.size(RiskIncidence.class, selected, new AsyncCallback<Long>() {
+    ClientSelectedItemsUtils.size(RiskIncidence.class, selected, new AsyncCallback<Long>() {
 
       @Override
       public void onFailure(Throwable caught) {
@@ -269,32 +269,32 @@ public class RiskIncidenceRegister extends Composite {
           messages.riskRemoveSelectedConfirmDialogMessage(size), messages.riskRemoveFolderConfirmDialogCancel(),
           messages.riskRemoveFolderConfirmDialogOk(), new AsyncCallback<Boolean>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            AsyncCallbackUtils.defaultFailureTreatment(caught);
-          }
-
-          @Override
-          public void onSuccess(Boolean confirmed) {
-            if (confirmed) {
-              buttonRemove.setEnabled(false);
-              BrowserService.Util.getInstance().deleteRiskIncidences(selected, new AsyncCallback<Void>() {
-
-                @Override
-                public void onFailure(Throwable caught) {
-                  AsyncCallbackUtils.defaultFailureTreatment(caught);
-                  riskIncidenceList.refresh();
-                }
-
-                @Override
-                public void onSuccess(Void result) {
-                  Toast.showInfo(messages.riskRemoveSuccessTitle(), messages.riskRemoveSuccessMessage(size));
-                  riskIncidenceList.refresh();
-                }
-              });
+            @Override
+            public void onFailure(Throwable caught) {
+              AsyncCallbackUtils.defaultFailureTreatment(caught);
             }
-          }
-        });
+
+            @Override
+            public void onSuccess(Boolean confirmed) {
+              if (confirmed) {
+                buttonRemove.setEnabled(false);
+                BrowserService.Util.getInstance().deleteRiskIncidences(selected, new AsyncCallback<Void>() {
+
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    AsyncCallbackUtils.defaultFailureTreatment(caught);
+                    riskIncidenceList.refresh();
+                  }
+
+                  @Override
+                  public void onSuccess(Void result) {
+                    Toast.showInfo(messages.riskRemoveSuccessTitle(), messages.riskRemoveSuccessMessage(size));
+                    riskIncidenceList.refresh();
+                  }
+                });
+              }
+            }
+          });
       }
     });
   }

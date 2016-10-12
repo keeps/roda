@@ -115,7 +115,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.READ);
 
     // delegate
     BrowseItemBundle itemBundle = BrowserHelper.retrieveItemBundle(aipId, locale);
@@ -135,7 +135,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.READ);
 
     // delegate
     DescriptiveMetadataEditBundle bundle = BrowserHelper.retrieveDescriptiveMetadataEditBundle(user, aip, metadataId,
@@ -157,7 +157,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.READ);
 
     // delegate
     DescriptiveMetadataEditBundle bundle = BrowserHelper.retrieveDescriptiveMetadataEditBundle(user, aip, metadataId,
@@ -179,7 +179,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.READ);
 
     // delegate
     DescriptiveMetadataVersionsBundle bundle = BrowserHelper.retrieveDescriptiveMetadataVersionsBundle(aipId,
@@ -199,8 +199,6 @@ public class Browser extends RodaWuiController {
 
     // check user permissions
     controllerAssistant.checkRoles(user, classToReturn);
-
-    // TODO check permissions for each class
 
     // delegate
     final IndexResult<T> ret = BrowserHelper.find(classToReturn, filter, sorter, sublist, facets, user, justActive);
@@ -241,8 +239,6 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user, classToReturn);
 
-    // TODO check permissions for each class
-
     // delegate
     final Long count = BrowserHelper.count(classToReturn, filter, user);
 
@@ -260,10 +256,11 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user, classToReturn);
 
-    // TODO check object level permissions
-
     // delegate
     final T ret = BrowserHelper.retrieve(classToReturn, id);
+
+    // checking object permissions
+    UserUtility.checkObjectPermissions(user, ret, PermissionType.READ);
 
     // register action
     String aipId = null;
@@ -282,7 +279,11 @@ public class Browser extends RodaWuiController {
 
     // check user permissions
     controllerAssistant.checkRoles(user, classToReturn);
+
     final List<T> objects = BrowserHelper.retrieve(classToReturn, selectedItems);
+    for (T obj : objects) {
+      UserUtility.checkObjectPermissions(user, obj, PermissionType.READ);
+    }
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "selectedItems", selectedItems);
@@ -297,8 +298,7 @@ public class Browser extends RodaWuiController {
 
     // check user permissions
     controllerAssistant.checkRoles(user, classToReturn);
-
-    // TODO check object level permissions
+    UserUtility.checkObjectPermissions(user, ids, PermissionType.DELETE);
 
     // delegate
     BrowserHelper.delete(user, classToReturn, ids);
@@ -314,9 +314,9 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user, classToReturn);
 
-    // TODO object level permissions
-
     // delegate
+    // TODO suggest must integrate the user filter to disallow view of
+    // information with permission
     final List<String> ret = BrowserHelper.suggest(classToReturn, field, query);
 
     // register action
@@ -332,7 +332,7 @@ public class Browser extends RodaWuiController {
 
     // check user permissions
     controllerAssistant.checkRoles(user);
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.READ);
 
     // delegate
     List<IndexedAIP> ancestors = BrowserHelper.retrieveAncestors(aip);
@@ -360,7 +360,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, representation.getAipId());
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.READ);
 
     // delegate
     EntityResponse aipRepresentation = BrowserHelper.retrieveAIPRepresentation(representation, acceptFormat);
@@ -380,8 +380,7 @@ public class Browser extends RodaWuiController {
 
     // check user permissions
     controllerAssistant.checkRoles(user);
-    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, representation.getAipId());
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
+    UserUtility.checkRepresentationPermissions(user, representation, PermissionType.READ);
 
     // delegate
     StreamResponse aipRepresentation = BrowserHelper.retrieveAIPRepresentationPart(representation, part);
@@ -404,7 +403,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.READ);
 
     // delegate
     EntityResponse aipDescriptiveMetadataList = BrowserHelper.listAIPDescriptiveMetadata(aipId, start, limit,
@@ -428,8 +427,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class, representationId);
-    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, representation.getAipId());
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
+    UserUtility.checkRepresentationPermissions(user, representation, PermissionType.READ);
 
     // delegate
     EntityResponse aipDescriptiveMetadataList = BrowserHelper.listRepresentationDescriptiveMetadata(
@@ -454,7 +452,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.READ);
 
     // delegate
     EntityResponse aipDescritiveMetadata = BrowserHelper.retrieveAIPDescritiveMetadata(aipId, metadataId, acceptFormat,
@@ -479,8 +477,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class, representationId);
-    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, representation.getAipId());
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
+    UserUtility.checkRepresentationPermissions(user, representation, PermissionType.READ);
 
     // delegate
     EntityResponse aipDescritiveMetadata = BrowserHelper.retrieveRepresentationDescriptiveMetadata(
@@ -505,7 +502,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.READ);
 
     // delegate
     EntityResponse aipDescritiveMetadata = BrowserHelper.retrieveAIPDescritiveMetadataVersion(aipId, metadataId,
@@ -529,7 +526,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.READ);
 
     // delegate
     EntityResponse aipPreservationMetadataList = BrowserHelper.listAIPPreservationMetadata(aipId, acceptFormat);
@@ -553,16 +550,15 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedRepresentation rep = BrowserHelper.retrieve(IndexedRepresentation.class, representationId);
-    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, rep.getAipId());
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
+    UserUtility.checkRepresentationPermissions(user, rep, PermissionType.READ);
 
     // delegate
     EntityResponse aipRepresentationPreservationMetadata = BrowserHelper.retrieveAIPRepresentationPreservationMetadata(
-      aip.getId(), rep.getId(), startAgent, limitAgent, startEvent, limitEvent, startFile, limitFile, acceptFormat,
+      rep.getAipId(), rep.getId(), startAgent, limitAgent, startEvent, limitEvent, startFile, limitFile, acceptFormat,
       language);
 
     // register action
-    controllerAssistant.registerAction(user, aip.getId(), LOG_ENTRY_STATE.SUCCESS,
+    controllerAssistant.registerAction(user, rep.getAipId(), LOG_ENTRY_STATE.SUCCESS,
       RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID, representationId, "startAgent", startAgent, "limitAgent",
       limitAgent, "startEvent", startEvent, "limitEvent", limitEvent, "startFile", startFile, "limitFile", limitFile);
 
@@ -581,16 +577,15 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedFile file = BrowserHelper.retrieve(IndexedFile.class, fileUUID);
-    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, file.getAipId());
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
+    UserUtility.checkFilePermissions(user, file, PermissionType.READ);
 
     // delegate
     StreamResponse aipRepresentationPreservationMetadataFile = BrowserHelper
-      .retrieveAIPRepresentationPreservationMetadataFile(aip.getId(), file.getRepresentationId(), file.getId(),
+      .retrieveAIPRepresentationPreservationMetadataFile(file.getAipId(), file.getRepresentationId(), file.getId(),
         acceptFormat);
 
     // register action
-    controllerAssistant.registerAction(user, aip.getId(), LOG_ENTRY_STATE.SUCCESS,
+    controllerAssistant.registerAction(user, file.getAipId(), LOG_ENTRY_STATE.SUCCESS,
       RodaConstants.API_PATH_PARAM_FILE_UUID, fileUUID);
 
     return aipRepresentationPreservationMetadataFile;
@@ -605,7 +600,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.UPDATE);
 
     String id = fileId == null ? fileDetail.getFileName() : fileId;
 
@@ -628,8 +623,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedRepresentation rep = BrowserHelper.retrieve(IndexedRepresentation.class, representationUUID);
-    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, rep.getAipId());
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
+    UserUtility.checkRepresentationPermissions(user, rep, PermissionType.UPDATE);
 
     String id = fileId == null ? fileDetail.getFileName() : fileId;
 
@@ -651,8 +645,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedFile file = BrowserHelper.retrieve(IndexedFile.class, fileUUID);
-    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, file.getAipId());
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
+    UserUtility.checkFilePermissions(user, file, PermissionType.UPDATE);
 
     // delegate
     BrowserHelper.createOrUpdateAIPRepresentationPreservationMetadataFile(file.getAipId(), file.getRepresentationId(),
@@ -671,7 +664,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.UPDATE);
 
     // delegate
     BrowserHelper.deletePreservationMetadataFile(PreservationMetadataType.valueOf(type), aipId, null, id, false);
@@ -690,8 +683,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedRepresentation rep = BrowserHelper.retrieve(IndexedRepresentation.class, representationUUID);
-    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, rep.getAipId());
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
+    UserUtility.checkRepresentationPermissions(user, rep, PermissionType.UPDATE);
 
     // delegate
     BrowserHelper.deletePreservationMetadataFile(PreservationMetadataType.valueOf(type), rep.getAipId(), rep.getId(),
@@ -716,11 +708,11 @@ public class Browser extends RodaWuiController {
 
     // check user permissions
     controllerAssistant.checkRoles(user);
-    UserUtility.checkObjectPermissions(user, selected, PermissionType.UPDATE);
+    UserUtility.checkAIPPermissions(user, selected, PermissionType.UPDATE);
 
     if (parentId != null) {
       IndexedAIP parentAip = BrowserHelper.retrieve(IndexedAIP.class, parentId);
-      UserUtility.checkObjectPermissions(user, parentAip, PermissionType.CREATE);
+      UserUtility.checkAIPPermissions(user, parentAip, PermissionType.CREATE);
     }
 
     // delegate
@@ -772,7 +764,7 @@ public class Browser extends RodaWuiController {
 
     if (parentId != null) {
       IndexedAIP parentSDO = BrowserHelper.retrieve(IndexedAIP.class, parentId);
-      UserUtility.checkObjectPermissions(user, parentSDO, PermissionType.CREATE);
+      UserUtility.checkAIPPermissions(user, parentSDO, PermissionType.CREATE);
       Permissions parentPermissions = parentSDO.getPermissions();
 
       for (String name : parentPermissions.getUsernames()) {
@@ -803,6 +795,8 @@ public class Browser extends RodaWuiController {
 
     // check user permissions
     controllerAssistant.checkRoles(user);
+    IndexedAIP indexedAip = BrowserHelper.retrieve(IndexedAIP.class, aip.getId());
+    UserUtility.checkAIPPermissions(user, indexedAip, PermissionType.UPDATE);
 
     // delegate
     AIP updatedAip = BrowserHelper.updateAIP(user, aip);
@@ -819,6 +813,7 @@ public class Browser extends RodaWuiController {
 
     // check user permissions
     controllerAssistant.checkRoles(user);
+    UserUtility.checkAIPPermissions(user, aips, PermissionType.DELETE);
 
     // delegate
     String parentId = BrowserHelper.deleteAIP(aips, user);
@@ -835,6 +830,7 @@ public class Browser extends RodaWuiController {
 
     // check user permissions
     controllerAssistant.checkRoles(user);
+    UserUtility.checkRepresentationPermissions(user, representations, PermissionType.DELETE);
 
     // delegate
     BrowserHelper.deleteRepresentation(representations, user);
@@ -849,6 +845,7 @@ public class Browser extends RodaWuiController {
 
     // check user permissions
     controllerAssistant.checkRoles(user);
+    UserUtility.checkFilePermissions(user, files, PermissionType.DELETE);
 
     // delegate
     BrowserHelper.deleteFile(files, user);
@@ -865,7 +862,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.UPDATE);
 
     // delegate
     DescriptiveMetadata ret = BrowserHelper.createDescriptiveMetadataFile(aipId, metadataId, metadataType,
@@ -886,7 +883,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.UPDATE);
 
     // delegate
     String message = "Updated by " + user.getName();
@@ -907,7 +904,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.DELETE);
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.DELETE);
 
     // delegate
     BrowserHelper.deleteDescriptiveMetadataFile(aipId, null, metadataId);
@@ -925,7 +922,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
     IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class, representationId);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, representation.getAipId());
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.DELETE);
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.DELETE);
 
     // delegate
     BrowserHelper.deleteDescriptiveMetadataFile(representation.getAipId(), representation.getId(), metadataId);
@@ -943,7 +940,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.READ);
 
     // delegate
     DescriptiveMetadata dm = BrowserHelper.retrieveMetadataFile(aipId, metadataId);
@@ -962,6 +959,8 @@ public class Browser extends RodaWuiController {
 
     // check user permissions
     controllerAssistant.checkRoles(user);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.CREATE);
 
     // delegate
     Representation updatedRep = BrowserHelper.createRepresentation(aipId, representationId, type);
@@ -980,6 +979,8 @@ public class Browser extends RodaWuiController {
 
     // check user permissions
     controllerAssistant.checkRoles(user);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, representation.getAipId());
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.UPDATE);
 
     // delegate
     Representation updatedRep = BrowserHelper.updateRepresentation(user, representation);
@@ -999,7 +1000,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
     IndexedRepresentation rep = BrowserHelper.retrieve(IndexedRepresentation.class, representationUUID);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, rep.getAipId());
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.DELETE);
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.DELETE);
 
     // delegate
     BrowserHelper.deleteRepresentation(rep.getAipId(), rep.getId());
@@ -1016,15 +1017,13 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedFile file = BrowserHelper.retrieve(IndexedFile.class, fileUUID);
-    // TODO check permissions from indexed file
-    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, file.getAipId());
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.DELETE);
+    UserUtility.checkFilePermissions(user, file, PermissionType.DELETE);
 
     // delegate
     BrowserHelper.deleteRepresentationFile(fileUUID);
 
     // register action
-    controllerAssistant.registerAction(user, aip.getId(), LOG_ENTRY_STATE.SUCCESS, RodaConstants.FILE_AIP_ID,
+    controllerAssistant.registerAction(user, file.getAipId(), LOG_ENTRY_STATE.SUCCESS, RodaConstants.FILE_AIP_ID,
       file.getAipId(), RodaConstants.FILE_REPRESENTATION_ID, file.getRepresentationId(), RodaConstants.FILE_PATH,
       file.getPath(), RodaConstants.FILE_FILE_ID, file.getId());
   }
@@ -1039,9 +1038,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedFile file = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class, fileUuid);
-    // TODO get permissions from indexed file
-    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, file.getAipId());
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
+    UserUtility.checkFilePermissions(user, file, PermissionType.READ);
 
     // delegate
     EntityResponse aipRepresentationFile = BrowserHelper.retrieveAIPRepresentationFile(fileUuid, acceptFormat);
@@ -1063,9 +1060,10 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.UPDATE);
 
     // delegate
+    // TODO set this message in ServerMessages
     String message = "Updated by " + user.getName();
     DescriptiveMetadata ret = BrowserHelper.createOrUpdateAIPDescriptiveMetadataFile(aipId, null, metadataId,
       metadataType, metadataVersion, message, is, fileDetail, false);
@@ -1085,10 +1083,10 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class, representationId);
-    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, representation.getAipId());
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
+    UserUtility.checkRepresentationPermissions(user, representation, PermissionType.UPDATE);
 
     // delegate
+    // TODO set this message in ServerMessages
     String message = "Updated by " + user.getName();
     DescriptiveMetadata ret = BrowserHelper.createOrUpdateAIPDescriptiveMetadataFile(representation.getAipId(),
       representation.getId(), metadataId, metadataType, metadataVersion, message, is, fileDetail, false);
@@ -1109,7 +1107,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.UPDATE);
 
     // delegate
     String message = "Created by " + user.getName();
@@ -1131,10 +1129,10 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class, representationId);
-    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, representation.getAipId());
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
+    UserUtility.checkRepresentationPermissions(user, representation, PermissionType.UPDATE);
 
     // delegate
+    // TODO Get this message from ServerMessages
     String message = "Created by " + user.getName();
     DescriptiveMetadata ret = BrowserHelper.createOrUpdateAIPDescriptiveMetadataFile(representation.getAipId(),
       representation.getId(), metadataId, metadataType, metadataVersion, message, is, fileDetail, true);
@@ -1253,6 +1251,9 @@ public class Browser extends RodaWuiController {
 
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
 
+    // check object permissions
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.READ);
+
     // delegate
     List<SupportedMetadataTypeBundle> supportedMetadata = BrowserHelper.retrieveSupportedMetadata(user, aip, locale);
 
@@ -1308,7 +1309,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.UPDATE);
 
     // delegate
     // TODO externalize this message
@@ -1329,7 +1330,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.DELETE);
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.DELETE);
 
     // TODO if not admin, add to filter a constraint for the resource to belong
     // to this user
@@ -1351,7 +1352,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     for (IndexedAIP aip : aips) {
-      UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
+      UserUtility.checkAIPPermissions(user, aip, PermissionType.UPDATE);
       BrowserHelper.updateAIPPermissions(user, aip, permissions, recursive);
     }
 
@@ -1456,8 +1457,7 @@ public class Browser extends RodaWuiController {
 
     // check user permissions
     controllerAssistant.checkRoles(user);
-
-    UserUtility.checkObjectPermissions(user, selected, PermissionType.READ);
+    UserUtility.checkAIPPermissions(user, selected, PermissionType.READ);
 
     // delegate
     StreamResponse aipExport = BrowserHelper.retrieveAIPs(selected, acceptFormat);
@@ -1468,6 +1468,10 @@ public class Browser extends RodaWuiController {
     return aipExport;
   }
 
+  // FIXME lfaria 20161012: This code should not be here as it is specific of
+  // the REST API
+  // Also, it should use other base methods that already log and check
+  // permissions
   public static <T extends IsIndexed> RODAObjectList<?> retrieveObjects(User user, Class<T> objectClass, String start,
     String limit, String acceptFormat)
     throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException {
@@ -1478,6 +1482,8 @@ public class Browser extends RodaWuiController {
 
     // check user permissions
     controllerAssistant.checkRoles(user);
+
+    // TODO check object permissions
 
     // delegate
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
@@ -1490,6 +1496,8 @@ public class Browser extends RodaWuiController {
     return aip;
   }
 
+  // FIXME lfaria 20161012: This code should not be here as it is specific of
+  // the REST API
   public static EntityResponse retrieveAIP(User user, String aipId, String acceptFormat)
     throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -1500,7 +1508,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedAIP indexedAIP = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    UserUtility.checkObjectPermissions(user, indexedAIP, PermissionType.READ);
+    UserUtility.checkAIPPermissions(user, indexedAIP, PermissionType.READ);
 
     // delegate
     EntityResponse aip = BrowserHelper.retrieveAIP(indexedAIP, acceptFormat);
@@ -1518,7 +1526,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedAIP indexedAIP = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    UserUtility.checkObjectPermissions(user, indexedAIP, PermissionType.READ);
+    UserUtility.checkAIPPermissions(user, indexedAIP, PermissionType.READ);
 
     // delegate
     StreamResponse aip = BrowserHelper.retrieveAIPPart(indexedAIP, part);
@@ -1693,6 +1701,7 @@ public class Browser extends RodaWuiController {
 
     // check user permissions
     controllerAssistant.checkRoles(user);
+    UserUtility.checkAIPPermissions(user, selected, PermissionType.UPDATE);
 
     // delegate
     BrowserHelper.appraisal(user, selected, accept, rejectReason);
@@ -1712,6 +1721,9 @@ public class Browser extends RodaWuiController {
     // delegate
     IndexedRepresentation ret = BrowserHelper.retrieveRepresentationById(user, representationId);
 
+    // check object permissions
+    UserUtility.checkRepresentationPermissions(user, ret, PermissionType.READ);
+
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "representationId", representationId);
 
@@ -1728,13 +1740,16 @@ public class Browser extends RodaWuiController {
     // delegate
     IndexedFile ret = BrowserHelper.retrieveFileById(user, fileId);
 
+    // check object permissions
+    UserUtility.checkFilePermissions(user, ret, PermissionType.READ);
+
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "fileId", fileId);
 
     return ret;
   }
 
-  public static String retrieveDescriptiveMetadataPreview(User user, String aipId, SupportedMetadataTypeBundle bundle)
+  public static String retrieveDescriptiveMetadataPreview(User user, SupportedMetadataTypeBundle bundle)
     throws AuthorizationDeniedException, GenericException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1806,6 +1821,8 @@ public class Browser extends RodaWuiController {
 
     // check user permissions
     controllerAssistant.checkRoles(user);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.CREATE);
 
     // delegate
     Path file = Files.createTempFile("descriptive", ".tmp");
@@ -1827,6 +1844,8 @@ public class Browser extends RodaWuiController {
 
     // check user permissions
     controllerAssistant.checkRoles(user);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, file.getAipId());
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.UPDATE);
 
     // delegate
     File updatedFile = BrowserHelper.updateFile(user, file);
@@ -1843,6 +1862,8 @@ public class Browser extends RodaWuiController {
 
     // check user permissions
     controllerAssistant.checkRoles(user);
+    IndexedFile file = BrowserHelper.retrieve(IndexedFile.class, fileUUID);
+    UserUtility.checkFilePermissions(user, file, PermissionType.DELETE);
 
     // delegate
     BrowserHelper.deleteRepresentationFile(fileUUID);

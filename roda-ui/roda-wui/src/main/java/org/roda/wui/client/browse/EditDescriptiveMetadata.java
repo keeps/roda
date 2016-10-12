@@ -368,7 +368,7 @@ public class EditDescriptiveMetadata extends Composite {
   private void updateMetadataXML() {
     if (hasModifiedForm()) {
       // Apply the form values to the template (server)
-      BrowserService.Util.getInstance().retrieveDescriptiveMetadataPreview(aipId, supportedBundle,
+      BrowserService.Util.getInstance().retrieveDescriptiveMetadataPreview(supportedBundle,
         new AsyncCallback<String>() {
           @Override
           public void onFailure(Throwable caught) {
@@ -398,7 +398,7 @@ public class EditDescriptiveMetadata extends Composite {
       updateMetadataOnServer(xmlText);
     } else {
       // Get the resulting XML using the data from the form
-      BrowserService.Util.getInstance().retrieveDescriptiveMetadataPreview(aipId, supportedBundle,
+      BrowserService.Util.getInstance().retrieveDescriptiveMetadataPreview(supportedBundle,
         new AsyncCallback<String>() {
           @Override
           public void onFailure(Throwable caught) {
