@@ -64,12 +64,14 @@ public class DescriptiveMetadataHistory extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      if (historyTokens.size() == 2) {
+      if (historyTokens.size() == 2 || historyTokens.size() == 3) {
         final String aipId = historyTokens.get(0);
-        final String descriptiveMetadataId = historyTokens.get(1);
+        final String representationId = historyTokens.size() == 3 ? historyTokens.get(1) : null;
+        final String descriptiveMetadataId = historyTokens.get(historyTokens.size() - 1);
 
-        BrowserService.Util.getInstance().retrieveDescriptiveMetadataVersionsBundle(aipId, descriptiveMetadataId,
-          LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<DescriptiveMetadataVersionsBundle>() {
+        BrowserService.Util.getInstance().retrieveDescriptiveMetadataVersionsBundle(aipId, representationId,
+          descriptiveMetadataId, LocaleInfo.getCurrentLocale().getLocaleName(),
+          new AsyncCallback<DescriptiveMetadataVersionsBundle>() {
 
             @Override
             public void onFailure(Throwable caught) {
@@ -78,7 +80,8 @@ public class DescriptiveMetadataHistory extends Composite {
 
             @Override
             public void onSuccess(DescriptiveMetadataVersionsBundle bundle) {
-              DescriptiveMetadataHistory widget = new DescriptiveMetadataHistory(aipId, descriptiveMetadataId, bundle);
+              DescriptiveMetadataHistory widget = new DescriptiveMetadataHistory(aipId, representationId,
+                descriptiveMetadataId, bundle);
               callback.onSuccess(widget);
             }
           });
@@ -113,6 +116,7 @@ public class DescriptiveMetadataHistory extends Composite {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private final String aipId;
+  private final String representationId;
   private final String descriptiveMetadataId;
   private DescriptiveMetadataVersionsBundle bundle;
 
@@ -146,14 +150,14 @@ public class DescriptiveMetadataHistory extends Composite {
    * @param user
    *          the user to edit
    */
-  public DescriptiveMetadataHistory(final String aipId, final String descriptiveMetadataId,
-    final DescriptiveMetadataVersionsBundle bundle) {
+  public DescriptiveMetadataHistory(final String aipId, final String representationId,
+    final String descriptiveMetadataId, final DescriptiveMetadataVersionsBundle bundle) {
     this.aipId = aipId;
+    this.representationId = representationId;
     this.descriptiveMetadataId = descriptiveMetadataId;
     this.bundle = bundle;
 
     initWidget(uiBinder.createAndBindUi(this));
-
     init();
 
     list.addChangeHandler(new ChangeHandler() {
@@ -198,34 +202,35 @@ public class DescriptiveMetadataHistory extends Composite {
   }
 
   protected void updatePreview() {
-    getDescriptiveMetadata(aipId, descriptiveMetadataId, selectedVersion, inHTML, new AsyncCallback<SafeHtml>() {
+    getDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, selectedVersion, inHTML,
+      new AsyncCallback<SafeHtml>() {
 
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-      }
-
-      @Override
-      public void onSuccess(SafeHtml html) {
-        preview.setHTML(html);
-        if (inHTML) {
-          preview.removeStyleName("code-pre");
-        } else {
-          preview.addStyleName("code-pre");
-          JavascriptUtils.runHighlighterOn(preview.getElement());
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
         }
-      }
-    });
+
+        @Override
+        public void onSuccess(SafeHtml html) {
+          preview.setHTML(html);
+          if (inHTML) {
+            preview.removeStyleName("code-pre");
+          } else {
+            preview.addStyleName("code-pre");
+            JavascriptUtils.runHighlighterOn(preview.getElement());
+          }
+        }
+      });
   }
 
-  private void getDescriptiveMetadata(final String aipId, final String descId, final String versionKey,
-    final boolean inHTML, final AsyncCallback<SafeHtml> callback) {
+  private void getDescriptiveMetadata(final String aipId, final String representationId, final String descId,
+    final String versionKey, final boolean inHTML, final AsyncCallback<SafeHtml> callback) {
 
     SafeUri uri;
     if (inHTML) {
-      uri = RestUtils.createDescriptiveMetadataHTMLUri(aipId, descId, versionKey);
+      uri = RestUtils.createRepresentationDescriptiveMetadataHTMLUri(representationId, descId, versionKey);
     } else {
-      uri = RestUtils.createDescriptiveMetadataDownloadUri(aipId, descId, versionKey);
+      uri = RestUtils.createRepresentationDescriptiveMetadataDownloadUri(representationId, descId, versionKey);
     }
     RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
     requestBuilder.setHeader("Authorization", "Custom");
@@ -306,8 +311,8 @@ public class DescriptiveMetadataHistory extends Composite {
 
   @UiHandler("buttonRevert")
   void buttonRevertHandler(ClickEvent e) {
-    BrowserService.Util.getInstance().revertDescriptiveMetadataVersion(aipId, descriptiveMetadataId, selectedVersion,
-      new AsyncCallback<Void>() {
+    BrowserService.Util.getInstance().revertDescriptiveMetadataVersion(aipId, representationId, descriptiveMetadataId,
+      selectedVersion, new AsyncCallback<Void>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -324,8 +329,8 @@ public class DescriptiveMetadataHistory extends Composite {
 
   @UiHandler("buttonRemove")
   void buttonRemoveHandler(ClickEvent e) {
-    BrowserService.Util.getInstance().deleteDescriptiveMetadataVersion(aipId, descriptiveMetadataId, selectedVersion,
-      new AsyncCallback<Void>() {
+    BrowserService.Util.getInstance().deleteDescriptiveMetadataVersion(aipId, representationId, descriptiveMetadataId,
+      selectedVersion, new AsyncCallback<Void>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -344,8 +349,9 @@ public class DescriptiveMetadataHistory extends Composite {
   }
 
   protected void refresh() {
-    BrowserService.Util.getInstance().retrieveDescriptiveMetadataVersionsBundle(aipId, descriptiveMetadataId,
-      LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<DescriptiveMetadataVersionsBundle>() {
+    BrowserService.Util.getInstance().retrieveDescriptiveMetadataVersionsBundle(aipId, representationId,
+      descriptiveMetadataId, LocaleInfo.getCurrentLocale().getLocaleName(),
+      new AsyncCallback<DescriptiveMetadataVersionsBundle>() {
 
         @Override
         public void onFailure(Throwable caught) {

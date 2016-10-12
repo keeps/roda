@@ -882,7 +882,7 @@ public class Browse extends Composite {
       @Override
       public void onSuccess(String itemAIPId) {
         view(itemAIPId);
-        Tools.newHistory(CreateDescriptiveMetadata.RESOLVER, itemAIPId, CreateDescriptiveMetadata.NEW);
+        Tools.newHistory(CreateDescriptiveMetadata.RESOLVER, "aip", itemAIPId, CreateDescriptiveMetadata.NEW);
       }
     });
   }
@@ -952,32 +952,32 @@ public class Browse extends Composite {
             messages.ingestTransferRemoveFolderConfirmDialogCancel(),
             messages.ingestTransferRemoveFolderConfirmDialogOk(), new AsyncCallback<Boolean>() {
 
-            @Override
-            public void onSuccess(Boolean confirmed) {
-              if (confirmed) {
-                BrowserService.Util.getInstance().deleteAIP(selected, new LoadingAsyncCallback<String>() {
+              @Override
+              public void onSuccess(Boolean confirmed) {
+                if (confirmed) {
+                  BrowserService.Util.getInstance().deleteAIP(selected, new LoadingAsyncCallback<String>() {
 
-                  @Override
-                  public void onFailureImpl(Throwable caught) {
-                    AsyncCallbackUtils.defaultFailureTreatment(caught);
-                    aipList.refresh();
-                  }
+                    @Override
+                    public void onFailureImpl(Throwable caught) {
+                      AsyncCallbackUtils.defaultFailureTreatment(caught);
+                      aipList.refresh();
+                    }
 
-                  @Override
-                  public void onSuccessImpl(String parentId) {
-                    Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
-                      messages.ingestTransferRemoveSuccessMessage(size));
-                    aipList.refresh();
-                  }
-                });
+                    @Override
+                    public void onSuccessImpl(String parentId) {
+                      Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
+                        messages.ingestTransferRemoveSuccessMessage(size));
+                      aipList.refresh();
+                    }
+                  });
+                }
               }
-            }
 
-            @Override
-            public void onFailure(Throwable caught) {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
-            }
-          });
+              @Override
+              public void onFailure(Throwable caught) {
+                AsyncCallbackUtils.defaultFailureTreatment(caught);
+              }
+            });
         }
 
       });
@@ -992,7 +992,7 @@ public class Browse extends Composite {
 
   private void newDescriptiveMetadataRedirect() {
     if (aipId != null) {
-      Tools.newHistory(RESOLVER, CreateDescriptiveMetadata.RESOLVER.getHistoryToken(), aipId);
+      Tools.newHistory(RESOLVER, CreateDescriptiveMetadata.RESOLVER.getHistoryToken(), "aip", aipId);
     }
   }
 
@@ -1089,24 +1089,24 @@ public class Browse extends Composite {
           BrowserService.Util.getInstance().moveAIPInHierarchy(selected, parentId,
             new LoadingAsyncCallback<IndexedAIP>() {
 
-            @Override
-            public void onSuccessImpl(IndexedAIP result) {
-              if (result != null) {
-                Tools.newHistory(Browse.RESOLVER, result.getId());
-              } else {
-                Tools.newHistory(Browse.RESOLVER);
+              @Override
+              public void onSuccessImpl(IndexedAIP result) {
+                if (result != null) {
+                  Tools.newHistory(Browse.RESOLVER, result.getId());
+                } else {
+                  Tools.newHistory(Browse.RESOLVER);
+                }
               }
-            }
 
-            @Override
-            public void onFailureImpl(Throwable caught) {
-              if (caught instanceof NotFoundException) {
-                Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-              } else {
-                AsyncCallbackUtils.defaultFailureTreatment(caught);
+              @Override
+              public void onFailureImpl(Throwable caught) {
+                if (caught instanceof NotFoundException) {
+                  Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+                } else {
+                  AsyncCallbackUtils.defaultFailureTreatment(caught);
+                }
               }
-            }
-          });
+            });
         }
 
       });

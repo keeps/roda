@@ -52,10 +52,10 @@ public interface BrowserServiceAsync {
 
   void retrieveItemBundle(String aipId, String localeString, AsyncCallback<BrowseItemBundle> callback);
 
-  void retrieveDescriptiveMetadataEditBundle(String aipId, String descId, String type, String version,
-    String localeString, AsyncCallback<DescriptiveMetadataEditBundle> callback);
+  void retrieveDescriptiveMetadataEditBundle(String aipId, String representationId, String descId, String type,
+    String version, String localeString, AsyncCallback<DescriptiveMetadataEditBundle> callback);
 
-  void retrieveDescriptiveMetadataEditBundle(String aipId, String descId, String localeString,
+  void retrieveDescriptiveMetadataEditBundle(String aipId, String representationId, String descId, String localeString,
     AsyncCallback<DescriptiveMetadataEditBundle> callback);
 
   void retrieveSearchFields(String locale, AsyncCallback<List<SearchField>> callback);
@@ -70,11 +70,13 @@ public interface BrowserServiceAsync {
 
   void deleteFile(SelectedItems<IndexedFile> representations, AsyncCallback<Void> callback);
 
-  void updateDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle, AsyncCallback<Void> callback);
+  void updateDescriptiveMetadataFile(String aipId, String representationId, DescriptiveMetadataEditBundle bundle,
+    AsyncCallback<Void> callback);
 
-  void deleteDescriptiveMetadataFile(String itemId, String descriptiveMetadataId, AsyncCallback<Void> callback);
+  void deleteDescriptiveMetadataFile(String aipId, String representationId, String descriptiveMetadataId,
+    AsyncCallback<Void> callback);
 
-  void createDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle newBundle,
+  void createDescriptiveMetadataFile(String aipId, String representationId, DescriptiveMetadataEditBundle newBundle,
     AsyncCallback<Void> asyncCallback);
 
   void retrieveDescriptiveMetadataPreview(SupportedMetadataTypeBundle bundle, AsyncCallback<String> async);
@@ -112,14 +114,14 @@ public interface BrowserServiceAsync {
 
   void retrievePreservationEventViewBundle(String eventId, AsyncCallback<PreservationEventViewBundle> asyncCallback);
 
-  void retrieveDescriptiveMetadataVersionsBundle(String aipId, String descriptiveMetadataId, String localeString,
-    AsyncCallback<DescriptiveMetadataVersionsBundle> callback);
+  void retrieveDescriptiveMetadataVersionsBundle(String aipId, String representationId, String descriptiveMetadataId,
+    String localeString, AsyncCallback<DescriptiveMetadataVersionsBundle> callback);
 
-  void revertDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId,
-    AsyncCallback<Void> callback);
+  void revertDescriptiveMetadataVersion(String aipId, String representationId, String descriptiveMetadataId,
+    String versionId, AsyncCallback<Void> callback);
 
-  void deleteDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId,
-    AsyncCallback<Void> callback);
+  void deleteDescriptiveMetadataVersion(String aipId, String representationId, String descriptiveMetadataId,
+    String versionId, AsyncCallback<Void> callback);
 
   <T extends IsIndexed> void find(String classNameToReturn, Filter filter, Sorter sorter, Sublist sublist,
     Facets facets, String localeString, boolean justActive, AsyncCallback<IndexResult<T>> callback);

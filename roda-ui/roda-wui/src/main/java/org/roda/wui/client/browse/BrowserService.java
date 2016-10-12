@@ -86,11 +86,12 @@ public interface BrowserService extends RemoteService {
   BrowseItemBundle retrieveItemBundle(String aipId, String localeString)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
-  DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String descId, String type,
-    String version, String localeString)
+  DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String representationId,
+    String descId, String type, String version, String localeString)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
-  DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String descId, String localeString)
+  DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String representationId,
+    String descId, String localeString)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
   List<SearchField> retrieveSearchFields(String locale) throws GenericException;
@@ -111,20 +112,19 @@ public interface BrowserService extends RemoteService {
   void deleteFile(SelectedItems<IndexedFile> files)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
-  void deleteDescriptiveMetadataFile(String itemId, String descriptiveMetadataId)
+  void deleteDescriptiveMetadataFile(String aipId, String representationId, String descriptiveMetadataId)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
-  void updateDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle)
+  void updateDescriptiveMetadataFile(String aipId, String representationId, DescriptiveMetadataEditBundle bundle)
     throws AuthorizationDeniedException, GenericException, ValidationException, NotFoundException,
     RequestNotValidException;
 
-  void createDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle newBundle)
+  void createDescriptiveMetadataFile(String aipId, String representationId, DescriptiveMetadataEditBundle newBundle)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     AlreadyExistsException, ValidationException;
 
-  String retrieveDescriptiveMetadataPreview(SupportedMetadataTypeBundle bundle)
-    throws AuthorizationDeniedException, GenericException, ValidationException, NotFoundException,
-    RequestNotValidException;
+  String retrieveDescriptiveMetadataPreview(SupportedMetadataTypeBundle bundle) throws AuthorizationDeniedException,
+    GenericException, ValidationException, NotFoundException, RequestNotValidException;
 
   String createTransferredResourcesFolder(String parent, String folderName)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
@@ -170,14 +170,16 @@ public interface BrowserService extends RemoteService {
   PreservationEventViewBundle retrievePreservationEventViewBundle(String eventId)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
-  DescriptiveMetadataVersionsBundle retrieveDescriptiveMetadataVersionsBundle(String aipId,
+  DescriptiveMetadataVersionsBundle retrieveDescriptiveMetadataVersionsBundle(String aipId, String representationId,
     String descriptiveMetadataId, String localeString)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException;
 
-  void revertDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId)
+  void revertDescriptiveMetadataVersion(String aipId, String representationId, String descriptiveMetadataId,
+    String versionId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 
-  void deleteDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId)
+  void deleteDescriptiveMetadataVersion(String aipId, String representationId, String descriptiveMetadataId,
+    String versionId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 
   <T extends IsIndexed> IndexResult<T> find(String classNameToReturn, Filter filter, Sorter sorter, Sublist sublist,

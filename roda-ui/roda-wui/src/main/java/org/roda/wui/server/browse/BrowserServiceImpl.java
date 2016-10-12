@@ -153,21 +153,21 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String descId, String type,
-    String version, String localeString)
+  public DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String representationId,
+    String descId, String type, String version, String localeString)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Locale locale = ServerTools.parseLocale(localeString);
-    return Browser.retrieveDescriptiveMetadataEditBundle(user, aipId, descId, type, version, locale);
+    return Browser.retrieveDescriptiveMetadataEditBundle(user, aipId, representationId, descId, type, version, locale);
   }
 
   @Override
-  public DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String descId,
-    String localeString)
+  public DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String representationId,
+    String descId, String localeString)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Locale locale = ServerTools.parseLocale(localeString);
-    return Browser.retrieveDescriptiveMetadataEditBundle(user, aipId, descId, locale);
+    return Browser.retrieveDescriptiveMetadataEditBundle(user, aipId, representationId, descId, locale);
   }
 
   @Override
@@ -325,7 +325,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void createDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle)
+  public void createDescriptiveMetadataFile(String aipId, String representationId, DescriptiveMetadataEditBundle bundle)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     AlreadyExistsException, ValidationException {
     User user = UserUtility.getUser(getThreadLocalRequest());
@@ -343,8 +343,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     String descriptiveMetadataVersion = bundle.getVersion();
     ContentPayload payload = new StringContentPayload(bundle.getXml());
 
-    Browser.createDescriptiveMetadataFile(user, aipId, metadataId, descriptiveMetadataType, descriptiveMetadataVersion,
-      payload);
+    Browser.createDescriptiveMetadataFile(user, aipId, representationId, metadataId, descriptiveMetadataType,
+      descriptiveMetadataVersion, payload);
   }
 
   @Override
@@ -357,7 +357,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void updateDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle)
+  public void updateDescriptiveMetadataFile(String aipId, String representationId, DescriptiveMetadataEditBundle bundle)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     ValidationException {
     User user = UserUtility.getUser(getThreadLocalRequest());
@@ -366,14 +366,15 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     String metadataVersion = bundle.getVersion();
     ContentPayload payload = new StringContentPayload(bundle.getXml());
 
-    Browser.updateDescriptiveMetadataFile(user, aipId, metadataId, metadataType, metadataVersion, payload);
+    Browser.updateDescriptiveMetadataFile(user, aipId, representationId, metadataId, metadataType, metadataVersion,
+      payload);
 
   }
 
-  public void deleteDescriptiveMetadataFile(String itemId, String descriptiveMetadataId)
+  public void deleteDescriptiveMetadataFile(String aipId, String representationId, String descriptiveMetadataId)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.deleteAIPDescriptiveMetadataFile(user, itemId, descriptiveMetadataId);
+    Browser.deleteDescriptiveMetadataFile(user, aipId, representationId, descriptiveMetadataId);
   }
 
   public String createTransferredResourcesFolder(String parent, String folderName)
@@ -527,25 +528,28 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public DescriptiveMetadataVersionsBundle retrieveDescriptiveMetadataVersionsBundle(String aipId,
-    String descriptiveMetadataId, String localeString)
+    String representationId, String descriptiveMetadataId, String localeString)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Locale locale = ServerTools.parseLocale(localeString);
-    return Browser.retrieveDescriptiveMetadataVersionsBundle(user, aipId, descriptiveMetadataId, locale);
+    return Browser.retrieveDescriptiveMetadataVersionsBundle(user, aipId, representationId, descriptiveMetadataId,
+      locale);
   }
 
   @Override
-  public void revertDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId)
+  public void revertDescriptiveMetadataVersion(String aipId, String representationId, String descriptiveMetadataId,
+    String versionId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.revertDescriptiveMetadataVersion(user, aipId, descriptiveMetadataId, versionId);
+    Browser.revertDescriptiveMetadataVersion(user, aipId, representationId, descriptiveMetadataId, versionId);
   }
 
   @Override
-  public void deleteDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId)
+  public void deleteDescriptiveMetadataVersion(String aipId, String representationId, String descriptiveMetadataId,
+    String versionId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.deleteDescriptiveMetadataVersion(user, aipId, descriptiveMetadataId, versionId);
+    Browser.deleteDescriptiveMetadataVersion(user, aipId, representationId, descriptiveMetadataId, versionId);
   }
 
   @Override

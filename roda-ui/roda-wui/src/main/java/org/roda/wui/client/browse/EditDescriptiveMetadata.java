@@ -59,12 +59,14 @@ public class EditDescriptiveMetadata extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      if (historyTokens.size() == 2) {
+      if (historyTokens.size() == 2 || historyTokens.size() == 3) {
         final String aipId = historyTokens.get(0);
-        final String descriptiveMetadataId = historyTokens.get(1);
+        final String representationId = historyTokens.size() == 3 ? historyTokens.get(1) : null;
+        final String descriptiveMetadataId = historyTokens.get(historyTokens.size() - 1);
 
-        BrowserService.Util.getInstance().retrieveDescriptiveMetadataEditBundle(aipId, descriptiveMetadataId,
-          LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<DescriptiveMetadataEditBundle>() {
+        BrowserService.Util.getInstance().retrieveDescriptiveMetadataEditBundle(aipId, representationId,
+          descriptiveMetadataId, LocaleInfo.getCurrentLocale().getLocaleName(),
+          new AsyncCallback<DescriptiveMetadataEditBundle>() {
 
             @Override
             public void onFailure(Throwable caught) {
@@ -73,7 +75,7 @@ public class EditDescriptiveMetadata extends Composite {
 
             @Override
             public void onSuccess(DescriptiveMetadataEditBundle bundle) {
-              EditDescriptiveMetadata edit = new EditDescriptiveMetadata(aipId, bundle);
+              EditDescriptiveMetadata edit = new EditDescriptiveMetadata(aipId, representationId, bundle);
               callback.onSuccess(edit);
             }
           });
@@ -104,6 +106,7 @@ public class EditDescriptiveMetadata extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   private final String aipId;
+  private final String representationId;
   private DescriptiveMetadataEditBundle bundle;
   private SupportedMetadataTypeBundle supportedBundle;
   private boolean inXML = false;
@@ -152,8 +155,10 @@ public class EditDescriptiveMetadata extends Composite {
    * @param user
    *          the user to edit
    */
-  public EditDescriptiveMetadata(final String aipId, final DescriptiveMetadataEditBundle bundleParam) {
+  public EditDescriptiveMetadata(final String aipId, final String representationId,
+    final DescriptiveMetadataEditBundle bundleParam) {
     this.aipId = aipId;
+    this.representationId = representationId;
     this.bundle = bundleParam;
 
     // Create new Set of MetadataValues so we can keep the original
@@ -186,8 +191,9 @@ public class EditDescriptiveMetadata extends Composite {
           typeString = value;
         }
 
-        BrowserService.Util.getInstance().retrieveDescriptiveMetadataEditBundle(aipId, bundle.getId(), typeString,
-          version, LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<DescriptiveMetadataEditBundle>() {
+        BrowserService.Util.getInstance().retrieveDescriptiveMetadataEditBundle(aipId, representationId, bundle.getId(),
+          typeString, version, LocaleInfo.getCurrentLocale().getLocaleName(),
+          new AsyncCallback<DescriptiveMetadataEditBundle>() {
             @Override
             public void onFailure(Throwable caught) {
               AsyncCallbackUtils.defaultFailureTreatment(caught);
@@ -426,26 +432,27 @@ public class EditDescriptiveMetadata extends Composite {
     DescriptiveMetadataEditBundle updatedBundle = new DescriptiveMetadataEditBundle(bundle.getId(), typeText, version,
       content);
 
-    BrowserService.Util.getInstance().updateDescriptiveMetadataFile(aipId, updatedBundle, new AsyncCallback<Void>() {
+    BrowserService.Util.getInstance().updateDescriptiveMetadataFile(aipId, representationId, updatedBundle,
+      new AsyncCallback<Void>() {
 
-      @Override
-      public void onFailure(Throwable caught) {
-        if (caught instanceof ValidationException) {
-          ValidationException e = (ValidationException) caught;
-          updateErrors(e);
-        } else {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        @Override
+        public void onFailure(Throwable caught) {
+          if (caught instanceof ValidationException) {
+            ValidationException e = (ValidationException) caught;
+            updateErrors(e);
+          } else {
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
+          }
         }
-      }
 
-      @Override
-      public void onSuccess(Void result) {
-        errors.setText("");
-        errors.setVisible(false);
-        Toast.showInfo(messages.dialogSuccess(), messages.metadataFileSaved());
-        Tools.newHistory(Browse.RESOLVER, aipId);
-      }
-    });
+        @Override
+        public void onSuccess(Void result) {
+          errors.setText("");
+          errors.setVisible(false);
+          Toast.showInfo(messages.dialogSuccess(), messages.metadataFileSaved());
+          Tools.newHistory(Browse.RESOLVER, aipId);
+        }
+      });
 
   }
 
@@ -464,19 +471,20 @@ public class EditDescriptiveMetadata extends Composite {
 
   @UiHandler("buttonRemove")
   void buttonRemoveHandler(ClickEvent e) {
-    BrowserService.Util.getInstance().deleteDescriptiveMetadataFile(aipId, bundle.getId(), new AsyncCallback<Void>() {
+    BrowserService.Util.getInstance().deleteDescriptiveMetadataFile(aipId, representationId, bundle.getId(),
+      new AsyncCallback<Void>() {
 
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-      }
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
 
-      @Override
-      public void onSuccess(Void result) {
-        Toast.showInfo(messages.dialogSuccess(), messages.metadataFileRemoved());
-        Tools.newHistory(Browse.RESOLVER, aipId);
-      }
-    });
+        @Override
+        public void onSuccess(Void result) {
+          Toast.showInfo(messages.dialogSuccess(), messages.metadataFileRemoved());
+          Tools.newHistory(Browse.RESOLVER, aipId);
+        }
+      });
   }
 
   @UiHandler("buttonCancel")

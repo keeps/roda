@@ -287,7 +287,7 @@ public class AipsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    DescriptiveMetadata dm = Browser.putAIPDescriptiveMetadataFile(user, aipId, metadataId, metadataType,
+    DescriptiveMetadata dm = Browser.updateAIPDescriptiveMetadataFile(user, aipId, metadataId, metadataType,
       metadataVersion, inputStream, fileDetail);
 
     return Response.ok(dm, mediaType).build();
@@ -315,7 +315,7 @@ public class AipsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    DescriptiveMetadata dm = Browser.postAIPDescriptiveMetadataFile(user, aipId, metadataId, metadataType,
+    DescriptiveMetadata dm = Browser.createAIPDescriptiveMetadataFile(user, aipId, metadataId, metadataType,
       metadataVersion, inputStream, fileDetail);
 
     return Response.ok(dm, mediaType).build();
@@ -339,7 +339,7 @@ public class AipsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    Browser.deleteAIPDescriptiveMetadataFile(user, aipId, metadataId);
+    Browser.deleteDescriptiveMetadataFile(user, aipId, null, metadataId);
 
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Descriptive metadata deleted"), mediaType)
       .build();

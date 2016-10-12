@@ -64,13 +64,25 @@ public class CreateDescriptiveMetadata extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      if (historyTokens.size() == 1 || historyTokens.size() == 2) {
-        final String aipId = historyTokens.get(0);
-        boolean isNew = historyTokens.size() == 2 && historyTokens.get(1).equals(NEW);
+      GWT.log(historyTokens.toString());
+      if ((historyTokens.get(0).equals("aip") && (historyTokens.size() == 2 || historyTokens.size() == 3))
+        || (historyTokens.get(0).equals("representation")
+          && (historyTokens.size() == 3 || historyTokens.size() == 4))) {
+        boolean isAIP = historyTokens.get(0).equals("aip");
+        final String aipId = historyTokens.get(1);
+        boolean isNew;
+        CreateDescriptiveMetadata create;
 
-        CreateDescriptiveMetadata create = new CreateDescriptiveMetadata(aipId, isNew);
+        if (isAIP) {
+          isNew = historyTokens.size() == 3 && historyTokens.get(2).equals(NEW);
+          create = new CreateDescriptiveMetadata(aipId, null, isNew);
+        } else {
+          final String representationId = historyTokens.get(2);
+          isNew = historyTokens.size() == 4 && historyTokens.get(3).equals(NEW);
+          create = new CreateDescriptiveMetadata(aipId, representationId, isNew);
+        }
+
         callback.onSuccess(create);
-
       } else {
         Tools.newHistory(Browse.RESOLVER);
         callback.onSuccess(null);
@@ -100,7 +112,7 @@ public class CreateDescriptiveMetadata extends Composite {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private final String aipId;
-
+  private final String representationId;
   private final boolean isNew;
 
   private boolean inXML = false;
@@ -109,8 +121,6 @@ public class CreateDescriptiveMetadata extends Composite {
   private SupportedMetadataTypeBundle selectedBundle = null;
   private TextArea metadataXML;
   private String metadataTextFromForm = null;
-
-  // private ClientLogger logger = new ClientLogger(getClass().getName());
 
   @UiField
   TextBox id;
@@ -148,8 +158,9 @@ public class CreateDescriptiveMetadata extends Composite {
    * @param user
    *          the user to edit
    */
-  public CreateDescriptiveMetadata(String aipId, boolean isNew) {
+  public CreateDescriptiveMetadata(String aipId, String representationId, boolean isNew) {
     this.aipId = aipId;
+    this.representationId = representationId;
     this.isNew = isNew;
 
     initWidget(uiBinder.createAndBindUi(this));
@@ -314,33 +325,34 @@ public class CreateDescriptiveMetadata extends Composite {
       DescriptiveMetadataEditBundle newBundle = new DescriptiveMetadataEditBundle(idText, typeText, typeVersion,
         xmlText, template, values, true);
 
-      BrowserService.Util.getInstance().createDescriptiveMetadataFile(aipId, newBundle, new AsyncCallback<Void>() {
+      BrowserService.Util.getInstance().createDescriptiveMetadataFile(aipId, representationId, newBundle,
+        new AsyncCallback<Void>() {
 
-        @Override
-        public void onFailure(Throwable caught) {
-          if (caught instanceof ValidationException) {
-            ValidationException e = (ValidationException) caught;
-            updateErrors(e);
-            idError.setVisible(false);
-          } else if (caught instanceof AlreadyExistsException) {
-            idError.setVisible(true);
-            idError.setHTML(SafeHtmlUtils.fromSafeConstant(messages.fileAlreadyExists()));
-            errors.setVisible(false);
-          } else {
-            idError.setVisible(false);
-            AsyncCallbackUtils.defaultFailureTreatment(caught);
+          @Override
+          public void onFailure(Throwable caught) {
+            if (caught instanceof ValidationException) {
+              ValidationException e = (ValidationException) caught;
+              updateErrors(e);
+              idError.setVisible(false);
+            } else if (caught instanceof AlreadyExistsException) {
+              idError.setVisible(true);
+              idError.setHTML(SafeHtmlUtils.fromSafeConstant(messages.fileAlreadyExists()));
+              errors.setVisible(false);
+            } else {
+              idError.setVisible(false);
+              AsyncCallbackUtils.defaultFailureTreatment(caught);
+            }
+            buttonApply.setEnabled(true);
           }
-          buttonApply.setEnabled(true);
-        }
 
-        @Override
-        public void onSuccess(Void result) {
-          errors.setText("");
-          errors.setVisible(false);
-          Toast.showInfo(messages.dialogSuccess(), messages.metadataFileCreated());
-          Tools.newHistory(Browse.RESOLVER, aipId);
-        }
-      });
+          @Override
+          public void onSuccess(Void result) {
+            errors.setText("");
+            errors.setVisible(false);
+            Toast.showInfo(messages.dialogSuccess(), messages.metadataFileCreated());
+            Tools.newHistory(Browse.RESOLVER, aipId);
+          }
+        });
     } else {
       Toast.showError("Please fill the mandatory fields");
       buttonApply.setEnabled(true);
@@ -368,7 +380,6 @@ public class CreateDescriptiveMetadata extends Composite {
 
   private void cancel() {
     if (isNew) {
-
       SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<IndexedAIP>(Arrays.asList(aipId),
         IndexedAIP.class.getName());
       BrowserService.Util.getInstance().deleteAIP(selected, new AsyncCallback<String>() {

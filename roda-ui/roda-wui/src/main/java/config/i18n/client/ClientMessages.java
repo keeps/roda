@@ -2245,4 +2245,6 @@ public interface ClientMessages extends Messages {
   String showMore();
 
   String showLess();
+
+  String revertedBy(String userId);
 }

@@ -128,28 +128,35 @@ public class Browser extends RodaWuiController {
   }
 
   public static DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(User user, String aipId,
-    String metadataId, String type, String version, Locale locale)
+    String representationId, String metadataId, String type, String version, Locale locale)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
+
     UserUtility.checkAIPPermissions(user, aip, PermissionType.READ);
+    String repUUID = representationId;
+
+    if (representationId != null) {
+      IndexedRepresentation rep = BrowserHelper.retrieve(IndexedRepresentation.class, representationId);
+      representationId = rep.getId();
+    }
 
     // delegate
-    DescriptiveMetadataEditBundle bundle = BrowserHelper.retrieveDescriptiveMetadataEditBundle(user, aip, metadataId,
-      type, version, locale);
+    DescriptiveMetadataEditBundle bundle = BrowserHelper.retrieveDescriptiveMetadataEditBundle(user, aip,
+      representationId, metadataId, type, version, locale);
 
     // register action
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
-      RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
+      RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID, repUUID, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
 
     return bundle;
   }
 
   public static DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(User user, String aipId,
-    String metadataId, Locale locale)
+    String representationId, String metadataId, Locale locale)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -157,21 +164,28 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
+
     UserUtility.checkAIPPermissions(user, aip, PermissionType.READ);
+    String repUUID = representationId;
+
+    if (representationId != null) {
+      IndexedRepresentation rep = BrowserHelper.retrieve(IndexedRepresentation.class, representationId);
+      representationId = rep.getId();
+    }
 
     // delegate
-    DescriptiveMetadataEditBundle bundle = BrowserHelper.retrieveDescriptiveMetadataEditBundle(user, aip, metadataId,
-      locale);
+    DescriptiveMetadataEditBundle bundle = BrowserHelper.retrieveDescriptiveMetadataEditBundle(user, aip,
+      representationId, metadataId, locale);
 
     // register action
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
-      RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
+      RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID, repUUID, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
 
     return bundle;
   }
 
   public static DescriptiveMetadataVersionsBundle retrieveDescriptiveMetadataVersionsBundle(User user, String aipId,
-    String metadataId, Locale locale)
+    String representationId, String metadataId, Locale locale)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -179,15 +193,25 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
+
     UserUtility.checkAIPPermissions(user, aip, PermissionType.READ);
+
+    String repUUID = representationId;
+    IndexedRepresentation rep = null;
+
+    if (representationId != null) {
+      rep = BrowserHelper.retrieve(IndexedRepresentation.class, representationId);
+      representationId = rep.getId();
+    }
 
     // delegate
     DescriptiveMetadataVersionsBundle bundle = BrowserHelper.retrieveDescriptiveMetadataVersionsBundle(aipId,
-      metadataId, locale);
+      representationId, metadataId, locale);
+    bundle.setRepresentation(rep);
 
     // register action
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
-      RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
+      RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID, repUUID, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
 
     return bundle;
   }
@@ -467,7 +491,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static EntityResponse retrieveRepresentationDescriptiveMetadata(User user, String representationId,
-    String metadataId, String acceptFormat, String language)
+    String metadataId, String versionId, String acceptFormat, String language)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -480,8 +504,14 @@ public class Browser extends RodaWuiController {
     UserUtility.checkRepresentationPermissions(user, representation, PermissionType.READ);
 
     // delegate
-    EntityResponse aipDescritiveMetadata = BrowserHelper.retrieveRepresentationDescriptiveMetadata(
-      representation.getAipId(), representation.getId(), metadataId, acceptFormat, language);
+    EntityResponse aipDescritiveMetadata;
+    if (versionId == null) {
+      aipDescritiveMetadata = BrowserHelper.retrieveRepresentationDescriptiveMetadata(representation.getAipId(),
+        representation.getId(), metadataId, acceptFormat, language);
+    } else {
+      aipDescritiveMetadata = BrowserHelper.retrieveRepresentationDescriptiveMetadataVersion(representation.getAipId(),
+        representation.getId(), metadataId, versionId, acceptFormat, language);
+    }
 
     // register action
     controllerAssistant.registerAction(user, representationId, LOG_ENTRY_STATE.SUCCESS,
@@ -854,64 +884,92 @@ public class Browser extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "selected", files);
   }
 
-  public static DescriptiveMetadata createDescriptiveMetadataFile(User user, String aipId, String metadataId,
-    String metadataType, String metadataVersion, ContentPayload metadataPayload) throws AuthorizationDeniedException,
-    GenericException, ValidationException, NotFoundException, RequestNotValidException, AlreadyExistsException {
+  public static DescriptiveMetadata createDescriptiveMetadataFile(User user, String aipId, String representationId,
+    String metadataId, String metadataType, String metadataVersion, ContentPayload metadataPayload)
+    throws AuthorizationDeniedException, GenericException, ValidationException, NotFoundException,
+    RequestNotValidException, AlreadyExistsException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
+
     UserUtility.checkAIPPermissions(user, aip, PermissionType.UPDATE);
 
+    String repUUID = representationId;
+
+    if (representationId != null) {
+      IndexedRepresentation rep = BrowserHelper.retrieve(IndexedRepresentation.class, representationId);
+      representationId = rep.getId();
+    }
+
     // delegate
-    DescriptiveMetadata ret = BrowserHelper.createDescriptiveMetadataFile(aipId, metadataId, metadataType,
-      metadataVersion, metadataPayload);
+    DescriptiveMetadata ret = BrowserHelper.createDescriptiveMetadataFile(aipId, representationId, metadataId,
+      metadataType, metadataVersion, metadataPayload);
 
     // register action
     controllerAssistant.registerAction(user, aip.getId(), LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID,
-      aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
+      aipId, RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID, repUUID, RodaConstants.API_PATH_PARAM_METADATA_ID,
+      metadataId);
 
     return ret;
   }
 
-  public static DescriptiveMetadata updateDescriptiveMetadataFile(User user, String aipId, String metadataId,
-    String metadataType, String metadataVersion, ContentPayload metadataPayload) throws AuthorizationDeniedException,
-    GenericException, ValidationException, NotFoundException, RequestNotValidException {
+  public static DescriptiveMetadata updateDescriptiveMetadataFile(User user, String aipId, String representationId,
+    String metadataId, String metadataType, String metadataVersion, ContentPayload metadataPayload)
+    throws AuthorizationDeniedException, GenericException, ValidationException, NotFoundException,
+    RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
+
     UserUtility.checkAIPPermissions(user, aip, PermissionType.UPDATE);
+
+    String repUUID = representationId;
+
+    if (representationId != null) {
+      IndexedRepresentation rep = BrowserHelper.retrieve(IndexedRepresentation.class, representationId);
+      representationId = rep.getId();
+    }
 
     // delegate
     String message = "Updated by " + user.getName();
-    DescriptiveMetadata ret = BrowserHelper.updateDescriptiveMetadataFile(aipId, metadataId, metadataType,
-      metadataVersion, metadataPayload, message);
+    DescriptiveMetadata ret = BrowserHelper.updateDescriptiveMetadataFile(aipId, representationId, metadataId,
+      metadataType, metadataVersion, metadataPayload, message);
 
     // register action
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
-      RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
+      RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID, repUUID, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
 
     return ret;
   }
 
-  public static void deleteAIPDescriptiveMetadataFile(User user, String aipId, String metadataId)
+  public static void deleteDescriptiveMetadataFile(User user, String aipId, String representationId, String metadataId)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
+
     UserUtility.checkAIPPermissions(user, aip, PermissionType.DELETE);
 
+    String repUUID = representationId;
+
+    if (representationId != null) {
+      IndexedRepresentation rep = BrowserHelper.retrieve(IndexedRepresentation.class, representationId);
+      representationId = rep.getId();
+    }
+
     // delegate
-    BrowserHelper.deleteDescriptiveMetadataFile(aipId, null, metadataId);
+    BrowserHelper.deleteDescriptiveMetadataFile(aipId, representationId, metadataId);
 
     // register action
     controllerAssistant.registerAction(user, aip.getId(), LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID,
-      aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
+      aipId, RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID, repUUID, RodaConstants.API_PATH_PARAM_METADATA_ID,
+      metadataId);
   }
 
   public static void deleteRepresentationDescriptiveMetadataFile(User user, String representationId, String metadataId)
@@ -1051,7 +1109,7 @@ public class Browser extends RodaWuiController {
     return aipRepresentationFile;
   }
 
-  public static DescriptiveMetadata putAIPDescriptiveMetadataFile(User user, String aipId, String metadataId,
+  public static DescriptiveMetadata updateAIPDescriptiveMetadataFile(User user, String aipId, String metadataId,
     String metadataType, String metadataVersion, InputStream is, FormDataContentDisposition fileDetail)
     throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException,
     AlreadyExistsException, ValidationException {
@@ -1074,7 +1132,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static DescriptiveMetadata putRepresentationDescriptiveMetadataFile(User user, String representationId,
+  public static DescriptiveMetadata updateRepresentationDescriptiveMetadataFile(User user, String representationId,
     String metadataId, String metadataType, String metadataVersion, InputStream is,
     FormDataContentDisposition fileDetail) throws GenericException, AuthorizationDeniedException, NotFoundException,
     RequestNotValidException, AlreadyExistsException, ValidationException {
@@ -1098,7 +1156,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static DescriptiveMetadata postAIPDescriptiveMetadataFile(User user, String aipId, String metadataId,
+  public static DescriptiveMetadata createAIPDescriptiveMetadataFile(User user, String aipId, String metadataId,
     String metadataType, String metadataVersion, InputStream is, FormDataContentDisposition fileDetail)
     throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException,
     AlreadyExistsException, ValidationException {
@@ -1120,7 +1178,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static DescriptiveMetadata postRepresentationDescriptiveMetadataFile(User user, String representationId,
+  public static DescriptiveMetadata createRepresentationDescriptiveMetadataFile(User user, String representationId,
     String metadataId, String metadataType, String metadataVersion, InputStream is,
     FormDataContentDisposition fileDetail) throws GenericException, AuthorizationDeniedException, NotFoundException,
     RequestNotValidException, AlreadyExistsException, ValidationException {
@@ -1301,44 +1359,62 @@ public class Browser extends RodaWuiController {
     return resource;
   }
 
-  public static void revertDescriptiveMetadataVersion(User user, String aipId, String descriptiveMetadataId,
-    String versionId)
+  public static void revertDescriptiveMetadataVersion(User user, String aipId, String representationId,
+    String descriptiveMetadataId, String versionId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
+
     UserUtility.checkAIPPermissions(user, aip, PermissionType.UPDATE);
 
+    String repUUID = representationId;
+
+    if (representationId != null) {
+      IndexedRepresentation rep = BrowserHelper.retrieve(IndexedRepresentation.class, representationId);
+      representationId = rep.getId();
+    }
+
     // delegate
-    // TODO externalize this message
     String message = "Reverted by " + user.getId();
-    BrowserHelper.revertDescriptiveMetadataVersion(aipId, descriptiveMetadataId, versionId, message);
+    BrowserHelper.revertDescriptiveMetadataVersion(aipId, representationId, descriptiveMetadataId, versionId, message);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
-      RodaConstants.API_PATH_PARAM_METADATA_ID, descriptiveMetadataId, RodaConstants.API_QUERY_PARAM_VERSION_ID,
-      versionId);
+      RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID, repUUID, RodaConstants.API_PATH_PARAM_METADATA_ID,
+      descriptiveMetadataId, RodaConstants.API_QUERY_PARAM_VERSION_ID, versionId);
   }
 
-  public static void deleteDescriptiveMetadataVersion(User user, String aipId, String descriptiveMetadataId,
-    String versionId)
+  public static void deleteDescriptiveMetadataVersion(User user, String aipId, String representationId,
+    String descriptiveMetadataId, String versionId)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
+
     UserUtility.checkAIPPermissions(user, aip, PermissionType.DELETE);
 
+    String repUUID = representationId;
+
+    if (representationId != null) {
+      IndexedRepresentation rep = BrowserHelper.retrieve(IndexedRepresentation.class, representationId);
+      representationId = rep.getId();
+    }
+
+    // TODO if not admin, add to filter a constraint for the resource to belong
+    // to this user
+
     // delegate
-    BrowserHelper.deleteDescriptiveMetadataVersion(aipId, descriptiveMetadataId, versionId);
+    BrowserHelper.deleteDescriptiveMetadataVersion(aipId, representationId, descriptiveMetadataId, versionId);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.API_PATH_PARAM_AIP_ID, aipId,
-      RodaConstants.API_PATH_PARAM_METADATA_ID, descriptiveMetadataId, RodaConstants.API_QUERY_PARAM_VERSION_ID,
-      versionId);
+      RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID, repUUID, RodaConstants.API_PATH_PARAM_METADATA_ID,
+      descriptiveMetadataId, RodaConstants.API_QUERY_PARAM_VERSION_ID, versionId);
   }
 
   public static void updateAIPPermissions(User user, List<IndexedAIP> aips, Permissions permissions, boolean recursive)

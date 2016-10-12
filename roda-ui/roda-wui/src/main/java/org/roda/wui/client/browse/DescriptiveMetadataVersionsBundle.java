@@ -11,12 +11,14 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 
 public class DescriptiveMetadataVersionsBundle implements Serializable {
 
   private static final long serialVersionUID = 7901536603462531124L;
 
   private IndexedAIP aip;
+  private IndexedRepresentation representation;
   private List<IndexedAIP> aipAncestors;
   private DescriptiveMetadataViewBundle descriptiveMetadata;
   private List<BinaryVersionBundle> versions;
@@ -29,6 +31,17 @@ public class DescriptiveMetadataVersionsBundle implements Serializable {
     DescriptiveMetadataViewBundle descriptiveMetadata, List<BinaryVersionBundle> versions) {
     super();
     this.aip = aip;
+    this.aipAncestors = aipAncestors;
+    this.descriptiveMetadata = descriptiveMetadata;
+    this.versions = versions;
+  }
+
+  public DescriptiveMetadataVersionsBundle(IndexedAIP aip, IndexedRepresentation representation,
+    List<IndexedAIP> aipAncestors, DescriptiveMetadataViewBundle descriptiveMetadata,
+    List<BinaryVersionBundle> versions) {
+    super();
+    this.aip = aip;
+    this.representation = representation;
     this.aipAncestors = aipAncestors;
     this.descriptiveMetadata = descriptiveMetadata;
     this.versions = versions;
@@ -64,6 +77,14 @@ public class DescriptiveMetadataVersionsBundle implements Serializable {
 
   public void setVersions(List<BinaryVersionBundle> versions) {
     this.versions = versions;
+  }
+
+  public IndexedRepresentation getRepresentation() {
+    return representation;
+  }
+
+  public void setRepresentation(IndexedRepresentation representation) {
+    this.representation = representation;
   }
 
 }
