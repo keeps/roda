@@ -202,6 +202,58 @@ public class RestUtils {
     return b.toString();
   }
 
+  public static SafeUri createRepresentationDescriptiveMetadataDownloadUri(String representationUUID, String descId) {
+    return createRepresentationDescriptiveMetadataDownloadUri(representationUUID, descId, null);
+  }
+
+  public static SafeUri createRepresentationDescriptiveMetadataDownloadUri(String representationUUID, String descId,
+    String versionId) {
+    // api/v1/representations/{representation_uuid}/descriptive_metadata/{descId}?acceptFormat=xml&version_id={versionId}
+    StringBuilder b = new StringBuilder();
+    // base uri
+    b.append(RodaConstants.API_REST_V1_REPRESENTATIONS).append(UriUtils.encode(representationUUID))
+      .append(RodaConstants.API_SEP).append(RodaConstants.API_DESCRIPTIVE_METADATA).append(RodaConstants.API_SEP)
+      .append(descId);
+    // accept format attribute
+    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML);
+
+    if (versionId != null) {
+      b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_PARAM_VERSION_ID)
+        .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(versionId);
+    }
+
+    return UriUtils.fromSafeConstant(b.toString());
+  }
+
+  public static SafeUri createRepresentationDescriptiveMetadataHTMLUri(String representationUUID, String descId) {
+    return createRepresentationDescriptiveMetadataHTMLUri(representationUUID, descId, null);
+  }
+
+  public static SafeUri createRepresentationDescriptiveMetadataHTMLUri(String representationUUID, String descId,
+    String versionId) {
+    // api/v1/representations/{representation_uuid}/descriptive_metadata/{descId}?acceptFormat=html&version_id={versionId}
+    StringBuilder b = new StringBuilder();
+    // base uri
+    b.append(RodaConstants.API_REST_V1_REPRESENTATIONS).append(UriUtils.encode(representationUUID))
+      .append(RodaConstants.API_SEP).append(RodaConstants.API_DESCRIPTIVE_METADATA).append(RodaConstants.API_SEP)
+      .append(descId);
+    // accept format attribute
+    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML);
+
+    if (versionId != null) {
+      b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_PARAM_VERSION_ID)
+        .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(versionId);
+    }
+
+    // locale
+    b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_KEY_LANG)
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(LocaleInfo.getCurrentLocale().getLocaleName());
+
+    return UriUtils.fromSafeConstant(b.toString());
+  }
+
   public static String createTransferredResourceUploadUri(String parentUUID, String locale) {
     // api/v1/transfers/?parentUUID={parentUUID}&locale={locale}
     StringBuilder b = new StringBuilder();

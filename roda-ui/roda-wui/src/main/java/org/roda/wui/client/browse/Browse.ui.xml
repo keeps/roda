@@ -4,7 +4,8 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client" xmlns:m="urn:import:org.roda.wui.client.main"
 	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search"
-	xmlns:lists="urn:import:org.roda.wui.client.common.lists">
+	xmlns:lists="urn:import:org.roda.wui.client.common.lists"
+	xmlns:browse="urn:import:org.roda.wui.client.browse">
 
 	<ui:style>
 	.searchlist-title {
@@ -43,6 +44,7 @@
 						<ui:text from='{messages.newDescriptiveMetadataTitle}' />
 					</g:Button>
 				</g:FlowPanel>
+				<browse:RepresentationsPanel ui:field="representationsPanel" />
 				<g:Label addStyleNames="h4 browseSearchListTitle" ui:field="fondsPanelTitle">
 					<ui:text from='{messages.sublevels}' />
 				</g:Label>
@@ -60,13 +62,6 @@
 					<g:Button addStyleNames="btn btn-danger btn-ban" ui:field="appraisalReject">
 						<ui:text from='{messages.appraisalReject}' />
 					</g:Button>
-				</g:FlowPanel>
-				<g:FlowPanel ui:field="sidebarData">
-					<g:Label addStyleNames="h4">
-						<ui:text from='{messages.representationsTitle}' />
-					</g:Label>
-					<g:FlowPanel ui:field="downloadList">
-					</g:FlowPanel>
 				</g:FlowPanel>
 				<g:FlowPanel ui:field="actionsSidebar">
 					<g:Label addStyleNames="h4">

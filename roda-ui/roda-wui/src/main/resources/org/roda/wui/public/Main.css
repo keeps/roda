@@ -5164,17 +5164,11 @@ td.datePickerMonth, td.datePickerYear {
 .representation {
 }
 .representationPanel {
-	margin-right: 150px;
 }
 .representationIconPanel,
 .representationDataPanel {
 	display: inline-block;
 	vertical-align: top;
-}
-.representation .pull-right .btn {
-	width: 100px;
-	display: block;
-	margin-bottom: 5px;
 }
 .representationIcon {
 	display: inline-block;

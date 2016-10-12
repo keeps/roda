@@ -189,6 +189,9 @@ public class Browse extends Composite {
   @UiField
   Label fondsPanelTitle;
 
+  @UiField
+  RepresentationsPanel representationsPanel;
+
   @UiField(provided = true)
   SearchPanel searchPanel;
 
@@ -196,13 +199,7 @@ public class Browse extends Composite {
   AIPList aipList;
 
   @UiField
-  FlowPanel sidebarData;
-
-  @UiField
   FlowPanel appraisalSidebar;
-
-  @UiField
-  FlowPanel downloadList;
 
   @UiField
   FlowPanel preservationSidebar;
@@ -363,8 +360,6 @@ public class Browse extends Composite {
       DescriptiveMetadataHistory.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else if (historyTokens.size() >= 1 && historyTokens.get(0).equals(EditPermissions.RESOLVER.getHistoryToken())) {
       EditPermissions.RESOLVER.resolve(Tools.tail(historyTokens), callback);
-    } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(Representations.RESOLVER.getHistoryToken())) {
-      Representations.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {
       Tools.newHistory(RESOLVER);
       callback.onSuccess(null);
@@ -432,6 +427,7 @@ public class Browse extends Composite {
     removeHandlerRegistrations();
 
     newDescriptiveMetadata.setVisible(false);
+    representationsPanel.setVisible(false);
 
     viewingTop = false;
     searchable = false;
@@ -439,9 +435,6 @@ public class Browse extends Composite {
     searchPanel.setVisible(false);
     searchPanel.clearSearchInputBox();
     aipList.setVisible(false);
-
-    downloadList.clear();
-    sidebarData.setVisible(false);
 
     appraisalSidebar.setVisible(false);
     preservationSidebar.setVisible(false);
@@ -499,7 +492,6 @@ public class Browse extends Composite {
 
       IndexedAIP aip = itemBundle.getAip();
       List<DescriptiveMetadataViewBundle> descMetadata = itemBundle.getDescriptiveMetadata();
-      List<IndexedRepresentation> representations = itemBundle.getRepresentations();
 
       breadcrumb.updatePath(getBreadcrumbsFromAncestors(itemBundle.getAIPAncestors(), aip));
       breadcrumb.setVisible(true);
@@ -582,19 +574,19 @@ public class Browse extends Composite {
         newDescriptiveMetadata.setVisible(true);
       }
 
+      if (itemBundle.getRepresentations().size() > 0) {
+        representationsPanel.setVisible(true);
+        representationsPanel.createRepresentationsPanel(aipId, itemBundle);
+      }
+
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId()));
       searchPanel.setDefaultFilter(filter);
       searchPanel.clearSearchInputBox();
       aipList.set(filter, justActive, FACETS);
 
       appraisalSidebar.setVisible(aip.getState().equals(AIPState.UNDER_APPRAISAL));
-      sidebarData.setVisible(representations.size() > 0);
       preservationSidebar.setVisible(true);
       actionsSidebar.setVisible(true);
-
-      for (IndexedRepresentation rep : representations) {
-        downloadList.add(createRepresentationDownloadButton(rep));
-      }
 
       // Set button visibility
 
@@ -720,6 +712,7 @@ public class Browse extends Composite {
     return breadcrumbLabel;
   }
 
+  @SuppressWarnings("unused")
   private Widget createRepresentationDownloadButton(IndexedRepresentation rep) {
     Button downloadButton = new Button();
     final String aipId = rep.getAipId();
@@ -864,6 +857,7 @@ public class Browse extends Composite {
     return historyUpdated;
   }
 
+  @SuppressWarnings("rawtypes")
   public SelectedItems getSelected() {
     return aipList.getSelected();
   }
@@ -958,32 +952,32 @@ public class Browse extends Composite {
             messages.ingestTransferRemoveFolderConfirmDialogCancel(),
             messages.ingestTransferRemoveFolderConfirmDialogOk(), new AsyncCallback<Boolean>() {
 
-              @Override
-              public void onSuccess(Boolean confirmed) {
-                if (confirmed) {
-                  BrowserService.Util.getInstance().deleteAIP(selected, new LoadingAsyncCallback<String>() {
+            @Override
+            public void onSuccess(Boolean confirmed) {
+              if (confirmed) {
+                BrowserService.Util.getInstance().deleteAIP(selected, new LoadingAsyncCallback<String>() {
 
-                    @Override
-                    public void onFailureImpl(Throwable caught) {
-                      AsyncCallbackUtils.defaultFailureTreatment(caught);
-                      aipList.refresh();
-                    }
+                  @Override
+                  public void onFailureImpl(Throwable caught) {
+                    AsyncCallbackUtils.defaultFailureTreatment(caught);
+                    aipList.refresh();
+                  }
 
-                    @Override
-                    public void onSuccessImpl(String parentId) {
-                      Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
-                        messages.ingestTransferRemoveSuccessMessage(size));
-                      aipList.refresh();
-                    }
-                  });
-                }
+                  @Override
+                  public void onSuccessImpl(String parentId) {
+                    Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
+                      messages.ingestTransferRemoveSuccessMessage(size));
+                    aipList.refresh();
+                  }
+                });
               }
+            }
 
-              @Override
-              public void onFailure(Throwable caught) {
-                AsyncCallbackUtils.defaultFailureTreatment(caught);
-              }
-            });
+            @Override
+            public void onFailure(Throwable caught) {
+              AsyncCallbackUtils.defaultFailureTreatment(caught);
+            }
+          });
         }
 
       });
@@ -1095,24 +1089,24 @@ public class Browse extends Composite {
           BrowserService.Util.getInstance().moveAIPInHierarchy(selected, parentId,
             new LoadingAsyncCallback<IndexedAIP>() {
 
-              @Override
-              public void onSuccessImpl(IndexedAIP result) {
-                if (result != null) {
-                  Tools.newHistory(Browse.RESOLVER, result.getId());
-                } else {
-                  Tools.newHistory(Browse.RESOLVER);
-                }
+            @Override
+            public void onSuccessImpl(IndexedAIP result) {
+              if (result != null) {
+                Tools.newHistory(Browse.RESOLVER, result.getId());
+              } else {
+                Tools.newHistory(Browse.RESOLVER);
               }
+            }
 
-              @Override
-              public void onFailureImpl(Throwable caught) {
-                if (caught instanceof NotFoundException) {
-                  Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-                } else {
-                  AsyncCallbackUtils.defaultFailureTreatment(caught);
-                }
+            @Override
+            public void onFailureImpl(Throwable caught) {
+              if (caught instanceof NotFoundException) {
+                Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+              } else {
+                AsyncCallbackUtils.defaultFailureTreatment(caught);
               }
-            });
+            }
+          });
         }
 
       });
