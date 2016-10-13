@@ -1,13 +1,17 @@
 package org.roda.wui.client.browse;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.RestErrorOverlayType;
 import org.roda.wui.common.client.tools.RestUtils;
@@ -33,6 +37,7 @@ import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -80,6 +85,9 @@ public class RepresentationPanel extends Composite {
   @UiField
   Button newDescriptiveMetadata;
 
+  @UiField
+  FocusPanel infoRepresentationButton;
+
   private HTMLPanel representationIcon;
 
   private List<HandlerRegistration> handlers;
@@ -98,11 +106,11 @@ public class RepresentationPanel extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
 
     representationType.setText(representation.getType());
-    representationInformation.setText("Has " + representation.getNumberOfDataFiles() + " files, "
-      + Humanize.readableFileSize(representation.getSizeInBytes()) + ", originally submitted representation");
+    representationInformation.setText(
+      representation.getNumberOfDataFiles() + " files, " + Humanize.readableFileSize(representation.getSizeInBytes()));
     representationId.setText(representation.getUUID());
 
-    representationIcon = representationIcon(representation.getType());
+    representationIcon = new HTMLPanel(DescriptionLevelUtils.getRepresentationTypeIcon(representation.getType()));
 
     representationIconPanel.setWidget(representationIcon);
     representationIcon.addStyleName("representationIcon");
@@ -118,30 +126,6 @@ public class RepresentationPanel extends Composite {
         Tools.newHistory(ViewRepresentation.RESOLVER, RepresentationPanel.this.aipId, RepresentationPanel.this.repId);
       }
     });
-
-    // removeButton.addClickHandler(new ClickHandler() {
-    //
-    // @Override
-    // public void onClick(ClickEvent event) {
-    // Dialogs.showConfirmDialog(messages.viewRepresentationRemoveFileTitle(),
-    // messages.viewRepresentationRemoveFileMessage(), messages.dialogCancel(),
-    // messages.dialogYes(),
-    // new AsyncCallback<Boolean>() {
-    //
-    // @Override
-    // public void onSuccess(Boolean confirmed) {
-    // if (confirmed) {
-    // RepresentationPanel.this.removeFromParent();
-    // }
-    // }
-    //
-    // @Override
-    // public void onFailure(Throwable caught) {
-    // // nothing to do
-    // }
-    // });
-    // }
-    // });
 
     final List<Pair<String, HTML>> descriptiveMetadataContainers = new ArrayList<Pair<String, HTML>>();
     final Map<String, DescriptiveMetadataViewBundle> bundles = new HashMap<>();
@@ -191,8 +175,7 @@ public class RepresentationPanel extends Composite {
       @Override
       public void onSelection(SelectionEvent<Integer> event) {
         if (event.getSelectedItem() == addTabIndex) {
-          Tools.newHistory(CreateDescriptiveMetadata.RESOLVER, "representation", RepresentationPanel.this.aipId,
-            RepresentationPanel.this.repId);
+          showRepresentation();
         }
       }
     });
@@ -205,27 +188,6 @@ public class RepresentationPanel extends Composite {
     if (!representationDescriptiveMetadata.isEmpty()) {
       itemMetadata.selectTab(0);
     }
-    // if (!representationDescriptiveMetadata.isEmpty()) {
-    // itemMetadata.setVisible(true);
-    // itemMetadata.selectTab(0);
-    // } else {
-    // newDescriptiveMetadata.setVisible(true);
-    // }
-  }
-
-  private HTMLPanel representationIcon(String type) {
-    StringBuilder b = new StringBuilder();
-
-    b.append("<i class='");
-    if (type.equals("MIXED")) {
-      b.append("fa fa-files-o");
-    } else {
-      b.append("fa fa-file");
-    }
-    b.append("'>");
-    b.append("</i>");
-
-    return new HTMLPanel(SafeHtmlUtils.fromSafeConstant(b.toString()));
   }
 
   private void getDescriptiveMetadataHTML(final String descId, final DescriptiveMetadataViewBundle bundle,
@@ -322,28 +284,78 @@ public class RepresentationPanel extends Composite {
     }
   }
 
+  private void showRepresentation() {
+    Tools.newHistory(CreateDescriptiveMetadata.RESOLVER, "representation", RepresentationPanel.this.aipId,
+      RepresentationPanel.this.repId);
+  }
+
   @UiHandler("newDescriptiveMetadata")
   void buttonNewDescriptiveMetadataEventsHandler(ClickEvent e) {
     Tools.newHistory(CreateDescriptiveMetadata.RESOLVER, "representation", aipId, repId);
   }
 
+  @UiHandler("playRepresentationButton")
+  void buttonPlayRepresentationHandler(ClickEvent e) {
+    showRepresentation();
+  }
+
   @UiHandler("downloadRepresentationButton")
   void buttonDownloadRepresentationHandler(ClickEvent e) {
-
+    SafeUri downloadUri = null;
+    if (repId != null) {
+      downloadUri = RestUtils.createRepresentationDownloadUri(repId);
+    }
+    if (downloadUri != null) {
+      Window.Location.assign(downloadUri.asString());
+    }
   }
 
   @UiHandler("removeRepresentationButton")
   void buttonRemoveRepresentationHandler(ClickEvent e) {
+    Dialogs.showConfirmDialog(messages.representationRemoveTitle(), messages.representationRemoveMessage(),
+      messages.dialogCancel(), messages.dialogYes(), new AsyncCallback<Boolean>() {
+
+        @Override
+        public void onSuccess(Boolean confirmed) {
+          if (confirmed) {
+            SelectedItemsList<IndexedRepresentation> selected = new SelectedItemsList<IndexedRepresentation>(
+              Arrays.asList(repId), IndexedRepresentation.class.getName());
+            BrowserService.Util.getInstance().deleteRepresentation(selected, new AsyncCallback<Void>() {
+
+              @Override
+              public void onSuccess(Void result) {
+                RepresentationPanel.this.removeFromParent();
+              }
+
+              @Override
+              public void onFailure(Throwable caught) {
+                AsyncCallbackUtils.defaultFailureTreatment(caught);
+              }
+            });
+          }
+        }
+
+        @Override
+        public void onFailure(Throwable caught) {
+          // nothing to do
+        }
+      });
   }
 
   @UiHandler("infoRepresentationButton")
   void buttonInfoRepresentationHandler(ClickEvent e) {
     representationMetadata.setVisible(!representationMetadata.isVisible());
-    representationMetadata.isVisible();
-    if (!representationDescriptiveMetadata.isEmpty()) {
-      itemMetadata.setVisible(true);
+    if (representationMetadata.isVisible()) {
+      if (!representationDescriptiveMetadata.isEmpty()) {
+        itemMetadata.setVisible(true);
+      } else {
+        newDescriptiveMetadata.setVisible(true);
+      }
+      infoRepresentationButton.removeStyleName("closed");
+      infoRepresentationButton.addStyleName("opened");
     } else {
-      newDescriptiveMetadata.setVisible(true);
+      infoRepresentationButton.removeStyleName("opened");
+      infoRepresentationButton.addStyleName("closed");
     }
   }
 }

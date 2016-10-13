@@ -12,9 +12,15 @@
 
 	</ui:style>
 
-	<g:FlowPanel addStyleNames="panel representation">
+	<g:FlowPanel addStyleNames="representation">
 		<g:FlowPanel addStyleNames="panel-body">
 			<g:FlowPanel addStyleNames="representationToolbarIcons">
+			    <g:FocusPanel ui:field="playRepresentationButton"
+					addStyleNames="toolbarLink representationToolbarPlayIcon">
+					<g:HTML>
+						<i class="fa fa-play"></i>
+					</g:HTML>
+				</g:FocusPanel>
 				<g:FocusPanel ui:field="downloadRepresentationButton"
 					addStyleNames="toolbarLink representationToolbarDownloadIcon">
 					<g:HTML>
@@ -22,15 +28,16 @@
 					</g:HTML>
 				</g:FocusPanel>
 				<g:FocusPanel ui:field="removeRepresentationButton"
-					addStyleNames="toolbarLink representationToolbarDownloadIcon">
+					addStyleNames="toolbarLink representationToolbarRemoveIcon">
 					<g:HTML>
 						<i class="fa fa-remove"></i>
 					</g:HTML>
 				</g:FocusPanel>
 				<g:FocusPanel ui:field="infoRepresentationButton"
-					addStyleNames="toolbarLink representationToolbarDownloadIcon">
+					addStyleNames="toolbarLink representationToolbarInfoIcon closed">
 					<g:HTML>
-						<i class="fa fa-info"></i>
+						<i class="fa fa-chevron-down"></i>
+						<i class="fa fa-chevron-up"></i>
 					</g:HTML>
 				</g:FocusPanel>
 			</g:FlowPanel>

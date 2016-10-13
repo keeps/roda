@@ -918,9 +918,11 @@ public final class RodaConstants {
   public static final String LEVELS_ICONS_GHOST = "levels.internal.icon.ghost";
   public static final String LEVELS_ICONS_DEFAULT = "levels.internal.icon.default";
   public static final String LEVELS_ICONS_REPRESENTATION = "levels.internal.icon.representation";
-  public static final String LEVELS_ICONS_FOLDER = "levels.internal.icon.representation.folder";
-  public static final String LEVELS_ICONS_FILE = "levels.internal.icon.representation.file";
+  public static final String LEVELS_ICONS_REPRESENTATION_FOLDER = "levels.internal.icon.representation.folder";
+  public static final String LEVELS_ICONS_REPRESENTATION_FILE = "levels.internal.icon.representation.file";
+  public static final String LEVELS_ICONS_REPRESENTATION_TYPES_PREFIX = "levels.internal.icon.representation.type";
   public static final String LEVEL_I18N_PREFIX = "level";
+  public static final String REPRESENTATION_TYPE_DEFAULT = "default";
 
   /* Dialog filter limit */
   public static final int DIALOG_FILTER_LIMIT_NUMBER = 120;

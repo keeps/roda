@@ -5162,6 +5162,14 @@ td.datePickerMonth, td.datePickerYear {
 ************************************************/
 
 .representation {
+	background-color: transparent;
+	padding-left: 0px;
+/* 	border: 1px solid #ddd; */
+	margin-bottom: 10px;
+}
+.representation .panel-body {
+	background: transparent;
+	padding: 0;
 }
 .representationPanel {
 }
@@ -5178,27 +5186,48 @@ td.datePickerMonth, td.datePickerYear {
 }
 .representationIcon {
 	display: inline-block;
-    font-size: 4rem;
-    line-height: 6rem;
-    margin-right: 15px;
-    height: 6rem;
-    width: 6rem;
-    text-align: center;
+	text-align: center;
+/*     font-size: 4rem; */
+/*     line-height: 6rem; */
+/*     margin-right: 15px; */
+/*     height: 6rem; */
+/*     width: 6rem; */
+    font-size: 2.2rem;
+    line-height: 3.5rem;
+    margin-right: 5px;
+    height: 3.5rem;
+    width: 3.5rem;
 }
 .representationType {
-	font-size: 2rem;
-    line-height: 1.2;
-    letter-spacing: -.1rem;
+/* 	font-size: 2rem; */
+/*     line-height: 1.2; */
+/*     letter-spacing: -.1rem; */
+	font-size: 1.6rem;
+	line-height: 1.2;
+	letter-spacing: -.1rem;
 }
 .representationInformation {
-    font-size: 90%;
+    /*font-size: 90%;*/
+    color: #a7a9ac;
+    font-size: 1rem;
 }
 .representationId {
 	color: #a7a9ac;
     font-size: 1rem;
+    display: none;
 }
 .representationToolbarIcons {
 	float: right;
+}
+/* .representationToolbarIcons .toolbarLink { */
+/* 	background-color: transparent; */
+/* 	color: blue; */
+/* } */
+.representationToolbarIcons .closed .fa-chevron-up {
+	display: none;
+}
+.representationToolbarIcons .opened .fa-chevron-down {
+	display: none;
 }
 
 /**********************************************

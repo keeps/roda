@@ -1182,6 +1182,10 @@ public interface ClientMessages extends Messages {
   String appraisalReject();
 
   String representationsTitle();
+  
+  String representationRemoveTitle();
+  
+  String representationRemoveMessage();
 
   String filesTitle();
 
@@ -1238,8 +1242,6 @@ public interface ClientMessages extends Messages {
   String searchContext();
 
   String searchAIP();
-
-  /***** Browse representations ****/
 
   /***** Job processes ****/
 

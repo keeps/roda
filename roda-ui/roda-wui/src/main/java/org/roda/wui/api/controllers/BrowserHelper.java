@@ -506,7 +506,7 @@ public class BrowserHelper {
     String aipId = representation.getAipId();
     String representationId = representation.getId();
 
-    if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
+    if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP.equals(acceptFormat)) {
       StoragePath storagePath = ModelUtils.getRepresentationStoragePath(representation.getAipId(),
         representation.getId());
       Directory directory = RodaCoreFactory.getStorageService().getDirectory(storagePath);

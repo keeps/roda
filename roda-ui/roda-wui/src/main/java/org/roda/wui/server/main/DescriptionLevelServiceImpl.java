@@ -10,7 +10,6 @@ package org.roda.wui.server.main;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
@@ -30,12 +29,12 @@ public class DescriptionLevelServiceImpl extends RemoteServiceServlet implements
 
   @SuppressWarnings("unused")
   private static final Logger LOGGER = LoggerFactory.getLogger(DescriptionLevelServiceImpl.class);
-  
+
   @Override
   public DescriptionLevelConfiguration getDescriptionLevelConfiguration(String localeString) {
     DescriptionLevelConfiguration dlc = new DescriptionLevelConfiguration();
-    dlc.setClassificationPlanLevels(RodaUtils
-      .copyList(RodaCoreFactory.getRodaConfiguration().getList(RodaConstants.LEVELS_CLASSIFICATION_PLAN)));
+    dlc.setClassificationPlanLevels(
+      RodaUtils.copyList(RodaCoreFactory.getRodaConfiguration().getList(RodaConstants.LEVELS_CLASSIFICATION_PLAN)));
     dlc.setDefaultClass(RodaCoreFactory.getRodaConfiguration().getString(RodaConstants.LEVELS_ICONS_DEFAULT));
     dlc.setGhostClass(RodaCoreFactory.getRodaConfiguration().getString(RodaConstants.LEVELS_ICONS_GHOST));
     Map<String, String> icons = new HashMap<String, String>();
@@ -43,24 +42,35 @@ public class DescriptionLevelServiceImpl extends RemoteServiceServlet implements
     if (iconKeys != null) {
       while (iconKeys.hasNext()) {
         String iconKey = iconKeys.next();
-        String level = iconKey.replace(RodaConstants.LEVELS_ICONS_PREFIX+".", "");
-        icons.put(level,
-          RodaCoreFactory.getRodaConfiguration().getString(iconKey));
+        String level = iconKey.replace(RodaConstants.LEVELS_ICONS_PREFIX + ".", "");
+        icons.put(level, RodaCoreFactory.getRodaConfiguration().getString(iconKey));
       }
     }
     dlc.setLevelIcons(icons);
     dlc.setRepresentationClass(
       RodaCoreFactory.getRodaConfiguration().getString(RodaConstants.LEVELS_ICONS_REPRESENTATION));
-    dlc.setRepresentationFileClass(RodaCoreFactory.getRodaConfiguration().getString(RodaConstants.LEVELS_ICONS_FILE));
+    dlc.setRepresentationFileClass(
+      RodaCoreFactory.getRodaConfiguration().getString(RodaConstants.LEVELS_ICONS_REPRESENTATION_FILE));
     dlc.setRepresentationFolderClass(
-      RodaCoreFactory.getRodaConfiguration().getString(RodaConstants.LEVELS_ICONS_FOLDER));
+      RodaCoreFactory.getRodaConfiguration().getString(RodaConstants.LEVELS_ICONS_REPRESENTATION_FOLDER));
 
-    
+    Map<String, String> representationTypesIcons = new HashMap<String, String>();
+    Iterator<String> representationTypesIconKeys = RodaCoreFactory.getRodaConfiguration()
+      .getKeys(RodaConstants.LEVELS_ICONS_REPRESENTATION_TYPES_PREFIX);
+    if (representationTypesIconKeys != null) {
+      while (representationTypesIconKeys.hasNext()) {
+        String iconKey = representationTypesIconKeys.next();
+        String level = iconKey.replace(RodaConstants.LEVELS_ICONS_REPRESENTATION_TYPES_PREFIX + ".", "");
+        representationTypesIcons.put(level, RodaCoreFactory.getRodaConfiguration().getString(iconKey));
+      }
+    }
+    dlc.setRepresentationTypesIcons(representationTypesIcons);
+
     Messages messages = RodaCoreFactory.getI18NMessages(ServerTools.parseLocale(localeString));
-    Map<String,String> translations = messages.getTranslations(RodaConstants.LEVEL_I18N_PREFIX, String.class, false);
-    Map<String,String> levelsLabels = new HashMap<String,String>();
-    for(Map.Entry<String, String> entry : translations.entrySet()){
-      levelsLabels.put(entry.getKey().replace(RodaConstants.LEVEL_I18N_PREFIX+".", ""), entry.getValue());
+    Map<String, String> translations = messages.getTranslations(RodaConstants.LEVEL_I18N_PREFIX, String.class, false);
+    Map<String, String> levelsLabels = new HashMap<String, String>();
+    for (Map.Entry<String, String> entry : translations.entrySet()) {
+      levelsLabels.put(entry.getKey().replace(RodaConstants.LEVEL_I18N_PREFIX + ".", ""), entry.getValue());
     }
     dlc.setTranslations(levelsLabels);
     return dlc;

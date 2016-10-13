@@ -28,6 +28,8 @@ public class DescriptionLevelConfiguration implements Serializable {
   private String representationFolderClass;
 
   private String representationFileClass;
+  
+  private Map<String, String> representationTypesIcons;
 
   private Map<String, String> levelIcons;
 
@@ -97,5 +99,12 @@ public class DescriptionLevelConfiguration implements Serializable {
   public void setTranslations(Map<String, String> translations) {
     this.translations = translations;
   }
-  
+
+  public Map<String, String> getRepresentationTypesIcons() {
+    return representationTypesIcons;
+  }
+
+  public void setRepresentationTypesIcons(Map<String, String> representationTypesIcons) {
+    this.representationTypesIcons = representationTypesIcons;
+  }
 }

@@ -8,7 +8,6 @@
 package org.roda.core.data.descriptionLevels;
 
 import java.io.Serializable;
-import java.util.Map;
 
 /**
  * 
