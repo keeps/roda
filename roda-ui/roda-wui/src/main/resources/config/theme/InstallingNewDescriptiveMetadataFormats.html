@@ -7,13 +7,13 @@
   </p>
 
   <p>
-    Once you have your metadata in XML you are ready to package it into a Submission Information Package (SIP) and ingest it on the repository. Alternatively, you may want to create a metadata file directly on the repository by using the funcionality provided by the Catalogue. When the metadata format is new to RODA, it will do its best to support without the need to do any reconfiguration of system, however, the following limitation apply: 
+    Once you have your metadata in XML you are ready to package it into a Submission Information Package (SIP) and ingest it on the repository. Alternatively, you may want to create a metadata file directly on the repository by using the functionality provided by the Catalogue. When the metadata format is new to RODA, the repository will do its best to support without the need to do any reconfiguration of system, however, the following limitations apply:
 
     <p>
       <div class="row full_width">
         <div class="col_3 col_card">
           <h4>Validation</h4>
-          <p>If no schema is provided for you metadata format, the repository will check if the metadata XML file is well-formed, however because the repository has no notion of  the right grammar, it will not verify if the file is valid.</p>
+          <p>If no schema is provided for your metadata format, the repository will check if the metadata XML file is well-formed, however because the repository has no notion of  the right grammar, it will not verify if the file is valid.</p>
         </div>
         <div class="col_3 col_card">
           <h4>Indexing</h4>
@@ -21,7 +21,7 @@
         </div>
         <div class="col_3 col_card">
           <h4>Visualization</h4>
-          <p>When no vizualization mappings are configured, a generic metadata viewer will be used the repository to display the XML-based metadata. All text elements and attributes will shown in no particular order and their XPath will be used as the label.</p>
+          <p>When no visualization mappings are configured, a generic metadata viewer will be used the repository to display the XML-based metadata. All text elements and attributes will shown in no particular order and their XPath will be used as the label.</p>
         </div>
         <div class="col_3 col_card">
           <h4>Edition</h4>
@@ -128,7 +128,7 @@
     </p>
 
     <p>
-      The following is an example of an Index map for the Simple Dublin Core example. 
+      The following is an example of an Index map for the Simple Dublin Core example.
     </p>
     <p>
       <pre>
@@ -701,21 +701,21 @@ crosswalks.dissemination.html.ead.level.item=Item</code></pre>
           </li>
           <br/>
           <li><strong>Full example of a "list" field</strong>:
-          <pre><code>{{~field 
+          <pre><code>{{~field
 name="statusDescription"
-order="470" 
-type="list" 
+order="470"
+type="list"
 value="final"
 options="[\"final\",\"revised\",\"draft\"]"
 optionsLabels="{\"final\": {\"en\":\"Final\", \"pt_PT\":\"Final\"},\"revised\": {\"en\":\"Revised\", \"pt_PT\":\"Verificado\"},\"draft\": {\"en\":\"Draft\", \"pt_PT\":\"Rascunho\"}}"
-optionsLabelI18nKeyPrefix="crosswalks.dissemination.html.ead.statusDescription" 
-label="{\"en\": \"Status description\", \"pt_PT\": \"Estado da descrição\"}" 
+optionsLabelI18nKeyPrefix="crosswalks.dissemination.html.ead.statusDescription"
+label="{\"en\": \"Status description\", \"pt_PT\": \"Estado da descrição\"}"
 xpath="/*:ead/*:archdesc/*:odd[@type='statusDescription']/*:p/string()"
 ~}}</code></pre>
           </li>
         </ul>
       </ul>
-      
+
     </ul>
 	<br/>
 	<br/>
