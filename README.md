@@ -22,9 +22,13 @@ For more information, please fell free to visit RODA website:
 
 ### Demo mode (based on docker containers)
 
-#### Windows and MacOS X
+#### Windows
 
 The RODA docker container cannot currently be used in Windows due to filename incompatibilities.
+
+#### MacOS
+
+Just install Kitematic, and search for "roda". Install and run docker container. It's that easy.
 
 #### Linux
 
