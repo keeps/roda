@@ -228,9 +228,17 @@ public class DescriptiveMetadataHistory extends Composite {
 
     SafeUri uri;
     if (inHTML) {
-      uri = RestUtils.createRepresentationDescriptiveMetadataHTMLUri(representationId, descId, versionKey);
+      if (representationId != null) {
+        uri = RestUtils.createRepresentationDescriptiveMetadataHTMLUri(representationId, descId, versionKey);
+      } else {
+        uri = RestUtils.createDescriptiveMetadataHTMLUri(aipId, descId, versionKey);
+      }
     } else {
-      uri = RestUtils.createRepresentationDescriptiveMetadataDownloadUri(representationId, descId, versionKey);
+      if (representationId != null) {
+        uri = RestUtils.createRepresentationDescriptiveMetadataDownloadUri(representationId, descId, versionKey);
+      } else {
+        uri = RestUtils.createDescriptiveMetadataDownloadUri(aipId, descId, versionKey);
+      }
     }
     RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
     requestBuilder.setHeader("Authorization", "Custom");
