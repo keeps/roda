@@ -39,6 +39,7 @@ import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.ClientSelectedItemsUtils;
+import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
@@ -189,14 +190,20 @@ public class Browse extends Composite {
   @UiField
   Label fondsPanelTitle;
 
-  @UiField
-  RepresentationsPanel representationsPanel;
-
   @UiField(provided = true)
   SearchPanel searchPanel;
 
   @UiField(provided = true)
   AIPList aipList;
+
+  @UiField
+  Label representationsPanelTitle;
+
+  @UiField(provided = true)
+  SearchPanel representationsSearchPanel;
+
+  @UiField(provided = true)
+  RepresentationList representationsList;
 
   @UiField
   FlowPanel appraisalSidebar;
@@ -261,6 +268,12 @@ public class Browse extends Composite {
     searchPanel.setDefaultFilterIncremental(true);
     searchPanel.setList(aipList);
 
+    representationsList = new RepresentationList(Filter.NULL, justActive, Facets.NONE, summary, false);
+
+    representationsSearchPanel = new SearchPanel(Filter.NULL, RodaConstants.REPRESENTATION_SEARCH,
+      messages.searchPlaceHolder(), false, false, false);
+    representationsSearchPanel.setList(representationsList);
+
     facetDescriptionLevels = new FlowPanel();
     facetHasRepresentations = new FlowPanel();
 
@@ -311,6 +324,29 @@ public class Browse extends Composite {
 
     });
 
+    representationsList.getSelectionModel().addSelectionChangeHandler(new Handler() {
+
+      @Override
+      public void onSelectionChange(SelectionChangeEvent event) {
+        IndexedRepresentation representation = representationsList.getSelectionModel().getSelectedObject();
+        if (representation != null) {
+          // TODO representation jump
+        }
+      }
+    });
+
+    representationsList.addValueChangeHandler(new ValueChangeHandler<IndexResult<IndexedRepresentation>>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<IndexResult<IndexedRepresentation>> event) {
+        if (event.getValue().getTotalCount() > 0) {
+          representationsPanelTitle.setVisible(true);
+          representationsSearchPanel.setVisible(true);
+          representationsList.setVisible(true);
+        }
+      }
+    });
+
     UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<User>() {
 
       @Override
@@ -338,6 +374,8 @@ public class Browse extends Composite {
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
+    GWT.log(Representation.RESOLVER.getHistoryToken());
+
     clear();
     if (historyTokens.size() == 0) {
       viewAction();
@@ -360,6 +398,8 @@ public class Browse extends Composite {
       DescriptiveMetadataHistory.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else if (historyTokens.size() >= 1 && historyTokens.get(0).equals(EditPermissions.RESOLVER.getHistoryToken())) {
       EditPermissions.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+    } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(Representation.RESOLVER.getHistoryToken())) {
+      Representation.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {
       Tools.newHistory(RESOLVER);
       callback.onSuccess(null);
@@ -427,10 +467,17 @@ public class Browse extends Composite {
     removeHandlerRegistrations();
 
     newDescriptiveMetadata.setVisible(false);
-    representationsPanel.setVisible(false);
 
     viewingTop = false;
     searchable = false;
+
+    // Representations list
+    representationsPanelTitle.setVisible(false);
+    representationsSearchPanel.setVisible(false);
+    representationsSearchPanel.clearSearchInputBox();
+    representationsList.setVisible(false);
+
+    // AIP list
     fondsPanelTitle.setVisible(false);
     searchPanel.setVisible(false);
     searchPanel.clearSearchInputBox();
@@ -575,8 +622,10 @@ public class Browse extends Composite {
       }
 
       if (itemBundle.getRepresentations().size() > 0) {
-        representationsPanel.setVisible(true);
-        representationsPanel.createRepresentationsPanel(aipId, itemBundle);
+        Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aip.getId()));
+        representationsSearchPanel.setDefaultFilter(filter);
+        representationsSearchPanel.clearSearchInputBox();
+        representationsList.set(filter, justActive, Facets.NONE);
       }
 
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId()));

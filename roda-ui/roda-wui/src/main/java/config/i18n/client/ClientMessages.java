@@ -1183,10 +1183,6 @@ public interface ClientMessages extends Messages {
 
   String representationsTitle();
   
-  String representationRemoveTitle();
-  
-  String representationRemoveMessage();
-
   String filesTitle();
 
   String transferredResourcesTitle();
@@ -1242,6 +1238,14 @@ public interface ClientMessages extends Messages {
   String searchContext();
 
   String searchAIP();
+  
+  /***** Representation ****/
+  
+  String representation();
+  
+  String representationRemoveTitle();
+  
+  String representationRemoveMessage();
 
   /***** Job processes ****/
 
