@@ -37,7 +37,7 @@
 					<g:Button addStyleNames="btn btn-download" ui:field="downloadButton">
 						<ui:text from='{messages.preservationEventsDownloadButton}' />
 					</g:Button>
-					<g:Button addStyleNames="btn btn-back" ui:field="backButton">
+					<g:Button addStyleNames="btn btn-default btn-back" ui:field="backButton">
 						<ui:text from='{messages.preservationEventsBackButton}' />
 					</g:Button>
 				</g:FlowPanel>

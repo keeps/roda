@@ -442,7 +442,7 @@ public class CreateActionJob extends Composite {
     ListFactory listFactory = new ListFactory();
     try {
       isListEmpty = true;
-      BasicAsyncTableCell<?> list = listFactory.getList(objectClassName, "", Filter.ALL, true, 10, 10);
+      BasicAsyncTableCell<?> list = listFactory.getList(objectClassName, "", Filter.ALL, true, 10, 50);
       SearchPanel searchPanel = new SearchPanel(SearchFilters.defaultFilter(objectClassName),
         SearchFilters.allFilter(objectClassName), "", false, false, true);
       searchPanel.setList(list);

@@ -54,7 +54,6 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
   private static ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
@@ -176,6 +175,7 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
       public void onSelectionChange(SelectedItems<RiskIncidence> selected) {
         ShowRisk.getInstance().enableProcessButton(!(ClientSelectedItemsUtils.isEmpty(selected)));
         ShowRisk.getInstance().enableEditIncidenceButton(!(ClientSelectedItemsUtils.isEmpty(selected)));
+        ShowRisk.getInstance().enableRemoveButton(!(ClientSelectedItemsUtils.isEmpty(selected)));
       }
     });
 

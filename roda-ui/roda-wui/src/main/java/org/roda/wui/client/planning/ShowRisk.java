@@ -119,6 +119,7 @@ public class ShowRisk extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
     buttonProcess.setEnabled(false);
     buttonEditIncidence.setEnabled(false);
+    buttonRemove.setEnabled(false);
   }
 
   public ShowRisk(Risk risk) {
@@ -127,6 +128,7 @@ public class ShowRisk extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
     buttonProcess.setEnabled(false);
     buttonEditIncidence.setEnabled(false);
+    buttonRemove.setEnabled(false);
 
     BrowserService.Util.getInstance().hasRiskVersions(risk.getId(), new AsyncCallback<Boolean>() {
 
@@ -245,6 +247,10 @@ public class ShowRisk extends Composite {
 
   public void enableEditIncidenceButton(boolean enable) {
     buttonEditIncidence.setEnabled(enable);
+  }
+
+  public void enableRemoveButton(boolean enable) {
+    buttonRemove.setEnabled(enable);
   }
 
 }
