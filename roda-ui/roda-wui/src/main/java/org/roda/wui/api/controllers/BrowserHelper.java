@@ -1452,7 +1452,7 @@ public class BrowserHelper {
       };
       return new StreamResponse("plan.json", MediaType.APPLICATION_JSON, stream);
     } catch (IOException e) {
-      throw new GenericException("Error creating classification plan: " + e.getMessage());
+      throw new GenericException("Error creating classification plan", e);
     }
 
   }

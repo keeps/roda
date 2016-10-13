@@ -1332,9 +1332,6 @@ public class Browser extends RodaWuiController {
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkAIPPermissions(user, aip, PermissionType.DELETE);
 
-    // TODO if not admin, add to filter a constraint for the resource to belong
-    // to this user
-
     // delegate
     BrowserHelper.deleteDescriptiveMetadataVersion(aipId, descriptiveMetadataId, versionId);
 
