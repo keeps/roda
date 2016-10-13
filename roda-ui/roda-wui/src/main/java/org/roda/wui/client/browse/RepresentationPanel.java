@@ -17,6 +17,7 @@ import org.roda.wui.common.client.widgets.Toast;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -36,6 +37,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -55,6 +57,9 @@ public class RepresentationPanel extends Composite {
   private static ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
+  FocusPanel representationPanelFocus;
+
+  @UiField
   SimplePanel representationIconPanel;
 
   @UiField
@@ -67,6 +72,9 @@ public class RepresentationPanel extends Composite {
   Label representationId;
 
   @UiField
+  FlowPanel representationMetadata;
+
+  @UiField
   TabPanel itemMetadata;
 
   @UiField
@@ -74,16 +82,17 @@ public class RepresentationPanel extends Composite {
 
   private HTMLPanel representationIcon;
 
-  // private FlowPanel rightPanel;
-
   private List<HandlerRegistration> handlers;
   private String aipId;
   private String repId;
+  private List<DescriptiveMetadataViewBundle> representationDescriptiveMetadata;
 
   public RepresentationPanel(final String aipId, final IndexedRepresentation representation,
     List<DescriptiveMetadataViewBundle> representationDescriptiveMetadata) {
     this.aipId = aipId;
     this.repId = representation.getUUID();
+    this.representationDescriptiveMetadata = representationDescriptiveMetadata;
+
     handlers = new ArrayList<HandlerRegistration>();
 
     initWidget(uiBinder.createAndBindUi(this));
@@ -98,8 +107,17 @@ public class RepresentationPanel extends Composite {
     representationIconPanel.setWidget(representationIcon);
     representationIcon.addStyleName("representationIcon");
 
+    representationMetadata.setVisible(false);
     itemMetadata.setVisible(false);
     newDescriptiveMetadata.setVisible(false);
+
+    representationPanelFocus.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        Tools.newHistory(ViewRepresentation.RESOLVER, RepresentationPanel.this.aipId, RepresentationPanel.this.repId);
+      }
+    });
 
     // removeButton.addClickHandler(new ClickHandler() {
     //
@@ -124,19 +142,6 @@ public class RepresentationPanel extends Composite {
     // });
     // }
     // });
-    //
-    // ClickHandler clickHandler = new ClickHandler() {
-    //
-    // @Override
-    // public void onClick(ClickEvent event) {
-    // Tools.newHistory(ViewRepresentation.RESOLVER,
-    // RepresentationPanel.this.representation.getAipId(),
-    // RepresentationPanel.this.representation.getUUID());
-    // }
-    // };
-    //
-    // representationType.addClickHandler(clickHandler);
-    // viewButton.addClickHandler(clickHandler);
 
     final List<Pair<String, HTML>> descriptiveMetadataContainers = new ArrayList<Pair<String, HTML>>();
     final Map<String, DescriptiveMetadataViewBundle> bundles = new HashMap<>();
@@ -159,7 +164,7 @@ public class RepresentationPanel extends Composite {
           final HTML html = pair.getSecond();
           final DescriptiveMetadataViewBundle bundle = bundles.get(descId);
           if (html.getText().length() == 0) {
-            getDescriptiveMetadataHTML(aipId, representation.getUUID(), descId, bundle, new AsyncCallback<SafeHtml>() {
+            getDescriptiveMetadataHTML(descId, bundle, new AsyncCallback<SafeHtml>() {
 
               @Override
               public void onFailure(Throwable caught) {
@@ -186,7 +191,8 @@ public class RepresentationPanel extends Composite {
       @Override
       public void onSelection(SelectionEvent<Integer> event) {
         if (event.getSelectedItem() == addTabIndex) {
-          Tools.newHistory(CreateDescriptiveMetadata.RESOLVER, "representation", aipId, repId);
+          Tools.newHistory(CreateDescriptiveMetadata.RESOLVER, "representation", RepresentationPanel.this.aipId,
+            RepresentationPanel.this.repId);
         }
       }
     });
@@ -197,11 +203,14 @@ public class RepresentationPanel extends Composite {
     handlers.add(addTabHandler);
 
     if (!representationDescriptiveMetadata.isEmpty()) {
-      itemMetadata.setVisible(true);
       itemMetadata.selectTab(0);
-    } else {
-      newDescriptiveMetadata.setVisible(true);
     }
+    // if (!representationDescriptiveMetadata.isEmpty()) {
+    // itemMetadata.setVisible(true);
+    // itemMetadata.selectTab(0);
+    // } else {
+    // newDescriptiveMetadata.setVisible(true);
+    // }
   }
 
   private HTMLPanel representationIcon(String type) {
@@ -219,9 +228,9 @@ public class RepresentationPanel extends Composite {
     return new HTMLPanel(SafeHtmlUtils.fromSafeConstant(b.toString()));
   }
 
-  private void getDescriptiveMetadataHTML(final String aipId, final String representationUUID, final String descId,
-    final DescriptiveMetadataViewBundle bundle, final AsyncCallback<SafeHtml> callback) {
-    SafeUri uri = RestUtils.createRepresentationDescriptiveMetadataHTMLUri(representationUUID, descId);
+  private void getDescriptiveMetadataHTML(final String descId, final DescriptiveMetadataViewBundle bundle,
+    final AsyncCallback<SafeHtml> callback) {
+    SafeUri uri = RestUtils.createRepresentationDescriptiveMetadataHTMLUri(repId, descId);
     RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
     requestBuilder.setHeader("Authorization", "Custom");
     try {
@@ -249,8 +258,7 @@ public class RepresentationPanel extends Composite {
             b.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
 
             // Download link
-            SafeUri downloadUri = RestUtils.createRepresentationDescriptiveMetadataDownloadUri(representationUUID,
-              descId);
+            SafeUri downloadUri = RestUtils.createRepresentationDescriptiveMetadataDownloadUri(repId, descId);
             String downloadLinkHtml = "<a href='" + downloadUri.asString()
               + "' class='toolbarLink'><i class='fa fa-download'></i></a>";
             b.append(SafeHtmlUtils.fromSafeConstant(downloadLinkHtml));
@@ -317,5 +325,25 @@ public class RepresentationPanel extends Composite {
   @UiHandler("newDescriptiveMetadata")
   void buttonNewDescriptiveMetadataEventsHandler(ClickEvent e) {
     Tools.newHistory(CreateDescriptiveMetadata.RESOLVER, "representation", aipId, repId);
+  }
+
+  @UiHandler("downloadRepresentationButton")
+  void buttonDownloadRepresentationHandler(ClickEvent e) {
+
+  }
+
+  @UiHandler("removeRepresentationButton")
+  void buttonRemoveRepresentationHandler(ClickEvent e) {
+  }
+
+  @UiHandler("infoRepresentationButton")
+  void buttonInfoRepresentationHandler(ClickEvent e) {
+    representationMetadata.setVisible(!representationMetadata.isVisible());
+    representationMetadata.isVisible();
+    if (!representationDescriptiveMetadata.isEmpty()) {
+      itemMetadata.setVisible(true);
+    } else {
+      newDescriptiveMetadata.setVisible(true);
+    }
   }
 }

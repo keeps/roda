@@ -14,18 +14,43 @@
 
 	<g:FlowPanel addStyleNames="panel representation">
 		<g:FlowPanel addStyleNames="panel-body">
-			<g:FlowPanel addStyleNames="representationPanel">
-				<g:SimplePanel addStyleNames="representationIconPanel"
-					ui:field="representationIconPanel">
-					<g:HTMLPanel addStyleNames="representationIcon"
-						ui:field="representationIcon" />
-				</g:SimplePanel>
-				<g:VerticalPanel addStyleNames="representationDataPanel">
-					<g:Label addStyleNames="representationType" ui:field="representationType"></g:Label>
-					<g:Label addStyleNames="representationInformation"
-						ui:field="representationInformation"></g:Label>
-					<g:Label addStyleNames="representationId" ui:field="representationId"></g:Label>
-				</g:VerticalPanel>
+			<g:FlowPanel addStyleNames="representationToolbarIcons">
+				<g:FocusPanel ui:field="downloadRepresentationButton"
+					addStyleNames="toolbarLink representationToolbarDownloadIcon">
+					<g:HTML>
+						<i class="fa fa-download"></i>
+					</g:HTML>
+				</g:FocusPanel>
+				<g:FocusPanel ui:field="removeRepresentationButton"
+					addStyleNames="toolbarLink representationToolbarDownloadIcon">
+					<g:HTML>
+						<i class="fa fa-remove"></i>
+					</g:HTML>
+				</g:FocusPanel>
+				<g:FocusPanel ui:field="infoRepresentationButton"
+					addStyleNames="toolbarLink representationToolbarDownloadIcon">
+					<g:HTML>
+						<i class="fa fa-info"></i>
+					</g:HTML>
+				</g:FocusPanel>
+			</g:FlowPanel>
+			<g:FocusPanel ui:field="representationPanelFocus"
+				addStyleNames="representationPanelFocus">
+				<g:FlowPanel addStyleNames="representationPanel">
+					<g:SimplePanel addStyleNames="representationIconPanel"
+						ui:field="representationIconPanel">
+						<g:HTMLPanel addStyleNames="representationIcon"
+							ui:field="representationIcon" />
+					</g:SimplePanel>
+					<g:FlowPanel addStyleNames="representationDataPanel">
+						<g:Label addStyleNames="representationType" ui:field="representationType"></g:Label>
+						<g:Label addStyleNames="representationInformation"
+							ui:field="representationInformation"></g:Label>
+						<g:Label addStyleNames="representationId" ui:field="representationId"></g:Label>
+					</g:FlowPanel>
+				</g:FlowPanel>
+			</g:FocusPanel>
+			<g:FlowPanel ui:field="representationMetadata">
 				<g:TabPanel ui:field="itemMetadata" addStyleNames="browseItemMetadata" />
 				<g:FlowPanel styleName="browseNewDescriptiveMetadataButton">
 					<g:Button addStyleNames="btn btn-plus" ui:field="newDescriptiveMetadata">
