@@ -152,7 +152,8 @@ public class IndexResource {
     throws RODAException {
 
     final String mediaType = ApiUtils.getMediaType(null, request);
-    final User user = UserUtility.getApiUser(request);
+    // final User user = UserUtility.getApiUser(request);
+    final User user = UserUtility.getUser(request, false);
 
     final FindRequest findRequest = new FindRequest();
     findRequest.classToReturn = returnClass;

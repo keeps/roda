@@ -33,9 +33,9 @@ import org.slf4j.LoggerFactory;
 /**
  * CAS authentication filter.
  */
-public class CasAuthenticationFilter implements Filter {
+public class CasAuthFilter implements Filter {
   /** Logger. */
-  private static final Logger LOGGER = LoggerFactory.getLogger(CasAuthenticationFilter.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CasAuthFilter.class);
 
   /** URL to logout in CAS service. */
   private String casLogoutURL;
@@ -43,7 +43,7 @@ public class CasAuthenticationFilter implements Filter {
   /**
    * Default constructor.
    */
-  public CasAuthenticationFilter() {
+  public CasAuthFilter() {
     // do nothing
   }
 
@@ -93,7 +93,7 @@ public class CasAuthenticationFilter implements Filter {
 
     final Principal principal = httpRequest.getUserPrincipal();
     if (principal == null) {
-      UserUtility.setUser(httpRequest, UserUtility.getUser(httpRequest));
+      // UserUtility.setUser(httpRequest, UserUtility.getUser(httpRequest));
     } else {
       UserUtility.setUser(httpRequest, getOrCreateUser(principal.getName()));
     }
