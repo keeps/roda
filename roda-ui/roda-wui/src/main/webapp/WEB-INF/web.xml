@@ -16,20 +16,43 @@
 	<!-- Authentication related filters/filter-mappings -->
 	<!-- ********************************************** -->
 	<filter>
-		<filter-name>RODA Authentication Filter</filter-name>
+		<filter-name>InternalAuthenticationFilter</filter-name>
 		<filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
 		<init-param>
 			<param-name>inner-filter-class</param-name>
-			<param-value>org.roda.wui.filter.InternalAuthenticationFilter</param-value>
+			<param-value>org.roda.wui.filter.InternalAuthFilter</param-value>
 		</init-param>
 	</filter>
 	<filter-mapping>
-		<filter-name>RODA Authentication Filter</filter-name>
+		<filter-name>InternalAuthenticationFilter</filter-name>
 		<url-pattern>/login</url-pattern>
 	</filter-mapping>
 	<filter-mapping>
-		<filter-name>RODA Authentication Filter</filter-name>
+		<filter-name>InternalAuthenticationFilter</filter-name>
 		<url-pattern>/logout</url-pattern>
+	</filter-mapping>
+
+	<filter>
+		<filter-name>InternalApiAuthFilter</filter-name>
+		<filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
+		<init-param>
+			<param-name>inner-filter-class</param-name>
+			<param-value>org.roda.wui.filter.InternalApiAuthFilter</param-value>
+		</init-param>
+		<init-param>
+			<description>Realm to be used</description>
+			<param-name>realm</param-name>
+			<param-value>RODA REST API</param-value>
+		</init-param>
+		<init-param>
+			<description>comma separated list of relative paths to exclude in filter logic (using regular expressions for extra power)</description>
+			<param-name>exclusions</param-name>
+			<param-value>^/swagger.json,^/v1/theme/?</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>InternalApiAuthFilter</filter-name>
+		<url-pattern>/api/*</url-pattern>
 	</filter-mapping>
 
 	<filter>
@@ -54,11 +77,34 @@
 	</filter-mapping>
 
 	<filter>
+		<filter-name>CasApiAuthFilter</filter-name>
+		<filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
+		<init-param>
+			<param-name>inner-filter-class</param-name>
+			<param-value>org.roda.wui.filter.CasApiAuthFilter</param-value>
+		</init-param>
+		<init-param>
+			<param-name>casServerUrlPrefix</param-name>
+			<param-value>https://localhost:8443/cas</param-value>
+		</init-param>
+		<init-param>
+			<description>comma separated list of relative paths to exclude in filter logic (using regular expressions for extra power)</description>
+			<param-name>exclusions</param-name>
+			<param-value>^/swagger.json,^/v1/theme/?</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>CasApiAuthFilter</filter-name>
+		<url-pattern>/api/v1/*</url-pattern>
+	</filter-mapping>
+
+	<filter>
 		<filter-name>CAS Validation Filter</filter-name>
 		<filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
 		<init-param>
 			<param-name>inner-filter-class</param-name>
-			<param-value>org.jasig.cas.client.validation.Cas10TicketValidationFilter</param-value>
+			<!--<param-value>org.jasig.cas.client.validation.Cas10TicketValidationFilter</param-value>-->
+			<param-value>org.jasig.cas.client.validation.Cas30ProxyReceivingTicketValidationFilter</param-value>
 		</init-param>
 		<init-param>
 			<param-name>casServerUrlPrefix</param-name>
@@ -68,6 +114,14 @@
 			<param-name>serverName</param-name>
 			<param-value>http://localhost:8888</param-value>
 		</init-param>
+		<init-param>
+			<param-name>exceptionOnValidationFailure</param-name>
+			<param-value>false</param-value>
+		</init-param>
+		<init-param>
+			<param-name>redirectAfterValidation</param-name>
+			<param-value>false</param-value>
+		</init-param>
 	</filter>
 	<filter-mapping>
 		<filter-name>CAS Validation Filter</filter-name>
@@ -75,7 +129,7 @@
 	</filter-mapping>
 
 	<filter>
-		<filter-name>CAS HttpServletRequest Wrapper Filter</filter-name>
+		<filter-name>CAS HttpServletRequestWrapperFilter</filter-name>
 		<filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
 		<init-param>
 			<param-name>inner-filter-class</param-name>
@@ -83,16 +137,16 @@
 		</init-param>
 	</filter>
 	<filter-mapping>
-		<filter-name>CAS HttpServletRequest Wrapper Filter</filter-name>
+		<filter-name>CAS HttpServletRequestWrapperFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
 	<filter>
-		<filter-name>CasAuthenticationFilter</filter-name>
+		<filter-name>CasAuthFilter</filter-name>
 		<filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
 		<init-param>
 			<param-name>inner-filter-class</param-name>
-			<param-value>org.roda.wui.filter.CasAuthenticationFilter</param-value>
+			<param-value>org.roda.wui.filter.CasAuthFilter</param-value>
 		</init-param>
 		<init-param>
 			<param-name>casServerUrlPrefix</param-name>
@@ -100,7 +154,7 @@
 		</init-param>
 	</filter>
 	<filter-mapping>
-		<filter-name>CasAuthenticationFilter</filter-name>
+		<filter-name>CasAuthFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
@@ -116,31 +170,10 @@
 		</init-param>
 		<load-on-startup>2</load-on-startup>
 	</servlet>
-
 	<servlet-mapping>
 		<servlet-name>rest_api</servlet-name>
 		<url-pattern>/api/*</url-pattern>
 	</servlet-mapping>
-
-	<filter>
-		<filter-name>rest_api_auth_filter</filter-name>
-		<filter-class>org.roda.wui.api.v1.utils.ApiAuthFilter</filter-class>
-		<init-param>
-			<description>Realm to be used</description>
-			<param-name>realm</param-name>
-			<param-value>RODA REST API</param-value>
-		</init-param>
-		<init-param>
-			<description>comma separated list of relative paths to exclude in filter logic (using regular expressions for extra power)</description>
-			<param-name>exclusions</param-name>
-			<param-value>^/swagger.json,^/v1/theme/?</param-value>
-		</init-param>
-	</filter>
-	<filter-mapping>
-		<filter-name>rest_api_auth_filter</filter-name>
-		<url-pattern>/api/*</url-pattern>
-	</filter-mapping>
-
 
 	<servlet>
 		<servlet-name>ClientLogger</servlet-name>

@@ -66,15 +66,15 @@ public class UserUtility {
 
   // FIXME 20151002 hsilva: this method should be more auth scheme agnostic
   // (basic auth vs. cas)
-  public static User getApiUser(HttpServletRequest request) throws AuthorizationDeniedException {
-
-    User user;
-    Pair<String, String> credentials = getUserCredentialsFromBasicAuth(request);
+  public static User getApiUser(final HttpServletRequest request) throws AuthorizationDeniedException {
+    final User user;
+    final Pair<String, String> credentials = getUserCredentialsFromBasicAuth(request);
     if (credentials != null) {
       try {
         user = UserUtility.getLdapUtility().getAuthenticatedUser(credentials.getFirst(), credentials.getSecond());
         user.setIpAddress(request.getRemoteAddr());
-      } catch (AuthenticationDeniedException | GenericException e) {
+      } catch (final AuthenticationDeniedException | GenericException e) {
+        LOGGER.debug("Unable to authenticate user!", e);
         throw new AuthorizationDeniedException("Unable to authenticate user!");
       }
     } else {
@@ -88,9 +88,9 @@ public class UserUtility {
 
   }
 
-  private static Pair<String, String> getUserCredentialsFromBasicAuth(HttpServletRequest request) {
+  public static Pair<String, String> getUserCredentialsFromBasicAuth(final HttpServletRequest request) {
     Pair<String, String> ret = null;
-    String authorization = request.getHeader("Authorization");
+    final String authorization = request.getHeader("Authorization");
     if (authorization != null && authorization.startsWith("Basic")) {
       String credentials = authorization;
       credentials = credentials.replaceFirst("[B|b]asic ", "");
@@ -104,32 +104,25 @@ public class UserUtility {
     return ret;
   }
 
-  public static User getUser(HttpServletRequest request, boolean returnGuestIfNoUserInSession) {
-    User user = null;
-    if (request.getSession().getAttribute(RODA_USER) != null) {
-      User rsu = (User) request.getSession().getAttribute(RODA_USER);
-      if (!rsu.isGuest()) {
-        try {
-          user = UserUtility.getLdapUtility().getUser(rsu.getId());
-        } catch (GenericException e) {
-          LOGGER.error("Could not login", e);
-        }
-      } else {
+  public static User getUser(final HttpServletRequest request, final boolean returnGuestIfNoUserInSession) {
+    User user = (User) request.getSession().getAttribute(RODA_USER);
+    if (user == null) {
+      user = returnGuestIfNoUserInSession ? getGuest() : null;
+    } else {
+      if (user.isGuest()) {
         user = getGuest();
       }
-    } else {
-      user = returnGuestIfNoUserInSession ? getGuest() : null;
     }
     return user;
   }
 
-  public static User getUser(HttpServletRequest request) {
+  public static User getUser(final HttpServletRequest request) {
     return getUser(request, true);
   }
 
   public static void checkRoles(final User rsu, final List<String> rolesToCheck) throws AuthorizationDeniedException {
     if (!rolesToCheck.isEmpty() && !rsu.getAllRoles().containsAll(rolesToCheck)) {
-      List<String> missingRoles = new ArrayList<String>(rolesToCheck);
+      final List<String> missingRoles = new ArrayList<String>(rolesToCheck);
       missingRoles.removeAll(rsu.getAllRoles());
 
       throw new AuthorizationDeniedException("The user '" + rsu.getId() + "' does not have all needed permissions",
@@ -171,8 +164,8 @@ public class UserUtility {
     }
   }
 
-  public static void setUser(HttpServletRequest request, User rsu) {
-    request.getSession(true).setAttribute(RODA_USER, rsu);
+  public static void setUser(final HttpServletRequest request, final User user) {
+    request.getSession(true).setAttribute(RODA_USER, user);
   }
 
   public static void logout(HttpServletRequest servletRequest) {

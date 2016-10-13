@@ -28,9 +28,9 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
-public class InternalAuthenticationFilter implements Filter {
+public class InternalAuthFilter implements Filter {
   /** Logger. */
-  private static final Logger LOGGER = LoggerFactory.getLogger(InternalAuthenticationFilter.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(InternalAuthFilter.class);
 
   @Override
   public void init(final FilterConfig config) throws ServletException {
