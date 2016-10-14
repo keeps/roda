@@ -31,11 +31,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * CAS authentication filter.
+ * CAS authentication filter for web requests.
  */
-public class CasAuthFilter implements Filter {
+public class CasWebAuthFilter implements Filter {
   /** Logger. */
-  private static final Logger LOGGER = LoggerFactory.getLogger(CasAuthFilter.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CasWebAuthFilter.class);
 
   /** URL to logout in CAS service. */
   private String casLogoutURL;
@@ -43,7 +43,7 @@ public class CasAuthFilter implements Filter {
   /**
    * Default constructor.
    */
-  public CasAuthFilter() {
+  public CasWebAuthFilter() {
     // do nothing
   }
 

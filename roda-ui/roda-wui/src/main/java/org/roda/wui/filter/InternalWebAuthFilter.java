@@ -26,11 +26,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Internal authentication filter for web requests.
+ * 
  * @author Hélder Silva <hsilva@keep.pt>
  */
-public class InternalAuthFilter implements Filter {
+public class InternalWebAuthFilter implements Filter {
   /** Logger. */
-  private static final Logger LOGGER = LoggerFactory.getLogger(InternalAuthFilter.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(InternalWebAuthFilter.class);
 
   @Override
   public void init(final FilterConfig config) throws ServletException {
