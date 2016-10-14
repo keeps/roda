@@ -16,12 +16,16 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
+import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Humanize;
 
+import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
@@ -37,13 +41,10 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
   private final ClientLogger logger = new ClientLogger(getClass().getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private TextColumn<IndexedRepresentation> idColumn;
   private TextColumn<IndexedRepresentation> originalColumn;
-  private TextColumn<IndexedRepresentation> typeColumn;
+  private Column<IndexedRepresentation, SafeHtml> typeColumn;
   private TextColumn<IndexedRepresentation> sizeInBytesColumn;
   private TextColumn<IndexedRepresentation> numberOfDataFilesColumn;
-  private TextColumn<IndexedRepresentation> numberOfDocumentationFilesColumn;
-  private TextColumn<IndexedRepresentation> numberOfSchemasFilesColumn;
 
   public RepresentationList() {
     this(null, false, null, null, false);
@@ -62,14 +63,6 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
   @Override
   protected void configureDisplay(CellTable<IndexedRepresentation> display) {
 
-    idColumn = new TextColumn<IndexedRepresentation>() {
-
-      @Override
-      public String getValue(IndexedRepresentation rep) {
-        return rep != null ? rep.getId() : null;
-      }
-    };
-
     originalColumn = new TextColumn<IndexedRepresentation>() {
 
       @Override
@@ -79,15 +72,17 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
       }
     };
 
-    typeColumn = new TextColumn<IndexedRepresentation>() {
-
+    typeColumn = new Column<IndexedRepresentation, SafeHtml>(new SafeHtmlCell()) {
       @Override
-      public String getValue(IndexedRepresentation rep) {
-        if (rep != null && StringUtils.isNotBlank(rep.getType())) {
-          return rep.getType();
+      public SafeHtml getValue(IndexedRepresentation rep) {
+        SafeHtml ret;
+        if (rep == null) {
+          logger.error("Trying to display a NULL item");
+          ret = null;
         } else {
-          return null;
+          ret = DescriptionLevelUtils.getRepresentationTypeIcon(rep.getType(), true);
         }
+        return ret;
       }
     };
 
@@ -107,39 +102,17 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
       }
     };
 
-    numberOfDocumentationFilesColumn = new TextColumn<IndexedRepresentation>() {
-
-      @Override
-      public String getValue(IndexedRepresentation rep) {
-        return rep != null ? messages.numberOfFiles(rep.getNumberOfDocumentationFiles()) : null;
-      }
-    };
-
-    numberOfSchemasFilesColumn = new TextColumn<IndexedRepresentation>() {
-
-      @Override
-      public String getValue(IndexedRepresentation rep) {
-        return rep != null ? messages.numberOfFiles(rep.getNumberOfSchemaFiles()) : null;
-      }
-    };
-
     /* add sortable */
-    idColumn.setSortable(true);
     originalColumn.setSortable(true);
     typeColumn.setSortable(true);
     sizeInBytesColumn.setSortable(true);
     numberOfDataFilesColumn.setSortable(true);
-    numberOfDocumentationFilesColumn.setSortable(true);
-    numberOfSchemasFilesColumn.setSortable(true);
 
     // TODO externalize strings into constants
-    display.addColumn(idColumn, messages.representationId());
-    display.addColumn(originalColumn, messages.representationOriginal());
     display.addColumn(typeColumn, messages.representationType());
-    display.addColumn(sizeInBytesColumn, messages.representationSize());
     display.addColumn(numberOfDataFilesColumn, messages.representationFiles());
-    display.addColumn(numberOfDocumentationFilesColumn, messages.representationDocumentation());
-    display.addColumn(numberOfSchemasFilesColumn, messages.representationSchemas());
+    display.addColumn(sizeInBytesColumn, messages.representationSize());
+    display.addColumn(originalColumn, messages.representationOriginal());
 
     Label emptyInfo = new Label(messages.noItemsToDisplay());
     display.setEmptyTableWidget(emptyInfo);
@@ -150,11 +123,9 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
     typeColumn.setCellStyleNames("nowrap");
     sizeInBytesColumn.setCellStyleNames("nowrap");
     numberOfDataFilesColumn.setCellStyleNames("nowrap");
-    numberOfDocumentationFilesColumn.setCellStyleNames("nowrap");
-    numberOfSchemasFilesColumn.setCellStyleNames("nowrap");
 
     // define default sorting
-    display.getColumnSortList().push(new ColumnSortInfo(idColumn, false));
+    display.getColumnSortList().push(new ColumnSortInfo(typeColumn, true));
 
     addStyleName("my-representation-table");
     emptyInfo.addStyleName("my-representation-empty-info");
@@ -164,15 +135,10 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
   @Override
   protected Sorter getSorter(ColumnSortList columnSortList) {
     Map<Column<IndexedRepresentation, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedRepresentation, ?>, List<String>>();
-    columnSortingKeyMap.put(idColumn, Arrays.asList(RodaConstants.REPRESENTATION_ID));
     columnSortingKeyMap.put(originalColumn, Arrays.asList(RodaConstants.REPRESENTATION_ORIGINAL));
     columnSortingKeyMap.put(typeColumn, Arrays.asList(RodaConstants.REPRESENTATION_TYPE));
     columnSortingKeyMap.put(sizeInBytesColumn, Arrays.asList(RodaConstants.REPRESENTATION_SIZE_IN_BYTES));
     columnSortingKeyMap.put(numberOfDataFilesColumn, Arrays.asList(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES));
-    columnSortingKeyMap.put(numberOfDocumentationFilesColumn,
-      Arrays.asList(RodaConstants.REPRESENTATION_NUMBER_OF_DOCUMENTATION_FILES));
-    columnSortingKeyMap.put(numberOfSchemasFilesColumn,
-      Arrays.asList(RodaConstants.REPRESENTATION_NUMBER_OF_SCHEMA_FILES));
 
     return createSorter(columnSortList, columnSortingKeyMap);
   }

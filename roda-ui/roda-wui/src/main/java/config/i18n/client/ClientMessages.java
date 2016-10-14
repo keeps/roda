@@ -1243,6 +1243,8 @@ public interface ClientMessages extends Messages {
   
   String representation();
   
+  String representationListOfFiles();
+  
   String representationRemoveTitle();
   
   String representationRemoveMessage();

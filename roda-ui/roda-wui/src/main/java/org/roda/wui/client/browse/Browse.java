@@ -272,6 +272,7 @@ public class Browse extends Composite {
 
     representationsSearchPanel = new SearchPanel(Filter.NULL, RodaConstants.REPRESENTATION_SEARCH,
       messages.searchPlaceHolder(), false, false, false);
+    representationsSearchPanel.setDefaultFilterIncremental(true);
     representationsSearchPanel.setList(representationsList);
 
     facetDescriptionLevels = new FlowPanel();
@@ -330,7 +331,7 @@ public class Browse extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         IndexedRepresentation representation = representationsList.getSelectionModel().getSelectedObject();
         if (representation != null) {
-          // TODO representation jump
+          Tools.newHistory(Representation.RESOLVER, aipId, representation.getUUID());
         }
       }
     });
@@ -374,8 +375,6 @@ public class Browse extends Composite {
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-    GWT.log(Representation.RESOLVER.getHistoryToken());
-
     clear();
     if (historyTokens.size() == 0) {
       viewAction();
@@ -712,15 +711,16 @@ public class Browse extends Composite {
   }
 
   private List<BreadcrumbItem> getBreadcrumbsFromAncestors(List<IndexedAIP> aipAncestors, IndexedAIP aip) {
-    List<BreadcrumbItem> ret = new ArrayList<>();
-    ret.add(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), RESOLVER.getHistoryPath()));
+    List<BreadcrumbItem> breadcrumb = new ArrayList<>();
+    breadcrumb.add(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), RESOLVER.getHistoryPath()));
+    
     if (aipAncestors != null) {
       for (IndexedAIP ancestor : aipAncestors) {
         if (ancestor != null) {
           SafeHtml breadcrumbLabel = getBreadcrumbLabel(ancestor);
           BreadcrumbItem ancestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel,
             getViewItemHistoryToken(ancestor.getId()));
-          ret.add(1, ancestorBreadcrumb);
+          breadcrumb.add(1, ancestorBreadcrumb);
         } else {
           SafeHtml breadcrumbLabel = DescriptionLevelUtils.getElementLevelIconSafeHtml(RodaConstants.AIP_GHOST, false);
           BreadcrumbItem unknownAncestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel, new Command() {
@@ -731,29 +731,29 @@ public class Browse extends Composite {
               Toast.showError(messages.unknownAncestorError());
             }
           });
-          ret.add(unknownAncestorBreadcrumb);
+          breadcrumb.add(unknownAncestorBreadcrumb);
         }
       }
     }
 
-    ret.add(new BreadcrumbItem(getBreadcrumbLabel(aip), getViewItemHistoryToken(aip.getId())));
-    return ret;
+    // AIP
+    breadcrumb.add(new BreadcrumbItem(getBreadcrumbLabel(aip), getViewItemHistoryToken(aip.getId())));
+    
+    return breadcrumb;
   }
 
-  private SafeHtml getBreadcrumbLabel(IndexedAIP ancestor) {
+  private SafeHtml getBreadcrumbLabel(IndexedAIP aip) {
     SafeHtml breadcrumbLabel;
     SafeHtml elementLevelIconSafeHtml;
-    if (ancestor.getGhost()) {
-      elementLevelIconSafeHtml = SafeHtmlUtils
-        .fromSafeConstant("<i class='fa fa-snapchat-ghost' aria-hidden='true'></i>");
+    if (aip.getGhost()) {
+      elementLevelIconSafeHtml = DescriptionLevelUtils.getElementLevelIconSafeHtml(RodaConstants.AIP_GHOST, true);
       SafeHtmlBuilder builder = new SafeHtmlBuilder();
-      String label = "<i>ghost</i>";
-      builder.append(elementLevelIconSafeHtml).append(SafeHtmlUtils.fromSafeConstant(label));
+      builder.append(elementLevelIconSafeHtml);
       breadcrumbLabel = builder.toSafeHtml();
     } else {
-      elementLevelIconSafeHtml = DescriptionLevelUtils.getElementLevelIconSafeHtml(ancestor.getLevel(), false);
+      elementLevelIconSafeHtml = DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel(), false);
       SafeHtmlBuilder builder = new SafeHtmlBuilder();
-      String label = ancestor.getTitle() != null ? ancestor.getTitle() : ancestor.getId();
+      String label = aip.getTitle() != null ? aip.getTitle() : aip.getId();
       builder.append(elementLevelIconSafeHtml).append(SafeHtmlUtils.fromString(label));
       breadcrumbLabel = builder.toSafeHtml();
     }

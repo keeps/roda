@@ -59,6 +59,10 @@ public class DescriptionLevelUtils {
   }
 
   public static DescriptionLevel getDescriptionLevel(String levelString) {
+    return getDescriptionLevel(levelString, true);
+  }
+  
+  public static DescriptionLevel getDescriptionLevel(String levelString, boolean showLabel) {
     if (LEVELS_CONFIGURATION == null) {
       logger.error("Requiring a description level while their are not yet loaded");
       return null;
@@ -125,7 +129,7 @@ public class DescriptionLevelUtils {
     return null;
   }
 
-  public static SafeHtml getRepresentationTypeIcon(String representationType) {
+  public static SafeHtml getRepresentationTypeIcon(String representationType, boolean showText) {
     if (LEVELS_CONFIGURATION == null) {
       logger.error("Requiring a description level while their are not yet loaded");
       return null;
@@ -147,7 +151,7 @@ public class DescriptionLevelUtils {
       b.append(icon);
     }
     b.append("'></i>");
-    
+    appendLevel(b, showText, representationType);
     ret = SafeHtmlUtils.fromSafeConstant(b.toString());
     return ret;
   }
