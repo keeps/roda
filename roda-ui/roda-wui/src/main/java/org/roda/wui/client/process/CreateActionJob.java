@@ -233,10 +233,9 @@ public class CreateActionJob extends Composite {
 
                                 if (categories.contains(checkbox.getName())
                                   && !categories.contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)) {
-                                  Widget pluginItem = addPluginItemWidgetToWorkflowList(pluginInfo);
+                                  addPluginItemWidgetToWorkflowList(pluginInfo);
                                   if (i == 0) {
                                     CreateActionJob.this.selectedPlugin = lookupPlugin(pluginInfo.getId());
-                                    pluginItem.addStyleName("plugin-list-item-selected");
                                   }
                                 }
                               }

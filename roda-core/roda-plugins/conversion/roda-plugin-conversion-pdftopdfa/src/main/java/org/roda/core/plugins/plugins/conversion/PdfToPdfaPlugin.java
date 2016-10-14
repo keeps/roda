@@ -9,6 +9,7 @@ package org.roda.core.plugins.plugins.conversion;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +17,10 @@ import java.util.Map;
 
 import org.ghost4j.GhostscriptException;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -31,10 +35,32 @@ import org.verapdf.core.VeraPDFException;
 public class PdfToPdfaPlugin<T extends IsRODAObject> extends AbstractConvertPlugin<T> {
   private static final String TOOLNAME = "pdftopdfa";
 
+  private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
+  static {
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES, "Ignore other files",
+        PluginParameterType.BOOLEAN, "true", false, false,
+        "Ignore files that have a different format from the indicated."));
+  }
+
   public PdfToPdfaPlugin() {
     super();
     super.setInputFormat("pdf");
     super.setOutputFormat("pdf");
+  }
+
+  @Override
+  public List<PluginParameter> getParameters() {
+    List<PluginParameter> parameters = new ArrayList<PluginParameter>();
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES));
+    return parameters;
+  }
+
+  @Override
+  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
+    super.setParameterValues(parameters);
+    setInputFormat("pdf");
+    setOutputFormat("pdf");
   }
 
   public static String getStaticName() {
