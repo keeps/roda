@@ -517,13 +517,15 @@ public class Browse extends Composite {
 
       final List<Pair<String, HTML>> descriptiveMetadataContainers = new ArrayList<Pair<String, HTML>>();
       final Map<String, DescriptiveMetadataViewBundle> bundles = new HashMap<>();
-      for (DescriptiveMetadataViewBundle bundle : descMetadata) {
-        String title = bundle.getLabel() != null ? bundle.getLabel() : bundle.getId();
-        HTML container = new HTML();
-        container.addStyleName("metadataContent");
-        itemMetadata.add(container, title);
-        descriptiveMetadataContainers.add(Pair.create(bundle.getId(), container));
-        bundles.put(bundle.getId(), bundle);
+      if (descMetadata != null) {
+        for (DescriptiveMetadataViewBundle bundle : descMetadata) {
+          String title = bundle.getLabel() != null ? bundle.getLabel() : bundle.getId();
+          HTML container = new HTML();
+          container.addStyleName("metadataContent");
+          itemMetadata.add(container, title);
+          descriptiveMetadataContainers.add(Pair.create(bundle.getId(), container));
+          bundles.put(bundle.getId(), bundle);
+        }
       }
 
       HandlerRegistration tabHandler = itemMetadata.addSelectionHandler(new SelectionHandler<Integer>() {
@@ -573,7 +575,7 @@ public class Browse extends Composite {
       handlers.add(tabHandler);
       handlers.add(addTabHandler);
 
-      if (!descMetadata.isEmpty()) {
+      if (descMetadata != null && !descMetadata.isEmpty()) {
         itemMetadata.setVisible(true);
         itemMetadata.selectTab(0);
       } else {
