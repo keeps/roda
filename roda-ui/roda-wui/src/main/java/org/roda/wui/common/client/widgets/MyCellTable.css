@@ -67,6 +67,15 @@
 	border-color: #eee;
 }
 
+.cellTableSelectedRow.cellTableHoveredRow {
+	background: #5bbeff;
+	color: white;
+}
+
+.cellTableSelectedRowCell.cellTableHoveredRowCell {
+	border-color: #5bbeff;
+}
+
 @external .cellTableFadeOut;
 
 .cellTableFadeOut {
@@ -97,6 +106,10 @@
 
 .cellTableHoveredRowCell.cellTableFadeOut:after {
 	background: linear-gradient(-90deg,#eee 30%,rgba(255,255,255,0) 100%);
+}
+
+.cellTableSelectedRowCell.cellTableHoveredRowCell.cellTableFadeOut:after {
+	background: linear-gradient(-90deg,#5bbeff 30%,rgba(255,255,255,0) 100%);
 }
 
 

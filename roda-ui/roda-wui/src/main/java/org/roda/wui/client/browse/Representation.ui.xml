@@ -44,6 +44,9 @@
 					<g:Label addStyleNames="h4">
 						<ui:text from='{messages.representation}' />
 					</g:Label>
+					<g:Button addStyleNames="btn btn-play" ui:field="viewer">
+						<ui:text from='{messages.viewButton}' />
+					</g:Button>
 					<g:Button addStyleNames="btn btn-danger btn-ban" ui:field="remove">
 						<ui:text from='{messages.removeButton}' />
 					</g:Button>
@@ -62,10 +65,6 @@
 					<g:Button addStyleNames="btn btn-default btn-exclamation-triangle"
 						ui:field="risks">
 						<ui:text from='{messages.preservationRisks}' />
-					</g:Button>
-					<g:Button addStyleNames="btn btn-default btn-clock"
-						ui:field="logs">
-						<ui:text from='{messages.preservationLogs}' />
 					</g:Button>
 				</g:FlowPanel>
 				<g:FlowPanel ui:field="downloadSection">

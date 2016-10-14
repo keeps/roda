@@ -26,6 +26,7 @@ import org.roda.wui.common.client.tools.Tools;
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
@@ -41,8 +42,7 @@ public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private Column<IndexedFile, SafeHtml> iconColumn;
-  private TextColumn<IndexedFile> pathColumn;
-  private TextColumn<IndexedFile> filenameColumn;
+  private Column<IndexedFile, SafeHtml> pathColumn;
   private TextColumn<IndexedFile> formatColumn;
   private TextColumn<IndexedFile> sizeColumn;
 
@@ -73,33 +73,47 @@ public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
       }
     };
 
-    pathColumn = new TextColumn<IndexedFile>() {
+    // pathColumn = new TextColumn<IndexedFile>() {
+    //
+    // @Override
+    // public String getValue(IndexedFile file) {
+    //
+    // String filePath = null;
+    // if (file != null) {
+    // String path = "";
+    // if (file.getPath() != null) {
+    // path = Tools.join(file.getPath(), "/");
+    // }
+    //
+    // String fileName = file.getOriginalName() != null ? file.getOriginalName()
+    // : file.getId();
+    // filePath = path.isEmpty() ? fileName : path + "/" + fileName;
+    // }
+    //
+    // return filePath;
+    // }
+    // };
+
+    pathColumn = new Column<IndexedFile, SafeHtml>(new SafeHtmlCell()) {
 
       @Override
-      public String getValue(IndexedFile file) {
-        String path = null;
+      public SafeHtml getValue(IndexedFile file) {
+        SafeHtmlBuilder b = new SafeHtmlBuilder();
         if (file != null) {
-          if (file.getPath() != null) {
-            path = Tools.join(file.getPath(), "/");
-          } else {
-            path = "";
+          if (file.getPath() != null && !file.getPath().isEmpty()) {
+            String path = Tools.join(file.getPath(), "/");
+            b.append(SafeHtmlUtils.fromSafeConstant("<span class='file-path'>"));
+            b.append(SafeHtmlUtils.fromString(path));
+            b.append(SafeHtmlUtils.fromSafeConstant("/"));
+            b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
           }
+
+          String fileName = file.getOriginalName() != null ? file.getOriginalName() : file.getId();
+          b.append(SafeHtmlUtils.fromString(fileName));
+
         }
 
-        return path;
-      }
-    };
-
-    filenameColumn = new TextColumn<IndexedFile>() {
-
-      @Override
-      public String getValue(IndexedFile file) {
-        String fileName = null;
-        if (file != null) {
-          fileName = file.getOriginalName() != null ? file.getOriginalName() : file.getId();
-        }
-
-        return fileName;
+        return b.toSafeHtml();
       }
     };
 
@@ -139,20 +153,19 @@ public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
     };
 
     /* add sortable */
-    filenameColumn.setSortable(true);
+    pathColumn.setSortable(true);
     formatColumn.setSortable(true);
     sizeColumn.setSortable(true);
 
     // TODO externalize strings into constants
 
     addColumn(iconColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-files-o'></i>"), false, false, 3);
-    addColumn(filenameColumn, messages.fileName(), true, false);
     addColumn(pathColumn, messages.filePath(), true, false);
     addColumn(formatColumn, messages.fileFormat(), true, false);
     addColumn(sizeColumn, messages.fileSize(), true, false, 7);
 
     // define default sorting
-    display.getColumnSortList().push(new ColumnSortInfo(filenameColumn, false));
+    display.getColumnSortList().push(new ColumnSortInfo(pathColumn, false));
 
     addStyleName("my-files-table");
 
@@ -161,10 +174,9 @@ public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
   @Override
   protected Sorter getSorter(ColumnSortList columnSortList) {
     Map<Column<IndexedFile, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedFile, ?>, List<String>>();
-    columnSortingKeyMap.put(filenameColumn, Arrays.asList(RodaConstants.FILE_ORIGINALNAME));
+    columnSortingKeyMap.put(pathColumn, Arrays.asList(RodaConstants.FILE_ORIGINALNAME));
     columnSortingKeyMap.put(sizeColumn, Arrays.asList(RodaConstants.FILE_SIZE));
     columnSortingKeyMap.put(formatColumn, Arrays.asList(RodaConstants.FILE_FORMAT_MIMETYPE));
-
     return createSorter(columnSortList, columnSortingKeyMap);
   }
 

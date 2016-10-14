@@ -68,6 +68,11 @@ public class PreservationEvents extends Composite {
       } else if (historyTokens.size() > 1
         && historyTokens.get(0).equals(ShowPreservationEvent.RESOLVER.getHistoryToken())) {
         ShowPreservationEvent.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      } else if (historyTokens.size() == 2) {
+        final String aipId = historyTokens.get(0);
+        final String repId = historyTokens.get(1);
+        PreservationEvents preservationEvents = new PreservationEvents(aipId, repId);
+        callback.onSuccess(preservationEvents);
       } else {
         Tools.newHistory(Browse.RESOLVER);
         callback.onSuccess(null);
@@ -118,7 +123,7 @@ public class PreservationEvents extends Composite {
   Button backButton;
 
   private String aipId;
-
+  private String repId;
   private BrowseItemBundle itemBundle;
 
   /**
@@ -128,9 +133,19 @@ public class PreservationEvents extends Composite {
    * 
    */
   public PreservationEvents(final String aipId) {
+    this(aipId, null);
+  }
+
+  public PreservationEvents(final String aipId, final String repId) {
     this.aipId = aipId;
+    this.repId = repId;
 
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aipId));
+
+    if (repId != null) {
+      filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID, repId));
+    }
+
     Facets facets = null;
 
     eventList = new PreservationEventList(filter, facets, messages.preservationEventsTitle(), false);

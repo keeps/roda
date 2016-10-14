@@ -17,9 +17,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.commons.configuration.Configuration;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.IdUtils;
 import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.SelectedItemsUtils;
@@ -81,6 +83,7 @@ import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
 import org.roda.wui.common.I18nUtility;
 import org.roda.wui.common.server.ServerTools;
+import org.roda_project.commons_ip.model.RepresentationContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -766,5 +769,14 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Browser.updateMultipleIncidences(user, selected, status, severity, mitigatedOn, mitigatedBy, mitigatedDescription);
+  }
+
+  @Override
+  public String createRepresentation(String aipId) throws AuthorizationDeniedException, GenericException,
+    NotFoundException, RequestNotValidException, AlreadyExistsException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    String representationId = UUID.randomUUID().toString();
+    Browser.createRepresentation(user, aipId, representationId, RepresentationContentType.getMIXED().asString());
+    return IdUtils.getRepresentationId(aipId, representationId);
   }
 }

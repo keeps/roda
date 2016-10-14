@@ -11,7 +11,6 @@
 package org.roda.wui.client.process;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -20,11 +19,9 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
-import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
-import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
@@ -73,26 +70,6 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
         } else if (historyTokens.get(0).equals("action")) {
           LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
           CreateSearchActionJob createSearchActionJob = new CreateSearchActionJob(selectedItems.getSelectedItems());
-          callback.onSuccess(createSearchActionJob);
-        } else {
-          Tools.newHistory(CreateJob.RESOLVER);
-          callback.onSuccess(null);
-        }
-      } else if (historyTokens.size() == 2) {
-        if (historyTokens.get(0).equals("action")) {
-          SelectedItems items = Browse.getInstance().getSelected();
-          SelectedItemsList list = SelectedItemsList.create(IndexedAIP.class, Arrays.asList(historyTokens.get(1)));
-
-          if (items instanceof SelectedItemsNone) {
-            items = list;
-          } else if (items instanceof SelectedItemsList) {
-            SelectedItemsList itemsList = (SelectedItemsList) items;
-            if (itemsList.getIds().isEmpty()) {
-              items = list;
-            }
-          }
-
-          CreateSearchActionJob createSearchActionJob = new CreateSearchActionJob(items);
           callback.onSuccess(createSearchActionJob);
         } else {
           Tools.newHistory(CreateJob.RESOLVER);

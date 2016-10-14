@@ -2061,4 +2061,5 @@ public class Browser extends RodaWuiController {
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "selected", selected);
   }
+
 }

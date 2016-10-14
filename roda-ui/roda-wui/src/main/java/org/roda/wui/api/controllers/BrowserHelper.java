@@ -1353,7 +1353,10 @@ public class BrowserHelper {
   public static Representation createRepresentation(String aipId, String representationId, String type)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
     AlreadyExistsException {
-    return RodaCoreFactory.getModelService().createRepresentation(aipId, representationId, true, type, false);
+    Representation representation = RodaCoreFactory.getModelService().createRepresentation(aipId, representationId,
+      true, type, true);
+    RodaCoreFactory.getIndexService().commit(IndexedRepresentation.class);
+    return representation;
   }
 
   public static Representation updateRepresentation(User user, Representation representation) throws GenericException,

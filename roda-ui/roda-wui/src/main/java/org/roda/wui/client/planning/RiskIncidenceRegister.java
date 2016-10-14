@@ -237,6 +237,14 @@ public class RiskIncidenceRegister extends Composite {
       riskIncidenceList.setFilter(new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, aipId)));
       riskIncidenceList.refresh();
       callback.onSuccess(this);
+    } else if (historyTokens.size() == 2) {
+      final String aipId = historyTokens.get(0);
+      final String repId = historyTokens.get(1);
+      setAipId(aipId);
+      riskIncidenceList.setFilter(new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, aipId),
+        new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, repId)));
+      riskIncidenceList.refresh();
+      callback.onSuccess(this);
     } else {
       Tools.newHistory(RESOLVER);
       callback.onSuccess(null);

@@ -83,6 +83,9 @@
 					<g:Button addStyleNames="btn btn-danger btn-ban" ui:field="remove">
 						<ui:text from='{messages.removeArchivalPackage}' />
 					</g:Button>
+					<g:Button addStyleNames="btn btn-plus" ui:field="newRepresentation">
+						<ui:text from='{messages.newRepresentation}' />
+					</g:Button>
 				</g:FlowPanel>
 				<g:FlowPanel ui:field="preservationSidebar">
 					<g:Label addStyleNames="h4">

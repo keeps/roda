@@ -33,6 +33,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.Dialogs;
+import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
@@ -218,7 +219,7 @@ public class Browse extends Composite {
   Button preservationEvents, risks, logs, newProcess;
 
   @UiField
-  Button createItem, moveItem, remove;
+  Button createItem, moveItem, remove, newRepresentation;
 
   @UiField
   Button editPermissions;
@@ -423,8 +424,10 @@ public class Browse extends Composite {
   protected void viewAction(final String id) {
     if (id == null) {
       viewAction();
+      newRepresentation.setVisible(false);
     } else {
       aipId = id;
+      newRepresentation.setVisible(true);
       BrowserService.Util.getInstance().retrieveItemBundle(id, LocaleInfo.getCurrentLocale().getLocaleName(),
         new AsyncCallback<BrowseItemBundle>() {
 
@@ -713,7 +716,7 @@ public class Browse extends Composite {
   private List<BreadcrumbItem> getBreadcrumbsFromAncestors(List<IndexedAIP> aipAncestors, IndexedAIP aip) {
     List<BreadcrumbItem> breadcrumb = new ArrayList<>();
     breadcrumb.add(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), RESOLVER.getHistoryPath()));
-    
+
     if (aipAncestors != null) {
       for (IndexedAIP ancestor : aipAncestors) {
         if (ancestor != null) {
@@ -738,7 +741,7 @@ public class Browse extends Composite {
 
     // AIP
     breadcrumb.add(new BreadcrumbItem(getBreadcrumbLabel(aip), getViewItemHistoryToken(aip.getId())));
-    
+
     return breadcrumb;
   }
 
@@ -1166,7 +1169,9 @@ public class Browse extends Composite {
   @UiHandler("newProcess")
   void buttonNewProcessHandler(ClickEvent e) {
     if (aipId != null) {
-      Tools.newHistory(CreateJob.RESOLVER, "action", aipId);
+      LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+      selectedItems.setSelectedItems(SelectedItemsList.create(IndexedAIP.class, aipId));
+      Tools.newHistory(CreateJob.RESOLVER, "action");
     }
   }
 
@@ -1276,5 +1281,16 @@ public class Browse extends Composite {
   @UiHandler("searchAIP")
   void searchAIPHandler(ClickEvent e) {
     Tools.newHistory(Search.RESOLVER, RodaConstants.SEARCH_LIST_BOX_REPRESENTATIONS, RodaConstants.AIP_AIP_ID, aipId);
+  }
+
+  @UiHandler("newRepresentation")
+  void createRepresentationHandler(ClickEvent e) {
+    BrowserService.Util.getInstance().createRepresentation(aipId, new LoadingAsyncCallback<String>() {
+
+      @Override
+      public void onSuccessImpl(String representationUUID) {
+        Tools.newHistory(Representation.RESOLVER, aipId, representationUUID);
+      }
+    });
   }
 }

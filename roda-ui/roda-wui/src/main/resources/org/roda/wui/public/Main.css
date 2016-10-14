@@ -3025,8 +3025,8 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .searchPanelRight .fa-stack {
-    line-height: 4rem;
-    height: 4rem;
+    /*line-height: 4rem;
+    height: 4rem; */
 }
 
 .searchBox {
@@ -3816,6 +3816,10 @@ td.datePickerMonth, td.datePickerYear {
     font-size: 1.3rem;
     word-break: break-all;
     line-height: 1.1em;
+}
+
+.my-files-table .file-path {
+    color: #a7a9ac;
 }
 
 /**********************************************

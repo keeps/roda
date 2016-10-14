@@ -446,6 +446,8 @@ public interface ClientMessages extends Messages {
 
   String stopButton();
 
+  String viewButton();
+
   /*** View representation ***/
 
   String viewRepresentationNextFileButton();
@@ -1182,7 +1184,7 @@ public interface ClientMessages extends Messages {
   String appraisalReject();
 
   String representationsTitle();
-  
+
   String filesTitle();
 
   String transferredResourcesTitle();
@@ -1198,6 +1200,8 @@ public interface ClientMessages extends Messages {
   String archivalPackagePermissionsTitle();
 
   String removeArchivalPackage();
+
+  String newRepresentation();
 
   String preservationTitle();
 
@@ -1238,15 +1242,15 @@ public interface ClientMessages extends Messages {
   String searchContext();
 
   String searchAIP();
-  
+
   /***** Representation ****/
-  
+
   String representation();
-  
+
   String representationListOfFiles();
-  
+
   String representationRemoveTitle();
-  
+
   String representationRemoveMessage();
 
   /***** Job processes ****/

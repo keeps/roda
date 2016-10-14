@@ -23,7 +23,6 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
@@ -501,20 +500,17 @@ public class ViewRepresentation extends Composite {
 
     // Representation breadcrumb
     fullBreadcrumb.add(fileBreadcrumb.size() > 1
-      ? new BreadcrumbItem(
-        getBreadcrumbLabel(representationType(rep), RodaConstants.VIEW_REPRESENTATION_REPRESENTATION),
+      ? new BreadcrumbItem(DescriptionLevelUtils.getRepresentationTypeIcon(rep.getType(), true),
         Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), aipId, representationUUID))
-      : new BreadcrumbItem(
-        getBreadcrumbLabel(representationType(rep), RodaConstants.VIEW_REPRESENTATION_REPRESENTATION), new Command() {
+      : new BreadcrumbItem(DescriptionLevelUtils.getRepresentationTypeIcon(rep.getType(), true), new Command() {
 
-          @Override
-          public void execute() {
-            clean();
-          }
-        }));
+        @Override
+        public void execute() {
+          clean();
+        }
+      }));
 
     fullBreadcrumb.addAll(fileBreadcrumb);
-
     return fullBreadcrumb;
   }
 
@@ -529,16 +525,16 @@ public class ViewRepresentation extends Composite {
     return rep;
   }
 
-  private String representationType(Representation rep) {
-    SafeHtml labelText;
-    String repType = rep.getType();
-    if (rep.isOriginal()) {
-      labelText = messages.downloadTitleOriginal(repType);
-    } else {
-      labelText = messages.downloadTitleDefault(repType);
-    }
-    return labelText.asString();
-  }
+  // private String representationType(Representation rep) {
+  // SafeHtml labelText;
+  // String repType = rep.getType();
+  // if (rep.isOriginal()) {
+  // labelText = messages.downloadTitleOriginal(repType);
+  // } else {
+  // labelText = messages.downloadTitleDefault(repType);
+  // }
+  // return labelText.asString();
+  // }
 
   private SafeHtml getBreadcrumbLabel(String label, String level) {
     SafeHtml elementLevelIconSafeHtml = getElementLevelIconSafeHtml(level);

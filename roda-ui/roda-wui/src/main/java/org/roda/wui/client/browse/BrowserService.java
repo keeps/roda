@@ -283,4 +283,7 @@ public interface BrowserService extends RemoteService {
   void updateMultipleIncidences(SelectedItems<RiskIncidence> selected, String status, String severity, Date mitigatedOn,
     String mitigatedBy, String mitigatedDescription)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException;
+
+  String createRepresentation(String aipId) throws AuthorizationDeniedException, GenericException, NotFoundException,
+    RequestNotValidException, AlreadyExistsException;
 }

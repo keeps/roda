@@ -26,6 +26,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.common.Dialogs;
+import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.SearchFileList;
 import org.roda.wui.client.common.search.SearchFilters;
@@ -33,6 +34,8 @@ import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
+import org.roda.wui.client.planning.RiskIncidenceRegister;
+import org.roda.wui.client.process.CreateJob;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.RestErrorOverlayType;
@@ -71,6 +74,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.SelectionChangeEvent;
 
 import config.i18n.client.ClientMessages;
 
@@ -91,31 +95,31 @@ public class Representation extends Composite {
         BrowserService.Util.getInstance().retrieveItemBundle(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
           new AsyncCallback<BrowseItemBundle>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
-            errorRedirect(callback);
-          }
+            @Override
+            public void onFailure(Throwable caught) {
+              Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
+              errorRedirect(callback);
+            }
 
-          @Override
-          public void onSuccess(final BrowseItemBundle itemBundle) {
-            BrowserService.Util.getInstance().retrieve(IndexedRepresentation.class.getName(), representationUUID,
-              new AsyncCallback<IndexedRepresentation>() {
+            @Override
+            public void onSuccess(final BrowseItemBundle itemBundle) {
+              BrowserService.Util.getInstance().retrieve(IndexedRepresentation.class.getName(), representationUUID,
+                new AsyncCallback<IndexedRepresentation>() {
 
-              @Override
-              public void onFailure(Throwable caught) {
-                Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
-                errorRedirect(callback);
-              }
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
+                    errorRedirect(callback);
+                  }
 
-              @Override
-              public void onSuccess(IndexedRepresentation indexedRepresentation) {
-                Representation representation = new Representation(itemBundle, indexedRepresentation);
-                callback.onSuccess(representation);
-              }
-            });
-          }
-        });
+                  @Override
+                  public void onSuccess(IndexedRepresentation indexedRepresentation) {
+                    Representation representation = new Representation(itemBundle, indexedRepresentation);
+                    callback.onSuccess(representation);
+                  }
+                });
+            }
+          });
 
       } else {
         errorRedirect(callback);
@@ -201,6 +205,17 @@ public class Representation extends Composite {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, repId));
     filesList = new SearchFileList(filter, true, Facets.NONE, summary, selectable);
 
+    filesList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+      @Override
+      public void onSelectionChange(SelectionChangeEvent event) {
+        IndexedFile selected = filesList.getSelectionModel().getSelectedObject();
+        if (selected != null) {
+          Tools.newHistory(Browse.RESOLVER, ViewRepresentation.RESOLVER.getHistoryToken(), aipId, repId,
+            selected.getUUID());
+        }
+      }
+    });
+
     searchPanel = new SearchPanel(filter, ALL_FILTER, messages.searchPlaceHolder(), false, false, false);
     searchPanel.setDefaultFilterIncremental(true);
     searchPanel.setList(filesList);
@@ -281,6 +296,7 @@ public class Representation extends Composite {
       itemMetadata.selectTab(0);
     } else {
       newDescriptiveMetadata.setVisible(true);
+      itemMetadata.setVisible(false);
     }
   }
 
@@ -486,5 +502,33 @@ public class Representation extends Composite {
           // nothing to do
         }
       });
+  }
+
+  @UiHandler("viewer")
+  void buttonViewHandler(ClickEvent e) {
+    Tools.newHistory(Browse.RESOLVER, ViewRepresentation.RESOLVER.getHistoryToken(), aipId, repId);
+  }
+
+  @UiHandler("newProcess")
+  void buttonNewProcessHandler(ClickEvent e) {
+    if (repId != null) {
+      LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+      selectedItems.setSelectedItems(SelectedItemsList.create(IndexedRepresentation.class, repId));
+      Tools.newHistory(CreateJob.RESOLVER, "action");
+    }
+  }
+
+  @UiHandler("risks")
+  void buttonRisksHandler(ClickEvent e) {
+    if (aipId != null) {
+      Tools.newHistory(RiskIncidenceRegister.RESOLVER, aipId, representation.getId());
+    }
+  }
+
+  @UiHandler("preservationEvents")
+  void buttonPreservationEventsHandler(ClickEvent e) {
+    if (aipId != null) {
+      Tools.newHistory(PreservationEvents.RESOLVER, aipId, repId);
+    }
   }
 }
