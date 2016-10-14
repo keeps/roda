@@ -16,19 +16,19 @@
 	<!-- Authentication related filters/filter-mappings -->
 	<!-- ********************************************** -->
 	<filter>
-		<filter-name>InternalAuthenticationFilter</filter-name>
+		<filter-name>InternalWebAuthFilter</filter-name>
 		<filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
 		<init-param>
 			<param-name>inner-filter-class</param-name>
-			<param-value>org.roda.wui.filter.InternalAuthFilter</param-value>
+			<param-value>org.roda.wui.filter.InternalWebAuthFilter</param-value>
 		</init-param>
 	</filter>
 	<filter-mapping>
-		<filter-name>InternalAuthenticationFilter</filter-name>
+		<filter-name>InternalWebAuthFilter</filter-name>
 		<url-pattern>/login</url-pattern>
 	</filter-mapping>
 	<filter-mapping>
-		<filter-name>InternalAuthenticationFilter</filter-name>
+		<filter-name>InternalWebAuthFilter</filter-name>
 		<url-pattern>/logout</url-pattern>
 	</filter-mapping>
 
@@ -56,7 +56,7 @@
 	</filter-mapping>
 
 	<filter>
-		<filter-name>CAS Authentication Filter</filter-name>
+		<filter-name>CASAuthenticationFilter</filter-name>
 		<filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
 		<init-param>
 			<param-name>inner-filter-class</param-name>
@@ -72,7 +72,7 @@
 		</init-param>
 	</filter>
 	<filter-mapping>
-		<filter-name>CAS Authentication Filter</filter-name>
+		<filter-name>CASAuthenticationFilter</filter-name>
 		<url-pattern>/login</url-pattern>
 	</filter-mapping>
 
@@ -99,11 +99,10 @@
 	</filter-mapping>
 
 	<filter>
-		<filter-name>CAS Validation Filter</filter-name>
+		<filter-name>CASValidationFilter</filter-name>
 		<filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
 		<init-param>
 			<param-name>inner-filter-class</param-name>
-			<!--<param-value>org.jasig.cas.client.validation.Cas10TicketValidationFilter</param-value>-->
 			<param-value>org.jasig.cas.client.validation.Cas30ProxyReceivingTicketValidationFilter</param-value>
 		</init-param>
 		<init-param>
@@ -124,12 +123,12 @@
 		</init-param>
 	</filter>
 	<filter-mapping>
-		<filter-name>CAS Validation Filter</filter-name>
+		<filter-name>CASValidationFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
 	<filter>
-		<filter-name>CAS HttpServletRequestWrapperFilter</filter-name>
+		<filter-name>CASRequestWrapperFilter</filter-name>
 		<filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
 		<init-param>
 			<param-name>inner-filter-class</param-name>
@@ -137,16 +136,16 @@
 		</init-param>
 	</filter>
 	<filter-mapping>
-		<filter-name>CAS HttpServletRequestWrapperFilter</filter-name>
+		<filter-name>CASRequestWrapperFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
 	<filter>
-		<filter-name>CasAuthFilter</filter-name>
+		<filter-name>CasWebAuthFilter</filter-name>
 		<filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
 		<init-param>
 			<param-name>inner-filter-class</param-name>
-			<param-value>org.roda.wui.filter.CasAuthFilter</param-value>
+			<param-value>org.roda.wui.filter.CasWebAuthFilter</param-value>
 		</init-param>
 		<init-param>
 			<param-name>casServerUrlPrefix</param-name>
@@ -154,7 +153,7 @@
 		</init-param>
 	</filter>
 	<filter-mapping>
-		<filter-name>CasAuthFilter</filter-name>
+		<filter-name>CasWebAuthFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
