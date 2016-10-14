@@ -23,7 +23,10 @@ import javax.ws.rs.core.HttpHeaders;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.common.UserUtility;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.AuthenticationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,10 +67,10 @@ public class InternalApiAuthFilter implements Filter {
       // No user yet
       try {
 
-        UserUtility.setUser(request, UserUtility.getApiUser(request));
+        UserUtility.setUser(request, getBasicAuthUser(request));
         chain.doFilter(servletRequest, servletResponse);
 
-      } catch (final AuthorizationDeniedException e) {
+      } catch (final AuthenticationDeniedException | GenericException e) {
         LOGGER.debug(e.getMessage(), e);
         response.setHeader(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"" + realm + "\"");
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
@@ -76,6 +79,30 @@ public class InternalApiAuthFilter implements Filter {
       chain.doFilter(servletRequest, servletResponse);
     }
 
+  }
+
+  /**
+   * Return a {@link User} from the HTTP Basic auth header information.
+   * 
+   * @param request
+   *          the HTTP request.
+   * @return the {@link User}.
+   * @throws AuthenticationDeniedException
+   *           if the credentials are invalid.
+   * @throws GenericException
+   *           if some other error occurs.
+   */
+  private User getBasicAuthUser(final HttpServletRequest request)
+    throws AuthenticationDeniedException, GenericException {
+    final Pair<String, String> credentials = new BasicAuthRequestWrapper(request).getCredentials();
+    if (credentials == null) {
+      throw new AuthenticationDeniedException("No credentials!");
+    } else {
+      final User user = UserUtility.getLdapUtility().getAuthenticatedUser(credentials.getFirst(),
+        credentials.getSecond());
+      user.setIpAddress(request.getRemoteAddr());
+      return user;
+    }
   }
 
   /**

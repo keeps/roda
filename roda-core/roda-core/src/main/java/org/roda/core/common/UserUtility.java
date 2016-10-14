@@ -8,10 +8,8 @@
 package org.roda.core.common;
 
 import java.lang.reflect.Method;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,12 +19,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
@@ -65,44 +61,8 @@ public class UserUtility {
     LDAP_UTILITY = ldapUtility;
   }
 
-  // FIXME 20151002 hsilva: this method should be more auth scheme agnostic
-  // (basic auth vs. cas)
   public static User getApiUser(final HttpServletRequest request) throws AuthorizationDeniedException {
-    final User user;
-    final Pair<String, String> credentials = getUserCredentialsFromBasicAuth(request);
-    if (credentials != null) {
-      try {
-        user = UserUtility.getLdapUtility().getAuthenticatedUser(credentials.getFirst(), credentials.getSecond());
-        user.setIpAddress(request.getRemoteAddr());
-      } catch (final AuthenticationDeniedException | GenericException e) {
-        LOGGER.debug("Unable to authenticate user!", e);
-        throw new AuthorizationDeniedException("Unable to authenticate user!");
-      }
-    } else {
-      user = getUser(request, false);
-      if (user == null) {
-        throw new AuthorizationDeniedException("No user provided!");
-      }
-      user.setIpAddress(request.getRemoteAddr());
-    }
-    return user;
-
-  }
-
-  public static Pair<String, String> getUserCredentialsFromBasicAuth(final HttpServletRequest request) {
-    Pair<String, String> ret = null;
-    final String authorization = request.getHeader("Authorization");
-    if (authorization != null && authorization.startsWith("Basic")) {
-      String credentials = authorization;
-      credentials = credentials.replaceFirst("[B|b]asic ", "");
-      credentials = new String(Base64.getDecoder().decode(credentials),
-        Charset.forName(RodaConstants.DEFAULT_ENCODING));
-      final String[] values = credentials.split(":", 2);
-      if (values[0] != null && values[1] != null) {
-        ret = new Pair<String, String>(values[0], values[1]);
-      }
-    }
-    return ret;
+    return getUser(request, false);
   }
 
   public static User getUser(final HttpServletRequest request, final boolean returnGuestIfNoUserInSession) {
