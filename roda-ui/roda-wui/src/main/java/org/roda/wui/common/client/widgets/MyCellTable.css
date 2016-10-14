@@ -74,6 +74,7 @@
 
 .cellTableSelectedRowCell.cellTableHoveredRowCell {
 	border-color: #5bbeff;
+	background: #5bbeff;
 }
 
 @external .cellTableFadeOut;
