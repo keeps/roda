@@ -18,7 +18,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.jasig.cas.client.util.AbstractCasFilter;
 import org.jasig.cas.client.validation.Assertion;
-import org.roda.core.common.UserUtility;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.v2.common.Pair;
@@ -75,14 +74,13 @@ public class CasApiAuthFilter implements Filter {
 
     try {
       final String tgt = request.getHeader("TGT");
-      final Pair<String, String> usernamePassword = UserUtility.getUserCredentialsFromBasicAuth(request);
+      final Pair<String, String> credentials = new BasicAuthRequestWrapper(request).getCredentials();
 
       if (StringUtils.isNotBlank(tgt)) {
         doFilterWithTGT(request, response, filterChain, tgt);
-      } else if (usernamePassword != null) {
+      } else if (credentials != null) {
         // TGT is blank. Try to use username and password
-        doFilterWithCredentials(request, response, filterChain, usernamePassword.getFirst(),
-          usernamePassword.getSecond());
+        doFilterWithCredentials(request, response, filterChain, credentials.getFirst(), credentials.getSecond());
       } else {
         LOGGER.debug("No username and password");
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No credentials");
@@ -103,7 +101,7 @@ public class CasApiAuthFilter implements Filter {
     final FilterChain filterChain, final String tgt) throws GenericException, IOException, ServletException {
     final String serviceUrl = constructServiceUrl(request);
     final String st = this.casClient.getServiceTicket(tgt, serviceUrl);
-    filterChain.doFilter(new STRequestWrapper(request, st), response);
+    filterChain.doFilter(new ServiceTicketRequestWrapper(request, st), response);
   }
 
   private void doFilterWithCredentials(final HttpServletRequest request, final HttpServletResponse response,
@@ -135,12 +133,32 @@ public class CasApiAuthFilter implements Filter {
     return false;
   }
 
-  class STRequestWrapper extends HttpServletRequestWrapper {
+  /**
+   * A {@link HttpServletRequestWrapper} that adds a <code>ticket</code> query
+   * string parameter.
+   * 
+   * @author Rui Castro <rui.castro@gmai.com>
+   */
+  private class ServiceTicketRequestWrapper extends HttpServletRequestWrapper {
 
+    /**
+     * CAS service ticket.
+     */
     private final String serviceTicket;
+    /**
+     * The query string.
+     */
     private String queryString = null;
 
-    public STRequestWrapper(final HttpServletRequest request, final String serviceTicket) {
+    /**
+     * Constructor.
+     * 
+     * @param request
+     *          the HTTP request.
+     * @param serviceTicket
+     *          the CAS service ticket.
+     */
+    ServiceTicketRequestWrapper(final HttpServletRequest request, final String serviceTicket) {
       super(request);
       setAttribute("ticket", serviceTicket);
       this.serviceTicket = serviceTicket;
@@ -162,12 +180,10 @@ public class CasApiAuthFilter implements Filter {
 
     @Override
     public String getParameter(final String name) {
-      final String superValue = super.getParameter(name);
-      final String requestValue = getRequest().getParameter(name);
       if ("ticket".equals(name)) {
         return this.serviceTicket;
       } else {
-        return superValue;
+        return super.getParameter(name);
       }
     }
   }
