@@ -624,8 +624,9 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   @Override
   public boolean areParameterValuesValid() {
     boolean areValid = true;
-    String sipToAipClass = getParameterValues()
-      .getOrDefault(getPluginParameter(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS).getId(), "");
+    PluginParameter sipToAipClassPluginParameter = getPluginParameter(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS);
+    String sipToAipClass = getParameterValues().getOrDefault(sipToAipClassPluginParameter.getId(),
+      sipToAipClassPluginParameter.getDefaultValue());
     if (StringUtils.isNotBlank(sipToAipClass)) {
       Plugin<TransferredResource> plugin = RodaCoreFactory.getPluginManager().getPlugin(sipToAipClass,
         TransferredResource.class);
