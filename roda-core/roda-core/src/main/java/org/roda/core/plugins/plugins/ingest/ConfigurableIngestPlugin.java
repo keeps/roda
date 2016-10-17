@@ -199,7 +199,7 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
   }
 
   @Override
-  Optional<? extends AfterExecute> getAfterExecute() {
+  public Optional<? extends AfterExecute> getAfterExecute() {
     return Optional.empty();
   }
 

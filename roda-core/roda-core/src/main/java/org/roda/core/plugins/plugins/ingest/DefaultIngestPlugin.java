@@ -682,7 +682,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
   public abstract void setTotalSteps();
 
-  abstract Optional<? extends AfterExecute> getAfterExecute();
+  public abstract Optional<? extends AfterExecute> getAfterExecute();
 
   interface AfterExecute {
     void execute(IngestJobPluginInfo jobPluginInfo, List<AIP> aips);
