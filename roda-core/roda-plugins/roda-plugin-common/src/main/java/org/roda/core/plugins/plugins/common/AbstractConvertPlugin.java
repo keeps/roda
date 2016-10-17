@@ -77,16 +77,16 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INPUT_FORMAT,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_INPUT_FORMAT, "Input format", PluginParameterType.STRING, "",
-        true, false, "Input file format to be converted."));
+        true, false, "Input file format to be converted (check documentation for list of supported formats)."));
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT, "Output format", PluginParameterType.STRING, "",
-        true, false, "Output file format to be converted."));
+        true, false, "Output file format to be converted (check documentation for list of supported formats)."));
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES, "Ignore other files",
         PluginParameterType.BOOLEAN, "true", false, false,
-        "Ignore files that have a different format from the indicated."));
+        "Do not process files that have a different format from the indicated. ."));
   }
 
   protected AbstractConvertPlugin() {

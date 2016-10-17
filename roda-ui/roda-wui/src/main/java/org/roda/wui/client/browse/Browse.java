@@ -424,10 +424,8 @@ public class Browse extends Composite {
   protected void viewAction(final String id) {
     if (id == null) {
       viewAction();
-      newRepresentation.setVisible(false);
     } else {
       aipId = id;
-      newRepresentation.setVisible(true);
       BrowserService.Util.getInstance().retrieveItemBundle(id, LocaleInfo.getCurrentLocale().getLocaleName(),
         new AsyncCallback<BrowseItemBundle>() {
 
@@ -545,6 +543,7 @@ public class Browse extends Composite {
 
       breadcrumb.updatePath(getBreadcrumbsFromAncestors(itemBundle.getAIPAncestors(), aip));
       breadcrumb.setVisible(true);
+      newRepresentation.setVisible(true);
 
       HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(aip.getLevel());
       itemIconHtmlPanel.addStyleName("browseItemIcon-other");
@@ -701,6 +700,7 @@ public class Browse extends Composite {
 
     downloadSection.setVisible(false);
     download.setVisible(false);
+    newRepresentation.setVisible(false);
 
     searchSection.setVisible(false);
 

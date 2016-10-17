@@ -744,6 +744,8 @@ public final class PluginHelper {
 
   private static void updateReportsAfterMovingSIPs(ModelService model, IngestJobPluginInfo jobPluginInfo,
     Map<String, String> oldToNewTransferredResourceIds) {
+    // FIXME 20161017 hsilva: old sip ids should be updated in
+    // IngestJobPluginInfo
     for (Entry<String, String> oldToNewId : oldToNewTransferredResourceIds.entrySet()) {
       String oldSIPId = oldToNewId.getKey();
       String newSIPId = oldToNewId.getValue();

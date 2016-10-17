@@ -45,23 +45,20 @@ import org.slf4j.LoggerFactory;
 public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(TikaFullTextPlugin.class);
 
-  private boolean createsPluginEvent = true;
   private boolean doFeatureExtraction = true;
   private boolean doFulltextExtraction = false;
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT, "Creates plugin event",
-        PluginParameterType.BOOLEAN, "true", true, false, "Creates plugin event after executing"));
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION, new PluginParameter(
+      RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION, "Feature extraction", PluginParameterType.BOOLEAN, "true",
+      true, false,
+      "Perform feature extraction from files. This will extract properties such as number of pages, width, height, colour space, etc."));
 
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION, "Do feature extraction",
-        PluginParameterType.BOOLEAN, "true", true, false, "Does Tika feature extraction"));
-
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_FULLTEXT_EXTRACTION,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FULLTEXT_EXTRACTION, "Do full text extraction",
-        PluginParameterType.BOOLEAN, "true", true, false, "Does Tika full text extraction"));
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_FULLTEXT_EXTRACTION, new PluginParameter(
+      RodaConstants.PLUGIN_PARAMS_DO_FULLTEXT_EXTRACTION, "Full text extraction", PluginParameterType.BOOLEAN, "true",
+      true, false,
+      "Extracts full text from document/textual files. Extracted text is used to perform full-text searching on the catalogue."));
   }
 
   @Override
@@ -75,7 +72,7 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticName() {
-    return "Feature and/or full-text extraction";
+    return "AIP feature extraction (Apache Tika)";
   }
 
   @Override
@@ -84,7 +81,7 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticDescription() {
-    return "Extraction of technical metadata and/or full-text using Apache Tika";
+    return "The Apache Tika tool extracts technical metadata and text from over a thousand different file types (such as PPT, XLS, and PDF). \nThe task updates PREMIS objects metadata in the Archival Information Package (AIP) to store the results of the characterization process. A PREMIS event is also recorded after the task is run.\nFor more information on this tool, please visit https://tika.apache.org";
   }
 
   @Override
@@ -100,7 +97,6 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
   @Override
   public List<PluginParameter> getParameters() {
     ArrayList<PluginParameter> parameters = new ArrayList<PluginParameter>();
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DO_FULLTEXT_EXTRACTION));
     return parameters;
@@ -109,11 +105,6 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
-
-    // updates the flag responsible to allow plugin event creation
-    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT)) {
-      createsPluginEvent = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT));
-    }
 
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION)) {
       doFeatureExtraction = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION));
@@ -171,15 +162,13 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
           report.addReport(reportItem);
           PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
 
-          if (createsPluginEvent) {
-            try {
-              boolean notify = true;
-              PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(),
-                outcomeDetailExtension, notify);
-            } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
-              | AuthorizationDeniedException | AlreadyExistsException e) {
-              LOGGER.error("Error creating preservation event", e);
-            }
+          try {
+            boolean notify = true;
+            PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(),
+              outcomeDetailExtension, notify);
+          } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
+            | AuthorizationDeniedException | AlreadyExistsException e) {
+            LOGGER.error("Error creating preservation event", e);
           }
         }
       } catch (ClassCastException e) {

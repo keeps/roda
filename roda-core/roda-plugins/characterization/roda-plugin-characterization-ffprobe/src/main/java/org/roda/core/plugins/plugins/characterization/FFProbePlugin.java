@@ -61,12 +61,12 @@ public class FFProbePlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "FFProbe characterization action";
+    return "AIP feature extraction (ffprobe)";
   }
 
   @Override
   public String getDescription() {
-    return "Generates the FFProbe output for each file in the AIP";
+    return "ffprobe extracts information from multimedia streams and prints it in human and machine-readable fashion. For example, it can be used to check the format of the container used by a multimedia stream and the format and type of each media stream contained in it.\nThe task updates PREMIS objects metadata in the Archival Information Package (AIP) to store the results of the characterization process. A PREMIS event is also recorded after the task is run.\nFor more information of the ffprobe tool, please visit https://ffmpeg.org  ";
   }
 
   @Override

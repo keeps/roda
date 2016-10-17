@@ -68,13 +68,16 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
-    pluginParameters.put(PLUGIN_PARAM_EXPORT_FOLDER_PARAMETER, new PluginParameter(PLUGIN_PARAM_EXPORT_FOLDER_PARAMETER,
-      "Output folder", PluginParameterType.STRING, "/tmp", true, false, "Folder where the exported AIP will be sent."));
-    pluginParameters.put(PLUGIN_PARAM_EXPORT_TYPE, new PluginParameter(PLUGIN_PARAM_EXPORT_TYPE, "Type of export",
-      PluginParameterType.STRING, "FOLDER", true, false, "Type of exportation (MULTI_ZIP, FOLDER)"));
+    pluginParameters.put(PLUGIN_PARAM_EXPORT_FOLDER_PARAMETER,
+      new PluginParameter(PLUGIN_PARAM_EXPORT_FOLDER_PARAMETER, "Destination folder", PluginParameterType.STRING,
+        "/tmp", true, false, "Folder where the exported AIPs will be stored."));
+    pluginParameters.put(PLUGIN_PARAM_EXPORT_TYPE,
+      new PluginParameter(PLUGIN_PARAM_EXPORT_TYPE, "Type of export", PluginParameterType.STRING, "FOLDER", true, false,
+        "Type of export: ZIP – exports each AIP as a ZIP file; FOLDER – exports each AIP as a folder."));
     pluginParameters.put(PLUGIN_PARAM_EXPORT_REMOVE_IF_ALREADY_EXISTS,
-      new PluginParameter(PLUGIN_PARAM_EXPORT_REMOVE_IF_ALREADY_EXISTS, "Remove if already exists",
-        PluginParameterType.BOOLEAN, "true", true, false, "Remove if already exists"));
+      new PluginParameter(PLUGIN_PARAM_EXPORT_REMOVE_IF_ALREADY_EXISTS, "Overwrite files/folders",
+        PluginParameterType.BOOLEAN, "true", true, false,
+        "Overwrites files and folders if they already exist on the destination folder."));
   }
 
   @Override
@@ -94,7 +97,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getDescription() {
-    return "Exports selected AIP(s) to a ZIP file on the server file system.";
+    return "Exports selected AIP(s) to a ZIP file or folder on the server file system. To retrieve the results of the export action you must have access to the server file system.\nNOTE: This action can potentially generate a large amount of data. Make sure you select a destination folder that has enough storage space to accommodate the results of the export action.";
   }
 
   @Override

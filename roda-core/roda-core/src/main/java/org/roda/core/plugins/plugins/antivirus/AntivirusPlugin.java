@@ -254,7 +254,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_VALIDATION);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_MISC);
   }
 
   @Override

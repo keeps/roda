@@ -1201,7 +1201,7 @@ public interface ClientMessages extends Messages {
 
   String removeArchivalPackage();
 
-  String newRepresentation();
+  String addRepresentation();
 
   String preservationTitle();
 

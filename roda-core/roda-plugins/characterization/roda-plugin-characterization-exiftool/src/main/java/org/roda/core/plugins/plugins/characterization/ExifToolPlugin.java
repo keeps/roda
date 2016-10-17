@@ -46,7 +46,6 @@ import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
-import org.roda.core.util.CommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,12 +63,12 @@ public class ExifToolPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "ExifTool characterization action";
+    return "AIP feature extraction (ExifTool)";
   }
 
   @Override
   public String getDescription() {
-    return "Generates the ExifTool output for each file in the AIP";
+    return "ExifTool is a platform-independent application capable of reading technical metadata from a wide variety of file formats.\nExifTool supports many different metadata formats including EXIF, GPS, IPTC, XMP, JFIF, GeoTIFF, ICC Profile, Photoshop IRB, FlashPix, AFCP and ID3, as well as the maker notes of many digital cameras by Canon, Casio, DJI, FLIR, FujiFilm, GE, HP, JVC/Victor, Kodak, Leaf, Minolta/Konica-Minolta, Motorola, Nikon, Nintendo, Olympus/Epson, Panasonic/Leica, Pentax/Asahi, Phase One, Reconyx, Ricoh, Samsung, Sanyo, Sigma/Foveon and Sony.\nThe task updates PREMIS objects metadata in the Archival Information Package (AIP) to store the results of the characterization process. A PREMIS event is also recorded after the task is run.\nFor a full list of supported file formats and metadata types, please visit http://www.sno.phy.queensu.ca/~phil/exiftool/#supported ";
   }
 
   @Override

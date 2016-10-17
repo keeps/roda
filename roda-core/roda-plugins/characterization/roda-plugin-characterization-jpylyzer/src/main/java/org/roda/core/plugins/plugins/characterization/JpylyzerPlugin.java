@@ -61,17 +61,17 @@ public class JpylyzerPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "Jpylyzer characterization action";
+    return "JP2 feature extraction (Jpylyzer)";
   }
 
   @Override
   public String getDescription() {
-    return "Generates the Jpylyzer output for each file in the AIP";
+    return "Jpylyzer is a validator and feature extractor for JP2 images. JP2 is the still image format that is defined by Part 1 of the JPEG 2000 image compression standard (ISO/IEC 15444-1).\nJpylyzer tells you if a JP2 image really conforms to the format’s specifications (validation). It also reports the image’s technical characteristics (feature extraction).\nThe task stores the output of the tool and stores it under the metadata/other folder of the Archival Information Package. \nNOTE: This task doesn’t create PREMIS events. This is still an experimental task.\nFor more information on this tool, please visit http://jpylyzer.openpreservation.org";
   }
 
   @Override
   public String getVersionImpl() {
-    return "1.0";
+    return "0.1";
   }
 
   @Override
@@ -213,7 +213,7 @@ public class JpylyzerPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CHARACTERIZATION);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CHARACTERIZATION, RodaConstants.PLUGIN_CATEGORY_EXPERIMENTAL);
   }
 
   @Override

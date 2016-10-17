@@ -25,8 +25,8 @@
 		<module>conversion/roda-plugin-conversion-avconv</module>
 		<module>conversion/roda-plugin-conversion-command</module>
 
-		<module>validation/roda-plugin-validation-verapdf</module>
-		<module>validation/roda-plugin-validation-digital_signature</module>
+		<module>characterization/roda-plugin-characterization-verapdf</module>
+		<module>characterization/roda-plugin-characterization-digital_signature</module>
 
 		<module>characterization/roda-plugin-characterization-tika</module>
 		<module>characterization/roda-plugin-characterization-droid</module>

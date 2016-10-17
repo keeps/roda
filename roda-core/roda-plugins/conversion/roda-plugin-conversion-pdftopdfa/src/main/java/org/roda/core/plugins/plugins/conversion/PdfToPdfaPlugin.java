@@ -38,9 +38,9 @@ public class PdfToPdfaPlugin<T extends IsRODAObject> extends AbstractConvertPlug
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES, "Ignore other files",
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES, "Ignore non PDF files",
         PluginParameterType.BOOLEAN, "true", false, false,
-        "Ignore files that have a different format from the indicated."));
+        "Ignore files that are not identified as Portable Document Format (PDF)."));
   }
 
   public PdfToPdfaPlugin() {
@@ -64,7 +64,7 @@ public class PdfToPdfaPlugin<T extends IsRODAObject> extends AbstractConvertPlug
   }
 
   public static String getStaticName() {
-    return "PDF to PDFA conversion";
+    return "PDF to PDF/A conversion (ghostscript)";
   }
 
   @Override
@@ -73,7 +73,7 @@ public class PdfToPdfaPlugin<T extends IsRODAObject> extends AbstractConvertPlug
   }
 
   public static String getStaticDescription() {
-    return "Generates a PDF/A format file, from a PDF one, that passes veraPDF validation.";
+    return "Converts standard Portable Document Format (PDF) files to PDF/A using the “ghostscript” tool. The results of conversion will be placed on a new representation under the same Archival Information Package (AIP) where the files were originally found. A PREMIS event is also recorded after the task is run.\nPDF/A is an ISO-standardized version of the Portable Document Format (PDF) specialized for use in the archiving and long-term preservation of electronic documents. PDF/A differs from PDF by prohibiting features ill-suited to long-term archiving, such as font linking (as opposed to font embedding) and encryption.\nThe ISO requirements for PDF/A file viewers include colour management guidelines, support for embedded fonts, and a user interface for reading embedded annotations.\nThe outcome of this action is a new representation where all the PDF files have been converted to PDF/A. The resulting converted files will be valid according to VeraPDF (the Industry Supported PDF/A Validation tool).";
   }
 
   @Override

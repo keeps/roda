@@ -59,12 +59,12 @@ public class DroidPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "Droid characterization action";
+    return "AIP file format identification (DROID)";
   }
 
   @Override
   public String getDescription() {
-    return "Update the premis files with the object characterization";
+    return "DROID (Digital Record Object Identification) is a software tool developed to perform automated batch identification of file formats. DROID is designed to meet the fundamental requirement of any digital repository to be able to identify the precise format of all stored digital objects, and to link that identification to a central registry of technical information about that format and its dependencies.\nDROID uses the PRONOM signature files to perform format identification. Like PRONOM, it was developed by the National Archives of the UK.\nThe task updates PREMIS objects metadata in the Archival Information Package (AIP) to store the results of the characterization process. A PREMIS event is also recorded after the task is run.";
   }
 
   @Override

@@ -60,12 +60,12 @@ public class JHOVEPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "JHOVE characterization action";
+    return "AIP feature extraction (JHOVE)";
   }
 
   @Override
   public String getDescription() {
-    return "Update the premis files with the object characterization";
+    return "JHOVE, the JSTOR/Harvard Object Validation Environment, is an extensible software framework for performing format characterization of digital objects.\nJHOVE includes modules for arbitrary byte streams, ASCII and UTF-8 encoded text, TIFF, HTML, XML, JPEG, JPEG2000, PDF, AIFF, WAVE audio; and text and XML output handlers. \nThe task updates PREMIS objects metadata in the Archival Information Package (AIP) to store the results of the characterization process. A PREMIS event is also recorded after the task is run.\nFor more information on this tool, please visit http://jhove.openpreservation.org ";
   }
 
   @Override

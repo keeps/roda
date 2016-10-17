@@ -64,12 +64,12 @@ public class FITSPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "FITS characterization action";
+    return "AIP feature extraction (FITS)";
   }
 
   @Override
   public String getDescription() {
-    return "Update the premis files with the object characterization";
+    return "The File Information Tool Set (FITS) identifies, validates and extracts technical metadata for a wide range of file formats. It acts as a wrapper, invoking and managing the output from several other open source tools. Output from these tools are converted into a common format, compared to one another and consolidated into a single XML output file.\nThe tools used in the latest version of FITS are: ADL Tool, Apache Tika, DROID, Exiftool, FFIdent, File Utility (windows port), Jhove, MediaInfo, National Library of New Zealand Metadata Extractor, OIS Audio Information, OIS File Information, OIS XML Information.\nThe task updates PREMIS objects metadata in the Archival Information Package (AIP) to store the results of the characterization process. A PREMIS event is also recorded after the task is run.\nMore information on this tool can be found at http://projects.iq.harvard.edu/fits ";
   }
 
   @Override

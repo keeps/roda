@@ -84,7 +84,11 @@
 						<ui:text from='{messages.removeArchivalPackage}' />
 					</g:Button>
 					<g:Button addStyleNames="btn btn-plus" ui:field="newRepresentation">
-						<ui:text from='{messages.newRepresentation}' />
+						<ui:text from='{messages.addRepresentation}' />
+					</g:Button>
+					<g:Button addStyleNames="btn btn-default btn-download"
+						ui:field="download">
+						<ui:text from='{messages.downloadArchivalPackage}' />
 					</g:Button>
 				</g:FlowPanel>
 				<g:FlowPanel ui:field="preservationSidebar">
@@ -111,10 +115,6 @@
 					<g:Label addStyleNames="h4">
 						<ui:text from='{messages.downloadTitle}' />
 					</g:Label>
-					<g:Button addStyleNames="btn btn-default btn-download"
-						ui:field="download">
-						<ui:text from='{messages.downloadArchivalPackage}' />
-					</g:Button>
 					<g:Button addStyleNames="btn btn-default btn-download"
 						ui:field="submission">
 						<ui:text from='{messages.downloadSubmission}' />

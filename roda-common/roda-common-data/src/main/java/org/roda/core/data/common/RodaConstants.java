@@ -587,15 +587,14 @@ public final class RodaConstants {
 
   public static final String PLUGIN_CATEGORY_CONVERSION = "conversion";
   public static final String PLUGIN_CATEGORY_CHARACTERIZATION = "characterization";
-  public static final String PLUGIN_CATEGORY_VALIDATION = "validation";
   public static final String PLUGIN_CATEGORY_RISK_MANAGEMENT = "risk_management";
-  public static final String PLUGIN_CATEGORY_FEATURE_EXTRACTION = "feature_extraction";
-  public static final String PLUGIN_CATEGORY_IDENTIFICATION = "identification";
+  public static final String PLUGIN_CATEGORY_DISSEMINATION = "dissemination";
   public static final String PLUGIN_CATEGORY_INGEST = "ingest";
   public static final String PLUGIN_CATEGORY_REPLICATION = "replication";
   public static final String PLUGIN_CATEGORY_MANAGEMENT = "management";
   public static final String PLUGIN_CATEGORY_REINDEX = "reindex";
   public static final String PLUGIN_CATEGORY_MISC = "misc";
+  public static final String PLUGIN_CATEGORY_EXPERIMENTAL = "experimental";
   public static final String PLUGIN_CATEGORY_NOT_LISTABLE = "not_listable";
 
   public static final String PLUGIN_SELECT_ALL_RODA_OBJECTS = "All";
@@ -926,7 +925,6 @@ public final class RodaConstants {
 
   /* Dialog filter limit */
   public static final int DIALOG_FILTER_LIMIT_NUMBER = 120;
-  
 
   /** Private empty constructor */
   private RodaConstants() {

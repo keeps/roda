@@ -2,8 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<name>roda-plugin-validation-digital_signature</name>
-	<artifactId>roda-plugin-validation-digital_signature</artifactId>
+	<name>roda-plugin-characterization-verapdf</name>
+	<artifactId>roda-plugin-characterization-verapdf</artifactId>
 	<packaging>jar</packaging>
 	<parent>
 		<groupId>org.roda-project</groupId>
@@ -31,7 +31,7 @@
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
 									<manifestEntries>
-										<RODA-Plugin>org.roda.core.plugins.plugins.validation.DigitalSignaturePlugin org.roda.core.plugins.plugins.validation.DigitalSignatureDIPPlugin</RODA-Plugin>
+										<RODA-Plugin>org.roda.core.plugins.plugins.characterization.VeraPDFPlugin</RODA-Plugin>
 									</manifestEntries>
 								</transformer>
 							</transformers>
@@ -67,9 +67,9 @@
 					<useSystemClassLoader>true</useSystemClassLoader>
 					<useManifestOnlyJar>false</useManifestOnlyJar>
 					<suiteXmlFiles>
-						<suiteXmlFile>testng.xml</suiteXmlFile>
-					</suiteXmlFiles>
-					<groups>${testng.groups}</groups>
+	                    <suiteXmlFile>testng.xml</suiteXmlFile>
+	                </suiteXmlFiles>
+	                <groups>${testng.groups}</groups>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -78,62 +78,19 @@
 		<dependency>
 			<groupId>org.roda-project</groupId>
 			<artifactId>roda-plugin-common</artifactId>
-			<exclusions>
-				<exclusion>
-			      	<groupId>org.apache.directory.server</groupId>
-					<artifactId>apacheds-all</artifactId>
-			    </exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.roda-project</groupId>
 			<artifactId>roda-core-tests</artifactId>
 			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-			      	<groupId>org.apache.directory.server</groupId>
-					<artifactId>apacheds-all</artifactId>
-			    </exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcprov-jdk15on</artifactId>
-			<version>1.47</version>
+			<artifactId>gui</artifactId>
+			<groupId>org.verapdf</groupId>
 		</dependency>
 		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcmail-jdk15on</artifactId>
-			<version>1.47</version>
-		</dependency>
-		<dependency>
-			<groupId>org.roda-project</groupId>
-			<artifactId>roda-common-data</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi-ooxml</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.itextpdf</groupId>
-			<artifactId>itextpdf</artifactId>
-			<version>5.3.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.santuario</groupId>
-			<artifactId>xmlsec</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>xalan</groupId>
-			<artifactId>xalan</artifactId>
+			<groupId>org.ghost4j</groupId>
+			<artifactId>ghost4j</artifactId>
 		</dependency>
 	</dependencies>
 </project>

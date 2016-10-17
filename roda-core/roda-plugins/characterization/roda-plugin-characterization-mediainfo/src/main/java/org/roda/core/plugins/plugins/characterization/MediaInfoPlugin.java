@@ -62,7 +62,6 @@ import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
-import org.roda.core.util.CommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -85,12 +84,12 @@ public class MediaInfoPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "MediaInfo characterization action";
+    return "AIP feature extraction (MediaInfo)";
   }
 
   @Override
   public String getDescription() {
-    return "Generates the MediaInfo output for each file in the AIP";
+    return "MediaInfo extracts technical and tag data for video and audio files.\nMediaInfo supports popular video formats (e.g. AVI, WMV, QuickTime, Real, DivX, XviD) as well as lesser known or emerging formats such as MKV including WebM.\nMediaInfo reveals information such as: Title, author, director, album, track number, date, duration, codec, aspect ratio, framerate, bitrate, Audio codec, sample rate, channels, language, bitrate, subtitle language, etc.\nThe task updates PREMIS objects metadata in the Archival Information Package (AIP) to store the results of the characterization process. A PREMIS event is also recorded after the task is run.";
   }
 
   @Override

@@ -493,7 +493,11 @@ public class EditDescriptiveMetadata extends Composite {
   }
 
   private void cancel() {
-    Tools.newHistory(Browse.RESOLVER, aipId);
+    if (representationId == null) {
+      Tools.newHistory(Browse.RESOLVER, aipId);
+    } else {
+      Tools.newHistory(Representation.RESOLVER, aipId, representationId);
+    }
   }
 
 }
