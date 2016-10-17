@@ -496,6 +496,7 @@ public class Browse extends Composite {
     moveItem.setVisible(false);
     editPermissions.setVisible(false);
     remove.setVisible(false);
+    newRepresentation.setVisible(false);
 
     submission.setVisible(false);
     documentation.setVisible(false);
@@ -696,6 +697,7 @@ public class Browse extends Composite {
     editPermissions.setVisible(true);
     editPermissions.setEnabled(false);
     remove.setVisible(true);
+    newRepresentation.setVisible(false);
 
     downloadSection.setVisible(false);
     download.setVisible(false);
