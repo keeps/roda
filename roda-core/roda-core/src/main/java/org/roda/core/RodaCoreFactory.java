@@ -131,6 +131,7 @@ public class RodaCoreFactory {
   private static boolean instantiated = false;
   private static boolean instantiatedWithoutErrors = true;
   private static NodeType nodeType;
+  private static List<Path> toDeleteDuringShutdown = new ArrayList<>();
 
   // Core related objects
   private static Path rodaHomePath;
@@ -583,6 +584,7 @@ public class RodaCoreFactory {
       if (!Files.exists(solrHome) || FEATURE_OVERRIDE_INDEX_CONFIGS) {
         try {
           Path tempConfig = Files.createTempDirectory(getWorkingDirectory(), RodaConstants.CORE_INDEX_FOLDER);
+          toDeleteDuringShutdown.add(tempConfig);
           copyFilesFromClasspath(RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER + "/",
             tempConfig);
           solrHome = tempConfig.resolve(RodaConstants.CORE_CONFIG_FOLDER).resolve(RodaConstants.CORE_INDEX_FOLDER);
@@ -756,6 +758,9 @@ public class RodaCoreFactory {
         // final cleanup
         FSUtils.deletePathQuietly(workingDirectoryPath);
       }
+
+      // delete resources that are no longer needed
+      toDeleteDuringShutdown.forEach(e -> FSUtils.deletePathQuietly(e));
 
     }
   }

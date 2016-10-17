@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
@@ -20,7 +21,9 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.plugins.Plugin;
+import org.roda.core.plugins.orchestrate.IngestJobPluginInfo;
 import org.roda.core.plugins.plugins.base.DescriptiveMetadataValidationPlugin;
+import org.roda.core.plugins.plugins.ingest.DefaultIngestPlugin.AfterExecute;
 import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin;
 
 public class MinimalIngestPlugin extends DefaultIngestPlugin {
@@ -116,6 +119,11 @@ public class MinimalIngestPlugin extends DefaultIngestPlugin {
   @Override
   public List<Class<TransferredResource>> getObjectClasses() {
     return Arrays.asList(TransferredResource.class);
+  }
+  
+  @Override
+  Optional<? extends AfterExecute> getAfterExecute() {
+    return Optional.empty();
   }
 
 }

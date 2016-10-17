@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
@@ -195,6 +196,11 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
   @Override
   public List<Class<TransferredResource>> getObjectClasses() {
     return Arrays.asList(TransferredResource.class);
+  }
+
+  @Override
+  Optional<? extends AfterExecute> getAfterExecute() {
+    return Optional.empty();
   }
 
 }
