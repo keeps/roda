@@ -684,7 +684,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
   public abstract Optional<? extends AfterExecute> getAfterExecute();
 
-  interface AfterExecute {
+  public interface AfterExecute {
     void execute(IngestJobPluginInfo jobPluginInfo, List<AIP> aips);
   }
 }
