@@ -14,20 +14,22 @@ import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.github.nmorel.gwtjackson.client.ObjectMapper;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.safehtml.shared.UriUtils;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
+import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
+import com.google.gwt.user.client.ui.FormPanel.SubmitHandler;
 import com.google.gwt.user.client.ui.Hidden;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.RootPanel;
 
 public class RestUtils {
 
@@ -317,8 +319,8 @@ public class RestUtils {
 
   private static FindRequestMapper FIND_REQUEST_MAPPER = GWT.create(FindRequestMapper.class);
 
-  public static <T extends IsIndexed> Widget requestCSVExport(Button button, Class<T> classToReturn, Filter filter,
-    Sorter sorter, Sublist sublist, Facets facets, boolean onlyActive, boolean exportFacets, String filename) {
+  public static <T extends IsIndexed> void requestCSVExport(Class<T> classToReturn, Filter filter, Sorter sorter,
+    Sublist sublist, Facets facets, boolean onlyActive, boolean exportFacets, String filename) {
     // api/v1/index/findFORM?type=csv
 
     String url = RodaConstants.API_REST_V1_INDEX + "findFORM";
@@ -333,17 +335,18 @@ public class RestUtils {
     form.setWidget(layout);
     layout.add(new Hidden("findRequest", FIND_REQUEST_MAPPER.write(request)));
     layout.add(new Hidden("type", "csv"));
-    button.addClickHandler(new ClickHandler() {
+
+    form.setVisible(false);
+    RootPanel.get().add(form);
+
+    form.addSubmitHandler(new SubmitHandler() {
 
       @Override
-      public void onClick(ClickEvent event) {
-        form.submit();
+      public void onSubmit(SubmitEvent event) {
+        RootPanel.get().remove(form);
       }
     });
-    form.addStyleName("wrapping-form");
-    layout.add(button);
-
-    return form;
+    form.submit();
   }
 
 }

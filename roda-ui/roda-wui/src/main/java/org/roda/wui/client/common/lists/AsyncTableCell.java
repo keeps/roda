@@ -30,6 +30,7 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.MyCellTableResources;
@@ -41,6 +42,8 @@ import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -125,8 +128,9 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     this(classToReturn, filter, justActive, facets, summary, selectable, 20, 100, object);
   }
 
-  public AsyncTableCell(Class<T> classToReturn, Filter filter, boolean justActive, Facets facets, String summary,
-    boolean selectable, int initialPageSize, int pageSizeIncrement, O object) {
+  public AsyncTableCell(final Class<T> classToReturn, final Filter filter, final boolean justActive,
+    final Facets facets, final String summary, final boolean selectable, final int initialPageSize,
+    final int pageSizeIncrement, final O object) {
     super();
 
     this.classToReturn = classToReturn;
@@ -134,9 +138,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     this.pageSizeIncrement = pageSizeIncrement;
     this.object = object;
 
-    if (summary == null) {
-      summary = "summary" + Random.nextInt(1000);
-    }
+    final String notNullSummary = StringUtils.isNotBlank(summary) ? summary : "summary" + Random.nextInt(1000);
 
     this.filter = filter;
     this.justActive = justActive;
@@ -194,9 +196,8 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     pageSizePager.setDisplay(display);
 
     csvDownloadButton = new Button(messages.tableDownloadCSV());
-    Widget csvDownloadRequestWidget = RestUtils.requestCSVExport(csvDownloadButton, getClassToReturn(), getFilter(),
-      dataProvider.getSorter(), dataProvider.getSublist(), getFacets(), getJustActive(), false, summary + ".csv");
-    csvDownloadButton.addStyleName("btn btn-link");
+
+    csvDownloadButton.addStyleName("btn btn-link csvDownloadButton");
 
     createSelectAllPanel();
 
@@ -204,7 +205,16 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     add(display);
     add(resultsPager);
     add(pageSizePager);
-    add(csvDownloadRequestWidget);
+    add(csvDownloadButton);
+    
+    csvDownloadButton.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        RestUtils.requestCSVExport(getClassToReturn(), getFilter(), dataProvider.getSorter(), dataProvider.getSublist(),
+          getFacets(), getJustActive(), false, notNullSummary + ".csv");
+      }
+    });
 
     selectionModel = new SingleSelectionModel<>(getKeyProvider());
 

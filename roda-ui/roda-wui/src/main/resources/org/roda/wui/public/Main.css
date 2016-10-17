@@ -5439,18 +5439,10 @@ td.datePickerMonth, td.datePickerYear {
  DOWNLOAD CSV
 ****************************************/
 
-.wrapping-form {
-	display: inline-block;
-	
-}
-
-.wrapping-form .btn-link { 
+.csvDownloadButton { 
 	padding: 2px;
-}
-
-.my-asyncdatagrid .wrapping-form {
 	float: right;
-} 
+}
 
 .object-dialog .searchPreFilters  {
 	display: none;
