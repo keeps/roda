@@ -216,4 +216,24 @@ public class TransferredResource {
       .build();
   }
 
+  @GET
+  @Path("/reindex")
+  @ApiOperation(value = "Reindex resource", notes = "Reindex resource.", response = Void.class)
+  @ApiResponses(value = {@ApiResponse(code = 204, message = "OK", response = Void.class),
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
+
+  public Response reindexResources(
+    @ApiParam(value = "The path of the resource") @QueryParam("transferred_resource_path") String path,
+    @ApiParam(value = "Choose format in which to get the response", allowableValues = RodaConstants.API_DELETE_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
+    throws RODAException {
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
+
+    // get user
+    User user = UserUtility.getApiUser(request);
+
+    // delegate action to controller
+    org.roda.core.data.v2.ip.TransferredResource resource = Browser.reindexTransferredResource(user, path);
+    return Response.ok(resource, mediaType).build();
+  }
+
 }

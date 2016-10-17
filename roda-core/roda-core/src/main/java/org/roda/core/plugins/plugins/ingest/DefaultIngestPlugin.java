@@ -249,10 +249,10 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         }
       }
 
-      // X) move SIPs to PROCESSED folder???
+      // X) move SIPs to PROCESSED folder??? (default: false)
       if (PluginHelper.verifyIfStepShouldBePerformed(this,
         getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT))
-        && RodaCoreFactory.getRodaConfiguration().getBoolean("core.ingest.processed.move_when_autoaccept", true)) {
+        && RodaCoreFactory.getRodaConfiguration().getBoolean("core.ingest.processed.move_when_autoaccept", false)) {
         PluginHelper.moveSIPs(this, model, index, resources, jobPluginInfo);
       }
 

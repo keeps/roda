@@ -50,6 +50,7 @@ import org.roda.core.common.StreamResponse;
 import org.roda.core.common.UserUtility;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
+import org.roda.core.common.monitor.TransferredResourcesScanner;
 import org.roda.core.common.tools.ZipEntryInfo;
 import org.roda.core.common.tools.ZipTools;
 import org.roda.core.common.validation.ValidationUtils;
@@ -2655,5 +2656,13 @@ public class BrowserHelper {
 
       index.commit(RiskIncidence.class);
     }
+  }
+
+  public static TransferredResource reindexTransferredResource(String path)
+    throws IsStillUpdatingException, NotFoundException, GenericException {
+    TransferredResourcesScanner scanner = RodaCoreFactory.getTransferredResourcesScanner();
+    String resourceUUID = IdUtils.getTransferredResourceUUID(path);
+    scanner.updateAllTransferredResources(resourceUUID, true);
+    return RodaCoreFactory.getIndexService().retrieve(TransferredResource.class, resourceUUID);
   }
 }

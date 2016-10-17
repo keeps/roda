@@ -195,7 +195,6 @@ public class Search extends Composite {
       filesSelectionButtons);
 
     initWidget(uiBinder.createAndBindUi(this));
-
     searchDescription.add(new HTMLWidgetWrapper("SearchDescription.html"));
 
     newJobButton.setEnabled(false);

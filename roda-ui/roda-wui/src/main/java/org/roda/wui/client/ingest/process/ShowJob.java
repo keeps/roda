@@ -55,6 +55,7 @@ import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.process.ActionProcess;
 import org.roda.wui.client.process.IngestProcess;
 import org.roda.wui.client.process.Process;
+import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.FacetUtils;
@@ -215,7 +216,7 @@ public class ShowJob extends Composite {
   SimpleJobReportList simpleJobReports;
 
   @UiField
-  Button buttonAppraisal, buttonBack, buttonStop;
+  Button buttonAppraisal, buttonBack, buttonStop, buttonProcess;
 
   @UiField(provided = true)
   FlowPanel jobReportStatus;
@@ -271,6 +272,7 @@ public class ShowJob extends Composite {
     ingestJobReportsSearchPanel.setVisible(isIngest);
     ingestJobReports.setVisible(isIngest);
     reportListPanel.setVisible(false);
+    buttonProcess.setVisible(isIngest);
 
     name.setText(job.getName());
     creator.setText(job.getUsername());
@@ -714,5 +716,12 @@ public class ShowJob extends Composite {
           }
         }
       });
+  }
+
+  @UiHandler("buttonProcess")
+  void buttonProcessHandler(ClickEvent e) {
+    if (job != null) {
+      Tools.newHistory(Search.RESOLVER, "items", "ingestJobId", job.getId());
+    }
   }
 }

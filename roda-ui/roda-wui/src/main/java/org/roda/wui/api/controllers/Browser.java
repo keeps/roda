@@ -1242,6 +1242,21 @@ public class Browser extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "selected", selected);
   }
 
+  public static TransferredResource reindexTransferredResource(User user, String path)
+    throws IsStillUpdatingException, AuthorizationDeniedException, NotFoundException, GenericException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    TransferredResource resource = BrowserHelper.reindexTransferredResource(path);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "path", path);
+    return resource;
+  }
+
   public static TransferredResource createTransferredResourceFile(User user, String parentUUID, String fileName,
     InputStream inputStream, boolean forceCommit) throws AuthorizationDeniedException, GenericException,
     AlreadyExistsException, RequestNotValidException, NotFoundException {
