@@ -35,6 +35,7 @@ import javax.xml.xpath.XPathFactory;
 import org.apache.commons.io.IOUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.JobException;
@@ -45,9 +46,11 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationIssue;
 import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.index.IndexService;
@@ -116,6 +119,7 @@ public class MediaInfoPlugin extends AbstractPlugin<AIP> {
           PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
           PluginState reportState = PluginState.SUCCESS;
           ValidationReport validationReport = new ValidationReport();
+          List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
 
           for (Representation representation : aip.getRepresentations()) {
             LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
@@ -137,6 +141,9 @@ public class MediaInfoPlugin extends AbstractPlugin<AIP> {
                   representation.getId(), entry.getValue().toFile().getName());
                 model.createOtherMetadata(aip.getId(), representation.getId(), directoryPath, fileId, ".xml",
                   RodaConstants.OTHER_METADATA_TYPE_MEDIAINFO, payload, inotify);
+
+                sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), representation.getId(), directoryPath,
+                  fileId, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
               }
             } catch (RODAException | IOException | XPathExpressionException | ParserConfigurationException
               | SAXException | TransformerFactoryConfigurationError | TransformerException e) {
@@ -161,6 +168,14 @@ public class MediaInfoPlugin extends AbstractPlugin<AIP> {
             jobPluginInfo.incrementObjectsProcessedWithFailure();
             reportItem.setHtmlPluginDetails(true).setPluginState(PluginState.FAILURE);
             reportItem.setPluginDetails(validationReport.toHtml(false, false, false, "Error list"));
+          }
+
+          try {
+            PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, null, reportItem.getPluginState(),
+              "", true);
+          } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
+            | AuthorizationDeniedException | AlreadyExistsException e) {
+            LOGGER.error("Error creating event: " + e.getMessage(), e);
           }
 
           report.addReport(reportItem);

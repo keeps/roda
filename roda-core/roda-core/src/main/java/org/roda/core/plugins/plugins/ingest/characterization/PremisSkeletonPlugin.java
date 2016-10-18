@@ -45,8 +45,6 @@ import org.slf4j.LoggerFactory;
 public class PremisSkeletonPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(PremisSkeletonPlugin.class);
 
-  private boolean createsPluginEvent = true;
-
   @Override
   public void init() throws PluginException {
   }
@@ -82,11 +80,6 @@ public class PremisSkeletonPlugin extends AbstractPlugin<AIP> {
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
-
-    // updates the flag responsible to allow plugin event creation
-    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT)) {
-      createsPluginEvent = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT));
-    }
   }
 
   @Override
@@ -123,14 +116,12 @@ public class PremisSkeletonPlugin extends AbstractPlugin<AIP> {
             reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
           }
 
-          if (createsPluginEvent) {
-            try {
-              boolean notify = true;
-              PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(), "", notify);
-            } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
-              | AuthorizationDeniedException | AlreadyExistsException e) {
-              LOGGER.error("Error creating event: " + e.getMessage(), e);
-            }
+          try {
+            boolean notify = true;
+            PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(), "", notify);
+          } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
+            | AuthorizationDeniedException | AlreadyExistsException e) {
+            LOGGER.error("Error creating event: " + e.getMessage(), e);
           }
 
           report.addReport(reportItem);

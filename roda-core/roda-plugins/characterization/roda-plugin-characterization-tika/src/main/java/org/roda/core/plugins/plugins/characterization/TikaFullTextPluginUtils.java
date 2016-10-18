@@ -10,6 +10,8 @@ package org.roda.core.plugins.plugins.characterization;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.ReaderInputStream;
@@ -31,16 +33,19 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.OptionalWithCause;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.InputStreamContentPayload;
@@ -54,15 +59,16 @@ public class TikaFullTextPluginUtils {
 
   private static final Tika tika = new Tika();
 
-  public static Report runTikaFullTextOnRepresentation(Report reportItem, IndexService index, ModelService model,
-    StorageService storage, AIP aip, Representation representation, boolean doFeatureExtraction,
-    boolean doFulltextExtraction) throws NotFoundException, GenericException, RequestNotValidException,
-    AuthorizationDeniedException, ValidationException, IOException {
+  public static Pair<Report, List<LinkingIdentifier>> runTikaFullTextOnRepresentation(Report reportItem,
+    IndexService index, ModelService model, StorageService storage, AIP aip, Representation representation,
+    boolean doFeatureExtraction, boolean doFulltextExtraction) throws NotFoundException, GenericException,
+    RequestNotValidException, AuthorizationDeniedException, ValidationException, IOException {
 
     boolean recursive = true;
     CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(), representation.getId(),
       recursive);
 
+    List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
     boolean notify = true; // need to index tika properties...
 
     for (OptionalWithCause<File> oFile : allFiles) {
@@ -91,6 +97,9 @@ public class TikaFullTextPluginUtils {
                 RodaConstants.TIKA_FILE_SUFFIX_FULLTEXT, RodaConstants.OTHER_METADATA_TYPE_APACHE_TIKA, payload,
                 notify);
             }
+
+            sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), representation.getId(), file.getPath(),
+              file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
           } catch (Exception e) {
             throw e;
@@ -140,7 +149,7 @@ public class TikaFullTextPluginUtils {
       }
     }
     IOUtils.closeQuietly(allFiles);
-    return reportItem;
+    return new Pair<Report, List<LinkingIdentifier>>(reportItem, sources);
   }
 
   private static String generateMetadataFile(Metadata metadata) throws IOException {

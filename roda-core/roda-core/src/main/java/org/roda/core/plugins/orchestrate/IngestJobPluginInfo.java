@@ -11,12 +11,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.index.IndexService;
+import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
+import org.roda.core.plugins.plugins.PluginHelper;
 
 public class IngestJobPluginInfo extends JobPluginInfo {
   private static final long serialVersionUID = -7993848868644990995L;
@@ -190,6 +196,21 @@ public class IngestJobPluginInfo extends JobPluginInfo {
     // set the success counter
     setSourceObjectsProcessedWithSuccess(getSourceObjectsCount() - getSourceObjectsProcessedWithFailure());
     setStepsCompleted(getTotalSteps());
+  }
+
+  public <T extends IsRODAObject> void failOtherTransferredResourceAIPs(Plugin<T> plugin, ModelService model,
+    IndexService index, String transferredResourceId) {
+    for (Entry<String, Report> aipReportEntry : allReports.get(transferredResourceId).entrySet()) {
+      Report report = aipReportEntry.getValue();
+      if (report.getPluginState() != PluginState.FAILURE) {
+        Report reportItem = PluginHelper
+          .initPluginReportItem(plugin, aipReportEntry.getKey(), AIPState.INGEST_PROCESSING)
+          .setPluginState(PluginState.FAILURE)
+          .setPluginDetails("This AIP processing failed because a related AIP also failed");
+        PluginHelper.updatePartialJobReport(plugin, model, index, reportItem, false);
+      }
+    }
+
   }
 
 }

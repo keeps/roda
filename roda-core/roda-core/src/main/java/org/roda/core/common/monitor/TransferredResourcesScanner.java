@@ -262,11 +262,19 @@ public class TransferredResourcesScanner {
     List<TransferredResource> resourcesToIndex = new ArrayList<TransferredResource>();
     boolean notFoundResources = false;
 
+    String baseFolder = RodaCoreFactory.getRodaConfiguration().getString("core.ingest.processed.base_folder",
+      "PROCESSED");
+    String successFolder = RodaCoreFactory.getRodaConfiguration()
+      .getString("core.ingest.processed.successfully_ingested", "SUCCESSFULLY_INGESTED");
+    String unsuccessFolder = RodaCoreFactory.getRodaConfiguration()
+      .getString("core.ingest.processed.unsuccessfully_ingested", "UNSUCCESSFULLY_INGESTED");
+
     for (TransferredResource resource : resources) {
       if (Files.exists(Paths.get(resource.getFullPath()))) {
         Path newResourcePath = basePath.resolve(newRelativePath);
         if (addOldRelativePathToNewRelativePath) {
-          newResourcePath = newResourcePath.resolve(resource.getRelativePath());
+          newResourcePath = newResourcePath.resolve(resource.getRelativePath()
+            .replace(baseFolder + "/" + successFolder + "/", "").replace(baseFolder + "/" + unsuccessFolder + "/", ""));
         } else {
           newResourcePath = newResourcePath.resolve(resource.getName());
         }

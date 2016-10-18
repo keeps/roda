@@ -247,7 +247,8 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
 
                     if (plugins != null) {
                       PluginUtils.sortByName(plugins);
-                      int pluginAdded = 0;
+
+                      int pluginsAdded = 0;
                       for (PluginInfo pluginInfo : plugins) {
                         if (pluginInfo != null) {
                           List<String> categories = pluginInfo.getCategories();
@@ -264,9 +265,10 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
                                   && ((!isSelectedEmpty() && pluginInfo.hasObjectClass(selectedClass))
                                     || (isSelectedEmpty() && pluginInfo.hasObjectClass(listSelectedClass)))) {
                                   Widget pluginItem = addPluginItemWidgetToWorkflowList(pluginInfo);
-                                  if (i == 0) {
+                                  if (pluginsAdded == 0) {
                                     CreateJob.this.selectedPlugin = lookupPlugin(pluginInfo.getId());
                                     pluginItem.addStyleName("plugin-list-item-selected");
+                                    pluginsAdded++;
                                   }
                                 }
 
@@ -278,10 +280,10 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
                                 && ((!isSelectedEmpty() && pluginInfo.hasObjectClass(selectedClass))
                                   || (isSelectedEmpty() && pluginInfo.hasObjectClass(listSelectedClass)))) {
                                 Widget pluginItem = addPluginItemWidgetToWorkflowList(pluginInfo);
-                                if (pluginAdded == 0) {
+                                if (pluginsAdded == 0) {
                                   CreateJob.this.selectedPlugin = lookupPlugin(pluginInfo.getId());
                                   pluginItem.addStyleName("plugin-list-item-selected");
-                                  pluginAdded++;
+                                  pluginsAdded++;
                                 }
                               }
                             }

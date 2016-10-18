@@ -20,6 +20,7 @@ import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.xmlbeans.XmlException;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -57,6 +58,7 @@ import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPluginUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DirectResourceAccess;
@@ -77,7 +79,9 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INPUT_FORMAT,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_INPUT_FORMAT, "Input format", PluginParameterType.STRING, "",
-        true, false, "Input file format to be converted (check documentation for list of supported formats)."));
+        true, false,
+        "Input file format to be converted (check documentation for list of supported formats). If the input file format is not specified, the task will"
+          + " run on all supported formats (check roda-core-formats.properties for list of supported formats)."));
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT, "Output format", PluginParameterType.STRING, "",
@@ -86,7 +90,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES, "Ignore other files",
         PluginParameterType.BOOLEAN, "true", false, false,
-        "Do not process files that have a different format from the indicated. ."));
+        "Do not process files that have a different format from the indicated."));
   }
 
   protected AbstractConvertPlugin() {
@@ -203,11 +207,11 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
         PluginState reportState = PluginState.SUCCESS;
         ValidationReport validationReport = new ValidationReport();
         boolean hasNonPdfFiles = false;
+        List<File> alteredFiles = new ArrayList<File>();
+        List<File> newFiles = new ArrayList<File>();
+        List<File> unchangedFiles = new ArrayList<File>();
 
         for (Representation representation : aip.getRepresentations()) {
-          List<File> alteredFiles = new ArrayList<File>();
-          List<File> newFiles = new ArrayList<File>();
-          List<File> unchangedFiles = new ArrayList<File>();
           newRepresentationID = UUID.randomUUID().toString();
           PluginState pluginResultState = PluginState.SUCCESS;
           // FIXME 20160516 hsilva: see how to set initial
@@ -334,15 +338,23 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
             reportItem.setPluginState(pluginResultState).setPluginDetails(e.getMessage());
           } finally {
             LOGGER.debug("Creating convert plugin event for the representation {}", representation.getId());
-            boolean notifyEvent = false;
-            createEvent(alteredFiles, newFiles, aip.getId(), newRepresentationID, model, index, outputFormat,
-              pluginResultState, detailExtension, notifyEvent);
             report.addReport(reportItem);
             PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+
+            try {
+              Representation rep = model.retrieveRepresentation(aip.getId(), newRepresentationID);
+              createPremisSkeletonOnRepresentation(model, aip.getId(), rep);
+            } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
+              | ValidationException | IOException | XmlException e) {
+              LOGGER.error("Error running premis skeleton on new representation: {}", e.getMessage());
+            }
           }
         }
 
         try {
+          boolean notifyEvent = false;
+          createEvent(model, index, aip.getId(), null, null, null, outputFormat, reportState, detailExtension,
+            alteredFiles, newFiles, notifyEvent);
           model.notifyAIPUpdated(aip.getId());
           jobPluginInfo.incrementObjectsProcessed(reportState);
         } catch (Exception e) {
@@ -505,8 +517,16 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
         jobPluginInfo.incrementObjectsProcessed(reportState);
         LOGGER.debug("Creating convert plugin event for the representation " + representation.getId());
         boolean notifyEvent = false;
-        createEvent(alteredFiles, newFiles, aipId, newRepresentationID, model, index, outputFormat, reportState,
-          detailExtension, notifyEvent);
+        createEvent(model, index, aipId, representation.getId(), null, null, outputFormat, reportState, detailExtension,
+          alteredFiles, newFiles, notifyEvent);
+
+        try {
+          Representation rep = model.retrieveRepresentation(representation.getAipId(), newRepresentationID);
+          createPremisSkeletonOnRepresentation(model, representation.getAipId(), rep);
+        } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
+          | ValidationException | IOException | XmlException e) {
+          LOGGER.error("Error running premis skeleton on new representation: {}", e.getMessage());
+        }
       }
 
       try {
@@ -642,8 +662,17 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
         jobPluginInfo.incrementObjectsProcessed(reportState);
         boolean notifyEvent = false;
-        createEvent(Arrays.asList(file), newFiles, file.getAipId(), newRepresentationID, model, index, outputFormat,
-          reportState, detailExtension, notifyEvent);
+        createEvent(model, index, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
+          outputFormat, reportState, detailExtension, Arrays.asList(file), newFiles, notifyEvent);
+
+        try {
+          Representation rep = model.retrieveRepresentation(file.getAipId(), newRepresentationID);
+          createPremisSkeletonOnRepresentation(model, file.getAipId(), rep);
+        } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
+          | ValidationException | IOException | XmlException e) {
+          LOGGER.error("Error running premis skeleton on new representation: {}", e.getMessage());
+        }
+
       }
 
       jobPluginInfo.finalizeInfo();
@@ -658,9 +687,17 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
   public abstract String executePlugin(Path inputPath, Path outputPath, String fileFormat)
     throws UnsupportedOperationException, IOException, CommandException;
 
-  private void createEvent(List<File> alteredFiles, List<File> newFiles, String aipId, String newRepresentationID,
-    ModelService model, IndexService index, String outputFormat, PluginState outcome, String detailExtension,
-    boolean notify) throws PluginException {
+  private void createPremisSkeletonOnRepresentation(ModelService model, String aipId, Representation representation)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
+    ValidationException, IOException, XmlException {
+    List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
+    PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aipId, representation.getId(), algorithms);
+    model.notifyRepresentationUpdated(representation);
+  }
+
+  private void createEvent(ModelService model, IndexService index, String aipId, String representationId,
+    List<String> filePath, String fileId, String outputFormat, PluginState outcome, String detailExtension,
+    List<File> alteredFiles, List<File> newFiles, boolean notify) throws PluginException {
 
     List<LinkingIdentifier> premisSourceFilesIdentifiers = new ArrayList<LinkingIdentifier>();
     List<LinkingIdentifier> premisTargetFilesIdentifiers = new ArrayList<LinkingIdentifier>();
@@ -693,8 +730,8 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
     }
 
     try {
-      PluginHelper.createPluginEvent(this, aipId, model, index, premisSourceFilesIdentifiers,
-        premisTargetFilesIdentifiers, outcome, stringBuilder.toString(), notify);
+      PluginHelper.createPluginEvent(this, aipId, representationId, filePath, fileId, model, index,
+        premisSourceFilesIdentifiers, premisTargetFilesIdentifiers, outcome, stringBuilder.toString(), notify);
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | ValidationException | AlreadyExistsException e) {
       throw new PluginException(e.getMessage(), e);

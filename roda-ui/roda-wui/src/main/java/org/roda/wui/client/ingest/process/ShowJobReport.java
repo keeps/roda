@@ -155,7 +155,7 @@ public class ShowJobReport extends Composite {
     if (!jobReport.getSourceObjectOriginalId().isEmpty() || !jobReport.getSourceObjectId().isEmpty()) {
       sourceObject.setText(!"".equals(jobReport.getSourceObjectOriginalId()) ? jobReport.getSourceObjectOriginalId()
         : jobReport.getSourceObjectId());
-      if(!jobReport.getSourceObjectClass().isEmpty())
+      if (!jobReport.getSourceObjectClass().isEmpty())
         sourceObject.setTitle(jobReport.getSourceObjectOriginalName());
 
       if (TransferredResource.class.getName().equals(jobReport.getSourceObjectClass())) {
@@ -180,7 +180,8 @@ public class ShowJobReport extends Composite {
               if (result != null) {
                 sourceObjectLabel.setText(messages.showRepresentationExtended());
                 sourceObject.setHref(Tools.createHistoryHashLink(Browse.RESOLVER,
-                  ViewRepresentation.RESOLVER.getHistoryToken(), result.getAipId(), result.getUUID()));
+                  org.roda.wui.client.browse.Representation.RESOLVER.getHistoryToken(), result.getAipId(),
+                  result.getUUID()));
               }
             }
           });
@@ -234,7 +235,8 @@ public class ShowJobReport extends Composite {
               if (result != null) {
                 outcomeObjectLabel.setText(messages.showRepresentationExtended());
                 outcomeObject.setHref(Tools.createHistoryHashLink(Browse.RESOLVER,
-                  ViewRepresentation.RESOLVER.getHistoryToken(), result.getAipId(), result.getUUID()));
+                  org.roda.wui.client.browse.Representation.RESOLVER.getHistoryToken(), result.getAipId(),
+                  result.getUUID()));
               }
             }
           });

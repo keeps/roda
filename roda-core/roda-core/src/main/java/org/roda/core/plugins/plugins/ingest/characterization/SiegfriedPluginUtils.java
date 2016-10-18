@@ -17,27 +17,25 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.IdUtils;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.storage.Binary;
+import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StringContentPayload;
@@ -49,8 +47,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
-import gov.loc.premis.v3.File;
 
 public class SiegfriedPluginUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(SiegfriedPluginUtils.class);
@@ -101,13 +97,14 @@ public class SiegfriedPluginUtils {
     return version;
   }
 
-  public static <T extends IsRODAObject> void runSiegfriedOnRepresentation(Plugin<T> plugin, IndexService index,
-    ModelService model, AIP aip, Representation representation) throws GenericException, RequestNotValidException,
-    AlreadyExistsException, NotFoundException, AuthorizationDeniedException, PluginException {
+  public static <T extends IsRODAObject> List<LinkingIdentifier> runSiegfriedOnRepresentation(Plugin<T> plugin,
+    IndexService index, ModelService model, AIP aip, Representation representation) throws GenericException,
+    RequestNotValidException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException, PluginException {
 
     StoragePath representationDataPath = ModelUtils.getRepresentationDataStoragePath(aip.getId(),
       representation.getId());
     DirectResourceAccess directAccess = model.getStorage().getDirectAccess(representationDataPath);
+    List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
 
     Path representationFsPath = directAccess.getPath();
     if (Files.exists(representationFsPath)) {
@@ -134,6 +131,9 @@ public class SiegfriedPluginUtils {
         model.createOtherMetadata(aip.getId(), representation.getId(), fileDirectoryPath, fileId,
           SiegfriedPlugin.FILE_SUFFIX, RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED, payload, notify);
 
+        sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), representation.getId(), fileDirectoryPath, fileId,
+          RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+
         // Update PREMIS files
         final JsonNode matches = file.get("matches");
         for (JsonNode match : matches) {
@@ -157,27 +157,14 @@ public class SiegfriedPluginUtils {
               mime = match.get("mime").textValue();
             }
           }
-          try {
-            Binary premisBin = model.retrievePreservationFile(aip.getId(), representation.getId(), fileDirectoryPath,
-              fileId);
 
-            File premisFile = PremisV3Utils.binaryToFile(premisBin.getContent(), false);
-            PremisV3Utils.updateFileFormat(premisFile, format, version, pronom, mime);
-
-            PreservationMetadataType type = PreservationMetadataType.FILE;
-            String id = IdUtils.getPreservationId(type, aip.getId(), representation.getId(), fileDirectoryPath, fileId);
-
-            ContentPayload premisFilePayload = PremisV3Utils.fileToBinary(premisFile);
-            model.updatePreservationMetadata(id, type, aip.getId(), representation.getId(), fileDirectoryPath, fileId,
-              premisFilePayload, notify);
-          } catch (NotFoundException e) {
-            LOGGER.debug("Siegfried will not update PREMIS because it doesn't exist");
-          } catch (RODAException e) {
-            LOGGER.error("Siegfried will not update PREMIS due to an error", e);
-          }
+          PremisV3Utils.updateFormatPreservationMetadata(model, aip.getId(), representation.getId(), fileDirectoryPath,
+            fileId, format, version, pronom, mime, notify);
         }
       }
     }
+
+    return sources;
   }
 
 }

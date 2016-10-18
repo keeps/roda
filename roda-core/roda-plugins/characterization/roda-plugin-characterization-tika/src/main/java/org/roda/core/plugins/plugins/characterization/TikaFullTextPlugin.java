@@ -22,9 +22,11 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -132,11 +134,16 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
           PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
           LOGGER.debug("Processing AIP {}", aip.getId());
           String outcomeDetailExtension = "";
+          List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
+
           try {
             for (Representation representation : aip.getRepresentations()) {
               LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
-              reportItem = TikaFullTextPluginUtils.runTikaFullTextOnRepresentation(reportItem, index, model, storage,
-                aip, representation, doFeatureExtraction, doFulltextExtraction);
+              Pair<Report, List<LinkingIdentifier>> tikaResult = TikaFullTextPluginUtils
+                .runTikaFullTextOnRepresentation(reportItem, index, model, storage, aip, representation,
+                  doFeatureExtraction, doFulltextExtraction);
+              reportItem = tikaResult.getFirst();
+              sources.addAll(tikaResult.getSecond());
               model.notifyRepresentationUpdated(representation);
             }
 
@@ -163,9 +170,10 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
           PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
 
           try {
+            List<LinkingIdentifier> outcomes = null;
             boolean notify = true;
-            PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(),
-              outcomeDetailExtension, notify);
+            PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, outcomes,
+              reportItem.getPluginState(), outcomeDetailExtension, notify);
           } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
             | AuthorizationDeniedException | AlreadyExistsException e) {
             LOGGER.error("Error creating preservation event", e);
@@ -218,7 +226,8 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Successfully extracted technical metadata from file.";
+    return "Successfully extracted technical metadata and/or full text from file(s). "
+      + "The results of extraction are stored under [REPRESENTATION_ID]/metadata/other/ApacheTika.";
   }
 
   @Override

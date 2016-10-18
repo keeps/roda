@@ -56,6 +56,11 @@
 									</excludes>
 								</filter>
 							</filters>
+							<artifactSet>
+								<excludes>
+									<exclude>org.roda-project:roda-core</exclude>
+								</excludes>
+							</artifactSet>
 						</configuration>
 					</execution>
 				</executions>

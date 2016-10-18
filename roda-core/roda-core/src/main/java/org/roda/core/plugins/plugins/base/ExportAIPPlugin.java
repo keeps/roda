@@ -40,6 +40,7 @@ import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
@@ -70,10 +71,12 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
   static {
     pluginParameters.put(PLUGIN_PARAM_EXPORT_FOLDER_PARAMETER,
       new PluginParameter(PLUGIN_PARAM_EXPORT_FOLDER_PARAMETER, "Destination folder", PluginParameterType.STRING,
-        "/tmp", true, false, "Folder where the exported AIPs will be stored."));
+        "/tmp/export", true, false, "Folder where the exported AIPs will be stored."));
+
     pluginParameters.put(PLUGIN_PARAM_EXPORT_TYPE,
       new PluginParameter(PLUGIN_PARAM_EXPORT_TYPE, "Type of export", PluginParameterType.STRING, "FOLDER", true, false,
         "Type of export: ZIP – exports each AIP as a ZIP file; FOLDER – exports each AIP as a folder."));
+
     pluginParameters.put(PLUGIN_PARAM_EXPORT_REMOVE_IF_ALREADY_EXISTS,
       new PluginParameter(PLUGIN_PARAM_EXPORT_REMOVE_IF_ALREADY_EXISTS, "Overwrite files/folders",
         PluginParameterType.BOOLEAN, "true", true, false,
@@ -155,8 +158,8 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
         LOGGER.error("Error creating base folder: " + e.getMessage());
         error = e.getMessage();
       }
-      LOGGER.error("Error: " + error);
-      if (error == null && exportType == ExportType.MULTI_ZIP) {
+
+      if (error == null && exportType == ExportType.ZIP) {
         report = exportMultiZip(aips, outputPath, report, model, index, storage, jobPluginInfo);
       } else if (error == null && exportType == ExportType.FOLDER) {
         report = exportFolders(aips, outputPath, storage, model, index, report, jobPluginInfo);
@@ -166,6 +169,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
         report.setPluginState(PluginState.FAILURE);
         report.setPluginDetails("Error exporting AIPs: " + error);
       }
+
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
     } catch (JobException e) {
@@ -209,6 +213,13 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
         report.addReport(reportItem);
         PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
 
+        try {
+          boolean notify = true;
+          PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(), "", notify);
+        } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
+          | AuthorizationDeniedException | AlreadyExistsException e) {
+          LOGGER.error("Error creating event: " + e.getMessage(), e);
+        }
       }
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
       LOGGER.error(e.getMessage(), e);

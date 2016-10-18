@@ -600,6 +600,7 @@ public final class PluginHelper {
         LOGGER.error("Error creating PREMIS agent", e);
       }
     }
+
     String id = IdUtils.createPreservationMetadataId(PreservationMetadataType.EVENT);
     String outcomeDetailNote = (outcome == PluginState.SUCCESS) ? plugin.getPreservationEventSuccessMessage()
       : plugin.getPreservationEventFailureMessage();

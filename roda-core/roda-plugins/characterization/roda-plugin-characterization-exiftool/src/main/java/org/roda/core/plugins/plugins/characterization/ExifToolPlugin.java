@@ -16,21 +16,27 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.roda.core.common.iterables.CloseableIterable;
+import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationIssue;
 import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.index.IndexService;
@@ -68,7 +74,13 @@ public class ExifToolPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getDescription() {
-    return "ExifTool is a platform-independent application capable of reading technical metadata from a wide variety of file formats.\nExifTool supports many different metadata formats including EXIF, GPS, IPTC, XMP, JFIF, GeoTIFF, ICC Profile, Photoshop IRB, FlashPix, AFCP and ID3, as well as the maker notes of many digital cameras by Canon, Casio, DJI, FLIR, FujiFilm, GE, HP, JVC/Victor, Kodak, Leaf, Minolta/Konica-Minolta, Motorola, Nikon, Nintendo, Olympus/Epson, Panasonic/Leica, Pentax/Asahi, Phase One, Reconyx, Ricoh, Samsung, Sanyo, Sigma/Foveon and Sony.\nThe task updates PREMIS objects metadata in the Archival Information Package (AIP) to store the results of the characterization process. A PREMIS event is also recorded after the task is run.\nFor a full list of supported file formats and metadata types, please visit http://www.sno.phy.queensu.ca/~phil/exiftool/#supported ";
+    return "ExifTool is a platform-independent application capable of reading technical metadata from a wide variety of file formats."
+      + "\nExifTool supports many different metadata formats including EXIF, GPS, IPTC, XMP, JFIF, GeoTIFF, ICC Profile, Photoshop IRB, "
+      + "FlashPix, AFCP and ID3, as well as the maker notes of many digital cameras by Canon, Casio, DJI, FLIR, FujiFilm, GE, HP, JVC/Victor, "
+      + "Kodak, Leaf, Minolta/Konica-Minolta, Motorola, Nikon, Nintendo, Olympus/Epson, Panasonic/Leica, Pentax/Asahi, Phase One, Reconyx, Ricoh, "
+      + "Samsung, Sanyo, Sigma/Foveon and Sony.\nThe task creates a new file under the [AIP_ID]/representation/metadata/other/ExifTool. This information is not yet added to "
+      + "PREMIS or indexed but it can be inspected by downloading the AIP. A PREMIS event is recorded after the task is run."
+      + "\nFor a full list of supported file formats and metadata types, please visit http://www.sno.phy.queensu.ca/~phil/exiftool/#supported ";
   }
 
   @Override
@@ -95,6 +107,7 @@ public class ExifToolPlugin extends AbstractPlugin<AIP> {
           PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
           PluginState reportState = PluginState.SUCCESS;
           ValidationReport validationReport = new ValidationReport();
+          List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
 
           for (Representation representation : aip.getRepresentations()) {
             LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
@@ -105,26 +118,34 @@ public class ExifToolPlugin extends AbstractPlugin<AIP> {
                 representation.getId());
               directAccess = storage.getDirectAccess(representationDataPath);
 
-              Path metadata = Files.createTempDirectory("metadata");
-              ExifToolPluginUtils.runExifToolOnPath(directAccess.getPath(), metadata);
+              sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), representation.getId(),
+                RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
-              try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(metadata)) {
-                for (Path path : directoryStream) {
-                  ContentPayload payload = new FSPathContentPayload(path);
-                  List<String> fileDirectoryPath = new ArrayList<>();
+              CloseableIterable<OptionalWithCause<org.roda.core.data.v2.ip.File>> allFiles = model
+                .listFilesUnder(aip.getId(), representation.getId(), true);
 
-                  Path relativePath = metadata.relativize(path);
-                  for (int i = 0; i < relativePath.getNameCount() - 2; i++) {
-                    fileDirectoryPath.add(relativePath.getName(i).toString());
+              if (!CloseableIterables.isEmpty(allFiles)) {
+                Path metadata = Files.createTempDirectory("metadata");
+                ExifToolPluginUtils.runExifToolOnPath(directAccess.getPath(), metadata);
+
+                try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(metadata)) {
+                  for (Path path : directoryStream) {
+                    ContentPayload payload = new FSPathContentPayload(path);
+                    List<String> fileDirectoryPath = new ArrayList<>();
+
+                    Path relativePath = metadata.relativize(path);
+                    for (int i = 0; i < relativePath.getNameCount() - 2; i++) {
+                      fileDirectoryPath.add(relativePath.getName(i).toString());
+                    }
+
+                    String fileId = path.getFileName().toString();
+                    model.createOtherMetadata(aip.getId(), representation.getId(), fileDirectoryPath, fileId, ".xml",
+                      RodaConstants.OTHER_METADATA_TYPE_EXIFTOOL, payload, inotify);
                   }
-
-                  String fileId = path.getFileName().toString();
-                  model.createOtherMetadata(aip.getId(), representation.getId(), fileDirectoryPath, fileId, ".xml",
-                    RodaConstants.OTHER_METADATA_TYPE_EXIFTOOL, payload, inotify);
                 }
-              }
 
-              FSUtils.deletePath(metadata);
+                FSUtils.deletePath(metadata);
+              }
             } catch (RODAException | IOException e) {
               LOGGER.error("Error processing AIP {}: {}", aip.getId(), e.getMessage());
               reportState = PluginState.FAILURE;
@@ -147,6 +168,14 @@ public class ExifToolPlugin extends AbstractPlugin<AIP> {
             jobPluginInfo.incrementObjectsProcessedWithFailure();
             reportItem.setHtmlPluginDetails(true).setPluginState(PluginState.FAILURE);
             reportItem.setPluginDetails(validationReport.toHtml(false, false, false, "Error list"));
+          }
+
+          try {
+            PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, null, reportItem.getPluginState(),
+              "", true);
+          } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
+            | AuthorizationDeniedException | AlreadyExistsException e) {
+            LOGGER.error("Error creating event: " + e.getMessage(), e);
           }
 
           report.addReport(reportItem);
@@ -184,22 +213,22 @@ public class ExifToolPlugin extends AbstractPlugin<AIP> {
   // TODO FIX
   @Override
   public PreservationEventType getPreservationEventType() {
-    return null;
+    return PreservationEventType.METADATA_EXTRACTION;
   }
 
   @Override
   public String getPreservationEventDescription() {
-    return "XXXXXXXXXX";
+    return "Extracted technical metadata from file.";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "XXXXXXXXXXXXXXXXXXXXXXXX";
+    return "Technical metadata stored under [AIP_ID]/representation/metadata/other/ExifTool";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "XXXXXXXXXXXXXXXXXXXXXXXXXX";
+    return "Could not extract technical metadata";
   }
 
   @Override
@@ -217,7 +246,7 @@ public class ExifToolPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CHARACTERIZATION);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CHARACTERIZATION, RodaConstants.PLUGIN_CATEGORY_EXPERIMENTAL);
   }
 
   @Override

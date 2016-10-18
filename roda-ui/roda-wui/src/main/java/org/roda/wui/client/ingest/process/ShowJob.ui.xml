@@ -129,8 +129,9 @@
 							<g:Button addStyleNames="btn btn-play" ui:field="buttonAppraisal">
 								<ui:text from='{messages.sidebarAppraisalTitle}' />
 							</g:Button>
-							<g:Button addStyleNames="btn btn-play" ui:field="buttonProcess">
-								<ui:text from='{messages.newProcessPreservation}' />
+							<g:Button addStyleNames="btn btn-play"
+							ui:field="buttonProcess">
+								<ui:text from='{messages.listButton}' />
 							</g:Button>
 							<g:Button addStyleNames="btn btn-default btn-times-circle"
 								ui:field="buttonBack">

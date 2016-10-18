@@ -93,6 +93,13 @@ public class ValidationReport implements Serializable {
       getValidationEntryAttribute(sb, "valid", title, "");
     }
 
+    if (message != null && !message.trim().isEmpty()) {
+      sb.append(getDivBeginning("message"));
+      // FIXME lfaria 20161018: escape HTML
+      sb.append(message);
+      sb.append(getDivEnding());
+    }
+
     // add validation entries
     sb.append(getDivBeginning("entries"));
     for (ValidationIssue validationEntry : issues) {

@@ -53,7 +53,7 @@ public class DroidPluginUtils {
       String droidOutput = CommandUtility.execute(command);
       return droidOutput;
     } catch (CommandException e) {
-      throw new RODAException("Error while executing DROID command");
+      throw new RODAException("Error while executing DROID command", e.getCause());
     }
   }
 }

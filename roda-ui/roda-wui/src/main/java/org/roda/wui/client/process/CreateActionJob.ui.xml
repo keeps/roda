@@ -36,7 +36,7 @@
 					<g:FlowPanel addStyleNames="pull-right plugin-details">
 						<g:Label addStyleNames="form-label h5" ui:field="workflowListTitle" />
 						<g:FlowPanel ui:field="workflowListDescription"></g:FlowPanel>
-						<g:HTML addStyleNames="p plugin-description" ui:field="workflowListDescriptionCategories" />
+						<g:HTML addStyleNames="p plugin-description plugin-category-padding" ui:field="workflowListDescriptionCategories" />
 
 						<g:FlowPanel styleName="panel" ui:field="workflowPanel">
 							<p:PluginOptionsPanel styleName="panel-body"

@@ -44,6 +44,7 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -175,12 +176,13 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
         PluginState reportState = PluginState.SUCCESS;
         ValidationReport validationReport = new ValidationReport();
         boolean hasNonPdfFiles = false;
+        List<File> resourceList = new ArrayList<File>();
+        List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
+        StringBuilder details = new StringBuilder();
 
         for (Representation representation : aip.getRepresentations()) {
-          List<String> resourceList = new ArrayList<String>();
           // FIXME 20160516 hsilva: see how to set initial
           // initialOutcomeObjectState
-          StringBuilder details = new StringBuilder();
 
           try {
             LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
@@ -206,6 +208,8 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
                     StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
                     DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
                     Path veraPDFResult = VeraPDFPluginUtils.runVeraPDF(directAccess.getPath(), profile, hasFeatures);
+                    sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), representation.getId(), file.getPath(),
+                      file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
                     if (veraPDFResult != null) {
                       ContentPayload payload = new FSPathContentPayload(veraPDFResult);
@@ -217,7 +221,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
                       Matcher matcher = pattern.matcher(xmlReport);
 
                       if (matcher.find()) {
-                        resourceList.add(file.getId());
+                        resourceList.add(file);
                         pluginResultState = PluginState.PARTIAL_SUCCESS;
                         details.append(xmlReport.substring(xmlReport.indexOf('\n') + 1));
                       }
@@ -229,7 +233,8 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
                     IOUtils.closeQuietly(directAccess);
 
                     if (!pluginResultState.equals(PluginState.SUCCESS)) {
-                      reportItem.addPluginDetails(" VeraPDF validation failed on " + fileInfoPath + ".");
+                      reportItem
+                        .addPluginDetails(" VeraPDF validation failed on " + fileInfoPath.replace("//", "/") + ".");
                     }
                   } else {
                     if (ignoreFiles) {
@@ -258,11 +263,11 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
             pluginResultState = PluginState.FAILURE;
             reportState = PluginState.FAILURE;
             reportItem.addPluginDetails(" VeraPDF validation execution failed.");
-          } finally {
-            LOGGER.debug("Creating veraPDF event for the representation {}", representation.getId());
-            createEvent(resourceList, aip, representation.getId(), model, index, pluginResultState, details);
           }
         }
+
+        LOGGER.debug("Creating veraPDF event on AIP {}", aip.getId());
+        createEvent(model, index, aip.getId(), null, null, null, pluginResultState, details, resourceList, sources);
 
         jobPluginInfo.incrementObjectsProcessed(reportState);
         reportItem.setPluginState(reportState);
@@ -301,7 +306,8 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       for (Representation representation : list) {
-        List<String> resourceList = new ArrayList<String>();
+        List<File> resourceList = new ArrayList<File>();
+        List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
         // FIXME 20160516 hsilva: see how to set initial
         // initialOutcomeObjectState
         Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
@@ -337,6 +343,8 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
                   StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
                   DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
                   Path veraPDFResult = VeraPDFPluginUtils.runVeraPDF(directAccess.getPath(), profile, hasFeatures);
+                  sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), representation.getId(), file.getPath(),
+                    file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
                   if (veraPDFResult != null) {
                     ContentPayload payload = new FSPathContentPayload(veraPDFResult);
@@ -348,7 +356,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
                     Matcher matcher = pattern.matcher(xmlReport);
 
                     if (matcher.find()) {
-                      resourceList.add(file.getId());
+                      resourceList.add(file);
                       pluginResultState = PluginState.PARTIAL_SUCCESS;
                       details.append(xmlReport.substring(xmlReport.indexOf('\n') + 1));
                     }
@@ -360,7 +368,8 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
                   IOUtils.closeQuietly(directAccess);
 
                   if (!pluginResultState.equals(PluginState.SUCCESS)) {
-                    reportItem.addPluginDetails(" VeraPDF validation failed on " + fileInfoPath + ".");
+                    reportItem
+                      .addPluginDetails(" VeraPDF validation failed on " + fileInfoPath.replace("//", "/") + ".");
                   }
                 } else {
                   if (ignoreFiles) {
@@ -389,7 +398,8 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
           reportItem.setPluginDetails(e.getMessage());
         } finally {
           LOGGER.debug("Creating veraPDF event for the representation {}", representation.getId());
-          createEvent(resourceList, aip, representation.getId(), model, index, pluginResultState, details);
+          createEvent(model, index, aip.getId(), representation.getId(), null, null, pluginResultState, details,
+            resourceList, sources);
         }
 
         jobPluginInfo.incrementObjectsProcessed(reportState);
@@ -436,14 +446,12 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
         PluginState reportState = PluginState.SUCCESS;
 
         try {
-          List<String> resourceList = new ArrayList<String>();
+          List<File> resourceList = new ArrayList<File>();
           // FIXME 20160516 hsilva: see how to set initial
           // initialOutcomeObjectState
           PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
           PluginState pluginResultState = PluginState.SUCCESS;
-
           StringBuilder details = new StringBuilder();
-          AIP aip = model.retrieveAIP(file.getAipId());
 
           LOGGER.debug("Processing file: {}", file);
           if (!file.isDirectory()) {
@@ -467,13 +475,13 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
                 Matcher matcher = pattern.matcher(xmlReport);
 
                 if (matcher.find()) {
-                  resourceList.add(file.getId());
+                  resourceList.add(file);
                   pluginResultState = PluginState.PARTIAL_SUCCESS;
                   details.append(xmlReport.substring(xmlReport.indexOf('\n') + 1));
                 }
 
                 if (!pluginResultState.equals(PluginState.SUCCESS)) {
-                  reportItem.addPluginDetails(" VeraPDF validation failed on " + file.getId() + ".");
+                  reportItem.addPluginDetails(" VeraPDF validation failed on " + file.getId().replace("//", "/") + ".");
                 }
 
               } else {
@@ -497,7 +505,8 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
             reportState = PluginState.FAILURE;
           }
 
-          createEvent(resourceList, aip, file.getRepresentationId(), model, index, pluginResultState, details);
+          createEvent(model, index, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
+            pluginResultState, details, resourceList, null);
           jobPluginInfo.incrementObjectsProcessed(reportState);
 
         } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
@@ -524,8 +533,9 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
     return report;
   }
 
-  private void createEvent(List<String> resourceList, AIP aip, String representationId, ModelService model,
-    IndexService index, PluginState pluginState, StringBuilder details) throws PluginException {
+  private void createEvent(ModelService model, IndexService index, String aipId, String representationId,
+    List<String> filePath, String fileId, PluginState pluginState, StringBuilder details, List<File> resourceList,
+    List<LinkingIdentifier> sources) throws PluginException {
     String outcomeDetails = null;
     try {
       // building the detail extension for the plugin event
@@ -534,8 +544,8 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       noteStringBuilder.append("The following files did not pass veraPDF's validation with success: ");
       detailsStringBuilder.append("\n\n<reportWrapper>");
 
-      for (String fileID : resourceList) {
-        noteStringBuilder.append(fileID + ", ");
+      for (File file : resourceList) {
+        noteStringBuilder.append(file.getId() + ", ");
       }
 
       noteStringBuilder.setLength(noteStringBuilder.length() - 2);
@@ -555,22 +565,17 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       }
 
       outcomeDetails = noteStringBuilder.toString();
-
     } catch (RuntimeException e) {
       pluginState = PluginState.FAILURE;
       outcomeDetails = e.getMessage();
       LOGGER.error("Error executing VeraPDF plugin: " + e.getMessage(), e);
     }
-    boolean notify = false;
 
     try {
-      // TODO fix linking identifiers
-      PluginHelper
-        .createPluginEvent(
-          this, aip.getId(), model, index, Arrays.asList(PluginHelper.getLinkingIdentifier(aip.getId(),
-            representationId, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE)),
-          null, pluginState, outcomeDetails, notify);
-      index.reindexAIP(aip);
+      boolean notify = false;
+      PluginHelper.createPluginEvent(this, aipId, representationId, filePath, fileId, model, index, sources, null,
+        pluginState, outcomeDetails, notify);
+      index.reindexAIP(model.retrieveAIP(aipId));
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
       | ValidationException | AlreadyExistsException e) {
       LOGGER.error("Error creating event: " + e.getMessage(), e);

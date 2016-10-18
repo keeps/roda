@@ -222,10 +222,13 @@ public class Browse extends Composite {
   Button editPermissions;
 
   @UiField
-  FlowPanel downloadSection;
+  Button download;
 
-  @UiField
-  Button download, submission, documentation, schemas;
+  // @UiField
+  // FlowPanel downloadSection;
+
+  // @UiField
+  // Button submission, documentation, schemas;
 
   @UiField
   FlowPanel searchSection;
@@ -500,9 +503,9 @@ public class Browse extends Composite {
     remove.setVisible(false);
     newRepresentation.setVisible(false);
 
-    submission.setVisible(false);
-    documentation.setVisible(false);
-    schemas.setVisible(false);
+    // submission.setVisible(false);
+    // documentation.setVisible(false);
+    // schemas.setVisible(false);
 
     for (AIPState state : AIPState.values()) {
       this.removeStyleName(state.toString().toLowerCase());
@@ -653,11 +656,11 @@ public class Browse extends Composite {
       editPermissions.setVisible(true);
       editPermissions.setEnabled(true);
       remove.setVisible(true);
-      downloadSection.setVisible(true);
       download.setVisible(true);
-      submission.setVisible(aip.getNumberOfSubmissionFiles() > 0);
-      documentation.setVisible(aip.getNumberOfDocumentationFiles() > 0);
-      schemas.setVisible(aip.getNumberOfSchemaFiles() > 0);
+      // downloadSection.setVisible(true);
+      // submission.setVisible(aip.getNumberOfSubmissionFiles() > 0);
+      // documentation.setVisible(aip.getNumberOfDocumentationFiles() > 0);
+      // schemas.setVisible(aip.getNumberOfSchemaFiles() > 0);
       searchSection.setVisible(true);
 
       for (AIPState state : AIPState.values()) {
@@ -704,7 +707,7 @@ public class Browse extends Composite {
     remove.setVisible(true);
     newRepresentation.setVisible(false);
 
-    downloadSection.setVisible(false);
+    // downloadSection.setVisible(false);
     download.setVisible(false);
     newRepresentation.setVisible(false);
 
@@ -1166,26 +1169,29 @@ public class Browse extends Composite {
     Window.Location.assign(downloadUri.asString());
   }
 
-  @UiHandler("submission")
-  void submissionButtonHandler(ClickEvent e) {
-    SafeUri downloadUri = null;
-    downloadUri = RestUtils.createAIPPartDownloadUri(aipId, RodaConstants.STORAGE_DIRECTORY_SUBMISSION);
-    Window.Location.assign(downloadUri.asString());
-  }
-
-  @UiHandler("documentation")
-  void documentationButtonHandler(ClickEvent e) {
-    SafeUri downloadUri = null;
-    downloadUri = RestUtils.createAIPPartDownloadUri(aipId, RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
-    Window.Location.assign(downloadUri.asString());
-  }
-
-  @UiHandler("schemas")
-  void schemasButtonHandler(ClickEvent e) {
-    SafeUri downloadUri = null;
-    downloadUri = RestUtils.createAIPPartDownloadUri(aipId, RodaConstants.STORAGE_DIRECTORY_SCHEMAS);
-    Window.Location.assign(downloadUri.asString());
-  }
+  // @UiHandler("submission")
+  // void submissionButtonHandler(ClickEvent e) {
+  // SafeUri downloadUri = null;
+  // downloadUri = RestUtils.createAIPPartDownloadUri(aipId,
+  // RodaConstants.STORAGE_DIRECTORY_SUBMISSION);
+  // Window.Location.assign(downloadUri.asString());
+  // }
+  //
+  // @UiHandler("documentation")
+  // void documentationButtonHandler(ClickEvent e) {
+  // SafeUri downloadUri = null;
+  // downloadUri = RestUtils.createAIPPartDownloadUri(aipId,
+  // RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
+  // Window.Location.assign(downloadUri.asString());
+  // }
+  //
+  // @UiHandler("schemas")
+  // void schemasButtonHandler(ClickEvent e) {
+  // SafeUri downloadUri = null;
+  // downloadUri = RestUtils.createAIPPartDownloadUri(aipId,
+  // RodaConstants.STORAGE_DIRECTORY_SCHEMAS);
+  // Window.Location.assign(downloadUri.asString());
+  // }
 
   @UiHandler("appraisalAccept")
   void appraisalAcceptHandler(ClickEvent e) {

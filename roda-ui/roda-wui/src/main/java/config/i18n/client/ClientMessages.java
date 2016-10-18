@@ -454,6 +454,10 @@ public interface ClientMessages extends Messages {
 
   String viewButton();
 
+  String listButton();
+
+  String downloadButton();
+
   /*** View representation ***/
 
   String viewRepresentationNextFileButton();

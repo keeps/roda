@@ -8,6 +8,7 @@
 package org.roda.core.plugins.plugins.characterization;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import org.apache.commons.io.IOUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.JobException;
@@ -26,9 +28,11 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationIssue;
 import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.index.IndexService;
@@ -92,6 +96,7 @@ public class JHOVEPlugin extends AbstractPlugin<AIP> {
           PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
           PluginState reportState = PluginState.SUCCESS;
           ValidationReport validationReport = new ValidationReport();
+          List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
 
           try {
             for (Representation representation : aip.getRepresentations()) {
@@ -112,6 +117,9 @@ public class JHOVEPlugin extends AbstractPlugin<AIP> {
                     model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), ".xml",
                       RodaConstants.OTHER_METADATA_TYPE_JHOVE, payload, inotify);
                     jhoveResults.toFile().delete();
+
+                    sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), representation.getId(), file.getPath(),
+                      file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
                   }
                 } else {
                   LOGGER.error("Cannot process AIP representation file", oFile.getCause());
@@ -138,6 +146,14 @@ public class JHOVEPlugin extends AbstractPlugin<AIP> {
             jobPluginInfo.incrementObjectsProcessedWithFailure();
             reportItem.setHtmlPluginDetails(true).setPluginState(PluginState.FAILURE);
             reportItem.setPluginDetails(validationReport.toHtml(false, false, false, "Error list"));
+          }
+
+          try {
+            PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, null, reportItem.getPluginState(),
+              "", true);
+          } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
+            | AuthorizationDeniedException | AlreadyExistsException e) {
+            LOGGER.error("Error creating event: " + e.getMessage(), e);
           }
 
           report.addReport(reportItem);

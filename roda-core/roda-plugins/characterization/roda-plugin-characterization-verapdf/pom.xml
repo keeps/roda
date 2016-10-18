@@ -37,14 +37,14 @@
 							</transformers>
 							<relocations>
 								<relocation>
-				                  <pattern>org.bouncycastle</pattern>
-				                  <shadedPattern>org.bouncycastle_147</shadedPattern>
-				                </relocation>
-				                <relocation>
-				                  <pattern>com.itextpdf</pattern>
-				                  <shadedPattern>com.itextpdf_532</shadedPattern>
-				                </relocation>
-				            </relocations>
+									<pattern>org.bouncycastle</pattern>
+									<shadedPattern>org.bouncycastle_147</shadedPattern>
+								</relocation>
+								<relocation>
+									<pattern>com.itextpdf</pattern>
+									<shadedPattern>com.itextpdf_532</shadedPattern>
+								</relocation>
+							</relocations>
 							<filters>
 								<filter>
 									<artifact>*:*</artifact>
@@ -56,6 +56,11 @@
 									</excludes>
 								</filter>
 							</filters>
+							<artifactSet>
+								<excludes>
+									<exclude>org.roda-project:roda-core</exclude>
+								</excludes>
+							</artifactSet>
 						</configuration>
 					</execution>
 				</executions>
@@ -67,9 +72,9 @@
 					<useSystemClassLoader>true</useSystemClassLoader>
 					<useManifestOnlyJar>false</useManifestOnlyJar>
 					<suiteXmlFiles>
-	                    <suiteXmlFile>testng.xml</suiteXmlFile>
-	                </suiteXmlFiles>
-	                <groups>${testng.groups}</groups>
+						<suiteXmlFile>testng.xml</suiteXmlFile>
+					</suiteXmlFiles>
+					<groups>${testng.groups}</groups>
 				</configuration>
 			</plugin>
 		</plugins>

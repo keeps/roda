@@ -44,8 +44,6 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(SiegfriedPlugin.class);
   public static final String FILE_SUFFIX = ".json";
 
-  private boolean createsPluginEvent = true;
-
   @Override
   public void init() throws PluginException {
     // do nothing
@@ -82,11 +80,6 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
-
-    // updates the flag responsible to allow plugin event creation
-    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT)) {
-      createsPluginEvent = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT));
-    }
   }
 
   @Override
@@ -110,9 +103,8 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
 
             for (Representation representation : aip.getRepresentations()) {
               LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
-              SiegfriedPluginUtils.runSiegfriedOnRepresentation(this, index, model, aip, representation);
-              sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), representation.getId(),
-                RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+              sources
+                .addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(this, index, model, aip, representation));
               model.notifyRepresentationUpdated(representation);
             }
 
@@ -127,16 +119,14 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
               .setPluginDetails("Error running Siegfried " + aip.getId() + ": " + e.getMessage());
           }
 
-          if (createsPluginEvent) {
-            try {
-              List<LinkingIdentifier> outcomes = null;
-              boolean notify = true;
-              PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, outcomes,
-                reportItem.getPluginState(), "", notify);
-            } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
-              | AuthorizationDeniedException | AlreadyExistsException e) {
-              LOGGER.error("Error creating event: " + e.getMessage(), e);
-            }
+          try {
+            List<LinkingIdentifier> outcomes = null;
+            boolean notify = true;
+            PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, outcomes,
+              reportItem.getPluginState(), "", notify);
+          } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
+            | AuthorizationDeniedException | AlreadyExistsException e) {
+            LOGGER.error("Error creating event: " + e.getMessage(), e);
           }
 
           report.addReport(reportItem);

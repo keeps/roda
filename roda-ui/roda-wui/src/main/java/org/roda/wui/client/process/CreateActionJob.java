@@ -226,6 +226,7 @@ public class CreateActionJob extends Composite {
                     if (plugins != null) {
                       PluginUtils.sortByName(plugins);
 
+                      int pluginsAdded = 0;
                       for (int p = 0; p < plugins.size(); p++) {
                         PluginInfo pluginInfo = plugins.get(p);
                         if (pluginInfo != null) {
@@ -235,14 +236,16 @@ public class CreateActionJob extends Composite {
                             for (int i = 0; i < workflowCategoryList.getWidgetCount(); i++) {
                               CheckBox checkbox = (CheckBox) workflowCategoryList.getWidget(i);
 
-                              if (checkbox.getValue()) {
+                              if (checkbox.getValue().booleanValue()) {
                                 noChecks = false;
 
                                 if (categories.contains(checkbox.getName())
                                   && !categories.contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)) {
-                                  addPluginItemWidgetToWorkflowList(pluginInfo);
-                                  if (i == 0) {
+                                  Widget pluginItem = addPluginItemWidgetToWorkflowList(pluginInfo);
+                                  if (pluginsAdded == 0) {
                                     CreateActionJob.this.selectedPlugin = lookupPlugin(pluginInfo.getId());
+                                    pluginItem.addStyleName("plugin-list-item-selected");
+                                    pluginsAdded++;
                                   }
                                 }
                               }

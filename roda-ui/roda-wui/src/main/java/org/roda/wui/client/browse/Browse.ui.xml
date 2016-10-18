@@ -118,23 +118,6 @@
 								<ui:text from='{messages.preservationLogs}' />
 							</g:Button>
 						</g:FlowPanel>
-						<g:FlowPanel ui:field="downloadSection">
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.downloadTitle}' />
-							</g:Label>
-							<g:Button addStyleNames="btn btn-default btn-download"
-								ui:field="submission">
-								<ui:text from='{messages.downloadSubmission}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-default btn-download"
-								ui:field="documentation">
-								<ui:text from='{messages.downloadDocumentation}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-default btn-download"
-								ui:field="schemas">
-								<ui:text from='{messages.downloadSchemas}' />
-							</g:Button>
-						</g:FlowPanel>
 						<g:FlowPanel ui:field="searchSection">
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.searchTitle}' />

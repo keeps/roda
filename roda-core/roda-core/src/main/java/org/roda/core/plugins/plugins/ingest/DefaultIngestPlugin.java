@@ -84,7 +84,6 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   public static PreservationEventType END_TYPE = PreservationEventType.INGEST_END;
 
   protected int totalSteps = 10;
-  protected boolean failIfRelatedAIPFailed = true;
 
   private String successMessage;
   private String failureMessage;
@@ -159,7 +158,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_VIRUS_CHECK))) {
         pluginReport = doVirusCheck(index, model, storage, aips);
         mergeReports(jobPluginInfo, pluginReport);
-        recalculateAIPsList(model, jobPluginInfo, aips, true);
+        recalculateAIPsList(model, index, this, jobPluginInfo, aips, true);
         PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
       }
 
@@ -168,7 +167,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_DESCRIPTIVE_METADATA_VALIDATION))) {
         pluginReport = doDescriptiveMetadataValidation(index, model, storage, aips);
         mergeReports(jobPluginInfo, pluginReport);
-        recalculateAIPsList(model, jobPluginInfo, aips, true);
+        recalculateAIPsList(model, index, this, jobPluginInfo, aips, true);
         PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
       }
 
@@ -177,7 +176,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         getPluginParameter(RodaConstants.PLUGIN_PARAMS_CREATE_PREMIS_SKELETON))) {
         pluginReport = createFileFixityInformation(index, model, storage, aips);
         mergeReports(jobPluginInfo, pluginReport);
-        recalculateAIPsList(model, jobPluginInfo, aips, true);
+        recalculateAIPsList(model, index, this, jobPluginInfo, aips, true);
         PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
       }
 
@@ -186,7 +185,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FILE_FORMAT_IDENTIFICATION))) {
         pluginReport = doFileFormatIdentification(index, model, storage, aips);
         mergeReports(jobPluginInfo, pluginReport);
-        recalculateAIPsList(model, jobPluginInfo, aips, false);
+        recalculateAIPsList(model, index, this, jobPluginInfo, aips, false);
         PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
       }
 
@@ -197,7 +196,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         params.put("profile", "1b");
         pluginReport = doVeraPDFCheck(index, model, storage, aips, params);
         mergeReports(jobPluginInfo, pluginReport);
-        recalculateAIPsList(model, jobPluginInfo, aips, false);
+        recalculateAIPsList(model, index, this, jobPluginInfo, aips, false);
         PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
       }
 
@@ -214,7 +213,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
           getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION)) ? "true" : "false");
         pluginReport = doFeatureAndFullTextExtraction(index, model, storage, aips, params);
         mergeReports(jobPluginInfo, pluginReport);
-        recalculateAIPsList(model, jobPluginInfo, aips, false);
+        recalculateAIPsList(model, index, this, jobPluginInfo, aips, false);
         PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
       }
 
@@ -223,7 +222,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_DIGITAL_SIGNATURE_VALIDATION))) {
         pluginReport = doDigitalSignatureValidation(index, model, storage, aips);
         mergeReports(jobPluginInfo, pluginReport);
-        recalculateAIPsList(model, jobPluginInfo, aips, false);
+        recalculateAIPsList(model, index, this, jobPluginInfo, aips, false);
         PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
       }
 
@@ -232,7 +231,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_PRODUCER_AUTHORIZATION_CHECK))) {
         pluginReport = verifyProducerAuthorization(index, model, storage, aips);
         mergeReports(jobPluginInfo, pluginReport);
-        recalculateAIPsList(model, jobPluginInfo, aips, true);
+        recalculateAIPsList(model, index, this, jobPluginInfo, aips, true);
         PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
       }
 
@@ -242,7 +241,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
           getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT))) {
           pluginReport = doAutoAccept(index, model, storage, aips);
           mergeReports(jobPluginInfo, pluginReport);
-          recalculateAIPsList(model, jobPluginInfo, aips, true);
+          recalculateAIPsList(model, index, this, jobPluginInfo, aips, true);
           jobPluginInfo.incrementStepsCompletedByOne();
         } else {
           updateAIPsToBeAppraised(model, aips, jobPluginInfo);
@@ -409,9 +408,9 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
    * Recalculates (if failures must be noticed) and updates AIP objects (by
    * obtaining them from model)
    */
-  private void recalculateAIPsList(ModelService model, IngestJobPluginInfo jobPluginInfo, List<AIP> aips,
-    boolean removeAIPProcessingFailed) {
-    List<AIP> newAips = new ArrayList<>();
+  private void recalculateAIPsList(ModelService model, IndexService index, Plugin executedPlugin,
+    IngestJobPluginInfo jobPluginInfo, List<AIP> aips, boolean removeAIPProcessingFailed) {
+    aips.clear();
     List<AIP> transferredResourceAips;
     List<String> transferredResourcesToRemoveFromjobPluginInfo = new ArrayList<>();
     boolean oneTransferredResourceAipFailed;
@@ -427,7 +426,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
           if (removeAIPProcessingFailed && aipReport.getPluginState() == PluginState.FAILURE) {
             LOGGER.trace("Removing AIP {} from the list", aipReport.getOutcomeObjectId());
             oneTransferredResourceAipFailed = true;
-            jobPluginInfo.incrementObjectsProcessedWithFailure();
+            break;
           } else {
             try {
               transferredResourceAips.add(model.retrieveAIP(aipId));
@@ -436,26 +435,23 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
             }
           }
         }
-      }
 
-      if (failIfRelatedAIPFailed && oneTransferredResourceAipFailed) {
-        LOGGER.trace(
-          "Will not process AIPs from transferred resource '{}' any longer because at least one of them failed",
-          transferredResourceId);
-        transferredResourcesToRemoveFromjobPluginInfo.add(transferredResourceId);
-        // FIXME 20160502 hsilva: more should be done because jobPluginInfo in
-        // some of the AIPs state that it went ok, so all jobPluginInfo of this
-        // transferred resource should be updated to state the failure
-      } else {
-        newAips.addAll(transferredResourceAips);
+        if (oneTransferredResourceAipFailed) {
+          LOGGER.trace(
+            "Will not process AIPs from transferred resource '{}' any longer because at least one of them failed",
+            transferredResourceId);
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+          jobPluginInfo.failOtherTransferredResourceAIPs(executedPlugin, model, index, transferredResourceId);
+          transferredResourcesToRemoveFromjobPluginInfo.add(transferredResourceId);
+        } else {
+          aips.addAll(transferredResourceAips);
+        }
       }
     }
+
     for (String transferredResourceId : transferredResourcesToRemoveFromjobPluginInfo) {
       jobPluginInfo.remove(transferredResourceId);
     }
-
-    aips.clear();
-    aips.addAll(newAips);
   }
 
   private int calculateEfectiveTotalSteps() {

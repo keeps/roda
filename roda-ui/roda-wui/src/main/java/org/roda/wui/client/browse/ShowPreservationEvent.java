@@ -446,7 +446,7 @@ public class ShowPreservationEvent extends Composite {
       body.add(originalValue);
 
       Anchor link = new Anchor(messages.inspectRepresentation(),
-        Tools.createHistoryHashLink(ViewRepresentation.RESOLVER, irep.getAipId(), irep.getUUID()));
+        Tools.createHistoryHashLink(Representation.RESOLVER, irep.getAipId(), irep.getUUID()));
 
       link.addStyleName("btn");
 
@@ -501,9 +501,10 @@ public class ShowPreservationEvent extends Composite {
       Label formatLabel = new Label(messages.fileFormat());
       formatLabel.addStyleName("label");
       FileFormat fileFormat = ifile.getFileFormat();
-      // TODO guard nulls
-      Label formatValue = new Label(
-        fileFormat.getFormatDesignationName() + " " + fileFormat.getFormatDesignationVersion());
+
+      String version = fileFormat.getFormatDesignationVersion() != null ? fileFormat.getFormatDesignationVersion() : "";
+      String name = fileFormat.getFormatDesignationName() != null ? fileFormat.getFormatDesignationName() : "Unknown";
+      Label formatValue = new Label(name + " " + version);
       formatValue.addStyleName("value");
 
       // TODO add pronom and mime type

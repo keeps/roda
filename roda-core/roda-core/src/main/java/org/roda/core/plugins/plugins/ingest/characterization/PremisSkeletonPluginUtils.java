@@ -37,16 +37,20 @@ public class PremisSkeletonPluginUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(PremisSkeletonPlugin.class);
 
   public static void createPremisSkeletonOnRepresentation(ModelService model, AIP aip, String representationId,
-    Collection<String> fixityAlgorithms) throws IOException, RequestNotValidException, GenericException,
-    NotFoundException, AuthorizationDeniedException, XmlException, ValidationException  {
+    Collection<String> fixityAlgorithms) throws RequestNotValidException, GenericException, NotFoundException,
+    AuthorizationDeniedException, ValidationException, IOException, XmlException {
+    createPremisSkeletonOnRepresentation(model, aip.getId(), representationId, fixityAlgorithms);
+  }
 
-    gov.loc.premis.v3.Representation representation = PremisV3Utils.createBaseRepresentation(aip.getId(),
-      representationId);
+  public static void createPremisSkeletonOnRepresentation(ModelService model, String aipId, String representationId,
+    Collection<String> fixityAlgorithms) throws IOException, RequestNotValidException, GenericException,
+    NotFoundException, AuthorizationDeniedException, XmlException, ValidationException {
+
+    gov.loc.premis.v3.Representation representation = PremisV3Utils.createBaseRepresentation(aipId, representationId);
     boolean notifyInSteps = false;
 
     boolean recursive = true;
-    CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(), representationId,
-      recursive);
+    CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aipId, representationId, recursive);
     for (OptionalWithCause<File> oFile : allFiles) {
       if (oFile.isPresent()) {
         File file = oFile.get();
@@ -55,16 +59,17 @@ public class PremisSkeletonPluginUtils {
           ContentPayload filePreservation = PremisV3Utils.createBaseFile(file, model, fixityAlgorithms);
           String pmId;
           try {
-            PreservationMetadata pm = model.createPreservationMetadata(PreservationMetadataType.FILE, aip.getId(),
+            PreservationMetadata pm = model.createPreservationMetadata(PreservationMetadataType.FILE, aipId,
               representationId, file.getPath(), file.getId(), filePreservation, notifyInSteps);
             pmId = pm.getId();
           } catch (AlreadyExistsException e) {
-            pmId = IdUtils.getPreservationId(PreservationMetadataType.FILE, aip.getId(), representationId, file.getPath(), file.getId());
-            model.updatePreservationMetadata(pmId, PreservationMetadataType.FILE, aip.getId(),
-                    representationId, file.getPath(), file.getId(), filePreservation, notifyInSteps);
+            pmId = IdUtils.getPreservationId(PreservationMetadataType.FILE, aipId, representationId, file.getPath(),
+              file.getId());
+            model.updatePreservationMetadata(pmId, PreservationMetadataType.FILE, aipId, representationId,
+              file.getPath(), file.getId(), filePreservation, notifyInSteps);
           }
           PremisV3Utils.linkFileToRepresentation(pmId, RodaConstants.PREMIS_RELATIONSHIP_TYPE_STRUCTURAL,
-                  RodaConstants.PREMIS_RELATIONSHIP_SUBTYPE_HASPART, representation);
+            RodaConstants.PREMIS_RELATIONSHIP_SUBTYPE_HASPART, representation);
         }
       } else {
         LOGGER.error("Cannot process File", oFile.getCause());
@@ -74,12 +79,12 @@ public class PremisSkeletonPluginUtils {
 
     ContentPayload representationPayload = PremisV3Utils.representationToBinary(representation);
     try {
-      model.createPreservationMetadata(PreservationMetadataType.REPRESENTATION, aip.getId(), representationId,
+      model.createPreservationMetadata(PreservationMetadataType.REPRESENTATION, aipId, representationId,
         representationPayload, notifyInSteps);
     } catch (AlreadyExistsException e) {
-      String pmId = IdUtils.getPreservationId(PreservationMetadataType.FILE, aip.getId(), representationId, null, null);
-      model.updatePreservationMetadata(pmId, PreservationMetadataType.REPRESENTATION, aip.getId(),
-              representationId, null, null, representationPayload, notifyInSteps);
+      String pmId = IdUtils.getPreservationId(PreservationMetadataType.FILE, aipId, representationId, null, null);
+      model.updatePreservationMetadata(pmId, PreservationMetadataType.REPRESENTATION, aipId, representationId, null,
+        null, representationPayload, notifyInSteps);
     }
   }
 

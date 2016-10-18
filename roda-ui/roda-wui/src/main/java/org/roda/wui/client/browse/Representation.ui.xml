@@ -56,6 +56,10 @@
 								ui:field="remove">
 								<ui:text from='{messages.removeButton}' />
 							</g:Button>
+							<g:Button addStyleNames="btn btn-default btn-download"
+								ui:field="download">
+								<ui:text from='{messages.downloadButton}' />
+							</g:Button>
 						</g:FlowPanel>
 						<g:FlowPanel ui:field="preservationSidebar">
 							<g:Label addStyleNames="h4">
@@ -71,15 +75,6 @@
 							<g:Button addStyleNames="btn btn-default btn-exclamation-triangle"
 								ui:field="risks">
 								<ui:text from='{messages.preservationRisks}' />
-							</g:Button>
-						</g:FlowPanel>
-						<g:FlowPanel ui:field="downloadSection">
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.downloadTitle}' />
-							</g:Label>
-							<g:Button addStyleNames="btn btn-default btn-download"
-								ui:field="download">
-								<ui:text from='{messages.representation}' />
 							</g:Button>
 						</g:FlowPanel>
 					</g:FlowPanel>

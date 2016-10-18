@@ -136,13 +136,12 @@ public class PreservationEvents extends Composite {
     this.aipId = aipId;
     this.repId = repId;
 
+    Facets facets = null;
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aipId));
 
     if (repId != null) {
       filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID, repId));
     }
-
-    Facets facets = null;
 
     eventList = new PreservationEventList(filter, facets, messages.preservationEventsTitle(), false);
 
@@ -184,7 +183,6 @@ public class PreservationEvents extends Composite {
 
   public void viewAction() {
     IndexedAIP aip = itemBundle.getAip();
-
     breadcrumb.updatePath(HtmlSnippetUtils.getBreadcrumbsFromAncestors(itemBundle.getAIPAncestors(), aip));
     breadcrumb.setVisible(true);
   }
@@ -199,6 +197,10 @@ public class PreservationEvents extends Composite {
 
   @UiHandler("backButton")
   void buttonBackHandler(ClickEvent e) {
-    Tools.newHistory(Tools.concat(Browse.RESOLVER.getHistoryPath(), aipId));
+    if (repId == null) {
+      Tools.newHistory(Tools.concat(Browse.RESOLVER.getHistoryPath(), aipId));
+    } else {
+      Tools.newHistory(Tools.concat(Representation.RESOLVER.getHistoryPath(), aipId, repId));
+    }
   }
 }

@@ -203,15 +203,15 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
         PluginState reportState = PluginState.SUCCESS;
         ValidationReport validationReport = new ValidationReport();
         boolean hasNonPdfFiles = false;
+        Map<String, String> verifiedFiles = new HashMap<String, String>();
+        List<File> unchangedFiles = new ArrayList<File>();
+        List<File> alteredFiles = new ArrayList<File>();
+        List<File> extractedFiles = new ArrayList<File>();
+        List<File> newFiles = new ArrayList<File>();
 
         try {
           for (Representation representation : aip.getRepresentations()) {
             String newRepresentationID = UUID.randomUUID().toString();
-            List<File> unchangedFiles = new ArrayList<File>();
-            List<File> alteredFiles = new ArrayList<File>();
-            List<File> extractedFiles = new ArrayList<File>();
-            List<File> newFiles = new ArrayList<File>();
-            Map<String, String> verifiedFiles = new HashMap<String, String>();
             String verification = null;
             boolean notify = true;
             // FIXME 20160516 hsilva: see how to set initial
@@ -315,6 +315,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
                 LOGGER.error("Cannot process representation file", oFile.getCause());
               }
             }
+
             IOUtils.closeQuietly(allFiles);
 
             // add unchanged files to the new representation
@@ -327,11 +328,6 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
                 model.createFile(f.getAipId(), newRepresentationID, f.getPath(), f.getId(), payload, notify);
               }
             }
-
-            LOGGER.debug("Creating digital signature plugin event for the representation {}", representation.getId());
-            boolean notifyEvent = true;
-            createEvent(alteredFiles, extractedFiles, newFiles, verifiedFiles, aip, newRepresentationID, model, index,
-              reportState, notifyEvent);
           }
 
           jobPluginInfo.incrementObjectsProcessed(reportState);
@@ -355,6 +351,11 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
         } finally {
           report.addReport(reportItem);
           PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+
+          LOGGER.debug("Creating digital signature plugin event on AIP {}", aip.getId());
+          boolean notifyEvent = true;
+          createEvent(model, index, aip.getId(), null, null, null, reportState, alteredFiles, extractedFiles, newFiles,
+            verifiedFiles, notifyEvent);
         }
       }
 
@@ -496,6 +497,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
               LOGGER.error("Cannot process representation file", oFile.getCause());
             }
           }
+
           IOUtils.closeQuietly(allFiles);
 
           // add unchanged files to the new representation
@@ -511,8 +513,8 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
 
           LOGGER.debug("Creating digital signature plugin event for the representation {}", representation.getId());
           boolean notifyEvent = true;
-          createEvent(alteredFiles, extractedFiles, newFiles, verifiedFiles, model.retrieveAIP(aipId),
-            newRepresentationID, model, index, reportState, notifyEvent);
+          createEvent(model, index, aipId, representation.getId(), null, null, reportState, alteredFiles,
+            extractedFiles, newFiles, verifiedFiles, notifyEvent);
           reportItem.setPluginState(reportState);
           jobPluginInfo.incrementObjectsProcessed(reportState);
 
@@ -693,15 +695,13 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
 
         LOGGER.debug("Creating digital signature plugin event for the representation {}", file.getRepresentationId());
         boolean notifyEvent = true;
-        createEvent(alteredFiles, extractedFiles, newFiles, verifiedFiles, model.retrieveAIP(file.getAipId()),
-          newRepresentationID, model, index, reportState, notifyEvent);
+        createEvent(model, index, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
+          reportState, alteredFiles, extractedFiles, newFiles, verifiedFiles, notifyEvent);
         jobPluginInfo.incrementObjectsProcessed(reportState);
       }
 
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      LOGGER.error("Error retrieving aip from file");
     } catch (JobException e) {
       throw new PluginException("A job exception has occurred", e);
     }
@@ -709,9 +709,10 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
     return report;
   }
 
-  private void createEvent(List<File> alteredFiles, List<File> extractedFiles, List<File> newFiles,
-    Map<String, String> verifiedFiles, AIP aip, String newRepresentationID, ModelService model, IndexService index,
-    PluginState pluginResultState, boolean notify) throws PluginException {
+  private void createEvent(ModelService model, IndexService index, String aipId, String representationId,
+    List<String> filePath, String fileId, PluginState pluginResultState, List<File> alteredFiles,
+    List<File> extractedFiles, List<File> newFiles, Map<String, String> verifiedFiles, boolean notify)
+    throws PluginException {
 
     List<LinkingIdentifier> premisSourceFilesIdentifiers = new ArrayList<LinkingIdentifier>();
     List<LinkingIdentifier> premisTargetFilesIdentifiers = new ArrayList<LinkingIdentifier>();
@@ -723,8 +724,8 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
       if (!verifiedFiles.isEmpty()) {
         stringBuilder.append("The DS verification ran on: ");
         String verifies = "";
-        for (String fileId : verifiedFiles.keySet()) {
-          verifies += fileId + " (" + verifiedFiles.get(fileId) + "), ";
+        for (String file : verifiedFiles.keySet()) {
+          verifies += file + " (" + verifiedFiles.get(file) + "), ";
         }
         stringBuilder.append(verifies.substring(0, verifies.lastIndexOf(',')) + ". ");
       }
@@ -750,19 +751,20 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
     } else {
       stringBuilder.append("The digital signature (DS) operation stripped some files. ");
       for (File file : alteredFiles) {
-        premisSourceFilesIdentifiers.add(PluginHelper.getLinkingIdentifier(aip.getId(), file.getRepresentationId(),
+        premisSourceFilesIdentifiers.add(PluginHelper.getLinkingIdentifier(aipId, file.getRepresentationId(),
           file.getPath(), file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
       }
       for (File file : newFiles) {
-        premisTargetFilesIdentifiers.add(PluginHelper.getLinkingIdentifier(aip.getId(), file.getRepresentationId(),
+        premisTargetFilesIdentifiers.add(PluginHelper.getLinkingIdentifier(aipId, file.getRepresentationId(),
           file.getPath(), file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
       }
     }
 
     // FIXME revise PREMIS generation
     try {
-      PluginHelper.createPluginEvent(this, aip.getId(), model, index, premisSourceFilesIdentifiers,
-        premisTargetFilesIdentifiers, pluginResultState, stringBuilder.toString(), notify);
+      PluginHelper.createPluginEvent(this, aipId, representationId, filePath, fileId, model, index,
+        premisSourceFilesIdentifiers, premisTargetFilesIdentifiers, pluginResultState, stringBuilder.toString(),
+        notify);
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | ValidationException | AlreadyExistsException e) {
       throw new PluginException(e.getMessage(), e);

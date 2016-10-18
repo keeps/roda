@@ -37,6 +37,7 @@ import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.ip.File;
@@ -824,6 +825,28 @@ public final class PremisV3Utils {
     }
 
     return pm;
+  }
+
+  public static void updateFormatPreservationMetadata(ModelService model, String aipId, String representationId,
+    List<String> fileDirectoryPath, String fileId, String format, String version, String pronom, String mime,
+    boolean notify) {
+    try {
+      Binary premisBin = model.retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId);
+
+      gov.loc.premis.v3.File premisFile = binaryToFile(premisBin.getContent(), false);
+      PremisV3Utils.updateFileFormat(premisFile, format, version, pronom, mime);
+
+      PreservationMetadataType type = PreservationMetadataType.FILE;
+      String id = IdUtils.getPreservationId(type, aipId, representationId, fileDirectoryPath, fileId);
+
+      ContentPayload premisFilePayload = fileToBinary(premisFile);
+      model.updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, premisFilePayload,
+        notify);
+    } catch (NotFoundException e) {
+      LOGGER.debug("PREMIS will not be updated because it doesn't exist");
+    } catch (RODAException e) {
+      LOGGER.error("PREMIS will not be updated due to an error", e);
+    }
   }
 
 }

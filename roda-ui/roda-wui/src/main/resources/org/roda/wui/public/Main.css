@@ -5391,6 +5391,10 @@ td.datePickerMonth, td.datePickerYear {
 	margin-top: 2em;
 }
 
+.plugin-category-padding {
+	padding-bottom: 20px;
+}
+
 /**********************************************
 				STATISTICS
 ************************************************/
