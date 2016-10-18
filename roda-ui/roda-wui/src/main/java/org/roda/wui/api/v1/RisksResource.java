@@ -24,6 +24,11 @@ import javax.ws.rs.core.Response;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.sort.Sorter;
+import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.Risks;
@@ -66,8 +71,11 @@ public class RisksResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    Risks risks = (Risks) Browser.retrieveObjects(user, IndexedRisk.class, start, limit, acceptFormat);
-    return Response.ok(risks, mediaType).build();
+    boolean justActive = false;
+    Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
+    IndexResult<IndexedRisk> result = Browser.find(IndexedRisk.class, Filter.NULL, Sorter.NONE,
+      new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, user, justActive);
+    return Response.ok(ApiUtils.indexedResultToRODAObjectList(IndexedRisk.class, result), mediaType).build();
   }
 
   @POST

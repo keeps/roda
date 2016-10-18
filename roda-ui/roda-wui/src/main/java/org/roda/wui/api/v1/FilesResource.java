@@ -33,6 +33,11 @@ import org.roda.core.common.StreamResponse;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.sort.Sorter;
+import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.Files;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -78,8 +83,11 @@ public class FilesResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    Files files = (Files) Browser.retrieveObjects(user, IndexedFile.class, start, limit, acceptFormat);
-    return Response.ok(files, mediaType).build();
+    boolean justActive = false;
+    Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
+    IndexResult<IndexedFile> result = Browser.find(IndexedFile.class, Filter.NULL, Sorter.NONE,
+      new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, user, justActive);
+    return Response.ok(ApiUtils.indexedResultToRODAObjectList(IndexedFile.class, result), mediaType).build();
   }
 
   @GET

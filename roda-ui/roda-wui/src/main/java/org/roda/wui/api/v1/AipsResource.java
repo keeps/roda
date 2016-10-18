@@ -33,8 +33,13 @@ import org.roda.core.common.StreamResponse;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.index.sort.Sorter;
+import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPs;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -83,8 +88,12 @@ public class AipsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    AIPs aips = (AIPs) Browser.retrieveObjects(user, IndexedAIP.class, start, limit, acceptFormat);
-    return Response.ok(aips, mediaType).build();
+    boolean justActive = false;
+    Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
+    IndexResult<IndexedAIP> result = Browser.find(IndexedAIP.class, Filter.NULL, Sorter.NONE,
+      new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, user, justActive);
+
+    return Response.ok(ApiUtils.indexedResultToRODAObjectList(IndexedAIP.class, result), mediaType).build();
   }
 
   @GET

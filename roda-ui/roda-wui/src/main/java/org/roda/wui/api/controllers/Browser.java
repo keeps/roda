@@ -37,8 +37,6 @@ import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.common.RODAObjectList;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -69,7 +67,6 @@ import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.fs.FSPathContentPayload;
-import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.client.browse.BrowseItemBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataVersionsBundle;
@@ -1554,34 +1551,6 @@ public class Browser extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
 
     return aipExport;
-  }
-
-  // FIXME lfaria 20161012: This code should not be here as it is specific of
-  // the REST API
-  // Also, it should use other base methods that already log and check
-  // permissions
-  public static <T extends IsIndexed> RODAObjectList<?> retrieveObjects(User user, Class<T> objectClass, String start,
-    String limit, String acceptFormat)
-    throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // validate input
-    BrowserHelper.validateListingParams(acceptFormat);
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    // TODO check object permissions
-
-    // delegate
-    Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
-    RODAObjectList<?> aip = BrowserHelper.retrieveObjects(objectClass, pagingParams.getFirst(),
-      pagingParams.getSecond(), acceptFormat);
-
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
-
-    return aip;
   }
 
   // FIXME lfaria 20161012: This code should not be here as it is specific of

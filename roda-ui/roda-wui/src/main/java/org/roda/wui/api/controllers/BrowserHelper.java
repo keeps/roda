@@ -70,7 +70,6 @@ import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.LinkingObjectUtils;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.common.RODAObjectList;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
@@ -91,7 +90,6 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
-import org.roda.core.data.v2.ip.AIPs;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -99,7 +97,6 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.Representations;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
@@ -114,14 +111,11 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.jobs.Reports;
-import org.roda.core.data.v2.log.LogEntry;
-import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
-import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationReport;
@@ -2015,61 +2009,6 @@ public class BrowserHelper {
       throw new RequestNotValidException("Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT
         + "' value. Expected values: " + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON,
           RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML, RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP));
-    }
-
-  }
-
-  public static <T extends IsIndexed> RODAObjectList<?> retrieveObjects(Class<T> objectClass, int start, int limit,
-    String acceptFormat)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-
-    IndexResult<T> result = RodaCoreFactory.getIndexService().find(objectClass, Filter.NULL, Sorter.NONE,
-      new Sublist(start, limit));
-
-    if (objectClass.equals(IndexedAIP.class)) {
-      AIPs aips = new AIPs();
-      for (T object : result.getResults()) {
-        IndexedAIP aip = (IndexedAIP) object;
-        aips.addObject(RodaCoreFactory.getModelService().retrieveAIP(aip.getId()));
-      }
-      return aips;
-    } else if (objectClass.equals(IndexedRepresentation.class)) {
-      Representations representations = new Representations();
-      for (T object : result.getResults()) {
-        IndexedRepresentation representation = (IndexedRepresentation) object;
-        representations.addObject(
-          RodaCoreFactory.getModelService().retrieveRepresentation(representation.getAipId(), representation.getId()));
-      }
-      return representations;
-    } else if (objectClass.equals(IndexedFile.class)) {
-      org.roda.core.data.v2.ip.Files files = new org.roda.core.data.v2.ip.Files();
-      for (T object : result.getResults()) {
-        IndexedFile file = (IndexedFile) object;
-        files.addObject(RodaCoreFactory.getModelService().retrieveFile(file.getAipId(), file.getRepresentationId(),
-          file.getPath(), file.getId()));
-      }
-      return files;
-    } else if (objectClass.equals(IndexedRisk.class)) {
-      List<Risk> risks = new ArrayList<Risk>();
-      for (T res : result.getResults()) {
-        IndexedRisk irisk = (IndexedRisk) res;
-        risks.add(irisk);
-      }
-      return new org.roda.core.data.v2.risks.Risks(risks);
-    } else if (objectClass.equals(TransferredResource.class)) {
-      return new org.roda.core.data.v2.ip.TransferredResources((List<TransferredResource>) result.getResults());
-    } else if (objectClass.equals(Format.class)) {
-      return new org.roda.core.data.v2.formats.Formats((List<Format>) result.getResults());
-    } else if (objectClass.equals(Notification.class)) {
-      return new org.roda.core.data.v2.notifications.Notifications((List<Notification>) result.getResults());
-    } else if (objectClass.equals(LogEntry.class)) {
-      return new org.roda.core.data.v2.log.LogEntries((List<LogEntry>) result.getResults());
-    } else if (objectClass.equals(RiskIncidence.class)) {
-      return new org.roda.core.data.v2.risks.RiskIncidences((List<RiskIncidence>) result.getResults());
-    } else if (objectClass.equals(RODAMember.class)) {
-      return new org.roda.core.data.v2.user.RODAMembers((List<RODAMember>) result.getResults());
-    } else {
-      throw new GenericException("Unsupported object class: " + objectClass);
     }
 
   }

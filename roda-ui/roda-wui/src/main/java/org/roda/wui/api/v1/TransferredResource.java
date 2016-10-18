@@ -37,7 +37,12 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.index.sort.Sorter;
+import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.TransferredResources;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
@@ -78,9 +83,14 @@ public class TransferredResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    TransferredResources resources = (TransferredResources) Browser.retrieveObjects(user,
-      org.roda.core.data.v2.ip.TransferredResource.class, start, limit, acceptFormat);
-    return Response.ok(resources, mediaType).build();
+    boolean justActive = false;
+    Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
+    IndexResult<org.roda.core.data.v2.ip.TransferredResource> result = Browser.find(
+      org.roda.core.data.v2.ip.TransferredResource.class, Filter.NULL, Sorter.NONE,
+      new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, user, justActive);
+    return Response
+      .ok(ApiUtils.indexedResultToRODAObjectList(org.roda.core.data.v2.ip.TransferredResource.class, result), mediaType)
+      .build();
   }
 
   @GET
