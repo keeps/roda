@@ -12,9 +12,9 @@ done
 
 LIST=(`find . -name roda-plugin-\*.jar $COMMAND | grep -v roda-plugin-common`)
 
-`mkdir plugins`
+`mkdir jar_plugins`
 
 for i in "${LIST[@]}"
 do :
-	`cp $i plugins/`
+	`cp $i jar_plugins/`
 done

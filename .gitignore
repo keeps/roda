@@ -11,4 +11,5 @@ roda-core/roda-core/velocity.log.1
 *.iml
 independent_plugin_script.sh
 roda-core/roda-core/src/main/java/org/roda/core/plugins/plugins/external/
-plugins/
+jar_plugins/
+
