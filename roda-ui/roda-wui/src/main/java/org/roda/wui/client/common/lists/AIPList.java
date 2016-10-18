@@ -126,7 +126,7 @@ public class AIPList extends BasicAsyncTableCell<IndexedAIP> {
     display.setEmptyTableWidget(emptyInfo);
 
     // define default sorting
-    display.getColumnSortList().push(new ColumnSortInfo(datesColumn, false));
+    display.getColumnSortList().push(new ColumnSortInfo(datesColumn, true));
 
     display.setColumnWidth(levelColumn, 7.0, Unit.EM);
     display.setColumnWidth(datesColumn, 13.0, Unit.EM);
@@ -142,10 +142,13 @@ public class AIPList extends BasicAsyncTableCell<IndexedAIP> {
   @Override
   protected Sorter getSorter(ColumnSortList columnSortList) {
     Map<Column<IndexedAIP, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedAIP, ?>, List<String>>();
-    columnSortingKeyMap.put(levelColumn, Arrays.asList(RodaConstants.AIP_LEVEL));
+    // setting secondary sorter to title
+    columnSortingKeyMap.put(levelColumn, Arrays.asList(RodaConstants.AIP_LEVEL, RodaConstants.AIP_TITLE_SORT));
     columnSortingKeyMap.put(titleColumn, Arrays.asList(RodaConstants.AIP_TITLE_SORT));
-    columnSortingKeyMap.put(datesColumn, Arrays.asList(RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_DATE_FINAL));
-    columnSortingKeyMap.put(hasRepresentationsColumn, Arrays.asList(RodaConstants.AIP_HAS_REPRESENTATIONS));
+    columnSortingKeyMap.put(datesColumn,
+      Arrays.asList(RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_DATE_FINAL, RodaConstants.AIP_TITLE_SORT));
+    columnSortingKeyMap.put(hasRepresentationsColumn,
+      Arrays.asList(RodaConstants.AIP_HAS_REPRESENTATIONS, RodaConstants.AIP_TITLE_SORT));
 
     return createSorter(columnSortList, columnSortingKeyMap);
   }

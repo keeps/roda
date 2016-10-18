@@ -1229,6 +1229,10 @@ public interface ClientMessages extends Messages {
 
   String permissionAssignedUsers();
 
+  String permissionAssignedGroupsEmpty();
+
+  String permissionAssignedUsersEmpty();
+
   String listOfItems();
 
   String unknownAncestorError();

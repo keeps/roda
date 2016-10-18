@@ -17,9 +17,11 @@
 			<g:FlowPanel addStyleNames="col_10 content">
 				<g:Label styleName="h1"><ui:text from='{messages.archivalPackagePermissionsTitle}' /></g:Label>
 				<g:FlowPanel addStyleNames="page-description" ui:field="editPermissionsDescription"></g:FlowPanel>
-				<g:Label styleName="h4" ui:field="groupPermissionsHeader"><ui:text from='{messages.permissionAssignedGroups}' /></g:Label>
+				<g:Label styleName="h4"><ui:text from='{messages.permissionAssignedGroups}' /></g:Label>
+				<g:Label styleName="info-empty"  ui:field="groupPermissionsEmpty"><ui:text from='{messages.permissionAssignedGroupsEmpty}' /></g:Label>
 				<g:FlowPanel ui:field="groupPermissionsPanel" />
-				<g:Label styleName="h4" ui:field="userPermissionsHeader"><ui:text from='{messages.permissionAssignedUsers}' /></g:Label>
+				<g:Label styleName="h4"><ui:text from='{messages.permissionAssignedUsers}' /></g:Label>
+				<g:Label styleName="info-empty"  ui:field="userPermissionsEmpty"><ui:text from='{messages.permissionAssignedUsersEmpty}' /></g:Label>
 				<g:FlowPanel ui:field="userPermissionsPanel" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">

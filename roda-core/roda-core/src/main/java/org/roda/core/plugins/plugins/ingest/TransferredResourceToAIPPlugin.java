@@ -18,6 +18,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -109,7 +110,13 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
           LOGGER.debug("Converting {} to AIP", transferredResourcePath);
 
           AIPState state = AIPState.INGEST_PROCESSING;
+
+          String jobUsername = PluginHelper.getJobUsername(this, index);
           Permissions permissions = new Permissions();
+          permissions.setUserPermissions(jobUsername,
+            new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
+              Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE, Permissions.PermissionType.GRANT)));
+
           boolean notifyCreatedAIP = false;
 
           String aipType = RodaConstants.AIP_TYPE_MIXED;

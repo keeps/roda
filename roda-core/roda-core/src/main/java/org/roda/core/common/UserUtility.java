@@ -249,6 +249,10 @@ public class UserUtility {
 
   public static void checkAIPPermissions(User user, IndexedAIP aip, PermissionType permissionType)
     throws AuthorizationDeniedException {
+    
+    if (isAdministrator(user)) {
+      return;
+    }
 
     Set<String> users = aip.getPermissions().getUsers().get(permissionType);
     Set<String> groups = aip.getPermissions().getGroups().get(permissionType);
@@ -275,6 +279,10 @@ public class UserUtility {
 
   private static <T extends IsIndexed> void checkObjectPermissions(User user, T obj, Function<T, String> toAIP,
     PermissionType permissionType) throws AuthorizationDeniedException {
+    
+    if (isAdministrator(user)) {
+      return;
+    }
 
     String aipId = toAIP.apply(obj);
     IndexedAIP aip;

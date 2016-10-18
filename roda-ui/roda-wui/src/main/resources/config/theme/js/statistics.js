@@ -66,8 +66,12 @@
         }
       }
     }
-
+    
     function buildDataUrl(element) {
+    	buildDataUrl(element, false);
+    }
+
+    function buildDataUrl(element, noLimits) {
       var returnClass = $(element).data("source-class");
 
       var filters = $(element).data("source-filters") ? $(element).data(
@@ -82,22 +86,34 @@
         return "facet=" + facet
       }).join("&");
 
-      var start = $(element).data("source-start") || 0;
-      var limit = $(element).data("source-limit") || 0;
-      var facetLimit = $(element).data("view-limit") || 100;
+      
       var onlyActive = $(element).data("source-onlyActive") || "false";
-
       var lang = document.locale;
 
-      return "/api/v1/index?returnClass=" +
+      var url;
+      if(noLimits) {
+    	  url = "/api/v1/index?returnClass=" +
           returnClass + "&" +
           filterParams + "&" +
           facetParams +
-          "&start=" + start +
-          "&limit=" + limit +
-          "&facetLimit=" + facetLimit +
           "&lang=" + lang +
           "&onlyActive=" + onlyActive;
+      } else {
+	      var start = $(element).data("source-start") || 0;
+	      var limit = $(element).data("source-limit") || 0;
+	      var facetLimit = $(element).data("view-limit") || 100;
+	
+	      url = "/api/v1/index?returnClass=" +
+	          returnClass + "&" +
+	          filterParams + "&" +
+	          facetParams +
+	          "&start=" + start +
+	          "&limit=" + limit +
+	          "&facetLimit=" + facetLimit +
+	          "&lang=" + lang +
+	          "&onlyActive=" + onlyActive;
+      }
+      return url;
     }
 
     function fetchIndexData(element, viewCallback) {
@@ -116,7 +132,8 @@
     }
 
     function initViewDownload(element, data) {
-      var url = buildDataUrl(element);
+      var noLimits = true;
+      var url = buildDataUrl(element, noLimits);
       if (element.data("view-field") == "facetResults") {
         url = url + "&exportFacets=true";
         var filename = element.data("view-filename");

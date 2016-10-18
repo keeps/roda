@@ -34,14 +34,18 @@ import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.AttachEvent;
+import com.google.gwt.event.logical.shared.AttachEvent.Handler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -124,7 +128,7 @@ public class EditPermissions extends Composite {
   FlowPanel editPermissionsDescription;
 
   @UiField
-  Label userPermissionsHeader, groupPermissionsHeader;
+  Label userPermissionsEmpty, groupPermissionsEmpty;
 
   @UiField
   FlowPanel userPermissionsPanel, groupPermissionsPanel;
@@ -203,52 +207,69 @@ public class EditPermissions extends Composite {
       }
     }
 
-    if (userPermissionsToShow.size() == 0) {
-      userPermissionsHeader.setVisible(false);
-    }
-
-    if (groupPermissionsToShow.size() == 0) {
-      groupPermissionsHeader.setVisible(false);
-    }
+    userPermissionsEmpty.setVisible(userPermissionsToShow.isEmpty());
+    groupPermissionsEmpty.setVisible(groupPermissionsToShow.isEmpty());
 
     for (String username : userPermissionsToShow.keySet()) {
-      userPermissionsPanel.add(new PermissionPanel(username, true, userPermissionsToShow.get(username)));
+      PermissionPanel permissionPanel = new PermissionPanel(username, true, userPermissionsToShow.get(username));
+      userPermissionsPanel.add(permissionPanel);
+      bindUpdateEmptyVisibility(permissionPanel);
     }
 
     for (String groupname : groupPermissionsToShow.keySet()) {
-      groupPermissionsPanel.add(new PermissionPanel(groupname, false, groupPermissionsToShow.get(groupname)));
+      PermissionPanel permissionPanel = new PermissionPanel(groupname, false, groupPermissionsToShow.get(groupname));
+      groupPermissionsPanel.add(permissionPanel);
+      bindUpdateEmptyVisibility(permissionPanel);
     }
+
   }
 
   private void createPermissionPanel() {
     Permissions permissions = aips.get(0).getPermissions();
-    GWT.log("Permissions are: " + permissions);
 
-    if (permissions.getUsernames().size() == 0) {
-      userPermissionsHeader.setVisible(false);
-    }
-
-    if (permissions.getGroupnames().size() == 0) {
-      groupPermissionsHeader.setVisible(false);
-    }
+    userPermissionsEmpty.setVisible(permissions.getUsernames().isEmpty());
+    groupPermissionsEmpty.setVisible(permissions.getGroupnames().isEmpty());
 
     for (String username : permissions.getUsernames()) {
-      userPermissionsPanel.add(new PermissionPanel(username, true, permissions.getUserPermissions(username)));
+      PermissionPanel permissionPanel = new PermissionPanel(username, true, permissions.getUserPermissions(username));
+      bindUpdateEmptyVisibility(permissionPanel);
+      userPermissionsPanel.add(permissionPanel);
     }
 
     for (String groupname : permissions.getGroupnames()) {
-      groupPermissionsPanel.add(new PermissionPanel(groupname, false, permissions.getGroupPermissions(groupname)));
+      PermissionPanel permissionPanel = new PermissionPanel(groupname, false,
+        permissions.getGroupPermissions(groupname));
+      bindUpdateEmptyVisibility(permissionPanel);
+      groupPermissionsPanel.add(permissionPanel);
     }
   }
 
   public void addPermissionPanel(RODAMember member) {
+    PermissionPanel permissionPanel = new PermissionPanel(member);
     if (member.isUser()) {
-      userPermissionsPanel.insert(new PermissionPanel(member), 0);
-      userPermissionsHeader.setVisible(true);
+      bindUpdateEmptyVisibility(permissionPanel);
+      userPermissionsPanel.insert(permissionPanel, 0);
     } else {
-      groupPermissionsPanel.insert(new PermissionPanel(member), 0);
-      groupPermissionsHeader.setVisible(true);
+      bindUpdateEmptyVisibility(permissionPanel);
+      groupPermissionsPanel.insert(permissionPanel, 0);
     }
+  }
+
+  private void bindUpdateEmptyVisibility(PermissionPanel permissionPanel) {
+    permissionPanel.addAttachHandler(new Handler() {
+
+      @Override
+      public void onAttachOrDetach(AttachEvent event) {
+        // running later to let attach/detach take effect
+        Scheduler.get().scheduleDeferred(new Command() {
+          public void execute() {
+            userPermissionsEmpty.setVisible(userPermissionsPanel.getWidgetCount() == 0);
+            groupPermissionsEmpty.setVisible(groupPermissionsPanel.getWidgetCount() == 0);
+          }
+        });
+
+      }
+    });
   }
 
   @UiHandler("buttonAdd")
