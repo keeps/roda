@@ -3507,7 +3507,7 @@ td.datePickerMonth, td.datePickerYear {
 				LOGIN
 ************************************************/
 .loginPanel {
-    margin: 40px auto;
+    margin: 40px auto 0;
     max-width: 400px;
     min-width: 300px;
     background-color: #eee;
