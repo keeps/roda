@@ -156,6 +156,7 @@ Change the values to match your LDAP server.
 4. Setup SSL for Jetty
 
     Create a keystore at **etc/jetty/thekeystore** with the password **changeit**.
+    
     **NOTE**: When the command asks "What is your first and last name?", write **localhost**.
     
     ```bash
@@ -345,6 +346,7 @@ Change the values to match your LDAP server.
 
     Open URL [https://localhost:8443/cas](https://localhost:8443/cas) and enter your user LDAP credentials.
     If the credentials are valid you'll see a message "**Log In Successful**".
+
     **NOTE**: The certificate we generated above is self-signed and the browser will complaint about that. 
     For testing purposes you can ignore that warning and accept the certificate.
     
