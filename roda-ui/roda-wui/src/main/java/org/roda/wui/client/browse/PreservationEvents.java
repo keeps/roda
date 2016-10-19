@@ -10,7 +10,6 @@
  */
 package org.roda.wui.client.browse;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
@@ -22,19 +21,15 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.PreservationEventList;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.main.BreadcrumbItem;
+import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -183,31 +178,8 @@ public class PreservationEvents extends Composite {
   public void viewAction() {
     IndexedAIP aip = itemBundle.getAip();
 
-    breadcrumb.updatePath(getBreadcrumbsFromAncestors(itemBundle.getAIPAncestors(), aip));
+    breadcrumb.updatePath(HtmlSnippetUtils.getBreadcrumbsFromAncestors(itemBundle.getAIPAncestors(), aip));
     breadcrumb.setVisible(true);
-  }
-
-  private List<BreadcrumbItem> getBreadcrumbsFromAncestors(List<IndexedAIP> aipAncestors, IndexedAIP aip) {
-    List<BreadcrumbItem> ret = new ArrayList<>();
-    ret.add(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), Browse.RESOLVER.getHistoryPath()));
-    for (IndexedAIP ancestor : aipAncestors) {
-      SafeHtml breadcrumbLabel = getBreadcrumbLabel(ancestor);
-      BreadcrumbItem ancestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel,
-        Tools.concat(Browse.RESOLVER.getHistoryPath(), ancestor.getId()));
-      ret.add(1, ancestorBreadcrumb);
-    }
-
-    ret.add(new BreadcrumbItem(getBreadcrumbLabel(aip), Tools.concat(Browse.RESOLVER.getHistoryPath(), aip.getId())));
-    return ret;
-  }
-
-  private SafeHtml getBreadcrumbLabel(IndexedAIP ancestor) {
-    SafeHtml elementLevelIconSafeHtml = DescriptionLevelUtils.getElementLevelIconSafeHtml(ancestor.getLevel(), false);
-    SafeHtmlBuilder builder = new SafeHtmlBuilder();
-    String label = ancestor.getTitle() != null ? ancestor.getTitle() : ancestor.getId();
-    builder.append(elementLevelIconSafeHtml).append(SafeHtmlUtils.fromString(label));
-    SafeHtml breadcrumbLabel = builder.toSafeHtml();
-    return breadcrumbLabel;
   }
 
   @UiHandler("downloadButton")

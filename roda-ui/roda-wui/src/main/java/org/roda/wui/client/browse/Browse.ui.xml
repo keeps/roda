@@ -25,9 +25,12 @@
 				</g:FlowPanel>
 				<g:HTML ui:field="aipState" />
 				<g:FlowPanel styleName="browseItemPanel browseTitle-allCollections-wrapper">
+					<g:Label addStyleNames="browseItemHeader" ui:field="browseItemHeader">
+						<ui:text from='{messages.catalogueItemTitle}' />
+					</g:Label>
 					<g:SimplePanel styleName="browseItemIcon" ui:field="itemIcon" />
 					<g:FlowPanel styleName="browseItemPanelText">
-						<g:Label styleName="h1" addStyleNames="browseItemText"
+						<g:Label styleName="h4" addStyleNames="browseItemText"
 							ui:field="itemTitle" />
 					</g:FlowPanel>
 					<g:Label addStyleNames="browseItemId" ui:field="itemId"

@@ -29,6 +29,7 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.SimpleFileList;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.main.BreadcrumbItem;
@@ -463,9 +464,8 @@ public class ViewRepresentation extends Composite {
     IndexedRepresentation rep = selectRepresentation(representations, representationUUID);
 
     // AIP breadcrumb
-    fullBreadcrumb.add(
-      new BreadcrumbItem(getBreadcrumbLabel((aip.getTitle() != null) ? aip.getTitle() : aip.getId(), aip.getLevel()),
-        Tools.concat(Browse.RESOLVER.getHistoryPath(), aipId)));
+    fullBreadcrumb.add(new BreadcrumbItem(HtmlSnippetUtils.getBreadcrumbLabel(aip),
+      HtmlSnippetUtils.getBreadcrumbTitle(aip), Tools.concat(Browse.RESOLVER.getHistoryPath(), aipId)));
 
     if (file != null) {
       List<String> filePath = file.getPath();
@@ -477,10 +477,10 @@ public class ViewRepresentation extends Composite {
         List<String> path = new ArrayList<>(pathBuilder);
         if (filePath.indexOf(folder) != (filePath.size() - 1)) {
           fileBreadcrumb.add(new BreadcrumbItem(getBreadcrumbLabel(folder, RodaConstants.VIEW_REPRESENTATION_FOLDER),
-            Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), path)));
+            folder, Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), path)));
         } else {
-          fileBreadcrumb.add(
-            new BreadcrumbItem(getBreadcrumbLabel(folder, RodaConstants.VIEW_REPRESENTATION_FOLDER), new Command() {
+          fileBreadcrumb.add(new BreadcrumbItem(getBreadcrumbLabel(folder, RodaConstants.VIEW_REPRESENTATION_FOLDER),
+            folder, new Command() {
 
               @Override
               public void execute() {
@@ -495,20 +495,22 @@ public class ViewRepresentation extends Composite {
       fileBreadcrumb.add(new BreadcrumbItem(
         file.isDirectory() ? getBreadcrumbLabel(fileLabel, RodaConstants.VIEW_REPRESENTATION_FOLDER)
           : getBreadcrumbLabel(fileLabel, RodaConstants.VIEW_REPRESENTATION_FILE),
+        fileLabel,
         Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), aipId, representationUUID, file.getId())));
     }
 
     // Representation breadcrumb
     fullBreadcrumb.add(fileBreadcrumb.size() > 1
-      ? new BreadcrumbItem(DescriptionLevelUtils.getRepresentationTypeIcon(rep.getType(), true),
+      ? new BreadcrumbItem(DescriptionLevelUtils.getRepresentationTypeIcon(rep.getType(), true), rep.getType(),
         Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), aipId, representationUUID))
-      : new BreadcrumbItem(DescriptionLevelUtils.getRepresentationTypeIcon(rep.getType(), true), new Command() {
+      : new BreadcrumbItem(DescriptionLevelUtils.getRepresentationTypeIcon(rep.getType(), true), rep.getType(),
+        new Command() {
 
-        @Override
-        public void execute() {
-          clean();
-        }
-      }));
+          @Override
+          public void execute() {
+            clean();
+          }
+        }));
 
     fullBreadcrumb.addAll(fileBreadcrumb);
     return fullBreadcrumb;

@@ -1584,11 +1584,16 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .main .wui-breadcrumbPanel .breadcrumb {
-    display: inline;
+    display: inline-block;
     color: #a7a9ac;
     cursor: pointer;
     cursor: hand;
     font-size: 1.2rem;
+    
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .main .wui-breadcrumbPanel .breadcrumb * {
@@ -1603,18 +1608,24 @@ td.datePickerMonth, td.datePickerYear {
 .main .wui-breadcrumbPanel .breadcrumb-last {
     color: #404142;
     text-decoration: none;
+    
+    max-width: 100px;
 }
+
+.viewRepresentationBreadcrumb .breadcrumb-last {
+	max-width: none !important;
+} 
 
 .main .wui-breadcrumbPanel .breadcrumb-last .fa, .main .wui-breadcrumbPanel .breadcrumb-last .description-level {
     color: #404142;
 }
 
 .main .wui-breadcrumbPanel .breadcrumb-separator {
-    display: inline;
-    font-family: 'Ubuntu', sans-serif;
-    font-size: 12px;
+    display: inline-block;
+    font-size: 1.2rem;
     color: #a7a9ac;
     cursor: text;
+    vertical-align: top;
 }
 
 /**********************************************
@@ -1867,12 +1878,11 @@ td.datePickerMonth, td.datePickerYear {
 .browseItemPanelText {
     display: inline;
     vertical-align: middle;
-    padding-left: 1em;
+    padding-left: 1rem;
 }
 
 .browseItemIcon {
     display: inline;
-    width: 50px;
     vertical-align: middle;
 }
 
@@ -1881,16 +1891,23 @@ td.datePickerMonth, td.datePickerYear {
     display: inline-block;
 }
 
+
 .browseItemIcon-all {
     display: inline-block;
-    font-size: 4rem;
-    line-height: 4rem;
+    font-size: 2.4rem;
+    line-height: 2.4rem;
+}
+
+.browseItemHeader {
+	color: #999;
+	font-size: 1.8rem;
+	font-weight: 300;
 }
 
 .browseItemIcon-other {
     display: inline-block;
-    font-size: 4rem;
-    line-height: 4rem;
+    font-size: 2.4rem;
+    line-height: 2.4rem;
 }
 
 .browseItemText {
@@ -1904,6 +1921,7 @@ td.datePickerMonth, td.datePickerYear {
 .browseRepresentationId {
     color: #a7a9ac;
     font-size: 1rem;
+    margin-left: 3.4rem;
 }
 
 .browseSearchListTitle {

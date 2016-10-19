@@ -7,13 +7,16 @@
  */
 package org.roda.wui.client.common.utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetValue;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
@@ -22,7 +25,6 @@ import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
-import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.notifications.Notification.NOTIFICATION_STATE;
 import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
 import org.roda.core.data.v2.risks.RiskIncidence;
@@ -30,12 +32,16 @@ import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.ViewRepresentation;
+import org.roda.wui.client.main.BreadcrumbItem;
+import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Label;
@@ -127,27 +133,26 @@ public class HtmlSnippetUtils {
     }
     return pluginStateHTML;
   }
-  public static SafeHtml getNotificationStateHTML(NOTIFICATION_STATE state){
-    GWT.log("STATE1: "+state);
-    String label = messages.notificationStateValue(state) ;
-    GWT.log("STATE2: "+label);
-    return getNotificationStateHTML(state,label);
+
+  public static SafeHtml getNotificationStateHTML(NOTIFICATION_STATE state) {
+    GWT.log("STATE1: " + state);
+    String label = messages.notificationStateValue(state);
+    GWT.log("STATE2: " + label);
+    return getNotificationStateHTML(state, label);
   }
+
   public static SafeHtml getNotificationStateHTML(NOTIFICATION_STATE state, String label) {
     SafeHtml notificationStateHTML;
     switch (state) {
       case COMPLETED:
-        notificationStateHTML = SafeHtmlUtils
-          .fromSafeConstant("<span class='label-success'>" + label+ "</span>");
+        notificationStateHTML = SafeHtmlUtils.fromSafeConstant("<span class='label-success'>" + label + "</span>");
         break;
       case FAILED:
-        notificationStateHTML = SafeHtmlUtils
-          .fromSafeConstant("<span class='label-danger'>" + label + "</span>");
+        notificationStateHTML = SafeHtmlUtils.fromSafeConstant("<span class='label-danger'>" + label + "</span>");
         break;
       case CREATED:
       default:
-        notificationStateHTML = SafeHtmlUtils
-          .fromSafeConstant("<span class='label-default'>" + label + "</span>");
+        notificationStateHTML = SafeHtmlUtils.fromSafeConstant("<span class='label-default'>" + label + "</span>");
         break;
     }
     return notificationStateHTML;
@@ -293,6 +298,75 @@ public class HtmlSnippetUtils {
       html = entry.getActionComponent();
     }
     return SafeHtmlUtils.fromSafeConstant(html);
+  }
+
+  public static SafeHtml getBreadcrumbLabel(IndexedAIP aip) {
+    SafeHtml breadcrumbLabel;
+    SafeHtml elementLevelIconSafeHtml;
+    if (aip.getGhost()) {
+      elementLevelIconSafeHtml = DescriptionLevelUtils.getElementLevelIconSafeHtml(RodaConstants.AIP_GHOST, true);
+      SafeHtmlBuilder builder = new SafeHtmlBuilder();
+      builder.append(elementLevelIconSafeHtml);
+      breadcrumbLabel = builder.toSafeHtml();
+    } else {
+      elementLevelIconSafeHtml = DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel(), false);
+      SafeHtmlBuilder builder = new SafeHtmlBuilder();
+      String label = aip.getTitle() != null ? aip.getTitle() : aip.getId();
+      builder.append(elementLevelIconSafeHtml).append(SafeHtmlUtils.fromString(label));
+      breadcrumbLabel = builder.toSafeHtml();
+    }
+
+    return breadcrumbLabel;
+  }
+
+  public static String getBreadcrumbTitle(IndexedAIP aip) {
+    String title;
+    if (aip.getGhost()) {
+      title = "";
+    } else {
+      title = aip.getTitle() != null ? aip.getTitle() : aip.getId();
+    }
+
+    return title;
+  }
+
+  public static List<BreadcrumbItem> getBreadcrumbsFromAncestors(List<IndexedAIP> aipAncestors, IndexedAIP aip) {
+    List<BreadcrumbItem> breadcrumb = new ArrayList<>();
+    breadcrumb
+      .add(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), "", Browse.RESOLVER.getHistoryPath()));
+
+    if (aipAncestors != null) {
+      for (IndexedAIP ancestor : aipAncestors) {
+        if (ancestor != null) {
+          SafeHtml breadcrumbLabel = getBreadcrumbLabel(ancestor);
+          String breadcrumbTitle = getBreadcrumbTitle(ancestor);
+          BreadcrumbItem ancestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel, breadcrumbTitle,
+            getViewItemHistoryToken(ancestor.getId()));
+          breadcrumb.add(1, ancestorBreadcrumb);
+        } else {
+          SafeHtml breadcrumbLabel = DescriptionLevelUtils.getElementLevelIconSafeHtml(RodaConstants.AIP_GHOST, false);
+          BreadcrumbItem unknownAncestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel, "", new Command() {
+
+            @Override
+            public void execute() {
+              // TODO find better error message
+              Toast.showError(messages.unknownAncestorError());
+            }
+          });
+          breadcrumb.add(unknownAncestorBreadcrumb);
+        }
+      }
+    }
+
+    // AIP
+    breadcrumb
+      .add(new BreadcrumbItem(getBreadcrumbLabel(aip), getBreadcrumbTitle(aip), getViewItemHistoryToken(aip.getId())));
+
+    return breadcrumb;
+  }
+
+  public static final List<String> getViewItemHistoryToken(String id) {
+    return Tools.concat(Browse.RESOLVER.getHistoryPath(), id);
   }
 
 }

@@ -32,6 +32,7 @@ import org.roda.wui.client.common.lists.SearchFileList;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
@@ -305,18 +306,20 @@ public class Representation extends Composite {
     List<IndexedAIP> aipAncestors = itemBundle.getAIPAncestors();
 
     List<BreadcrumbItem> breadcrumb = new ArrayList<>();
-    breadcrumb.add(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), Browse.RESOLVER.getHistoryPath()));
+    breadcrumb
+      .add(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), "", Browse.RESOLVER.getHistoryPath()));
 
     if (aipAncestors != null) {
       for (IndexedAIP ancestor : aipAncestors) {
         if (ancestor != null) {
-          SafeHtml breadcrumbLabel = getBreadcrumbLabel(ancestor);
-          BreadcrumbItem ancestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel,
+          SafeHtml breadcrumbLabel = HtmlSnippetUtils.getBreadcrumbLabel(ancestor);
+          String breadcrumbTitle = HtmlSnippetUtils.getBreadcrumbTitle(ancestor);
+          BreadcrumbItem ancestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel, breadcrumbTitle,
             Tools.concat(Browse.RESOLVER.getHistoryPath(), ancestor.getId()));
           breadcrumb.add(1, ancestorBreadcrumb);
         } else {
           SafeHtml breadcrumbLabel = DescriptionLevelUtils.getElementLevelIconSafeHtml(RodaConstants.AIP_GHOST, false);
-          BreadcrumbItem unknownAncestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel, new Command() {
+          BreadcrumbItem unknownAncestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel, "", new Command() {
 
             @Override
             public void execute() {
@@ -330,32 +333,14 @@ public class Representation extends Composite {
     }
 
     // AIP
-    breadcrumb.add(new BreadcrumbItem(getBreadcrumbLabel(aip), Tools.concat(Browse.RESOLVER.getHistoryPath(), aipId)));
+    breadcrumb.add(new BreadcrumbItem(HtmlSnippetUtils.getBreadcrumbLabel(aip),
+      HtmlSnippetUtils.getBreadcrumbTitle(aip), Tools.concat(Browse.RESOLVER.getHistoryPath(), aipId)));
 
     // Representation
     breadcrumb.add(new BreadcrumbItem(DescriptionLevelUtils.getRepresentationTypeIcon(representation.getType(), true),
-      Tools.concat(Representation.RESOLVER.getHistoryPath(), aipId, repId)));
+      representation.getType(), Tools.concat(Representation.RESOLVER.getHistoryPath(), aipId, repId)));
 
     return breadcrumb;
-  }
-
-  private SafeHtml getBreadcrumbLabel(IndexedAIP ancestor) {
-    SafeHtml breadcrumbLabel;
-    SafeHtml elementLevelIconSafeHtml;
-    if (ancestor.getGhost()) {
-      elementLevelIconSafeHtml = DescriptionLevelUtils.getElementLevelIconSafeHtml(RodaConstants.AIP_GHOST, true);
-      SafeHtmlBuilder builder = new SafeHtmlBuilder();
-      builder.append(elementLevelIconSafeHtml);
-      breadcrumbLabel = builder.toSafeHtml();
-    } else {
-      elementLevelIconSafeHtml = DescriptionLevelUtils.getElementLevelIconSafeHtml(ancestor.getLevel(), false);
-      SafeHtmlBuilder builder = new SafeHtmlBuilder();
-      String label = ancestor.getTitle() != null ? ancestor.getTitle() : ancestor.getId();
-      builder.append(elementLevelIconSafeHtml).append(SafeHtmlUtils.fromString(label));
-      breadcrumbLabel = builder.toSafeHtml();
-    }
-
-    return breadcrumbLabel;
   }
 
   private void getDescriptiveMetadataHTML(final String descId, final DescriptiveMetadataViewBundle bundle,

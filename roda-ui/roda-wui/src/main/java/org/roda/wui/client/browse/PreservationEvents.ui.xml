@@ -20,7 +20,7 @@
 						<i class="fa fa-clock-o"></i>
 					</g:HTML>
 					<g:FlowPanel styleName="browseItemPanelText">
-						<g:Label styleName="h1" addStyleNames="browseItemText"
+						<g:Label styleName="h4" addStyleNames="browseItemText"
 							ui:field="itemTitle"><ui:text from='{messages.preservationEventsTitle}' /></g:Label>
 					</g:FlowPanel>
 				</g:FlowPanel>

@@ -85,6 +85,12 @@ public interface ClientMessages extends Messages {
   String historyDescriptiveMetadataTitle();
 
   String catalogueTitle();
+  
+  String catalogueItemTitle();
+  
+  String catalogueRepresentationTitle();
+  
+  String catalogueFileTitle();
 
   String preservationActionsTitle();
 

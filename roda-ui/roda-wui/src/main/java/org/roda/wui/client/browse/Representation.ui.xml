@@ -8,7 +8,7 @@
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<ui:style>
-
+	
 	</ui:style>
 
 	<g:FlowPanel styleName="wui-browse-representation"
@@ -16,9 +16,12 @@
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
 				<g:FlowPanel styleName="browseItemPanel">
+					<g:Label addStyleNames="browseItemHeader" ui:field="browseItemHeader">
+						<ui:text from='{messages.catalogueRepresentationTitle}' />
+					</g:Label>
 					<g:SimplePanel styleName="browseItemIcon" ui:field="representationIcon" />
 					<g:FlowPanel styleName="browseItemPanelText">
-						<g:Label styleName="h1" addStyleNames="browseItemText"
+						<g:Label styleName="h4" addStyleNames="browseItemText"
 							ui:field="representationType" />
 					</g:FlowPanel>
 					<g:Label addStyleNames="browseRepresentationId" ui:field="representationId"

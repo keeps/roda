@@ -132,10 +132,6 @@ public class Browse extends Composite {
     }
   };
 
-  public static final List<String> getViewItemHistoryToken(String id) {
-    return Tools.concat(RESOLVER.getHistoryPath(), id);
-  }
-
   interface MyUiBinder extends UiBinder<Widget, Browse> {
   }
 
@@ -180,7 +176,7 @@ public class Browse extends Composite {
   HTML aipState;
 
   @UiField
-  Label itemTitle, itemId, sipId;
+  Label browseItemHeader, itemTitle, itemId, sipId;
 
   @UiField
   TabPanel itemMetadata;
@@ -446,6 +442,7 @@ public class Browse extends Composite {
 
   private void clear() {
     justActive = true;
+    browseItemHeader.setVisible(false);
     browseTitle.setVisible(false);
     browseDescription.setVisible(false);
 
@@ -541,7 +538,9 @@ public class Browse extends Composite {
       IndexedAIP aip = itemBundle.getAip();
       List<DescriptiveMetadataViewBundle> descMetadata = itemBundle.getDescriptiveMetadata();
 
-      breadcrumb.updatePath(getBreadcrumbsFromAncestors(itemBundle.getAIPAncestors(), aip));
+      browseItemHeader.setVisible(true);
+
+      breadcrumb.updatePath(HtmlSnippetUtils.getBreadcrumbsFromAncestors(itemBundle.getAIPAncestors(), aip));
       breadcrumb.setVisible(true);
       newRepresentation.setVisible(true);
 
@@ -675,7 +674,7 @@ public class Browse extends Composite {
     browseDescription.setVisible(true);
 
     breadcrumb.updatePath(
-      Arrays.asList(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), RESOLVER.getHistoryPath())));
+      Arrays.asList(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), "", RESOLVER.getHistoryPath())));
 
     HTMLPanel topIcon = DescriptionLevelUtils.getTopIconHTMLPanel();
     topIcon.addStyleName("browseItemIcon-all");
@@ -713,57 +712,6 @@ public class Browse extends Composite {
       handlerRegistration.removeHandler();
     }
     handlers.clear();
-  }
-
-  private List<BreadcrumbItem> getBreadcrumbsFromAncestors(List<IndexedAIP> aipAncestors, IndexedAIP aip) {
-    List<BreadcrumbItem> breadcrumb = new ArrayList<>();
-    breadcrumb.add(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), RESOLVER.getHistoryPath()));
-
-    if (aipAncestors != null) {
-      for (IndexedAIP ancestor : aipAncestors) {
-        if (ancestor != null) {
-          SafeHtml breadcrumbLabel = getBreadcrumbLabel(ancestor);
-          BreadcrumbItem ancestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel,
-            getViewItemHistoryToken(ancestor.getId()));
-          breadcrumb.add(1, ancestorBreadcrumb);
-        } else {
-          SafeHtml breadcrumbLabel = DescriptionLevelUtils.getElementLevelIconSafeHtml(RodaConstants.AIP_GHOST, false);
-          BreadcrumbItem unknownAncestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel, new Command() {
-
-            @Override
-            public void execute() {
-              // TODO find better error message
-              Toast.showError(messages.unknownAncestorError());
-            }
-          });
-          breadcrumb.add(unknownAncestorBreadcrumb);
-        }
-      }
-    }
-
-    // AIP
-    breadcrumb.add(new BreadcrumbItem(getBreadcrumbLabel(aip), getViewItemHistoryToken(aip.getId())));
-
-    return breadcrumb;
-  }
-
-  private SafeHtml getBreadcrumbLabel(IndexedAIP aip) {
-    SafeHtml breadcrumbLabel;
-    SafeHtml elementLevelIconSafeHtml;
-    if (aip.getGhost()) {
-      elementLevelIconSafeHtml = DescriptionLevelUtils.getElementLevelIconSafeHtml(RodaConstants.AIP_GHOST, true);
-      SafeHtmlBuilder builder = new SafeHtmlBuilder();
-      builder.append(elementLevelIconSafeHtml);
-      breadcrumbLabel = builder.toSafeHtml();
-    } else {
-      elementLevelIconSafeHtml = DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel(), false);
-      SafeHtmlBuilder builder = new SafeHtmlBuilder();
-      String label = aip.getTitle() != null ? aip.getTitle() : aip.getId();
-      builder.append(elementLevelIconSafeHtml).append(SafeHtmlUtils.fromString(label));
-      breadcrumbLabel = builder.toSafeHtml();
-    }
-
-    return breadcrumbLabel;
   }
 
   @SuppressWarnings("unused")
@@ -899,7 +847,7 @@ public class Browse extends Composite {
     if (id == null) {
       path = RESOLVER.getHistoryPath();
     } else {
-      path = getViewItemHistoryToken(id);
+      path = HtmlSnippetUtils.getViewItemHistoryToken(id);
     }
 
     if (path.equals(History.getToken())) {

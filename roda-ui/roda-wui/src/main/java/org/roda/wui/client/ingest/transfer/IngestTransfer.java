@@ -326,7 +326,7 @@ public class IngestTransfer extends Composite {
   private List<BreadcrumbItem> getBreadcrumbs(TransferredResource r) {
     List<BreadcrumbItem> ret = new ArrayList<BreadcrumbItem>();
 
-    ret.add(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), RESOLVER.getHistoryPath()));
+    ret.add(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), "", RESOLVER.getHistoryPath()));
     if (r != null) {
 
       // add parent
@@ -335,7 +335,7 @@ public class IngestTransfer extends Composite {
         path.addAll(RESOLVER.getHistoryPath());
         path.add(r.getParentUUID());
         SafeHtml breadcrumbLabel = SafeHtmlUtils.fromString(r.getParentId());
-        ret.add(new BreadcrumbItem(breadcrumbLabel, path));
+        ret.add(new BreadcrumbItem(breadcrumbLabel, r.getParentId(), path));
       }
 
       // add self
@@ -343,7 +343,7 @@ public class IngestTransfer extends Composite {
       path.addAll(RESOLVER.getHistoryPath());
       path.add(r.getUUID());
       SafeHtml breadcrumbLabel = SafeHtmlUtils.fromString(r.getName());
-      ret.add(new BreadcrumbItem(breadcrumbLabel, path));
+      ret.add(new BreadcrumbItem(breadcrumbLabel, r.getName(), path));
     }
 
     return ret;

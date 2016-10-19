@@ -126,6 +126,7 @@ public class BreadcrumbPanel extends FlowPanel {
     public Breadcrumb(final BreadcrumbItem item) {
       super();
       setHTML(item.getLabel());
+      setTitle(item.getTitle());
 
       this.item = item;
       enabled = true;
