@@ -18,7 +18,8 @@
 					<g:FlowPanel addStyleNames="row full_width no_padding">
 						<g:FlowPanel addStyleNames="wui-data-panel">
 							<g:FlowPanel styleName="browseItemPanel">
-								<g:SimplePanel styleName="browseItemIcon" ui:field="itemIcon" />
+								<g:SimplePanel styleName="browseItemIcon"
+									ui:field="itemIcon" />
 								<g:HTML styleName="browseItemIcon-other">
 									<i class="fa fa-clock-o"></i>
 								</g:HTML>
@@ -48,21 +49,21 @@
 									</g:Label>
 									<g:Label styleName="value" ui:field="eventDetailLabel" />
 								</g:FlowPanel>
-								
+
 								<g:FlowPanel styleName="field">
 									<g:Label styleName="label">
 										<ui:text from='{messages.preservationEventDatetime}' />
 									</g:Label>
 									<g:Label styleName="value" ui:field="eventDatetimeLabel" />
 								</g:FlowPanel>
-								
+
 								<g:FlowPanel styleName="field">
 									<g:Label styleName="label">
 										<ui:text from='{messages.preservationEventOutcome}' />
 									</g:Label>
 									<g:Label styleName="value" ui:field="eventOutcomeLabel" />
 								</g:FlowPanel>
-								
+
 								<g:FlowPanel styleName="field">
 									<!-- AGENTS -->
 									<g:Label styleName="h4">
@@ -70,7 +71,7 @@
 									</g:Label>
 									<g:FlowPanel ui:field="agentsPanel" />
 								</g:FlowPanel>
-								
+
 								<g:FlowPanel styleName="field">
 									<!-- LINKING SOURCE OBJECTS -->
 									<g:Label styleName="h4" ui:field="sourceObjectsHeader">
@@ -78,7 +79,7 @@
 									</g:Label>
 									<g:FlowPanel ui:field="sourceObjectsPanel" />
 								</g:FlowPanel>
-								
+
 								<g:FlowPanel styleName="field">
 									<!-- LINKING OUTCOME OBJECTS -->
 									<g:Label styleName="h4" ui:field="outcomeObjectsHeader">
@@ -86,19 +87,21 @@
 									</g:Label>
 									<g:FlowPanel ui:field="outcomeObjectsPanel" />
 								</g:FlowPanel>
-								
+
 								<g:FlowPanel styleName="field">
 									<!-- OUTCOME DETAIL -->
 									<g:Label styleName="h4" ui:field="outcomeDetailHeader">
 										<ui:text from='{messages.preservationEventOutcomeDetailHeader}' />
 									</g:Label>
 								</g:FlowPanel>
-				
+
 								<g:FlowPanel styleName="field">
-									<g:Label ui:field="eventOutcomeDetailNoteLabel" styleName="label">
+									<g:Label ui:field="eventOutcomeDetailNoteLabel"
+										styleName="label">
 										<ui:text from='{messages.preservationEventOutcomeDetailNote}' />
 									</g:Label>
-									<g:Label ui:field="eventOutcomeDetailNoteValue" styleName="code-pre" />
+									<g:Label ui:field="eventOutcomeDetailNoteValue"
+										styleName="code-pre" />
 								</g:FlowPanel>
 								<g:FlowPanel styleName="field">
 									<g:Label ui:field="eventOutcomeDetailExtensionLabel"
@@ -113,14 +116,19 @@
 					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>
-			<g:FlowPanel addStyleNames="col_2 last sidebar">
-				<g:FlowPanel>
-					<g:Label addStyleNames="h4">
-						<ui:text from='{messages.sidebarActionsTitle}' />
-					</g:Label>
-					<g:Button addStyleNames="btn btn-default btn-back" ui:field="backButton">
-						<ui:text from='{messages.preservationEventsBackButton}' />
-					</g:Button>
+			<g:FlowPanel addStyleNames="col_2 last sidebar sticky">
+				<g:FlowPanel addStyleNames="sticky-flow">
+					<g:FlowPanel addStyleNames="sticky-padding">
+						<g:FlowPanel>
+							<g:Label addStyleNames="h4">
+								<ui:text from='{messages.sidebarActionsTitle}' />
+							</g:Label>
+							<g:Button addStyleNames="btn btn-default btn-back"
+								ui:field="backButton">
+								<ui:text from='{messages.preservationEventsBackButton}' />
+							</g:Button>
+						</g:FlowPanel>
+					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>

@@ -1558,7 +1558,7 @@ td.datePickerMonth, td.datePickerYear {
 ************************************************/
 .main .wui-breadcrumbPanel {
     margin-top: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .main .wui-breadcrumbPanel .breadcrumb {
@@ -1958,7 +1958,6 @@ td.datePickerMonth, td.datePickerYear {
 .browseItemMetadata .gwt-TabPanelBottom {
     background-color: transparent;
     padding: 5px 10px;
-    margin-bottom: 20px;
     min-height: 25px;
 }
 
@@ -2067,7 +2066,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .descriptiveMetadataHTML {
-    padding-top: 25px;
+    padding-top: 5px;
 }
 
 .descriptiveMetadata {

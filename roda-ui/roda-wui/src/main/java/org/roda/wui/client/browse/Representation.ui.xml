@@ -30,54 +30,59 @@
 				<m:BreadcrumbPanel ui:field="breadcrumb"
 					addStyleNames="browseBreadcrumb" />
 				<g:TabPanel ui:field="itemMetadata" addStyleNames="browseItemMetadata" />
-				<g:FlowPanel styleName="browseNewDescriptiveMetadataButton">
-					<g:Button addStyleNames="btn btn-plus" ui:field="newDescriptiveMetadata">
-						<ui:text from='{messages.newDescriptiveMetadataTitle}' />
-					</g:Button>
-				</g:FlowPanel>
-				<g:Label addStyleNames="h4 browseSearchListTitle" ui:field="filesPanelTitle">
+				<g:Button addStyleNames="btn btn-plus browseNewDescriptiveMetadataButton"
+					ui:field="newDescriptiveMetadata">
+					<ui:text from='{messages.newDescriptiveMetadataTitle}' />
+				</g:Button>
+
+				<g:Label addStyleNames="h5 browseSearchListTitle" ui:field="filesPanelTitle">
 					<ui:text from='{messages.representationFiles}' />
 				</g:Label>
 				<commonsearch:SearchPanel ui:field="searchPanel" />
 				<lists:SearchFileList addStyleNames="searchResults"
 					ui:field="filesList" />
 			</g:FlowPanel>
-			<g:FlowPanel addStyleNames="col_2 last sidebar">
-				<g:FlowPanel ui:field="actionsSidebar">
-					<g:Label addStyleNames="h4">
-						<ui:text from='{messages.representation}' />
-					</g:Label>
-					<g:Button addStyleNames="btn btn-play" ui:field="viewer">
-						<ui:text from='{messages.viewButton}' />
-					</g:Button>
-					<g:Button addStyleNames="btn btn-danger btn-ban" ui:field="remove">
-						<ui:text from='{messages.removeButton}' />
-					</g:Button>
-				</g:FlowPanel>
-				<g:FlowPanel ui:field="preservationSidebar">
-					<g:Label addStyleNames="h4">
-						<ui:text from='{messages.preservationTitle}' />
-					</g:Label>
-					<g:Button addStyleNames="btn btn-play" ui:field="newProcess">
-						<ui:text from='{messages.newProcessPreservation}' />
-					</g:Button>
-					<g:Button addStyleNames="btn btn-default btn-clock"
-						ui:field="preservationEvents">
-						<ui:text from='{messages.preservationEvents}' />
-					</g:Button>
-					<g:Button addStyleNames="btn btn-default btn-exclamation-triangle"
-						ui:field="risks">
-						<ui:text from='{messages.preservationRisks}' />
-					</g:Button>
-				</g:FlowPanel>
-				<g:FlowPanel ui:field="downloadSection">
-					<g:Label addStyleNames="h4">
-						<ui:text from='{messages.downloadTitle}' />
-					</g:Label>
-					<g:Button addStyleNames="btn btn-default btn-download"
-						ui:field="download">
-						<ui:text from='{messages.representation}' />
-					</g:Button>
+			<g:FlowPanel addStyleNames="col_2 last sidebar sticky">
+				<g:FlowPanel addStyleNames="sticky-flow">
+					<g:FlowPanel addStyleNames="sticky-padding">
+						<g:FlowPanel ui:field="actionsSidebar">
+							<g:Label addStyleNames="h4">
+								<ui:text from='{messages.representation}' />
+							</g:Label>
+							<g:Button addStyleNames="btn btn-play" ui:field="viewer">
+								<ui:text from='{messages.viewButton}' />
+							</g:Button>
+							<g:Button addStyleNames="btn btn-danger btn-ban"
+								ui:field="remove">
+								<ui:text from='{messages.removeButton}' />
+							</g:Button>
+						</g:FlowPanel>
+						<g:FlowPanel ui:field="preservationSidebar">
+							<g:Label addStyleNames="h4">
+								<ui:text from='{messages.preservationTitle}' />
+							</g:Label>
+							<g:Button addStyleNames="btn btn-play" ui:field="newProcess">
+								<ui:text from='{messages.newProcessPreservation}' />
+							</g:Button>
+							<g:Button addStyleNames="btn btn-default btn-clock"
+								ui:field="preservationEvents">
+								<ui:text from='{messages.preservationEvents}' />
+							</g:Button>
+							<g:Button addStyleNames="btn btn-default btn-exclamation-triangle"
+								ui:field="risks">
+								<ui:text from='{messages.preservationRisks}' />
+							</g:Button>
+						</g:FlowPanel>
+						<g:FlowPanel ui:field="downloadSection">
+							<g:Label addStyleNames="h4">
+								<ui:text from='{messages.downloadTitle}' />
+							</g:Label>
+							<g:Button addStyleNames="btn btn-default btn-download"
+								ui:field="download">
+								<ui:text from='{messages.representation}' />
+							</g:Button>
+						</g:FlowPanel>
+					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>

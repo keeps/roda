@@ -21,7 +21,9 @@
 					</g:HTML>
 					<g:FlowPanel styleName="browseItemPanelText">
 						<g:Label styleName="h4" addStyleNames="browseItemText"
-							ui:field="itemTitle"><ui:text from='{messages.preservationEventsTitle}' /></g:Label>
+							ui:field="itemTitle">
+							<ui:text from='{messages.preservationEventsTitle}' />
+						</g:Label>
 					</g:FlowPanel>
 				</g:FlowPanel>
 				<m:BreadcrumbPanel ui:field="breadcrumb"
@@ -29,17 +31,22 @@
 
 				<lists:PreservationEventList ui:field="eventList" />
 			</g:FlowPanel>
-			<g:FlowPanel addStyleNames="col_2 last sidebar">
-				<g:FlowPanel>
-					<g:Label addStyleNames="h4">
-						<ui:text from='{messages.sidebarActionsTitle}' />
-					</g:Label>
-					<g:Button addStyleNames="btn btn-download" ui:field="downloadButton">
-						<ui:text from='{messages.preservationEventsDownloadButton}' />
-					</g:Button>
-					<g:Button addStyleNames="btn btn-default btn-back" ui:field="backButton">
-						<ui:text from='{messages.preservationEventsBackButton}' />
-					</g:Button>
+			<g:FlowPanel addStyleNames="col_2 last sidebar sticky">
+				<g:FlowPanel addStyleNames="sticky-flow">
+					<g:FlowPanel addStyleNames="sticky-padding">
+						<g:FlowPanel>
+							<g:Label addStyleNames="h4">
+								<ui:text from='{messages.sidebarActionsTitle}' />
+							</g:Label>
+							<g:Button addStyleNames="btn btn-download" ui:field="downloadButton">
+								<ui:text from='{messages.preservationEventsDownloadButton}' />
+							</g:Button>
+							<g:Button addStyleNames="btn btn-default btn-back"
+								ui:field="backButton">
+								<ui:text from='{messages.preservationEventsBackButton}' />
+							</g:Button>
+						</g:FlowPanel>
+					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>

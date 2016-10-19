@@ -41,18 +41,18 @@
 				<m:BreadcrumbPanel ui:field="breadcrumb"
 					addStyleNames="browseBreadcrumb" />
 				<g:TabPanel ui:field="itemMetadata" addStyleNames="browseItemMetadata" />
-				<g:FlowPanel styleName="browseNewDescriptiveMetadataButton">
-					<g:Button addStyleNames="btn btn-plus" ui:field="newDescriptiveMetadata">
-						<ui:text from='{messages.newDescriptiveMetadataTitle}' />
-					</g:Button>
-				</g:FlowPanel>
-				<g:Label addStyleNames="h4 browseSearchListTitle" ui:field="representationsPanelTitle">
+				<g:Button addStyleNames="btn btn-plus browseNewDescriptiveMetadataButton"
+					ui:field="newDescriptiveMetadata">
+					<ui:text from='{messages.newDescriptiveMetadataTitle}' />
+				</g:Button>
+
+				<g:Label addStyleNames="h5 browseSearchListTitle" ui:field="representationsPanelTitle">
 					<ui:text from='{messages.representationsTitle}' />
 				</g:Label>
 				<commonsearch:SearchPanel ui:field="representationsSearchPanel" />
 				<lists:RepresentationList addStyleNames="searchResults"
 					ui:field="representationsList" />
-				<g:Label addStyleNames="h4 browseSearchListTitle" ui:field="fondsPanelTitle">
+				<g:Label addStyleNames="h5 browseSearchListTitle" ui:field="fondsPanelTitle">
 					<ui:text from='{messages.sublevels}' />
 				</g:Label>
 				<commonsearch:SearchPanel ui:field="searchPanel" />

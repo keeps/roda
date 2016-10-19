@@ -26,9 +26,9 @@
 				</g:Label>
 
 				<g:TextBox ui:field="id" addStyleNames="form-textbox" />
-				
+
 				<g:HTML visible="false" ui:field="idError" addStyleNames="error metadata-edit-errors" />
-				
+
 				<g:Label styleName="form-label">
 					<ui:text from='{messages.editDescriptiveMetadataFormLabel}' />
 				</g:Label>
@@ -50,19 +50,23 @@
 				</g:FlowPanel>
 			</g:FlowPanel>
 
-			<g:FlowPanel addStyleNames="col_2 last sidebar">
-				<g:FlowPanel>
-					<g:Label addStyleNames="h4">
-						<ui:text from='{messages.sidebarActionsTitle}' />
-					</g:Label>
-					<g:Button addStyleNames="btn btn-play" ui:field="buttonApply">
-						<ui:text from='{messages.saveButton}' />
-					</g:Button>
-					<g:Button addStyleNames="btn btn-default btn-times-circle"
-						ui:field="buttonCancel">
-						<ui:text from='{messages.cancelButton}' />
-					</g:Button>
+			<g:FlowPanel addStyleNames="col_2 last sidebar sticky">
+				<g:FlowPanel addStyleNames="sticky-flow">
+					<g:FlowPanel addStyleNames="sticky-padding">
+						<g:FlowPanel>
+							<g:Label addStyleNames="h4">
+								<ui:text from='{messages.sidebarActionsTitle}' />
+							</g:Label>
+							<g:Button addStyleNames="btn btn-play" ui:field="buttonApply">
+								<ui:text from='{messages.saveButton}' />
+							</g:Button>
+							<g:Button addStyleNames="btn btn-default btn-times-circle"
+								ui:field="buttonCancel">
+								<ui:text from='{messages.cancelButton}' />
+							</g:Button>
 
+						</g:FlowPanel>
+					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>
