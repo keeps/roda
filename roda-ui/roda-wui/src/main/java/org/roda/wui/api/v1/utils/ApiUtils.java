@@ -19,10 +19,14 @@ import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang.StringUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.ConsumesOutputStream;
+import org.roda.core.common.DownloadUtils;
+import org.roda.core.common.EntityResponse;
 import org.roda.core.common.StreamResponse;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -35,11 +39,13 @@ import org.roda.core.data.v2.common.RODAObjectList;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPs;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representations;
+import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
@@ -47,6 +53,11 @@ import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RODAMember;
+import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.storage.Directory;
+import org.roda.core.storage.Resource;
+import org.roda.core.storage.StorageService;
+import org.roda.wui.common.server.RodaStreamingOutput;
 
 /**
  * API Utils
@@ -243,6 +254,42 @@ public class ApiUtils {
       return new org.roda.core.data.v2.user.RODAMembers((List<RODAMember>) result.getResults());
     } else {
       throw new GenericException("Unsupported object class: " + objectClass);
+    }
+  }
+
+  public static StreamResponse download(Resource resource) {
+    ConsumesOutputStream download = DownloadUtils.download(RodaCoreFactory.getStorageService(), resource);
+    StreamingOutput streamingOutput = new RodaStreamingOutput(download);
+    return new StreamResponse(download.getFileName(), download.getMediaType(), streamingOutput);
+  }
+
+  public static <T extends IsIndexed> Response okResponse(T indexed, String acceptFormat, String mediaType)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    EntityResponse representation;
+
+    if (indexed instanceof IndexedAIP) {
+      IndexedAIP indexedAIP = (IndexedAIP) indexed;
+      if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP.equals(acceptFormat)) {
+        StoragePath storagePath = ModelUtils.getAIPStoragePath(indexedAIP.getId());
+        StorageService storage = RodaCoreFactory.getStorageService();
+        Directory directory = storage.getDirectory(storagePath);
+        representation = download(directory);
+      } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
+        || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
+        AIP aip = RodaCoreFactory.getModelService().retrieveAIP(indexedAIP.getId());
+        representation = new ObjectResponse<AIP>(acceptFormat, aip);
+      } else {
+        throw new GenericException("Unsupported class: " + acceptFormat);
+      }
+
+      if (representation instanceof ObjectResponse) {
+        ObjectResponse<AIP> aip = (ObjectResponse<AIP>) representation;
+        return Response.ok(aip.getObject(), mediaType).build();
+      } else {
+        return ApiUtils.okResponse((StreamResponse) representation);
+      }
+    } else {
+      throw new GenericException("Unsupported accept format: " + acceptFormat);
     }
   }
 

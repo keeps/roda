@@ -1299,16 +1299,13 @@ public class Browser extends RodaWuiController {
     return classificationPlan;
   }
 
-  public static boolean retrieveScanUpdateStatus() {
-    // TODO: should this method use ControllerAssistant to checkRoles and
-    // registerAction? Where is User?
-    return BrowserHelper.retrieveScanUpdateStatus();
-  }
+  public static void updateAllTransferredResources(User user, String subFolderUUID, boolean waitToFinish)
+    throws IsStillUpdatingException, AuthorizationDeniedException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
-  public static void updateAllTransferredResources(String subFolderUUID, boolean waitToFinish)
-    throws IsStillUpdatingException {
-    // TODO: should this method use ControllerAssistant to checkRoles and
-    // registerAction? Where is User?
+    // check permissions
+    controllerAssistant.checkRoles(user);
+
     BrowserHelper.runTransferredResourceScan(subFolderUUID, waitToFinish);
   }
 
@@ -1353,17 +1350,12 @@ public class Browser extends RodaWuiController {
     throws AuthorizationDeniedException, NotFoundException, GenericException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
-    // TODO maybe update permissions...
     // check user permissions
     controllerAssistant.checkRoles(user);
-    // IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    // UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
-
-    // TODO if not admin, add to filter a constraint for the resource to belong
-    // to this user
-
     // delegate
     PreservationEventViewBundle resource = BrowserHelper.retrievePreservationEventViewBundle(eventId);
+
+    UserUtility.checkPreservationEventPermissions(user, resource.getEvent(), PermissionType.READ);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, INDEX_PRESERVATION_EVENT_ID, eventId);
@@ -1551,29 +1543,6 @@ public class Browser extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
 
     return aipExport;
-  }
-
-  // FIXME lfaria 20161012: This code should not be here as it is specific of
-  // the REST API
-  public static EntityResponse retrieveAIP(User user, String aipId, String acceptFormat)
-    throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // validate input
-    BrowserHelper.validateGetAIPParams(acceptFormat);
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-    IndexedAIP indexedAIP = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    UserUtility.checkAIPPermissions(user, indexedAIP, PermissionType.READ);
-
-    // delegate
-    EntityResponse aip = BrowserHelper.retrieveAIP(indexedAIP, acceptFormat);
-
-    // register action
-    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS);
-
-    return aip;
   }
 
   public static StreamResponse retrieveAIPPart(User user, String aipId, String part)

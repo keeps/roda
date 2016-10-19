@@ -87,8 +87,6 @@ public interface BrowserServiceAsync {
 
   void deleteTransferredResources(SelectedItems<TransferredResource> selected, AsyncCallback<Void> callback);
 
-  void transferScanIsUpdating(AsyncCallback<Boolean> callback);
-
   void transferScanRequestUpdate(String transferredResourceUUID, AsyncCallback<Void> callback);
 
   void createJob(Job job, AsyncCallback<Job> callback);

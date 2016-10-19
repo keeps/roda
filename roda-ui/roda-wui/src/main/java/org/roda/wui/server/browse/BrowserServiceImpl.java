@@ -394,14 +394,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public boolean transferScanIsUpdating() {
-    return Browser.retrieveScanUpdateStatus();
-  }
-
-  @Override
-  public void transferScanRequestUpdate(String transferredResourceUUID) throws IsStillUpdatingException {
+  public void transferScanRequestUpdate(String transferredResourceUUID)
+    throws IsStillUpdatingException, AuthorizationDeniedException {
     try {
-      Browser.updateAllTransferredResources(transferredResourceUUID, true);
+      User user = UserUtility.getUser(getThreadLocalRequest());
+      Browser.updateAllTransferredResources(user, transferredResourceUUID, true);
     } catch (RuntimeException e) {
       LOGGER.error("Error running transferred resources scanner");
     }

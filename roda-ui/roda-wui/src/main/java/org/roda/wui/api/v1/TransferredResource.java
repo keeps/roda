@@ -173,8 +173,11 @@ public class TransferredResource {
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
+    // get user
+    User user = UserUtility.getApiUser(request);
+
     // delegate action to controller
-    Browser.updateAllTransferredResources(path, true);
+    Browser.updateAllTransferredResources(user, path, true);
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Transferred resources updated"), mediaType)
       .build();
   }

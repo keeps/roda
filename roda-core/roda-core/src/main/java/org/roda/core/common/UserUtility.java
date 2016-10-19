@@ -35,6 +35,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
@@ -312,6 +313,11 @@ public class UserUtility {
   public static void checkFilePermissions(User user, IndexedFile file, PermissionType permissionType)
     throws AuthorizationDeniedException {
     checkObjectPermissions(user, file, f -> f.getAipId(), permissionType);
+  }
+
+  public static void checkPreservationEventPermissions(User user, IndexedPreservationEvent event,
+    PermissionType permissionType) throws AuthorizationDeniedException {
+    checkObjectPermissions(user, event, f -> f.getAipId(), permissionType);
   }
 
   public static void checkAIPPermissions(User user, SelectedItems<IndexedAIP> selected, PermissionType permission)

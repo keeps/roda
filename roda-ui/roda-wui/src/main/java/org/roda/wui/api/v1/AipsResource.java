@@ -113,14 +113,9 @@ public class AipsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    EntityResponse aipRepresentation = Browser.retrieveAIP(user, aipId, acceptFormat);
+    IndexedAIP indexedAIP = Browser.retrieve(user, IndexedAIP.class, aipId);
 
-    if (aipRepresentation instanceof ObjectResponse) {
-      ObjectResponse<AIP> aip = (ObjectResponse<AIP>) aipRepresentation;
-      return Response.ok(aip.getObject(), mediaType).build();
-    } else {
-      return ApiUtils.okResponse((StreamResponse) aipRepresentation);
-    }
+    return ApiUtils.okResponse(indexedAIP, acceptFormat, mediaType);
   }
 
   @GET

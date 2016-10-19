@@ -132,9 +132,8 @@ public interface BrowserService extends RemoteService {
   void deleteTransferredResources(SelectedItems<TransferredResource> selected)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
-  boolean transferScanIsUpdating();
-
-  void transferScanRequestUpdate(String transferredResourceUUID) throws IsStillUpdatingException;
+  void transferScanRequestUpdate(String transferredResourceUUID)
+    throws IsStillUpdatingException, AuthorizationDeniedException;
 
   Job createJob(Job job) throws AuthorizationDeniedException, NotFoundException, RequestNotValidException,
     GenericException, JobAlreadyStartedException;

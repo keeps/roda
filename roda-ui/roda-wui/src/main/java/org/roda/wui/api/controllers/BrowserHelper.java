@@ -39,8 +39,6 @@ import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.ConsumesOutputStream;
-import org.roda.core.common.DownloadUtils;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.Messages;
@@ -131,7 +129,6 @@ import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Directory;
-import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
@@ -149,7 +146,6 @@ import org.roda.wui.client.planning.MitigationPropertiesBundle;
 import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
 import org.roda.wui.common.HTMLUtils;
-import org.roda.wui.common.server.RodaStreamingOutput;
 import org.roda.wui.common.server.ServerTools;
 import org.roda.wui.server.common.XMLSimilarityIgnoreElements;
 import org.slf4j.Logger;
@@ -505,7 +501,7 @@ public class BrowserHelper {
       StoragePath storagePath = ModelUtils.getRepresentationStoragePath(representation.getAipId(),
         representation.getId());
       Directory directory = RodaCoreFactory.getStorageService().getDirectory(storagePath);
-      return download(directory);
+      return ApiUtils.download(directory);
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
       ModelService model = RodaCoreFactory.getModelService();
@@ -516,12 +512,6 @@ public class BrowserHelper {
     }
   }
 
-  private static StreamResponse download(Resource resource) {
-    ConsumesOutputStream download = DownloadUtils.download(RodaCoreFactory.getStorageService(), resource);
-    StreamingOutput streamingOutput = new RodaStreamingOutput(download);
-    return new StreamResponse(download.getFileName(), download.getMediaType(), streamingOutput);
-  }
-
   public static StreamResponse retrieveAIPRepresentationPart(IndexedRepresentation representation, String part)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     String aipId = representation.getAipId();
@@ -530,17 +520,17 @@ public class BrowserHelper {
     if (RodaConstants.STORAGE_DIRECTORY_DATA.equals(part)) {
       StoragePath storagePath = ModelUtils.getRepresentationDataStoragePath(aipId, representationId);
       Directory directory = RodaCoreFactory.getStorageService().getDirectory(storagePath);
-      return download(directory);
+      return ApiUtils.download(directory);
     } else if (RodaConstants.STORAGE_DIRECTORY_METADATA.equals(part)) {
       StoragePath storagePath = ModelUtils.getRepresentationMetadataStoragePath(aipId, representationId);
       Directory directory = RodaCoreFactory.getStorageService().getDirectory(storagePath);
-      return download(directory);
+      return ApiUtils.download(directory);
     } else if (RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION.equals(part)) {
       Directory directory = RodaCoreFactory.getModelService().getDocumentationDirectory(aipId, representationId);
-      return download(directory);
+      return ApiUtils.download(directory);
     } else if (RodaConstants.STORAGE_DIRECTORY_SCHEMAS.equals(part)) {
       Directory directory = RodaCoreFactory.getModelService().getSchemasDirectory(aipId, representationId);
-      return download(directory);
+      return ApiUtils.download(directory);
     } else {
       throw new GenericException("Unsupported part: " + part);
     }
@@ -2013,35 +2003,19 @@ public class BrowserHelper {
 
   }
 
-  public static EntityResponse retrieveAIP(IndexedAIP indexedAIP, String acceptFormat)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP.equals(acceptFormat)) {
-      StoragePath storagePath = ModelUtils.getAIPStoragePath(indexedAIP.getId());
-      StorageService storage = RodaCoreFactory.getStorageService();
-      Directory directory = storage.getDirectory(storagePath);
-      return download(directory);
-    } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
-      || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
-      AIP aip = RodaCoreFactory.getModelService().retrieveAIP(indexedAIP.getId());
-      return new ObjectResponse<AIP>(acceptFormat, aip);
-    } else {
-      throw new GenericException("Unsupported accept format: " + acceptFormat);
-    }
-  }
-
   public static StreamResponse retrieveAIPPart(IndexedAIP aip, String part)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     String aipId = aip.getId();
 
     if (RodaConstants.STORAGE_DIRECTORY_SUBMISSION.equals(part)) {
       Directory directory = RodaCoreFactory.getModelService().getSubmissionDirectory(aipId);
-      return download(directory);
+      return ApiUtils.download(directory);
     } else if (RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION.equals(part)) {
       Directory directory = RodaCoreFactory.getModelService().getDocumentationDirectory(aipId);
-      return download(directory);
+      return ApiUtils.download(directory);
     } else if (RodaConstants.STORAGE_DIRECTORY_SCHEMAS.equals(part)) {
       Directory directory = RodaCoreFactory.getModelService().getSchemasDirectory(aipId);
-      return download(directory);
+      return ApiUtils.download(directory);
     } else {
       throw new GenericException("Unsupported part: " + part);
     }
