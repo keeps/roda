@@ -111,7 +111,7 @@ public class OnOffFilter implements Filter {
         + this.webXmlFilterConfig.getInitParameter(PARAM_INNER_FILTER_CLASS) + ").");
     } else {
       final String innerFilterClass = this.webXmlFilterConfig.getInitParameter(PARAM_INNER_FILTER_CLASS);
-      final List<String> activeFilters = Arrays.asList(rodaConfig.getStringArray("ui.auth.filter"));
+      final List<String> activeFilters = Arrays.asList(rodaConfig.getStringArray("ui.filter"));
       this.isOn = activeFilters.contains(getFilterConfig().getFilterName());
       LOGGER.info("Inner filter (" + getFilterConfig().getFilterName() + ") is " + (this.isOn ? "ON" : "OFF"));
       if (this.isOn) {
@@ -170,7 +170,7 @@ public class OnOffFilter implements Filter {
     OnOffFilterConfig(final FilterConfig filterConfig, final Configuration rodaConfig) {
       this.filterConfig = filterConfig;
       this.rodaConfig = rodaConfig;
-      this.rodaConfigPrefix = String.format("ui.auth.filter.%s.", this.filterConfig.getFilterName());
+      this.rodaConfigPrefix = String.format("ui.filter.%s.", this.filterConfig.getFilterName());
     }
 
     @Override
