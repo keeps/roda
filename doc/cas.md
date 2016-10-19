@@ -23,7 +23,8 @@ Change the values to match your LDAP server.
     cd cas-overlay-template
     ```
 
-2. Open file **etc/cas.properties** and edit the following parts
+2. Open file **etc/cas.properties** and edit the following parts:
+
     **NOTE**: Change the LDAP values to match your LDAP setup.
      
     ```bash
@@ -113,6 +114,7 @@ Change the values to match your LDAP server.
     ```
 
 3. Create a RODA service in **etc/services/roda.json**
+
     **NOTE**: Change the **serviceId** to match your RODA address.
 
     ```json
@@ -152,6 +154,7 @@ Change the values to match your LDAP server.
     ```
 
 4. Setup SSL for Jetty
+
     Create a keystore at **etc/jetty/thekeystore** with the password **changeit**.
     **NOTE**: When the command asks "What is your first and last name?", write **localhost**.
     
@@ -160,12 +163,14 @@ Change the values to match your LDAP server.
     ```
 
 5. Copy configuration files to **/etc/cas**
+
     ```bash
     sudo mkdir -p /etc/cas
     sudo cp -r etc/* /etc/cas
     ```
 
 6. Open file **pom.xml** and edit the following parts
+
     ```xml
     <?xml version="1.0" encoding="UTF-8"?>
     <project xmlns="http://maven.apache.org/POM/4.0.0"
@@ -202,6 +207,7 @@ Change the values to match your LDAP server.
     ```
 
 7. Create file **src/main/webapp/WEB-INF/deployerConfigContext.xml** with the following contents:
+
     **NOTE**: Change the **principalIdAttribute** to match the attribute of users on your LDAP server.
 
     ```xml
@@ -322,11 +328,13 @@ Change the values to match your LDAP server.
     ```
 
 8. Build the **cas.war** file
+
     ```bash
     ./mvnw clean package
     ```
 
 9. Start the embedded Jetty server
+
     ```bash
     ./mvnw jetty:run-forked
     ```
@@ -334,6 +342,7 @@ Change the values to match your LDAP server.
     To run the CAS service in another application server, just install the file **target/cas.war** in your application server.
 
 10. Access the CAS server and login with LDAP credentials
+
     Open URL [https://localhost:8443/cas](https://localhost:8443/cas) and enter your user LDAP credentials.
     If the credentials are valid you'll see a message "**Log In Successful**".
     **NOTE**: The certificate we generated above is self-signed and the browser will complaint about that. 
@@ -342,6 +351,7 @@ Change the values to match your LDAP server.
 ## Setup RODA to use CAS
 
 1. Open file **~/.roda/config/roda-wui.properties** and make the following changes:
+
     * Disable internal filters and
     * Enable CAS filters,
     * Review the configuration values to match your setup.
@@ -398,17 +408,20 @@ If during the login you see an exception like **SSLHandshakeException** or
 If your CAS server is using the self-signed certificate from we created above, you'll see this error.
 
 To fix it, you can:
+
 1. Use a valid certificate, or
 2. Make java programs (RODA) trust your self-signed certificate.
 
 To make java programs trust your self-signed certificate do the following steps:
 
 1. Export jetty self-signed certificate
+
     ```bash
     keytool -export -keystore /etc/jetty/thekeystore -alias jetty -file jetty.cer
     ```
 
 2. Import jetty certificate in Java truststore
+
     **NOTE**: Assuming your **JAVA_HOME** is **/usr/lib/jvm/java-8-oracle**
 
     ```bash
