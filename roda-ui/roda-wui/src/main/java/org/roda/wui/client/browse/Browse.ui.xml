@@ -58,102 +58,108 @@
 				<commonsearch:SearchPanel ui:field="searchPanel" />
 				<lists:AIPList addStyleNames="searchResults" ui:field="aipList" />
 			</g:FlowPanel>
-			<g:FlowPanel addStyleNames="col_2 last sidebar">
-				<g:FlowPanel ui:field="appraisalSidebar">
-					<g:Label addStyleNames="h4">
-						<ui:text from='{messages.appraisalTitle}' />
-					</g:Label>
-					<g:Button addStyleNames="btn btn-play" ui:field="appraisalAccept">
-						<ui:text from='{messages.appraisalAccept}' />
-					</g:Button>
-					<g:Button addStyleNames="btn btn-danger btn-ban" ui:field="appraisalReject">
-						<ui:text from='{messages.appraisalReject}' />
-					</g:Button>
-				</g:FlowPanel>
-				<g:FlowPanel ui:field="actionsSidebar">
-					<g:Label addStyleNames="h4">
-						<ui:text from='{messages.archivalPackageTitle}' />
-					</g:Label>
-					<g:Button addStyleNames="btn btn-plus" ui:field="createItem">
-						<ui:text from='{messages.newArchivalPackage}' />
-					</g:Button>
-					<g:Button addStyleNames="btn btn-edit" ui:field="moveItem">
-						<ui:text from='{messages.moveArchivalPackage}' />
-					</g:Button>
-					<g:Button addStyleNames="btn btn-edit" ui:field="editPermissions">
-						<ui:text from='{messages.archivalPackagePermissions}' />
-					</g:Button>
-					<g:Button addStyleNames="btn btn-danger btn-ban" ui:field="remove">
-						<ui:text from='{messages.removeArchivalPackage}' />
-					</g:Button>
-					<g:Button addStyleNames="btn btn-plus" ui:field="newRepresentation">
-						<ui:text from='{messages.addRepresentation}' />
-					</g:Button>
-					<g:Button addStyleNames="btn btn-default btn-download"
-						ui:field="download">
-						<ui:text from='{messages.downloadArchivalPackage}' />
-					</g:Button>
-				</g:FlowPanel>
-				<g:FlowPanel ui:field="preservationSidebar">
-					<g:Label addStyleNames="h4">
-						<ui:text from='{messages.preservationTitle}' />
-					</g:Label>
-					<g:Button addStyleNames="btn btn-play" ui:field="newProcess">
-						<ui:text from='{messages.newProcessPreservation}' />
-					</g:Button>
-					<g:Button addStyleNames="btn btn-default btn-clock"
-						ui:field="preservationEvents">
-						<ui:text from='{messages.preservationEvents}' />
-					</g:Button>
-					<g:Button addStyleNames="btn btn-default btn-exclamation-triangle"
-						ui:field="risks">
-						<ui:text from='{messages.preservationRisks}' />
-					</g:Button>
-					<g:Button addStyleNames="btn btn-default btn-clock"
-						ui:field="logs">
-						<ui:text from='{messages.preservationLogs}' />
-					</g:Button>
-				</g:FlowPanel>
-				<g:FlowPanel ui:field="downloadSection">
-					<g:Label addStyleNames="h4">
-						<ui:text from='{messages.downloadTitle}' />
-					</g:Label>
-					<g:Button addStyleNames="btn btn-default btn-download"
-						ui:field="submission">
-						<ui:text from='{messages.downloadSubmission}' />
-					</g:Button>
-					<g:Button addStyleNames="btn btn-default btn-download"
-						ui:field="documentation">
-						<ui:text from='{messages.downloadDocumentation}' />
-					</g:Button>
-					<g:Button addStyleNames="btn btn-default btn-download"
-						ui:field="schemas">
-						<ui:text from='{messages.downloadSchemas}' />
-					</g:Button>
-				</g:FlowPanel>
-				<g:FlowPanel ui:field="searchSection">
-					<g:Label addStyleNames="h4">
-						<ui:text from='{messages.searchTitle}' />
-					</g:Label>
-					<g:Button addStyleNames="btn btn-search" ui:field="searchContext">
-						<ui:text from='{messages.searchContext}' />
-					</g:Button>
-					<g:Button addStyleNames="btn btn-search" ui:field="searchAIP">
-						<ui:text from='{messages.searchAIP}' />
-					</g:Button>
-				</g:FlowPanel>
-				<g:FlowPanel styleName="sidebar-group" ui:field="itemsFacets">
-					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-						<g:Label addStyleNames="h5 sidebar-facet-title">
-							<ui:text from='{messages.searchDescriptionLevels}' />
-						</g:Label>
-						<g:FlowPanel ui:field="facetDescriptionLevels" />
-					</g:FlowPanel>
-					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-						<g:Label addStyleNames="h5 sidebar-facet-title">
-							<ui:text from='{messages.searchRepresentations}' />
-						</g:Label>
-						<g:FlowPanel ui:field="facetHasRepresentations" />
+			<g:FlowPanel addStyleNames="col_2 last sidebar sticky">
+				<g:FlowPanel addStyleNames="sticky-flow">
+					<g:FlowPanel addStyleNames="sticky-padding">
+						<g:FlowPanel ui:field="appraisalSidebar">
+							<g:Label addStyleNames="h4">
+								<ui:text from='{messages.appraisalTitle}' />
+							</g:Label>
+							<g:Button addStyleNames="btn btn-play" ui:field="appraisalAccept">
+								<ui:text from='{messages.appraisalAccept}' />
+							</g:Button>
+							<g:Button addStyleNames="btn btn-danger btn-ban"
+								ui:field="appraisalReject">
+								<ui:text from='{messages.appraisalReject}' />
+							</g:Button>
+						</g:FlowPanel>
+						<g:FlowPanel ui:field="actionsSidebar">
+							<g:Label addStyleNames="h4">
+								<ui:text from='{messages.archivalPackageTitle}' />
+							</g:Label>
+							<g:Button addStyleNames="btn btn-plus" ui:field="createItem">
+								<ui:text from='{messages.newArchivalPackage}' />
+							</g:Button>
+							<g:Button addStyleNames="btn btn-edit" ui:field="moveItem">
+								<ui:text from='{messages.moveArchivalPackage}' />
+							</g:Button>
+							<g:Button addStyleNames="btn btn-edit" ui:field="editPermissions">
+								<ui:text from='{messages.archivalPackagePermissions}' />
+							</g:Button>
+							<g:Button addStyleNames="btn btn-danger btn-ban"
+								ui:field="remove">
+								<ui:text from='{messages.removeArchivalPackage}' />
+							</g:Button>
+							<g:Button addStyleNames="btn btn-plus" ui:field="newRepresentation">
+								<ui:text from='{messages.addRepresentation}' />
+							</g:Button>
+							<g:Button addStyleNames="btn btn-default btn-download"
+								ui:field="download">
+								<ui:text from='{messages.downloadArchivalPackage}' />
+							</g:Button>
+						</g:FlowPanel>
+						<g:FlowPanel ui:field="preservationSidebar">
+							<g:Label addStyleNames="h4">
+								<ui:text from='{messages.preservationTitle}' />
+							</g:Label>
+							<g:Button addStyleNames="btn btn-play" ui:field="newProcess">
+								<ui:text from='{messages.newProcessPreservation}' />
+							</g:Button>
+							<g:Button addStyleNames="btn btn-default btn-clock"
+								ui:field="preservationEvents">
+								<ui:text from='{messages.preservationEvents}' />
+							</g:Button>
+							<g:Button addStyleNames="btn btn-default btn-exclamation-triangle"
+								ui:field="risks">
+								<ui:text from='{messages.preservationRisks}' />
+							</g:Button>
+							<g:Button addStyleNames="btn btn-default btn-clock"
+								ui:field="logs">
+								<ui:text from='{messages.preservationLogs}' />
+							</g:Button>
+						</g:FlowPanel>
+						<g:FlowPanel ui:field="downloadSection">
+							<g:Label addStyleNames="h4">
+								<ui:text from='{messages.downloadTitle}' />
+							</g:Label>
+							<g:Button addStyleNames="btn btn-default btn-download"
+								ui:field="submission">
+								<ui:text from='{messages.downloadSubmission}' />
+							</g:Button>
+							<g:Button addStyleNames="btn btn-default btn-download"
+								ui:field="documentation">
+								<ui:text from='{messages.downloadDocumentation}' />
+							</g:Button>
+							<g:Button addStyleNames="btn btn-default btn-download"
+								ui:field="schemas">
+								<ui:text from='{messages.downloadSchemas}' />
+							</g:Button>
+						</g:FlowPanel>
+						<g:FlowPanel ui:field="searchSection">
+							<g:Label addStyleNames="h4">
+								<ui:text from='{messages.searchTitle}' />
+							</g:Label>
+							<g:Button addStyleNames="btn btn-search" ui:field="searchContext">
+								<ui:text from='{messages.searchContext}' />
+							</g:Button>
+							<g:Button addStyleNames="btn btn-search" ui:field="searchAIP">
+								<ui:text from='{messages.searchAIP}' />
+							</g:Button>
+						</g:FlowPanel>
+						<g:FlowPanel styleName="sidebar-group" ui:field="itemsFacets">
+							<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+								<g:Label addStyleNames="h5 sidebar-facet-title">
+									<ui:text from='{messages.searchDescriptionLevels}' />
+								</g:Label>
+								<g:FlowPanel ui:field="facetDescriptionLevels" />
+							</g:FlowPanel>
+							<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+								<g:Label addStyleNames="h5 sidebar-facet-title">
+									<ui:text from='{messages.searchRepresentations}' />
+								</g:Label>
+								<g:FlowPanel ui:field="facetHasRepresentations" />
+							</g:FlowPanel>
+						</g:FlowPanel>
 					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>

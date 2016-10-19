@@ -16,17 +16,20 @@
 				<u:UserDataPanel ui:field="userDataPanel" />
 			</g:FlowPanel>
 
-			<g:FlowPanel addStyleNames="col_2 last sidebar">
-				<g:FlowPanel addStyleNames="sidebar_actions_wrapper sticky">
-					<g:Label addStyleNames="h4">
-						<ui:text from='{messages.actions}' />
-					</g:Label>
-					<g:Button addStyleNames="btn btn-play" ui:field="buttonApply">
-						<ui:text from='{messages.preferencesSubmit}' />
-					</g:Button>
-					<g:Button addStyleNames="btn btn-default btn-times-circle" ui:field="buttonCancel">
-						<ui:text from='{messages.preferencesCancel}' />
-					</g:Button>
+			<g:FlowPanel addStyleNames="col_2 last sidebar sticky">
+				<g:FlowPanel addStyleNames="sticky-flow">
+					<g:FlowPanel addStyleNames="sticky-padding">
+						<g:Label addStyleNames="h4">
+							<ui:text from='{messages.actions}' />
+						</g:Label>
+						<g:Button addStyleNames="btn btn-play" ui:field="buttonApply">
+							<ui:text from='{messages.preferencesSubmit}' />
+						</g:Button>
+						<g:Button addStyleNames="btn btn-default btn-times-circle"
+							ui:field="buttonCancel">
+							<ui:text from='{messages.preferencesCancel}' />
+						</g:Button>
+					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>

@@ -540,24 +540,6 @@ pre code {
     min-height: 600px;
 }
 
-.sidebar {
-    background: #eee;
-    padding: 30px !important;
-    min-width: 230px;
-}
-
-.sidebar .btn {
-    width: 100%;
-    margin-right: 10px;
-    margin-bottom: 7px;
-}
-
-.sidebar .h1, .sidebar .h2, .sidebar .h3, .sidebar .h4, .sidebar .h5,
-.sidebar .h6 {
-    margin-bottom: 0.6rem;
-    font-size: 1.8rem;
-}
-
 .btn {
     border-radius: 2px;
     padding: 8px 10px;
@@ -1264,10 +1246,6 @@ td.datePickerMonth, td.datePickerYear {
         margin-left: 80px;
         padding-right: 20px;
     }
-    
-    .sidebar_actions_wrapper.sticky {
-		position: fixed; 
-	}
 }
 
 @media (max-width: 768px) {
@@ -1631,6 +1609,43 @@ td.datePickerMonth, td.datePickerYear {
 /**********************************************
 				SIDEBAR
 ************************************************/
+
+.sidebar {
+    background: #eee;
+    padding: 30px !important;
+    min-width: 230px;
+}
+
+.sidebar .btn {
+    width: 100%;
+    margin-right: 10px;
+    margin-bottom: 7px;
+}
+
+.sidebar .h1, .sidebar .h2, .sidebar .h3, .sidebar .h4, .sidebar .h5,
+.sidebar .h6 {
+    margin-bottom: 0.6rem;
+    font-size: 1.8rem;
+}
+
+
+@media (min-width: 768px) {    
+	.sidebar.sticky {
+		padding: 0 !important;
+	}    
+    
+    .sidebar.sticky .sticky-flow {
+		position: fixed;
+		width: inherit;
+		min-width: inherit;	 
+	}
+	
+	.sidebar.sticky .sticky-padding {
+		padding: 30px;
+	}
+}
+
+
 .sidebar-facet-title {
     color: inherit;
     margin-bottom: 5px;
