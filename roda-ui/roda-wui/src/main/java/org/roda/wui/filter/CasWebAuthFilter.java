@@ -92,9 +92,7 @@ public class CasWebAuthFilter implements Filter {
       locale);
 
     final Principal principal = httpRequest.getUserPrincipal();
-    if (principal == null) {
-      // UserUtility.setUser(httpRequest, UserUtility.getUser(httpRequest));
-    } else {
+    if (principal != null) {
       UserUtility.setUser(httpRequest, getOrCreateUser(principal.getName()));
     }
 
