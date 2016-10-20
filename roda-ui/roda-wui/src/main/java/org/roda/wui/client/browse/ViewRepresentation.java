@@ -502,7 +502,7 @@ public class ViewRepresentation extends Composite {
     // Representation breadcrumb
     fullBreadcrumb.add(fileBreadcrumb.size() > 1
       ? new BreadcrumbItem(DescriptionLevelUtils.getRepresentationTypeIcon(rep.getType(), true), rep.getType(),
-        Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), aipId, representationUUID))
+        Tools.concat(Representation.RESOLVER.getHistoryPath(), aipId, representationUUID))
       : new BreadcrumbItem(DescriptionLevelUtils.getRepresentationTypeIcon(rep.getType(), true), rep.getType(),
         new Command() {
 
