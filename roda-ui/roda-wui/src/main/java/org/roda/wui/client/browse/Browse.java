@@ -45,6 +45,7 @@ import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.process.ShowJobReport;
 import org.roda.wui.client.main.BreadcrumbItem;
@@ -87,7 +88,6 @@ import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -368,7 +368,7 @@ public class Browse extends Composite {
     });
 
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();
@@ -569,10 +569,13 @@ public class Browse extends Composite {
       itemIcon.getParent().removeStyleName("browseTitle-allCollections-wrapper");
       itemId.setText(messages.itemId() + " " + aip.getId());
       itemId.addStyleName("browseItemId");
-      sipId.setText(messages.sipId() + " " + StringUtility.prettyPrint(aip.getIngestSIPIds()));
-      sipId.addStyleName("browseSipId");
 
-      if (aip.getIngestJobId() != null) {
+      if (!aip.getIngestSIPIds().isEmpty()) {
+        sipId.setText(messages.sipId() + " " + StringUtility.prettyPrint(aip.getIngestSIPIds()));
+        sipId.addStyleName("browseSipId");
+      }
+
+      if (StringUtils.isNotBlank(aip.getIngestJobId())) {
         final IndexedAIP ingestedAIP = aip;
         ingestJobId
           .setHTML("<div class='browseIngestJobId'>" + messages.processId() + ": " + aip.getIngestJobId() + "</div>");
