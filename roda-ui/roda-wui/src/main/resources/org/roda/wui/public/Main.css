@@ -382,10 +382,10 @@ pre code {
 .form-label {
 	margin-top: 5px;
 }
-.form-label-mandatory::after{
+.form-label-mandatory::after {
 	content:" *";
 }
-.form-label-error{
+.form-label-error {
 	color:red;
 	font-size: 0.8em;
 }
@@ -396,12 +396,12 @@ pre code {
 	padding: 5px 15px !important;
 }
 
-.panelDescriptiveMetadata .form-separator:first-child{
+.panelDescriptiveMetadata .form-separator:first-child {
 	margin-top:0px !important;
 }
 
-.descriptiveMetadata .form-separator:first-child{
-	margin-top:-15px !important;
+.descriptiveMetadata .form-separator:first-child {
+	margin-top: 0 !important;
 }
 
 .form-integerbox {
@@ -542,7 +542,7 @@ pre code {
 
 .btn {
     border-radius: 2px;
-    padding: 8px 10px;
+    padding: 8px 27px 8px 10px;
     border: none;
     background-color: #089de3;
     color: white;
@@ -3528,7 +3528,6 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .login-button {
-    min-width: 12rem;
     float: right;
 }
 
