@@ -24,6 +24,7 @@ import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.select.SelectedItemsAll;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -148,7 +149,7 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
     job.setPlugin(PluginHelper.getReindexPluginName(reindexClass));
 
     if (TransferredResource.class.equals(reindexClass) || LogEntry.class.equals(reindexClass)
-      || RODAMember.class.equals(reindexClass)) {
+      || RODAMember.class.equals(reindexClass) || IndexedPreservationAgent.class.equals(reindexClass)) {
       job.setSourceObjects(SelectedItemsNone.create());
     } else {
       job.setSourceObjects(SelectedItemsAll.create(reindexClass));

@@ -53,6 +53,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
@@ -80,6 +81,7 @@ import org.roda.core.plugins.plugins.base.reindex.ReindexFormatPlugin;
 import org.roda.core.plugins.plugins.base.reindex.ReindexIncidencePlugin;
 import org.roda.core.plugins.plugins.base.reindex.ReindexJobPlugin;
 import org.roda.core.plugins.plugins.base.reindex.ReindexNotificationPlugin;
+import org.roda.core.plugins.plugins.base.reindex.ReindexPreservationAgentPlugin;
 import org.roda.core.plugins.plugins.base.reindex.ReindexRiskPlugin;
 import org.roda.core.plugins.plugins.base.reindex.ReindexRodaMemberPlugin;
 import org.roda.core.plugins.plugins.base.reindex.ReindexTransferredResourcePlugin;
@@ -350,6 +352,7 @@ public final class PluginHelper {
     list.add(LogEntry.class);
     list.add(RiskIncidence.class);
     list.add(Job.class);
+    list.add(IndexedPreservationAgent.class);
     return list;
   }
 
@@ -863,6 +866,8 @@ public final class PluginHelper {
       return ReindexRodaMemberPlugin.class.getName();
     } else if (reindexClass.equals(LogEntry.class)) {
       return ReindexActionLogPlugin.class.getName();
+    } else if (reindexClass.equals(IndexedPreservationAgent.class)) {
+      return ReindexPreservationAgentPlugin.class.getName();
     } else {
       throw new NotFoundException("No reindex plugin available");
     }

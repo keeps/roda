@@ -577,6 +577,8 @@ public interface ClientMessages extends Messages {
 
   String sipId();
 
+  String processId();
+
   /************* Search ****************/
   String searchListBoxItems();
 

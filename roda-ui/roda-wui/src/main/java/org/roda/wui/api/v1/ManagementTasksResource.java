@@ -33,6 +33,7 @@ import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
@@ -67,7 +68,7 @@ public class ManagementTasksResource {
   @POST
   @Path("/index/reindex")
   public Response executeIndexReindexTask(
-    @ApiParam(value = "", allowableValues = "ALL,aip,job,risk,riskincidence,agent,format,notification,actionlogs,transferred_resources,users_and_groups", defaultValue = "aip") @QueryParam("entity") String entity,
+    @ApiParam(value = "", allowableValues = "ALL,aip,job,risk,riskincidence,preservation_agent,format,notification,actionlogs,transferred_resources,users_and_groups", defaultValue = "aip") @QueryParam("entity") String entity,
     @QueryParam("params") List<String> params) throws AuthorizationDeniedException, NotFoundException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -110,6 +111,8 @@ public class ManagementTasksResource {
       response = createJobToReindex(user, controllerAssistant, params, Notification.class);
     } else if ("transferred_resources".equals(entity)) {
       response = createJobToReindex(user, controllerAssistant, params, TransferredResource.class);
+    } else if ("preservation_agent".equals(entity)) {
+      response = createJobToReindex(user, controllerAssistant, params, IndexedPreservationAgent.class);
     } else if ("actionlogs".equals(entity)) {
       response = createJobToReindex(user, controllerAssistant, params, LogEntry.class);
     } else if ("users_and_groups".equals(entity)) {
@@ -126,7 +129,7 @@ public class ManagementTasksResource {
 
     SelectedItems<?> create;
     if (TransferredResource.class.equals(classToCreate) || LogEntry.class.equals(classToCreate)
-      || RODAMember.class.equals(classToCreate)) {
+      || RODAMember.class.equals(classToCreate) || IndexedPreservationAgent.class.equals(classToCreate)) {
       create = SelectedItemsNone.create();
     } else {
       if (params.isEmpty()) {

@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrClient;
@@ -194,7 +193,12 @@ public class IndexService {
       }
       LOGGER.info("{} > Optimizing indexes", new Date().getTime());
 
-      reindexPreservationAgents();
+      try {
+        reindexPreservationAgents();
+      } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
+        LOGGER.error("Error reindexing preservation agents");
+      }
+
       commitAIPs();
       optimizeAIPs();
       LOGGER.info("{} > Done", new Date().getTime());
@@ -232,16 +236,13 @@ public class IndexService {
     observer.aipCreated(aip);
   }
 
-  public void reindexPreservationAgents() {
-    try {
-      CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = model.listPreservationAgents();
-      for (OptionalWithCause<PreservationMetadata> opm : iterable) {
-        observer.preservationMetadataCreated(opm.get());
-      }
-      IOUtils.closeQuietly(iterable);
-    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | NoSuchElementException e) {
-      LOGGER.error("Could not reindex preservation agents");
+  public void reindexPreservationAgents()
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
+    CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = model.listPreservationAgents();
+    for (OptionalWithCause<PreservationMetadata> opm : iterable) {
+      observer.preservationMetadataCreated(opm.get());
     }
+    IOUtils.closeQuietly(iterable);
   }
 
   public void reindexJob(Job job) {

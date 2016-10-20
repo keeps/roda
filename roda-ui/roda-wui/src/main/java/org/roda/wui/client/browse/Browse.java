@@ -46,6 +46,7 @@ import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
+import org.roda.wui.client.ingest.process.ShowJobReport;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.management.UserLog;
@@ -90,6 +91,7 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -178,6 +180,9 @@ public class Browse extends Composite {
 
   @UiField
   Label browseItemHeader, itemTitle, itemId, sipId;
+
+  @UiField
+  Anchor ingestJobId;
 
   @UiField
   TabPanel itemMetadata;
@@ -466,6 +471,8 @@ public class Browse extends Composite {
     itemId.removeStyleName("browseItemId");
     sipId.setText("");
     sipId.removeStyleName("browseSipId");
+    ingestJobId.setText("");
+    ingestJobId.removeStyleName("browseIngestJobId");
 
     breadcrumb.setVisible(false);
 
@@ -560,10 +567,19 @@ public class Browse extends Composite {
       itemTitle.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
       itemTitle.removeStyleName("browseTitle-allCollections");
       itemIcon.getParent().removeStyleName("browseTitle-allCollections-wrapper");
-      itemId.setText(aip.getId());
+      itemId.setText(messages.itemId() + " " + aip.getId());
       itemId.addStyleName("browseItemId");
-      sipId.setText(StringUtility.prettyPrint(aip.getIngestSIPIds()));
+      sipId.setText(messages.sipId() + " " + StringUtility.prettyPrint(aip.getIngestSIPIds()));
       sipId.addStyleName("browseSipId");
+
+      if (aip.getIngestJobId() != null) {
+        final IndexedAIP ingestedAIP = aip;
+        ingestJobId
+          .setHTML("<div class='browseIngestJobId'>" + messages.processId() + ": " + aip.getIngestJobId() + "</div>");
+        ingestJobId.setHref(Tools.createHistoryHashLink(ShowJobReport.RESOLVER,
+          ingestedAIP.getIngestJobId() + '-' + ingestedAIP.getId()));
+        ingestJobId.addStyleName("browseIngestJobId");
+      }
 
       final List<Pair<String, HTML>> descriptiveMetadataContainers = new ArrayList<Pair<String, HTML>>();
       final Map<String, DescriptiveMetadataViewBundle> bundles = new HashMap<>();

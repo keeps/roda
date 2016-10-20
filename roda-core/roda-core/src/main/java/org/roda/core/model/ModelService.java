@@ -59,6 +59,7 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
@@ -2082,7 +2083,7 @@ public class ModelService extends ModelObservable {
   public boolean hasObjects(Class<? extends IsRODAObject> objectClass) {
     try {
       if (LogEntry.class.equals(objectClass) || RODAMember.class.equals(objectClass)
-        || TransferredResource.class.equals(objectClass)) {
+        || TransferredResource.class.equals(objectClass) || IndexedPreservationAgent.class.equals(objectClass)) {
         return true;
       } else {
         StoragePath storagePath = ModelUtils.getContainerPath(objectClass);
