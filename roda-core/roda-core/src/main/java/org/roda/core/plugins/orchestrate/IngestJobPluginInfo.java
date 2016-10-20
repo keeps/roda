@@ -15,17 +15,19 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.v2.IsRODAObject;
-import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
-import org.roda.core.plugins.plugins.PluginHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class IngestJobPluginInfo extends JobPluginInfo {
   private static final long serialVersionUID = -7993848868644990995L;
+  private static final Logger LOGGER = LoggerFactory.getLogger(IngestJobPluginInfo.class);
 
   private int stepsCompleted = 0;
   private int totalSteps = 0;
@@ -203,11 +205,29 @@ public class IngestJobPluginInfo extends JobPluginInfo {
     for (Entry<String, Report> aipReportEntry : allReports.get(transferredResourceId).entrySet()) {
       Report report = aipReportEntry.getValue();
       if (report.getPluginState() != PluginState.FAILURE) {
-        Report reportItem = PluginHelper
-          .initPluginReportItem(plugin, aipReportEntry.getKey(), AIPState.INGEST_PROCESSING)
-          .setPluginState(PluginState.FAILURE)
+        List<Report> reportItems = report.getReports();
+        Report reportItem = reportItems.get(reportItems.size() - 1);
+        reportItem.setPluginState(PluginState.FAILURE)
           .setPluginDetails("This AIP processing failed because a related AIP also failed");
-        PluginHelper.updatePartialJobReport(plugin, model, index, reportItem, false);
+        reportItems.remove(reportItems.size() - 1);
+        reportItems.add(reportItem);
+        // report.setReports(reportItems);
+        report.setPluginState(PluginState.FAILURE);
+
+        try {
+          model.createOrUpdateJobReport(report);
+        } catch (GenericException e) {
+          LOGGER.error("Error updating last job report indicating other AIP failure.");
+        }
+
+        // Report reportItem = PluginHelper
+        // .initPluginReportItem(plugin, aipReportEntry.getKey(),
+        // AIPState.INGEST_PROCESSING)
+        // .setPluginState(PluginState.FAILURE)
+        // .setPluginDetails("This AIP processing failed because a related AIP
+        // also failed");
+        // PluginHelper.updatePartialJobReport(plugin, model, index, reportItem,
+        // false);
       }
     }
 

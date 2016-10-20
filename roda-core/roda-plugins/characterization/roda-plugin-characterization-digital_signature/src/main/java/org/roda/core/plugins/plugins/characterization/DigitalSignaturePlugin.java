@@ -128,7 +128,11 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
 
   @Override
   public String getDescription() {
-    return "Checks if digital signatures embedded in files are valid. \nThe task supports the following formats: PDF, Microsoft Office Formats (.docx, .xslx, .pptx) and OpenDocument formats (.odt, .ods, .odp).\nThe outcome of this action is three-fold: \n1) the outcome of verification is stored in a PREMIS event; \n2) the extracted digital signatures are stored within the AIP under the “metadata/other” folder; and \n3) the files with the digital signature removed are stored under a new representation in the Archival Information Package (AIP).";
+    return "Checks if digital signatures embedded in files are valid. \nThe task supports the following formats: PDF, "
+      + "Microsoft Office Formats (.docx, .xslx, .pptx) and OpenDocument formats (.odt, .ods, .odp).\nThe outcome of this action is "
+      + "three-fold: \n1) the outcome of verification is stored in a PREMIS event; \n2) the extracted digital signatures are stored within "
+      + "the AIP under the “metadata/other” folder; and \n3) the files with the digital signature removed are stored under a new representation "
+      + "in the Archival Information Package (AIP).";
   }
 
   @Override
