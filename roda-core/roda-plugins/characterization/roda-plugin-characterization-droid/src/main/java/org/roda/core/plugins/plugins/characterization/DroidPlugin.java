@@ -13,6 +13,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
@@ -81,6 +83,11 @@ public class DroidPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getVersionImpl() {
+    String signatureFile = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "droid", "signatureFile");
+    if (StringUtils.isNotBlank(signatureFile)) {
+
+    }
+
     return "1.0";
   }
 
