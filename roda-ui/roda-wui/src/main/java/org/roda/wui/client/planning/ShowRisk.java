@@ -22,6 +22,7 @@ import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.EditMultipleRiskIncidenceDialog;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.process.CreateJob;
 import org.roda.wui.common.client.HistoryResolver;
@@ -143,7 +144,13 @@ public class ShowRisk extends Composite {
       }
     });
   }
-
+  
+  @Override
+  protected void onLoad() {
+    super.onLoad();
+    JavascriptUtils.stickSidebar();
+  }
+  
   void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 1) {
       String riskId = historyTokens.get(0);

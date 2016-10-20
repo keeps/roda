@@ -17,6 +17,7 @@ import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
@@ -114,6 +115,12 @@ public class Profile extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
 
     userDataPanel.setUsernameReadOnly(true);
+  }
+  
+  @Override
+  protected void onLoad() {
+    super.onLoad();
+    JavascriptUtils.stickSidebar();
   }
 
   @UiHandler("buttonApply")

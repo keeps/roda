@@ -28,6 +28,7 @@ import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.common.client.HistoryResolver;
@@ -180,6 +181,12 @@ public class ShowPreservationEvent extends Composite {
           viewAction();
         }
       });
+  }
+  
+  @Override
+  protected void onLoad() {
+    super.onLoad();
+    JavascriptUtils.stickSidebar();
   }
 
   public void viewAction() {

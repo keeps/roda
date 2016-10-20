@@ -28,6 +28,7 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.LogEntryList;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
+import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
@@ -201,6 +202,12 @@ public class UserLog extends Composite {
 
     inputDateInitial.getElement().setPropertyString("placeholder", messages.sidebarFilterFromDatePlaceHolder());
     inputDateFinal.getElement().setPropertyString("placeholder", messages.sidebarFilterToDatePlaceHolder());
+  }
+  
+  @Override
+  protected void onLoad() {
+    super.onLoad();
+    JavascriptUtils.stickSidebar();
   }
 
   private void updateDateFilter() {

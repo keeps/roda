@@ -17,6 +17,7 @@ import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
@@ -181,6 +182,12 @@ public class ShowLogEntry extends Composite {
     logStateLabel.setVisible(logEntry.getState() != null);
     logStateValue.setVisible(logEntry.getState() != null);
 
+  }
+  
+  @Override
+  protected void onLoad() {
+    super.onLoad();
+    JavascriptUtils.stickSidebar();
   }
 
   @UiHandler("buttonCancel")

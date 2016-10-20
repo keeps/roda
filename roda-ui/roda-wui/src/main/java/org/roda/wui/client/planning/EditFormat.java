@@ -14,6 +14,7 @@ import org.roda.core.data.v2.formats.Format;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
@@ -99,6 +100,12 @@ public class EditFormat extends Composite {
     this.format = format;
     this.formatDataPanel = new FormatDataPanel(true, true, format);
     initWidget(uiBinder.createAndBindUi(this));
+  }
+  
+  @Override
+  protected void onLoad() {
+    super.onLoad();
+    JavascriptUtils.stickSidebar();
   }
 
   @UiHandler("buttonApply")

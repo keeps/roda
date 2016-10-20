@@ -104,7 +104,7 @@
 				</g:FlowPanel>
 			</g:FlowPanel>
 
-			<g:FlowPanel addStyleNames="col_2 last sidebar sticky">
+			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
 						<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">

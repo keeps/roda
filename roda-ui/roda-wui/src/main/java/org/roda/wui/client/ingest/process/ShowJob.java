@@ -51,6 +51,7 @@ import org.roda.wui.client.common.lists.TransferredResourceList;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.process.ActionProcess;
 import org.roda.wui.client.process.IngestProcess;
@@ -126,6 +127,7 @@ public class ShowJob extends Composite {
             ShowJob showJob = new ShowJob(jobBundle.getJob(), pluginsInfo);
             callback.onSuccess(showJob);
           }
+
         });
       } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(ShowJobReport.RESOLVER.getHistoryToken())) {
         ShowJobReport.RESOLVER.resolve(Tools.tail(historyTokens), callback);
@@ -337,31 +339,55 @@ public class ShowJob extends Composite {
     }
 
     PluginInfo pluginInfo = pluginsInfo.get(job.getPlugin());
-    plugin.setText(messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()));
+    if (pluginInfo != null) {
+      plugin.setText(messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()));
 
-    if (pluginInfo.getParameters().isEmpty()) {
+      if (pluginInfo.getParameters().isEmpty()) {
+        pluginPanel.setVisible(false);
+        pluginOptions.setVisible(false);
+      } else {
+        pluginPanel.setVisible(true);
+        pluginOptions.setVisible(true);
+      }
+
+      for (PluginParameter parameter : pluginInfo.getParameters()) {
+
+        if (PluginParameterType.BOOLEAN.equals(parameter.getType())) {
+          createBooleanLayout(parameter);
+        } else if (PluginParameterType.STRING.equals(parameter.getType())) {
+          createStringLayout(parameter);
+        } else if (PluginParameterType.PLUGIN_SIP_TO_AIP.equals(parameter.getType())) {
+          createPluginSipToAipLayout(parameter);
+        } else if (PluginParameterType.AIP_ID.equals(parameter.getType())) {
+          createSelectAipLayout(parameter);
+        } else {
+          // TODO log a warning
+          createStringLayout(parameter);
+        }
+      }
+    } else {
+      plugin.setText(job.getPlugin());
       pluginPanel.setVisible(false);
       pluginOptions.setVisible(false);
-    } else {
-      pluginPanel.setVisible(true);
-      pluginOptions.setVisible(true);
+    }
+  }
+
+  @Override
+  protected void onDetach() {
+    if (autoUpdateTimer != null) {
+      autoUpdateTimer.cancel();
+    }
+    super.onDetach();
+  }
+
+  @Override
+  protected void onLoad() {
+    if (autoUpdateTimer != null && !autoUpdateTimer.isRunning() && isJobRunning()) {
+      autoUpdateTimer.scheduleRepeating(PERIOD_MILLIS);
     }
 
-    for (PluginParameter parameter : pluginInfo.getParameters()) {
-
-      if (PluginParameterType.BOOLEAN.equals(parameter.getType())) {
-        createBooleanLayout(parameter);
-      } else if (PluginParameterType.STRING.equals(parameter.getType())) {
-        createStringLayout(parameter);
-      } else if (PluginParameterType.PLUGIN_SIP_TO_AIP.equals(parameter.getType())) {
-        createPluginSipToAipLayout(parameter);
-      } else if (PluginParameterType.AIP_ID.equals(parameter.getType())) {
-        createSelectAipLayout(parameter);
-      } else {
-        // TODO log a warning
-        createStringLayout(parameter);
-      }
-    }
+    JavascriptUtils.stickSidebar();
+    super.onLoad();
   }
 
   private boolean isJobRunning() {
@@ -541,22 +567,6 @@ public class ShowJob extends Composite {
       }
       autoUpdateTimer.schedule(PERIOD_MILLIS);
     }
-  }
-
-  @Override
-  protected void onDetach() {
-    if (autoUpdateTimer != null) {
-      autoUpdateTimer.cancel();
-    }
-    super.onDetach();
-  }
-
-  @Override
-  protected void onLoad() {
-    if (autoUpdateTimer != null && !autoUpdateTimer.isRunning() && isJobRunning()) {
-      autoUpdateTimer.scheduleRepeating(PERIOD_MILLIS);
-    }
-    super.onLoad();
   }
 
   private void createSelectAipLayout(PluginParameter parameter) {

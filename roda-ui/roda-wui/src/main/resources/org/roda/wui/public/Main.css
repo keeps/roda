@@ -1612,8 +1612,12 @@ td.datePickerMonth, td.datePickerYear {
 
 .sidebar {
     background: #eee;
-    padding: 30px !important;
+    padding: 0 !important;
     min-width: 230px;
+}
+
+.sidebar .sticky-padding {
+	padding: 30px;
 }
 
 .sidebar .btn {
@@ -1626,23 +1630,6 @@ td.datePickerMonth, td.datePickerYear {
 .sidebar .h6 {
     margin-bottom: 0.6rem;
     font-size: 1.8rem;
-}
-
-
-@media (min-width: 768px) {    
-	.sidebar.sticky {
-		padding: 0 !important;
-	}    
-    
-    .sidebar.sticky .sticky-flow {
-		position: fixed;
-		width: inherit;
-		min-width: inherit;	 
-	}
-	
-	.sidebar.sticky .sticky-padding {
-		padding: 30px;
-	}
 }
 
 

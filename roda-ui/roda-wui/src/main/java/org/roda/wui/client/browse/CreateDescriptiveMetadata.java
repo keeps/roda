@@ -24,6 +24,7 @@ import org.roda.core.data.v2.validation.ValidationIssue;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
@@ -223,6 +224,12 @@ public class CreateDescriptiveMetadata extends Composite {
           updateFormOrXML();
         }
       });
+  }
+  
+  @Override
+  protected void onLoad() {
+    super.onLoad();
+    JavascriptUtils.stickSidebar();
   }
 
   private void createForm(SupportedMetadataTypeBundle bundle) {

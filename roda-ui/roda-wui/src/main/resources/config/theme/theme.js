@@ -11,14 +11,4 @@ $(document).ready(function() {
 			});
 		}
 	});
-
-	$(window).scroll(function () {
-		// FIXME the math for the sidebar has to be reviewed
-		if ($(".sidebar").length > 0 && 
-				$(window).height() > $(".sticky-flow").height() + $(".footer").height() + $(".footerTop").height() + $(".sidebar").position().top + 40) {
-		  $('.sidebar').addClass('sticky');
-	    } else {
-	      $('.sidebar').removeClass('sticky');
-	    }
-   	});
 });

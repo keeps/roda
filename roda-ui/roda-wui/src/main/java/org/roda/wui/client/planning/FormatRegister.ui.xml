@@ -25,7 +25,7 @@
 				<lists:FormatList addStyleNames="searchResults"
 					ui:field="formatList" />
 			</g:FlowPanel>
-			<g:FlowPanel addStyleNames="col_2 last sidebar sticky">
+			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
 						<g:Label addStyleNames="h5 sidebar-facet-title">

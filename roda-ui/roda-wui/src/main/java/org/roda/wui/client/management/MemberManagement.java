@@ -20,6 +20,7 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.RodaMemberList;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
+import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Tools;
@@ -148,6 +149,12 @@ public class MemberManagement extends Composite {
         }
       }
     });
+  }
+  
+  @Override
+  protected void onLoad() {
+    super.onLoad();
+    JavascriptUtils.stickSidebar();
   }
 
   private void refresh() {

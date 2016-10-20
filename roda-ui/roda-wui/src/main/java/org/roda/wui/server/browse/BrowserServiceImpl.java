@@ -409,6 +409,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     throws AuthorizationDeniedException, GenericException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Job job = Browser.retrieve(user, Job.class, jobId);
+
     List<PluginInfo> pluginsInfo = new ArrayList<>();
 
     PluginInfo basePlugin = RodaCoreFactory.getPluginManager().getPluginInfo(job.getPlugin());

@@ -128,6 +128,12 @@ public class IngestTransferUpload extends Composite {
   private IngestTransferUpload() {
     initWidget(uiBinder.createAndBindUi(this));
   }
+  
+  @Override
+  protected void onLoad() {
+    super.onLoad();
+    JavascriptUtils.stickSidebar();
+  }
 
   private String getUploadUrl() {
     String ret;

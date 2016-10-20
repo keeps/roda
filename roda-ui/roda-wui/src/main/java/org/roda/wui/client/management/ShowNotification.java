@@ -17,6 +17,7 @@ import org.roda.core.data.v2.notifications.Notification;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 
@@ -165,6 +166,12 @@ public class ShowNotification extends Composite {
     stateValue.setHTML(HtmlSnippetUtils.getNotificationStateHTML(notification.getState()));
     stateLabel.setVisible(notification.getState() != null);
     stateValue.setVisible(notification.getState() != null);
+  }
+  
+  @Override
+  protected void onLoad() {
+    super.onLoad();
+    JavascriptUtils.stickSidebar();
   }
 
   @UiHandler("buttonCancel")

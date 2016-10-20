@@ -15,6 +15,7 @@ import java.util.List;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.v2.user.Group;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
@@ -91,6 +92,12 @@ public class CreateGroup extends Composite {
     this.groupDataPanel.setGroup(group);
 
     initWidget(uiBinder.createAndBindUi(this));
+  }
+  
+  @Override
+  protected void onLoad() {
+    super.onLoad();
+    JavascriptUtils.stickSidebar();
   }
 
   @UiHandler("buttonApply")

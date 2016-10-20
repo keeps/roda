@@ -336,6 +336,12 @@ public class ShowJobReport extends Composite {
       }
     }
   }
+  
+  @Override
+  protected void onLoad() {
+    super.onLoad();
+    JavascriptUtils.stickSidebar();
+  }
 
   @UiHandler("buttonBack")
   void buttonCancelHandler(ClickEvent e) {

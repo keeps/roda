@@ -28,6 +28,7 @@ import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.MemberSelectDialog;
 import org.roda.wui.client.common.lists.ClientSelectedItemsUtils;
+import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
@@ -146,6 +147,12 @@ public class EditPermissions extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
     editPermissionsDescription.add(new HTMLWidgetWrapper("EditPermissionsDescription.html"));
     createPermissionPanelList();
+  }
+  
+  @Override
+  protected void onLoad() {
+    super.onLoad();
+    JavascriptUtils.stickSidebar();
   }
 
   private void createPermissionPanelList() {

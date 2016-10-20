@@ -25,7 +25,7 @@
 				</g:FlowPanel>
 				<commonsearch:MainSearch ui:field="mainSearch" />
 			</g:FlowPanel>
-			<g:FlowPanel addStyleNames="col_2 last sidebar sticky">
+			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
 						<g:FlowPanel styleName="sidebar-group" ui:field="filesFacets">

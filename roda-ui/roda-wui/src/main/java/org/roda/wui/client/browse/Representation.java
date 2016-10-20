@@ -33,6 +33,7 @@ import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
@@ -299,6 +300,12 @@ public class Representation extends Composite {
       newDescriptiveMetadata.setVisible(true);
       itemMetadata.setVisible(false);
     }
+  }
+  
+  @Override
+  protected void onLoad() {
+    super.onLoad();
+    JavascriptUtils.stickSidebar();
   }
 
   private List<BreadcrumbItem> getBreadcrumbs() {

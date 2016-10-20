@@ -25,6 +25,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.JobList;
+import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
@@ -182,6 +183,12 @@ public class IngestProcess extends Composite {
 
     jobList.autoUpdate(10000);
 
+  }
+  
+  @Override
+  protected void onLoad() {
+    super.onLoad();
+    JavascriptUtils.stickSidebar();
   }
 
   private void updateDateFilter() {

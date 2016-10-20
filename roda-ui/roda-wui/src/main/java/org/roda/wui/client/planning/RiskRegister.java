@@ -32,6 +32,7 @@ import org.roda.wui.client.common.lists.RiskList;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.process.CreateJob;
 import org.roda.wui.client.process.CreateSearchActionJob;
 import org.roda.wui.common.client.HistoryResolver;
@@ -225,7 +226,13 @@ public class RiskRegister extends Composite {
     inputDateInitial.getElement().setPropertyString("placeholder", messages.sidebarFilterFromDatePlaceHolder());
     inputDateFinal.getElement().setPropertyString("placeholder", messages.sidebarFilterToDatePlaceHolder());
   }
-
+  
+  @Override
+  protected void onLoad() {
+    super.onLoad();
+    JavascriptUtils.stickSidebar();
+  }
+  
   private void updateDateFilter() {
     Date dateInitial = inputDateInitial.getDatePicker().getValue();
     Date dateFinal = inputDateFinal.getDatePicker().getValue();

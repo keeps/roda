@@ -25,6 +25,7 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.PluginUtils;
 import org.roda.wui.client.ingest.process.PluginOptionsPanel;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
@@ -151,9 +152,17 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
     this.selected = items;
     getInformation(classToReceive, pluginType);
   }
+  
+  
 
   public CreateJob(Class<T> classToReceive, final List<PluginType> pluginType) {
     getInformation(classToReceive, pluginType);
+  }
+  
+  @Override
+  protected void onLoad() {
+    super.onLoad();
+    JavascriptUtils.stickSidebar();
   }
 
   private void getInformation(Class<T> classToReceive, final List<PluginType> pluginType) {

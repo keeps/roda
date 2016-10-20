@@ -28,6 +28,7 @@ import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.search.MainSearch;
+import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
@@ -63,15 +64,6 @@ public class IngestAppraisal extends Composite {
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
       getInstance().resolve(historyTokens, callback);
-//      Filter filter = new Filter(BASE_FILTER);
-//      for (int i = 0; i < historyTokens.size() - 1; i++) {
-//        String name = historyTokens.get(i);
-//        String value = historyTokens.get(i + 1);
-//        filter.add(new SimpleFilterParameter(name, value));
-//      }
-//
-//      IngestAppraisal ingestAppraisal = new IngestAppraisal(filter);
-//      callback.onSuccess(ingestAppraisal);
     }
 
     @Override
@@ -197,6 +189,12 @@ public class IngestAppraisal extends Composite {
 
     acceptButton.setEnabled(false);
     rejectButton.setEnabled(false);
+  }
+  
+  @Override
+  protected void onLoad() {
+    super.onLoad();
+    JavascriptUtils.stickSidebar();
   }
   
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {

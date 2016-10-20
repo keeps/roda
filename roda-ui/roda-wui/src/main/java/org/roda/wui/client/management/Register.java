@@ -20,6 +20,7 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.UserExtraBundle;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.main.Login;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
 import org.roda.wui.client.management.recaptcha.RecaptchaWidget;
@@ -152,6 +153,12 @@ public class Register extends Composite {
         recaptchaActive = false;
       }
     });
+  }
+  
+  @Override
+  protected void onLoad() {
+    super.onLoad();
+    JavascriptUtils.stickSidebar();
   }
 
   void setExtra(UserExtraBundle b) {

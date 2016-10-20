@@ -298,5 +298,13 @@ public class JavascriptUtils {
   public static native void expose(String key, String value) /*-{
 		$doc[key] = value;
   }-*/;
+  
+  public static native void stickInParent(JavaScriptObject object) /*-{
+    $wnd.jQuery(object).stick_in_parent();
+  }-*/;
+  
+  public static native void stickSidebar() /*-{
+    $wnd.jQuery('.sticky-flow').stick_in_parent();
+  }-*/;
 
 }
