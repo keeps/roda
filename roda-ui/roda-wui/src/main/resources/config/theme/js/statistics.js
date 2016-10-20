@@ -19,32 +19,35 @@
         inheritDataAttributes(element);
 
         var view = element.data("view");
-        var viewCallback = function() {};
+        var initView = function() {};
         if (view == "chart") {
           var viewField = element.data("view-field");
           if (viewField == "facetResults") {
-            viewCallback = initViewFacetChart;
+            initView = initViewFacetChart;
           } else {
             console.log("Unknown view-field '" + viewField + "'");
           }
         } else if (view == "text") {
-          viewCallback = initViewText;
+          initView = initViewText;
         } else if (view == "download") {
-          viewCallback = initViewDownload;
+          initView = initViewDownload;
         } else {
           console.log("Unknown view '" + view + "'");
         }
 
         var source = element.data("source");
+        var dataFunction = function() {};
         if (source == "index") {
-          fetchIndexData(element, viewCallback);
+          dataFunction = fetchIndexData;
         } else if (source == "function") {
           var customFunction = element.data("function");
-          executeFunctionByName(window, customFunction, element,
-            viewCallback);
+          executeFunctionByName(window, customFunction, element);
         } else {
           console.log("Unknown data source '" + source + "'");
         }
+
+        initView(element, dataFunction);
+
       });
     }
 
@@ -57,7 +60,6 @@
       var ref = element.data("ref");
       if (ref) {
         var refElement = document.getElementById(ref);
-        refElement = refElement ? $(refElement) : refElement;
         if (refElement) {
           refElement = $(refElement);
           attributes.forEach(function(attribute) {
@@ -108,14 +110,18 @@
       });
     }
 
-    function initViewText(element, data) {
+    function initViewText(element, dataFunction) {
+      dataFunction(element, viewTextCallback);
+    }
+
+    function viewTextCallback(element, data) {
       element.text(data[element.data("view-field")]);
       element.parent().textfill({
         widthOnly: true
       });
     }
 
-    function initViewDownload(element, data) {
+    function initViewDownload(element, dataFunction) {
       var url = buildDataUrl(element);
       if (element.data("view-field") == "facetResults") {
         url = url + "&exportFacets=true";
@@ -143,7 +149,11 @@
       });
     }
 
-    function initViewFacetChart(element, data) {
+    function initViewFacetChart(element, dataFunction) {
+      dataFunction(element, viewFacetChartCallback);
+    }
+
+    function viewFacetChartCallback(element, data) {
       var chartOptionsCallback;
       var type = element.data("view-type");
       if (type == "function") {
