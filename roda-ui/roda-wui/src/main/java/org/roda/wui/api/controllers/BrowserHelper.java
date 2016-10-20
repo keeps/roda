@@ -1587,6 +1587,9 @@ public class BrowserHelper {
           if (dm.getType() != null) {
             dmNode = dmNode.put("metadataType", dm.getType());
           }
+          if (dm.getVersion() != null){
+            dmNode = dmNode.put("metadataVersion", dm.getVersion());
+          }
           Binary b = model.retrieveDescriptiveMetadataBinary(modelAIP.getId(), dm.getId());
           InputStream is = b.getContent().createInputStream();
           dmNode = dmNode.put("content", new String(Base64.encodeBase64(IOUtils.toByteArray(is))));
