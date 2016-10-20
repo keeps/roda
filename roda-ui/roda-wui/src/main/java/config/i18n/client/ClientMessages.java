@@ -85,11 +85,11 @@ public interface ClientMessages extends Messages {
   String historyDescriptiveMetadataTitle();
 
   String catalogueTitle();
-  
+
   String catalogueItemTitle();
-  
+
   String catalogueRepresentationTitle();
-  
+
   String catalogueFileTitle();
 
   String preservationActionsTitle();
@@ -578,6 +578,10 @@ public interface ClientMessages extends Messages {
   String sipId();
 
   String processId();
+
+  String itemIdMin(String itemId);
+
+  String sipIdMin(String sipId);
 
   /************* Search ****************/
   String searchListBoxItems();

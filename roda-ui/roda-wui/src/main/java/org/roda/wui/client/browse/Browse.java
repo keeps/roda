@@ -97,6 +97,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TabPanel;
@@ -182,7 +183,7 @@ public class Browse extends Composite {
   Label browseItemHeader, itemTitle, itemId, sipId;
 
   @UiField
-  Anchor ingestJobId;
+  FlowPanel ingestJobId;
 
   @UiField
   TabPanel itemMetadata;
@@ -471,7 +472,7 @@ public class Browse extends Composite {
     itemId.removeStyleName("browseItemId");
     sipId.setText("");
     sipId.removeStyleName("browseSipId");
-    ingestJobId.setText("");
+    ingestJobId.clear();
     ingestJobId.removeStyleName("browseIngestJobId");
 
     breadcrumb.setVisible(false);
@@ -567,20 +568,27 @@ public class Browse extends Composite {
       itemTitle.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
       itemTitle.removeStyleName("browseTitle-allCollections");
       itemIcon.getParent().removeStyleName("browseTitle-allCollections-wrapper");
-      itemId.setText(messages.itemId() + " " + aip.getId());
+      itemId.setText(messages.itemIdMin(aip.getId()));
       itemId.addStyleName("browseItemId");
 
       if (!aip.getIngestSIPIds().isEmpty()) {
-        sipId.setText(messages.sipId() + " " + StringUtility.prettyPrint(aip.getIngestSIPIds()));
+        sipId.setText(messages.sipIdMin(StringUtility.prettyPrint(aip.getIngestSIPIds())));
         sipId.addStyleName("browseSipId");
       }
 
       if (StringUtils.isNotBlank(aip.getIngestJobId())) {
         final IndexedAIP ingestedAIP = aip;
-        ingestJobId
-          .setHTML("<div class='browseIngestJobId'>" + messages.processId() + ": " + aip.getIngestJobId() + "</div>");
-        ingestJobId.setHref(Tools.createHistoryHashLink(ShowJobReport.RESOLVER,
+
+        InlineHTML html = new InlineHTML();
+        html.setText(messages.processId());
+
+        Anchor anchor = new Anchor();
+        anchor.setText(aip.getIngestJobId());
+        anchor.setHref(Tools.createHistoryHashLink(ShowJobReport.RESOLVER,
           ingestedAIP.getIngestJobId() + '-' + ingestedAIP.getId()));
+
+        ingestJobId.add(html);
+        ingestJobId.add(anchor);
         ingestJobId.addStyleName("browseIngestJobId");
       }
 

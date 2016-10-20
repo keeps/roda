@@ -85,7 +85,8 @@ public class DroidPlugin extends AbstractPlugin<AIP> {
   public String getVersionImpl() {
     String signatureFile = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "droid", "signatureFile");
     if (StringUtils.isNotBlank(signatureFile)) {
-
+      return signatureFile.substring(signatureFile.lastIndexOf("/")).replaceAll(".*DROID_SignatureFile_(V[0-9]+).*",
+        "$1");
     }
 
     return "1.0";

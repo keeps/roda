@@ -37,7 +37,7 @@
 						title="{messages.itemId}" />
 					<g:Label addStyleNames="browseSipId" ui:field="sipId"
 						title="{messages.sipId}" />
-					<g:Anchor ui:field="ingestJobId" title="{messages.sipId}" />
+					<g:FlowPanel ui:field="ingestJobId" title="{messages.sipId}" />
 				</g:FlowPanel>
 				<m:BreadcrumbPanel ui:field="breadcrumb"
 					addStyleNames="browseBreadcrumb" />
@@ -96,7 +96,7 @@
 							</g:Button>
 							<g:Button addStyleNames="btn btn-default btn-download"
 								ui:field="download">
-								<ui:text from='{messages.downloadArchivalPackage}' />
+								<ui:text from='{messages.downloadButton}' />
 							</g:Button>
 						</g:FlowPanel>
 						<g:FlowPanel ui:field="preservationSidebar">
