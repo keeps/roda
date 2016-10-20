@@ -553,6 +553,11 @@ pre code {
     text-overflow: ellipsis;
     text-transform: uppercase;
     text-decoration: none;
+    
+    position: relative;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .btn:hover {
@@ -618,7 +623,9 @@ pre code {
     -moz-osx-font-smoothing: grayscale;
     float: right;
     margin-top: 1px;
-    padding-left: 5px;
+    
+    position: absolute;
+    right: 10px;
 }
 
 .btn-link:after {
@@ -1613,7 +1620,10 @@ td.datePickerMonth, td.datePickerYear {
 .sidebar {
     background: #eee;
     padding: 0 !important;
-    min-width: 230px;
+}
+
+.sidebar .sticky-flow {
+	min-width: 220px;
 }
 
 .sidebar .sticky-padding {
