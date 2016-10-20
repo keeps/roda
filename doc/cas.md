@@ -6,16 +6,16 @@ These instructions are for CAS service from [apereo](https://www.apereo.org/proj
 
 ## Install and run CAS with LDAP
 
-For these instructions assume the LDAP server has the following characteristics:
+For these instructions, we're assuming the LDAP server has the following characteristics:
 
-* URL: ldap://localhost:10389
-* Base DN: dc=roda,dc=org
-* Users DN: ou=users,dc=roda,dc=org
-* Admin DN: uid=admin,ou=system
-* Admin password: roda
-* User filter: uid={user}
+* **URL**: ldap://localhost:10389
+* **Base DN**: dc=roda,dc=org
+* **Users DN**: ou=users,dc=roda,dc=org
+* **Admin DN**: uid=admin,ou=system
+* **Admin password**: roda
+* **User unique attribute**: uid
 
-Change the values to match your LDAP server.
+Change the values to match your LDAP.
 
 1. Get CAS Overlay Template
     ```
@@ -407,24 +407,25 @@ Change the values to match your LDAP server.
 
 If during the login you see an exception like **SSLHandshakeException** or 
 **ValidationException**, it probably means RODA is having issues validating the certificate from the CAS server.
-If your CAS server is using the self-signed certificate from we created above, you'll see this error.
+If your CAS server is using the self-signed certificate we created above, you'll see this error.
 
 To fix it, you can:
 
 1. Use a valid certificate, or
-2. Make java programs (RODA) trust your self-signed certificate.
+2. Make java programs (like RODA) trust your self-signed certificate.
 
 To make java programs trust your self-signed certificate do the following steps:
 
 1. Export jetty self-signed certificate
 
     ```bash
-    keytool -export -keystore /etc/jetty/thekeystore -alias jetty -file jetty.cer
+    keytool -export -keystore /etc/cas/jetty/thekeystore -alias jetty -file jetty.cer
     ```
 
 2. Import jetty certificate in Java truststore
 
-    **NOTE**: Assuming your **JAVA_HOME** is **/usr/lib/jvm/java-8-oracle**
+    **NOTE**: Assuming your **JAVA_HOME** is **/usr/lib/jvm/java-8-oracle**. 
+    If it's not, adjust the keystore path accordingly.
 
     ```bash
     sudo keytool -import -keystore /usr/lib/jvm/java-8-oracle/jre/lib/security/cacerts -alias jetty -file jetty.cer
