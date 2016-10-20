@@ -371,7 +371,7 @@ public class Browse extends Composite {
   }
 
   @Override
-  protected void onLoad() {
+  protected void onLoad() {    
     super.onLoad();
     JavascriptUtils.stickSidebar();
   }
