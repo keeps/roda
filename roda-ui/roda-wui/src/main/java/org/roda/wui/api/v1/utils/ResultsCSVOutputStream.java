@@ -58,7 +58,7 @@ public class ResultsCSVOutputStream<T extends IsIndexed> extends CSVOutputStream
     boolean isFirst = true;
     for (final T result : this.results) {
       if (isFirst) {
-        printer = CSVFormat.DEFAULT.withHeader(result.toCsvHeaders().toArray(new String[0])).print(writer);
+        printer = getFormat().withHeader(result.toCsvHeaders().toArray(new String[0])).print(writer);
         isFirst = false;
       }
       printer.printRecord(result.toCsvValues());
