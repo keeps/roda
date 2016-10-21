@@ -61,7 +61,7 @@ public class DescriptionLevelUtils {
   public static DescriptionLevel getDescriptionLevel(String levelString) {
     return getDescriptionLevel(levelString, true);
   }
-  
+
   public static DescriptionLevel getDescriptionLevel(String levelString, boolean showLabel) {
     if (LEVELS_CONFIGURATION == null) {
       logger.error("Requiring a description level while their are not yet loaded");
@@ -69,19 +69,21 @@ public class DescriptionLevelUtils {
     }
     DescriptionLevel level = new DescriptionLevel();
     if (levelString == null) {
-      level.setIconClass("");
-    } else if (LEVELS_CONFIGURATION.getLevelIcons().containsKey(levelString)) {
-      level.setIconClass(LEVELS_CONFIGURATION.getLevelIcons().get(levelString));
-    } else if (levelString.equalsIgnoreCase(RodaConstants.AIP_GHOST)) {
-      level.setIconClass(LEVELS_CONFIGURATION.getGhostClass());
-    } else if ((levelString.equalsIgnoreCase(RodaConstants.VIEW_REPRESENTATION_REPRESENTATION))) {
-      level.setIconClass(LEVELS_CONFIGURATION.getRepresentationClass());
-    } else if ((levelString.equalsIgnoreCase(RodaConstants.VIEW_REPRESENTATION_FOLDER))) {
-      level.setIconClass(LEVELS_CONFIGURATION.getRepresentationFolderClass());
-    } else if ((levelString.equalsIgnoreCase(RodaConstants.VIEW_REPRESENTATION_FILE))) {
-      level.setIconClass(LEVELS_CONFIGURATION.getRepresentationFileClass());
-    } else {
       level.setIconClass(LEVELS_CONFIGURATION.getDefaultClass());
+    } else {
+      if (LEVELS_CONFIGURATION.getLevelIcons().containsKey(levelString)) {
+        level.setIconClass(LEVELS_CONFIGURATION.getLevelIcons().get(levelString));
+      } else if (levelString.equalsIgnoreCase(RodaConstants.AIP_GHOST)) {
+        level.setIconClass(LEVELS_CONFIGURATION.getGhostClass());
+      } else if ((levelString.equalsIgnoreCase(RodaConstants.VIEW_REPRESENTATION_REPRESENTATION))) {
+        level.setIconClass(LEVELS_CONFIGURATION.getRepresentationClass());
+      } else if ((levelString.equalsIgnoreCase(RodaConstants.VIEW_REPRESENTATION_FOLDER))) {
+        level.setIconClass(LEVELS_CONFIGURATION.getRepresentationFolderClass());
+      } else if ((levelString.equalsIgnoreCase(RodaConstants.VIEW_REPRESENTATION_FILE))) {
+        level.setIconClass(LEVELS_CONFIGURATION.getRepresentationFileClass());
+      } else {
+        level.setIconClass(LEVELS_CONFIGURATION.getDefaultClass());
+      }
     }
     Map<String, String> translations = LEVELS_CONFIGURATION.getTranslations();
     String label = translations.get(levelString);
@@ -138,13 +140,14 @@ public class DescriptionLevelUtils {
     String representationTypeKey = representationType.toLowerCase();
     String icon;
     if (LEVELS_CONFIGURATION.getRepresentationTypesIcons().containsKey(representationTypeKey)) {
-      icon = LEVELS_CONFIGURATION.getRepresentationTypesIcons().get(representationTypeKey); 
-    } else if (LEVELS_CONFIGURATION.getRepresentationTypesIcons().containsKey(RodaConstants.REPRESENTATION_TYPE_DEFAULT)) {
+      icon = LEVELS_CONFIGURATION.getRepresentationTypesIcons().get(representationTypeKey);
+    } else if (LEVELS_CONFIGURATION.getRepresentationTypesIcons()
+      .containsKey(RodaConstants.REPRESENTATION_TYPE_DEFAULT)) {
       icon = LEVELS_CONFIGURATION.getRepresentationTypesIcons().get(RodaConstants.REPRESENTATION_TYPE_DEFAULT);
     } else {
       icon = LEVELS_CONFIGURATION.getRepresentationClass();
     }
-    
+
     StringBuilder b = new StringBuilder();
     b.append("<i class='");
     if (icon != null) {
