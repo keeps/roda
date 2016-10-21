@@ -186,6 +186,7 @@ public final class RodaConstants {
   public static final String API_QUERY_PARAM_RISK_MESSAGE = "message";
   public static final String API_QUERY_PARAM_TEMPLATE = "template";
   public static final String API_QUERY_PARAM_PASSWORD = "password";
+  public static final String API_QUERY_PARAM_SIZE_LIMIT = "size";
   public static final String API_PARAM_FILE = "file";
   public static final String API_FORM_PARAM_FIND_REQUEST = "findRequest";
   public static final String API_FORM_PARAM_EXPORT_FACETS = "exportFacets";
@@ -561,6 +562,7 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_CREATE_SUBMISSION = "parameter.create_submission";
   public static final String PLUGIN_PARAMS_USERNAME = "parameter.username";
   public static final String PLUGIN_PARAMS_IGNORE_OTHER_FILES = "parameter.ignore_other_files";
+  public static final String PLUGIN_PARAMS_IGNORE_VERAPDF_VALIDATION = "parameter.ignore_verapdf_validation";
   public static final String PLUGIN_PARAMS_PDF_PROFILE = "parameter.pdf_profile";
   public static final String PLUGIN_PARAMS_SIGNATURE_VERIFY = "parameter.signature_verify";
   public static final String PLUGIN_PARAMS_SIGNATURE_EXTRACT = "parameter.signature_extract";

@@ -47,6 +47,7 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -135,9 +136,13 @@ public class ShowPreservationEvent extends Composite {
   @UiField
   Label outcomeDetailHeader;
   @UiField
-  Label eventOutcomeDetailNoteLabel, eventOutcomeDetailNoteValue;
+  Label eventOutcomeDetailNoteLabel;
   @UiField
-  Label eventOutcomeDetailExtensionLabel, eventOutcomeDetailExtensionValue;
+  HTML eventOutcomeDetailNoteValue;
+  @UiField
+  Label eventOutcomeDetailExtensionLabel;
+  @UiField
+  HTML eventOutcomeDetailExtensionValue;
 
   @UiField
   Button backButton;
@@ -182,7 +187,7 @@ public class ShowPreservationEvent extends Composite {
         }
       });
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();
@@ -252,14 +257,14 @@ public class ShowPreservationEvent extends Composite {
     }
 
     if (StringUtils.isNotBlank(event.getEventOutcomeDetailNote())) {
-      eventOutcomeDetailNoteValue.setText(event.getEventOutcomeDetailNote());
+      eventOutcomeDetailNoteValue.setHTML(event.getEventOutcomeDetailNote());
     } else {
       eventOutcomeDetailNoteLabel.setVisible(false);
       eventOutcomeDetailNoteValue.setVisible(false);
     }
 
     if (StringUtils.isNotBlank(event.getEventOutcomeDetailExtension())) {
-      eventOutcomeDetailExtensionValue.setText(event.getEventOutcomeDetailExtension());
+      eventOutcomeDetailExtensionValue.setHTML(event.getEventOutcomeDetailExtension());
     } else {
       eventOutcomeDetailExtensionLabel.setVisible(false);
       eventOutcomeDetailExtensionValue.setVisible(false);

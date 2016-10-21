@@ -361,4 +361,8 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
   protected void onChange() {
     ValueChangeEvent.fire(this, searchInputListBox.getSelectedValue());
   }
+
+  public void addKeyDownEvent(KeyDownHandler handler) {
+    searchInputBox.addKeyDownHandler(handler);
+  }
 }

@@ -507,6 +507,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
         viewers.addExtension(extension, type);
       }
 
+      viewers.setTextLimit(rodaConfig.getString("ui.viewers.text.limit"));
     }
 
     return viewers;

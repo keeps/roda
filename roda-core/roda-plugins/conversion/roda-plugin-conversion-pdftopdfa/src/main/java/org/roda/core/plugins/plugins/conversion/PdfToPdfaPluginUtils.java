@@ -27,7 +27,6 @@ import org.verapdf.metadata.fixer.utils.FixerConfig;
 import org.verapdf.model.ModelParser;
 import org.verapdf.pdfa.PDFAValidator;
 import org.verapdf.pdfa.flavours.PDFAFlavour;
-import org.verapdf.pdfa.results.MetadataFixerResult;
 import org.verapdf.pdfa.results.ValidationResult;
 import org.verapdf.pdfa.validation.Profiles;
 import org.verapdf.pdfa.validation.ValidationProfile;
@@ -35,31 +34,18 @@ import org.verapdf.pdfa.validators.Validators;
 
 public class PdfToPdfaPluginUtils {
 
-  public static String executePdfToPdfa(Path p, Path fixed) throws IOException, VeraPDFException, GhostscriptException {
+  public static String executePdfToPdfa(Path p, Path fixed, boolean validatePDF)
+    throws IOException, VeraPDFException, GhostscriptException {
     // pdfa - file to save the GS output
     // fixed - file to save the fixed representation
-    Path pdfa = Files.createTempFile("pdfa", ".pdf");
+    Path pdfa = null;
 
-    // GhostScript transformation command
-    String[] gsArgs = new String[10];
-    gsArgs[0] = "gs";
-    gsArgs[1] = "-dPDFA";
-    gsArgs[2] = "-dBATCH";
-    gsArgs[3] = "-dNOPAUSE";
-    gsArgs[4] = "-dUseCIEColor";
-    gsArgs[5] = "-sProcessColorModel=DeviceCMYK";
-    gsArgs[6] = "-sDEVICE=pdfwrite";
-    gsArgs[7] = "-sPDFACompatibilityPolicy=1";
-    gsArgs[8] = "-sOutputFile=" + pdfa.toString();
-    gsArgs[9] = p.toString();
-
-    Ghostscript gs = Ghostscript.getInstance();
-
-    try {
-      gs.initialize(gsArgs);
-      gs.exit();
-    } catch (GhostscriptException e) {
-      throw new GhostscriptException("Exception when using GhostScript: ", e);
+    if (validatePDF) {
+      pdfa = Files.createTempFile("pdfa", ".pdf");
+      runGS(p, pdfa);
+    } else {
+      runGS(p, fixed);
+      return "";
     }
 
     // metadata fixer transformation
@@ -80,7 +66,7 @@ public class PdfToPdfaPluginUtils {
         // fixing metadata
         OutputStream fixedOutputStream = new FileOutputStream(fixed.toString());
         FixerConfig fconf = FixerConfigImpl.getFixerConfig(loader.getPDDocument(), result);
-        MetadataFixerResult mfr = MetadataFixerImpl.fixMetadata(fixedOutputStream, fconf);
+        MetadataFixerImpl.fixMetadata(fixedOutputStream, fconf);
         fixedOutputStream.close();
       }
 
@@ -91,6 +77,30 @@ public class PdfToPdfaPluginUtils {
     }
 
     return "";
+  }
+
+  private static void runGS(Path input, Path output) throws GhostscriptException {
+    // GhostScript transformation command
+    String[] gsArgs = new String[10];
+    gsArgs[0] = "gs";
+    gsArgs[1] = "-dPDFA";
+    gsArgs[2] = "-dBATCH";
+    gsArgs[3] = "-dNOPAUSE";
+    gsArgs[4] = "-dUseCIEColor";
+    gsArgs[5] = "-sProcessColorModel=DeviceCMYK";
+    gsArgs[6] = "-sDEVICE=pdfwrite";
+    gsArgs[7] = "-sPDFACompatibilityPolicy=1";
+    gsArgs[8] = "-sOutputFile=" + output.toString();
+    gsArgs[9] = input.toString();
+
+    Ghostscript gs = Ghostscript.getInstance();
+
+    try {
+      gs.initialize(gsArgs);
+      gs.exit();
+    } catch (GhostscriptException e) {
+      throw new GhostscriptException("Exception when using GhostScript: ", e);
+    }
   }
 
 }

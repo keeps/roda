@@ -40,6 +40,7 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.Fixity;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -89,7 +90,13 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getDescription() {
-    return "Computes the fixity/checksum information of files inside an Archival Information Package (AIP) and verifies if this information differs from the information stored in the preservation metadata (i.e. PREMIS objects). If so, it creates a new risk called “File(s) corrupted due to hardware malfunction or human intervention“ and assigns the corrupted file to that risk in the Risk register.\nWithin the repository, fixity checking is used to ensure that digital files have not been affected by data rot or other digital preservation dangers. By itself, fixity checking does not ensure the preservation of a digital file. Instead, it allows a repository to identify which corrupted files to replace with a clean copy from the producer or from a backup.";
+    return "Computes the fixity/checksum information of files inside an Archival Information Package (AIP) and verifies if this "
+      + "information differs from the information stored in the preservation metadata (i.e. PREMIS objects). If so, it creates a "
+      + "new risk called “File(s) corrupted due to hardware malfunction or human intervention“ and assigns the corrupted file to "
+      + "that risk in the Risk register.\nWithin the repository, fixity checking is used to ensure that digital files have not been "
+      + "affected by data rot or other digital preservation dangers. By itself, fixity checking does not ensure the preservation "
+      + "of a digital file. Instead, it allows a repository to identify which corrupted files to replace with a clean copy from "
+      + "the producer or from a backup.";
   }
 
   @Override
@@ -111,6 +118,7 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
           boolean aipFailed = false;
           List<String> passedFiles = new ArrayList<String>();
           Map<String, Pair<String, String>> failedFiles = new HashMap<>();
+          List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
 
           for (Representation r : aip.getRepresentations()) {
             LOGGER.debug("Checking fixity for files in representation {} of AIP {}", r.getId(), aip.getId());
@@ -129,6 +137,8 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
                     Binary currentFileBinary = storage.getBinary(storagePath);
                     Binary premisFile = model.retrievePreservationFile(file);
                     List<Fixity> fixities = PremisV3Utils.extractFixities(premisFile);
+                    sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), file.getRepresentationId(),
+                      file.getPath(), file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
                     String fileEntry = file.getRepresentationId()
                       + (file.getPath().isEmpty() ? "" : '/' + String.join("/", file.getPath())) + '/' + file.getId();
@@ -195,12 +205,13 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
               reportItem.setPluginState(PluginState.FAILURE).setHtmlPluginDetails(true)
                 .setPluginDetails(validationReport.toHtml(false, false, false, "Corrupted files and their checksums"));
               jobPluginInfo.incrementObjectsProcessedWithFailure();
-              PluginHelper.createPluginEvent(this, aip.getId(), model, index, PluginState.FAILURE,
+              PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, null, PluginState.FAILURE,
                 validationReport.toHtml(false, false, false, "Corrupted files and their checksums"), true);
             } else {
               reportItem.setPluginState(PluginState.SUCCESS).setPluginDetails("Fixity checking ran successfully");
               jobPluginInfo.incrementObjectsProcessedWithSuccess();
-              PluginHelper.createPluginEvent(this, aip.getId(), model, index, PluginState.SUCCESS, "", true);
+              PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, null, PluginState.SUCCESS, "",
+                true);
             }
 
             report.addReport(reportItem);
@@ -265,12 +276,12 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Computed the fixity information of files inside AIPs";
+    return "Computed the fixity information of files inside the AIP and compared to fixity information recorded in preservation metadata";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Tested the fixity information of files inside AIPs successfully";
+    return "Fixity of files inside the AIP has been assessed and there was no evidence of corruption";
   }
 
   @Override

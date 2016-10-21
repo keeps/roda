@@ -70,6 +70,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -424,6 +425,16 @@ public class ViewRepresentation extends Composite {
         }
       }
     });
+
+    searchPanel.addKeyDownEvent(new KeyDownHandler() {
+
+      @Override
+      public void onKeyDown(KeyDownEvent event) {
+        if (event.getNativeKeyCode() == KeyCodes.KEY_LEFT || event.getNativeKeyCode() == KeyCodes.KEY_RIGHT) {
+          DOM.eventCancelBubble(DOM.eventGetCurrentEvent(), true);
+        }
+      }
+    });
   }
 
   private void clean() {
@@ -487,6 +498,7 @@ public class ViewRepresentation extends Composite {
                 clean();
               }
             }));
+
         }
       }
 
@@ -511,6 +523,9 @@ public class ViewRepresentation extends Composite {
             clean();
           }
         }));
+
+    fullBreadcrumb.add(new BreadcrumbItem(getBreadcrumbLabel("data", RodaConstants.VIEW_REPRESENTATION_FOLDER), "data",
+      Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), aipId, representationUUID)));
 
     fullBreadcrumb.addAll(fileBreadcrumb);
     return fullBreadcrumb;
@@ -826,32 +841,36 @@ public class ViewRepresentation extends Composite {
   }
 
   private void textPreview(IndexedFile file) {
-    RequestBuilder request = new RequestBuilder(RequestBuilder.GET,
-      RestUtils.createRepresentationFileDownloadUri(file.getUUID()).asString());
-    try {
-      request.sendRequest(null, new RequestCallback() {
+    if (file.getSize() <= Long.parseLong(viewers.getTextLimit())) {
+      RequestBuilder request = new RequestBuilder(RequestBuilder.GET,
+        RestUtils.createRepresentationFileDownloadUri(file.getUUID()).asString());
+      try {
+        request.sendRequest(null, new RequestCallback() {
 
-        @Override
-        public void onResponseReceived(Request request, Response response) {
-          if (response.getStatusCode() == HttpStatus.SC_OK) {
-            HTML html = new HTML("<pre><code>" + SafeHtmlUtils.htmlEscape(response.getText()) + "</code></pre>");
-            FlowPanel frame = new FlowPanel();
-            frame.add(html);
+          @Override
+          public void onResponseReceived(Request request, Response response) {
+            if (response.getStatusCode() == HttpStatus.SC_OK) {
+              HTML html = new HTML("<pre><code>" + SafeHtmlUtils.htmlEscape(response.getText()) + "</code></pre>");
+              FlowPanel frame = new FlowPanel();
+              frame.add(html);
 
-            filePreview.add(frame);
-            frame.setStyleName("viewRepresentationTextFilePreview");
-            JavascriptUtils.runHighlighter(html.getElement());
-          } else {
+              filePreview.add(frame);
+              frame.setStyleName("viewRepresentationTextFilePreview");
+              JavascriptUtils.runHighlighter(html.getElement());
+            } else {
+              errorPreview();
+            }
+          }
+
+          @Override
+          public void onError(Request request, Throwable exception) {
             errorPreview();
           }
-        }
-
-        @Override
-        public void onError(Request request, Throwable exception) {
-          errorPreview();
-        }
-      });
-    } catch (RequestException e) {
+        });
+      } catch (RequestException e) {
+        errorPreview();
+      }
+    } else {
       errorPreview();
     }
   }
@@ -864,7 +883,8 @@ public class ViewRepresentation extends Composite {
       b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-headphones fa-5'></i>"));
       html.setHTML(b.toSafeHtml());
 
-      audioPlayer.addSource(RestUtils.createRepresentationFileDownloadUri(file.getUUID()).asString(), "audio/mpeg");
+      audioPlayer.addSource(RestUtils.createRepresentationFileDownloadUri(file.getUUID()).asString(),
+        file.getFileFormat().getMimeType());
       audioPlayer.setControls(true);
       filePreview.add(html);
       filePreview.add(audioPlayer);
@@ -878,7 +898,8 @@ public class ViewRepresentation extends Composite {
   private void videoPreview(IndexedFile file) {
     Video videoPlayer = Video.createIfSupported();
     if (videoPlayer != null) {
-      videoPlayer.addSource(RestUtils.createRepresentationFileDownloadUri(file.getUUID()).asString(), "video/dvd");
+      videoPlayer.addSource(RestUtils.createRepresentationFileDownloadUri(file.getUUID()).asString(),
+        file.getFileFormat().getMimeType());
       videoPlayer.setControls(true);
       filePreview.add(videoPlayer);
       videoPlayer.addStyleName("viewRepresentationAudioFilePreview");

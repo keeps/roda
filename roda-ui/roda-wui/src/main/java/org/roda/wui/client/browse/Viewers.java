@@ -16,11 +16,13 @@ public class Viewers implements Serializable {
   private HashMap<String, String> pronoms;
   private HashMap<String, String> mimetypes;
   private HashMap<String, String> extensions;
+  private String textLimit;
 
   public Viewers() {
     this.pronoms = new HashMap<String, String>();
     this.mimetypes = new HashMap<String, String>();
     this.extensions = new HashMap<String, String>();
+    this.textLimit = "";
   }
 
   public HashMap<String, String> getPronoms() {
@@ -59,8 +61,17 @@ public class Viewers implements Serializable {
     this.extensions.put(extension, type);
   }
 
+  public String getTextLimit() {
+    return textLimit;
+  }
+
+  public void setTextLimit(String textLimit) {
+    this.textLimit = textLimit;
+  }
+
   @Override
   public String toString() {
-    return "Viewer [pronoms=" + pronoms + ", mimetypes=" + mimetypes + ", extensions=" + extensions + "]";
+    return "Viewer [pronoms=" + pronoms + ", mimetypes=" + mimetypes + ", extensions=" + extensions + ", textLimit="
+      + textLimit + "]";
   }
 }

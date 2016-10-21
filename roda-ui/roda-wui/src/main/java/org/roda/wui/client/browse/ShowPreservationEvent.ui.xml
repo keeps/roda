@@ -100,7 +100,7 @@
 										styleName="label">
 										<ui:text from='{messages.preservationEventOutcomeDetailNote}' />
 									</g:Label>
-									<g:Label ui:field="eventOutcomeDetailNoteValue"
+									<g:HTML ui:field="eventOutcomeDetailNoteValue"
 										styleName="code-pre" />
 								</g:FlowPanel>
 								<g:FlowPanel styleName="field">
@@ -108,7 +108,7 @@
 										styleName="label">
 										<ui:text from='{messages.preservationEventOutcomeDetailExtension}' />
 									</g:Label>
-									<g:Label ui:field="eventOutcomeDetailExtensionValue"
+									<g:HTML ui:field="eventOutcomeDetailExtensionValue"
 										styleName="code-pre" />
 								</g:FlowPanel>
 							</g:FlowPanel>

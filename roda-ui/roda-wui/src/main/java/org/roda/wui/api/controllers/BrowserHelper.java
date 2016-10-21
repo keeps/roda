@@ -1587,7 +1587,7 @@ public class BrowserHelper {
           if (dm.getType() != null) {
             dmNode = dmNode.put("metadataType", dm.getType());
           }
-          if (dm.getVersion() != null){
+          if (dm.getVersion() != null) {
             dmNode = dmNode.put("metadataVersion", dm.getVersion());
           }
           Binary b = model.retrieveDescriptiveMetadataBinary(modelAIP.getId(), dm.getId());

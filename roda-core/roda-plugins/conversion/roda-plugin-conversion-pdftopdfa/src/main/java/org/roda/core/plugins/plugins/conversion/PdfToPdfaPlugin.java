@@ -34,6 +34,7 @@ import org.verapdf.core.VeraPDFException;
 
 public class PdfToPdfaPlugin<T extends IsRODAObject> extends AbstractConvertPlugin<T> {
   private static final String TOOLNAME = "pdftopdfa";
+  private static boolean validatePDF = true;
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
@@ -41,6 +42,10 @@ public class PdfToPdfaPlugin<T extends IsRODAObject> extends AbstractConvertPlug
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES, "Ignore non PDF files",
         PluginParameterType.BOOLEAN, "true", false, false,
         "Ignore files that are not identified as Portable Document Format (PDF)."));
+
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_IGNORE_VERAPDF_VALIDATION,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_IGNORE_VERAPDF_VALIDATION, "Use veraPDF validation",
+        PluginParameterType.BOOLEAN, "true", false, false, "Use veraPDF validation and metadata fixing."));
   }
 
   public PdfToPdfaPlugin() {
@@ -53,6 +58,7 @@ public class PdfToPdfaPlugin<T extends IsRODAObject> extends AbstractConvertPlug
   public List<PluginParameter> getParameters() {
     List<PluginParameter> parameters = new ArrayList<PluginParameter>();
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_IGNORE_VERAPDF_VALIDATION));
     return parameters;
   }
 
@@ -61,6 +67,10 @@ public class PdfToPdfaPlugin<T extends IsRODAObject> extends AbstractConvertPlug
     super.setParameterValues(parameters);
     setInputFormat("pdf");
     setOutputFormat("pdf");
+
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_IGNORE_VERAPDF_VALIDATION)) {
+      validatePDF = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_IGNORE_VERAPDF_VALIDATION));
+    }
   }
 
   public static String getStaticName() {
@@ -73,7 +83,14 @@ public class PdfToPdfaPlugin<T extends IsRODAObject> extends AbstractConvertPlug
   }
 
   public static String getStaticDescription() {
-    return "Converts standard Portable Document Format (PDF) files to PDF/A using the “ghostscript” tool. The results of conversion will be placed on a new representation under the same Archival Information Package (AIP) where the files were originally found. A PREMIS event is also recorded after the task is run.\nPDF/A is an ISO-standardized version of the Portable Document Format (PDF) specialized for use in the archiving and long-term preservation of electronic documents. PDF/A differs from PDF by prohibiting features ill-suited to long-term archiving, such as font linking (as opposed to font embedding) and encryption.\nThe ISO requirements for PDF/A file viewers include colour management guidelines, support for embedded fonts, and a user interface for reading embedded annotations.\nThe outcome of this action is a new representation where all the PDF files have been converted to PDF/A. The resulting converted files will be valid according to VeraPDF (the Industry Supported PDF/A Validation tool).";
+    return "Converts standard Portable Document Format (PDF) files to PDF/A using the “ghostscript” tool. The results of conversion will "
+      + "be placed on a new representation under the same Archival Information Package (AIP) where the files were originally found. A "
+      + "PREMIS event is also recorded after the task is run.\nPDF/A is an ISO-standardized version of the Portable Document Format (PDF) "
+      + "specialized for use in the archiving and long-term preservation of electronic documents. PDF/A differs from PDF by prohibiting "
+      + "features ill-suited to long-term archiving, such as font linking (as opposed to font embedding) and encryption.\nThe ISO "
+      + "requirements for PDF/A file viewers include colour management guidelines, support for embedded fonts, and a user interface "
+      + "for reading embedded annotations.\nThe outcome of this action is a new representation where all the PDF files have been converted "
+      + "to PDF/A. The resulting converted files will be valid, if wanted, according to VeraPDF (the Industry Supported PDF/A Validation tool).";
   }
 
   @Override
@@ -96,7 +113,7 @@ public class PdfToPdfaPlugin<T extends IsRODAObject> extends AbstractConvertPlug
     throws UnsupportedOperationException, IOException, CommandException {
 
     try {
-      return PdfToPdfaPluginUtils.executePdfToPdfa(inputPath, outputPath);
+      return PdfToPdfaPluginUtils.executePdfToPdfa(inputPath, outputPath, validatePDF);
     } catch (VeraPDFException | GhostscriptException e) {
       return null;
     }
