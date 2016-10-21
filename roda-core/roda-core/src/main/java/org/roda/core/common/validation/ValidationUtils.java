@@ -9,23 +9,26 @@ package org.roda.core.common.validation;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Source;
+import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.Validator;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.RodaEntityResolver;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -48,6 +51,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
+import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * 
@@ -136,10 +140,14 @@ public class ValidationUtils {
 
     try {
       inputStream = xmlPayload.createInputStream();
-      SAXParser parser = factory.newSAXParser();
-      XMLReader reader = parser.getXMLReader();
-      reader.setErrorHandler(errorHandler);
-      reader.parse(new InputSource(inputStream));
+      Reader reader = new InputStreamReader(new BOMInputStream(inputStream));
+
+      XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+      xmlReader.setEntityResolver(new RodaEntityResolver());
+      InputSource inputSource = new InputSource(reader);
+
+      xmlReader.setErrorHandler(errorHandler);
+      xmlReader.parse(inputSource);
       ret.setValid(errorHandler.getErrors().isEmpty());
       for (SAXParseException saxParseException : errorHandler.getErrors()) {
         ret.addIssue(convertSAXParseException(saxParseException));
@@ -149,7 +157,7 @@ public class ValidationUtils {
       for (SAXParseException saxParseException : errorHandler.getErrors()) {
         ret.addIssue(convertSAXParseException(saxParseException));
       }
-    } catch (IOException | ParserConfigurationException e) {
+    } catch (IOException e) {
       ret.setValid(false);
       ret.setMessage(e.getMessage());
     } finally {
@@ -275,13 +283,23 @@ public class ValidationUtils {
     Optional<Schema> xmlSchema = RodaCoreFactory.getRodaSchema(descriptiveMetadataType, descriptiveMetadataVersion);
     try {
       if (xmlSchema.isPresent()) {
-        inputStream = descriptiveMetadataPayload.createInputStream();
-        Source xmlFile = new StreamSource(inputStream);
-        Validator validator = xmlSchema.get().newValidator();
+
+        InputStreamReader inputStreamReader = new InputStreamReader(
+          new BOMInputStream(descriptiveMetadataPayload.createInputStream()));
+
         RodaErrorHandler errorHandler = new RodaErrorHandler();
-        validator.setErrorHandler(errorHandler);
+
         try {
-          validator.validate(xmlFile);
+          XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+          xmlReader.setEntityResolver(new RodaEntityResolver());
+          InputSource inputSource = new InputSource(inputStreamReader);
+          Source source = new SAXSource(xmlReader, inputSource);
+
+          Validator validator = xmlSchema.get().newValidator();
+
+          validator.setErrorHandler(errorHandler);
+
+          validator.validate(source);
           ret.setValid(errorHandler.getErrors().isEmpty());
           for (SAXParseException saxParseException : errorHandler.getErrors()) {
             ret.addIssue(convertSAXParseException(saxParseException));

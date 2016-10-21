@@ -51,6 +51,7 @@ public final class XMLUtility {
     try {
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       DocumentBuilder builder = factory.newDocumentBuilder();
+      builder.setEntityResolver(new RodaEntityResolver());
       Document doc;
       doc = builder.parse(inputStream);
       XPathFactory xPathfactory = XPathFactory.newInstance();

@@ -512,17 +512,8 @@ public class ViewRepresentation extends Composite {
     }
 
     // Representation breadcrumb
-    fullBreadcrumb.add(fileBreadcrumb.size() > 1
-      ? new BreadcrumbItem(DescriptionLevelUtils.getRepresentationTypeIcon(rep.getType(), true), rep.getType(),
-        Tools.concat(Representation.RESOLVER.getHistoryPath(), aipId, representationUUID))
-      : new BreadcrumbItem(DescriptionLevelUtils.getRepresentationTypeIcon(rep.getType(), true), rep.getType(),
-        new Command() {
-
-          @Override
-          public void execute() {
-            clean();
-          }
-        }));
+    fullBreadcrumb.add(new BreadcrumbItem(DescriptionLevelUtils.getRepresentationTypeIcon(rep.getType(), true),
+      rep.getType(), Tools.concat(Representation.RESOLVER.getHistoryPath(), aipId, representationUUID)));
 
     fullBreadcrumb.add(new BreadcrumbItem(getBreadcrumbLabel("data", RodaConstants.VIEW_REPRESENTATION_FOLDER), "data",
       Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), aipId, representationUUID)));
@@ -841,7 +832,7 @@ public class ViewRepresentation extends Composite {
   }
 
   private void textPreview(IndexedFile file) {
-    if (file.getSize() <= Long.parseLong(viewers.getTextLimit())) {
+    if (StringUtils.isBlank(viewers.getTextLimit()) || file.getSize() <= Long.parseLong(viewers.getTextLimit())) {
       RequestBuilder request = new RequestBuilder(RequestBuilder.GET,
         RestUtils.createRepresentationFileDownloadUri(file.getUUID()).asString());
       try {
