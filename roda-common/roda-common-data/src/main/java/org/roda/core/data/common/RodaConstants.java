@@ -224,9 +224,71 @@ public final class RodaConstants {
   /*
    * Controllers related
    */
+  public static final String CONTROLLER_ID_PARAM = "id";
+  public static final String CONTROLLER_AIP_PARAM = "aip";
+  public static final String CONTROLLER_AIPS_PARAM = "aips";
+  public static final String CONTROLLER_AIP_ID_PARAM = "aipId";
+  public static final String CONTROLLER_REPRESENTATION_PARAM = "representation";
+  public static final String CONTROLLER_REPRESENTATION_ID_PARAM = "representationId";
+  public static final String CONTROLLER_REPRESENTATION_UUID_PARAM = "representationUUID";
+  public static final String CONTROLLER_TRANSFERRED_RESOURCE_PARAM = "transferredResource";
+  public static final String CONTROLLER_TRANSFERRED_RESOURCE_ID_PARAM = "transferredResourceId";
+  public static final String CONTROLLER_FILE_PARAM = "file";
+  public static final String CONTROLLER_FILE_ID_PARAM = "fileId";
+  public static final String CONTROLLER_FILE_UUID_PARAM = "fileUUID";
+  public static final String CONTROLLER_METADATA_ID_PARAM = "metadataId";
+  public static final String CONTROLLER_INDEX_PRESERVATION_EVENT_ID_PARAM = "indexedPreservationEventId";
+  public static final String CONTROLLER_VERSION_ID_PARAM = "versionId";
+  public static final String CONTROLLER_RESOURCE_ID_PARAM = "resourceId";
+
+  public static final String CONTROLLER_SIP_PARAM = "sip";
+  public static final String CONTROLLER_ID_OBJECT_PARAM = "transferred_resource_uuid, transferred_resource_path, sip";
+  public static final String CONTROLLER_ID_OBJECT_RESOURCE_PATH = "transferred_resource_path";
+
+  public static final String CONTROLLER_PERMISSIONS_PARAM = "permissions";
+  public static final String CONTROLLER_RISK_PARAM = "risk";
+  public static final String CONTROLLER_RISK_ID_PARAM = "riskId";
+  public static final String CONTROLLER_FORMAT_PARAM = "format";
+  public static final String CONTROLLER_MESSAGE_PARAM = "message";
+  public static final String CONTROLLER_INCIDENCE_PARAM = "incidence";
+  public static final String CONTROLLER_TEMPLATE_PARAM = "template";
+
+  public static final String CONTROLLER_PRE_MITIGATION_PROBABILITY_PARAM = "preMitigationProbability";
+  public static final String CONTROLLER_PRE_MITIGATION_IMPACT_PARAM = "preMitigationImpact";
+  public static final String CONTROLLER_POS_MITIGATION_PROBABILITY_PARAM = "posMitigationProbability";
+  public static final String CONTROLLER_POS_MITIGATION_IMPACT_PARAM = "posMitigationImpact";
+
   public static final String CONTROLLER_FILTER_PARAM = "filter";
   public static final String CONTROLLER_SORTER_PARAM = "sorter";
   public static final String CONTROLLER_SUBLIST_PARAM = "sublist";
+  public static final String CONTROLLER_CLASS_PARAM = "class";
+  public static final String CONTROLLER_JUST_ACTIVE_PARAM = "justActive";
+  public static final String CONTROLLER_SELECTED_ITEMS_PARAM = "selectedItems";
+  public static final String CONTROLLER_START_PARAM = "start";
+  public static final String CONTROLLER_LIMIT_PARAM = "limit";
+  public static final String CONTROLLER_PARENT_PARAM = "parent";
+  public static final String CONTROLLER_PARENT_ID_PARAM = "parentId";
+  public static final String CONTROLLER_FOLDERNAME_PARAM = "folderName";
+  public static final String CONTROLLER_FILENAME_PARAM = "filename";
+  public static final String CONTROLLER_PATH_PARAM = "path";
+  public static final String CONTROLLER_DIRECTORY_PATH_PARAM = "directoryPath";
+  public static final String CONTROLLER_SUCCESS_PARAM = "success";
+  public static final String CONTROLLER_ERROR_PARAM = "error";
+  public static final String CONTROLLER_PART_PARAM = "part";
+  public static final String CONTROLLER_START_AGENT_PARAM = "startAgent";
+  public static final String CONTROLLER_LIMIT_AGENT_PARAM = "limitAgent";
+  public static final String CONTROLLER_START_EVENT_PARAM = "startEvent";
+  public static final String CONTROLLER_LIMIT_EVENT_PARAM = "limitEvent";
+  public static final String CONTROLLER_START_FILE_PARAM = "startFile";
+  public static final String CONTROLLER_LIMIT_FILE_PARAM = "limitFile";
+  public static final String CONTROLLER_SELECTED_PARAM = "selected";
+  public static final String CONTROLLER_TO_PARENT_PARAM = "toParent";
+  public static final String CONTROLLER_FIELD_PARAM = "field";
+  public static final String CONTROLLER_QUERY_PARAM = "query";
+  public static final String CONTROLLER_TYPE_PARAM = "type";
+  public static final String CONTROLLER_ACCEPT_PARAM = "accept";
+  public static final String CONTROLLER_REJECT_REASON_PARAM = "rejectReason";
+  public static final String CONTROLLER_SELECTED_VERSION_PARAM = "selectedVersion";
 
   /*
    * Core (storage, index, orchestrator, etc.)
@@ -580,6 +642,7 @@ public final class RodaConstants {
   public static final String PLUGIN_CLASS_TIKA_FULLTEXT = "org.roda.core.plugins.plugins.characterization.TikaFullTextPlugin";
 
   public static final Map<String, String> PLUGIN_PARAMETER_TO_CLASS = new HashMap<>();
+
   static {
     PLUGIN_PARAMETER_TO_CLASS.put(PLUGIN_PARAMS_DO_DIGITAL_SIGNATURE_VALIDATION, PLUGIN_CLASS_DIGITAL_SIGNATURE);
     PLUGIN_PARAMETER_TO_CLASS.put(PLUGIN_PARAMS_DO_VERAPDF_CHECK, PLUGIN_CLASS_VERAPDF);
