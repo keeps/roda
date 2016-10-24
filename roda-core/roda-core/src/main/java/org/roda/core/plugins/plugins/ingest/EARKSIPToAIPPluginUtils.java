@@ -8,9 +8,12 @@
 package org.roda.core.plugins.plugins.ingest;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -39,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class EARKSIPToAIPPluginUtils {
+  @SuppressWarnings("unused")
   private static final Logger LOGGER = LoggerFactory.getLogger(EARKSIPToAIPPluginUtils.class);
 
   public static AIP earkSIPToAIP(SIP sip, String username, Permissions fullPermissions, ModelService model,
@@ -130,8 +134,11 @@ public class EARKSIPToAIPPluginUtils {
           metadataVersion, notify);
       } catch (AlreadyExistsException e) {
         if (update) {
+          Map<String, String> properties = new HashMap<String, String>();
+          properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATE_FROM_SIP.toString());
+          
           model.updateDescriptiveMetadata(aipId, descriptiveMetadataId, payload, metadataType, metadataVersion,
-            "Update from SIP");
+            properties);
         } else {
           throw e;
         }

@@ -16,6 +16,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.browse.BinaryVersionBundle;
 import org.roda.wui.client.browse.BrowserService;
@@ -153,7 +154,7 @@ public class RiskHistory extends Composite {
     });
 
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();
@@ -174,7 +175,7 @@ public class RiskHistory extends Composite {
     // create list layout
     for (BinaryVersionBundle version : versionList) {
       String versionKey = version.getId();
-      String message = version.getMessage();
+      String message = messages.versionAction(version.getProperties().get(RodaConstants.VERSION_ACTION));
       Date createdDate = version.getCreatedDate();
 
       list.addItem(messages.riskHistoryLabel(message, createdDate), versionKey);
@@ -188,20 +189,19 @@ public class RiskHistory extends Composite {
 
   @UiHandler("buttonRevert")
   void buttonRevertHandler(ClickEvent e) {
-    BrowserService.Util.getInstance().revertRiskVersion(riskId, selectedVersion, messages.modifyRiskMessage(),
-      new AsyncCallback<Void>() {
+    BrowserService.Util.getInstance().revertRiskVersion(riskId, selectedVersion, new AsyncCallback<Void>() {
 
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
+      @Override
+      public void onFailure(Throwable caught) {
+        AsyncCallbackUtils.defaultFailureTreatment(caught);
+      }
 
-        @Override
-        public void onSuccess(Void result) {
-          Toast.showInfo(messages.dialogDone(), messages.versionReverted());
-          Tools.newHistory(ShowRisk.RESOLVER, riskId);
-        }
-      });
+      @Override
+      public void onSuccess(Void result) {
+        Toast.showInfo(messages.dialogDone(), messages.versionReverted());
+        Tools.newHistory(ShowRisk.RESOLVER, riskId);
+      }
+    });
   }
 
   @UiHandler("buttonRemove")

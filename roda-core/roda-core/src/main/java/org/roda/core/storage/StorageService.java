@@ -7,6 +7,8 @@
  */
 package org.roda.core.storage;
 
+import java.util.Map;
+
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -342,7 +344,7 @@ public interface StorageService {
   public BinaryVersion getBinaryVersion(StoragePath storagePath, String version)
     throws RequestNotValidException, NotFoundException, GenericException;
 
-  public BinaryVersion createBinaryVersion(StoragePath storagePath, String message)
+  public BinaryVersion createBinaryVersion(StoragePath storagePath, Map<String, String> properties)
     throws RequestNotValidException, NotFoundException, GenericException;
 
   public void revertBinaryVersion(StoragePath storagePath, String version)

@@ -13,7 +13,9 @@ import static org.testng.AssertJUnit.assertNotNull;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
@@ -22,6 +24,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.roda.core.common.iterables.CloseableIterable;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
@@ -205,20 +208,27 @@ public class FedoraStorageServiceTestDelegate extends AbstractStorageServiceTest
     }
 
     // 6) Versionning
+    Map<String, String> properties = new HashMap<String, String>();
+    properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
+
     final StoragePath binaryStoragePathVersionning = StorageTestUtils
       .generateRandomResourceStoragePathUnder(containerStoragePath);
     final ContentPayload payloadV0 = new RandomMockContentPayload();
     getStorage().createBinary(binaryStoragePathVersionning, payloadV0, false);
-    getStorage().createBinaryVersion(binaryStoragePathVersionning, "V0");
+    properties.put(RodaConstants.VERSION_MESSAGE, "V0");
+    getStorage().createBinaryVersion(binaryStoragePathVersionning, properties);
     final ContentPayload payloadV1 = new RandomMockContentPayload();
     getStorage().updateBinaryContent(binaryStoragePathVersionning, payloadV1, false, true);
-    getStorage().createBinaryVersion(binaryStoragePathVersionning, "V1");
+    properties.put(RodaConstants.VERSION_MESSAGE, "V1");
+    getStorage().createBinaryVersion(binaryStoragePathVersionning, properties);
     final ContentPayload payloadV2 = new RandomMockContentPayload();
     getStorage().updateBinaryContent(binaryStoragePathVersionning, payloadV2, false, true);
-    getStorage().createBinaryVersion(binaryStoragePathVersionning, "V2");
+    properties.put(RodaConstants.VERSION_MESSAGE, "V2");
+    getStorage().createBinaryVersion(binaryStoragePathVersionning, properties);
     final ContentPayload payloadV3 = new RandomMockContentPayload();
     getStorage().updateBinaryContent(binaryStoragePathVersionning, payloadV3, false, true);
-    getStorage().createBinaryVersion(binaryStoragePathVersionning, "V3");
+    properties.put(RodaConstants.VERSION_MESSAGE, "V3");
+    getStorage().createBinaryVersion(binaryStoragePathVersionning, properties);
 
     int counter = 0;
     CloseableIterable<BinaryVersion> versions = getStorage().listBinaryVersions(binaryStoragePathVersionning);

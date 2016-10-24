@@ -16,6 +16,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -73,18 +74,18 @@ public class DescriptiveMetadataHistory extends Composite {
           descriptiveMetadataId, LocaleInfo.getCurrentLocale().getLocaleName(),
           new AsyncCallback<DescriptiveMetadataVersionsBundle>() {
 
-            @Override
-            public void onFailure(Throwable caught) {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
-            }
+          @Override
+          public void onFailure(Throwable caught) {
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
+          }
 
-            @Override
-            public void onSuccess(DescriptiveMetadataVersionsBundle bundle) {
-              DescriptiveMetadataHistory widget = new DescriptiveMetadataHistory(aipId, representationId,
-                descriptiveMetadataId, bundle);
-              callback.onSuccess(widget);
-            }
-          });
+          @Override
+          public void onSuccess(DescriptiveMetadataVersionsBundle bundle) {
+            DescriptiveMetadataHistory widget = new DescriptiveMetadataHistory(aipId, representationId,
+              descriptiveMetadataId, bundle);
+            callback.onSuccess(widget);
+          }
+        });
 
       } else {
         Tools.newHistory(Browse.RESOLVER);
@@ -171,7 +172,7 @@ public class DescriptiveMetadataHistory extends Composite {
     });
 
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();
@@ -192,8 +193,12 @@ public class DescriptiveMetadataHistory extends Composite {
     // create list layout
     for (BinaryVersionBundle version : versionList) {
       String versionKey = version.getId();
-      String message = version.getMessage();
+      String message = messages.versionAction(version.getProperties().get(RodaConstants.VERSION_ACTION));
       Date createdDate = version.getCreatedDate();
+
+      if (version.getProperties().get(RodaConstants.VERSION_USER) != null) {
+        message = messages.versionActionBy(message, version.getProperties().get(RodaConstants.VERSION_USER));
+      }
 
       list.addItem(messages.descriptiveMetadataHistoryLabel(message, createdDate), versionKey);
     }

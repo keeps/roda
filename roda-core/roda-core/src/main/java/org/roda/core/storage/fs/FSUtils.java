@@ -651,8 +651,8 @@ public final class FSUtils {
         ret.setBinary(binary);
       } else {
         Date createdDate = new Date(Files.readAttributes(path, BasicFileAttributes.class).creationTime().toMillis());
-        String message = "";
-        ret = new DefaultBinaryVersion(binary, id, message, createdDate);
+        Map<String, String> defaultProperties = new HashMap<String, String>();
+        ret = new DefaultBinaryVersion(binary, id, createdDate, defaultProperties);
       }
 
     } catch (IOException e) {
@@ -772,7 +772,7 @@ public final class FSUtils {
 
   public static CloseableIterable<BinaryVersion> listBinaryVersions(final Path historyDataPath,
     final Path historyMetadataPath, final StoragePath storagePath)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     Path fauxPath = getEntityPath(historyDataPath, storagePath);
     final Path parent = fauxPath.getParent();
     final String baseName = fauxPath.getFileName().toString();

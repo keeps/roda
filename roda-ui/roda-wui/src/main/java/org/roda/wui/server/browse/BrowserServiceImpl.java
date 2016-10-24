@@ -562,10 +562,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void updateRisk(Risk risk, String message)
+  public void updateRisk(Risk risk)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.updateRisk(user, risk, message);
+    Browser.updateRisk(user, risk);
   }
 
   @Override
@@ -590,10 +590,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void revertRiskVersion(String riskId, String versionId, String message)
+  public void revertRiskVersion(String riskId, String versionId)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IOException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.revertRiskVersion(user, riskId, versionId, message);
+    Browser.revertRiskVersion(user, riskId, versionId);
   }
 
   @Override

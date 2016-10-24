@@ -866,8 +866,6 @@ public interface ClientMessages extends Messages {
 
   String riskRemoveSuccessMessage(Long size);
 
-  String modifyRiskMessage();
-
   String riskHistoryLabel(String versionKey, Date createdDate);
 
   String severityLevel(@Select SEVERITY_LEVEL level);
@@ -2279,4 +2277,9 @@ public interface ClientMessages extends Messages {
   String showLess();
 
   String revertedBy(String userId);
+  
+  /* Version action */
+  String versionAction(@Select String action);
+  
+  String versionActionBy(String message, String string);
 }

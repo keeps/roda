@@ -569,7 +569,7 @@ public class FileStorageService implements StorageService {
   }
 
   @Override
-  public BinaryVersion createBinaryVersion(StoragePath storagePath, String message)
+  public BinaryVersion createBinaryVersion(StoragePath storagePath, Map<String, String> properties)
     throws RequestNotValidException, NotFoundException, GenericException {
     Path binPath = FSUtils.getEntityPath(basePath, storagePath);
 
@@ -602,7 +602,7 @@ public class FileStorageService implements StorageService {
       // Creating metadata
       DefaultBinaryVersion b = new DefaultBinaryVersion();
       b.setId(id);
-      b.setMessage(message);
+      b.setProperties(properties);
       b.setCreatedDate(new Date());
       Files.createDirectories(metadataPath.getParent());
       JsonUtils.writeObjectToFile(b, metadataPath);

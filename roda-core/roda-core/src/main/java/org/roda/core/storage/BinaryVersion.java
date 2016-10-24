@@ -9,6 +9,7 @@ package org.roda.core.storage;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
 
 public interface BinaryVersion extends Serializable {
 
@@ -16,7 +17,7 @@ public interface BinaryVersion extends Serializable {
 
   String getId();
   
-  String getMessage();
+  Map<String, String> getProperties();
 
   Date getCreatedDate();
 

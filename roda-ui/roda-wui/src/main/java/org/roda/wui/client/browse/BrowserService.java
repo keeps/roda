@@ -203,7 +203,7 @@ public interface BrowserService extends RemoteService {
   void updateAIPPermissions(List<IndexedAIP> aips, Permissions permissions, boolean recursive)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
 
-  void updateRisk(Risk risk, String message)
+  void updateRisk(Risk risk)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
   void updateFormat(Format format)
@@ -215,7 +215,7 @@ public interface BrowserService extends RemoteService {
   Format createFormat(Format format)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
-  void revertRiskVersion(String riskId, String versionId, String message)
+  void revertRiskVersion(String riskId, String versionId)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IOException;
 
   boolean hasRiskVersions(String id)

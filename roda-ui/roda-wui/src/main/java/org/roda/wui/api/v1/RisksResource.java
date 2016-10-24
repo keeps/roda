@@ -105,7 +105,7 @@ public class RisksResource {
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Risk.class),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
-  public Response updateRisk(Risk risk, @QueryParam(RodaConstants.API_QUERY_PARAM_RISK_MESSAGE) String updateMessage,
+  public Response updateRisk(Risk risk,
     @ApiParam(value = "Choose format in which to get the risk", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
@@ -114,7 +114,7 @@ public class RisksResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    Risk updatedRisk = org.roda.wui.api.controllers.Risks.updateRisk(user, risk, updateMessage);
+    Risk updatedRisk = org.roda.wui.api.controllers.Risks.updateRisk(user, risk);
     return Response.ok(updatedRisk, mediaType).build();
   }
 

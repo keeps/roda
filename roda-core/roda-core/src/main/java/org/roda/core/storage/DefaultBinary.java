@@ -24,6 +24,8 @@ import org.roda.core.data.v2.ip.StoragePath;
  */
 public class DefaultBinary extends AbstractResource implements Binary {
 
+  private static final long serialVersionUID = 2220776180390113576L;
+  
   private ContentPayload content;
   private Long sizeInBytes;
   private boolean reference;

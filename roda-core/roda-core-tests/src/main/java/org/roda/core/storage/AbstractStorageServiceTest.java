@@ -18,13 +18,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.Matchers;
 import org.roda.core.common.iterables.CloseableIterable;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -882,6 +885,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   // TODO test move from different storage
 
   public void testBinaryVersions() throws RODAException, IOException {
+    Map<String, String> properties = new HashMap<String, String>();
+    properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
 
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
@@ -895,7 +900,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
 
     // 2) create binary version
     String message1 = "v1";
-    BinaryVersion v1 = getStorage().createBinaryVersion(binaryStoragePath, message1);
+    properties.put(RodaConstants.VERSION_MESSAGE, message1);
+    BinaryVersion v1 = getStorage().createBinaryVersion(binaryStoragePath, properties);
 
     // 3) update binary
     final ContentPayload payload2 = new RandomMockContentPayload();
@@ -903,10 +909,11 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
 
     // 4) create binary version 2
     String message2 = "v2";
-    BinaryVersion v2 = getStorage().createBinaryVersion(binaryStoragePath, message2);
+    properties.put(RodaConstants.VERSION_MESSAGE, message2);
+    BinaryVersion v2 = getStorage().createBinaryVersion(binaryStoragePath, properties);
 
     // 5) create a version with a message that already exists
-    BinaryVersion v3 = getStorage().createBinaryVersion(binaryStoragePath, message1);
+    BinaryVersion v3 = getStorage().createBinaryVersion(binaryStoragePath, properties);
 
     // 6) list binary versions
     CloseableIterable<BinaryVersion> binaryVersions = getStorage().listBinaryVersions(binaryStoragePath);
@@ -918,7 +925,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     // 7) get binary version
     System.out.println(v1.getId());
     BinaryVersion binaryVersion1 = getStorage().getBinaryVersion(binaryStoragePath, v1.getId());
-    assertEquals(message1, binaryVersion1.getMessage());
+    // TODO compare properties
+    assertEquals(message1, binaryVersion1.getProperties().get(RodaConstants.VERSION_MESSAGE));
     if (!(getStorage() instanceof FedoraStorageService)) {
       assertNotNull(binaryVersion1.getCreatedDate());
     }

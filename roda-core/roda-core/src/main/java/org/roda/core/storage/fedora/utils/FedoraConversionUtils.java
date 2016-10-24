@@ -233,9 +233,9 @@ public final class FedoraConversionUtils {
    * @throws GenericException,
    *           RequestNotValidException, FedoraException
    */
-  public static BinaryVersion convertDataStreamToBinaryVersion(FedoraDatastream datastream, String id, String message)
-    throws GenericException, RequestNotValidException, FedoraException {
+  public static BinaryVersion convertDataStreamToBinaryVersion(FedoraDatastream datastream, String id,
+    Map<String, String> properties) throws GenericException, RequestNotValidException, FedoraException {
     Binary binary = FedoraConversionUtils.fedoraDatastreamToBinary(datastream);
-    return new DefaultBinaryVersion(binary, id, message, datastream.getCreatedDate());
+    return new DefaultBinaryVersion(binary, id, datastream.getCreatedDate(), properties);
   }
 }

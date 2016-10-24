@@ -929,6 +929,29 @@ public final class RodaConstants {
   }
 
   /*
+   * Versions control
+   */
+  public static final String VERSION_MESSAGE = "message";
+  public static final String VERSION_USER = "user";
+  public static final String VERSION_ACTION = "action";
+
+  public enum VersionAction {
+    CREATED("created"), REVERTED("reverted"), UPDATED("updated"), METADATA_TYPE_FORCED("metadata_type_forced"),
+    UPDATE_FROM_SIP("update_from_sip");
+
+    private final String text;
+
+    private VersionAction(final String text) {
+      this.text = text;
+    }
+
+    @Override
+    public String toString() {
+      return text;
+    }
+  }
+
+  /*
    * WUI related
    */
 

@@ -15,9 +15,11 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.xml.transform.TransformerException;
 
@@ -929,9 +931,12 @@ public class Browser extends RodaWuiController {
     }
 
     // delegate
-    String message = "Updated by " + user.getName();
+    Map<String, String> properties = new HashMap<String, String>();
+    properties.put(RodaConstants.VERSION_USER, user.getId());
+    properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
+
     DescriptiveMetadata ret = BrowserHelper.updateDescriptiveMetadataFile(aipId, representationId, metadataId,
-      metadataType, metadataVersion, metadataPayload, message);
+      metadataType, metadataVersion, metadataPayload, properties);
 
     // register action
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIP_ID_PARAM,
@@ -1118,10 +1123,12 @@ public class Browser extends RodaWuiController {
     UserUtility.checkAIPPermissions(user, aip, PermissionType.UPDATE);
 
     // delegate
-    // TODO set this message in ServerMessages
-    String message = "Updated by " + user.getName();
+    Map<String, String> properties = new HashMap<String, String>();
+    properties.put(RodaConstants.VERSION_USER, user.getId());
+    properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
+
     DescriptiveMetadata ret = BrowserHelper.createOrUpdateAIPDescriptiveMetadataFile(aipId, null, metadataId,
-      metadataType, metadataVersion, message, is, fileDetail, false);
+      metadataType, metadataVersion, properties, is, fileDetail, false);
 
     // register action
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIP_ID_PARAM,
@@ -1141,10 +1148,12 @@ public class Browser extends RodaWuiController {
     UserUtility.checkRepresentationPermissions(user, representation, PermissionType.UPDATE);
 
     // delegate
-    // TODO set this message in ServerMessages
-    String message = "Updated by " + user.getName();
+    Map<String, String> properties = new HashMap<String, String>();
+    properties.put(RodaConstants.VERSION_USER, user.getId());
+    properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
+
     DescriptiveMetadata ret = BrowserHelper.createOrUpdateAIPDescriptiveMetadataFile(representation.getAipId(),
-      representation.getId(), metadataId, metadataType, metadataVersion, message, is, fileDetail, false);
+      representation.getId(), metadataId, metadataType, metadataVersion, properties, is, fileDetail, false);
 
     // register action
     controllerAssistant.registerAction(user, representationId, LOG_ENTRY_STATE.SUCCESS,
@@ -1165,9 +1174,12 @@ public class Browser extends RodaWuiController {
     UserUtility.checkAIPPermissions(user, aip, PermissionType.UPDATE);
 
     // delegate
-    String message = "Created by " + user.getName();
+    Map<String, String> properties = new HashMap<String, String>();
+    properties.put(RodaConstants.VERSION_USER, user.getId());
+    properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.CREATED.toString());
+
     DescriptiveMetadata ret = BrowserHelper.createOrUpdateAIPDescriptiveMetadataFile(aipId, null, metadataId,
-      metadataType, metadataVersion, message, is, fileDetail, true);
+      metadataType, metadataVersion, properties, is, fileDetail, true);
 
     // register action
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIP_ID_PARAM,
@@ -1187,10 +1199,12 @@ public class Browser extends RodaWuiController {
     UserUtility.checkRepresentationPermissions(user, representation, PermissionType.UPDATE);
 
     // delegate
-    // TODO Get this message from ServerMessages
-    String message = "Created by " + user.getName();
+    Map<String, String> properties = new HashMap<String, String>();
+    properties.put(RodaConstants.VERSION_USER, user.getId());
+    properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.CREATED.toString());
+
     DescriptiveMetadata ret = BrowserHelper.createOrUpdateAIPDescriptiveMetadataFile(representation.getAipId(),
-      representation.getId(), metadataId, metadataType, metadataVersion, message, is, fileDetail, true);
+      representation.getId(), metadataId, metadataType, metadataVersion, properties, is, fileDetail, true);
 
     // register action
     controllerAssistant.registerAction(user, representationId, LOG_ENTRY_STATE.SUCCESS,
@@ -1388,8 +1402,12 @@ public class Browser extends RodaWuiController {
     }
 
     // delegate
-    String message = "Reverted by " + user.getId();
-    BrowserHelper.revertDescriptiveMetadataVersion(aipId, representationId, descriptiveMetadataId, versionId, message);
+    Map<String, String> properties = new HashMap<String, String>();
+    properties.put(RodaConstants.VERSION_USER, user.getId());
+    properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.REVERTED.toString());
+
+    BrowserHelper.revertDescriptiveMetadataVersion(aipId, representationId, descriptiveMetadataId, versionId,
+      properties);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
@@ -1443,7 +1461,7 @@ public class Browser extends RodaWuiController {
       RodaConstants.CONTROLLER_PERMISSIONS_PARAM, permissions);
   }
 
-  public static void updateRisk(User user, Risk risk, String message)
+  public static void updateRisk(User user, Risk risk)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1451,10 +1469,14 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     // delegate
-    BrowserHelper.updateRisk(risk, user, message, false);
+    Map<String, String> properties = new HashMap<String, String>();
+    properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
+
+    BrowserHelper.updateRisk(risk, user, properties, false);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_RISK_PARAM, risk);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_RISK_PARAM, risk,
+      RodaConstants.CONTROLLER_MESSAGE_PARAM, RodaConstants.VersionAction.UPDATED.toString());
   }
 
   public static void updateFormat(User user, Format format)
@@ -1503,7 +1525,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static void revertRiskVersion(User user, String riskId, String versionId, String message)
+  public static void revertRiskVersion(User user, String riskId, String versionId)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IOException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1511,11 +1533,15 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     // delegate
-    BrowserHelper.revertRiskVersion(riskId, versionId, message);
+    Map<String, String> properties = new HashMap<String, String>();
+    properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.REVERTED.toString());
+
+    BrowserHelper.revertRiskVersion(riskId, versionId, properties);
 
     // register action
     controllerAssistant.registerAction(user, versionId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_RISK_ID_PARAM,
-      riskId, RodaConstants.CONTROLLER_VERSION_ID_PARAM, versionId, RodaConstants.CONTROLLER_MESSAGE_PARAM, message);
+      riskId, RodaConstants.CONTROLLER_VERSION_ID_PARAM, versionId, RodaConstants.CONTROLLER_MESSAGE_PARAM,
+      RodaConstants.VersionAction.REVERTED.toString());
   }
 
   /**

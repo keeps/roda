@@ -142,13 +142,13 @@ public interface BrowserServiceAsync {
 
   void createRisk(Risk risk, AsyncCallback<Risk> asyncCallback);
 
-  void updateRisk(Risk risk, String message, AsyncCallback<Void> asyncCallback);
+  void updateRisk(Risk risk, AsyncCallback<Void> asyncCallback);
 
   void createFormat(Format format, AsyncCallback<Format> asyncCallback);
 
   void updateFormat(Format format, AsyncCallback<Void> asyncCallback);
 
-  void revertRiskVersion(String riskId, String versionId, String message, AsyncCallback<Void> callback);
+  void revertRiskVersion(String riskId, String versionId, AsyncCallback<Void> callback);
 
   void deleteRiskVersion(String riskId, String versionId, AsyncCallback<Void> callback);
 

@@ -8,6 +8,7 @@
 package org.roda.core.storage;
 
 import java.util.Date;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -18,19 +19,19 @@ public class DefaultBinaryVersion implements BinaryVersion {
   @JsonIgnore
   private Binary binary;
   private String id;
-  private String message;
   private Date createdDate;
+  private Map<String, String> properties;
 
   public DefaultBinaryVersion() {
     super();
   }
 
-  public DefaultBinaryVersion(Binary binary, String id, String message, Date createdDate) {
+  public DefaultBinaryVersion(Binary binary, String id, Date createdDate, Map<String, String> properties) {
     super();
     this.binary = binary;
     this.id = id;
-    this.message = message;
     this.createdDate = createdDate;
+    this.properties = properties;
   }
 
   @Override
@@ -52,15 +53,6 @@ public class DefaultBinaryVersion implements BinaryVersion {
   }
 
   @Override
-  public String getMessage() {
-    return message;
-  }
-
-  public void setMessage(String message) {
-    this.message = message;
-  }
-
-  @Override
   public Date getCreatedDate() {
     return createdDate;
   }
@@ -71,7 +63,15 @@ public class DefaultBinaryVersion implements BinaryVersion {
 
   @Override
   public String toString() {
-    return "DefaultBinaryVersion [binary=" + binary + ", label=" + id + ", createdDate=" + createdDate + "]";
+    return "DefaultBinaryVersion [binary=" + binary + ", id=" + id + ", createdDate=" + createdDate + ", properties="
+      + properties + "]";
   }
 
+  public Map<String, String> getProperties() {
+    return properties;
+  }
+
+  public void setProperties(Map<String, String> properties) {
+    this.properties = properties;
+  }
 }

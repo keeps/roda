@@ -49,14 +49,14 @@ public class Risks extends RodaWuiController {
     return risk;
   }
 
-  public static Risk updateRisk(User user, Risk risk, String updateMessage)
+  public static Risk updateRisk(User user, Risk risk)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    risk = RodaCoreFactory.getModelService().updateRisk(risk, updateMessage, false);
+    risk = RodaCoreFactory.getModelService().updateRisk(risk, null, false);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "risk", risk);

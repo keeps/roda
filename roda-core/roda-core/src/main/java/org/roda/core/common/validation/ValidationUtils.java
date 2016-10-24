@@ -10,7 +10,9 @@ package org.roda.core.common.validation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -24,6 +26,7 @@ import javax.xml.validation.Validator;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -71,7 +74,7 @@ public class ValidationUtils {
   public static ValidationReport isAIPMetadataValid(boolean forceDescriptiveMetadataType,
     boolean validateDescriptiveMetadata, String fallbackMetadataType, String fallbackMetadataVersion,
     boolean validatePremis, ModelService model, String aipId) throws GenericException, RequestNotValidException,
-    AuthorizationDeniedException, NotFoundException, ValidationException {
+      AuthorizationDeniedException, NotFoundException, ValidationException {
     ValidationReport report = new ValidationReport();
     report.setValid(true);
     List<DescriptiveMetadata> descriptiveMetadata = model.retrieveAIP(aipId).getDescriptiveMetadata();
@@ -85,10 +88,13 @@ public class ValidationUtils {
           consolidateReports(report, dmReport);
         }
         // XXX review why should a validation method update data
-        String message = "Forcing metadata type to " + fallbackMetadataType;
+        Map<String, String> properties = new HashMap<String, String>();
+        properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.METADATA_TYPE_FORCED.toString());
+
         model.updateDescriptiveMetadata(aipId, dm.getId(), binary.getContent(), fallbackMetadataType,
-          fallbackMetadataVersion, message);
+          fallbackMetadataVersion, properties);
         report.setValid(true);
+
         LOGGER.debug("{} valid for metadata type {}", storagePath, fallbackMetadataType);
 
       } else if (validateDescriptiveMetadata) {
@@ -208,7 +214,7 @@ public class ValidationUtils {
    */
   public static ValidationReport isDescriptiveMetadataValid(ModelService model, DescriptiveMetadata metadata,
     boolean failIfNoSchema)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     ValidationReport ret;
     if (metadata != null) {
       StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(metadata.getAipId(),
@@ -246,7 +252,7 @@ public class ValidationUtils {
    */
   public static ValidationReport isPreservationMetadataValid(ModelService model, PreservationMetadata metadata,
     boolean failIfNoSchema)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
 
     StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(metadata);
     Binary binary = model.getStorage().getBinary(storagePath);
@@ -388,6 +394,7 @@ public class ValidationUtils {
       return errors;
     }
 
+    @SuppressWarnings("unused")
     public void setErrors(List<SAXParseException> errors) {
       this.errors = errors;
     }

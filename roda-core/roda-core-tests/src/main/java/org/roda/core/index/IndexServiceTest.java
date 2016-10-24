@@ -20,8 +20,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -641,7 +643,9 @@ public class IndexServiceTest {
       assertEquals(risk.getName(), risk3.getName());
 
       risk3.setName("Risk New Name");
-      model.updateRisk(risk3, "Risk updated", false);
+      Map<String, String> properties = new HashMap<String, String>();
+      properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
+      model.updateRisk(risk3, properties, false);
 
       Risk risk4 = index.retrieve(IndexedRisk.class, risk.getId());
       assertNotNull(risk4);

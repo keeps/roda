@@ -9,24 +9,25 @@ package org.roda.wui.client.browse;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
 
 public class BinaryVersionBundle implements Serializable {
 
   private static final long serialVersionUID = 7901536603462531124L;
 
   private String id;
-  private String message;
   private Date createdDate;
+  private Map<String, String> properties;
 
   public BinaryVersionBundle() {
     super();
   }
 
-  public BinaryVersionBundle(String id, String message, Date createdDate) {
+  public BinaryVersionBundle(String id, Date createdDate, Map<String, String> properties) {
     super();
     this.id = id;
-    this.message = message;
     this.createdDate = createdDate;
+    this.properties = properties;
   }
 
   public String getId() {
@@ -37,14 +38,6 @@ public class BinaryVersionBundle implements Serializable {
     this.id = id;
   }
 
-  public String getMessage() {
-    return message;
-  }
-
-  public void setMessage(String message) {
-    this.message = message;
-  }
-
   public Date getCreatedDate() {
     return createdDate;
   }
@@ -53,4 +46,11 @@ public class BinaryVersionBundle implements Serializable {
     this.createdDate = createdDate;
   }
 
+  public Map<String, String> getProperties() {
+    return properties;
+  }
+
+  public void setProperties(Map<String, String> properties) {
+    this.properties = properties;
+  }
 }
