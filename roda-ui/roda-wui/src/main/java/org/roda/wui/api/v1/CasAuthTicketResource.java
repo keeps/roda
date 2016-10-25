@@ -5,7 +5,7 @@
  * <p>
  * https://github.com/keeps/roda
  */
-package org.roda.wui.api;
+package org.roda.wui.api.v1;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.FormParam;
@@ -27,15 +27,15 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 /**
- * REST API authentication tickets resource.
+ * REST API CAS authentication tickets resource.
  *
  * @author Rui Castro <rui.castro@gmail.com>
  */
-@Path("/auth/ticket")
+@Path("/v1/auth/ticket")
 @Api(value = "auth ticket")
-public class AuthTicketResource {
+public class CasAuthTicketResource {
   /** Logger. */
-  private static final Logger LOGGER = LoggerFactory.getLogger(AuthTicketResource.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CasAuthTicketResource.class);
 
   /** HTTP request. */
   @Context
