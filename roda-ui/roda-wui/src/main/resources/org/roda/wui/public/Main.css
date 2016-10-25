@@ -26,6 +26,10 @@ a {
     color: #089de3;
 }
 
+a:HOVER {
+	text-decoration: underline;
+}
+
 select {
     color: #444;
     padding: 5px;
