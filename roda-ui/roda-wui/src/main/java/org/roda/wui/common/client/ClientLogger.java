@@ -90,7 +90,7 @@ public class ClientLogger implements IsSerializable {
       ClientLogger clientlogger = new ClientLogger("Uncaught");
 
       public void onUncaughtException(Throwable e) {
-        clientlogger.fatal("Uncaught Exception: " + e.getMessage(), e);
+        clientlogger.fatal("Uncaught Exception: [" + e.getClass().getName() + "] " + e.getMessage(), e);
       }
 
     });

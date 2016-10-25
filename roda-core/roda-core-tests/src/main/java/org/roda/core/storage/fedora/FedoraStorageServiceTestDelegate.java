@@ -237,7 +237,7 @@ public class FedoraStorageServiceTestDelegate extends AbstractStorageServiceTest
       BinaryVersion next = it.next();
       counter++;
     }
-    Assert.assertEquals(4, counter);
+    Assert.assertEquals(counter, 4);
     // cleanup
     getStorage().deleteContainer(containerStoragePath);
   }

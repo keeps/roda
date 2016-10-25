@@ -74,9 +74,13 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   public void testListContainer() throws RODAException {
 
     // 1) list of containers
-    Iterator<Container> iterator = getStorage().listContainers().iterator();
-    assertThat("Storage starts with empty list of containers", !iterator.hasNext());
-
+    CloseableIterable<Container> iterable = getStorage().listContainers();
+    Iterator<Container> iterator = iterable.iterator();
+    // assertThat("Storage starts with empty list of containers",
+    // !iterator.hasNext());
+    
+    assertThat(iterable, Matchers.iterableWithSize(0));
+    
     // 2) container list with one element (which implies creating one
     // container)
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();

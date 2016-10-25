@@ -9,8 +9,6 @@ package org.roda.core.storage.fedora;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileAttribute;
@@ -59,6 +57,7 @@ import org.roda.core.storage.fedora.utils.FedoraConversionUtils;
 import org.roda.core.storage.fedora.utils.FedoraUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.storage.utils.StorageRecursiveListingUtils;
+import org.roda.core.util.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -384,7 +383,7 @@ public class FedoraStorageService implements StorageService {
   @Override
   public Binary updateBinaryContent(StoragePath storagePath, ContentPayload payload, boolean asReference,
     boolean createIfNotExists)
-      throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     if (asReference) {
       // TODO method to update binary as reference.
       throw new GenericException("Updating binary as reference not yet supported");
@@ -498,7 +497,7 @@ public class FedoraStorageService implements StorageService {
 
   private void copyInsideFedora(StoragePath fromStoragePath, StoragePath toStoragePath,
     Class<? extends Entity> rootEntity)
-      throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     try {
       if (rootEntity.equals(Container.class) || rootEntity.equals(Directory.class)) {
         FedoraObject object = fedoraRepository.getObject(FedoraUtils.storagePathToFedoraPath(fromStoragePath));
@@ -539,7 +538,7 @@ public class FedoraStorageService implements StorageService {
 
   private void moveInsideFedora(StoragePath fromStoragePath, StoragePath toStoragePath,
     Class<? extends Entity> rootEntity)
-      throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     try {
       if (rootEntity.equals(Container.class) || rootEntity.equals(Directory.class)) {
         FedoraObject object = fedoraRepository.getObject(FedoraUtils.storagePathToFedoraPath(fromStoragePath));
@@ -653,6 +652,53 @@ public class FedoraStorageService implements StorageService {
     return asFileAttribute;
   }
 
+  class ListBinaryVersionsIterable implements CloseableIterable<BinaryVersion> {
+
+    private final String fedoraPath;
+    private final Iterator<String> versionsIterator;
+
+    public ListBinaryVersionsIterable(String fedoraPath, List<String> versions) {
+      this.fedoraPath = fedoraPath;
+      this.versionsIterator = versions.iterator();
+    }
+
+    @Override
+    public Iterator<BinaryVersion> iterator() {
+      return new Iterator<BinaryVersion>() {
+
+        @Override
+        public boolean hasNext() {
+          return versionsIterator.hasNext();
+        }
+
+        @Override
+        public BinaryVersion next() {
+          String next = versionsIterator.next();
+          String id = next.substring(0, 36);
+          String propertiesString = next.substring(36);
+
+          Map<String, String> properties = decodeProperties(propertiesString);
+
+          BinaryVersion ret;
+          try {
+            FedoraDatastream version = fedoraRepository.getDatastreamVersion(fedoraPath, next);
+            ret = FedoraConversionUtils.convertDataStreamToBinaryVersion(version, id, properties);
+          } catch (FedoraException | GenericException | RequestNotValidException e) {
+            ret = null;
+          }
+
+          return ret;
+        }
+
+      };
+    }
+
+    @Override
+    public void close() throws IOException {
+      // nothing to do
+    }
+  }
+
   @Override
   public CloseableIterable<BinaryVersion> listBinaryVersions(StoragePath storagePath)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
@@ -664,45 +710,7 @@ public class FedoraStorageService implements StorageService {
         throw new RequestNotValidException("The resource obtained as being a datastream isn't really a datastream");
       }
       List<String> versions = ds.getVersionsName();
-      final Iterator<String> versionsIterator = versions.iterator();
-      CloseableIterable<BinaryVersion> iterable = new CloseableIterable<BinaryVersion>() {
-
-        @Override
-        public Iterator<BinaryVersion> iterator() {
-          return new Iterator<BinaryVersion>() {
-
-            @Override
-            public boolean hasNext() {
-              return versionsIterator.hasNext();
-            }
-
-            @Override
-            public BinaryVersion next() {
-              String next = versionsIterator.next();
-              String id = next.substring(0, 36);
-              String propertiesString = next.substring(36);
-
-              Map<String, String> properties = JsonUtils.getMapFromJson(propertiesString);
-
-              BinaryVersion ret;
-              try {
-                FedoraDatastream version = fedoraRepository.getDatastreamVersion(fedoraPath, next);
-                ret = FedoraConversionUtils.convertDataStreamToBinaryVersion(version, id, properties);
-              } catch (FedoraException | GenericException | RequestNotValidException e) {
-                ret = null;
-              }
-
-              return ret;
-            }
-
-          };
-        }
-
-        @Override
-        public void close() throws IOException {
-        }
-      };
-      return iterable;
+      return new ListBinaryVersionsIterable(fedoraPath, versions);
     } catch (ForbiddenException e) {
       throw new AuthorizationDeniedException(e.getMessage(), e);
     } catch (BadRequestException e) {
@@ -727,7 +735,7 @@ public class FedoraStorageService implements StorageService {
         throw new RequestNotValidException("The resource obtained as being a datastream isn't really a datastream");
       }
       String propertiesString = fullVersionID.replace(version, "");
-      Map<String, String> properties = JsonUtils.getMapFromJson(propertiesString);
+      Map<String, String> properties = decodeProperties(propertiesString);
       return FedoraConversionUtils.convertDataStreamToBinaryVersion(ds, version, properties);
     } catch (ForbiddenException e) {
       throw new NotFoundException(e.getMessage(), e);
@@ -744,25 +752,32 @@ public class FedoraStorageService implements StorageService {
     }
   }
 
+  private static String encodeProperties(Map<String, String> properties) {
+    String propertiesAsJSON = JsonUtils.getJsonFromObject(properties);
+    String propertiesAsJsonAsBase64 = new String(Base64.encode(propertiesAsJSON.getBytes()));
+    return propertiesAsJsonAsBase64.replace('=', '_');
+  }
+
+  private static Map<String, String> decodeProperties(String encodedProperties) {
+    String propertiesAsJsonAsBase64 = encodedProperties.replace('_', '=');
+    String propertiesAsJSON = new String(Base64.decode(propertiesAsJsonAsBase64.toCharArray()));
+    return JsonUtils.getMapFromJson(propertiesAsJSON);
+  }
+
   @Override
   public BinaryVersion createBinaryVersion(StoragePath storagePath, Map<String, String> properties)
     throws RequestNotValidException, NotFoundException, GenericException {
     try {
       String id = UUID.randomUUID().toString();
       FedoraDatastream binary = fedoraRepository.getDatastream(FedoraUtils.storagePathToFedoraPath(storagePath));
-      String propertiesString = JsonUtils.getJsonFromObject(properties);
-      String versionID = id + propertiesString;
-      String versionIDEncoded = URLEncoder.encode(versionID, "UTF-8");
-      LOGGER.warn("Creating version {} ({})", versionID, versionIDEncoded);
-      binary.createVersionSnapshot(versionIDEncoded);
+      String versionID = id + encodeProperties(properties);
+      binary.createVersionSnapshot(versionID);
       return FedoraConversionUtils.convertDataStreamToBinaryVersion(binary, id, properties);
     } catch (ForbiddenException e) {
       throw new GenericException(e.getMessage(), e);
     } catch (org.fcrepo.client.NotFoundException e) {
       throw new GenericException(e.getMessage(), e);
     } catch (FedoraException e) {
-      throw new GenericException(e.getMessage(), e);
-    } catch (UnsupportedEncodingException e) {
       throw new GenericException(e.getMessage(), e);
     }
   }
