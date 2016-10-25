@@ -26,34 +26,37 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Internal authentication filter for web requests.
+ * 
  * @author Hélder Silva <hsilva@keep.pt>
  */
-public class RodaInternalAuthenticationFilter implements Filter {
-  private static final Logger LOGGER = LoggerFactory.getLogger(RodaInternalAuthenticationFilter.class);
+public class InternalWebAuthFilter implements Filter {
+  /** Logger. */
+  private static final Logger LOGGER = LoggerFactory.getLogger(InternalWebAuthFilter.class);
 
   @Override
-  public void init(FilterConfig arg0) throws ServletException {
+  public void init(final FilterConfig config) throws ServletException {
     LOGGER.info("{} initialized ok", getClass().getSimpleName());
   }
 
   @Override
-  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+  public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
     throws IOException, ServletException {
 
     final HttpServletRequest httpRequest = (HttpServletRequest) request;
     final HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-    String url = httpRequest.getRequestURL().toString();
-    String requestURI = httpRequest.getRequestURI();
-    String service = httpRequest.getParameter("service");
-    String hash = httpRequest.getParameter("hash");
-    String locale = httpRequest.getParameter("locale");
+    final String url = httpRequest.getRequestURL().toString();
+    final String requestURI = httpRequest.getRequestURI();
+    final String service = httpRequest.getParameter("service");
+    final String hash = httpRequest.getParameter("hash");
+    final String locale = httpRequest.getParameter("locale");
 
     LOGGER.debug("URL: {} ; Request URI: {} ; Service: {} ; Hash: {}, Locale: {}", url, requestURI, service, hash,
       locale);
 
-    if (requestURI.equals("/login")) {
-      StringBuilder b = new StringBuilder();
+    if ("/login".equals(requestURI)) {
+      final StringBuilder b = new StringBuilder();
       b.append("/");
 
       if (StringUtils.isNotBlank(locale)) {
@@ -67,10 +70,10 @@ public class RodaInternalAuthenticationFilter implements Filter {
       }
 
       httpResponse.sendRedirect(b.toString());
-    } else if (requestURI.equals("/logout")) {
+    } else if ("/logout".equals(requestURI)) {
       UserUtility.logout(httpRequest);
 
-      StringBuilder b = new StringBuilder();
+      final StringBuilder b = new StringBuilder();
       b.append("/");
 
       if (StringUtils.isNotBlank(locale)) {

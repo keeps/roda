@@ -1516,7 +1516,10 @@ public class LdapUtility {
       if (newPassword == null) {
         // Copy password from old entry
         final Entry oldEntry = session.lookup(new Dn(userDN));
-        modifiedUserEntry.add(oldEntry.get(USER_PASSWORD));
+        final Object oldPassword = oldEntry.get(USER_PASSWORD);
+        if (oldPassword != null) {
+          modifiedUserEntry.add(oldEntry.get(USER_PASSWORD));
+        }
       }
       session.delete(modifiedUserEntry.getDn());
       session.add(modifiedUserEntry);
