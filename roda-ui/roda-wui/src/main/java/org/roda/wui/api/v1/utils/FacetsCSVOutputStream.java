@@ -32,21 +32,13 @@ public class FacetsCSVOutputStream extends CSVOutputStream {
    *
    * @param facets
    *          the facets to write to output stream.
-   */
-  public FacetsCSVOutputStream(final List<FacetFieldResult> facets) {
-    this(facets, "facets.csv");
-  }
-
-  /**
-   * Constructor.
-   *
-   * @param facets
-   *          the facets to write to output stream.
    * @param filename
    *          the filename.
+   * @param delimiter
+   *          the CSV field delimiter.
    */
-  public FacetsCSVOutputStream(final List<FacetFieldResult> facets, final String filename) {
-    super(filename);
+  public FacetsCSVOutputStream(final List<FacetFieldResult> facets, final String filename, final char delimiter) {
+    super(filename, delimiter);
     this.facets = facets;
   }
 
