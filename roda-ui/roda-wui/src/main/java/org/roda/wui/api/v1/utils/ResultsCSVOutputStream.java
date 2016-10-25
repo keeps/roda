@@ -30,24 +30,16 @@ public class ResultsCSVOutputStream<T extends IsIndexed> extends CSVOutputStream
 
   /**
    * Constructor.
-   * 
-   * @param results
-   *          the results to write to output stream.
-   */
-  public ResultsCSVOutputStream(final IterableIndexResult<T> results) {
-    this(results, "results.csv");
-  }
-
-  /**
-   * Constructor.
    *
    * @param results
    *          the results to write to output stream.
    * @param filename
    *          the filename.
+   * @param delimiter
+   *          the CSV field delimiter.
    */
-  public ResultsCSVOutputStream(final IterableIndexResult<T> results, final String filename) {
-    super(filename);
+  public ResultsCSVOutputStream(final IterableIndexResult<T> results, final String filename, final char delimiter) {
+    super(filename, delimiter);
     this.results = results;
   }
 
