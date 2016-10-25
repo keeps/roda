@@ -12,18 +12,15 @@ import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.lang.StringUtils;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -96,6 +93,8 @@ public class IndexResource {
    * Default value for <i>facetLimit</i> parameter.
    */
   private static final int DEFAULT_FACET_LIMIT = 100;
+  /** CSV field delimiter config key. */
+  private static final String CONFIG_KEY_CSV_DELIMITER = "csv.delimiter";
 
   /**
    * HTTP request.
@@ -308,14 +307,21 @@ public class IndexResource {
     throws RequestNotValidException, AuthorizationDeniedException, GenericException {
 
     final Class<T> returnClass = getClass(findRequest.classToReturn);
+    final Configuration config = RodaCoreFactory.getRodaConfiguration();
+    final char delimiter;
+    if (StringUtils.isBlank(config.getString(CONFIG_KEY_CSV_DELIMITER))) {
+      delimiter = CSVFormat.DEFAULT.getDelimiter();
+    } else {
+      delimiter = config.getString(CONFIG_KEY_CSV_DELIMITER).trim().charAt(0);
+    }
 
     if (findRequest.exportFacets) {
 
       final IndexResult<T> result = Browser.find(returnClass, findRequest.filter, Sorter.NONE, Sublist.NONE,
         findRequest.facets, user, findRequest.onlyActive);
 
-      return ApiUtils
-        .okResponse(new RodaStreamingOutput(new FacetsCSVOutputStream(result.getFacetResults(), findRequest.filename))
+      return ApiUtils.okResponse(
+        new RodaStreamingOutput(new FacetsCSVOutputStream(result.getFacetResults(), findRequest.filename, delimiter))
           .toStreamResponse());
 
     } else {
@@ -323,8 +329,9 @@ public class IndexResource {
       final IterableIndexResult<T> result = Browser.findAll(returnClass, findRequest.filter, findRequest.sorter,
         findRequest.sublist, user, findRequest.onlyActive);
 
-      return ApiUtils.okResponse(
-        new RodaStreamingOutput(new ResultsCSVOutputStream<>(result, findRequest.filename)).toStreamResponse());
+      return ApiUtils
+        .okResponse(new RodaStreamingOutput(new ResultsCSVOutputStream<>(result, findRequest.filename, delimiter))
+          .toStreamResponse());
     }
   }
 

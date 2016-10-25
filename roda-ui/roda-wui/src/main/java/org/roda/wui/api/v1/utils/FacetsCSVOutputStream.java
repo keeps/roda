@@ -32,28 +32,20 @@ public class FacetsCSVOutputStream extends CSVOutputStream {
    *
    * @param facets
    *          the facets to write to output stream.
-   */
-  public FacetsCSVOutputStream(final List<FacetFieldResult> facets) {
-    this(facets, "facets.csv");
-  }
-
-  /**
-   * Constructor.
-   *
-   * @param facets
-   *          the facets to write to output stream.
    * @param filename
    *          the filename.
+   * @param delimiter
+   *          the CSV field delimiter.
    */
-  public FacetsCSVOutputStream(final List<FacetFieldResult> facets, final String filename) {
-    super(filename);
+  public FacetsCSVOutputStream(final List<FacetFieldResult> facets, final String filename, final char delimiter) {
+    super(filename, delimiter);
     this.facets = facets;
   }
 
   @Override
   public void consumeOutputStream(final OutputStream out) throws IOException {
     final OutputStreamWriter writer = new OutputStreamWriter(out);
-    final CSVPrinter printer = CSVFormat.DEFAULT.withHeader("field", "label", "value", "count").print(writer);
+    final CSVPrinter printer = getFormat().withHeader("field", "label", "value", "count").print(writer);
 
     for (FacetFieldResult facet : this.facets) {
       final String field = facet.getField();
