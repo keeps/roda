@@ -9,9 +9,7 @@ import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.DeleteMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.lang.StringUtils;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.slf4j.Logger;
@@ -144,68 +142,15 @@ public class CasClient {
     }
   }
 
+  /**
+   * Returns an error message for invalid response from CAS server.
+   * 
+   * @param method
+   *          the HTTP method
+   * @return a String with the error message.
+   */
   private String invalidResponseMessage(final HttpMethod method) {
     return String.format("Invalid response from CAS server: %s - %s", method.getStatusCode(), method.getStatusText());
   }
 
-  /**
-   * Do a service call with the specified service ticket. <strong>This is a TEST
-   * method</strong>.
-   * 
-   * @param service
-   *          the service URL.
-   * @param serviceTicket
-   *          the <strong>Service Ticket</strong>.
-   */
-  private void getServiceCall(final String service, final String serviceTicket) {
-    final HttpClient client = new HttpClient();
-    final GetMethod method = new GetMethod(service);
-    if (StringUtils.isBlank(method.getQueryString())) {
-      method.setQueryString(String.format("ticket=%s", serviceTicket));
-    } else {
-      method.setQueryString(String.format("%s&ticket=%s", method.getQueryString(), serviceTicket));
-    }
-    LOGGER.info(String.format("GET %s?%s", method.getPath(), method.getQueryString()));
-    try {
-      client.executeMethod(method);
-      final String response = method.getResponseBodyAsString();
-      if (method.getStatusCode() == HttpStatus.SC_OK) {
-        LOGGER.info("Response: {}", response);
-      } else {
-        LOGGER.warn(invalidResponseMessage(method));
-      }
-    } catch (final IOException e) {
-      LOGGER.warn(e.getMessage(), e);
-    } finally {
-      method.releaseConnection();
-    }
-  }
-
-  public static void main(final String[] args) {
-    try {
-      final String casServer = "https://localhost:8443/cas";
-      final String username = args[0];
-      final String password = args[1];
-
-      final String service1 = "http://localhost:8888/api/v1/index?returnClass=org.roda.core.data.v2.ip.IndexedAIP";
-      final String service2 = "http://localhost:8888/api/v1/index?returnClass=org.roda.core.data.v2.user.RODAMember";
-
-      final CasClient client = new CasClient(casServer);
-      final String ticketGrantingTicket = client.getTicketGrantingTicket(username, password);
-      LOGGER.info("TicketGrantingTicket is {}", ticketGrantingTicket);
-
-      final String serviceTicket1 = client.getServiceTicket(ticketGrantingTicket, service1);
-      LOGGER.info("ServiceTicket is {}", serviceTicket1);
-      client.getServiceCall(service1, serviceTicket1);
-
-      final String serviceTicket2 = client.getServiceTicket(ticketGrantingTicket, service2);
-      LOGGER.info("ServiceTicket is {}", serviceTicket1);
-      client.getServiceCall(service2, serviceTicket2);
-
-      client.logout(ticketGrantingTicket);
-    } catch (final Exception e) {
-      LOGGER.error(e.getMessage(), e);
-      System.exit(1);
-    }
-  }
 }

@@ -90,7 +90,7 @@
 		<init-param>
 			<description>comma separated list of relative paths to exclude in filter logic (using regular expressions for extra power)</description>
 			<param-name>exclusions</param-name>
-			<param-value>^/swagger.json,^/v1/theme/?</param-value>
+			<param-value>^/swagger.json,^/v1/theme/?,^/v1/auth/ticket?</param-value>
 		</init-param>
 	</filter>
 	<filter-mapping>
