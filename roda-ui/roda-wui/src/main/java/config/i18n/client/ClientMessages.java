@@ -89,6 +89,8 @@ public interface ClientMessages extends Messages {
   String catalogueItemTitle();
 
   String catalogueRepresentationTitle();
+  
+  String catalogueFolderTitle();
 
   String catalogueFileTitle();
 
@@ -328,26 +330,6 @@ public interface ClientMessages extends Messages {
 
   String ingestTransferLastScanned(Date lastScanDate);
 
-  String ingestTransferButtonUploadFiles();
-
-  String ingestTransferButtonRefresh();
-
-  String ingestTransferButtonRename();
-
-  String ingestTransferButtonMove();
-
-  String ingestTransferButtonDownload();
-
-  String ingestTransferButtonCreateFolder();
-
-  String ingestTransferButtonRemoveWholeFolder();
-
-  String ingestTransferButtonRemoveSelectedItems();
-
-  String ingestTransferButtonIngestWholeFolder();
-
-  String ingestTransferButtonIngestSelectedItems();
-
   String ingestTransferNotFoundDialogTitle();
 
   String ingestTransferNotFoundDialogMessage();
@@ -457,6 +439,22 @@ public interface ClientMessages extends Messages {
   String listButton();
 
   String downloadButton();
+  
+  String uploadFilesButton();
+
+  String renameButton();
+
+  String moveButton();
+
+  String createFolderButton();
+
+  String removeWholeFolderButton();
+
+  String removeSelectedItemsButton();
+
+  String ingestWholeFolderButton();
+
+  String ingestSelectedItemsButton();
 
   /*** View representation ***/
 
@@ -643,6 +641,12 @@ public interface ClientMessages extends Messages {
   String aipDates();
 
   String aipHasRepresentations();
+  
+  String folderId();
+  
+  String folderFiles();
+  
+  String fileId();
 
   String fileName();
 

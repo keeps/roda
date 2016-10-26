@@ -21,7 +21,6 @@ import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Humanize;
-import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
@@ -73,40 +72,20 @@ public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
       }
     };
 
-    // pathColumn = new TextColumn<IndexedFile>() {
-    //
-    // @Override
-    // public String getValue(IndexedFile file) {
-    //
-    // String filePath = null;
-    // if (file != null) {
-    // String path = "";
-    // if (file.getPath() != null) {
-    // path = Tools.join(file.getPath(), "/");
-    // }
-    //
-    // String fileName = file.getOriginalName() != null ? file.getOriginalName()
-    // : file.getId();
-    // filePath = path.isEmpty() ? fileName : path + "/" + fileName;
-    // }
-    //
-    // return filePath;
-    // }
-    // };
-
     pathColumn = new Column<IndexedFile, SafeHtml>(new SafeHtmlCell()) {
 
       @Override
       public SafeHtml getValue(IndexedFile file) {
         SafeHtmlBuilder b = new SafeHtmlBuilder();
         if (file != null) {
-          if (file.getPath() != null && !file.getPath().isEmpty()) {
-            String path = Tools.join(file.getPath(), "/");
-            b.append(SafeHtmlUtils.fromSafeConstant("<span class='file-path'>"));
-            b.append(SafeHtmlUtils.fromString(path));
-            b.append(SafeHtmlUtils.fromSafeConstant("/"));
-            b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
-          }
+          // if (file.getPath() != null && !file.getPath().isEmpty()) {
+          // String path = Tools.join(file.getPath(), "/");
+          // b.append(SafeHtmlUtils.fromSafeConstant("<span
+          // class='file-path'>"));
+          // b.append(SafeHtmlUtils.fromString(path));
+          // b.append(SafeHtmlUtils.fromSafeConstant("/"));
+          // b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
+          // }
 
           String fileName = file.getOriginalName() != null ? file.getOriginalName() : file.getId();
           b.append(SafeHtmlUtils.fromString(fileName));

@@ -109,7 +109,7 @@
    <field name="uuid" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="fileId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="path" type="string" indexed="true" stored="true" required="false" multiValued="true" />
-   <field name="parentUUID" type="string" indexed="true" stored="false" required="false" multiValued="false" /> 
+   <field name="parentUUID" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="aipId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="representationId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="representationUUID" type="string" indexed="true" stored="true" required="false" multiValued="false" />
@@ -131,6 +131,7 @@
    <field name="hash" type="string" indexed="true" stored="true" required="false" multiValued="true" /> 
    <field name="search" type="search" indexed="true" stored="false" required="false" multiValued="true" />
    <field name="ancestors" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+   <field name="ancestorsPath" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    
    <defaultSearchField>search</defaultSearchField>
    <copyField source="*_txt" dest="search"/>
@@ -147,6 +148,7 @@
    <copyField source="creatingApplicationVersion" dest="search"/>
    <copyField source="dateCreatedByApplication" dest="search"/>
    <copyField source="hash" dest="search"/>
+   <copyField source="ancestorsPath" dest="search"/>
    
    <!-- AIP -->
    <field name="state" type="string" default="false" indexed="true" stored="true" required="true" multiValued="false" />

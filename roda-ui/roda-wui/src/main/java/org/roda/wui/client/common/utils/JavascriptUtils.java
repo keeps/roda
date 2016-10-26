@@ -8,7 +8,6 @@
 package org.roda.wui.client.common.utils;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.i18n.client.LocaleInfo;
 
 public class JavascriptUtils {
 

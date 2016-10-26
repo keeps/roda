@@ -692,6 +692,7 @@ public final class RodaConstants {
   public static final String JOB_REPORT_SEARCH = "search";
 
   public static final String FILE_PATH = "path";
+  public static final String FILE_ANCESTORS_PATH = "ancestorsPath";
   public static final String FILE_PARENT_UUID = "parentUUID";
   public static final String FILE_AIP_ID = "aipId";
   public static final String FILE_FORMAT_MIMETYPE = "formatMimetype";

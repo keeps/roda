@@ -451,7 +451,7 @@ public class ShowPreservationEvent extends Composite {
       body.add(originalValue);
 
       Anchor link = new Anchor(messages.inspectRepresentation(),
-        Tools.createHistoryHashLink(Representation.RESOLVER, irep.getAipId(), irep.getUUID()));
+        Tools.createHistoryHashLink(BrowseRepresentation.RESOLVER, irep.getAipId(), irep.getUUID()));
 
       link.addStyleName("btn");
 
@@ -534,7 +534,7 @@ public class ShowPreservationEvent extends Composite {
       footer.addStyleName("panel-footer");
       layout.add(footer);
 
-      Anchor link = new Anchor(messages.inspectFile(), Tools.createHistoryHashLink(ViewRepresentation.RESOLVER,
+      Anchor link = new Anchor(messages.inspectFile(), Tools.createHistoryHashLink(BrowseFile.RESOLVER,
         ifile.getAipId(), ifile.getRepresentationUUID(), ifile.getUUID()));
 
       link.addStyleName("btn");

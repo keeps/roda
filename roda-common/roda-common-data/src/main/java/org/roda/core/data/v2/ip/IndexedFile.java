@@ -25,6 +25,7 @@ public class IndexedFile implements IsIndexed {
   private String representationId;
   private String representationUUID;
   private List<String> path;
+  private List<String> ancestorsPath;
   private String id;
 
   private FileFormat fileFormat;
@@ -46,10 +47,10 @@ public class IndexedFile implements IsIndexed {
 
   // FIXME 20160809 hsilva: entryPoint is not being used. but should it?
   public IndexedFile(String uuid, String parentUUID, String aipId, String representationId, String representationUUID,
-    List<String> path, String id, boolean entryPoint, FileFormat fileFormat, String originalName, long size,
-    boolean isDirectory, String creatingApplicationName, String creatingApplicationVersion,
-    String dateCreatedByApplication, List<String> hash, String storagePath, List<String> ancestors,
-    Map<String, List<String>> otherProperties) {
+    List<String> path, List<String> ancestorsPath, String id, boolean entryPoint, FileFormat fileFormat,
+    String originalName, long size, boolean isDirectory, String creatingApplicationName,
+    String creatingApplicationVersion, String dateCreatedByApplication, List<String> hash, String storagePath,
+    List<String> ancestors, Map<String, List<String>> otherProperties) {
     this.uuid = uuid;
     this.parentUUID = parentUUID;
 
@@ -57,6 +58,7 @@ public class IndexedFile implements IsIndexed {
     this.representationId = representationId;
     this.representationUUID = representationUUID;
     this.path = path;
+    this.ancestorsPath = ancestorsPath;
     this.id = id;
 
     this.fileFormat = fileFormat;
@@ -217,6 +219,14 @@ public class IndexedFile implements IsIndexed {
     this.otherProperties = otherProperties;
   }
 
+  public List<String> getAncestorsPath() {
+    return ancestorsPath;
+  }
+
+  public void setAncestorsPath(List<String> ancestorsPath) {
+    this.ancestorsPath = ancestorsPath;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -233,6 +243,7 @@ public class IndexedFile implements IsIndexed {
     result = prime * result + ((otherProperties == null) ? 0 : otherProperties.hashCode());
     result = prime * result + ((parentUUID == null) ? 0 : parentUUID.hashCode());
     result = prime * result + ((path == null) ? 0 : path.hashCode());
+    result = prime * result + ((ancestorsPath == null) ? 0 : ancestorsPath.hashCode());
     result = prime * result + ((representationId == null) ? 0 : representationId.hashCode());
     result = prime * result + ((representationUUID == null) ? 0 : representationUUID.hashCode());
     result = prime * result + (int) (size ^ (size >>> 32));
@@ -306,6 +317,11 @@ public class IndexedFile implements IsIndexed {
         return false;
     } else if (!path.equals(other.path))
       return false;
+    if (ancestorsPath == null) {
+      if (other.ancestorsPath != null)
+        return false;
+    } else if (!ancestorsPath.equals(other.ancestorsPath))
+      return false;
     if (representationId == null) {
       if (other.representationId != null)
         return false;
@@ -334,25 +350,26 @@ public class IndexedFile implements IsIndexed {
   @Override
   public String toString() {
     return "IndexedFile [uuid=" + uuid + ", parentUUID=" + parentUUID + ", aipId=" + aipId + ", representationId="
-      + representationId + ", representationUUID=" + representationUUID + ", path=" + path + ", id=" + id
-      + ", fileFormat=" + fileFormat + ", originalName=" + originalName + ", size=" + size + ", isDirectory="
-      + isDirectory + ", creatingApplicationName=" + creatingApplicationName + ", creatingApplicationVersion="
-      + creatingApplicationVersion + ", dateCreatedByApplication=" + dateCreatedByApplication + ", hash=" + hash
-      + ", storagePath=" + storagePath + ", ancestors=" + ancestors + ", otherProperties=" + otherProperties + "]";
+      + representationId + ", representationUUID=" + representationUUID + ", path=" + path + ", ancestorsPath="
+      + ancestorsPath + ", id=" + id + ", fileFormat=" + fileFormat + ", originalName=" + originalName + ", size="
+      + size + ", isDirectory=" + isDirectory + ", creatingApplicationName=" + creatingApplicationName
+      + ", creatingApplicationVersion=" + creatingApplicationVersion + ", dateCreatedByApplication="
+      + dateCreatedByApplication + ", hash=" + hash + ", storagePath=" + storagePath + ", ancestors=" + ancestors
+      + ", otherProperties=" + otherProperties + "]";
   }
 
   @Override
   public List<String> toCsvHeaders() {
-    return Arrays.asList("uuid", "parentUUID", "aipId", "representationId", "representationUUID", "path", "id",
-      "fileFormat", "originalName", "size", "isDirectory", "creatingApplicationName", "creatingApplicationVersion",
-      "dateCreatedByApplication", "hash", "storagePath", "ancestors", "otherProperties");
+    return Arrays.asList("uuid", "parentUUID", "aipId", "representationId", "representationUUID", "path",
+      "ancestorsPath", "id", "fileFormat", "originalName", "size", "isDirectory", "creatingApplicationName",
+      "creatingApplicationVersion", "dateCreatedByApplication", "hash", "storagePath", "ancestors", "otherProperties");
   }
 
   @Override
   public List<Object> toCsvValues() {
-    return Arrays.asList(uuid, parentUUID, aipId, representationId, representationUUID, path, id, fileFormat,
-      originalName, size, isDirectory, creatingApplicationName, creatingApplicationVersion, dateCreatedByApplication,
-      hash, storagePath, ancestors, otherProperties);
+    return Arrays.asList(uuid, parentUUID, aipId, representationId, representationUUID, path, ancestorsPath, id,
+      fileFormat, originalName, size, isDirectory, creatingApplicationName, creatingApplicationVersion,
+      dateCreatedByApplication, hash, storagePath, ancestors, otherProperties);
   }
 
 }

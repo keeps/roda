@@ -19,14 +19,6 @@
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FocusPanel ui:field="focusPanel" addStyleNames="focusPreviewPanel">
 				<g:HorizontalPanel ui:field="previewPanel">
-					<!-- LEFT PANEL -->
-					<g:FlowPanel ui:field="filesPanel">
-						<commonsearch:SearchPanel ui:field="searchPanel" />
-						<g:FlowPanel addStyleNames="fileListScroll">
-							<lists:SimpleFileList ui:field="filesList" />
-						</g:FlowPanel>
-					</g:FlowPanel>
-					<!-- RIGHT PANEL -->
 					<g:FlowPanel ui:field="filePreviewPanel">
 						<g:FlowPanel addStyleNames="filePreviewToolbar">
 							<m:BreadcrumbPanel ui:field="breadcrumb"

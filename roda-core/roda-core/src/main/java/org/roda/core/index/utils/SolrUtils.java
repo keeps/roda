@@ -227,7 +227,7 @@ public class SolrUtils {
 
   public static <T extends IsIndexed> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve, Filter filter,
     Sorter sorter, Sublist sublist, Facets facets, User user, boolean justActive)
-    throws GenericException, RequestNotValidException {
+      throws GenericException, RequestNotValidException {
 
     IndexResult<T> ret;
     SolrQuery query = new SolrQuery();
@@ -1124,7 +1124,7 @@ public class SolrUtils {
 
   public static SolrInputDocument aipToSolrInputDocument(AIP aip, List<String> ancestors, ModelService model,
     boolean safemode)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+      throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     SolrInputDocument ret = new SolrInputDocument();
 
     ret.addField(RodaConstants.INDEX_UUID, aip.getId());
@@ -1261,14 +1261,11 @@ public class SolrUtils {
     List<String> path = file.getPath();
     doc.addField(RodaConstants.FILE_PATH, path);
     if (path != null && !path.isEmpty()) {
-      String parentFileId = path.get(path.size() - 1);
-      List<String> parentFileDirectoryPath = new ArrayList<>();
-      if (path.size() > 1) {
-        parentFileDirectoryPath.addAll(path.subList(0, path.size() - 1));
+      List<String> ancestorsPath = getFileAncestorsPath(file.getAipId(), file.getRepresentationId(), path);
+      if (!ancestorsPath.isEmpty()) {
+        doc.addField(RodaConstants.FILE_PARENT_UUID, ancestorsPath.get(ancestorsPath.size() - 1));
+        doc.addField(RodaConstants.FILE_ANCESTORS_PATH, ancestorsPath);
       }
-
-      doc.addField(RodaConstants.FILE_PARENT_UUID,
-        IdUtils.getFileId(file.getAipId(), file.getRepresentationId(), parentFileDirectoryPath, parentFileId));
     }
     doc.addField(RodaConstants.FILE_AIP_ID, file.getAipId());
     doc.addField(RodaConstants.FILE_FILE_ID, file.getId());
@@ -1295,6 +1292,22 @@ public class SolrUtils {
     return doc;
   }
 
+  private static List<String> getFileAncestorsPath(String aipId, String representationId, List<String> path) {
+    List<String> parentFileDirectoryPath = new ArrayList<String>();
+    List<String> ancestorsPath = new ArrayList<String>();
+
+    parentFileDirectoryPath.addAll(path);
+
+    while (!parentFileDirectoryPath.isEmpty()) {
+      int lastElementIndex = parentFileDirectoryPath.size() - 1;
+      String parentFileId = parentFileDirectoryPath.get(lastElementIndex);
+      parentFileDirectoryPath.remove(lastElementIndex);
+      ancestorsPath.add(0, IdUtils.getFileId(aipId, representationId, parentFileDirectoryPath, parentFileId));
+    }
+
+    return ancestorsPath;
+  }
+
   public static IndexedFile solrDocumentToIndexedFile(SolrDocument doc) {
     IndexedFile file = null;
     String uuid = objectToString(doc.get(RodaConstants.INDEX_UUID));
@@ -1304,6 +1317,7 @@ public class SolrUtils {
     String representationUUID = objectToString(doc.get(RodaConstants.FILE_REPRESENTATION_UUID));
     String fileId = objectToString(doc.get(RodaConstants.FILE_FILE_ID));
     List<String> path = objectToListString(doc.get(RodaConstants.FILE_PATH));
+    List<String> ancestorsPath = objectToListString(doc.get(RodaConstants.FILE_ANCESTORS_PATH));
     // boolean entryPoint =
     // objectToBoolean(doc.get(RodaConstants.FILE_ISENTRYPOINT));
 
@@ -1342,8 +1356,8 @@ public class SolrUtils {
     FileFormat fileFormat = new FileFormat(formatDesignationName, formatDesignationVersion, mimetype, pronom, extension,
       formatRegistries);
 
-    file = new IndexedFile(uuid, parentUUID, aipId, representationId, representationUUID, path, fileId, false,
-      fileFormat, originalName, size, isDirectory, creatingApplicationName, creatingApplicationVersion,
+    file = new IndexedFile(uuid, parentUUID, aipId, representationId, representationUUID, path, ancestorsPath, fileId,
+      false, fileFormat, originalName, size, isDirectory, creatingApplicationName, creatingApplicationVersion,
       dateCreatedByApplication, hash, storagePath, ancestors, otherProperties);
 
     return file;
@@ -1351,8 +1365,8 @@ public class SolrUtils {
 
   public static SolrInputDocument addOtherPropertiesToIndexedFile(String prefix, OtherMetadata otherMetadataBinary,
     ModelService model, SolrClient index)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
-    ParserConfigurationException, SAXException, IOException, XPathExpressionException, SolrServerException {
+      throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
+      ParserConfigurationException, SAXException, IOException, XPathExpressionException, SolrServerException {
     SolrDocument solrDocument = index.getById(RodaConstants.INDEX_FILE,
       IdUtils.getFileId(otherMetadataBinary.getAipId(), otherMetadataBinary.getRepresentationId(),
         otherMetadataBinary.getFileDirectoryPath(), otherMetadataBinary.getFileId()));

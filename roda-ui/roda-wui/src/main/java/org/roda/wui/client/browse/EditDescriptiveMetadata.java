@@ -460,7 +460,7 @@ public class EditDescriptiveMetadata extends Composite {
           if (representationId == null) {
             Tools.newHistory(Browse.RESOLVER, aipId);
           } else {
-            Tools.newHistory(Representation.RESOLVER, aipId, representationId);
+            Tools.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
           }
         }
       });
@@ -507,7 +507,7 @@ public class EditDescriptiveMetadata extends Composite {
     if (representationId == null) {
       Tools.newHistory(Browse.RESOLVER, aipId);
     } else {
-      Tools.newHistory(Representation.RESOLVER, aipId, representationId);
+      Tools.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
     }
   }
 

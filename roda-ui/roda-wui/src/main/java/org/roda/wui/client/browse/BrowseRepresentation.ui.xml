@@ -34,7 +34,6 @@
 					ui:field="newDescriptiveMetadata">
 					<ui:text from='{messages.newDescriptiveMetadataTitle}' />
 				</g:Button>
-
 				<g:Label addStyleNames="h5 browseSearchListTitle" ui:field="filesPanelTitle">
 					<ui:text from='{messages.representationFiles}' />
 				</g:Label>
@@ -49,9 +48,6 @@
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.representation}' />
 							</g:Label>
-							<g:Button addStyleNames="btn btn-play" ui:field="viewer">
-								<ui:text from='{messages.viewButton}' />
-							</g:Button>
 							<g:Button addStyleNames="btn btn-danger btn-ban"
 								ui:field="remove">
 								<ui:text from='{messages.removeButton}' />

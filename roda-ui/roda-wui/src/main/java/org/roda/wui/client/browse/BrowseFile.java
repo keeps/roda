@@ -10,33 +10,24 @@
  */
 package org.roda.wui.client.browse;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
-import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.lists.SimpleFileList;
-import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
+import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.Tools;
@@ -47,13 +38,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.event.dom.client.ErrorHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.logical.shared.ResizeEvent;
-import com.google.gwt.event.logical.shared.ResizeHandler;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -69,8 +53,6 @@ import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -83,8 +65,6 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.SelectionChangeEvent;
-import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
 import config.i18n.client.ClientMessages;
 
@@ -92,7 +72,7 @@ import config.i18n.client.ClientMessages;
  * @author Luis Faria
  * 
  */
-public class ViewRepresentation extends Composite {
+public class BrowseFile extends Composite {
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
@@ -122,54 +102,46 @@ public class ViewRepresentation extends Composite {
     }
 
     public String getHistoryToken() {
-      return "view";
+      return "file";
     }
 
     private void load(final Viewers viewers, final List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      if (historyTokens.size() > 1) {
+      if (historyTokens.size() > 2) {
         final String aipId = historyTokens.get(0);
         final String representationUUID = historyTokens.get(1);
+        final String fileUUID = historyTokens.get(2);
 
         BrowserService.Util.getInstance().retrieveItemBundle(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
           new AsyncCallback<BrowseItemBundle>() {
 
-            @Override
-            public void onFailure(Throwable caught) {
-              errorRedirect(callback);
-            }
+          @Override
+          public void onFailure(Throwable caught) {
+            errorRedirect(callback);
+          }
 
-            @Override
-            public void onSuccess(final BrowseItemBundle itemBundle) {
-              if (itemBundle != null && verifyRepresentation(itemBundle.getRepresentations(), representationUUID)) {
-                if (historyTokens.size() > 2) {
-                  final String fileUUID = historyTokens.get(2);
+          @Override
+          public void onSuccess(final BrowseItemBundle itemBundle) {
+            if (itemBundle != null && verifyRepresentation(itemBundle.getRepresentations(), representationUUID)) {
+              BrowserService.Util.getInstance().retrieve(IndexedFile.class.getName(), fileUUID,
+                new AsyncCallback<IndexedFile>() {
 
-                  BrowserService.Util.getInstance().retrieve(IndexedFile.class.getName(), fileUUID,
-                    new AsyncCallback<IndexedFile>() {
-
-                      @Override
-                      public void onSuccess(IndexedFile simpleFile) {
-                        ViewRepresentation view = new ViewRepresentation(viewers, aipId, itemBundle, representationUUID,
-                          fileUUID, simpleFile);
-                        callback.onSuccess(view);
-                      }
-
-                      @Override
-                      public void onFailure(Throwable caught) {
-                        Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
-                        errorRedirect(callback);
-                      }
-                    });
-
-                } else {
-                  ViewRepresentation view = new ViewRepresentation(viewers, aipId, itemBundle, representationUUID);
+                @Override
+                public void onSuccess(IndexedFile simpleFile) {
+                  BrowseFile view = new BrowseFile(viewers, aipId, itemBundle, representationUUID, fileUUID, simpleFile);
                   callback.onSuccess(view);
                 }
-              } else {
-                errorRedirect(callback);
-              }
+
+                @Override
+                public void onFailure(Throwable caught) {
+                  Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
+                  errorRedirect(callback);
+                }
+              });
+            } else {
+              errorRedirect(callback);
             }
-          });
+          }
+        });
       } else {
         errorRedirect(callback);
       }
@@ -192,11 +164,10 @@ public class ViewRepresentation extends Composite {
   };
 
   public static void jumpTo(IndexedFile selected) {
-    Tools.newHistory(ViewRepresentation.RESOLVER, selected.getAipId(), selected.getRepresentationUUID(),
-      selected.getUUID());
+    Tools.newHistory(BrowseFile.RESOLVER, selected.getAipId(), selected.getRepresentationUUID(), selected.getUUID());
   }
 
-  interface MyUiBinder extends UiBinder<Widget, ViewRepresentation> {
+  interface MyUiBinder extends UiBinder<Widget, BrowseFile> {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
@@ -213,10 +184,6 @@ public class ViewRepresentation extends Composite {
   @SuppressWarnings("unused")
   private String fileUUID;
   private IndexedFile file;
-  private Filter defaultFilter;
-
-  private boolean singleFileMode = false;
-  private boolean firstLoad = true;
 
   static final int WINDOW_WIDTH = 800;
 
@@ -228,16 +195,7 @@ public class ViewRepresentation extends Composite {
 
   @UiField
   HorizontalPanel previewPanel;
-
-  @UiField
-  FlowPanel filesPanel;
-
-  @UiField(provided = true)
-  SearchPanel searchPanel;
-
-  @UiField(provided = true)
-  SimpleFileList filesList;
-
+  
   @UiField
   FlowPanel filePreviewPanel;
 
@@ -268,41 +226,13 @@ public class ViewRepresentation extends Composite {
    * @param viewers
    * @param aipId
    * @param itemBundle
-   * @param representationId
-   * 
-   */
-  public ViewRepresentation(Viewers viewers, String aipId, BrowseItemBundle itemBundle, String representationId) {
-    this(viewers, aipId, itemBundle, representationId, null, null);
-  }
-
-  /**
-   * Create a new panel to view a representation
-   * 
-   * @param viewers
-   * @param aipId
-   * @param itemBundle
-   * @param representationId
-   * @param fileId
-   * 
-   */
-  public ViewRepresentation(Viewers viewers, String aipId, BrowseItemBundle itemBundle, String representationId,
-    String fileId) {
-    this(viewers, aipId, itemBundle, representationId, fileId, null);
-  }
-
-  /**
-   * Create a new panel to view a representation
-   * 
-   * @param viewers
-   * @param aipId
-   * @param itemBundle
    * @param representationUUID
    * @param fileUUID
    * @param file
    * 
    */
-  public ViewRepresentation(Viewers viewers, String aipId, BrowseItemBundle itemBundle, String representationUUID,
-    String fileUUID, IndexedFile file) {
+  public BrowseFile(Viewers viewers, String aipId, BrowseItemBundle itemBundle, String representationUUID, String fileUUID,
+    IndexedFile file) {
     this.viewers = viewers;
     this.aipId = aipId;
     this.itemBundle = itemBundle;
@@ -317,25 +247,6 @@ public class ViewRepresentation extends Composite {
         break;
       }
     }
-
-    if (file != null && file.isDirectory()) {
-      defaultFilter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_PARENT_UUID, file.getUUID()));
-    } else if (file != null && !file.isDirectory() && file.getParentUUID() != null) {
-      defaultFilter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_PARENT_UUID, file.getParentUUID()));
-    } else {
-      defaultFilter = new Filter(new EmptyKeyFilterParameter(RodaConstants.FILE_PARENT_UUID));
-    }
-    defaultFilter.add(new SimpleFilterParameter(RodaConstants.FILE_AIP_ID, aipId));
-    defaultFilter.add(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, representationUUID));
-
-    boolean selectable = false;
-    boolean justActive = false;
-    filesList = new SimpleFileList(defaultFilter, justActive, null, null, selectable);
-
-    searchPanel = new SearchPanel(defaultFilter, RodaConstants.FILE_SEARCH,
-      messages.viewRepresentationSearchPlaceHolder(), false, false, false);
-    searchPanel.setList(filesList);
-    searchPanel.setDefaultFilterIncremental(false);
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -353,207 +264,13 @@ public class ViewRepresentation extends Composite {
     removeFileButton.setTitle(messages.viewRepresentationRemoveFileButton());
     infoFileButton.setTitle(messages.viewRepresentationInfoFileButton());
 
-    filesList.getSelectionModel().addSelectionChangeHandler(new Handler() {
-
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        IndexedFile selected = filesList.getSelectionModel().getSelectedObject();
-        if (selected != null && selected.isDirectory()) {
-          jumpTo(selected);
-        } else {
-          filePreview();
-          panelsControl();
-          changeInfoFile();
-          changeURL();
-        }
-      }
-    });
-
-    filesList.addValueChangeHandler(new ValueChangeHandler<IndexResult<IndexedFile>>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<IndexResult<IndexedFile>> event) {
-        if (firstLoad) {
-          List<IndexedFile> results = event.getValue().getResults();
-
-          if (results.size() == 1 && !results.get(0).isDirectory()
-            && (ViewRepresentation.this.file == null || results.get(0).equals(ViewRepresentation.this.file))) {
-            singleFileMode = true;
-            filesList.nextItemSelection();
-          } else if (results.size() > 1 && !results.get(0).isDirectory()
-            && (ViewRepresentation.this.file == null || ViewRepresentation.this.file.isDirectory())
-            && Window.getClientWidth() > WINDOW_WIDTH) {
-            filesList.nextItemSelection();
-          }
-
-          firstLoad = false;
-        }
-      }
-
-    });
-
     focusPanel.addStyleName("viewRepresentationFocusPanel");
     previewPanel.addStyleName("viewRepresentationPreviewPanel");
-    filesPanel.addStyleName("viewRepresentationFilesPanel");
     filePreviewPanel.addStyleName("viewRepresentationFilePreviewPanel");
     filePreview.addStyleName("viewRepresentationFilePreview");
     previewPanel.setCellWidth(filePreviewPanel, "100%");
 
-    panelsControl();
-
-    Window.addResizeHandler(new ResizeHandler() {
-
-      @Override
-      public void onResize(ResizeEvent event) {
-        panelsControl();
-      }
-    });
-
     filePreview();
-
-    focusPanel.setFocus(true);
-    focusPanel.addKeyDownHandler(new KeyDownHandler() {
-
-      @Override
-      public void onKeyDown(KeyDownEvent event) {
-        if (event.getNativeKeyCode() == KeyCodes.KEY_LEFT || event.getNativeKeyCode() == KeyCodes.KEY_UP) {
-          event.preventDefault();
-          filesList.previousItemSelection();
-        } else if (event.getNativeKeyCode() == KeyCodes.KEY_RIGHT || event.getNativeKeyCode() == KeyCodes.KEY_DOWN) {
-          event.preventDefault();
-          filesList.nextItemSelection();
-        }
-      }
-    });
-
-    searchPanel.addKeyDownEvent(new KeyDownHandler() {
-
-      @Override
-      public void onKeyDown(KeyDownEvent event) {
-        if (event.getNativeKeyCode() == KeyCodes.KEY_LEFT || event.getNativeKeyCode() == KeyCodes.KEY_RIGHT) {
-          DOM.eventCancelBubble(DOM.eventGetCurrentEvent(), true);
-        }
-      }
-    });
-  }
-
-  private void clean() {
-    cleanURL();
-    file = null;
-    hideRightPanel();
-    breadcrumb.updatePath(getBreadcrumbs());
-    firstLoad = true;
-    filesList.refresh();
-  }
-
-  private void changeURL() {
-    if (file != null) {
-      String url = Window.Location.createUrlBuilder().buildString();
-      String viewUrl = url.substring(0, url.indexOf('#'));
-
-      // TODO set representation UUID
-      String hashLink = Tools.createHistoryHashLink(ViewRepresentation.RESOLVER, file.getAipId(),
-        file.getRepresentationUUID(), file.getUUID());
-      viewUrl += hashLink;
-
-      JavascriptUtils.updateURLWithoutReloading(viewUrl);
-    }
-  }
-
-  private void cleanURL() {
-    String url = Window.Location.createUrlBuilder().buildString();
-    url = url.substring(0, url.lastIndexOf("/"));
-    JavascriptUtils.updateURLWithoutReloading(url);
-  }
-
-  private List<BreadcrumbItem> getBreadcrumbs() {
-    List<BreadcrumbItem> fullBreadcrumb = new ArrayList<>();
-    List<BreadcrumbItem> fileBreadcrumb = new ArrayList<>();
-
-    IndexedAIP aip = itemBundle.getAip();
-    List<IndexedRepresentation> representations = itemBundle.getRepresentations();
-    IndexedRepresentation rep = selectRepresentation(representations, representationUUID);
-
-    // AIP breadcrumb
-    fullBreadcrumb.add(new BreadcrumbItem(HtmlSnippetUtils.getBreadcrumbLabel(aip),
-      HtmlSnippetUtils.getBreadcrumbTitle(aip), Tools.concat(Browse.RESOLVER.getHistoryPath(), aipId)));
-
-    if (file != null) {
-      List<String> filePath = file.getPath();
-      List<String> pathBuilder = new ArrayList<>();
-      pathBuilder.add(aipId);
-      pathBuilder.add(representationUUID);
-      for (String folder : filePath) {
-        pathBuilder.add(folder);
-        List<String> path = new ArrayList<>(pathBuilder);
-        if (filePath.indexOf(folder) != (filePath.size() - 1)) {
-          fileBreadcrumb.add(new BreadcrumbItem(getBreadcrumbLabel(folder, RodaConstants.VIEW_REPRESENTATION_FOLDER),
-            folder, Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), path)));
-        } else {
-          fileBreadcrumb.add(new BreadcrumbItem(getBreadcrumbLabel(folder, RodaConstants.VIEW_REPRESENTATION_FOLDER),
-            folder, new Command() {
-
-              @Override
-              public void execute() {
-                clean();
-              }
-            }));
-
-        }
-      }
-
-      String fileLabel = file.getOriginalName() != null ? file.getOriginalName() : file.getId();
-
-      fileBreadcrumb.add(new BreadcrumbItem(
-        file.isDirectory() ? getBreadcrumbLabel(fileLabel, RodaConstants.VIEW_REPRESENTATION_FOLDER)
-          : getBreadcrumbLabel(fileLabel, RodaConstants.VIEW_REPRESENTATION_FILE),
-        fileLabel,
-        Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), aipId, representationUUID, file.getId())));
-    }
-
-    // Representation breadcrumb
-    fullBreadcrumb.add(new BreadcrumbItem(DescriptionLevelUtils.getRepresentationTypeIcon(rep.getType(), true),
-      rep.getType(), Tools.concat(Representation.RESOLVER.getHistoryPath(), aipId, representationUUID)));
-
-    fullBreadcrumb.add(new BreadcrumbItem(getBreadcrumbLabel("data", RodaConstants.VIEW_REPRESENTATION_FOLDER), "data",
-      Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), aipId, representationUUID)));
-
-    fullBreadcrumb.addAll(fileBreadcrumb);
-    return fullBreadcrumb;
-  }
-
-  private IndexedRepresentation selectRepresentation(List<IndexedRepresentation> representations,
-    String representationUUID) {
-    IndexedRepresentation rep = null;
-    for (IndexedRepresentation representation : representations) {
-      if (representation.getUUID().equals(representationUUID)) {
-        rep = representation;
-      }
-    }
-    return rep;
-  }
-
-  // private String representationType(Representation rep) {
-  // SafeHtml labelText;
-  // String repType = rep.getType();
-  // if (rep.isOriginal()) {
-  // labelText = messages.downloadTitleOriginal(repType);
-  // } else {
-  // labelText = messages.downloadTitleDefault(repType);
-  // }
-  // return labelText.asString();
-  // }
-
-  private SafeHtml getBreadcrumbLabel(String label, String level) {
-    SafeHtml elementLevelIconSafeHtml = getElementLevelIconSafeHtml(level);
-    SafeHtmlBuilder builder = new SafeHtmlBuilder();
-    builder.append(elementLevelIconSafeHtml).append(SafeHtmlUtils.fromString(label));
-    SafeHtml breadcrumbLabel = builder.toSafeHtml();
-    return breadcrumbLabel;
-  }
-
-  private SafeHtml getElementLevelIconSafeHtml(String level) {
-    return DescriptionLevelUtils.getElementLevelIconSafeHtml(level, false);
   }
 
   @UiHandler("downloadFileButton")
@@ -565,9 +282,6 @@ public class ViewRepresentation extends Composite {
     SafeUri downloadUri = null;
     if (file != null) {
       downloadUri = RestUtils.createRepresentationFileDownloadUri(file.getUUID());
-    } else if (filesList.getSelectionModel().getSelectedObject() != null) {
-      downloadUri = RestUtils
-        .createRepresentationFileDownloadUri(filesList.getSelectionModel().getSelectedObject().getUUID());
     }
     if (downloadUri != null) {
       Window.Location.assign(downloadUri.asString());
@@ -603,7 +317,7 @@ public class ViewRepresentation extends Composite {
 
               @Override
               public void onSuccess(Void result) {
-                clean();
+                //clean();
               }
 
               @Override
@@ -634,60 +348,8 @@ public class ViewRepresentation extends Composite {
     JavascriptUtils.toggleRightPanel(".infoFilePanel");
   }
 
-  private void hideRightPanel() {
-    infoFileButton.removeStyleName("active");
-    JavascriptUtils.hideRightPanel(".infoFilePanel");
-  }
-
-  private void panelsControl() {
-    if (file == null || file.isDirectory()) {
-      showFilesPanel();
-      if (Window.getClientWidth() < WINDOW_WIDTH) {
-        hideFilePreview();
-      } else {
-        showFilePreview();
-      }
-    } else {
-      showFilePreview();
-      if (!singleFileMode) {
-        if (Window.getClientWidth() < WINDOW_WIDTH) {
-          hideFilesPanel();
-        } else {
-          showFilesPanel();
-        }
-      } else {
-        hideFilesPanel();
-      }
-    }
-  }
-
-  private void showFilesPanel() {
-    filesPanel.setVisible(true);
-    filePreviewPanel.removeStyleName("single");
-  }
-
-  private void hideFilesPanel() {
-    filesPanel.setVisible(false);
-    filePreviewPanel.addStyleName("single");
-  }
-
-  private void showFilePreview() {
-    filesPanel.removeStyleName("full_width");
-    previewPanel.setCellWidth(filePreviewPanel, "100%");
-    filePreviewPanel.setVisible(true);
-  }
-
-  private void hideFilePreview() {
-    filesPanel.addStyleName("full_width");
-    previewPanel.setCellWidth(filePreviewPanel, "0px");
-    filePreviewPanel.setVisible(false);
-  }
-
   private void filePreview() {
     filePreview.clear();
-
-    file = (filesList.getSelectionModel().getSelectedObject() != null)
-      ? filesList.getSelectionModel().getSelectedObject() : file;
     breadcrumb.updatePath(getBreadcrumbs());
 
     if (file != null && !file.isDirectory()) {
@@ -716,6 +378,10 @@ public class ViewRepresentation extends Composite {
     } else {
       emptyPreview();
     }
+  }
+
+  private List<BreadcrumbItem> getBreadcrumbs() {
+    return BreadcrumbUtils.getFileBreadcrumbs(itemBundle, aipId, representationUUID, file);
   }
 
   private String viewerType(IndexedFile file) {

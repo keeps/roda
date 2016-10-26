@@ -22,7 +22,7 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.browse.ViewRepresentation;
+import org.roda.wui.client.browse.BrowseFile;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -181,7 +181,7 @@ public class ShowJobReport extends Composite {
               if (result != null) {
                 sourceObjectLabel.setText(messages.showRepresentationExtended());
                 sourceObject.setHref(Tools.createHistoryHashLink(Browse.RESOLVER,
-                  org.roda.wui.client.browse.Representation.RESOLVER.getHistoryToken(), result.getAipId(),
+                  org.roda.wui.client.browse.BrowseRepresentation.RESOLVER.getHistoryToken(), result.getAipId(),
                   result.getUUID()));
               }
             }
@@ -201,7 +201,7 @@ public class ShowJobReport extends Composite {
               if (result != null) {
                 sourceObjectLabel.setText(messages.showFileExtended());
                 sourceObject
-                  .setHref(Tools.createHistoryHashLink(Browse.RESOLVER, ViewRepresentation.RESOLVER.getHistoryToken(),
+                  .setHref(Tools.createHistoryHashLink(Browse.RESOLVER, BrowseFile.RESOLVER.getHistoryToken(),
                     result.getAipId(), result.getRepresentationUUID(), result.getUUID()));
               }
             }
@@ -236,7 +236,7 @@ public class ShowJobReport extends Composite {
               if (result != null) {
                 outcomeObjectLabel.setText(messages.showRepresentationExtended());
                 outcomeObject.setHref(Tools.createHistoryHashLink(Browse.RESOLVER,
-                  org.roda.wui.client.browse.Representation.RESOLVER.getHistoryToken(), result.getAipId(),
+                  org.roda.wui.client.browse.BrowseRepresentation.RESOLVER.getHistoryToken(), result.getAipId(),
                   result.getUUID()));
               }
             }
@@ -256,7 +256,7 @@ public class ShowJobReport extends Composite {
               if (result != null) {
                 outcomeObjectLabel.setText(messages.showFileExtended());
                 outcomeObject
-                  .setHref(Tools.createHistoryHashLink(Browse.RESOLVER, ViewRepresentation.RESOLVER.getHistoryToken(),
+                  .setHref(Tools.createHistoryHashLink(Browse.RESOLVER, BrowseFile.RESOLVER.getHistoryToken(),
                     result.getAipId(), result.getRepresentationUUID(), result.getUUID()));
               }
             }

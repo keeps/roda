@@ -8,7 +8,7 @@
 	xmlns:m="urn:import:org.roda.wui.client.main">
 
 	<ui:style>
-	
+
 	</ui:style>
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
@@ -16,28 +16,26 @@
 	<g:FlowPanel styleName="wui-ingest-transfer" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1" ui:field="ingestTransferTitle">
-					<ui:text from='{messages.ingestTransferTitle}' />
-				</g:Label>
-				<g:FlowPanel addStyleNames="page-description" ui:field="ingestTransferDescription">
-				</g:FlowPanel>
-				<g:FlowPanel styleName="browseItemPanel browseTitle-allCollections-wrapper ">
-					<g:SimplePanel styleName="browseItemIcon" ui:field="itemIcon" />
+				<g:FlowPanel styleName="browseItemPanel">
+					<g:Label addStyleNames="browseItemHeader" ui:field="browseItemHeader">
+						<ui:text from='{messages.catalogueFolderTitle}' />
+					</g:Label>
+					<g:SimplePanel styleName="browseItemIcon" ui:field="folderIcon" />
 					<g:FlowPanel styleName="browseItemPanelText">
-						<g:Label styleName="h1" addStyleNames="browseItemText"
-							ui:field="itemTitle" />
+						<g:Label styleName="h4" addStyleNames="browseItemText"
+							ui:field="folderName" />
 					</g:FlowPanel>
-					<g:Label addStyleNames="browseItemDates" ui:field="itemDates" />
+					<g:Label addStyleNames="browseItemId" ui:field="folderId"
+						title="{messages.folderId}" />
 				</g:FlowPanel>
 				<m:BreadcrumbPanel ui:field="breadcrumb"
 					addStyleNames="browseBreadcrumb" />
+				<g:Label addStyleNames="h5 browseSearchListTitle" ui:field="filesPanelTitle">
+					<ui:text from='{messages.folderFiles}' />
+				</g:Label>
 				<commonsearch:SearchPanel ui:field="searchPanel" />
-				<lists:TransferredResourceList
-					addStyleNames="transferredResourceList" ui:field="transferredResourceList" />
-				<g:Button addStyleNames="btn btn-download" ui:field="download">
-					<ui:text from='{messages.downloadButton}' />
-				</g:Button>
-				<g:Label styleName="ingest-transfer-lastscanned" ui:field="lastScanned" />
+				<lists:SearchFileList addStyleNames="searchResults"
+					ui:field="filesList" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
@@ -64,14 +62,6 @@
 							<g:Button addStyleNames="btn btn-danger btn-ban"
 								ui:field="remove">
 								<ui:text from='{messages.removeWholeFolderButton}' />
-							</g:Button>
-						</g:FlowPanel>
-						<g:FlowPanel>
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.sidebarIngestTitle}' />
-							</g:Label>
-							<g:Button addStyleNames="btn btn-play" ui:field="startIngest">
-								<ui:text from='{messages.ingestWholeFolderButton}' />
 							</g:Button>
 						</g:FlowPanel>
 					</g:FlowPanel>

@@ -24,6 +24,7 @@ import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.main.BreadcrumbPanel;
+import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.Tools;
@@ -174,7 +175,7 @@ public class PreservationEvents extends Composite {
         }
       });
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();
@@ -183,7 +184,7 @@ public class PreservationEvents extends Composite {
 
   public void viewAction() {
     IndexedAIP aip = itemBundle.getAip();
-    breadcrumb.updatePath(HtmlSnippetUtils.getBreadcrumbsFromAncestors(itemBundle.getAIPAncestors(), aip));
+    breadcrumb.updatePath(BreadcrumbUtils.getAipBreadcrumbs(itemBundle.getAIPAncestors(), aip));
     breadcrumb.setVisible(true);
   }
 
@@ -200,7 +201,7 @@ public class PreservationEvents extends Composite {
     if (repId == null) {
       Tools.newHistory(Tools.concat(Browse.RESOLVER.getHistoryPath(), aipId));
     } else {
-      Tools.newHistory(Tools.concat(Representation.RESOLVER.getHistoryPath(), aipId, repId));
+      Tools.newHistory(Tools.concat(BrowseRepresentation.RESOLVER.getHistoryPath(), aipId, repId));
     }
   }
 }

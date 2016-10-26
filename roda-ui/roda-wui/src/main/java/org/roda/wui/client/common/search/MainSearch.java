@@ -30,7 +30,8 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.browse.ViewRepresentation;
+import org.roda.wui.client.browse.BrowseFile;
+import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.ClientSelectedItemsUtils;
@@ -498,7 +499,7 @@ public class MainSearch extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         IndexedRepresentation rep = representationsSearchResultPanel.getSelectionModel().getSelectedObject();
         if (rep != null) {
-          Tools.newHistory(ViewRepresentation.RESOLVER, rep.getAipId(), rep.getUUID());
+          Tools.newHistory(BrowseRepresentation.RESOLVER, rep.getAipId(), rep.getUUID());
         }
       }
     });
@@ -530,7 +531,7 @@ public class MainSearch extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         IndexedFile file = filesSearchResultPanel.getSelectionModel().getSelectedObject();
         if (file != null) {
-          ViewRepresentation.jumpTo(file);
+          BrowseFile.jumpTo(file);
         }
       }
     });

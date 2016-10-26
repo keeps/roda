@@ -19,10 +19,10 @@ import java.util.Map;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
-import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.common.Dialogs;
@@ -32,10 +32,9 @@ import org.roda.wui.client.common.lists.SearchFileList;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
+import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.client.process.CreateJob;
 import org.roda.wui.common.client.HistoryResolver;
@@ -64,7 +63,6 @@ import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -84,7 +82,7 @@ import config.i18n.client.ClientMessages;
  * @author Luis Faria
  * 
  */
-public class Representation extends Composite {
+public class BrowseRepresentation extends Composite {
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
@@ -97,31 +95,31 @@ public class Representation extends Composite {
         BrowserService.Util.getInstance().retrieveItemBundle(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
           new AsyncCallback<BrowseItemBundle>() {
 
-            @Override
-            public void onFailure(Throwable caught) {
-              Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
-              errorRedirect(callback);
-            }
+          @Override
+          public void onFailure(Throwable caught) {
+            Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
+            errorRedirect(callback);
+          }
 
-            @Override
-            public void onSuccess(final BrowseItemBundle itemBundle) {
-              BrowserService.Util.getInstance().retrieve(IndexedRepresentation.class.getName(), representationUUID,
-                new AsyncCallback<IndexedRepresentation>() {
+          @Override
+          public void onSuccess(final BrowseItemBundle itemBundle) {
+            BrowserService.Util.getInstance().retrieve(IndexedRepresentation.class.getName(), representationUUID,
+              new AsyncCallback<IndexedRepresentation>() {
 
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
-                    errorRedirect(callback);
-                  }
+              @Override
+              public void onFailure(Throwable caught) {
+                Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
+                errorRedirect(callback);
+              }
 
-                  @Override
-                  public void onSuccess(IndexedRepresentation indexedRepresentation) {
-                    Representation representation = new Representation(itemBundle, indexedRepresentation);
-                    callback.onSuccess(representation);
-                  }
-                });
-            }
-          });
+              @Override
+              public void onSuccess(IndexedRepresentation indexedRepresentation) {
+                BrowseRepresentation representation = new BrowseRepresentation(itemBundle, indexedRepresentation);
+                callback.onSuccess(representation);
+              }
+            });
+          }
+        });
 
       } else {
         errorRedirect(callback);
@@ -151,7 +149,7 @@ public class Representation extends Composite {
     return Tools.concat(RESOLVER.getHistoryPath(), id);
   }
 
-  interface MyUiBinder extends UiBinder<Widget, Representation> {
+  interface MyUiBinder extends UiBinder<Widget, BrowseRepresentation> {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
@@ -183,7 +181,6 @@ public class Representation extends Composite {
   SearchFileList filesList;
 
   private List<HandlerRegistration> handlers;
-  private BrowseItemBundle itemBundle;
   private IndexedRepresentation representation;
   private String aipId;
   private String repId;
@@ -191,8 +188,7 @@ public class Representation extends Composite {
 
   private static final String ALL_FILTER = SearchFilters.allFilter(IndexedFile.class.getName());
 
-  public Representation(BrowseItemBundle itemBundle, IndexedRepresentation representation) {
-    this.itemBundle = itemBundle;
+  public BrowseRepresentation(BrowseItemBundle itemBundle, IndexedRepresentation representation) {
     this.representation = representation;
     this.aipId = representation.getAipId();
     this.repId = representation.getUUID();
@@ -204,7 +200,8 @@ public class Representation extends Composite {
     String summary = messages.representationListOfFiles();
     boolean selectable = false;
 
-    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, repId));
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, repId),
+      new EmptyKeyFilterParameter(RodaConstants.FILE_PARENT_UUID));
     filesList = new SearchFileList(filter, true, Facets.NONE, summary, selectable);
 
     filesList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
@@ -212,8 +209,12 @@ public class Representation extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         IndexedFile selected = filesList.getSelectionModel().getSelectedObject();
         if (selected != null) {
-          Tools.newHistory(Browse.RESOLVER, ViewRepresentation.RESOLVER.getHistoryToken(), aipId, repId,
-            selected.getUUID());
+          if (selected.isDirectory()) {
+            Tools.newHistory(Browse.RESOLVER, BrowseFolder.RESOLVER.getHistoryToken(), aipId, repId, selected.getUUID());
+          } else {
+            Tools.newHistory(Browse.RESOLVER, BrowseFile.RESOLVER.getHistoryToken(), aipId, repId,
+              selected.getUUID());
+          }
         }
       }
     });
@@ -231,7 +232,7 @@ public class Representation extends Composite {
     representationType.setText(representation.getType() != null ? representation.getType() : representation.getId());
     representationId.setText(repId);
 
-    breadcrumb.updatePath(getBreadcrumbs());
+    breadcrumb.updatePath(BreadcrumbUtils.getRepresentatioBreadcrumbs(itemBundle, aipId, repId));
     breadcrumb.setVisible(true);
 
     final List<Pair<String, HTML>> descriptiveMetadataContainers = new ArrayList<Pair<String, HTML>>();
@@ -301,53 +302,11 @@ public class Representation extends Composite {
       itemMetadata.setVisible(false);
     }
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();
     JavascriptUtils.stickSidebar();
-  }
-
-  private List<BreadcrumbItem> getBreadcrumbs() {
-    IndexedAIP aip = itemBundle.getAip();
-    List<IndexedAIP> aipAncestors = itemBundle.getAIPAncestors();
-
-    List<BreadcrumbItem> breadcrumb = new ArrayList<>();
-    breadcrumb
-      .add(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), "", Browse.RESOLVER.getHistoryPath()));
-
-    if (aipAncestors != null) {
-      for (IndexedAIP ancestor : aipAncestors) {
-        if (ancestor != null) {
-          SafeHtml breadcrumbLabel = HtmlSnippetUtils.getBreadcrumbLabel(ancestor);
-          String breadcrumbTitle = HtmlSnippetUtils.getBreadcrumbTitle(ancestor);
-          BreadcrumbItem ancestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel, breadcrumbTitle,
-            Tools.concat(Browse.RESOLVER.getHistoryPath(), ancestor.getId()));
-          breadcrumb.add(1, ancestorBreadcrumb);
-        } else {
-          SafeHtml breadcrumbLabel = DescriptionLevelUtils.getElementLevelIconSafeHtml(RodaConstants.AIP_GHOST, false);
-          BreadcrumbItem unknownAncestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel, "", new Command() {
-
-            @Override
-            public void execute() {
-              // TODO find better error message
-              Toast.showError(messages.unknownAncestorError());
-            }
-          });
-          breadcrumb.add(unknownAncestorBreadcrumb);
-        }
-      }
-    }
-
-    // AIP
-    breadcrumb.add(new BreadcrumbItem(HtmlSnippetUtils.getBreadcrumbLabel(aip),
-      HtmlSnippetUtils.getBreadcrumbTitle(aip), Tools.concat(Browse.RESOLVER.getHistoryPath(), aipId)));
-
-    // Representation
-    breadcrumb.add(new BreadcrumbItem(DescriptionLevelUtils.getRepresentationTypeIcon(representation.getType(), true),
-      representation.getType(), Tools.concat(Representation.RESOLVER.getHistoryPath(), aipId, repId)));
-
-    return breadcrumb;
   }
 
   private void getDescriptiveMetadataHTML(final String descId, final DescriptiveMetadataViewBundle bundle,
@@ -494,11 +453,6 @@ public class Representation extends Composite {
           // nothing to do
         }
       });
-  }
-
-  @UiHandler("viewer")
-  void buttonViewHandler(ClickEvent e) {
-    Tools.newHistory(Browse.RESOLVER, ViewRepresentation.RESOLVER.getHistoryToken(), aipId, repId);
   }
 
   @UiHandler("newProcess")
