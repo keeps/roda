@@ -75,10 +75,10 @@ public class IngestJobReportList extends BasicAsyncTableCell<Report> {
       public String getValue(Report report) {
         String value = "";
         if (report != null) {
-          if ("".equals(report.getSourceObjectOriginalId())) {
+          if (report.getSourceObjectOriginalIds().isEmpty()) {
             value = report.getSourceObjectId();
           } else {
-            value = report.getSourceObjectOriginalId();
+            value = report.getSourceObjectOriginalIdsString();
           }
         }
 

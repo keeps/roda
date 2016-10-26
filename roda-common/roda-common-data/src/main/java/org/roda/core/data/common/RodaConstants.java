@@ -669,7 +669,7 @@ public final class RodaConstants {
   public static final String JOB_REPORT_JOB_ID = "jobId";
   public static final String JOB_REPORT_SOURCE_OBJECT_ID = "sourceObjectId";
   public static final String JOB_REPORT_SOURCE_OBJECT_CLASS = "sourceObjectClass";
-  public static final String JOB_REPORT_SOURCE_OBJECT_ORIGINAL_ID = "sourceObjectOriginalId";
+  public static final String JOB_REPORT_SOURCE_OBJECT_ORIGINAL_IDS = "sourceObjectOriginalIds";
   public static final String JOB_REPORT_SOURCE_OBJECT_ORIGINAL_NAME = "sourceObjectOriginalName";
   public static final String JOB_REPORT_OUTCOME_OBJECT_ID = "outcomeObjectId";
   public static final String JOB_REPORT_OUTCOME_OBJECT_CLASS = "outcomeObjectClass";

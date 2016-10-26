@@ -152,8 +152,8 @@ public class ShowJobReport extends Composite {
     job.setHref(Tools.createHistoryHashLink(ShowJob.RESOLVER, jobReport.getJobId()));
 
     boolean hasSource = true;
-    if (!jobReport.getSourceObjectOriginalId().isEmpty() || !jobReport.getSourceObjectId().isEmpty()) {
-      sourceObject.setText(!"".equals(jobReport.getSourceObjectOriginalId()) ? jobReport.getSourceObjectOriginalId()
+    if (!jobReport.getSourceObjectOriginalIds().isEmpty() || !jobReport.getSourceObjectId().isEmpty()) {
+      sourceObject.setText(!jobReport.getSourceObjectOriginalIds().isEmpty() ? jobReport.getSourceObjectOriginalIdsString()
         : jobReport.getSourceObjectId());
       if (!jobReport.getSourceObjectClass().isEmpty())
         sourceObject.setTitle(jobReport.getSourceObjectOriginalName());

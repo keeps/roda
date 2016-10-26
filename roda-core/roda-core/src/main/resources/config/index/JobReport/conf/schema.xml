@@ -109,7 +109,7 @@
    <field name="jobId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="sourceObjectId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="sourceObjectClass" type="string" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="sourceObjectOriginalId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="sourceObjectOriginalIds" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <field name="sourceObjectOriginalName" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="outcomeObjectId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="outcomeObjectClass" type="string" indexed="true" stored="true" required="false" multiValued="false" />

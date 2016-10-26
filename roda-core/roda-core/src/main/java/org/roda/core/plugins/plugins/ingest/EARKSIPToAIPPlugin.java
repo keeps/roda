@@ -128,7 +128,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
     try {
       sip = EARKSIP.parse(earkSIPPath, RodaCoreFactory.getWorkingDirectory());
      
-      reportItem.setSourceObjectOriginalId(sip.getId());
+      reportItem.setSourceObjectOriginalIds(sip.getIds());
 
       if (sip.getValidationReport().isValid()) {
         String sipParentId = createAncestors(sip, index, model, PluginHelper.getParentIdFromParameters(this));

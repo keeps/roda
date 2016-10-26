@@ -94,8 +94,8 @@ public class SimpleJobReportList extends BasicAsyncTableCell<Report> {
       public String getValue(Report report) {
         String value = "";
         if (report != null) {
-          value = "".equals(report.getSourceObjectOriginalId()) ? report.getSourceObjectId()
-            : report.getSourceObjectOriginalId();
+          value = report.getSourceObjectOriginalIds().isEmpty() ? report.getSourceObjectId()
+            : report.getSourceObjectOriginalIdsString();
         }
 
         sourceClass = report.getSourceObjectClass();

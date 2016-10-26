@@ -36,7 +36,7 @@ public class Report implements Serializable, IsIndexed {
   private String jobId = "";
   private String sourceObjectId = "";
   private String sourceObjectClass = "";
-  private String sourceObjectOriginalId = "";
+  private List<String> sourceObjectOriginalIds = new ArrayList<>();
   private String sourceObjectOriginalName = "";
   private String outcomeObjectId = "";
   private String outcomeObjectClass = "";
@@ -74,7 +74,7 @@ public class Report implements Serializable, IsIndexed {
     this.jobId = report.getJobId();
     this.sourceObjectId = report.getSourceObjectId();
     this.sourceObjectClass = report.getSourceObjectClass();
-    this.sourceObjectOriginalId = report.getSourceObjectOriginalId();
+    this.sourceObjectOriginalIds = report.getSourceObjectOriginalIds();
     this.sourceObjectOriginalName = report.getSourceObjectOriginalName();
     this.outcomeObjectId = report.getOutcomeObjectId();
     this.outcomeObjectClass = report.getOutcomeObjectClass();
@@ -129,15 +129,17 @@ public class Report implements Serializable, IsIndexed {
     return this;
   }
 
-  public String getSourceObjectOriginalId() {
-    return sourceObjectOriginalId;
+  public List<String> getSourceObjectOriginalIds() {
+    return sourceObjectOriginalIds;
   }
 
-  public Report setSourceObjectOriginalId(String sourceObjectOriginalId) {
-    this.sourceObjectOriginalId = sourceObjectOriginalId;
+  public Report setSourceObjectOriginalIds(List<String> sourceObjectOriginalIds) {
+    this.sourceObjectOriginalIds = sourceObjectOriginalIds;
     return this;
   }
-
+  public String getSourceObjectOriginalIdsString() {
+    return String.join(";", sourceObjectOriginalIds);
+  }
   public String getSourceObjectOriginalName() {
     return sourceObjectOriginalName;
   }
@@ -330,7 +332,7 @@ public class Report implements Serializable, IsIndexed {
   @Override
   public String toString() {
     return "Report [id=" + id + ", jobId=" + jobId + ", sourceObjectId=" + sourceObjectId + ", sourceObjectClass="
-      + sourceObjectClass + ", sourceObjectOriginalId=" + sourceObjectOriginalId + ", outcomeObjectId="
+      + sourceObjectClass + ", sourceObjectOriginalIds=" + getSourceObjectOriginalIdsString() + ", outcomeObjectId="
       + outcomeObjectId + ", outcomeObjectClass=" + outcomeObjectClass + ", outcomeObjectState=" + outcomeObjectState
       + ", title=" + title + ", dateCreated=" + dateCreated + ", dateUpdated=" + dateUpdated + ", completionPercentage="
       + completionPercentage + ", stepsCompleted=" + stepsCompleted + ", totalSteps=" + totalSteps + ", plugin="
@@ -340,7 +342,7 @@ public class Report implements Serializable, IsIndexed {
 
   @Override
   public List<String> toCsvHeaders() {
-    return Arrays.asList("id", "jobId", "sourceObjectId", "sourceObjectClass", "sourceObjectOriginalId",
+    return Arrays.asList("id", "jobId", "sourceObjectId", "sourceObjectClass", "sourceObjectOriginalIds",
       "outcomeObjectId", "outcomeObjectClass", "outcomeObjectState", "title", "dateCreated", "dateUpdated",
       "completionPercentage", "stepsCompleted", "totalSteps", "plugin", "pluginName", "pluginVersion", "pluginState",
       "pluginDetails", "htmlPluginDetails", "reports");
@@ -348,7 +350,7 @@ public class Report implements Serializable, IsIndexed {
 
   @Override
   public List<Object> toCsvValues() {
-    return Arrays.asList(id, jobId, sourceObjectId, sourceObjectClass, sourceObjectOriginalId, outcomeObjectId,
+    return Arrays.asList(id, jobId, sourceObjectId, sourceObjectClass, getSourceObjectOriginalIdsString(), outcomeObjectId,
       outcomeObjectClass, outcomeObjectState, title, dateCreated, dateUpdated, completionPercentage, stepsCompleted,
       totalSteps, plugin, pluginName, pluginVersion, pluginState, pluginDetails, htmlPluginDetails, reports);
   }
