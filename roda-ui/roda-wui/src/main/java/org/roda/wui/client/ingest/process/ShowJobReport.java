@@ -31,6 +31,7 @@ import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.process.IngestProcess;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Humanize;
+import org.roda.wui.common.client.tools.StringUtility;
 import org.roda.wui.common.client.tools.Humanize.DHMSFormat;
 import org.roda.wui.common.client.tools.Tools;
 
@@ -153,7 +154,7 @@ public class ShowJobReport extends Composite {
 
     boolean hasSource = true;
     if (!jobReport.getSourceObjectOriginalIds().isEmpty() || !jobReport.getSourceObjectId().isEmpty()) {
-      sourceObject.setText(!jobReport.getSourceObjectOriginalIds().isEmpty() ? jobReport.getSourceObjectOriginalIdsString()
+      sourceObject.setText(!jobReport.getSourceObjectOriginalIds().isEmpty() ? StringUtility.prettyPrint(jobReport.getSourceObjectOriginalIds())
         : jobReport.getSourceObjectId());
       if (!jobReport.getSourceObjectClass().isEmpty())
         sourceObject.setTitle(jobReport.getSourceObjectOriginalName());

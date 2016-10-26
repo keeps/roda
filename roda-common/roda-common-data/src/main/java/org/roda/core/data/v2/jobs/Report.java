@@ -137,9 +137,7 @@ public class Report implements Serializable, IsIndexed {
     this.sourceObjectOriginalIds = sourceObjectOriginalIds;
     return this;
   }
-  public String getSourceObjectOriginalIdsString() {
-    return String.join(";", sourceObjectOriginalIds);
-  }
+
   public String getSourceObjectOriginalName() {
     return sourceObjectOriginalName;
   }
@@ -332,7 +330,7 @@ public class Report implements Serializable, IsIndexed {
   @Override
   public String toString() {
     return "Report [id=" + id + ", jobId=" + jobId + ", sourceObjectId=" + sourceObjectId + ", sourceObjectClass="
-      + sourceObjectClass + ", sourceObjectOriginalIds=" + getSourceObjectOriginalIdsString() + ", outcomeObjectId="
+      + sourceObjectClass + ", sourceObjectOriginalIds=" + sourceObjectOriginalIds + ", outcomeObjectId="
       + outcomeObjectId + ", outcomeObjectClass=" + outcomeObjectClass + ", outcomeObjectState=" + outcomeObjectState
       + ", title=" + title + ", dateCreated=" + dateCreated + ", dateUpdated=" + dateUpdated + ", completionPercentage="
       + completionPercentage + ", stepsCompleted=" + stepsCompleted + ", totalSteps=" + totalSteps + ", plugin="
@@ -350,7 +348,7 @@ public class Report implements Serializable, IsIndexed {
 
   @Override
   public List<Object> toCsvValues() {
-    return Arrays.asList(id, jobId, sourceObjectId, sourceObjectClass, getSourceObjectOriginalIdsString(), outcomeObjectId,
+    return Arrays.asList(id, jobId, sourceObjectId, sourceObjectClass, sourceObjectOriginalIds, outcomeObjectId,
       outcomeObjectClass, outcomeObjectState, title, dateCreated, dateUpdated, completionPercentage, stepsCompleted,
       totalSteps, plugin, pluginName, pluginVersion, pluginState, pluginDetails, htmlPluginDetails, reports);
   }
