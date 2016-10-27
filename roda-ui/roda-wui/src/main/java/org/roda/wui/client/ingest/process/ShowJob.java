@@ -52,6 +52,7 @@ import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.process.ActionProcess;
 import org.roda.wui.client.process.IngestProcess;
@@ -572,7 +573,8 @@ public class ShowJob extends Composite {
   private void createSelectAipLayout(PluginParameter parameter) {
     Label parameterName = new Label(parameter.getName());
     final FlowPanel aipPanel = new FlowPanel();
-    final String value = job.getPluginParameters().get(parameter.getId());
+    final String value = job.getPluginParameters().containsKey(parameter.getId())
+      ? job.getPluginParameters().get(parameter.getId()) : parameter.getDefaultValue();
 
     if (value != null && !value.isEmpty()) {
       BrowserService.Util.getInstance().retrieve(IndexedAIP.class.getName(), value, new AsyncCallback<IndexedAIP>() {
@@ -618,6 +620,9 @@ public class ShowJob extends Composite {
   private void createBooleanLayout(PluginParameter parameter) {
     CheckBox checkBox = new CheckBox(parameter.getName());
     String value = job.getPluginParameters().get(parameter.getId());
+    if (value == null) {
+      value = parameter.getDefaultValue();
+    }
     checkBox.setValue("true".equals(value));
     checkBox.setEnabled(false);
 
@@ -629,6 +634,9 @@ public class ShowJob extends Composite {
 
   private void createStringLayout(PluginParameter parameter) {
     String value = job.getPluginParameters().get(parameter.getId());
+    if (value == null) {
+      value = parameter.getDefaultValue();
+    }
     if (value != null && value.length() > 0) {
       Label parameterLabel = new Label(parameter.getName());
       Label parameterValue = new Label(value);
@@ -643,25 +651,34 @@ public class ShowJob extends Composite {
 
   private void createPluginSipToAipLayout(PluginParameter parameter) {
     String value = job.getPluginParameters().get(parameter.getId());
-    if (value != null && value.length() > 0) {
+    if (value == null) {
+      value = parameter.getDefaultValue();
+    }
+    if (StringUtils.isNotBlank(value)) {
       Label pluginLabel = new Label(parameter.getName());
       PluginInfo sipToAipPlugin = pluginsInfo.get(value);
       // Label pluginValue = new
       // Label(messages.pluginLabel(sipToAipPlugin.getName(),
       // sipToAipPlugin.getVersion()));
 
-      RadioButton pluginValue = new RadioButton(parameter.getId(),
-        messages.pluginLabel(sipToAipPlugin.getName(), sipToAipPlugin.getVersion()));
-      pluginValue.setValue(true);
-      pluginValue.setEnabled(false);
+      if (sipToAipPlugin != null) {
 
-      pluginOptions.add(pluginLabel);
-      addHelp(parameter.getDescription());
-      pluginOptions.add(pluginValue);
-      addHelp(sipToAipPlugin.getDescription());
+        RadioButton pluginValue = new RadioButton(parameter.getId(),
+          messages.pluginLabel(sipToAipPlugin.getName(), sipToAipPlugin.getVersion()));
+        pluginValue.setValue(true);
+        pluginValue.setEnabled(false);
 
-      pluginLabel.addStyleName("label");
-      pluginValue.addStyleName("form-radiobutton");
+        pluginOptions.add(pluginLabel);
+        addHelp(parameter.getDescription());
+        pluginOptions.add(pluginValue);
+        addHelp(sipToAipPlugin.getDescription());
+
+        pluginLabel.addStyleName("label");
+        pluginValue.addStyleName("form-radiobutton");
+      } else {
+        // TODO show value if plugin disapeared
+        GWT.log("Plugin not found: " + value);
+      }
 
       // TODO show SIP_TO_AIP plugin description
     }
