@@ -114,34 +114,35 @@ public class BrowseFile extends Composite {
         BrowserService.Util.getInstance().retrieveItemBundle(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
           new AsyncCallback<BrowseItemBundle>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            errorRedirect(callback);
-          }
-
-          @Override
-          public void onSuccess(final BrowseItemBundle itemBundle) {
-            if (itemBundle != null && verifyRepresentation(itemBundle.getRepresentations(), representationUUID)) {
-              BrowserService.Util.getInstance().retrieve(IndexedFile.class.getName(), fileUUID,
-                new AsyncCallback<IndexedFile>() {
-
-                @Override
-                public void onSuccess(IndexedFile simpleFile) {
-                  BrowseFile view = new BrowseFile(viewers, aipId, itemBundle, representationUUID, fileUUID, simpleFile);
-                  callback.onSuccess(view);
-                }
-
-                @Override
-                public void onFailure(Throwable caught) {
-                  Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
-                  errorRedirect(callback);
-                }
-              });
-            } else {
+            @Override
+            public void onFailure(Throwable caught) {
               errorRedirect(callback);
             }
-          }
-        });
+
+            @Override
+            public void onSuccess(final BrowseItemBundle itemBundle) {
+              if (itemBundle != null && verifyRepresentation(itemBundle.getRepresentations(), representationUUID)) {
+                BrowserService.Util.getInstance().retrieve(IndexedFile.class.getName(), fileUUID,
+                  new AsyncCallback<IndexedFile>() {
+
+                    @Override
+                    public void onSuccess(IndexedFile simpleFile) {
+                      BrowseFile view = new BrowseFile(viewers, aipId, itemBundle, representationUUID, fileUUID,
+                        simpleFile);
+                      callback.onSuccess(view);
+                    }
+
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
+                      errorRedirect(callback);
+                    }
+                  });
+              } else {
+                errorRedirect(callback);
+              }
+            }
+          });
       } else {
         errorRedirect(callback);
       }
@@ -195,7 +196,7 @@ public class BrowseFile extends Composite {
 
   @UiField
   HorizontalPanel previewPanel;
-  
+
   @UiField
   FlowPanel filePreviewPanel;
 
@@ -231,8 +232,8 @@ public class BrowseFile extends Composite {
    * @param file
    * 
    */
-  public BrowseFile(Viewers viewers, String aipId, BrowseItemBundle itemBundle, String representationUUID, String fileUUID,
-    IndexedFile file) {
+  public BrowseFile(Viewers viewers, String aipId, BrowseItemBundle itemBundle, String representationUUID,
+    String fileUUID, IndexedFile file) {
     this.viewers = viewers;
     this.aipId = aipId;
     this.itemBundle = itemBundle;
@@ -317,7 +318,7 @@ public class BrowseFile extends Composite {
 
               @Override
               public void onSuccess(Void result) {
-                //clean();
+                // clean();
               }
 
               @Override

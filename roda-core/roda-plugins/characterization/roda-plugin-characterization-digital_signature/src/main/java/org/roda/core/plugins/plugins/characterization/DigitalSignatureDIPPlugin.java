@@ -110,7 +110,8 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
         boolean notify = true;
         // FIXME 20160516 hsilva: see how to set initial
         // initialOutcomeObjectState
-        Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(), Representation.class);
+        Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
+          Representation.class);
 
         try {
           LOGGER.debug("Processing representation {}", representation);
