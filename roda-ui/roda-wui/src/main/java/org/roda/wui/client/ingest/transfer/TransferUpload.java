@@ -50,7 +50,7 @@ import config.i18n.client.ClientMessages;
  * @author Luis Faria <lfaria@keep.pt>
  * 
  */
-public class IngestTransferUpload extends Composite {
+public class TransferUpload extends Composite {
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
@@ -75,21 +75,21 @@ public class IngestTransferUpload extends Composite {
     }
   };
 
-  private static IngestTransferUpload instance = null;
+  private static TransferUpload instance = null;
 
   /**
    * Get the singleton instance
    * 
    * @return the instance
    */
-  public static IngestTransferUpload getInstance() {
+  public static TransferUpload getInstance() {
     if (instance == null) {
-      instance = new IngestTransferUpload();
+      instance = new TransferUpload();
     }
     return instance;
   }
 
-  interface MyUiBinder extends UiBinder<Widget, IngestTransferUpload> {
+  interface MyUiBinder extends UiBinder<Widget, TransferUpload> {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
@@ -125,10 +125,10 @@ public class IngestTransferUpload extends Composite {
 
   protected boolean verified = false;
 
-  private IngestTransferUpload() {
+  private TransferUpload() {
     initWidget(uiBinder.createAndBindUi(this));
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();
@@ -175,7 +175,7 @@ public class IngestTransferUpload extends Composite {
     if (historyTokens.size() == 0) {
       // Upload to root
       resource = null;
-      callback.onSuccess(IngestTransferUpload.this);
+      callback.onSuccess(TransferUpload.this);
       updateUploadForm();
     } else {
       // Upload to directory
@@ -192,7 +192,7 @@ public class IngestTransferUpload extends Composite {
             @Override
             public void onSuccess(TransferredResource r) {
               resource = r;
-              callback.onSuccess(IngestTransferUpload.this);
+              callback.onSuccess(TransferUpload.this);
               updateUploadForm();
             }
 

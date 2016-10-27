@@ -44,9 +44,6 @@
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarFoldersFilesTitle}' />
 							</g:Label>
-							<g:Button addStyleNames="btn btn-refresh" ui:field="refresh">
-								<ui:text from='{messages.refreshButton}' />
-							</g:Button>
 							<g:Button addStyleNames="btn btn-edit" ui:field="rename">
 								<ui:text from='{messages.renameButton}' />
 							</g:Button>

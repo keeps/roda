@@ -9,10 +9,10 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.Browse;
-import org.roda.wui.client.browse.BrowseItemBundle;
-import org.roda.wui.client.browse.BrowseFolder;
-import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.BrowseFile;
+import org.roda.wui.client.browse.BrowseFolder;
+import org.roda.wui.client.browse.BrowseItemBundle;
+import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Tools;
@@ -105,7 +105,8 @@ public class BreadcrumbUtils {
 
     // Representation
     breadcrumb.add(new BreadcrumbItem(DescriptionLevelUtils.getRepresentationTypeIcon(representation.getType(), true),
-      representation.getType(), Tools.concat(BrowseRepresentation.RESOLVER.getHistoryPath(), aipId, representationUUID)));
+      representation.getType(),
+      Tools.concat(BrowseRepresentation.RESOLVER.getHistoryPath(), aipId, representationUUID)));
 
     return breadcrumb;
   }
@@ -127,49 +128,55 @@ public class BreadcrumbUtils {
       List<String> filePath = file.getPath();
       List<String> fileAncestorsPath = file.getAncestorsPath();
 
-      for (int i = 0; i < filePath.size(); i++) {
-        String folderName = filePath.get(i);
-        String folderUUID = fileAncestorsPath.get(i);
+      if (filePath != null && fileAncestorsPath != null && filePath.size() == fileAncestorsPath.size()) {
+        for (int i = 0; i < filePath.size(); i++) {
+          String folderName = filePath.get(i);
+          String folderUUID = fileAncestorsPath.get(i);
 
-        fileBreadcrumb.add(new BreadcrumbItem(getBreadcrumbLabel(folderName, RodaConstants.VIEW_REPRESENTATION_FOLDER),
-          folderName, Tools.concat(BrowseFolder.RESOLVER.getHistoryPath(), aipId, representationUUID, folderUUID)));
+          fileBreadcrumb
+            .add(new BreadcrumbItem(getBreadcrumbLabel(folderName, RodaConstants.VIEW_REPRESENTATION_FOLDER),
+              folderName, Tools.concat(BrowseFolder.RESOLVER.getHistoryPath(), aipId, representationUUID, folderUUID)));
+        }
       }
-//
-//      List<String> pathBuilder = new ArrayList<>();
-//      pathBuilder.add(aipId);
-//      pathBuilder.add(representationUUID);
-//      for (String folder : filePath) {
-//        pathBuilder.add(folder);
-//        List<String> path = new ArrayList<>(pathBuilder);
-//        if (filePath.indexOf(folder) != (filePath.size() - 1)) {
-//          fileBreadcrumb.add(new BreadcrumbItem(getBreadcrumbLabel(folder, RodaConstants.VIEW_REPRESENTATION_FOLDER),
-//            folder, Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), path)));
-//        } else {
-//          fileBreadcrumb.add(new BreadcrumbItem(getBreadcrumbLabel(folder, RodaConstants.VIEW_REPRESENTATION_FOLDER),
-//            folder, new Command() {
-//
-//              @Override
-//              public void execute() {
-//                // clean();
-//              }
-//            }));
-//
-//        }
-//      }
+
+      //
+      // List<String> pathBuilder = new ArrayList<>();
+      // pathBuilder.add(aipId);
+      // pathBuilder.add(representationUUID);
+      // for (String folder : filePath) {
+      // pathBuilder.add(folder);
+      // List<String> path = new ArrayList<>(pathBuilder);
+      // if (filePath.indexOf(folder) != (filePath.size() - 1)) {
+      // fileBreadcrumb.add(new BreadcrumbItem(getBreadcrumbLabel(folder,
+      // RodaConstants.VIEW_REPRESENTATION_FOLDER),
+      // folder, Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(),
+      // path)));
+      // } else {
+      // fileBreadcrumb.add(new BreadcrumbItem(getBreadcrumbLabel(folder,
+      // RodaConstants.VIEW_REPRESENTATION_FOLDER),
+      // folder, new Command() {
+      //
+      // @Override
+      // public void execute() {
+      // // clean();
+      // }
+      // }));
+      //
+      // }
+      // }
 
       String fileLabel = file.getOriginalName() != null ? file.getOriginalName() : file.getId();
 
       fileBreadcrumb.add(new BreadcrumbItem(
         file.isDirectory() ? getBreadcrumbLabel(fileLabel, RodaConstants.VIEW_REPRESENTATION_FOLDER)
           : getBreadcrumbLabel(fileLabel, RodaConstants.VIEW_REPRESENTATION_FILE),
-        fileLabel,
-        Tools.concat(BrowseFile.RESOLVER.getHistoryPath(), aipId, representationUUID, file.getId())));
+        fileLabel, Tools.concat(BrowseFile.RESOLVER.getHistoryPath(), aipId, representationUUID, file.getId())));
     }
 
     // Representation breadcrumb
-    fullBreadcrumb
-      .add(new BreadcrumbItem(DescriptionLevelUtils.getRepresentationTypeIcon(representation.getType(), true),
-        representation.getType(), Tools.concat(BrowseRepresentation.RESOLVER.getHistoryPath(), aipId, representationUUID)));
+    fullBreadcrumb.add(new BreadcrumbItem(
+      DescriptionLevelUtils.getRepresentationTypeIcon(representation.getType(), true), representation.getType(),
+      Tools.concat(BrowseRepresentation.RESOLVER.getHistoryPath(), aipId, representationUUID)));
 
     // fullBreadcrumb.add(new BreadcrumbItem(getBreadcrumbLabel("data",
     // RodaConstants.VIEW_REPRESENTATION_FOLDER), "data",

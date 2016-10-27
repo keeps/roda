@@ -231,7 +231,7 @@ public class ModelService extends ModelObservable {
    */
   public AIP createAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath, boolean notify,
     String createdBy) throws RequestNotValidException, GenericException, AuthorizationDeniedException,
-      AlreadyExistsException, NotFoundException, ValidationException {
+    AlreadyExistsException, NotFoundException, ValidationException {
     // XXX possible optimization would be to allow move between storage
     // TODO support asReference
     ModelService sourceModelService = new ModelService(sourceStorage);
@@ -263,7 +263,7 @@ public class ModelService extends ModelObservable {
 
   public AIP createAIP(String parentId, String type, Permissions permissions, boolean notify, List<String> sipIds,
     boolean isGhost, String createdBy) throws RequestNotValidException, NotFoundException, GenericException,
-      AlreadyExistsException, AuthorizationDeniedException {
+    AlreadyExistsException, AuthorizationDeniedException {
 
     AIPState state = AIPState.ACTIVE;
     Directory directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
@@ -301,7 +301,7 @@ public class ModelService extends ModelObservable {
 
   public AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, boolean notify,
     String createdBy) throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
-      AuthorizationDeniedException {
+    AuthorizationDeniedException {
 
     Directory directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
     String id = directory.getStoragePath().getName();
@@ -319,7 +319,7 @@ public class ModelService extends ModelObservable {
 
   public AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, List<String> ingestSIPIds,
     String ingestJobId, boolean notify, String createdBy) throws RequestNotValidException, NotFoundException,
-      GenericException, AlreadyExistsException, AuthorizationDeniedException {
+    GenericException, AlreadyExistsException, AuthorizationDeniedException {
 
     Directory directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
     String id = directory.getStoragePath().getName();
@@ -461,7 +461,7 @@ public class ModelService extends ModelObservable {
 
   private ValidationReport isAIPvalid(ModelService model, Directory directory,
     boolean failIfNoDescriptiveMetadataSchema)
-      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     ValidationReport report = new ValidationReport();
 
     // validate metadata (against schemas)
@@ -500,7 +500,7 @@ public class ModelService extends ModelObservable {
 
   public DescriptiveMetadata retrieveDescriptiveMetadata(String aipId, String representationId,
     String descriptiveMetadataId)
-      throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
 
@@ -521,16 +521,16 @@ public class ModelService extends ModelObservable {
 
   public DescriptiveMetadata createDescriptiveMetadata(String aipId, String descriptiveMetadataId,
     ContentPayload payload, String descriptiveMetadataType, String descriptiveMetadataVersion, boolean notify)
-      throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
-      NotFoundException {
+    throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
+    NotFoundException {
     return createDescriptiveMetadata(aipId, null, descriptiveMetadataId, payload, descriptiveMetadataType,
       descriptiveMetadataVersion, notify);
   }
 
   public DescriptiveMetadata createDescriptiveMetadata(String aipId, String descriptiveMetadataId,
     ContentPayload payload, String descriptiveMetadataType, String descriptiveMetadataVersion)
-      throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
-      NotFoundException {
+    throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
+    NotFoundException {
     return createDescriptiveMetadata(aipId, null, descriptiveMetadataId, payload, descriptiveMetadataType,
       descriptiveMetadataVersion, true);
   }
@@ -538,7 +538,7 @@ public class ModelService extends ModelObservable {
   public DescriptiveMetadata createDescriptiveMetadata(String aipId, String representationId,
     String descriptiveMetadataId, ContentPayload payload, String descriptiveMetadataType,
     String descriptiveMetadataVersion) throws RequestNotValidException, GenericException, AlreadyExistsException,
-      AuthorizationDeniedException, NotFoundException {
+    AuthorizationDeniedException, NotFoundException {
     return createDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, payload, descriptiveMetadataType,
       descriptiveMetadataVersion, true);
   }
@@ -546,7 +546,7 @@ public class ModelService extends ModelObservable {
   public DescriptiveMetadata createDescriptiveMetadata(String aipId, String representationId,
     String descriptiveMetadataId, ContentPayload payload, String descriptiveMetadataType,
     String descriptiveMetadataVersion, boolean notify) throws RequestNotValidException, GenericException,
-      AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
+    AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
 
     StoragePath binaryPath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId,
       descriptiveMetadataId);
@@ -570,7 +570,7 @@ public class ModelService extends ModelObservable {
   public DescriptiveMetadata updateDescriptiveMetadata(String aipId, String descriptiveMetadataId,
     ContentPayload descriptiveMetadataPayload, String descriptiveMetadataType, String descriptiveMetadataVersion,
     Map<String, String> properties) throws RequestNotValidException, GenericException, NotFoundException,
-      AuthorizationDeniedException, ValidationException {
+    AuthorizationDeniedException, ValidationException {
     return updateDescriptiveMetadata(aipId, null, descriptiveMetadataId, descriptiveMetadataPayload,
       descriptiveMetadataType, descriptiveMetadataVersion, properties);
   }
@@ -578,7 +578,7 @@ public class ModelService extends ModelObservable {
   public DescriptiveMetadata updateDescriptiveMetadata(String aipId, String representationId,
     String descriptiveMetadataId, ContentPayload descriptiveMetadataPayload, String descriptiveMetadataType,
     String descriptiveMetadataVersion, Map<String, String> properties) throws RequestNotValidException,
-      GenericException, NotFoundException, AuthorizationDeniedException, ValidationException {
+    GenericException, NotFoundException, AuthorizationDeniedException, ValidationException {
     DescriptiveMetadata ret = null;
 
     StoragePath binaryPath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId,
@@ -677,7 +677,7 @@ public class ModelService extends ModelObservable {
 
   public CloseableIterable<BinaryVersion> listDescriptiveMetadataVersions(String aipId, String representationId,
     String descriptiveMetadataId)
-      throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     StoragePath binaryPath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId,
       descriptiveMetadataId);
     return storage.listBinaryVersions(binaryPath);
@@ -685,13 +685,13 @@ public class ModelService extends ModelObservable {
 
   public BinaryVersion revertDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId,
     Map<String, String> properties)
-      throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     return revertDescriptiveMetadataVersion(aipId, null, descriptiveMetadataId, versionId, properties);
   }
 
   public BinaryVersion revertDescriptiveMetadataVersion(String aipId, String representationId,
     String descriptiveMetadataId, String versionId, Map<String, String> properties)
-      throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     StoragePath binaryPath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId,
       descriptiveMetadataId);
 
@@ -728,7 +728,7 @@ public class ModelService extends ModelObservable {
 
   public Representation createRepresentation(String aipId, String representationId, boolean original, String type,
     boolean notify) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
-      AlreadyExistsException {
+    AlreadyExistsException {
     Representation representation = new Representation(representationId, aipId, original, type);
 
     StoragePath directoryPath = ModelUtils.getRepresentationStoragePath(aipId, representationId);
@@ -749,7 +749,7 @@ public class ModelService extends ModelObservable {
   // TODO support asReference
   public Representation createRepresentation(String aipId, String representationId, boolean original, String type,
     StorageService sourceStorage, StoragePath sourcePath) throws RequestNotValidException, GenericException,
-      NotFoundException, AuthorizationDeniedException, AlreadyExistsException, ValidationException {
+    NotFoundException, AuthorizationDeniedException, AlreadyExistsException, ValidationException {
     Representation representation;
 
     StoragePath directoryPath = ModelUtils.getRepresentationStoragePath(aipId, representationId);
@@ -782,7 +782,7 @@ public class ModelService extends ModelObservable {
 
   public Representation updateRepresentation(String aipId, String representationId, boolean original, String type,
     StorageService sourceStorage, StoragePath sourcePath) throws RequestNotValidException, NotFoundException,
-      GenericException, AuthorizationDeniedException, ValidationException {
+    GenericException, AuthorizationDeniedException, ValidationException {
     Representation representation;
 
     // verify structure of source representation
@@ -839,7 +839,7 @@ public class ModelService extends ModelObservable {
 
   public CloseableIterable<OptionalWithCause<File>> listFilesUnder(String aipId, String representationId,
     boolean recursive)
-      throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
 
     final StoragePath storagePath = ModelUtils.getRepresentationDataStoragePath(aipId, representationId);
     CloseableIterable<OptionalWithCause<File>> ret;
@@ -871,7 +871,7 @@ public class ModelService extends ModelObservable {
 
   public CloseableIterable<OptionalWithCause<File>> listFilesUnder(String aipId, String representationId,
     List<String> directoryPath, String fileId, boolean recursive)
-      throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     final StoragePath filePath = ModelUtils.getFileStoragePath(aipId, representationId, directoryPath, fileId);
     final CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(filePath, recursive);
     return ResourceParseUtils.convert(getStorage(), iterable, File.class);
@@ -896,14 +896,14 @@ public class ModelService extends ModelObservable {
 
   public File createFile(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload) throws RequestNotValidException, GenericException, AlreadyExistsException,
-      AuthorizationDeniedException, NotFoundException {
+    AuthorizationDeniedException, NotFoundException {
     return createFile(aipId, representationId, directoryPath, fileId, contentPayload, true);
 
   }
 
   public File createFile(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload, boolean notify) throws RequestNotValidException, GenericException,
-      AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
+    AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
     File file;
     // FIXME how to set this?
     boolean asReference = false;
@@ -920,6 +920,21 @@ public class ModelService extends ModelObservable {
     return file;
   }
 
+  public File createFile(String aipId, String representationId, List<String> directoryPath, String fileId,
+    String dirName, boolean notify) throws RequestNotValidException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException, NotFoundException {
+
+    StoragePath filePath = ModelUtils.getFileStoragePath(aipId, representationId, directoryPath, fileId);
+    final Directory createdDirectory = storage.createDirectory(DefaultStoragePath.parse(filePath, dirName));
+    File file = ResourceParseUtils.convertResourceToFile(createdDirectory);
+
+    if (notify) {
+      notifyFileCreated(file);
+    }
+
+    return file;
+  }
+
   public File updateFileInfo(File file) {
     notifyFileUpdated(file);
     return file;
@@ -927,7 +942,7 @@ public class ModelService extends ModelObservable {
 
   public File updateFile(String aipId, String representationId, List<String> directoryPath, String fileId,
     Binary binary, boolean createIfNotExists, boolean notify)
-      throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     File file = null;
     // FIXME how to set this?
     boolean asReference = false;
@@ -961,6 +976,56 @@ public class ModelService extends ModelObservable {
 
   }
 
+  public String renameFolder(File folder, String newName, boolean replaceExisting, boolean reindexResources)
+    throws AlreadyExistsException, GenericException, NotFoundException, RequestNotValidException,
+    AuthorizationDeniedException {
+
+    Path basePath = RodaCoreFactory.getStoragePath();
+    StoragePath fileStoragePath = ModelUtils.getFileStoragePath(folder);
+    Path fullPath = basePath.resolve(FSUtils.getStoragePathAsString(fileStoragePath, false));
+
+    if (Files.exists(fullPath)) {
+      FSUtils.move(fullPath, fullPath.getParent().resolve(newName), replaceExisting);
+
+      if (reindexResources) {
+        notifyAIPUpdated(folder.getAipId());
+      }
+
+      return IdUtils.getFileId(folder.getAipId(), folder.getRepresentationId(), folder.getPath(), newName);
+    } else {
+      throw new NotFoundException("Folder was moved or does not exist");
+    }
+  }
+
+  public void moveFiles(String aipId, List<File> files, String newRelativePath, boolean replaceExisting,
+    boolean reindexResources) throws AlreadyExistsException, GenericException, NotFoundException,
+    RequestNotValidException, AuthorizationDeniedException {
+
+    Path basePath = RodaCoreFactory.getStoragePath();
+    boolean notFoundFiles = false;
+
+    for (File file : files) {
+      StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
+      Path fullPath = basePath.resolve(FSUtils.getStoragePathAsString(fileStoragePath, false));
+
+      if (Files.exists(fullPath)) {
+        Path newResourcePath = basePath.resolve(newRelativePath).resolve(file.getId());
+        FSUtils.move(fullPath, newResourcePath, replaceExisting);
+      } else {
+        notFoundFiles = true;
+      }
+    }
+
+    if (reindexResources) {
+      notifyAIPUpdated(aipId);
+    }
+
+    // doing the throw after the moving process to reindex the moved ones
+    if (notFoundFiles) {
+      throw new NotFoundException("Some files/folders were moved or do not exist");
+    }
+  }
+
   /***************** Preservation related *****************/
   /********************************************************/
 
@@ -981,7 +1046,7 @@ public class ModelService extends ModelObservable {
 
   public Binary retrievePreservationFile(String aipId, String representationId, List<String> fileDirectoryPath,
     String fileId, PreservationMetadataType type)
-      throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
     String id = IdUtils.getPreservationId(type, aipId, representationId, fileDirectoryPath, fileId);
     StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(id, type, aipId, representationId,
@@ -1010,8 +1075,8 @@ public class ModelService extends ModelObservable {
 
   public PreservationMetadata createPreservationMetadata(PreservationMetadataType type, String aipId,
     String representationId, List<String> fileDirectoryPath, String fileId, ContentPayload payload, boolean notify)
-      throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
-      AlreadyExistsException {
+    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
+    AlreadyExistsException {
     String identifier = IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId);
     String urn = URNUtils.createRodaPreservationURN(type, identifier);
     return createPreservationMetadata(type, urn, aipId, representationId, fileDirectoryPath, fileId, payload, notify);
@@ -1019,28 +1084,28 @@ public class ModelService extends ModelObservable {
 
   public PreservationMetadata createPreservationMetadata(PreservationMetadataType type, String aipId,
     List<String> fileDirectoryPath, String fileId, ContentPayload payload, boolean notify) throws GenericException,
-      NotFoundException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
+    NotFoundException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
     String id = IdUtils.getPreservationId(type, aipId, null, fileDirectoryPath, fileId);
     return createPreservationMetadata(type, id, aipId, null, fileDirectoryPath, fileId, payload, notify);
   }
 
   public PreservationMetadata createPreservationMetadata(PreservationMetadataType type, String aipId,
     String representationId, ContentPayload payload, boolean notify) throws GenericException, NotFoundException,
-      RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
+    RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
     String id = IdUtils.getPreservationId(type, aipId, representationId, null, null);
     return createPreservationMetadata(type, id, aipId, representationId, null, null, payload, notify);
   }
 
   public PreservationMetadata createPreservationMetadata(PreservationMetadataType type, String id,
     ContentPayload payload, boolean notify) throws GenericException, NotFoundException, RequestNotValidException,
-      AuthorizationDeniedException, AlreadyExistsException {
+    AuthorizationDeniedException, AlreadyExistsException {
     return createPreservationMetadata(type, id, null, null, null, null, payload, notify);
   }
 
   public PreservationMetadata createPreservationMetadata(PreservationMetadataType type, String id, String aipId,
     String representationId, List<String> fileDirectoryPath, String fileId, ContentPayload payload, boolean notify)
-      throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
-      AlreadyExistsException {
+    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
+    AlreadyExistsException {
     PreservationMetadata pm = new PreservationMetadata();
     pm.setId(id);
     pm.setAipId(aipId);
@@ -1064,7 +1129,7 @@ public class ModelService extends ModelObservable {
 
   public PreservationMetadata updatePreservationMetadata(String id, PreservationMetadataType type, String aipId,
     String representationId, List<String> fileDirectoryPath, String fileId, ContentPayload payload, boolean notify)
-      throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     PreservationMetadata pm = new PreservationMetadata();
     pm.setId(id);
     pm.setType(type);
@@ -1084,7 +1149,7 @@ public class ModelService extends ModelObservable {
 
   public void deletePreservationMetadata(PreservationMetadataType type, String aipId, String representationId,
     String id, boolean notify)
-      throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     PreservationMetadata pm = new PreservationMetadata();
     pm.setAipId(aipId);
     pm.setId(id);
@@ -1101,7 +1166,7 @@ public class ModelService extends ModelObservable {
 
   public CloseableIterable<OptionalWithCause<PreservationMetadata>> listPreservationMetadata(String aipId,
     boolean includeRepresentations)
-      throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     StoragePath storagePath = ModelUtils.getAIPPreservationMetadataStoragePath(aipId);
 
     CloseableIterable<OptionalWithCause<PreservationMetadata>> aipPreservationMetadata;
@@ -1135,7 +1200,7 @@ public class ModelService extends ModelObservable {
 
   public CloseableIterable<OptionalWithCause<PreservationMetadata>> listPreservationMetadata(String aipId,
     String representationId)
-      throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     StoragePath storagePath = ModelUtils.getRepresentationPreservationMetadataStoragePath(aipId, representationId);
 
     boolean recursive = true;
@@ -1179,7 +1244,7 @@ public class ModelService extends ModelObservable {
 
   public Binary retrieveOtherMetadataBinary(String aipId, String representationId, List<String> fileDirectoryPath,
     String fileId, String fileSuffix, String type)
-      throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Binary binary;
     StoragePath binaryPath = ModelUtils.getOtherMetadataStoragePath(aipId, representationId, fileDirectoryPath, fileId,
       fileSuffix, type);
@@ -1189,7 +1254,7 @@ public class ModelService extends ModelObservable {
 
   public OtherMetadata createOtherMetadata(String aipId, String representationId, List<String> fileDirectoryPath,
     String fileId, String fileSuffix, String type, ContentPayload payload, boolean notify)
-      throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     OtherMetadata om = null;
 
     StoragePath binaryPath = ModelUtils.getOtherMetadataStoragePath(aipId, representationId, fileDirectoryPath, fileId,
@@ -1215,7 +1280,7 @@ public class ModelService extends ModelObservable {
 
   public CloseableIterable<OptionalWithCause<OtherMetadata>> listOtherMetadata(String aipId, String type,
     boolean includeRepresentations)
-      throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     StoragePath storagePath = ModelUtils.getAIPOtherMetadataStoragePath(aipId, type);
 
     boolean recursive = true;
@@ -1717,8 +1782,8 @@ public class ModelService extends ModelObservable {
     return storage.getBinaryVersion(binaryPath, versionId);
   }
 
-  public BinaryVersion revertRiskVersion(String riskId, String versionId, Map<String, String> properties, boolean commit)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+  public BinaryVersion revertRiskVersion(String riskId, String versionId, Map<String, String> properties,
+    boolean commit) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     StoragePath binaryPath = ModelUtils.getRiskStoragePath(riskId);
 
     BinaryVersion currentVersion = storage.createBinaryVersion(binaryPath, properties);
@@ -1969,7 +2034,7 @@ public class ModelService extends ModelObservable {
 
   public File createDocumentation(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload) throws RequestNotValidException, GenericException, AlreadyExistsException,
-      AuthorizationDeniedException, NotFoundException {
+    AuthorizationDeniedException, NotFoundException {
     File file;
     // FIXME how to set this?
     boolean asReference = false;
@@ -1994,7 +2059,7 @@ public class ModelService extends ModelObservable {
 
   public File createSchema(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload) throws RequestNotValidException, GenericException, AlreadyExistsException,
-      AuthorizationDeniedException, NotFoundException {
+    AuthorizationDeniedException, NotFoundException {
     File file;
     // FIXME how to set this?
     boolean asReference = false;

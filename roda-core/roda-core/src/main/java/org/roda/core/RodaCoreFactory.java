@@ -960,6 +960,10 @@ public class RodaCoreFactory {
     return dataPath;
   }
 
+  public static Path getStoragePath() {
+    return storagePath;
+  }
+
   public static Path getLogPath() {
     return logPath;
   }

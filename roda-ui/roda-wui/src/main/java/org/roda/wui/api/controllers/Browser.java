@@ -1848,6 +1848,55 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
+  public static String renameFolder(User user, String folderUUID, String newName) throws AuthorizationDeniedException,
+    GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    String ret = BrowserHelper.renameFolder(folderUUID, newName);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_FILE_UUID_PARAM,
+      folderUUID);
+    return ret;
+  }
+
+  public static String moveFiles(User user, String aipId, SelectedItems<IndexedFile> selectedFiles,
+    IndexedFile toFolder) throws AuthorizationDeniedException, GenericException, RequestNotValidException,
+    AlreadyExistsException, NotFoundException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    String ret = BrowserHelper.moveFiles(aipId, selectedFiles, toFolder);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
+      RodaConstants.CONTROLLER_FILES_PARAM, selectedFiles, RodaConstants.CONTROLLER_FILE_PARAM, toFolder);
+    return ret;
+  }
+
+  public static String createFolder(User user, String folderUUID, String newName) throws AuthorizationDeniedException,
+    GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    String ret = BrowserHelper.createFolder(folderUUID, newName);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_FILE_UUID_PARAM,
+      folderUUID);
+    return ret;
+  }
+
   public static String moveTransferredResource(User user, SelectedItems<TransferredResource> selected,
     TransferredResource transferredResource) throws AuthorizationDeniedException, GenericException,
     RequestNotValidException, AlreadyExistsException, IsStillUpdatingException, NotFoundException {

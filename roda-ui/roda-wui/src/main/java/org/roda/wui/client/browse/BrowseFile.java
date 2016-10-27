@@ -240,7 +240,6 @@ public class BrowseFile extends Composite {
     this.representationUUID = representationUUID;
     this.fileUUID = fileUUID;
     this.file = file;
-
     IndexedRepresentation rep = null;
     for (IndexedRepresentation irep : itemBundle.getRepresentations()) {
       if (irep.getUUID().equals(representationUUID)) {

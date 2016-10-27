@@ -537,5 +537,4 @@ public class IndexService {
 
     return resourceIterable;
   }
-
 }

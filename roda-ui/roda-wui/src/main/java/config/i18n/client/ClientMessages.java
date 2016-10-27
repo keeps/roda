@@ -762,6 +762,16 @@ public interface ClientMessages extends Messages {
 
   String selectFileSearchResults();
 
+  /************* Rename Item ****************/
+
+  String renameItemTitle();
+
+  String renamePlaceholder();
+
+  String renameFailed();
+
+  String renameSuccessful();
+
   /************* Move Item ****************/
 
   String moveItemTitle();

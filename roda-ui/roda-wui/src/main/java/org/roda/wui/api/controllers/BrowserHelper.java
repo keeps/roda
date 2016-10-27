@@ -2304,6 +2304,55 @@ public class BrowserHelper {
     }
   }
 
+  public static String renameFolder(String folderUUID, String newName) throws GenericException,
+    RequestNotValidException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
+    ModelService model = RodaCoreFactory.getModelService();
+    IndexService index = RodaCoreFactory.getIndexService();
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.INDEX_UUID, folderUUID));
+    IndexResult<IndexedFile> files = index.find(IndexedFile.class, filter, Sorter.NONE, new Sublist(0, 1));
+
+    if (!files.getResults().isEmpty()) {
+      IndexedFile ifolder = (IndexedFile) files.getResults().get(0);
+      File folder = model.retrieveFile(ifolder.getAipId(), ifolder.getRepresentationId(), ifolder.getPath(),
+        ifolder.getId());
+      String newUUID = model.renameFolder(folder, newName, true, true);
+      index.commitAIPs();
+      return newUUID;
+    } else {
+      return folderUUID;
+    }
+  }
+
+  public static String moveFiles(String aipId, SelectedItems<IndexedFile> selectedFiles, IndexedFile toFolder)
+    throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
+    AuthorizationDeniedException {
+    ModelService model = RodaCoreFactory.getModelService();
+    IndexService index = RodaCoreFactory.getIndexService();
+    List<File> files = new ArrayList<File>();
+    IndexResult<IndexedFile> findResult = new IndexResult<IndexedFile>();
+
+    if (selectedFiles instanceof SelectedItemsList) {
+      SelectedItemsList selectedList = (SelectedItemsList) selectedFiles;
+      Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, selectedList.getIds()));
+      findResult = index.find(IndexedFile.class, filter, Sorter.NONE, new Sublist(0, selectedList.getIds().size()));
+    } else if (selectedFiles instanceof SelectedItemsFilter) {
+      SelectedItemsFilter selectedFilter = (SelectedItemsFilter) selectedFiles;
+      int findCounter = index.count(IndexedFile.class, selectedFilter.getFilter()).intValue();
+      findResult = index.find(IndexedFile.class, selectedFilter.getFilter(), Sorter.NONE, new Sublist(0, findCounter));
+    }
+
+    for (IndexedFile ifile : findResult.getResults()) {
+      files.add(model.retrieveFile(ifile.getAipId(), ifile.getRepresentationId(), ifile.getPath(), ifile.getId()));
+    }
+
+    if (!files.isEmpty()) {
+      model.moveFiles(aipId, files, toFolder.getStoragePath(), true, true);
+      index.commitAIPs();
+    }
+
+    return toFolder.getUUID();
+  }
+
   public static String moveTransferredResource(SelectedItems selected, TransferredResource transferredResource)
     throws GenericException, RequestNotValidException, AlreadyExistsException, IsStillUpdatingException,
     NotFoundException {
@@ -2339,6 +2388,24 @@ public class BrowserHelper {
       return transferredResource.getUUID();
     }
 
+  }
+
+  public static String createFolder(String folderUUID, String newName) throws GenericException,
+    RequestNotValidException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
+    ModelService model = RodaCoreFactory.getModelService();
+    IndexService index = RodaCoreFactory.getIndexService();
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.INDEX_UUID, folderUUID));
+    IndexResult<IndexedFile> files = index.find(IndexedFile.class, filter, Sorter.NONE, new Sublist(0, 1));
+
+    if (!files.getResults().isEmpty()) {
+      IndexedFile ifolder = (IndexedFile) files.getResults().get(0);
+      File newFolder = model.createFile(ifolder.getAipId(), ifolder.getRepresentationId(), ifolder.getPath(),
+        ifolder.getId(), newName, true);
+      index.commitAIPs();
+      return IdUtils.getFileId(newFolder);
+    } else {
+      return folderUUID;
+    }
   }
 
   public static List<TransferredResource> retrieveSelectedTransferredResource(
@@ -2489,4 +2556,5 @@ public class BrowserHelper {
     scanner.updateAllTransferredResources(resourceUUID, true);
     return RodaCoreFactory.getIndexService().retrieve(TransferredResource.class, resourceUUID);
   }
+
 }

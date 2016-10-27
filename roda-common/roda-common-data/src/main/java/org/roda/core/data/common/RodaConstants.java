@@ -289,6 +289,7 @@ public final class RodaConstants {
   public static final String CONTROLLER_ACCEPT_PARAM = "accept";
   public static final String CONTROLLER_REJECT_REASON_PARAM = "rejectReason";
   public static final String CONTROLLER_SELECTED_VERSION_PARAM = "selectedVersion";
+  public static final String CONTROLLER_FILES_PARAM = "files";
 
   /*
    * Core (storage, index, orchestrator, etc.)

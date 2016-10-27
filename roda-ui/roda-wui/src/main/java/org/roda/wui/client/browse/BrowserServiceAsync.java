@@ -197,4 +197,11 @@ public interface BrowserServiceAsync {
   void updateMultipleIncidences(SelectedItems<RiskIncidence> selected, String status, String severity, Date mitigatedOn,
     String mitigatedBy, String mitigatedDescription, AsyncCallback<Void> loadingAsyncCallback);
 
+  void renameFolder(String folderUUID, String newName, AsyncCallback<String> asyncCallback);
+
+  void moveFiles(String aipId, SelectedItems<IndexedFile> selectedFiles, IndexedFile toFolder,
+    AsyncCallback<String> asyncCallback);
+
+  void createFolder(String folderUUID, String newName, AsyncCallback<String> asyncCallback);
+
 }

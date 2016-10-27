@@ -329,8 +329,8 @@ public class IngestTransfer extends Composite {
       view();
       callback.onSuccess(this);
     } else if (historyTokens.size() >= 1
-      && historyTokens.get(0).equals(IngestTransferUpload.RESOLVER.getHistoryToken())) {
-      IngestTransferUpload.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      && historyTokens.get(0).equals(TransferUpload.RESOLVER.getHistoryToken())) {
+      TransferUpload.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {
       String transferredResourceUUID = historyTokens.get(0);
       if (transferredResourceUUID != null) {
@@ -419,9 +419,9 @@ public class IngestTransfer extends Composite {
   @UiHandler("uploadFiles")
   void buttonUploadFilesHandler(ClickEvent e) {
     if (resource != null) {
-      Tools.newHistory(IngestTransferUpload.RESOLVER, resource.getUUID());
+      Tools.newHistory(TransferUpload.RESOLVER, resource.getUUID());
     } else {
-      Tools.newHistory(IngestTransferUpload.RESOLVER);
+      Tools.newHistory(TransferUpload.RESOLVER);
     }
   }
 

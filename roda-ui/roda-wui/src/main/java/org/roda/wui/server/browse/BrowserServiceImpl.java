@@ -727,6 +727,28 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
+  public String renameFolder(String folderUUID, String newName) throws AuthorizationDeniedException, GenericException,
+    RequestNotValidException, AlreadyExistsException, NotFoundException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.renameFolder(user, folderUUID, newName);
+  }
+
+  @Override
+  public String moveFiles(String aipId, SelectedItems<IndexedFile> selectedFiles, IndexedFile toFolder)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, AlreadyExistsException,
+    NotFoundException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.moveFiles(user, aipId, selectedFiles, toFolder);
+  }
+
+  @Override
+  public String createFolder(String folderUUID, String newName) throws AuthorizationDeniedException, GenericException,
+    RequestNotValidException, AlreadyExistsException, NotFoundException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.createFolder(user, folderUUID, newName);
+  }
+
+  @Override
   public String moveTransferredResource(SelectedItems selected, TransferredResource transferredResource)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, AlreadyExistsException,
     IsStillUpdatingException, NotFoundException {
@@ -778,4 +800,5 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     Browser.createRepresentation(user, aipId, representationId, RepresentationContentType.getMIXED().asString());
     return IdUtils.getRepresentationId(aipId, representationId);
   }
+
 }

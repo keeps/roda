@@ -194,8 +194,8 @@ public class TransferredResourcesScanner {
   public void updateAllTransferredResources(String folderUUID, boolean waitToFinish) throws IsStillUpdatingException {
     if (!RodaCoreFactory.getTransferredResourcesScannerUpdateStatus()) {
       if (index != null) {
-        ReindexTransferredResourcesRunnable reindexRunnable;
-        reindexRunnable = new ReindexTransferredResourcesRunnable(basePath, folderUUID, index);
+        ReindexTransferredResourcesRunnable reindexRunnable = new ReindexTransferredResourcesRunnable(basePath,
+          folderUUID, index);
 
         if (waitToFinish) {
           reindexRunnable.run();
