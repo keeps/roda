@@ -198,7 +198,7 @@ public class BrowseRepresentation extends Composite {
     handlers = new ArrayList<HandlerRegistration>();
 
     String summary = messages.representationListOfFiles();
-    boolean selectable = false;
+    boolean selectable = true;
 
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, repId),
       new EmptyKeyFilterParameter(RodaConstants.FILE_PARENT_UUID));
