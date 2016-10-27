@@ -200,9 +200,9 @@ public class Search extends Composite {
 
     newJobButton.setEnabled(false);
     moveItem.setEnabled(false);
-    
+
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();
@@ -283,24 +283,24 @@ public class Search extends Composite {
         BrowserService.Util.getInstance().moveAIPInHierarchy(selected, parentId,
           new LoadingAsyncCallback<IndexedAIP>() {
 
-            @Override
-            public void onSuccessImpl(IndexedAIP result) {
-              if (result != null) {
-                Tools.newHistory(Browse.RESOLVER, result.getId());
-              } else {
-                Tools.newHistory(Search.RESOLVER);
-              }
+          @Override
+          public void onSuccessImpl(IndexedAIP result) {
+            if (result != null) {
+              Tools.newHistory(Browse.RESOLVER, result.getId());
+            } else {
+              Tools.newHistory(Search.RESOLVER);
             }
+          }
 
-            @Override
-            public void onFailureImpl(Throwable caught) {
-              if (caught instanceof NotFoundException) {
-                Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-              } else {
-                AsyncCallbackUtils.defaultFailureTreatment(caught);
-              }
+          @Override
+          public void onFailureImpl(Throwable caught) {
+            if (caught instanceof NotFoundException) {
+              Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+            } else {
+              AsyncCallbackUtils.defaultFailureTreatment(caught);
             }
-          });
+          }
+        });
       }
     });
 
@@ -313,10 +313,8 @@ public class Search extends Composite {
 
     if (!ClientSelectedItemsUtils.isEmpty(selected)) {
 
-      Dialogs.showConfirmDialog(messages.ingestTransferRemoveFolderConfirmDialogTitle(),
-        messages.ingestTransferRemoveAllSelectedConfirmDialogMessage(),
-        messages.ingestTransferRemoveFolderConfirmDialogCancel(), messages.ingestTransferRemoveFolderConfirmDialogOk(),
-        new AsyncCallback<Boolean>() {
+      Dialogs.showConfirmDialog(messages.removeConfirmDialogTitle(), messages.removeAllSelectedConfirmDialogMessage(),
+        messages.dialogNo(), messages.dialogYes(), new AsyncCallback<Boolean>() {
 
           @Override
           public void onSuccess(Boolean confirmed) {
@@ -333,8 +331,7 @@ public class Search extends Composite {
 
                   @Override
                   public void onSuccessImpl(String parentId) {
-                    Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
-                      messages.ingestTransferRemoveAllSuccessMessage());
+                    Toast.showInfo(messages.removeSuccessTitle(), messages.removeAllSuccessMessage());
                     mainSearch.refresh();
                   }
                 });
@@ -350,8 +347,7 @@ public class Search extends Composite {
 
                   @Override
                   public void onSuccessImpl(Void returned) {
-                    Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
-                      messages.ingestTransferRemoveAllSuccessMessage());
+                    Toast.showInfo(messages.removeSuccessTitle(), messages.removeAllSuccessMessage());
                     mainSearch.refresh();
                   }
                 });
@@ -367,8 +363,7 @@ public class Search extends Composite {
 
                   @Override
                   public void onSuccessImpl(Void returned) {
-                    Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
-                      messages.ingestTransferRemoveAllSuccessMessage());
+                    Toast.showInfo(messages.removeSuccessTitle(), messages.removeAllSuccessMessage());
                     mainSearch.refresh();
                   }
                 });

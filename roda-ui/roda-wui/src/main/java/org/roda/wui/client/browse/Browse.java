@@ -38,7 +38,6 @@ import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.lists.AIPList;
-import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.search.SearchPanel;
@@ -321,17 +320,6 @@ public class Browse extends Composite {
       }
     });
 
-    aipList.addCheckboxSelectionListener(new CheckboxSelectionListener<IndexedAIP>() {
-
-      @Override
-      public void onSelectionChange(SelectedItems<IndexedAIP> selected) {
-        boolean empty = ClientSelectedItemsUtils.isEmpty(selected);
-        moveItem.setEnabled(!empty);
-        editPermissions.setEnabled(!empty);
-      }
-
-    });
-
     representationsList.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
       @Override
@@ -410,7 +398,8 @@ public class Browse extends Composite {
       DescriptiveMetadataHistory.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else if (historyTokens.size() >= 1 && historyTokens.get(0).equals(EditPermissions.RESOLVER.getHistoryToken())) {
       EditPermissions.RESOLVER.resolve(Tools.tail(historyTokens), callback);
-    } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(BrowseRepresentation.RESOLVER.getHistoryToken())) {
+    } else if (historyTokens.size() > 1
+      && historyTokens.get(0).equals(BrowseRepresentation.RESOLVER.getHistoryToken())) {
       BrowseRepresentation.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(BrowseFolder.RESOLVER.getHistoryToken())) {
       BrowseFolder.RESOLVER.resolve(Tools.tail(historyTokens), callback);
@@ -899,9 +888,8 @@ public class Browse extends Composite {
       // Remove the whole folder
 
       if (aipId != null) {
-        Dialogs.showConfirmDialog(messages.browseRemoveConfirmDialogTitle(),
-          messages.browseRemoveConfirmDialogMessage(), messages.dialogCancel(), messages.dialogYes(),
-          new AsyncCallback<Boolean>() {
+        Dialogs.showConfirmDialog(messages.removeConfirmDialogTitle(), messages.removeAllConfirmDialogMessage(),
+          messages.dialogNo(), messages.dialogYes(), new AsyncCallback<Boolean>() {
 
             @Override
             public void onFailure(Throwable caught) {
@@ -950,10 +938,9 @@ public class Browse extends Composite {
         @Override
         public void onSuccess(final Long size) {
           // TODO update messages
-          Dialogs.showConfirmDialog(messages.ingestTransferRemoveFolderConfirmDialogTitle(),
-            messages.ingestTransferRemoveSelectedConfirmDialogMessage(size),
-            messages.ingestTransferRemoveFolderConfirmDialogCancel(),
-            messages.ingestTransferRemoveFolderConfirmDialogOk(), new AsyncCallback<Boolean>() {
+          Dialogs.showConfirmDialog(messages.removeConfirmDialogTitle(),
+            messages.removeSelectedConfirmDialogMessage(size), messages.dialogNo(), messages.dialogYes(),
+            new AsyncCallback<Boolean>() {
 
             @Override
             public void onSuccess(Boolean confirmed) {
@@ -968,8 +955,7 @@ public class Browse extends Composite {
 
                   @Override
                   public void onSuccessImpl(String parentId) {
-                    Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
-                      messages.ingestTransferRemoveSuccessMessage(size));
+                    Toast.showInfo(messages.removeSuccessTitle(), messages.removeSuccessMessage(size));
                     aipList.refresh();
                   }
                 });
@@ -1159,7 +1145,7 @@ public class Browse extends Composite {
     downloadUri = RestUtils.createAIPDownloadUri(aipId);
     Window.Location.assign(downloadUri.asString());
   }
-  
+
   @UiHandler("appraisalAccept")
   void appraisalAcceptHandler(ClickEvent e) {
     final boolean accept = true;

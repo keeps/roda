@@ -89,7 +89,7 @@ public interface ClientMessages extends Messages {
   String catalogueItemTitle();
 
   String catalogueRepresentationTitle();
-  
+
   String catalogueFolderTitle();
 
   String catalogueFileTitle();
@@ -318,16 +318,6 @@ public interface ClientMessages extends Messages {
 
   String ingestTransferRemoveSelectedConfirmDialogMessage(Long size);
 
-  String ingestTransferRemoveFolderConfirmDialogCancel();
-
-  String ingestTransferRemoveFolderConfirmDialogOk();
-
-  String ingestTransferRemoveSuccessTitle();
-
-  String ingestTransferRemoveAllSuccessMessage();
-
-  String ingestTransferRemoveSuccessMessage(Long size);
-
   String ingestTransferLastScanned(Date lastScanDate);
 
   String ingestTransferNotFoundDialogTitle();
@@ -394,6 +384,8 @@ public interface ClientMessages extends Messages {
 
   String dialogOk();
 
+  String dialogNo();
+
   String dialogYes();
 
   String dialogSorry();
@@ -439,7 +431,7 @@ public interface ClientMessages extends Messages {
   String listButton();
 
   String downloadButton();
-  
+
   String uploadFilesButton();
 
   String renameButton();
@@ -564,12 +556,24 @@ public interface ClientMessages extends Messages {
 
   String jobStopConfirmDialogMessage();
 
+  /************* Generic remove toast and dialog ****************/
+
+  String removeSuccessTitle();
+
+  String removeAllSuccessMessage();
+
+  String removeSuccessMessage(Long size);
+
+  String removeConfirmDialogTitle();
+
+  String removeAllConfirmDialogMessage();
+
+  String removeSelectedConfirmDialogMessage(Long size);
+
+  String removeAllSelectedConfirmDialogMessage();
+
   /************* Browse ****************/
   String browseLoading();
-
-  String browseRemoveConfirmDialogTitle();
-
-  String browseRemoveConfirmDialogMessage();
 
   String itemId();
 
@@ -641,11 +645,11 @@ public interface ClientMessages extends Messages {
   String aipDates();
 
   String aipHasRepresentations();
-  
+
   String folderId();
-  
+
   String folderFiles();
-  
+
   String fileId();
 
   String fileName();
@@ -2281,9 +2285,9 @@ public interface ClientMessages extends Messages {
   String showLess();
 
   String revertedBy(String userId);
-  
+
   /* Version action */
   String versionAction(@Select String action);
-  
+
   String versionActionBy(String message, String string);
 }

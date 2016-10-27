@@ -144,13 +144,13 @@ public class ShowRisk extends Composite {
       }
     });
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();
     JavascriptUtils.stickSidebar();
   }
-  
+
   void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 1) {
       String riskId = historyTokens.get(0);
@@ -202,7 +202,7 @@ public class ShowRisk extends Composite {
       @Override
       public void onSuccess(Void result) {
         riskShowPanel.refreshList();
-        Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(), messages.ingestTransferRemoveAllSuccessMessage());
+        Toast.showInfo(messages.removeSuccessTitle(), messages.removeAllSuccessMessage());
       }
     });
   }
@@ -230,16 +230,16 @@ public class ShowRisk extends Composite {
           editDialog.getSeverity(), editDialog.getMitigatedOn(), editDialog.getMitigatedBy(),
           editDialog.getMitigatedDescription(), new LoadingAsyncCallback<Void>() {
 
-            @Override
-            public void onSuccessImpl(Void result) {
-              riskShowPanel.incidenceList.refresh();
-            }
+          @Override
+          public void onSuccessImpl(Void result) {
+            riskShowPanel.incidenceList.refresh();
+          }
 
-            @Override
-            public void onFailureImpl(Throwable caught) {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
-            }
-          });
+          @Override
+          public void onFailureImpl(Throwable caught) {
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
+          }
+        });
       }
     });
   }

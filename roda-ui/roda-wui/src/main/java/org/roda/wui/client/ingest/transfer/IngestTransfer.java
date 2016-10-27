@@ -465,9 +465,8 @@ public class IngestTransfer extends Composite {
 
       if (resource != null) {
         Dialogs.showConfirmDialog(messages.ingestTransferRemoveFolderConfirmDialogTitle(),
-          messages.ingestTransferRemoveFolderConfirmDialogMessage(resource.getName()),
-          messages.ingestTransferRemoveFolderConfirmDialogCancel(),
-          messages.ingestTransferRemoveFolderConfirmDialogOk(), new AsyncCallback<Boolean>() {
+          messages.ingestTransferRemoveFolderConfirmDialogMessage(resource.getName()), messages.dialogNo(),
+          messages.dialogYes(), new AsyncCallback<Boolean>() {
 
             @Override
             public void onFailure(Throwable caught) {
@@ -488,8 +487,7 @@ public class IngestTransfer extends Composite {
 
                   @Override
                   public void onSuccess(Void result) {
-                    Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
-                      messages.ingestTransferRemoveSuccessMessage(1L));
+                    Toast.showInfo(messages.removeSuccessTitle(), messages.removeSuccessMessage(1L));
                     Tools.newHistory(RESOLVER, resource.getParentUUID());
                   }
                 });
@@ -512,9 +510,8 @@ public class IngestTransfer extends Composite {
         @Override
         public void onSuccess(final Long size) {
           Dialogs.showConfirmDialog(messages.ingestTransferRemoveFolderConfirmDialogTitle(),
-            messages.ingestTransferRemoveSelectedConfirmDialogMessage(size),
-            messages.ingestTransferRemoveFolderConfirmDialogCancel(),
-            messages.ingestTransferRemoveFolderConfirmDialogOk(), new AsyncCallback<Boolean>() {
+            messages.ingestTransferRemoveSelectedConfirmDialogMessage(size), messages.dialogNo(), messages.dialogYes(),
+            new AsyncCallback<Boolean>() {
 
             @Override
             public void onFailure(Throwable caught) {
@@ -534,8 +531,7 @@ public class IngestTransfer extends Composite {
 
                   @Override
                   public void onSuccess(Void result) {
-                    Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
-                      messages.ingestTransferRemoveSuccessMessage(size));
+                    Toast.showInfo(messages.removeSuccessTitle(), messages.removeSuccessMessage(size));
                     transferredResourceList.refresh();
                     move.setEnabled(false);
                     rename.setEnabled(false);

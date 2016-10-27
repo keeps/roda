@@ -178,7 +178,7 @@ public class BrowseFolder extends Composite {
     // this.folder = folder;
     this.aipId = folder.getAipId();
     this.repId = folder.getRepresentationUUID();
-//    this.folderUUID = folder.getUUID();
+    // this.folderUUID = folder.getUUID();
 
     String summary = messages.representationListOfFiles();
     boolean selectable = true;
@@ -192,10 +192,10 @@ public class BrowseFolder extends Composite {
         IndexedFile selected = filesList.getSelectionModel().getSelectedObject();
         if (selected != null) {
           if (selected.isDirectory()) {
-            Tools.newHistory(Browse.RESOLVER, BrowseFolder.RESOLVER.getHistoryToken(), aipId, repId, selected.getUUID());
-          } else {
-            Tools.newHistory(Browse.RESOLVER, BrowseFile.RESOLVER.getHistoryToken(), aipId, repId,
+            Tools.newHistory(Browse.RESOLVER, BrowseFolder.RESOLVER.getHistoryToken(), aipId, repId,
               selected.getUUID());
+          } else {
+            Tools.newHistory(Browse.RESOLVER, BrowseFile.RESOLVER.getHistoryToken(), aipId, repId, selected.getUUID());
           }
         }
       }
@@ -226,40 +226,40 @@ public class BrowseFolder extends Composite {
     super.onLoad();
     JavascriptUtils.stickSidebar();
   }
-  
+
   // TODO
   @UiHandler("refresh")
   void buttonRefreshHandler(ClickEvent e) {
-    
+
   }
 
   // TODO
   @UiHandler("rename")
   void buttonRenameHandler(ClickEvent e) {
-    
+
   }
-  
+
   // TODO
   @UiHandler("move")
   void buttonMoveHandler(ClickEvent e) {
-    
+
   }
-  
+
   // TODO
   @UiHandler("uploadFiles")
   void buttonUploadFilesHandler(ClickEvent e) {
-    
+
   }
-  
+
   // TODO
   @UiHandler("createFolder")
   void buttonCreateFolderHandler(ClickEvent e) {
-    
+
   }
-  
+
   // TODO
   @UiHandler("remove")
   void buttonRemoveHandler(ClickEvent e) {
-    
+
   }
 }
