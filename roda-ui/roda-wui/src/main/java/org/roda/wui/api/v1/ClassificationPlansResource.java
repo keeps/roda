@@ -14,13 +14,16 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 
+import org.roda.core.common.ConsumesOutputStream;
 import org.roda.core.common.StreamResponse;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiUtils;
+import org.roda.wui.common.server.RodaStreamingOutput;
 
 import io.swagger.annotations.Api;
 
@@ -44,9 +47,10 @@ public class ClassificationPlansResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    StreamResponse streamResponse = Browser.retrieveClassificationPlan(user);
+    ConsumesOutputStream cos = Browser.retrieveClassificationPlan(user);
+    StreamingOutput streamingOutput = new RodaStreamingOutput(cos);
 
-    return ApiUtils.okResponse(streamResponse);
+    return ApiUtils.okResponse(new StreamResponse(cos.getFileName(), cos.getMediaType(), streamingOutput));
   }
 
 }
