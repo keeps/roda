@@ -16,14 +16,12 @@ import java.util.Optional;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.plugins.Plugin;
-import org.roda.core.plugins.orchestrate.IngestJobPluginInfo;
 import org.roda.core.plugins.plugins.base.DescriptiveMetadataValidationPlugin;
-import org.roda.core.plugins.plugins.ingest.DefaultIngestPlugin.AfterExecute;
+import org.roda.core.plugins.plugins.base.ReplicationPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin;
 
 public class MinimalIngestPlugin extends DefaultIngestPlugin {
@@ -38,8 +36,8 @@ public class MinimalIngestPlugin extends DefaultIngestPlugin {
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_PARENT_ID, "Parent node", PluginParameterType.AIP_ID, "", false,
         false, "Use the provided parent node if the SIPs does not provide one."));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, "Force parent node",
-        PluginParameterType.BOOLEAN, "false", false, false,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, "Force parent node", PluginParameterType.BOOLEAN,
+        "false", false, false,
         "Force the use of the selected parent node even if the SIPs provide information about the desired parent."));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_DESCRIPTIVE_METADATA_VALIDATION,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_DESCRIPTIVE_METADATA_VALIDATION,
@@ -55,6 +53,9 @@ public class MinimalIngestPlugin extends DefaultIngestPlugin {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT, AutoAcceptSIPPlugin.getStaticName(),
         PluginParameterType.BOOLEAN, "true", true, true, AutoAcceptSIPPlugin.getStaticDescription()));
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_REPLICATION,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_REPLICATION, ReplicationPlugin.getStaticName(),
+        PluginParameterType.BOOLEAN, "false", true, true, ReplicationPlugin.getStaticDescription()));
   }
 
   @Override
@@ -120,9 +121,9 @@ public class MinimalIngestPlugin extends DefaultIngestPlugin {
   public List<Class<TransferredResource>> getObjectClasses() {
     return Arrays.asList(TransferredResource.class);
   }
-  
+
   @Override
-  public  Optional<? extends AfterExecute> getAfterExecute() {
+  public Optional<? extends AfterExecute> getAfterExecute() {
     return Optional.empty();
   }
 

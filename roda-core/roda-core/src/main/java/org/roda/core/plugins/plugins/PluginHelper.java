@@ -203,6 +203,7 @@ public final class PluginHelper {
   public static <T extends IsRODAObject> void updatePartialJobReport(Plugin<T> plugin, ModelService model,
     IndexService index, Report reportItem, boolean replaceLastReportItemIfTheSame) {
     String jobId = getJobId(plugin);
+    boolean retrieved = true;
     try {
       Report jobReport;
       try {
@@ -214,17 +215,20 @@ public final class PluginHelper {
 
         jobReport.setId(reportItem.getOutcomeObjectId());
         jobReport.addReport(reportItem);
+        retrieved = false;
       }
 
-      if (!replaceLastReportItemIfTheSame) {
-        jobReport.addReport(reportItem);
-      } else {
-        List<Report> reportItems = jobReport.getReports();
-        Report report = reportItems.get(reportItems.size() - 1);
-        if (report.getPlugin().equalsIgnoreCase(reportItem.getPlugin())) {
-          reportItems.remove(reportItems.size() - 1);
-          jobReport.setStepsCompleted(jobReport.getStepsCompleted() - 1);
+      if (retrieved) {
+        if (!replaceLastReportItemIfTheSame) {
           jobReport.addReport(reportItem);
+        } else {
+          List<Report> reportItems = jobReport.getReports();
+          Report report = reportItems.get(reportItems.size() - 1);
+          if (report.getPlugin().equalsIgnoreCase(reportItem.getPlugin())) {
+            reportItems.remove(reportItems.size() - 1);
+            jobReport.setStepsCompleted(jobReport.getStepsCompleted() - 1);
+            jobReport.addReport(reportItem);
+          }
         }
       }
 

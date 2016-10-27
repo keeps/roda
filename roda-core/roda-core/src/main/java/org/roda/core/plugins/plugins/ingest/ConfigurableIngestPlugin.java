@@ -23,6 +23,7 @@ import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.plugins.antivirus.AntivirusPlugin;
 import org.roda.core.plugins.plugins.base.DescriptiveMetadataValidationPlugin;
+import org.roda.core.plugins.plugins.base.ReplicationPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPlugin;
 
@@ -74,6 +75,7 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
 
     pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_PRODUCER_AUTHORIZATION_CHECK));
     pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT));
+    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_REPLICATION));
     pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION));
     return pluginParameters;
   }
@@ -89,8 +91,8 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
           "Select the format of the Submission Information Packages to be ingested in this ingest process."));
 
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID,
-        new PluginParameter(RodaConstants.PLUGIN_PARAMS_PARENT_ID, "Parent node", PluginParameterType.AIP_ID, "",
-          false, false, "Use the provided parent node if the SIPs does not provide one."));
+        new PluginParameter(RodaConstants.PLUGIN_PARAMS_PARENT_ID, "Parent node", PluginParameterType.AIP_ID, "", false,
+          false, "Use the provided parent node if the SIPs does not provide one."));
 
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID,
         new PluginParameter(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, "Force parent node",
@@ -154,6 +156,10 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
         new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT, AutoAcceptSIPPlugin.getStaticName(),
           PluginParameterType.BOOLEAN, "true", true, false, AutoAcceptSIPPlugin.getStaticDescription()));
 
+      pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_REPLICATION,
+        new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_REPLICATION, ReplicationPlugin.getStaticName(),
+          PluginParameterType.BOOLEAN, "false", true, false, ReplicationPlugin.getStaticDescription()));
+
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION,
         new PluginParameter(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION, "Ingest finished notification",
           PluginParameterType.STRING, "", false, false,
@@ -185,7 +191,7 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
 
   @Override
   public void setTotalSteps() {
-    this.totalSteps = 10 - deactivatedPlugins.size();
+    this.totalSteps = 11 - deactivatedPlugins.size();
   }
 
   @Override

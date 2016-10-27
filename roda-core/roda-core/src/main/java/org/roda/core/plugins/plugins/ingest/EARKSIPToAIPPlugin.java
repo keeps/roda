@@ -127,7 +127,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
     SIP sip = null;
     try {
       sip = EARKSIP.parse(earkSIPPath, RodaCoreFactory.getWorkingDirectory());
-     
+
       reportItem.setSourceObjectOriginalIds(sip.getIds());
 
       if (sip.getValidationReport().isValid()) {
@@ -161,8 +161,8 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
                 Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE,
                 Permissions.PermissionType.GRANT)));
             // Create the permissions object for the user that created the job
-            aip = EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, jobUsername, fullPermissions, model, storage,
-              sip.getIds(), reportItem.getJobId(), computedParentId);
+            aip = EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, jobUsername, fullPermissions, model, storage, sip.getIds(),
+              reportItem.getJobId(), computedParentId);
           } else {
             throw new GenericException("Unknown IP Status: " + sip.getStatus());
           }

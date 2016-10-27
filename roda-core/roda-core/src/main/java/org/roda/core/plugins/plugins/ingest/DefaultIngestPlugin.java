@@ -51,6 +51,7 @@ import org.roda.core.plugins.orchestrate.IngestJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.plugins.plugins.antivirus.AntivirusPlugin;
 import org.roda.core.plugins.plugins.base.DescriptiveMetadataValidationPlugin;
+import org.roda.core.plugins.plugins.base.ReplicationPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPlugin;
 import org.roda.core.storage.StorageService;
@@ -62,9 +63,6 @@ import com.google.common.base.CaseFormat;
 /***
  * https://docs.google.com/spreadsheets/d/
  * 1Ncu0My6tf19umSClIA6iXeYlJ4_FP6MygRwFCe0EzyM
- * 
- * FIXME 20160323 hsilva: after each task (i.e. plugin), the AIP should be
- * obtained again from model (as it might have changed)
  * 
  * @author Hélder Silva <hsilva@keep.pt>
  */
@@ -83,7 +81,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   public static String END_DESCRIPTION = "The ingest process has ended.";
   public static PreservationEventType END_TYPE = PreservationEventType.INGEST_END;
 
-  protected int totalSteps = 10;
+  protected int totalSteps = 11;
 
   private String successMessage;
   private String failureMessage;
@@ -256,6 +254,14 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       }
 
       createIngestEndedEvent(model, index, aips);
+
+      // 11) Replication
+      if (!aips.isEmpty() && PluginHelper.verifyIfStepShouldBePerformed(this,
+        getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_REPLICATION))) {
+        pluginReport = doReplication(index, model, storage, aips);
+        mergeReports(jobPluginInfo, pluginReport);
+        PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
+      }
 
       getAfterExecute().ifPresent(e -> e.execute(jobPluginInfo, aips));
 
@@ -567,6 +573,10 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
   private Report doAutoAccept(IndexService index, ModelService model, StorageService storage, List<AIP> aips) {
     return executePlugin(index, model, storage, aips, AutoAcceptSIPPlugin.class.getName());
+  }
+
+  private Report doReplication(IndexService index, ModelService model, StorageService storage, List<AIP> aips) {
+    return executePlugin(index, model, storage, aips, ReplicationPlugin.class.getName());
   }
 
   private Report executePlugin(IndexService index, ModelService model, StorageService storage, List<AIP> aips,

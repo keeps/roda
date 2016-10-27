@@ -10,11 +10,13 @@ package org.roda.core.model.utils;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.RodaUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.tools.ZipEntryInfo;
 import org.roda.core.data.common.RodaConstants;
@@ -115,7 +117,7 @@ public final class ModelUtils {
   }
 
   private static List<String> getSubmissionPath(String aipId) {
-    return build(getAIPPath(aipId), RodaConstants.STORAGE_DIRECTORY_SUBMISSION);
+    return build(getAIPPath(aipId), RodaConstants.STORAGE_DIRECTORY_SUBMISSION, RodaUtils.dateToISO8601(new Date()));
   }
 
   public static StoragePath getSubmissionStoragePath(String aipId) throws RequestNotValidException {
