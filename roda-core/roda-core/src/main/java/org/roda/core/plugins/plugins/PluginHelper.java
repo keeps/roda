@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -753,7 +754,7 @@ public final class PluginHelper {
     for (Entry<String, String> oldToNewId : oldToNewTransferredResourceIds.entrySet()) {
       String oldSIPId = oldToNewId.getKey();
       String newSIPId = oldToNewId.getValue();
-      for (Report report : jobPluginInfo.getAllReports().get(oldSIPId).values()) {
+      for (Report report : jobPluginInfo.getAllReports().getOrDefault(oldSIPId, Collections.emptyMap()).values()) {
         report.setSourceObjectId(newSIPId);
         if (!report.getReports().isEmpty()) {
           report.getReports().get(0).setSourceObjectId(newSIPId);
