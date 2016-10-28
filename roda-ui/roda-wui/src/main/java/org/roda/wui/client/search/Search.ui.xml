@@ -52,6 +52,9 @@
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarActionsTitle}' />
 							</g:Label>
+							<g:Button addStyleNames="btn btn-edit" ui:field="editPermissions">
+								<ui:text from='{messages.archivalPackagePermissions}' />
+							</g:Button>
 							<g:Button addStyleNames="btn btn-edit" ui:field="moveItem">
 								<ui:text from='{messages.moveArchivalPackage}' />
 							</g:Button>

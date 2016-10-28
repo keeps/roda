@@ -1132,6 +1132,8 @@ public class Browse extends Composite {
         Tools.newHistory(RESOLVER, EditPermissions.RESOLVER.getHistoryToken(), aipId);
       }
     } else {
+      LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+      selectedItems.setSelectedItems(selected);
       Tools.newHistory(RESOLVER, EditPermissions.RESOLVER.getHistoryToken());
     }
   }

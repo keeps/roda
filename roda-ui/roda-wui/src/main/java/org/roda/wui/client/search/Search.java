@@ -30,6 +30,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.browse.EditPermissions;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.LoadingAsyncCallback;
@@ -131,7 +132,7 @@ public class Search extends Composite {
   Button newJobButton;
 
   @UiField(provided = true)
-  Button moveItem, remove;
+  Button moveItem, remove, editPermissions;
 
   boolean justActive = true;
   boolean itemsSelectable = true;
@@ -152,6 +153,7 @@ public class Search extends Composite {
     newJobButton = new Button();
     moveItem = new Button();
     remove = new Button();
+    editPermissions = new Button();
 
     // Define facets and facets panels
     Map<FacetParameter, FlowPanel> itemsFacetsMap = new HashMap<FacetParameter, FlowPanel>();
@@ -174,12 +176,17 @@ public class Search extends Composite {
     representationsButtons.put(moveItem, false);
     filesButtons.put(moveItem, false);
 
+    itemsButtons.put(editPermissions, true);
+    representationsButtons.put(editPermissions, false);
+    filesButtons.put(editPermissions, false);
+
     // Define active buttons
     List<Button> itemsSelectionButtons = new ArrayList<>();
     List<Button> representationsSelectionButtons = new ArrayList<>();
     List<Button> filesSelectionButtons = new ArrayList<>();
 
     itemsSelectionButtons.add(moveItem);
+    itemsSelectionButtons.add(editPermissions);
 
     itemsSelectionButtons.add(remove);
     representationsSelectionButtons.add(remove);
@@ -200,7 +207,7 @@ public class Search extends Composite {
 
     newJobButton.setEnabled(false);
     moveItem.setEnabled(false);
-
+    editPermissions.setEnabled(false);
   }
 
   @Override
@@ -240,6 +247,13 @@ public class Search extends Composite {
 
   public SelectedItems<?> getSelected() {
     return mainSearch.getSelected();
+  }
+
+  @UiHandler("editPermissions")
+  void buttonEditPermissionsHandler(ClickEvent e) {
+    LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+    selectedItems.setSelectedItems(mainSearch.getSelected());
+    Tools.newHistory(Browse.RESOLVER, EditPermissions.RESOLVER.getHistoryToken());
   }
 
   @UiHandler("moveItem")
@@ -283,24 +297,24 @@ public class Search extends Composite {
         BrowserService.Util.getInstance().moveAIPInHierarchy(selected, parentId,
           new LoadingAsyncCallback<IndexedAIP>() {
 
-          @Override
-          public void onSuccessImpl(IndexedAIP result) {
-            if (result != null) {
-              Tools.newHistory(Browse.RESOLVER, result.getId());
-            } else {
-              Tools.newHistory(Search.RESOLVER);
+            @Override
+            public void onSuccessImpl(IndexedAIP result) {
+              if (result != null) {
+                Tools.newHistory(Browse.RESOLVER, result.getId());
+              } else {
+                Tools.newHistory(Search.RESOLVER);
+              }
             }
-          }
 
-          @Override
-          public void onFailureImpl(Throwable caught) {
-            if (caught instanceof NotFoundException) {
-              Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-            } else {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
+            @Override
+            public void onFailureImpl(Throwable caught) {
+              if (caught instanceof NotFoundException) {
+                Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+              } else {
+                AsyncCallbackUtils.defaultFailureTreatment(caught);
+              }
             }
-          }
-        });
+          });
       }
     });
 

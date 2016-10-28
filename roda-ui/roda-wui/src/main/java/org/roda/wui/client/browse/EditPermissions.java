@@ -24,6 +24,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.user.RODAMember;
+import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.MemberSelectDialog;
@@ -82,7 +83,9 @@ public class EditPermissions extends Composite {
         });
 
       } else if (historyTokens.isEmpty() && !ClientSelectedItemsUtils.isEmpty(Browse.getInstance().getSelected())) {
-        final SelectedItems<IndexedAIP> selected = Browse.getInstance().getSelected();
+        LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+        final SelectedItems selected = selectedItems.getSelectedItems();
+
         BrowserService.Util.getInstance().retrieve(IndexedAIP.class.getName(), selected,
           new AsyncCallback<List<IndexedAIP>>() {
 
@@ -148,7 +151,7 @@ public class EditPermissions extends Composite {
     editPermissionsDescription.add(new HTMLWidgetWrapper("EditPermissionsDescription.html"));
     createPermissionPanelList();
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();
