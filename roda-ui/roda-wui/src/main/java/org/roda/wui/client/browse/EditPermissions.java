@@ -30,6 +30,7 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.MemberSelectDialog;
 import org.roda.wui.client.common.lists.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
@@ -82,27 +83,29 @@ public class EditPermissions extends Composite {
           }
         });
 
-      } else if (historyTokens.isEmpty() && !ClientSelectedItemsUtils.isEmpty(Browse.getInstance().getSelected())) {
+      } else if (historyTokens.isEmpty()) {
         LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
         final SelectedItems selected = selectedItems.getSelectedItems();
 
-        BrowserService.Util.getInstance().retrieve(IndexedAIP.class.getName(), selected,
-          new AsyncCallback<List<IndexedAIP>>() {
+        if (!ClientSelectedItemsUtils.isEmpty(selected)) {
+          BrowserService.Util.getInstance().retrieve(IndexedAIP.class.getName(), selected,
+            new AsyncCallback<List<IndexedAIP>>() {
 
-            @Override
-            public void onFailure(Throwable caught) {
-              Tools.newHistory(Browse.RESOLVER);
-              callback.onSuccess(null);
-            }
+              @Override
+              public void onFailure(Throwable caught) {
+                Tools.newHistory(Browse.RESOLVER);
+                callback.onSuccess(null);
+              }
 
-            @Override
-            public void onSuccess(List<IndexedAIP> aips) {
-              EditPermissions edit = new EditPermissions(aips);
-              callback.onSuccess(edit);
-            }
-          });
+              @Override
+              public void onSuccess(List<IndexedAIP> aips) {
+                EditPermissions edit = new EditPermissions(aips);
+                callback.onSuccess(edit);
+              }
+            });
+        }
       } else {
-        Tools.newHistory(Browse.RESOLVER);
+        Tools.newHistory(Search.RESOLVER);
         callback.onSuccess(null);
       }
     }

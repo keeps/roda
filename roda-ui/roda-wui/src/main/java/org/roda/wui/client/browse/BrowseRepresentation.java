@@ -22,12 +22,14 @@ import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.lists.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.lists.SearchFileList;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
@@ -173,6 +175,9 @@ public class BrowseRepresentation extends Composite {
 
   @UiField
   Button newDescriptiveMetadata;
+  //
+  // @UiField
+  // Button renameFiles, moveFiles, uploadFiles, createFolder;
 
   @UiField(provided = true)
   SearchPanel searchPanel;
@@ -196,10 +201,7 @@ public class BrowseRepresentation extends Composite {
       .get(representation.getUUID());
 
     handlers = new ArrayList<HandlerRegistration>();
-
     String summary = messages.representationListOfFiles();
-
-    // FIXME change selectable to true
     boolean selectable = false;
 
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, repId),
@@ -220,6 +222,34 @@ public class BrowseRepresentation extends Composite {
         }
       }
     });
+
+    // filesList.addCheckboxSelectionListener(new
+    // CheckboxSelectionListener<IndexedFile>() {
+    //
+    // @Override
+    // public void onSelectionChange(SelectedItems<IndexedFile> selected) {
+    // SelectedItems<IndexedFile> files = (SelectedItems<IndexedFile>)
+    // filesList.getSelected();
+    // boolean empty = ClientSelectedItemsUtils.isEmpty(selected);
+    // moveFiles.setEnabled(!empty);
+    // createFolder.setEnabled(empty);
+    // uploadFiles.setEnabled(empty);
+    //
+    // ClientSelectedItemsUtils.size(IndexedFile.class, files, new
+    // AsyncCallback<Long>() {
+    //
+    // @Override
+    // public void onFailure(Throwable caught) {
+    // // do nothing
+    // }
+    //
+    // @Override
+    // public void onSuccess(Long result) {
+    // renameFiles.setEnabled(result == 1);
+    // }
+    // });
+    // }
+    // });
 
     searchPanel = new SearchPanel(filter, ALL_FILTER, messages.searchPlaceHolder(), false, false, false);
     searchPanel.setDefaultFilterIncremental(true);
@@ -303,6 +333,11 @@ public class BrowseRepresentation extends Composite {
       newDescriptiveMetadata.setVisible(true);
       itemMetadata.setVisible(false);
     }
+
+    // renameFiles.setEnabled(false);
+    // moveFiles.setEnabled(false);
+    // uploadFiles.setEnabled(true);
+    // createFolder.setEnabled(true);
   }
 
   @Override
@@ -433,20 +468,38 @@ public class BrowseRepresentation extends Composite {
         @Override
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
-            SelectedItemsList<IndexedRepresentation> selected = new SelectedItemsList<IndexedRepresentation>(
-              Arrays.asList(repId), IndexedRepresentation.class.getName());
-            BrowserService.Util.getInstance().deleteRepresentation(selected, new AsyncCallback<Void>() {
+            SelectedItems selected = (SelectedItems) filesList.getSelected();
 
-              @Override
-              public void onSuccess(Void result) {
-                Tools.newHistory(Browse.RESOLVER, aipId);
-              }
+            if (ClientSelectedItemsUtils.isEmpty(selected)) {
+              selected = new SelectedItemsList<IndexedRepresentation>(Arrays.asList(repId),
+                IndexedRepresentation.class.getName());
 
-              @Override
-              public void onFailure(Throwable caught) {
-                AsyncCallbackUtils.defaultFailureTreatment(caught);
-              }
-            });
+              BrowserService.Util.getInstance().deleteRepresentation(selected, new AsyncCallback<Void>() {
+
+                @Override
+                public void onSuccess(Void result) {
+                  Tools.newHistory(Browse.RESOLVER, aipId);
+                }
+
+                @Override
+                public void onFailure(Throwable caught) {
+                  AsyncCallbackUtils.defaultFailureTreatment(caught);
+                }
+              });
+            } else {
+              BrowserService.Util.getInstance().deleteFile(selected, new AsyncCallback<Void>() {
+
+                @Override
+                public void onSuccess(Void result) {
+                  filesList.refresh();
+                }
+
+                @Override
+                public void onFailure(Throwable caught) {
+                  AsyncCallbackUtils.defaultFailureTreatment(caught);
+                }
+              });
+            }
           }
         }
 
@@ -459,11 +512,16 @@ public class BrowseRepresentation extends Composite {
 
   @UiHandler("newProcess")
   void buttonNewProcessHandler(ClickEvent e) {
-    if (repId != null) {
-      LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-      selectedItems.setSelectedItems(SelectedItemsList.create(IndexedRepresentation.class, repId));
-      Tools.newHistory(CreateJob.RESOLVER, "action");
+    SelectedItems selected = (SelectedItems) filesList.getSelected();
+
+    if (ClientSelectedItemsUtils.isEmpty(selected)) {
+      selected = new SelectedItemsList<IndexedRepresentation>(Arrays.asList(repId),
+        IndexedRepresentation.class.getName());
     }
+
+    LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+    selectedItems.setSelectedItems(selected);
+    Tools.newHistory(CreateJob.RESOLVER, "action");
   }
 
   @UiHandler("risks")

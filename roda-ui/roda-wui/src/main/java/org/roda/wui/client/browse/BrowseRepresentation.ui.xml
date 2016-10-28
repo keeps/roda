@@ -75,11 +75,8 @@
 						</g:FlowPanel>
 <!-- 						<g:FlowPanel ui:field="filesSidebar"> -->
 <!-- 							<g:Label addStyleNames="h4"> -->
-<!-- 								<ui:text from='{messages.filesTitle}' /> -->
+<!-- 								<ui:text from='{messages.sidebarFoldersFilesTitle}' /> -->
 <!-- 							</g:Label> -->
-<!-- 							<g:Button addStyleNames="btn btn-play" ui:field="newFilesProcess"> -->
-<!-- 								<ui:text from='{messages.newProcessPreservation}' /> -->
-<!-- 							</g:Button> -->
 <!-- 							<g:Button addStyleNames="btn btn-edit" ui:field="renameFiles"> -->
 <!-- 								<ui:text from='{messages.renameButton}' /> -->
 <!-- 							</g:Button> -->
@@ -91,10 +88,6 @@
 <!-- 							</g:Button> -->
 <!-- 							<g:Button addStyleNames="btn btn-plus" ui:field="createFolder"> -->
 <!-- 								<ui:text from='{messages.createFolderButton}' /> -->
-<!-- 							</g:Button> -->
-<!-- 							<g:Button addStyleNames="btn btn-danger btn-ban" -->
-<!-- 								ui:field="removeFiles"> -->
-<!-- 								<ui:text from='{messages.removeWholeFolderButton}' /> -->
 <!-- 							</g:Button> -->
 <!-- 						</g:FlowPanel> -->
 					</g:FlowPanel>
