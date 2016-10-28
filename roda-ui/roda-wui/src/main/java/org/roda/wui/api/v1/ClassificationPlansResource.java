@@ -8,9 +8,11 @@
 package org.roda.wui.api.v1;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -19,6 +21,7 @@ import javax.ws.rs.core.StreamingOutput;
 import org.roda.core.common.ConsumesOutputStream;
 import org.roda.core.common.StreamResponse;
 import org.roda.core.common.UserUtility;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
@@ -26,6 +29,7 @@ import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.common.server.RodaStreamingOutput;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiParam;
 
 /**
  * @author Hélder Silva <hsilva@keep.pt>
@@ -41,13 +45,15 @@ public class ClassificationPlansResource {
 
   @GET
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  public Response getClassificationPlan() throws RODAException {
+  public Response getClassificationPlan(
+    @DefaultValue("plan.json") @ApiParam(value = "Choose file name", defaultValue = "plan.json") @QueryParam(RodaConstants.API_QUERY_KEY_FILENAME) String filename)
+    throws RODAException {
 
     // get user
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    ConsumesOutputStream cos = Browser.retrieveClassificationPlan(user);
+    ConsumesOutputStream cos = Browser.retrieveClassificationPlan(user, filename);
     StreamingOutput streamingOutput = new RodaStreamingOutput(cos);
 
     return ApiUtils.okResponse(new StreamResponse(cos.getFileName(), cos.getMediaType(), streamingOutput));

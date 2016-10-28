@@ -7,13 +7,10 @@
  */
 package org.roda.wui.api.controllers;
 
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.io.StringWriter;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -21,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -37,11 +33,11 @@ import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.net.util.Base64;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.ClassificationPlanUtils;
 import org.roda.core.common.ConsumesOutputStream;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.common.IdUtils;
@@ -156,10 +152,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 
@@ -1513,121 +1505,10 @@ public class BrowserHelper {
     RodaCoreFactory.getTransferredResourcesScanner().updateAllTransferredResources(subFolderUUID, waitToFinish);
   }
 
-  // TODO Limit access to SDO accessible by user
-  public static ConsumesOutputStream retrieveClassificationPlan(User user)
+  public static ConsumesOutputStream retrieveClassificationPlan(User user, String filename)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    try {
-      JsonFactory factory = new JsonFactory();
-      ObjectMapper mapper = new ObjectMapper(factory);
-      ObjectNode root = mapper.createObjectNode();
+    return ClassificationPlanUtils.retrieveClassificationPlan(user, filename);
 
-      ArrayNode array = mapper.createArrayNode();
-      List<String> descriptionsLevels = RodaUtils
-        .copyList(RodaCoreFactory.getRodaConfiguration().getList(RodaConstants.LEVELS_CLASSIFICATION_PLAN));
-
-      Filter allButRepresentationsFilter = new Filter(
-        new OneOfManyFilterParameter(RodaConstants.AIP_LEVEL, descriptionsLevels));
-
-      IndexService index = RodaCoreFactory.getIndexService();
-      boolean justActive = true;
-      boolean removeDuplicates = true;
-      IterableIndexResult<IndexedAIP> res = index.findAll(IndexedAIP.class, allButRepresentationsFilter, null,
-        Sublist.ALL, user, justActive, removeDuplicates);
-      Iterator<IndexedAIP> it = res.iterator();
-      while (it.hasNext()) {
-        array.add(aipToJSON(it.next()));
-      }
-
-      root.set("dos", array);
-      StringWriter sw = new StringWriter();
-      mapper.writeValue(sw, root);
-
-      ConsumesOutputStream stream = new ConsumesOutputStream() {
-
-        @Override
-        public void consumeOutputStream(OutputStream out) throws IOException {
-          BufferedOutputStream bos = new BufferedOutputStream(out);
-          try {
-            IOUtils.write(sw.toString(), bos, Charset.defaultCharset());
-          } catch (IOException e) {
-            throw e;
-          } finally {
-            IOUtils.closeQuietly(bos);
-            IOUtils.closeQuietly(out);
-          }
-
-        }
-
-        @Override
-        public String getFileName() {
-          return "plan.json";
-        }
-
-        @Override
-        public String getMediaType() {
-          return MediaType.APPLICATION_JSON;
-        }
-
-      };
-      return stream;
-    } catch (IOException e) {
-      throw new GenericException("Error creating classification plan", e);
-    }
-
-  }
-
-  /**
-   * @deprecated this method should be replaced by a specialized class to
-   *             marshal and unmarshal a classification plans
-   */
-  @Deprecated
-  public static ObjectNode aipToJSON(IndexedAIP indexedAIP)
-    throws IOException, RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    JsonFactory factory = new JsonFactory();
-    ObjectMapper mapper = new ObjectMapper(factory);
-    ModelService model = RodaCoreFactory.getModelService();
-
-    ObjectNode node = mapper.createObjectNode();
-    if (indexedAIP.getTitle() != null) {
-      node = node.put("title", indexedAIP.getTitle());
-    }
-    if (indexedAIP.getId() != null) {
-      node = node.put("id", indexedAIP.getId());
-    }
-    if (indexedAIP.getParentID() != null) {
-      node = node.put("parentId", indexedAIP.getParentID());
-    }
-    if (indexedAIP.getLevel() != null) {
-      node = node.put("descriptionlevel", indexedAIP.getLevel());
-    }
-
-    AIP modelAIP = model.retrieveAIP(indexedAIP.getId());
-    if (modelAIP != null) {
-      List<DescriptiveMetadata> descriptiveMetadata = modelAIP.getDescriptiveMetadata();
-      if (descriptiveMetadata != null && !descriptiveMetadata.isEmpty()) {
-        ArrayNode metadata = mapper.createArrayNode();
-        for (DescriptiveMetadata dm : descriptiveMetadata) {
-          ObjectNode dmNode = mapper.createObjectNode();
-          if (dm.getId() != null) {
-            dmNode = dmNode.put("id", dm.getId());
-          }
-          if (dm.getType() != null) {
-            dmNode = dmNode.put("metadataType", dm.getType());
-          }
-          if (dm.getVersion() != null) {
-            dmNode = dmNode.put("metadataVersion", dm.getVersion());
-          }
-          Binary b = model.retrieveDescriptiveMetadataBinary(modelAIP.getId(), dm.getId());
-          InputStream is = b.getContent().createInputStream();
-          dmNode = dmNode.put("content", new String(Base64.encodeBase64(IOUtils.toByteArray(is))));
-          IOUtils.closeQuietly(is);
-          dmNode = dmNode.put("contentEncoding", "Base64");
-          metadata = metadata.add(dmNode);
-        }
-        node.set("metadata", metadata);
-      }
-    }
-    return node;
   }
 
   public static List<SupportedMetadataTypeBundle> retrieveSupportedMetadata(User user, IndexedAIP aip, Locale locale)
