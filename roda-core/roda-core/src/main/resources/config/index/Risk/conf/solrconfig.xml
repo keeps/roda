@@ -564,55 +564,6 @@
     </arr>
   </requestHandler>
   
-  <!-- SUGGESTER -->
-
-	<searchComponent name="suggest" class="solr.SuggestComponent">
-		<lst name="suggester">
-			<str name="name">categorySuggester</str>
-			<str name="lookupImpl">FuzzyLookupFactory</str>
-			<str name="dictionaryImpl">DocumentDictionaryFactory</str>
-			<str name="field">category</str>
-			<str name="suggestAnalyzerFieldType">text_general</str>
-			<str name="buildOnStartup">true</str>
-			<str name="buildOnOptimize">true</str>
-			<!-- XXX Remove this on production? -->
-			<str name="buildOnCommit">true</str>
-		</lst>
-		<lst name="suggester">
-			<str name="name">identifiedBySuggester</str>
-			<str name="lookupImpl">FuzzyLookupFactory</str>
-			<str name="dictionaryImpl">DocumentDictionaryFactory</str>
-			<str name="field">identifiedBy</str>
-			<str name="suggestAnalyzerFieldType">text_general</str>
-			<str name="buildOnStartup">true</str>
-			<str name="buildOnOptimize">true</str>
-			<!-- XXX Remove this on production? -->
-			<str name="buildOnCommit">true</str>
-		</lst>
-		<lst name="suggester">
-			<str name="name">mitigationOwnerSuggester</str>
-			<str name="lookupImpl">FuzzyLookupFactory</str>
-			<str name="dictionaryImpl">DocumentDictionaryFactory</str>
-			<str name="field">mitigationOwner</str>
-			<str name="suggestAnalyzerFieldType">text_general</str>
-			<str name="buildOnStartup">true</str>
-			<str name="buildOnOptimize">true</str>
-			<!-- XXX Remove this on production? -->
-			<str name="buildOnCommit">true</str>
-		</lst>
-	</searchComponent>
-	
-	<requestHandler name="/suggest" class="solr.SearchHandler"
-		startup="lazy">
-		<lst name="defaults">
-			<str name="suggest">true</str>
-			<str name="suggest.count">10</str>
-		</lst>
-		<arr name="components">
-			<str>suggest</str>
-		</arr>
-	</requestHandler>
-
   <!-- Legacy config for the admin interface -->
   <admin>
     <defaultQuery>*:*</defaultQuery>

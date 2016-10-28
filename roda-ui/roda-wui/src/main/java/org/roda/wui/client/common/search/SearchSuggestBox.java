@@ -17,12 +17,13 @@ import com.google.gwt.user.client.ui.SuggestBox;
 public class SearchSuggestBox<T extends IsIndexed> extends Composite {
 
   private SuggestBox suggestBox;
+  private boolean allowPartial;
 
-  public SearchSuggestBox(Class<T> classToRequest, String facet) {
-    suggestBox = new SuggestBox(new SearchSuggestOracle<T>(classToRequest, facet));
+  public SearchSuggestBox(Class<T> classToRequest, String facet, boolean allowPartial) {
+    this.allowPartial = allowPartial;
+    suggestBox = new SuggestBox(new SearchSuggestOracle<T>(classToRequest, facet, allowPartial));
     initWidget(suggestBox);
     suggestBox.addStyleName("form-textbox");
-
   }
 
   public String getValue() {
@@ -31,6 +32,10 @@ public class SearchSuggestBox<T extends IsIndexed> extends Composite {
 
   public void setValue(String value) {
     suggestBox.setValue(value);
+  }
+  
+  public boolean isAllowPartial(){
+    return allowPartial;
   }
 
   public HandlerRegistration addValueChangeHandler(ValueChangeHandler<String> handler) {

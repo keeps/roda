@@ -159,9 +159,9 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
   public RiskDataPanel(final boolean editmode, final IndexedRisk risk, final String categoryField,
     final String identifiedByField, final String ownerField) {
 
-    category = new SearchSuggestBox<IndexedRisk>(IndexedRisk.class, categoryField);
-    identifiedBy = new SearchSuggestBox<IndexedRisk>(IndexedRisk.class, identifiedByField);
-    mitigationOwner = new SearchSuggestBox<IndexedRisk>(IndexedRisk.class, ownerField);
+    category = new SearchSuggestBox<IndexedRisk>(IndexedRisk.class, categoryField,false);
+    identifiedBy = new SearchSuggestBox<IndexedRisk>(IndexedRisk.class, identifiedByField,false);
+    mitigationOwner = new SearchSuggestBox<IndexedRisk>(IndexedRisk.class, ownerField,false);
 
     initWidget(uiBinder.createAndBindUi(this));
 

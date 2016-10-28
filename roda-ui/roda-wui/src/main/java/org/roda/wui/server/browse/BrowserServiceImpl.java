@@ -225,11 +225,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public <T extends IsIndexed> List<String> suggest(String classNameToReturn, String field, String query)
+  public <T extends IsIndexed> List<String> suggest(String classNameToReturn, String field, String query, boolean allowPartial)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Class<T> classToReturn = SelectedItemsUtils.parseClass(classNameToReturn);
-    return Browser.suggest(user, classToReturn, field, query);
+    return Browser.suggest(user, classToReturn, field, query, allowPartial);
   }
 
   public List<IndexedAIP> retrieveAncestors(IndexedAIP aip)

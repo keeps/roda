@@ -378,16 +378,16 @@ public class MainSearch extends Composite {
   private void setSuggestions(String searchFieldId, SearchFieldPanel searchFieldPanel) {
     if (searchFieldId.equals(RodaConstants.FILE_FILEFORMAT)) {
       searchFieldPanel
-        .addInputSearchSuggestBox(new SearchSuggestBox<IndexedFile>(IndexedFile.class, RodaConstants.FILE_FILEFORMAT));
+        .addInputSearchSuggestBox(new SearchSuggestBox<IndexedFile>(IndexedFile.class, RodaConstants.FILE_FILEFORMAT,true));
     } else if (searchFieldId.equals(RodaConstants.FILE_PRONOM)) {
       searchFieldPanel
-        .addInputSearchSuggestBox(new SearchSuggestBox<IndexedFile>(IndexedFile.class, RodaConstants.FILE_PRONOM));
+        .addInputSearchSuggestBox(new SearchSuggestBox<IndexedFile>(IndexedFile.class, RodaConstants.FILE_PRONOM,false));
     } else if (searchFieldId.equals(RodaConstants.FILE_FORMAT_MIMETYPE)) {
       searchFieldPanel.addInputSearchSuggestBox(
-        new SearchSuggestBox<IndexedFile>(IndexedFile.class, RodaConstants.FILE_FORMAT_MIMETYPE));
+        new SearchSuggestBox<IndexedFile>(IndexedFile.class, RodaConstants.FILE_FORMAT_MIMETYPE,false));
     } else if (searchFieldId.equals(RodaConstants.REPRESENTATION_TYPE)) {
       searchFieldPanel.addInputSearchSuggestBox(
-        new SearchSuggestBox<IndexedRepresentation>(IndexedRepresentation.class, RodaConstants.REPRESENTATION_TYPE));
+        new SearchSuggestBox<IndexedRepresentation>(IndexedRepresentation.class, RodaConstants.REPRESENTATION_TYPE,false));
     }
   }
 

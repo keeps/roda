@@ -120,6 +120,7 @@
    <field name="formatPronom" type="string" indexed="true" stored="true" required="false" multiValued="false" />  
    <field name="isEntryPoint" type="boolean" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="fileFormat" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
+  
    <field name="originalName" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="size" type="long" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="isDirectory" type="boolean" indexed="true" stored="true" required="false" multiValued="false" /> 
@@ -138,9 +139,12 @@
    <copyField source="path" dest="search"/>
    <copyField source="fileId" dest="search"/>
    <copyField source="formatMimetype" dest="search"/>
+   <copyField source="formatMimetype" dest="formatMimetype_txt"/>
    <copyField source="formatVersion" dest="search"/>
    <copyField source="formatPronom" dest="search"/>
+   <copyField source="formatPronom" dest="formatPronom_txt"/>
    <copyField source="fileFormat" dest="search"/>
+   <copyField source="fileFormat" dest="fileFormat_txt"/>
    <copyField source="originalName" dest="search"/>
    <copyField source="extension" dest="search"/>
    <copyField source="fulltext" dest="search"/>

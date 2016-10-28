@@ -110,8 +110,8 @@
    <field name="description" type="text_general" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="identifiedOn" type="tdate" indexed="true" stored="true" required="true" multiValued="false" /> 
    <field name="identifiedBy" type="string" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="category" type="string" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="notes" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />
+  <field name="category" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+  <field name="notes" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />
    
    <field name="preMitigationProbability" type="int" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="preMitigationImpact" type="int" indexed="true" stored="true" required="true" multiValued="false" />
@@ -141,7 +141,12 @@
    <field name="search" type="text_general" indexed="true" stored="false" multiValued="true" />
    
    <copyField source="*" dest="search" />
-
+   <copyField source="category" dest="category_txt" />
+   <copyField source="mitigationOwner" dest="mitigationOwner_txt" />
+   <copyField source="identifiedBy" dest="identifiedBy_txt" />
+  
+  
+  
    <!-- Dynamic field definitions allow using convention over configuration
        for fields via the specification of patterns to match field names. 
        EXAMPLE:  name="*_i" will match any field ending in _i (like myid_i, z_i)

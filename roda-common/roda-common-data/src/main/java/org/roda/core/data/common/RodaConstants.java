@@ -1022,6 +1022,8 @@ public final class RodaConstants {
 
   /* Dialog filter limit */
   public static final int DIALOG_FILTER_LIMIT_NUMBER = 120;
+  
+  public static final String INDEX_SEARCH_SUFFIX = "_txt";
 
   /** Private empty constructor */
   private RodaConstants() {

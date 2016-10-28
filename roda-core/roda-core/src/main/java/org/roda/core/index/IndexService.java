@@ -487,10 +487,10 @@ public class IndexService {
     SolrUtils.commit(getSolrClient(), classToCommit);
   }
 
-  public <T extends IsIndexed> List<String> suggest(Class<T> returnClass, String field, String query, User user)
-    throws GenericException {
+  public <T extends IsIndexed> List<String> suggest(Class<T> returnClass, String field, String query, User user,
+    boolean allowPartial) throws GenericException {
     boolean justActive = true;
-    return SolrUtils.suggest(getSolrClient(), returnClass, field, query, justActive, user);
+    return SolrUtils.suggest(getSolrClient(), returnClass, field, query, justActive, user, allowPartial);
   }
 
   public <T extends IsIndexed> void execute(Class<T> classToRetrieve, Filter filter, IndexRunnable<T> indexRunnable)

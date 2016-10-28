@@ -21,16 +21,18 @@ public class SearchSuggestOracle<T extends IsIndexed> extends SuggestOracle {
 
   private Class<T> classToRequest;
   private String field;
+  private boolean allowPartial;
 
-  public SearchSuggestOracle(Class<T> classToRequest, String field) {
+  public SearchSuggestOracle(Class<T> classToRequest, String field, boolean allowPartial) {
     this.classToRequest = classToRequest;
     this.field = field;
+    this.allowPartial = allowPartial;
   }
 
   @Override
   public void requestSuggestions(final Request request, final Callback callback) {
 
-    BrowserService.Util.getInstance().suggest(classToRequest.getName(), field, request.getQuery(),
+    BrowserService.Util.getInstance().suggest(classToRequest.getName(), field, request.getQuery(),allowPartial,
       new AsyncCallback<List<String>>() {
 
         @Override

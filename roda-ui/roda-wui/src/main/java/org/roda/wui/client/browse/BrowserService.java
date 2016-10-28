@@ -197,7 +197,7 @@ public interface BrowserService extends RemoteService {
   <T extends IsIndexed> void delete(String classNameToReturn, SelectedItems<T> ids)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
-  <T extends IsIndexed> List<String> suggest(String classNameToReturn, String field, String query)
+  <T extends IsIndexed> List<String> suggest(String classNameToReturn, String field, String query, boolean allowPartial)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
   void updateAIPPermissions(List<IndexedAIP> aips, Permissions permissions, boolean recursive)

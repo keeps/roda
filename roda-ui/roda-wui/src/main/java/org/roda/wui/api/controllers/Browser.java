@@ -320,7 +320,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static <T extends IsIndexed> List<String> suggest(final User user, final Class<T> classToReturn,
-    final String field, final String query) throws AuthorizationDeniedException, GenericException, NotFoundException {
+    final String field, final String query, boolean allowPartial) throws AuthorizationDeniedException, GenericException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -329,7 +329,7 @@ public class Browser extends RodaWuiController {
     // delegate
     // TODO suggest must integrate the user filter to disallow view of
     // information with permission
-    final List<String> ret = BrowserHelper.suggest(classToReturn, field, query, user);
+    final List<String> ret = BrowserHelper.suggest(classToReturn, field, query, user, allowPartial);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_CLASS_PARAM,

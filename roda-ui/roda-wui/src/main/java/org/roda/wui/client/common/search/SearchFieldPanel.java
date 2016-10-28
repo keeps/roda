@@ -275,7 +275,7 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
       } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_BOOLEAN) && valid(inputCheckBox)) {
         filterParameter = new SimpleFilterParameter(field, Boolean.toString(inputCheckBox.getValue()));
       } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_SUGGEST) && valid(inputSearchSuggestBox)) {
-        filterParameter = new SimpleFilterParameter(field, inputSearchSuggestBox.getValue());
+        filterParameter = new SimpleFilterParameter(inputSearchSuggestBox.isAllowPartial()?field+RodaConstants.INDEX_SEARCH_SUFFIX:field, inputSearchSuggestBox.getValue());
       } else if(type.equals(RodaConstants.SEARCH_FIELD_TYPE_CONTROLLED)){ 
         filterParameter = new SimpleFilterParameter(field, inputControlled.getSelectedValue());
       }else if (valid(inputText)) {

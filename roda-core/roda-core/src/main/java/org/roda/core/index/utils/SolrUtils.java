@@ -2306,29 +2306,26 @@ public class SolrUtils {
     doc.addField(RodaConstants.INDEX_UUID, doc.getFieldValue(RodaConstants.PRESERVATION_EVENT_ID));
     return doc;
   }
-  
 
   public static <T extends IsIndexed> List<String> suggest(SolrClient index, Class<T> classToRetrieve, String field,
-    String queryString, boolean justActive, User user) throws GenericException {
-
-    String dictionaryName = field + "Suggester";
-
+    String queryString, boolean justActive, User user, boolean allowPartial) throws GenericException {
+    StringBuilder queryBuilder = new StringBuilder();
+    appendKeyValue(queryBuilder, field + RodaConstants.INDEX_SEARCH_SUFFIX, queryString + "*");
     SolrQuery query = new SolrQuery();
-    query.setRequestHandler("/suggest");
-    query.setParam("suggest", "true");
-    query.setParam("suggest.dictionary", dictionaryName);
-    query.setParam("suggest.q", queryString);
-
+    query.setParam("q.op", DEFAULT_QUERY_PARSER_OPERATOR);
+    query.setQuery(queryBuilder.toString());
     if (hasPermissionFilters(classToRetrieve)) {
       query.addFilterQuery(getFilterQueries(user, justActive));
     }
-    
+    parseAndConfigureFacets(new Facets(new SimpleFacetParameter(field)), query);
+    List<String> suggestions = new ArrayList<>();
     try {
       QueryResponse response = index.query(getIndexName(classToRetrieve).get(0), query);
-      return response.getSuggesterResponse().getSuggestedTerms().get(dictionaryName);
+      response.getFacetField(field).getValues().forEach(count -> suggestions.add(count.getName()));
     } catch (SolrServerException | IOException e) {
       throw new GenericException("Could not get suggestions", e);
     }
+    return suggestions;
   }
 
   public static <T extends IsIndexed> void execute(SolrClient index, Class<T> classToRetrieve, Filter filter,
