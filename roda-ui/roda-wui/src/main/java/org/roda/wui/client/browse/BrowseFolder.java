@@ -116,9 +116,6 @@ public class BrowseFolder extends Composite {
               }
             }
           });
-      } else if (historyTokens.size() > 0
-        && historyTokens.get(0).equals(TransferUpload.BROWSE_RESOLVER.getHistoryToken())) {
-        TransferUpload.BROWSE_RESOLVER.resolve(Tools.tail(historyTokens), callback);
       } else {
         errorRedirect(callback);
       }
@@ -189,7 +186,7 @@ public class BrowseFolder extends Composite {
   SearchFileList filesList;
 
   // private BrowseItemBundle itemBundle;
-  // private IndexedFile folder;
+  private IndexedFile folder;
   private String aipId;
   private String repId;
   private String folderUUID;
@@ -198,7 +195,7 @@ public class BrowseFolder extends Composite {
 
   private BrowseFolder(BrowseItemBundle itemBundle, IndexedFile folder) {
     // this.itemBundle = itemBundle;
-    // this.folder = folder;
+    this.folder = folder;
     this.aipId = folder.getAipId();
     this.repId = folder.getRepresentationUUID();
     this.folderUUID = folder.getUUID();
@@ -228,11 +225,9 @@ public class BrowseFolder extends Composite {
 
       @Override
       public void onSelectionChange(SelectedItems<IndexedFile> selected) {
-        SelectedItems<IndexedFile> files = (SelectedItems<IndexedFile>) filesList.getSelected();
-
-        if (ClientSelectedItemsUtils.isEmpty(files)) {
-          files = new SelectedItemsList<IndexedFile>(Arrays.asList(folderUUID), IndexedFile.class.getName());
-        }
+        final SelectedItems<IndexedFile> files = !ClientSelectedItemsUtils.isEmpty(filesList.getSelected())
+          ? filesList.getSelected()
+          : new SelectedItemsList<IndexedFile>(Arrays.asList(folderUUID), IndexedFile.class.getName());
 
         boolean empty = ClientSelectedItemsUtils.isEmpty(selected);
         createFolder.setEnabled(empty);
@@ -246,7 +241,25 @@ public class BrowseFolder extends Composite {
 
           @Override
           public void onSuccess(Long result) {
-            rename.setEnabled(result == 1);
+            if (result == 1 && files instanceof SelectedItemsList) {
+              SelectedItemsList<IndexedFile> fileList = (SelectedItemsList<IndexedFile>) files;
+
+              BrowserService.Util.getInstance().retrieve(IndexedFile.class.getName(), fileList.getIds().get(0),
+                new AsyncCallback<IndexedFile>() {
+
+                  @Override
+                  public void onSuccess(IndexedFile file) {
+                    rename.setEnabled(file.isDirectory());
+                  }
+
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    // do nothing
+                  }
+                });
+            } else {
+              rename.setEnabled(false);
+            }
           }
         });
       }
@@ -298,11 +311,11 @@ public class BrowseFolder extends Composite {
 
         @Override
         public void onFailure(Throwable caught) {
-          Toast.showInfo(messages.dialogFailure(), messages.renameFailed());
+          // do nothing
         }
 
         @Override
-        public void onSuccess(String newName) {
+        public void onSuccess(final String newName) {
           BrowserService.Util.getInstance().renameFolder(folderUUID, newName, new LoadingAsyncCallback<String>() {
 
             @Override
@@ -311,6 +324,7 @@ public class BrowseFolder extends Composite {
               Tools.newHistory(BrowseFolder.RESOLVER, aipId, repId, newUUID);
             }
           });
+
         }
       });
   }
@@ -322,6 +336,7 @@ public class BrowseFolder extends Composite {
       new SimpleFilterParameter(RodaConstants.FILE_AIP_ID, aipId),
       new SimpleFilterParameter(RodaConstants.FILE_ISDIRECTORY, Boolean.toString(true)));
     SelectFileDialog selectFileDialog = new SelectFileDialog(messages.moveItemTitle(), filter, true, false);
+    selectFileDialog.setEmptyParentButtonVisible(true);
     selectFileDialog.setSingleSelectionMode();
     selectFileDialog.showAndCenter();
     selectFileDialog.addValueChangeHandler(new ValueChangeHandler<IndexedFile>() {
@@ -335,30 +350,35 @@ public class BrowseFolder extends Composite {
           selected = new SelectedItemsList<IndexedFile>(Arrays.asList(folderUUID), IndexedFile.class.getName());
         }
 
-        BrowserService.Util.getInstance().moveFiles(aipId, selected, toFolder, new LoadingAsyncCallback<String>() {
+        BrowserService.Util.getInstance().moveFiles(aipId, repId, selected, toFolder,
+          new LoadingAsyncCallback<String>() {
 
-          @Override
-          public void onSuccessImpl(String newUUID) {
-            Tools.newHistory(BrowseFolder.RESOLVER, aipId, repId, newUUID);
-          }
-
-          @Override
-          public void onFailureImpl(Throwable caught) {
-            if (caught instanceof NotFoundException) {
-              Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-            } else {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
+            @Override
+            public void onSuccessImpl(String newUUID) {
+              if (newUUID != null) {
+                Tools.newHistory(BrowseFolder.RESOLVER, aipId, repId, newUUID);
+              } else {
+                Tools.newHistory(BrowseRepresentation.RESOLVER, aipId, repId);
+              }
             }
-          }
 
-        });
+            @Override
+            public void onFailureImpl(Throwable caught) {
+              if (caught instanceof NotFoundException) {
+                Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+              } else {
+                AsyncCallbackUtils.defaultFailureTreatment(caught);
+              }
+            }
+
+          });
       }
     });
   }
 
   @UiHandler("uploadFiles")
   void buttonUploadFilesHandler(ClickEvent e) {
-    Tools.newHistory(RESOLVER, TransferUpload.BROWSE_RESOLVER.getHistoryToken(), aipId, repId, folderUUID);
+    Tools.newHistory(Browse.RESOLVER, TransferUpload.BROWSE_RESOLVER.getHistoryToken(), aipId, repId, folderUUID);
   }
 
   @UiHandler("createFolder")
@@ -372,49 +392,98 @@ public class BrowseFolder extends Composite {
 
         @Override
         public void onSuccess(String newName) {
-          BrowserService.Util.getInstance().createFolder(folderUUID, newName, new LoadingAsyncCallback<String>() {
+          BrowserService.Util.getInstance().createFolder(aipId, repId, folderUUID, newName,
+            new LoadingAsyncCallback<String>() {
 
-            @Override
-            public void onSuccessImpl(String newUUID) {
-              filesList.refresh();
-            }
-
-            @Override
-            public void onFailureImpl(Throwable caught) {
-              if (caught instanceof NotFoundException) {
-                Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-              } else {
-                AsyncCallbackUtils.defaultFailureTreatment(caught);
+              @Override
+              public void onSuccessImpl(String newUUID) {
+                filesList.refresh();
               }
-            }
 
-          });
+              @Override
+              public void onFailureImpl(Throwable caught) {
+                if (caught instanceof NotFoundException) {
+                  Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+                } else {
+                  AsyncCallbackUtils.defaultFailureTreatment(caught);
+                }
+              }
+
+            });
         }
       });
   }
 
   @UiHandler("remove")
   void buttonRemoveHandler(ClickEvent e) {
-    SelectedItems<IndexedFile> files = (SelectedItems<IndexedFile>) filesList.getSelected();
+    final SelectedItems<IndexedFile> files = (SelectedItems<IndexedFile>) filesList.getSelected();
+    final boolean deleteItself = ClientSelectedItemsUtils.isEmpty(files);
+    final String folderParent = folder.getParentUUID();
 
-    if (ClientSelectedItemsUtils.isEmpty(files)) {
-      files = new SelectedItemsList<IndexedFile>(Arrays.asList(folderUUID), IndexedFile.class.getName());
+    if (deleteItself) {
+      final SelectedItems<IndexedFile> file = new SelectedItemsList<IndexedFile>(Arrays.asList(folderUUID),
+        IndexedFile.class.getName());
+
+      Dialogs.showConfirmDialog(messages.fileRemoveTitle(), messages.folderRemoveMessage(), messages.dialogCancel(),
+        messages.dialogYes(), new AsyncCallback<Boolean>() {
+
+          @Override
+          public void onSuccess(Boolean confirmed) {
+            if (confirmed) {
+              BrowserService.Util.getInstance().deleteFile(file, new LoadingAsyncCallback<Void>() {
+
+                @Override
+                public void onFailureImpl(Throwable caught) {
+                  AsyncCallbackUtils.defaultFailureTreatment(caught);
+                }
+
+                @Override
+                public void onSuccessImpl(Void returned) {
+                  Toast.showInfo(messages.removeSuccessTitle(), messages.removeAllSuccessMessage());
+                  if (folderParent == null) {
+                    Tools.newHistory(BrowseRepresentation.RESOLVER, aipId, repId);
+                  } else {
+                    Tools.newHistory(BrowseFolder.RESOLVER, aipId, repId, folderParent);
+                  }
+                }
+              });
+            }
+          }
+
+          @Override
+          public void onFailure(Throwable caught) {
+            // nothing to do
+          }
+        });
+    } else {
+      Dialogs.showConfirmDialog(messages.filesRemoveTitle(), messages.selectedFileRemoveMessage(),
+        messages.dialogCancel(), messages.dialogYes(), new AsyncCallback<Boolean>() {
+
+          @Override
+          public void onSuccess(Boolean confirmed) {
+            if (confirmed) {
+              BrowserService.Util.getInstance().deleteFile(files, new LoadingAsyncCallback<Void>() {
+
+                @Override
+                public void onFailureImpl(Throwable caught) {
+                  AsyncCallbackUtils.defaultFailureTreatment(caught);
+                }
+
+                @Override
+                public void onSuccessImpl(Void returned) {
+                  Toast.showInfo(messages.removeSuccessTitle(), messages.removeAllSuccessMessage());
+                  filesList.refresh();
+                }
+              });
+            }
+          }
+
+          @Override
+          public void onFailure(Throwable caught) {
+            // nothing to do
+          }
+        });
     }
-
-    BrowserService.Util.getInstance().deleteFile(files, new LoadingAsyncCallback<Void>() {
-
-      @Override
-      public void onFailureImpl(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-        filesList.refresh();
-      }
-
-      @Override
-      public void onSuccessImpl(Void returned) {
-        Toast.showInfo(messages.removeSuccessTitle(), messages.removeAllSuccessMessage());
-        filesList.refresh();
-      }
-    });
   }
 
   @UiHandler("newProcess")

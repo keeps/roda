@@ -1859,24 +1859,8 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static String moveFiles(User user, String aipId, SelectedItems<IndexedFile> selectedFiles,
-    IndexedFile toFolder) throws AuthorizationDeniedException, GenericException, RequestNotValidException,
-    AlreadyExistsException, NotFoundException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    // delegate
-    String ret = BrowserHelper.moveFiles(aipId, selectedFiles, toFolder);
-
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
-      RodaConstants.CONTROLLER_FILES_PARAM, selectedFiles, RodaConstants.CONTROLLER_FILE_PARAM, toFolder);
-    return ret;
-  }
-
-  public static String createFolder(User user, String folderUUID, String newName) throws AuthorizationDeniedException,
+  public static String moveFiles(User user, String aipId, String representationUUID,
+    SelectedItems<IndexedFile> selectedFiles, IndexedFile toFolder) throws AuthorizationDeniedException,
     GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1884,7 +1868,24 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     // delegate
-    String ret = BrowserHelper.createFolder(folderUUID, newName);
+    String ret = BrowserHelper.moveFiles(aipId, representationUUID, selectedFiles, toFolder);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
+      RodaConstants.CONTROLLER_FILES_PARAM, selectedFiles, RodaConstants.CONTROLLER_FILE_PARAM, toFolder);
+    return ret;
+  }
+
+  public static String createFolder(User user, String aipId, String representationUUID, String folderUUID,
+    String newName) throws AuthorizationDeniedException, GenericException, RequestNotValidException,
+    AlreadyExistsException, NotFoundException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    String ret = BrowserHelper.createFolder(aipId, representationUUID, folderUUID, newName);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_FILE_UUID_PARAM,
@@ -1926,7 +1927,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static File createFile(User user, String aipId, String representationId, List<String> directoryPath,
+  public static File createFile(User user, String aipId, String representationUUID, List<String> directoryPath,
     String fileId, InputStream is) throws AuthorizationDeniedException, GenericException, RequestNotValidException,
     NotFoundException, AlreadyExistsException, IOException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -1934,6 +1935,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
+    IndexedRepresentation rep = BrowserHelper.retrieve(IndexedRepresentation.class, representationUUID);
     UserUtility.checkAIPPermissions(user, aip, PermissionType.CREATE);
 
     // delegate
@@ -1941,11 +1943,12 @@ public class Browser extends RodaWuiController {
     Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
     ContentPayload payload = new FSPathContentPayload(file);
 
-    File updatedFile = BrowserHelper.createFile(aipId, representationId, directoryPath, fileId, payload);
+    File updatedFile = BrowserHelper.createFile(aipId, rep.getId(), directoryPath, fileId, payload);
+    BrowserHelper.commit(IndexedFile.class);
 
     // register action
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIP_ID_PARAM,
-      aipId, RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId,
+      aipId, RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, rep.getId(),
       RodaConstants.CONTROLLER_DIRECTORY_PATH_PARAM, directoryPath, RodaConstants.CONTROLLER_FILE_ID_PARAM, fileId);
 
     return updatedFile;

@@ -176,9 +176,9 @@ public class TransferUpload extends Composite {
     } else {
       if (folderUUID == null) {
         // upload to root
-        ret = RestUtils.createFileUploadUri(null, LocaleInfo.getCurrentLocale().getLocaleName());
+        ret = RestUtils.createFileUploadUri(aipId, representationUUID);
       } else {
-        ret = RestUtils.createFileUploadUri(folderUUID, LocaleInfo.getCurrentLocale().getLocaleName());
+        ret = RestUtils.createFileUploadUri(folderUUID);
       }
     }
 
@@ -231,7 +231,7 @@ public class TransferUpload extends Composite {
     if (historyTokens.size() == 2 || historyTokens.size() == 3) {
       aipId = historyTokens.get(0);
       representationUUID = historyTokens.get(1);
-      folderUUID = historyTokens.get(2);
+      folderUUID = historyTokens.size() == 3 ? historyTokens.get(2) : null;
       callback.onSuccess(TransferUpload.this);
       updateUploadForm();
     }

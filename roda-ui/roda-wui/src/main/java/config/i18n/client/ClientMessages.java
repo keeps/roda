@@ -1289,6 +1289,18 @@ public interface ClientMessages extends Messages {
 
   String representationRemoveMessage();
 
+  /***** File ****/
+
+  String fileRemoveTitle();
+
+  String fileRemoveMessage();
+
+  String folderRemoveMessage();
+
+  String filesRemoveTitle();
+
+  String selectedFileRemoveMessage();
+
   /***** Job processes ****/
 
   String processJobTypes();

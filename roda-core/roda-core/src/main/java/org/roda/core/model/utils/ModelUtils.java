@@ -265,7 +265,9 @@ public final class ModelUtils {
     if (directoryPath != null) {
       path.addAll(directoryPath);
     }
-    path.add(fileId);
+    if (fileId != null) {
+      path.add(fileId);
+    }
     return DefaultStoragePath.parse(path);
   }
 

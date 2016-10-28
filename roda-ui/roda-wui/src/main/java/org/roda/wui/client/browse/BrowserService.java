@@ -289,10 +289,11 @@ public interface BrowserService extends RemoteService {
   String renameFolder(String folderUUID, String newName) throws AuthorizationDeniedException, GenericException,
     RequestNotValidException, AlreadyExistsException, NotFoundException;
 
-  String moveFiles(String aipId, SelectedItems<IndexedFile> selectedFiles, IndexedFile toFolder)
+  String moveFiles(String aipId, String representationUUID, SelectedItems<IndexedFile> selectedFiles,
+    IndexedFile toFolder) throws AuthorizationDeniedException, GenericException, RequestNotValidException,
+    AlreadyExistsException, NotFoundException;
+
+  String createFolder(String aipId, String representationUUID, String folderUUID, String newName)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, AlreadyExistsException,
     NotFoundException;
-
-  String createFolder(String folderUUID, String newName) throws AuthorizationDeniedException, GenericException,
-    RequestNotValidException, AlreadyExistsException, NotFoundException;
 }

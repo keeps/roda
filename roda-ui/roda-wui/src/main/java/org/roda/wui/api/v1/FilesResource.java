@@ -141,11 +141,12 @@ public class FilesResource {
     @ApiResponse(code = 409, message = "Already exists", response = ApiResponseMessage.class)})
 
   public Response createRepresentationFile(
-    @ApiParam(value = "The ID of the AIP where to create the representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
-    @ApiParam(value = "The requested ID for the new representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
-    @ApiParam(value = "The requested ID of the new file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_ID) String fileId,
+    @ApiParam(value = "The ID of the AIP where to create the representation") @QueryParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
+    @ApiParam(value = "The requested ID for the new representation") @QueryParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID) String representationId,
+    @ApiParam(value = "The UUID of the parent folder") @QueryParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileUUID,
     @FormDataParam(RodaConstants.API_PARAM_UPLOAD) InputStream inputStream,
     @FormDataParam(RodaConstants.API_PARAM_UPLOAD) FormDataContentDisposition fileDetail,
+    @ApiParam(value = "A new filename to this file", required = true) @QueryParam(RodaConstants.API_QUERY_KEY_FILENAME) String filename,
     @ApiParam(value = "Choose format in which to get the file", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
@@ -155,41 +156,19 @@ public class FilesResource {
 
     // delegate action to controller
     try {
-      org.roda.core.data.v2.ip.File file = Browser.createFile(user, aipId, representationId, new ArrayList<>(), fileId,
-        inputStream);
+      org.roda.core.data.v2.ip.File file;
+      String name = filename == null ? fileDetail.getFileName() : filename;
+
+      if (fileUUID == null) {
+        file = Browser.createFile(user, aipId, representationId, new ArrayList<>(), name, inputStream);
+      } else {
+        file = Browser.createFileWithUUID(user, fileUUID, name, inputStream);
+      }
+
       return Response.ok(file, mediaType).build();
     } catch (IOException e) {
       return ApiUtils.errorResponse(new TransformerException(e.getMessage()));
     }
-
-  }
-
-  @POST
-  @Path("/{" + RodaConstants.API_PATH_PARAM_FILE_UUID + "}")
-  @ApiOperation(value = "Create file", notes = "Create a new representation file", response = org.roda.core.data.v2.ip.File.class)
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = org.roda.core.data.v2.ip.File.class),
-    @ApiResponse(code = 409, message = "Already exists", response = ApiResponseMessage.class)})
-
-  public Response createFile(
-    @ApiParam(value = "The UUID of the parent folder", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileUUID,
-    @FormDataParam(RodaConstants.API_PARAM_UPLOAD) InputStream inputStream,
-    @FormDataParam(RodaConstants.API_PARAM_UPLOAD) FormDataContentDisposition fileDetail,
-    @ApiParam(value = "Choose format in which to get the file", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
-    throws RODAException {
-    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
-
-    // get user
-    User user = UserUtility.getApiUser(request);
-
-    // delegate action to controller
-    try {
-      org.roda.core.data.v2.ip.File file = Browser.createFileWithUUID(user, fileUUID, fileDetail.getFileName(),
-        inputStream);
-      return Response.ok(file, mediaType).build();
-    } catch (IOException e) {
-      return ApiUtils.errorResponse(new TransformerException(e.getMessage()));
-    }
-
   }
 
   @DELETE

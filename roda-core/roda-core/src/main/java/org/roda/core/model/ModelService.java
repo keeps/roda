@@ -997,9 +997,9 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  public void moveFiles(String aipId, List<File> files, String newRelativePath, boolean replaceExisting,
-    boolean reindexResources) throws AlreadyExistsException, GenericException, NotFoundException,
-    RequestNotValidException, AuthorizationDeniedException {
+  public void moveFiles(String aipId, String representationId, List<File> files, String newRelativePath,
+    boolean replaceExisting, boolean reindexResources) throws AlreadyExistsException, GenericException,
+    NotFoundException, RequestNotValidException, AuthorizationDeniedException {
 
     Path basePath = RodaCoreFactory.getStoragePath();
     boolean notFoundFiles = false;

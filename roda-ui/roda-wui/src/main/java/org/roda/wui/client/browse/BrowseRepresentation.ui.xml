@@ -73,23 +73,23 @@
 								<ui:text from='{messages.preservationRisks}' />
 							</g:Button>
 						</g:FlowPanel>
-<!-- 						<g:FlowPanel ui:field="filesSidebar"> -->
-<!-- 							<g:Label addStyleNames="h4"> -->
-<!-- 								<ui:text from='{messages.sidebarFoldersFilesTitle}' /> -->
-<!-- 							</g:Label> -->
-<!-- 							<g:Button addStyleNames="btn btn-edit" ui:field="renameFiles"> -->
-<!-- 								<ui:text from='{messages.renameButton}' /> -->
-<!-- 							</g:Button> -->
-<!-- 							<g:Button addStyleNames="btn btn-edit" ui:field="moveFiles"> -->
-<!-- 								<ui:text from='{messages.moveButton}' /> -->
-<!-- 							</g:Button> -->
-<!-- 							<g:Button addStyleNames="btn btn-upload" ui:field="uploadFiles"> -->
-<!-- 								<ui:text from='{messages.uploadFilesButton}' /> -->
-<!-- 							</g:Button> -->
-<!-- 							<g:Button addStyleNames="btn btn-plus" ui:field="createFolder"> -->
-<!-- 								<ui:text from='{messages.createFolderButton}' /> -->
-<!-- 							</g:Button> -->
-<!-- 						</g:FlowPanel> -->
+						<g:FlowPanel ui:field="filesSidebar">
+							<g:Label addStyleNames="h4">
+								<ui:text from='{messages.sidebarFoldersFilesTitle}' />
+							</g:Label>
+							<g:Button addStyleNames="btn btn-edit" ui:field="renameFolders">
+								<ui:text from='{messages.renameButton}' />
+							</g:Button>
+							<g:Button addStyleNames="btn btn-edit" ui:field="moveFiles">
+								<ui:text from='{messages.moveButton}' />
+							</g:Button>
+							<g:Button addStyleNames="btn btn-upload" ui:field="uploadFiles">
+								<ui:text from='{messages.uploadFilesButton}' />
+							</g:Button>
+							<g:Button addStyleNames="btn btn-plus" ui:field="createFolder">
+								<ui:text from='{messages.createFolderButton}' />
+							</g:Button>
+						</g:FlowPanel>
 					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>

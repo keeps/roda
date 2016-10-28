@@ -279,12 +279,29 @@ public class RestUtils {
     return b.toString();
   }
 
-  public static String createFileUploadUri(String parentUUID, String locale) {
-    // api/v1/files/{fileUUID}?locale={locale}
+  public static String createFileUploadUri(String parentUUID) {
+    // api/v1/files?file_uuid={fileUUID}
     StringBuilder b = new StringBuilder();
 
     // base uri
-    b.append(RodaConstants.API_REST_V1_FILES).append(UriUtils.encode(parentUUID));
+    b.append(RodaConstants.API_REST_V1_FILES).append(RodaConstants.API_QUERY_START)
+      .append(RodaConstants.API_PATH_PARAM_FILE_UUID).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
+      .append(UriUtils.encode(parentUUID));
+
+    return b.toString();
+  }
+
+  public static String createFileUploadUri(String aipId, String representationUUID) {
+    // api/v1/files?aip_id={aipId}&representation_uuid={representationUUID}
+    StringBuilder b = new StringBuilder();
+
+    // base uri
+    b.append(RodaConstants.API_REST_V1_FILES).append(RodaConstants.API_QUERY_START)
+      .append(RodaConstants.API_PATH_PARAM_AIP_ID).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
+      .append(UriUtils.encode(aipId)).append(RodaConstants.API_QUERY_SEP)
+      .append(RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
+      .append(UriUtils.encode(representationUUID));
+
     return b.toString();
   }
 

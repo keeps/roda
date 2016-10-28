@@ -199,9 +199,10 @@ public interface BrowserServiceAsync {
 
   void renameFolder(String folderUUID, String newName, AsyncCallback<String> asyncCallback);
 
-  void moveFiles(String aipId, SelectedItems<IndexedFile> selectedFiles, IndexedFile toFolder,
-    AsyncCallback<String> asyncCallback);
+  void moveFiles(String aipId, String representationUUID, SelectedItems<IndexedFile> selectedFiles,
+    IndexedFile toFolder, AsyncCallback<String> asyncCallback);
 
-  void createFolder(String folderUUID, String newName, AsyncCallback<String> asyncCallback);
+  void createFolder(String aipId, String representationUUID, String folderUUID, String newName,
+    AsyncCallback<String> asyncCallback);
 
 }

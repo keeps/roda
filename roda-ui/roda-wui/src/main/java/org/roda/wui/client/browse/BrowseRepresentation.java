@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
@@ -28,13 +29,17 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
+import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.SelectFileDialog;
+import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.lists.SearchFileList;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.ingest.transfer.TransferUpload;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
@@ -51,6 +56,8 @@ import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -58,6 +65,7 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -175,9 +183,9 @@ public class BrowseRepresentation extends Composite {
 
   @UiField
   Button newDescriptiveMetadata;
-  //
-  // @UiField
-  // Button renameFiles, moveFiles, uploadFiles, createFolder;
+
+  @UiField
+  Button renameFolders, moveFiles, uploadFiles, createFolder;
 
   @UiField(provided = true)
   SearchPanel searchPanel;
@@ -202,7 +210,7 @@ public class BrowseRepresentation extends Composite {
 
     handlers = new ArrayList<HandlerRegistration>();
     String summary = messages.representationListOfFiles();
-    boolean selectable = false;
+    boolean selectable = true;
 
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, repId),
       new EmptyKeyFilterParameter(RodaConstants.FILE_PARENT_UUID));
@@ -223,33 +231,48 @@ public class BrowseRepresentation extends Composite {
       }
     });
 
-    // filesList.addCheckboxSelectionListener(new
-    // CheckboxSelectionListener<IndexedFile>() {
-    //
-    // @Override
-    // public void onSelectionChange(SelectedItems<IndexedFile> selected) {
-    // SelectedItems<IndexedFile> files = (SelectedItems<IndexedFile>)
-    // filesList.getSelected();
-    // boolean empty = ClientSelectedItemsUtils.isEmpty(selected);
-    // moveFiles.setEnabled(!empty);
-    // createFolder.setEnabled(empty);
-    // uploadFiles.setEnabled(empty);
-    //
-    // ClientSelectedItemsUtils.size(IndexedFile.class, files, new
-    // AsyncCallback<Long>() {
-    //
-    // @Override
-    // public void onFailure(Throwable caught) {
-    // // do nothing
-    // }
-    //
-    // @Override
-    // public void onSuccess(Long result) {
-    // renameFiles.setEnabled(result == 1);
-    // }
-    // });
-    // }
-    // });
+    filesList.addCheckboxSelectionListener(new CheckboxSelectionListener<IndexedFile>() {
+
+      @Override
+      public void onSelectionChange(SelectedItems<IndexedFile> selected) {
+        final SelectedItems<IndexedFile> files = (SelectedItems<IndexedFile>) filesList.getSelected();
+        boolean empty = ClientSelectedItemsUtils.isEmpty(selected);
+        moveFiles.setEnabled(!empty);
+        createFolder.setEnabled(empty);
+        uploadFiles.setEnabled(empty);
+
+        ClientSelectedItemsUtils.size(IndexedFile.class, files, new AsyncCallback<Long>() {
+
+          @Override
+          public void onFailure(Throwable caught) {
+            // do nothing
+          }
+
+          @Override
+          public void onSuccess(Long result) {
+            if (result == 1 && files instanceof SelectedItemsList) {
+              SelectedItemsList<IndexedFile> fileList = (SelectedItemsList<IndexedFile>) files;
+
+              BrowserService.Util.getInstance().retrieve(IndexedFile.class.getName(), fileList.getIds().get(0),
+                new AsyncCallback<IndexedFile>() {
+
+                  @Override
+                  public void onSuccess(IndexedFile file) {
+                    renameFolders.setEnabled(file.isDirectory());
+                  }
+
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    // do nothing
+                  }
+                });
+            } else {
+              renameFolders.setEnabled(false);
+            }
+          }
+        });
+      }
+    });
 
     searchPanel = new SearchPanel(filter, ALL_FILTER, messages.searchPlaceHolder(), false, false, false);
     searchPanel.setDefaultFilterIncremental(true);
@@ -334,10 +357,10 @@ public class BrowseRepresentation extends Composite {
       itemMetadata.setVisible(false);
     }
 
-    // renameFiles.setEnabled(false);
-    // moveFiles.setEnabled(false);
-    // uploadFiles.setEnabled(true);
-    // createFolder.setEnabled(true);
+    renameFolders.setEnabled(false);
+    moveFiles.setEnabled(false);
+    uploadFiles.setEnabled(true);
+    createFolder.setEnabled(true);
   }
 
   @Override
@@ -462,19 +485,19 @@ public class BrowseRepresentation extends Composite {
 
   @UiHandler("remove")
   void buttonRemoveHandler(ClickEvent e) {
-    Dialogs.showConfirmDialog(messages.representationRemoveTitle(), messages.representationRemoveMessage(),
-      messages.dialogCancel(), messages.dialogYes(), new AsyncCallback<Boolean>() {
+    final SelectedItems selected = (SelectedItems) filesList.getSelected();
 
-        @Override
-        public void onSuccess(Boolean confirmed) {
-          if (confirmed) {
-            SelectedItems selected = (SelectedItems) filesList.getSelected();
+    if (ClientSelectedItemsUtils.isEmpty(selected)) {
+      final SelectedItems selectedList = new SelectedItemsList<IndexedRepresentation>(Arrays.asList(repId),
+        IndexedRepresentation.class.getName());
 
-            if (ClientSelectedItemsUtils.isEmpty(selected)) {
-              selected = new SelectedItemsList<IndexedRepresentation>(Arrays.asList(repId),
-                IndexedRepresentation.class.getName());
+      Dialogs.showConfirmDialog(messages.representationRemoveTitle(), messages.representationRemoveMessage(),
+        messages.dialogCancel(), messages.dialogYes(), new AsyncCallback<Boolean>() {
 
-              BrowserService.Util.getInstance().deleteRepresentation(selected, new AsyncCallback<Void>() {
+          @Override
+          public void onSuccess(Boolean confirmed) {
+            if (confirmed) {
+              BrowserService.Util.getInstance().deleteRepresentation(selectedList, new AsyncCallback<Void>() {
 
                 @Override
                 public void onSuccess(Void result) {
@@ -486,7 +509,21 @@ public class BrowseRepresentation extends Composite {
                   AsyncCallbackUtils.defaultFailureTreatment(caught);
                 }
               });
-            } else {
+            }
+          }
+
+          @Override
+          public void onFailure(Throwable caught) {
+            // nothing to do
+          }
+        });
+    } else {
+      Dialogs.showConfirmDialog(messages.filesRemoveTitle(), messages.selectedFileRemoveMessage(),
+        messages.dialogCancel(), messages.dialogYes(), new AsyncCallback<Boolean>() {
+
+          @Override
+          public void onSuccess(Boolean confirmed) {
+            if (confirmed) {
               BrowserService.Util.getInstance().deleteFile(selected, new AsyncCallback<Void>() {
 
                 @Override
@@ -501,13 +538,14 @@ public class BrowseRepresentation extends Composite {
               });
             }
           }
-        }
 
-        @Override
-        public void onFailure(Throwable caught) {
-          // nothing to do
-        }
-      });
+          @Override
+          public void onFailure(Throwable caught) {
+            // nothing to do
+          }
+
+        });
+    }
   }
 
   @UiHandler("newProcess")
@@ -537,4 +575,122 @@ public class BrowseRepresentation extends Composite {
       Tools.newHistory(PreservationEvents.RESOLVER, aipId, repId);
     }
   }
+
+  @UiHandler("renameFolders")
+  void buttonRenameHandler(ClickEvent e) {
+    if (!ClientSelectedItemsUtils.isEmpty(filesList.getSelected())) {
+      final String folderUUID;
+      if (filesList.getSelected() instanceof SelectedItemsList) {
+        SelectedItemsList<IndexedFile> fileList = (SelectedItemsList<IndexedFile>) filesList.getSelected();
+        folderUUID = (String) fileList.getIds().get(0);
+      } else {
+        return;
+      }
+
+      Dialogs.showPromptDialog(messages.renameItemTitle(), null, messages.renamePlaceholder(), RegExp.compile(".*"),
+        messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
+
+          @Override
+          public void onFailure(Throwable caught) {
+            // do nothing
+          }
+
+          @Override
+          public void onSuccess(final String newName) {
+            BrowserService.Util.getInstance().renameFolder(folderUUID, newName, new LoadingAsyncCallback<String>() {
+
+              @Override
+              public void onSuccessImpl(String newUUID) {
+                Toast.showInfo(messages.dialogSuccess(), messages.renameSuccessful());
+                Tools.newHistory(BrowseFolder.RESOLVER, aipId, repId, newUUID);
+              }
+            });
+          }
+        });
+    }
+  }
+
+  @UiHandler("moveFiles")
+  void buttonMoveHandler(ClickEvent e) {
+    // FIXME missing filter to remove the files themselves
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, repId),
+      new SimpleFilterParameter(RodaConstants.FILE_AIP_ID, aipId),
+      new SimpleFilterParameter(RodaConstants.FILE_ISDIRECTORY, Boolean.toString(true)));
+    SelectFileDialog selectFileDialog = new SelectFileDialog(messages.moveItemTitle(), filter, true, false);
+    selectFileDialog.setEmptyParentButtonVisible(true);
+    selectFileDialog.setSingleSelectionMode();
+    selectFileDialog.showAndCenter();
+    selectFileDialog.addValueChangeHandler(new ValueChangeHandler<IndexedFile>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<IndexedFile> event) {
+        final IndexedFile toFolder = event.getValue();
+        SelectedItems<IndexedFile> selected = filesList.getSelected();
+
+        if (!ClientSelectedItemsUtils.isEmpty(selected)) {
+          BrowserService.Util.getInstance().moveFiles(aipId, repId, selected, toFolder,
+            new LoadingAsyncCallback<String>() {
+
+              @Override
+              public void onSuccessImpl(String newUUID) {
+                if (newUUID != null) {
+                  Tools.newHistory(BrowseFolder.RESOLVER, aipId, repId, newUUID);
+                } else {
+                  Tools.newHistory(BrowseRepresentation.RESOLVER, aipId, repId);
+                }
+              }
+
+              @Override
+              public void onFailureImpl(Throwable caught) {
+                if (caught instanceof NotFoundException) {
+                  Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+                } else {
+                  AsyncCallbackUtils.defaultFailureTreatment(caught);
+                }
+              }
+
+            });
+        }
+      }
+    });
+  }
+
+  @UiHandler("uploadFiles")
+  void buttonUploadFilesHandler(ClickEvent e) {
+    Tools.newHistory(Browse.RESOLVER, TransferUpload.BROWSE_RESOLVER.getHistoryToken(), aipId, repId);
+  }
+
+  @UiHandler("createFolder")
+  void buttonCreateFolderHandler(ClickEvent e) {
+    Dialogs.showPromptDialog(messages.renameItemTitle(), null, messages.renamePlaceholder(), RegExp.compile(".*"),
+      messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
+        @Override
+        public void onFailure(Throwable caught) {
+          Toast.showInfo(messages.dialogFailure(), messages.renameFailed());
+        }
+
+        @Override
+        public void onSuccess(String newName) {
+          BrowserService.Util.getInstance().createFolder(aipId, repId, null, newName,
+            new LoadingAsyncCallback<String>() {
+
+              @Override
+              public void onSuccessImpl(String newUUID) {
+                filesList.refresh();
+              }
+
+              @Override
+              public void onFailureImpl(Throwable caught) {
+                if (caught instanceof NotFoundException) {
+                  Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+                } else {
+                  AsyncCallbackUtils.defaultFailureTreatment(caught);
+                }
+              }
+
+            });
+        }
+      });
+  }
+
 }

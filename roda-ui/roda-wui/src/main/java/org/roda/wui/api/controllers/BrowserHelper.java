@@ -35,7 +35,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ClassificationPlanUtils;
 import org.roda.core.common.ConsumesOutputStream;
@@ -2327,8 +2326,8 @@ public class BrowserHelper {
     }
   }
 
-  public static String moveFiles(String aipId, SelectedItems<IndexedFile> selectedFiles, IndexedFile toFolder)
-    throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
+  public static String moveFiles(String aipId, String representationUUID, SelectedItems<IndexedFile> selectedFiles,
+    IndexedFile toFolder) throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
     AuthorizationDeniedException {
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
@@ -2350,11 +2349,14 @@ public class BrowserHelper {
     }
 
     if (!files.isEmpty()) {
-      model.moveFiles(aipId, files, toFolder.getStoragePath(), true, true);
+      String representationId = files.get(0).getRepresentationId();
+      String storagePath = toFolder != null ? toFolder.getStoragePath()
+        : ModelUtils.getRepresentationDataStoragePath(aipId, representationId).toString();
+      model.moveFiles(aipId, representationId, files, storagePath, true, true);
       index.commitAIPs();
     }
 
-    return toFolder.getUUID();
+    return toFolder != null ? toFolder.getUUID() : null;
   }
 
   public static String moveTransferredResource(SelectedItems selected, TransferredResource transferredResource)
@@ -2394,21 +2396,23 @@ public class BrowserHelper {
 
   }
 
-  public static String createFolder(String folderUUID, String newName) throws GenericException,
-    RequestNotValidException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
+  public static String createFolder(String aipId, String representationUUID, String folderUUID, String newName)
+    throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
+    AuthorizationDeniedException {
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
-    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.INDEX_UUID, folderUUID));
-    IndexResult<IndexedFile> files = index.find(IndexedFile.class, filter, Sorter.NONE, new Sublist(0, 1));
 
-    if (!files.getResults().isEmpty()) {
-      IndexedFile ifolder = (IndexedFile) files.getResults().get(0);
+    if (folderUUID != null) {
+      IndexedFile ifolder = index.retrieve(IndexedFile.class, folderUUID);
       File newFolder = model.createFile(ifolder.getAipId(), ifolder.getRepresentationId(), ifolder.getPath(),
         ifolder.getId(), newName, true);
-      index.commitAIPs();
+      index.commit(IndexedFile.class);
       return IdUtils.getFileId(newFolder);
     } else {
-      return folderUUID;
+      IndexedRepresentation irep = index.retrieve(IndexedRepresentation.class, representationUUID);
+      File newFolder = model.createFile(irep.getAipId(), irep.getId(), null, null, newName, true);
+      index.commit(IndexedFile.class);
+      return IdUtils.getFileId(newFolder);
     }
   }
 
