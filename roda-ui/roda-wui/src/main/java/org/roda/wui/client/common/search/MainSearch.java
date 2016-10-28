@@ -224,6 +224,36 @@ public class MainSearch extends Composite {
 
     searchPanel.addDropdownPopupStyleName("searchInputListBoxPopup");
 
+    // handler aqui
+    searchPanel.addSearchAdvancedFieldAddHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        if (selectedItem.equals(Representation.class.getName())) {
+          addSearchFieldPanel(searchAdvancedFieldOptionsRepresentation, representationFields, null,
+            representationsSearchAdvancedFieldsPanel);
+        } else if (selectedItem.equals(File.class.getName())) {
+          addSearchFieldPanel(searchAdvancedFieldOptionsFile, fileFields, null, filesSearchAdvancedFieldsPanel);
+        } else {
+          addSearchFieldPanel(searchAdvancedFieldOptionsAIP, searchFields, null, itemsSearchAdvancedFieldsPanel);
+        }
+      }
+    });
+
+    itemsSearchAdvancedFieldsPanel.addStyleName("searchAdvancedFieldsPanel empty");
+    filesSearchAdvancedFieldsPanel.addStyleName("searchAdvancedFieldsPanel empty");
+    representationsSearchAdvancedFieldsPanel.addStyleName("searchAdvancedFieldsPanel empty");
+
+    createItemsSearchAdvancedFieldsPanel();
+    createRepresentationsSearchAdvancedFieldsPanel();
+    createFilesSearchAdvancedFieldsPanel();
+  }
+
+  public boolean isJustActive() {
+    return justActive;
+  }
+  
+  private void createItemsSearchAdvancedFieldsPanel() {
     BrowserService.Util.getInstance().retrieveSearchFields(LocaleInfo.getCurrentLocale().getLocaleName(),
       new AsyncCallback<List<SearchField>>() {
         @Override
@@ -248,34 +278,6 @@ public class MainSearch extends Composite {
           }
         }
       });
-
-    // handler aqui
-    searchPanel.addSearchAdvancedFieldAddHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        if (selectedItem.equals(Representation.class.getName())) {
-          addSearchFieldPanel(searchAdvancedFieldOptionsRepresentation, representationFields, null,
-            representationsSearchAdvancedFieldsPanel);
-        } else if (selectedItem.equals(File.class.getName())) {
-          addSearchFieldPanel(searchAdvancedFieldOptionsFile, fileFields, null, filesSearchAdvancedFieldsPanel);
-        } else {
-          addSearchFieldPanel(searchAdvancedFieldOptionsAIP, searchFields, null, itemsSearchAdvancedFieldsPanel);
-        }
-      }
-    });
-
-    itemsSearchAdvancedFieldsPanel.addStyleName("searchAdvancedFieldsPanel empty");
-    filesSearchAdvancedFieldsPanel.addStyleName("searchAdvancedFieldsPanel empty");
-    representationsSearchAdvancedFieldsPanel.addStyleName("searchAdvancedFieldsPanel empty");
-
-    createItemsSearchResultPanel();
-    createRepresentationsSearchAdvancedFieldsPanel();
-    createFilesSearchAdvancedFieldsPanel();
-  }
-
-  public boolean isJustActive() {
-    return justActive;
   }
 
   private void createRepresentationsSearchAdvancedFieldsPanel() {
