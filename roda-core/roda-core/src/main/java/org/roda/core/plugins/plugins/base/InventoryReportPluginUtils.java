@@ -238,7 +238,7 @@ public class InventoryReportPluginUtils {
       } else if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_FILE_PATH)) {
         fileInfo.add(FSUtils.asString(otherMetadata.getFileDirectoryPath()));
       } else if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_FILE_ID)) {
-        fileInfo.add(otherMetadata.getId());
+        fileInfo.add(otherMetadata.getFileId());
       } else if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_ISDIRECTORY)) {
         fileInfo.add("false");
       } else if (InventoryReportPlugin.CHECKSUM_ALGORITHMS.contains(fieldName.toUpperCase())) {
