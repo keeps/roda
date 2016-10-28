@@ -32,6 +32,7 @@ import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -154,7 +155,7 @@ public class Register extends Composite {
       }
     });
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();
@@ -180,11 +181,11 @@ public class Register extends Composite {
       final String recaptcha = recaptchaResponse;
 
       UserManagementService.Util.getInstance().registerUser(user, password, recaptcha, userDataPanel.getExtra(),
-        new AsyncCallback<User>() {
+        LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<User>() {
 
           @Override
           public void onFailure(Throwable caught) {
-            GWT.log("ERROR: "+caught.getMessage());
+            GWT.log("ERROR: " + caught.getMessage());
             errorMessage(caught);
           }
 
@@ -195,31 +196,31 @@ public class Register extends Composite {
                 messages.registerSuccessDialogMessageActive(), messages.registerSuccessDialogButton(),
                 new AsyncCallback<Void>() {
 
-                  @Override
-                  public void onSuccess(Void result) {
-                    Tools.newHistory(Login.RESOLVER);
-                  }
+                @Override
+                public void onSuccess(Void result) {
+                  Tools.newHistory(Login.RESOLVER);
+                }
 
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    Tools.newHistory(Login.RESOLVER);
-                  }
-                });
+                @Override
+                public void onFailure(Throwable caught) {
+                  Tools.newHistory(Login.RESOLVER);
+                }
+              });
             } else {
               Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
                 messages.registerSuccessDialogMessage(), messages.registerSuccessDialogButton(),
                 new AsyncCallback<Void>() {
 
-                  @Override
-                  public void onSuccess(Void result) {
-                    Tools.newHistory(Login.RESOLVER);
-                  }
+                @Override
+                public void onSuccess(Void result) {
+                  Tools.newHistory(Login.RESOLVER);
+                }
 
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    Tools.newHistory(Login.RESOLVER);
-                  }
-                });
+                @Override
+                public void onFailure(Throwable caught) {
+                  Tools.newHistory(Login.RESOLVER);
+                }
+              });
             }
           }
         });
@@ -248,9 +249,5 @@ public class Register extends Composite {
     } else {
       Toast.showError(messages.registerFailure());
     }
-  }
-
-  private void sendEmailVerificationFailure(Throwable caught) {
-    Toast.showError(messages.registerSendEmailVerificationFailure());
   }
 }

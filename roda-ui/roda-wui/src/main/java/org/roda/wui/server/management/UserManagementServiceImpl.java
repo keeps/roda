@@ -7,8 +7,6 @@
  */
 package org.roda.wui.server.management;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.roda.core.RodaCoreFactory;
@@ -72,14 +70,14 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public User registerUser(User user, String password, String captcha, UserExtraBundle extra)
+  public User registerUser(User user, String password, String captcha, UserExtraBundle extra, String localeString)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException, RecaptchaException {
     if (captcha != null) {
       RecaptchaUtils
         .recaptchaVerify(RodaCoreFactory.getRodaConfiguration().getString(RECAPTCHA_CODE_SECRET_PROPERTY, ""), captcha);
     }
     String servletPath = retrieveServletUrl(getThreadLocalRequest());
-    return UserManagement.registerUser(user, password, extra, servletPath);
+    return UserManagement.registerUser(user, password, extra, localeString, servletPath);
   }
 
   @Override
@@ -130,10 +128,10 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public Notification sendEmailVerification(final String username, final boolean generateNewToken)
+  public Notification sendEmailVerification(final String username, final boolean generateNewToken, String localeString)
     throws GenericException, NotFoundException {
     final String servletPath = retrieveServletUrl(getThreadLocalRequest());
-    return UserManagement.sendEmailVerification(servletPath, username, generateNewToken);
+    return UserManagement.sendEmailVerification(servletPath, username, generateNewToken, localeString);
   }
 
   @Override
@@ -162,14 +160,14 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public void requestPasswordReset(String usernameOrEmail, String captcha)
+  public void requestPasswordReset(String usernameOrEmail, String captcha, String localeString)
     throws GenericException, NotFoundException, IllegalOperationException, RecaptchaException {
     if (captcha != null) {
       RecaptchaUtils
         .recaptchaVerify(RodaCoreFactory.getRodaConfiguration().getString(RECAPTCHA_CODE_SECRET_PROPERTY, ""), captcha);
     }
     String servletPath = retrieveServletUrl(getThreadLocalRequest());
-    UserManagement.requestPasswordReset(servletPath, usernameOrEmail);
+    UserManagement.requestPasswordReset(servletPath, usernameOrEmail, localeString);
   }
 
   @Override

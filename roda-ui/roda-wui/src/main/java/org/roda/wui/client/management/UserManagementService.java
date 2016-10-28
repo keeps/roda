@@ -89,13 +89,15 @@ public interface UserManagementService extends RemoteService {
    *          user password
    * @param captcha
    *          the captcha challenge
+   * @param localeString
+   *          the locale string
    * @return true if passed the challenge, false otherwise
    * @throws GenericException
    * @throws UserAlreadyExistsException
    * @throws EmailAlreadyExistsException
    * @throws RecaptchaException
    */
-  public User registerUser(User user, String password, String captcha, UserExtraBundle extra)
+  public User registerUser(User user, String password, String captcha, UserExtraBundle extra, String localeString)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException, RecaptchaException;
 
   /**
@@ -190,8 +192,6 @@ public interface UserManagementService extends RemoteService {
    */
   public void deleteGroup(String groupname) throws AuthorizationDeniedException, GenericException;
 
-
-
   /**
    * Send the email challenge to a user email
    *
@@ -199,10 +199,12 @@ public interface UserManagementService extends RemoteService {
    *          the name of the user
    * @param generateNewToken
    *          generate a new token before sending the email?
+   * @param localeString
+   *          the locale string
    * @throws GenericException
    * @throws NotFoundException
    */
-  public Notification sendEmailVerification(String username, boolean generateNewToken)
+  public Notification sendEmailVerification(String username, boolean generateNewToken, String localeString)
     throws GenericException, NotFoundException;
 
   /**
@@ -241,12 +243,14 @@ public interface UserManagementService extends RemoteService {
    *          the user name or email
    * @param captcha
    *          the captcha challenge answer
+   * @param localeString
+   *          the locale string
    * @throws GenericException
    * @throws NotFoundException
    * @throws IllegalOperationException
    * @throws RecaptchaException
    */
-  public void requestPasswordReset(String usernameOrEmail, String captcha)
+  public void requestPasswordReset(String usernameOrEmail, String captcha, String localeString)
     throws GenericException, NotFoundException, IllegalOperationException, RecaptchaException;
 
   /**
@@ -266,15 +270,15 @@ public interface UserManagementService extends RemoteService {
    */
   public void resetUserPassword(String username, String password, String resetPasswordToken)
     throws InvalidTokenException, IllegalOperationException, NotFoundException, GenericException;
-  
+
   /**
    * Retrieve the default extra bundle
    *
    * @throws AuthorizationDeniedException
    */
   public UserExtraBundle retrieveDefaultExtraBundle() throws AuthorizationDeniedException;
-  
-  public UserExtraBundle retrieveUserExtraBundle(String name) throws AuthorizationDeniedException, GenericException, NotFoundException;
 
+  public UserExtraBundle retrieveUserExtraBundle(String name)
+    throws AuthorizationDeniedException, GenericException, NotFoundException;
 
 }

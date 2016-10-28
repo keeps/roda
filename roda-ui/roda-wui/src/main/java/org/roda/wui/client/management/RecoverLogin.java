@@ -35,6 +35,7 @@ import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -207,7 +208,7 @@ public class RecoverLogin extends Composite {
         recaptchaResponse = recaptchaWidget.getResponse();
       }
       UserManagementService.Util.getInstance().requestPasswordReset(usernameOrEmail.getValue(), recaptchaResponse,
-        new AsyncCallback<Void>() {
+        LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<Void>() {
 
           @Override
           public void onFailure(Throwable caught) {
@@ -220,16 +221,16 @@ public class RecoverLogin extends Composite {
               messages.recoverLoginSuccessDialogMessage(), messages.recoverLoginSuccessDialogButton(),
               new AsyncCallback<Void>() {
 
-                @Override
-                public void onFailure(Throwable caught) {
-                  Tools.newHistory(Login.RESOLVER);
-                }
+              @Override
+              public void onFailure(Throwable caught) {
+                Tools.newHistory(Login.RESOLVER);
+              }
 
-                @Override
-                public void onSuccess(Void result) {
-                  Tools.newHistory(Login.RESOLVER);
-                }
-              });
+              @Override
+              public void onSuccess(Void result) {
+                Tools.newHistory(Login.RESOLVER);
+              }
+            });
           }
         });
     }

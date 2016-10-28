@@ -34,6 +34,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.logical.shared.AttachEvent;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -170,7 +171,7 @@ public class Login extends Composite {
   void handleResendEmail(final ClickEvent e) {
 
     UserManagementService.Util.getInstance().sendEmailVerification(username.getText(), true,
-      new AsyncCallback<Notification>() {
+      LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<Notification>() {
 
         @Override
         public void onSuccess(final Notification result) {
@@ -179,31 +180,31 @@ public class Login extends Composite {
               messages.loginResendEmailSuccessDialogMessage(), messages.loginResendEmailSuccessDialogButton(),
               new AsyncCallback<Void>() {
 
-                @Override
-                public void onSuccess(final Void result) {
-                  Tools.newHistory(Login.RESOLVER);
-                }
+              @Override
+              public void onSuccess(final Void result) {
+                Tools.newHistory(Login.RESOLVER);
+              }
 
-                @Override
-                public void onFailure(final Throwable caught) {
-                  Tools.newHistory(Login.RESOLVER);
-                }
-              });
+              @Override
+              public void onFailure(final Throwable caught) {
+                Tools.newHistory(Login.RESOLVER);
+              }
+            });
           } else {
             Dialogs.showInformationDialog(messages.loginResendEmailFailureDialogTitle(),
               messages.loginResendEmailFailureDialogMessage(), messages.loginResendEmailFailureDialogButton(),
               new AsyncCallback<Void>() {
 
-                @Override
-                public void onSuccess(final Void result) {
-                  Tools.newHistory(Login.RESOLVER);
-                }
+              @Override
+              public void onSuccess(final Void result) {
+                Tools.newHistory(Login.RESOLVER);
+              }
 
-                @Override
-                public void onFailure(final Throwable caught) {
-                  Tools.newHistory(Login.RESOLVER);
-                }
-              });
+              @Override
+              public void onFailure(final Throwable caught) {
+                Tools.newHistory(Login.RESOLVER);
+              }
+            });
           }
         }
 

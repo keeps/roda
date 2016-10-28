@@ -58,8 +58,8 @@ public class UserManagementHelper {
     return RodaCoreFactory.getModelService().listGroups();
   }
 
-  public static User registerUser(User user, String password, UserExtraBundle extra, String servletPath)
-    throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException {
+  public static User registerUser(User user, String password, UserExtraBundle extra, String localeString,
+    String servletPath) throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException {
     user.setExtra(getUserExtra(user, extra));
     user = UserUtility.resetGroupsAndRoles(user);
 
@@ -69,7 +69,8 @@ public class UserManagementHelper {
     if (!user.isActive()) {
       try {
         boolean generateNewToken = false;
-        Notification notification = UserManagement.sendEmailVerification(servletPath, user.getName(), generateNewToken);
+        Notification notification = UserManagement.sendEmailVerification(servletPath, user.getName(), generateNewToken,
+          localeString);
         if (notification.getState() == NOTIFICATION_STATE.FAILED) {
           registeredUser.setActive(true);
           boolean notify = true;

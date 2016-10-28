@@ -982,8 +982,13 @@ public final class RodaConstants {
   /* Template Constants */
   public static final String INGEST_EMAIL_TEMPLATE = "ingestion-template.vm";
   public static final String VERIFICATION_EMAIL_TEMPLATE = "emailverification_html.vm";
+  public static final String VERIFICATION_EMAIL_TEMPLATE_SUBJECT_TRANSLATION = "email.verification.subject";
+  public static final String VERIFICATION_EMAIL_TEMPLATE_FROM_TRANSLATION = "email.verification.from";
   public static final String RECOVER_LOGIN_EMAIL_TEMPLATE = "recoverlogin_html.vm";
+  public static final String RECOVER_LOGIN_EMAIL_TEMPLATE_SUBJECT_TRANSLATION = "email.recoverlogin.subject";
+  public static final String RECOVER_LOGIN_EMAIL_TEMPLATE_FROM_TRANSLATION = "email.recoverlogin.from";
   public static final String NOTIFY_PRODUCER_EMAIL_TEMPLATE = "notifyproducer_html.vm";
+  public static final String EMAIL_TEMPLATE_EXTENSION = ".vm";
 
   /* Tika Constants */
   public static final String TIKA_FILE_SUFFIX_FULLTEXT = ".fulltext.txt";

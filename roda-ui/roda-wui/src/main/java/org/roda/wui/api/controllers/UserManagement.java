@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.Messages;
 import org.roda.core.common.notifications.EmailNotificationProcessor;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -34,6 +35,7 @@ import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.UserExtraBundle;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
+import org.roda.wui.common.server.ServerTools;
 import org.w3c.util.DateParser;
 
 public class UserManagement extends RodaWuiController {
@@ -89,12 +91,12 @@ public class UserManagement extends RodaWuiController {
     return ret;
   }
 
-  public static User registerUser(User user, String password, UserExtraBundle extra, String servletPath)
-    throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException {
+  public static User registerUser(User user, String password, UserExtraBundle extra, String localeString,
+    String servletPath) throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // delegate
-    User ret = UserManagementHelper.registerUser(user, password, extra, servletPath);
+    User ret = UserManagementHelper.registerUser(user, password, extra, localeString, servletPath);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "user", user);
@@ -211,7 +213,7 @@ public class UserManagement extends RodaWuiController {
   // return true if notification was sent, false if the mail cannot be sent and
   // the user was activated...
   public static Notification sendEmailVerification(final String servletPath, final String username,
-    final boolean generateNewToken) throws GenericException, NotFoundException {
+    final boolean generateNewToken, String localeString) throws GenericException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     User user = UserManagementHelper.retrieveUser(username);
 
@@ -235,7 +237,7 @@ public class UserManagement extends RodaWuiController {
       throw new GenericException("User " + username + " is already active or email confirmation token doesn't exist.");
     }
 
-    final Notification notification = sendEmailVerification(servletPath, user);
+    final Notification notification = sendEmailVerification(servletPath, user, localeString);
 
     // register action
     controllerAssistant.registerAction(user, getLogEntryState(notification), "user", user);
@@ -269,7 +271,7 @@ public class UserManagement extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "user", user);
   }
 
-  public static void requestPasswordReset(String servletPath, String usernameOrEmail)
+  public static void requestPasswordReset(String servletPath, String usernameOrEmail, String localeString)
     throws GenericException, NotFoundException, IllegalOperationException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -284,7 +286,7 @@ public class UserManagement extends RodaWuiController {
     }
 
     User user = UserManagementHelper.requestPasswordReset(username, email);
-    sendRecoverLoginEmail(servletPath, user);
+    sendRecoverLoginEmail(servletPath, user, localeString);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "user", user);
@@ -300,11 +302,14 @@ public class UserManagement extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "user", user);
   }
 
-  private static Notification sendEmailVerification(String servletPath, User user) throws GenericException {
+  private static Notification sendEmailVerification(String servletPath, User user, String localeString)
+    throws GenericException {
     try {
+      Messages messages = RodaCoreFactory.getI18NMessages(ServerTools.parseLocale(localeString));
+
       Notification notification = new Notification();
-      notification.setSubject("Registration in RODA");
-      notification.setFromUser("RODA Admin");
+      notification.setSubject(messages.getTranslation(RodaConstants.VERIFICATION_EMAIL_TEMPLATE_SUBJECT_TRANSLATION));
+      notification.setFromUser(messages.getTranslation(RodaConstants.VERIFICATION_EMAIL_TEMPLATE_FROM_TRANSLATION));
       notification.setRecipientUsers(Arrays.asList(user.getEmail()));
 
       String token = user.getEmailConfirmationToken();
@@ -320,18 +325,20 @@ public class UserManagement extends RodaWuiController {
       scopes.put("verificationCompleteURL", verificationCompleteURL);
 
       return RodaCoreFactory.getModelService().createNotification(notification,
-        new EmailNotificationProcessor(RodaConstants.VERIFICATION_EMAIL_TEMPLATE, scopes));
+        new EmailNotificationProcessor(RodaConstants.VERIFICATION_EMAIL_TEMPLATE, scopes, localeString));
     } catch (UnsupportedEncodingException | AuthorizationDeniedException e) {
       throw new GenericException("Error sending email verification", e);
     }
   }
 
-  private static void sendRecoverLoginEmail(String servletPath, User user) throws GenericException {
+  private static void sendRecoverLoginEmail(String servletPath, User user, String localeString)
+    throws GenericException {
     try {
+      Messages messages = RodaCoreFactory.getI18NMessages(ServerTools.parseLocale(localeString));
 
       Notification notification = new Notification();
-      notification.setSubject("Recover login in RODA");
-      notification.setFromUser("RODA Admin");
+      notification.setSubject(messages.getTranslation(RodaConstants.RECOVER_LOGIN_EMAIL_TEMPLATE_SUBJECT_TRANSLATION));
+      notification.setFromUser(messages.getTranslation(RodaConstants.RECOVER_LOGIN_EMAIL_TEMPLATE_FROM_TRANSLATION));
       notification.setRecipientUsers(Arrays.asList(user.getEmail()));
 
       String token = user.getResetPasswordToken();
@@ -346,7 +353,7 @@ public class UserManagement extends RodaWuiController {
       scopes.put("recoverLoginURL", recoverLoginURL);
       scopes.put("recoverLoginCompleteURL", recoverLoginCompleteURL);
       RodaCoreFactory.getModelService().createNotification(notification,
-        new EmailNotificationProcessor(RodaConstants.RECOVER_LOGIN_EMAIL_TEMPLATE, scopes));
+        new EmailNotificationProcessor(RodaConstants.RECOVER_LOGIN_EMAIL_TEMPLATE, scopes, localeString));
 
     } catch (Exception e) {
       throw new GenericException("Problem sending email");
@@ -374,7 +381,7 @@ public class UserManagement extends RodaWuiController {
 
     // check permissions
     controllerAssistant.checkRoles(user);
-    
+
     // delegate
     UserExtraBundle extraBudle = UserManagementHelper.retrieveDefaultExtraBundle();
 

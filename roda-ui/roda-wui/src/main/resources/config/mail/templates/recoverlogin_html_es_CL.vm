@@ -1,0 +1,17 @@
+<html>
+<body>
+<p>Una recuperación de acceso asociada a este correo electrónico fue solicitada.</p>
+
+<p>Para continuar con el proceso de recuperación, acceda a la siguiente dirección <a href="{{recoverLoginCompleteURL}}">{{recoverLoginCompleteURL}}</a>.</p>
+<p>Como alternativa, introduzca los datos necesarios en la siguiente dirección <a href="{{recoverLoginURL}}">{{recoverLoginURL}}</a>.</p>
+<ul>
+<li><strong>Nombre de usuario:</strong> {{username}}</li>
+<li><strong>Contraseña para la verificación:</strong> {{token}}</li>
+</ul>
+<p>Y modificar su contraseña.</p>
+<p>Si usted no pidió la recuperación de inicio de sesión antes mencionado, por favor, ignora este correo electrónico.</p>
+
+<p>RODA - Repository of Authentic Digital Objects</p>
+
+</body>
+<html>

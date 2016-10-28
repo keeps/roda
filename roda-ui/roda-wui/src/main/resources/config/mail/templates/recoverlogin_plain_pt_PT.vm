@@ -1,0 +1,14 @@
+Uma recuperação de registo associado a este email foi pedida.
+
+Para continuar o processo de recuperação, aceda ao seguinte endereço: $recoverLoginCompleteURL
+Em alternativa, insira os dados necessários no seguinte endereço: $recoverLoginURL
+
+Nome de utilizador: $username
+Palavra-passe para verificação: $token
+
+De seguida modifique a sua palavra-passe.
+
+Se não efetuou o pedido de recuperação acima mencionado, por favor ignore este email.
+
+=====================================================
+RODA - Repository of Authentic Digital Objects

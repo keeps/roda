@@ -1,0 +1,15 @@
+<html>
+<body>
+<p>Na sequência do processo de registo do nome de utilizador <em>{{username}}</em>, um email de verificação é necessário.</p>
+<p>Para continuar o processo de verificação, aceda ao seguinte endereço <a href="{{verificationCompleteURL}}">{{verificationCompleteURL}}</a>, ou, em alternativa, insira a palavra-passe para verificação no seguinte endereço <a href="{{verificationURL}}">{{verificationURL}}</a>:
+<ul>
+<li><strong>Nome de utilizador:</strong> {{username}}</li>
+<li><strong>Palavra-passe para verificação:</strong> {{token}}</li>
+</ul>
+</p>
+<p>Se não efetuou o registo acima mencionado, por favor ignore este email.</p>
+
+<p>RODA - Repository of Authentic Digital Objects</p>
+
+</body>
+<html>

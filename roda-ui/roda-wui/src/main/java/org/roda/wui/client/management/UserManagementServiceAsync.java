@@ -63,13 +63,17 @@ public interface UserManagementServiceAsync {
    *          user password
    * @param captcha
    *          the captcha challenge
+   * @param extra
+   *          the extra user fields
+   * @param localeString
+   *          the locale string
    * @return true if passed the challenge, false otherwise
    * @throws GenericException
    * @throws UserAlreadyExistsException
    * @throws EmailAlreadyExistsException
    * @throws RecaptchaException
    */
-  public void registerUser(User user, String password, String captcha, UserExtraBundle extra,
+  public void registerUser(User user, String password, String captcha, UserExtraBundle extra, String localeString,
     AsyncCallback<User> callback);
 
   void createUser(User user, String password, UserExtraBundle extra, AsyncCallback<User> callback);
@@ -153,10 +157,13 @@ public interface UserManagementServiceAsync {
    *          the name of the user
    * @param generateNewToken
    *          generate a new token before sending the email?
+   * @param localeString
+   *          the locale string
    * @throws GenericException
    * @throws NotFoundException
    */
-  public void sendEmailVerification(String username, boolean generateNewToken, AsyncCallback<Notification> callback);
+  public void sendEmailVerification(String username, boolean generateNewToken, String localeString,
+    AsyncCallback<Notification> callback);
 
   /**
    * Verify a user email. If verified user will become active
@@ -192,12 +199,15 @@ public interface UserManagementServiceAsync {
    *          the user name or email
    * @param captcha
    *          the captcha challenge answer
+   * @param localeString
+   *          the locale string
    * @throws GenericException
    * @throws NotFoundException
    * @throws IllegalOperationException
    * @throws RecaptchaException
    */
-  public void requestPasswordReset(String usernameOrEmail, String captcha, AsyncCallback<Void> callback);
+  public void requestPasswordReset(String usernameOrEmail, String captcha, String localeString,
+    AsyncCallback<Void> callback);
 
   /**
    * Reset a user password

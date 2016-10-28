@@ -1,0 +1,12 @@
+En la secuencia del proceso de registro del nombre de usuario $username, se necesita una verificación de la dirección de correo electrónico.
+
+Para continuar con el proceso de verificación, acceda a la siguiente dirección: $verificationCompleteURL
+Como alternativa, introduzca la contraseña para su verificación en la siguiente dirección: $verificationURL
+
+Nombre de usuario: $username
+Contraseña para la verificación: $token
+
+Si no ha efectuado el registro antes mencionado, por favor, ignora este correo electrónico.
+
+=====================================================
+RODA - Repository of Authentic Digital Objects

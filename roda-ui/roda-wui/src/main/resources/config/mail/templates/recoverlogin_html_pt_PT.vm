@@ -1,0 +1,17 @@
+<html>
+<body>
+<p>Uma recuperação de registo associado a este email foi pedida.</p>
+
+<p>Para continuar o processo de recuperação, aceda ao seguinte endereço <a href="{{recoverLoginCompleteURL}}">{{recoverLoginCompleteURL}}</a>.</p>
+<p>Em alternativa, insira os dados necessários no seguinte endereço <a href="{{recoverLoginURL}}">{{recoverLoginURL}}</a>.</p>
+<ul>
+<li><strong>Nome de utilizador:</strong> {{username}}</li>
+<li><strong>Palavra-passe para verificação:</strong> {{token}}</li>
+</ul>
+<p>De seguida modifique a sua palavra-passe.</p>
+<p>Se não efetuou o pedido de recuperação acima mencionado, por favor ignore este email.</p>
+
+<p>RODA - Repository of Authentic Digital Objects</p>
+
+</body>
+<html>

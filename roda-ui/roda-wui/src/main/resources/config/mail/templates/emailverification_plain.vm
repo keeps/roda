@@ -1,6 +1,6 @@
 In the sequence of the registration process of the username $username, an e-mail address verification is needed.
 
-To continue the verification process, access the following address : $verificationCompleteURL
+To continue the verification process, access the following address: $verificationCompleteURL
 Alternatively, insert the password for verification in the following address: $verificationURL
 
 Username: $username

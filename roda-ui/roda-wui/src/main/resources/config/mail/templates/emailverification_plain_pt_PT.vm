@@ -1,0 +1,12 @@
+Na sequência do processo de registo do nome de utilizador $username, um email de verificação é necessário.
+
+Para continuar o processo de verificação, aceda ao seguinte endereço: $verificationCompleteURL
+Em alternativa, insira a palavra-passe para verificação no seguinte endereço: $verificationURL
+
+Nome de utilizador: $username
+Palavra-passe para verificação: $token
+
+Se não efetuou o registo acima mencionado, por favor ignore este email.
+
+=====================================================
+RODA - Repository of Authentic Digital Objects

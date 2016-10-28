@@ -1059,6 +1059,14 @@ public class RodaCoreFactory {
     }
     return inputStream;
   }
+  
+  public static InputStream getConfigurationFileAsStream(String configurationFile, String fallbackConfigurationFile) {
+    InputStream inputStream = getConfigurationFileAsStream(configurationFile);
+    if (inputStream == null) {
+      inputStream = getConfigurationFileAsStream(fallbackConfigurationFile);
+    }
+    return inputStream;
+  }
 
   public static InputStream getDefaultFileAsStream(String defaultFile) {
     Path defaultPath = getDefaultPath().resolve(defaultFile);

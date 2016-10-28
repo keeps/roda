@@ -38,15 +38,22 @@ public class EmailNotificationProcessor implements NotificationProcessor {
   private static final Logger LOGGER = LoggerFactory.getLogger(EmailNotificationProcessor.class);
   private Map<String, Object> scope;
   private String templateName;
+  private String localeString;
 
-  public EmailNotificationProcessor(String template) {
+  public EmailNotificationProcessor(String templateName) {
     this.scope = new HashMap<String, Object>();
-    this.templateName = template;
+    this.templateName = templateName;
   }
 
-  public EmailNotificationProcessor(String template, Map<String, Object> scope) {
+  public EmailNotificationProcessor(String templateName, Map<String, Object> scope) {
+    this.templateName = templateName;
     this.scope = scope;
-    this.templateName = template;
+  }
+
+  public EmailNotificationProcessor(String templateName, Map<String, Object> scope, String localeString) {
+    this.templateName = templateName;
+    this.scope = scope;
+    this.localeString = localeString;
   }
 
   @Override
@@ -55,7 +62,15 @@ public class EmailNotificationProcessor implements NotificationProcessor {
     try {
       List<String> recipients = processedNotification.getRecipientUsers();
       String templatePath = RodaCoreFactory.getRodaConfigurationAsString("core", "notification", "template_path");
-      InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(templatePath + templateName);
+      String templateCompletePath = templatePath + templateName;
+      InputStream templateStream;
+      if (localeString != null) {
+        String localeTemplateCompletePath = templateCompletePath.replace(RodaConstants.EMAIL_TEMPLATE_EXTENSION,
+          "_" + localeString + RodaConstants.EMAIL_TEMPLATE_EXTENSION);
+        templateStream = RodaCoreFactory.getConfigurationFileAsStream(localeTemplateCompletePath, templateCompletePath);
+      } else {
+        templateStream = RodaCoreFactory.getConfigurationFileAsStream(templateCompletePath);
+      }
       String template = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
       IOUtils.closeQuietly(templateStream);
       if (!scope.containsKey(FROM)) {
