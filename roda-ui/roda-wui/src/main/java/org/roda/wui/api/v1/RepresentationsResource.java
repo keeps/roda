@@ -285,7 +285,7 @@ public class RepresentationsResource {
 
     // delegate action to controller
     DescriptiveMetadata dm = Browser.updateRepresentationDescriptiveMetadataFile(user, representationId, metadataId,
-      metadataType, metadataVersion, inputStream, fileDetail);
+      metadataType, metadataVersion, inputStream);
 
     return Response.ok(dm, mediaType).build();
   }
@@ -313,7 +313,7 @@ public class RepresentationsResource {
 
     // delegate action to controller
     DescriptiveMetadata dm = Browser.createRepresentationDescriptiveMetadataFile(user, representationId, metadataId,
-      metadataType, metadataVersion, inputStream, fileDetail);
+      metadataType, metadataVersion, inputStream);
 
     return Response.ok(dm, mediaType).build();
   }
@@ -404,7 +404,7 @@ public class RepresentationsResource {
 
     // delegate action to controller
     Browser.createOrUpdatePreservationMetadataWithRepresentation(user, representationId, fileId, inputStream,
-      fileDetail, true);
+      fileDetail.getFileName(), true);
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Preservation file created"), mediaType).build();
   }
 
@@ -428,7 +428,7 @@ public class RepresentationsResource {
 
     // delegate action to controller
     Browser.createOrUpdatePreservationMetadataWithRepresentation(user, representationId, fileId, inputStream,
-      fileDetail, false);
+      fileDetail.getFileName(), false);
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Preservation file updated"), mediaType).build();
   }
 

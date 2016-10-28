@@ -292,7 +292,7 @@ public class AipsResource {
 
     // delegate action to controller
     DescriptiveMetadata dm = Browser.updateAIPDescriptiveMetadataFile(user, aipId, metadataId, metadataType,
-      metadataVersion, inputStream, fileDetail);
+      metadataVersion, inputStream);
 
     return Response.ok(dm, mediaType).build();
   }
@@ -320,7 +320,7 @@ public class AipsResource {
 
     // delegate action to controller
     DescriptiveMetadata dm = Browser.createAIPDescriptiveMetadataFile(user, aipId, metadataId, metadataType,
-      metadataVersion, inputStream, fileDetail);
+      metadataVersion, inputStream);
 
     return Response.ok(dm, mediaType).build();
   }
@@ -397,7 +397,7 @@ public class AipsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    Browser.createOrUpdatePreservationMetadataWithAIP(user, aipId, fileId, inputStream, fileDetail, true);
+    Browser.createOrUpdatePreservationMetadataWithAIP(user, aipId, fileId, inputStream, fileDetail.getFileName(), true);
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Preservation file created"), mediaType).build();
   }
 
@@ -420,7 +420,8 @@ public class AipsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    Browser.createOrUpdatePreservationMetadataWithAIP(user, aipId, fileId, inputStream, fileDetail, false);
+    Browser.createOrUpdatePreservationMetadataWithAIP(user, aipId, fileId, inputStream, fileDetail.getFileName(),
+      false);
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Preservation file updated"), mediaType).build();
   }
 

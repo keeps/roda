@@ -448,9 +448,9 @@ public class BrowserHelper {
     return null;
   }
 
-  protected static <T extends IsIndexed> List<String> suggest(Class<T> returnClass, String field, String query, User user)
-    throws GenericException, NotFoundException {
-    return RodaCoreFactory.getIndexService().suggest(returnClass, field, query,user);
+  protected static <T extends IsIndexed> List<String> suggest(Class<T> returnClass, String field, String query,
+    User user) throws GenericException, NotFoundException {
+    return RodaCoreFactory.getIndexService().suggest(returnClass, field, query, user);
   }
 
   private static IndexResult<IndexedRepresentation> findRepresentations(String aipId, Sorter sorter, Sublist sublist)
@@ -1052,8 +1052,8 @@ public class BrowserHelper {
   }
 
   public static void createOrUpdateAIPRepresentationPreservationMetadataFile(String aipId, String representationId,
-    List<String> fileDirectoryPath, String fileId, InputStream is, FormDataContentDisposition fileDetail,
-    boolean create) throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException,
+    List<String> fileDirectoryPath, String fileId, InputStream is, boolean create)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException,
     ValidationException, AlreadyExistsException {
     Path file = null;
     try {
@@ -1413,8 +1413,8 @@ public class BrowserHelper {
 
   public static DescriptiveMetadata createOrUpdateAIPDescriptiveMetadataFile(String aipId, String representationId,
     String metadataId, String metadataType, String metadataVersion, Map<String, String> properties, InputStream is,
-    FormDataContentDisposition fileDetail, boolean create) throws GenericException, RequestNotValidException,
-    NotFoundException, AuthorizationDeniedException, AlreadyExistsException, ValidationException {
+    boolean create) throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException,
+    AlreadyExistsException, ValidationException {
     Path file = null;
     DescriptiveMetadata dm = null;
     try {

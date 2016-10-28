@@ -260,7 +260,7 @@ public class FilesResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    Browser.createOrUpdatePreservationMetadataWithFile(user, fileId, inputStream, fileDetail, true);
+    Browser.createOrUpdatePreservationMetadataWithFile(user, fileId, inputStream, true);
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Preservation file created"), mediaType).build();
   }
 
@@ -282,7 +282,7 @@ public class FilesResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    Browser.createOrUpdatePreservationMetadataWithFile(user, fileId, inputStream, fileDetail, false);
+    Browser.createOrUpdatePreservationMetadataWithFile(user, fileId, inputStream, false);
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Preservation file updated"), mediaType).build();
   }
 

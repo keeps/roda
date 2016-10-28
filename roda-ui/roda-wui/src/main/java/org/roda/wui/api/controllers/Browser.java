@@ -23,7 +23,6 @@ import java.util.Map;
 
 import javax.xml.transform.TransformerException;
 
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.core.common.ConsumesOutputStream;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.common.IdUtils;
@@ -330,7 +329,7 @@ public class Browser extends RodaWuiController {
     // delegate
     // TODO suggest must integrate the user filter to disallow view of
     // information with permission
-    final List<String> ret = BrowserHelper.suggest(classToReturn, field, query,user);
+    final List<String> ret = BrowserHelper.suggest(classToReturn, field, query, user);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_CLASS_PARAM,
@@ -615,8 +614,8 @@ public class Browser extends RodaWuiController {
   }
 
   public static void createOrUpdatePreservationMetadataWithAIP(User user, String aipId, String fileId, InputStream is,
-    FormDataContentDisposition fileDetail, boolean create) throws AuthorizationDeniedException, GenericException,
-    NotFoundException, RequestNotValidException, ValidationException, AlreadyExistsException {
+    String fileName, boolean create) throws AuthorizationDeniedException, GenericException, NotFoundException,
+    RequestNotValidException, ValidationException, AlreadyExistsException {
 
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -625,11 +624,11 @@ public class Browser extends RodaWuiController {
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkAIPPermissions(user, aip, PermissionType.UPDATE);
 
-    String id = fileId == null ? fileDetail.getFileName() : fileId;
+    String id = (fileId == null ? fileName : fileId);
 
     // delegate
     BrowserHelper.createOrUpdateAIPRepresentationPreservationMetadataFile(aipId, null, new ArrayList<>(), id, is,
-      fileDetail, create);
+      create);
 
     // register action
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIP_ID_PARAM,
@@ -637,9 +636,8 @@ public class Browser extends RodaWuiController {
   }
 
   public static void createOrUpdatePreservationMetadataWithRepresentation(User user, String representationUUID,
-    String fileId, InputStream is, FormDataContentDisposition fileDetail, boolean create)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
-    ValidationException, AlreadyExistsException {
+    String fileId, InputStream is, String fileName, boolean create) throws AuthorizationDeniedException,
+    GenericException, NotFoundException, RequestNotValidException, ValidationException, AlreadyExistsException {
 
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -648,11 +646,11 @@ public class Browser extends RodaWuiController {
     IndexedRepresentation rep = BrowserHelper.retrieve(IndexedRepresentation.class, representationUUID);
     UserUtility.checkRepresentationPermissions(user, rep, PermissionType.UPDATE);
 
-    String id = fileId == null ? fileDetail.getFileName() : fileId;
+    String id = fileId == null ? fileName : fileId;
 
     // delegate
     BrowserHelper.createOrUpdateAIPRepresentationPreservationMetadataFile(rep.getAipId(), rep.getId(),
-      new ArrayList<>(), id, is, fileDetail, create);
+      new ArrayList<>(), id, is, create);
 
     // register action
     controllerAssistant.registerAction(user, rep.getAipId(), LOG_ENTRY_STATE.SUCCESS,
@@ -660,8 +658,8 @@ public class Browser extends RodaWuiController {
   }
 
   public static void createOrUpdatePreservationMetadataWithFile(User user, String fileUUID, InputStream is,
-    FormDataContentDisposition fileDetail, boolean create) throws AuthorizationDeniedException, GenericException,
-    NotFoundException, RequestNotValidException, ValidationException, AlreadyExistsException {
+    boolean create) throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
+    ValidationException, AlreadyExistsException {
 
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -672,7 +670,7 @@ public class Browser extends RodaWuiController {
 
     // delegate
     BrowserHelper.createOrUpdateAIPRepresentationPreservationMetadataFile(file.getAipId(), file.getRepresentationId(),
-      file.getPath(), file.getId(), is, fileDetail, create);
+      file.getPath(), file.getId(), is, create);
 
     // register action
     controllerAssistant.registerAction(user, file.getAipId(), LOG_ENTRY_STATE.SUCCESS,
@@ -1112,9 +1110,8 @@ public class Browser extends RodaWuiController {
   }
 
   public static DescriptiveMetadata updateAIPDescriptiveMetadataFile(User user, String aipId, String metadataId,
-    String metadataType, String metadataVersion, InputStream is, FormDataContentDisposition fileDetail)
-    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException,
-    AlreadyExistsException, ValidationException {
+    String metadataType, String metadataVersion, InputStream is) throws GenericException, AuthorizationDeniedException,
+    NotFoundException, RequestNotValidException, AlreadyExistsException, ValidationException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -1128,7 +1125,7 @@ public class Browser extends RodaWuiController {
     properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
 
     DescriptiveMetadata ret = BrowserHelper.createOrUpdateAIPDescriptiveMetadataFile(aipId, null, metadataId,
-      metadataType, metadataVersion, properties, is, fileDetail, false);
+      metadataType, metadataVersion, properties, is, false);
 
     // register action
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIP_ID_PARAM,
@@ -1137,9 +1134,9 @@ public class Browser extends RodaWuiController {
   }
 
   public static DescriptiveMetadata updateRepresentationDescriptiveMetadataFile(User user, String representationId,
-    String metadataId, String metadataType, String metadataVersion, InputStream is,
-    FormDataContentDisposition fileDetail) throws GenericException, AuthorizationDeniedException, NotFoundException,
-    RequestNotValidException, AlreadyExistsException, ValidationException {
+    String metadataId, String metadataType, String metadataVersion, InputStream is)
+    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException,
+    AlreadyExistsException, ValidationException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -1153,7 +1150,7 @@ public class Browser extends RodaWuiController {
     properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
 
     DescriptiveMetadata ret = BrowserHelper.createOrUpdateAIPDescriptiveMetadataFile(representation.getAipId(),
-      representation.getId(), metadataId, metadataType, metadataVersion, properties, is, fileDetail, false);
+      representation.getId(), metadataId, metadataType, metadataVersion, properties, is, false);
 
     // register action
     controllerAssistant.registerAction(user, representationId, LOG_ENTRY_STATE.SUCCESS,
@@ -1163,9 +1160,8 @@ public class Browser extends RodaWuiController {
   }
 
   public static DescriptiveMetadata createAIPDescriptiveMetadataFile(User user, String aipId, String metadataId,
-    String metadataType, String metadataVersion, InputStream is, FormDataContentDisposition fileDetail)
-    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException,
-    AlreadyExistsException, ValidationException {
+    String metadataType, String metadataVersion, InputStream is) throws GenericException, AuthorizationDeniedException,
+    NotFoundException, RequestNotValidException, AlreadyExistsException, ValidationException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -1179,7 +1175,7 @@ public class Browser extends RodaWuiController {
     properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.CREATED.toString());
 
     DescriptiveMetadata ret = BrowserHelper.createOrUpdateAIPDescriptiveMetadataFile(aipId, null, metadataId,
-      metadataType, metadataVersion, properties, is, fileDetail, true);
+      metadataType, metadataVersion, properties, is, true);
 
     // register action
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIP_ID_PARAM,
@@ -1188,9 +1184,9 @@ public class Browser extends RodaWuiController {
   }
 
   public static DescriptiveMetadata createRepresentationDescriptiveMetadataFile(User user, String representationId,
-    String metadataId, String metadataType, String metadataVersion, InputStream is,
-    FormDataContentDisposition fileDetail) throws GenericException, AuthorizationDeniedException, NotFoundException,
-    RequestNotValidException, AlreadyExistsException, ValidationException {
+    String metadataId, String metadataType, String metadataVersion, InputStream is)
+    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException,
+    AlreadyExistsException, ValidationException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -1204,7 +1200,7 @@ public class Browser extends RodaWuiController {
     properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.CREATED.toString());
 
     DescriptiveMetadata ret = BrowserHelper.createOrUpdateAIPDescriptiveMetadataFile(representation.getAipId(),
-      representation.getId(), metadataId, metadataType, metadataVersion, properties, is, fileDetail, true);
+      representation.getId(), metadataId, metadataType, metadataVersion, properties, is, true);
 
     // register action
     controllerAssistant.registerAction(user, representationId, LOG_ENTRY_STATE.SUCCESS,
