@@ -2306,9 +2306,10 @@ public class SolrUtils {
     doc.addField(RodaConstants.INDEX_UUID, doc.getFieldValue(RodaConstants.PRESERVATION_EVENT_ID));
     return doc;
   }
+  
 
   public static <T extends IsIndexed> List<String> suggest(SolrClient index, Class<T> classToRetrieve, String field,
-    String queryString) throws GenericException {
+    String queryString, boolean justActive, User user) throws GenericException {
 
     String dictionaryName = field + "Suggester";
 
@@ -2318,6 +2319,10 @@ public class SolrUtils {
     query.setParam("suggest.dictionary", dictionaryName);
     query.setParam("suggest.q", queryString);
 
+    if (hasPermissionFilters(classToRetrieve)) {
+      query.addFilterQuery(getFilterQueries(user, justActive));
+    }
+    
     try {
       QueryResponse response = index.query(getIndexName(classToRetrieve).get(0), query);
       return response.getSuggesterResponse().getSuggestedTerms().get(dictionaryName);

@@ -331,7 +331,7 @@ public class Browser extends RodaWuiController {
     // delegate
     // TODO suggest must integrate the user filter to disallow view of
     // information with permission
-    final List<String> ret = BrowserHelper.suggest(classToReturn, field, query);
+    final List<String> ret = BrowserHelper.suggest(classToReturn, field, query,user);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_CLASS_PARAM,

@@ -114,6 +114,7 @@ public class AIP implements IsRODAObject {
         representation.setAipId(id);
         for (DescriptiveMetadata repDm : representation.getDescriptiveMetadata()) {
           repDm.setAipId(id);
+          repDm.setRepresentationId(representation.getId());
         }
       }
     }

@@ -444,9 +444,9 @@ public class BrowserHelper {
     return null;
   }
 
-  protected static <T extends IsIndexed> List<String> suggest(Class<T> returnClass, String field, String query)
+  protected static <T extends IsIndexed> List<String> suggest(Class<T> returnClass, String field, String query, User user)
     throws GenericException, NotFoundException {
-    return RodaCoreFactory.getIndexService().suggest(returnClass, field, query);
+    return RodaCoreFactory.getIndexService().suggest(returnClass, field, query,user);
   }
 
   private static IndexResult<IndexedRepresentation> findRepresentations(String aipId, Sorter sorter, Sublist sublist)

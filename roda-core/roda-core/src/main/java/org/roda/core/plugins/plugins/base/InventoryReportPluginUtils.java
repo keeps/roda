@@ -89,6 +89,13 @@ public class InventoryReportPluginUtils {
     for (DescriptiveMetadata dm : aip.getDescriptiveMetadata()) {
       descriptiveMetadataInformation.add(retrieveDescriptiveMetadataInfo(fields, aip, dm, model, storage));
     }
+    if(aip.getRepresentations()!=null){
+      for(Representation r : aip.getRepresentations()){
+        for (DescriptiveMetadata dm : r.getDescriptiveMetadata()) {
+          descriptiveMetadataInformation.add(retrieveDescriptiveMetadataInfo(fields, aip, dm, model, storage));
+        }
+      }
+    }
     return descriptiveMetadataInformation;
 
   }
@@ -101,9 +108,9 @@ public class InventoryReportPluginUtils {
       if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_SIP_ID)) {
         fileInfo.add(FSUtils.asString(aip.getIngestSIPIds()));
       } else if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_AIP_ID)) {
-        fileInfo.add(aip.getId());
+        fileInfo.add(dm.getAipId());
       } else if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_REPRESENTATION_ID)) {
-        fileInfo.add("");
+        fileInfo.add(dm.getRepresentationId());
       } else if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_FILE_PATH)) {
         fileInfo.add("");
       } else if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_FILE_ID)) {

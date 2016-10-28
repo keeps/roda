@@ -467,9 +467,10 @@ public class IndexService {
     SolrUtils.commit(getSolrClient(), classToCommit);
   }
 
-  public <T extends IsIndexed> List<String> suggest(Class<T> returnClass, String field, String query)
+  public <T extends IsIndexed> List<String> suggest(Class<T> returnClass, String field, String query, User user)
     throws GenericException {
-    return SolrUtils.suggest(getSolrClient(), returnClass, field, query);
+    boolean justActive = true;
+    return SolrUtils.suggest(getSolrClient(), returnClass, field, query, justActive,user);
   }
 
   public <T extends IsIndexed> void execute(Class<T> classToRetrieve, Filter filter, IndexRunnable<T> indexRunnable)
