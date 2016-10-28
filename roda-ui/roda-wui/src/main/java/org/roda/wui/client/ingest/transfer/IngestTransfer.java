@@ -233,6 +233,9 @@ public class IngestTransfer extends Composite {
           int size = selectedList.getIds().size();
           move.setEnabled(size > 0);
           rename.setEnabled(size == 1 || (size == 0 && resource != null));
+        } else if (selected instanceof SelectedItemsList) {
+          move.setEnabled(true);
+          rename.setEnabled(false);
         }
       }
 
@@ -329,8 +332,8 @@ public class IngestTransfer extends Composite {
       view();
       callback.onSuccess(this);
     } else if (historyTokens.size() >= 1
-      && historyTokens.get(0).equals(TransferUpload.RESOLVER.getHistoryToken())) {
-      TransferUpload.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      && historyTokens.get(0).equals(TransferUpload.INGEST_RESOLVER.getHistoryToken())) {
+      TransferUpload.INGEST_RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {
       String transferredResourceUUID = historyTokens.get(0);
       if (transferredResourceUUID != null) {
@@ -344,16 +347,16 @@ public class IngestTransfer extends Composite {
                   messages.ingestTransferNotFoundDialogMessage(), messages.ingestTransferNotFoundDialogButton(),
                   new AsyncCallback<Void>() {
 
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    // do nothing
-                  }
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      // do nothing
+                    }
 
-                  @Override
-                  public void onSuccess(Void result) {
-                    Tools.newHistory(IngestTransfer.RESOLVER);
-                  }
-                });
+                    @Override
+                    public void onSuccess(Void result) {
+                      Tools.newHistory(IngestTransfer.RESOLVER);
+                    }
+                  });
               } else {
                 AsyncCallbackUtils.defaultFailureTreatment(caught);
                 Tools.newHistory(IngestTransfer.RESOLVER);
@@ -419,9 +422,9 @@ public class IngestTransfer extends Composite {
   @UiHandler("uploadFiles")
   void buttonUploadFilesHandler(ClickEvent e) {
     if (resource != null) {
-      Tools.newHistory(TransferUpload.RESOLVER, resource.getUUID());
+      Tools.newHistory(TransferUpload.INGEST_RESOLVER, resource.getUUID());
     } else {
-      Tools.newHistory(TransferUpload.RESOLVER);
+      Tools.newHistory(TransferUpload.INGEST_RESOLVER);
     }
   }
 
@@ -441,16 +444,16 @@ public class IngestTransfer extends Composite {
           BrowserService.Util.getInstance().createTransferredResourcesFolder(parent, folderName,
             new AsyncCallback<String>() {
 
-            @Override
-            public void onFailure(Throwable caught) {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
-            }
+              @Override
+              public void onFailure(Throwable caught) {
+                AsyncCallbackUtils.defaultFailureTreatment(caught);
+              }
 
-            @Override
-            public void onSuccess(String newResourceUUID) {
-              Tools.newHistory(RESOLVER, newResourceUUID);
-            }
-          });
+              @Override
+              public void onSuccess(String newResourceUUID) {
+                Tools.newHistory(RESOLVER, newResourceUUID);
+              }
+            });
         }
       });
   }
@@ -513,33 +516,33 @@ public class IngestTransfer extends Composite {
             messages.ingestTransferRemoveSelectedConfirmDialogMessage(size), messages.dialogNo(), messages.dialogYes(),
             new AsyncCallback<Boolean>() {
 
-            @Override
-            public void onFailure(Throwable caught) {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
-            }
-
-            @Override
-            public void onSuccess(Boolean confirmed) {
-              if (confirmed) {
-                BrowserService.Util.getInstance().deleteTransferredResources(selected, new AsyncCallback<Void>() {
-
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    AsyncCallbackUtils.defaultFailureTreatment(caught);
-                    transferredResourceList.refresh();
-                  }
-
-                  @Override
-                  public void onSuccess(Void result) {
-                    Toast.showInfo(messages.removeSuccessTitle(), messages.removeSuccessMessage(size));
-                    transferredResourceList.refresh();
-                    move.setEnabled(false);
-                    rename.setEnabled(false);
-                  }
-                });
+              @Override
+              public void onFailure(Throwable caught) {
+                AsyncCallbackUtils.defaultFailureTreatment(caught);
               }
-            }
-          });
+
+              @Override
+              public void onSuccess(Boolean confirmed) {
+                if (confirmed) {
+                  BrowserService.Util.getInstance().deleteTransferredResources(selected, new AsyncCallback<Void>() {
+
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      AsyncCallbackUtils.defaultFailureTreatment(caught);
+                      transferredResourceList.refresh();
+                    }
+
+                    @Override
+                    public void onSuccess(Void result) {
+                      Toast.showInfo(messages.removeSuccessTitle(), messages.removeSuccessMessage(size));
+                      transferredResourceList.refresh();
+                      move.setEnabled(false);
+                      rename.setEnabled(false);
+                    }
+                  });
+                }
+              }
+            });
         }
       });
 
@@ -610,17 +613,17 @@ public class IngestTransfer extends Composite {
           BrowserService.Util.getInstance().renameTransferredResource(transferredResourceId, result,
             new AsyncCallback<String>() {
 
-            @Override
-            public void onFailure(Throwable caught) {
-              Toast.showInfo(messages.dialogFailure(), messages.renameSIPFailed());
-            }
+              @Override
+              public void onFailure(Throwable caught) {
+                Toast.showInfo(messages.dialogFailure(), messages.renameSIPFailed());
+              }
 
-            @Override
-            public void onSuccess(String result) {
-              Toast.showInfo(messages.dialogSuccess(), messages.renameSIPSuccessful());
-              Tools.newHistory(IngestTransfer.RESOLVER, result);
-            }
-          });
+              @Override
+              public void onSuccess(String result) {
+                Toast.showInfo(messages.dialogSuccess(), messages.renameSIPSuccessful());
+                Tools.newHistory(IngestTransfer.RESOLVER, result);
+              }
+            });
         }
       });
   }
@@ -689,21 +692,21 @@ public class IngestTransfer extends Composite {
         BrowserService.Util.getInstance().moveTransferredResource(getSelected(), transferredResource,
           new AsyncCallback<String>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            Toast.showInfo(messages.dialogFailure(), messages.moveSIPFailed());
-          }
-
-          @Override
-          public void onSuccess(String result) {
-            Toast.showInfo(messages.dialogSuccess(), messages.moveSIPSuccessful());
-            if (resource != null && resource.isFile()) {
-              Tools.newHistory(IngestTransfer.RESOLVER, result);
-            } else {
-              transferredResourceList.refresh();
+            @Override
+            public void onFailure(Throwable caught) {
+              Toast.showInfo(messages.dialogFailure(), messages.moveSIPFailed());
             }
-          }
-        });
+
+            @Override
+            public void onSuccess(String result) {
+              Toast.showInfo(messages.dialogSuccess(), messages.moveSIPSuccessful());
+              if (resource != null && resource.isFile()) {
+                Tools.newHistory(IngestTransfer.RESOLVER, result);
+              } else {
+                transferredResourceList.refresh();
+              }
+            }
+          });
       }
     });
   }

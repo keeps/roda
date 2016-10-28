@@ -23,9 +23,11 @@ import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.common.Dialogs;
+import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.SelectFileDialog;
+import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.lists.SearchFileList;
 import org.roda.wui.client.common.search.SearchFilters;
@@ -35,6 +37,7 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.transfer.TransferUpload;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
+import org.roda.wui.client.process.CreateJob;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -53,6 +56,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -112,9 +116,9 @@ public class BrowseFolder extends Composite {
               }
             }
           });
-      }
-      if (historyTokens.size() == 1 && historyTokens.get(0).equals(TransferUpload.RESOLVER.getHistoryToken())) {
-        TransferUpload.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      } else if (historyTokens.size() > 0
+        && historyTokens.get(0).equals(TransferUpload.BROWSE_RESOLVER.getHistoryToken())) {
+        TransferUpload.BROWSE_RESOLVER.resolve(Tools.tail(historyTokens), callback);
       } else {
         errorRedirect(callback);
       }
@@ -173,6 +177,9 @@ public class BrowseFolder extends Composite {
   Label folderId;
 
   @UiField
+  Button rename, createFolder;
+
+  @UiField
   BreadcrumbPanel breadcrumb;
 
   @UiField(provided = true)
@@ -214,6 +221,34 @@ public class BrowseFolder extends Composite {
             Tools.newHistory(Browse.RESOLVER, BrowseFile.RESOLVER.getHistoryToken(), aipId, repId, selected.getUUID());
           }
         }
+      }
+    });
+
+    filesList.addCheckboxSelectionListener(new CheckboxSelectionListener<IndexedFile>() {
+
+      @Override
+      public void onSelectionChange(SelectedItems<IndexedFile> selected) {
+        SelectedItems<IndexedFile> files = (SelectedItems<IndexedFile>) filesList.getSelected();
+
+        if (ClientSelectedItemsUtils.isEmpty(files)) {
+          files = new SelectedItemsList<IndexedFile>(Arrays.asList(folderUUID), IndexedFile.class.getName());
+        }
+
+        boolean empty = ClientSelectedItemsUtils.isEmpty(selected);
+        createFolder.setEnabled(empty);
+
+        ClientSelectedItemsUtils.size(IndexedFile.class, files, new AsyncCallback<Long>() {
+
+          @Override
+          public void onFailure(Throwable caught) {
+            // do nothing
+          }
+
+          @Override
+          public void onSuccess(Long result) {
+            rename.setEnabled(result == 1);
+          }
+        });
       }
     });
 
@@ -268,15 +303,10 @@ public class BrowseFolder extends Composite {
 
         @Override
         public void onSuccess(String newName) {
-          BrowserService.Util.getInstance().renameFolder(folderUUID, newName, new AsyncCallback<String>() {
+          BrowserService.Util.getInstance().renameFolder(folderUUID, newName, new LoadingAsyncCallback<String>() {
 
             @Override
-            public void onFailure(Throwable caught) {
-              Toast.showInfo(messages.dialogFailure(), messages.renameFailed());
-            }
-
-            @Override
-            public void onSuccess(String newUUID) {
+            public void onSuccessImpl(String newUUID) {
               Toast.showInfo(messages.dialogSuccess(), messages.renameSuccessful());
               Tools.newHistory(BrowseFolder.RESOLVER, aipId, repId, newUUID);
             }
@@ -328,9 +358,7 @@ public class BrowseFolder extends Composite {
 
   @UiHandler("uploadFiles")
   void buttonUploadFilesHandler(ClickEvent e) {
-    // Tools.newHistory(RESOLVER, TransferUpload.RESOLVER.getHistoryToken(),
-    // "file", folderUUID);
-    Toast.showInfo("Warning", "This feature is not yet implemented");
+    Tools.newHistory(RESOLVER, TransferUpload.BROWSE_RESOLVER.getHistoryToken(), aipId, repId, folderUUID);
   }
 
   @UiHandler("createFolder")
@@ -387,5 +415,18 @@ public class BrowseFolder extends Composite {
         filesList.refresh();
       }
     });
+  }
+
+  @UiHandler("newProcess")
+  void buttonNewProcessHandler(ClickEvent e) {
+    SelectedItems<IndexedFile> files = (SelectedItems<IndexedFile>) filesList.getSelected();
+
+    if (ClientSelectedItemsUtils.isEmpty(files)) {
+      files = new SelectedItemsList<IndexedFile>(Arrays.asList(folderUUID), IndexedFile.class.getName());
+    }
+
+    LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+    selectedItems.setSelectedItems(files);
+    Tools.newHistory(CreateJob.RESOLVER, "action");
   }
 }

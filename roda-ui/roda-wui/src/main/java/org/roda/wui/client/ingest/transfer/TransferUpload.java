@@ -12,11 +12,13 @@ package org.roda.wui.client.ingest.transfer;
 
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.wui.client.browse.BrowseFolder;
+import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.Tools;
@@ -52,7 +54,7 @@ import config.i18n.client.ClientMessages;
  */
 public class TransferUpload extends Composite {
 
-  public static final HistoryResolver RESOLVER = new HistoryResolver() {
+  public static final HistoryResolver INGEST_RESOLVER = new HistoryResolver() {
 
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
@@ -75,6 +77,29 @@ public class TransferUpload extends Composite {
     }
   };
 
+  public static final HistoryResolver BROWSE_RESOLVER = new HistoryResolver() {
+
+    @Override
+    public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
+      getInstance().browseResolve(historyTokens, callback);
+    }
+
+    @Override
+    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+      UserLogin.getInstance().checkRole(this, callback);
+    }
+
+    @Override
+    public String getHistoryToken() {
+      return "upload";
+    }
+
+    @Override
+    public List<String> getHistoryPath() {
+      return Tools.concat(BrowseFolder.RESOLVER.getHistoryPath(), getHistoryToken());
+    }
+  };
+
   private static TransferUpload instance = null;
 
   /**
@@ -93,10 +118,6 @@ public class TransferUpload extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
-  @SuppressWarnings("unused")
-  private ClientLogger logger = new ClientLogger(getClass().getName());
-
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   @UiField
@@ -120,6 +141,12 @@ public class TransferUpload extends Composite {
 
   private TransferredResource resource;
 
+  private String folderUUID;
+  private String representationUUID;
+  private String aipId;
+
+  private boolean isIngest = true;
+
   @SuppressWarnings("unused")
   private HandlerRegistration handlerRegistration;
 
@@ -136,16 +163,23 @@ public class TransferUpload extends Composite {
   }
 
   private String getUploadUrl() {
-    String ret;
+    String ret = null;
 
-    if (resource == null) {
-      // upload to root
-      ret = RestUtils.createTransferredResourceUploadUri(null, LocaleInfo.getCurrentLocale().getLocaleName());
-    } else if (resource != null && !resource.isFile()) {
-      ret = RestUtils.createTransferredResourceUploadUri(resource.getUUID(),
-        LocaleInfo.getCurrentLocale().getLocaleName());
+    if (isIngest) {
+      if (resource == null) {
+        // upload to root
+        ret = RestUtils.createTransferredResourceUploadUri(null, LocaleInfo.getCurrentLocale().getLocaleName());
+      } else if (resource != null && !resource.isFile()) {
+        ret = RestUtils.createTransferredResourceUploadUri(resource.getUUID(),
+          LocaleInfo.getCurrentLocale().getLocaleName());
+      }
     } else {
-      ret = null;
+      if (folderUUID == null) {
+        // upload to root
+        ret = RestUtils.createFileUploadUri(null, LocaleInfo.getCurrentLocale().getLocaleName());
+      } else {
+        ret = RestUtils.createFileUploadUri(folderUUID, LocaleInfo.getCurrentLocale().getLocaleName());
+      }
     }
 
     return ret;
@@ -153,31 +187,18 @@ public class TransferUpload extends Composite {
 
   protected void onAttach() {
     verified = false;
-
-    // handlerRegistration = History.addValueChangeHandler(new
-    // ValueChangeHandler<String>() {
-    //
-    // @Override
-    // public void onValueChange(ValueChangeEvent<String> event) {
-    // if (!verified) {
-    // logger.debug("BACK " + JavascriptUtils.isUploadRunning());
-    // History.newItem(Tools.createHistoryToken(IngestTransferUpload.RESOLVER.getHistoryPath()),
-    // false);
-    // // verifyActiveUploads();
-    // }
-    // }
-    // });
-
     super.onAttach();
   }
 
   protected void resolve(final List<String> historyTokens, final AsyncCallback<Widget> callback) {
+    isIngest = true;
+
     if (historyTokens.size() == 0) {
       // Upload to root
       resource = null;
       callback.onSuccess(TransferUpload.this);
       updateUploadForm();
-    } else {
+    } else if (historyTokens.size() == 1) {
       // Upload to directory
       String transferredResourceUUID = historyTokens.get(0);
       if (transferredResourceUUID != null) {
@@ -204,14 +225,26 @@ public class TransferUpload extends Composite {
     }
   }
 
+  protected void browseResolve(final List<String> historyTokens, final AsyncCallback<Widget> callback) {
+    isIngest = false;
+
+    if (historyTokens.size() == 2 || historyTokens.size() == 3) {
+      aipId = historyTokens.get(0);
+      representationUUID = historyTokens.get(1);
+      folderUUID = historyTokens.get(2);
+      callback.onSuccess(TransferUpload.this);
+      updateUploadForm();
+    }
+  }
+
   private void updateUploadForm() {
     String uploadUrl = getUploadUrl();
 
     if (uploadUrl != null) {
-      SafeHtml html = SafeHtmlUtils.fromSafeConstant("<form id='upload' method='post' action='" + getUploadUrl()
+      SafeHtml html = SafeHtmlUtils.fromSafeConstant("<form id='upload' method='post' action='" + uploadUrl
         + "' enctype='multipart/form-data'>" + "<div id='drop'><h4>" + messages.ingestTransferUploadDropHere()
-        + "</h4><a>" + messages.ingestTransferUploadBrowseFiles() + "</a>"
-        + "<input type='file' name='upl' multiple='true' />" + "</div>" + "</form>");
+        + "</h4><a>" + messages.ingestTransferUploadBrowseFiles() + "</a>" + "<input type='file' name='"
+        + RodaConstants.API_PARAM_UPLOAD + "' multiple='true' />" + "</div>" + "</form>");
 
       uploadForm.setHTML(html);
       uploadList.setHTML(SafeHtmlUtils.fromSafeConstant("<ul id='upload-list'></ul>"));
@@ -251,36 +284,19 @@ public class TransferUpload extends Composite {
     historyBack();
   }
 
-  // void verifyActiveUploads() {
-  // int uploads = JavascriptUtils.isUploadRunning();
-  // if (uploads > 0) {
-  // historyBack();
-  // } else {
-  // Dialogs.showConfirmDialog("1", "2", "3", "4", new AsyncCallback<Boolean>()
-  // {
-  //
-  // @Override
-  // public void onFailure(Throwable caught) {
-  // // TODO Auto-generated method stub
-  //
-  // }
-  //
-  // @Override
-  // public void onSuccess(Boolean result) {
-  // if (result) {
-  // verified = true;
-  // historyBack();
-  // }
-  // }
-  // });
-  // }
-  // }
-
   void historyBack() {
-    if (resource != null) {
-      Tools.newHistory(IngestTransfer.RESOLVER, resource.getUUID());
+    if (isIngest) {
+      if (resource != null) {
+        Tools.newHistory(IngestTransfer.RESOLVER, resource.getUUID());
+      } else {
+        Tools.newHistory(IngestTransfer.RESOLVER);
+      }
     } else {
-      Tools.newHistory(IngestTransfer.RESOLVER);
+      if (folderUUID != null) {
+        Tools.newHistory(BrowseFolder.RESOLVER, aipId, representationUUID, folderUUID);
+      } else {
+        Tools.newHistory(BrowseRepresentation.RESOLVER, aipId, representationUUID);
+      }
     }
   }
 }

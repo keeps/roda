@@ -95,31 +95,31 @@ public class BrowseRepresentation extends Composite {
         BrowserService.Util.getInstance().retrieveItemBundle(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
           new AsyncCallback<BrowseItemBundle>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
-            errorRedirect(callback);
-          }
+            @Override
+            public void onFailure(Throwable caught) {
+              Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
+              errorRedirect(callback);
+            }
 
-          @Override
-          public void onSuccess(final BrowseItemBundle itemBundle) {
-            BrowserService.Util.getInstance().retrieve(IndexedRepresentation.class.getName(), representationUUID,
-              new AsyncCallback<IndexedRepresentation>() {
+            @Override
+            public void onSuccess(final BrowseItemBundle itemBundle) {
+              BrowserService.Util.getInstance().retrieve(IndexedRepresentation.class.getName(), representationUUID,
+                new AsyncCallback<IndexedRepresentation>() {
 
-              @Override
-              public void onFailure(Throwable caught) {
-                Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
-                errorRedirect(callback);
-              }
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
+                    errorRedirect(callback);
+                  }
 
-              @Override
-              public void onSuccess(IndexedRepresentation indexedRepresentation) {
-                BrowseRepresentation representation = new BrowseRepresentation(itemBundle, indexedRepresentation);
-                callback.onSuccess(representation);
-              }
-            });
-          }
-        });
+                  @Override
+                  public void onSuccess(IndexedRepresentation indexedRepresentation) {
+                    BrowseRepresentation representation = new BrowseRepresentation(itemBundle, indexedRepresentation);
+                    callback.onSuccess(representation);
+                  }
+                });
+            }
+          });
 
       } else {
         errorRedirect(callback);
@@ -198,7 +198,9 @@ public class BrowseRepresentation extends Composite {
     handlers = new ArrayList<HandlerRegistration>();
 
     String summary = messages.representationListOfFiles();
-    boolean selectable = true;
+
+    // FIXME change selectable to true
+    boolean selectable = false;
 
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, repId),
       new EmptyKeyFilterParameter(RodaConstants.FILE_PARENT_UUID));
@@ -210,10 +212,10 @@ public class BrowseRepresentation extends Composite {
         IndexedFile selected = filesList.getSelectionModel().getSelectedObject();
         if (selected != null) {
           if (selected.isDirectory()) {
-            Tools.newHistory(Browse.RESOLVER, BrowseFolder.RESOLVER.getHistoryToken(), aipId, repId, selected.getUUID());
-          } else {
-            Tools.newHistory(Browse.RESOLVER, BrowseFile.RESOLVER.getHistoryToken(), aipId, repId,
+            Tools.newHistory(Browse.RESOLVER, BrowseFolder.RESOLVER.getHistoryToken(), aipId, repId,
               selected.getUUID());
+          } else {
+            Tools.newHistory(Browse.RESOLVER, BrowseFile.RESOLVER.getHistoryToken(), aipId, repId, selected.getUUID());
           }
         }
       }

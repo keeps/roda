@@ -279,6 +279,15 @@ public class RestUtils {
     return b.toString();
   }
 
+  public static String createFileUploadUri(String parentUUID, String locale) {
+    // api/v1/files/{fileUUID}?locale={locale}
+    StringBuilder b = new StringBuilder();
+
+    // base uri
+    b.append(RodaConstants.API_REST_V1_FILES).append(UriUtils.encode(parentUUID));
+    return b.toString();
+  }
+
   public static SafeUri createTransferredResourceDownloadUri(String resourceId) {
     // api/v1/transferred/{transferred_resource_uuid}?acceptFormat=bin
     StringBuilder b = new StringBuilder();

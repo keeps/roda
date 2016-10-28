@@ -43,9 +43,11 @@ import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
@@ -236,6 +238,14 @@ public class IndexService {
     observer.aipCreated(aip);
   }
 
+  public void reindexRepresentation(Representation rep) {
+    observer.representationCreated(rep);
+  }
+
+  public void reindexFile(File file) {
+    observer.fileCreated(file);
+  }
+
   public void reindexPreservationAgents()
     throws RequestNotValidException, GenericException, AuthorizationDeniedException {
     CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = model.listPreservationAgents();
@@ -347,6 +357,10 @@ public class IndexService {
       reindexActionLog(LogEntry.class.cast(object));
     } else if (Job.class.equals(objectClass)) {
       reindexJob(Job.class.cast(object));
+    } else if (Representation.class.equals(objectClass) || IndexedRepresentation.class.equals(objectClass)) {
+      reindexRepresentation(Representation.class.cast(object));
+    } else if (File.class.equals(objectClass) || IndexedFile.class.equals(objectClass)) {
+      reindexFile(File.class.cast(object));
     } else {
       LOGGER.error("Error trying to reindex an unconfigured object class: {}", objectClass.getName());
     }

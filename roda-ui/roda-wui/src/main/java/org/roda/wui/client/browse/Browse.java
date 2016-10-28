@@ -38,6 +38,7 @@ import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.lists.AIPList;
+import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.search.SearchPanel;
@@ -289,9 +290,7 @@ public class Browse extends Composite {
     facetPanels.put(RodaConstants.AIP_HAS_REPRESENTATIONS, facetHasRepresentations);
 
     FacetUtils.bindFacets(aipList, facetPanels);
-
     initWidget(uiBinder.createAndBindUi(this));
-
     browseDescription.add(new HTMLWidgetWrapper("BrowseDescription.html"));
 
     aipList.getSelectionModel().addSelectionChangeHandler(new Handler() {
@@ -317,6 +316,18 @@ public class Browse extends Composite {
         searchPanel.setVisible(viewingTop || searchable);
         aipList.setVisible(viewingTop || searchable);
         // itemsFacets.setVisible(viewingTop);
+      }
+    });
+
+    aipList.addCheckboxSelectionListener(new CheckboxSelectionListener<IndexedAIP>() {
+
+      @Override
+      public void onSelectionChange(SelectedItems<IndexedAIP> selected) {
+        if (aipId == null) {
+          boolean empty = ClientSelectedItemsUtils.isEmpty(selected);
+          moveItem.setEnabled(!empty);
+          editPermissions.setEnabled(!empty);
+        }
       }
     });
 
@@ -942,31 +953,31 @@ public class Browse extends Composite {
             messages.removeSelectedConfirmDialogMessage(size), messages.dialogNo(), messages.dialogYes(),
             new AsyncCallback<Boolean>() {
 
-            @Override
-            public void onSuccess(Boolean confirmed) {
-              if (confirmed) {
-                BrowserService.Util.getInstance().deleteAIP(selected, new LoadingAsyncCallback<String>() {
+              @Override
+              public void onSuccess(Boolean confirmed) {
+                if (confirmed) {
+                  BrowserService.Util.getInstance().deleteAIP(selected, new LoadingAsyncCallback<String>() {
 
-                  @Override
-                  public void onFailureImpl(Throwable caught) {
-                    AsyncCallbackUtils.defaultFailureTreatment(caught);
-                    aipList.refresh();
-                  }
+                    @Override
+                    public void onFailureImpl(Throwable caught) {
+                      AsyncCallbackUtils.defaultFailureTreatment(caught);
+                      aipList.refresh();
+                    }
 
-                  @Override
-                  public void onSuccessImpl(String parentId) {
-                    Toast.showInfo(messages.removeSuccessTitle(), messages.removeSuccessMessage(size));
-                    aipList.refresh();
-                  }
-                });
+                    @Override
+                    public void onSuccessImpl(String parentId) {
+                      Toast.showInfo(messages.removeSuccessTitle(), messages.removeSuccessMessage(size));
+                      aipList.refresh();
+                    }
+                  });
+                }
               }
-            }
 
-            @Override
-            public void onFailure(Throwable caught) {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
-            }
-          });
+              @Override
+              public void onFailure(Throwable caught) {
+                AsyncCallbackUtils.defaultFailureTreatment(caught);
+              }
+            });
         }
 
       });
@@ -1078,24 +1089,24 @@ public class Browse extends Composite {
           BrowserService.Util.getInstance().moveAIPInHierarchy(selected, parentId,
             new LoadingAsyncCallback<IndexedAIP>() {
 
-            @Override
-            public void onSuccessImpl(IndexedAIP result) {
-              if (result != null) {
-                Tools.newHistory(Browse.RESOLVER, result.getId());
-              } else {
-                Tools.newHistory(Browse.RESOLVER);
+              @Override
+              public void onSuccessImpl(IndexedAIP result) {
+                if (result != null) {
+                  Tools.newHistory(Browse.RESOLVER, result.getId());
+                } else {
+                  Tools.newHistory(Browse.RESOLVER);
+                }
               }
-            }
 
-            @Override
-            public void onFailureImpl(Throwable caught) {
-              if (caught instanceof NotFoundException) {
-                Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-              } else {
-                AsyncCallbackUtils.defaultFailureTreatment(caught);
+              @Override
+              public void onFailureImpl(Throwable caught) {
+                if (caught instanceof NotFoundException) {
+                  Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+                } else {
+                  AsyncCallbackUtils.defaultFailureTreatment(caught);
+                }
               }
-            }
-          });
+            });
         }
 
       });

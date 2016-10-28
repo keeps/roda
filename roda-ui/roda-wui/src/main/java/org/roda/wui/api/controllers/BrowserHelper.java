@@ -429,6 +429,10 @@ public class BrowserHelper {
     return RodaCoreFactory.getIndexService().retrieve(returnClass, id);
   }
 
+  protected static <T extends IsIndexed> void commit(Class<T> returnClass) throws GenericException, NotFoundException {
+    RodaCoreFactory.getIndexService().commit(returnClass);
+  }
+
   protected static <T extends IsIndexed> List<T> retrieve(Class<T> returnClass, SelectedItems<T> selectedItems)
     throws GenericException, NotFoundException, RequestNotValidException {
     if (selectedItems instanceof SelectedItemsList) {

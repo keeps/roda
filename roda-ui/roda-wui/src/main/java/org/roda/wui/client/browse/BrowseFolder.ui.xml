@@ -8,7 +8,7 @@
 	xmlns:m="urn:import:org.roda.wui.client.main">
 
 	<ui:style>
-
+	
 	</ui:style>
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
@@ -44,6 +44,9 @@
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarFoldersFilesTitle}' />
 							</g:Label>
+							<g:Button addStyleNames="btn btn-play" ui:field="newProcess">
+								<ui:text from='{messages.newProcessPreservation}' />
+							</g:Button>
 							<g:Button addStyleNames="btn btn-edit" ui:field="rename">
 								<ui:text from='{messages.renameButton}' />
 							</g:Button>

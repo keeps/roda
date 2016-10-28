@@ -24,7 +24,6 @@ import java.util.Map;
 import javax.xml.transform.TransformerException;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ConsumesOutputStream;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.common.IdUtils;
@@ -1098,7 +1097,7 @@ public class Browser extends RodaWuiController {
 
     // check user permissions
     controllerAssistant.checkRoles(user);
-    IndexedFile file = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class, fileUuid);
+    IndexedFile file = BrowserHelper.retrieve(IndexedFile.class, fileUuid);
     UserUtility.checkFilePermissions(user, file, PermissionType.READ);
 
     // delegate
@@ -1952,6 +1951,35 @@ public class Browser extends RodaWuiController {
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIP_ID_PARAM,
       aipId, RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId,
       RodaConstants.CONTROLLER_DIRECTORY_PATH_PARAM, directoryPath, RodaConstants.CONTROLLER_FILE_ID_PARAM, fileId);
+
+    return updatedFile;
+  }
+
+  public static File createFileWithUUID(User user, String fileUUID, String filename, InputStream is)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException,
+    AlreadyExistsException, IOException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+    IndexedFile ifile = BrowserHelper.retrieve(IndexedFile.class, fileUUID);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, ifile.getAipId());
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.CREATE);
+
+    // delegate
+    Path file = Files.createTempFile("descriptive", ".tmp");
+    Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
+    ContentPayload payload = new FSPathContentPayload(file);
+    List<String> newFileDirectoryPath = ifile.getPath();
+    newFileDirectoryPath.add(ifile.getId());
+
+    File updatedFile = BrowserHelper.createFile(ifile.getAipId(), ifile.getRepresentationId(), newFileDirectoryPath,
+      filename, payload);
+    BrowserHelper.commit(IndexedFile.class);
+
+    // register action
+    controllerAssistant.registerAction(user, aip.getId(), LOG_ENTRY_STATE.SUCCESS,
+      RodaConstants.CONTROLLER_FILE_UUID_PARAM, fileUUID, RodaConstants.CONTROLLER_FILENAME_PARAM, filename);
 
     return updatedFile;
   }

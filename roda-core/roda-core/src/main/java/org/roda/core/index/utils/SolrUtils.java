@@ -227,7 +227,7 @@ public class SolrUtils {
 
   public static <T extends IsIndexed> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve, Filter filter,
     Sorter sorter, Sublist sublist, Facets facets, User user, boolean justActive)
-      throws GenericException, RequestNotValidException {
+    throws GenericException, RequestNotValidException {
 
     IndexResult<T> ret;
     SolrQuery query = new SolrQuery();
@@ -369,7 +369,7 @@ public class SolrUtils {
     } else if (resultClass.equals(Job.class)) {
       indexNames.add(RodaConstants.INDEX_JOB);
       indexNames.add(RodaConstants.INDEX_JOB_REPORT);
-    } else if (resultClass.equals(IndexedFile.class)) {
+    } else if (resultClass.equals(IndexedFile.class) || resultClass.equals(File.class)) {
       indexNames.add(RodaConstants.INDEX_FILE);
     } else if (resultClass.equals(Risk.class) || resultClass.equals(IndexedRisk.class)) {
       indexNames.add(RodaConstants.INDEX_RISK);
@@ -1124,7 +1124,7 @@ public class SolrUtils {
 
   public static SolrInputDocument aipToSolrInputDocument(AIP aip, List<String> ancestors, ModelService model,
     boolean safemode)
-      throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     SolrInputDocument ret = new SolrInputDocument();
 
     ret.addField(RodaConstants.INDEX_UUID, aip.getId());
@@ -1365,8 +1365,8 @@ public class SolrUtils {
 
   public static SolrInputDocument addOtherPropertiesToIndexedFile(String prefix, OtherMetadata otherMetadataBinary,
     ModelService model, SolrClient index)
-      throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
-      ParserConfigurationException, SAXException, IOException, XPathExpressionException, SolrServerException {
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
+    ParserConfigurationException, SAXException, IOException, XPathExpressionException, SolrServerException {
     SolrDocument solrDocument = index.getById(RodaConstants.INDEX_FILE,
       IdUtils.getFileId(otherMetadataBinary.getAipId(), otherMetadataBinary.getRepresentationId(),
         otherMetadataBinary.getFileDirectoryPath(), otherMetadataBinary.getFileId()));
