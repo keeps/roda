@@ -488,8 +488,7 @@ public class IndexService {
   }
 
   public <T extends IsIndexed> List<String> suggest(Class<T> returnClass, String field, String query, User user,
-    boolean allowPartial) throws GenericException {
-    boolean justActive = true;
+    boolean allowPartial, boolean justActive) throws GenericException {
     return SolrUtils.suggest(getSolrClient(), returnClass, field, query, justActive, user, allowPartial);
   }
 

@@ -401,7 +401,7 @@ public class InternalPluginsTest {
     AssertJUnit.assertEquals("Plain Text File", indFile.getFileFormat().getFormatDesignationName());
 
     List<String> suggest = index.suggest(IndexedFile.class, RodaConstants.FILE_FORMAT_MIMETYPE,
-      mimetype.substring(0, 1),null,false);
+      mimetype.substring(0, 1),null,false,false);
     MatcherAssert.assertThat(suggest, Matchers.contains(mimetype));
 
     Plugin<? extends IsRODAObject> plugin = RodaCoreFactory.getPluginManager()
