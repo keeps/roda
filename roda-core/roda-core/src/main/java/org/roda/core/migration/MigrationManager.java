@@ -11,6 +11,7 @@ import java.util.Set;
 
 import org.reflections.Reflections;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.ModelInfo;
@@ -24,7 +25,6 @@ public class MigrationManager {
   private Path modelInfoFile;
   // map<model class, workflow>
   private Map<String, MigrationWorkflow> modelMigrations = new HashMap<>();
-  private Map<String, MigrationWorkflow> indexMigrations = new HashMap<>();
 
   public MigrationManager(Path dataFolder) {
     super();
@@ -52,15 +52,6 @@ public class MigrationManager {
     // addModelMigration(Job.class, 2, JobToVersion2.class);
   }
 
-  // 20161031 hsilva: this method is not invoked in the constructor as it might
-  // get very big & therefore
-  // should be done in a lazy fashion
-  public void setupIndexMigrations() {
-    // FIXME 20161031 hsilva: the following line is just an example and should
-    // be removed as soon as one real migration is configured
-    // addIndexMigration();
-  }
-
   private void addModelMigration(Class<? extends IsModelObject> clazz, int toVersion,
     Class<? extends MigrationAction> migrationClass) {
     String className = clazz.getName();
@@ -85,13 +76,18 @@ public class MigrationManager {
         try {
           // migrate
           migrationClass.newInstance().migrate();
-          LOGGER.info("Done migrating to version {}", toVersion);
+          LOGGER.info("Migrated with success to version {}", toVersion);
 
           // update class specific version after successful migration
           modelInfo.getInstalledClassesVersions().put(className, toVersion);
         } catch (InstantiationException | IllegalAccessException e) {
-          LOGGER.error("Error instantiating migration class '{}' (which migrates to version {})",
+          LOGGER.error("Error instantiating migration action class '{}' (which migrates to version {})",
             migrationClass.getName(), toVersion, e);
+          break;
+        } catch (RODAException e) {
+          LOGGER.error("Error executing migration action '{}'. Stopping migrations for class '{}'.",
+            migrationClass.getName(), className);
+          break;
         }
       }
       LOGGER.info("Done migrating class '{}'", className);
@@ -99,10 +95,6 @@ public class MigrationManager {
 
     // update model info. file
     JsonUtils.writeObjectToFile(modelInfo, modelInfoFile);
-  }
-
-  public void performIndexMigrations() throws GenericException {
-    // FIXME 20161031 hsilva: implement this
   }
 
   private boolean isModelMigrationNecessary() throws GenericException {

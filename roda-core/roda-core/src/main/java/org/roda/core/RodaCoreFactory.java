@@ -1442,7 +1442,6 @@ public class RodaCoreFactory {
   private static void printMigrateUsage() {
     System.err.println("Migrate command parameters:");
     System.err.println("\tmodel - performs model related migrations.");
-    System.err.println("\tindex - performs index related migrations.");
   }
 
   private static void mainMasterTasks(final List<String> args) throws GenericException, RequestNotValidException {
@@ -1488,9 +1487,6 @@ public class RodaCoreFactory {
         if ("model".equals(migrateParam)) {
           migrationManager.setupModelMigrations();
           migrationManager.performModelMigrations();
-        } else if ("index".equals(migrateParam)) {
-          migrationManager.setupIndexMigrations();
-          migrationManager.performIndexMigrations();
         } else {
           printMigrateUsage();
         }
