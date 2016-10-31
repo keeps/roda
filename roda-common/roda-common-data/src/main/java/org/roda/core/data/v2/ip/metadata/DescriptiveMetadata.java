@@ -9,14 +9,14 @@ package org.roda.core.data.v2.ip.metadata;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.IsModelObject;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlRootElement(name = "descriptive_metadata")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class DescriptiveMetadata implements IsRODAObject {
+public class DescriptiveMetadata implements IsModelObject {
   private static final long serialVersionUID = 5460845130599998867L;
 
   private String id;
@@ -40,6 +40,11 @@ public class DescriptiveMetadata implements IsRODAObject {
     this.representationId = representationId;
     this.type = type;
     this.version = version;
+  }
+
+  @Override
+  public int getModelVersion() {
+    return 1;
   }
 
   public String getId() {

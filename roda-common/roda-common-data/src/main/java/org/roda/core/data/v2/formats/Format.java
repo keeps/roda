@@ -7,7 +7,6 @@
  */
 package org.roda.core.data.v2.formats;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -15,6 +14,7 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.NamedIndexedModel;
 import org.roda.core.data.v2.index.IsIndexed;
 
@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlRootElement(name = "format")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Format extends NamedIndexedModel implements IsIndexed, Serializable {
+public class Format extends NamedIndexedModel implements IsModelObject, IsIndexed {
 
   private static final long serialVersionUID = 7178184202935641440L;
 
@@ -64,6 +64,11 @@ public class Format extends NamedIndexedModel implements IsIndexed, Serializable
     this.mimetypes = new ArrayList<String>(format.getMimetypes());
     this.pronoms = new ArrayList<String>(format.getPronoms());
     this.utis = new ArrayList<String>(format.getUtis());
+  }
+
+  @Override
+  public int getModelVersion() {
+    return 1;
   }
 
   public String getDefinition() {

@@ -13,14 +13,14 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @XmlRootElement(name = "aip")
-public class AIP implements IsRODAObject {
+public class AIP implements IsModelObject {
 
   private static final long serialVersionUID = 430629679119752757L;
 
@@ -80,6 +80,11 @@ public class AIP implements IsRODAObject {
     this.createdBy = createdBy;
     this.updatedOn = updatedOn;
     this.updatedBy = updatedBy;
+  }
+
+  @Override
+  public int getModelVersion() {
+    return 1;
   }
 
   /**

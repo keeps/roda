@@ -7,7 +7,6 @@
  */
 package org.roda.core.data.v2.jobs;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -15,6 +14,7 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIPState;
 
@@ -25,7 +25,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @XmlRootElement(name = "report")
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Report implements Serializable, IsIndexed {
+public class Report implements IsModelObject, IsIndexed {
   private static final long serialVersionUID = 4316398565678538090L;
 
   public enum PluginState {
@@ -92,6 +92,11 @@ public class Report implements Serializable, IsIndexed {
     this.pluginDetails = report.getPluginDetails();
     this.htmlPluginDetails = report.isHtmlPluginDetails();
     this.reports = new ArrayList<Report>();
+  }
+
+  @Override
+  public int getModelVersion() {
+    return 1;
   }
 
   public String getId() {

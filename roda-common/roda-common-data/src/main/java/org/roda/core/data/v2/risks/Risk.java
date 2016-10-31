@@ -11,6 +11,7 @@ import java.util.Date;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.NamedIndexedModel;
 
@@ -19,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlRootElement(name = "risk")
 @JsonInclude(JsonInclude.Include.ALWAYS)
-public class Risk extends NamedIndexedModel implements IsRODAObject {
+public class Risk extends NamedIndexedModel implements IsModelObject {
 
   private static final long serialVersionUID = -585753367605901060L;
 
@@ -86,6 +87,11 @@ public class Risk extends NamedIndexedModel implements IsRODAObject {
     this.mitigationOwner = risk.getMitigationOwner();
     this.mitigationRelatedEventIdentifierType = risk.getMitigationRelatedEventIdentifierType();
     this.mitigationRelatedEventIdentifierValue = risk.getMitigationRelatedEventIdentifierValue();
+  }
+
+  @Override
+  public int getModelVersion() {
+    return 1;
   }
 
   public String getDescription() {

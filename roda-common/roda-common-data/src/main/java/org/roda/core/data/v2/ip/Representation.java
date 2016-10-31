@@ -12,6 +12,7 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 
@@ -20,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlRootElement(name = "representation")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Representation implements IsRODAObject {
+public class Representation implements IsModelObject {
 
   private static final long serialVersionUID = 3658011895150894795L;
 
@@ -50,6 +51,11 @@ public class Representation implements IsRODAObject {
     this.original = original;
     this.type = type;
     this.descriptiveMetadata = descriptiveMetadata;
+  }
+
+  @Override
+  public int getModelVersion() {
+    return 1;
   }
 
   public String getId() {

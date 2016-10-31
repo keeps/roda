@@ -108,6 +108,21 @@ public final class JsonUtils {
     return mapper;
   }
 
+  public static <T> T getObjectFromJson(Path json, Class<T> objectClass) throws GenericException {
+    T ret;
+    InputStream stream = null;
+    try {
+      stream = Files.newInputStream(json);
+      String jsonString = IOUtils.toString(stream, RodaConstants.DEFAULT_ENCODING);
+      ret = getObjectFromJson(jsonString, objectClass);
+    } catch (IOException e) {
+      throw new GenericException("Error while parsing json file", e);
+    } finally {
+      IOUtils.closeQuietly(stream);
+    }
+    return ret;
+  }
+
   public static <T> T getObjectFromJson(InputStream json, Class<T> objectClass) throws GenericException {
     T ret;
     try {

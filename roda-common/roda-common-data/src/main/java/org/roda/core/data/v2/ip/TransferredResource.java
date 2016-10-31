@@ -13,13 +13,14 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.index.IsIndexed;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlRootElement(name = "transferred_resource")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class TransferredResource implements IsIndexed {
+public class TransferredResource implements IsModelObject, IsIndexed {
 
   private static final long serialVersionUID = 1L;
   private String uuid;
@@ -35,6 +36,11 @@ public class TransferredResource implements IsIndexed {
   private Date lastScanDate;
   private String name;
   private boolean file;
+
+  @Override
+  public int getModelVersion() {
+    return 1;
+  }
 
   public String getParentPath() {
     return parentId;

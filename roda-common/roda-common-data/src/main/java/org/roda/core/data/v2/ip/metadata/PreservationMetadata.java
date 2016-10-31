@@ -11,13 +11,13 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.IsModelObject;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlRootElement(name = "preservation_metadata")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class PreservationMetadata implements IsRODAObject {
+public class PreservationMetadata implements IsModelObject {
   private static final long serialVersionUID = -4312941542769679721L;
 
   public static enum PreservationMetadataType {
@@ -57,6 +57,11 @@ public class PreservationMetadata implements IsRODAObject {
 
   public PreservationMetadata(String id, PreservationMetadataType type, String aipId, String representationId) {
     this(id, type, aipId, representationId, null, null);
+  }
+
+  @Override
+  public int getModelVersion() {
+    return 1;
   }
 
   /**

@@ -24,6 +24,10 @@ public class RodaWuiServlet extends HttpServlet {
   @Override
   public void init() throws ServletException {
     RodaCoreFactory.instantiate();
+    if (!RodaCoreFactory.instantiatedWithoutErrors()) {
+      LOGGER.error("Init: ko...");
+      throw new ServletException("RODA Core instantiated with errors! Please see RODA logs for more detail!");
+    }
     try {
       RodaCoreFactory.addConfiguration("roda-wui.properties");
     } catch (ConfigurationException e) {

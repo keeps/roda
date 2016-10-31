@@ -7,7 +7,6 @@
  */
 package org.roda.core.data.v2.jobs;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -17,6 +16,7 @@ import java.util.Map;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -32,7 +32,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @XmlRootElement(name = "job")
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Job implements IsIndexed, Serializable {
+public class Job implements IsModelObject, IsIndexed {
   private static final long serialVersionUID = 615993757726175203L;
 
   public static enum JOB_STATE {
@@ -86,6 +86,11 @@ public class Job implements IsIndexed, Serializable {
     if (sourceObjects instanceof SelectedItemsList) {
       jobStats.setSourceObjectsCount(((SelectedItemsList<?>) sourceObjects).getIds().size());
     }
+  }
+
+  @Override
+  public int getModelVersion() {
+    return 1;
   }
 
   public String getId() {

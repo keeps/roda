@@ -11,13 +11,14 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.IsRODAObject;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlRootElement(name = "file")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class File implements IsRODAObject {
+public class File implements IsModelObject {
 
   private static final long serialVersionUID = 3303019735787641534L;
 
@@ -40,6 +41,11 @@ public class File implements IsRODAObject {
     this.representationId = representationId;
     this.path = path;
     this.isDirectory = isDirectory;
+  }
+
+  @Override
+  public int getModelVersion() {
+    return 1;
   }
 
   public String getId() {

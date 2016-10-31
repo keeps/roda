@@ -13,6 +13,7 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.index.IsIndexed;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -24,7 +25,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @XmlRootElement(name = "log_entry")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class LogEntry implements IsIndexed {
+public class LogEntry implements IsModelObject, IsIndexed {
   private static final long serialVersionUID = -178083792639806983L;
 
   public enum LOG_ENTRY_STATE {
@@ -95,6 +96,11 @@ public class LogEntry implements IsIndexed {
     setRelatedObjectID(relatedObjectID);
     setDuration(duration);
     setState(state);
+  }
+
+  @Override
+  public int getModelVersion() {
+    return 1;
   }
 
   @Override

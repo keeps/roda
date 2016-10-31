@@ -7,7 +7,6 @@
  */
 package org.roda.core.data.v2.risks;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -15,6 +14,7 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
 
@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlRootElement(name = "riskincidence")
 @JsonInclude(JsonInclude.Include.ALWAYS)
-public class RiskIncidence implements IsIndexed, Serializable {
+public class RiskIncidence implements IsModelObject, IsIndexed {
 
   private static final long serialVersionUID = -1089167070045254627L;
 
@@ -61,6 +61,11 @@ public class RiskIncidence implements IsIndexed, Serializable {
     this.setFileId(incidence.getFileId());
     this.setObjectClass(incidence.getObjectClass());
     this.setRiskId(incidence.getRiskId());
+  }
+
+  @Override
+  public int getModelVersion() {
+    return 1;
   }
 
   public String getId() {

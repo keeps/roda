@@ -106,11 +106,11 @@ public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
           AIPState.INGEST_PROCESSING);
         if (error != null) {
           reportItem.setPluginState(PluginState.FAILURE)
-            .setPluginDetails("Removal of unwanted AIP " + indexedAIP.getId() + " did not end successfully: " + error);
+            .setPluginDetails("Removal of AIP " + indexedAIP.getId() + " did not end successfully: " + error);
           jobPluginInfo.incrementObjectsProcessedWithFailure();
         } else {
           reportItem.setPluginState(PluginState.SUCCESS)
-            .setPluginDetails("Removal of unwanted AIP " + indexedAIP.getId() + " ended successfully");
+            .setPluginDetails("Removal of AIP " + indexedAIP.getId() + " ended successfully");
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
         }
         report.addReport(reportItem);

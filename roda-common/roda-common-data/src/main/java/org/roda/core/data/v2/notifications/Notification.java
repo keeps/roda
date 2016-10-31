@@ -7,7 +7,6 @@
  */
 package org.roda.core.data.v2.notifications;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,6 +15,7 @@ import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.index.IsIndexed;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlRootElement(name = "notification")
 @JsonInclude(JsonInclude.Include.ALWAYS)
-public class Notification implements IsIndexed, Serializable {
+public class Notification implements IsModelObject, IsIndexed {
 
   private static final long serialVersionUID = -585753367605901060L;
 
@@ -60,6 +60,11 @@ public class Notification implements IsIndexed, Serializable {
     this.isAcknowledged = notification.isAcknowledged();
     this.acknowledgedUsers = notification.getAcknowledgedUsers();
     this.state = NOTIFICATION_STATE.CREATED;
+  }
+
+  @Override
+  public int getModelVersion() {
+    return 1;
   }
 
   public String getId() {

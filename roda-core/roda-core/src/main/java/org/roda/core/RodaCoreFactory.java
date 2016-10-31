@@ -100,6 +100,7 @@ import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.SolrUtils;
+import org.roda.core.migration.MigrationManager;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.PluginManager;
 import org.roda.core.plugins.PluginManagerException;
@@ -183,6 +184,10 @@ public class RodaCoreFactory {
   /** Private empty constructor */
   private RodaCoreFactory() {
 
+  }
+
+  public static boolean instantiatedWithoutErrors() {
+    return instantiatedWithoutErrors;
   }
 
   public static void instantiate() {
@@ -272,6 +277,15 @@ public class RodaCoreFactory {
         instantiateNodeSpecificObjects(nodeType);
         LOGGER.debug("Finished instantiating node specific objects");
 
+        // verify if is necessary to perform a model/index migration
+        MigrationManager migrationManager = new MigrationManager(dataPath);
+        if (migrationManager.isNecessaryToPerformMigration()) {
+          // migrationManager.setupModelMigrations();
+          // migrationManager.performModelMigrations();
+
+          throw new GenericException("It's necessary to do a model/index migration");
+        }
+
         instantiateDefaultObjects();
         LOGGER.debug("Finished instantiating default objects");
 
@@ -324,7 +338,6 @@ public class RodaCoreFactory {
     } catch (IOException e) {
       throw new RuntimeException("Unable to create RODA Reports DIRECTORY " + reportDirectoryPath + ". Aborting...", e);
     }
-
   }
 
   private static Path determineRodaHomePath() {
@@ -1059,7 +1072,7 @@ public class RodaCoreFactory {
     }
     return inputStream;
   }
-  
+
   public static InputStream getConfigurationFileAsStream(String configurationFile, String fallbackConfigurationFile) {
     InputStream inputStream = getConfigurationFileAsStream(configurationFile);
     if (inputStream == null) {
