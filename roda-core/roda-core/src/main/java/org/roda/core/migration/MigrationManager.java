@@ -67,11 +67,26 @@ public class MigrationManager {
     // perform migrations
     for (Entry<String, MigrationWorkflow> classMigrations : modelMigrations.entrySet()) {
       String className = classMigrations.getKey();
+      MigrationWorkflow migrationWorkflow = classMigrations.getValue();
+      int installedVersion = modelInfo.getInstalledClassesVersions().getOrDefault(className, Integer.MAX_VALUE);
+      
+      // see if there is no need to continue processing this particular class based on installed version (if any)
+      if(installedVersion >= migrationWorkflow.getLastToVersion()){
+        continue;
+      }
+      
       LOGGER.info("Performing migration for class '{}'", className);
-      for (Pair<Integer, Class<? extends MigrationAction>> classMigration : classMigrations.getValue()
+      for (Pair<Integer, Class<? extends MigrationAction>> classMigration : migrationWorkflow
         .getMigrations()) {
         Integer toVersion = classMigration.getFirst();
         Class<? extends MigrationAction> migrationClass = classMigration.getSecond();
+        
+        // see if there is no need to perform this particular migration
+        if (installedVersion >= toVersion) {
+          continue;
+        }
+        
+        
         LOGGER.info("Migrating to version {} using class '{}'", toVersion, migrationClass.getName());
         try {
           // migrate
@@ -172,7 +187,7 @@ public class MigrationManager {
   }
 
   private class MigrationWorkflow {
-    private int lastToVersion = -1;
+    private int lastToVersion = Integer.MIN_VALUE;
     private List<Pair<Integer, Class<? extends MigrationAction>>> migrations = new ArrayList<>();
 
     public void addMigration(int toVersion, Class<? extends MigrationAction> migrationActionClazz) {
@@ -189,6 +204,10 @@ public class MigrationManager {
 
     public List<Pair<Integer, Class<? extends MigrationAction>>> getMigrations() {
       return migrations;
+    }
+
+    public int getLastToVersion() {
+      return lastToVersion;
     }
 
   }
