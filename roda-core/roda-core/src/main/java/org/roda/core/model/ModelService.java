@@ -2105,11 +2105,18 @@ public class ModelService extends ModelObservable {
       OptionalWithCause<AIP> aip = aipIter.next();
       if (aip.isPresent()) {
         for (Representation representation : aip.get().getRepresentations()) {
-          final CloseableIterable<Resource> resourcesIterable = storage.listResourcesUnderContainer(
-            ModelUtils.getRepresentationDataStoragePath(aip.get().getId(), representation.getId()), true);
-          CloseableIterable<OptionalWithCause<T>> fs = ResourceParseUtils.convert(getStorage(), resourcesIterable,
-            objectClass);
-          files.add(fs);
+          StoragePath representationDataStoragePath = ModelUtils.getRepresentationDataStoragePath(aip.get().getId(),
+            representation.getId());
+          try {
+            final CloseableIterable<Resource> resourcesIterable = storage
+              .listResourcesUnderDirectory(representationDataStoragePath, true);
+            CloseableIterable<OptionalWithCause<T>> fs = ResourceParseUtils.convert(getStorage(), resourcesIterable,
+              objectClass);
+            files.add(fs);
+          } catch (NotFoundException e) {
+            // do nothing as it is expected in some situation (e.g. a
+            // representation without binaries)
+          }
         }
       }
     }
