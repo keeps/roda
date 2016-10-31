@@ -1025,6 +1025,33 @@ public final class RodaConstants {
   
   public static final String INDEX_SEARCH_SUFFIX = "_txt";
 
+  
+  
+  
+  public static final String MEDIA_TYPE_WILDCARD = "*";
+
+  public final static String MEDIA_TYPE_APPLICATION_XML = "application/xml";
+  
+  public final static String MEDIA_TYPE_APPLICATION_ATOM_XML = "application/atom+xml";
+  
+  public final static String MEDIA_TYPE_APPLICATION_XHTML_XML = "application/xhtml+xml";
+  
+  public final static String MEDIA_TYPE_APPLICATION_SVG_XML = "application/svg+xml";
+  
+  public final static String MEDIA_TYPE_APPLICATION_JSON = "application/json";
+
+  public final static String MEDIA_TYPE_APPLICATION_FORM_URLENCODED = "application/x-www-form-urlencoded";
+
+  public final static String MEDIA_TYPE_MULTIPART_FORM_DATA = "multipart/form-data";
+
+  public final static String MEDIA_TYPE_APPLICATION_OCTET_STREAM = "application/octet-stream";
+
+  public final static String MEDIA_TYPE_TEXT_PLAIN = "text/plain";
+
+  public final static String MEDIA_TYPE_TEXT_XML = "text/xml";
+
+  public final static String MEDIA_TYPE_TEXT_HTML = "text/html";
+  
   /** Private empty constructor */
   private RodaConstants() {
 
