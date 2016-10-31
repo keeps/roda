@@ -53,7 +53,7 @@ public class SimpleJobPluginInfo extends JobPluginInfo {
     SimpleJobPluginInfo infoUpdated = new SimpleJobPluginInfo();
     // FIXME 20160819 hsilva: divide by zero problem when # of sourceObjects is
     // unknown
-    int newPercentage = 0;
+    int newPercentage = 100;
     if (sourceObjectsCount > 0) {
       newPercentage = Math
         .round((((sourceObjectsProcessedWithSuccess + sourceObjectsProcessedWithFailure) * 100) / sourceObjectsCount));

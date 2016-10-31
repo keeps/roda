@@ -140,4 +140,8 @@ public class IterableIndexResult<T extends IsIndexed> implements Iterable<T> {
     };
   }
 
+  public long getTotalObjects() {
+    return totalObjects;
+  }
+
 }

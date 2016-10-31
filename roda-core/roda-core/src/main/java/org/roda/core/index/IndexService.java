@@ -148,6 +148,12 @@ public class IndexService {
   }
 
   public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
+    final boolean justActive, final boolean removeDuplicates) {
+    return findAll(returnClass, filter, new Sorter(new SortParameter(RodaConstants.INDEX_UUID, true)), Sublist.ALL,
+      null, justActive, removeDuplicates);
+  }
+
+  public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
     final Sorter sorter) {
     return findAll(returnClass, filter, sorter, true);
   }
@@ -484,7 +490,7 @@ public class IndexService {
   public <T extends IsIndexed> List<String> suggest(Class<T> returnClass, String field, String query, User user)
     throws GenericException {
     boolean justActive = true;
-    return SolrUtils.suggest(getSolrClient(), returnClass, field, query, justActive,user);
+    return SolrUtils.suggest(getSolrClient(), returnClass, field, query, justActive, user);
   }
 
   public <T extends IsIndexed> void execute(Class<T> classToRetrieve, Filter filter, IndexRunnable<T> indexRunnable)
