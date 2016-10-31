@@ -1430,11 +1430,19 @@ public class RodaCoreFactory {
     System.err.println("\tantivirus");
     System.err.println("\tpremisskeleton");
     System.err.println("\treset admin");
+    System.err.println("\tmigrate model");
+    System.err.println("\tmigrate index");
   }
 
   private static void printResetUsage() {
     System.err.println("Reset command parameters:");
     System.err.println("\tadmin - resets admin user password and grant it all permissions.");
+  }
+
+  private static void printMigrateUsage() {
+    System.err.println("Migrate command parameters:");
+    System.err.println("\tmodel - performs model related migrations.");
+    System.err.println("\tindex - performs index related migrations.");
   }
 
   private static void mainMasterTasks(final List<String> args) throws GenericException, RequestNotValidException {
@@ -1457,8 +1465,7 @@ public class RodaCoreFactory {
       } else if ("reindex".equals(args.get(1))) {
         runReindex(args);
       }
-    }
-    if ("reset".equals(args.get(0))) {
+    } else if ("reset".equals(args.get(0))) {
       final List<String> resetParams = args.subList(1, args.size());
       if (resetParams.isEmpty()) {
         printResetUsage();
@@ -1469,6 +1476,23 @@ public class RodaCoreFactory {
         } else {
           System.err.println("ERROR: Unknown parameter '" + resetParam + "'");
           printResetUsage();
+        }
+      }
+    } else if ("migrate".equals(args.get(0))) {
+      final List<String> migrateParams = args.subList(1, args.size());
+      if (migrateParams.isEmpty()) {
+        printMigrateUsage();
+      } else {
+        final String migrateParam = migrateParams.get(0);
+        MigrationManager migrationManager = new MigrationManager(RodaCoreFactory.dataPath);
+        if ("model".equals(migrateParam)) {
+          migrationManager.setupModelMigrations();
+          migrationManager.performModelMigrations();
+        } else if ("index".equals(migrateParam)) {
+          migrationManager.setupIndexMigrations();
+          migrationManager.performIndexMigrations();
+        } else {
+          printMigrateUsage();
         }
       }
     } else {

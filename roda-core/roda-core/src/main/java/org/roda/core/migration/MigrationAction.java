@@ -1,5 +1,5 @@
 package org.roda.core.migration;
 
-public interface ModelMigration {
+public interface MigrationAction {
   public void migrate();
 }

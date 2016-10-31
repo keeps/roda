@@ -22,8 +22,9 @@ public class MigrationManager {
   private static final Logger LOGGER = LoggerFactory.getLogger(MigrationManager.class);
 
   private Path modelInfoFile;
-  // Map<className, ClassMigrations>
-  private Map<String, ModelClassMigration> modelMigrations = new HashMap<>();
+  // map<model class, workflow>
+  private Map<String, MigrationWorkflow> modelMigrations = new HashMap<>();
+  private Map<String, MigrationWorkflow> indexMigrations = new HashMap<>();
 
   public MigrationManager(Path dataFolder) {
     super();
@@ -51,10 +52,19 @@ public class MigrationManager {
     // addModelMigration(Job.class, 2, JobToVersion2.class);
   }
 
+  // 20161031 hsilva: this method is not invoked in the constructor as it might
+  // get very big & therefore
+  // should be done in a lazy fashion
+  public void setupIndexMigrations() {
+    // FIXME 20161031 hsilva: the following line is just an example and should
+    // be removed as soon as one real migration is configured
+    // addIndexMigration();
+  }
+
   private void addModelMigration(Class<? extends IsModelObject> clazz, int toVersion,
-    Class<? extends ModelMigration> migrationClass) {
+    Class<? extends MigrationAction> migrationClass) {
     String className = clazz.getName();
-    ModelClassMigration classMigrations = modelMigrations.getOrDefault(className, new ModelClassMigration());
+    MigrationWorkflow classMigrations = modelMigrations.getOrDefault(className, new MigrationWorkflow());
     // at the very last I'm updating pointers
     modelMigrations.put(className, classMigrations);
     classMigrations.addMigration(toVersion, migrationClass);
@@ -64,12 +74,13 @@ public class MigrationManager {
     ModelInfo modelInfo = JsonUtils.getObjectFromJson(modelInfoFile, ModelInfo.class);
 
     // perform migrations
-    for (Entry<String, ModelClassMigration> classMigrations : modelMigrations.entrySet()) {
+    for (Entry<String, MigrationWorkflow> classMigrations : modelMigrations.entrySet()) {
       String className = classMigrations.getKey();
       LOGGER.info("Performing migration for class '{}'", className);
-      for (Pair<Integer, Class<? extends ModelMigration>> classMigration : classMigrations.getValue().getMigrations()) {
+      for (Pair<Integer, Class<? extends MigrationAction>> classMigration : classMigrations.getValue()
+        .getMigrations()) {
         Integer toVersion = classMigration.getFirst();
-        Class<? extends ModelMigration> migrationClass = classMigration.getSecond();
+        Class<? extends MigrationAction> migrationClass = classMigration.getSecond();
         LOGGER.info("Migrating to version {} using class '{}'", toVersion, migrationClass.getName());
         try {
           // migrate
@@ -88,6 +99,10 @@ public class MigrationManager {
 
     // update model info. file
     JsonUtils.writeObjectToFile(modelInfo, modelInfoFile);
+  }
+
+  public void performIndexMigrations() throws GenericException {
+    // FIXME 20161031 hsilva: implement this
   }
 
   private boolean isModelMigrationNecessary() throws GenericException {
@@ -164,23 +179,23 @@ public class MigrationManager {
     return ret;
   }
 
-  private class ModelClassMigration {
+  private class MigrationWorkflow {
     private int lastToVersion = -1;
-    private List<Pair<Integer, Class<? extends ModelMigration>>> migrations = new ArrayList<>();
+    private List<Pair<Integer, Class<? extends MigrationAction>>> migrations = new ArrayList<>();
 
-    public void addMigration(int toVersion, Class<? extends ModelMigration> migrationClazz) {
+    public void addMigration(int toVersion, Class<? extends MigrationAction> migrationActionClazz) {
       if (lastToVersion < toVersion) {
         lastToVersion = toVersion;
-        migrations.add(new Pair<Integer, Class<? extends ModelMigration>>(toVersion, migrationClazz));
+        migrations.add(new Pair<Integer, Class<? extends MigrationAction>>(toVersion, migrationActionClazz));
       } else {
         LOGGER.error(
-          "Error trying to add a model class migration out of order (last toVersion added: {}; toVersion to be added: {})",
+          "Error trying to add a migration action class out of order (last toVersion added: {}; toVersion to be added: {})",
           lastToVersion, toVersion);
-        throw new RuntimeException("Error trying to add a model class migration out of order");
+        throw new RuntimeException("Error trying to add a migration action class out of order");
       }
     }
 
-    public List<Pair<Integer, Class<? extends ModelMigration>>> getMigrations() {
+    public List<Pair<Integer, Class<? extends MigrationAction>>> getMigrations() {
       return migrations;
     }
 
