@@ -49,7 +49,6 @@ public class SearchSuggestOracle<T extends IsIndexed> extends SuggestOracle {
 
           Response response = new Response();
           response.setSuggestions(suggestions);
-
           callback.onSuggestionsReady(request, response);
         }
       });
