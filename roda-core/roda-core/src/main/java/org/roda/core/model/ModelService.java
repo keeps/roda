@@ -997,6 +997,8 @@ public class ModelService extends ModelObservable {
     }
   }
 
+  // FIXME 20161031 hsilva: representationId is not being used but it should
+  // (e.g. for notify representation change)
   public void moveFiles(String aipId, String representationId, List<File> files, String newRelativePath,
     boolean replaceExisting, boolean reindexResources) throws AlreadyExistsException, GenericException,
     NotFoundException, RequestNotValidException, AuthorizationDeniedException {
