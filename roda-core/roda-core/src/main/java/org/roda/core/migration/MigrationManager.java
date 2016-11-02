@@ -269,7 +269,7 @@ public class MigrationManager {
     Map<String, Integer> ret = new HashMap<>();
     for (String collection : collections) {
       Path schemaFile = indexConfigsFolder.resolve(collection).resolve("conf").resolve("schema.xml");
-      String version = XMLUtility.getStringFromFile(schemaFile, "/schema/@name");
+      String version = XMLUtility.getStringFromFile(schemaFile, "/schema/@name").replaceFirst(".*-", "");
       try {
         ret.put(collection, Integer.parseInt(version));
       } catch (NumberFormatException e) {
