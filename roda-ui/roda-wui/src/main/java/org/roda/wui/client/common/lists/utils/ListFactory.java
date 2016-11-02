@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.client.common.lists;
+package org.roda.wui.client.common.lists.utils;
 
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.formats.Format;
@@ -26,6 +26,18 @@ import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RODAMember;
+import org.roda.wui.client.common.lists.AIPList;
+import org.roda.wui.client.common.lists.FormatList;
+import org.roda.wui.client.common.lists.JobList;
+import org.roda.wui.client.common.lists.LogEntryList;
+import org.roda.wui.client.common.lists.NotificationList;
+import org.roda.wui.client.common.lists.RepresentationList;
+import org.roda.wui.client.common.lists.RiskIncidenceList;
+import org.roda.wui.client.common.lists.RiskList;
+import org.roda.wui.client.common.lists.RodaMemberList;
+import org.roda.wui.client.common.lists.SimpleFileList;
+import org.roda.wui.client.common.lists.SimpleJobReportList;
+import org.roda.wui.client.common.lists.TransferredResourceList;
 
 import com.google.gwt.core.client.GWT;
 

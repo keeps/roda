@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.client.common.lists;
+package org.roda.wui.client.common.lists.utils;
 
 import java.io.Serializable;
 import java.util.Date;

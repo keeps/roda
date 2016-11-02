@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.client.common.lists;
+package org.roda.wui.client.common.lists.utils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -42,6 +42,7 @@ import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.dom.client.TableCellElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
@@ -206,7 +207,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     add(resultsPager);
     add(pageSizePager);
     add(csvDownloadButton);
-    
+
     csvDownloadButton.addClickHandler(new ClickHandler() {
 
       @Override

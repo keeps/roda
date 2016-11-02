@@ -18,6 +18,8 @@ import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
+import org.roda.wui.client.common.lists.utils.TooltipTextColumn;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.Humanize.DHMSFormat;
@@ -47,7 +49,7 @@ public class JobList extends BasicAsyncTableCell<Job> {
   // private final ClientLogger logger = new ClientLogger(getClass().getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private TextColumn<Job> nameColumn;
+  private TooltipTextColumn<Job> nameColumn;
   private TextColumn<Job> usernameColumn;
   private Column<Job, Date> startDateColumn;
   private TextColumn<Job> durationColumn;
@@ -74,7 +76,7 @@ public class JobList extends BasicAsyncTableCell<Job> {
   @Override
   protected void configureDisplay(CellTable<Job> display) {
 
-    nameColumn = new TextColumn<Job>() {
+    nameColumn = new TooltipTextColumn<Job>() {
 
       @Override
       public String getValue(Job job) {

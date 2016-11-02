@@ -16,7 +16,7 @@ import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetParameter;
 import org.roda.core.data.v2.index.facet.FacetValue;
 import org.roda.core.data.v2.index.facet.Facets;
-import org.roda.wui.client.common.lists.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.event.logical.shared.ValueChangeEvent;

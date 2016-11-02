@@ -28,7 +28,7 @@ import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.MemberSelectDialog;
-import org.roda.wui.client.common.lists.ClientSelectedItemsUtils;
+import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;

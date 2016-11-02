@@ -20,6 +20,8 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
+import org.roda.wui.client.common.lists.utils.TooltipTextColumn;
 import org.roda.wui.common.client.tools.StringUtility;
 
 import com.google.gwt.cell.client.DateCell;
@@ -48,8 +50,8 @@ public class IngestJobReportList extends BasicAsyncTableCell<Report> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   // private Column<Report, SafeHtml> objectIdColumn;
-  private TextColumn<Report> sourceObjectColumn;
-  private TextColumn<Report> outcomeObjectColumn;
+  private TooltipTextColumn<Report> sourceObjectColumn;
+  private TooltipTextColumn<Report> outcomeObjectColumn;
   private Column<Report, Date> updatedDateColumn;
   private TextColumn<Report> lastPluginRunColumn;
   private Column<Report, SafeHtml> lastPluginRunStateColumn;
@@ -70,7 +72,7 @@ public class IngestJobReportList extends BasicAsyncTableCell<Report> {
   @Override
   protected void configureDisplay(CellTable<Report> display) {
 
-    sourceObjectColumn = new TextColumn<Report>() {
+    sourceObjectColumn = new TooltipTextColumn<Report>() {
 
       @Override
       public String getValue(Report report) {
@@ -87,7 +89,7 @@ public class IngestJobReportList extends BasicAsyncTableCell<Report> {
       }
     };
 
-    outcomeObjectColumn = new TextColumn<Report>() {
+    outcomeObjectColumn = new TooltipTextColumn<Report>() {
 
       @Override
       public String getValue(Report report) {

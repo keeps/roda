@@ -18,6 +18,7 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
+import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.StringUtility;
 

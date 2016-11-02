@@ -1,4 +1,4 @@
-package org.roda.wui.client.common.lists;
+package org.roda.wui.client.common.lists.utils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;

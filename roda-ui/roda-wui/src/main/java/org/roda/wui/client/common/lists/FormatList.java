@@ -17,6 +17,7 @@ import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
+import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.cellview.client.CellTable;
