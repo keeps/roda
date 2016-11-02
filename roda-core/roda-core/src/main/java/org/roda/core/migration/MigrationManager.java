@@ -52,8 +52,8 @@ public class MigrationManager {
     // addModelMigration(Job.class, 2, JobToVersion2.class);
   }
 
-  private void addModelMigration(Class<? extends IsModelObject> clazz, int toVersion,
-    Class<? extends MigrationAction> migrationClass) {
+  private <T extends IsModelObject> void addModelMigration(Class<T> clazz, int toVersion,
+    Class<? extends MigrationAction<T>> migrationClass) {
     String className = clazz.getName();
     MigrationWorkflow classMigrations = modelMigrations.getOrDefault(className, new MigrationWorkflow());
     // at the very last I'm updating pointers
@@ -69,28 +69,27 @@ public class MigrationManager {
       String className = classMigrations.getKey();
       MigrationWorkflow migrationWorkflow = classMigrations.getValue();
       int installedVersion = modelInfo.getInstalledClassesVersions().getOrDefault(className, Integer.MAX_VALUE);
-      
-      // see if there is no need to continue processing this particular class based on installed version (if any)
-      if(installedVersion >= migrationWorkflow.getLastToVersion()){
+
+      // see if there is no need to continue processing this particular class
+      // based on installed version (if any)
+      if (installedVersion >= migrationWorkflow.getLastToVersion()) {
         continue;
       }
-      
+
       LOGGER.info("Performing migration for class '{}'", className);
-      for (Pair<Integer, Class<? extends MigrationAction>> classMigration : migrationWorkflow
-        .getMigrations()) {
+      for (Pair<Integer, Class<? extends MigrationAction>> classMigration : migrationWorkflow.getMigrations()) {
         Integer toVersion = classMigration.getFirst();
         Class<? extends MigrationAction> migrationClass = classMigration.getSecond();
-        
+
         // see if there is no need to perform this particular migration
         if (installedVersion >= toVersion) {
           continue;
         }
-        
-        
+
         LOGGER.info("Migrating to version {} using class '{}'", toVersion, migrationClass.getName());
         try {
           // migrate
-          migrationClass.newInstance().migrate();
+          migrationClass.newInstance().migrate(toVersion);
           LOGGER.info("Migrated with success to version {}", toVersion);
 
           // update class specific version after successful migration
