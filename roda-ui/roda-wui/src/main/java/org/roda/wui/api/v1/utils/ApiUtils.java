@@ -12,7 +12,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.CacheControl;
@@ -240,7 +239,12 @@ public class ApiUtils {
       }
       ret = files;
     } else if (objectClass.equals(IndexedRisk.class)) {
-      ret = new org.roda.core.data.v2.risks.Risks((List<Risk>) result.getResults());
+      List<Risk> risks = new ArrayList<Risk>();
+      for (T res : result.getResults()) {
+        IndexedRisk irisk = (IndexedRisk) res;
+        risks.add(irisk);
+      }
+      ret = new org.roda.core.data.v2.risks.Risks(risks);
     } else if (objectClass.equals(TransferredResource.class)) {
       ret = new org.roda.core.data.v2.ip.TransferredResources((List<TransferredResource>) result.getResults());
     } else if (objectClass.equals(Format.class)) {
