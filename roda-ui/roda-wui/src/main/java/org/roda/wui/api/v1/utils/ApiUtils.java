@@ -12,6 +12,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.CacheControl;
@@ -34,6 +35,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.common.RODAObjectList;
 import org.roda.core.data.v2.formats.Format;
@@ -207,16 +209,20 @@ public class ApiUtils {
     }
   }
 
-  public static <T extends IsIndexed> RODAObjectList<?> indexedResultToRODAObjectList(Class<T> objectClass,
-    IndexResult<T> result)
+  @SuppressWarnings("unchecked")
+  public static <T extends IsIndexed, R extends IsModelObject> RODAObjectList<R> indexedResultToRODAObjectList(
+    Class<T> objectClass, IndexResult<T> result)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+
+    RODAObjectList<?> ret;
+
     if (objectClass.equals(IndexedAIP.class)) {
       AIPs aips = new AIPs();
       for (T object : result.getResults()) {
         IndexedAIP aip = (IndexedAIP) object;
         aips.addObject(RodaCoreFactory.getModelService().retrieveAIP(aip.getId()));
       }
-      return aips;
+      ret = aips;
     } else if (objectClass.equals(IndexedRepresentation.class)) {
       Representations representations = new Representations();
       for (T object : result.getResults()) {
@@ -224,7 +230,7 @@ public class ApiUtils {
         representations.addObject(
           RodaCoreFactory.getModelService().retrieveRepresentation(representation.getAipId(), representation.getId()));
       }
-      return representations;
+      ret = representations;
     } else if (objectClass.equals(IndexedFile.class)) {
       org.roda.core.data.v2.ip.Files files = new org.roda.core.data.v2.ip.Files();
       for (T object : result.getResults()) {
@@ -232,29 +238,26 @@ public class ApiUtils {
         files.addObject(RodaCoreFactory.getModelService().retrieveFile(file.getAipId(), file.getRepresentationId(),
           file.getPath(), file.getId()));
       }
-      return files;
+      ret = files;
     } else if (objectClass.equals(IndexedRisk.class)) {
-      List<Risk> risks = new ArrayList<Risk>();
-      for (T res : result.getResults()) {
-        IndexedRisk irisk = (IndexedRisk) res;
-        risks.add(irisk);
-      }
-      return new org.roda.core.data.v2.risks.Risks(risks);
+      ret = new org.roda.core.data.v2.risks.Risks((List<Risk>) result.getResults());
     } else if (objectClass.equals(TransferredResource.class)) {
-      return new org.roda.core.data.v2.ip.TransferredResources((List<TransferredResource>) result.getResults());
+      ret = new org.roda.core.data.v2.ip.TransferredResources((List<TransferredResource>) result.getResults());
     } else if (objectClass.equals(Format.class)) {
-      return new org.roda.core.data.v2.formats.Formats((List<Format>) result.getResults());
+      ret = new org.roda.core.data.v2.formats.Formats((List<Format>) result.getResults());
     } else if (objectClass.equals(Notification.class)) {
-      return new org.roda.core.data.v2.notifications.Notifications((List<Notification>) result.getResults());
+      ret = new org.roda.core.data.v2.notifications.Notifications((List<Notification>) result.getResults());
     } else if (objectClass.equals(LogEntry.class)) {
-      return new org.roda.core.data.v2.log.LogEntries((List<LogEntry>) result.getResults());
+      ret = new org.roda.core.data.v2.log.LogEntries((List<LogEntry>) result.getResults());
     } else if (objectClass.equals(RiskIncidence.class)) {
-      return new org.roda.core.data.v2.risks.RiskIncidences((List<RiskIncidence>) result.getResults());
+      ret = new org.roda.core.data.v2.risks.RiskIncidences((List<RiskIncidence>) result.getResults());
     } else if (objectClass.equals(RODAMember.class)) {
-      return new org.roda.core.data.v2.user.RODAMembers((List<RODAMember>) result.getResults());
+      ret = new org.roda.core.data.v2.user.RODAMembers((List<RODAMember>) result.getResults());
     } else {
       throw new GenericException("Unsupported object class: " + objectClass);
     }
+
+    return (RODAObjectList<R>) ret;
   }
 
   public static StreamResponse download(Resource resource) {
