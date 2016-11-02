@@ -524,12 +524,12 @@ public class IndexService {
     return solrClient;
   }
 
-  public <T extends Serializable> CloseableIterable<OptionalWithCause<T>> list(Class<? extends IsIndexed> listClass)
+  public <T extends IsIndexed> CloseableIterable<OptionalWithCause<T>> list(Class<T> listClass)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
     int counter = RodaCoreFactory.getIndexService().count(listClass, Filter.ALL).intValue();
-    IndexResult<T> resources = (IndexResult<T>) RodaCoreFactory.getIndexService().find(listClass, Filter.ALL,
-      Sorter.NONE, new Sublist(0, counter));
+    IndexResult<T> resources = RodaCoreFactory.getIndexService().find(listClass, Filter.ALL, Sorter.NONE,
+      new Sublist(0, counter));
     Iterator<T> it = resources.getResults().iterator();
 
     CloseableIterable<OptionalWithCause<T>> resourceIterable = new CloseableIterable<OptionalWithCause<T>>() {

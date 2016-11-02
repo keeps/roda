@@ -2110,26 +2110,31 @@ public class ModelService extends ModelObservable {
 
   }
 
-  public <T extends Serializable> CloseableIterable<OptionalWithCause<T>> list(Class<T> objectClass)
+  @SuppressWarnings("unchecked")
+  public <T extends IsRODAObject> CloseableIterable<OptionalWithCause<T>> list(Class<T> objectClass)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    CloseableIterable<? extends OptionalWithCause<?>> ret;
+
     if (Representation.class.equals(objectClass)) {
-      return listRepresentations();
+      ret = listRepresentations();
     } else if (File.class.equals(objectClass)) {
-      return listFiles();
+      ret = listFiles();
     } else if (TransferredResource.class.equals(objectClass)) {
       // FIXME 20160930 it uses index but it should not(?)
-      return RodaCoreFactory.getIndexService().list(TransferredResource.class);
+      ret = RodaCoreFactory.getIndexService().list(TransferredResource.class);
     } else if (RODAMember.class.equals(objectClass)) {
       // FIXME 20160930 it uses index but it should not(?)
-      return RodaCoreFactory.getIndexService().list(RODAMember.class);
+      ret = RodaCoreFactory.getIndexService().list(RODAMember.class);
     } else if (LogEntry.class.equals(objectClass)) {
       // FIXME 20160930 it uses index but it should not(?)
-      return RodaCoreFactory.getIndexService().list(LogEntry.class);
+      ret = RodaCoreFactory.getIndexService().list(LogEntry.class);
     } else {
       StoragePath containerPath = ModelUtils.getContainerPath(objectClass);
       final CloseableIterable<Resource> resourcesIterable = storage.listResourcesUnderContainer(containerPath, false);
-      return ResourceParseUtils.convert(getStorage(), resourcesIterable, objectClass);
+      ret = ResourceParseUtils.convert(getStorage(), resourcesIterable, objectClass);
     }
+
+    return (CloseableIterable<OptionalWithCause<T>>) ret;
   }
 
   public boolean hasObjects(Class<? extends IsRODAObject> objectClass) {

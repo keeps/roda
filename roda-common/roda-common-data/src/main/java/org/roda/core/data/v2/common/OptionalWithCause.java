@@ -7,12 +7,11 @@
  */
 package org.roda.core.data.v2.common;
 
-import java.io.Serializable;
 import java.util.Optional;
 
 import org.roda.core.data.exceptions.RODAException;
 
-public class OptionalWithCause<T extends Serializable> {
+public class OptionalWithCause<T> {
 
   private final Optional<T> optional;
   private final RODAException cause;
@@ -45,11 +44,11 @@ public class OptionalWithCause<T extends Serializable> {
     return optional.isPresent();
   }
 
-  public static <T extends Serializable> OptionalWithCause<T> empty(RODAException cause) {
+  public static <T> OptionalWithCause<T> empty(RODAException cause) {
     return new OptionalWithCause<>(Optional.empty(), cause);
   }
 
-  public static <T extends Serializable> OptionalWithCause<T> of(T value) {
+  public static <T> OptionalWithCause<T> of(T value) {
     return new OptionalWithCause<>(Optional.of(value), null);
   }
 
