@@ -94,8 +94,9 @@ public class Report implements IsModelObject, IsIndexed {
     this.reports = new ArrayList<Report>();
   }
 
+  @JsonIgnore
   @Override
-  public int getModelVersion() {
+  public int getClassVersion() {
     return 1;
   }
 

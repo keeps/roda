@@ -53,8 +53,9 @@ public class Representation implements IsModelObject {
     this.descriptiveMetadata = descriptiveMetadata;
   }
 
+  @JsonIgnore
   @Override
-  public int getModelVersion() {
+  public int getClassVersion() {
     return 1;
   }
 

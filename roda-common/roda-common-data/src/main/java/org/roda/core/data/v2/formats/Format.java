@@ -66,8 +66,9 @@ public class Format extends NamedIndexedModel implements IsModelObject, IsIndexe
     this.utis = new ArrayList<String>(format.getUtis());
   }
 
+  @JsonIgnore
   @Override
-  public int getModelVersion() {
+  public int getClassVersion() {
     return 1;
   }
 

@@ -98,8 +98,9 @@ public class LogEntry implements IsModelObject, IsIndexed {
     setState(state);
   }
 
+  @JsonIgnore
   @Override
-  public int getModelVersion() {
+  public int getClassVersion() {
     return 1;
   }
 

@@ -14,6 +14,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.IsRODAObject;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlRootElement(name = "file")
@@ -43,8 +44,9 @@ public class File implements IsModelObject {
     this.isDirectory = isDirectory;
   }
 
+  @JsonIgnore
   @Override
-  public int getModelVersion() {
+  public int getClassVersion() {
     return 1;
   }
 

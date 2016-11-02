@@ -46,19 +46,36 @@ public class MigrationManager {
   // 20161031 hsilva: this method is not invoked in the constructor as it might
   // get very big & therefore
   // should be done in a lazy fashion
-  public void setupModelMigrations() {
+  public void setupModelMigrations() throws GenericException {
     // FIXME 20161031 hsilva: the following line is just an example and should
     // be removed as soon as one real migration is configured
     // addModelMigration(Job.class, 2, JobToVersion2.class);
   }
 
   private <T extends IsModelObject> void addModelMigration(Class<T> clazz, int toVersion,
-    Class<? extends MigrationAction<T>> migrationClass) {
+    Class<? extends MigrationAction<T>> migrationClass) throws GenericException {
     String className = clazz.getName();
     MigrationWorkflow classMigrations = modelMigrations.getOrDefault(className, new MigrationWorkflow());
     // at the very last I'm updating pointers
     modelMigrations.put(className, classMigrations);
-    classMigrations.addMigration(toVersion, migrationClass);
+
+    try {
+      MigrationAction<T> migrationAction = migrationClass.newInstance();
+      if (migrationAction.isToVersionValid(toVersion)) {
+        classMigrations.addMigration(toVersion, migrationClass);
+      } else {
+        LOGGER.error(
+          "Trying to configure migration for model class '{}', setting toVersion to '{}' using action class '{}' but this class says the toVersion is not valid",
+          className, toVersion, migrationClass.getName());
+        throw new GenericException(
+          "Trying to configure migration for model class '" + className + "' with the wrong toVersion");
+      }
+    } catch (InstantiationException | IllegalAccessException e) {
+      LOGGER.error("Error instantiating migration action class '{}' (which migrates to version {})",
+        migrationClass.getName(), toVersion, e);
+      throw new GenericException("Error instantiating migration action class '" + migrationClass.getName()
+        + "' (which migrates to version '" + toVersion + "')");
+    }
   }
 
   public void performModelMigrations() throws GenericException {
@@ -89,7 +106,7 @@ public class MigrationManager {
         LOGGER.info("Migrating to version {} using class '{}'", toVersion, migrationClass.getName());
         try {
           // migrate
-          migrationClass.newInstance().migrate(toVersion);
+          migrationClass.newInstance().migrate();
           LOGGER.info("Migrated with success to version {}", toVersion);
 
           // update class specific version after successful migration
@@ -113,7 +130,7 @@ public class MigrationManager {
 
   private boolean isModelMigrationNecessary() throws GenericException {
     boolean migrationIsNecessary = false;
-    Map<String, Integer> modelClassesVersionsFromCode = getCodeModelClassesVersions(true, "Indexed");
+    Map<String, Integer> modelClassesVersionsFromCode = getModelClassesVersionsFromCode(true, "Indexed");
     Map<String, Integer> modelClassesVersionInstalled = new HashMap<>();
 
     if (Files.exists(modelInfoFile)) {
@@ -128,9 +145,9 @@ public class MigrationManager {
         modelInfoFile);
     } else {
       // information exists in file, lets see if any migration is needed
-      for (Entry<String, Integer> classVersion : modelClassesVersionsFromCode.entrySet()) {
-        String classFromCode = classVersion.getKey();
-        int versionFromCode = classVersion.getValue();
+      for (Entry<String, Integer> classVersionFromCode : modelClassesVersionsFromCode.entrySet()) {
+        String classFromCode = classVersionFromCode.getKey();
+        int versionFromCode = classVersionFromCode.getValue();
 
         LOGGER.debug("Checking if model class '{}' requires to do a migration...", classFromCode);
 
@@ -166,7 +183,7 @@ public class MigrationManager {
     return false;
   }
 
-  private Map<String, Integer> getCodeModelClassesVersions(final boolean avoidClassesByNamePrefix,
+  private Map<String, Integer> getModelClassesVersionsFromCode(final boolean avoidClassesByNamePrefix,
     final String avoidByNamePrefix) {
     Map<String, Integer> ret = new HashMap<>();
     Reflections reflections = new Reflections("org.roda.core.data.v2");
@@ -177,7 +194,7 @@ public class MigrationManager {
       }
 
       try {
-        ret.put(clazz.getName(), clazz.newInstance().getModelVersion());
+        ret.put(clazz.getName(), clazz.newInstance().getClassVersion());
       } catch (InstantiationException | IllegalAccessException e) {
         LOGGER.error("Unable to determine class '{}' model version", clazz.getName(), e);
       }

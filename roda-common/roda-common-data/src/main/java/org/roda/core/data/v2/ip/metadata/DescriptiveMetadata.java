@@ -42,8 +42,9 @@ public class DescriptiveMetadata implements IsModelObject {
     this.version = version;
   }
 
+  @JsonIgnore
   @Override
-  public int getModelVersion() {
+  public int getClassVersion() {
     return 1;
   }
 

@@ -13,6 +13,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.roda.core.data.v2.IsModelObject;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlRootElement(name = "preservation_metadata")
@@ -59,8 +60,9 @@ public class PreservationMetadata implements IsModelObject {
     this(id, type, aipId, representationId, null, null);
   }
 
+  @JsonIgnore
   @Override
-  public int getModelVersion() {
+  public int getClassVersion() {
     return 1;
   }
 

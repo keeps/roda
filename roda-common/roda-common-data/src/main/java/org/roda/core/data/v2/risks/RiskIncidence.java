@@ -63,8 +63,9 @@ public class RiskIncidence implements IsModelObject, IsIndexed {
     this.setRiskId(incidence.getRiskId());
   }
 
+  @JsonIgnore
   @Override
-  public int getModelVersion() {
+  public int getClassVersion() {
     return 1;
   }
 

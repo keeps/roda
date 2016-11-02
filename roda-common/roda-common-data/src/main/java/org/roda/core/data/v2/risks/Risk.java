@@ -89,8 +89,9 @@ public class Risk extends NamedIndexedModel implements IsModelObject {
     this.mitigationRelatedEventIdentifierValue = risk.getMitigationRelatedEventIdentifierValue();
   }
 
+  @JsonIgnore
   @Override
-  public int getModelVersion() {
+  public int getClassVersion() {
     return 1;
   }
 

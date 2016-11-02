@@ -88,8 +88,9 @@ public class Job implements IsModelObject, IsIndexed {
     }
   }
 
+  @JsonIgnore
   @Override
-  public int getModelVersion() {
+  public int getClassVersion() {
     return 1;
   }
 

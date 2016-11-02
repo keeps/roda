@@ -62,8 +62,9 @@ public class Notification implements IsModelObject, IsIndexed {
     this.state = NOTIFICATION_STATE.CREATED;
   }
 
+  @JsonIgnore
   @Override
-  public int getModelVersion() {
+  public int getClassVersion() {
     return 1;
   }
 

@@ -16,6 +16,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.index.IsIndexed;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlRootElement(name = "transferred_resource")
@@ -37,8 +38,9 @@ public class TransferredResource implements IsModelObject, IsIndexed {
   private String name;
   private boolean file;
 
+  @JsonIgnore
   @Override
-  public int getModelVersion() {
+  public int getClassVersion() {
     return 1;
   }
 
