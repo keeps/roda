@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -21,7 +22,10 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsAll;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
@@ -48,7 +52,7 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "Clear indexes", PluginParameterType.BOOLEAN,
-        "false", false, false, "Clear all indexes before reindexing them."));
+        "true", false, false, "Clear all indexes before reindexing them."));
   }
 
   @Override
@@ -97,6 +101,19 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
       PluginHelper.updateJobInformation(this, jobPluginInfo);
       pluginReport.setPluginState(PluginState.SUCCESS);
 
+      // clearing specific indexes from a id list
+      try {
+        Job job = PluginHelper.getJob(this, index);
+        SelectedItems selectedItems = job.getSourceObjects();
+        if (!(selectedItems instanceof SelectedItemsAll) && clearIndexes) {
+          List<String> ids = list.stream().map(obj -> obj.getId()).collect(Collectors.toList());
+          clearSpecificIndexes(index, ids);
+        }
+      } catch (GenericException | RequestNotValidException | NotFoundException e) {
+        LOGGER.error("Error clearing specific indexes of a RODA entity", e);
+      }
+
+      // executing reindex
       for (T object : list) {
         if (LOGGER.isTraceEnabled()) {
           LOGGER.trace("Reindexing {} {}", object.getClass().getSimpleName(), object.getId());
@@ -117,6 +134,8 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
 
     } catch (JobException e) {
       LOGGER.error("Error reindexing RODA entity", e);
+    } finally {
+
     }
 
     return pluginReport;
@@ -130,8 +149,11 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
 
       try {
         Job job = PluginHelper.getJob(this, index);
-        Class selectedClass = Class.forName(job.getSourceObjects().getSelectedClass());
-        index.clearIndexes(SolrUtils.getIndexName(selectedClass));
+
+        if (job.getSourceObjects() instanceof SelectedItemsAll) {
+          Class selectedClass = Class.forName(job.getSourceObjects().getSelectedClass());
+          index.clearIndexes(SolrUtils.getIndexName(selectedClass));
+        }
       } catch (GenericException | NotFoundException | ClassNotFoundException e) {
         throw new PluginException("Error clearing index", e);
       }
@@ -158,6 +180,9 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
     }
     return new Report();
   }
+
+  public abstract void clearSpecificIndexes(IndexService index, List<String> ids)
+    throws GenericException, RequestNotValidException;
 
   @Override
   public abstract Plugin<T> cloneMe();

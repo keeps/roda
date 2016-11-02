@@ -10,7 +10,16 @@ package org.roda.core.plugins.plugins.base.reindex;
 import java.util.Arrays;
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.index.IndexService;
 import org.roda.core.plugins.Plugin;
 
 public class ReindexAIPPlugin extends ReindexRodaEntityPlugin<AIP> {
@@ -33,6 +42,16 @@ public class ReindexAIPPlugin extends ReindexRodaEntityPlugin<AIP> {
   @Override
   public List<Class<AIP>> getObjectClasses() {
     return Arrays.asList(AIP.class);
+  }
+
+  @Override
+  public void clearSpecificIndexes(IndexService index, List<String> ids)
+    throws GenericException, RequestNotValidException {
+    index.delete(IndexedRepresentation.class,
+      new Filter(new OneOfManyFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, ids)));
+    index.delete(IndexedFile.class, new Filter(new OneOfManyFilterParameter(RodaConstants.FILE_AIP_ID, ids)));
+    index.delete(IndexedPreservationEvent.class,
+      new Filter(new OneOfManyFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, ids)));
   }
 
 }

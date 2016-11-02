@@ -10,7 +10,10 @@ package org.roda.core.plugins.plugins.base.reindex;
 import java.util.Arrays;
 import java.util.List;
 
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.index.IndexService;
 import org.roda.core.plugins.Plugin;
 
 public class ReindexNotificationPlugin extends ReindexRodaEntityPlugin<Notification> {
@@ -33,6 +36,12 @@ public class ReindexNotificationPlugin extends ReindexRodaEntityPlugin<Notificat
   @Override
   public List<Class<Notification>> getObjectClasses() {
     return Arrays.asList(Notification.class);
+  }
+
+  @Override
+  public void clearSpecificIndexes(IndexService index, List<String> ids)
+    throws GenericException, RequestNotValidException {
+    // do nothing
   }
 
 }
