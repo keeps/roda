@@ -2075,11 +2075,11 @@ public class ModelService extends ModelObservable {
     return file;
   }
 
-  private <T extends Serializable> CloseableIterable<OptionalWithCause<Representation>> listRepresentations()
+  private CloseableIterable<OptionalWithCause<Representation>> listRepresentations()
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     CloseableIterable<OptionalWithCause<AIP>> aips = listAIPs();
 
-    return CloseableIterables.concat(aips, (aip) -> {
+    return CloseableIterables.concat(aips, aip -> {
       if (aip.isPresent()) {
         List<Representation> representations = aip.get().getRepresentations();
         return CloseableIterables
@@ -2090,11 +2090,11 @@ public class ModelService extends ModelObservable {
     });
   }
 
-  private <T extends Serializable> CloseableIterable<OptionalWithCause<File>> listFiles()
+  private CloseableIterable<OptionalWithCause<File>> listFiles()
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     CloseableIterable<OptionalWithCause<Representation>> representations = listRepresentations();
 
-    return CloseableIterables.concat(representations, (rep) -> {
+    return CloseableIterables.concat(representations, rep -> {
       if (rep.isPresent()) {
         try {
           Representation representation = rep.get();

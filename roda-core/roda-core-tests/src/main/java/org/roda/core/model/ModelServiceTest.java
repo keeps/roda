@@ -572,7 +572,7 @@ public class ModelServiceTest {
 
     Map<String, String> properties = new HashMap<String, String>();
     properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
-    
+
     final DescriptiveMetadata updatedDescriptiveMetadata = model.updateDescriptiveMetadata(aipId,
       CorporaConstants.DESCRIPTIVE_METADATA_ID, binary.getContent(), CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE,
       CorporaConstants.OTHER_DESCRIPTIVE_METADATA_VERSION, properties);
@@ -593,11 +593,14 @@ public class ModelServiceTest {
 
     // check if binary version message collisions are well treated
     model.updateDescriptiveMetadata(aipId, CorporaConstants.DESCRIPTIVE_METADATA_ID, binary.getContent(),
-      CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE, CorporaConstants.OTHER_DESCRIPTIVE_METADATA_VERSION, properties);
+      CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE, CorporaConstants.OTHER_DESCRIPTIVE_METADATA_VERSION,
+      properties);
     model.updateDescriptiveMetadata(aipId, CorporaConstants.DESCRIPTIVE_METADATA_ID, binary.getContent(),
-      CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE, CorporaConstants.OTHER_DESCRIPTIVE_METADATA_VERSION, properties);
+      CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE, CorporaConstants.OTHER_DESCRIPTIVE_METADATA_VERSION,
+      properties);
     model.updateDescriptiveMetadata(aipId, CorporaConstants.DESCRIPTIVE_METADATA_ID, binary.getContent(),
-      CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE, CorporaConstants.OTHER_DESCRIPTIVE_METADATA_VERSION, properties);
+      CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE, CorporaConstants.OTHER_DESCRIPTIVE_METADATA_VERSION,
+      properties);
 
     assertEquals(4, Iterables.size(storage.listBinaryVersions(storagePath)));
   }
@@ -632,6 +635,10 @@ public class ModelServiceTest {
 
     final Iterable<Representation> list = model.retrieveAIP(aipId).getRepresentations();
     assertThat(list, containsInAnyOrder(representation1, representation2));
+
+    CloseableIterable<OptionalWithCause<Representation>> list2 = model.list(Representation.class);
+    assertThat(Iterables.transform(list2, i -> i.get()), containsInAnyOrder(representation1, representation2));
+
   }
 
   @Test

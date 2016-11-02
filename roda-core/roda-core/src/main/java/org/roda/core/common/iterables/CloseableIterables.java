@@ -91,7 +91,7 @@ public final class CloseableIterables {
 
       @Override
       public Iterator<T> iterator() {
-        Iterator<T> iterator = new Iterator<T>() {
+        return new Iterator<T>() {
           Iterator<T> currentIt = null;
 
           @Override
@@ -102,16 +102,24 @@ public final class CloseableIterables {
                 hasNext = true;
               } else {
                 IOUtils.closeQuietly(current);
-                while (main.hasNext()) {
-                  current = main.next();
-                  currentIt = current.iterator();
-                  if (currentIt.hasNext()) {
-                    hasNext = true;
-                    break;
-                  } else {
-                    IOUtils.closeQuietly(current);
-                  }
-                }
+                hasNext = fastForward();
+              }
+            } else {
+              hasNext = fastForward();
+            }
+            return hasNext;
+          }
+
+          private boolean fastForward() {
+            boolean hasNext = false;
+            while (main.hasNext()) {
+              current = main.next();
+              currentIt = current.iterator();
+              if (currentIt.hasNext()) {
+                hasNext = true;
+                break;
+              } else {
+                IOUtils.closeQuietly(current);
               }
             }
             return hasNext;
@@ -122,8 +130,6 @@ public final class CloseableIterables {
             return hasNext() ? currentIt.next() : null;
           }
         };
-
-        return iterator;
       }
     };
   }
