@@ -1,5 +1,7 @@
 package org.roda.core.migration;
 
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -7,9 +9,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrRequest;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.schema.SchemaRequest;
+import org.apache.solr.common.util.NamedList;
 import org.reflections.Reflections;
+import org.roda.core.common.XMLUtility;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
@@ -31,18 +42,6 @@ public class MigrationManager {
     this.modelInfoFile = dataFolder.resolve("model.json");
   }
 
-  public boolean isNecessaryToPerformMigration() throws GenericException {
-    boolean migrationIsNecessary = false;
-
-    // check if model migration is necessary
-    migrationIsNecessary = isModelMigrationNecessary();
-
-    // check if index migration is necessary
-    migrationIsNecessary = migrationIsNecessary && isIndexMigrationNecessary();
-
-    return migrationIsNecessary;
-  }
-
   // 20161031 hsilva: this method is not invoked in the constructor as it might
   // get very big & therefore
   // should be done in a lazy fashion
@@ -52,8 +51,8 @@ public class MigrationManager {
     // addModelMigration(Job.class, 2, JobToVersion2.class);
   }
 
-  private <T extends IsModelObject> void addModelMigration(Class<T> clazz, int toVersion,
-    Class<? extends MigrationAction<T>> migrationClass) throws GenericException {
+  private <T extends IsModelObject> void addModelMigration(final Class<T> clazz, final int toVersion,
+    final Class<? extends MigrationAction<T>> migrationClass) throws GenericException {
     String className = clazz.getName();
     MigrationWorkflow classMigrations = modelMigrations.getOrDefault(className, new MigrationWorkflow());
     // at the very last I'm updating pointers
@@ -76,6 +75,88 @@ public class MigrationManager {
       throw new GenericException("Error instantiating migration action class '" + migrationClass.getName()
         + "' (which migrates to version '" + toVersion + "')");
     }
+  }
+
+  public boolean isNecessaryToPerformMigration(final SolrClient solrClient, final Optional<Path> tempIndexConfigsPath)
+    throws GenericException {
+    boolean migrationIsNecessary = false;
+
+    // check if model migration is necessary
+    migrationIsNecessary = isModelMigrationNecessary();
+
+    // check if index migration is necessary
+    migrationIsNecessary = migrationIsNecessary || isIndexMigrationNecessary(solrClient, tempIndexConfigsPath);
+
+    return migrationIsNecessary;
+  }
+
+  private boolean isModelMigrationNecessary() throws GenericException {
+    boolean migrationIsNecessary = false;
+    Map<String, Integer> modelClassesVersionsFromCode = getModelClassesVersionsFromCode(true, "Indexed");
+    Map<String, Integer> modelClassesVersionsInstalled = new HashMap<>();
+
+    if (Files.exists(modelInfoFile)) {
+      modelClassesVersionsInstalled = JsonUtils.getObjectFromJson(modelInfoFile, ModelInfo.class)
+        .getInstalledClassesVersions();
+    }
+
+    if (modelClassesVersionsInstalled.isEmpty()) {
+      // no information, lets assume first RODA execution
+      LOGGER.info("No model info. available. Writing initial model info. to file {}", modelInfoFile);
+      JsonUtils.writeObjectToFile(new ModelInfo().setInstalledClassesVersions(modelClassesVersionsFromCode),
+        modelInfoFile);
+    } else {
+      // information exists in file, lets see if any migration is needed
+      for (Entry<String, Integer> classVersionFromCode : modelClassesVersionsFromCode.entrySet()) {
+        String classFromCode = classVersionFromCode.getKey();
+        int versionFromCode = classVersionFromCode.getValue();
+
+        LOGGER.debug("Checking if model class '{}' requires to do a migration...", classFromCode);
+
+        // previous information about a class already exists
+        if (modelClassesVersionsInstalled.containsKey(classFromCode)) {
+          int versionInstalled = modelClassesVersionsInstalled.get(classFromCode);
+          if (versionInstalled != versionFromCode) {
+            LOGGER.warn(
+              "A migration may be needed! Model class '{}' version is set to {} in code & installed version is set to {}",
+              classFromCode, versionFromCode, versionInstalled);
+            migrationIsNecessary = true;
+          }
+        } else {
+          // class information does not exists, probably is new & therefore no
+          // model migration is needed
+          LOGGER.info("No migration is needed as no previous information about model class '{}' exists");
+        }
+      }
+
+      if (migrationIsNecessary) {
+        LOGGER.warn(
+          "A migration might be needed. But if you know what you're doing & realize that no migration is needed, write the following content in file '{}':{}{}{}{}",
+          modelInfoFile, System.lineSeparator(), System.lineSeparator(),
+          JsonUtils.getJsonFromObject(new ModelInfo().setInstalledClassesVersions(modelClassesVersionsFromCode)),
+          System.lineSeparator());
+      }
+    }
+    return migrationIsNecessary;
+  }
+
+  private Map<String, Integer> getModelClassesVersionsFromCode(final boolean avoidClassesByNamePrefix,
+    final String avoidByNamePrefix) {
+    Map<String, Integer> ret = new HashMap<>();
+    Reflections reflections = new Reflections("org.roda.core.data.v2");
+    Set<Class<? extends IsModelObject>> modelClasses = reflections.getSubTypesOf(IsModelObject.class);
+    for (Class<? extends IsModelObject> clazz : modelClasses) {
+      if (avoidClassesByNamePrefix && clazz.getSimpleName().startsWith(avoidByNamePrefix)) {
+        continue;
+      }
+
+      try {
+        ret.put(clazz.getName(), clazz.newInstance().getClassVersion());
+      } catch (InstantiationException | IllegalAccessException e) {
+        LOGGER.error("Unable to determine class '{}' model version", clazz.getName(), e);
+      }
+    }
+    return ret;
   }
 
   public void performModelMigrations() throws GenericException {
@@ -128,76 +209,99 @@ public class MigrationManager {
     JsonUtils.writeObjectToFile(modelInfo, modelInfoFile);
   }
 
-  private boolean isModelMigrationNecessary() throws GenericException {
+  private boolean isIndexMigrationNecessary(SolrClient solrClient, Optional<Path> tempIndexConfigsPath)
+    throws GenericException {
     boolean migrationIsNecessary = false;
-    Map<String, Integer> modelClassesVersionsFromCode = getModelClassesVersionsFromCode(true, "Indexed");
-    Map<String, Integer> modelClassesVersionInstalled = new HashMap<>();
+    if (tempIndexConfigsPath.isPresent()) {
+      Path indexConfigsFolder = tempIndexConfigsPath.get().resolve(RodaConstants.CORE_CONFIG_FOLDER)
+        .resolve(RodaConstants.CORE_INDEX_FOLDER);
+      List<String> solrCollections = getSolrCollections(indexConfigsFolder);
 
-    if (Files.exists(modelInfoFile)) {
-      modelClassesVersionInstalled = JsonUtils.getObjectFromJson(modelInfoFile, ModelInfo.class)
-        .getInstalledClassesVersions();
-    }
+      Map<String, Integer> indexVersionsFromCode = getIndexVersionsFromCode(indexConfigsFolder, solrCollections);
+      Map<String, Integer> indexVersionsInstalled = getIndexVersionsFromSolr(solrClient, solrCollections);
 
-    if (modelClassesVersionInstalled.isEmpty()) {
-      // no information, lets assume first RODA execution
-      LOGGER.info("No model info. available. Writing initial model info. to file {}", modelInfoFile);
-      JsonUtils.writeObjectToFile(new ModelInfo().setInstalledClassesVersions(modelClassesVersionsFromCode),
-        modelInfoFile);
-    } else {
-      // information exists in file, lets see if any migration is needed
-      for (Entry<String, Integer> classVersionFromCode : modelClassesVersionsFromCode.entrySet()) {
-        String classFromCode = classVersionFromCode.getKey();
-        int versionFromCode = classVersionFromCode.getValue();
-
-        LOGGER.debug("Checking if model class '{}' requires to do a migration...", classFromCode);
-
-        // previous information about a class already exists
-        if (modelClassesVersionInstalled.containsKey(classFromCode)) {
-          int versionInstalled = modelClassesVersionInstalled.get(classFromCode);
-          if (versionInstalled != versionFromCode) {
+      if (indexVersionsFromCode.isEmpty() || indexVersionsInstalled.isEmpty()) {
+        LOGGER.error("Unable to determine if index migration/migrations is/are needed");
+        throw new GenericException("Unable to determine if index migration/migrations is/are needed");
+      } else {
+        for (Entry<String, Integer> indexFromCode : indexVersionsFromCode.entrySet()) {
+          String collection = indexFromCode.getKey();
+          Integer collectionVersionFromCode = indexFromCode.getValue();
+          if (indexVersionsInstalled.containsKey(collection)) {
+            Integer collectionVersionInstalled = indexVersionsInstalled.get(collection);
+            if (collectionVersionFromCode != collectionVersionInstalled) {
+              LOGGER.warn(
+                "A migration is needed! Collection '{}' version is set to {} in code schema.xml & installed version (Solr deployed) is set to {}",
+                collection, collectionVersionFromCode, collectionVersionInstalled);
+              migrationIsNecessary = true;
+            }
+          } else {
             LOGGER.warn(
-              "A migration may be needed! Model class '{}' version is set to {} in code & installed version is set to {}",
-              classFromCode, versionFromCode, versionInstalled);
+              "A new collection called '{}' exists & needs to be installed before being able to start RODA properly",
+              collection);
             migrationIsNecessary = true;
           }
-        } else {
-          // class information does not exists, probably is new & therefore no
-          // model migration is needed
-          LOGGER.info("No migration is needed as no previous information about model class '{}' exists");
         }
       }
-
-      if (migrationIsNecessary) {
-        LOGGER.warn(
-          "A migration might be needed. But if you know what you're doing & realize that no migration is needed, write the following content in file '{}':{}{}{}{}",
-          modelInfoFile, System.lineSeparator(), System.lineSeparator(),
-          JsonUtils.getJsonFromObject(new ModelInfo().setInstalledClassesVersions(modelClassesVersionsFromCode)),
-          System.lineSeparator());
-      }
+    } else {
+      LOGGER.error("Unable to determine Solr collections via folder with index configs");
+      throw new GenericException("Unable to determine Solr collections via folder with index configs");
     }
+
     return migrationIsNecessary;
   }
 
-  private boolean isIndexMigrationNecessary() {
-    // FIXME 20161031 hsilva: implement this
-    return false;
+  private List<String> getSolrCollections(Path indexConfigsFolder) {
+    List<String> solrCollections = new ArrayList<>();
+    try (DirectoryStream<Path> stream = Files.newDirectoryStream(indexConfigsFolder)) {
+      stream.forEach(e -> {
+        if (Files.isDirectory(e)) {
+          solrCollections.add(e.getFileName().toString());
+        }
+      });
+    } catch (IOException e) {
+      // do nothing
+    }
+    return solrCollections;
   }
 
-  private Map<String, Integer> getModelClassesVersionsFromCode(final boolean avoidClassesByNamePrefix,
-    final String avoidByNamePrefix) {
+  private Map<String, Integer> getIndexVersionsFromCode(Path indexConfigsFolder, List<String> collections) {
     Map<String, Integer> ret = new HashMap<>();
-    Reflections reflections = new Reflections("org.roda.core.data.v2");
-    Set<Class<? extends IsModelObject>> modelClasses = reflections.getSubTypesOf(IsModelObject.class);
-    for (Class<? extends IsModelObject> clazz : modelClasses) {
-      if (avoidClassesByNamePrefix && clazz.getSimpleName().startsWith(avoidByNamePrefix)) {
-        continue;
-      }
-
+    for (String collection : collections) {
+      Path schemaFile = indexConfigsFolder.resolve(collection).resolve("conf").resolve("schema.xml");
+      String version = XMLUtility.getStringFromFile(schemaFile, "/schema/@name");
       try {
-        ret.put(clazz.getName(), clazz.newInstance().getClassVersion());
-      } catch (InstantiationException | IllegalAccessException e) {
-        LOGGER.error("Unable to determine class '{}' model version", clazz.getName(), e);
+        ret.put(collection, Integer.parseInt(version));
+      } catch (NumberFormatException e) {
+        // do nothing
       }
+    }
+
+    return ret;
+  }
+
+  private Map<String, Integer> getIndexVersionsFromSolr(SolrClient solrClient, List<String> collections) {
+    Map<String, Integer> ret = new HashMap<>();
+
+    SolrRequest request = new SchemaRequest.SchemaName();
+    try {
+      for (String collection : collections) {
+        NamedList<Object> response = solrClient.request(request, collection);
+        for (Entry<String, Object> entry : response) {
+          String value = entry.getValue().toString();
+          if ("name".equals(entry.getKey()) && StringUtils.isNotBlank(value)) {
+            String version = value.replaceFirst(".*-", "");
+            try {
+              ret.put(collection, Integer.parseInt(version));
+            } catch (NumberFormatException e) {
+              // do nothing
+            }
+            break;
+          }
+        }
+      }
+    } catch (SolrServerException | IOException e) {
+      // do nothing
     }
     return ret;
   }

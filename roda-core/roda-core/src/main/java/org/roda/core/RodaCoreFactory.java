@@ -138,6 +138,7 @@ public class RodaCoreFactory {
   private static Path rodaHomePath;
   private static Path storagePath;
   private static Path indexDataPath;
+  private static Optional<Path> tempIndexConfigsPath;
   private static Path dataPath;
   private static Path logPath;
   private static Path configPath;
@@ -279,10 +280,10 @@ public class RodaCoreFactory {
 
         // verify if is necessary to perform a model/index migration
         MigrationManager migrationManager = new MigrationManager(dataPath);
-        if (migrationManager.isNecessaryToPerformMigration()) {
+        if (NodeType.MASTER == nodeType
+          && migrationManager.isNecessaryToPerformMigration(getSolr(), tempIndexConfigsPath)) {
           // migrationManager.setupModelMigrations();
           // migrationManager.performModelMigrations();
-
           throw new GenericException("It's necessary to do a model/index migration");
         }
 
@@ -593,11 +594,13 @@ public class RodaCoreFactory {
    */
   private static void instantiateSolrAndIndexService() throws URISyntaxException {
     if (nodeType == NodeType.MASTER) {
+      tempIndexConfigsPath = Optional.empty();
       Path solrHome = configPath.resolve(RodaConstants.CORE_INDEX_FOLDER);
       if (!Files.exists(solrHome) || FEATURE_OVERRIDE_INDEX_CONFIGS) {
         try {
           Path tempConfig = Files.createTempDirectory(getWorkingDirectory(), RodaConstants.CORE_INDEX_FOLDER);
           toDeleteDuringShutdown.add(tempConfig);
+          tempIndexConfigsPath = Optional.of(tempConfig);
           copyFilesFromClasspath(RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER + "/",
             tempConfig);
           solrHome = tempConfig.resolve(RodaConstants.CORE_CONFIG_FOLDER).resolve(RodaConstants.CORE_INDEX_FOLDER);
