@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
@@ -2074,62 +2075,47 @@ public class ModelService extends ModelObservable {
     return file;
   }
 
-  private <T extends Serializable> CloseableIterable<OptionalWithCause<T>> listRepresentations(Class<T> objectClass)
+  private <T extends Serializable> CloseableIterable<OptionalWithCause<Representation>> listRepresentations()
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     CloseableIterable<OptionalWithCause<AIP>> aips = listAIPs();
-    Iterator<OptionalWithCause<AIP>> aipIter = aips.iterator();
-    List<CloseableIterable<OptionalWithCause<T>>> representations = new ArrayList<CloseableIterable<OptionalWithCause<T>>>();
 
-    while (aipIter.hasNext()) {
-      OptionalWithCause<AIP> oaip = aipIter.next();
-      AIP aip = oaip.get();
-      if (oaip.isPresent() && !aip.getRepresentations().isEmpty()) {
-        final CloseableIterable<Resource> resourcesIterable = storage
-          .listResourcesUnderContainer(ModelUtils.getRepresentationsContainerPath(aip.getId()), false);
-        CloseableIterable<OptionalWithCause<T>> fs = ResourceParseUtils.convert(getStorage(), resourcesIterable,
-          objectClass);
-        representations.add(fs);
+    return CloseableIterables.concat(aips, (aip) -> {
+      if (aip.isPresent()) {
+        List<Representation> representations = aip.get().getRepresentations();
+        return CloseableIterables
+          .fromList(representations.stream().map(rep -> OptionalWithCause.of(rep)).collect(Collectors.toList()));
+      } else {
+        return CloseableIterables.empty();
       }
-    }
-
-    return CloseableIterables.concat(representations);
+    });
   }
 
-  private <T extends Serializable> CloseableIterable<OptionalWithCause<T>> listFiles(Class<T> objectClass)
+  private <T extends Serializable> CloseableIterable<OptionalWithCause<File>> listFiles()
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    CloseableIterable<OptionalWithCause<AIP>> aips = listAIPs();
-    Iterator<OptionalWithCause<AIP>> aipIter = aips.iterator();
-    List<CloseableIterable<OptionalWithCause<T>>> files = new ArrayList<CloseableIterable<OptionalWithCause<T>>>();
+    CloseableIterable<OptionalWithCause<Representation>> representations = listRepresentations();
 
-    while (aipIter.hasNext()) {
-      OptionalWithCause<AIP> aip = aipIter.next();
-      if (aip.isPresent()) {
-        for (Representation representation : aip.get().getRepresentations()) {
-          StoragePath representationDataStoragePath = ModelUtils.getRepresentationDataStoragePath(aip.get().getId(),
-            representation.getId());
-          try {
-            final CloseableIterable<Resource> resourcesIterable = storage
-              .listResourcesUnderDirectory(representationDataStoragePath, true);
-            CloseableIterable<OptionalWithCause<T>> fs = ResourceParseUtils.convert(getStorage(), resourcesIterable,
-              objectClass);
-            files.add(fs);
-          } catch (NotFoundException e) {
-            // do nothing as it is expected in some situation (e.g. a
-            // representation without binaries)
-          }
+    return CloseableIterables.concat(representations, (rep) -> {
+      if (rep.isPresent()) {
+        try {
+          Representation representation = rep.get();
+          return listFilesUnder(representation.getAipId(), representation.getId(), true);
+        } catch (RODAException e) {
+          // TODO log
+          return CloseableIterables.empty();
         }
+      } else {
+        return CloseableIterables.empty();
       }
-    }
+    });
 
-    return CloseableIterables.concat(files);
   }
 
   public <T extends Serializable> CloseableIterable<OptionalWithCause<T>> list(Class<T> objectClass)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     if (Representation.class.equals(objectClass)) {
-      return listRepresentations(objectClass);
+      return listRepresentations();
     } else if (File.class.equals(objectClass)) {
-      return listFiles(objectClass);
+      return listFiles();
     } else if (TransferredResource.class.equals(objectClass)) {
       // FIXME 20160930 it uses index but it should not(?)
       return RodaCoreFactory.getIndexService().list(TransferredResource.class);

@@ -9,8 +9,10 @@ package org.roda.core.common.iterables;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
 
 import org.apache.commons.io.IOUtils;
 
@@ -37,6 +39,91 @@ public final class CloseableIterables {
       @Override
       public Iterator<T> iterator() {
         return Iterators.concat(iterators(list));
+      }
+    };
+  }
+
+  public static <A, B> CloseableIterable<B> concat(final CloseableIterable<A> list,
+    final Function<A, CloseableIterable<B>> listFunction) {
+
+    CloseableIterable<CloseableIterable<B>> iterable = new CloseableIterable<CloseableIterable<B>>() {
+
+      @Override
+      public void close() throws IOException {
+        list.close();
+      }
+
+      @Override
+      public Iterator<CloseableIterable<B>> iterator() {
+        final Iterator<A> iterator = list.iterator();
+        return new Iterator<CloseableIterable<B>>() {
+
+          @Override
+          public boolean hasNext() {
+            return iterator.hasNext();
+          }
+
+          @Override
+          public CloseableIterable<B> next() {
+            A next = iterator.next();
+            return listFunction.apply(next);
+          }
+        };
+      }
+    };
+    return concat(iterable);
+  }
+
+  public static <T> CloseableIterable<T> concat(CloseableIterable<CloseableIterable<T>> list) {
+    final Iterator<CloseableIterable<T>> main = list.iterator();
+
+    return new CloseableIterable<T>() {
+
+      CloseableIterable<T> current = null;
+
+      @Override
+      public void close() throws IOException {
+        if (current != null) {
+          current.close();
+        }
+        list.close();
+      }
+
+      @Override
+      public Iterator<T> iterator() {
+        Iterator<T> iterator = new Iterator<T>() {
+          Iterator<T> currentIt = null;
+
+          @Override
+          public boolean hasNext() {
+            boolean hasNext = false;
+            if (current != null) {
+              if (currentIt.hasNext()) {
+                hasNext = true;
+              } else {
+                IOUtils.closeQuietly(current);
+                while (main.hasNext()) {
+                  current = main.next();
+                  currentIt = current.iterator();
+                  if (currentIt.hasNext()) {
+                    hasNext = true;
+                    break;
+                  } else {
+                    IOUtils.closeQuietly(current);
+                  }
+                }
+              }
+            }
+            return hasNext;
+          }
+
+          @Override
+          public T next() {
+            return hasNext() ? currentIt.next() : null;
+          }
+        };
+
+        return iterator;
       }
     };
   }
@@ -108,6 +195,36 @@ public final class CloseableIterables {
     boolean empty = Iterables.isEmpty(it);
     IOUtils.closeQuietly(it);
     return empty;
+  }
+
+  public static <T> CloseableIterable<T> fromList(final List<T> list) {
+    return new CloseableIterable<T>() {
+
+      @Override
+      public void close() throws IOException {
+        // do nothing
+      }
+
+      @Override
+      public Iterator<T> iterator() {
+        return list.iterator();
+      }
+    };
+  }
+
+  public static <T> CloseableIterable<T> empty() {
+    return new CloseableIterable<T>() {
+
+      @Override
+      public void close() throws IOException {
+        // nothing to do
+      }
+
+      @Override
+      public Iterator<T> iterator() {
+        return Collections.emptyIterator();
+      }
+    };
   }
 
 }

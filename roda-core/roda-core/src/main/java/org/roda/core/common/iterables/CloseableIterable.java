@@ -10,4 +10,5 @@ package org.roda.core.common.iterables;
 import java.io.Closeable;
 
 public interface CloseableIterable<T> extends Closeable, Iterable<T> {
+
 }
