@@ -11,17 +11,17 @@ import java.io.Serializable;
 
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 
-public class SearchSuggestion implements Suggestion, Serializable, Comparable<SearchSuggestion> {
+public class SearchSuggest implements Suggestion, Serializable, Comparable<SearchSuggest> {
   private static final long serialVersionUID = -4292378982124160066L;
   private String displayString;
   private String replacementString;
   private int order;
 
-  public SearchSuggestion() {
+  public SearchSuggest() {
     super();
   }
 
-  public SearchSuggestion(String replacement, String display, int order) {
+  public SearchSuggest(String replacement, String display, int order) {
     super();
     this.displayString = display;
     this.replacementString = replacement;
@@ -52,11 +52,11 @@ public class SearchSuggestion implements Suggestion, Serializable, Comparable<Se
     this.order = order;
   }
 
-  public int compareTo(SearchSuggestion o) {
+  public int compareTo(SearchSuggest o) {
     return getReplacementString().compareTo(o.getReplacementString());
   }
 
-  public boolean equals(SearchSuggestion o) {
+  public boolean equals(SearchSuggest o) {
     return getReplacementString().equals(o.getReplacementString());
   }
 }

@@ -94,7 +94,7 @@ public interface BrowserService extends RemoteService {
     String descId, String localeString)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
-  List<SearchField> retrieveSearchFields(String locale) throws GenericException;
+  List<SearchField> retrieveSearchFields(String className, String locale) throws GenericException;
 
   IndexedAIP moveAIPInHierarchy(SelectedItems<IndexedAIP> selected, String parentId)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,

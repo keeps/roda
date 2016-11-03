@@ -34,8 +34,8 @@ public class SearchSuggestBox<T extends IsIndexed> extends Composite {
   public void setValue(String value) {
     suggestBox.setValue(value);
   }
-  
-  public boolean isAllowPartial(){
+
+  public boolean isAllowPartial() {
     return allowPartial;
   }
 

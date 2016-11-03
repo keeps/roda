@@ -8,7 +8,6 @@
 package org.roda.wui.client.common.search;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,32 +30,24 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowseFile;
 import org.roda.wui.client.browse.BrowseRepresentation;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.SearchFileList;
-import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.ListboxUtils;
+import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
@@ -93,60 +84,9 @@ public class MainSearch extends Composite {
   RepresentationList representationsSearchResultPanel;
   SearchFileList filesSearchResultPanel;
 
-  FlowPanel itemsSearchAdvancedFieldsPanel;
-  FlowPanel filesSearchAdvancedFieldsPanel;
-  FlowPanel representationsSearchAdvancedFieldsPanel;
-
-  ListBox searchAdvancedFieldOptionsAIP;
-  ListBox searchAdvancedFieldOptionsRepresentation;
-  ListBox searchAdvancedFieldOptionsFile;
-
-  private final Map<String, SearchField> searchFields = new HashMap<String, SearchField>();
-
-  private static Map<String, SearchField> representationFields = new HashMap<String, SearchField>();
-
-  static {
-    representationFields.put(RodaConstants.REPRESENTATION_ID,
-      new SearchField(RodaConstants.REPRESENTATION_ID, Arrays.asList(RodaConstants.REPRESENTATION_ID),
-        messages.searchRepresentationFieldIdentifier(), RodaConstants.SEARCH_FIELD_TYPE_TEXT));
-    representationFields.put(RodaConstants.REPRESENTATION_TYPE,
-      new SearchField(RodaConstants.REPRESENTATION_TYPE, Arrays.asList(RodaConstants.REPRESENTATION_TYPE),
-        messages.searchRepresentationFieldType(), RodaConstants.SEARCH_FIELD_TYPE_SUGGEST));
-    representationFields.put(RodaConstants.REPRESENTATION_ORIGINAL,
-      new SearchField(RodaConstants.REPRESENTATION_ORIGINAL, Arrays.asList(RodaConstants.REPRESENTATION_ORIGINAL),
-        messages.searchRepresentationFieldOriginal(), RodaConstants.SEARCH_FIELD_TYPE_BOOLEAN));
-    representationFields.put(RodaConstants.REPRESENTATION_SIZE_IN_BYTES,
-      new SearchField(RodaConstants.REPRESENTATION_SIZE_IN_BYTES,
-        Arrays.asList(RodaConstants.REPRESENTATION_SIZE_IN_BYTES), messages.searchRepresentationFieldSize(),
-        RodaConstants.SEARCH_FIELD_TYPE_STORAGE));
-    representationFields.put(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES,
-      new SearchField(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES,
-        Arrays.asList(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES),
-        messages.searchRepresentationFieldNumberOfFiles(), RodaConstants.SEARCH_FIELD_TYPE_NUMERIC_INTERVAL));
-  }
-
-  private static Map<String, SearchField> fileFields = new HashMap<String, SearchField>();
-
-  static {
-    fileFields.put(RodaConstants.FILE_FILE_ID,
-      new SearchField(RodaConstants.FILE_FILE_ID, Arrays.asList(RodaConstants.FILE_FILE_ID),
-        messages.searchFileFieldFilename(), RodaConstants.SEARCH_FIELD_TYPE_TEXT));
-    fileFields.put(RodaConstants.FILE_FILEFORMAT,
-      new SearchField(RodaConstants.FILE_FILEFORMAT, Arrays.asList(RodaConstants.FILE_FILEFORMAT),
-        messages.searchFileFieldFormat(), RodaConstants.SEARCH_FIELD_TYPE_SUGGEST));
-    fileFields.put(RodaConstants.FILE_PRONOM,
-      new SearchField(RodaConstants.FILE_PRONOM, Arrays.asList(RodaConstants.FILE_PRONOM),
-        messages.searchFileFieldPronom(), RodaConstants.SEARCH_FIELD_TYPE_SUGGEST));
-    fileFields.put(RodaConstants.FILE_FORMAT_MIMETYPE,
-      new SearchField(RodaConstants.FILE_FORMAT_MIMETYPE, Arrays.asList(RodaConstants.FILE_FORMAT_MIMETYPE),
-        messages.searchFileFieldMimetype(), RodaConstants.SEARCH_FIELD_TYPE_SUGGEST));
-    fileFields.put(RodaConstants.FILE_SIZE,
-      new SearchField(RodaConstants.FILE_SIZE, Arrays.asList(RodaConstants.FILE_SIZE),
-        messages.searchFileFieldFilesize(), RodaConstants.SEARCH_FIELD_TYPE_STORAGE));
-    fileFields.put(RodaConstants.FILE_FULLTEXT,
-      new SearchField(RodaConstants.FILE_FULLTEXT, Arrays.asList(RodaConstants.FILE_FULLTEXT),
-        messages.searchFileFieldFulltext(), RodaConstants.SEARCH_FIELD_TYPE_TEXT));
-  }
+  AdvancedSearchFieldsPanel itemsSearchAdvancedFieldsPanel;
+  AdvancedSearchFieldsPanel filesSearchAdvancedFieldsPanel;
+  AdvancedSearchFieldsPanel representationsSearchAdvancedFieldsPanel;
 
   boolean justActive = true;
   boolean itemsSelectable = true;
@@ -193,9 +133,21 @@ public class MainSearch extends Composite {
     this.filesButtons = filesButtons;
     this.filesSelectionButtons = filesSelectionButtons;
 
-    itemsSearchAdvancedFieldsPanel = new FlowPanel();
-    filesSearchAdvancedFieldsPanel = new FlowPanel();
-    representationsSearchAdvancedFieldsPanel = new FlowPanel();
+    ValueChangeHandler<Integer> searchAdvancedFieldsPanelHandler = new ValueChangeHandler<Integer>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<Integer> event) {
+        searchPanel.setSearchAdvancedGoEnabled(event.getValue() == 0 ? false : true);
+      }
+    };
+
+    itemsSearchAdvancedFieldsPanel = new AdvancedSearchFieldsPanel(RodaConstants.SEARCH_ITEMS);
+    representationsSearchAdvancedFieldsPanel = new AdvancedSearchFieldsPanel(RodaConstants.SEARCH_REPRESENTATIONS);
+    filesSearchAdvancedFieldsPanel = new AdvancedSearchFieldsPanel(RodaConstants.SEARCH_FILES);
+
+    itemsSearchAdvancedFieldsPanel.addValueChangeHandler(searchAdvancedFieldsPanelHandler);
+    representationsSearchAdvancedFieldsPanel.addValueChangeHandler(searchAdvancedFieldsPanelHandler);
+    filesSearchAdvancedFieldsPanel.addValueChangeHandler(searchAdvancedFieldsPanelHandler);
 
     defaultFilters();
 
@@ -203,16 +155,12 @@ public class MainSearch extends Composite {
       false);
     searchPanel.setDefaultFilterIncremental(false);
 
-    searchAdvancedFieldOptionsAIP = new ListBox();
-    searchAdvancedFieldOptionsRepresentation = new ListBox();
-    searchAdvancedFieldOptionsFile = new ListBox();
-
     initWidget(uiBinder.createAndBindUi(this));
 
     searchPanel.setDropdownLabel(messages.searchListBoxItems());
-    searchPanel.addDropdownItem(messages.searchListBoxItems(), RodaConstants.SEARCH_LIST_BOX_ITEMS);
-    searchPanel.addDropdownItem(messages.searchListBoxRepresentations(), RodaConstants.SEARCH_LIST_BOX_REPRESENTATIONS);
-    searchPanel.addDropdownItem(messages.searchListBoxFiles(), RodaConstants.SEARCH_LIST_BOX_FILES);
+    searchPanel.addDropdownItem(messages.searchListBoxItems(), RodaConstants.SEARCH_ITEMS);
+    searchPanel.addDropdownItem(messages.searchListBoxRepresentations(), RodaConstants.SEARCH_REPRESENTATIONS);
+    searchPanel.addDropdownItem(messages.searchListBoxFiles(), RodaConstants.SEARCH_FILES);
 
     searchPanel.addValueChangeHandler(new ValueChangeHandler<String>() {
 
@@ -230,165 +178,18 @@ public class MainSearch extends Composite {
       @Override
       public void onClick(ClickEvent event) {
         if (selectedItem.equals(Representation.class.getName())) {
-          addSearchFieldPanel(searchAdvancedFieldOptionsRepresentation, representationFields, null,
-            representationsSearchAdvancedFieldsPanel);
+          representationsSearchAdvancedFieldsPanel.addSearchFieldPanel();
         } else if (selectedItem.equals(File.class.getName())) {
-          addSearchFieldPanel(searchAdvancedFieldOptionsFile, fileFields, null, filesSearchAdvancedFieldsPanel);
+          filesSearchAdvancedFieldsPanel.addSearchFieldPanel();
         } else {
-          addSearchFieldPanel(searchAdvancedFieldOptionsAIP, searchFields, null, itemsSearchAdvancedFieldsPanel);
+          itemsSearchAdvancedFieldsPanel.addSearchFieldPanel();
         }
       }
     });
-
-    itemsSearchAdvancedFieldsPanel.addStyleName("searchAdvancedFieldsPanel empty");
-    filesSearchAdvancedFieldsPanel.addStyleName("searchAdvancedFieldsPanel empty");
-    representationsSearchAdvancedFieldsPanel.addStyleName("searchAdvancedFieldsPanel empty");
-
-    createItemsSearchAdvancedFieldsPanel();
-    createRepresentationsSearchAdvancedFieldsPanel();
-    createFilesSearchAdvancedFieldsPanel();
   }
 
   public boolean isJustActive() {
     return justActive;
-  }
-  
-  private void createItemsSearchAdvancedFieldsPanel() {
-    BrowserService.Util.getInstance().retrieveSearchFields(LocaleInfo.getCurrentLocale().getLocaleName(),
-      new AsyncCallback<List<SearchField>>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
-
-        @Override
-        public void onSuccess(List<SearchField> searchFields) {
-          MainSearch.this.searchFields.clear();
-          for (SearchField searchField : searchFields) {
-            ListboxUtils.insertItemByAlphabeticOrder(searchAdvancedFieldOptionsAIP, searchField.getLabel(),
-              searchField.getId());
-            MainSearch.this.searchFields.put(searchField.getId(), searchField);
-          }
-
-          for (SearchField searchField : searchFields) {
-            if (searchField.isFixed()) {
-              addSearchFieldPanel(searchAdvancedFieldOptionsAIP, MainSearch.this.searchFields, searchField.getId(),
-                itemsSearchAdvancedFieldsPanel);
-            }
-          }
-        }
-      });
-  }
-
-  private void createRepresentationsSearchAdvancedFieldsPanel() {
-    for (SearchField searchField : representationFields.values()) {
-      ListboxUtils.insertItemByAlphabeticOrder(searchAdvancedFieldOptionsRepresentation, searchField.getLabel(),
-        searchField.getId());
-    }
-
-    for (SearchField searchField : representationFields.values()) {
-      addSearchFieldPanel(searchAdvancedFieldOptionsRepresentation, representationFields, searchField.getId(),
-        representationsSearchAdvancedFieldsPanel);
-    }
-  }
-
-  private void createFilesSearchAdvancedFieldsPanel() {
-    for (SearchField searchField : fileFields.values()) {
-      ListboxUtils.insertItemByAlphabeticOrder(searchAdvancedFieldOptionsFile, searchField.getLabel(),
-        searchField.getId());
-    }
-
-    for (SearchField searchField : fileFields.values()) {
-      addSearchFieldPanel(searchAdvancedFieldOptionsFile, fileFields, searchField.getId(),
-        filesSearchAdvancedFieldsPanel);
-    }
-  }
-
-  private void addSearchFieldPanel(ListBox searchAdvancedFieldOptions, Map<String, SearchField> searchFields,
-    String selectedField, final FlowPanel searchAdvancedFieldPanel) {
-    final SearchFieldPanel searchFieldPanel = new SearchFieldPanel();
-
-    searchFieldPanel.setSearchAdvancedFields(searchAdvancedFieldOptions);
-    searchFieldPanel.setSearchFields(searchFields);
-
-    if (selectedField == null) {
-      selectedField = searchFieldPanel.getFirstSearchField();
-    }
-
-    searchFieldPanel.selectSearchField(selectedField);
-
-    ClickHandler clickHandler = new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        searchAdvancedFieldPanel.remove(searchFieldPanel);
-        if (searchAdvancedFieldPanel.getWidgetCount() == 0) {
-          searchAdvancedFieldPanel.addStyleName("empty");
-          searchPanel.setSearchAdvancedGoEnabled(false);
-          addWarningToDuplicateFields(searchAdvancedFieldPanel);
-        }
-      }
-    };
-
-    searchFieldPanel.addRemoveClickHandler(clickHandler);
-    searchFieldPanel.addValueChangeHandler(new ValueChangeHandler<String>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<String> event) {
-        setSuggestions(event.getValue(), searchFieldPanel);
-      }
-    });
-
-    searchFieldPanel.addListBoxChangeHandler(new ChangeHandler() {
-
-      @Override
-      public void onChange(ChangeEvent event) {
-        addWarningToDuplicateFields(searchAdvancedFieldPanel);
-      }
-    });
-
-    setSuggestions(selectedField, searchFieldPanel);
-
-    searchAdvancedFieldPanel.add(searchFieldPanel);
-    searchAdvancedFieldPanel.removeStyleName("empty");
-
-    searchPanel.setSearchAdvancedGoEnabled(true);
-    addWarningToDuplicateFields(searchAdvancedFieldPanel);
-  }
-
-  private void addWarningToDuplicateFields(final FlowPanel searchAdvancedFieldPanel) {
-    List<String> activeFields = new ArrayList<String>();
-    for (int i = 0; i < searchAdvancedFieldPanel.getWidgetCount(); i++) {
-      Widget widget = searchAdvancedFieldPanel.getWidget(i);
-
-      if (widget instanceof SearchFieldPanel) {
-        SearchFieldPanel fieldPanel = (SearchFieldPanel) widget;
-        ListBox listBox = fieldPanel.getAdvancedFieldBox();
-
-        if (activeFields.contains(listBox.getSelectedValue())) {
-          fieldPanel.setWarningVisible(true, listBox.getSelectedValue());
-        } else {
-          activeFields.add(listBox.getSelectedValue());
-          fieldPanel.setWarningVisible(false);
-        }
-      }
-    }
-  }
-
-  private void setSuggestions(String searchFieldId, SearchFieldPanel searchFieldPanel) {
-    if (searchFieldId.equals(RodaConstants.FILE_FILEFORMAT)) {
-      searchFieldPanel
-        .addInputSearchSuggestBox(new SearchSuggestBox<IndexedFile>(IndexedFile.class, RodaConstants.FILE_FILEFORMAT,true));
-    } else if (searchFieldId.equals(RodaConstants.FILE_PRONOM)) {
-      searchFieldPanel
-        .addInputSearchSuggestBox(new SearchSuggestBox<IndexedFile>(IndexedFile.class, RodaConstants.FILE_PRONOM,false));
-    } else if (searchFieldId.equals(RodaConstants.FILE_FORMAT_MIMETYPE)) {
-      searchFieldPanel.addInputSearchSuggestBox(
-        new SearchSuggestBox<IndexedFile>(IndexedFile.class, RodaConstants.FILE_FORMAT_MIMETYPE,false));
-    } else if (searchFieldId.equals(RodaConstants.REPRESENTATION_TYPE)) {
-      searchFieldPanel.addInputSearchSuggestBox(
-        new SearchSuggestBox<IndexedRepresentation>(IndexedRepresentation.class, RodaConstants.REPRESENTATION_TYPE,false));
-    }
   }
 
   public void showSearchAdvancedFieldsPanel() {
@@ -399,6 +200,7 @@ public class MainSearch extends Composite {
     searchPanel.setVariables(filter_aips, RodaConstants.AIP_SEARCH, itemsSearchResultPanel,
       itemsSearchAdvancedFieldsPanel);
     searchPanel.setSearchAdvancedFieldOptionsAddVisible(true);
+    searchPanel.setSearchAdvancedGoEnabled(itemsSearchAdvancedFieldsPanel.getWidgetCount() == 0 ? false : true);
 
     searchResultPanel.clear();
     searchResultPanel.add(itemsSearchResultPanel);
@@ -420,6 +222,8 @@ public class MainSearch extends Composite {
     searchPanel.setVariables(filter_representations, RodaConstants.REPRESENTATION_SEARCH,
       representationsSearchResultPanel, representationsSearchAdvancedFieldsPanel);
     searchPanel.setSearchAdvancedFieldOptionsAddVisible(true);
+    searchPanel
+      .setSearchAdvancedGoEnabled(representationsSearchAdvancedFieldsPanel.getWidgetCount() == 0 ? false : true);
 
     searchResultPanel.clear();
     searchResultPanel.add(representationsSearchResultPanel);
@@ -441,6 +245,7 @@ public class MainSearch extends Composite {
     searchPanel.setVariables(filter_files, RodaConstants.FILE_SEARCH, filesSearchResultPanel,
       filesSearchAdvancedFieldsPanel);
     searchPanel.setSearchAdvancedFieldOptionsAddVisible(true);
+    searchPanel.setSearchAdvancedGoEnabled(filesSearchAdvancedFieldsPanel.getWidgetCount() == 0 ? false : true);
 
     searchResultPanel.clear();
     searchResultPanel.add(filesSearchResultPanel);
@@ -635,9 +440,9 @@ public class MainSearch extends Composite {
   }
 
   public void search() {
-    if (searchPanel.getDropdownSelectedValue().equals(RodaConstants.SEARCH_LIST_BOX_ITEMS)) {
+    if (searchPanel.getDropdownSelectedValue().equals(RodaConstants.SEARCH_ITEMS)) {
       showSearchAdvancedFieldsPanel();
-    } else if (searchPanel.getDropdownSelectedValue().equals(RodaConstants.SEARCH_LIST_BOX_REPRESENTATIONS)) {
+    } else if (searchPanel.getDropdownSelectedValue().equals(RodaConstants.SEARCH_REPRESENTATIONS)) {
       showRepresentationsSearchAdvancedFieldsPanel();
     } else {
       showFilesSearchAdvancedFieldsPanel();

@@ -1208,12 +1208,12 @@ public class Browse extends Composite {
 
   @UiHandler("searchContext")
   void searchContextHandler(ClickEvent e) {
-    Tools.newHistory(Search.RESOLVER, RodaConstants.SEARCH_LIST_BOX_ITEMS, RodaConstants.AIP_ANCESTORS, aipId);
+    Tools.newHistory(Search.RESOLVER, RodaConstants.SEARCH_ITEMS, RodaConstants.AIP_ANCESTORS, aipId);
   }
 
   @UiHandler("searchAIP")
   void searchAIPHandler(ClickEvent e) {
-    Tools.newHistory(Search.RESOLVER, RodaConstants.SEARCH_LIST_BOX_REPRESENTATIONS, RodaConstants.AIP_AIP_ID, aipId);
+    Tools.newHistory(Search.RESOLVER, RodaConstants.SEARCH_REPRESENTATIONS, RodaConstants.AIP_AIP_ID, aipId);
   }
 
   @UiHandler("newRepresentation")

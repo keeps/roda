@@ -608,28 +608,6 @@ public interface ClientMessages extends Messages {
 
   String searchFieldNumericToPlaceHolder();
 
-  String searchRepresentationFieldIdentifier();
-
-  String searchRepresentationFieldType();
-
-  String searchRepresentationFieldSize();
-
-  String searchRepresentationFieldNumberOfFiles();
-
-  String searchRepresentationFieldOriginal();
-
-  String searchFileFieldFilename();
-
-  String searchFileFieldFormat();
-
-  String searchFileFieldPronom();
-
-  String searchFileFieldMimetype();
-
-  String searchFileFieldFilesize();
-
-  String searchFileFieldFulltext();
-
   String addSearchField();
 
   String searchButton();

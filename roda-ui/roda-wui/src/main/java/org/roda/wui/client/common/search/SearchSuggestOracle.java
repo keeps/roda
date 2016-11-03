@@ -31,8 +31,7 @@ public class SearchSuggestOracle<T extends IsIndexed> extends SuggestOracle {
 
   @Override
   public void requestSuggestions(final Request request, final Callback callback) {
-
-    BrowserService.Util.getInstance().suggest(classToRequest.getName(), field, request.getQuery(),allowPartial,
+    BrowserService.Util.getInstance().suggest(classToRequest.getName(), field, request.getQuery(), allowPartial,
       new AsyncCallback<List<String>>() {
 
         @Override
@@ -42,9 +41,9 @@ public class SearchSuggestOracle<T extends IsIndexed> extends SuggestOracle {
 
         @Override
         public void onSuccess(List<String> suggestionList) {
-          List<SearchSuggestion> suggestions = new ArrayList<SearchSuggestion>();
+          List<SearchSuggest> suggestions = new ArrayList<SearchSuggest>();
           for (String suggestion : suggestionList) {
-            suggestions.add(new SearchSuggestion(suggestion, suggestion, suggestions.size()));
+            suggestions.add(new SearchSuggest(suggestion, suggestion, suggestions.size()));
           }
 
           Response response = new Response();

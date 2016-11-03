@@ -27,6 +27,7 @@ import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.SelectedItemsUtils;
 import org.roda.core.common.UserUtility;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -159,7 +160,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String representationId,
     String descId, String type, String version, String localeString)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+      throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Locale locale = ServerTools.parseLocale(localeString);
     return Browser.retrieveDescriptiveMetadataEditBundle(user, aipId, representationId, descId, type, version, locale);
@@ -168,7 +169,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String representationId,
     String descId, String localeString)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+      throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Locale locale = ServerTools.parseLocale(localeString);
     return Browser.retrieveDescriptiveMetadataEditBundle(user, aipId, representationId, descId, locale);
@@ -177,7 +178,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public <T extends IsIndexed> IndexResult<T> find(String classNameToReturn, Filter filter, Sorter sorter,
     Sublist sublist, Facets facets, String localeString, boolean justActive)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+      throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     try {
       User user = UserUtility.getUser(getThreadLocalRequest());
       Class<T> classToReturn = SelectedItemsUtils.parseClass(classNameToReturn);
@@ -240,21 +241,31 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public List<SearchField> retrieveSearchFields(String localeString) throws GenericException {
+  public List<SearchField> retrieveSearchFields(String className, String localeString) throws GenericException {
     List<SearchField> searchFields = new ArrayList<SearchField>();
-    List<String> fields = RodaUtils.copyList(RodaCoreFactory.getRodaConfiguration().getList("ui.search.fields"));
+    List<String> fields = RodaUtils.copyList(RodaCoreFactory.getRodaConfiguration()
+      .getList(RodaCoreFactory.getConfigurationKey(RodaConstants.SEARCH_FIELD_PREFIX, className)));
     Locale locale = ServerTools.parseLocale(localeString);
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     for (String field : fields) {
       SearchField searchField = new SearchField();
-      String fieldsNames = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "fields");
-      String fieldType = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "type");
-      String fieldLabelI18N = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "i18n");
-      List<String> fieldsValues = RodaCoreFactory.getRodaConfigurationAsList("ui", "search", "fields", field, "values");
-      String fieldI18NPrefix = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field,
-        "i18nPrefix");
-      boolean fieldFixed = Boolean
-        .valueOf(RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "fixed"));
+      String fieldsNames = RodaCoreFactory.getRodaConfigurationAsString(RodaConstants.SEARCH_FIELD_PREFIX, className,
+        field, RodaConstants.SEARCH_FIELD_FIELDS);
+      String fieldType = RodaCoreFactory.getRodaConfigurationAsString(RodaConstants.SEARCH_FIELD_PREFIX, className,
+        field, RodaConstants.SEARCH_FIELD_TYPE);
+      String fieldLabelI18N = RodaCoreFactory.getRodaConfigurationAsString(RodaConstants.SEARCH_FIELD_PREFIX, className,
+        field, RodaConstants.SEARCH_FIELD_I18N);
+      String fieldI18NPrefix = RodaCoreFactory.getRodaConfigurationAsString(RodaConstants.SEARCH_FIELD_PREFIX,
+        className, field, RodaConstants.SEARCH_FIELD_I18N_PREFIX);
+      List<String> fieldsValues = RodaCoreFactory.getRodaConfigurationAsList(RodaConstants.SEARCH_FIELD_PREFIX,
+        className, field, RodaConstants.SEARCH_FIELD_VALUES);
+      String suggestField = RodaCoreFactory.getRodaConfigurationAsString(RodaConstants.SEARCH_FIELD_PREFIX, className,
+        field, RodaConstants.SEARCH_FIELD_TYPE_SUGGEST_FIELD);
+
+      boolean fieldFixed = Boolean.valueOf(RodaCoreFactory.getRodaConfigurationAsString(
+        RodaConstants.SEARCH_FIELD_PREFIX, className, field, RodaConstants.SEARCH_FIELD_FIXED));
+      boolean suggestPartial = Boolean.valueOf(RodaCoreFactory.getRodaConfigurationAsString(
+        RodaConstants.SEARCH_FIELD_PREFIX, className, field, RodaConstants.SEARCH_FIELD_TYPE_SUGGEST_PARTIAL));
 
       if (fieldsNames != null && fieldType != null && fieldLabelI18N != null) {
         List<String> fieldsNamesList = Arrays.asList(fieldsNames.split(","));
@@ -278,8 +289,13 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
           }
           searchField.setTerms(terms);
         }
-        searchFields.add(searchField);
 
+        if (suggestField != null) {
+          searchField.setSuggestField(suggestField);
+        }
+        searchField.setSuggestPartial(suggestPartial);
+
+        searchFields.add(searchField);
       }
     }
 
@@ -537,7 +553,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public DescriptiveMetadataVersionsBundle retrieveDescriptiveMetadataVersionsBundle(String aipId,
     String representationId, String descriptiveMetadataId, String localeString)
-    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
+      throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Locale locale = ServerTools.parseLocale(localeString);
     return Browser.retrieveDescriptiveMetadataVersionsBundle(user, aipId, representationId, descriptiveMetadataId,
@@ -547,7 +563,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public void revertDescriptiveMetadataVersion(String aipId, String representationId, String descriptiveMetadataId,
     String versionId)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+      throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Browser.revertDescriptiveMetadataVersion(user, aipId, representationId, descriptiveMetadataId, versionId);
   }
@@ -555,7 +571,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public void deleteDescriptiveMetadataVersion(String aipId, String representationId, String descriptiveMetadataId,
     String versionId)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+      throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Browser.deleteDescriptiveMetadataVersion(user, aipId, representationId, descriptiveMetadataId, versionId);
   }
@@ -667,7 +683,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public <T extends IsIndexed> Job createProcess(String jobName, SelectedItems<T> selected, String id,
     Map<String, String> value, String selectedClass) throws AuthorizationDeniedException, RequestNotValidException,
-    NotFoundException, GenericException, JobAlreadyStartedException {
+      NotFoundException, GenericException, JobAlreadyStartedException {
 
     User user = UserUtility.getUser(getThreadLocalRequest());
 
@@ -742,7 +758,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public String moveFiles(String aipId, String representationUUID, SelectedItems<IndexedFile> selectedFiles,
     IndexedFile toFolder) throws AuthorizationDeniedException, GenericException, RequestNotValidException,
-    AlreadyExistsException, NotFoundException {
+      AlreadyExistsException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.moveFiles(user, aipId, representationUUID, selectedFiles, toFolder);
   }
@@ -794,7 +810,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public void updateMultipleIncidences(SelectedItems<RiskIncidence> selected, String status, String severity,
     Date mitigatedOn, String mitigatedBy, String mitigatedDescription)
-    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
+      throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Browser.updateMultipleIncidences(user, selected, status, severity, mitigatedOn, mitigatedBy, mitigatedDescription);
   }

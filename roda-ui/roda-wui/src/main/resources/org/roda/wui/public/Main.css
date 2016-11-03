@@ -3185,6 +3185,7 @@ td.datePickerMonth, td.datePickerYear {
     font-size: 1.1rem;
     color: #999;
     position: absolute;
+	width: 100%;
 }
 
 .search-field.full_width {

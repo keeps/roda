@@ -959,9 +959,18 @@ public final class RodaConstants {
    * WUI related
    */
 
-  public static final String SEARCH_LIST_BOX_ITEMS = "items";
-  public static final String SEARCH_LIST_BOX_REPRESENTATIONS = "representations";
-  public static final String SEARCH_LIST_BOX_FILES = "files";
+  public static final String SEARCH_ITEMS = "items";
+  public static final String SEARCH_REPRESENTATIONS = "representations";
+  public static final String SEARCH_FILES = "files";
+
+  public static final String SEARCH_FIELD_PREFIX = "ui.search.fields";
+  public static final String SEARCH_FIELD_FIELDS = "fields";
+  public static final String SEARCH_FIELD_TYPE = "type";
+  public static final String SEARCH_FIELD_I18N = "i18n";
+  public static final String SEARCH_FIELD_I18N_PREFIX = "i18nPrefix";
+  public static final String SEARCH_FIELD_VALUES = "values";
+  public static final String SEARCH_FIELD_FIXED = "fixed";
+
   public static final String SEARCH_FIELD_TYPE_TEXT = "text";
   public static final String SEARCH_FIELD_TYPE_DATE = "date";
   public static final String SEARCH_FIELD_TYPE_DATE_INTERVAL = "date_interval";
@@ -970,6 +979,8 @@ public final class RodaConstants {
   public static final String SEARCH_FIELD_TYPE_STORAGE = "storage";
   public static final String SEARCH_FIELD_TYPE_BOOLEAN = "boolean";
   public static final String SEARCH_FIELD_TYPE_SUGGEST = "suggest";
+  public static final String SEARCH_FIELD_TYPE_SUGGEST_FIELD = "suggestField";
+  public static final String SEARCH_FIELD_TYPE_SUGGEST_PARTIAL = "suggestPartial";
   public static final String SEARCH_FIELD_TYPE_CONTROLLED = "controlled";
 
   public static final String METADATA_VERSION_SEPARATOR = "_";
@@ -1022,22 +1033,19 @@ public final class RodaConstants {
 
   /* Dialog filter limit */
   public static final int DIALOG_FILTER_LIMIT_NUMBER = 120;
-  
+
   public static final String INDEX_SEARCH_SUFFIX = "_txt";
 
-  
-  
-  
-  public static final String MEDIA_TYPE_WILDCARD = "*/*";
+  public static final String MEDIA_TYPE_WILDCARD = "*";
 
   public final static String MEDIA_TYPE_APPLICATION_XML = "application/xml";
-  
+
   public final static String MEDIA_TYPE_APPLICATION_ATOM_XML = "application/atom+xml";
-  
+
   public final static String MEDIA_TYPE_APPLICATION_XHTML_XML = "application/xhtml+xml";
-  
+
   public final static String MEDIA_TYPE_APPLICATION_SVG_XML = "application/svg+xml";
-  
+
   public final static String MEDIA_TYPE_APPLICATION_JSON = "application/json";
 
   public final static String MEDIA_TYPE_APPLICATION_FORM_URLENCODED = "application/x-www-form-urlencoded";
@@ -1051,7 +1059,7 @@ public final class RodaConstants {
   public final static String MEDIA_TYPE_TEXT_XML = "text/xml";
 
   public final static String MEDIA_TYPE_TEXT_HTML = "text/html";
-  
+
   /** Private empty constructor */
   private RodaConstants() {
 

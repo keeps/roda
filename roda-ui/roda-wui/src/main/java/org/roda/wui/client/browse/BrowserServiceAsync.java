@@ -58,7 +58,7 @@ public interface BrowserServiceAsync {
   void retrieveDescriptiveMetadataEditBundle(String aipId, String representationId, String descId, String localeString,
     AsyncCallback<DescriptiveMetadataEditBundle> callback);
 
-  void retrieveSearchFields(String locale, AsyncCallback<List<SearchField>> callback);
+  void retrieveSearchFields(String className, String locale, AsyncCallback<List<SearchField>> callback);
 
   void moveAIPInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, AsyncCallback<IndexedAIP> callback);
 

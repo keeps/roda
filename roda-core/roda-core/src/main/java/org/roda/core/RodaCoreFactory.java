@@ -1166,7 +1166,7 @@ public class RodaCoreFactory {
     return rodaConfiguration;
   }
 
-  private static String getConfigurationKey(String... keyParts) {
+  public static String getConfigurationKey(String... keyParts) {
     StringBuilder sb = new StringBuilder();
     for (String part : keyParts) {
       if (sb.length() != 0) {
