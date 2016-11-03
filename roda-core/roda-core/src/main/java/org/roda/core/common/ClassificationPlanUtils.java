@@ -1,11 +1,8 @@
 package org.roda.core.common;
 
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.StringWriter;
-import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.List;
 
@@ -63,20 +60,15 @@ public class ClassificationPlanUtils {
       }
 
       root.set("dos", array);
-      StringWriter sw = new StringWriter();
-      mapper.writeValue(sw, root);
-
       ConsumesOutputStream stream = new ConsumesOutputStream() {
 
         @Override
         public void consumeOutputStream(OutputStream out) throws IOException {
-          BufferedOutputStream bos = new BufferedOutputStream(out);
           try {
-            IOUtils.write(sw.toString(), bos, Charset.defaultCharset());
+            mapper.writeValue(out, root);
           } catch (IOException e) {
             throw e;
           } finally {
-            IOUtils.closeQuietly(bos);
             IOUtils.closeQuietly(out);
           }
 
