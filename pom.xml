@@ -138,7 +138,7 @@
 		<spring.version>4.1.1.RELEASE</spring.version>
 		<grizzly.version>2.3.16</grizzly.version>
 		<jena.version>2.13.0</jena.version>
-		<solr.version>5.5.1</solr.version>
+		<solr.version>5.5.3</solr.version>
 		<akka.version>2.4.10</akka.version>
 		<httpcomponents.version>4.5.2</httpcomponents.version>
 		<poi.version>3.13</poi.version>
