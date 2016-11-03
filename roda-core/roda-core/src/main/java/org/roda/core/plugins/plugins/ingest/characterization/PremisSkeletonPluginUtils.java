@@ -68,6 +68,7 @@ public class PremisSkeletonPluginUtils {
             model.updatePreservationMetadata(pmId, PreservationMetadataType.FILE, aipId, representationId,
               file.getPath(), file.getId(), filePreservation, notifyInSteps);
           }
+
           PremisV3Utils.linkFileToRepresentation(pmId, RodaConstants.PREMIS_RELATIONSHIP_TYPE_STRUCTURAL,
             RodaConstants.PREMIS_RELATIONSHIP_SUBTYPE_HASPART, representation);
         }

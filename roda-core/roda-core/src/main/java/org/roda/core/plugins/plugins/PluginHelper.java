@@ -435,16 +435,16 @@ public final class PluginHelper {
 
   /***************** Plugin related *****************/
   /**************************************************/
-  public static void createSubmission(ModelService model, boolean createSubmission, Path submissionPath, String aipID)
+  public static void createSubmission(ModelService model, boolean createSubmission, Path submissionPath, String aipId)
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException {
     if (createSubmission) {
       if (Files.isDirectory(submissionPath)) {
         StorageService submissionStorage = new FileStorageService(submissionPath);
         StoragePath submissionStoragePath = DefaultStoragePath.empty();
-        model.createSubmission(submissionStorage, submissionStoragePath, aipID);
+        model.createSubmission(submissionStorage, submissionStoragePath, aipId);
       } else {
-        model.createSubmission(submissionPath, aipID);
+        model.createSubmission(submissionPath, aipId);
       }
     }
   }
@@ -487,90 +487,90 @@ public final class PluginHelper {
   /**
    * For SIP > AIP
    */
-  public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
+  public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipId,
     ModelService model, IndexService index, TransferredResource source, PluginState outcome,
     String outcomeDetailExtension, boolean notify, Date eventDate) throws RequestNotValidException, NotFoundException,
     GenericException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
     List<LinkingIdentifier> sources = Arrays
       .asList(PluginHelper.getLinkingIdentifier(source, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
     List<LinkingIdentifier> outcomes = Arrays
-      .asList(PluginHelper.getLinkingIdentifier(aipID, RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
+      .asList(PluginHelper.getLinkingIdentifier(aipId, RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
 
-    return createPluginEvent(plugin, aipID, null, null, null, model, index, sources, outcomes, outcome,
+    return createPluginEvent(plugin, aipId, null, null, null, model, index, sources, outcomes, outcome,
       outcomeDetailExtension, notify, eventDate);
   }
 
-  public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
+  public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipId,
     ModelService model, IndexService index, TransferredResource source, PluginState outcome,
     String outcomeDetailExtension, boolean notify) throws RequestNotValidException, NotFoundException, GenericException,
     AuthorizationDeniedException, ValidationException, AlreadyExistsException {
-    return createPluginEvent(plugin, aipID, model, index, source, outcome, outcomeDetailExtension, notify, new Date());
+    return createPluginEvent(plugin, aipId, model, index, source, outcome, outcomeDetailExtension, notify, new Date());
   }
 
   /**
    * For AIP as source only
    */
-  public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
+  public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipId,
     ModelService model, IndexService index, PluginState outcome, String outcomeDetailExtension, boolean notify)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
     ValidationException, AlreadyExistsException {
     List<LinkingIdentifier> sources = Arrays
-      .asList(PluginHelper.getLinkingIdentifier(aipID, RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
+      .asList(PluginHelper.getLinkingIdentifier(aipId, RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
     List<LinkingIdentifier> outcomes = null;
-    return createPluginEvent(plugin, aipID, null, null, null, model, index, sources, outcomes, outcome,
+    return createPluginEvent(plugin, aipId, null, null, null, model, index, sources, outcomes, outcome,
       outcomeDetailExtension, notify, new Date());
   }
 
   // used by migration plugin
-  public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
+  public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipId,
     ModelService model, IndexService index, PluginState outcome, String outcomeDetailExtension, boolean notify,
     Date eventDate) throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
     ValidationException, AlreadyExistsException {
     List<LinkingIdentifier> sources = Arrays
-      .asList(PluginHelper.getLinkingIdentifier(aipID, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+      .asList(PluginHelper.getLinkingIdentifier(aipId, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
     List<LinkingIdentifier> outcomes = Arrays
-      .asList(PluginHelper.getLinkingIdentifier(aipID, RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
-    return createPluginEvent(plugin, aipID, null, null, null, model, index, sources, outcomes, outcome,
+      .asList(PluginHelper.getLinkingIdentifier(aipId, RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
+    return createPluginEvent(plugin, aipId, null, null, null, model, index, sources, outcomes, outcome,
       outcomeDetailExtension, notify, eventDate);
   }
 
   /**
    * For AIP
    */
-  public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
+  public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipId,
     ModelService model, IndexService index, List<LinkingIdentifier> sources, List<LinkingIdentifier> targets,
     PluginState outcome, String outcomeDetailExtension, boolean notify) throws RequestNotValidException,
     NotFoundException, GenericException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
-    return createPluginEvent(plugin, aipID, null, null, null, model, index, sources, targets, outcome,
+    return createPluginEvent(plugin, aipId, null, null, null, model, index, sources, targets, outcome,
       outcomeDetailExtension, notify, new Date());
   }
 
   /**
    * For REPRESENTATION
    */
-  public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
-    String representationID, ModelService model, IndexService index, List<LinkingIdentifier> sources,
+  public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipId,
+    String representationId, ModelService model, IndexService index, List<LinkingIdentifier> sources,
     List<LinkingIdentifier> targets, PluginState outcome, String outcomeDetailExtension, boolean notify)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
     ValidationException, AlreadyExistsException {
-    return createPluginEvent(plugin, aipID, representationID, null, null, model, index, sources, targets, outcome,
+    return createPluginEvent(plugin, aipId, representationId, null, null, model, index, sources, targets, outcome,
       outcomeDetailExtension, notify, new Date());
   }
 
   /**
    * For FILE
    */
-  public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
-    String representationID, List<String> filePath, String fileID, ModelService model, IndexService index,
+  public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipId,
+    String representationId, List<String> filePath, String fileId, ModelService model, IndexService index,
     List<LinkingIdentifier> sources, List<LinkingIdentifier> outcomes, PluginState outcome,
     String outcomeDetailExtension, boolean notify) throws RequestNotValidException, NotFoundException, GenericException,
     AuthorizationDeniedException, ValidationException, AlreadyExistsException {
-    return createPluginEvent(plugin, aipID, representationID, filePath, fileID, model, index, sources, outcomes,
+    return createPluginEvent(plugin, aipId, representationId, filePath, fileId, model, index, sources, outcomes,
       outcome, outcomeDetailExtension, notify, new Date());
   }
 
-  private static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
-    String representationID, List<String> filePath, String fileID, ModelService model, IndexService index,
+  private static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipId,
+    String representationId, List<String> filePath, String fileId, ModelService model, IndexService index,
     List<LinkingIdentifier> sources, List<LinkingIdentifier> outcomes, PluginState outcome,
     String outcomeDetailExtension, boolean notify, Date startDate) throws RequestNotValidException, NotFoundException,
     GenericException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
@@ -615,12 +615,12 @@ public final class PluginHelper {
     ContentPayload premisEvent = PremisV3Utils.createPremisEventBinary(id, startDate,
       plugin.getPreservationEventType().toString(), plugin.getPreservationEventDescription(), sources, outcomes,
       outcome.name(), outcomeDetailNote, outcomeDetailExtension, agentIds);
-    model.createPreservationMetadata(PreservationMetadataType.EVENT, id, aipID, representationID, filePath, fileID,
+    model.createPreservationMetadata(PreservationMetadataType.EVENT, id, aipId, representationId, filePath, fileId,
       premisEvent, notify);
     PreservationMetadata pm = new PreservationMetadata();
     pm.setId(id);
-    pm.setAipId(aipID);
-    pm.setRepresentationId(representationID);
+    pm.setAipId(aipId);
+    pm.setRepresentationId(representationId);
     pm.setType(PreservationMetadataType.EVENT);
     return pm;
   }
@@ -633,17 +633,17 @@ public final class PluginHelper {
     return li;
   }
 
-  public static LinkingIdentifier getLinkingIdentifier(String aipID, String role) {
-    return getLinkingIdentifier(RODA_TYPE.AIP, aipID, role);
+  public static LinkingIdentifier getLinkingIdentifier(String aipId, String role) {
+    return getLinkingIdentifier(RODA_TYPE.AIP, aipId, role);
   }
 
-  public static LinkingIdentifier getLinkingIdentifier(String aipID, String representationID, String role) {
-    return getLinkingIdentifier(RODA_TYPE.REPRESENTATION, IdUtils.getRepresentationId(aipID, representationID), role);
+  public static LinkingIdentifier getLinkingIdentifier(String aipId, String representationId, String role) {
+    return getLinkingIdentifier(RODA_TYPE.REPRESENTATION, IdUtils.getRepresentationId(aipId, representationId), role);
   }
 
-  public static LinkingIdentifier getLinkingIdentifier(String aipID, String representationID, List<String> filePath,
-    String fileID, String role) {
-    return getLinkingIdentifier(RODA_TYPE.FILE, IdUtils.getFileId(aipID, representationID, filePath, fileID), role);
+  public static LinkingIdentifier getLinkingIdentifier(String aipId, String representationId, List<String> filePath,
+    String fileId, String role) {
+    return getLinkingIdentifier(RODA_TYPE.FILE, IdUtils.getFileId(aipId, representationId, filePath, fileId), role);
   }
 
   private static LinkingIdentifier getLinkingIdentifier(RODA_TYPE type, String uuid, String role) {

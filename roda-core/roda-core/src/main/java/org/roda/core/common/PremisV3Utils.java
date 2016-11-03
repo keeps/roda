@@ -374,13 +374,13 @@ public final class PremisV3Utils {
     return MetadataUtils.saveToContentPayload(agent, true);
   }
 
-  public static Representation createBaseRepresentation(String aipID, String representationId)
+  public static Representation createBaseRepresentation(String aipId, String representationId)
     throws GenericException, ValidationException {
 
     Representation representation = Representation.Factory.newInstance();
     ObjectIdentifierComplexType oict = representation.addNewObjectIdentifier();
     oict.setObjectIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
-    String identifier = IdUtils.getPreservationId(PreservationMetadataType.REPRESENTATION, aipID, representationId,
+    String identifier = IdUtils.getPreservationId(PreservationMetadataType.REPRESENTATION, aipId, representationId,
       null, null);
     oict.setObjectIdentifierValue(identifier);
     representation.addNewPreservationLevel().setPreservationLevelValue(getStringPlusAuthority(""));

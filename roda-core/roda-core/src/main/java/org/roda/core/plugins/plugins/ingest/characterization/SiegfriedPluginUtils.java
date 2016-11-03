@@ -26,7 +26,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
-import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
@@ -98,10 +97,10 @@ public class SiegfriedPluginUtils {
   }
 
   public static <T extends IsRODAObject> List<LinkingIdentifier> runSiegfriedOnRepresentation(Plugin<T> plugin,
-    IndexService index, ModelService model, AIP aip, Representation representation) throws GenericException,
+    IndexService index, ModelService model, Representation representation) throws GenericException,
     RequestNotValidException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException, PluginException {
 
-    StoragePath representationDataPath = ModelUtils.getRepresentationDataStoragePath(aip.getId(),
+    StoragePath representationDataPath = ModelUtils.getRepresentationDataStoragePath(representation.getAipId(),
       representation.getId());
     DirectResourceAccess directAccess = model.getStorage().getDirectAccess(representationDataPath);
     List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
@@ -128,11 +127,11 @@ public class SiegfriedPluginUtils {
 
         ContentPayload payload = new StringContentPayload(file.toString());
 
-        model.createOtherMetadata(aip.getId(), representation.getId(), fileDirectoryPath, fileId,
+        model.createOtherMetadata(representation.getAipId(), representation.getId(), fileDirectoryPath, fileId,
           SiegfriedPlugin.FILE_SUFFIX, RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED, payload, notify);
 
-        sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), representation.getId(), fileDirectoryPath, fileId,
-          RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+        sources.add(PluginHelper.getLinkingIdentifier(representation.getAipId(), representation.getId(),
+          fileDirectoryPath, fileId, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
         // Update PREMIS files
         final JsonNode matches = file.get("matches");
@@ -158,8 +157,8 @@ public class SiegfriedPluginUtils {
             }
           }
 
-          PremisV3Utils.updateFormatPreservationMetadata(model, aip.getId(), representation.getId(), fileDirectoryPath,
-            fileId, format, version, pronom, mime, notify);
+          PremisV3Utils.updateFormatPreservationMetadata(model, representation.getAipId(), representation.getId(),
+            fileDirectoryPath, fileId, format, version, pronom, mime, notify);
         }
       }
     }

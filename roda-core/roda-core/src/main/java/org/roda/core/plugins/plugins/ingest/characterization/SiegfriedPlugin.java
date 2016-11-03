@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.common.IdUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -21,8 +22,10 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -40,7 +43,7 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SiegfriedPlugin extends AbstractPlugin<AIP> {
+public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(SiegfriedPlugin.class);
   public static final String FILE_SUFFIX = ".json";
 
@@ -83,7 +86,23 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
+  public Report execute(IndexService index, ModelService model, StorageService storage, List<T> list)
+    throws PluginException {
+
+    if (!list.isEmpty()) {
+      if (list.get(0) instanceof AIP) {
+        return executeOnAIP(index, model, storage, (List<AIP>) list);
+      } else if (list.get(0) instanceof Representation) {
+        return executeOnRepresentation(index, model, storage, (List<Representation>) list);
+      } else if (list.get(0) instanceof File) {
+        // return executeOnFile(index, model, storage, (List<File>) list);
+      }
+    }
+
+    return new Report();
+  }
+
+  public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
     Report report = PluginHelper.initPluginReport(this);
 
@@ -103,8 +122,7 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
 
             for (Representation representation : aip.getRepresentations()) {
               LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
-              sources
-                .addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(this, index, model, aip, representation));
+              sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(this, index, model, representation));
               model.notifyRepresentationUpdated(representation);
             }
 
@@ -145,8 +163,60 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
     return report;
   }
 
+  public Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage,
+    List<Representation> list) throws PluginException {
+    Report report = PluginHelper.initPluginReport(this);
+
+    try {
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+
+      for (Representation representation : list) {
+        List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
+
+        Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
+          Representation.class, AIPState.ACTIVE);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+        LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), representation.getAipId());
+        try {
+          sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(this, index, model, representation));
+          model.notifyRepresentationUpdated(representation);
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+          reportItem.setPluginState(PluginState.SUCCESS);
+        } catch (PluginException | NotFoundException | GenericException | RequestNotValidException
+          | AuthorizationDeniedException | AlreadyExistsException e) {
+          LOGGER.error("Error running Siegfried " + representation.getAipId() + ": " + e.getMessage(), e);
+
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+          reportItem.setPluginState(PluginState.FAILURE)
+            .setPluginDetails("Error running Siegfried " + representation.getAipId() + ": " + e.getMessage());
+        }
+
+        try {
+          List<LinkingIdentifier> outcomes = null;
+          boolean notify = true;
+          PluginHelper.createPluginEvent(this, representation.getAipId(), representation.getId(), model, index, sources,
+            outcomes, reportItem.getPluginState(), "", notify);
+        } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
+          | AuthorizationDeniedException | AlreadyExistsException e) {
+          LOGGER.error("Error creating event: " + e.getMessage(), e);
+        }
+
+        report.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+      }
+
+      jobPluginInfo.finalizeInfo();
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+    } catch (JobException e) {
+      throw new PluginException("A job exception has occurred", e);
+    }
+
+    return report;
+  }
+
   @Override
-  public Plugin<AIP> cloneMe() {
+  public Plugin<T> cloneMe() {
     SiegfriedPlugin siegfriedPlugin = new SiegfriedPlugin();
     try {
       siegfriedPlugin.init();
@@ -205,8 +275,12 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public List<Class<AIP>> getObjectClasses() {
-    return Arrays.asList(AIP.class);
+  public List<Class<T>> getObjectClasses() {
+    List<Class<? extends IsRODAObject>> list = new ArrayList<>();
+    list.add(AIP.class);
+    list.add(Representation.class);
+    // list.add(File.class);
+    return (List) list;
   }
 
 }

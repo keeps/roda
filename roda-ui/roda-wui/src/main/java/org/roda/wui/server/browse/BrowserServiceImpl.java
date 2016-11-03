@@ -225,8 +225,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public <T extends IsIndexed> List<String> suggest(String classNameToReturn, String field, String query, boolean allowPartial)
-    throws AuthorizationDeniedException, GenericException, NotFoundException {
+  public <T extends IsIndexed> List<String> suggest(String classNameToReturn, String field, String query,
+    boolean allowPartial) throws AuthorizationDeniedException, GenericException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Class<T> classToReturn = SelectedItemsUtils.parseClass(classNameToReturn);
     return Browser.suggest(user, classToReturn, field, query, allowPartial);
@@ -420,6 +420,9 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
       for (PluginParameter parameter : basePlugin.getParameters()) {
         if (PluginParameterType.PLUGIN_SIP_TO_AIP.equals(parameter.getType())) {
           String pluginId = job.getPluginParameters().get(parameter.getId());
+          if (pluginId == null) {
+            pluginId = parameter.getDefaultValue();
+          }
           if (pluginId != null) {
             PluginInfo refPlugin = RodaCoreFactory.getPluginManager().getPluginInfo(pluginId);
             pluginsInfo.add(refPlugin);
