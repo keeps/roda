@@ -2055,9 +2055,7 @@ public class SolrUtils {
   public static SolrInputDocument representationPermissionsUpdateToSolrDocument(Representation representation,
     Permissions permissions) {
     SolrInputDocument document = new SolrInputDocument();
-    document.addField(RodaConstants.INDEX_UUID,
-      IdUtils.getRepresentationId(representation.getAipId(), IdUtils.getRepresentationId(representation)));
-    document.addField(RodaConstants.REPRESENTATION_ID, representation.getId());
+    document.addField(RodaConstants.INDEX_UUID, IdUtils.getRepresentationId(representation));
     return permissionsUpdateToSolrDocument(document, permissions);
   }
 
