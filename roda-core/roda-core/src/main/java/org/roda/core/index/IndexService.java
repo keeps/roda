@@ -44,6 +44,8 @@ import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.DIP;
+import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -253,6 +255,14 @@ public class IndexService {
     observer.fileCreated(file);
   }
 
+  public void reindexDIP(DIP dip) {
+    observer.dipCreated(dip, true);
+  }
+
+  public void reindexDIPFile(DIPFile file) {
+    observer.dipFileCreated(file);
+  }
+
   public void reindexPreservationAgents()
     throws RequestNotValidException, GenericException, AuthorizationDeniedException {
     CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = model.listPreservationAgents();
@@ -368,6 +378,10 @@ public class IndexService {
       reindexRepresentation(Representation.class.cast(object));
     } else if (File.class.equals(objectClass) || IndexedFile.class.equals(objectClass)) {
       reindexFile(File.class.cast(object));
+    } else if (DIP.class.equals(objectClass)) {
+      reindexDIP(DIP.class.cast(object));
+    } else if (DIPFile.class.equals(objectClass)) {
+      reindexDIPFile(DIPFile.class.cast(object));
     } else {
       LOGGER.error("Error trying to reindex an unconfigured object class: {}", objectClass.getName());
     }

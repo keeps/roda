@@ -114,7 +114,6 @@ public class AipsResource {
 
     // delegate action to controller
     IndexedAIP indexedAIP = Browser.retrieve(user, IndexedAIP.class, aipId);
-
     return ApiUtils.okResponse(indexedAIP, acceptFormat, mediaType);
   }
 
@@ -192,7 +191,6 @@ public class AipsResource {
     // delegate action to controller
     SelectedItems<IndexedAIP> aips = new SelectedItemsList<>(Arrays.asList(aipId), IndexedAIP.class.getName());
     Browser.deleteAIP(user, aips);
-
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "AIP deleted"), mediaType).build();
   }
 

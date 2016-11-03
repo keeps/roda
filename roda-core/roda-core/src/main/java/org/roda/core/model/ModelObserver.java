@@ -11,6 +11,8 @@ import java.util.List;
 
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.DIP;
+import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
@@ -105,5 +107,17 @@ public interface ModelObserver {
   public void notificationCreatedOrUpdated(Notification notification);
 
   public void notificationDeleted(String notificationId);
+
+  public void dipCreated(DIP dip, boolean commit);
+
+  public void dipUpdated(DIP dip, boolean commit);
+
+  public void dipDeleted(String dipId, boolean commit);
+
+  public void dipFileCreated(DIPFile file);
+
+  public void dipFileUpdated(DIPFile file);
+
+  public void dipFileDeleted(String dipId, List<String> path, String fileId);
 
 }

@@ -12,6 +12,8 @@ import java.util.List;
 
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.DIP;
+import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
@@ -275,6 +277,42 @@ public abstract class ModelObservable {
   protected void notifyNotificationDeleted(String notificationId) {
     for (ModelObserver observer : observers) {
       observer.notificationDeleted(notificationId);
+    }
+  }
+
+  protected void notifyDIPCreated(DIP dip, boolean commit) {
+    for (ModelObserver observer : observers) {
+      observer.dipCreated(dip, commit);
+    }
+  }
+
+  protected void notifyDIPUpdated(DIP dip, boolean commit) {
+    for (ModelObserver observer : observers) {
+      observer.dipUpdated(dip, commit);
+    }
+  }
+
+  protected void notifyDIPDeleted(String dipId, boolean commit) {
+    for (ModelObserver observer : observers) {
+      observer.dipDeleted(dipId, commit);
+    }
+  }
+
+  protected void notifyDIPFileCreated(DIPFile file) {
+    for (ModelObserver observer : observers) {
+      observer.dipFileCreated(file);
+    }
+  }
+
+  protected void notifyDIPFileUpdated(DIPFile file) {
+    for (ModelObserver observer : observers) {
+      observer.dipFileUpdated(file);
+    }
+  }
+
+  protected void notifyDIPFileDeleted(String dipId, List<String> path, String fileId) {
+    for (ModelObserver observer : observers) {
+      observer.dipFileDeleted(dipId, path, fileId);
     }
   }
 }

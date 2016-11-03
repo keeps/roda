@@ -46,6 +46,8 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPs;
+import org.roda.core.data.v2.ip.DIP;
+import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
@@ -285,6 +287,10 @@ public class ApiUtils {
       ret = new org.roda.core.data.v2.risks.RiskIncidences((List<RiskIncidence>) result.getResults());
     } else if (objectClass.equals(RODAMember.class)) {
       ret = new org.roda.core.data.v2.user.RODAMembers((List<RODAMember>) result.getResults());
+    } else if (objectClass.equals(DIP.class)) {
+      ret = new org.roda.core.data.v2.ip.DIPs((List<DIP>) result.getResults());
+    } else if (objectClass.equals(DIPFile.class)) {
+      ret = new org.roda.core.data.v2.ip.DIPFiles((List<DIPFile>) result.getResults());
     } else {
       throw new GenericException("Unsupported object class: " + objectClass);
     }

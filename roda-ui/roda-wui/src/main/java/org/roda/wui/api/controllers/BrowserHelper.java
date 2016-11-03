@@ -84,6 +84,8 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.DIP;
+import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -468,7 +470,7 @@ public class BrowserHelper {
 
   }
 
-  public static void validateGetAIPRepresentationFileParams(String acceptFormat) throws RequestNotValidException {
+  public static void validateGetFileParams(String acceptFormat) throws RequestNotValidException {
     if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)
       && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
@@ -2700,4 +2702,93 @@ public class BrowserHelper {
       IdUtils.getTransferredResourceUUID(path));
   }
 
+  public static DIP createDIP(DIP dip) throws GenericException, AuthorizationDeniedException {
+    return RodaCoreFactory.getModelService().createDIP(dip);
+  }
+
+  public static DIP updateDIP(DIP dip) throws GenericException, AuthorizationDeniedException, NotFoundException {
+    return RodaCoreFactory.getModelService().updateDIP(dip);
+  }
+
+  public static void deleteDIP(String dipId) throws GenericException, AuthorizationDeniedException, NotFoundException {
+    RodaCoreFactory.getModelService().deleteDIP(dipId);
+  }
+
+  public static EntityResponse retrieveDIPFile(String fileUuid, String acceptFormat)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+
+    DIPFile iFile = RodaCoreFactory.getIndexService().retrieve(DIPFile.class, fileUuid);
+
+    if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
+      final String filename;
+      final String mediaType;
+      final ConsumesOutputStream stream;
+
+      StorageService storage = RodaCoreFactory.getStorageService();
+      Binary representationFileBinary = storage.getBinary(ModelUtils.getDIPFileStoragePath(iFile));
+      filename = representationFileBinary.getStoragePath().getName();
+      mediaType = RodaConstants.MEDIA_TYPE_WILDCARD;
+
+      stream = new ConsumesOutputStream() {
+
+        @Override
+        public String getMediaType() {
+          return acceptFormat;
+        }
+
+        @Override
+        public String getFileName() {
+          return filename;
+        }
+
+        @Override
+        public void consumeOutputStream(OutputStream out) throws IOException {
+          InputStream fileInputStream = null;
+          try {
+            fileInputStream = representationFileBinary.getContent().createInputStream();
+            IOUtils.copy(fileInputStream, out);
+          } finally {
+            IOUtils.closeQuietly(fileInputStream);
+          }
+        }
+      };
+      return new StreamResponse(filename, mediaType, stream);
+    } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
+      || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
+      DIPFile file = RodaCoreFactory.getModelService().retrieveDIPFile(iFile.getDipId(), iFile.getPath(),
+        iFile.getId());
+      return new ObjectResponse(acceptFormat, file);
+    } else {
+      throw new GenericException("Unsupported accept format: " + acceptFormat);
+    }
+  }
+
+  public static DIPFile createDIPFile(String dipId, List<String> directoryPath, String fileId, ContentPayload content,
+    boolean notify) throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
+    AlreadyExistsException {
+    return RodaCoreFactory.getModelService().createDIPFile(dipId, directoryPath, fileId, content, notify);
+  }
+
+  public static DIPFile updateDIPFile(DIPFile file)
+    throws GenericException, AuthorizationDeniedException, NotFoundException {
+    // RodaCoreFactory.getModelService().updateDIPFile(file.getDipId(),
+    // file.getPath(), file.getId());
+    return null;
+  }
+
+  public static void deleteDIPFiles(SelectedItems<DIPFile> selected, User user)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    List<String> fileIds = consolidate(user, DIPFile.class, selected);
+
+    Filter filter = new Filter();
+    filter.add(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, fileIds));
+    IndexResult<DIPFile> files = RodaCoreFactory.getIndexService().find(DIPFile.class, filter, Sorter.NONE,
+      new Sublist(0, fileIds.size()));
+
+    for (DIPFile file : files.getResults()) {
+      RodaCoreFactory.getModelService().deleteDIPFile(file.getDipId(), file.getPath(), file.getId(), true);
+    }
+
+    RodaCoreFactory.getIndexService().commit(DIPFile.class);
+  }
 }

@@ -12,7 +12,6 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
@@ -109,31 +108,29 @@ public class ReplicationPlugin extends AbstractPlugin<AIP> {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
       PluginState pluginState = PluginState.SUCCESS;
-      try {
-        for (AIP aip : list) {
-          Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, aip.getState());
-          PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
-          reports.put(aip.getId(), reportItem);
 
-          String rsyncResult = ReplicationPluginUtils.executeRsyncAIP(aip, hasCompression);
-          if (rsyncResult.equals(ReplicationPluginUtils.PROPERTIES_ERROR_MESSAGE)) {
-            pluginState = PluginState.FAILURE;
-          }
+      for (AIP aip : list) {
+        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, aip.getState());
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+        reports.put(aip.getId(), reportItem);
 
-          reportItem.addPluginDetails(rsyncResult);
-
-          PreservationMetadata pm = PluginHelper.createPluginEvent(this, aip.getId(), model, index, pluginState,
-            rsyncResult, true);
-
-          rsyncResult = ReplicationPluginUtils.executeRsyncEvent(pm, hasCompression);
-          if (rsyncResult.equals(ReplicationPluginUtils.PROPERTIES_ERROR_MESSAGE)) {
-            pluginState = PluginState.FAILURE;
-          }
-          reportItem.addPluginDetails("\n" + rsyncResult);
+        String rsyncResult = ReplicationPluginUtils.executeRsyncAIP(aip, hasCompression, true);
+        if (rsyncResult.equals(ReplicationPluginUtils.PROPERTIES_ERROR_MESSAGE)) {
+          pluginState = PluginState.FAILURE;
         }
 
+        PreservationMetadata pm = PluginHelper.createPluginEvent(this, aip.getId(), model, index, pluginState,
+          rsyncResult, true);
+
+        rsyncResult = ReplicationPluginUtils.executeRsyncEvent(pm, hasCompression);
+        if (rsyncResult.equals(ReplicationPluginUtils.PROPERTIES_ERROR_MESSAGE)) {
+          pluginState = PluginState.FAILURE;
+        }
+      }
+
+      try {
         // rsync agents
-        String rsyncAgentsResult = ReplicationPluginUtils.executeRsyncAgents(hasCompression);
+        ReplicationPluginUtils.executeRsyncAgents(hasCompression);
 
         // create reindex job on the remote side
         sendReindexRequest(model, index, list.stream().map(aip -> aip.getId()).collect(Collectors.toList()));
@@ -142,8 +139,6 @@ public class ReplicationPlugin extends AbstractPlugin<AIP> {
         for (AIP aip : list) {
           Report reportItem = reports.get(aip.getId());
           reportItem.setPluginState(pluginState);
-          reportItem.addPluginDetails("\n" + rsyncAgentsResult);
-
           report.addReport(reportItem);
           PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
           jobPluginInfo.incrementObjectsProcessed(pluginState);
@@ -159,9 +154,6 @@ public class ReplicationPlugin extends AbstractPlugin<AIP> {
         // fail all AIPs
         for (AIP aip : list) {
           Report reportItem = reports.get(aip.getId());
-          if (reportItem == null) {
-            reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, aip.getState());
-          }
           reportItem.setPluginState(pluginState).setPluginDetails(outcomeDetailExtension);
           report.addReport(reportItem);
           PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
@@ -172,7 +164,7 @@ public class ReplicationPlugin extends AbstractPlugin<AIP> {
       // finalize
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException e) {
+    } catch (RODAException e) {
       throw new PluginException("A job exception has occurred", e);
     }
 

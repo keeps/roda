@@ -12,6 +12,8 @@ import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.DIP;
+import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -27,6 +29,8 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.common.lists.AIPList;
+import org.roda.wui.client.common.lists.DIPFileList;
+import org.roda.wui.client.common.lists.DIPList;
 import org.roda.wui.client.common.lists.FormatList;
 import org.roda.wui.client.common.lists.JobList;
 import org.roda.wui.client.common.lists.LogEntryList;
@@ -82,6 +86,10 @@ public class ListFactory {
       return new LogEntryList(filter, null, title, selectable, pageSize, incrementPage);
     } else if (actualClass.equals(RODAMember.class.getName())) {
       return new RodaMemberList(filter, null, title, selectable, pageSize, incrementPage);
+    } else if (actualClass.equals(DIP.class.getName())) {
+      return new DIPList(filter, null, title, selectable, pageSize, incrementPage);
+    } else if (actualClass.equals(DIPFile.class.getName())) {
+      return new DIPFileList(filter, null, title, selectable, pageSize, incrementPage);
     } else {
       throw new RODAException();
     }

@@ -13,8 +13,11 @@ import java.util.UUID;
 
 import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.FileLink;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.RepresentationLink;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.plugins.Plugin;
 
@@ -28,6 +31,10 @@ public final class IdUtils {
 
   public static String getRepresentationId(Representation representation) {
     return getRepresentationId(representation.getAipId(), representation.getId());
+  }
+
+  public static String getRepresentationId(RepresentationLink link) {
+    return getRepresentationId(link.getAipId(), link.getRepresentationId());
   }
 
   public static String getRepresentationId(String aipId, String representationId) {
@@ -55,8 +62,29 @@ public final class IdUtils {
     return UUID.nameUUIDFromBytes(idBuilder.toString().getBytes()).toString();
   }
 
+  public static String getFileId(FileLink link) {
+    return getFileId(link.getAipId(), link.getRepresentationId(), link.getPath(), link.getFileId());
+  }
+
   public static String getFileId(File file) {
     return getFileId(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId());
+  }
+
+  public static String getDIPFileId(String dipId, List<String> fileDirectoryPath, String fileId) {
+    StringBuilder idBuilder = new StringBuilder();
+    idBuilder.append(dipId);
+    idBuilder.append(ID_SEPARATOR);
+    for (String dir : fileDirectoryPath) {
+      idBuilder.append(dir);
+      idBuilder.append(ID_SEPARATOR);
+    }
+    idBuilder.append(fileId);
+
+    return UUID.nameUUIDFromBytes(idBuilder.toString().getBytes()).toString();
+  }
+
+  public static String getDIPFileId(DIPFile file) {
+    return getDIPFileId(file.getDipId(), file.getPath(), file.getId());
   }
 
   public static String getOtherMetadataId(String type, String aipId, String representationId,

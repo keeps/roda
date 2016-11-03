@@ -664,6 +664,10 @@ public interface ClientMessages extends Messages {
 
   String representationSchemas();
 
+  String dipCreatedDate();
+
+  String dipLastModified();
+
   /************* Preservation Event List ****************/
 
   String preservationEventListHeaderDate();

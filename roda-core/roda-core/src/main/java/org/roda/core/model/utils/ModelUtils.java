@@ -32,6 +32,8 @@ import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.DIP;
+import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -187,6 +189,14 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(getRepresentationDataPath(aipId, representationId));
   }
 
+  private static List<String> getDIPDataPath(String dipId) {
+    return build(Arrays.asList(RodaConstants.STORAGE_CONTAINER_DIP, dipId), RodaConstants.STORAGE_DIRECTORY_DATA);
+  }
+
+  public static StoragePath getDIPDataStoragePath(String dipId) throws RequestNotValidException {
+    return DefaultStoragePath.parse(getDIPDataPath(dipId));
+  }
+
   public static StoragePath getDescriptiveMetadataStoragePath(String aipId, String descriptiveMetadataBinaryId)
     throws RequestNotValidException {
     return getDescriptiveMetadataStoragePath(aipId, null, descriptiveMetadataBinaryId);
@@ -275,6 +285,22 @@ public final class ModelUtils {
     return getFileStoragePath(f.getAipId(), f.getRepresentationId(), f.getPath(), f.getId());
   }
 
+  public static StoragePath getDIPFileStoragePath(String dipId, List<String> directoryPath, String fileId)
+    throws RequestNotValidException {
+    List<String> path = getDIPDataPath(dipId);
+    if (directoryPath != null) {
+      path.addAll(directoryPath);
+    }
+    if (fileId != null) {
+      path.add(fileId);
+    }
+    return DefaultStoragePath.parse(path);
+  }
+
+  public static StoragePath getDIPFileStoragePath(DIPFile f) throws RequestNotValidException {
+    return getDIPFileStoragePath(f.getDipId(), f.getPath(), f.getId());
+  }
+
   public static String extractAipId(StoragePath path) {
     // AIP/[aipId]/...
 
@@ -318,6 +344,32 @@ public final class ModelUtils {
       && directoryPath.get(1).equals(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS)
       && directoryPath.get(3).equals(RodaConstants.STORAGE_DIRECTORY_DATA)) {
       return directoryPath.subList(4, directoryPath.size());
+    } else {
+      return new ArrayList<>();
+    }
+  }
+
+  public static String extractDipId(StoragePath path) {
+    // DIP/[dipId]/...
+
+    String container = path.getContainerName();
+    List<String> directoryPath = path.getDirectoryPath();
+
+    if (container.equals(RodaConstants.STORAGE_CONTAINER_DIP) && !directoryPath.isEmpty()) {
+      return directoryPath.get(0);
+    } else {
+      return null;
+    }
+  }
+
+  public static List<String> extractFilePathFromDIPData(StoragePath path) {
+    // DIP/[dipId]/data/.../file.bin
+
+    String container = path.getContainerName();
+    List<String> directoryPath = path.getDirectoryPath();
+    if (container.equals(RodaConstants.STORAGE_CONTAINER_DIP) && directoryPath.size() > 1
+      && directoryPath.get(1).equals(RodaConstants.STORAGE_DIRECTORY_DATA)) {
+      return directoryPath.subList(2, directoryPath.size());
     } else {
       return new ArrayList<>();
     }
@@ -567,6 +619,14 @@ public final class ModelUtils {
       notificationId + RodaConstants.NOTIFICATION_FILE_EXTENSION);
   }
 
+  public static StoragePath getDIPContainerPath() throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DIP);
+  }
+
+  public static StoragePath getDIPStoragePath(String dipId) throws RequestNotValidException {
+    return DefaultStoragePath.parse(Arrays.asList(RodaConstants.STORAGE_CONTAINER_DIP, dipId));
+  }
+
   public static StoragePath getOtherMetadataFolderStoragePath(String aipId, String representationId)
     throws RequestNotValidException {
     return DefaultStoragePath.parse(getRepresentationOtherMetadataFolderPath(aipId, representationId));
@@ -626,6 +686,8 @@ public final class ModelUtils {
       return getJobReportContainerPath();
     } else if (clazz.equals(RiskIncidence.class)) {
       return getRiskIncidenceContainerPath();
+    } else if (clazz.equals(DIP.class)) {
+      return getDIPContainerPath();
     } else {
       throw new RequestNotValidException("Unknown class for getting container path: " + clazz.getName());
     }

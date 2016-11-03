@@ -98,7 +98,7 @@ public class FilesResource {
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response retrieve(
-    @ApiParam(value = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileUUID,
+    @ApiParam(value = "The UUID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileUUID,
     @ApiParam(value = "Choose format in which to get the file", allowableValues = RodaConstants.API_GET_FILE_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
@@ -141,12 +141,12 @@ public class FilesResource {
     @ApiResponse(code = 409, message = "Already exists", response = ApiResponseMessage.class)})
 
   public Response createRepresentationFile(
-    @ApiParam(value = "The ID of the AIP where to create the representation") @QueryParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
-    @ApiParam(value = "The requested ID for the new representation") @QueryParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID) String representationId,
+    @ApiParam(value = "The AIP ID of the new file") @QueryParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
+    @ApiParam(value = "The representation ID of the new file") @QueryParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
     @ApiParam(value = "The UUID of the parent folder") @QueryParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileUUID,
     @FormDataParam(RodaConstants.API_PARAM_UPLOAD) InputStream inputStream,
     @FormDataParam(RodaConstants.API_PARAM_UPLOAD) FormDataContentDisposition fileDetail,
-    @ApiParam(value = "A new filename to this file", required = true) @QueryParam(RodaConstants.API_QUERY_KEY_FILENAME) String filename,
+    @ApiParam(value = "A new filename to this file") @QueryParam(RodaConstants.API_QUERY_KEY_FILENAME) String filename,
     @ApiParam(value = "Choose format in which to get the file", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
@@ -178,7 +178,7 @@ public class FilesResource {
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response delete(
-    @ApiParam(value = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileUUID,
+    @ApiParam(value = "The UUID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileUUID,
     @ApiParam(value = "Choose format in which to get the response", allowableValues = RodaConstants.API_DELETE_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);

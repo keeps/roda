@@ -9,7 +9,6 @@ package org.roda.core.model;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -55,6 +54,8 @@ import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.DIP;
+import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
@@ -128,6 +129,7 @@ public class ModelService extends ModelObservable {
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_JOB_REPORT);
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_RISK);
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_RISK_INCIDENCE);
+      createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_DIP);
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error while ensuring that all containers exist", e);
     }
@@ -899,7 +901,6 @@ public class ModelService extends ModelObservable {
     ContentPayload contentPayload) throws RequestNotValidException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, NotFoundException {
     return createFile(aipId, representationId, directoryPath, fileId, contentPayload, true);
-
   }
 
   public File createFile(String aipId, String representationId, List<String> directoryPath, String fileId,
@@ -962,7 +963,6 @@ public class ModelService extends ModelObservable {
 
   public void updateFile(File file) {
     // TODO
-
     notifyFileUpdated(file);
   }
 
@@ -1911,9 +1911,7 @@ public class ModelService extends ModelObservable {
   }
 
   /***************** Notification related *****************/
-  /**
-   * @throws AuthorizationDeniedException
-   **********************************************/
+  /**********************************************************/
 
   public Notification createNotification(final Notification notification, final NotificationProcessor processor)
     throws GenericException, AuthorizationDeniedException {
@@ -1996,6 +1994,181 @@ public class ModelService extends ModelObservable {
         }
       }
     }
+  }
+
+  /***************** DIP related *****************/
+  /**********************************************************/
+
+  public CloseableIterable<OptionalWithCause<DIPFile>> listDIPFilesUnder(DIPFile f, boolean recursive)
+    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    return listDIPFilesUnder(f.getDipId(), f.getPath(), f.getId(), recursive);
+  }
+
+  public CloseableIterable<OptionalWithCause<DIPFile>> listDIPFilesUnder(String dipId, List<String> directoryPath,
+    String fileId, boolean recursive)
+    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    final StoragePath filePath = ModelUtils.getDIPFileStoragePath(dipId, directoryPath, fileId);
+    final CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(filePath, recursive);
+    return ResourceParseUtils.convert(getStorage(), iterable, DIPFile.class);
+  }
+
+  public CloseableIterable<OptionalWithCause<DIPFile>> listDIPFilesUnder(String dipId, boolean recursive)
+    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+
+    final StoragePath storagePath = ModelUtils.getDIPDataStoragePath(dipId);
+    CloseableIterable<OptionalWithCause<DIPFile>> ret;
+    try {
+      final CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(storagePath, recursive);
+      ret = ResourceParseUtils.convert(getStorage(), iterable, DIPFile.class);
+    } catch (NotFoundException e) {
+      // check if AIP exists
+      storage.getDirectory(ModelUtils.getDIPStoragePath(dipId));
+      // if no exception was sent by above method, return empty list
+      ret = new EmptyClosableIterable<OptionalWithCause<DIPFile>>();
+    }
+
+    return ret;
+
+  }
+
+  private void createDIPMetadata(DIP dip, StoragePath storagePath) throws RequestNotValidException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
+    String json = JsonUtils.getJsonFromObject(dip);
+    DefaultStoragePath metadataStoragePath = DefaultStoragePath.parse(storagePath,
+      RodaConstants.STORAGE_DIP_METADATA_FILENAME);
+    boolean asReference = false;
+    storage.createBinary(metadataStoragePath, new StringContentPayload(json), asReference);
+  }
+
+  private void updateDIPMetadata(DIP dip, StoragePath storagePath)
+    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    String json = JsonUtils.getJsonFromObject(dip);
+    DefaultStoragePath metadataStoragePath = DefaultStoragePath.parse(storagePath,
+      RodaConstants.STORAGE_DIP_METADATA_FILENAME);
+    boolean asReference = false;
+    boolean createIfNotExists = true;
+    storage.updateBinaryContent(metadataStoragePath, new StringContentPayload(json), asReference, createIfNotExists);
+  }
+
+  public DIP createDIP(DIP dip) throws GenericException, AuthorizationDeniedException {
+    try {
+      Directory directory = storage
+        .createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DIP));
+      dip.setId(directory.getStoragePath().getName());
+      dip.setDateCreated(new Date());
+      dip.setLastModified(new Date());
+
+      createDIPMetadata(dip, directory.getStoragePath());
+      notifyDIPCreated(dip, false);
+      return dip;
+    } catch (NotFoundException | RequestNotValidException | AlreadyExistsException e) {
+      LOGGER.error("Error creating DIP in storage", e);
+      throw new GenericException(e);
+    }
+  }
+
+  public DIP updateDIP(DIP dip) throws GenericException, NotFoundException, AuthorizationDeniedException {
+    try {
+      dip.setLastModified(new Date());
+      updateDIPMetadata(dip, DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DIP, dip.getId()));
+    } catch (GenericException | RequestNotValidException e) {
+      LOGGER.error("Error updating DIP in storage", e);
+      throw new GenericException(e);
+    }
+
+    notifyDIPUpdated(dip, false);
+    return dip;
+  }
+
+  public void deleteDIP(String dipId) throws GenericException, NotFoundException, AuthorizationDeniedException {
+    try {
+      StoragePath dipPath = ModelUtils.getDIPStoragePath(dipId);
+      storage.deleteResource(dipPath);
+      notifyDIPDeleted(dipId, false);
+    } catch (RequestNotValidException e) {
+      LOGGER.error("Error deleting DIP", e);
+      throw new GenericException(e);
+    }
+  }
+
+  public DIP retrieveDIP(String dipId) throws GenericException, NotFoundException, AuthorizationDeniedException {
+    InputStream inputStream = null;
+    DIP ret;
+    try {
+      StoragePath dipPath = ModelUtils.getDIPStoragePath(dipId);
+      Binary binary = storage.getBinary(dipPath);
+      inputStream = binary.getContent().createInputStream();
+      ret = JsonUtils.getObjectFromJson(inputStream, DIP.class);
+    } catch (IOException | RequestNotValidException e) {
+      throw new GenericException("Error reading DIP", e);
+    } finally {
+      IOUtils.closeQuietly(inputStream);
+    }
+    return ret;
+  }
+
+  public DIPFile createDIPFile(String dipId, List<String> directoryPath, String fileId, ContentPayload contentPayload,
+    boolean notify) throws RequestNotValidException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException, NotFoundException {
+    // FIXME how to set this?
+    boolean asReference = false;
+
+    StoragePath filePath = ModelUtils.getDIPFileStoragePath(dipId, directoryPath, fileId);
+    final Binary createdBinary = storage.createBinary(filePath, contentPayload, asReference);
+    DIPFile file = ResourceParseUtils.convertResourceToDIPFile(createdBinary);
+    file.setUUID(IdUtils.getDIPFileId(file));
+
+    if (notify) {
+      notifyDIPFileCreated(file);
+    }
+
+    return file;
+  }
+
+  public DIPFile updateDIPFile(String dipId, List<String> directoryPath, String fileId, Binary binary,
+    boolean createIfNotExists, boolean notify)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    DIPFile file = null;
+    // FIXME how to set this?
+    boolean asReference = false;
+
+    StoragePath filePath = ModelUtils.getDIPFileStoragePath(dipId, directoryPath, fileId);
+
+    storage.updateBinaryContent(filePath, binary.getContent(), asReference, createIfNotExists);
+    Binary binaryUpdated = storage.getBinary(filePath);
+    file = ResourceParseUtils.convertResourceToDIPFile(binaryUpdated);
+    if (notify) {
+      notifyDIPFileUpdated(file);
+    }
+
+    return file;
+  }
+
+  public void deleteDIPFile(String dipId, List<String> directoryPath, String fileId, boolean notify)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+
+    StoragePath filePath = ModelUtils.getDIPFileStoragePath(dipId, directoryPath, fileId);
+    storage.deleteResource(filePath);
+    if (notify) {
+      notifyDIPFileDeleted(dipId, directoryPath, fileId);
+    }
+  }
+
+  public DIPFile retrieveDIPFile(String dipId, List<String> directoryPath, String fileId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    DIPFile file;
+    StoragePath filePath = ModelUtils.getDIPFileStoragePath(dipId, directoryPath, fileId);
+    Class<? extends Entity> entity = storage.getEntity(filePath);
+
+    if (entity.equals(Binary.class) || entity.equals(DefaultBinary.class)) {
+      Binary binary = storage.getBinary(filePath);
+      file = ResourceParseUtils.convertResourceToDIPFile(binary);
+    } else {
+      Directory directory = storage.getDirectory(filePath);
+      file = ResourceParseUtils.convertResourceToDIPFile(directory);
+    }
+
+    return file;
   }
 
   /****************************************************************
@@ -2110,6 +2283,26 @@ public class ModelService extends ModelObservable {
 
   }
 
+  private CloseableIterable<OptionalWithCause<DIPFile>> listDIPFiles()
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    CloseableIterable<OptionalWithCause<DIP>> dips = list(DIP.class);
+
+    return CloseableIterables.concat(dips, odip -> {
+      if (odip.isPresent()) {
+        try {
+          DIP dip = odip.get();
+          return listDIPFilesUnder(dip.getId(), true);
+        } catch (RODAException e) {
+          // TODO log
+          return CloseableIterables.empty();
+        }
+      } else {
+        return CloseableIterables.empty();
+      }
+    });
+
+  }
+
   @SuppressWarnings("unchecked")
   public <T extends IsRODAObject> CloseableIterable<OptionalWithCause<T>> list(Class<T> objectClass)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
@@ -2128,6 +2321,8 @@ public class ModelService extends ModelObservable {
     } else if (LogEntry.class.equals(objectClass)) {
       // FIXME 20160930 it uses index but it should not(?)
       ret = RodaCoreFactory.getIndexService().list(LogEntry.class);
+    } else if (DIPFile.class.equals(objectClass)) {
+      ret = listDIPFiles();
     } else {
       StoragePath containerPath = ModelUtils.getContainerPath(objectClass);
       final CloseableIterable<Resource> resourcesIterable = storage.listResourcesUnderContainer(containerPath, false);

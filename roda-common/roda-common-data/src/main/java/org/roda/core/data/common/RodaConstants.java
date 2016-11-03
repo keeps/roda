@@ -102,6 +102,8 @@ public final class RodaConstants {
   public static final String CORE_MAIL_TEMPLATE_FOLDER = "mail/templates";
   public static final String CORE_CERTIFICATES_FOLDER = "certificates";
   public static final String CORE_REPORT_FOLDER = "reports";
+  public static final String CORE_DIP_FOLDER = "dip";
+  public static final String CORE_DIP_FILE_FOLDER = "dipfile";
 
   public static final String CORE_CROSSWALKS_INGEST = "crosswalks/ingest/";
   public static final String CORE_CROSSWALKS_INGEST_OTHER = "crosswalks/ingest/other/";
@@ -169,6 +171,9 @@ public final class RodaConstants {
   public static final String API_PATH_PARAM_FORMAT_ID = "format_id";
   public static final String API_PATH_PARAM_RISK_ID = "risk_id";
   public static final String API_PATH_PARAM_RISK_INCIDENCE_ID = "risk_incidence_id";
+  public static final String API_PATH_PARAM_DIP_ID = "dip_id";
+  public static final String API_PATH_PARAM_DIP_FILE_ID = "dip_file_id";
+  public static final String API_PATH_PARAM_DIP_FILE_UUID = "dip_file_uuid";
   public static final String API_PATH_PARAM_PART = "part";
   public static final String API_PATH_PARAM_NAME = "name";
 
@@ -241,6 +246,11 @@ public final class RodaConstants {
   public static final String CONTROLLER_INDEX_PRESERVATION_EVENT_ID_PARAM = "indexedPreservationEventId";
   public static final String CONTROLLER_VERSION_ID_PARAM = "versionId";
   public static final String CONTROLLER_RESOURCE_ID_PARAM = "resourceId";
+  public static final String CONTROLLER_DIP_PARAM = "dip";
+  public static final String CONTROLLER_DIP_ID_PARAM = "dipId";
+  public static final String CONTROLLER_DIP_FILE_PARAM = "dipFile";
+  public static final String CONTROLLER_DIP_FILE_ID_PARAM = "dipFileId";
+  public static final String CONTROLLER_DIP_FILE_UUID_PARAM = "dipFileUUID";
 
   public static final String CONTROLLER_SIP_PARAM = "sip";
   public static final String CONTROLLER_ID_OBJECT_PARAM = "transferred_resource_uuid, transferred_resource_path, sip";
@@ -340,6 +350,8 @@ public final class RodaConstants {
   public static final String INDEX_FORMAT = "Format";
   public static final String INDEX_NOTIFICATION = "Notification";
   public static final String INDEX_RISK_INCIDENCE = "RiskIncidence";
+  public static final String INDEX_DIP = "DIP";
+  public static final String INDEX_DIP_FILE = "DIPFile";
 
   /*
    * STORAGE CONTAINERS
@@ -355,6 +367,7 @@ public final class RodaConstants {
   public static final String STORAGE_CONTAINER_FORMAT = "format";
   public static final String STORAGE_CONTAINER_NOTIFICATION = "notification";
   public static final String STORAGE_CONTAINER_PRESERVATION_AGENTS = "agents";
+  public static final String STORAGE_CONTAINER_DIP = "dip";
 
   public static final String STORAGE_HISTORY_CONTAINER_DATA = "data";
   public static final String STORAGE_HISTORY_CONTAINER_METADATA = "metadata";
@@ -375,6 +388,7 @@ public final class RodaConstants {
   public static final String STORAGE_DIRECTORY_OTHER = "other";
 
   public static final String STORAGE_AIP_METADATA_FILENAME = "aip.json";
+  public static final String STORAGE_DIP_METADATA_FILENAME = "dip.json";
 
   /*
    * OTHER METADATA TYPES
@@ -799,7 +813,7 @@ public final class RodaConstants {
   public static final String FORMAT_FILE_EXTENSION = ".json";
   public static final String FORMAT_SEARCH = "search";
 
-  /* Messages */
+  /* Notifications */
   public static final String NOTIFICATION_ID = "id";
   public static final String NOTIFICATION_SUBJECT = "subject";
   public static final String NOTIFICATION_BODY = "body";
@@ -817,6 +831,43 @@ public final class RodaConstants {
 
   public static final String NOTIFICATION_HTTP_ENDPOINT = "ingest.http_notification.endpoint";
   public static final String NOTIFICATION_HTTP_TIMEOUT = "ingest.http_notification.timeout";
+
+  /* DIPs */
+  public static final String DIP_ID = "id";
+  public static final String DIP_TITLE = "title";
+  public static final String DIP_DESCRIPTION = "description";
+  public static final String DIP_DATE_CREATED = "dateCreated";
+  public static final String DIP_LAST_MODIFIED = "lastModified";
+  public static final String DIP_IS_PERMANENT = "isPermanent";
+  public static final String DIP_OPEN_EXTERNAL_URL = "openExternalURL";
+  public static final String DIP_DELETE_EXTERNAL_URL = "deleteExternalURL";
+  public static final String DIP_AIP_IDS = "aipIds";
+  public static final String DIP_REPRESENTATION_IDS = "representationIds";
+  public static final String DIP_FILE_IDS = "fileIds";
+  public static final String DIP_AIP_UUIDS = "aipUUIDs";
+  public static final String DIP_REPRESENTATION_UUIDS = "representationUUIDs";
+  public static final String DIP_FILE_UUIDS = "fileUUIDs";
+  public static final String DIP_PERMISSIONS = "permissions";
+
+  public static final String DIP_EXTENSION = ".json";
+  public static final String DIP_SEARCH = "search";
+
+  public static final String DIP_FILE_ID = "id";
+  public static final String DIP_FILE_UUID = "uuid";
+  public static final String DIP_FILE_DIP_ID = "dipId";
+  public static final String DIP_FILE_PATH = "path";
+  public static final String DIP_FILE_ANCESTORS_PATH = "ancestorsPath";
+  public static final String DIP_FILE_SIZE = "size";
+  public static final String DIP_FILE_IS_DIRECTORY = "isDirectory";
+  public static final String DIP_FILE_STORAGE_PATH = "storagePath";
+  public static final String DIP_FILE_FILE_FORMAT = "fileFormat";
+  public static final String DIP_FILE_FORMAT_VERSION = "formatVersion";
+  public static final String DIP_FILE_FORMAT_MIMETYPE = "formatMimetype";
+  public static final String DIP_FILE_FORMAT_PRONOM = "formatPronom";
+  public static final String DIP_FILE_FORMAT_EXTENSION = "formatExtension";
+
+  public static final String DIP_FILE_FILE_EXTENSION = ".json";
+  public static final String DIP_FILE_SEARCH = "search";
 
   /* View representation */
   public static final String VIEW_REPRESENTATION_DESCRIPTION_LEVEL = "description-level-representation";
@@ -1059,11 +1110,10 @@ public final class RodaConstants {
   public final static String MEDIA_TYPE_TEXT_XML = "text/xml";
 
   public final static String MEDIA_TYPE_TEXT_HTML = "text/html";
-  
+
   public final static String HTTP_HEADERS_WWW_AUTHENTICATE = "WWW-Authenticate";
-  
+
   public final static int STATUS_OK = 200;
-  
 
   /** Private empty constructor */
   private RodaConstants() {

@@ -681,6 +681,8 @@ public class RodaCoreFactory {
       indexDataPath.resolve(RodaConstants.CORE_NOTIFICATION_FOLDER).toString());
     System.setProperty("solr.data.dir.riskincidence",
       indexDataPath.resolve(RodaConstants.CORE_RISKINCIDENCE_FOLDER).toString());
+    System.setProperty("solr.data.dir.dip", indexDataPath.resolve(RodaConstants.CORE_DIP_FOLDER).toString());
+    System.setProperty("solr.data.dir.dipfile", indexDataPath.resolve(RodaConstants.CORE_DIP_FILE_FOLDER).toString());
   }
 
   private static void instantiateNodeSpecificObjects(NodeType nodeType) {

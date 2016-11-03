@@ -29,6 +29,8 @@ import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.DIP;
+import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
@@ -77,6 +79,32 @@ public class ResourceParseUtils {
     } else {
       throw new GenericException(
         "Error while trying to convert something that it isn't a Binary into a representation file");
+    }
+    return ret;
+  }
+
+  public static DIPFile convertResourceToDIPFile(Resource resource)
+    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
+    DIPFile ret;
+
+    if (resource == null) {
+      throw new RequestNotValidException("Resource cannot be null");
+    }
+
+    StoragePath resourcePath = resource.getStoragePath();
+
+    String id = resourcePath.getName();
+    String dipId = ModelUtils.extractDipId(resourcePath);
+    List<String> filePath = ModelUtils.extractFilePathFromDIPData(resourcePath);
+
+    if (resource instanceof DefaultBinary) {
+      boolean isDirectory = false;
+      ret = new DIPFile(id, dipId, filePath, isDirectory);
+    } else if (resource instanceof DefaultDirectory) {
+      boolean isDirectory = true;
+      ret = new DIPFile(id, dipId, filePath, isDirectory);
+    } else {
+      throw new GenericException("Error while trying to convert something that it isn't a Binary into a DIP file");
     }
     return ret;
   }
@@ -199,6 +227,7 @@ public class ResourceParseUtils {
   public static <T extends Serializable> OptionalWithCause<T> convertResourceTo(StorageService storage,
     Resource resource, Class<T> classToReturn) {
     OptionalWithCause<T> ret;
+    System.out.print("JKD");
 
     try {
       if (classToReturn.equals(AIP.class)) {
@@ -211,6 +240,10 @@ public class ResourceParseUtils {
         ret = OptionalWithCause.of(classToReturn.cast(convertResourceToPreservationMetadata(resource)));
       } else if (classToReturn.equals(OtherMetadata.class)) {
         ret = OptionalWithCause.of(classToReturn.cast(convertResourceToOtherMetadata(resource)));
+      } else if (classToReturn.equals(DIP.class)) {
+        ret = OptionalWithCause.of(classToReturn.cast(getDIPMetadata(storage, resource.getStoragePath())));
+      } else if (classToReturn.equals(DIPFile.class)) {
+        ret = OptionalWithCause.of(classToReturn.cast(convertResourceToDIPFile(resource)));
       } else {
         ret = OptionalWithCause.of(convertResourceToObject(resource, classToReturn));
       }
@@ -255,13 +288,43 @@ public class ResourceParseUtils {
 
     // Setting information that does not come in JSON
     aip.setId(aipId);
-
     return aip;
+  }
+
+  public static DIP getDIPMetadata(StorageService storage, StoragePath storagePath)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    return getDIPMetadata(storage, storagePath.getName(), storagePath);
+  }
+
+  public static DIP getDIPMetadata(StorageService storage, String dipId, StoragePath storagePath)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+
+    DefaultStoragePath metadataStoragePath = DefaultStoragePath.parse(storagePath,
+      RodaConstants.STORAGE_DIP_METADATA_FILENAME);
+    Binary binary = storage.getBinary(metadataStoragePath);
+
+    String json;
+    DIP dip;
+    InputStream inputStream = null;
+    try {
+      inputStream = binary.getContent().createInputStream();
+      json = IOUtils.toString(inputStream, Charset.forName(RodaConstants.DEFAULT_ENCODING));
+      dip = JsonUtils.getObjectFromJson(json, DIP.class);
+    } catch (IOException | GenericException e) {
+      throw new GenericException("Could not parse DIP metadata of " + dipId + " at " + metadataStoragePath, e);
+    } finally {
+      IOUtils.closeQuietly(inputStream);
+    }
+
+    // Setting information that does not come in JSON
+    dip.setId(dipId);
+    return dip;
   }
 
   private static <T extends Serializable> boolean isDirectoryAcceptable(Class<T> classToReturn) {
     return classToReturn.equals(File.class) || classToReturn.equals(AIP.class)
-      || classToReturn.equals(Representation.class) || classToReturn.equals(TransferredResource.class);
+      || classToReturn.equals(Representation.class) || classToReturn.equals(TransferredResource.class)
+      || classToReturn.equals(DIPFile.class) || classToReturn.equals(DIP.class);
   }
 
   public static <T extends Serializable> CloseableIterable<OptionalWithCause<T>> convert(final StorageService storage,

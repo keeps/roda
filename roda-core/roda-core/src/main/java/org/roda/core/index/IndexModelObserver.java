@@ -39,6 +39,8 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.DIP;
+import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -604,7 +606,6 @@ public class IndexModelObserver implements ModelObserver {
   public void fileUpdated(File file) {
     fileDeleted(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), false);
     fileCreated(file);
-
   }
 
   @Override
@@ -1017,6 +1018,84 @@ public class IndexModelObserver implements ModelObserver {
 
   public void notificationDeleted(String notificationId) {
     deleteDocumentFromIndex(Notification.class, notificationId);
+  }
+
+  public void dipCreated(DIP dip, boolean commit) {
+    addDocumentToIndex(DIP.class, dip);
+
+    // TODO index dip files?
+
+    if (commit) {
+      try {
+        SolrUtils.commit(index, DIP.class);
+      } catch (GenericException e) {
+        LOGGER.warn("Commit did not run as expected");
+      }
+    }
+  }
+
+  public void dipUpdated(DIP dip, boolean commit) {
+    dipDeleted(dip.getId(), commit);
+    dipCreated(dip, commit);
+  }
+
+  public void dipDeleted(String dipId, boolean commit) {
+    deleteDocumentFromIndex(DIP.class, dipId);
+    deleteDocumentsFromIndex(DIPFile.class, RodaConstants.DIP_FILE_DIP_ID, dipId);
+
+    if (commit) {
+      try {
+        SolrUtils.commit(index, DIP.class);
+        SolrUtils.commit(index, DIPFile.class);
+      } catch (GenericException e) {
+        LOGGER.warn("Commit did not run as expected");
+      }
+    }
+  }
+
+  private void indexDIPFile(DIPFile file, boolean recursive) {
+    SolrInputDocument fileDocument = SolrUtils.dipFileToSolrDocument(file);
+
+    try {
+      index.add(RodaConstants.INDEX_DIP_FILE, fileDocument);
+    } catch (SolrServerException | IOException e) {
+      LOGGER.error("Cannot index DIP file: {}", file, e);
+    }
+
+    if (recursive && file.isDirectory()) {
+      try {
+        CloseableIterable<OptionalWithCause<DIPFile>> allFiles = model.listDIPFilesUnder(file, true);
+        for (OptionalWithCause<DIPFile> subfile : allFiles) {
+          if (subfile.isPresent()) {
+            indexDIPFile(subfile.get(), false);
+          } else {
+            LOGGER.error("Cannot index DIP file", subfile.getCause());
+          }
+        }
+        IOUtils.closeQuietly(allFiles);
+
+      } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+        LOGGER.error("Cannot index DIP file sub-resources: {}", file, e);
+      }
+    }
+  }
+
+  @Override
+  public void dipFileCreated(DIPFile file) {
+    boolean recursive = true;
+    indexDIPFile(file, recursive);
+  }
+
+  @Override
+  public void dipFileUpdated(DIPFile file) {
+    dipFileDeleted(file.getDipId(), file.getPath(), file.getId());
+    dipFileCreated(file);
+  }
+
+  @Override
+  public void dipFileDeleted(String dipId, List<String> path, String fileId) {
+    String uuid = IdUtils.getDIPFileId(dipId, path, fileId);
+    deleteDocumentFromIndex(DIPFile.class, uuid);
   }
 
 }

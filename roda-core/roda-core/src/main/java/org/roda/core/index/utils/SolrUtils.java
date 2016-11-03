@@ -87,14 +87,19 @@ import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPLink;
 import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.DIP;
+import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.FileLink;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.RepresentationLink;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
@@ -285,6 +290,10 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToNotification(doc));
     } else if (resultClass.equals(RiskIncidence.class)) {
       ret = resultClass.cast(solrDocumentToRiskIncidence(doc));
+    } else if (resultClass.equals(DIP.class)) {
+      ret = resultClass.cast(solrDocumentToDIP(doc));
+    } else if (resultClass.equals(DIPFile.class)) {
+      ret = resultClass.cast(solrDocumentToDIPFile(doc));
     } else if (resultClass.equals(IndexedFile.class)) {
       ret = resultClass.cast(solrDocumentToIndexedFile(doc));
     } else if (resultClass.equals(IndexedPreservationEvent.class)) {
@@ -324,6 +333,10 @@ public class SolrUtils {
       ret = notificationToSolrDocument((Notification) object);
     } else if (resultClass.equals(RiskIncidence.class)) {
       ret = riskIncidenceToSolrDocument((RiskIncidence) object);
+    } else if (resultClass.equals(DIP.class)) {
+      ret = dipToSolrDocument((DIP) object);
+    } else if (resultClass.equals(DIPFile.class)) {
+      ret = dipFileToSolrDocument((DIPFile) object);
     } else if (resultClass.equals(IndexedFile.class)) {
       throw new NotSupportedException();
     } else if (resultClass.equals(IndexedPreservationEvent.class)) {
@@ -379,6 +392,10 @@ public class SolrUtils {
       indexNames.add(RodaConstants.INDEX_NOTIFICATION);
     } else if (resultClass.equals(RiskIncidence.class)) {
       indexNames.add(RodaConstants.INDEX_RISK_INCIDENCE);
+    } else if (resultClass.equals(DIP.class)) {
+      indexNames.add(RodaConstants.INDEX_DIP);
+    } else if (resultClass.equals(DIPFile.class)) {
+      indexNames.add(RodaConstants.INDEX_DIP_FILE);
     } else {
       throw new GenericException("Cannot find class index name: " + resultClass.getName());
     }
@@ -2011,6 +2028,129 @@ public class SolrUtils {
     incidence.setMitigatedBy(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_MITIGATED_BY)));
     incidence.setMitigatedDescription(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_MITIGATED_DESCRIPTION)));
     return incidence;
+  }
+
+  public static SolrInputDocument dipToSolrDocument(DIP dip) {
+    SolrInputDocument doc = new SolrInputDocument();
+    doc.addField(RodaConstants.INDEX_UUID, dip.getId());
+    doc.addField(RodaConstants.DIP_ID, dip.getId());
+    doc.addField(RodaConstants.DIP_TITLE, dip.getTitle());
+    doc.addField(RodaConstants.DIP_DESCRIPTION, dip.getDescription());
+    doc.addField(RodaConstants.DIP_DATE_CREATED, dip.getDateCreated());
+    doc.addField(RodaConstants.DIP_LAST_MODIFIED, dip.getLastModified());
+    doc.addField(RodaConstants.DIP_IS_PERMANENT, dip.getIsPermanent());
+    doc.addField(RodaConstants.DIP_OPEN_EXTERNAL_URL, dip.getOpenExternalURL());
+    doc.addField(RodaConstants.DIP_DELETE_EXTERNAL_URL, dip.getDeleteExternalURL());
+    doc.addField(RodaConstants.DIP_AIP_IDS, JsonUtils.getJsonFromObject(dip.getAipIds()));
+    doc.addField(RodaConstants.DIP_REPRESENTATION_IDS, JsonUtils.getJsonFromObject(dip.getRepresentationIds()));
+    doc.addField(RodaConstants.DIP_FILE_IDS, JsonUtils.getJsonFromObject(dip.getFileIds()));
+
+    List<String> aipUUIDs = new ArrayList<String>();
+    for (AIPLink aip : dip.getAipIds()) {
+      aipUUIDs.add(aip.getAipId());
+    }
+
+    List<String> representationUUIDs = new ArrayList<String>();
+    for (RepresentationLink rep : dip.getRepresentationIds()) {
+      representationUUIDs.add(IdUtils.getRepresentationId(rep));
+    }
+
+    List<String> fileUUIDs = new ArrayList<String>();
+    for (FileLink file : dip.getFileIds()) {
+      fileUUIDs.add(IdUtils.getFileId(file));
+    }
+
+    doc.addField(RodaConstants.DIP_AIP_UUIDS, aipUUIDs);
+    doc.addField(RodaConstants.DIP_REPRESENTATION_UUIDS, representationUUIDs);
+    doc.addField(RodaConstants.DIP_FILE_UUIDS, fileUUIDs);
+
+    setPermissions(dip.getPermissions(), doc);
+
+    return doc;
+  }
+
+  public static DIP solrDocumentToDIP(SolrDocument doc) {
+    DIP dip = new DIP();
+    dip.setId(objectToString(doc.get(RodaConstants.INDEX_UUID)));
+    dip.setTitle(objectToString(doc.get(RodaConstants.DIP_TITLE)));
+    dip.setDescription(objectToString(doc.get(RodaConstants.DIP_DESCRIPTION)));
+    dip.setDateCreated(objectToDate(doc.get(RodaConstants.DIP_DATE_CREATED)));
+    dip.setLastModified(objectToDate(doc.get(RodaConstants.DIP_LAST_MODIFIED)));
+    dip.setIsPermanent(objectToBoolean(doc.get(RodaConstants.DIP_IS_PERMANENT), Boolean.FALSE));
+    dip.setOpenExternalURL(objectToString(doc.get(RodaConstants.DIP_OPEN_EXTERNAL_URL)));
+    dip.setDeleteExternalURL(objectToString(doc.get(RodaConstants.DIP_DELETE_EXTERNAL_URL)));
+
+    try {
+      String aipIds = objectToString(doc.get(RodaConstants.DIP_AIP_IDS));
+      dip.setAipIds(JsonUtils.getListFromJson(aipIds == null ? "" : aipIds, AIPLink.class));
+
+      String representationIds = objectToString(doc.get(RodaConstants.DIP_REPRESENTATION_IDS));
+      dip.setRepresentationIds(
+        JsonUtils.getListFromJson(representationIds == null ? "" : representationIds, RepresentationLink.class));
+
+      String fileIds = objectToString(doc.get(RodaConstants.DIP_FILE_IDS));
+      dip.setFileIds(JsonUtils.getListFromJson(fileIds == null ? "" : fileIds, FileLink.class));
+    } catch (GenericException e) {
+      LOGGER.error("Error getting related ids from DIP index");
+    }
+
+    dip.setPermissions(getPermissions(doc));
+    return dip;
+  }
+
+  public static SolrInputDocument dipFileToSolrDocument(DIPFile file) {
+    SolrInputDocument doc = new SolrInputDocument();
+    doc.addField(RodaConstants.INDEX_UUID, IdUtils.getDIPFileId(file));
+    List<String> path = file.getPath();
+    doc.addField(RodaConstants.DIP_FILE_PATH, path);
+    if (path != null && !path.isEmpty()) {
+      List<String> ancestorsPath = getDIPFileAncestorsPath(file.getDipId(), path);
+      if (!ancestorsPath.isEmpty()) {
+        doc.addField(RodaConstants.DIP_FILE_ANCESTORS_PATH, ancestorsPath);
+      }
+    }
+    doc.addField(RodaConstants.DIP_FILE_DIP_ID, file.getDipId());
+    doc.addField(RodaConstants.DIP_FILE_ID, file.getId());
+    doc.addField(RodaConstants.DIP_FILE_IS_DIRECTORY, file.isDirectory());
+    doc.addField(RodaConstants.DIP_FILE_SIZE, Long.toString(file.getSize()));
+
+    // extra-fields
+    try {
+      StoragePath filePath = ModelUtils.getDIPFileStoragePath(file);
+      doc.addField(RodaConstants.DIP_FILE_STORAGE_PATH, FSUtils.getStoragePathAsString(filePath, false));
+    } catch (RequestNotValidException e) {
+      LOGGER.warn("Could not index DIP file storage path", e);
+    }
+
+    return doc;
+  }
+
+  private static List<String> getDIPFileAncestorsPath(String dipId, List<String> path) {
+    List<String> parentFileDirectoryPath = new ArrayList<String>();
+    List<String> ancestorsPath = new ArrayList<String>();
+    parentFileDirectoryPath.addAll(path);
+
+    while (!parentFileDirectoryPath.isEmpty()) {
+      int lastElementIndex = parentFileDirectoryPath.size() - 1;
+      String parentFileId = parentFileDirectoryPath.get(lastElementIndex);
+      parentFileDirectoryPath.remove(lastElementIndex);
+      ancestorsPath.add(0, IdUtils.getDIPFileId(dipId, parentFileDirectoryPath, parentFileId));
+    }
+
+    return ancestorsPath;
+  }
+
+  public static DIPFile solrDocumentToDIPFile(SolrDocument doc) {
+    DIPFile file = new DIPFile();
+    file.setUUID(objectToString(doc.get(RodaConstants.INDEX_UUID)));
+    file.setId(objectToString(doc.get(RodaConstants.DIP_FILE_ID)));
+    file.setDipId(objectToString(doc.get(RodaConstants.DIP_FILE_DIP_ID)));
+    file.setPath(objectToListString(doc.get(RodaConstants.DIP_FILE_PATH)));
+    file.setAncestorsPath(objectToListString(doc.get(RodaConstants.FILE_ANCESTORS_PATH)));
+    file.setDirectory(objectToBoolean(doc.get(RodaConstants.DIP_FILE_IS_DIRECTORY), Boolean.FALSE));
+    file.setStoragePath(objectToString(doc.get(RodaConstants.DIP_FILE_STORAGE_PATH)));
+    file.setSize(objectToLong(doc.get(RodaConstants.FILE_SIZE), 0L));
+    return file;
   }
 
   /*

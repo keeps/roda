@@ -48,6 +48,8 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.DIP;
+import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -1091,7 +1093,7 @@ public class Browser extends RodaWuiController {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // validate input
-    BrowserHelper.validateGetAIPRepresentationFileParams(acceptFormat);
+    BrowserHelper.validateGetFileParams(acceptFormat);
 
     // check user permissions
     controllerAssistant.checkRoles(user);
@@ -1931,7 +1933,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static File createFile(User user, String aipId, String representationUUID, List<String> directoryPath,
+  public static File createFile(User user, String aipId, String representationId, List<String> directoryPath,
     String fileId, InputStream is) throws AuthorizationDeniedException, GenericException, RequestNotValidException,
     NotFoundException, AlreadyExistsException, IOException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -1939,7 +1941,6 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    IndexedRepresentation rep = BrowserHelper.retrieve(IndexedRepresentation.class, representationUUID);
     UserUtility.checkAIPPermissions(user, aip, PermissionType.CREATE);
 
     // delegate
@@ -1947,12 +1948,12 @@ public class Browser extends RodaWuiController {
     Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
     ContentPayload payload = new FSPathContentPayload(file);
 
-    File updatedFile = BrowserHelper.createFile(aipId, rep.getId(), directoryPath, fileId, payload);
+    File updatedFile = BrowserHelper.createFile(aipId, representationId, directoryPath, fileId, payload);
     BrowserHelper.commit(IndexedFile.class);
 
     // register action
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIP_ID_PARAM,
-      aipId, RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, rep.getId(),
+      aipId, RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId,
       RodaConstants.CONTROLLER_DIRECTORY_PATH_PARAM, directoryPath, RodaConstants.CONTROLLER_FILE_ID_PARAM, fileId);
 
     return updatedFile;
@@ -2141,6 +2142,149 @@ public class Browser extends RodaWuiController {
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_SELECTED_PARAM,
       selected);
+  }
+
+  public static DIP createDIP(User user, DIP dip) throws AuthorizationDeniedException, GenericException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    DIP createdDip = BrowserHelper.createDIP(dip);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_DIP_PARAM, dip);
+
+    return createdDip;
+  }
+
+  public static DIP updateDIP(User user, DIP dip)
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    DIP updatedDIP = BrowserHelper.updateDIP(dip);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_DIP_PARAM, dip);
+
+    return updatedDIP;
+  }
+
+  public static void deleteDIP(User user, String dipId)
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    BrowserHelper.deleteDIP(dipId);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_DIP_ID_PARAM, dipId);
+  }
+
+  public static EntityResponse retrieveDIPFile(User user, String fileUUID, String acceptFormat)
+    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // validate input
+    BrowserHelper.validateGetFileParams(acceptFormat);
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    EntityResponse aipRepresentationFile = BrowserHelper.retrieveDIPFile(fileUUID, acceptFormat);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.DIP_FILE_UUID, fileUUID);
+
+    return aipRepresentationFile;
+  }
+
+  public static DIPFile createDIPFile(User user, String dipId, List<String> directoryPath, String fileId,
+    InputStream is) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException,
+    AlreadyExistsException, IOException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    Path file = Files.createTempFile("descriptive", ".tmp");
+    Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
+    ContentPayload payload = new FSPathContentPayload(file);
+
+    DIPFile updatedFile = BrowserHelper.createDIPFile(dipId, directoryPath, fileId, payload, true);
+    BrowserHelper.commit(DIPFile.class);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_DIP_ID_PARAM, dipId,
+      RodaConstants.CONTROLLER_DIRECTORY_PATH_PARAM, directoryPath, RodaConstants.CONTROLLER_FILE_ID_PARAM, fileId);
+
+    return updatedFile;
+  }
+
+  public static DIPFile createDIPFileWithUUID(User user, String fileUUID, String filename, InputStream is)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException,
+    AlreadyExistsException, IOException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+    DIPFile ifile = BrowserHelper.retrieve(DIPFile.class, fileUUID);
+
+    // delegate
+    Path file = Files.createTempFile("descriptive", ".tmp");
+    Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
+    ContentPayload payload = new FSPathContentPayload(file);
+    List<String> newFileDirectoryPath = ifile.getPath();
+    newFileDirectoryPath.add(ifile.getId());
+
+    DIPFile updatedFile = BrowserHelper.createDIPFile(ifile.getDipId(), newFileDirectoryPath, filename, payload, true);
+    BrowserHelper.commit(DIPFile.class);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_DIP_FILE_UUID_PARAM,
+      fileUUID, RodaConstants.CONTROLLER_FILENAME_PARAM, filename);
+
+    return updatedFile;
+  }
+
+  public static DIPFile updateDIPFile(User user, DIPFile file) throws AuthorizationDeniedException, GenericException,
+    RequestNotValidException, NotFoundException, AlreadyExistsException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    DIPFile updatedFile = BrowserHelper.updateDIPFile(file);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_DIP_FILE_PARAM, file);
+
+    return updatedFile;
+  }
+
+  public static void deleteDIPFile(User user, SelectedItems<DIPFile> files)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    BrowserHelper.deleteDIPFiles(files, user);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_SELECTED_PARAM, files);
   }
 
 }

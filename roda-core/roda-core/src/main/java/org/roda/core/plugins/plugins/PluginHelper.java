@@ -50,6 +50,7 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
@@ -358,6 +359,7 @@ public final class PluginHelper {
     list.add(RiskIncidence.class);
     list.add(Job.class);
     list.add(IndexedPreservationAgent.class);
+    list.add(DIP.class);
     return list;
   }
 
