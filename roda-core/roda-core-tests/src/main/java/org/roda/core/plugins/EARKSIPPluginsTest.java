@@ -130,7 +130,7 @@ public class EARKSIPPluginsTest {
 
     f.createFile(null, CorporaConstants.EARK_SIP, Files.newInputStream(sip));
 
-    f.updateAllTransferredResources(null, true);
+    f.updateTransferredResources(null, true);
     index.commit(TransferredResource.class);
 
     TransferredResource transferredResource = index.retrieve(TransferredResource.class,
@@ -204,7 +204,7 @@ public class EARKSIPPluginsTest {
       }
     });
 
-    f.updateAllTransferredResources(null, true);
+    f.updateTransferredResources(null, true);
     index.commit(TransferredResource.class);
 
     return resultIDs;

@@ -1503,9 +1503,9 @@ public class BrowserHelper {
     return RodaCoreFactory.getTransferredResourcesScannerUpdateStatus();
   }
 
-  public static void runTransferredResourceScan(String subFolderUUID, boolean waitToFinish)
+  public static void updateTransferredResources(String subFolderUUID, boolean waitToFinish)
     throws IsStillUpdatingException {
-    RodaCoreFactory.getTransferredResourcesScanner().updateAllTransferredResources(subFolderUUID, waitToFinish);
+    RodaCoreFactory.getTransferredResourcesScanner().updateTransferredResources(subFolderUUID, waitToFinish);
   }
 
   public static ConsumesOutputStream retrieveClassificationPlan(User user, String filename)
@@ -2562,7 +2562,7 @@ public class BrowserHelper {
     throws IsStillUpdatingException, NotFoundException, GenericException {
     TransferredResourcesScanner scanner = RodaCoreFactory.getTransferredResourcesScanner();
     String resourceUUID = IdUtils.getTransferredResourceUUID(path);
-    scanner.updateAllTransferredResources(resourceUUID, true);
+    scanner.updateTransferredResources(resourceUUID, true);
     return RodaCoreFactory.getIndexService().retrieve(TransferredResource.class, resourceUUID);
   }
 

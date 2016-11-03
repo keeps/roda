@@ -178,7 +178,7 @@ public class TransferredResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    Browser.updateAllTransferredResources(user, path, true);
+    Browser.updateTransferredResources(user, path, true);
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Transferred resources updated"), mediaType)
       .build();
   }

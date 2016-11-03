@@ -93,7 +93,7 @@ public class MonitorIndexTest {
     Path sips = RodaCoreFactory.getDataPath().resolve(transferredResourcesFolder);
     TransferredResourcesScanner monitor = new TransferredResourcesScanner(sips, index);
     populate(sips);
-    monitor.updateAllTransferredResources(null, true);
+    monitor.updateTransferredResources(null, true);
 
     int folderToIndex = -1;
     IndexResult<TransferredResource> transferredResources = index.find(TransferredResource.class, null, null,
@@ -114,7 +114,7 @@ public class MonitorIndexTest {
     Path p = Files.createFile(parent.resolve(UUID.randomUUID().toString() + ".txt"));
     Files.write(p, "NUNCAMAISACABA".getBytes());
 
-    monitor.updateAllTransferredResources(resource.getUUID(), true);
+    monitor.updateTransferredResources(resource.getUUID(), true);
 
     IndexResult<TransferredResource> transferredResources2 = index.find(TransferredResource.class, null, null,
       new Sublist(0, fileCounter + 1));
@@ -129,7 +129,7 @@ public class MonitorIndexTest {
     Path sips = RodaCoreFactory.getDataPath().resolve(transferredResourcesFolder);
     TransferredResourcesScanner monitor = new TransferredResourcesScanner(sips, index);
     populate(sips);
-    monitor.updateAllTransferredResources(null, true);
+    monitor.updateTransferredResources(null, true);
 
     int toRemove1 = -1;
     int toRemove2 = -1;
@@ -158,7 +158,7 @@ public class MonitorIndexTest {
     File secondFileRemoved = new File(resource2.getFullPath());
     secondFileRemoved.delete();
 
-    monitor.updateAllTransferredResources(null, true);
+    monitor.updateTransferredResources(null, true);
 
     IndexResult<TransferredResource> transferredResources2 = index.find(TransferredResource.class, null, null,
       new Sublist(0, fileCounter));
@@ -174,7 +174,7 @@ public class MonitorIndexTest {
     Path sips = RodaCoreFactory.getDataPath().resolve(transferredResourcesFolder);
     TransferredResourcesScanner monitor = new TransferredResourcesScanner(sips, index);
     populate(sips);
-    monitor.updateAllTransferredResources(null, true);
+    monitor.updateTransferredResources(null, true);
 
     int toRemove = -1;
     IndexResult<TransferredResource> transferredResources = index.find(TransferredResource.class, null, null,
@@ -192,7 +192,7 @@ public class MonitorIndexTest {
     TransferredResource resource = transferredResources.getResults().get(toRemove);
     FileUtils.deleteDirectory(new File(resource.getFullPath()));
 
-    monitor.updateAllTransferredResources(null, true);
+    monitor.updateTransferredResources(null, true);
 
     IndexResult<TransferredResource> transferredResources2 = index.find(TransferredResource.class, null, null,
       new Sublist(0, fileCounter));
@@ -208,7 +208,7 @@ public class MonitorIndexTest {
     TransferredResourcesScanner monitor = new TransferredResourcesScanner(sips, index);
     populate(sips);
 
-    monitor.updateAllTransferredResources(null, true);
+    monitor.updateTransferredResources(null, true);
 
     int toRemove = -1;
     String folder = "";
@@ -240,7 +240,7 @@ public class MonitorIndexTest {
     fileRemoved.delete();
 
     TransferredResource transferredResourceFolder = transferredResources.getResults().get(folderIndex);
-    monitor.updateAllTransferredResources(transferredResourceFolder.getUUID(), true);
+    monitor.updateTransferredResources(transferredResourceFolder.getUUID(), true);
 
     IndexResult<TransferredResource> transferredResources2 = index.find(TransferredResource.class, null, null,
       new Sublist(0, fileCounter));

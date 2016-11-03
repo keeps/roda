@@ -116,7 +116,7 @@ public class UnoconvTest {
     String transferredResourceId = "testt";
     FSUtils.copy(corpora, f.getBasePath().resolve(transferredResourceId), true);
 
-    f.updateAllTransferredResources(null, true);
+    f.updateTransferredResources(null, true);
     index.commit(TransferredResource.class);
 
     resources.add(

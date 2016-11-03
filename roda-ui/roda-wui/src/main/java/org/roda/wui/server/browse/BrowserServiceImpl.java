@@ -398,7 +398,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     throws IsStillUpdatingException, AuthorizationDeniedException {
     try {
       User user = UserUtility.getUser(getThreadLocalRequest());
-      Browser.updateAllTransferredResources(user, transferredResourceUUID, true);
+      Browser.updateTransferredResources(user, transferredResourceUUID, true);
     } catch (RuntimeException e) {
       LOGGER.error("Error running transferred resources scanner");
     }

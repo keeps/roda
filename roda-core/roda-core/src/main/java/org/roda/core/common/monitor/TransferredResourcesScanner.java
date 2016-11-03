@@ -191,7 +191,7 @@ public class TransferredResourcesScanner {
     index.commit(TransferredResource.class);
   }
 
-  public void updateAllTransferredResources(String folderUUID, boolean waitToFinish) throws IsStillUpdatingException {
+  public void updateTransferredResources(String folderUUID, boolean waitToFinish) throws IsStillUpdatingException {
     if (!RodaCoreFactory.getTransferredResourcesScannerUpdateStatus()) {
       if (index != null) {
         ReindexTransferredResourcesRunnable reindexRunnable = new ReindexTransferredResourcesRunnable(basePath,
@@ -218,7 +218,7 @@ public class TransferredResourcesScanner {
       FSUtils.move(resourcePath, resourcePath.getParent().resolve(newName), replaceExisting);
 
       if (reindexResources) {
-        updateAllTransferredResources(resource.getParentUUID(), true);
+        updateTransferredResources(resource.getParentUUID(), true);
       }
 
       Path relativeToBase = basePath.relativize(resourcePath.getParent().resolve(newName));
@@ -289,7 +289,7 @@ public class TransferredResourcesScanner {
     }
 
     if (reindexResources) {
-      updateAllTransferredResources(IdUtils.getTransferredResourceUUID(newRelativePath), true);
+      updateTransferredResources(IdUtils.getTransferredResourceUUID(newRelativePath), true);
       reindexOldResourcesParentsAfterMove(resourcesToIndex, areResourcesFromSameFolder);
     }
 
@@ -307,7 +307,7 @@ public class TransferredResourcesScanner {
 
     if (areResourcesFromSameFolder) {
       if (!resources.isEmpty()) {
-        updateAllTransferredResources(resources.get(0).getParentUUID(), true);
+        updateTransferredResources(resources.get(0).getParentUUID(), true);
       }
     } else {
 
@@ -327,7 +327,7 @@ public class TransferredResourcesScanner {
       }
 
       for (TransferredResource resourceToUpdate : resourcesToUpdate) {
-        updateAllTransferredResources(resourceToUpdate.getParentUUID(), true);
+        updateTransferredResources(resourceToUpdate.getParentUUID(), true);
       }
     }
 

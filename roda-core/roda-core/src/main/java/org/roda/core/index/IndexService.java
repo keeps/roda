@@ -306,7 +306,7 @@ public class IndexService {
       if (AIP.class.equals(objectClass)) {
         reindexAIPs();
       } else if (TransferredResource.class.equals(objectClass)) {
-        RodaCoreFactory.getTransferredResourcesScanner().updateAllTransferredResources(null, true);
+        RodaCoreFactory.getTransferredResourcesScanner().updateTransferredResources(null, true);
       } else {
         StoragePath containerPath = ModelUtils.getContainerPath(objectClass);
         try {

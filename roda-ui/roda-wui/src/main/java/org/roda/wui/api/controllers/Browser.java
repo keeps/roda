@@ -1312,14 +1312,18 @@ public class Browser extends RodaWuiController {
     return classificationPlan;
   }
 
-  public static void updateAllTransferredResources(User user, String subFolderUUID, boolean waitToFinish)
+  public static void updateTransferredResources(User user, String subFolderUUID, boolean waitToFinish)
     throws IsStillUpdatingException, AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check permissions
     controllerAssistant.checkRoles(user);
 
-    BrowserHelper.runTransferredResourceScan(subFolderUUID, waitToFinish);
+    // delegate
+    BrowserHelper.updateTransferredResources(subFolderUUID, waitToFinish);
+    
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
   }
 
   public static List<SupportedMetadataTypeBundle> retrieveSupportedMetadata(User user, String aipId, Locale locale)
