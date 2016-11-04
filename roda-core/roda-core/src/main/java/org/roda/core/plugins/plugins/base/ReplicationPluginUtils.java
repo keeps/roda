@@ -1,18 +1,15 @@
 package org.roda.core.plugins.plugins.base;
 
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.compress.utils.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
-import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
 import org.slf4j.Logger;
@@ -21,140 +18,150 @@ import org.slf4j.LoggerFactory;
 public class ReplicationPluginUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(ReplicationPluginUtils.class);
 
-  private static List<String> finalCommand = addFinalCommandPart();
-  private static String PROPERTIES_ERROR_MESSAGE = "Rsync properties are not well defined";
+  protected static String PROPERTIES_ERROR_MESSAGE = "Rsync properties are not well defined";
 
-  public static String executeRsyncAIPList(List<AIP> aips, boolean hasCompression)
-    throws CommandException, IOException, UnsupportedOperationException {
-    if (!finalCommand.isEmpty()) {
-      Path path = creatingIncludeFileForAIPs(aips);
+  public static String executeRsyncAIP(AIP aip, boolean hasCompression) throws CommandException {
+    String dataTarget = RodaCoreFactory.getRodaConfigurationAsString("core", "aip_rsync", "target");
 
-      List<String> rsyncCommand = addInitialCommandPart(hasCompression);
-      rsyncCommand.add("--include-from=" + path.toString());
-      rsyncCommand.addAll(finalCommand);
-      try {
-        LOGGER.debug("Executing AIPs rsync: {}", rsyncCommand);
-        return CommandUtility.execute(rsyncCommand);
-      } catch (CommandException e) {
-        throw e;
-      } finally {
-        FSUtils.deletePathQuietly(path);
-      }
+    if (dataTarget == null) {
+      return PROPERTIES_ERROR_MESSAGE;
     }
 
-    return PROPERTIES_ERROR_MESSAGE;
+    List<String> rsyncCommand = addInitialCommandPart(hasCompression);
+    Path sourceAipPath = RodaCoreFactory.getDataPath().resolve(RodaConstants.CORE_STORAGE_FOLDER)
+      .resolve(RodaConstants.STORAGE_CONTAINER_AIP).resolve(aip.getId());
+
+    String targetAipPath = dataTarget + RodaConstants.CORE_STORAGE_FOLDER + "/" + RodaConstants.STORAGE_CONTAINER_AIP
+      + "/" + aip.getId() + "/";
+
+    StringBuilder ret = new StringBuilder();
+
+    if (Files.exists(sourceAipPath)) {
+      rsyncCommand.add(sourceAipPath + "/");
+      rsyncCommand.add(targetAipPath);
+
+      String output = CommandUtility.execute(rsyncCommand);
+
+      ret.append("Executing AIPs rsync: ").append(StringUtils.join(rsyncCommand, " ")).append("\n");
+      ret.append(output);
+    }
+
+    // data
+    Path sourceAipHistoryDataPath = RodaCoreFactory.getDataPath().resolve(RodaConstants.CORE_STORAGE_HISTORY_FOLDER)
+      .resolve(RodaConstants.STORAGE_HISTORY_CONTAINER_DATA).resolve(RodaConstants.STORAGE_CONTAINER_AIP)
+      .resolve(aip.getId());
+
+    String targetAipHistoryDataPath = dataTarget + RodaConstants.CORE_STORAGE_HISTORY_FOLDER + "/"
+      + RodaConstants.STORAGE_HISTORY_CONTAINER_DATA + "/" + RodaConstants.STORAGE_CONTAINER_AIP + "/" + aip.getId()
+      + "/";
+
+    if (Files.exists(sourceAipHistoryDataPath)) {
+      List<String> rsyncHistoryDataCommand = addInitialCommandPart(hasCompression);
+      rsyncHistoryDataCommand.add(sourceAipHistoryDataPath + "/");
+      rsyncHistoryDataCommand.add(targetAipHistoryDataPath);
+
+      String output = CommandUtility.execute(rsyncHistoryDataCommand);
+
+      ret.append("\nExecuting AIP history data rsync: ").append(StringUtils.join(rsyncHistoryDataCommand, " "))
+        .append("\n");
+      ret.append(output);
+    } else {
+      // TODO lfaria 20161104: if source doesn't exist it should be deleted on
+      // target
+    }
+
+    // metadata
+    Path sourceAipHistoryMetadataPath = RodaCoreFactory.getDataPath().resolve(RodaConstants.CORE_STORAGE_HISTORY_FOLDER)
+      .resolve(RodaConstants.STORAGE_HISTORY_CONTAINER_METADATA).resolve(RodaConstants.STORAGE_CONTAINER_AIP)
+      .resolve(aip.getId());
+
+    String targetAipHistoryMetadataPath = dataTarget + RodaConstants.CORE_STORAGE_HISTORY_FOLDER + "/"
+      + RodaConstants.STORAGE_HISTORY_CONTAINER_METADATA + "/" + RodaConstants.STORAGE_CONTAINER_AIP + "/" + aip.getId()
+      + "/";
+
+    if (Files.exists(sourceAipHistoryMetadataPath)) {
+      List<String> rsyncHistoryMetadataCommand = addInitialCommandPart(hasCompression);
+      rsyncHistoryMetadataCommand.add(sourceAipHistoryMetadataPath + "/");
+      rsyncHistoryMetadataCommand.add(targetAipHistoryMetadataPath);
+
+      String output = CommandUtility.execute(rsyncHistoryMetadataCommand);
+
+      ret.append("\nExecuting AIP history metadata rsync: ").append(StringUtils.join(rsyncHistoryMetadataCommand, " "))
+        .append("\n");
+      ret.append(output);
+    } else {
+      // TODO lfaria 20161104: if source doesn't exist it should be deleted on
+      // target
+    }
+
+    return ret.toString();
   }
 
-  public static String executeRsyncEvents(List<PreservationMetadata> pms, boolean hasCompression)
-    throws CommandException, IOException, UnsupportedOperationException {
-    if (!finalCommand.isEmpty()) {
-      Path path = creatingIncludeFileForEvents(pms);
+  public static String executeRsyncEvent(PreservationMetadata pm, boolean hasCompression) throws CommandException {
+    String dataTarget = RodaCoreFactory.getRodaConfigurationAsString("core", "aip_rsync", "target");
 
-      List<String> rsyncCommand = addInitialCommandPart(hasCompression);
-      rsyncCommand.add("--include-from=" + path.toString());
-      rsyncCommand.addAll(finalCommand);
-
-      try {
-        LOGGER.debug("Executing events rsync: {}", rsyncCommand);
-        return CommandUtility.execute(rsyncCommand);
-      } catch (CommandException e) {
-        throw e;
-      } finally {
-        FSUtils.deletePathQuietly(path);
-      }
+    if (dataTarget == null) {
+      return PROPERTIES_ERROR_MESSAGE;
     }
 
-    return PROPERTIES_ERROR_MESSAGE;
+    List<String> rsyncCommand = addInitialCommandPart(hasCompression);
+    Path sourceEventPath = RodaCoreFactory.getDataPath().resolve(RodaConstants.CORE_STORAGE_FOLDER)
+      .resolve(RodaConstants.STORAGE_CONTAINER_AIP).resolve(pm.getAipId())
+      .resolve(RodaConstants.STORAGE_DIRECTORY_METADATA).resolve(RodaConstants.STORAGE_DIRECTORY_PRESERVATION)
+      .resolve(pm.getId() + RodaConstants.PREMIS_SUFFIX);
+
+    String targetEventPath = dataTarget + RodaConstants.CORE_STORAGE_FOLDER + "/" + RodaConstants.STORAGE_CONTAINER_AIP
+      + "/" + pm.getAipId() + "/" + RodaConstants.STORAGE_DIRECTORY_METADATA + "/"
+      + RodaConstants.STORAGE_DIRECTORY_PRESERVATION + "/" + pm.getId() + RodaConstants.PREMIS_SUFFIX;
+
+    StringBuilder ret = new StringBuilder();
+    if (Files.exists(sourceEventPath)) {
+
+      rsyncCommand.add(sourceEventPath.toString());
+      rsyncCommand.add(targetEventPath);
+
+      String output = CommandUtility.execute(rsyncCommand);
+
+      ret.append("Executing AIP preservation events rsync: ").append(StringUtils.join(rsyncCommand, " ")).append("\n");
+      ret.append(output);
+    } else {
+      // TODO lfaria 20161104: if source doesn't exist it should be deleted on
+      // target
+    }
+    return ret.toString();
   }
 
-  public static String executeRsyncAgents(boolean hasCompression)
-    throws CommandException, IOException, UnsupportedOperationException {
-    if (!finalCommand.isEmpty()) {
-      List<String> rsyncCommand = addInitialCommandPart(hasCompression);
-      rsyncCommand.add("--include");
-      rsyncCommand.add(RodaConstants.CORE_STORAGE_FOLDER + "/");
-      rsyncCommand.add("--include");
-      rsyncCommand.add(RodaConstants.CORE_STORAGE_FOLDER + "/" + RodaConstants.STORAGE_CONTAINER_PRESERVATION + "/");
-      rsyncCommand.add("--include");
-      rsyncCommand.add(RodaConstants.CORE_STORAGE_FOLDER + "/" + RodaConstants.STORAGE_CONTAINER_PRESERVATION + "/"
-        + RodaConstants.STORAGE_CONTAINER_PRESERVATION_AGENTS + "/***");
-      rsyncCommand.addAll(finalCommand);
+  public static String executeRsyncAgents(boolean hasCompression) throws CommandException {
+    String dataTarget = RodaCoreFactory.getRodaConfigurationAsString("core", "aip_rsync", "target");
 
-      LOGGER.debug("Executing agents rsync: {}", rsyncCommand);
-      return CommandUtility.execute(rsyncCommand);
+    if (dataTarget == null) {
+      return PROPERTIES_ERROR_MESSAGE;
     }
 
-    return PROPERTIES_ERROR_MESSAGE;
-  }
+    List<String> rsyncCommand = addInitialCommandPart(hasCompression);
 
-  private static Path creatingIncludeFileForAIPs(List<AIP> aips) throws IOException {
-    Path path = Files.createTempFile("replication", ".txt");
-    PrintWriter writer = new PrintWriter(path.toFile());
+    Path sourceAgentPath = RodaCoreFactory.getDataPath().resolve(RodaConstants.CORE_STORAGE_FOLDER)
+      .resolve(RodaConstants.STORAGE_CONTAINER_PRESERVATION)
+      .resolve(RodaConstants.STORAGE_CONTAINER_PRESERVATION_AGENTS);
 
-    String storageAIP = RodaConstants.CORE_STORAGE_FOLDER + "/" + RodaConstants.STORAGE_CONTAINER_AIP + "/";
+    String targetAgentPath = dataTarget + RodaConstants.CORE_STORAGE_FOLDER + "/"
+      + RodaConstants.STORAGE_CONTAINER_PRESERVATION + "/" + RodaConstants.STORAGE_CONTAINER_PRESERVATION_AGENTS + "/";
 
-    String historyDataAIP = RodaConstants.CORE_STORAGE_HISTORY_FOLDER + "/"
-      + RodaConstants.STORAGE_HISTORY_CONTAINER_DATA + "/" + RodaConstants.STORAGE_CONTAINER_AIP + "/";
+    StringBuilder ret = new StringBuilder();
+    if (Files.exists(sourceAgentPath)) {
 
-    String historyMetadataAIP = RodaConstants.CORE_STORAGE_HISTORY_FOLDER + "/"
-      + RodaConstants.STORAGE_HISTORY_CONTAINER_METADATA + "/" + RodaConstants.STORAGE_CONTAINER_AIP + "/";
+      rsyncCommand.add(sourceAgentPath + "/");
+      rsyncCommand.add(targetAgentPath);
 
-    writer.println(RodaConstants.CORE_STORAGE_FOLDER + "/");
-    writer.println(storageAIP);
-    writer.println(RodaConstants.CORE_STORAGE_HISTORY_FOLDER + "/");
-    writer
-      .println(RodaConstants.CORE_STORAGE_HISTORY_FOLDER + "/" + RodaConstants.STORAGE_HISTORY_CONTAINER_DATA + "/");
-    writer.println(historyDataAIP);
-    writer.println(
-      RodaConstants.CORE_STORAGE_HISTORY_FOLDER + "/" + RodaConstants.STORAGE_HISTORY_CONTAINER_METADATA + "/");
-    writer.println(historyMetadataAIP);
+      String output = CommandUtility.execute(rsyncCommand);
 
-    for (AIP aip : aips) {
-      writer.println(storageAIP + aip.getId() + "/***");
-      writer.println(historyDataAIP + aip.getId() + "/***");
-      writer.println(historyMetadataAIP + aip.getId() + "/***");
+      ret.append("Executing AIP preservation agent rsync: ").append(StringUtils.join(rsyncCommand, " ")).append("\n");
+      ret.append(output);
+    } else {
+      // TODO lfaria 20161104: if source doesn't exist it should be deleted on
+      // target
     }
-
-    IOUtils.closeQuietly(writer);
-    return path;
-  }
-
-  private static Path creatingIncludeFileForEvents(List<PreservationMetadata> pms) throws IOException {
-    Path path = Files.createTempFile("replication_event", ".txt");
-    PrintWriter writer = new PrintWriter(path.toFile());
-
-    String storageAIP = RodaConstants.CORE_STORAGE_FOLDER + "/" + RodaConstants.STORAGE_CONTAINER_AIP + "/";
-
-    writer.println(RodaConstants.CORE_STORAGE_FOLDER + "/");
-    writer.println(storageAIP);
-
-    for (PreservationMetadata pm : pms) {
-      writer.println(storageAIP + pm.getAipId() + "/");
-      writer.println(storageAIP + pm.getAipId() + "/" + RodaConstants.STORAGE_DIRECTORY_METADATA + "/");
-      writer.println(storageAIP + pm.getAipId() + "/" + RodaConstants.STORAGE_DIRECTORY_METADATA + "/"
-        + RodaConstants.STORAGE_DIRECTORY_PRESERVATION + "/");
-      writer.println(storageAIP + pm.getAipId() + "/" + RodaConstants.STORAGE_DIRECTORY_METADATA + "/"
-        + RodaConstants.STORAGE_DIRECTORY_PRESERVATION + "/***");
-    }
-
-    IOUtils.closeQuietly(writer);
-    return path;
-  }
-
-  private static List<String> addFinalCommandPart() {
-    List<String> command = new ArrayList<String>();
-
-    String sourcePath = RodaCoreFactory.getDataPath().toString();
-    String target = RodaCoreFactory.getRodaConfigurationAsString("core", "aip_rsync", "target");
-
-    if (target != null) {
-      command.add("--exclude");
-      command.add("*");
-      command.add(sourcePath + "/");
-      command.add(target);
-    }
-
-    return command;
+    return ret.toString();
   }
 
   private static List<String> addInitialCommandPart(boolean hasCompression) {
@@ -169,12 +176,6 @@ public class ReplicationPluginUtils {
 
     command.add("--delete");
     // command.add("--dry-run");
-    return command;
-  }
-
-  private static List<String> addIncludeOnCommand(List<String> command, String toInclude) {
-    command.add("--include");
-    command.add(RodaConstants.CORE_STORAGE_FOLDER + "/" + toInclude);
     return command;
   }
 }
