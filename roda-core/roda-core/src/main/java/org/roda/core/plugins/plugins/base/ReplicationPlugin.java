@@ -159,6 +159,9 @@ public class ReplicationPlugin extends AbstractPlugin<AIP> {
         // fail all AIPs
         for (AIP aip : list) {
           Report reportItem = reports.get(aip.getId());
+          if (reportItem == null) {
+            reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, aip.getState());
+          }
           reportItem.setPluginState(pluginState).setPluginDetails(outcomeDetailExtension);
           report.addReport(reportItem);
           PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);

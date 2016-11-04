@@ -10,6 +10,7 @@ package org.roda.core.plugins;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
@@ -120,6 +121,12 @@ public class ReplicationPluginTest {
       PosixFilePermissions
         .asFileAttribute(new HashSet<>(Arrays.asList(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE,
           PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OTHERS_READ, PosixFilePermission.OTHERS_EXECUTE))));
+
+    Files.createDirectories(
+      testPath.resolve(RodaConstants.CORE_STORAGE_FOLDER).resolve(RodaConstants.STORAGE_CONTAINER_AIP));
+    Files.createDirectories(
+      testPath.resolve(RodaConstants.CORE_STORAGE_FOLDER).resolve(RodaConstants.STORAGE_CONTAINER_PRESERVATION)
+        .resolve(RodaConstants.STORAGE_CONTAINER_PRESERVATION_AGENTS));
 
     LOGGER.info("Running {} tests under storage {}", getClass().getSimpleName(), basePath);
   }
@@ -280,10 +287,12 @@ public class ReplicationPluginTest {
     NotFoundException, AuthorizationDeniedException {
 
     String targetUser = RodaCoreFactory.getRodaConfigurationAsString("core", "aip_rsync", "target");
-    RodaCoreFactory.getRodaConfiguration().setProperty("core.aip_rsync.target", testPath.toString());
+    RodaCoreFactory.getRodaConfiguration().setProperty("core.aip_rsync.target", testPath.toString() + "/");
 
-    TestsHelper.executeJob(ReplicationPlugin.class, new HashMap<>(), PluginType.MISC,
+    Job job = TestsHelper.executeJob(ReplicationPlugin.class, new HashMap<>(), PluginType.MISC,
       SelectedItemsList.create(AIP.class, aipIds));
+
+    TestsHelper.getJobReports(index, job, true);
 
     RodaCoreFactory.getRodaConfiguration().setProperty("core.aip_rsync.target", targetUser);
   }
