@@ -10,6 +10,7 @@ package org.roda.wui.api.v1;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
@@ -168,8 +169,8 @@ public class TransferredResource {
     @ApiResponse(code = 200, message = "OK", response = org.roda.core.data.v2.ip.TransferredResource.class),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
-  public Response updateAIP(
-    @ApiParam(value = "The id of the resource") @QueryParam(RodaConstants.API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID) String path,
+  public Response updateTransferredResource(
+    @ApiParam(value = "The relative path of the resource") @QueryParam(RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH) String relativePath,
     @ApiParam(value = "Choose format in which to get the response", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
@@ -178,7 +179,10 @@ public class TransferredResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    Browser.updateTransferredResources(user, path, true);
+    Browser.updateTransferredResources(user, Optional.of(relativePath), true);
+
+    // TODO this method should allow to replace a file with a new one.
+
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Transferred resources updated"), mediaType)
       .build();
   }

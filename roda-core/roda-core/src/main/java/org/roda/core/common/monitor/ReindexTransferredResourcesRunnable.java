@@ -17,12 +17,12 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Date;
 import java.util.EnumSet;
+import java.util.Optional;
 import java.util.Stack;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
@@ -37,34 +37,26 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
   private static final Logger LOGGER = LoggerFactory.getLogger(ReindexTransferredResourcesRunnable.class);
 
   private Path basePath;
-  private TransferredResource folder;
+  private Optional<String> folderRelativePath;
   private IndexService index;
 
-  public ReindexTransferredResourcesRunnable(Path basePath, String folderUUID, IndexService index) {
+  public ReindexTransferredResourcesRunnable(Path basePath, Optional<String> folderRelativePath, IndexService index) {
     this.basePath = basePath;
     this.index = index;
-
-    try {
-      if (folderUUID != null) {
-        this.folder = index.retrieve(TransferredResource.class, folderUUID);
-      } else {
-        folder = null;
-      }
-    } catch (NotFoundException | GenericException e) {
-      LOGGER.error("Specific folder is not indexed or does not exist");
-    }
+    this.folderRelativePath = folderRelativePath;
   }
 
+  @Override
   public void run() {
 
     long start = System.currentTimeMillis();
     Date lastScanDate = new Date();
-    RodaCoreFactory.setTransferredResourcesScannerUpdateStatus(true);
+    RodaCoreFactory.setTransferredResourcesScannerUpdateStatus(folderRelativePath, true);
     try {
       EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
       Path path;
-      if (folder != null) {
-        path = basePath.resolve(Paths.get(folder.getRelativePath()));
+      if (folderRelativePath.isPresent()) {
+        path = basePath.resolve(Paths.get(folderRelativePath.get()));
       } else {
         path = basePath;
       }
@@ -130,20 +122,20 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
 
       Filter filter;
       String formattedDate = SolrUtils.getLastScanDate(lastScanDate);
-      if (folder == null) {
+      if (!folderRelativePath.isPresent()) {
         filter = new Filter(
           new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_LAST_SCAN_DATE, formattedDate));
       } else {
         filter = new Filter(
-          new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS, folder.getRelativePath()),
+          new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS, folderRelativePath.get()),
           new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_LAST_SCAN_DATE, formattedDate));
       }
 
       index.delete(TransferredResource.class, filter);
       index.commit(TransferredResource.class);
       LOGGER.info("End indexing Transferred Resources");
-      LOGGER.info("Time elapsed: {} seconds", ((System.currentTimeMillis() - start) / 1000));
-      RodaCoreFactory.setTransferredResourcesScannerUpdateStatus(false);
+      LOGGER.info("Time elapsed: {} seconds", (System.currentTimeMillis() - start) / 1000);
+      RodaCoreFactory.setTransferredResourcesScannerUpdateStatus(folderRelativePath, false);
     } catch (IOException | GenericException | RequestNotValidException | RuntimeException e) {
       LOGGER.error("Error reindexing Transferred Resources", e);
     }

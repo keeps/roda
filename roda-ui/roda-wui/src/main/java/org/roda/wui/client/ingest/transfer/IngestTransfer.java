@@ -392,11 +392,11 @@ public class IngestTransfer extends Composite {
 
   @UiHandler("refresh")
   void buttonRefreshHandler(ClickEvent e) {
-    String uuid = resource != null ? resource.getUUID() : null;
+    String relativePath = resource != null ? resource.getRelativePath() : null;
     refresh.setEnabled(false);
 
     // Toast.showInfo(messages.dialogRefresh(), messages.updateIsBeginning());
-    BrowserService.Util.getInstance().transferScanRequestUpdate(uuid, new AsyncCallback<Void>() {
+    BrowserService.Util.getInstance().transferScanRequestUpdate(relativePath, new AsyncCallback<Void>() {
 
       @Override
       public void onFailure(Throwable caught) {

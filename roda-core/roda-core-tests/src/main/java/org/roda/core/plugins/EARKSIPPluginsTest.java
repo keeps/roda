@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -130,7 +131,7 @@ public class EARKSIPPluginsTest {
 
     f.createFile(null, CorporaConstants.EARK_SIP, Files.newInputStream(sip));
 
-    f.updateTransferredResources(null, true);
+    f.updateTransferredResources(Optional.empty(), true);
     index.commit(TransferredResource.class);
 
     TransferredResource transferredResource = index.retrieve(TransferredResource.class,
@@ -204,7 +205,7 @@ public class EARKSIPPluginsTest {
       }
     });
 
-    f.updateTransferredResources(null, true);
+    f.updateTransferredResources(Optional.empty(), true);
     index.commit(TransferredResource.class);
 
     return resultIDs;

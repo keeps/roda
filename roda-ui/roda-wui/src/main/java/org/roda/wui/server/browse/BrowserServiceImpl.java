@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -394,12 +395,14 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void transferScanRequestUpdate(String transferredResourceUUID)
+  public void transferScanRequestUpdate(String transferredResourceRelativePath)
     throws IsStillUpdatingException, AuthorizationDeniedException {
     try {
       User user = UserUtility.getUser(getThreadLocalRequest());
-      Browser.updateTransferredResources(user, transferredResourceUUID, true);
-    } catch (RuntimeException e) {
+      Browser.updateTransferredResources(user,
+        transferredResourceRelativePath != null ? Optional.of(transferredResourceRelativePath) : Optional.empty(),
+        true);
+    } catch (RuntimeException | GenericException e) {
       LOGGER.error("Error running transferred resources scanner");
     }
   }

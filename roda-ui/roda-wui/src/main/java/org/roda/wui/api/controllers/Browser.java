@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.xml.transform.TransformerException;
 
@@ -1312,16 +1313,16 @@ public class Browser extends RodaWuiController {
     return classificationPlan;
   }
 
-  public static void updateTransferredResources(User user, String subFolderUUID, boolean waitToFinish)
-    throws IsStillUpdatingException, AuthorizationDeniedException {
+  public static void updateTransferredResources(User user, Optional<String> folderRelativePath, boolean waitToFinish)
+    throws IsStillUpdatingException, AuthorizationDeniedException, GenericException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check permissions
     controllerAssistant.checkRoles(user);
 
     // delegate
-    BrowserHelper.updateTransferredResources(subFolderUUID, waitToFinish);
-    
+    BrowserHelper.updateTransferredResources(folderRelativePath, waitToFinish);
+
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
   }

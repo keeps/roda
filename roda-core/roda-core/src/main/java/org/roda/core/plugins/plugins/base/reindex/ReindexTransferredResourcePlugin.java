@@ -108,7 +108,7 @@ public class ReindexTransferredResourcePlugin extends AbstractPlugin<Void> {
       try {
         RodaCoreFactory.getTransferredResourcesScanner().updateTransferredResources(null, true);
         jobPluginInfo.incrementObjectsProcessedWithSuccess(resourceCounter);
-      } catch (IsStillUpdatingException e) {
+      } catch (IsStillUpdatingException | GenericException e) {
         LOGGER.error("Error updating transferred resources");
         jobPluginInfo.incrementObjectsProcessedWithFailure(resourceCounter);
       }

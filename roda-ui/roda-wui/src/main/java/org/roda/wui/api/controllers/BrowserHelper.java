@@ -23,6 +23,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.MissingResourceException;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -1499,13 +1500,13 @@ public class BrowserHelper {
     RodaCoreFactory.getIndexService().commit(returnClass);
   }
 
-  public static boolean retrieveScanUpdateStatus() {
-    return RodaCoreFactory.getTransferredResourcesScannerUpdateStatus();
+  public static boolean retrieveScanUpdateStatus(Optional<String> folderRelativePath) {
+    return RodaCoreFactory.getTransferredResourcesScannerUpdateStatus(folderRelativePath);
   }
 
-  public static void updateTransferredResources(String subFolderUUID, boolean waitToFinish)
-    throws IsStillUpdatingException {
-    RodaCoreFactory.getTransferredResourcesScanner().updateTransferredResources(subFolderUUID, waitToFinish);
+  public static void updateTransferredResources(Optional<String> folderRelativePath, boolean waitToFinish)
+    throws IsStillUpdatingException, GenericException {
+    RodaCoreFactory.getTransferredResourcesScanner().updateTransferredResources(folderRelativePath, waitToFinish);
   }
 
   public static ConsumesOutputStream retrieveClassificationPlan(User user, String filename)
@@ -2561,9 +2562,9 @@ public class BrowserHelper {
   public static TransferredResource reindexTransferredResource(String path)
     throws IsStillUpdatingException, NotFoundException, GenericException {
     TransferredResourcesScanner scanner = RodaCoreFactory.getTransferredResourcesScanner();
-    String resourceUUID = IdUtils.getTransferredResourceUUID(path);
-    scanner.updateTransferredResources(resourceUUID, true);
-    return RodaCoreFactory.getIndexService().retrieve(TransferredResource.class, resourceUUID);
+    scanner.updateTransferredResources(Optional.of(path), true);
+    return RodaCoreFactory.getIndexService().retrieve(TransferredResource.class,
+      IdUtils.getTransferredResourceUUID(path));
   }
 
 }

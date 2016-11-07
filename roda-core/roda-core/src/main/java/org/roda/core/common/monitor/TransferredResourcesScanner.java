@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
@@ -191,11 +192,12 @@ public class TransferredResourcesScanner {
     index.commit(TransferredResource.class);
   }
 
-  public void updateTransferredResources(String folderUUID, boolean waitToFinish) throws IsStillUpdatingException {
-    if (!RodaCoreFactory.getTransferredResourcesScannerUpdateStatus()) {
+  public void updateTransferredResources(Optional<String> folderRelativePath, boolean waitToFinish)
+    throws IsStillUpdatingException, GenericException {
+    if (!RodaCoreFactory.getTransferredResourcesScannerUpdateStatus(folderRelativePath)) {
       if (index != null) {
         ReindexTransferredResourcesRunnable reindexRunnable = new ReindexTransferredResourcesRunnable(basePath,
-          folderUUID, index);
+          folderRelativePath, index);
 
         if (waitToFinish) {
           reindexRunnable.run();
@@ -203,9 +205,23 @@ public class TransferredResourcesScanner {
           Thread threadReindex = new Thread(reindexRunnable, "ReindexThread");
           threadReindex.start();
         }
+      } else {
+        throw new GenericException("Could not update transferred resources because index was not initialized");
       }
     } else {
+      LOGGER.warn("Could not update transferred resources because it is still updating");
       throw new IsStillUpdatingException();
+    }
+  }
+
+  public void updateParentTransferredResource(String parentUUID, boolean waitToFinish)
+    throws GenericException, IsStillUpdatingException {
+    TransferredResource parent;
+    try {
+      parent = index.retrieve(TransferredResource.class, parentUUID);
+      updateTransferredResources(Optional.of(parent.getRelativePath()), waitToFinish);
+    } catch (NotFoundException e) {
+      updateTransferredResources(Optional.empty(), waitToFinish);
     }
   }
 
@@ -218,7 +234,8 @@ public class TransferredResourcesScanner {
       FSUtils.move(resourcePath, resourcePath.getParent().resolve(newName), replaceExisting);
 
       if (reindexResources) {
-        updateTransferredResources(resource.getParentUUID(), true);
+        TransferredResource parent = index.retrieve(TransferredResource.class, resource.getParentUUID());
+        updateTransferredResources(parent != null ? Optional.of(parent.getRelativePath()) : Optional.empty(), true);
       }
 
       Path relativeToBase = basePath.relativize(resourcePath.getParent().resolve(newName));
@@ -289,7 +306,7 @@ public class TransferredResourcesScanner {
     }
 
     if (reindexResources) {
-      updateTransferredResources(IdUtils.getTransferredResourceUUID(newRelativePath), true);
+      updateTransferredResources(Optional.of(newRelativePath), true);
       reindexOldResourcesParentsAfterMove(resourcesToIndex, areResourcesFromSameFolder);
     }
 
@@ -302,12 +319,12 @@ public class TransferredResourcesScanner {
   }
 
   public void reindexOldResourcesParentsAfterMove(List<TransferredResource> resources,
-    boolean areResourcesFromSameFolder) throws IsStillUpdatingException {
+    boolean areResourcesFromSameFolder) throws IsStillUpdatingException, GenericException {
     List<TransferredResource> resourcesToUpdate = new ArrayList<TransferredResource>();
 
     if (areResourcesFromSameFolder) {
       if (!resources.isEmpty()) {
-        updateTransferredResources(resources.get(0).getParentUUID(), true);
+        updateParentTransferredResource(resources.get(0).getParentUUID(), true);
       }
     } else {
 
@@ -327,7 +344,7 @@ public class TransferredResourcesScanner {
       }
 
       for (TransferredResource resourceToUpdate : resourcesToUpdate) {
-        updateTransferredResources(resourceToUpdate.getParentUUID(), true);
+        updateParentTransferredResource(resourceToUpdate.getParentUUID(), true);
       }
     }
 

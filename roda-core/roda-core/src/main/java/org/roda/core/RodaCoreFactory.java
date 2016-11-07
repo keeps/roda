@@ -904,12 +904,12 @@ public class RodaCoreFactory {
     }
   }
 
-  public static boolean getTransferredResourcesScannerUpdateStatus() {
-    return TransferUpdateStatus.getInstance().isUpdatingStatus();
+  public static boolean getTransferredResourcesScannerUpdateStatus(Optional<String> folderRelativePath) {
+    return TransferUpdateStatus.getInstance().isUpdatingStatus(folderRelativePath);
   }
 
-  public static void setTransferredResourcesScannerUpdateStatus(boolean isUpdating) {
-    TransferUpdateStatus.getInstance().setUpdatingStatus(isUpdating);
+  public static void setTransferredResourcesScannerUpdateStatus(Optional<String> folderRelativePath, boolean isUpdating) {
+    TransferUpdateStatus.getInstance().setUpdatingStatus(folderRelativePath, isUpdating);
   }
 
   public static StorageService getStorageService() {
