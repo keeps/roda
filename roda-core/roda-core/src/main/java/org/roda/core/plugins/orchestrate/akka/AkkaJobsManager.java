@@ -23,6 +23,7 @@ public class AkkaJobsManager extends AkkaBaseActor {
   private ConcurrentLinkedQueue<Job> jobsWaiting;
   private Map<String, ActorRef> jobsWaitingCreators;
   private AtomicInteger jobsBeingExecuted;
+  private boolean tickSent;
 
   public AkkaJobsManager(int maxNumberOfJobsInParallel) {
     super();
@@ -30,15 +31,17 @@ public class AkkaJobsManager extends AkkaBaseActor {
     this.jobsWaiting = new ConcurrentLinkedQueue<>();
     this.jobsWaitingCreators = new HashMap<>();
     this.jobsBeingExecuted = new AtomicInteger(0);
+    this.tickSent = false;
 
     Props jobsProps = new RoundRobinPool(maxNumberOfJobsInParallel).props(Props.create(AkkaJobActor.class, getSelf()));
     jobsRouter = getContext().actorOf(jobsProps, "JobsRouter");
 
     getContext().system().scheduler().schedule(Duration.create(0, TimeUnit.MILLISECONDS),
-      Duration.create(10, TimeUnit.SECONDS), new Runnable() {
+      Duration.create(2, TimeUnit.SECONDS), new Runnable() {
         @Override
         public void run() {
-          if (!jobsWaiting.isEmpty()) {
+          if (!tickSent && !jobsWaiting.isEmpty()) {
+            tickSent = true;
             getSelf().tell(new Messages.JobsManagerTick(), getSelf());
           }
         }
@@ -50,7 +53,7 @@ public class AkkaJobsManager extends AkkaBaseActor {
     LOGGER.debug("onReceive start | maxNumberOfJobsInParallel:{}; #jobsBeingExecuted:{}; #jobsWaiting:{}",
       maxNumberOfJobsInParallel, jobsBeingExecuted.get(), jobsWaiting.size());
     if (msg instanceof Job) {
-      if (jobsBeingExecuted.get() < maxNumberOfJobsInParallel) {
+      if (jobsWaiting.isEmpty() && jobsBeingExecuted.get() < maxNumberOfJobsInParallel) {
         jobsBeingExecuted.incrementAndGet();
         jobsRouter.tell(msg, getSender());
       } else {
@@ -60,13 +63,17 @@ public class AkkaJobsManager extends AkkaBaseActor {
       }
     } else if (msg instanceof Messages.JobsManagerTick) {
       if (!jobsWaiting.isEmpty() && jobsBeingExecuted.get() < maxNumberOfJobsInParallel) {
-        jobsBeingExecuted.incrementAndGet();
-        Job job = jobsWaiting.remove();
-        ActorRef jobCreator = jobsWaitingCreators.remove(job.getId());
-        jobsRouter.tell(job, jobCreator);
+        while (!jobsWaiting.isEmpty() && jobsBeingExecuted.get() < maxNumberOfJobsInParallel) {
+          jobsBeingExecuted.incrementAndGet();
+          Job job = jobsWaiting.remove();
+          ActorRef jobCreator = jobsWaitingCreators.remove(job.getId());
+          jobsRouter.tell(job, jobCreator);
+        }
       }
+      tickSent = false;
     } else if (msg instanceof Messages.JobsManagerJobEnded) {
       jobsBeingExecuted.decrementAndGet();
+      tickSent = false;
     } else {
       LOGGER.error("Received a message that don't know how to process ({})...", msg.getClass().getName());
       unhandled(msg);
