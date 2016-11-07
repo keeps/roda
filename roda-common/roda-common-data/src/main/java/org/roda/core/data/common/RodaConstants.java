@@ -1036,7 +1036,7 @@ public final class RodaConstants {
 
   public static final String INDEX_SEARCH_SUFFIX = "_txt";
 
-  public static final String MEDIA_TYPE_WILDCARD = "*";
+  public static final String MEDIA_TYPE_WILDCARD = "*/*";
 
   public final static String MEDIA_TYPE_APPLICATION_XML = "application/xml";
 
