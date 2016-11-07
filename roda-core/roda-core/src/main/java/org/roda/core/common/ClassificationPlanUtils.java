@@ -6,8 +6,6 @@ import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.ws.rs.core.MediaType;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.util.Base64;
 import org.roda.core.RodaCoreFactory;
@@ -81,7 +79,7 @@ public class ClassificationPlanUtils {
 
         @Override
         public String getMediaType() {
-          return MediaType.APPLICATION_JSON;
+          return RodaConstants.MEDIA_TYPE_APPLICATION_JSON;
         }
 
       };

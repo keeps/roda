@@ -54,9 +54,8 @@ public class ClassificationPlansResource {
 
     // delegate action to controller
     ConsumesOutputStream cos = Browser.retrieveClassificationPlan(user, filename);
-    StreamingOutput streamingOutput = new RodaStreamingOutput(cos);
 
-    return ApiUtils.okResponse(new StreamResponse(cos.getFileName(), cos.getMediaType(), streamingOutput));
+    return ApiUtils.okResponse(new StreamResponse(cos.getFileName(), cos.getMediaType(), cos));
   }
 
 }

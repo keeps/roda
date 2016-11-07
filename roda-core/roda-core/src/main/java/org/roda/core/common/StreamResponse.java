@@ -7,14 +7,12 @@
  */
 package org.roda.core.common;
 
-import javax.ws.rs.core.StreamingOutput;
-
 public class StreamResponse implements EntityResponse {
   private String filename;
   private String mediaType;
-  private StreamingOutput stream;
+  private ConsumesOutputStream stream;
 
-  public StreamResponse(String filename, String mediaType, StreamingOutput stream) {
+  public StreamResponse(String filename, String mediaType, ConsumesOutputStream stream) {
     super();
     this.filename = filename;
     this.mediaType = mediaType;
@@ -37,11 +35,11 @@ public class StreamResponse implements EntityResponse {
     this.mediaType = mediaType;
   }
 
-  public StreamingOutput getStream() {
+  public ConsumesOutputStream getStream() {
     return stream;
   }
 
-  public void setStream(StreamingOutput stream) {
+  public void setStream(ConsumesOutputStream stream) {
     this.stream = stream;
   }
 

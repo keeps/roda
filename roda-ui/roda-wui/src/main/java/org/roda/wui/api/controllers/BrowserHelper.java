@@ -28,9 +28,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.StreamingOutput;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.custommonkey.xmlunit.Diff;
@@ -617,7 +614,7 @@ public class BrowserHelper {
 
     final String filename;
     final String mediaType;
-    final StreamingOutput stream;
+    final ConsumesOutputStream stream;
     StreamResponse ret = null;
     ModelService model = RodaCoreFactory.getModelService();
 
@@ -625,10 +622,21 @@ public class BrowserHelper {
       Binary descriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aipId, metadataId);
       filename = descriptiveMetadataBinary.getStoragePath().getName();
       mediaType = RodaConstants.MEDIA_TYPE_TEXT_XML;
-      stream = new StreamingOutput() {
+      stream = new ConsumesOutputStream() {
+
         @Override
-        public void write(OutputStream os) throws IOException, WebApplicationException {
-          IOUtils.copy(descriptiveMetadataBinary.getContent().createInputStream(), os);
+        public String getMediaType() {
+          return mediaType;
+        }
+
+        @Override
+        public String getFileName() {
+          return filename;
+        }
+
+        @Override
+        public void consumeOutputStream(OutputStream out) throws IOException {
+          IOUtils.copy(descriptiveMetadataBinary.getContent().createInputStream(), out);
         }
       };
       ret = new StreamResponse(filename, mediaType, stream);
@@ -640,15 +648,24 @@ public class BrowserHelper {
       mediaType = RodaConstants.MEDIA_TYPE_TEXT_HTML;
       String htmlDescriptive = HTMLUtils.descriptiveMetadataToHtml(descriptiveMetadataBinary,
         descriptiveMetadata.getType(), descriptiveMetadata.getVersion(), ServerTools.parseLocale(language));
-      stream = new StreamingOutput() {
+      stream = new ConsumesOutputStream() {
 
         @Override
-        public void write(OutputStream os) throws IOException, WebApplicationException {
-          PrintStream printStream = new PrintStream(os);
+        public String getMediaType() {
+          return mediaType;
+        }
+
+        @Override
+        public String getFileName() {
+          return filename;
+        }
+
+        @Override
+        public void consumeOutputStream(OutputStream out) throws IOException {
+          PrintStream printStream = new PrintStream(out);
           printStream.print(htmlDescriptive);
           printStream.close();
         }
-
       };
       ret = new StreamResponse(filename, mediaType, stream);
 
@@ -674,7 +691,7 @@ public class BrowserHelper {
 
     final String filename;
     final String mediaType;
-    final StreamingOutput stream;
+    final ConsumesOutputStream stream;
     StreamResponse ret = null;
     ModelService model = RodaCoreFactory.getModelService();
 
@@ -682,12 +699,25 @@ public class BrowserHelper {
       Binary descriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aipId, representationId, metadataId);
       filename = descriptiveMetadataBinary.getStoragePath().getName();
       mediaType = RodaConstants.MEDIA_TYPE_TEXT_XML;
-      stream = new StreamingOutput() {
+
+      stream = new ConsumesOutputStream() {
+
         @Override
-        public void write(OutputStream os) throws IOException, WebApplicationException {
-          IOUtils.copy(descriptiveMetadataBinary.getContent().createInputStream(), os);
+        public String getMediaType() {
+          return mediaType;
+        }
+
+        @Override
+        public String getFileName() {
+          return filename;
+        }
+
+        @Override
+        public void consumeOutputStream(OutputStream out) throws IOException {
+          IOUtils.copy(descriptiveMetadataBinary.getContent().createInputStream(), out);
         }
       };
+
       ret = new StreamResponse(filename, mediaType, stream);
 
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
@@ -697,16 +727,27 @@ public class BrowserHelper {
       mediaType = RodaConstants.MEDIA_TYPE_TEXT_HTML;
       String htmlDescriptive = HTMLUtils.descriptiveMetadataToHtml(descriptiveMetadataBinary,
         descriptiveMetadata.getType(), descriptiveMetadata.getVersion(), ServerTools.parseLocale(language));
-      stream = new StreamingOutput() {
+
+      stream = new ConsumesOutputStream() {
 
         @Override
-        public void write(OutputStream os) throws IOException, WebApplicationException {
-          PrintStream printStream = new PrintStream(os);
+        public String getMediaType() {
+          return mediaType;
+        }
+
+        @Override
+        public String getFileName() {
+          return filename;
+        }
+
+        @Override
+        public void consumeOutputStream(OutputStream out) throws IOException {
+          PrintStream printStream = new PrintStream(out);
           printStream.print(htmlDescriptive);
           printStream.close();
         }
-
       };
+
       ret = new StreamResponse(filename, mediaType, stream);
 
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
@@ -731,7 +772,7 @@ public class BrowserHelper {
 
     final String filename;
     final String mediaType;
-    final StreamingOutput stream;
+    final ConsumesOutputStream stream;
 
     ModelService model = RodaCoreFactory.getModelService();
 
@@ -742,10 +783,22 @@ public class BrowserHelper {
     String fileName = binary.getStoragePath().getName();
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
       mediaType = RodaConstants.MEDIA_TYPE_TEXT_XML;
-      stream = new StreamingOutput() {
+
+      stream = new ConsumesOutputStream() {
+
         @Override
-        public void write(OutputStream os) throws IOException, WebApplicationException {
-          IOUtils.copy(binary.getContent().createInputStream(), os);
+        public String getMediaType() {
+          return mediaType;
+        }
+
+        @Override
+        public String getFileName() {
+          return fileName;
+        }
+
+        @Override
+        public void consumeOutputStream(OutputStream out) throws IOException {
+          IOUtils.copy(binary.getContent().createInputStream(), out);
         }
       };
       return new StreamResponse(fileName, mediaType, stream);
@@ -756,16 +809,27 @@ public class BrowserHelper {
       mediaType = RodaConstants.MEDIA_TYPE_TEXT_HTML;
       String htmlDescriptive = HTMLUtils.descriptiveMetadataToHtml(binary, descriptiveMetadata.getType(),
         descriptiveMetadata.getVersion(), ServerTools.parseLocale(language));
-      stream = new StreamingOutput() {
+
+      stream = new ConsumesOutputStream() {
 
         @Override
-        public void write(OutputStream os) throws IOException, WebApplicationException {
-          PrintStream printStream = new PrintStream(os);
+        public String getMediaType() {
+          return mediaType;
+        }
+
+        @Override
+        public String getFileName() {
+          return filename;
+        }
+
+        @Override
+        public void consumeOutputStream(OutputStream out) throws IOException {
+          PrintStream printStream = new PrintStream(out);
           printStream.print(htmlDescriptive);
           printStream.close();
         }
-
       };
+
       return new StreamResponse(filename, mediaType, stream);
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
@@ -787,7 +851,7 @@ public class BrowserHelper {
 
     final String filename;
     final String mediaType;
-    final StreamingOutput stream;
+    final ConsumesOutputStream stream;
 
     ModelService model = RodaCoreFactory.getModelService();
 
@@ -798,12 +862,25 @@ public class BrowserHelper {
     String fileName = binary.getStoragePath().getName();
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
       mediaType = RodaConstants.MEDIA_TYPE_TEXT_XML;
-      stream = new StreamingOutput() {
+
+      stream = new ConsumesOutputStream() {
+
         @Override
-        public void write(OutputStream os) throws IOException, WebApplicationException {
-          IOUtils.copy(binary.getContent().createInputStream(), os);
+        public String getMediaType() {
+          return mediaType;
+        }
+
+        @Override
+        public String getFileName() {
+          return binary.getStoragePath().getName();
+        }
+
+        @Override
+        public void consumeOutputStream(OutputStream out) throws IOException {
+          IOUtils.copy(binary.getContent().createInputStream(), out);
         }
       };
+
       return new StreamResponse(fileName, mediaType, stream);
 
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
@@ -812,16 +889,27 @@ public class BrowserHelper {
       mediaType = RodaConstants.MEDIA_TYPE_TEXT_HTML;
       String htmlDescriptive = HTMLUtils.descriptiveMetadataToHtml(binary, descriptiveMetadata.getType(),
         descriptiveMetadata.getVersion(), ServerTools.parseLocale(language));
-      stream = new StreamingOutput() {
+
+      stream = new ConsumesOutputStream() {
 
         @Override
-        public void write(OutputStream os) throws IOException, WebApplicationException {
-          PrintStream printStream = new PrintStream(os);
+        public String getMediaType() {
+          return mediaType;
+        }
+
+        @Override
+        public String getFileName() {
+          return fileName + ".html";
+        }
+
+        @Override
+        public void consumeOutputStream(OutputStream out) throws IOException {
+          PrintStream printStream = new PrintStream(out);
           printStream.print(htmlDescriptive);
           printStream.close();
         }
-
       };
+
       return new StreamResponse(filename, mediaType, stream);
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
@@ -1034,13 +1122,24 @@ public class BrowserHelper {
       Binary binary = RodaCoreFactory.getModelService().retrievePreservationRepresentation(aipId, representationId);
 
       String filename = binary.getStoragePath().getName();
-      StreamingOutput stream = new StreamingOutput() {
 
-        public void write(OutputStream os) throws IOException, WebApplicationException {
-          IOUtils.copy(binary.getContent().createInputStream(), os);
+      ConsumesOutputStream stream = new ConsumesOutputStream() {
+
+        @Override
+        public String getMediaType() {
+          return acceptFormat;
+        }
+
+        @Override
+        public String getFileName() {
+          return filename;
+        }
+
+        @Override
+        public void consumeOutputStream(OutputStream out) throws IOException {
+          IOUtils.copy(binary.getContent().createInputStream(), out);
         }
       };
-
       return new StreamResponse(filename, RodaConstants.MEDIA_TYPE_APPLICATION_OCTET_STREAM, stream);
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
@@ -1325,10 +1424,22 @@ public class BrowserHelper {
 
   // FIXME allow to create a zip without files/directories???
   private static StreamResponse createZipStreamResponse(List<ZipEntryInfo> zipEntries, String zipName) {
-    final StreamingOutput stream = new StreamingOutput() {
+
+    final ConsumesOutputStream stream = new ConsumesOutputStream() {
+
       @Override
-      public void write(OutputStream os) throws IOException, WebApplicationException {
-        ZipTools.zip(zipEntries, os);
+      public String getMediaType() {
+        return "application/zip";
+      }
+
+      @Override
+      public String getFileName() {
+        return zipName;
+      }
+
+      @Override
+      public void consumeOutputStream(OutputStream out) throws IOException {
+        ZipTools.zip(zipEntries, out);
       }
     };
 
@@ -1380,26 +1491,37 @@ public class BrowserHelper {
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
       final String filename;
       final String mediaType;
-      final StreamingOutput stream;
+      final ConsumesOutputStream stream;
 
       StorageService storage = RodaCoreFactory.getStorageService();
       Binary representationFileBinary = storage.getBinary(
         ModelUtils.getFileStoragePath(iFile.getAipId(), iFile.getRepresentationId(), iFile.getPath(), iFile.getId()));
       filename = representationFileBinary.getStoragePath().getName();
       mediaType = RodaConstants.MEDIA_TYPE_WILDCARD;
-      stream = new StreamingOutput() {
+
+      stream = new ConsumesOutputStream() {
+
         @Override
-        public void write(OutputStream os) throws IOException, WebApplicationException {
+        public String getMediaType() {
+          return acceptFormat;
+        }
+
+        @Override
+        public String getFileName() {
+          return filename;
+        }
+
+        @Override
+        public void consumeOutputStream(OutputStream out) throws IOException {
           InputStream fileInputStream = null;
           try {
             fileInputStream = representationFileBinary.getContent().createInputStream();
-            IOUtils.copy(fileInputStream, os);
+            IOUtils.copy(fileInputStream, out);
           } finally {
             IOUtils.closeQuietly(fileInputStream);
           }
         }
       };
-
       return new StreamResponse(filename, mediaType, stream);
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
@@ -1611,15 +1733,26 @@ public class BrowserHelper {
     String acceptFormat) throws NotFoundException, RequestNotValidException, GenericException {
 
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
-      StreamingOutput streamingOutput = new StreamingOutput() {
+
+      ConsumesOutputStream stream = new ConsumesOutputStream() {
 
         @Override
-        public void write(OutputStream os) throws IOException, WebApplicationException {
+        public String getMediaType() {
+          return acceptFormat;
+        }
+
+        @Override
+        public String getFileName() {
+          return transferredResource.getName();
+        }
+
+        @Override
+        public void consumeOutputStream(OutputStream out) throws IOException {
           InputStream retrieveFile = null;
           try {
             retrieveFile = RodaCoreFactory.getTransferredResourcesScanner()
               .retrieveFile(transferredResource.getFullPath());
-            IOUtils.copy(retrieveFile, os);
+            IOUtils.copy(retrieveFile, out);
           } catch (NotFoundException | RequestNotValidException | GenericException e) {
             // do nothing
           } finally {
@@ -1629,7 +1762,7 @@ public class BrowserHelper {
       };
 
       return new StreamResponse(transferredResource.getName(), RodaConstants.MEDIA_TYPE_APPLICATION_OCTET_STREAM,
-        streamingOutput);
+        stream);
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
       return new ObjectResponse(acceptFormat, transferredResource);

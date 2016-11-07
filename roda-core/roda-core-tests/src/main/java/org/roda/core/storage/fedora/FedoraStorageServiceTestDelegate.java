@@ -17,8 +17,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.ws.rs.core.Response.Status;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -90,7 +88,7 @@ public class FedoraStorageServiceTestDelegate extends AbstractStorageServiceTest
     HttpResponse response;
     try {
       response = client.execute(request);
-      assertEquals(Status.OK.getStatusCode(), response.getStatusLine().getStatusCode());
+      assertEquals(RodaConstants.STATUS_OK, response.getStatusLine().getStatusCode());
     } catch (IOException e) {
       Assert.fail(e.getMessage());
     }

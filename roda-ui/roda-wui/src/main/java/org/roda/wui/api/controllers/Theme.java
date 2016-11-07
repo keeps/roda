@@ -17,12 +17,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.StreamingOutput;
-
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.ConsumesOutputStream;
 import org.roda.core.common.StreamResponse;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -57,17 +54,10 @@ public class Theme extends RodaWuiController {
     throws IOException, NotFoundException {
     StreamResponse streamResponse = null;
 
-    StreamingOutput streamingOutput = new StreamingOutput() {
-      @Override
-      public void write(OutputStream os) throws IOException, WebApplicationException {
-        IOUtils.copy(themeResourceInputstream.getSecond(), os);
-      }
-    };
-
     String resourceId = themeResourceInputstream.getFirst();
     String mimeType;
     if (resourceId.endsWith(".html")) {
-      mimeType = MediaType.TEXT_HTML;
+      mimeType = RodaConstants.MEDIA_TYPE_TEXT_HTML;
     } else if (resourceId.endsWith(".css")) {
       mimeType = "text/css";
     } else if (resourceId.endsWith(".png")) {
@@ -75,10 +65,28 @@ public class Theme extends RodaWuiController {
     } else if (resourceId.endsWith(".js")) {
       mimeType = "text/javascript";
     } else {
-      mimeType = MediaType.APPLICATION_OCTET_STREAM;
+      mimeType = RodaConstants.MEDIA_TYPE_APPLICATION_OCTET_STREAM;
     }
 
-    streamResponse = new StreamResponse(resourceId, mimeType, streamingOutput);
+    ConsumesOutputStream stream = new ConsumesOutputStream() {
+
+      @Override
+      public String getMediaType() {
+        return mimeType;
+      }
+
+      @Override
+      public String getFileName() {
+        return resourceId;
+      }
+
+      @Override
+      public void consumeOutputStream(OutputStream out) throws IOException {
+        IOUtils.copy(themeResourceInputstream.getSecond(), out);
+      }
+    };
+
+    streamResponse = new StreamResponse(resourceId, mimeType, stream);
 
     return streamResponse;
   }

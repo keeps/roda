@@ -1059,6 +1059,11 @@ public final class RodaConstants {
   public final static String MEDIA_TYPE_TEXT_XML = "text/xml";
 
   public final static String MEDIA_TYPE_TEXT_HTML = "text/html";
+  
+  public final static String HTTP_HEADERS_WWW_AUTHENTICATE = "WWW-Authenticate";
+  
+  public final static int STATUS_OK = 200;
+  
 
   /** Private empty constructor */
   private RodaConstants() {

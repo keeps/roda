@@ -7,6 +7,8 @@
  */
 package org.roda.wui.api.v1.utils;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -14,6 +16,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpHeaders;
@@ -22,6 +25,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import javax.xml.transform.TransformerException;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ConsumesOutputStream;
@@ -155,7 +159,15 @@ public class ApiUtils {
 
   public static Response okResponse(StreamResponse streamResponse, CacheControl cacheControl, Date lastModifiedDate,
     boolean inline) {
-    return Response.ok(streamResponse.getStream(), streamResponse.getMediaType())
+    StreamingOutput so = new StreamingOutput() {
+      
+      @Override
+      public void write(OutputStream output) throws IOException, WebApplicationException {
+        streamResponse.getStream().consumeOutputStream(output);
+        
+      }
+    };
+    return Response.ok(so, streamResponse.getMediaType())
       .header(HttpHeaders.CONTENT_DISPOSITION,
         contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + "\"" + streamResponse.getFilename() + "\"")
       .cacheControl(cacheControl).lastModified(lastModifiedDate).build();
@@ -167,7 +179,15 @@ public class ApiUtils {
 
   public static Response okResponse(StreamResponse streamResponse, CacheControl cacheControl, EntityTag tag,
     boolean inline) {
-    return Response.ok(streamResponse.getStream(), streamResponse.getMediaType())
+    StreamingOutput so = new StreamingOutput() {
+      
+      @Override
+      public void write(OutputStream output) throws IOException, WebApplicationException {
+        streamResponse.getStream().consumeOutputStream(output);
+        
+      }
+    };
+    return Response.ok(so, streamResponse.getMediaType())
       .header(HttpHeaders.CONTENT_DISPOSITION,
         contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + "\"" + streamResponse.getFilename() + "\"")
       .cacheControl(cacheControl).tag(tag).build();
@@ -178,7 +198,15 @@ public class ApiUtils {
   }
 
   public static Response okResponse(StreamResponse streamResponse, boolean inline) {
-    return Response.ok(streamResponse.getStream(), streamResponse.getMediaType())
+    StreamingOutput so = new StreamingOutput() {
+      
+      @Override
+      public void write(OutputStream output) throws IOException, WebApplicationException {
+        streamResponse.getStream().consumeOutputStream(output);
+        
+      }
+    };
+    return Response.ok(so, streamResponse.getMediaType())
       .header(HttpHeaders.CONTENT_DISPOSITION,
         contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + "\"" + streamResponse.getFilename() + "\"")
       .build();
@@ -266,8 +294,7 @@ public class ApiUtils {
 
   public static StreamResponse download(Resource resource) {
     ConsumesOutputStream download = DownloadUtils.download(RodaCoreFactory.getStorageService(), resource);
-    StreamingOutput streamingOutput = new RodaStreamingOutput(download);
-    return new StreamResponse(download.getFileName(), download.getMediaType(), streamingOutput);
+    return new StreamResponse(download.getFileName(), download.getMediaType(), download);
   }
 
   public static <T extends IsIndexed> Response okResponse(T indexed, String acceptFormat, String mediaType)

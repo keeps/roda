@@ -19,10 +19,10 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.HttpHeaders;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.common.UserUtility;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.v2.common.Pair;
@@ -72,7 +72,7 @@ public class InternalApiAuthFilter implements Filter {
 
       } catch (final AuthenticationDeniedException | GenericException e) {
         LOGGER.debug(e.getMessage(), e);
-        response.setHeader(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"" + realm + "\"");
+        response.setHeader(RodaConstants.HTTP_HEADERS_WWW_AUTHENTICATE, "Basic realm=\"" + realm + "\"");
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
       }
     } else {
