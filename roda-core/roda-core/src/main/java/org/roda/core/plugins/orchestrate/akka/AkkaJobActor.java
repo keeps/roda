@@ -35,6 +35,8 @@ import akka.japi.pf.DeciderBuilder;
 public class AkkaJobActor extends AkkaBaseActor {
   private static final Logger LOGGER = LoggerFactory.getLogger(AkkaJobActor.class);
 
+  private ActorRef jobsManager;
+
   private SupervisorStrategy strategy = new OneForOneStrategy(false, DeciderBuilder.matchAny(e -> {
     LOGGER.error("A child actor of {} has thrown an exception", AkkaJobActor.class.getSimpleName(), e);
     for (ActorRef actorRef : getContext().getChildren()) {
@@ -43,9 +45,10 @@ public class AkkaJobActor extends AkkaBaseActor {
     return SupervisorStrategy.resume();
   }).build());
 
-  /** Public empty constructor */
-  public AkkaJobActor() {
+  /** Public constructor */
+  public AkkaJobActor(ActorRef jobsManager) {
     super();
+    this.jobsManager = jobsManager;
   }
 
   @Override
@@ -64,8 +67,8 @@ public class AkkaJobActor extends AkkaBaseActor {
       JobsHelper.setPluginParameters(plugin, job);
 
       String jobId = job.getId();
-      ActorRef jobStateInfoActor = getContext().actorOf(
-        Props.create(AkkaJobStateInfoActor.class, plugin, getSender(), JobsHelper.getNumberOfJobsWorkers()), jobId);
+      ActorRef jobStateInfoActor = getContext().actorOf(Props.create(AkkaJobStateInfoActor.class, plugin, getSender(),
+        jobsManager, JobsHelper.getNumberOfJobsWorkers()), jobId);
       super.getPluginOrchestrator().setJobContextInformation(jobId, jobStateInfoActor);
 
       jobStateInfoActor.tell(new Messages.JobStateUpdated(plugin, JOB_STATE.STARTED), getSelf());

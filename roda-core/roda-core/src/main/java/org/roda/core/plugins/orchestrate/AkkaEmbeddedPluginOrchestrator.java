@@ -46,7 +46,7 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginOrchestrator;
-import org.roda.core.plugins.orchestrate.akka.AkkaJobActor;
+import org.roda.core.plugins.orchestrate.akka.AkkaJobsManager;
 import org.roda.core.plugins.orchestrate.akka.Messages;
 import org.roda.core.plugins.orchestrate.akka.Messages.JobPartialUpdate;
 import org.roda.core.plugins.orchestrate.akka.Messages.JobStateUpdated;
@@ -64,7 +64,6 @@ import akka.actor.Props;
 import akka.actor.Terminated;
 import akka.dispatch.OnComplete;
 import akka.pattern.Patterns;
-import akka.routing.RoundRobinPool;
 import akka.util.Timeout;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
@@ -82,8 +81,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   private final ModelService model;
   private final StorageService storage;
 
-  private ActorSystem workersSystem;
-  private ActorRef jobWorkersRouter;
+  private ActorSystem jobsSystem;
+  private ActorRef jobsManager;
   private int maxNumberOfJobsInParallel;
 
   // Map<jobId, ActorRef>
@@ -99,10 +98,9 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     runningJobs = new HashMap<>();
 
     Config akkaConfig = getAkkaConfiguration();
-    workersSystem = ActorSystem.create("WorkersSystem", akkaConfig);
+    jobsSystem = ActorSystem.create("JobsSystem", akkaConfig);
 
-    Props jobsProps = new RoundRobinPool(maxNumberOfJobsInParallel).props(Props.create(AkkaJobActor.class));
-    jobWorkersRouter = workersSystem.actorOf(jobsProps, "JobWorkersRouter");
+    jobsManager = jobsSystem.actorOf(Props.create(AkkaJobsManager.class, maxNumberOfJobsInParallel), "jobsManager");
 
   }
 
@@ -132,7 +130,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public void shutdown() {
     LOGGER.info("Going to shutdown actor system (which will be done asynchronously)");
-    Future<Terminated> terminate = workersSystem.terminate();
+    Future<Terminated> terminate = jobsSystem.terminate();
     terminate.onComplete(new OnComplete<Terminated>() {
       public void onComplete(Throwable failure, Terminated result) {
         if (failure != null) {
@@ -141,7 +139,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
           LOGGER.info("Done shutting down actor system");
         }
       }
-    }, workersSystem.dispatcher());
+    }, jobsSystem.dispatcher());
   }
 
   @Override
@@ -355,11 +353,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       throw new JobAlreadyStartedException();
     } else {
       if (async) {
-        jobWorkersRouter.tell(job, ActorRef.noSender());
+        jobsManager.tell(job, ActorRef.noSender());
       } else {
         int timeoutInSeconds = JobsHelper.getSyncTimeout();
         Timeout timeout = new Timeout(Duration.create(timeoutInSeconds, "seconds"));
-        Future<Object> future = Patterns.ask(jobWorkersRouter, job, timeout);
+        Future<Object> future = Patterns.ask(jobsManager, job, timeout);
         try {
           Await.result(future, timeout.duration());
         } catch (Exception e) {

@@ -39,14 +39,16 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
   private JobInfo jobInfo;
   private Plugin<?> plugin;
   private ActorRef jobCreator;
+  private ActorRef jobsManager;
   private ActorRef workersRouter;
   boolean stopping = false;
 
-  public AkkaJobStateInfoActor(Plugin<?> plugin, ActorRef jobCreator, int numberOfJobsWorkers) {
+  public AkkaJobStateInfoActor(Plugin<?> plugin, ActorRef jobCreator, ActorRef jobsManager, int numberOfJobsWorkers) {
     super();
     jobInfo = new JobInfo();
     this.plugin = plugin;
     this.jobCreator = jobCreator;
+    this.jobsManager = jobsManager;
 
     LOGGER.debug("Starting AkkaJobStateInfoActor router with {} actors", numberOfJobsWorkers);
     Props workersProps = new RoundRobinPool(numberOfJobsWorkers).props(Props.create(AkkaWorkerActor.class));
@@ -102,6 +104,7 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
       // 20160817 hsilva: the following instruction is needed for the "sync"
       // execution of a job (i.e. for testing purposes)
       jobCreator.tell("Done", getSelf());
+      jobsManager.tell(new Messages.JobsManagerJobEnded(), getSelf());
       getContext().stop(getSelf());
     }
     message.logProcessingEnded();

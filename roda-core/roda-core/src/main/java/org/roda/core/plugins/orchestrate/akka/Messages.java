@@ -47,6 +47,33 @@ public class Messages {
     }
   }
 
+  /*-------------------- JOB MANAGER RELATED STATIC CLASSES --------------------*/
+  public static final class JobsManagerTick extends AbstractMessage {
+    private static final long serialVersionUID = -2514581679498648676L;
+
+    public JobsManagerTick() {
+      super();
+    }
+
+    @Override
+    public String toString() {
+      return "JobManagerTick []";
+    }
+  }
+
+  public static final class JobsManagerJobEnded extends AbstractMessage {
+    private static final long serialVersionUID = -2514581679498648676L;
+
+    public JobsManagerJobEnded() {
+      super();
+    }
+
+    @Override
+    public String toString() {
+      return "JobsManagerJobEnded []";
+    }
+  }
+
   /*-------------------- JOB STATE RELATED STATIC CLASSES --------------------*/
   public static final class JobInfoUpdated extends AbstractMessage {
     private static final long serialVersionUID = -6918015956027259760L;
