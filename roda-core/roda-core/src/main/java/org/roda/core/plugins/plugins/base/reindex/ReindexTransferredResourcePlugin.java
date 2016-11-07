@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
@@ -106,7 +107,7 @@ public class ReindexTransferredResourcePlugin extends AbstractPlugin<Void> {
 
       jobPluginInfo.setSourceObjectsCount(resourceCounter);
       try {
-        RodaCoreFactory.getTransferredResourcesScanner().updateTransferredResources(null, true);
+        RodaCoreFactory.getTransferredResourcesScanner().updateTransferredResources(Optional.empty(), true);
         jobPluginInfo.incrementObjectsProcessedWithSuccess(resourceCounter);
       } catch (IsStillUpdatingException | GenericException e) {
         LOGGER.error("Error updating transferred resources");

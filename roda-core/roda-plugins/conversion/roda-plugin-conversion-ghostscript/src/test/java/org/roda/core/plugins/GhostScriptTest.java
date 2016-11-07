@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -116,7 +117,7 @@ public class GhostScriptTest {
     String transferredResourceId = "testt";
     FSUtils.copy(corpora, f.getBasePath().resolve(transferredResourceId), true);
 
-    f.updateTransferredResources(null, true);
+    f.updateTransferredResources(Optional.empty(), true);
     index.commit(TransferredResource.class);
 
     resources.add(

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrClient;
@@ -306,7 +307,7 @@ public class IndexService {
       if (AIP.class.equals(objectClass)) {
         reindexAIPs();
       } else if (TransferredResource.class.equals(objectClass)) {
-        RodaCoreFactory.getTransferredResourcesScanner().updateTransferredResources(null, true);
+        RodaCoreFactory.getTransferredResourcesScanner().updateTransferredResources(Optional.empty(), true);
       } else {
         StoragePath containerPath = ModelUtils.getContainerPath(objectClass);
         try {
