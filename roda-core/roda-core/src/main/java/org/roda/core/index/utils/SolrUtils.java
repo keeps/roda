@@ -370,10 +370,8 @@ public class SolrUtils {
     } else if (resultClass.equals(Report.class)) {
       indexNames.add(RodaConstants.INDEX_JOB_REPORT);
     } else if (resultClass.equals(User.class)) {
-      LOGGER.warn("Use {} instead of {}", RODAMember.class.getName(), User.class.getName());
       indexNames.add(RodaConstants.INDEX_MEMBERS);
     } else if (resultClass.equals(Group.class)) {
-      LOGGER.warn("Use {} instead of {}", RODAMember.class.getName(), Group.class.getName());
       indexNames.add(RodaConstants.INDEX_MEMBERS);
     } else if (resultClass.equals(RODAMember.class)) {
       indexNames.add(RodaConstants.INDEX_MEMBERS);
