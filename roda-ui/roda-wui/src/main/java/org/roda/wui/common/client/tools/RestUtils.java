@@ -21,6 +21,7 @@ import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.safehtml.shared.UriUtils;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
@@ -362,13 +363,26 @@ public class RestUtils {
     form.setVisible(false);
     RootPanel.get().add(form);
 
+    // using submit instead of submit completed because Chrome doesn't created
+    // the other event
     form.addSubmitHandler(new SubmitHandler() {
 
       @Override
       public void onSubmit(SubmitEvent event) {
-        RootPanel.get().remove(form);
+
+        Timer timer = new Timer() {
+
+          @Override
+          public void run() {
+            RootPanel.get().remove(form);
+          }
+        };
+
+        // remove form 10 seconds in the future
+        timer.schedule(10000);
       }
     });
+
     form.submit();
   }
 
