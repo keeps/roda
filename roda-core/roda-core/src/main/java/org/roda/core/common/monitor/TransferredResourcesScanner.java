@@ -216,11 +216,14 @@ public class TransferredResourcesScanner {
 
   public void updateParentTransferredResource(String parentUUID, boolean waitToFinish)
     throws GenericException, IsStillUpdatingException {
-    TransferredResource parent;
-    try {
-      parent = index.retrieve(TransferredResource.class, parentUUID);
-      updateTransferredResources(Optional.of(parent.getRelativePath()), waitToFinish);
-    } catch (NotFoundException e) {
+    if (StringUtils.isNotBlank(parentUUID)) {
+      try {
+        TransferredResource parent = index.retrieve(TransferredResource.class, parentUUID);
+        updateTransferredResources(Optional.of(parent.getRelativePath()), waitToFinish);
+      } catch (NotFoundException e) {
+        updateTransferredResources(Optional.empty(), waitToFinish);
+      }
+    } else {
       updateTransferredResources(Optional.empty(), waitToFinish);
     }
   }
