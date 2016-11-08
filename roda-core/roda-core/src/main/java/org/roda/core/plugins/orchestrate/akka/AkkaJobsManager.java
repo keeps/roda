@@ -50,7 +50,7 @@ public class AkkaJobsManager extends AkkaBaseActor {
 
   @Override
   public void onReceive(Object msg) throws Throwable {
-    LOGGER.debug("onReceive start | maxNumberOfJobsInParallel:{}; #jobsBeingExecuted:{}; #jobsWaiting:{}",
+    LOGGER.debug("start > maxNumberOfJobsInParallel:{}; #jobsBeingExecuted:{}; #jobsWaiting:{}",
       maxNumberOfJobsInParallel, jobsBeingExecuted.get(), jobsWaiting.size());
     if (msg instanceof Job) {
       if (jobsWaiting.isEmpty() && jobsBeingExecuted.get() < maxNumberOfJobsInParallel) {
@@ -78,7 +78,7 @@ public class AkkaJobsManager extends AkkaBaseActor {
       LOGGER.error("Received a message that don't know how to process ({})...", msg.getClass().getName());
       unhandled(msg);
     }
-    LOGGER.debug("onReceive end | maxNumberOfJobsInParallel:{}; #jobsBeingExecuted:{}; #jobsWaiting:{}",
+    LOGGER.debug("end > maxNumberOfJobsInParallel:{}; #jobsBeingExecuted:{}; #jobsWaiting:{}",
       maxNumberOfJobsInParallel, jobsBeingExecuted.get(), jobsWaiting.size());
   }
 
