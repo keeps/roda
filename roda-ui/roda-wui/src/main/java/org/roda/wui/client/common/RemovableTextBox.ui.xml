@@ -13,6 +13,6 @@
 
 	<g:FlowPanel>
 		<g:TextBox addStyleNames="form-textbox form-textbox-medium" ui:field="item"></g:TextBox>
-		<g:Button addStyleNames="search-field-remove" ui:field="removeDynamicTextBoxButton"><i class="fa fa-close"></i></g:Button>
+		<g:Anchor addStyleNames="search-field-remove toolbarLink toolbarLinkSmall" ui:field="removeDynamicTextBoxButton"><i class="fa fa-close"></i></g:Anchor>
 	</g:FlowPanel>
 </ui:UiBinder>

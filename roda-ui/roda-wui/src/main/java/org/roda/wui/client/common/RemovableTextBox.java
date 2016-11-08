@@ -13,9 +13,10 @@ import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.HasHandlers;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -29,14 +30,16 @@ public class RemovableTextBox extends Composite implements HasHandlers {
   @UiField
   TextBox item;
 
-  @UiField
-  Button removeDynamicTextBoxButton;
+  @UiField(provided = true)
+  Anchor removeDynamicTextBoxButton;
 
   public RemovableTextBox() {
+    removeDynamicTextBoxButton = new Anchor(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-remove\"></i>"));
     initWidget(uiBinder.createAndBindUi(this));
   }
 
   public RemovableTextBox(String content) {
+    removeDynamicTextBoxButton = new Anchor(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-remove\"></i>"));
     initWidget(uiBinder.createAndBindUi(this));
     if (content != null) {
       item.setText(content);

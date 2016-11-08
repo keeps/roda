@@ -15,8 +15,10 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.DomEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.HasHandlers;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
@@ -35,19 +37,21 @@ public class RemovableAssociativeTextBox extends Composite implements HasHandler
   @UiField
   TextBox hiddenItemId;
 
-  @UiField
-  Button removeDynamicTextBoxButton;
+  @UiField(provided = true)
+  Anchor removeDynamicTextBoxButton;
 
   @UiField
   Button dialogButton;
 
   public RemovableAssociativeTextBox() {
+    removeDynamicTextBoxButton = new Anchor(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-remove\"></i>"));
     initWidget(uiBinder.createAndBindUi(this));
     hiddenItemId.setVisible(false);
     dialogButton.setVisible(false);
   }
 
   public RemovableAssociativeTextBox(String id, String name) {
+    removeDynamicTextBoxButton = new Anchor(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-remove\"></i>"));
     initWidget(uiBinder.createAndBindUi(this));
     hiddenItemId.setVisible(false);
     dialogButton.setVisible(false);
