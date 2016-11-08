@@ -394,6 +394,7 @@ public class SolrUtils {
       indexNames.add(RodaConstants.INDEX_RISK_INCIDENCE);
     } else if (resultClass.equals(DIP.class)) {
       indexNames.add(RodaConstants.INDEX_DIP);
+      indexNames.add(RodaConstants.INDEX_DIP_FILE);
     } else if (resultClass.equals(DIPFile.class)) {
       indexNames.add(RodaConstants.INDEX_DIP_FILE);
     } else {

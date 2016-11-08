@@ -9,6 +9,10 @@ public class FileLink extends RepresentationLink implements Serializable {
   private List<String> path;
   private String fileId;
 
+  public FileLink() {
+    super();
+  }
+
   public FileLink(String aipId, String representationId, List<String> path, String fileId) {
     super(aipId, representationId);
     this.path = path;
@@ -29,6 +33,11 @@ public class FileLink extends RepresentationLink implements Serializable {
 
   public void setFileId(String fileId) {
     this.fileId = fileId;
+  }
+
+  @Override
+  public String toString() {
+    return "FileLink [path=" + path + ", fileId=" + fileId + "]";
   }
 
 }

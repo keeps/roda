@@ -2107,9 +2107,9 @@ public class ModelService extends ModelObservable {
     return ret;
   }
 
-  public DIPFile createDIPFile(String dipId, List<String> directoryPath, String fileId, ContentPayload contentPayload,
-    boolean notify) throws RequestNotValidException, GenericException, AlreadyExistsException,
-    AuthorizationDeniedException, NotFoundException {
+  public DIPFile createDIPFile(String dipId, List<String> directoryPath, String fileId, long size,
+    ContentPayload contentPayload, boolean notify) throws RequestNotValidException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
     // FIXME how to set this?
     boolean asReference = false;
 
@@ -2117,6 +2117,7 @@ public class ModelService extends ModelObservable {
     final Binary createdBinary = storage.createBinary(filePath, contentPayload, asReference);
     DIPFile file = ResourceParseUtils.convertResourceToDIPFile(createdBinary);
     file.setUUID(IdUtils.getDIPFileId(file));
+    file.setSize(size);
 
     if (notify) {
       notifyDIPFileCreated(file);
@@ -2125,20 +2126,23 @@ public class ModelService extends ModelObservable {
     return file;
   }
 
-  public DIPFile updateDIPFile(String dipId, List<String> directoryPath, String fileId, Binary binary,
-    boolean createIfNotExists, boolean notify)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+  public DIPFile updateDIPFile(String dipId, List<String> directoryPath, String oldFileId, String fileId, long size,
+    ContentPayload contentPayload, boolean createIfNotExists, boolean notify) throws RequestNotValidException,
+    GenericException, NotFoundException, AuthorizationDeniedException, AlreadyExistsException {
     DIPFile file = null;
     // FIXME how to set this?
     boolean asReference = false;
 
-    StoragePath filePath = ModelUtils.getDIPFileStoragePath(dipId, directoryPath, fileId);
+    StoragePath oldFilePath = ModelUtils.getDIPFileStoragePath(dipId, directoryPath, oldFileId);
+    storage.deleteResource(oldFilePath);
 
-    storage.updateBinaryContent(filePath, binary.getContent(), asReference, createIfNotExists);
-    Binary binaryUpdated = storage.getBinary(filePath);
-    file = ResourceParseUtils.convertResourceToDIPFile(binaryUpdated);
+    StoragePath filePath = ModelUtils.getDIPFileStoragePath(dipId, directoryPath, fileId);
+    final Binary binary = storage.createBinary(filePath, contentPayload, asReference);
+    file = ResourceParseUtils.convertResourceToDIPFile(binary);
+
     if (notify) {
-      notifyDIPFileUpdated(file);
+      notifyDIPFileDeleted(dipId, directoryPath, oldFileId);
+      notifyDIPFileCreated(file);
     }
 
     return file;

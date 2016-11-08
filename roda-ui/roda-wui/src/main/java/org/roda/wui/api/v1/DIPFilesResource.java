@@ -120,17 +120,28 @@ public class DIPFilesResource {
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = DIPFile.class),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
-  public Response update(DIPFile file,
+  public Response update(
+    @ApiParam(value = "The UUID of the DIP file") @QueryParam(RodaConstants.API_PATH_PARAM_DIP_FILE_UUID) String fileUUID,
+    @FormDataParam(RodaConstants.API_PARAM_UPLOAD) InputStream inputStream,
+    @FormDataParam(RodaConstants.API_PARAM_UPLOAD) FormDataContentDisposition fileDetail,
+    @ApiParam(value = "A new filename to the file") @QueryParam(RodaConstants.API_QUERY_KEY_FILENAME) String filename,
     @ApiParam(value = "Choose format in which to get the DIP file", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
     User user = UserUtility.getApiUser(request);
+    String name = filename == null ? fileDetail.getFileName() : filename;
+    long size = fileDetail.getSize();
 
     // delegate action to controller
-    DIPFile updatedFile = Browser.updateDIPFile(user, file);
-    return Response.ok(updatedFile, mediaType).build();
+    try {
+      DIPFile updatedFile = Browser.updateDIPFile(user, fileUUID, name, size == -1 ? 0 : size, inputStream);
+      return Response.ok(updatedFile, mediaType).build();
+    } catch (IOException e) {
+      return ApiUtils.errorResponse(new TransformerException(e.getMessage()));
+    }
+
   }
 
   @POST
@@ -155,11 +166,12 @@ public class DIPFilesResource {
     try {
       DIPFile file;
       String name = filename == null ? fileDetail.getFileName() : filename;
+      long size = fileDetail.getSize();
 
       if (fileUUID == null) {
-        file = Browser.createDIPFile(user, dipId, new ArrayList<>(), name, inputStream);
+        file = Browser.createDIPFile(user, dipId, new ArrayList<>(), name, size == -1 ? 0 : size, inputStream);
       } else {
-        file = Browser.createDIPFileWithUUID(user, fileUUID, name, inputStream);
+        file = Browser.createDIPFileWithUUID(user, fileUUID, name, size == -1 ? 0 : size, inputStream);
       }
 
       return Response.ok(file, mediaType).build();

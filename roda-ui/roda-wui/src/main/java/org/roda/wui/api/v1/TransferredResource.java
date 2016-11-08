@@ -7,6 +7,7 @@
  */
 package org.roda.wui.api.v1;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
@@ -25,6 +26,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.xml.transform.TransformerException;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -145,7 +147,6 @@ public class TransferredResource {
 
     // delegate action to controller
     try {
-
       org.roda.core.data.v2.ip.TransferredResource transferredResource;
       String fileName = fileDetail.getFileName();
       boolean forceCommit = false;
@@ -171,6 +172,8 @@ public class TransferredResource {
 
   public Response updateTransferredResource(
     @ApiParam(value = "The relative path of the resource") @QueryParam(RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH) String relativePath,
+    @FormDataParam(RodaConstants.API_PARAM_UPLOAD) InputStream inputStream,
+    @FormDataParam(RodaConstants.API_PARAM_UPLOAD) FormDataContentDisposition fileDetail,
     @ApiParam(value = "Choose format in which to get the response", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
@@ -179,12 +182,13 @@ public class TransferredResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    Browser.updateTransferredResources(user, Optional.of(relativePath), true);
-
-    // TODO this method should allow to replace a file with a new one.
-
-    return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Transferred resources updated"), mediaType)
-      .build();
+    try {
+      Browser.updateTransferredResource(user, Optional.of(relativePath), inputStream, fileDetail.getFileName(), false);
+      return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Transferred resources updated"), mediaType)
+        .build();
+    } catch (IOException e) {
+      return ApiUtils.errorResponse(new TransformerException(e.getMessage()));
+    }
   }
 
   @DELETE

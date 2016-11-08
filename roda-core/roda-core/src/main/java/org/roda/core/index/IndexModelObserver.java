@@ -200,7 +200,7 @@ public class IndexModelObserver implements ModelObserver {
         }
         numberOfDataFiles++;
       }
-      allFiles.close();
+      IOUtils.closeQuietly(allFiles);
 
       // Calculate number of documentation and schema files
       StorageService storage = model.getStorage();
@@ -1023,11 +1023,27 @@ public class IndexModelObserver implements ModelObserver {
   public void dipCreated(DIP dip, boolean commit) {
     addDocumentToIndex(DIP.class, dip);
 
-    // TODO index dip files?
+    // index DIP Files
+    try {
+      final boolean recursive = true;
+      CloseableIterable<OptionalWithCause<DIPFile>> allFiles = model.listDIPFilesUnder(dip.getId(), recursive);
+      for (OptionalWithCause<DIPFile> file : allFiles) {
+        if (file.isPresent()) {
+          boolean recursiveIndexFile = false;
+          indexDIPFile(file.get(), recursiveIndexFile);
+        } else {
+          LOGGER.error("Cannot index DIP file", file.getCause());
+        }
+      }
+      IOUtils.closeQuietly(allFiles);
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e1) {
+      LOGGER.error("Could not index DIP files");
+    }
 
     if (commit) {
       try {
         SolrUtils.commit(index, DIP.class);
+        SolrUtils.commit(index, DIPFile.class);
       } catch (GenericException e) {
         LOGGER.warn("Commit did not run as expected");
       }

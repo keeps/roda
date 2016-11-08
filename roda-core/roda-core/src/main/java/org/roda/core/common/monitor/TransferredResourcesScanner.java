@@ -37,6 +37,7 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.index.IndexService;
+import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -211,6 +212,19 @@ public class TransferredResourcesScanner {
     } else {
       LOGGER.warn("Could not update transferred resources because it is still updating");
       throw new IsStillUpdatingException();
+    }
+  }
+
+  public void updateTransferredResource(Optional<String> folderRelativePath, ContentPayload payload, String name,
+    boolean waitToFinish) throws NotFoundException, GenericException, IOException, IsStillUpdatingException {
+    if (folderRelativePath.isPresent()) {
+      Path path = basePath.resolve(folderRelativePath.get());
+      Path parent = path.getParent();
+      Path parentToBase = basePath.relativize(parent);
+      FSUtils.deletePath(path);
+
+      payload.writeToPath(parent.resolve(name));
+      updateTransferredResources(Optional.ofNullable(parentToBase.toString()), waitToFinish);
     }
   }
 

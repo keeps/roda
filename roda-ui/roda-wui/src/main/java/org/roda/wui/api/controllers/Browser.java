@@ -1329,6 +1329,24 @@ public class Browser extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
   }
 
+  public static void updateTransferredResource(User user, Optional<String> folderRelativePath, InputStream is,
+    String name, boolean waitToFinish)
+    throws IsStillUpdatingException, AuthorizationDeniedException, GenericException, IOException, NotFoundException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    Path filePath = Files.createTempFile("descriptive", ".tmp");
+    Files.copy(is, filePath, StandardCopyOption.REPLACE_EXISTING);
+    ContentPayload payload = new FSPathContentPayload(filePath);
+    BrowserHelper.updateTransferredResource(folderRelativePath, payload, name, waitToFinish);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
+  }
+
   public static List<SupportedMetadataTypeBundle> retrieveSupportedMetadata(User user, String aipId, Locale locale)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -2208,7 +2226,7 @@ public class Browser extends RodaWuiController {
     return aipRepresentationFile;
   }
 
-  public static DIPFile createDIPFile(User user, String dipId, List<String> directoryPath, String fileId,
+  public static DIPFile createDIPFile(User user, String dipId, List<String> directoryPath, String fileId, long size,
     InputStream is) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException,
     AlreadyExistsException, IOException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -2221,7 +2239,7 @@ public class Browser extends RodaWuiController {
     Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
     ContentPayload payload = new FSPathContentPayload(file);
 
-    DIPFile updatedFile = BrowserHelper.createDIPFile(dipId, directoryPath, fileId, payload, true);
+    DIPFile updatedFile = BrowserHelper.createDIPFile(dipId, directoryPath, fileId, size, payload, true);
     BrowserHelper.commit(DIPFile.class);
 
     // register action
@@ -2231,7 +2249,7 @@ public class Browser extends RodaWuiController {
     return updatedFile;
   }
 
-  public static DIPFile createDIPFileWithUUID(User user, String fileUUID, String filename, InputStream is)
+  public static DIPFile createDIPFileWithUUID(User user, String fileUUID, String filename, long size, InputStream is)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException,
     AlreadyExistsException, IOException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -2241,36 +2259,42 @@ public class Browser extends RodaWuiController {
     DIPFile ifile = BrowserHelper.retrieve(DIPFile.class, fileUUID);
 
     // delegate
-    Path file = Files.createTempFile("descriptive", ".tmp");
-    Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
-    ContentPayload payload = new FSPathContentPayload(file);
+    Path filePath = Files.createTempFile("descriptive", ".tmp");
+    Files.copy(is, filePath, StandardCopyOption.REPLACE_EXISTING);
+    ContentPayload payload = new FSPathContentPayload(filePath);
     List<String> newFileDirectoryPath = ifile.getPath();
     newFileDirectoryPath.add(ifile.getId());
 
-    DIPFile updatedFile = BrowserHelper.createDIPFile(ifile.getDipId(), newFileDirectoryPath, filename, payload, true);
-    BrowserHelper.commit(DIPFile.class);
+    DIPFile file = BrowserHelper.createDIPFile(ifile.getDipId(), newFileDirectoryPath, filename, size, payload, true);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_DIP_FILE_UUID_PARAM,
       fileUUID, RodaConstants.CONTROLLER_FILENAME_PARAM, filename);
 
-    return updatedFile;
+    return file;
   }
 
-  public static DIPFile updateDIPFile(User user, DIPFile file) throws AuthorizationDeniedException, GenericException,
-    RequestNotValidException, NotFoundException, AlreadyExistsException {
+  public static DIPFile updateDIPFile(User user, String fileUUID, String filename, long size, InputStream is)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException,
+    AlreadyExistsException, IOException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
     controllerAssistant.checkRoles(user);
 
     // delegate
-    DIPFile updatedFile = BrowserHelper.updateDIPFile(file);
+    DIPFile ifile = BrowserHelper.retrieve(DIPFile.class, fileUUID);
+    Path filePath = Files.createTempFile("descriptive", ".tmp");
+    Files.copy(is, filePath, StandardCopyOption.REPLACE_EXISTING);
+    ContentPayload payload = new FSPathContentPayload(filePath);
+
+    DIPFile file = BrowserHelper.updateDIPFile(ifile.getDipId(), ifile.getPath(), ifile.getId(), filename, size,
+      payload, true);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_DIP_FILE_PARAM, file);
 
-    return updatedFile;
+    return file;
   }
 
   public static void deleteDIPFile(User user, SelectedItems<DIPFile> files)

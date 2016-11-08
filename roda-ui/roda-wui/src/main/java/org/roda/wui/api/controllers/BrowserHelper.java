@@ -1633,6 +1633,12 @@ public class BrowserHelper {
     RodaCoreFactory.getTransferredResourcesScanner().updateTransferredResources(folderRelativePath, waitToFinish);
   }
 
+  public static void updateTransferredResource(Optional<String> folderRelativePath, ContentPayload payload, String name,
+    boolean waitToFinish) throws IsStillUpdatingException, GenericException, NotFoundException, IOException {
+    RodaCoreFactory.getTransferredResourcesScanner().updateTransferredResource(folderRelativePath, payload, name,
+      waitToFinish);
+  }
+
   public static ConsumesOutputStream retrieveClassificationPlan(User user, String filename)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     return ClassificationPlanUtils.retrieveClassificationPlan(user, filename);
@@ -2763,17 +2769,17 @@ public class BrowserHelper {
     }
   }
 
-  public static DIPFile createDIPFile(String dipId, List<String> directoryPath, String fileId, ContentPayload content,
-    boolean notify) throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
-    AlreadyExistsException {
-    return RodaCoreFactory.getModelService().createDIPFile(dipId, directoryPath, fileId, content, notify);
+  public static DIPFile createDIPFile(String dipId, List<String> directoryPath, String fileId, long size,
+    ContentPayload content, boolean notify) throws GenericException, AuthorizationDeniedException,
+    RequestNotValidException, NotFoundException, AlreadyExistsException {
+    return RodaCoreFactory.getModelService().createDIPFile(dipId, directoryPath, fileId, size, content, notify);
   }
 
-  public static DIPFile updateDIPFile(DIPFile file)
-    throws GenericException, AuthorizationDeniedException, NotFoundException {
-    // RodaCoreFactory.getModelService().updateDIPFile(file.getDipId(),
-    // file.getPath(), file.getId());
-    return null;
+  public static DIPFile updateDIPFile(String dipId, List<String> directoryPath, String oldFileId, String fileId,
+    long size, ContentPayload content, boolean notify) throws GenericException, AuthorizationDeniedException,
+    NotFoundException, RequestNotValidException, AlreadyExistsException {
+    return RodaCoreFactory.getModelService().updateDIPFile(dipId, directoryPath, oldFileId, fileId, size, content, true,
+      notify);
   }
 
   public static void deleteDIPFiles(SelectedItems<DIPFile> selected, User user)

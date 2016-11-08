@@ -6,6 +6,10 @@ public class AIPLink implements Serializable {
   private static final long serialVersionUID = 6222816570283361558L;
   private String aipId;
 
+  public AIPLink() {
+    super();
+  }
+
   public AIPLink(String aipId) {
     super();
     this.aipId = aipId;

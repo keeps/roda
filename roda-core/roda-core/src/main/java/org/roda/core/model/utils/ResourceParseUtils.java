@@ -227,7 +227,6 @@ public class ResourceParseUtils {
   public static <T extends Serializable> OptionalWithCause<T> convertResourceTo(StorageService storage,
     Resource resource, Class<T> classToReturn) {
     OptionalWithCause<T> ret;
-    System.out.print("JKD");
 
     try {
       if (classToReturn.equals(AIP.class)) {
