@@ -1,18 +1,16 @@
 <div id="statistics" class="static-page max-width">
-	<h1>Statistics</h1>
+	<h1>Estatísticas</h1>
 
-	<p>This page shows a dashboard of statistics concerning several
-		aspects of the repository. Statistics are organised by sections, each
-		of these focusing on a particular aspect of the repository, e.g.
-		issues related to metadata and data, statistics about ingest and
-		preservation processes, figures about users and authentication issues,
-		preservation events, risk management and notifications.</p>
+	<p>Esta página apresenta diagramas sobre variados aspetos do repositório.
+		Os diagramas estão organizados em secções por tema, e.g. metainformação,
+		ingestão ou acções de preservação, eventos de preservação, gestão de riscos
+		e notificações.</p>
 
-	<h2>Metadata</h2>
+	<h2>Metainformação</h2>
 
 	<div class="row full_width">
 		<div class="col_4 stat_col_card">
-			<h4>Number of intellectual entities</h4>
+			<h4>Número de entidades intelectuais</h4>
 			<div class="textfill">
 				<span class="statistic" data-source="index"
 					data-source-class="org.roda.core.data.v2.ip.IndexedAIP"
@@ -20,7 +18,7 @@
 			</div>
 		</div>
 		<div class="col_8 chart_col_card">
-			<h4>Distribution of description levels (top 10)</h4>
+			<h4>Distribuição de níveis de descrição (top 10)</h4>
 			<canvas id="stat-desc-levels" class="statistic" data-source="index"
 				data-source-class="org.roda.core.data.v2.ip.IndexedAIP"
 				data-source-facets="level" data-view="chart"
@@ -35,7 +33,7 @@
 
 	<div class="row full_width">
 		<div class="col_6 chart_col_card">
-			<h4>User move actions (top 10)</h4>
+			<h4>Alteração no plano de classificação (top 10)</h4>
 			<canvas id="user-move-actions" class="statistic" data-source="index"
 				data-source-class="org.roda.core.data.v2.log.LogEntry"
 				data-source-facets="username" data-view="chart"
@@ -48,7 +46,7 @@
 			</span>
 		</div>
 		<div class="col_6 chart_col_card">
-			<h4>User descriptive metadata creations (top 10)</h4>
+			<h4>Criação de metainformação descritiva (top 10)</h4>
 			<canvas id="user-desc-creations" class="statistic"
 				data-source="index"
 				data-source-class="org.roda.core.data.v2.log.LogEntry"
@@ -65,7 +63,7 @@
 
 	<div class="row full_width">
 		<div class="col_6 chart_col_card">
-			<h4>User descriptive metadata updates (top 10)</h4>
+			<h4>Atualização de metainformação descritiva (top 10)</h4>
 			<canvas id="user-desc-updates" class="statistic" data-source="index"
 				data-source-class="org.roda.core.data.v2.log.LogEntry"
 				data-source-facets="username" data-view="chart"
@@ -78,7 +76,7 @@
 			</span>
 		</div>
 		<div class="col_6 chart_col_card">
-			<h4>User descriptive metadata deletes (top 10)</h4>
+			<h4>Eliminação de metainformação descritiva (top 10)</h4>
 			<canvas id="user-desc-deletes" class="statistic" data-source="index"
 				data-source-class="org.roda.core.data.v2.log.LogEntry"
 				data-source-facets="username" data-view="chart"
@@ -92,12 +90,11 @@
 		</div>
 	</div>
 
-	<h2>Data</h2>
-
+	<h2>Informação / Dados</h2>
 
 	<div class="row full_width">
 		<div class="col_4 stat_col_card">
-			<h4>Number of representations</h4>
+			<h4>Número de representações</h4>
 			<div class="textfill">
 				<span class="statistic" data-source="index"
 					data-source-class="org.roda.core.data.v2.ip.IndexedRepresentation"
@@ -105,7 +102,7 @@
 			</div>
 		</div>
 		<div class="col_8 chart_col_card">
-			<h4>Distribution of representation types</h4>
+			<h4>Distribuição dos tipos de representação</h4>
 			<canvas id="representation-types" class="statistic"
 				data-source="index"
 				data-source-class="org.roda.core.data.v2.ip.IndexedRepresentation"
@@ -120,7 +117,7 @@
 
 	<div class="row full_width">
 		<div class="col_4 stat_col_card">
-			<h4>Number of files</h4>
+			<h4>Número de ficheiros</h4>
 			<div class="textfill">
 				<span class="statistic" data-source="index"
 					data-source-class="org.roda.core.data.v2.ip.IndexedFile"
@@ -128,7 +125,7 @@
 			</div>
 		</div>
 		<div class="col_8 chart_col_card">
-			<h4>Distribution of file PRONOMs (top 10)</h4>
+			<h4>Distribuição de PRONOMs (top 10)</h4>
 			<canvas id="file-formats-pronom" class="statistic"
 				data-source="index"
 				data-source-class="org.roda.core.data.v2.ip.IndexedFile"
@@ -143,7 +140,7 @@
 	</div>
 	<div class="row full_width">
 		<div class="col_12 chart_col_card">
-			<h4>Distribution of file formats (top 10)</h4>
+			<h4>Distribuição de formatos (top 10)</h4>
 			<canvas id="file-formats-description" class="statistic"
 				data-source="index"
 				data-source-class="org.roda.core.data.v2.ip.IndexedFile"
@@ -158,7 +155,7 @@
 	</div>
 	<div class="row full_width">
 		<div class="col_12 chart_col_card">
-			<h4>Distribution of file mimetypes (top 10)</h4>
+			<h4>Distribuição de tipos MIME (top 10)</h4>
 			<canvas id="file-formats-mimetypes" class="statistic"
 				data-source="index"
 				data-source-class="org.roda.core.data.v2.ip.IndexedFile"
@@ -173,11 +170,11 @@
 	</div>
 
 
-	<h2>Processes</h2>
+	<h2>Processos</h2>
 
 	<div class="row full_width">
 		<div class="col_4 stat_col_card">
-			<h4>Number of action processes</h4>
+			<h4>Número de acções de preservação</h4>
 			<div class="textfill">
 				<span class="statistic" data-source="index"
 					data-source-class="org.roda.core.data.v2.jobs.Job" data-view="text"
@@ -186,7 +183,7 @@
 			</div>
 		</div>
 		<div class="col_4 chart_col_card">
-			<h4>Distribution of action process status</h4>
+			<h4>Distribuição do estado</h4>
 			<canvas id="process-action-status" class="statistic"
 				data-source="index"
 				data-source-class="org.roda.core.data.v2.jobs.Job"
@@ -199,7 +196,7 @@
 			</span>
 		</div>
 		<div class="col_4 chart_col_card">
-			<h4>Distribution of action process type</h4>
+			<h4>Distribuição do tipo</h4>
 			<canvas id="process-action-type" class="statistic"
 				data-source="index"
 				data-source-class="org.roda.core.data.v2.jobs.Job"
@@ -215,7 +212,7 @@
 
 	<div class="row full_width">
 		<div class="col_4 stat_col_card">
-			<h4>Number of ingest processes</h4>
+			<h4>Número de processos de ingestão</h4>
 			<div class="textfill">
 				<span class="statistic" data-source="index"
 					data-source-class="org.roda.core.data.v2.jobs.Job" data-view="text"
@@ -224,7 +221,7 @@
 			</div>
 		</div>
 		<div class="col_4 chart_col_card">
-			<h4>Distribution of process status</h4>
+			<h4>Distribuição do estado do processo</h4>
 			<canvas id="process-ingest-status" class="statistic"
 				data-source="index"
 				data-source-class="org.roda.core.data.v2.jobs.Job"
@@ -237,7 +234,7 @@
 			</span>
 		</div>
 		<div class="col_4 chart_col_card">
-			<h4>Number of appraisals (top 10)</h4>
+			<h4>Número de validações (top 10)</h4>
 			<canvas id="appraisal" class="statistic" data-source="index"
 				data-source-class="org.roda.core.data.v2.log.LogEntry"
 				data-source-facets="username" data-view="chart"
@@ -253,7 +250,7 @@
 
 	<div class="row full_width">
 		<div class="col_4 stat_col_card">
-			<h4>Number of reports</h4>
+			<h4>Número de relatórios</h4>
 			<div class="textfill">
 				<span class="statistic" data-source="index"
 					data-source-class="org.roda.core.data.v2.jobs.Report"
@@ -261,7 +258,7 @@
 			</div>
 		</div>
 		<div class="col_8 chart_col_card">
-			<h4>Distribution of report plugin (top 5)</h4>
+			<h4>Distribuição de plugins (top 5)</h4>
 			<canvas id="process-reports-plugin" class="statistic"
 				data-source="index"
 				data-source-class="org.roda.core.data.v2.jobs.Report"
@@ -278,7 +275,7 @@
 
 	<div class="row full_width">
 		<div class="col_4 chart_col_card">
-			<h4>Distribution of report plugin state</h4>
+			<h4>Distribuição do estado de execução</h4>
 			<canvas id="process-reports-plugin-state" class="statistic"
 				data-source="index"
 				data-source-class="org.roda.core.data.v2.jobs.Report"
@@ -292,7 +289,7 @@
 		</div>
 
 		<div class="col_8 chart_col_card">
-			<h4>Users that started more processes (top 5)</h4>
+			<h4>Utilizadores que iniciaram mais processos (top 5)</h4>
 			<canvas id="process-users" class="statistic" data-source="index"
 				data-source-class="org.roda.core.data.v2.log.LogEntry"
 				data-source-facets="username" data-view="chart"
@@ -306,11 +303,11 @@
 		</div>
 	</div>
 
-	<h2>Users</h2>
+	<h2>Utilizadores</h2>
 
 	<div class="row full_width">
 		<div class="col_4 stat_col_card">
-			<h4>Number of users</h4>
+			<h4>Número de utilizadores</h4>
 			<div class="textfill">
 				<span class="statistic" data-source="index"
 					data-source-class="org.roda.core.data.v2.user.RODAMember"
@@ -319,7 +316,7 @@
 			</div>
 		</div>
 		<div class="col_4 stat_col_card">
-			<h4>Number of authentications</h4>
+			<h4>Número de autenticações</h4>
 			<div class="textfill">
 				<span class="statistic" data-source="index"
 					data-source-class="org.roda.core.data.v2.log.LogEntry"
@@ -328,7 +325,7 @@
 			</div>
 		</div>
 		<div class="col_4 chart_col_card">
-			<h4>Successful vs failed logins</h4>
+			<h4>Estado da autenticação</h4>
 			<canvas id="logins-state" class="statistic" data-source="index"
 				data-source-class="org.roda.core.data.v2.log.LogEntry"
 				data-source-filters="actionComponent=org.roda.wui.api.controllers.UserLogin, actionMethod=login"
@@ -341,11 +338,11 @@
 		</div>
 	</div>
 
-	<h2>Transferred resources</h2>
+	<h2>Transferência</h2>
 
 	<div class="row full_width">
 		<div class="col_4 stat_col_card">
-			<h4>Number of transferred resources</h4>
+			<h4>Número de transferências</h4>
 			<div class="textfill">
 				<span class="statistic" data-source="index"
 					data-source-class="org.roda.core.data.v2.ip.TransferredResource"
@@ -353,7 +350,7 @@
 			</div>
 		</div>
 		<div class="col_4 stat_col_card">
-			<h4>Successful ingestions</h4>
+			<h4>Ingestões bem sucedidas</h4>
 			<div class="textfill">
 				<span class="statistic" data-source="index"
 					data-source-class="org.roda.core.data.v2.ip.TransferredResource"
@@ -362,7 +359,7 @@
 			</div>
 		</div>
 		<div class="col_4 stat_col_card">
-			<h4>Failed ingestions</h4>
+			<h4>Ingestões mal sucedidas</h4>
 			<div class="textfill">
 				<span class="statistic" data-source="index"
 					data-source-class="org.roda.core.data.v2.ip.TransferredResource"
@@ -372,11 +369,11 @@
 		</div>
 	</div>
 
-	<h2>Preservation events</h2>
+	<h2>Eventos de preservação</h2>
 
 	<div class="row full_width">
 		<div class="col_4 stat_col_card">
-			<h4>Number of preservation events</h4>
+			<h4>Número de eventos de preservação</h4>
 			<div class="textfill">
 				<span class="statistic" data-source="index"
 					data-source-class="org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent"
@@ -384,7 +381,7 @@
 			</div>
 		</div>
 		<div class="col_8 chart_col_card">
-			<h4>Preservation agents by type (top 5)</h4>
+			<h4>Agentes de preservação por tipo (top 5)</h4>
 			<canvas id="preservation-agents-type" class="statistic"
 				data-source="index"
 				data-source-class="org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent"
@@ -401,7 +398,7 @@
 	</div>
 	<div class="row full_width">
 		<div class="col_12 chart_col_card">
-			<h4>Preservation events by agent (top 5)</h4>
+			<h4>Eventos de preservação por agente (top 5)</h4>
 			<canvas id="preservation-event-agents" class="statistic"
 				data-source="index"
 				data-source-class="org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent"
@@ -432,11 +429,11 @@
 		</div>
 	</div>
 
-	<h2>Risks</h2>
+	<h2>Riscos</h2>
 
 	<div class="row full_width">
 		<div class="col_4 stat_col_card">
-			<h4>Number of risks</h4>
+			<h4>Número de riscos</h4>
 			<div class="textfill">
 				<span class="statistic" data-source="index"
 					data-source-class="org.roda.core.data.v2.risks.IndexedRisk"
@@ -444,7 +441,7 @@
 			</div>
 		</div>
 		<div class="col_8 chart_col_card">
-			<h4>Risks by post-mitigation severity</h4>
+			<h4>Riscos por severidade pós-mitigação</h4>
 			<canvas id="risk-severity" class="statistic" data-source="index"
 				data-source-class="org.roda.core.data.v2.risks.IndexedRisk"
 				data-source-facets="posMitigationSeverityLevel" data-view="chart"
@@ -456,11 +453,11 @@
 		</div>
 	</div>
 
-	<h2>Risk incidences</h2>
+	<h2>Incidências de risco</h2>
 
 	<div class="row full_width">
 		<div class="col_4 stat_col_card">
-			<h4>Number of risk incidences</h4>
+			<h4>Número de incidências</h4>
 			<div class="textfill">
 				<span class="statistic" data-source="index"
 					data-source-class="org.roda.core.data.v2.risks.RiskIncidence"
@@ -468,7 +465,7 @@
 			</div>
 		</div>
 		<div class="col_4 chart_col_card">
-			<h4>Risk incidence by severity</h4>
+			<h4>Incidências por severidade</h4>
 			<canvas id="risk-incidence-severity" class="statistic"
 				data-source="index"
 				data-source-class="org.roda.core.data.v2.risks.RiskIncidence"
@@ -481,7 +478,7 @@
 			</span>
 		</div>
 		<div class="col_4 chart_col_card">
-			<h4>Risk incidence by status</h4>
+			<h4>Incidências por estado</h4>
 			<canvas id="risk-incidence-status" class="statistic"
 				data-source="index"
 				data-source-class="org.roda.core.data.v2.risks.RiskIncidence"
@@ -494,11 +491,11 @@
 		</div>
 	</div>
 
-	<h2>Notification</h2>
+	<h2>Notificações</h2>
 
 	<div class="row full_width">
 		<div class="col_4 stat_col_card">
-			<h4>Number of notifications</h4>
+			<h4>Número de notificações</h4>
 			<div class="textfill">
 				<span class="statistic" data-source="index"
 					data-source-class="org.roda.core.data.v2.notifications.Notification"
@@ -506,7 +503,7 @@
 			</div>
 		</div>
 		<div class="col_8 chart_col_card">
-			<h4>Acknowledged notifications</h4>
+			<h4>Notificações com recepção confirmada</h4>
 			<canvas id="notification-acknowledge" class="statistic"
 				data-source="index"
 				data-source-class="org.roda.core.data.v2.notifications.Notification"
