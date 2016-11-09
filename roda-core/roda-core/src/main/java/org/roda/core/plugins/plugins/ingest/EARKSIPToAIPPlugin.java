@@ -136,36 +136,12 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
 
         AIP aip;
 
-        // Status is UPDATE or the AIP is a ghost
-        if (IPEnums.IPStatus.UPDATE == sip.getStatus()) {
-          IndexResult<IndexedAIP> result = index.find(IndexedAIP.class,
-            new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_IDS, sip.getId())), Sorter.NONE,
-            new Sublist(0, 1));
-          if (result.getTotalCount() == 1) {
-            IndexedAIP indexedAIP = result.getResults().get(0);
-
-            String jobUsername = PluginHelper.getJobUsername(this, index);
-            // Update the AIP
-            aip = EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP.getId(), model, storage, jobUsername);
-          } else {
-            // Fail to update since there's no AIP
-            throw new NotFoundException("Unable to find AIP created with SIP ID: " + sip.getId());
-          }
+        if (IPEnums.IPStatus.NEW == sip.getStatus()) {
+          aip = processNewSIP(index, model, storage, reportItem, sip, computedParentId);
+        } else if (IPEnums.IPStatus.UPDATE == sip.getStatus()) {
+          aip = processUpdateSIP(index, model, storage, sip);
         } else {
-          if (IPEnums.IPStatus.NEW == sip.getStatus()) {
-            String jobUsername = PluginHelper.getJobUsername(this, index);
-            Permissions fullPermissions = new Permissions();
-
-            fullPermissions.setUserPermissions(jobUsername,
-              new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
-                Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE,
-                Permissions.PermissionType.GRANT)));
-            // Create the permissions object for the user that created the job
-            aip = EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, jobUsername, fullPermissions, model, storage, sip.getIds(),
-              reportItem.getJobId(), computedParentId);
-          } else {
-            throw new GenericException("Unknown IP Status: " + sip.getStatus());
-          }
+          throw new GenericException("Unknown IP Status: " + sip.getStatus());
         }
 
         // put SIP inside the created AIP (if it is supposed to do so)
@@ -199,6 +175,40 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
     }
   }
 
+  private AIP processNewSIP(IndexService index, ModelService model, StorageService storage, Report reportItem, SIP sip,
+    String computedParentId) throws NotFoundException, GenericException, RequestNotValidException,
+    AuthorizationDeniedException, AlreadyExistsException, ValidationException, IOException {
+    String jobUsername = PluginHelper.getJobUsername(this, index);
+    Permissions fullPermissions = new Permissions();
+
+    // Create the permissions object for the user that created the job
+    fullPermissions.setUserPermissions(jobUsername,
+      new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
+        Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE, Permissions.PermissionType.GRANT)));
+
+    return EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, jobUsername, fullPermissions, model, storage, sip.getIds(),
+      reportItem.getJobId(), computedParentId);
+  }
+
+  private AIP processUpdateSIP(IndexService index, ModelService model, StorageService storage, SIP sip)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException,
+    AlreadyExistsException, ValidationException {
+    AIP aip;
+    IndexResult<IndexedAIP> result = index.find(IndexedAIP.class,
+      new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_IDS, sip.getId())), Sorter.NONE, new Sublist(0, 1));
+    if (result.getTotalCount() == 1) {
+      IndexedAIP indexedAIP = result.getResults().get(0);
+
+      String jobUsername = PluginHelper.getJobUsername(this, index);
+      // Update the AIP
+      aip = EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP.getId(), model, storage, jobUsername);
+    } else {
+      // Fail to update since there's no AIP
+      throw new NotFoundException("Unable to find AIP created with SIP ID: " + sip.getId());
+    }
+    return aip;
+  }
+
   private String createAncestors(SIP sip, IndexService index, ModelService model, String forcedParent)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException,
     AlreadyExistsException, ValidationException {
@@ -225,9 +235,6 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
         }
       } catch (NotFoundException e) {
         Job currentJob = PluginHelper.getJob(this, index);
-        if (currentJob == null) {
-          throw new GenericException("Job is null");
-        }
         String username = currentJob.getUsername();
         Permissions permissions = new Permissions();
 

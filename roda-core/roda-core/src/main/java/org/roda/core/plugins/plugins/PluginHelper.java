@@ -789,6 +789,10 @@ public final class PluginHelper {
     }
   }
 
+  // FIXME 20161109 hsilva: if this method is invoked from an ingestion, it
+  // should be possible to set jobId to process just the ghosts created by a
+  // particular job (otherwise, if two or more jobs are running in parallel,
+  // this will process ghosts from all jobs)
   public static <T extends IsRODAObject> void fixParents(Plugin<T> plugin, IndexService index, ModelService model)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     String forcedParent = getParentIdFromParameters(plugin);

@@ -456,7 +456,7 @@ public class IndexModelObserver implements ModelObserver {
       index.add(RodaConstants.INDEX_AIP, aipDoc);
       updateRepresentationAndFileAncestors(aip, topAncestors);
 
-      LOGGER.debug("Finding descendents of moved aip {}", aip.getId());
+      LOGGER.debug("Finding descendants of moved aip {}", aip.getId());
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
       SolrUtils.execute(index, IndexedAIP.class, filter, new IndexRunnable<IndexedAIP>() {
 
@@ -465,14 +465,16 @@ public class IndexModelObserver implements ModelObserver {
           throws RequestNotValidException, GenericException, AuthorizationDeniedException {
           SolrInputDocument descendantDoc;
           try {
-            LOGGER.debug("Reindexing aip {} descendent {}", aip.getId(), item.getId());
+            LOGGER.debug("Reindexing aip {} descendant {}", aip.getId(), item.getId());
+            // 20161109 hsilva: lets test if descendant exists, otherwise there
+            // is not point in trying to updated it in the index
+            AIP aip = model.retrieveAIP(item.getId());
             List<String> ancestors = SolrUtils.getAncestors(item.getParentID(), model);
             descendantDoc = SolrUtils.updateAIPAncestors(item.getId(), ancestors);
             index.add(RodaConstants.INDEX_AIP, descendantDoc);
 
             // update representation and file ancestors information
             if (item.getHasRepresentations()) {
-              AIP aip = model.retrieveAIP(item.getId());
               updateRepresentationAndFileAncestors(aip, ancestors);
             }
 
