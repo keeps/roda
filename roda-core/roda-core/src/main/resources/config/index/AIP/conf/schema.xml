@@ -29,7 +29,10 @@
  http://wiki.apache.org/solr/SchemaXml
 -->
 
-<schema name="schema-version-1" version="1.5">
+<schema name="schema-version-2" version="1.5">
+  <!--
+    2 - removed field 'state' default value (it was leftovers from previous field definition);
+  -->
   <!-- attribute "name" is the name of this schema and is only used for display purposes.
        version="x.y" is Solr's version number for the schema syntax and 
        semantics.  It should not normally be changed by applications.
@@ -136,7 +139,7 @@
    <field name="search" type="text_general" indexed="true" stored="false" multiValued="true" />
    
    <!-- PERMISSIONS -->
-   <field name="state" type="string" default="false" indexed="true" stored="true" required="true" multiValued="false" />
+   <field name="state" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <dynamicField name="permission_users_*" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <dynamicField name="permission_groups_*" type="string" indexed="true" stored="true" required="false" multiValued="true" />
 
