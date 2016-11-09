@@ -264,9 +264,9 @@ public class ModelService extends ModelObservable {
     return aip;
   }
 
-  public AIP createAIP(String parentId, String type, Permissions permissions, boolean notify, List<String> sipIds,
-    boolean isGhost, String createdBy) throws RequestNotValidException, NotFoundException, GenericException,
-    AlreadyExistsException, AuthorizationDeniedException {
+  public AIP createAIP(String parentId, String type, Permissions permissions, List<String> ingestSIPIds,
+    String ingestJobId, boolean notify, String createdBy, boolean isGhost) throws RequestNotValidException,
+    NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
 
     AIPState state = AIPState.ACTIVE;
     Directory directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
@@ -276,7 +276,8 @@ public class ModelService extends ModelObservable {
     AIP aip = new AIP(id, parentId, type, state, permissions, createdBy);
 
     aip.setGhost(isGhost);
-    aip.setIngestSIPIds(sipIds);
+    aip.setIngestSIPIds(ingestSIPIds);
+    aip.setIngestJobId(ingestJobId);
 
     createAIPMetadata(aip);
 
@@ -358,6 +359,11 @@ public class ModelService extends ModelObservable {
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
     notifyAipUpdated(aip);
     return aip;
+  }
+
+  public void notifyAIPDeleted(String aipId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    notifyAipDeleted(aipId);
   }
 
   private Permissions addParentPermissions(Permissions permissions, String parentId)

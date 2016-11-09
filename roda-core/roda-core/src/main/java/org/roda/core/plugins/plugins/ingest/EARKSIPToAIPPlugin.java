@@ -105,6 +105,8 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<TransferredResource> list)
     throws PluginException {
     Report report = PluginHelper.initPluginReport(this);
+    String jobId = PluginHelper.getJobId(this);
+    String parentIdFromParameters = PluginHelper.getParentIdFromParameters(this);
 
     for (TransferredResource transferredResource : list) {
       Report reportItem = PluginHelper.initPluginReportItem(this, transferredResource);
@@ -113,7 +115,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
       LOGGER.debug("Converting {} to AIP", earkSIPPath);
 
       transformTransferredResourceIntoAnAIP(index, model, storage, transferredResource, earkSIPPath, createSubmission,
-        reportItem);
+        reportItem, jobId, parentIdFromParameters);
       report.addReport(reportItem);
 
       PluginHelper.createJobReport(this, model, reportItem);
@@ -123,7 +125,8 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
   }
 
   private void transformTransferredResourceIntoAnAIP(IndexService index, ModelService model, StorageService storage,
-    TransferredResource transferredResource, Path earkSIPPath, boolean createSubmission, Report reportItem) {
+    TransferredResource transferredResource, Path earkSIPPath, boolean createSubmission, Report reportItem,
+    String jobId, String parentIdFromParameters) {
     SIP sip = null;
     try {
       sip = EARKSIP.parse(earkSIPPath, RodaCoreFactory.getWorkingDirectory());
@@ -131,7 +134,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
       reportItem.setSourceObjectOriginalIds(sip.getIds());
 
       if (sip.getValidationReport().isValid()) {
-        String sipParentId = createAncestors(sip, index, model, PluginHelper.getParentIdFromParameters(this));
+        String sipParentId = createAncestors(sip, index, model, parentIdFromParameters, jobId);
         String computedParentId = PluginHelper.computeParentId(this, index, sipParentId);
 
         AIP aip;
@@ -209,7 +212,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
     return aip;
   }
 
-  private String createAncestors(SIP sip, IndexService index, ModelService model, String forcedParent)
+  private String createAncestors(SIP sip, IndexService index, ModelService model, String forcedParent, String jobId)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException,
     AlreadyExistsException, ValidationException {
     List<String> ancestors = new ArrayList<>(sip.getAncestors());
@@ -242,7 +245,8 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
           new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
             Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE, Permissions.PermissionType.GRANT)));
         boolean isGhost = true;
-        AIP ghostAIP = model.createAIP(parent, "", permissions, true, Arrays.asList(ancestor), isGhost, username);
+        AIP ghostAIP = model.createAIP(parent, "", permissions, Arrays.asList(ancestor), jobId, true, username,
+          isGhost);
         parent = ghostAIP.getId();
       }
     }

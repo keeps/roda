@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -789,46 +790,52 @@ public final class PluginHelper {
     }
   }
 
-  // FIXME 20161109 hsilva: if this method is invoked from an ingestion, it
-  // should be possible to set jobId to process just the ghosts created by a
-  // particular job (otherwise, if two or more jobs are running in parallel,
-  // this will process ghosts from all jobs)
-  public static <T extends IsRODAObject> void fixParents(Plugin<T> plugin, IndexService index, ModelService model)
+  public static <T extends IsRODAObject> void fixParents(Plugin<T> plugin, IndexService index, ModelService model,
+    Optional<String> jobId)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     String forcedParent = getParentIdFromParameters(plugin);
-    index.execute(IndexedAIP.class,
-      new Filter(new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.TRUE.toString())), ghost -> {
-        Filter nonGhostsFilter = new Filter(
-          new OneOfManyFilterParameter(RodaConstants.INGEST_SIP_IDS, ghost.getIngestSIPIds()),
-          new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.FALSE.toString()));
-        if (!StringUtils.isBlank(forcedParent)) {
-          nonGhostsFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, forcedParent));
-        }
-        // if there are AIPs that have the same sip id
-        IndexResult<IndexedAIP> result = index.find(IndexedAIP.class, nonGhostsFilter, Sorter.NONE, new Sublist(0, 1));
 
-        if (result.getTotalCount() > 1) {
-          LOGGER.debug("Couldn't find non-ghost AIP with ingest SIP ids {}", ghost.getIngestSIPIds());
-        } else if (result.getTotalCount() == 1) {
-          IndexedAIP newParentIAIP = result.getResults().get(0);
-          moveChildrenAIPsAndDelete(plugin, index, model, ghost.getId(), newParentIAIP.getId(), forcedParent);
-        } else if (result.getTotalCount() == 0) {
-          // check if there are other ghosts with the same sip id and from the
-          // same job, move all of this ghost children
-          Filter otherGhostsFilter = new Filter(
-            new OneOfManyFilterParameter(RodaConstants.INGEST_SIP_IDS, ghost.getIngestSIPIds()),
-            new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.TRUE.toString()));
-          if (!StringUtils.isBlank(forcedParent)) {
-            otherGhostsFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, forcedParent));
-          }
-          IndexResult<IndexedAIP> otherGhosts = index.find(IndexedAIP.class, otherGhostsFilter, Sorter.NONE,
-            new Sublist(0, 1));
-          if (otherGhosts.getTotalCount() >= 1) {
-            IndexedAIP otherGhost = otherGhosts.getResults().get(0);
-            moveChildrenAIPsAndDelete(plugin, index, model, ghost.getId(), otherGhost.getId(), forcedParent);
-          }
+    // collect all ghost ids
+    List<String> ghostsIds = new ArrayList<>();
+    Filter ghostsFilter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.TRUE.toString()));
+    jobId.ifPresent(id -> ghostsFilter.add(new SimpleFilterParameter(RodaConstants.INGEST_JOB_ID, id)));
+    index.findAll(IndexedAIP.class, ghostsFilter).forEach(ghost -> ghostsIds.add(ghost.getId()));
+
+    // process each ghost
+    for (String ghostId : ghostsIds) {
+      IndexedAIP ghost = index.retrieve(IndexedAIP.class, ghostId);
+
+      Filter nonGhostsFilter = new Filter(
+        new OneOfManyFilterParameter(RodaConstants.INGEST_SIP_IDS, ghost.getIngestSIPIds()),
+        new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.FALSE.toString()));
+      if (!StringUtils.isBlank(forcedParent)) {
+        nonGhostsFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, forcedParent));
+      }
+      // if there are AIPs that have the same sip id
+      IndexResult<IndexedAIP> result = index.find(IndexedAIP.class, nonGhostsFilter, Sorter.NONE, new Sublist(0, 1));
+
+      if (result.getTotalCount() > 1) {
+        LOGGER.debug("Couldn't find non-ghost AIP with ingest SIP ids {}", ghost.getIngestSIPIds());
+      } else if (result.getTotalCount() == 1) {
+        IndexedAIP newParentIAIP = result.getResults().get(0);
+        moveChildrenAIPsAndDelete(plugin, index, model, ghost.getId(), newParentIAIP.getId(), forcedParent);
+      } else if (result.getTotalCount() == 0) {
+        // check if there are other ghosts with the same sip id and from the
+        // same job, move all of this ghost children
+        Filter otherGhostsFilter = new Filter(
+          new OneOfManyFilterParameter(RodaConstants.INGEST_SIP_IDS, ghost.getIngestSIPIds()),
+          new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.TRUE.toString()));
+        if (!StringUtils.isBlank(forcedParent)) {
+          otherGhostsFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, forcedParent));
         }
-      });
+        IndexResult<IndexedAIP> otherGhosts = index.find(IndexedAIP.class, otherGhostsFilter, Sorter.NONE,
+          new Sublist(0, 1));
+        if (otherGhosts.getTotalCount() >= 1) {
+          IndexedAIP otherGhost = otherGhosts.getResults().get(0);
+          moveChildrenAIPsAndDelete(plugin, index, model, ghost.getId(), otherGhost.getId(), forcedParent);
+        }
+      }
+    }
   }
 
   private static <T extends IsRODAObject> void moveChildrenAIPsAndDelete(Plugin<T> plugin, IndexService index,

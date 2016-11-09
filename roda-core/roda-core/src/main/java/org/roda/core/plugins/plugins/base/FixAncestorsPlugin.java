@@ -9,6 +9,7 @@ package org.roda.core.plugins.plugins.base;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -87,7 +88,9 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
       jobPluginInfo.setSourceObjectsCount(counter);
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      PluginHelper.fixParents(this, index, model);
+      // FIXME 20161109 hsilva: there should be a parameter to set jobId or
+      // empty for all
+      PluginHelper.fixParents(this, index, model, Optional.empty());
 
       jobPluginInfo.incrementObjectsProcessedWithSuccess(counter);
       jobPluginInfo.finalizeInfo();

@@ -2470,7 +2470,7 @@ public class SolrUtils {
 
     Sorter sorter = null;
     int offset = 0;
-    int pagesize = 1000;
+    int pagesize = RodaConstants.DEFAULT_PAGINATION_VALUE;
     boolean done = false;
 
     do {
