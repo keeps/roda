@@ -2775,6 +2775,24 @@ public class BrowserHelper {
     return RodaCoreFactory.getModelService().createDIPFile(dipId, directoryPath, fileId, size, content, notify);
   }
 
+  public static String createDIPFolder(String dipId, String folderUUID, String newName) throws GenericException,
+    RequestNotValidException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
+    ModelService model = RodaCoreFactory.getModelService();
+    IndexService index = RodaCoreFactory.getIndexService();
+
+    if (folderUUID != null) {
+      DIPFile ifolder = index.retrieve(DIPFile.class, folderUUID);
+      DIPFile newFolder = model.createDIPFile(ifolder.getDipId(), ifolder.getPath(), ifolder.getId(), newName, true);
+      index.commit(DIPFile.class);
+      return IdUtils.getDIPFileId(newFolder);
+    } else {
+      DIP dip = index.retrieve(DIP.class, folderUUID);
+      DIPFile newFolder = model.createDIPFile(dip.getId(), null, null, newName, true);
+      index.commit(DIPFile.class);
+      return IdUtils.getDIPFileId(newFolder);
+    }
+  }
+
   public static DIPFile updateDIPFile(String dipId, List<String> directoryPath, String oldFileId, String fileId,
     long size, ContentPayload content, boolean notify) throws GenericException, AuthorizationDeniedException,
     NotFoundException, RequestNotValidException, AlreadyExistsException {

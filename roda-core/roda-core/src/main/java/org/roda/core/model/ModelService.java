@@ -2126,6 +2126,21 @@ public class ModelService extends ModelObservable {
     return file;
   }
 
+  public DIPFile createDIPFile(String dipId, List<String> directoryPath, String fileId, String dirName, boolean notify)
+    throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
+    NotFoundException {
+
+    StoragePath filePath = ModelUtils.getDIPFileStoragePath(dipId, directoryPath, fileId);
+    final Directory createdDirectory = storage.createDirectory(DefaultStoragePath.parse(filePath, dirName));
+    DIPFile file = ResourceParseUtils.convertResourceToDIPFile(createdDirectory);
+
+    if (notify) {
+      notifyDIPFileCreated(file);
+    }
+
+    return file;
+  }
+
   public DIPFile updateDIPFile(String dipId, List<String> directoryPath, String oldFileId, String fileId, long size,
     ContentPayload contentPayload, boolean createIfNotExists, boolean notify) throws RequestNotValidException,
     GenericException, NotFoundException, AuthorizationDeniedException, AlreadyExistsException {

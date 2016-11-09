@@ -40,7 +40,7 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
   private Optional<String> folderRelativePath;
   private IndexService index;
 
-  public ReindexTransferredResourcesRunnable(Path basePath, Optional<String> folderRelativePath, IndexService index) {
+  public ReindexTransferredResourcesRunnable(IndexService index, Path basePath, Optional<String> folderRelativePath) {
     this.basePath = basePath;
     this.index = index;
     this.folderRelativePath = folderRelativePath;

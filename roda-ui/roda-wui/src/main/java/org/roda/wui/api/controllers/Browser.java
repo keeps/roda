@@ -71,6 +71,7 @@ import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.fs.FSPathContentPayload;
+import org.roda.core.storage.fs.FSUtils;
 import org.roda.wui.client.browse.BrowseItemBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataVersionsBundle;
@@ -1345,6 +1346,7 @@ public class Browser extends RodaWuiController {
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
+    FSUtils.deletePath(filePath);
   }
 
   public static List<SupportedMetadataTypeBundle> retrieveSupportedMetadata(User user, String aipId, Locale locale)
@@ -2274,6 +2276,23 @@ public class Browser extends RodaWuiController {
     return file;
   }
 
+  public static String createDIPFolder(User user, String dipId, String folderUUID, String newName)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, AlreadyExistsException,
+    NotFoundException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    String ret = BrowserHelper.createDIPFolder(dipId, folderUUID, newName);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_DIP_ID_PARAM, dipId,
+      RodaConstants.CONTROLLER_DIP_FILE_UUID_PARAM, folderUUID);
+    return ret;
+  }
+
   public static DIPFile updateDIPFile(User user, String fileUUID, String filename, long size, InputStream is)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException,
     AlreadyExistsException, IOException {
@@ -2293,7 +2312,7 @@ public class Browser extends RodaWuiController {
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_DIP_FILE_PARAM, file);
-
+    FSUtils.deletePath(filePath);
     return file;
   }
 
