@@ -5364,6 +5364,10 @@ td.datePickerMonth, td.datePickerYear {
 	content: "\f0c5";
 }
 
+.plugin-list-item-icon-dissemination:before {
+	content: "\f01a";
+}
+
 .plugin-list-item-icon-misc:before {
 	content: "\f0ae";
 }

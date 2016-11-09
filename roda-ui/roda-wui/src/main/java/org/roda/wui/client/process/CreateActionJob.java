@@ -34,10 +34,10 @@ import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.lists.utils.ListFactory;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -177,7 +177,7 @@ public class CreateActionJob extends Composite {
       }
     });
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();
@@ -206,10 +206,9 @@ public class CreateActionJob extends Composite {
         if (pluginInfo != null) {
           List<String> pluginCategories = pluginInfo.getCategories();
 
-          if (pluginCategories != null) {
+          if (pluginCategories != null && !pluginCategories.contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)) {
             for (String category : pluginCategories) {
-              if (!categoriesOnListBox.contains(category)
-                && !category.equals(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)) {
+              if (!categoriesOnListBox.contains(category)) {
 
                 CheckBox box = new CheckBox();
                 box.setText(messages.showPluginCategories(category));

@@ -322,20 +322,6 @@ public class TransferredResourcesScanner {
     return oldToNewTransferredResourceIds;
   }
 
-  public void updateParentTransferredResource(String parentUUID, boolean waitToFinish)
-    throws GenericException, IsStillUpdatingException {
-    if (StringUtils.isNotBlank(parentUUID)) {
-      try {
-        TransferredResource parent = index.retrieve(TransferredResource.class, parentUUID);
-        updateTransferredResources(Optional.of(parent.getRelativePath()), waitToFinish);
-      } catch (NotFoundException e) {
-        updateTransferredResources(Optional.empty(), waitToFinish);
-      }
-    } else {
-      updateTransferredResources(Optional.empty(), waitToFinish);
-    }
-  }
-
   public void reindexOldResourcesParentsAfterMove(List<TransferredResource> resources,
     boolean areResourcesFromSameFolder) throws IsStillUpdatingException, GenericException {
 
@@ -346,39 +332,6 @@ public class TransferredResourcesScanner {
     } catch (RequestNotValidException e) {
       LOGGER.error("Could not delete old transferred resources");
     }
-
-    // if (areResourcesFromSameFolder) {
-    // if (!resources.isEmpty()) {
-    // updateParentTransferredResource(resources.get(0).getParentUUID(), true);
-    // }
-    // } else {
-    // List<TransferredResource> resourcesToUpdate = new
-    // ArrayList<TransferredResource>();
-    //
-    // for (TransferredResource resource : resources) {
-    // boolean hasAncestors = false;
-    // for (TransferredResource resourceToUpdate : resourcesToUpdate) {
-    // if
-    // (resource.getAncestorsPaths().contains(resourceToUpdate.getRelativePath()))
-    // {
-    // resourcesToUpdate.remove(resourceToUpdate);
-    // } else if
-    // (resourceToUpdate.getAncestorsPaths().contains(resource.getRelativePath()))
-    // {
-    // hasAncestors = true;
-    // }
-    // }
-    //
-    // if (!hasAncestors) {
-    // resourcesToUpdate.add(resource);
-    // }
-    // }
-    //
-    // for (TransferredResource resourceToUpdate : resourcesToUpdate) {
-    // updateParentTransferredResource(resourceToUpdate.getParentUUID(), true);
-    // }
-    // }
-
   }
 
 }

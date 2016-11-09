@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.ip;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -45,6 +46,14 @@ public class DIP implements IsModelObject, IsIndexed {
 
   public DIP() {
     super();
+
+    this.title = "";
+    this.description = "";
+    this.dateCreated = new Date();
+    this.lastModified = new Date();
+    this.aipIds = new ArrayList<AIPLink>();
+    this.representationIds = new ArrayList<RepresentationLink>();
+    this.fileIds = new ArrayList<FileLink>();
   }
 
   public DIP(DIP other) {
@@ -57,6 +66,7 @@ public class DIP implements IsModelObject, IsIndexed {
     String openExternalURL, String deleteExternalURL, List<AIPLink> aipIds, List<RepresentationLink> representationIds,
     List<FileLink> fileIds, Permissions permissions) {
     super();
+
     this.id = id;
     this.title = title;
     this.description = description;
