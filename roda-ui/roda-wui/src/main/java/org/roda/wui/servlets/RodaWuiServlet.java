@@ -23,20 +23,26 @@ public class RodaWuiServlet extends HttpServlet {
 
   @Override
   public void init() throws ServletException {
+    LOGGER.info("Starting up RODA Core...");
     RodaCoreFactory.instantiate();
     if (!RodaCoreFactory.instantiatedWithoutErrors()) {
-      LOGGER.error("Init: KO...");
-      throw new ServletException("RODA Core instantiated with errors! Please see RODA logs for more detail!");
+      LOGGER.error("RODA Core didn't start because errors have occurred! Please see RODA logs to understand why...");
+      throw new ServletException(
+        "RODA Core didn't start because errors have occurred! Please see RODA logs to understand why...");
+    } else {
+      LOGGER.info("RODA Core started with success!");
     }
     try {
+      LOGGER.info("Injecting RODA WUI configurations...");
       RodaCoreFactory.addConfiguration("roda-wui.properties");
+      LOGGER.info("RODA WUI configurations injected with success!");
     } catch (ConfigurationException e) {
-      LOGGER.error("Error while loading roda-wui properties", e);
+      LOGGER.error("RODA WUI configurations could not be injected!", e);
     }
 
     RodaCoreFactory.addLogger("logback_wui.xml");
 
-    LOGGER.info("Init: ok...");
+    LOGGER.info("RODA WUI started with success!");
   }
 
   @Override
