@@ -1,11 +1,14 @@
 FROM tomcat:8.0-jre8
-MAINTAINER hsilva@keep.pt
+MAINTAINER admin@keep.pt
 
 # Install dependencies
 RUN curl -s https://bintray.com/user/downloadSubjectPublicKey?username=bintray | \
     apt-key add - && echo "deb http://dl.bintray.com/siegfried/debian wheezy main" | \
     tee -a /etc/apt/sources.list && apt-get -qq update && \
-    apt-get -qq -y install clamav clamav-daemon siegfried curl supervisor zip
+    apt-get -qq -y install clamav clamav-daemon siegfried curl supervisor zip \
+    libav-tools imagemagick sox libsox-fmt-all ghostscript libgs-dev \
+    libreoffice-common unoconv cpio libgcrypt20 libnss3 libreoffice-pdfimport \
+    exiftool python-jpylyzer mediainfo
 
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY clamd.conf /etc/clamav/clamd.conf
