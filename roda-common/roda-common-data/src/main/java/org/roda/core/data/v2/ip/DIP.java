@@ -28,15 +28,15 @@ public class DIP implements IsModelObject, IsIndexed {
   public static int VERSION = 1;
 
   private String id;
-  private String title = null;
-  private String description = null;
+  private String title;
+  private String description;
 
-  private Date dateCreated = null;
-  private Date lastModified = null;
-  private Boolean isPermanent = false;
+  private Date dateCreated;
+  private Date lastModified;
+  private Boolean isPermanent;
 
-  private String openExternalURL = null;
-  private String deleteExternalURL = null;
+  private String openExternalURL;
+  private String deleteExternalURL;
 
   private List<AIPLink> aipIds;
   private List<RepresentationLink> representationIds;
@@ -49,6 +49,8 @@ public class DIP implements IsModelObject, IsIndexed {
 
     this.title = "";
     this.description = "";
+    this.openExternalURL = "";
+    this.deleteExternalURL = "";
     this.dateCreated = new Date();
     this.lastModified = new Date();
     this.aipIds = new ArrayList<AIPLink>();
@@ -181,14 +183,17 @@ public class DIP implements IsModelObject, IsIndexed {
     this.fileIds = fileIds;
   }
 
+  @JsonIgnore
   public void addAip(AIPLink link) {
     this.aipIds.add(link);
   }
 
+  @JsonIgnore
   public void addRepresentation(RepresentationLink link) {
     this.representationIds.add(link);
   }
 
+  @JsonIgnore
   public void addFile(FileLink link) {
     this.fileIds.add(link);
   }

@@ -238,8 +238,16 @@ public class TransferredResourcesScanner {
       FSUtils.move(resourcePath, resourcePath.getParent().resolve(newName), replaceExisting);
 
       if (reindexResources) {
-        TransferredResource parent = index.retrieve(TransferredResource.class, resource.getParentUUID());
-        updateTransferredResources(parent != null ? Optional.of(parent.getRelativePath()) : Optional.empty(), true);
+        if (resource.getParentUUID() != null) {
+          try {
+            TransferredResource parent = index.retrieve(TransferredResource.class, resource.getParentUUID());
+            updateTransferredResources(Optional.of(parent.getRelativePath()), true);
+          } catch (GenericException | NotFoundException e) {
+            LOGGER.error("Could not reindex transferred resources after renaming");
+          }
+        } else {
+          updateTransferredResources(Optional.empty(), true);
+        }
       }
 
       Path relativeToBase = basePath.relativize(resourcePath.getParent().resolve(newName));

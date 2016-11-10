@@ -104,8 +104,9 @@ public class ResourceParseUtils {
       boolean isDirectory = true;
       ret = new DIPFile(id, dipId, filePath, isDirectory);
     } else {
-      throw new GenericException("Error while trying to convert something that it isn't a Binary into a DIP file");
+      throw new GenericException("Error while trying to convert something that is not a Binary into a DIP file");
     }
+
     return ret;
   }
 

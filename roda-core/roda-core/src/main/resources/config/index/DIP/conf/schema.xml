@@ -121,6 +121,9 @@
    <field name="aipUUIDs" type="string" indexed="true" stored="false" required="false" multiValued="true" /> 
    <field name="representationUUIDs" type="string" indexed="true" stored="false" required="false" multiValued="true" />
    <field name="fileUUIDs" type="string" indexed="true" stored="false" required="false" multiValued="true" />
+   
+   <field name="allAipUUIDs" type="string" indexed="true" stored="false" required="false" multiValued="true" /> 
+   <field name="allRepresentationUUIDs" type="string" indexed="true" stored="false" required="false" multiValued="true" />
 
    <field name="search" type="text_general" indexed="true" stored="false" multiValued="true" />
    

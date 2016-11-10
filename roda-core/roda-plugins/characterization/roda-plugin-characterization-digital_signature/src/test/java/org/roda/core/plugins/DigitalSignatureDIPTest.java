@@ -14,7 +14,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -26,6 +25,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
+import org.roda.core.common.IdUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
 import org.roda.core.data.common.RodaConstants;
@@ -43,8 +43,11 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItemsAll;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.DIP;
+import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
@@ -53,6 +56,7 @@ import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
@@ -64,7 +68,6 @@ import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.Assert;
 import org.testng.AssertJUnit;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -77,7 +80,6 @@ public class DigitalSignatureDIPTest {
   private static Path basePath;
   private static ModelService model;
   private static IndexService index;
-  private static int numberOfConvertableFiles = 17;
   private static Path corporaPath;
   private static String aipCreator = "admin";
 
@@ -165,8 +167,8 @@ public class DigitalSignatureDIPTest {
   public void testDigitalSignatureDIPPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
     IOException, SolrServerException, IsStillUpdatingException {
     AIP aip = ingestCorpora();
-    CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
-      aip.getRepresentations().get(0).getId(), true);
+    Representation rep = aip.getRepresentations().get(0);
+    CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(), rep.getId(), true);
     OptionalWithCause<File> file = allFiles.iterator().next();
 
     StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file.get());
@@ -180,19 +182,27 @@ public class DigitalSignatureDIPTest {
     Job job = TestsHelper.executeJob(DigitalSignatureDIPPlugin.class, parameters, PluginType.AIP_TO_AIP,
       SelectedItemsAll.create(Representation.class));
 
-    TestsHelper.getJobReports(index, job, true);
+    List<Report> jobReports = TestsHelper.getJobReports(index, job, true);
+    index.commit(DIP.class);
 
-    aip = model.retrieveAIP(aip.getId());
-    CloseableIterable<OptionalWithCause<File>> allNewFiles = model.listFilesUnder(aip.getId(),
-      aip.getRepresentations().get(1).getId(), true);
-    Iterator<OptionalWithCause<File>> iterator = allNewFiles.iterator();
-    Assert.assertTrue(iterator.hasNext(), "Iterator should have at least one element");
-    OptionalWithCause<File> newFile = iterator.next();
+    for (Report report : jobReports) {
+      if (report.getSourceObjectId().equals(aip.getRepresentations().get(0))) {
+        String repUUID = IdUtils.getRepresentationId(rep);
+        IndexResult<DIP> dips = index.find(DIP.class,
+          new Filter(new SimpleFilterParameter(RodaConstants.DIP_REPRESENTATION_UUIDS, repUUID)), Sorter.NONE,
+          new Sublist(0, 1));
+        DIP dip = dips.getResults().get(0);
+        IndexResult<DIPFile> files = index.find(DIPFile.class,
+          new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_DIP_ID, dip.getId())), Sorter.NONE,
+          new Sublist(0, 1));
+        DIPFile dipfile = files.getResults().get(0);
 
-    StoragePath newFileStoragePath = ModelUtils.getFileStoragePath(newFile.get());
-    DirectResourceAccess newDirectAccess = model.getStorage().getDirectAccess(newFileStoragePath);
-    AssertJUnit.assertEquals(1, PDFSignatureUtils.countSignaturesPDF(newDirectAccess.getPath()));
-    IOUtils.closeQuietly(newDirectAccess);
+        StoragePath newFileStoragePath = ModelUtils.getDIPFileStoragePath(dipfile);
+        DirectResourceAccess newDirectAccess = model.getStorage().getDirectAccess(newFileStoragePath);
+        AssertJUnit.assertEquals(1, PDFSignatureUtils.countSignaturesPDF(newDirectAccess.getPath()));
+        IOUtils.closeQuietly(newDirectAccess);
+      }
+    }
   }
 
 }

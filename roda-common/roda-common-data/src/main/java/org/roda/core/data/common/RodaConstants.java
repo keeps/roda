@@ -847,6 +847,8 @@ public final class RodaConstants {
   public static final String DIP_AIP_UUIDS = "aipUUIDs";
   public static final String DIP_REPRESENTATION_UUIDS = "representationUUIDs";
   public static final String DIP_FILE_UUIDS = "fileUUIDs";
+  public static final String DIP_ALL_AIP_UUIDS = "allAipUUIDs";
+  public static final String DIP_ALL_REPRESENTATION_UUIDS = "allRepresentationUUIDs";
   public static final String DIP_PERMISSIONS = "permissions";
 
   public static final String DIP_EXTENSION = ".json";

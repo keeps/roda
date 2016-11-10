@@ -25,7 +25,7 @@ public class RodaWuiServlet extends HttpServlet {
   public void init() throws ServletException {
     RodaCoreFactory.instantiate();
     if (!RodaCoreFactory.instantiatedWithoutErrors()) {
-      LOGGER.error("Init: ko...");
+      LOGGER.error("Init: KO...");
       throw new ServletException("RODA Core instantiated with errors! Please see RODA logs for more detail!");
     }
     try {
@@ -43,7 +43,7 @@ public class RodaWuiServlet extends HttpServlet {
   public void destroy() {
     try {
       RodaCoreFactory.shutdown();
-      LOGGER.info("Shudown: ok...");
+      LOGGER.info("Shutdown: ok...");
     } catch (IOException e) {
       LOGGER.error("Error while shutting down {}", RodaCoreFactory.class.getName());
     }

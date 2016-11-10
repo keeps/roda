@@ -7,6 +7,7 @@
  */
 package org.roda.core.plugins.plugins.characterization;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -65,10 +66,10 @@ public class DigitalSignatureDIPPluginUtils {
       }
       signatureUtility.initSign(KEYSTORE_ALIAS, KEYSTORE_PASSWORD.toCharArray());
 
-      Path zipResult = Files.createTempFile("signed_", ".zip");
       Path signatureTempFile = Files.createTempFile("signature_", ".p7s");
       signatureUtility.sign(input.toFile(), signatureTempFile.toFile());
 
+      Path zipResult = Files.createTempFile("signed_", ".zip");
       OutputStream os = new FileOutputStream(zipResult.toString());
       ZipOutputStream zout = new ZipOutputStream(os);
 
@@ -105,11 +106,32 @@ public class DigitalSignatureDIPPluginUtils {
     } catch (UnrecoverableKeyException | CMSException | InvalidAlgorithmParameterException e) {
       LOGGER.error("Error running initSign of SignatureUtility", e);
     } catch (CertStoreException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      LOGGER.error("Error retrieving certificate from store", e);
     }
 
     return null;
+  }
+
+  public static void addDetachedSignature(Path input) {
+    try {
+      SignatureUtility signatureUtility = new SignatureUtility();
+      if (KEYSTORE_PATH != null) {
+        InputStream is = new FileInputStream(KEYSTORE_PATH);
+        signatureUtility.loadKeyStore(is, KEYSTORE_PASSWORD.toCharArray());
+      }
+      signatureUtility.initSign(KEYSTORE_ALIAS, KEYSTORE_PASSWORD.toCharArray());
+
+      File inputFile = input.toFile();
+      signatureUtility.sign(inputFile, input.getParent().resolve(inputFile.getName() + ".p7s").toFile());
+    } catch (CertificateException | IOException e) {
+      LOGGER.error("Cannot load keystore " + KEYSTORE_PATH, e);
+    } catch (KeyStoreException | NoSuchAlgorithmException | NoSuchProviderException e) {
+      LOGGER.error("Error initializing SignatureUtility", e);
+    } catch (UnrecoverableKeyException | CMSException | InvalidAlgorithmParameterException e) {
+      LOGGER.error("Error running initSign of SignatureUtility", e);
+    } catch (CertStoreException e) {
+      LOGGER.error("Error retrieving certificate from store", e);
+    }
   }
 
   public static Path addEmbeddedSignature(Path input, String fileFormat, String mimetype) throws Exception {

@@ -280,7 +280,7 @@ public abstract class ModelObservable {
     }
   }
 
-  protected void notifyDIPCreated(DIP dip, boolean commit) {
+  public void notifyDIPCreated(DIP dip, boolean commit) {
     for (ModelObserver observer : observers) {
       observer.dipCreated(dip, commit);
     }

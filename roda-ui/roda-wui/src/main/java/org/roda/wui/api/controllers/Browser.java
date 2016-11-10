@@ -1953,7 +1953,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static File createFile(User user, String aipId, String representationId, List<String> directoryPath,
+  public static File createFile(User user, String aipId, String representationUUID, List<String> directoryPath,
     String fileId, InputStream is) throws AuthorizationDeniedException, GenericException, RequestNotValidException,
     NotFoundException, AlreadyExistsException, IOException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -1961,6 +1961,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
+    IndexedRepresentation rep = BrowserHelper.retrieve(IndexedRepresentation.class, representationUUID);
     UserUtility.checkAIPPermissions(user, aip, PermissionType.CREATE);
 
     // delegate
@@ -1968,12 +1969,12 @@ public class Browser extends RodaWuiController {
     Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
     ContentPayload payload = new FSPathContentPayload(file);
 
-    File updatedFile = BrowserHelper.createFile(aipId, representationId, directoryPath, fileId, payload);
+    File updatedFile = BrowserHelper.createFile(aipId, rep.getId(), directoryPath, fileId, payload);
     BrowserHelper.commit(IndexedFile.class);
 
     // register action
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIP_ID_PARAM,
-      aipId, RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId,
+      aipId, RodaConstants.CONTROLLER_REPRESENTATION_UUID_PARAM, representationUUID,
       RodaConstants.CONTROLLER_DIRECTORY_PATH_PARAM, directoryPath, RodaConstants.CONTROLLER_FILE_ID_PARAM, fileId);
 
     return updatedFile;

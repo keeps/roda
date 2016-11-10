@@ -2709,7 +2709,7 @@ public class BrowserHelper {
   }
 
   public static DIP createDIP(DIP dip) throws GenericException, AuthorizationDeniedException {
-    return RodaCoreFactory.getModelService().createDIP(dip);
+    return RodaCoreFactory.getModelService().createDIP(dip, true);
   }
 
   public static DIP updateDIP(DIP dip) throws GenericException, AuthorizationDeniedException, NotFoundException {

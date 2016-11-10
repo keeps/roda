@@ -2056,7 +2056,7 @@ public class ModelService extends ModelObservable {
     storage.updateBinaryContent(metadataStoragePath, new StringContentPayload(json), asReference, createIfNotExists);
   }
 
-  public DIP createDIP(DIP dip) throws GenericException, AuthorizationDeniedException {
+  public DIP createDIP(DIP dip, boolean notify) throws GenericException, AuthorizationDeniedException {
     try {
       Directory directory = storage
         .createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DIP));
@@ -2065,7 +2065,11 @@ public class ModelService extends ModelObservable {
       dip.setLastModified(new Date());
 
       createDIPMetadata(dip, directory.getStoragePath());
-      notifyDIPCreated(dip, false);
+
+      if (notify) {
+        notifyDIPCreated(dip, false);
+      }
+
       return dip;
     } catch (NotFoundException | RequestNotValidException | AlreadyExistsException e) {
       LOGGER.error("Error creating DIP in storage", e);

@@ -142,7 +142,7 @@ public class FilesResource {
 
   public Response createRepresentationFile(
     @ApiParam(value = "The AIP ID of the new file") @QueryParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
-    @ApiParam(value = "The representation ID of the new file") @QueryParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
+    @ApiParam(value = "The representation UUID of the new file") @QueryParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID) String representationUUID,
     @ApiParam(value = "The UUID of the parent folder") @QueryParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileUUID,
     @FormDataParam(RodaConstants.API_PARAM_UPLOAD) InputStream inputStream,
     @FormDataParam(RodaConstants.API_PARAM_UPLOAD) FormDataContentDisposition fileDetail,
@@ -160,7 +160,7 @@ public class FilesResource {
       String name = filename == null ? fileDetail.getFileName() : filename;
 
       if (fileUUID == null) {
-        file = Browser.createFile(user, aipId, representationId, new ArrayList<>(), name, inputStream);
+        file = Browser.createFile(user, aipId, representationUUID, new ArrayList<>(), name, inputStream);
       } else {
         file = Browser.createFileWithUUID(user, fileUUID, name, inputStream);
       }

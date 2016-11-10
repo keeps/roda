@@ -172,6 +172,10 @@ public class SolrUtils {
 
   public static <T extends IsIndexed> T retrieve(SolrClient index, Class<T> classToRetrieve, String id)
     throws NotFoundException, GenericException {
+    if (id == null) {
+      throw new GenericException("Could not retrieve object from a null id");
+    }
+
     T ret;
     try {
       SolrDocument doc = index.getById(getIndexName(classToRetrieve).get(0), id);
@@ -2031,7 +2035,7 @@ public class SolrUtils {
 
   public static SolrInputDocument dipToSolrDocument(DIP dip) {
     SolrInputDocument doc = new SolrInputDocument();
-    doc.addField(RodaConstants.INDEX_UUID, dip.getId());
+    doc.addField(RodaConstants.INDEX_UUID, dip.getUUID());
     doc.addField(RodaConstants.DIP_ID, dip.getId());
     doc.addField(RodaConstants.DIP_TITLE, dip.getTitle());
     doc.addField(RodaConstants.DIP_DESCRIPTION, dip.getDescription());
@@ -2044,24 +2048,45 @@ public class SolrUtils {
     doc.addField(RodaConstants.DIP_REPRESENTATION_IDS, JsonUtils.getJsonFromObject(dip.getRepresentationIds()));
     doc.addField(RodaConstants.DIP_FILE_IDS, JsonUtils.getJsonFromObject(dip.getFileIds()));
 
+    List<String> allAipUUIDs = new ArrayList<String>();
+    List<String> allRepresentationUUIDs = new ArrayList<String>();
+
     List<String> aipUUIDs = new ArrayList<String>();
     for (AIPLink aip : dip.getAipIds()) {
       aipUUIDs.add(aip.getAipId());
     }
 
+    allAipUUIDs.addAll(aipUUIDs);
+
     List<String> representationUUIDs = new ArrayList<String>();
     for (RepresentationLink rep : dip.getRepresentationIds()) {
       representationUUIDs.add(IdUtils.getRepresentationId(rep));
+      if (!allAipUUIDs.contains(rep.getAipId())) {
+        allAipUUIDs.add(rep.getAipId());
+      }
     }
+
+    allRepresentationUUIDs.addAll(representationUUIDs);
 
     List<String> fileUUIDs = new ArrayList<String>();
     for (FileLink file : dip.getFileIds()) {
       fileUUIDs.add(IdUtils.getFileId(file));
+      if (!allAipUUIDs.contains(file.getAipId())) {
+        allAipUUIDs.add(file.getAipId());
+      }
+
+      String repUUID = IdUtils.getRepresentationId(file.getAipId(), file.getRepresentationId());
+      if (!allRepresentationUUIDs.contains(repUUID)) {
+        allRepresentationUUIDs.add(repUUID);
+      }
     }
 
-    doc.addField(RodaConstants.DIP_AIP_UUIDS, aipUUIDs);
-    doc.addField(RodaConstants.DIP_REPRESENTATION_UUIDS, representationUUIDs);
-    doc.addField(RodaConstants.DIP_FILE_UUIDS, fileUUIDs);
+    doc.addField(RodaConstants.DIP_AIP_UUIDS, JsonUtils.getJsonFromObject(aipUUIDs));
+    doc.addField(RodaConstants.DIP_REPRESENTATION_UUIDS, JsonUtils.getJsonFromObject(representationUUIDs));
+    doc.addField(RodaConstants.DIP_FILE_UUIDS, JsonUtils.getJsonFromObject(fileUUIDs));
+
+    doc.addField(RodaConstants.DIP_ALL_AIP_UUIDS, JsonUtils.getJsonFromObject(allAipUUIDs));
+    doc.addField(RodaConstants.DIP_ALL_REPRESENTATION_UUIDS, JsonUtils.getJsonFromObject(allRepresentationUUIDs));
 
     setPermissions(dip.getPermissions(), doc);
 
