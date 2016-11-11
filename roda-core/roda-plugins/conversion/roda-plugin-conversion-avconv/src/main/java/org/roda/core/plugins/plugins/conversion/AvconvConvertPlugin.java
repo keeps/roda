@@ -72,7 +72,7 @@ public class AvconvConvertPlugin<T extends IsRODAObject> extends CommandConvertP
 
   @Override
   public String getDescription() {
-    return "“avconv” is a very fast video and audio converter. It can also convert between arbitrary sample rates and resize video on the fly with a high quality polyphase filter.\nThe results of conversion will be placed on a new representation under the same Archival Information Package (AIP) where the files were originally found. A PREMIS event is also recorded after the task is run.\nEach input or output file can in principle contain any number of streams of different types (video/audio/subtitle/attachment/data). Allowed number and/or types of streams can be limited by the container format. \nFor more information about this tool, please visit https://libav.org/documentation/avconv.html";
+    return "avconv is a very fast video and audio converter. It can also convert between arbitrary sample rates and resize video on the fly with a high quality polyphase filter.\nThe results of conversion will be placed on a new representation under the same Archival Information Package (AIP) where the files were originally found. A PREMIS event is also recorded after the task is run.\nEach input or output file can in principle contain any number of streams of different types (video/audio/subtitle/attachment/data). Allowed number and/or types of streams can be limited by the container format. \nFor more information about this tool, please visit https://libav.org/documentation/avconv.html";
   }
 
   @Override

@@ -34,12 +34,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
@@ -67,7 +66,6 @@ import org.roda.core.common.UserUtility;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.monitor.TransferUpdateStatus;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
-import org.roda.core.common.validation.ResourceResolver;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.NodeType;
 import org.roda.core.data.common.RodaConstants.PreservationAgentType;
@@ -82,6 +80,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.RoleAlreadyExistsException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
@@ -116,7 +115,10 @@ import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
@@ -178,9 +180,22 @@ public class RodaCoreFactory {
   // Configuration related objects
   private static CompositeConfiguration rodaConfiguration = null;
   private static List<String> configurationFiles = null;
+
+  // Caches
+  private static CacheLoader<Pair<String, String>, Optional<Schema>> RODA_SCHEMAS_LOADER = new SchemasCacheLoader();
+  private static LoadingCache<Pair<String, String>, Optional<Schema>> RODA_SCHEMAS_CACHE = CacheBuilder.newBuilder()
+    .build(RODA_SCHEMAS_LOADER);
+
+  private static LoadingCache<Locale, Messages> I18N_CACHE = CacheBuilder.newBuilder()
+    .build(new CacheLoader<Locale, Messages>() {
+
+      @Override
+      public Messages load(Locale locale) throws Exception {
+        return new Messages(locale, getConfigPath().resolve(RodaConstants.CORE_I18N_FOLDER));
+      }
+    });
+
   private static Map<String, Map<String, String>> rodaPropertiesCache = null;
-  private static Map<String, Schema> rodaSchemasCache = new HashMap<String, Schema>();
-  private static Map<Locale, Messages> i18nMessages = new HashMap<Locale, Messages>();
 
   /** Private empty constructor */
   private RodaCoreFactory() {
@@ -910,7 +925,8 @@ public class RodaCoreFactory {
     return TransferUpdateStatus.getInstance().isUpdatingStatus(folderRelativePath);
   }
 
-  public static void setTransferredResourcesScannerUpdateStatus(Optional<String> folderRelativePath, boolean isUpdating) {
+  public static void setTransferredResourcesScannerUpdateStatus(Optional<String> folderRelativePath,
+    boolean isUpdating) {
     TransferUpdateStatus.getInstance().setUpdatingStatus(folderRelativePath, isUpdating);
   }
 
@@ -1108,60 +1124,25 @@ public class RodaCoreFactory {
 
   public static void clearRodaCachableObjectsAfterConfigurationChange() {
     rodaPropertiesCache.clear();
-    rodaSchemasCache.clear();
-    i18nMessages.clear();
+    RODA_SCHEMAS_CACHE.invalidateAll();
+    I18N_CACHE.invalidateAll();
     LOGGER.info("Reloaded roda configurations after file change!");
   }
 
   public static Optional<Schema> getRodaSchema(String metadataType, String metadataVersion) {
-    Optional<Schema> schema = Optional.empty();
-    InputStream schemaStream = null;
 
-    String type = metadataType != null ? metadataType.toLowerCase() : "";
-    String version = metadataVersion != null ? metadataVersion.toLowerCase() : "";
-    String schemaPathWithVersion = RodaConstants.CORE_SCHEMAS_FOLDER + "/" + type
-      + RodaConstants.METADATA_VERSION_SEPARATOR + version + ".xsd";
-    String schemaPathWithoutVersion = RodaConstants.CORE_SCHEMAS_FOLDER + "/" + type + ".xsd";
-
-    if (rodaSchemasCache.containsKey(schemaPathWithVersion)) {
-      schema = Optional.ofNullable(rodaSchemasCache.get(schemaPathWithVersion));
-    } else if (rodaSchemasCache.containsKey(schemaPathWithoutVersion)) {
-      schema = Optional.ofNullable(rodaSchemasCache.get(schemaPathWithoutVersion));
-    } else {
-
-      if (!"".equals(type)) {
-        boolean withVersion = true;
-        synchronized (rodaSchemasCache) {
-          if (!"".equals(version)) {
-            LOGGER.debug("Trying to load XML Schema '{}'", schemaPathWithVersion);
-            schemaStream = RodaCoreFactory.getConfigurationFileAsStream(schemaPathWithVersion);
-          }
-
-          if (schemaStream == null) {
-            LOGGER.debug("Trying to load XML Schema '{}'", schemaPathWithoutVersion);
-            schemaStream = RodaCoreFactory.getConfigurationFileAsStream(schemaPathWithoutVersion);
-            withVersion = false;
-          }
-
-          if (schemaStream != null) {
-            // FIXME 20160531 hsilva: what about 1.1 xsds???
-            SchemaFactory schemaFactory = SchemaFactory.newInstance(RodaConstants.W3C_XML_SCHEMA_NS_URI);
-            schemaFactory.setResourceResolver(new ResourceResolver());
-            try {
-              Schema xmlSchema = schemaFactory.newSchema(new StreamSource(schemaStream));
-              rodaSchemasCache.put(withVersion ? schemaPathWithVersion : schemaPathWithoutVersion, xmlSchema);
-              schema = Optional.ofNullable(xmlSchema);
-            } catch (SAXException e) {
-              LOGGER.error("Error while loading XML Schema", e);
-            } finally {
-              RodaUtils.closeQuietly(schemaStream);
-            }
-          }
-        }
+    Optional<Schema> schema;
+    try {
+      schema = RODA_SCHEMAS_CACHE.get(Pair.create(metadataType, metadataVersion));
+      if (!schema.isPresent() && StringUtils.isNotBlank(metadataVersion)) {
+        // try without version
+        schema = RODA_SCHEMAS_CACHE.get(Pair.create(metadataType, metadataVersion));
       }
+    } catch (ExecutionException e) {
+      LOGGER.error("Error while loading XML Schema", e);
+      schema = Optional.empty();
     }
     return schema;
-
   }
 
   public static Configuration getRodaConfiguration() {
@@ -1266,12 +1247,12 @@ public class RodaCoreFactory {
 
   public static Messages getI18NMessages(Locale locale) {
     checkForChangesInI18N();
-    Messages messages = i18nMessages.get(locale);
-    if (messages == null) {
-      messages = new Messages(locale, getConfigPath().resolve(RodaConstants.CORE_I18N_FOLDER));
-      i18nMessages.put(locale, messages);
+    try {
+      return I18N_CACHE.get(locale);
+    } catch (ExecutionException e) {
+      LOGGER.debug("Could not load messages", e);
+      return null;
     }
-    return messages;
   }
 
   private static void checkForChangesInI18N() {
