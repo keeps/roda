@@ -17,21 +17,52 @@
 <?xml version="1.0"?>
 <simpledc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	  xsi:noNamespaceSchemaLocation="../schemas/dc.xsd">
-	<title>{{title}}</title>
+	{{~#if title~}}		
+		<title>{{title}}</title>
+	{{~/if~}}
+	{{~#if id~}}	
 	<identifier>{{id}}</identifier>
+	{{~/if~}}
+	{{~#if creator~}}	
 	<creator>{{creator}}</creator>
+	{{~/if~}}
+	{{~#if dateInitial~}}	
 	<date>{{dateInitial}}</date>
+	{{~/if~}}
+	{{~#if dateFinal~}}	
 	<date>{{dateFinal}}</date>
+	{{~/if~}}
+	{{~#if description~}}	
 	<description>{{description}}</description>
+	{{~/if~}}
+	{{~#if producer~}}	
 	<publisher>{{producer}}</publisher>
+	{{~/if~}}
+	{{~#if contributor~}}	
 	<contributor>{{contributor}}</contributor>
+	{{~/if~}}
+	{{~#if rights~}}	
 	<rights>{{rights}}</rights>
+	{{~/if~}}
+	{{~#if language~}}	
 	<language>{{language}}</language>
+	{{~/if~}}
+	{{~#if coverage~}}	
 	<coverage>{{coverage}}</coverage>
+	{{~/if~}}
+	{{~#if format~}}	
 	<format>{{format}}</format>
+	{{~/if~}}
+	{{~#if relation~}}	
 	<relation>{{relation}}</relation>
+	{{~/if~}}
+	{{~#if subject~}}	
 	<subject>{{subject}}</subject>
+	{{~/if~}}
+	{{~#if type~}}	
 	<type>{{type}}</type>
+	{{~/if~}}
+	{{~#if source~}}	
 	<source>{{source}}</source>
+	{{~/if~}}
 </simpledc>
-    

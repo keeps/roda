@@ -7,34 +7,71 @@
  */
 package org.roda.core.common.validation;
 
-import java.io.IOException;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Paths;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+
 public class ResourceResolver implements LSResourceResolver {
+
+  private static CacheLoader<String, byte[]> loader = new CacheLoader<String, byte[]>() {
+
+    @Override
+    public byte[] load(String href) throws Exception {
+      InputStream in = null;
+      ByteArrayOutputStream out = null;
+      try {
+        String filename = href;
+        try{
+          filename = Paths.get(URI.create(href)).getFileName().toString();
+        }catch(IllegalArgumentException e){
+          try {
+          filename = Paths.get(href).getFileName().toString();
+          } catch (InvalidPathException e2) {
+            // nothing to do
+          }
+        }
+        in = RodaCoreFactory.getConfigurationFileAsStream(RodaConstants.CORE_SCHEMAS_FOLDER + "/" + filename);
+
+        out = new ByteArrayOutputStream();
+        IOUtils.copy(in, out);
+
+        return out.toByteArray();
+      } finally {
+        IOUtils.closeQuietly(in);
+        IOUtils.closeQuietly(out);
+      }
+    }
+
+  };
+  private static LoadingCache<String, byte[]> cache = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES)
+    .build(loader);
 
   @Override
   public LSInput resolveResource(String type, String namespaceURI, String publicId, String systemId, String baseURI) {
     InputStream resourceAsStream = null;
     try {
-      if (StringUtils.isNotBlank(systemId) && systemId.startsWith("http")) {
-        URL url = new URL(systemId);
-        resourceAsStream = url.openStream();
-      }
-    } catch (IOException e) {
-      // try to fallback to file
+      byte[] in = cache.get(systemId);
+      resourceAsStream = new ByteArrayInputStream(in);
+    } catch (ExecutionException e) {
+      resourceAsStream = null;
     }
-    if (resourceAsStream == null) {
-      resourceAsStream = RodaCoreFactory
-        .getConfigurationFileAsStream(RodaConstants.CORE_SCHEMAS_FOLDER + "/" + systemId);
-    }
-    return new Input(publicId, systemId, resourceAsStream);
+    return resourceAsStream == null ? null : new Input(publicId, systemId, resourceAsStream);
+
   }
 
 }
