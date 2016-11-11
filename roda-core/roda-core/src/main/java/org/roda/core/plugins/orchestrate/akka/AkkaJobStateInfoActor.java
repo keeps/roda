@@ -42,19 +42,24 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
   private ActorRef jobsManager;
   private ActorRef workersRouter;
   boolean stopping = false;
+  private String jobId;
 
-  public AkkaJobStateInfoActor(Plugin<?> plugin, ActorRef jobCreator, ActorRef jobsManager, int numberOfJobsWorkers) {
+  public AkkaJobStateInfoActor(Plugin<?> plugin, ActorRef jobCreator, ActorRef jobsManager, String jobId,
+    int numberOfJobsWorkers) {
     super();
     jobInfo = new JobInfo();
     this.plugin = plugin;
     this.jobCreator = jobCreator;
     this.jobsManager = jobsManager;
+    this.jobId = jobId;
 
     LOGGER.debug("Starting AkkaJobStateInfoActor router with {} actors", numberOfJobsWorkers);
     Props workersProps = new RoundRobinPool(numberOfJobsWorkers).props(Props.create(AkkaWorkerActor.class));
     workersRouter = getContext().actorOf(workersProps, "WorkersRouter");
     // 20160914 hsilva: watch child events, so when they stop we can react
     getContext().watch(workersRouter);
+
+    JobsHelper.createJobWorkingDirectory(jobId);
   }
 
   @Override
@@ -105,6 +110,7 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
       // execution of a job (i.e. for testing purposes)
       jobCreator.tell("Done", getSelf());
       jobsManager.tell(new Messages.JobsManagerJobEnded(), getSelf());
+      JobsHelper.deleteJobWorkingDirectory(jobId);
       getContext().stop(getSelf());
     }
     message.logProcessingEnded();

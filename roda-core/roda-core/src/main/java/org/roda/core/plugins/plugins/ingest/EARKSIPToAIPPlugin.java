@@ -107,6 +107,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
     Report report = PluginHelper.initPluginReport(this);
     String jobId = PluginHelper.getJobId(this);
     String parentIdFromParameters = PluginHelper.getParentIdFromParameters(this);
+    Path jobWorkingDirectory = PluginHelper.getJobWorkingDirectory(this);
 
     for (TransferredResource transferredResource : list) {
       Report reportItem = PluginHelper.initPluginReportItem(this, transferredResource);
@@ -115,7 +116,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
       LOGGER.debug("Converting {} to AIP", earkSIPPath);
 
       transformTransferredResourceIntoAnAIP(index, model, storage, transferredResource, earkSIPPath, createSubmission,
-        reportItem, jobId, parentIdFromParameters);
+        reportItem, jobId, parentIdFromParameters, jobWorkingDirectory);
       report.addReport(reportItem);
 
       PluginHelper.createJobReport(this, model, reportItem);
@@ -126,10 +127,10 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
 
   private void transformTransferredResourceIntoAnAIP(IndexService index, ModelService model, StorageService storage,
     TransferredResource transferredResource, Path earkSIPPath, boolean createSubmission, Report reportItem,
-    String jobId, String parentIdFromParameters) {
+    String jobId, String parentIdFromParameters, Path jobWorkingDirectory) {
     SIP sip = null;
     try {
-      sip = EARKSIP.parse(earkSIPPath, RodaCoreFactory.getWorkingDirectory());
+      sip = EARKSIP.parse(earkSIPPath, jobWorkingDirectory);
 
       reportItem.setSourceObjectOriginalIds(sip.getIds());
 

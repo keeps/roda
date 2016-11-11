@@ -7,6 +7,9 @@
  */
 package org.roda.core.plugins.orchestrate;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -47,6 +50,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.akka.Messages;
 import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -396,6 +400,24 @@ public final class JobsHelper {
       } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
         LOGGER.error("Error doing deleting AIP during Job cleanup", e);
       }
+    }
+  }
+
+  public static void createJobWorkingDirectory(String jobId) {
+    Path path = RodaCoreFactory.getWorkingDirectory().resolve(jobId);
+    try {
+      Files.createDirectory(path);
+    } catch (IOException e) {
+      LOGGER.error("Error while creating job working directory (path='{}')", path);
+    }
+  }
+
+  public static void deleteJobWorkingDirectory(String jobId) {
+    Path path = RodaCoreFactory.getWorkingDirectory().resolve(jobId);
+    try {
+      FSUtils.deletePath(path);
+    } catch (NotFoundException | GenericException e) {
+      LOGGER.error("Error while deleting job working directory (path='{}')", path);
     }
   }
 

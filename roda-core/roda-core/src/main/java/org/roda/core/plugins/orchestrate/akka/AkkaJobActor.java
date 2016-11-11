@@ -68,7 +68,7 @@ public class AkkaJobActor extends AkkaBaseActor {
 
       String jobId = job.getId();
       ActorRef jobStateInfoActor = getContext().actorOf(Props.create(AkkaJobStateInfoActor.class, plugin, getSender(),
-        jobsManager, JobsHelper.getNumberOfJobsWorkers()), jobId);
+        jobsManager, jobId, JobsHelper.getNumberOfJobsWorkers()), jobId);
       super.getPluginOrchestrator().setJobContextInformation(jobId, jobStateInfoActor);
 
       jobStateInfoActor.tell(new Messages.JobStateUpdated(plugin, JOB_STATE.STARTED), getSelf());

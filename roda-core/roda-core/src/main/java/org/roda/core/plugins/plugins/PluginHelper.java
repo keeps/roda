@@ -308,6 +308,10 @@ public final class PluginHelper {
 
   }
 
+  public static <T extends IsRODAObject> Path getJobWorkingDirectory(Plugin<T> plugin) {
+    return RodaCoreFactory.getWorkingDirectory().resolve(getJobId(plugin));
+  }
+
   /**
    * Updates the job status for a particular plugin instance
    */
