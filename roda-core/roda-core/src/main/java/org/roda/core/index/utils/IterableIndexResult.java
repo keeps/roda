@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.apache.solr.client.solrj.SolrClient;
@@ -103,6 +104,7 @@ public class IterableIndexResult<T extends IsIndexed> implements Iterable<T> {
     } catch (GenericException | RequestNotValidException e) {
       // just set index result to null & let iterator return proper values
       indexResult = null;
+      LOGGER.error("Error while retrieving partial list of results", e);
     }
   }
 
@@ -121,21 +123,29 @@ public class IterableIndexResult<T extends IsIndexed> implements Iterable<T> {
 
       @Override
       public T next() {
-        final T t = indexResultObjects.get(currentObjectInPartialList);
-        currentObject += 1;
-        currentObjectInPartialList += 1;
-        if (LOGGER.isTraceEnabled()) {
-          LOGGER.trace("({} of {}) Returning object of class '{}' with id '{}'", currentObject, totalObjects,
-            returnClass.getSimpleName(), t.getUUID());
-        }
+        try {
+          final T t = indexResultObjects.get(currentObjectInPartialList);
+          currentObject += 1;
+          currentObjectInPartialList += 1;
+          if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("({} of {}) Returning object of class '{}' with id '{}'", currentObject, totalObjects,
+              returnClass.getSimpleName(), t.getUUID());
+          }
 
-        // see if a new page needs to be obtained
-        if (currentObjectInPartialList == indexResultObjects.size()) {
-          getResults(sublist.setFirstElementIndex(sublist.getFirstElementIndex() + PAGE_SIZE));
-          currentObjectInPartialList = 0;
-        }
+          // see if a new page needs to be obtained
+          if (currentObjectInPartialList == indexResultObjects.size()) {
+            getResults(sublist.setFirstElementIndex(sublist.getFirstElementIndex() + PAGE_SIZE));
+            currentObjectInPartialList = 0;
+          }
 
-        return t;
+          return t;
+        } catch (IndexOutOfBoundsException e) {
+          LOGGER.error(
+            "Error while processing next element. filter='{}'; sorter='{}'; sublist='{}'; justActive='{}'; removeDuplicates='{}'; currentObjectInPartialList='{}'; currentObject='{}'; totalObjects='{}'",
+            filter, sorter, sublist, justActive, removeDuplicates, currentObjectInPartialList, currentObject,
+            totalObjects, e);
+          throw new NoSuchElementException("Error while processing next element");
+        }
       }
     };
   }
