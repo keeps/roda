@@ -108,4 +108,14 @@ public class SoxConvertPlugin<T extends IsRODAObject> extends CommandConvertPlug
     return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CONVERSION);
   }
 
+  @Override
+  public String getDIPTitle() {
+    return "Sox DIP title";
+  }
+
+  @Override
+  public String getDIPDescription() {
+    return "Sox DIP description";
+  }
+
 }

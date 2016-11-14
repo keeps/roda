@@ -171,8 +171,8 @@ public class MediaInfoPlugin extends AbstractPlugin<AIP> {
           }
 
           try {
-            PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, null, reportItem.getPluginState(),
-              "", true);
+            PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, new ArrayList<LinkingIdentifier>(),
+              reportItem.getPluginState(), "", true);
           } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
             | AuthorizationDeniedException | AlreadyExistsException e) {
             LOGGER.error("Error creating event: " + e.getMessage(), e);
@@ -252,7 +252,7 @@ public class MediaInfoPlugin extends AbstractPlugin<AIP> {
   // TODO FIX
   @Override
   public PreservationEventType getPreservationEventType() {
-    return null;
+    return PreservationEventType.METADATA_EXTRACTION;
   }
 
   @Override

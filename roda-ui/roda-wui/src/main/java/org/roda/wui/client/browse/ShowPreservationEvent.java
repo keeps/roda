@@ -118,6 +118,8 @@ public class ShowPreservationEvent extends Composite {
   Label eventDetailLabel;
 
   @UiField
+  Label agentsHeader;
+  @UiField
   FlowPanel agentsPanel;
 
   @UiField
@@ -206,14 +208,18 @@ public class ShowPreservationEvent extends Composite {
 
     // AGENTS
     Map<String, IndexedPreservationAgent> agents = bundle.getAgents();
+    boolean hasAgents = false;
 
     for (LinkingIdentifier agentId : event.getLinkingAgentIds()) {
       IndexedPreservationAgent agent = agents.get(agentId.getValue());
       if (agent != null) {
         FlowPanel layout = createAgentPanel(agentId, agent);
         agentsPanel.add(layout);
+        hasAgents = true;
       }
     }
+
+    agentsHeader.setVisible(hasAgents);
 
     // Source objects
     boolean showSourceObjects = false;

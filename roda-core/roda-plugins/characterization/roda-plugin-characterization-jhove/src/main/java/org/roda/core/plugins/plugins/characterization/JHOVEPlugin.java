@@ -112,7 +112,7 @@ public class JHOVEPlugin extends AbstractPlugin<AIP> {
                     StoragePath storagePath = ModelUtils.getFileStoragePath(file);
                     Binary binary = storage.getBinary(storagePath);
 
-                    Path jhoveResults = JHOVEPluginUtils.runJhove(file, binary, getParameterValues());
+                    Path jhoveResults = JHOVEPluginUtils.runJhove(binary, getParameterValues());
                     ContentPayload payload = new FSPathContentPayload(jhoveResults);
                     model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), ".xml",
                       RodaConstants.OTHER_METADATA_TYPE_JHOVE, payload, inotify);
@@ -191,7 +191,7 @@ public class JHOVEPlugin extends AbstractPlugin<AIP> {
   // TODO FIX
   @Override
   public PreservationEventType getPreservationEventType() {
-    return null;
+    return PreservationEventType.METADATA_EXTRACTION;
   }
 
   @Override

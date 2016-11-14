@@ -17,11 +17,8 @@ import java.util.List;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class MediaInfoPluginUtils {
-  private static final Logger LOGGER = LoggerFactory.getLogger(MediaInfoPluginUtils.class);
 
   private static List<String> getBatchCommand(Path sourceDirectory) {
     Path mediaInfoHome = Paths.get(RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "mediainfo", "path"));

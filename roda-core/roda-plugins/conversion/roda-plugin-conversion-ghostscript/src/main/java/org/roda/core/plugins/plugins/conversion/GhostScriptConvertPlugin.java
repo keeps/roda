@@ -113,4 +113,14 @@ public class GhostScriptConvertPlugin<T extends IsRODAObject> extends CommandCon
     return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CONVERSION);
   }
 
+  @Override
+  public String getDIPTitle() {
+    return "Ghostscript DIP title";
+  }
+
+  @Override
+  public String getDIPDescription() {
+    return "Ghostscript DIP description";
+  }
+
 }

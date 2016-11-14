@@ -46,6 +46,11 @@ public class PdfToPdfaPlugin<T extends IsRODAObject> extends AbstractConvertPlug
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_IGNORE_VERAPDF_VALIDATION,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_IGNORE_VERAPDF_VALIDATION, "Use veraPDF validation",
         PluginParameterType.BOOLEAN, "true", false, false, "Use veraPDF validation and metadata fixing."));
+
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP, new PluginParameter(
+      RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP, "Convert to a DIP", PluginParameterType.BOOLEAN, "true", false,
+      false,
+      "If this is selected then the plugin will convert the files to a new DIP. If not, a new representation will be created."));
   }
 
   public PdfToPdfaPlugin() {
@@ -59,6 +64,7 @@ public class PdfToPdfaPlugin<T extends IsRODAObject> extends AbstractConvertPlug
     List<PluginParameter> parameters = new ArrayList<PluginParameter>();
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_IGNORE_VERAPDF_VALIDATION));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP));
     return parameters;
   }
 
@@ -158,6 +164,16 @@ public class PdfToPdfaPlugin<T extends IsRODAObject> extends AbstractConvertPlug
   @Override
   public List<String> getCategories() {
     return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CONVERSION);
+  }
+
+  @Override
+  public String getDIPTitle() {
+    return "PdfToPdfa DIP title";
+  }
+
+  @Override
+  public String getDIPDescription() {
+    return "PdfToPdfa DIP description";
   }
 
 }

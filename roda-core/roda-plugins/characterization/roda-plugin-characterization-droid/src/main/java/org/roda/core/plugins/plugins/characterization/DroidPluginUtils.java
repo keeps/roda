@@ -17,11 +17,8 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DroidPluginUtils {
-  private static final Logger LOGGER = LoggerFactory.getLogger(DroidPluginUtils.class);
 
   private static List<String> getBatchCommand(Path sourceDirectory) {
     Path rodaHome = RodaCoreFactory.getRodaHomePath();

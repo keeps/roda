@@ -164,4 +164,14 @@ public class AvconvConvertPlugin<T extends IsRODAObject> extends CommandConvertP
   public List<String> getCategories() {
     return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CONVERSION);
   }
+
+  @Override
+  public String getDIPTitle() {
+    return "Avconv DIP title";
+  }
+
+  @Override
+  public String getDIPDescription() {
+    return "Avconv DIP description";
+  }
 }

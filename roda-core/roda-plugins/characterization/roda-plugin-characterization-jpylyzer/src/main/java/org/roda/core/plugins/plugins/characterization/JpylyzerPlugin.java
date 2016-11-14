@@ -115,7 +115,7 @@ public class JpylyzerPlugin extends AbstractPlugin<AIP> {
                       StoragePath storagePath = ModelUtils.getFileStoragePath(file);
                       Binary binary = storage.getBinary(storagePath);
 
-                      String jpylyzerResults = JpylyzerPluginUtils.runJpylyzer(file, binary, getParameterValues());
+                      String jpylyzerResults = JpylyzerPluginUtils.runJpylyzer(binary, getParameterValues());
                       ContentPayload payload = new StringContentPayload(jpylyzerResults);
                       model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(),
                         ".xml", "jpylyzer", payload, inotify);
@@ -196,7 +196,7 @@ public class JpylyzerPlugin extends AbstractPlugin<AIP> {
   // TODO FIX
   @Override
   public PreservationEventType getPreservationEventType() {
-    return null;
+    return PreservationEventType.METADATA_EXTRACTION;
   }
 
   @Override

@@ -96,4 +96,14 @@ public class GeneralCommandConvertPlugin<T extends IsRODAObject> extends Command
     return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
   }
 
+  @Override
+  public String getDIPTitle() {
+    return "Command DIP title";
+  }
+
+  @Override
+  public String getDIPDescription() {
+    return "Command DIP description";
+  }
+
 }

@@ -653,6 +653,7 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_REPORTING_CLASS = "parameter.reporting_class";
   public static final String PLUGIN_PARAMS_HAS_COMPRESSION = "parameter.has_compression";
   public static final String PLUGIN_PARAMS_HAS_SINGLE_REQUEST = "parameter.has_single_request";
+  public static final String PLUGIN_PARAMS_REPRESENTATION_OR_DIP = "parameter.representation_or_dip";
 
   public static final String PLUGIN_CLASS_DIGITAL_SIGNATURE = "org.roda.core.plugins.plugins.validation.DigitalSignaturePlugin";
   public static final String PLUGIN_CLASS_VERAPDF = "org.roda.core.plugins.plugins.validation.VeraPDFPlugin";

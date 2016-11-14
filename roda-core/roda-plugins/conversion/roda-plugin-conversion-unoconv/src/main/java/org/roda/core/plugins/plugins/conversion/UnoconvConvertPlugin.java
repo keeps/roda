@@ -109,4 +109,14 @@ public class UnoconvConvertPlugin<T extends IsRODAObject> extends CommandConvert
     return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CONVERSION);
   }
 
+  @Override
+  public String getDIPTitle() {
+    return "Unoconv DIP title";
+  }
+
+  @Override
+  public String getDIPDescription() {
+    return "Unoconv DIP description";
+  }
+
 }

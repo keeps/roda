@@ -233,8 +233,8 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
                     IOUtils.closeQuietly(directAccess);
 
                     if (!pluginResultState.equals(PluginState.SUCCESS)) {
-                      reportItem
-                        .addPluginDetails(" VeraPDF validation failed on " + fileInfoPath.replace("//", "/") + ".");
+                      reportItem.addPluginDetails(
+                        "VeraPDF validation failed on " + fileInfoPath.replace("//", "/").replace("/[]/", "/") + ".\n");
                     }
                   } else {
                     if (ignoreFiles) {
@@ -262,7 +262,8 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
             LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
             pluginResultState = PluginState.FAILURE;
             reportState = PluginState.FAILURE;
-            reportItem.addPluginDetails(" VeraPDF validation execution failed.");
+            reportItem.addPluginDetails(
+              "VeraPDF validation execution failed on representation " + representation.getId() + ".\n");
           }
         }
 
@@ -368,8 +369,8 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
                   IOUtils.closeQuietly(directAccess);
 
                   if (!pluginResultState.equals(PluginState.SUCCESS)) {
-                    reportItem
-                      .addPluginDetails(" VeraPDF validation failed on " + fileInfoPath.replace("//", "/") + ".");
+                    reportItem.addPluginDetails(
+                      "VeraPDF validation failed on " + fileInfoPath.replace("//", "/").replace("/[]/", "/") + ".\n");
                   }
                 } else {
                   if (ignoreFiles) {
@@ -481,7 +482,8 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
                 }
 
                 if (!pluginResultState.equals(PluginState.SUCCESS)) {
-                  reportItem.addPluginDetails(" VeraPDF validation failed on " + file.getId().replace("//", "/") + ".");
+                  reportItem
+                    .addPluginDetails("VeraPDF validation failed on " + file.getId().replace("//", "/") + ".\n");
                 }
 
               } else {

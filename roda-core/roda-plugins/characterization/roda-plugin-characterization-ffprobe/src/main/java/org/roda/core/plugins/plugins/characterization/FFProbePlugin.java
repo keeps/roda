@@ -117,7 +117,7 @@ public class FFProbePlugin extends AbstractPlugin<AIP> {
                     StoragePath storagePath = ModelUtils.getFileStoragePath(file);
                     Binary binary = storage.getBinary(storagePath);
 
-                    String ffProbeResults = FFProbePluginUtils.runFFProbe(file, binary, getParameterValues());
+                    String ffProbeResults = FFProbePluginUtils.runFFProbe(binary, getParameterValues());
                     ContentPayload payload = new StringContentPayload(ffProbeResults);
                     // TODO support file path
                     model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), ".xml",

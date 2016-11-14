@@ -22,13 +22,19 @@ public class UnoconvConvertPluginUtils {
     throws CommandException, IOException, UnsupportedOperationException {
 
     String command = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "unoconvconvert", "commandLine");
-    command = command.replace("{input_file}", input.toString());
+    // command = command.replace("{input_file}", input.toString());
     command = command.replace("{output_file}", output.toString());
     command = command.replace("{output_format}", outputFormat);
     command = command.replace("{arguments}", commandArguments);
 
     // filling a list of the command line arguments
     List<String> commandList = Arrays.asList(command.split("\\s+"));
+
+    for (int i = 0; i < commandList.size(); i++) {
+      if (commandList.get(i).equals("{input_file}")) {
+        commandList.set(i, input.toString());
+      }
+    }
 
     // running the command
     return CommandUtility.execute(commandList);

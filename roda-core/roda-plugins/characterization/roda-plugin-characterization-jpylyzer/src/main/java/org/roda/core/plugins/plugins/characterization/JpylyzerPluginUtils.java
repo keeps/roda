@@ -23,11 +23,8 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.storage.Binary;
 import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class JpylyzerPluginUtils {
-  private static final Logger LOGGER = LoggerFactory.getLogger(JpylyzerPluginUtils.class);
 
   public static String inspect(File f) throws RODAException {
     try {
@@ -57,8 +54,8 @@ public class JpylyzerPluginUtils {
     return command;
   }
 
-  public static String runJpylyzer(org.roda.core.data.v2.ip.File file, Binary binary,
-    Map<String, String> parameterValues) throws IOException, RODAException {
+  public static String runJpylyzer(Binary binary, Map<String, String> parameterValues)
+    throws IOException, RODAException {
     // TODO f is not deleted in runtime
     // TODO use storage method to get direct access to file
     java.io.File f = File.createTempFile("temp", ".temp");

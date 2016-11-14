@@ -21,8 +21,8 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.wui.client.browse.Browse;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.BrowseFile;
+import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -31,8 +31,8 @@ import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.process.IngestProcess;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Humanize;
-import org.roda.wui.common.client.tools.StringUtility;
 import org.roda.wui.common.client.tools.Humanize.DHMSFormat;
+import org.roda.wui.common.client.tools.StringUtility;
 import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.core.client.GWT;
@@ -151,17 +151,19 @@ public class ShowJobReport extends Composite {
 
     job.setText(jobReport.getJobId());
     job.setHref(Tools.createHistoryHashLink(ShowJob.RESOLVER, jobReport.getJobId()));
+    outcomeObjectState.setVisible(false);
 
     boolean hasSource = true;
     if (!jobReport.getSourceObjectOriginalIds().isEmpty() || !jobReport.getSourceObjectId().isEmpty()) {
-      sourceObject.setText(!jobReport.getSourceObjectOriginalIds().isEmpty() ? StringUtility.prettyPrint(jobReport.getSourceObjectOriginalIds())
-        : jobReport.getSourceObjectId());
+      sourceObject.setText(!jobReport.getSourceObjectOriginalIds().isEmpty()
+        ? StringUtility.prettyPrint(jobReport.getSourceObjectOriginalIds()) : jobReport.getSourceObjectId());
       if (!jobReport.getSourceObjectClass().isEmpty())
         sourceObject.setTitle(jobReport.getSourceObjectOriginalName());
 
       if (TransferredResource.class.getName().equals(jobReport.getSourceObjectClass())) {
         sourceObject.setHref(Tools.createHistoryHashLink(IngestTransfer.RESOLVER, jobReport.getSourceObjectId()));
         sourceObjectLabel.setText(messages.showSIPExtended());
+        outcomeObjectState.setVisible(true);
 
       } else if (AIP.class.getName().equals(jobReport.getSourceObjectClass())) {
         sourceObject.setHref(Tools.createHistoryHashLink(Browse.RESOLVER, sourceObject.getText()));
@@ -200,9 +202,8 @@ public class ShowJobReport extends Composite {
             public void onSuccess(IndexedFile result) {
               if (result != null) {
                 sourceObjectLabel.setText(messages.showFileExtended());
-                sourceObject
-                  .setHref(Tools.createHistoryHashLink(Browse.RESOLVER, BrowseFile.RESOLVER.getHistoryToken(),
-                    result.getAipId(), result.getRepresentationUUID(), result.getUUID()));
+                sourceObject.setHref(Tools.createHistoryHashLink(Browse.RESOLVER, BrowseFile.RESOLVER.getHistoryToken(),
+                  result.getAipId(), result.getRepresentationUUID(), result.getUUID()));
               }
             }
           });
@@ -214,7 +215,10 @@ public class ShowJobReport extends Composite {
     sourceObjectLabel.setVisible(hasSource);
     sourceObject.setVisible(hasSource);
 
-    if (StringUtils.isNotBlank(jobReport.getOutcomeObjectId())) {
+    if (StringUtils.isNotBlank(jobReport.getOutcomeObjectId())
+      && !(jobReport.getOutcomeObjectId().equals(jobReport.getSourceObjectId())
+        && jobReport.getOutcomeObjectClass().equals(jobReport.getSourceObjectClass()))) {
+
       outcomeObject.setText(jobReport.getOutcomeObjectId());
       outcomeObjectState.setHTML(HtmlSnippetUtils.getAIPStateHTML(jobReport.getOutcomeObjectState()));
 
@@ -339,7 +343,7 @@ public class ShowJobReport extends Composite {
       }
     }
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();

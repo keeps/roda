@@ -22,12 +22,18 @@ public class ImageMagickConvertPluginUtils {
     throws CommandException {
 
     String command = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "imagemagickconvert", "commandLine");
-    command = command.replace("{input_file}", input.toString());
+    // command = command.replace("{input_file}", input.toString());
     command = command.replace("{output_file}", outputFormat + ":" + output.toString());
     command = command.replace("{arguments}", commandArguments);
 
     // filling a list of the command line arguments
     List<String> commandList = Arrays.asList(command.split("\\s+"));
+
+    for (int i = 0; i < commandList.size(); i++) {
+      if (commandList.get(i).equals("{input_file}")) {
+        commandList.set(i, input.toString());
+      }
+    }
 
     // running the command
     return CommandUtility.execute(commandList);

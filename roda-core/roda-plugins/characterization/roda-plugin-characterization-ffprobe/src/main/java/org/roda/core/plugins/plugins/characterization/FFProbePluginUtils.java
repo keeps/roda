@@ -23,11 +23,8 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.storage.Binary;
 import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class FFProbePluginUtils {
-  private static final Logger LOGGER = LoggerFactory.getLogger(FFProbePluginUtils.class);
 
   public static String inspect(File f) throws RODAException {
     try {
@@ -61,8 +58,8 @@ public class FFProbePluginUtils {
     return command;
   }
 
-  public static String runFFProbe(org.roda.core.data.v2.ip.File file, Binary binary,
-    Map<String, String> parameterValues) throws IOException, RODAException {
+  public static String runFFProbe(Binary binary, Map<String, String> parameterValues)
+    throws IOException, RODAException {
     // TODO f is not deleted in runtime
     // TODO use storage method to get direct access to file
 
