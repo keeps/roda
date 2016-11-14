@@ -13,7 +13,7 @@
 
 	<g:FlowPanel>
 		<g:Label addStyleNames="label associative-label" ui:field="itemName"></g:Label>
-		<g:Anchor addStyleNames="search-field-remove toolbarLink toolbarLinkSmall" ui:field="removeDynamicTextBoxButton"></g:Anchor>
+		<g:Anchor addStyleNames="pull-right toolbarLink toolbarLinkSmall" ui:field="removeDynamicTextBoxButton"></g:Anchor>
 		<g:Button addStyleNames="search-field-dialog" ui:field="dialogButton"><i class="fa fa-search"></i></g:Button>
 		<g:TextBox addStyleNames="form-textbox" ui:field="hiddenItemId"></g:TextBox>
 	</g:FlowPanel>
