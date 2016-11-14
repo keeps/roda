@@ -10,7 +10,6 @@ package org.roda.core.common;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -28,7 +27,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
-class RodaURIResolver implements URIResolver {
+public class RodaURIFileResolver implements URIResolver {
 
   private static CacheLoader<String, byte[]> loader = new CacheLoader<String, byte[]>() {
 
@@ -37,9 +36,10 @@ class RodaURIResolver implements URIResolver {
       InputStream in = null;
       ByteArrayOutputStream out = null;
       try {
-        in = RodaCoreFactory.getConfigurationFileAsStream(RodaConstants.CROSSWALKS_DISSEMINATION_OTHER_PATH + href);
-        if(in==null){
-          throw new NotFoundException();
+        String filePath = RodaConstants.CROSSWALKS_DISSEMINATION_OTHER_PATH + href;
+        in = RodaCoreFactory.getConfigurationFileAsStream(filePath);
+        if (in == null) {
+          throw new NotFoundException(filePath);
         }
         out = new ByteArrayOutputStream();
         IOUtils.copy(in, out);

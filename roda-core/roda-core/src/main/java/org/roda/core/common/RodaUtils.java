@@ -190,7 +190,7 @@ public class RodaUtils {
     Writer result) throws IOException, TransformerException {
 
     TransformerFactory factory = new net.sf.saxon.TransformerFactoryImpl();
-    factory.setURIResolver(new RodaURIResolver());
+    factory.setURIResolver(new RodaURIFileResolver());
     Source xsltSource = new StreamSource(xsltReader);
     Transformer transformer = factory.newTransformer(xsltSource);
     for (Entry<String, String> parameter : parameters.entrySet()) {
@@ -292,7 +292,7 @@ public class RodaUtils {
       }
 
       XsltCompiler compiler = PROCESSOR.newXsltCompiler();
-      compiler.setURIResolver(new RodaURIResolver());
+      compiler.setURIResolver(new RodaURIFileResolver());
       // compiler.setSchemaAware(false);
       return compiler.compile(new StreamSource(transformerStream));
 

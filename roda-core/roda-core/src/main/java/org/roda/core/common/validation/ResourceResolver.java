@@ -19,6 +19,9 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
 
@@ -36,17 +39,20 @@ public class ResourceResolver implements LSResourceResolver {
       ByteArrayOutputStream out = null;
       try {
         String filename = href;
-        try{
+        try {
           filename = Paths.get(URI.create(href)).getFileName().toString();
-        }catch(IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
           try {
-          filename = Paths.get(href).getFileName().toString();
+            filename = Paths.get(href).getFileName().toString();
           } catch (InvalidPathException e2) {
             // nothing to do
           }
         }
-        in = RodaCoreFactory.getConfigurationFileAsStream(RodaConstants.CORE_SCHEMAS_FOLDER + "/" + filename);
-
+        String filePath = RodaConstants.CORE_SCHEMAS_FOLDER + "/" + filename;
+        in = RodaCoreFactory.getConfigurationFileAsStream(filePath);
+        if (in == null) {
+          throw new NotFoundException(filePath);
+        }
         out = new ByteArrayOutputStream();
         IOUtils.copy(in, out);
 
@@ -58,8 +64,11 @@ public class ResourceResolver implements LSResourceResolver {
     }
 
   };
+
   private static LoadingCache<String, byte[]> cache = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES)
     .build(loader);
+
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Override
   public LSInput resolveResource(String type, String namespaceURI, String publicId, String systemId, String baseURI) {
@@ -68,6 +77,7 @@ public class ResourceResolver implements LSResourceResolver {
       byte[] in = cache.get(systemId);
       resourceAsStream = new ByteArrayInputStream(in);
     } catch (ExecutionException e) {
+      logger.error("Error loading " + systemId, e);
       resourceAsStream = null;
     }
     return resourceAsStream == null ? null : new Input(publicId, systemId, resourceAsStream);
