@@ -19,39 +19,30 @@ Change the values to match your LDAP.
 
 1. Get CAS Overlay Template
     ```
-    git clone https://github.com/apereo/cas-overlay-template.git
+    git clone -b 4.2 https://github.com/apereo/cas-overlay-template.git
     cd cas-overlay-template
     ```
 
 2. Open file **etc/cas.properties** and edit the following parts:
 
-    **NOTE**: Change the LDAP values to match your LDAP setup.
-     
+    * Change server.name to https://localhost:8443
     ```bash
-    ...
-
     server.name=https://localhost:8443
+    ```
 
-    ...
-
-    ##
-    # CAS Logout Behavior
-    # WEB-INF/cas-servlet.xml
-    #
-    # Specify whether CAS should redirect to the specified service parameter on /logout requests
+    * Uncomment the following line and set the value to true
+    ```bash
     cas.logout.followServiceRedirects=true
+    ```
 
-    ...
-
-    ##
-    # JSON Service Registry
-    #
-    # Directory location where JSON service files may be found.
-    # service.registry.config.location=classpath:services
+    * Uncomment the following line and set the value to file:/etc/cas/services
+    ```bash
     service.registry.config.location=file:/etc/cas/services
+    ```
 
-    ...
-
+    * Add these lines with LDAP configuration
+    **NOTE**: Change the LDAP values to match your LDAP setup.
+    ```bash
     #========================================
     # LDAP General properties
     #========================================
@@ -119,36 +110,32 @@ Change the values to match your LDAP.
 
     ```json
     {
-      @class: org.jasig.cas.services.RegexRegisteredService
-      serviceId: ^http://localhost:8888/.*
-      name: RODA
-      id: 16226673791703
-      description: RODA
-      evaluationOrder: 3
-      logoutType: BACK_CHANNEL
-      attributeReleasePolicy:
-      {
-        @class: org.jasig.cas.services.ReturnAllAttributeReleasePolicy
-        principalAttributesRepository:
-        {
-          @class: org.jasig.cas.authentication.principal.DefaultPrincipalAttributesRepository
-          expiration: 2
-          timeUnit:
-          [
-            java.util.concurrent.TimeUnit
-            HOURS
+      "@class": "org.jasig.cas.services.RegexRegisteredService",
+      "serviceId": "^http://localhost:8888/.*",
+      "name": "RODA",
+      "id": "16226673791703",
+      "description": "RODA",
+      "evaluationOrder": 3,
+      "logoutType": "BACK_CHANNEL",
+      "attributeReleasePolicy": {
+        "@class": "org.jasig.cas.services.ReturnAllAttributeReleasePolicy",
+        "principalAttributesRepository": {
+          "@class": "org.jasig.cas.authentication.principal.DefaultPrincipalAttributesRepository",
+          "expiration": 2,
+          "timeUnit": [
+            "java.util.concurrent.TimeUnit",
+            "HOURS"
           ]
-        }
-        authorizedToReleaseCredentialPassword: false
-        authorizedToReleaseProxyGrantingTicket: false
-      }
-      accessStrategy:
-      {
-        @class: org.jasig.cas.services.TimeBasedRegisteredServiceAccessStrategy
-        enabled: true
-        ssoEnabled: true
-        requireAllAttributes: false
-        caseInsensitive: false
+        },
+        "authorizedToReleaseCredentialPassword": false,
+        "authorizedToReleaseProxyGrantingTicket": false
+      },
+      "accessStrategy": {
+        "@class": "org.jasig.cas.services.TimeBasedRegisteredServiceAccessStrategy",
+        "enabled": true,
+        "ssoEnabled": true,
+        "requireAllAttributes": false,
+        "caseInsensitive": false
       }
     }
     ```
@@ -170,41 +157,25 @@ Change the values to match your LDAP.
     sudo cp -r etc/* /etc/cas
     ```
 
-6. Open file **pom.xml** and edit the following parts
+6. Open file **pom.xml** and add the following dependencies
 
     ```xml
-    <?xml version="1.0" encoding="UTF-8"?>
-    <project xmlns="http://maven.apache.org/POM/4.0.0"
-             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd ">
-        ...
+    <!-- Add support for REST API -->
+    <dependency>
+        <groupId>org.jasig.cas</groupId>
+        <artifactId>cas-server-support-rest</artifactId>
+        <version>${cas.version}</version>
+        <scope>runtime</scope>
+    </dependency>
+    ```
     
-        <dependencies>
-            ...
-            <!-- Add support for REST API -->
-            <dependency>
-                <groupId>org.jasig.cas</groupId>
-                <artifactId>cas-server-support-rest</artifactId>
-                <version>${cas.version}</version>
-                <scope>runtime</scope>
-            </dependency>
-            <!-- Add support for LDAP authentication -->
-            <dependency>
-                <groupId>org.jasig.cas</groupId>
-                <artifactId>cas-server-support-ldap</artifactId>
-                <version>${cas.version}</version>
-            </dependency>
-        </dependencies>
-    
-        <properties>
-            <!-- Version 4.2.6 has a bug (https://github.com/apereo/cas/issues/2027) that affects REST API. 
-                Replace it with version 4.2.7-SNAPSHOT -->
-            <!--<cas.version>4.2.6</cas.version>-->
-            <cas.version>4.2.7-SNAPSHOT</cas.version>
-            ...
-        </properties>
-    
-    </project>
+    ```xml
+    <!-- Add support for LDAP authentication -->
+    <dependency>
+        <groupId>org.jasig.cas</groupId>
+        <artifactId>cas-server-support-ldap</artifactId>
+        <version>${cas.version}</version>
+    </dependency>
     ```
 
 7. Create file **src/main/webapp/WEB-INF/deployerConfigContext.xml** with the following contents:
