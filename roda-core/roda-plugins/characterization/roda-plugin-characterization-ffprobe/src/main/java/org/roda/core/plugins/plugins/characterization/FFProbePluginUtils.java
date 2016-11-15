@@ -26,6 +26,8 @@ import org.roda.core.util.CommandUtility;
 
 public class FFProbePluginUtils {
 
+  public static String FFPROBE_METADATA_FORMAT = "json";
+
   public static String inspect(File f) throws RODAException {
     try {
       List<String> command = getCommand();
@@ -51,19 +53,25 @@ public class FFProbePluginUtils {
           "-show_format", "-show_error", "-show_streams", "-show_chapters", "-show_private_data", "-show_versions",
           "-print_format", "xml", "-v", "quiet", "-i"));
     } else {
-      command = new ArrayList<String>(Arrays.asList(FFPROBE_DIRECTORY.getAbsolutePath() + File.separator + "ffprobe",
-        "-show_data", "-show_format", "-show_error", "-show_streams", "-show_chapters", "-show_private_data",
-        "-show_versions", "-print_format", "xml", "-v", "quiet", "-i"));
+      // command = new
+      // ArrayList<String>(Arrays.asList(FFPROBE_DIRECTORY.getAbsolutePath() +
+      // File.separator + "ffprobe",
+      // "-show_data", "-show_format", "-show_error", "-show_streams",
+      // "-show_chapters", "-show_private_data",
+      // "-show_versions", "-print_format", "xml", "-v", "quiet", "-i"));
+      command = new ArrayList<String>(
+        Arrays.asList(FFPROBE_DIRECTORY.getAbsolutePath() + File.separator + "avprobe", "-show_format", "-show_streams",
+          "-show_packets", "-of", FFProbePluginUtils.FFPROBE_METADATA_FORMAT, "-v", "quiet"));
     }
     return command;
   }
 
-  public static String runFFProbe(Binary binary, Map<String, String> parameterValues)
+  public static String runFFProbe(Binary binary, String fileFormat, Map<String, String> parameterValues)
     throws IOException, RODAException {
     // TODO f is not deleted in runtime
     // TODO use storage method to get direct access to file
 
-    java.io.File f = File.createTempFile("temp", ".temp");
+    java.io.File f = File.createTempFile("temp", "." + fileFormat);
     FileOutputStream fos = new FileOutputStream(f);
     InputStream inputStream = binary.getContent().createInputStream();
     IOUtils.copy(inputStream, fos);

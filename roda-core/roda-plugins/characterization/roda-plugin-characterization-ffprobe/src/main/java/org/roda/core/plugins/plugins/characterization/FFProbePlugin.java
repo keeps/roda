@@ -109,6 +109,8 @@ public class FFProbePlugin extends AbstractPlugin<AIP> {
                 if (oFile.isPresent()) {
                   File file = oFile.get();
                   if (!file.isDirectory()) {
+                    String fileFormat = file.getId().substring(file.getId().lastIndexOf('.') + 1,
+                      file.getId().length());
 
                     sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), representation.getId(), file.getPath(),
                       file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
@@ -117,11 +119,12 @@ public class FFProbePlugin extends AbstractPlugin<AIP> {
                     StoragePath storagePath = ModelUtils.getFileStoragePath(file);
                     Binary binary = storage.getBinary(storagePath);
 
-                    String ffProbeResults = FFProbePluginUtils.runFFProbe(binary, getParameterValues());
+                    String ffProbeResults = FFProbePluginUtils.runFFProbe(binary, fileFormat, getParameterValues());
                     ContentPayload payload = new StringContentPayload(ffProbeResults);
                     // TODO support file path
-                    model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), ".xml",
-                      RodaConstants.OTHER_METADATA_TYPE_FFPROBE, payload, inotify);
+                    model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(),
+                      "." + FFProbePluginUtils.FFPROBE_METADATA_FORMAT, RodaConstants.OTHER_METADATA_TYPE_FFPROBE,
+                      payload, inotify);
                   }
                 } else {
                   LOGGER.error("Cannot process AIP representation file", oFile.getCause());
