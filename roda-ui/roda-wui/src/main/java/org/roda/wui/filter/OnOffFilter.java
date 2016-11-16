@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
- *
+ * <p>
  * https://github.com/keeps/roda
  */
 package org.roda.wui.filter;
@@ -23,6 +23,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -138,7 +139,7 @@ public class OnOffFilter implements Filter {
 
   /**
    * Return the combined filter configuration.
-   * 
+   *
    * @return the combined filter configuration.
    */
   private FilterConfig getFilterConfig() {
@@ -172,7 +173,7 @@ public class OnOffFilter implements Filter {
 
     /**
      * Constructor.
-     * 
+     *
      * @param filterConfig
      *          default filter configuration (from web.xml).
      * @param rodaConfig
@@ -181,7 +182,12 @@ public class OnOffFilter implements Filter {
     OnOffFilterConfig(final FilterConfig filterConfig, final Configuration rodaConfig) {
       this.filterConfig = filterConfig;
       this.rodaConfig = rodaConfig;
-      this.rodaConfigPrefix = this.filterConfig.getInitParameter(PARAM_CONFIG_PREFIX);
+      final String configPrefix = this.filterConfig.getInitParameter(PARAM_CONFIG_PREFIX);
+      if (StringUtils.isBlank(configPrefix)) {
+        this.rodaConfigPrefix = String.format("ui.filter.%s", this.filterConfig.getFilterName());
+      } else {
+        this.rodaConfigPrefix = configPrefix;
+      }
     }
 
     @Override
@@ -213,7 +219,7 @@ public class OnOffFilter implements Filter {
         }
         final Iterator<String> rodaNames = this.rodaConfig.getKeys(this.rodaConfigPrefix);
         while (rodaNames.hasNext()) {
-          this.configNames.add(rodaNames.next().replace(this.rodaConfigPrefix, ""));
+          this.configNames.add(rodaNames.next().replace(this.rodaConfigPrefix + ".", ""));
         }
       }
       return Collections.enumeration(this.configNames);
