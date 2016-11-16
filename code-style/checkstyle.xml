@@ -96,9 +96,11 @@
 			<property name="lineWrappingIndentation" value="2" />
 			<property name="forceStrictCondition" value="false" />
 		</module>
+		<module name="SuppressWarningsHolder" />
 	</module>
 	<module name="FileLength" />
 	<module name="FileTabCharacter" />
 	<module name="NewlineAtEndOfFile" />
 	<module name="Translation" />
+	<module name="SuppressWarningsFilter" />
 </module>
