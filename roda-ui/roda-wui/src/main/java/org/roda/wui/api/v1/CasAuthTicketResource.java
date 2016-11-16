@@ -59,7 +59,8 @@ public class CasAuthTicketResource {
   @ApiOperation(value = "Create an authorization ticket", response = String.class)
   public Response create(@FormParam("username") final String username, @FormParam("password") final String password)
     throws GenericException {
-    final String casServerUrlPrefix = RodaCoreFactory.getRodaConfiguration().getString("ui.auth.cas.base_url");
+    final String casServerUrlPrefix = RodaCoreFactory.getRodaConfiguration()
+      .getString("ui.filter.cas.casServerUrlPrefix");
     final CasClient casClient = new CasClient(casServerUrlPrefix);
     try {
       final String tgt = casClient.getTicketGrantingTicket(username, password);

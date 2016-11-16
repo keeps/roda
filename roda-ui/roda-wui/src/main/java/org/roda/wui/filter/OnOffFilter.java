@@ -9,7 +9,6 @@ package org.roda.wui.filter;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -41,6 +40,10 @@ public class OnOffFilter implements Filter {
    */
   private static final String PARAM_INNER_FILTER_CLASS = "inner-filter-class";
   /**
+   * Configuration values prefix parameter name.
+   */
+  private static final String PARAM_CONFIG_PREFIX = "config-prefix";
+  /**
    * Inner filter to which all calls to this filter will be delegated.
    */
   private Filter innerFilter = null;
@@ -58,6 +61,7 @@ public class OnOffFilter implements Filter {
   private OnOffFilterConfig filterConfig = null;
 
   @Override
+  @SuppressWarnings("checkstyle:hiddenfield")
   public void init(final FilterConfig filterConfig) throws ServletException {
     this.webXmlFilterConfig = filterConfig;
     if (isConfigAvailable()) {
@@ -114,13 +118,13 @@ public class OnOffFilter implements Filter {
   private void initInnerFilter() throws ServletException {
     final Configuration rodaConfig = RodaCoreFactory.getRodaConfiguration();
     if (rodaConfig == null) {
-      LOGGER.info("RODA configuration not available yet. Delaying init of inner filter ("
-        + this.webXmlFilterConfig.getInitParameter(PARAM_INNER_FILTER_CLASS) + ").");
+      LOGGER.info("RODA configuration not available yet. Delaying init of "
+        + this.webXmlFilterConfig.getInitParameter(PARAM_INNER_FILTER_CLASS) + ".");
     } else {
       final String innerFilterClass = this.webXmlFilterConfig.getInitParameter(PARAM_INNER_FILTER_CLASS);
-      final List<String> activeFilters = Arrays.asList(rodaConfig.getStringArray("ui.filter"));
-      this.isOn = activeFilters.contains(getFilterConfig().getFilterName());
-      LOGGER.info("Inner filter (" + getFilterConfig().getFilterName() + ") is " + (this.isOn ? "ON" : "OFF"));
+      final String configPrefix = this.webXmlFilterConfig.getInitParameter(PARAM_CONFIG_PREFIX);
+      this.isOn = rodaConfig.getBoolean(configPrefix + ".enabled", false);
+      LOGGER.info(getFilterConfig().getFilterName() + " is " + (this.isOn ? "ON" : "OFF"));
       if (this.isOn) {
         try {
           this.innerFilter = (Filter) Class.forName(innerFilterClass).newInstance();
@@ -177,7 +181,7 @@ public class OnOffFilter implements Filter {
     OnOffFilterConfig(final FilterConfig filterConfig, final Configuration rodaConfig) {
       this.filterConfig = filterConfig;
       this.rodaConfig = rodaConfig;
-      this.rodaConfigPrefix = String.format("ui.filter.%s.", this.filterConfig.getFilterName());
+      this.rodaConfigPrefix = this.filterConfig.getInitParameter(PARAM_CONFIG_PREFIX);
     }
 
     @Override
@@ -223,7 +227,7 @@ public class OnOffFilter implements Filter {
      * @return the parameter value.
      */
     private String getRodaInitParameter(final String name) {
-      return this.rodaConfig.getString(this.rodaConfigPrefix + name);
+      return this.rodaConfig.getString(this.rodaConfigPrefix + "." + name);
     }
   }
 }
