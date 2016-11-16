@@ -23,7 +23,7 @@
 							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
 						</manifest>
 						<manifestEntries>
-							<RODA-Plugin>org.roda.core.plugins.plugins.characterization.FindUnknownFilesPlugin</RODA-Plugin>
+							<RODA-Plugin>org.roda.core.plugins.misc.FindUnknownFilesPlugin</RODA-Plugin>
 						</manifestEntries>
 					</archive>
 				</configuration>
