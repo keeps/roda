@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.findunknownfiles;
+package org.roda.core.plugins.misc;
 
 import java.util.Arrays;
 import java.util.List;
