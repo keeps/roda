@@ -67,7 +67,9 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   }
 
   public static String getStaticDescription() {
-    return "Identifies the file format and version of data files included in Information Packages using the Siegfried tool (a signature-based file format identification tool that supports PRONOM identifiers and Mimetypes).\nThe task updates PREMIS objects metadata in the Information Package to store the results of format identification. A PREMIS event is also recorded after the task is run.";
+    return "Identifies the file format and version of data files included in Information Packages using the Siegfried tool (a signature-based file format "
+      + "identification tool that supports PRONOM identifiers and Mimetypes).\nThe task updates PREMIS objects metadata in the Information Package to store "
+      + "the results of format identification. A PREMIS event is also recorded after the task is run.";
   }
 
   @Override

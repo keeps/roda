@@ -77,6 +77,10 @@
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarFoldersFilesTitle}' />
 							</g:Label>
+							<g:Button addStyleNames="btn btn-edit"
+								ui:field="identifyFormats">
+								<ui:text from='{messages.identifyFormatsButton}' />
+							</g:Button>
 							<g:Button addStyleNames="btn btn-edit" ui:field="renameFolders">
 								<ui:text from='{messages.renameButton}' />
 							</g:Button>

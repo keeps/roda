@@ -160,7 +160,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String representationId,
     String descId, String type, String version, String localeString)
-      throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Locale locale = ServerTools.parseLocale(localeString);
     return Browser.retrieveDescriptiveMetadataEditBundle(user, aipId, representationId, descId, type, version, locale);
@@ -169,7 +169,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String representationId,
     String descId, String localeString)
-      throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Locale locale = ServerTools.parseLocale(localeString);
     return Browser.retrieveDescriptiveMetadataEditBundle(user, aipId, representationId, descId, locale);
@@ -178,7 +178,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public <T extends IsIndexed> IndexResult<T> find(String classNameToReturn, Filter filter, Sorter sorter,
     Sublist sublist, Facets facets, String localeString, boolean justActive)
-      throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     try {
       User user = UserUtility.getUser(getThreadLocalRequest());
       Class<T> classToReturn = SelectedItemsUtils.parseClass(classNameToReturn);
@@ -553,7 +553,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public DescriptiveMetadataVersionsBundle retrieveDescriptiveMetadataVersionsBundle(String aipId,
     String representationId, String descriptiveMetadataId, String localeString)
-      throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Locale locale = ServerTools.parseLocale(localeString);
     return Browser.retrieveDescriptiveMetadataVersionsBundle(user, aipId, representationId, descriptiveMetadataId,
@@ -563,7 +563,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public void revertDescriptiveMetadataVersion(String aipId, String representationId, String descriptiveMetadataId,
     String versionId)
-      throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Browser.revertDescriptiveMetadataVersion(user, aipId, representationId, descriptiveMetadataId, versionId);
   }
@@ -571,7 +571,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public void deleteDescriptiveMetadataVersion(String aipId, String representationId, String descriptiveMetadataId,
     String versionId)
-      throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Browser.deleteDescriptiveMetadataVersion(user, aipId, representationId, descriptiveMetadataId, versionId);
   }
@@ -683,7 +683,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public <T extends IsIndexed> Job createProcess(String jobName, SelectedItems<T> selected, String id,
     Map<String, String> value, String selectedClass) throws AuthorizationDeniedException, RequestNotValidException,
-      NotFoundException, GenericException, JobAlreadyStartedException {
+    NotFoundException, GenericException, JobAlreadyStartedException {
 
     User user = UserUtility.getUser(getThreadLocalRequest());
 
@@ -758,7 +758,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public String moveFiles(String aipId, String representationUUID, SelectedItems<IndexedFile> selectedFiles,
     IndexedFile toFolder) throws AuthorizationDeniedException, GenericException, RequestNotValidException,
-      AlreadyExistsException, NotFoundException {
+    AlreadyExistsException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.moveFiles(user, aipId, representationUUID, selectedFiles, toFolder);
   }
@@ -810,7 +810,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public void updateMultipleIncidences(SelectedItems<RiskIncidence> selected, String status, String severity,
     Date mitigatedOn, String mitigatedBy, String mitigatedDescription)
-      throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Browser.updateMultipleIncidences(user, selected, status, severity, mitigatedOn, mitigatedBy, mitigatedDescription);
   }
@@ -822,6 +822,13 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     String representationId = UUID.randomUUID().toString();
     Browser.createRepresentation(user, aipId, representationId, RepresentationContentType.getMIXED().asString());
     return IdUtils.getRepresentationId(aipId, representationId);
+  }
+
+  @Override
+  public void createFormatIdentificationJob(SelectedItems selected)
+    throws GenericException, AuthorizationDeniedException, JobAlreadyStartedException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Browser.createFormatIdentificationJob(user, selected);
   }
 
 }

@@ -2331,4 +2331,19 @@ public class Browser extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_SELECTED_PARAM, files);
   }
 
+  public static void createFormatIdentificationJob(User user, SelectedItems selected)
+    throws GenericException, AuthorizationDeniedException, JobAlreadyStartedException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    BrowserHelper.createFormatIdentificationJob(user, selected);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_SELECTED_PARAM,
+      selected);
+  }
+
 }

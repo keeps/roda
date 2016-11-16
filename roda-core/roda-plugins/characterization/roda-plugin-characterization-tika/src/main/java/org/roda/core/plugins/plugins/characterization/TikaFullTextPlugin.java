@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -22,10 +23,13 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.RepresentationLink;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
@@ -44,7 +48,7 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
+public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(TikaFullTextPlugin.class);
 
   private boolean doFeatureExtraction = true;
@@ -118,7 +122,23 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
+  public Report execute(IndexService index, ModelService model, StorageService storage, List<T> list)
+    throws PluginException {
+
+    if (!list.isEmpty()) {
+      if (list.get(0) instanceof AIP) {
+        return executeOnAIP(index, model, storage, (List<AIP>) list);
+      } else if (list.get(0) instanceof Representation) {
+        return executeOnRepresentation(index, model, storage, (List<Representation>) list);
+      } else if (list.get(0) instanceof File) {
+        return executeOnFile(index, model, storage, (List<File>) list);
+      }
+    }
+
+    return new Report();
+  }
+
+  public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
 
     Report report = PluginHelper.initPluginReport(this);
@@ -139,11 +159,22 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
           try {
             for (Representation representation : aip.getRepresentations()) {
               LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
-              Pair<Report, List<LinkingIdentifier>> tikaResult = TikaFullTextPluginUtils
-                .runTikaFullTextOnRepresentation(reportItem, index, model, storage, aip, representation,
-                  doFeatureExtraction, doFulltextExtraction);
-              reportItem = tikaResult.getFirst();
-              sources.addAll(tikaResult.getSecond());
+
+              CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
+                representation.getId(), true);
+
+              for (OptionalWithCause<File> oFile : allFiles) {
+                if (oFile.isPresent()) {
+                  File file = oFile.get();
+
+                  LinkingIdentifier tikaResult = TikaFullTextPluginUtils.runTikaFullTextOnFile(index, model, storage,
+                    file, doFeatureExtraction, doFulltextExtraction);
+                  sources.add(tikaResult);
+                } else {
+                  LOGGER.error("Cannot process File", oFile.getCause());
+                }
+              }
+
               model.notifyRepresentationUpdated(representation);
             }
 
@@ -193,9 +224,169 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
     return report;
   }
 
+  public Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage,
+    List<Representation> list) throws PluginException {
+    Report report = PluginHelper.initPluginReport(this);
+
+    try {
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+
+      try {
+        for (Representation representation : list) {
+          LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), representation.getAipId());
+          Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(), Representation.class,
+            AIPState.INGEST_PROCESSING);
+          PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+          List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
+          String outcomeDetailExtension = "";
+
+          try {
+            CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(representation.getAipId(),
+              representation.getId(), true);
+
+            for (OptionalWithCause<File> oFile : allFiles) {
+              if (oFile.isPresent()) {
+                File file = oFile.get();
+
+                LinkingIdentifier tikaResult = TikaFullTextPluginUtils.runTikaFullTextOnFile(index, model, storage,
+                  file, doFeatureExtraction, doFulltextExtraction);
+                sources.add(tikaResult);
+              } else {
+                LOGGER.error("Cannot process File", oFile.getCause());
+              }
+            }
+
+            model.notifyRepresentationUpdated(representation);
+            jobPluginInfo.incrementObjectsProcessedWithSuccess();
+            reportItem.setPluginState(PluginState.SUCCESS);
+          } catch (Exception e) {
+            outcomeDetailExtension = e.getMessage();
+            LOGGER.error("Error running Tika on Representation " + representation.getId() + ": " + e.getMessage());
+            if (reportItem != null) {
+              String details = reportItem.getPluginDetails();
+              if (details == null) {
+                details = "";
+              }
+              details += e.getMessage();
+              reportItem.setPluginDetails(details).setPluginState(PluginState.FAILURE);
+            } else {
+              LOGGER.error("Error running Apache Tika", e);
+            }
+
+            jobPluginInfo.incrementObjectsProcessedWithFailure();
+          }
+
+          report.addReport(reportItem);
+          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+
+          try {
+            List<LinkingIdentifier> outcomes = null;
+            boolean notify = true;
+            PluginHelper.createPluginEvent(this, representation.getAipId(), representation.getId(), model, index,
+              sources, outcomes, reportItem.getPluginState(), outcomeDetailExtension, notify);
+          } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
+            | AuthorizationDeniedException | AlreadyExistsException e) {
+            LOGGER.error("Error creating preservation event", e);
+          }
+        }
+
+      } catch (ClassCastException e) {
+        LOGGER.error("Trying to execute an Representation-only plugin with other objects");
+        jobPluginInfo.incrementObjectsProcessedWithFailure(list.size());
+      }
+
+      jobPluginInfo.finalizeInfo();
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+    } catch (JobException e) {
+      throw new PluginException("A job exception has occurred", e);
+    }
+
+    return report;
+  }
+
+  public Report executeOnFile(IndexService index, ModelService model, StorageService storage, List<File> list)
+    throws PluginException {
+    Report report = PluginHelper.initPluginReport(this);
+
+    try {
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+      List<RepresentationLink> representationsToUpdate = new ArrayList<RepresentationLink>();
+
+      for (File file : list) {
+        LOGGER.debug("Processing file {} of representation {} of AIP {}", file.getId(), file.getRepresentationId(),
+          file.getAipId());
+        Report reportItem = PluginHelper.initPluginReportItem(this, file.getId(), File.class,
+          AIPState.INGEST_PROCESSING);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+        List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
+        String outcomeDetailExtension = "";
+
+        try {
+          LinkingIdentifier tikaResult = TikaFullTextPluginUtils.runTikaFullTextOnFile(index, model, storage, file,
+            doFeatureExtraction, doFulltextExtraction);
+          sources.add(tikaResult);
+
+          RepresentationLink link = new RepresentationLink(file.getAipId(), file.getRepresentationId());
+          if (!representationsToUpdate.contains(link)) {
+            representationsToUpdate.add(link);
+          }
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+          reportItem.setPluginState(PluginState.SUCCESS);
+
+        } catch (Exception e) {
+          outcomeDetailExtension = e.getMessage();
+          LOGGER.error("Error running Tika on File " + file.getId() + ": " + e.getMessage());
+          if (reportItem != null) {
+            String details = reportItem.getPluginDetails();
+            if (details == null) {
+              details = "";
+            }
+            details += e.getMessage();
+            reportItem.setPluginDetails(details).setPluginState(PluginState.FAILURE);
+          } else {
+            LOGGER.error("Error running Apache Tika", e);
+          }
+
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+        }
+
+        report.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+
+        try {
+          List<LinkingIdentifier> outcomes = null;
+          boolean notify = true;
+          PluginHelper.createPluginEvent(this, file.getAipId(), file.getRepresentationId(), file.getPath(),
+            file.getId(), model, index, sources, outcomes, reportItem.getPluginState(), outcomeDetailExtension, notify);
+        } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
+          | AuthorizationDeniedException | AlreadyExistsException e) {
+          LOGGER.error("Error creating preservation event", e);
+        }
+      }
+
+      for (RepresentationLink link : representationsToUpdate) {
+        try {
+          Representation representation = model.retrieveRepresentation(link.getAipId(), link.getRepresentationId());
+          model.notifyRepresentationUpdated(representation);
+        } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+          LOGGER.error("Error updating representation after running Tika plugin");
+        }
+      }
+
+      jobPluginInfo.finalizeInfo();
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+    } catch (JobException e) {
+      throw new PluginException("A job exception has occurred", e);
+    }
+
+    return report;
+  }
+
   @Override
-  public Plugin<AIP> cloneMe() {
-    TikaFullTextPlugin tikaPlugin = new TikaFullTextPlugin();
+  public Plugin<T> cloneMe() {
+    TikaFullTextPlugin<T> tikaPlugin = new TikaFullTextPlugin<T>();
     try {
       tikaPlugin.init();
     } catch (PluginException e) {
@@ -254,8 +445,12 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public List<Class<AIP>> getObjectClasses() {
-    return Arrays.asList(AIP.class);
+  public List<Class<T>> getObjectClasses() {
+    List<Class<? extends IsRODAObject>> list = new ArrayList<>();
+    list.add(AIP.class);
+    list.add(Representation.class);
+    list.add(File.class);
+    return (List) list;
   }
 
 }

@@ -121,7 +121,6 @@ public class FFProbePlugin extends AbstractPlugin<AIP> {
 
                     String ffProbeResults = FFProbePluginUtils.runFFProbe(binary, fileFormat, getParameterValues());
                     ContentPayload payload = new StringContentPayload(ffProbeResults);
-                    // TODO support file path
                     model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(),
                       "." + FFProbePluginUtils.FFPROBE_METADATA_FORMAT, RodaConstants.OTHER_METADATA_TYPE_FFPROBE,
                       payload, inotify);

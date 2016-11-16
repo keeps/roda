@@ -448,6 +448,14 @@ public interface ClientMessages extends Messages {
 
   String ingestSelectedItemsButton();
 
+  /*** Identify formats ***/
+
+  String identifyFormatsButton();
+
+  String identifyingFormatsTitle();
+
+  String identifyingFormatsDescription();
+
   /*** View representation ***/
 
   String viewRepresentationNextFileButton();

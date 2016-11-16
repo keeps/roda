@@ -104,6 +104,7 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadataList;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.jobs.Reports;
@@ -121,6 +122,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.plugins.plugins.ingest.AutoAcceptSIPPlugin;
+import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPlugin;
 import org.roda.core.plugins.plugins.risks.RiskIncidenceRemoverPlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryVersion;
@@ -2814,5 +2816,18 @@ public class BrowserHelper {
     }
 
     RodaCoreFactory.getIndexService().commit(DIPFile.class);
+  }
+
+  public static void createFormatIdentificationJob(User user, SelectedItems selected)
+    throws GenericException, JobAlreadyStartedException {
+    Job job = new Job();
+    job.setId(UUID.randomUUID().toString());
+    job.setName("Format identification using Siegfried");
+    job.setSourceObjects(selected);
+    job.setPlugin(SiegfriedPlugin.class.getCanonicalName());
+    job.setPluginType(PluginType.MISC);
+    job.setUsername(user.getName());
+    RodaCoreFactory.getModelService().createJob(job);
+    RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
   }
 }

@@ -52,6 +52,7 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
+import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPluginUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.util.FileUtility;
@@ -830,8 +831,18 @@ public final class PremisV3Utils {
   public static void updateFormatPreservationMetadata(ModelService model, String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId, String format, String version, String pronom, String mime,
     boolean notify) {
+    Binary premisBin;
+
     try {
-      Binary premisBin = model.retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId);
+      try {
+        premisBin = model.retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId);
+      } catch (NotFoundException e) {
+        LOGGER.debug("PREMIS object skeleton does not exist yet. Creating PREMIS object!");
+        List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
+        PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aipId, representationId, algorithms);
+        premisBin = model.retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId);
+        LOGGER.debug("PREMIS object skeleton created");
+      }
 
       gov.loc.premis.v3.File premisFile = binaryToFile(premisBin.getContent(), false);
       PremisV3Utils.updateFileFormat(premisFile, format, version, pronom, mime);
@@ -842,9 +853,38 @@ public final class PremisV3Utils {
       ContentPayload premisFilePayload = fileToBinary(premisFile);
       model.updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, premisFilePayload,
         notify);
-    } catch (NotFoundException e) {
-      LOGGER.debug("PREMIS will not be updated because it doesn't exist");
-    } catch (RODAException e) {
+    } catch (RODAException | XmlException | IOException e) {
+      LOGGER.error("PREMIS will not be updated due to an error", e);
+    }
+  }
+
+  public static void updateCreatingApplicationPreservationMetadata(ModelService model, String aipId,
+    String representationId, List<String> fileDirectoryPath, String fileId, String creatingApplicationName,
+    String creatingApplicationVersion, String dateCreatedByApplication, boolean notify) {
+    Binary premisBin;
+
+    try {
+      try {
+        premisBin = model.retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId);
+      } catch (NotFoundException e) {
+        LOGGER.debug("PREMIS object skeleton does not exist yet. Creating PREMIS object!");
+        List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
+        PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aipId, representationId, algorithms);
+        premisBin = model.retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId);
+        LOGGER.debug("PREMIS object skeleton created");
+      }
+
+      gov.loc.premis.v3.File premisFile = binaryToFile(premisBin.getContent(), false);
+      PremisV3Utils.updateCreatingApplication(premisFile, creatingApplicationName, creatingApplicationVersion,
+        dateCreatedByApplication);
+
+      PreservationMetadataType type = PreservationMetadataType.FILE;
+      String id = IdUtils.getPreservationId(type, aipId, representationId, fileDirectoryPath, fileId);
+
+      ContentPayload premisFilePayload = fileToBinary(premisFile);
+      model.updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, premisFilePayload,
+        notify);
+    } catch (RODAException | XmlException | IOException e) {
       LOGGER.error("PREMIS will not be updated due to an error", e);
     }
   }

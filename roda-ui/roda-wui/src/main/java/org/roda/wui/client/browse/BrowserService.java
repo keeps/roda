@@ -296,4 +296,7 @@ public interface BrowserService extends RemoteService {
   String createFolder(String aipId, String representationUUID, String folderUUID, String newName)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, AlreadyExistsException,
     NotFoundException;
+
+  void createFormatIdentificationJob(SelectedItems selected)
+    throws GenericException, AuthorizationDeniedException, JobAlreadyStartedException;
 }

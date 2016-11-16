@@ -28,8 +28,8 @@ import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.SelectFileDialog;
 import org.roda.wui.client.common.lists.SearchFileList;
-import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
+import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -174,7 +174,7 @@ public class BrowseFolder extends Composite {
   Label folderId;
 
   @UiField
-  Button rename, createFolder;
+  Button rename, createFolder, identifyFormats;
 
   @UiField
   BreadcrumbPanel breadcrumb;
@@ -497,5 +497,34 @@ public class BrowseFolder extends Composite {
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
     selectedItems.setSelectedItems(files);
     Tools.newHistory(CreateJob.RESOLVER, "action");
+  }
+
+  @UiHandler("identifyFormats")
+  void buttonIdentifyFormatsHandler(ClickEvent e) {
+    SelectedItems selected = (SelectedItems) filesList.getSelected();
+
+    if (ClientSelectedItemsUtils.isEmpty(selected)) {
+      // FIXME 20161117 nvieira it should use the parent folder UUID but the
+      // plugin cannot support it
+      selected = new SelectedItemsList<IndexedRepresentation>(Arrays.asList(repId),
+        IndexedRepresentation.class.getName());
+    }
+
+    BrowserService.Util.getInstance().createFormatIdentificationJob(selected, new AsyncCallback<Void>() {
+
+      @Override
+      public void onSuccess(Void object) {
+        Toast.showInfo(messages.identifyingFormatsTitle(), messages.identifyingFormatsDescription());
+      }
+
+      @Override
+      public void onFailure(Throwable caught) {
+        if (caught instanceof NotFoundException) {
+          Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+        } else {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
+      }
+    });
   }
 }

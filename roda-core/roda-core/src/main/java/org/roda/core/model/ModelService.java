@@ -829,7 +829,6 @@ public class ModelService extends ModelObservable {
   public void deleteRepresentation(String aipId, String representationId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     StoragePath representationPath = ModelUtils.getRepresentationStoragePath(aipId, representationId);
-
     storage.deleteResource(representationPath);
 
     // update AIP metadata

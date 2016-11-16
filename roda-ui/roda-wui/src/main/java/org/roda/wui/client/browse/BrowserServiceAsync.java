@@ -135,7 +135,8 @@ public interface BrowserServiceAsync {
   <T extends IsIndexed> void retrieve(String classNameToReturn, SelectedItems<T> selectedItems,
     AsyncCallback<List<T>> asyncCallback);
 
-  void suggest(String classNameToReturn, String field, String query, boolean allowPartial, AsyncCallback<List<String>> callback);
+  void suggest(String classNameToReturn, String field, String query, boolean allowPartial,
+    AsyncCallback<List<String>> callback);
 
   void updateAIPPermissions(List<IndexedAIP> aips, Permissions permissions, boolean recursive,
     AsyncCallback<Void> callback);
@@ -204,5 +205,7 @@ public interface BrowserServiceAsync {
 
   void createFolder(String aipId, String representationUUID, String folderUUID, String newName,
     AsyncCallback<String> asyncCallback);
+
+  void createFormatIdentificationJob(SelectedItems selected, AsyncCallback<Void> loadingAsyncCallback);
 
 }

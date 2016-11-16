@@ -59,6 +59,10 @@
 							<g:Button addStyleNames="btn btn-plus" ui:field="createFolder">
 								<ui:text from='{messages.createFolderButton}' />
 							</g:Button>
+							<g:Button addStyleNames="btn btn-edit"
+								ui:field="identifyFormats">
+								<ui:text from='{messages.identifyFormatsButton}' />
+							</g:Button>
 							<g:Button addStyleNames="btn btn-danger btn-ban"
 								ui:field="remove">
 								<ui:text from='{messages.removeWholeFolderButton}' />
