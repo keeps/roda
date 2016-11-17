@@ -39,8 +39,8 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.RepresentationList;
-import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
+import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
@@ -276,7 +276,7 @@ public class Browse extends Composite {
     searchPanel.setDefaultFilterIncremental(true);
     searchPanel.setList(aipList);
 
-    representationsList = new RepresentationList(Filter.NULL, justActive, Facets.NONE, summary, false);
+    representationsList = new RepresentationList(Filter.NULL, justActive, Facets.NONE, summary, true);
 
     representationsSearchPanel = new SearchPanel(Filter.NULL, RodaConstants.REPRESENTATION_SEARCH,
       messages.searchPlaceHolder(), false, false, false);
@@ -902,8 +902,47 @@ public class Browse extends Composite {
     if (ClientSelectedItemsUtils.isEmpty(selected)) {
       // Remove the whole folder
 
-      if (aipId != null) {
-        Dialogs.showConfirmDialog(messages.removeConfirmDialogTitle(), messages.removeAllConfirmDialogMessage(),
+      final SelectedItems<IndexedRepresentation> selectedRepresentations = representationsList.getSelected();
+      if (ClientSelectedItemsUtils.isEmpty(selectedRepresentations)) {
+        if (aipId != null) {
+          Dialogs.showConfirmDialog(messages.removeConfirmDialogTitle(), messages.removeAllConfirmDialogMessage(),
+            messages.dialogNo(), messages.dialogYes(), new AsyncCallback<Boolean>() {
+
+              @Override
+              public void onFailure(Throwable caught) {
+                // nothing to do
+              }
+
+              @Override
+              public void onSuccess(Boolean confirmed) {
+                if (confirmed) {
+                  SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<IndexedAIP>(Arrays.asList(aipId),
+                    IndexedAIP.class.getName());
+                  BrowserService.Util.getInstance().deleteAIP(selected, new AsyncCallback<String>() {
+
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      AsyncCallbackUtils.defaultFailureTreatment(caught);
+                    }
+
+                    @Override
+                    public void onSuccess(String parentId) {
+                      if (parentId != null) {
+                        Tools.newHistory(Browse.RESOLVER, parentId);
+                      } else {
+                        Tools.newHistory(Browse.RESOLVER);
+                      }
+                    }
+                  });
+                }
+              }
+            });
+        } else {
+          Dialogs.showInformationDialog(messages.selectAnItemTitle(), messages.selectAnItemToRemoveDescription(),
+            messages.dialogOk());
+        }
+      } else {
+        Dialogs.showConfirmDialog(messages.removeConfirmDialogTitle(), messages.removeAllSelectedConfirmDialogMessage(),
           messages.dialogNo(), messages.dialogYes(), new AsyncCallback<Boolean>() {
 
             @Override
@@ -914,31 +953,22 @@ public class Browse extends Composite {
             @Override
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
-                SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<IndexedAIP>(Arrays.asList(aipId),
-                  IndexedAIP.class.getName());
-                BrowserService.Util.getInstance().deleteAIP(selected, new AsyncCallback<String>() {
+                BrowserService.Util.getInstance().deleteRepresentation(selectedRepresentations,
+                  new AsyncCallback<Void>() {
 
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    AsyncCallbackUtils.defaultFailureTreatment(caught);
-                  }
-
-                  @Override
-                  public void onSuccess(String parentId) {
-                    if (parentId != null) {
-                      Tools.newHistory(Browse.RESOLVER, parentId);
-                    } else {
-                      Tools.newHistory(Browse.RESOLVER);
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      AsyncCallbackUtils.defaultFailureTreatment(caught);
                     }
-                  }
-                });
+
+                    @Override
+                    public void onSuccess(Void nothing) {
+                      representationsList.refresh();
+                    }
+                  });
               }
             }
           });
-
-      } else {
-        Dialogs.showInformationDialog(messages.selectAnItemTitle(), messages.selectAnItemToRemoveDescription(),
-          messages.dialogOk());
       }
     } else {
       // Remove all selected
@@ -1120,9 +1150,16 @@ public class Browse extends Composite {
 
   @UiHandler("newProcess")
   void buttonNewProcessHandler(ClickEvent e) {
-    if (aipId != null) {
+    final SelectedItems<IndexedRepresentation> selected = representationsList.getSelected();
+    if (ClientSelectedItemsUtils.isEmpty(selected)) {
+      if (aipId != null) {
+        LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+        selectedItems.setSelectedItems(SelectedItemsList.create(IndexedAIP.class, aipId));
+        Tools.newHistory(CreateJob.RESOLVER, "action");
+      }
+    } else {
       LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-      selectedItems.setSelectedItems(SelectedItemsList.create(IndexedAIP.class, aipId));
+      selectedItems.setSelectedItems(selected);
       Tools.newHistory(CreateJob.RESOLVER, "action");
     }
   }

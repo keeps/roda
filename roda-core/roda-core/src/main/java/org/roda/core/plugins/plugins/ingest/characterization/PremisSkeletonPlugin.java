@@ -96,7 +96,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractPlugin
       } else if (list.get(0) instanceof Representation) {
         return executeOnRepresentation(index, model, storage, (List<Representation>) list);
       } else if (list.get(0) instanceof File) {
-        // return executeOnFile(index, model, storage, (List<File>) list);
+        return executeOnFile(index, model, storage, (List<File>) list);
       }
     }
 
@@ -210,6 +210,56 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractPlugin
     return report;
   }
 
+  public Report executeOnFile(IndexService index, ModelService model, StorageService storage, List<File> list)
+    throws PluginException {
+    Report report = PluginHelper.initPluginReport(this);
+
+    try {
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+
+      for (File file : list) {
+        LOGGER.debug("Processing file {} from representation {} from AIP {}", file.getId(), file.getRepresentationId(),
+          file.getAipId());
+        Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class,
+          AIPState.ACTIVE);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+        reportItem.setPluginState(PluginState.SUCCESS);
+
+        try {
+          List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
+          PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, file.getAipId(), file.getRepresentationId(), file,
+            algorithms);
+          model.updateFile(file);
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        } catch (RODAException | XmlException | IOException e) {
+          LOGGER.error("Error processing file " + file.getId(), e);
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+          reportItem.setPluginState(PluginState.FAILURE).addPluginDetails(e.getMessage() + "\n");
+        }
+
+        try {
+          boolean notify = true;
+          PluginHelper.createPluginEvent(this, file.getAipId(), file.getRepresentationId(), file.getPath(),
+            file.getId(), model, index, null, null, reportItem.getPluginState(), "", notify);
+        } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
+          | AuthorizationDeniedException | AlreadyExistsException e) {
+          LOGGER.error("Error creating event: " + e.getMessage(), e);
+        }
+
+        report.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+      }
+
+      jobPluginInfo.finalizeInfo();
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+    } catch (JobException e) {
+      throw new PluginException("A job exception has occurred", e);
+    }
+
+    return report;
+  }
+
   @Override
   public Plugin<T> cloneMe() {
     return new PremisSkeletonPlugin<T>();
@@ -268,7 +318,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractPlugin
     List<Class<? extends IsRODAObject>> list = new ArrayList<>();
     list.add(AIP.class);
     list.add(Representation.class);
-    // list.add(File.class);
+    list.add(File.class);
     return (List) list;
   }
 

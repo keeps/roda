@@ -97,7 +97,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       } else if (list.get(0) instanceof Representation) {
         return executeOnRepresentation(index, model, storage, (List<Representation>) list);
       } else if (list.get(0) instanceof File) {
-        // return executeOnFile(index, model, storage, (List<File>) list);
+        return executeOnFile(index, model, storage, (List<File>) list);
       }
     }
 
@@ -217,6 +217,62 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
     return report;
   }
 
+  public Report executeOnFile(IndexService index, ModelService model, StorageService storage, List<File> list)
+    throws PluginException {
+    Report report = PluginHelper.initPluginReport(this);
+
+    try {
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+
+      for (File file : list) {
+        List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
+
+        Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class,
+          AIPState.ACTIVE);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+        LOGGER.debug("Processing file {} from representation {} of AIP {}", file.getId(), file.getRepresentationId(),
+          file.getAipId());
+
+        try {
+          // FIXME 20161117 nvieira this should be done with a single file
+          Representation representation = model.retrieveRepresentation(file.getAipId(), file.getRepresentationId());
+          sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(this, index, model, representation));
+          model.updateFile(file);
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+          reportItem.setPluginState(PluginState.SUCCESS);
+        } catch (PluginException | NotFoundException | GenericException | RequestNotValidException
+          | AuthorizationDeniedException | AlreadyExistsException e) {
+          LOGGER.error("Error running Siegfried on file " + file.getId() + ": " + e.getMessage(), e);
+
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+          reportItem.setPluginState(PluginState.FAILURE)
+            .setPluginDetails("Error running Siegfried on file " + file.getId() + ": " + e.getMessage());
+        }
+
+        try {
+          List<LinkingIdentifier> outcomes = null;
+          boolean notify = true;
+          PluginHelper.createPluginEvent(this, file.getAipId(), file.getRepresentationId(), file.getPath(),
+            file.getId(), model, index, sources, outcomes, reportItem.getPluginState(), "", notify);
+        } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
+          | AuthorizationDeniedException | AlreadyExistsException e) {
+          LOGGER.error("Error creating event: " + e.getMessage(), e);
+        }
+
+        report.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+      }
+
+      jobPluginInfo.finalizeInfo();
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+    } catch (JobException e) {
+      throw new PluginException("A job exception has occurred", e);
+    }
+
+    return report;
+  }
+
   @Override
   public Plugin<T> cloneMe() {
     SiegfriedPlugin siegfriedPlugin = new SiegfriedPlugin();
@@ -281,7 +337,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
     List<Class<? extends IsRODAObject>> list = new ArrayList<>();
     list.add(AIP.class);
     list.add(Representation.class);
-    // list.add(File.class);
+    list.add(File.class);
     return (List) list;
   }
 

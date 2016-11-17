@@ -351,7 +351,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     User user = UserUtility.getUser(getThreadLocalRequest());
 
     // If the bundle has values from the form, we need to update the XML by
-    // applying the values of the form to the raw tempalte
+    // applying the values of the form to the raw template
     if (bundle.getValues() != null) {
       SupportedMetadataTypeBundle smtb = new SupportedMetadataTypeBundle(bundle.getId(), bundle.getType(),
         bundle.getVersion(), bundle.getId(), bundle.getRawTemplate(), bundle.getValues());
