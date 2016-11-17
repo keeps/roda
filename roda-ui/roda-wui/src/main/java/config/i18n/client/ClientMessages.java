@@ -116,6 +116,8 @@ public interface ClientMessages extends Messages {
 
   String logsTitle();
 
+  String changeTypeTitle();
+
   /******* SIDEBAR ******************************************/
 
   String sidebarFilterDates();
@@ -211,6 +213,8 @@ public interface ClientMessages extends Messages {
   String moveSIPFailed();
 
   String moveSIPSuccessful();
+
+  String changeTypeSuccessful();
 
   String allItemsWereAccepted();
 
@@ -447,6 +451,8 @@ public interface ClientMessages extends Messages {
   String ingestWholeFolderButton();
 
   String ingestSelectedItemsButton();
+
+  String changeTypeButton();
 
   /*** Identify formats ***/
 

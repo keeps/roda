@@ -48,6 +48,10 @@
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.representation}' />
 							</g:Label>
+							<g:Button addStyleNames="btn btn-edit"
+								ui:field="changeType">
+								<ui:text from='{messages.changeTypeButton}' />
+							</g:Button>
 							<g:Button addStyleNames="btn btn-danger btn-ban"
 								ui:field="remove">
 								<ui:text from='{messages.removeButton}' />

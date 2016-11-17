@@ -185,7 +185,7 @@ public class BrowseRepresentation extends Composite {
   Button newDescriptiveMetadata;
 
   @UiField
-  Button renameFolders, moveFiles, uploadFiles, createFolder, identifyFormats;
+  Button renameFolders, moveFiles, uploadFiles, createFolder, identifyFormats, changeType;
 
   @UiField(provided = true)
   SearchPanel searchPanel;
@@ -718,6 +718,35 @@ public class BrowseRepresentation extends Composite {
         }
       }
     });
+  }
+
+  @UiHandler("changeType")
+  void buttonChangeTypeHandler(ClickEvent e) {
+    final SelectedItemsList<IndexedRepresentation> selectedRepresentation = new SelectedItemsList<IndexedRepresentation>(
+      Arrays.asList(repId), IndexedRepresentation.class.getName());
+
+    Dialogs.showPromptDialog(messages.changeTypeTitle(), null, messages.renamePlaceholder(), RegExp.compile(".*"),
+      messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          // do nothing
+        }
+
+        @Override
+        public void onSuccess(final String newType) {
+          BrowserService.Util.getInstance().changeRepresentationType(selectedRepresentation, newType,
+            new LoadingAsyncCallback<Void>() {
+
+              @Override
+              public void onSuccessImpl(Void nothing) {
+                Toast.showInfo(messages.dialogSuccess(), messages.changeTypeSuccessful());
+                representationType.setText(newType);
+              }
+            });
+        }
+      });
+
   }
 
 }

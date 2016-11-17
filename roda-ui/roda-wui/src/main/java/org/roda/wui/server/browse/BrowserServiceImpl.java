@@ -831,4 +831,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     Browser.createFormatIdentificationJob(user, selected);
   }
 
+  @Override
+  public void changeRepresentationType(SelectedItemsList<IndexedRepresentation> selected, String newType)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Browser.changeRepresentationType(user, selected, newType);
+  }
+
 }

@@ -2830,4 +2830,24 @@ public class BrowserHelper {
     RodaCoreFactory.getModelService().createJob(job);
     RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
   }
+
+  public static void changeRepresentationType(User user, SelectedItemsList<IndexedRepresentation> selected,
+    String newType) throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+    List<String> representationIds = consolidate(user, IndexedRepresentation.class, selected);
+    ModelService model = RodaCoreFactory.getModelService();
+    IndexService index = RodaCoreFactory.getIndexService();
+
+    Filter filter = new Filter();
+    filter.add(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, representationIds));
+    IndexResult<IndexedRepresentation> reps = index.find(IndexedRepresentation.class, filter, Sorter.NONE,
+      new Sublist(0, representationIds.size()));
+
+    for (IndexedRepresentation irep : reps.getResults()) {
+      Representation rep = model.retrieveRepresentation(irep.getAipId(), irep.getId());
+      rep.setType(newType);
+      model.updateRepresentationInfo(rep);
+    }
+
+    index.commit(IndexedRepresentation.class);
+  }
 }
