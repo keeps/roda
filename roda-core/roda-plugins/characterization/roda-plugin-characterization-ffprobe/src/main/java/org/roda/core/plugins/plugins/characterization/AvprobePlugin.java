@@ -51,8 +51,8 @@ import org.roda.core.storage.StringContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FFProbePlugin extends AbstractPlugin<AIP> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(FFProbePlugin.class);
+public class AvprobePlugin extends AbstractPlugin<AIP> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(AvprobePlugin.class);
 
   @Override
   public void init() throws PluginException {
@@ -65,12 +65,15 @@ public class FFProbePlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "AIP feature extraction (ffprobe)";
+    return "AIP feature extraction (avprobe)";
   }
 
   @Override
   public String getDescription() {
-    return "ffprobe extracts information from multimedia streams and prints it in human and machine-readable fashion. For example, it can be used to check the format of the container used by a multimedia stream and the format and type of each media stream contained in it.\nThe task updates PREMIS objects metadata in the Archival Information Package (AIP) to store the results of the characterization process. A PREMIS event is also recorded after the task is run.\nFor more information of the ffprobe tool, please visit https://ffmpeg.org  ";
+    return "avprobe extracts information from multimedia streams and prints it in human and machine-readable fashion. For example, it can be used to check "
+      + "the format of the container used by a multimedia stream and the format and type of each media stream contained in it.\nThe task updates PREMIS "
+      + "objects metadata in the Archival Information Package (AIP) to store the results of the characterization process. A PREMIS event is also recorded"
+      + " after the task is run.\nFor more information of the avprobe tool, please visit https://libav.org/documentation/avprobe.html";
   }
 
   @Override
@@ -119,10 +122,10 @@ public class FFProbePlugin extends AbstractPlugin<AIP> {
                     StoragePath storagePath = ModelUtils.getFileStoragePath(file);
                     Binary binary = storage.getBinary(storagePath);
 
-                    String ffProbeResults = FFProbePluginUtils.runFFProbe(binary, fileFormat, getParameterValues());
-                    ContentPayload payload = new StringContentPayload(ffProbeResults);
+                    String probeResults = AvprobePluginUtils.runAvprobe(binary, fileFormat, getParameterValues());
+                    ContentPayload payload = new StringContentPayload(probeResults);
                     model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(),
-                      "." + FFProbePluginUtils.FFPROBE_METADATA_FORMAT, RodaConstants.OTHER_METADATA_TYPE_FFPROBE,
+                      "." + AvprobePluginUtils.AVPROBE_METADATA_FORMAT, RodaConstants.OTHER_METADATA_TYPE_AVPROBE,
                       payload, inotify);
                   }
                 } else {
@@ -180,7 +183,7 @@ public class FFProbePlugin extends AbstractPlugin<AIP> {
 
   @Override
   public Plugin<AIP> cloneMe() {
-    return new FFProbePlugin();
+    return new AvprobePlugin();
   }
 
   @Override

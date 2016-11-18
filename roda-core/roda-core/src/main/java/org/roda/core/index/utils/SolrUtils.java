@@ -2230,10 +2230,11 @@ public class SolrUtils {
   }
 
   public static SolrInputDocument preservationEventPermissionsUpdateToSolrDocument(String preservationEventID,
-    String preservationEventAipId, Permissions permissions) {
+    String preservationEventAipId, Permissions permissions, AIPState state) {
     SolrInputDocument document = new SolrInputDocument();
     document.addField(RodaConstants.INDEX_UUID, preservationEventID);
     document = permissionsUpdateToSolrDocument(document, permissions);
+    document.addField(RodaConstants.STATE, state.toString());
     document.addField(RodaConstants.PRESERVATION_EVENT_AIP_ID, preservationEventAipId);
     return document;
   }

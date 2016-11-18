@@ -118,6 +118,8 @@ public interface ClientMessages extends Messages {
 
   String changeTypeTitle();
 
+  String changeTypePlaceHolder();
+
   /******* SIDEBAR ******************************************/
 
   String sidebarFilterDates();
@@ -477,6 +479,8 @@ public interface ClientMessages extends Messages {
   String viewRepresentationEmptyPreview();
 
   String viewRepresentationErrorPreview();
+
+  String viewRepresentationTooLargeErrorPreview();
 
   String viewRepresentationNotSupportedPreview();
 

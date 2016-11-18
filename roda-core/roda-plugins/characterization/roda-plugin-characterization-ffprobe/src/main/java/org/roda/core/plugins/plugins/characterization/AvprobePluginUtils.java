@@ -24,9 +24,9 @@ import org.roda.core.storage.Binary;
 import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
 
-public class FFProbePluginUtils {
+public class AvprobePluginUtils {
 
-  public static String FFPROBE_METADATA_FORMAT = "json";
+  public static String AVPROBE_METADATA_FORMAT = "json";
 
   public static String inspect(File f) throws RODAException {
     try {
@@ -34,39 +34,24 @@ public class FFProbePluginUtils {
       command.add(f.getAbsolutePath());
       return CommandUtility.execute(command);
     } catch (CommandException e) {
-      throw new RODAException("Error while executing FFProbe command");
+      throw new RODAException("Error while executing Avprobe command");
     }
   }
 
   private static List<String> getCommand() {
     Path rodaHome = RodaCoreFactory.getRodaHomePath();
-    Path ffProbeHome = rodaHome
-      .resolve(RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "ffprobe", "path"));
+    Path avprobeHome = rodaHome
+      .resolve(RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "avprobe", "path"));
 
-    File FFPROBE_DIRECTORY = ffProbeHome.toFile();
+    File AVPROBE_DIRECTORY = avprobeHome.toFile();
+    List<String> command = new ArrayList<String>(
+      Arrays.asList(AVPROBE_DIRECTORY.getAbsolutePath() + File.separator + "avprobe", "-show_format", "-show_streams",
+        "-show_packets", "-of", AvprobePluginUtils.AVPROBE_METADATA_FORMAT, "-v", "quiet"));
 
-    String osName = System.getProperty("os.name");
-    List<String> command;
-    if (osName.startsWith("Windows")) {
-      command = new ArrayList<String>(
-        Arrays.asList(FFPROBE_DIRECTORY.getAbsolutePath() + File.separator + "ffprobe.exe", "-show_data",
-          "-show_format", "-show_error", "-show_streams", "-show_chapters", "-show_private_data", "-show_versions",
-          "-print_format", "xml", "-v", "quiet", "-i"));
-    } else {
-      // command = new
-      // ArrayList<String>(Arrays.asList(FFPROBE_DIRECTORY.getAbsolutePath() +
-      // File.separator + "ffprobe",
-      // "-show_data", "-show_format", "-show_error", "-show_streams",
-      // "-show_chapters", "-show_private_data",
-      // "-show_versions", "-print_format", "xml", "-v", "quiet", "-i"));
-      command = new ArrayList<String>(
-        Arrays.asList(FFPROBE_DIRECTORY.getAbsolutePath() + File.separator + "avprobe", "-show_format", "-show_streams",
-          "-show_packets", "-of", FFProbePluginUtils.FFPROBE_METADATA_FORMAT, "-v", "quiet"));
-    }
     return command;
   }
 
-  public static String runFFProbe(Binary binary, String fileFormat, Map<String, String> parameterValues)
+  public static String runAvprobe(Binary binary, String fileFormat, Map<String, String> parameterValues)
     throws IOException, RODAException {
     // TODO f is not deleted in runtime
     // TODO use storage method to get direct access to file

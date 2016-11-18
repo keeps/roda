@@ -37,6 +37,7 @@ import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionLi
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
+import org.roda.wui.client.common.search.SearchSuggestBox;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.transfer.TransferUpload;
@@ -725,8 +726,11 @@ public class BrowseRepresentation extends Composite {
     final SelectedItemsList<IndexedRepresentation> selectedRepresentation = new SelectedItemsList<IndexedRepresentation>(
       Arrays.asList(repId), IndexedRepresentation.class.getName());
 
-    Dialogs.showPromptDialog(messages.changeTypeTitle(), null, messages.renamePlaceholder(), RegExp.compile(".*"),
-      messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
+    SearchSuggestBox<IndexedRepresentation> suggestBox = new SearchSuggestBox<IndexedRepresentation>(
+      IndexedRepresentation.class, RodaConstants.REPRESENTATION_TYPE, true);
+
+    Dialogs.showPromptDialogSuggest(messages.changeTypeTitle(), null, messages.changeTypePlaceHolder(),
+      messages.cancelButton(), messages.confirmButton(), suggestBox, new AsyncCallback<String>() {
 
         @Override
         public void onFailure(Throwable caught) {

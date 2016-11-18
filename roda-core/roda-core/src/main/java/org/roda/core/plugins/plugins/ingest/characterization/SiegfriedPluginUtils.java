@@ -26,10 +26,10 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
-import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
@@ -97,41 +97,68 @@ public class SiegfriedPluginUtils {
   }
 
   public static <T extends IsRODAObject> List<LinkingIdentifier> runSiegfriedOnRepresentation(Plugin<T> plugin,
-    IndexService index, ModelService model, Representation representation) throws GenericException,
-    RequestNotValidException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException, PluginException {
+    ModelService model, Representation representation) throws GenericException, RequestNotValidException,
+    AlreadyExistsException, NotFoundException, AuthorizationDeniedException, PluginException {
 
     StoragePath representationDataPath = ModelUtils.getRepresentationDataStoragePath(representation.getAipId(),
       representation.getId());
     DirectResourceAccess directAccess = model.getStorage().getDirectAccess(representationDataPath);
-    List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
 
     Path representationFsPath = directAccess.getPath();
-    if (Files.exists(representationFsPath)) {
+    List<LinkingIdentifier> sources = runSiegfriedOnRepresentationOrFile(plugin, model, representation.getAipId(),
+      representation.getId(), null, null, representationFsPath);
 
-      String siegfriedOutput = SiegfriedPluginUtils.runSiegfriedOnPath(representationFsPath);
-      IOUtils.closeQuietly(directAccess);
+    IOUtils.closeQuietly(directAccess);
+    return sources;
+  }
+
+  public static <T extends IsRODAObject> List<LinkingIdentifier> runSiegfriedOnFile(Plugin<T> plugin,
+    ModelService model, File file) throws GenericException, RequestNotValidException, AlreadyExistsException,
+    NotFoundException, AuthorizationDeniedException, PluginException {
+
+    StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
+    DirectResourceAccess directAccess = model.getStorage().getDirectAccess(fileStoragePath);
+
+    Path filePath = directAccess.getPath();
+    List<LinkingIdentifier> sources = runSiegfriedOnRepresentationOrFile(plugin, model, file.getAipId(),
+      file.getRepresentationId(), file.getPath(), file.getId(), filePath);
+
+    IOUtils.closeQuietly(directAccess);
+    return sources;
+  }
+
+  private static <T extends IsRODAObject> List<LinkingIdentifier> runSiegfriedOnRepresentationOrFile(Plugin<T> plugin,
+    ModelService model, String aipId, String representationId, List<String> fileDirectoryPath, String fileId, Path path)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
+    PluginException {
+    List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
+
+    if (Files.exists(path)) {
+      String siegfriedOutput = SiegfriedPluginUtils.runSiegfriedOnPath(path);
 
       boolean notify = false;
       final JsonNode jsonObject = JsonUtils.parseJson(siegfriedOutput);
       final JsonNode files = jsonObject.get("files");
 
       for (JsonNode file : files) {
-        Path fullFsPath = Paths.get(file.get("filename").asText());
-        Path relativeFsPath = representationFsPath.relativize(fullFsPath);
+        if (fileDirectoryPath == null || fileId == null) {
+          Path fullFsPath = Paths.get(file.get("filename").asText());
+          Path relativeFsPath = path.relativize(fullFsPath);
 
-        String fileId = relativeFsPath.getFileName().toString();
-        List<String> fileDirectoryPath = new ArrayList<>();
-        for (int j = 0; j < relativeFsPath.getNameCount() - 1; j++) {
-          fileDirectoryPath.add(relativeFsPath.getName(j).toString());
+          fileId = relativeFsPath.getFileName().toString();
+          fileDirectoryPath = new ArrayList<>();
+          for (int j = 0; j < relativeFsPath.getNameCount() - 1; j++) {
+            fileDirectoryPath.add(relativeFsPath.getName(j).toString());
+          }
         }
 
         ContentPayload payload = new StringContentPayload(file.toString());
 
-        model.createOtherMetadata(representation.getAipId(), representation.getId(), fileDirectoryPath, fileId,
-          SiegfriedPlugin.FILE_SUFFIX, RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED, payload, notify);
+        model.createOtherMetadata(aipId, representationId, fileDirectoryPath, fileId, SiegfriedPlugin.FILE_SUFFIX,
+          RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED, payload, notify);
 
-        sources.add(PluginHelper.getLinkingIdentifier(representation.getAipId(), representation.getId(),
-          fileDirectoryPath, fileId, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+        sources.add(PluginHelper.getLinkingIdentifier(aipId, representationId, fileDirectoryPath, fileId,
+          RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
         // Update PREMIS files
         final JsonNode matches = file.get("matches");
@@ -157,8 +184,8 @@ public class SiegfriedPluginUtils {
             }
           }
 
-          PremisV3Utils.updateFormatPreservationMetadata(model, representation.getAipId(), representation.getId(),
-            fileDirectoryPath, fileId, format, version, pronom, mime, notify);
+          PremisV3Utils.updateFormatPreservationMetadata(model, aipId, representationId, fileDirectoryPath, fileId,
+            format, version, pronom, mime, notify);
         }
       }
     }

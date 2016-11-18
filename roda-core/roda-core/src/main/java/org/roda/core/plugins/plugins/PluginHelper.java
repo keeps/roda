@@ -494,6 +494,7 @@ public final class PluginHelper {
   /**
    * For SIP > AIP
    */
+
   public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipId,
     ModelService model, IndexService index, TransferredResource source, PluginState outcome,
     String outcomeDetailExtension, boolean notify, Date eventDate) throws RequestNotValidException, NotFoundException,
@@ -869,7 +870,7 @@ public final class PluginHelper {
     RodaCoreFactory.getIndexService().commit(Job.class);
   }
 
-  public static String getReindexPluginName(Class reindexClass) throws NotFoundException {
+  public static String getReindexPluginName(Class<?> reindexClass) throws NotFoundException {
     if (reindexClass.equals(AIP.class)) {
       return ReindexAIPPlugin.class.getName();
     } else if (reindexClass.equals(Format.class)) {

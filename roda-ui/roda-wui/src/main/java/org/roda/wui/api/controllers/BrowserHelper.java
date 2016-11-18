@@ -1328,6 +1328,17 @@ public class BrowserHelper {
     for (IndexedFile file : files.getResults()) {
       RodaCoreFactory.getModelService().deleteFile(file.getAipId(), file.getRepresentationId(), file.getPath(),
         file.getId(), true);
+
+      // FIXME PREMIS EVENT DETAILS
+      // try {
+      // RodaCoreFactory.getModelService().createEvent(file.getAipId(),
+      // file.getRepresentationId(), null, null,
+      // PreservationEventType.DELETION, "The file was deleted", "", "", true);
+      // } catch (ValidationException | AlreadyExistsException |
+      // GenericException | NotFoundException
+      // | RequestNotValidException | AuthorizationDeniedException e1) {
+      // LOGGER.error("Could not create a event after deleting file");
+      // }
     }
 
     RodaCoreFactory.getIndexService().commit(IndexedFile.class);
@@ -1901,6 +1912,7 @@ public class BrowserHelper {
   public static void updateAIPPermissions(User user, IndexedAIP indexedAIP, Permissions permissions, boolean recursive)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     final ModelService model = RodaCoreFactory.getModelService();
+
     AIP aip = model.retrieveAIP(indexedAIP.getId());
     aip.setPermissions(permissions);
     model.updateAIPPermissions(aip, user.getName());
@@ -2546,19 +2558,19 @@ public class BrowserHelper {
     AuthorizationDeniedException {
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
+    File newFolder;
 
     if (folderUUID != null) {
       IndexedFile ifolder = index.retrieve(IndexedFile.class, folderUUID);
-      File newFolder = model.createFile(ifolder.getAipId(), ifolder.getRepresentationId(), ifolder.getPath(),
+      newFolder = model.createFile(ifolder.getAipId(), ifolder.getRepresentationId(), ifolder.getPath(),
         ifolder.getId(), newName, true);
-      index.commit(IndexedFile.class);
-      return IdUtils.getFileId(newFolder);
     } else {
       IndexedRepresentation irep = index.retrieve(IndexedRepresentation.class, representationUUID);
-      File newFolder = model.createFile(irep.getAipId(), irep.getId(), null, null, newName, true);
-      index.commit(IndexedFile.class);
-      return IdUtils.getFileId(newFolder);
+      newFolder = model.createFile(irep.getAipId(), irep.getId(), null, null, newName, true);
     }
+
+    index.commit(IndexedFile.class);
+    return IdUtils.getFileId(newFolder);
   }
 
   public static List<TransferredResource> retrieveSelectedTransferredResource(

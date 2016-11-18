@@ -425,12 +425,16 @@ public class BrowseFile extends Composite {
   }
 
   private void errorPreview() {
+    errorPreview(messages.viewRepresentationErrorPreview());
+  }
+
+  private void errorPreview(String errorPreview) {
     HTML html = new HTML();
     SafeHtmlBuilder b = new SafeHtmlBuilder();
 
     b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-download fa-5'></i>"));
     b.append(SafeHtmlUtils.fromSafeConstant("<h4 class='errormessage'>"));
-    b.append(SafeHtmlUtils.fromString(messages.viewRepresentationErrorPreview()));
+    b.append(SafeHtmlUtils.fromString(errorPreview));
     b.append(SafeHtmlUtils.fromSafeConstant("</h4>"));
 
     Button downloadButton = new Button(messages.viewRepresentationDownloadFileButton());
@@ -528,7 +532,7 @@ public class BrowseFile extends Composite {
         errorPreview();
       }
     } else {
-      errorPreview();
+      errorPreview(messages.viewRepresentationTooLargeErrorPreview());
     }
   }
 

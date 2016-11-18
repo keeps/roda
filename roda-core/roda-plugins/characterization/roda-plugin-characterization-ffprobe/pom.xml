@@ -23,7 +23,7 @@
 							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
 						</manifest>
 						<manifestEntries>
-							<RODA-Plugin>org.roda.core.plugins.plugins.characterization.FFProbePlugin</RODA-Plugin>
+							<RODA-Plugin>org.roda.core.plugins.plugins.characterization.AvprobePlugin</RODA-Plugin>
 						</manifestEntries>
 					</archive>
 				</configuration>

@@ -30,12 +30,14 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
+import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.UserUtility;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.common.notifications.NotificationProcessor;
 import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -68,6 +70,7 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
@@ -430,7 +433,6 @@ public class ModelService extends ModelObservable {
     aip.setUpdatedOn(new Date());
     updateAIPMetadata(aip);
     notifyAipUpdated(aip);
-
     return aip;
   }
 
@@ -439,8 +441,8 @@ public class ModelService extends ModelObservable {
     aip.setUpdatedBy(updatedBy);
     aip.setUpdatedOn(new Date());
     updateAIPMetadata(aip);
-    notifyAipStateUpdated(aip);
 
+    notifyAipStateUpdated(aip);
     return aip;
   }
 
@@ -813,8 +815,7 @@ public class ModelService extends ModelObservable {
 
       // build return object
       representation = new Representation(representationId, aipId, original, type);
-
-      super.notifyRepresentationUpdated(representation);
+      notifyRepresentationUpdated(representation);
     } else {
       throw new ValidationException(validationReport);
     }
@@ -841,7 +842,6 @@ public class ModelService extends ModelObservable {
       }
     }
     updateAIPMetadata(aip);
-
     notifyRepresentationDeleted(aipId, representationId);
   }
 
@@ -959,6 +959,7 @@ public class ModelService extends ModelObservable {
     storage.updateBinaryContent(filePath, binary.getContent(), asReference, createIfNotExists);
     Binary binaryUpdated = storage.getBinary(filePath);
     file = ResourceParseUtils.convertResourceToFile(binaryUpdated);
+
     if (notify) {
       notifyFileUpdated(file);
     }
@@ -976,6 +977,7 @@ public class ModelService extends ModelObservable {
 
     StoragePath filePath = ModelUtils.getFileStoragePath(aipId, representationId, directoryPath, fileId);
     storage.deleteResource(filePath);
+
     if (notify) {
       notifyFileDeleted(aipId, representationId, directoryPath, fileId);
     }
@@ -1036,6 +1038,18 @@ public class ModelService extends ModelObservable {
 
   /***************** Preservation related *****************/
   /********************************************************/
+
+  public void createEvent(String aipId, String representationId, List<String> filePath, String fileId,
+    PreservationEventType eventType, String eventDescription, String outcomeDetail, String outcomeExtension,
+    boolean notify) throws GenericException, ValidationException, NotFoundException, RequestNotValidException,
+    AuthorizationDeniedException, AlreadyExistsException {
+
+    String id = IdUtils.createPreservationMetadataId(PreservationMetadataType.EVENT);
+    ContentPayload premisEvent = PremisV3Utils.createPremisEventBinary(id, new Date(), eventType.toString(),
+      eventDescription, null, null, PluginState.SUCCESS.toString(), outcomeDetail, outcomeExtension, new ArrayList<>());
+    createPreservationMetadata(PreservationMetadataType.EVENT, id, aipId, representationId, filePath, fileId,
+      premisEvent, notify);
+  }
 
   public Binary retrievePreservationRepresentation(String aipId, String representationId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {

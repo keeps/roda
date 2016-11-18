@@ -903,7 +903,7 @@ public class IndexModelObserver implements ModelObserver {
           PreservationMetadata pm = opm.get();
           if (PreservationMetadataType.EVENT.equals(pm.getType())) {
             try {
-              preservationEventPermissionsUpdated(pm, aip.getPermissions());
+              preservationEventPermissionsUpdated(pm, aip.getPermissions(), aip.getState());
             } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException
               | AuthorizationDeniedException e) {
               LOGGER.error("Cannot index premis event", e);
@@ -921,11 +921,11 @@ public class IndexModelObserver implements ModelObserver {
 
   }
 
-  private void preservationEventPermissionsUpdated(PreservationMetadata pm, Permissions permissions)
+  private void preservationEventPermissionsUpdated(PreservationMetadata pm, Permissions permissions, AIPState state)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
     SolrServerException, IOException {
     SolrInputDocument premisEventDocument = SolrUtils.preservationEventPermissionsUpdateToSolrDocument(pm.getId(),
-      pm.getAipId(), permissions);
+      pm.getAipId(), permissions, state);
 
     index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
   }

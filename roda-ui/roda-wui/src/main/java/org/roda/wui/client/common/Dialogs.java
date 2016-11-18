@@ -7,6 +7,8 @@
  */
 package org.roda.wui.client.common;
 
+import org.roda.wui.client.common.search.SearchSuggestBox;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -207,6 +209,66 @@ public class Dialogs {
     });
 
     confirmButton.setEnabled(validator.test(inputBox.getText()));
+
+    dialogBox.addStyleName("wui-dialog-prompt");
+    layout.addStyleName("wui-dialog-layout");
+    inputBox.addStyleName("form-textbox wui-dialog-message");
+    cancelButton.addStyleName("btn btn-link");
+    confirmButton.addStyleName("pull-right btn btn-play");
+
+    dialogBox.center();
+    dialogBox.show();
+    inputBox.setFocus(true);
+  }
+
+  public static void showPromptDialogSuggest(String title, String message, String placeHolder, String cancelButtonText,
+    String confirmButtonText, SearchSuggestBox suggestBox, final AsyncCallback<String> callback) {
+    final DialogBox dialogBox = new DialogBox(false, true);
+    dialogBox.setText(title);
+
+    final FlowPanel layout = new FlowPanel();
+
+    if (message != null) {
+      final Label messageLabel = new Label(message);
+      layout.add(messageLabel);
+      messageLabel.addStyleName("wui-dialog-message");
+    }
+
+    final SearchSuggestBox inputBox = suggestBox;
+
+    if (placeHolder != null) {
+      inputBox.getElement().setPropertyString("placeholder", placeHolder);
+    }
+
+    final Button cancelButton = new Button(cancelButtonText);
+    final Button confirmButton = new Button(confirmButtonText);
+
+    layout.add(inputBox);
+    layout.add(cancelButton);
+    layout.add(confirmButton);
+
+    dialogBox.setWidget(layout);
+
+    dialogBox.setGlassEnabled(true);
+    dialogBox.setAnimationEnabled(false);
+
+    cancelButton.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        dialogBox.hide();
+        callback.onFailure(null);
+      }
+    });
+
+    confirmButton.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        dialogBox.hide();
+        callback.onSuccess(inputBox.getValue());
+      }
+    });
 
     dialogBox.addStyleName("wui-dialog-prompt");
     layout.addStyleName("wui-dialog-layout");

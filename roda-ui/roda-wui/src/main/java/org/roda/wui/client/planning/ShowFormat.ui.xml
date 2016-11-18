@@ -32,6 +32,12 @@
 								<g:Label styleName="value" ui:field="formatName" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="formatLatestVersionKey">
+									<ui:text from='{messages.formatLatestVersion}' />
+								</g:Label>
+								<g:Label styleName="value" ui:field="formatLatestVersionValue" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
 								<g:Label styleName="label" ui:field="formatDefinitionKey">
 									<ui:text from='{messages.formatDefinition}' />
 								</g:Label>
@@ -42,12 +48,6 @@
 									<ui:text from='{messages.formatCategory}' />
 								</g:Label>
 								<g:FlowPanel styleName="value" ui:field="formatCategoryValue" />
-							</g:FlowPanel>
-							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="formatLatestVersionKey">
-									<ui:text from='{messages.formatLatestVersion}' />
-								</g:Label>
-								<g:Label styleName="value" ui:field="formatLatestVersionValue" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
 								<g:Label styleName="label" ui:field="formatPopularityKey">

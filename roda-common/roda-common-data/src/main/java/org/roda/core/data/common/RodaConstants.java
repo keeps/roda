@@ -398,7 +398,7 @@ public final class RodaConstants {
   public static final String OTHER_METADATA_TYPE_DIGITAL_SIGNATURE = "DigitalSignature";
   public static final String OTHER_METADATA_TYPE_DROID = "DROID";
   public static final String OTHER_METADATA_TYPE_EXIFTOOL = "ExifTool";
-  public static final String OTHER_METADATA_TYPE_FFPROBE = "FFProbe";
+  public static final String OTHER_METADATA_TYPE_AVPROBE = "Avprobe";
   public static final String OTHER_METADATA_TYPE_FITS = "FITS";
   public static final String OTHER_METADATA_TYPE_JHOVE = "JHOVE";
   public static final String OTHER_METADATA_TYPE_JPYLYZER = "jpylyzer";

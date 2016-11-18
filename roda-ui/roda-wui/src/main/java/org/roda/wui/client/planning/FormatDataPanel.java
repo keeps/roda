@@ -192,14 +192,6 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
       initialRelease.removeStyleName("isWrong");
     }
 
-    try {
-      Integer.parseInt(popularity.getText());
-      popularity.removeStyleName("isWrong");
-    } catch (NumberFormatException e) {
-      valid = false;
-      popularity.addStyleName("isWrong");
-    }
-
     checked = true;
     return valid;
   }

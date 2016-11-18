@@ -42,4 +42,8 @@ public class SearchSuggestBox<T extends IsIndexed> extends Composite {
   public HandlerRegistration addValueChangeHandler(ValueChangeHandler<String> handler) {
     return suggestBox.addValueChangeHandler(handler);
   }
+
+  public void setFocus(boolean focused) {
+    suggestBox.setFocus(focused);
+  }
 }

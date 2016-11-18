@@ -124,7 +124,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
             for (Representation representation : aip.getRepresentations()) {
               LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
-              sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(this, index, model, representation));
+              sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(this, model, representation));
               model.notifyRepresentationUpdated(representation);
             }
 
@@ -181,7 +181,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
         PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
         LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), representation.getAipId());
         try {
-          sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(this, index, model, representation));
+          sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(this, model, representation));
           model.notifyRepresentationUpdated(representation);
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
           reportItem.setPluginState(PluginState.SUCCESS);
@@ -236,8 +236,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
         try {
           // FIXME 20161117 nvieira this should be done with a single file
-          Representation representation = model.retrieveRepresentation(file.getAipId(), file.getRepresentationId());
-          sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(this, index, model, representation));
+          sources.addAll(SiegfriedPluginUtils.runSiegfriedOnFile(this, model, file));
           model.updateFile(file);
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
           reportItem.setPluginState(PluginState.SUCCESS);
