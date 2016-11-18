@@ -474,6 +474,11 @@ public final class PluginHelper {
       + RodaConstants.CORE_RISK_FOLDER + '/' + riskId + ".json";
 
     InputStream inputStream = RodaCoreFactory.getDefaultFileAsStream(defaultFile);
+    if (inputStream == null) {
+      inputStream = pluginClass.getResourceAsStream("/" + RodaConstants.CORE_DEFAULT_FOLDER + "/" + defaultFile);
+      LOGGER.trace("Loading default file from plugin classpath {}", defaultFile);
+    }
+
     Risk risk = null;
 
     try {
