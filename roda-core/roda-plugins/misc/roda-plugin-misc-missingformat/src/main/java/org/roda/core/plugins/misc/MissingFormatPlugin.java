@@ -31,6 +31,7 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
@@ -78,7 +79,7 @@ public class MissingFormatPlugin extends AbstractPlugin<File> {
   private static final String PRONOM = "pronom";
 
   /** Plugin parameter 'pronom'. */
-  private static final PluginParameter PARAM_PRONOM = new PluginParameter(PRONOM, "Pronom ID",
+  private static final PluginParameter PARAM_PRONOM = new PluginParameter(PRONOM, "PRONOM",
     PluginParameter.PluginParameterType.BOOLEAN, PARAM_VALUE_TRUE, false, false,
     "Check existence of a PRONOM Unique Identifier (PUID)?");
 
@@ -102,14 +103,14 @@ public class MissingFormatPlugin extends AbstractPlugin<File> {
 
   @Override
   public String getName() {
-    return "File with missing format information risk assessment";
+    return "Missing format risk assessor";
   }
 
   @Override
   public String getDescription() {
-    return "Check file format information (Mimetype, Pronom ID and Format designation). "
-      + "If this information is missing a, it creates a new risk called "
-      + "“<Mimetype/Pronom ID/Format designation> information missing“ "
+    return "Check file format information (Mimetype, PRONOM and Format designation). "
+      + "If this information is missing, it creates a new risk called "
+      + "“<Mimetype/PRONOM/Format designation> information missing“ "
       + "and assigns the file to that risk in the Risk register.";
   }
 
@@ -129,7 +130,7 @@ public class MissingFormatPlugin extends AbstractPlugin<File> {
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       for (File file : list) {
-        executeOnIndexedFile(file, index, model, jobPluginInfo, report);
+        executeOnFile(file, index, model, jobPluginInfo, report);
       }
 
       jobPluginInfo.finalizeInfo();
@@ -164,7 +165,7 @@ public class MissingFormatPlugin extends AbstractPlugin<File> {
 
   @Override
   public PreservationEventType getPreservationEventType() {
-    return PreservationEventType.FORMAT_IDENTIFICATION;
+    return PreservationEventType.RISK_MANAGEMENT;
   }
 
   @Override
@@ -250,7 +251,7 @@ public class MissingFormatPlugin extends AbstractPlugin<File> {
    * @param report
    *          the {@link Report}.
    */
-  private void executeOnIndexedFile(final File file, final IndexService index, final ModelService model,
+  private void executeOnFile(final File file, final IndexService index, final ModelService model,
     final JobPluginInfo jobPluginInfo, final Report report) {
     LOGGER.debug("Processing File {}", file.getId());
 
@@ -287,6 +288,14 @@ public class MissingFormatPlugin extends AbstractPlugin<File> {
       LOGGER.debug(String.format("Error retrieving IndexedFile for File %s (%s)", file.getId(), fileUUID), e);
       jobPluginInfo.incrementObjectsProcessedWithFailure();
       reportItem.setPluginState(PluginState.FAILURE);
+    }
+
+    try {
+      PluginHelper.createPluginEvent(this, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
+        model, index, null, null, reportItem.getPluginState(), "", true);
+    } catch (final RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
+      | ValidationException | AlreadyExistsException e) {
+      LOGGER.error("Could not create plugin event for file " + file.getId(), e);
     }
 
     report.addReport(reportItem);
