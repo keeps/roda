@@ -25,6 +25,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -238,7 +239,7 @@ public class MissingFormatPlugin extends AbstractPlugin<File> {
   }
 
   /**
-   * Execute verifications on a single {@link IndexedFile}.
+   * Execute verifications on a single {@link File}.
    *
    * @param file
    *          the {@link File}.
@@ -260,18 +261,18 @@ public class MissingFormatPlugin extends AbstractPlugin<File> {
     PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
 
     try {
-      final IndexedFile indexedFile = index.retrieve(IndexedFile.class, fileUUID);
+      final FileFormat fileFormat = index.retrieve(IndexedFile.class, fileUUID).getFileFormat();
       boolean fileOk = true;
 
-      if (checkMimetype() && StringUtils.isBlank(indexedFile.getFileFormat().getMimeType())) {
+      if (checkMimetype() && StringUtils.isBlank(fileFormat.getMimeType())) {
         createIncidence(model, file, MISSING_MIMETYPE_RISK_ID, reportItem);
         fileOk = false;
       }
-      if (checkPronom() && StringUtils.isBlank(indexedFile.getFileFormat().getPronom())) {
+      if (checkPronom() && StringUtils.isBlank(fileFormat.getPronom())) {
         createIncidence(model, file, MISSING_PRONOM_RISK_ID, reportItem);
         fileOk = false;
       }
-      if (checkFormatDesignation() && StringUtils.isBlank(indexedFile.getFileFormat().getFormatDesignationName())) {
+      if (checkFormatDesignation() && StringUtils.isBlank(fileFormat.getFormatDesignationName())) {
         createIncidence(model, file, MISSING_FORMAT_RISK_ID, reportItem);
         fileOk = false;
       }
