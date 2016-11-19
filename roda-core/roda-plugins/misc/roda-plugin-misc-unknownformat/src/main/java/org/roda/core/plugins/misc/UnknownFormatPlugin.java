@@ -22,9 +22,13 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.formats.Format;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -45,7 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Plugin identifies risk of missing format information in files.
+ * Plugin identifies risk of files with unknown formats.
  * 
  * @author Rui Castro <rui.castro@gmail.com>
  */
@@ -57,13 +61,10 @@ public class UnknownFormatPlugin extends AbstractPlugin<File> {
   private static final String VERSION = "1.0";
 
   /** <i>Unknown mimetype</i> risk ID. */
-  private static final String MISSING_MIMETYPE_RISK_ID = "urn:missingmimetype:r1";
+  private static final String UNKNOWN_MIMETYPE_RISK_ID = "urn:unknownmimetype:r1";
 
-  /** <i>Unknown pronom PUID</i> risk ID. */
-  private static final String MISSING_PRONOM_RISK_ID = "urn:missingpronom:r1";
-
-  /** <i>Unknown format</i> risk ID. */
-  private static final String MISSING_FORMAT_RISK_ID = "urn:missingformat:r1";
+  /** <i>Unknown PRONON ID</i> risk ID. */
+  private static final String UNKNOWN_PRONOM_RISK_ID = "urn:unknownpronom:r1";
 
   /** Plugin parameter value 'true'. */
   private static final String PARAM_VALUE_TRUE = "true";
@@ -73,7 +74,7 @@ public class UnknownFormatPlugin extends AbstractPlugin<File> {
 
   /** Plugin parameter 'mimetype'. */
   private static final PluginParameter PARAM_MIMETYPE = new PluginParameter(MIMETYPE, "Mimetype",
-    PluginParameter.PluginParameterType.BOOLEAN, PARAM_VALUE_TRUE, false, false, "Check existence of a Mimetype?");
+    PluginParameter.PluginParameterType.BOOLEAN, PARAM_VALUE_TRUE, false, false, "Check Mimetype?");
 
   /** Plugin parameter ID 'pronom'. */
   private static final String PRONOM = "pronom";
@@ -81,15 +82,7 @@ public class UnknownFormatPlugin extends AbstractPlugin<File> {
   /** Plugin parameter 'pronom'. */
   private static final PluginParameter PARAM_PRONOM = new PluginParameter(PRONOM, "PRONOM",
     PluginParameter.PluginParameterType.BOOLEAN, PARAM_VALUE_TRUE, false, false,
-    "Check existence of a PRONOM Unique Identifier (PUID)?");
-
-  /** Plugin parameter ID 'format'. */
-  private static final String FORMAT_DESIGNATION = "format";
-
-  /** Plugin parameter 'format'. */
-  private static final PluginParameter PARAM_FORMAT_DESIGNATION = new PluginParameter(FORMAT_DESIGNATION,
-    "Format designation", PluginParameter.PluginParameterType.BOOLEAN, PARAM_VALUE_TRUE, false, false,
-    "Check existence of a Format designation?");
+    "Check PRONOM Unique Identifier (PUID)?");
 
   @Override
   public void init() throws PluginException {
@@ -103,15 +96,14 @@ public class UnknownFormatPlugin extends AbstractPlugin<File> {
 
   @Override
   public String getName() {
-    return "Missing format risk assessor";
+    return "Unknown format risk assessor";
   }
 
   @Override
   public String getDescription() {
-    return "Check file format information (Mimetype, PRONOM and Format designation). "
-      + "If this information is missing, it creates a new risk called "
-      + "“<Mimetype/PRONOM/Format designation> information missing“ "
-      + "and assigns the file to that risk in the Risk register.";
+    return "Check file format (Mimetype and PRONOM) in the Format Registry. "
+      + "If File Format is not present in the Format Registry, it creates a new risk called "
+      + "“<Mimetype/PRONOM> is unknown“ " + "and assigns the file to that risk in the Risk register.";
   }
 
   @Override
@@ -155,7 +147,7 @@ public class UnknownFormatPlugin extends AbstractPlugin<File> {
 
   @Override
   public List<PluginParameter> getParameters() {
-    return Arrays.asList(PARAM_MIMETYPE, PARAM_PRONOM, PARAM_FORMAT_DESIGNATION);
+    return Arrays.asList(PARAM_MIMETYPE, PARAM_PRONOM);
   }
 
   @Override
@@ -170,17 +162,17 @@ public class UnknownFormatPlugin extends AbstractPlugin<File> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Checked for the presence of format identification information.";
+    return "Searched for file format in Format Registry.";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "File format information is present.";
+    return "File format is known.";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "File format information is missing.";
+    return "File format is unknown.";
   }
 
   @Override
@@ -208,37 +200,28 @@ public class UnknownFormatPlugin extends AbstractPlugin<File> {
   }
 
   /**
-   * Check existence of a mimetype?
+   * Check the mimetype?
    * 
-   * @return <code>true</code> if plugin should check the existence of a
-   *         mimetype, <code>false</code> otherwise.
+   * @return <code>true</code> if plugin should search for the mimetype in the
+   *         Format Registry, <code>false</code> otherwise.
    */
   private boolean checkMimetype() {
     return PARAM_VALUE_TRUE.equalsIgnoreCase(getParameterValues().get(MIMETYPE));
   }
 
   /**
-   * Check existence of a PRONOM Unique Identifier (PUID)?
+   * Check the PRONOM Unique Identifier (PUID)?
    *
-   * @return <code>true</code> if plugin should check the existence of a PRONOM
-   *         Unique Identifier (PUID), <code>false</code> otherwise.
+   * @return <code>true</code> if plugin should search for the PRONOM Unique
+   *         Identifier (PUID) in the Format Registry, <code>false</code>
+   *         otherwise.
    */
   private boolean checkPronom() {
     return PARAM_VALUE_TRUE.equalsIgnoreCase(getParameterValues().get(PRONOM));
   }
 
   /**
-   * Check existence of a Format?
-   *
-   * @return <code>true</code> if plugin should check the existence of a Format
-   *         designation, <code>false</code> otherwise.
-   */
-  private boolean checkFormatDesignation() {
-    return PARAM_VALUE_TRUE.equalsIgnoreCase(getParameterValues().get(FORMAT_DESIGNATION));
-  }
-
-  /**
-   * Execute verifications on a single {@link IndexedFile}.
+   * Execute verifications on a single {@link File}.
    *
    * @param file
    *          the {@link File}.
@@ -260,19 +243,19 @@ public class UnknownFormatPlugin extends AbstractPlugin<File> {
     PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
 
     try {
-      final IndexedFile indexedFile = index.retrieve(IndexedFile.class, fileUUID);
+      final FileFormat fileFormat = index.retrieve(IndexedFile.class, fileUUID).getFileFormat();
       boolean fileOk = true;
 
-      if (checkMimetype() && StringUtils.isBlank(indexedFile.getFileFormat().getMimeType())) {
-        createIncidence(model, file, MISSING_MIMETYPE_RISK_ID, reportItem);
+      final String mimetype = fileFormat.getMimeType();
+      if (checkMimetype() && StringUtils.isNotBlank(mimetype)
+        && !findFileFormat(index, RodaConstants.FORMAT_MIMETYPES, mimetype)) {
+        createIncidence(model, file, UNKNOWN_MIMETYPE_RISK_ID, reportItem);
         fileOk = false;
       }
-      if (checkPronom() && StringUtils.isBlank(indexedFile.getFileFormat().getPronom())) {
-        createIncidence(model, file, MISSING_PRONOM_RISK_ID, reportItem);
-        fileOk = false;
-      }
-      if (checkFormatDesignation() && StringUtils.isBlank(indexedFile.getFileFormat().getFormatDesignationName())) {
-        createIncidence(model, file, MISSING_FORMAT_RISK_ID, reportItem);
+      final String pronom = fileFormat.getPronom();
+      if (checkPronom() && StringUtils.isNotBlank(pronom)
+        && !findFileFormat(index, RodaConstants.FORMAT_PRONOMS, pronom)) {
+        createIncidence(model, file, UNKNOWN_PRONOM_RISK_ID, reportItem);
         fileOk = false;
       }
 
@@ -300,6 +283,27 @@ public class UnknownFormatPlugin extends AbstractPlugin<File> {
 
     report.addReport(reportItem);
     PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+  }
+
+  /**
+   * Check if a Format exists with the specified attribute.
+   * 
+   * @param index
+   *          the {@link IndexService}.
+   * @param key
+   *          the attribute key.
+   * @param value
+   *          the attribute value.
+   * @return <code>true</code> if a {@link Format} exists with the specified
+   *         key/value pair, <code>true</code> otherwise.
+   */
+  private boolean findFileFormat(final IndexService index, final String key, final String value) {
+    try {
+      return index.count(Format.class, new Filter(new SimpleFilterParameter(key, value))) > 0;
+    } catch (final RequestNotValidException | GenericException e) {
+      LOGGER.error(String.format("Error searching for %s '%s'.", key, value), e);
+      return false;
+    }
   }
 
   /**
@@ -334,7 +338,6 @@ public class UnknownFormatPlugin extends AbstractPlugin<File> {
       final String message = String.format("Error creating risk %s incidence for File %s", riskId, file.getId());
       report.setPluginState(PluginState.FAILURE).setPluginDetails(message);
       LOGGER.error(message, e);
-
     }
   }
 
