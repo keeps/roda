@@ -141,23 +141,26 @@ public class SiegfriedPluginUtils {
       final JsonNode files = jsonObject.get("files");
 
       for (JsonNode file : files) {
+        String jsonFileId = fileId;
+        List<String> jsonFilePath = fileDirectoryPath;
+
         if (fileDirectoryPath == null || fileId == null) {
           Path fullFsPath = Paths.get(file.get("filename").asText());
           Path relativeFsPath = path.relativize(fullFsPath);
 
-          fileId = relativeFsPath.getFileName().toString();
-          fileDirectoryPath = new ArrayList<>();
+          jsonFileId = relativeFsPath.getFileName().toString();
+          jsonFilePath = new ArrayList<>();
           for (int j = 0; j < relativeFsPath.getNameCount() - 1; j++) {
-            fileDirectoryPath.add(relativeFsPath.getName(j).toString());
+            jsonFilePath.add(relativeFsPath.getName(j).toString());
           }
         }
 
         ContentPayload payload = new StringContentPayload(file.toString());
 
-        model.createOtherMetadata(aipId, representationId, fileDirectoryPath, fileId, SiegfriedPlugin.FILE_SUFFIX,
+        model.createOtherMetadata(aipId, representationId, jsonFilePath, jsonFileId, SiegfriedPlugin.FILE_SUFFIX,
           RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED, payload, notify);
 
-        sources.add(PluginHelper.getLinkingIdentifier(aipId, representationId, fileDirectoryPath, fileId,
+        sources.add(PluginHelper.getLinkingIdentifier(aipId, representationId, jsonFilePath, jsonFileId,
           RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
         // Update PREMIS files
@@ -184,7 +187,7 @@ public class SiegfriedPluginUtils {
             }
           }
 
-          PremisV3Utils.updateFormatPreservationMetadata(model, aipId, representationId, fileDirectoryPath, fileId,
+          PremisV3Utils.updateFormatPreservationMetadata(model, aipId, representationId, jsonFilePath, jsonFileId,
             format, version, pronom, mime, notify);
         }
       }

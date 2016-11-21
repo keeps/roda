@@ -84,7 +84,8 @@ public class PremisSkeletonPluginUtils {
       model.createPreservationMetadata(PreservationMetadataType.REPRESENTATION, aipId, representationId,
         representationPayload, notifyInSteps);
     } catch (AlreadyExistsException e1) {
-      String pmId = IdUtils.getPreservationId(PreservationMetadataType.FILE, aipId, representationId, null, null);
+      String pmId = IdUtils.getPreservationId(PreservationMetadataType.REPRESENTATION, aipId, representationId, null,
+        null);
       model.updatePreservationMetadata(pmId, PreservationMetadataType.REPRESENTATION, aipId, representationId, null,
         null, representationPayload, notifyInSteps);
     }

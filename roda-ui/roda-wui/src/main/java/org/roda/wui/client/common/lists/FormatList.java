@@ -18,6 +18,7 @@ import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
+import org.roda.wui.common.client.tools.StringUtility;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.cellview.client.CellTable;
@@ -41,6 +42,8 @@ public class FormatList extends BasicAsyncTableCell<Format> {
 
   private TextColumn<Format> nameColumn;
   private TextColumn<Format> categoryColumn;
+  private TextColumn<Format> mimetypeColumn;
+  private TextColumn<Format> pronomColumn;
 
   public FormatList() {
     this(null, null, null, false);
@@ -69,17 +72,34 @@ public class FormatList extends BasicAsyncTableCell<Format> {
 
       @Override
       public String getValue(Format format) {
-        return (format != null && format.getCategories() != null && format.getCategories().size() > 0)
-          ? format.getCategories().get(0) : null;
+        return StringUtility.prettyPrint(format.getCategories());
+      }
+    };
+
+    mimetypeColumn = new TextColumn<Format>() {
+
+      @Override
+      public String getValue(Format format) {
+        return StringUtility.prettyPrint(format.getMimetypes());
+      }
+    };
+
+    pronomColumn = new TextColumn<Format>() {
+
+      @Override
+      public String getValue(Format format) {
+        return StringUtility.prettyPrint(format.getPronoms());
       }
     };
 
     nameColumn.setSortable(true);
     categoryColumn.setSortable(true);
+    mimetypeColumn.setSortable(true);
 
-    // TODO externalize strings into constants
+    addColumn(categoryColumn, messages.formatCategory(), true, false, 8);
     addColumn(nameColumn, messages.formatName(), false, false);
-    addColumn(categoryColumn, messages.formatCategory(), true, false);
+    addColumn(mimetypeColumn, messages.formatMimetypes(), false, false, 10);
+    addColumn(pronomColumn, messages.formatPronoms(), false, false, 10);
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(nameColumn, false));
@@ -90,7 +110,9 @@ public class FormatList extends BasicAsyncTableCell<Format> {
   protected Sorter getSorter(ColumnSortList columnSortList) {
     Map<Column<Format, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<Format, ?>, List<String>>();
     columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.FORMAT_NAME_SORT));
-    columnSortingKeyMap.put(categoryColumn, Arrays.asList(RodaConstants.FORMAT_CATEGORY_SORT));
+    columnSortingKeyMap.put(categoryColumn, Arrays.asList(RodaConstants.FORMAT_CATEGORY));
+    columnSortingKeyMap.put(mimetypeColumn, Arrays.asList(RodaConstants.FORMAT_MIMETYPES));
+    columnSortingKeyMap.put(pronomColumn, Arrays.asList(RodaConstants.FORMAT_PRONOMS));
 
     return createSorter(columnSortList, columnSortingKeyMap);
   }

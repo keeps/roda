@@ -3589,7 +3589,8 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .recoverPanel .isWrong {
-	border-left: 2px solid #d97570;
+	border-left: 2px solid #d97570 !important;
+	background: rgba(217, 117, 112, 0.25) !important;
 }
 
 /**********************************************
@@ -4535,7 +4536,8 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .wui-user-data .isWrong {
-	border-left: 2px solid #d97570;
+	border-left: 2px solid #d97570 !important;
+	background: rgba(217, 117, 112, 0.25) !important;
 }
 
 .wui-user-data .password {

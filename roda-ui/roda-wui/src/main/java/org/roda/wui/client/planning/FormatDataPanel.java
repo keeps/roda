@@ -178,18 +178,11 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
   public boolean isValid() {
     boolean valid = true;
 
-    if (name.getText().length() == 0) {
+    if (name.getText().isEmpty()) {
       valid = false;
       name.addStyleName("isWrong");
     } else {
       name.removeStyleName("isWrong");
-    }
-
-    if (initialRelease.getValue() == null || initialRelease.getValue().after(new Date())) {
-      valid = false;
-      initialRelease.addStyleName("isWrong");
-    } else {
-      initialRelease.removeStyleName("isWrong");
     }
 
     checked = true;

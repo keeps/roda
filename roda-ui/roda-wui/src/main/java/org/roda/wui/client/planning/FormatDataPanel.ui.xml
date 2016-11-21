@@ -22,12 +22,12 @@
 			<g:FlowPanel addStyleNames="wui-data-panel">
 				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatName}' /></g:Label>
 				<g:TextBox ui:field="name" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatLatestVersion}' /></g:Label>
+				<g:TextBox ui:field="latestVersion" addStyleNames="form-textbox form-textbox-small" />
 				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatDefinition}' /></g:Label>
 				<g:TextArea ui:field="definition" addStyleNames="form-textbox" />
 				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatCategory}' /></g:Label>
 				<l:IncrementalList ui:field="category"></l:IncrementalList>
-				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatLatestVersion}' /></g:Label>
-				<g:TextBox ui:field="latestVersion" addStyleNames="form-textbox form-textbox-small" />
 				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatPopularity}' /></g:Label>
 				<g:IntegerBox ui:field="popularity" addStyleNames="form-textbox form-textbox-small" />
 				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatDeveloper}' /></g:Label>

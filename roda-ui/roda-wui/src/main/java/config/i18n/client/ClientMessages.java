@@ -1193,7 +1193,11 @@ public interface ClientMessages extends Messages {
 
   String formatMimetypes();
 
+  String formatMimetype();
+
   String formatPronoms();
+
+  String formatPronom();
 
   String formatUtis();
 
