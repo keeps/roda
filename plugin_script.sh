@@ -1,20 +1,24 @@
-#!/bin/bash 
+#!/bin/bash
 
-JARLIST=(`find . -name roda-plugin-\*.jar | grep 'with-dependencies'`)
-COMMAND=" "
+cd "$(dirname "$0")"
 
-for i in "${JARLIST[@]}"
+JARS_WITH_DEPENDENCIES=(`find roda-core/roda-plugins/ -name roda-plugin-\*-jar-with-dependencies.jar`)
+ALL_JARS=(`find roda-core/roda-plugins/ -name roda-plugin-\*.jar`)
+
+JARS=("${ALL_JARS[@]}")
+
+for i in "${JARS_WITH_DEPENDENCIES[@]}"
 do :
-	size=${#i}-26
-	file="${i:0:$size}.jar"
-    COMMAND="$COMMAND ! -name '${file##*/}'"
+	SIZE=${#i}-26
+	FILE="${i:0:$SIZE}.jar"
+
+	JARS=(${JARS[@]/$FILE})
+
 done
 
-LIST=(`find . -name roda-plugin-\*.jar $COMMAND | grep -v roda-plugin-common`)
+mkdir -p jar_plugins
 
-`mkdir jar_plugins`
-
-for i in "${LIST[@]}"
+for i in "${JARS[@]}"
 do :
-	`cp $i jar_plugins/`
+	cp -v -f  "$i" jar_plugins/
 done
