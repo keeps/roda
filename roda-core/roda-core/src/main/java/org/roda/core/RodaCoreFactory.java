@@ -1156,22 +1156,17 @@ public class RodaCoreFactory {
   }
 
   public static Optional<Schema> getRodaSchema(String metadataType, String metadataVersion) {
-
-    Optional<Schema> schema = null;
+    Optional<Schema> schema = Optional.empty();
     try {
       schema = RODA_SCHEMAS_CACHE.get(Pair.create(metadataType, metadataVersion));
-
     } catch (ExecutionException e) {
       if (StringUtils.isNotBlank(metadataType)) {
         try {
           schema = RODA_SCHEMAS_CACHE.get(Pair.create(metadataType, null));
         } catch (ExecutionException e2) {
-
+          // Do nothing
         }
       }
-    }
-    if (schema == null) {
-      schema = Optional.empty();
     }
     return schema;
   }
