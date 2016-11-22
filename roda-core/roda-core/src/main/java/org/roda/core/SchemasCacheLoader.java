@@ -19,13 +19,16 @@ public class SchemasCacheLoader extends CacheLoader<Pair<String, String>, Option
   @Override
   public Optional<Schema> load(Pair<String, String> pair) throws Exception {
     String metadataType = pair.getFirst();
+    String metadataTypeLowerCase = metadataType.toLowerCase();
     String metadataVersion = pair.getSecond();
+    String metadataVersionLowerCase = metadataType.toLowerCase();
 
     String schemaFileName;
     if (StringUtils.isNotEmpty(metadataVersion)) {
-      schemaFileName = metadataType + RodaConstants.METADATA_VERSION_SEPARATOR + metadataVersion + ".xsd";
+      schemaFileName = metadataTypeLowerCase + RodaConstants.METADATA_VERSION_SEPARATOR + metadataVersionLowerCase
+        + ".xsd";
     } else {
-      schemaFileName = metadataType + ".xsd";
+      schemaFileName = metadataTypeLowerCase + ".xsd";
     }
 
     String schemaPath = RodaConstants.CORE_SCHEMAS_FOLDER + "/" + schemaFileName;
