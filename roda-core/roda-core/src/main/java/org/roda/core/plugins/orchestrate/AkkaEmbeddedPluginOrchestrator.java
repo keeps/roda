@@ -418,11 +418,13 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     for (Job job : unfinishedJobs) {
       try {
         Job jobToBeCleaned = model.retrieveJob(job.getId());
-        JobsHelper.updateJobInTheStateStartedOrCreated(jobToBeCleaned);
-        model.createOrUpdateJob(jobToBeCleaned);
 
         // cleanup job related objects (aips, sips, etc.)
         JobsHelper.doJobObjectsCleanup(job, model, index);
+
+        // only after deleting all the objects, delete the job
+        JobsHelper.updateJobInTheStateStartedOrCreated(jobToBeCleaned);
+        model.createOrUpdateJob(jobToBeCleaned);
       } catch (NotFoundException e) {
         jobsToBeDeletedFromIndex.add(job.getId());
       } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
