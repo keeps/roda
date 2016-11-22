@@ -64,13 +64,20 @@ public class Messages {
   public static final class JobsManagerJobEnded extends AbstractMessage {
     private static final long serialVersionUID = -2514581679498648676L;
 
-    public JobsManagerJobEnded() {
+    private String jobId;
+
+    public JobsManagerJobEnded(String jobId) {
       super();
+      this.jobId = jobId;
+    }
+
+    public String getJobId() {
+      return jobId;
     }
 
     @Override
     public String toString() {
-      return "JobsManagerJobEnded []";
+      return "JobsManagerJobEnded [jobId=" + jobId + "]";
     }
   }
 

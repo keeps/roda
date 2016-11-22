@@ -116,6 +116,8 @@ import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.codahale.metrics.JmxReporter;
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -162,6 +164,10 @@ public class RodaCoreFactory {
   private static boolean TEST_DEPLOY_PLUGIN_MANAGER = true;
   private static boolean TEST_DEPLOY_DEFAULT_RESOURCES = true;
   private static SolrType TEST_SOLR_TYPE = null;
+
+  // Metrics related objects
+  private static MetricRegistry metricsRegistry;
+  private static JmxReporter jmxMetricsReporter;
 
   // Orchestrator related objects
   private static PluginManager pluginManager;
@@ -282,6 +288,9 @@ public class RodaCoreFactory {
         // initialize reports directory
         initializeReportsDirectory();
 
+        // initialize metrics stuff
+        initializeMetrics();
+
         // instantiate storage and model service
         instantiateStorageAndModel();
         LOGGER.debug("Finished instantiating storage & model");
@@ -353,6 +362,14 @@ public class RodaCoreFactory {
       Files.createDirectories(reportDirectoryPath);
     } catch (IOException e) {
       throw new RuntimeException("Unable to create RODA Reports DIRECTORY " + reportDirectoryPath + ". Aborting...", e);
+    }
+  }
+
+  private static void initializeMetrics() {
+    metricsRegistry = new MetricRegistry();
+    if (getSystemProperty("com.sun.management.jmxremote", null) != null) {
+      jmxMetricsReporter = JmxReporter.forRegistry(metricsRegistry).build();
+      jmxMetricsReporter.start();
     }
   }
 
@@ -792,10 +809,19 @@ public class RodaCoreFactory {
         FSUtils.deletePathQuietly(workingDirectoryPath);
       }
 
+      // stop jmx metrics reporter
+      if (getSystemProperty("com.sun.management.jmxremote", null) != null) {
+        jmxMetricsReporter.stop();
+      }
+
       // delete resources that are no longer needed
       toDeleteDuringShutdown.forEach(e -> FSUtils.deletePathQuietly(e));
 
     }
+  }
+
+  public static MetricRegistry getMetrics() {
+    return metricsRegistry;
   }
 
   /**

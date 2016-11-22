@@ -8,14 +8,19 @@
 package org.roda.core.plugins.orchestrate.akka;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.Queue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.v2.jobs.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.Histogram;
+import com.codahale.metrics.MetricRegistry;
 
 import akka.actor.ActorRef;
 import akka.actor.Props;
@@ -25,31 +30,36 @@ import scala.concurrent.duration.Duration;
 public class AkkaJobsManager extends AkkaBaseActor {
   private static final Logger LOGGER = LoggerFactory.getLogger(AkkaJobsManager.class);
 
-  private ActorRef jobsRouter;
+  // state
   private int maxNumberOfJobsInParallel;
-  private ConcurrentLinkedQueue<Job> jobsWaiting;
+  private Queue<Job> jobsWaiting;
   private Map<String, ActorRef> jobsWaitingCreators;
-  private AtomicInteger jobsBeingExecuted;
-  private boolean tickSent;
+  private ActorRef jobsRouter;
+
+  // metrics
+  private Counter jobsBeingExecuted;
+  private Counter jobsWaitingToBeExecuted;
+  private Counter ticksWaitingToBeProcessed;
+  private Histogram jobsBeingExecutedHisto;
+  private Histogram jobsWaitingToBeExecutedHisto;
 
   public AkkaJobsManager(int maxNumberOfJobsInParallel) {
     super();
     this.maxNumberOfJobsInParallel = maxNumberOfJobsInParallel;
-    this.jobsWaiting = new ConcurrentLinkedQueue<>();
+    this.jobsWaiting = new LinkedList<Job>();
     this.jobsWaitingCreators = new HashMap<>();
-    this.jobsBeingExecuted = new AtomicInteger(0);
-    this.tickSent = false;
 
     Props jobsProps = new RoundRobinPool(maxNumberOfJobsInParallel).props(Props.create(AkkaJobActor.class, getSelf()));
     jobsRouter = getContext().actorOf(jobsProps, "JobsRouter");
+
+    initMetrics(maxNumberOfJobsInParallel);
 
     getContext().system().scheduler().schedule(Duration.create(0, TimeUnit.MILLISECONDS),
       Duration.create(2, TimeUnit.SECONDS), new Runnable() {
         @Override
         public void run() {
-          if (!tickSent && !jobsWaiting.isEmpty()) {
-            tickSent = true;
-            getSelf().tell(new Messages.JobsManagerTick(), getSelf());
+          if (jobsWaitingToBeExecuted.getCount() > 0) {
+            sendTick();
           }
         }
       }, getContext().system().dispatcher());
@@ -57,36 +67,95 @@ public class AkkaJobsManager extends AkkaBaseActor {
 
   @Override
   public void onReceive(Object msg) throws Throwable {
-    LOGGER.debug("start > maxNumberOfJobsInParallel:{}; #jobsBeingExecuted:{}; #jobsWaiting:{}",
-      maxNumberOfJobsInParallel, jobsBeingExecuted.get(), jobsWaiting.size());
     if (msg instanceof Job) {
-      if (jobsWaiting.isEmpty() && jobsBeingExecuted.get() < maxNumberOfJobsInParallel) {
-        jobsBeingExecuted.incrementAndGet();
-        jobsRouter.tell(msg, getSender());
+      Job job = (Job) msg;
+      if (jobsWaitingToBeExecuted.getCount() == 0 && jobsBeingExecuted.getCount() < maxNumberOfJobsInParallel) {
+        sendJobForExecution(msg, job);
       } else {
-        Job job = (Job) msg;
-        jobsWaiting.add(job);
-        jobsWaitingCreators.put(job.getId(), getSender());
+        queueJob(job, getSender());
       }
     } else if (msg instanceof Messages.JobsManagerTick) {
-      if (!jobsWaiting.isEmpty() && jobsBeingExecuted.get() < maxNumberOfJobsInParallel) {
-        while (!jobsWaiting.isEmpty() && jobsBeingExecuted.get() < maxNumberOfJobsInParallel) {
-          jobsBeingExecuted.incrementAndGet();
-          Job job = jobsWaiting.remove();
-          ActorRef jobCreator = jobsWaitingCreators.remove(job.getId());
-          jobsRouter.tell(job, jobCreator);
+      if (jobsWaitingToBeExecuted.getCount() > 0 && jobsBeingExecuted.getCount() < maxNumberOfJobsInParallel) {
+        while (jobsWaitingToBeExecuted.getCount() > 0 && jobsBeingExecuted.getCount() < maxNumberOfJobsInParallel) {
+          dequeueJob();
         }
       }
-      tickSent = false;
+      ticksWaitingToBeProcessed.dec();
     } else if (msg instanceof Messages.JobsManagerJobEnded) {
-      jobsBeingExecuted.decrementAndGet();
-      tickSent = false;
+      updateJobsBeingExecuted(false);
+      sendTick();
+      log("The end for job", ((Messages.JobsManagerJobEnded) msg).getJobId());
     } else {
       LOGGER.error("Received a message that don't know how to process ({})...", msg.getClass().getName());
       unhandled(msg);
     }
-    LOGGER.debug("end > maxNumberOfJobsInParallel:{}; #jobsBeingExecuted:{}; #jobsWaiting:{}",
-      maxNumberOfJobsInParallel, jobsBeingExecuted.get(), jobsWaiting.size());
+  }
+
+  private void sendTick() {
+    if (ticksWaitingToBeProcessed.getCount() == 0) {
+      self().tell(new Messages.JobsManagerTick(), self());
+      ticksWaitingToBeProcessed.inc();
+    }
+  }
+
+  private void sendJobForExecution(Object msg, Job job) {
+    updateJobsBeingExecuted(true);
+    jobsRouter.tell(msg, getSender());
+    log("Will execute job", job.getId());
+  }
+
+  private void updateJobsBeingExecuted(boolean increment) {
+    if (increment) {
+      jobsBeingExecuted.inc();
+    } else {
+      jobsBeingExecuted.dec();
+    }
+    jobsBeingExecutedHisto.update(jobsBeingExecuted.getCount());
+  }
+
+  private void updateJobsWaitingToBeExecuted(boolean increment) {
+    if (increment) {
+      jobsWaitingToBeExecuted.inc();
+    } else {
+      jobsWaitingToBeExecuted.dec();
+    }
+    jobsWaitingToBeExecutedHisto.update(jobsWaitingToBeExecuted.getCount());
+  }
+
+  private void queueJob(Job job, ActorRef sender) {
+    jobsWaiting.offer(job);
+    jobsWaitingCreators.put(job.getId(), sender);
+    updateJobsWaitingToBeExecuted(true);
+    log("Queued job", job.getId());
+  }
+
+  private Job dequeueJob() {
+    Job job = jobsWaiting.remove();
+    ActorRef jobCreator = jobsWaitingCreators.remove(job.getId());
+    jobsRouter.tell(job, jobCreator);
+    updateJobsBeingExecuted(true);
+    updateJobsWaitingToBeExecuted(false);
+    log("Dequeued job", job.getId());
+    return job;
+  }
+
+  private void log(String msg, String jobId) {
+    LOGGER.info("{} '{}' (max: {}| exec: {}| wait: {})", msg, jobId, maxNumberOfJobsInParallel,
+      jobsBeingExecuted.getCount(), jobsWaitingToBeExecuted.getCount());
+  }
+
+  private void initMetrics(int maxNumberOfJobsInParallel) {
+    MetricRegistry metrics = RodaCoreFactory.getMetrics();
+    Counter maxNumberOfJobsInParallelCounter = metrics
+      .counter(MetricRegistry.name(AkkaJobsManager.class, "maxNumberOfJobsInParallel"));
+    maxNumberOfJobsInParallelCounter.inc(maxNumberOfJobsInParallel);
+    jobsBeingExecuted = metrics.counter(MetricRegistry.name(AkkaJobsManager.class, "jobsBeingExecuted"));
+    jobsWaitingToBeExecuted = metrics.counter(MetricRegistry.name(AkkaJobsManager.class, "jobsWaitingToBeExecuted"));
+    ticksWaitingToBeProcessed = metrics
+      .counter(MetricRegistry.name(AkkaJobsManager.class, "ticksWaitingToBeProcessed"));
+    jobsBeingExecutedHisto = metrics.histogram(MetricRegistry.name(AkkaJobsManager.class, "jobsBeingExecutedHisto"));
+    jobsWaitingToBeExecutedHisto = metrics
+      .histogram(MetricRegistry.name(AkkaJobsManager.class, "jobsWaitingToBeExecutedHisto"));
   }
 
 }
