@@ -128,7 +128,7 @@ public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
 
       @Override
       public String getValue(IndexedFile file) {
-        return (file != null) ? Humanize.readableFileSize(file.getSize()) : null;
+        return (file != null && file.getSize() > 0) ? Humanize.readableFileSize(file.getSize()) : "";
       }
     };
 
