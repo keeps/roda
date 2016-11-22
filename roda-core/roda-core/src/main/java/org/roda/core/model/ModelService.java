@@ -17,6 +17,7 @@ import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
@@ -1039,14 +1040,23 @@ public class ModelService extends ModelObservable {
   /***************** Preservation related *****************/
   /********************************************************/
 
+  public void createUpdateAIPEvent(String aipId, String representationId, List<String> filePath, String fileId,
+    PreservationEventType eventType, String eventDescription, String outcomeDetail, String agentName, boolean notify)
+    throws GenericException, ValidationException, NotFoundException, RequestNotValidException,
+    AuthorizationDeniedException, AlreadyExistsException {
+
+    createEvent(aipId, representationId, filePath, fileId, eventType, eventDescription, outcomeDetail, "",
+      Arrays.asList(IdUtils.getUserAgentId(agentName)), notify);
+  }
+
   public void createEvent(String aipId, String representationId, List<String> filePath, String fileId,
     PreservationEventType eventType, String eventDescription, String outcomeDetail, String outcomeExtension,
-    boolean notify) throws GenericException, ValidationException, NotFoundException, RequestNotValidException,
-    AuthorizationDeniedException, AlreadyExistsException {
+    List<String> agentIds, boolean notify) throws GenericException, ValidationException, NotFoundException,
+    RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
 
     String id = IdUtils.createPreservationMetadataId(PreservationMetadataType.EVENT);
     ContentPayload premisEvent = PremisV3Utils.createPremisEventBinary(id, new Date(), eventType.toString(),
-      eventDescription, null, null, PluginState.SUCCESS.toString(), outcomeDetail, outcomeExtension, new ArrayList<>());
+      eventDescription, null, null, PluginState.SUCCESS.toString(), outcomeDetail, outcomeExtension, agentIds);
     createPreservationMetadata(PreservationMetadataType.EVENT, id, aipId, representationId, filePath, fileId,
       premisEvent, notify);
   }

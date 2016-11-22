@@ -168,6 +168,7 @@ public class RepresentationsResource {
     @ApiParam(value = "The AIP to add the representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @ApiParam(value = "The desired representation ID", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
     @ApiParam(value = "The type of the new representation", required = true) @FormParam(RodaConstants.API_QUERY_PARAM_TYPE) String type,
+    @ApiParam(value = "Reason to create representation", required = true) @FormParam(RodaConstants.API_QUERY_PARAM_DETAILS) String details,
     @ApiParam(value = "Choose format in which to get the representation", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
@@ -176,7 +177,7 @@ public class RepresentationsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    Representation rep = Browser.createRepresentation(user, aipId, representationId, type);
+    Representation rep = Browser.createRepresentation(user, aipId, representationId, type, details);
     return Response.ok(rep, mediaType).build();
   }
 

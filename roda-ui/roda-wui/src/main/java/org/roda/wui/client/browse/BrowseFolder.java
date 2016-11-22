@@ -19,6 +19,7 @@ import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
@@ -316,15 +317,27 @@ public class BrowseFolder extends Composite {
 
         @Override
         public void onSuccess(final String newName) {
-          BrowserService.Util.getInstance().renameFolder(folderUUID, newName, new LoadingAsyncCallback<String>() {
+          Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
+            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
 
-            @Override
-            public void onSuccessImpl(String newUUID) {
-              Toast.showInfo(messages.dialogSuccess(), messages.renameSuccessful());
-              Tools.newHistory(BrowseFolder.RESOLVER, aipId, repId, newUUID);
-            }
-          });
+              @Override
+              public void onFailure(Throwable caught) {
+                Toast.showInfo(messages.dialogFailure(), messages.renameFailed());
+              }
 
+              @Override
+              public void onSuccess(String details) {
+                BrowserService.Util.getInstance().renameFolder(folderUUID, newName, details,
+                  new LoadingAsyncCallback<String>() {
+
+                    @Override
+                    public void onSuccessImpl(String newUUID) {
+                      Toast.showInfo(messages.dialogSuccess(), messages.renameSuccessful());
+                      Tools.newHistory(BrowseFolder.RESOLVER, aipId, repId, newUUID);
+                    }
+                  });
+              }
+            });
         }
       });
   }
@@ -344,33 +357,48 @@ public class BrowseFolder extends Composite {
       @Override
       public void onValueChange(ValueChangeEvent<IndexedFile> event) {
         final IndexedFile toFolder = event.getValue();
-        SelectedItems<IndexedFile> selected = filesList.getSelected();
 
-        if (ClientSelectedItemsUtils.isEmpty(selected)) {
-          selected = new SelectedItemsList<IndexedFile>(Arrays.asList(folderUUID), IndexedFile.class.getName());
-        }
-
-        BrowserService.Util.getInstance().moveFiles(aipId, repId, selected, toFolder,
-          new LoadingAsyncCallback<String>() {
+        Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
+          RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
 
             @Override
-            public void onSuccessImpl(String newUUID) {
-              if (newUUID != null) {
-                Tools.newHistory(BrowseFolder.RESOLVER, aipId, repId, newUUID);
-              } else {
-                Tools.newHistory(BrowseRepresentation.RESOLVER, aipId, repId);
-              }
+            public void onFailure(Throwable caught) {
+              Toast.showInfo(messages.dialogFailure(), messages.renameFailed());
             }
 
             @Override
-            public void onFailureImpl(Throwable caught) {
-              if (caught instanceof NotFoundException) {
-                Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-              } else {
-                AsyncCallbackUtils.defaultFailureTreatment(caught);
-              }
-            }
+            public void onSuccess(String details) {
+              SelectedItems<IndexedFile> selected = filesList.getSelected();
 
+              if (ClientSelectedItemsUtils.isEmpty(selected)) {
+                selected = new SelectedItemsList<IndexedFile>(Arrays.asList(folderUUID), IndexedFile.class.getName());
+              }
+
+              final SelectedItems<IndexedFile> selectedItems = selected;
+
+              BrowserService.Util.getInstance().moveFiles(aipId, repId, selectedItems, toFolder, details,
+                new LoadingAsyncCallback<String>() {
+
+                  @Override
+                  public void onSuccessImpl(String newUUID) {
+                    if (newUUID != null) {
+                      Tools.newHistory(BrowseFolder.RESOLVER, aipId, repId, newUUID);
+                    } else {
+                      Tools.newHistory(BrowseRepresentation.RESOLVER, aipId, repId);
+                    }
+                  }
+
+                  @Override
+                  public void onFailureImpl(Throwable caught) {
+                    if (caught instanceof NotFoundException) {
+                      Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+                    } else {
+                      AsyncCallbackUtils.defaultFailureTreatment(caught);
+                    }
+                  }
+
+                });
+            }
           });
       }
     });
@@ -383,32 +411,44 @@ public class BrowseFolder extends Composite {
 
   @UiHandler("createFolder")
   void buttonCreateFolderHandler(ClickEvent e) {
-    Dialogs.showPromptDialog(messages.renameItemTitle(), null, messages.renamePlaceholder(), RegExp.compile(".*"),
-      messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
+    Dialogs.showPromptDialog(messages.createFolderTitle(), null, messages.createFolderPlaceholder(),
+      RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
         @Override
         public void onFailure(Throwable caught) {
           Toast.showInfo(messages.dialogFailure(), messages.renameFailed());
         }
 
         @Override
-        public void onSuccess(String newName) {
-          BrowserService.Util.getInstance().createFolder(aipId, repId, folderUUID, newName,
-            new LoadingAsyncCallback<String>() {
+        public void onSuccess(final String newName) {
+          Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
+            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
 
               @Override
-              public void onSuccessImpl(String newUUID) {
-                filesList.refresh();
+              public void onFailure(Throwable caught) {
+                Toast.showInfo(messages.dialogFailure(), messages.renameFailed());
               }
 
               @Override
-              public void onFailureImpl(Throwable caught) {
-                if (caught instanceof NotFoundException) {
-                  Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-                } else {
-                  AsyncCallbackUtils.defaultFailureTreatment(caught);
-                }
-              }
+              public void onSuccess(String details) {
+                BrowserService.Util.getInstance().createFolder(aipId, repId, folderUUID, newName, details,
+                  new LoadingAsyncCallback<String>() {
 
+                    @Override
+                    public void onSuccessImpl(String newUUID) {
+                      filesList.refresh();
+                    }
+
+                    @Override
+                    public void onFailureImpl(Throwable caught) {
+                      if (caught instanceof NotFoundException) {
+                        Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+                      } else {
+                        AsyncCallbackUtils.defaultFailureTreatment(caught);
+                      }
+                    }
+
+                  });
+              }
             });
         }
       });
@@ -473,6 +513,8 @@ public class BrowseFolder extends Composite {
                 public void onSuccessImpl(Void returned) {
                   Toast.showInfo(messages.removeSuccessTitle(), messages.removeAllSuccessMessage());
                   filesList.refresh();
+                  rename.setEnabled(true);
+                  createFolder.setEnabled(true);
                 }
               });
             }
@@ -501,13 +543,11 @@ public class BrowseFolder extends Composite {
 
   @UiHandler("identifyFormats")
   void buttonIdentifyFormatsHandler(ClickEvent e) {
-    SelectedItems selected = (SelectedItems) filesList.getSelected();
+    SelectedItems<IndexedFile> selected = (SelectedItems<IndexedFile>) filesList.getSelected();
 
     if (ClientSelectedItemsUtils.isEmpty(selected)) {
-      // FIXME 20161117 nvieira it should use the parent folder UUID but the
-      // plugin cannot support it
-      selected = new SelectedItemsList<IndexedRepresentation>(Arrays.asList(repId),
-        IndexedRepresentation.class.getName());
+      Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_ANCESTORS_PATH, folderUUID));
+      selected = new SelectedItemsFilter<IndexedFile>(filter, IndexedFile.class.getName(), false);
     }
 
     BrowserService.Util.getInstance().createFormatIdentificationJob(selected, new AsyncCallback<Void>() {
@@ -527,4 +567,5 @@ public class BrowseFolder extends Composite {
       }
     });
   }
+
 }

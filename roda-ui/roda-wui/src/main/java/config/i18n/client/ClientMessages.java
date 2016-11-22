@@ -120,6 +120,14 @@ public interface ClientMessages extends Messages {
 
   String changeTypePlaceHolder();
 
+  String createFolderTitle();
+
+  String createFolderPlaceholder();
+
+  String outcomeDetailTitle();
+
+  String outcomeDetailPlaceholder();
+
   /******* SIDEBAR ******************************************/
 
   String sidebarFilterDates();

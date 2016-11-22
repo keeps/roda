@@ -107,7 +107,7 @@ public interface BrowserService extends RemoteService {
   String deleteAIP(SelectedItems<IndexedAIP> aips)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
-  void deleteRepresentation(SelectedItems<IndexedRepresentation> representations)
+  void deleteRepresentation(SelectedItems<IndexedRepresentation> representations, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   void deleteFile(SelectedItems<IndexedFile> files)
@@ -284,23 +284,23 @@ public interface BrowserService extends RemoteService {
     String mitigatedBy, String mitigatedDescription)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException;
 
-  String createRepresentation(String aipId) throws AuthorizationDeniedException, GenericException, NotFoundException,
-    RequestNotValidException, AlreadyExistsException;
+  String createRepresentation(String aipId, String details) throws AuthorizationDeniedException, GenericException,
+    NotFoundException, RequestNotValidException, AlreadyExistsException;
 
-  String renameFolder(String folderUUID, String newName) throws AuthorizationDeniedException, GenericException,
-    RequestNotValidException, AlreadyExistsException, NotFoundException;
+  String renameFolder(String folderUUID, String newName, String details) throws AuthorizationDeniedException,
+    GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException;
 
   String moveFiles(String aipId, String representationUUID, SelectedItems<IndexedFile> selectedFiles,
-    IndexedFile toFolder) throws AuthorizationDeniedException, GenericException, RequestNotValidException,
-    AlreadyExistsException, NotFoundException;
+    IndexedFile toFolder, String details) throws AuthorizationDeniedException, GenericException,
+    RequestNotValidException, AlreadyExistsException, NotFoundException;
 
-  String createFolder(String aipId, String representationUUID, String folderUUID, String newName)
+  String createFolder(String aipId, String representationUUID, String folderUUID, String newName, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, AlreadyExistsException,
     NotFoundException;
 
   void createFormatIdentificationJob(SelectedItems selected)
     throws GenericException, AuthorizationDeniedException, JobAlreadyStartedException;
 
-  void changeRepresentationType(SelectedItemsList<IndexedRepresentation> selectedRepresentation, String newType)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
+  void changeRepresentationType(SelectedItemsList<IndexedRepresentation> selectedRepresentation, String newType,
+    String details) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 }

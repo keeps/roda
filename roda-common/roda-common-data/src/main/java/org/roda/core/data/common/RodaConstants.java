@@ -192,6 +192,7 @@ public final class RodaConstants {
   public static final String API_QUERY_PARAM_TEMPLATE = "template";
   public static final String API_QUERY_PARAM_PASSWORD = "password";
   public static final String API_QUERY_PARAM_SIZE_LIMIT = "size";
+  public static final String API_QUERY_PARAM_DETAILS = "details";
   public static final String API_PARAM_UPLOAD = "upl";
   public static final String API_PARAM_FILE = "file";
   public static final String API_FORM_PARAM_FIND_REQUEST = "findRequest";

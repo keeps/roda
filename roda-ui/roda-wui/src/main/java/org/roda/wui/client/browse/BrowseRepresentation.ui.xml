@@ -68,6 +68,10 @@
 							<g:Button addStyleNames="btn btn-play" ui:field="newProcess">
 								<ui:text from='{messages.newProcessPreservation}' />
 							</g:Button>
+							<g:Button addStyleNames="btn btn-play"
+								ui:field="identifyFormats">
+								<ui:text from='{messages.identifyFormatsButton}' />
+							</g:Button>
 							<g:Button addStyleNames="btn btn-default btn-clock"
 								ui:field="preservationEvents">
 								<ui:text from='{messages.preservationEvents}' />
@@ -81,10 +85,6 @@
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarFoldersFilesTitle}' />
 							</g:Label>
-							<g:Button addStyleNames="btn btn-edit"
-								ui:field="identifyFormats">
-								<ui:text from='{messages.identifyFormatsButton}' />
-							</g:Button>
 							<g:Button addStyleNames="btn btn-edit" ui:field="renameFolders">
 								<ui:text from='{messages.renameButton}' />
 							</g:Button>

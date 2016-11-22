@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -1280,7 +1281,7 @@ public class BrowserHelper {
     return parentId;
   }
 
-  public static void deleteRepresentation(SelectedItems<IndexedRepresentation> selected, User user)
+  public static void deleteRepresentation(User user, SelectedItems<IndexedRepresentation> selected, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     List<String> representationIds = consolidate(user, IndexedRepresentation.class, selected);
 
@@ -1299,8 +1300,21 @@ public class BrowserHelper {
     IndexResult<IndexedRepresentation> reps = RodaCoreFactory.getIndexService().find(IndexedRepresentation.class,
       filter, Sorter.NONE, new Sublist(0, representationIds.size()));
 
+    Set<String> changedAIPs = new HashSet<String>();
     for (IndexedRepresentation rep : reps.getResults()) {
       RodaCoreFactory.getModelService().deleteRepresentation(rep.getAipId(), rep.getId());
+      changedAIPs.add(rep.getAipId());
+    }
+
+    for (String aipId : changedAIPs) {
+      // FIXME PREMIS EVENT
+      try {
+        RodaCoreFactory.getModelService().createUpdateAIPEvent(aipId, null, null, null, PreservationEventType.DELETION,
+          "Representations were deleted", details, user.getName(), true);
+      } catch (ValidationException | AlreadyExistsException | GenericException | NotFoundException
+        | RequestNotValidException | AuthorizationDeniedException e1) {
+        LOGGER.error("Could not create an event after deleting representations");
+      }
     }
 
     RodaCoreFactory.getIndexService().commit(IndexedRepresentation.class);
@@ -1328,17 +1342,6 @@ public class BrowserHelper {
     for (IndexedFile file : files.getResults()) {
       RodaCoreFactory.getModelService().deleteFile(file.getAipId(), file.getRepresentationId(), file.getPath(),
         file.getId(), true);
-
-      // FIXME PREMIS EVENT DETAILS
-      // try {
-      // RodaCoreFactory.getModelService().createEvent(file.getAipId(),
-      // file.getRepresentationId(), null, null,
-      // PreservationEventType.DELETION, "The file was deleted", "", "", true);
-      // } catch (ValidationException | AlreadyExistsException |
-      // GenericException | NotFoundException
-      // | RequestNotValidException | AuthorizationDeniedException e1) {
-      // LOGGER.error("Could not create a event after deleting file");
-      // }
     }
 
     RodaCoreFactory.getIndexService().commit(IndexedFile.class);
@@ -1461,11 +1464,21 @@ public class BrowserHelper {
     return new StreamResponse(zipName + ".zip", "application/zip", stream);
   }
 
-  public static Representation createRepresentation(String aipId, String representationId, String type)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
+  public static Representation createRepresentation(User user, String aipId, String representationId, String type,
+    String details) throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
     AlreadyExistsException {
     Representation representation = RodaCoreFactory.getModelService().createRepresentation(aipId, representationId,
       true, type, true);
+
+    // FIXME PREMIS EVENT
+    try {
+      RodaCoreFactory.getModelService().createUpdateAIPEvent(aipId, null, null, null, PreservationEventType.CREATION,
+        "A new representation was created", details, user.getName(), true);
+    } catch (ValidationException | AlreadyExistsException | GenericException | NotFoundException
+      | RequestNotValidException | AuthorizationDeniedException e1) {
+      LOGGER.error("Could not create an event after creating a new representation");
+    }
+
     RodaCoreFactory.getIndexService().commit(IndexedRepresentation.class);
     return representation;
   }
@@ -1480,10 +1493,21 @@ public class BrowserHelper {
     RodaCoreFactory.getModelService().deleteRepresentation(aipId, representationId);
   }
 
-  public static File createFile(String aipId, String representationId, List<String> directoryPath, String fileId,
-    ContentPayload content) throws GenericException, AuthorizationDeniedException, RequestNotValidException,
-    NotFoundException, AlreadyExistsException {
-    return RodaCoreFactory.getModelService().createFile(aipId, representationId, directoryPath, fileId, content);
+  public static File createFile(User user, String aipId, String representationId, List<String> directoryPath,
+    String fileId, ContentPayload content, String details) throws GenericException, AuthorizationDeniedException,
+    RequestNotValidException, NotFoundException, AlreadyExistsException {
+    File file = RodaCoreFactory.getModelService().createFile(aipId, representationId, directoryPath, fileId, content);
+
+    // FIXME PREMIS EVENT
+    try {
+      RodaCoreFactory.getModelService().createUpdateAIPEvent(aipId, representationId, null, null,
+        PreservationEventType.CREATION, "A new file was created", details, user.getName(), true);
+    } catch (ValidationException | AlreadyExistsException | GenericException | NotFoundException
+      | RequestNotValidException | AuthorizationDeniedException e1) {
+      LOGGER.error("Could not create an event after creating a new file");
+    }
+
+    return file;
   }
 
   public static File updateFile(User user, File file) throws GenericException, AuthorizationDeniedException,
@@ -2464,28 +2488,34 @@ public class BrowserHelper {
     }
   }
 
-  public static String renameFolder(String folderUUID, String newName) throws GenericException,
-    RequestNotValidException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
+  public static String renameFolder(User user, String folderUUID, String newName, String details)
+    throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
+    AuthorizationDeniedException {
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
-    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.INDEX_UUID, folderUUID));
-    IndexResult<IndexedFile> files = index.find(IndexedFile.class, filter, Sorter.NONE, new Sublist(0, 1));
+    IndexedFile ifolder = index.retrieve(IndexedFile.class, folderUUID);
 
-    if (!files.getResults().isEmpty()) {
-      IndexedFile ifolder = (IndexedFile) files.getResults().get(0);
-      File folder = model.retrieveFile(ifolder.getAipId(), ifolder.getRepresentationId(), ifolder.getPath(),
-        ifolder.getId());
-      String newUUID = model.renameFolder(folder, newName, true, true);
-      index.commitAIPs();
-      return newUUID;
-    } else {
-      return folderUUID;
+    File folder = model.retrieveFile(ifolder.getAipId(), ifolder.getRepresentationId(), ifolder.getPath(),
+      ifolder.getId());
+    String newUUID = model.renameFolder(folder, newName, true, true);
+
+    // FIXME PREMIS EVENT
+    try {
+      RodaCoreFactory.getModelService().createUpdateAIPEvent(folder.getAipId(), folder.getRepresentationId(),
+        folder.getPath(), folder.getId(), PreservationEventType.CREATION, "The folder was renamed", details,
+        user.getName(), true);
+    } catch (ValidationException | AlreadyExistsException | GenericException | NotFoundException
+      | RequestNotValidException | AuthorizationDeniedException e1) {
+      LOGGER.error("Could not create an event after renaming a folder");
     }
+
+    index.commitAIPs();
+    return newUUID;
   }
 
-  public static String moveFiles(String aipId, String representationUUID, SelectedItems<IndexedFile> selectedFiles,
-    IndexedFile toFolder) throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
-    AuthorizationDeniedException {
+  public static String moveFiles(User user, String aipId, String representationUUID,
+    SelectedItems<IndexedFile> selectedFiles, IndexedFile toFolder, String details) throws GenericException,
+    RequestNotValidException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
     List<File> files = new ArrayList<File>();
@@ -2510,6 +2540,16 @@ public class BrowserHelper {
       String storagePath = toFolder != null ? toFolder.getStoragePath()
         : ModelUtils.getRepresentationDataStoragePath(aipId, representationId).toString();
       model.moveFiles(aipId, representationId, files, storagePath, true, true);
+
+      // FIXME PREMIS EVENT
+      try {
+        RodaCoreFactory.getModelService().createUpdateAIPEvent(aipId, representationId, null, null,
+          PreservationEventType.CREATION, "Files were moved", details, user.getName(), true);
+      } catch (ValidationException | AlreadyExistsException | GenericException | NotFoundException
+        | RequestNotValidException | AuthorizationDeniedException e1) {
+        LOGGER.error("Could not create an event after moving files");
+      }
+
       index.commitAIPs();
     }
 
@@ -2545,7 +2585,7 @@ public class BrowserHelper {
       .moveTransferredResource(resources.getResults(), resourceRelativePath, true, true, true);
 
     if (!moveMap.isEmpty()) {
-      List<String> values = new ArrayList(moveMap.values());
+      List<String> values = new ArrayList<String>(moveMap.values());
       return values.get(0);
     } else {
       return transferredResource.getUUID();
@@ -2553,9 +2593,9 @@ public class BrowserHelper {
 
   }
 
-  public static String createFolder(String aipId, String representationUUID, String folderUUID, String newName)
-    throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
-    AuthorizationDeniedException {
+  public static String createFolder(User user, String aipId, String representationUUID, String folderUUID,
+    String newName, String details) throws GenericException, RequestNotValidException, AlreadyExistsException,
+    NotFoundException, AuthorizationDeniedException {
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
     File newFolder;
@@ -2567,6 +2607,15 @@ public class BrowserHelper {
     } else {
       IndexedRepresentation irep = index.retrieve(IndexedRepresentation.class, representationUUID);
       newFolder = model.createFile(irep.getAipId(), irep.getId(), null, null, newName, true);
+
+      // FIXME PREMIS EVENT
+      try {
+        RodaCoreFactory.getModelService().createUpdateAIPEvent(irep.getAipId(), irep.getId(), null, null,
+          PreservationEventType.CREATION, "A folder was created", details, user.getName(), true);
+      } catch (ValidationException | AlreadyExistsException | GenericException | NotFoundException
+        | RequestNotValidException | AuthorizationDeniedException e1) {
+        LOGGER.error("Could not create an event after creating a folder");
+      }
     }
 
     index.commit(IndexedFile.class);
@@ -2576,14 +2625,14 @@ public class BrowserHelper {
   public static List<TransferredResource> retrieveSelectedTransferredResource(
     SelectedItems<TransferredResource> selected) throws GenericException, RequestNotValidException {
     if (selected instanceof SelectedItemsList) {
-      SelectedItemsList selectedList = (SelectedItemsList) selected;
+      SelectedItemsList<TransferredResource> selectedList = (SelectedItemsList<TransferredResource>) selected;
 
       Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, selectedList.getIds()));
       IndexResult<TransferredResource> iresults = RodaCoreFactory.getIndexService().find(TransferredResource.class,
         filter, Sorter.NONE, new Sublist(0, selectedList.getIds().size()));
       return iresults.getResults();
     } else if (selected instanceof SelectedItemsFilter) {
-      SelectedItemsFilter selectedFilter = (SelectedItemsFilter) selected;
+      SelectedItemsFilter<TransferredResource> selectedFilter = (SelectedItemsFilter<TransferredResource>) selected;
 
       Long counter = RodaCoreFactory.getIndexService().count(TransferredResource.class, selectedFilter.getFilter());
       IndexResult<TransferredResource> iresults = RodaCoreFactory.getIndexService().find(TransferredResource.class,
@@ -2844,7 +2893,8 @@ public class BrowserHelper {
   }
 
   public static void changeRepresentationType(User user, SelectedItemsList<IndexedRepresentation> selected,
-    String newType) throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+    String newType, String details)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     List<String> representationIds = consolidate(user, IndexedRepresentation.class, selected);
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
@@ -2858,6 +2908,15 @@ public class BrowserHelper {
       Representation rep = model.retrieveRepresentation(irep.getAipId(), irep.getId());
       rep.setType(newType);
       model.updateRepresentationInfo(rep);
+
+      // FIXME PREMIS EVENT
+      try {
+        RodaCoreFactory.getModelService().createUpdateAIPEvent(irep.getAipId(), irep.getId(), null, null,
+          PreservationEventType.CREATION, "Representation type was changed", details, user.getName(), true);
+      } catch (ValidationException | AlreadyExistsException | GenericException | NotFoundException
+        | RequestNotValidException | AuthorizationDeniedException e1) {
+        LOGGER.error("Could not create an event after changing representation type");
+      }
     }
 
     index.commit(IndexedRepresentation.class);

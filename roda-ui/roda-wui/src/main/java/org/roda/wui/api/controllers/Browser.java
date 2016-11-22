@@ -851,8 +851,8 @@ public class Browser extends RodaWuiController {
     return parentId;
   }
 
-  public static void deleteRepresentation(User user, SelectedItems<IndexedRepresentation> representations)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+  public static void deleteRepresentation(User user, SelectedItems<IndexedRepresentation> representations,
+    String details) throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -860,7 +860,7 @@ public class Browser extends RodaWuiController {
     UserUtility.checkRepresentationPermissions(user, representations, PermissionType.DELETE);
 
     // delegate
-    BrowserHelper.deleteRepresentation(representations, user);
+    BrowserHelper.deleteRepresentation(user, representations, details);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_SELECTED_PARAM,
@@ -1012,8 +1012,8 @@ public class Browser extends RodaWuiController {
     return dm;
   }
 
-  public static Representation createRepresentation(User user, String aipId, String representationId, String type)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException,
+  public static Representation createRepresentation(User user, String aipId, String representationId, String type,
+    String details) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException,
     AlreadyExistsException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1023,7 +1023,7 @@ public class Browser extends RodaWuiController {
     UserUtility.checkAIPPermissions(user, aip, PermissionType.CREATE);
 
     // delegate
-    Representation updatedRep = BrowserHelper.createRepresentation(aipId, representationId, type);
+    Representation updatedRep = BrowserHelper.createRepresentation(user, aipId, representationId, type, details);
 
     // register action
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIP_ID_PARAM,
@@ -1870,15 +1870,16 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static String renameFolder(User user, String folderUUID, String newName) throws AuthorizationDeniedException,
-    GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException {
+  public static String renameFolder(User user, String folderUUID, String newName, String details)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, AlreadyExistsException,
+    NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
     controllerAssistant.checkRoles(user);
 
     // delegate
-    String ret = BrowserHelper.renameFolder(folderUUID, newName);
+    String ret = BrowserHelper.renameFolder(user, folderUUID, newName, details);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_FILE_UUID_PARAM,
@@ -1887,7 +1888,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static String moveFiles(User user, String aipId, String representationUUID,
-    SelectedItems<IndexedFile> selectedFiles, IndexedFile toFolder) throws AuthorizationDeniedException,
+    SelectedItems<IndexedFile> selectedFiles, IndexedFile toFolder, String details) throws AuthorizationDeniedException,
     GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1895,7 +1896,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     // delegate
-    String ret = BrowserHelper.moveFiles(aipId, representationUUID, selectedFiles, toFolder);
+    String ret = BrowserHelper.moveFiles(user, aipId, representationUUID, selectedFiles, toFolder, details);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
@@ -1904,7 +1905,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static String createFolder(User user, String aipId, String representationUUID, String folderUUID,
-    String newName) throws AuthorizationDeniedException, GenericException, RequestNotValidException,
+    String newName, String details) throws AuthorizationDeniedException, GenericException, RequestNotValidException,
     AlreadyExistsException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1912,7 +1913,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     // delegate
-    String ret = BrowserHelper.createFolder(aipId, representationUUID, folderUUID, newName);
+    String ret = BrowserHelper.createFolder(user, aipId, representationUUID, folderUUID, newName, details);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_FILE_UUID_PARAM,
@@ -1955,8 +1956,8 @@ public class Browser extends RodaWuiController {
   }
 
   public static File createFile(User user, String aipId, String representationUUID, List<String> directoryPath,
-    String fileId, InputStream is) throws AuthorizationDeniedException, GenericException, RequestNotValidException,
-    NotFoundException, AlreadyExistsException, IOException {
+    String fileId, InputStream is, String details) throws AuthorizationDeniedException, GenericException,
+    RequestNotValidException, NotFoundException, AlreadyExistsException, IOException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -1970,7 +1971,7 @@ public class Browser extends RodaWuiController {
     Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
     ContentPayload payload = new FSPathContentPayload(file);
 
-    File updatedFile = BrowserHelper.createFile(aipId, rep.getId(), directoryPath, fileId, payload);
+    File updatedFile = BrowserHelper.createFile(user, aipId, rep.getId(), directoryPath, fileId, payload, details);
     BrowserHelper.commit(IndexedFile.class);
 
     // register action
@@ -1981,7 +1982,7 @@ public class Browser extends RodaWuiController {
     return updatedFile;
   }
 
-  public static File createFileWithUUID(User user, String fileUUID, String filename, InputStream is)
+  public static File createFileWithUUID(User user, String fileUUID, String filename, InputStream is, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException,
     AlreadyExistsException, IOException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -1999,8 +2000,8 @@ public class Browser extends RodaWuiController {
     List<String> newFileDirectoryPath = ifile.getPath();
     newFileDirectoryPath.add(ifile.getId());
 
-    File updatedFile = BrowserHelper.createFile(ifile.getAipId(), ifile.getRepresentationId(), newFileDirectoryPath,
-      filename, payload);
+    File updatedFile = BrowserHelper.createFile(user, ifile.getAipId(), ifile.getRepresentationId(),
+      newFileDirectoryPath, filename, payload, details);
     BrowserHelper.commit(IndexedFile.class);
 
     // register action
@@ -2348,14 +2349,15 @@ public class Browser extends RodaWuiController {
   }
 
   public static void changeRepresentationType(User user, SelectedItemsList<IndexedRepresentation> selected,
-    String newType) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    String newType, String details)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
     controllerAssistant.checkRoles(user);
 
     // delegate
-    BrowserHelper.changeRepresentationType(user, selected, newType);
+    BrowserHelper.changeRepresentationType(user, selected, newType, details);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_SELECTED_PARAM,

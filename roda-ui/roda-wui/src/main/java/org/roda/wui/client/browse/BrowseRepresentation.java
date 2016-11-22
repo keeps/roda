@@ -486,11 +486,11 @@ public class BrowseRepresentation extends Composite {
 
   @UiHandler("remove")
   void buttonRemoveHandler(ClickEvent e) {
-    final SelectedItems selected = (SelectedItems) filesList.getSelected();
+    final SelectedItems<IndexedFile> selected = (SelectedItems<IndexedFile>) filesList.getSelected();
 
     if (ClientSelectedItemsUtils.isEmpty(selected)) {
-      final SelectedItems selectedList = new SelectedItemsList<IndexedRepresentation>(Arrays.asList(repId),
-        IndexedRepresentation.class.getName());
+      final SelectedItems<IndexedRepresentation> selectedList = new SelectedItemsList<IndexedRepresentation>(
+        Arrays.asList(repId), IndexedRepresentation.class.getName());
 
       Dialogs.showConfirmDialog(messages.representationRemoveTitle(), messages.representationRemoveMessage(),
         messages.dialogCancel(), messages.dialogYes(), new AsyncCallback<Boolean>() {
@@ -498,18 +498,31 @@ public class BrowseRepresentation extends Composite {
           @Override
           public void onSuccess(Boolean confirmed) {
             if (confirmed) {
-              BrowserService.Util.getInstance().deleteRepresentation(selectedList, new AsyncCallback<Void>() {
+              Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
+                RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
 
-                @Override
-                public void onSuccess(Void result) {
-                  Tools.newHistory(Browse.RESOLVER, aipId);
-                }
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    Toast.showInfo(messages.dialogFailure(), messages.renameFailed());
+                  }
 
-                @Override
-                public void onFailure(Throwable caught) {
-                  AsyncCallbackUtils.defaultFailureTreatment(caught);
-                }
-              });
+                  @Override
+                  public void onSuccess(String details) {
+                    BrowserService.Util.getInstance().deleteRepresentation(selectedList, details,
+                      new AsyncCallback<Void>() {
+
+                        @Override
+                        public void onSuccess(Void result) {
+                          Tools.newHistory(Browse.RESOLVER, aipId);
+                        }
+
+                        @Override
+                        public void onFailure(Throwable caught) {
+                          AsyncCallbackUtils.defaultFailureTreatment(caught);
+                        }
+                      });
+                  }
+                });
             }
           }
 
@@ -530,6 +543,9 @@ public class BrowseRepresentation extends Composite {
                 @Override
                 public void onSuccess(Void result) {
                   filesList.refresh();
+                  uploadFiles.setEnabled(true);
+                  createFolder.setEnabled(true);
+                  renameFolders.setEnabled(false);
                 }
 
                 @Override
@@ -598,14 +614,27 @@ public class BrowseRepresentation extends Composite {
 
           @Override
           public void onSuccess(final String newName) {
-            BrowserService.Util.getInstance().renameFolder(folderUUID, newName, new LoadingAsyncCallback<String>() {
+            Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
+              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
 
-              @Override
-              public void onSuccessImpl(String newUUID) {
-                Toast.showInfo(messages.dialogSuccess(), messages.renameSuccessful());
-                Tools.newHistory(BrowseFolder.RESOLVER, aipId, repId, newUUID);
-              }
-            });
+                @Override
+                public void onFailure(Throwable caught) {
+                  Toast.showInfo(messages.dialogFailure(), messages.renameFailed());
+                }
+
+                @Override
+                public void onSuccess(String details) {
+                  BrowserService.Util.getInstance().renameFolder(folderUUID, newName, details,
+                    new LoadingAsyncCallback<String>() {
+
+                      @Override
+                      public void onSuccessImpl(String newUUID) {
+                        Toast.showInfo(messages.dialogSuccess(), messages.renameSuccessful());
+                        Tools.newHistory(BrowseFolder.RESOLVER, aipId, repId, newUUID);
+                      }
+                    });
+                }
+              });
           }
         });
     }
@@ -626,30 +655,41 @@ public class BrowseRepresentation extends Composite {
       @Override
       public void onValueChange(ValueChangeEvent<IndexedFile> event) {
         final IndexedFile toFolder = event.getValue();
-        SelectedItems<IndexedFile> selected = filesList.getSelected();
+        final SelectedItems<IndexedFile> selected = filesList.getSelected();
 
         if (!ClientSelectedItemsUtils.isEmpty(selected)) {
-          BrowserService.Util.getInstance().moveFiles(aipId, repId, selected, toFolder,
-            new LoadingAsyncCallback<String>() {
+          Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
+            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
 
               @Override
-              public void onSuccessImpl(String newUUID) {
-                if (newUUID != null) {
-                  Tools.newHistory(BrowseFolder.RESOLVER, aipId, repId, newUUID);
-                } else {
-                  Tools.newHistory(BrowseRepresentation.RESOLVER, aipId, repId);
-                }
+              public void onFailure(Throwable caught) {
+                Toast.showInfo(messages.dialogFailure(), messages.renameFailed());
               }
 
               @Override
-              public void onFailureImpl(Throwable caught) {
-                if (caught instanceof NotFoundException) {
-                  Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-                } else {
-                  AsyncCallbackUtils.defaultFailureTreatment(caught);
-                }
-              }
+              public void onSuccess(String details) {
+                BrowserService.Util.getInstance().moveFiles(aipId, repId, selected, toFolder, details,
+                  new LoadingAsyncCallback<String>() {
 
+                    @Override
+                    public void onSuccessImpl(String newUUID) {
+                      if (newUUID != null) {
+                        Tools.newHistory(BrowseFolder.RESOLVER, aipId, repId, newUUID);
+                      } else {
+                        Tools.newHistory(BrowseRepresentation.RESOLVER, aipId, repId);
+                      }
+                    }
+
+                    @Override
+                    public void onFailureImpl(Throwable caught) {
+                      if (caught instanceof NotFoundException) {
+                        Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+                      } else {
+                        AsyncCallbackUtils.defaultFailureTreatment(caught);
+                      }
+                    }
+                  });
+              }
             });
         }
       }
@@ -663,32 +703,44 @@ public class BrowseRepresentation extends Composite {
 
   @UiHandler("createFolder")
   void buttonCreateFolderHandler(ClickEvent e) {
-    Dialogs.showPromptDialog(messages.renameItemTitle(), null, messages.renamePlaceholder(), RegExp.compile(".*"),
-      messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
+    Dialogs.showPromptDialog(messages.createFolderTitle(), null, messages.createFolderPlaceholder(),
+      RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
         @Override
         public void onFailure(Throwable caught) {
           Toast.showInfo(messages.dialogFailure(), messages.renameFailed());
         }
 
         @Override
-        public void onSuccess(String newName) {
-          BrowserService.Util.getInstance().createFolder(aipId, repId, null, newName,
-            new LoadingAsyncCallback<String>() {
+        public void onSuccess(final String newName) {
+          Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
+            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
 
               @Override
-              public void onSuccessImpl(String newUUID) {
-                filesList.refresh();
+              public void onFailure(Throwable caught) {
+                Toast.showInfo(messages.dialogFailure(), messages.renameFailed());
               }
 
               @Override
-              public void onFailureImpl(Throwable caught) {
-                if (caught instanceof NotFoundException) {
-                  Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-                } else {
-                  AsyncCallbackUtils.defaultFailureTreatment(caught);
-                }
-              }
+              public void onSuccess(String details) {
+                BrowserService.Util.getInstance().createFolder(aipId, repId, null, newName, details,
+                  new LoadingAsyncCallback<String>() {
 
+                    @Override
+                    public void onSuccessImpl(String newUUID) {
+                      filesList.refresh();
+                    }
+
+                    @Override
+                    public void onFailureImpl(Throwable caught) {
+                      if (caught instanceof NotFoundException) {
+                        Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+                      } else {
+                        AsyncCallbackUtils.defaultFailureTreatment(caught);
+                      }
+                    }
+
+                  });
+              }
             });
         }
       });
@@ -739,18 +791,29 @@ public class BrowseRepresentation extends Composite {
 
         @Override
         public void onSuccess(final String newType) {
-          BrowserService.Util.getInstance().changeRepresentationType(selectedRepresentation, newType,
-            new LoadingAsyncCallback<Void>() {
+          Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
+            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
 
               @Override
-              public void onSuccessImpl(Void nothing) {
-                Toast.showInfo(messages.dialogSuccess(), messages.changeTypeSuccessful());
-                representationType.setText(newType);
+              public void onFailure(Throwable caught) {
+                Toast.showInfo(messages.dialogFailure(), messages.renameFailed());
+              }
+
+              @Override
+              public void onSuccess(String details) {
+                BrowserService.Util.getInstance().changeRepresentationType(selectedRepresentation, newType, details,
+                  new LoadingAsyncCallback<Void>() {
+
+                    @Override
+                    public void onSuccessImpl(Void nothing) {
+                      Toast.showInfo(messages.dialogSuccess(), messages.changeTypeSuccessful());
+                      representationType.setText(newType);
+                    }
+                  });
               }
             });
         }
       });
-
   }
 
 }

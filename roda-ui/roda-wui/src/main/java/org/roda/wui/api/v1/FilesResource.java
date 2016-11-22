@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -147,6 +148,7 @@ public class FilesResource {
     @FormDataParam(RodaConstants.API_PARAM_UPLOAD) InputStream inputStream,
     @FormDataParam(RodaConstants.API_PARAM_UPLOAD) FormDataContentDisposition fileDetail,
     @ApiParam(value = "A new filename to this file") @QueryParam(RodaConstants.API_QUERY_KEY_FILENAME) String filename,
+    @ApiParam(value = "Reason to upload file", required = true) @FormParam(RodaConstants.API_QUERY_PARAM_DETAILS) String details,
     @ApiParam(value = "Choose format in which to get the file", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
@@ -160,9 +162,9 @@ public class FilesResource {
       String name = filename == null ? fileDetail.getFileName() : filename;
 
       if (fileUUID == null) {
-        file = Browser.createFile(user, aipId, representationUUID, new ArrayList<>(), name, inputStream);
+        file = Browser.createFile(user, aipId, representationUUID, new ArrayList<>(), name, inputStream, details);
       } else {
-        file = Browser.createFileWithUUID(user, fileUUID, name, inputStream);
+        file = Browser.createFileWithUUID(user, fileUUID, name, inputStream, details);
       }
 
       return Response.ok(file, mediaType).build();

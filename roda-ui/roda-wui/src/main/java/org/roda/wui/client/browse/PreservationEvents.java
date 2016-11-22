@@ -21,7 +21,6 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.PreservationEventList;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
@@ -130,10 +129,14 @@ public class PreservationEvents extends Composite {
    * 
    */
   public PreservationEvents(final String aipId) {
-    this(aipId, null);
+    this(aipId, null, null);
   }
 
   public PreservationEvents(final String aipId, final String repId) {
+    this(aipId, repId, null);
+  }
+
+  public PreservationEvents(final String aipId, final String repId, final String fileId) {
     this.aipId = aipId;
     this.repId = repId;
 

@@ -31,7 +31,7 @@
 		<module>characterization/roda-plugin-characterization-tika</module>
 		<module>characterization/roda-plugin-characterization-droid</module>
 		<module>characterization/roda-plugin-characterization-exiftool</module>
-		<module>characterization/roda-plugin-characterization-ffprobe</module>
+		<module>characterization/roda-plugin-characterization-avprobe</module>
 		<module>characterization/roda-plugin-characterization-fits</module>
 		<module>characterization/roda-plugin-characterization-jhove</module>
 		<module>characterization/roda-plugin-characterization-jpylyzer</module>

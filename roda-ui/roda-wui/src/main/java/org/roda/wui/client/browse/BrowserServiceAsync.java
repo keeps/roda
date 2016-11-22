@@ -65,11 +65,12 @@ public interface BrowserServiceAsync {
 
   void createAIP(String parentId, String type, AsyncCallback<String> callback);
 
-  void createRepresentation(String aipId, AsyncCallback<String> callback);
+  void createRepresentation(String aipId, String details, AsyncCallback<String> callback);
 
   void deleteAIP(SelectedItems<IndexedAIP> aips, AsyncCallback<String> callback);
 
-  void deleteRepresentation(SelectedItems<IndexedRepresentation> representations, AsyncCallback<Void> callback);
+  void deleteRepresentation(SelectedItems<IndexedRepresentation> representations, String details,
+    AsyncCallback<Void> callback);
 
   void deleteFile(SelectedItems<IndexedFile> representations, AsyncCallback<Void> callback);
 
@@ -199,17 +200,17 @@ public interface BrowserServiceAsync {
   void updateMultipleIncidences(SelectedItems<RiskIncidence> selected, String status, String severity, Date mitigatedOn,
     String mitigatedBy, String mitigatedDescription, AsyncCallback<Void> loadingAsyncCallback);
 
-  void renameFolder(String folderUUID, String newName, AsyncCallback<String> asyncCallback);
+  void renameFolder(String folderUUID, String newName, String details, AsyncCallback<String> asyncCallback);
 
   void moveFiles(String aipId, String representationUUID, SelectedItems<IndexedFile> selectedFiles,
-    IndexedFile toFolder, AsyncCallback<String> asyncCallback);
+    IndexedFile toFolder, String details, AsyncCallback<String> asyncCallback);
 
-  void createFolder(String aipId, String representationUUID, String folderUUID, String newName,
+  void createFolder(String aipId, String representationUUID, String folderUUID, String newName, String details,
     AsyncCallback<String> asyncCallback);
 
   void createFormatIdentificationJob(SelectedItems selected, AsyncCallback<Void> loadingAsyncCallback);
 
   void changeRepresentationType(SelectedItemsList<IndexedRepresentation> selectedRepresentation, String newType,
-    AsyncCallback<Void> loadingAsyncCallback);
+    String details, AsyncCallback<Void> loadingAsyncCallback);
 
 }

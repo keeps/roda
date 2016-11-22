@@ -953,17 +953,29 @@ public class Browse extends Composite {
             @Override
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
-                BrowserService.Util.getInstance().deleteRepresentation(selectedRepresentations,
-                  new AsyncCallback<Void>() {
+                Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
+                  RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
 
                     @Override
                     public void onFailure(Throwable caught) {
-                      AsyncCallbackUtils.defaultFailureTreatment(caught);
+                      Toast.showInfo(messages.dialogFailure(), messages.renameFailed());
                     }
 
                     @Override
-                    public void onSuccess(Void nothing) {
-                      representationsList.refresh();
+                    public void onSuccess(String details) {
+                      BrowserService.Util.getInstance().deleteRepresentation(selectedRepresentations, details,
+                        new AsyncCallback<Void>() {
+
+                          @Override
+                          public void onFailure(Throwable caught) {
+                            AsyncCallbackUtils.defaultFailureTreatment(caught);
+                          }
+
+                          @Override
+                          public void onSuccess(Void nothing) {
+                            representationsList.refresh();
+                          }
+                        });
                     }
                   });
               }
@@ -1255,12 +1267,24 @@ public class Browse extends Composite {
 
   @UiHandler("newRepresentation")
   void createRepresentationHandler(ClickEvent e) {
-    BrowserService.Util.getInstance().createRepresentation(aipId, new LoadingAsyncCallback<String>() {
+    Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
+      RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
 
-      @Override
-      public void onSuccessImpl(String representationUUID) {
-        Tools.newHistory(BrowseRepresentation.RESOLVER, aipId, representationUUID);
-      }
-    });
+        @Override
+        public void onFailure(Throwable caught) {
+          Toast.showInfo(messages.dialogFailure(), messages.renameFailed());
+        }
+
+        @Override
+        public void onSuccess(String details) {
+          BrowserService.Util.getInstance().createRepresentation(aipId, details, new LoadingAsyncCallback<String>() {
+
+            @Override
+            public void onSuccessImpl(String representationUUID) {
+              Tools.newHistory(BrowseRepresentation.RESOLVER, aipId, representationUUID);
+            }
+          });
+        }
+      });
   }
 }

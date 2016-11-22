@@ -50,6 +50,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -351,20 +352,34 @@ public class Search extends Composite {
                 });
               } else if (IndexedRepresentation.class.getName().equals(selectedClass)) {
                 final SelectedItems<IndexedRepresentation> reps = (SelectedItems<IndexedRepresentation>) selected;
-                BrowserService.Util.getInstance().deleteRepresentation(reps, new LoadingAsyncCallback<Void>() {
+                Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
+                  RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
 
-                  @Override
-                  public void onFailureImpl(Throwable caught) {
-                    AsyncCallbackUtils.defaultFailureTreatment(caught);
-                    mainSearch.refresh();
-                  }
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      Toast.showInfo(messages.dialogFailure(), messages.renameFailed());
+                    }
 
-                  @Override
-                  public void onSuccessImpl(Void returned) {
-                    Toast.showInfo(messages.removeSuccessTitle(), messages.removeAllSuccessMessage());
-                    mainSearch.refresh();
-                  }
-                });
+                    @Override
+                    public void onSuccess(String details) {
+                      BrowserService.Util.getInstance().deleteRepresentation(reps, details,
+                        new LoadingAsyncCallback<Void>() {
+
+                          @Override
+                          public void onFailureImpl(Throwable caught) {
+                            AsyncCallbackUtils.defaultFailureTreatment(caught);
+                            mainSearch.refresh();
+                          }
+
+                          @Override
+                          public void onSuccessImpl(Void returned) {
+                            Toast.showInfo(messages.removeSuccessTitle(), messages.removeAllSuccessMessage());
+                            mainSearch.refresh();
+                          }
+                        });
+                    }
+                  });
+
               } else if (IndexedFile.class.getName().equals(selectedClass)) {
                 final SelectedItems<IndexedFile> files = (SelectedItems<IndexedFile>) selected;
                 BrowserService.Util.getInstance().deleteFile(files, new LoadingAsyncCallback<Void>() {

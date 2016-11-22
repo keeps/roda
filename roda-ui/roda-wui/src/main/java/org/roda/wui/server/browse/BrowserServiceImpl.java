@@ -331,10 +331,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void deleteRepresentation(SelectedItems<IndexedRepresentation> representations)
+  public void deleteRepresentation(SelectedItems<IndexedRepresentation> representations, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.deleteRepresentation(user, representations);
+    Browser.deleteRepresentation(user, representations, details);
   }
 
   @Override
@@ -749,26 +749,26 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public String renameFolder(String folderUUID, String newName) throws AuthorizationDeniedException, GenericException,
-    RequestNotValidException, AlreadyExistsException, NotFoundException {
+  public String renameFolder(String folderUUID, String newName, String details) throws AuthorizationDeniedException,
+    GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.renameFolder(user, folderUUID, newName);
+    return Browser.renameFolder(user, folderUUID, newName, details);
   }
 
   @Override
   public String moveFiles(String aipId, String representationUUID, SelectedItems<IndexedFile> selectedFiles,
-    IndexedFile toFolder) throws AuthorizationDeniedException, GenericException, RequestNotValidException,
-    AlreadyExistsException, NotFoundException {
+    IndexedFile toFolder, String details) throws AuthorizationDeniedException, GenericException,
+    RequestNotValidException, AlreadyExistsException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.moveFiles(user, aipId, representationUUID, selectedFiles, toFolder);
+    return Browser.moveFiles(user, aipId, representationUUID, selectedFiles, toFolder, details);
   }
 
   @Override
-  public String createFolder(String aipId, String representationUUID, String folderUUID, String newName)
+  public String createFolder(String aipId, String representationUUID, String folderUUID, String newName, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, AlreadyExistsException,
     NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.createFolder(user, aipId, representationUUID, folderUUID, newName);
+    return Browser.createFolder(user, aipId, representationUUID, folderUUID, newName, details);
   }
 
   @Override
@@ -816,11 +816,12 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public String createRepresentation(String aipId) throws AuthorizationDeniedException, GenericException,
-    NotFoundException, RequestNotValidException, AlreadyExistsException {
+  public String createRepresentation(String aipId, String details) throws AuthorizationDeniedException,
+    GenericException, NotFoundException, RequestNotValidException, AlreadyExistsException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     String representationId = UUID.randomUUID().toString();
-    Browser.createRepresentation(user, aipId, representationId, RepresentationContentType.getMIXED().asString());
+    Browser.createRepresentation(user, aipId, representationId, RepresentationContentType.getMIXED().asString(),
+      details);
     return IdUtils.getRepresentationId(aipId, representationId);
   }
 
@@ -832,10 +833,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void changeRepresentationType(SelectedItemsList<IndexedRepresentation> selected, String newType)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+  public void changeRepresentationType(SelectedItemsList<IndexedRepresentation> selected, String newType,
+    String details) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.changeRepresentationType(user, selected, newType);
+    Browser.changeRepresentationType(user, selected, newType, details);
   }
 
 }
