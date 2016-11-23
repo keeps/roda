@@ -191,7 +191,7 @@ public class UnknownFormatPlugin extends AbstractPlugin<File> {
 
   @Override
   public List<String> getCategories() {
-    return Collections.singletonList(RodaConstants.PLUGIN_CATEGORY_MISC);
+    return Collections.singletonList(RodaConstants.PLUGIN_CATEGORY_RISK_MANAGEMENT);
   }
 
   @Override
