@@ -72,7 +72,6 @@ import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.IngestJobPluginInfo;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
@@ -456,28 +455,24 @@ public final class PluginHelper {
     }
   }
 
-  public static <T extends AbstractPlugin> Risk createRiskIfNotExists(ModelService model, int riskIndex, String riskId,
-    Class<T> pluginClass) throws RequestNotValidException, GenericException, AuthorizationDeniedException,
+  public static Risk createRiskIfNotExists(ModelService model, int riskIndex, String riskId,
+    ClassLoader pluginClassLoader) throws RequestNotValidException, GenericException, AuthorizationDeniedException,
     AlreadyExistsException, NotFoundException {
     try {
       return model.retrieveRisk(riskId);
     } catch (NotFoundException e) {
-      return createDefaultRisk(model, riskIndex, riskId, pluginClass);
+      return createDefaultRisk(model, riskIndex, riskId, pluginClassLoader);
     }
   }
 
-  private static <T extends AbstractPlugin> Risk createDefaultRisk(ModelService model, int riskIndex, String riskId,
-    Class<T> pluginClass) throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
+  private static Risk createDefaultRisk(ModelService model, int riskIndex, String riskId, ClassLoader pluginClassLoader)
+    throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException {
 
     String defaultFile = RodaConstants.CORE_DATA_FOLDER + '/' + RodaConstants.CORE_STORAGE_FOLDER + '/'
       + RodaConstants.CORE_RISK_FOLDER + '/' + riskId + ".json";
 
-    InputStream inputStream = RodaCoreFactory.getDefaultFileAsStream(defaultFile);
-    if (inputStream == null) {
-      inputStream = pluginClass.getResourceAsStream("/" + RodaConstants.CORE_DEFAULT_FOLDER + "/" + defaultFile);
-      LOGGER.trace("Loading default file from plugin classpath {}", defaultFile);
-    }
+    InputStream inputStream = RodaCoreFactory.getDefaultFileAsStream(defaultFile, pluginClassLoader);
 
     Risk risk = null;
 

@@ -238,7 +238,7 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
 
   private void createIncidence(ModelService model, File file, String riskId) throws RequestNotValidException,
     GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
-    Risk risk = PluginHelper.createRiskIfNotExists(model, 0, risks.get(0), getClass());
+    Risk risk = PluginHelper.createRiskIfNotExists(model, 0, risks.get(0), getClass().getClassLoader());
     RiskIncidence incidence = new RiskIncidence();
     incidence.setDetectedOn(new Date());
     incidence.setDetectedBy(this.getName());

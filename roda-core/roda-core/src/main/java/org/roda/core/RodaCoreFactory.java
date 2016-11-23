@@ -1128,23 +1128,36 @@ public class RodaCoreFactory {
     return inputStream;
   }
 
-  public static InputStream getDefaultFileAsStream(String defaultFile) {
+  public static InputStream getDefaultFileAsStream(String defaultFile, ClassLoader... extraClassLoaders) {
     Path defaultPath = getDefaultPath().resolve(defaultFile);
     InputStream inputStream = null;
     try {
       if (Files.exists(defaultPath) && !Files.isDirectory(defaultPath)
         && defaultPath.toAbsolutePath().startsWith(getDefaultPath().toAbsolutePath().toString())) {
         inputStream = Files.newInputStream(defaultPath);
-        LOGGER.trace("Loading default from file {}", defaultPath);
+        LOGGER.trace("Trying to load default from file {}", defaultPath);
       }
     } catch (IOException e) {
       // do nothing
     }
+
+    String fileClassPath = "/" + RodaConstants.CORE_DEFAULT_FOLDER + "/" + defaultFile;
+
     if (inputStream == null) {
-      inputStream = RodaCoreFactory.class
-        .getResourceAsStream("/" + RodaConstants.CORE_DEFAULT_FOLDER + "/" + defaultFile);
-      LOGGER.trace("Loading default file from classpath {}", defaultFile);
+      inputStream = RodaCoreFactory.class.getResourceAsStream(fileClassPath);
+      LOGGER.trace("Trying to load default file from classpath {}", defaultFile);
     }
+
+    if (inputStream == null) {
+      for (ClassLoader classLoader : extraClassLoaders) {
+        LOGGER.trace("Trying to load default file from extra class loader {}", defaultFile);
+        inputStream = classLoader.getResourceAsStream(fileClassPath);
+        if (inputStream != null) {
+          break;
+        }
+      }
+    }
+
     return inputStream;
   }
 
