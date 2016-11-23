@@ -3702,7 +3702,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .viewRepresentationFilePreview {
     padding: 40px !important;
-    height: 650px;
+    /* height: 650px;*/
     display: inline-block;
     vertical-align: top;
     width: 100%;
@@ -3719,7 +3719,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .viewRepresentationPDFFilePreview {
     width: 100%;
-    height: 600px;
+    /*height: 600px;*/
 }
 
 .viewRepresentationTextFilePreview {
@@ -3732,13 +3732,13 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .viewRepresentationAudioFilePreview {
-    width: 100%;
-    max-width: 300px;
+    max-width: 100%;
+    /*max-width: 300px;*/
 }
 
 .viewRepresentationVideoFilePreview {
     width: 100%;
-    height: 600px;
+    /*height: 600px;*/
 }
 
 .viewRepresentationEmptyPreview, .viewRepresentationErrorPreview,
