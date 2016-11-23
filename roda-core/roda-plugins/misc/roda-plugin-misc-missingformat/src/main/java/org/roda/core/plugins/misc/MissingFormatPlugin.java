@@ -130,12 +130,15 @@ public class MissingFormatPlugin extends AbstractPlugin<File> {
 
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
+      final Result result = new Result();
       for (File file : list) {
-        executeOnFile(file, index, model, jobPluginInfo, report);
+        result.addResult(executeOnFile(file, index, model, jobPluginInfo, report));
       }
 
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
+
+      report.addPluginDetails(result.toString());
 
       return report;
 
@@ -251,14 +254,17 @@ public class MissingFormatPlugin extends AbstractPlugin<File> {
    *          the {@link JobPluginInfo}
    * @param report
    *          the {@link Report}.
+   * @return a {@link Result} with the number of missing attributes.
    */
-  private void executeOnFile(final File file, final IndexService index, final ModelService model,
+  private Result executeOnFile(final File file, final IndexService index, final ModelService model,
     final JobPluginInfo jobPluginInfo, final Report report) {
     LOGGER.debug("Processing File {}", file.getId());
 
     final String fileUUID = IdUtils.getFileId(file);
     final Report reportItem = PluginHelper.initPluginReportItem(this, fileUUID, File.class, AIPState.ACTIVE);
     PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+
+    final Result result = new Result();
 
     try {
       final FileFormat fileFormat = index.retrieve(IndexedFile.class, fileUUID).getFileFormat();
@@ -267,14 +273,17 @@ public class MissingFormatPlugin extends AbstractPlugin<File> {
       if (checkMimetype() && StringUtils.isBlank(fileFormat.getMimeType())) {
         createIncidence(model, file, MISSING_MIMETYPE_RISK_ID, reportItem);
         fileOk = false;
+        result.mimetype = 1;
       }
       if (checkPronom() && StringUtils.isBlank(fileFormat.getPronom())) {
         createIncidence(model, file, MISSING_PRONOM_RISK_ID, reportItem);
         fileOk = false;
+        result.pronom = 1;
       }
       if (checkFormatDesignation() && StringUtils.isBlank(fileFormat.getFormatDesignationName())) {
         createIncidence(model, file, MISSING_FORMAT_RISK_ID, reportItem);
         fileOk = false;
+        result.formatName = 1;
       }
 
       if (fileOk) {
@@ -301,6 +310,7 @@ public class MissingFormatPlugin extends AbstractPlugin<File> {
 
     report.addReport(reportItem);
     PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+    return result;
   }
 
   /**
@@ -336,6 +346,65 @@ public class MissingFormatPlugin extends AbstractPlugin<File> {
       report.setPluginState(PluginState.FAILURE).setPluginDetails(message);
       LOGGER.error(message, e);
 
+    }
+  }
+
+  /**
+   * Result of executing the verification.
+   */
+  private class Result {
+    /**
+     * Missing format name count.
+     */
+    private int formatName;
+    /**
+     * Missing mimetype count.
+     */
+    private int mimetype;
+    /**
+     * Missing pronom count.
+     */
+    private int pronom;
+
+    /**
+     * Constructor.
+     */
+    Result() {
+      this(0, 0, 0);
+    }
+
+    /**
+     * Constructor.
+     * 
+     * @param formatName
+     *          missing format name count.
+     * @param mimetype
+     *          missing mimetypecount.
+     * @param pronom
+     *          missing pronom count.
+     */
+    Result(final int formatName, final int mimetype, final int pronom) {
+      this.formatName = formatName;
+      this.mimetype = mimetype;
+      this.pronom = pronom;
+    }
+
+    /**
+     * Add a {@link Result} to this result.
+     * 
+     * @param result
+     *          the {@link Result} to add.
+     */
+    void addResult(final Result result) {
+      this.formatName += result.formatName;
+      this.mimetype += result.mimetype;
+      this.pronom += result.pronom;
+    }
+
+    @Override
+    public String toString() {
+      return String.format("Missing format names: %s%nMissing mimetypes: %s%nMissing PRONOM UIDs: %s%n",
+        this.formatName, this.mimetype, this.pronom);
     }
   }
 
