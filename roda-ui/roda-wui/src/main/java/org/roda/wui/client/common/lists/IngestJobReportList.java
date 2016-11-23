@@ -83,6 +83,8 @@ public class IngestJobReportList extends BasicAsyncTableCell<Report> {
           } else {
             value = StringUtility.prettyPrint(report.getSourceObjectOriginalIds());
           }
+
+          value = report.getSourceObjectOriginalName() + " (" + value + ")";
         }
 
         return value;

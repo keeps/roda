@@ -128,6 +128,8 @@ public interface ClientMessages extends Messages {
 
   String outcomeDetailPlaceholder();
 
+  String outcomeDetailFailed();
+
   /******* SIDEBAR ******************************************/
 
   String sidebarFilterDates();

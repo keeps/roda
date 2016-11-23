@@ -61,7 +61,8 @@ public interface BrowserServiceAsync {
 
   void retrieveSearchFields(String className, String locale, AsyncCallback<List<SearchField>> callback);
 
-  void moveAIPInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, AsyncCallback<IndexedAIP> callback);
+  void moveAIPInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, String details,
+    AsyncCallback<IndexedAIP> callback);
 
   void createAIP(String parentId, String type, AsyncCallback<String> callback);
 
@@ -72,7 +73,7 @@ public interface BrowserServiceAsync {
   void deleteRepresentation(SelectedItems<IndexedRepresentation> representations, String details,
     AsyncCallback<Void> callback);
 
-  void deleteFile(SelectedItems<IndexedFile> representations, AsyncCallback<Void> callback);
+  void deleteFile(SelectedItems<IndexedFile> representations, String details, AsyncCallback<Void> callback);
 
   void updateDescriptiveMetadataFile(String aipId, String representationId, DescriptiveMetadataEditBundle bundle,
     AsyncCallback<Void> callback);
@@ -140,7 +141,7 @@ public interface BrowserServiceAsync {
   void suggest(String classNameToReturn, String field, String query, boolean allowPartial,
     AsyncCallback<List<String>> callback);
 
-  void updateAIPPermissions(List<IndexedAIP> aips, Permissions permissions, boolean recursive,
+  void updateAIPPermissions(List<IndexedAIP> aips, Permissions permissions, String details, boolean recursive,
     AsyncCallback<Void> callback);
 
   void createRisk(Risk risk, AsyncCallback<Risk> asyncCallback);

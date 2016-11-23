@@ -29,6 +29,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.PremisV3Utils;
@@ -66,6 +67,7 @@ import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
@@ -985,7 +987,7 @@ public class ModelService extends ModelObservable {
 
   }
 
-  public String renameFolder(File folder, String newName, boolean replaceExisting, boolean reindexResources)
+  public File renameFolder(File folder, String newName, boolean replaceExisting, boolean reindexResources)
     throws AlreadyExistsException, GenericException, NotFoundException, RequestNotValidException,
     AuthorizationDeniedException {
 
@@ -1000,63 +1002,74 @@ public class ModelService extends ModelObservable {
         notifyAIPUpdated(folder.getAipId());
       }
 
-      return IdUtils.getFileId(folder.getAipId(), folder.getRepresentationId(), folder.getPath(), newName);
+      return retrieveFile(folder.getAipId(), folder.getRepresentationId(), folder.getPath(), newName);
     } else {
       throw new NotFoundException("Folder was moved or does not exist");
     }
   }
 
-  // FIXME 20161031 hsilva: representationId is not being used but it should
-  // (e.g. for notify representation change)
-  public void moveFiles(String aipId, String representationId, List<File> files, String newRelativePath,
+  public File moveFile(String aipId, String representationId, File file, String newRelativePath,
     boolean replaceExisting, boolean reindexResources) throws AlreadyExistsException, GenericException,
     NotFoundException, RequestNotValidException, AuthorizationDeniedException {
 
     Path basePath = RodaCoreFactory.getStoragePath();
-    boolean notFoundFiles = false;
 
-    for (File file : files) {
-      StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
-      Path fullPath = basePath.resolve(FSUtils.getStoragePathAsString(fileStoragePath, false));
+    StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
+    Path fullPath = basePath.resolve(FSUtils.getStoragePathAsString(fileStoragePath, false));
+    Path newPath = basePath.resolve(newRelativePath);
 
-      if (Files.exists(fullPath)) {
-        Path newResourcePath = basePath.resolve(newRelativePath).resolve(file.getId());
-        FSUtils.move(fullPath, newResourcePath, replaceExisting);
-      } else {
-        notFoundFiles = true;
-      }
+    if (Files.exists(fullPath)) {
+      Path newResourcePath = newPath.resolve(file.getId());
+      FSUtils.move(fullPath, newResourcePath, replaceExisting);
+    } else {
+      throw new NotFoundException("Some files/folders were moved or do not exist");
     }
 
     if (reindexResources) {
-      notifyAIPUpdated(aipId);
+      notifyRepresentationUpdated(retrieveRepresentation(aipId, representationId));
     }
 
-    // doing the throw after the moving process to reindex the moved ones
-    if (notFoundFiles) {
-      throw new NotFoundException("Some files/folders were moved or do not exist");
-    }
+    return retrieveFile(aipId, representationId, Arrays.asList(newPath.toString().split(java.io.File.separator)),
+      file.getId());
   }
 
   /***************** Preservation related *****************/
   /********************************************************/
 
   public void createUpdateAIPEvent(String aipId, String representationId, List<String> filePath, String fileId,
-    PreservationEventType eventType, String eventDescription, String outcomeDetail, String agentName, boolean notify)
-    throws GenericException, ValidationException, NotFoundException, RequestNotValidException,
-    AuthorizationDeniedException, AlreadyExistsException {
+    PreservationEventType eventType, String eventDescription, PluginState outcomeState, String outcomeText,
+    String outcomeDetail, String agentName, boolean notify) {
+    createUpdateAIPEvent(aipId, representationId, filePath, fileId, eventType, eventDescription, null, null,
+      outcomeState, outcomeText, outcomeDetail, agentName, notify);
+  }
 
-    createEvent(aipId, representationId, filePath, fileId, eventType, eventDescription, outcomeDetail, "",
-      Arrays.asList(IdUtils.getUserAgentId(agentName)), notify);
+  public void createUpdateAIPEvent(String aipId, String representationId, List<String> filePath, String fileId,
+    PreservationEventType eventType, String eventDescription, List<LinkingIdentifier> sources,
+    List<LinkingIdentifier> targets, PluginState outcomeState, String outcomeText, String outcomeDetail,
+    String agentName, boolean notify) {
+    try {
+      StringBuilder builder = new StringBuilder(outcomeText);
+      if (StringUtils.isNotBlank(outcomeDetail) && outcomeState.equals(PluginState.SUCCESS)) {
+        builder.append("\n").append("The following reason has been reported by the user: ").append(agentName);
+      }
+
+      createEvent(aipId, representationId, filePath, fileId, eventType, eventDescription, sources, targets,
+        outcomeState, builder.toString(), "", Arrays.asList(IdUtils.getUserAgentId(agentName)), notify);
+    } catch (ValidationException | AlreadyExistsException | GenericException | NotFoundException
+      | RequestNotValidException | AuthorizationDeniedException e1) {
+      LOGGER.error("Could not create an event for: ", eventDescription);
+    }
   }
 
   public void createEvent(String aipId, String representationId, List<String> filePath, String fileId,
-    PreservationEventType eventType, String eventDescription, String outcomeDetail, String outcomeExtension,
+    PreservationEventType eventType, String eventDescription, List<LinkingIdentifier> sources,
+    List<LinkingIdentifier> targets, PluginState outcomeState, String outcomeDetail, String outcomeExtension,
     List<String> agentIds, boolean notify) throws GenericException, ValidationException, NotFoundException,
     RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
 
     String id = IdUtils.createPreservationMetadataId(PreservationMetadataType.EVENT);
     ContentPayload premisEvent = PremisV3Utils.createPremisEventBinary(id, new Date(), eventType.toString(),
-      eventDescription, null, null, PluginState.SUCCESS.toString(), outcomeDetail, outcomeExtension, agentIds);
+      eventDescription, null, null, outcomeState.toString(), outcomeDetail, outcomeExtension, agentIds);
     createPreservationMetadata(PreservationMetadataType.EVENT, id, aipId, representationId, filePath, fileId,
       premisEvent, notify);
   }

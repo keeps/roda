@@ -303,12 +303,12 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public IndexedAIP moveAIPInHierarchy(SelectedItems<IndexedAIP> selected, String parentId)
+  public IndexedAIP moveAIPInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     AlreadyExistsException, ValidationException {
     try {
       User user = UserUtility.getUser(getThreadLocalRequest());
-      return Browser.moveAIPInHierarchy(selected, parentId, user);
+      return Browser.moveAIPInHierarchy(user, selected, parentId, details);
     } catch (Throwable e) {
       LOGGER.error("Unexpected error", e);
       throw e;
@@ -338,10 +338,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void deleteFile(SelectedItems<IndexedFile> files)
+  public void deleteFile(SelectedItems<IndexedFile> files, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.deleteFile(user, files);
+    Browser.deleteFile(user, files, details);
   }
 
   @Override
@@ -577,10 +577,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void updateAIPPermissions(List<IndexedAIP> aips, Permissions permissions, boolean recursive)
+  public void updateAIPPermissions(List<IndexedAIP> aips, Permissions permissions, String details, boolean recursive)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.updateAIPPermissions(user, aips, permissions, recursive);
+    Browser.updateAIPPermissions(user, aips, permissions, details, recursive);
   }
 
   @Override

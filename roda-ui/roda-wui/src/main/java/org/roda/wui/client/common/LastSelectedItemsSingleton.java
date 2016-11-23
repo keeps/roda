@@ -13,6 +13,7 @@ public class LastSelectedItemsSingleton {
 
   private static LastSelectedItemsSingleton singleton = null;
   private static SelectedItems<?> selected = null;
+  private static String detailsMessage = "";
 
   private LastSelectedItemsSingleton() {
   }
@@ -30,6 +31,14 @@ public class LastSelectedItemsSingleton {
 
   public void setSelectedItems(SelectedItems<?> items) {
     selected = items;
+  }
+
+  public String getDetailsMessage() {
+    return detailsMessage;
+  }
+
+  public void setDetailsMessage(String details) {
+    detailsMessage = details;
   }
 
 }

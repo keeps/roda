@@ -17,6 +17,7 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.BrowseFolder;
 import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
@@ -174,11 +175,14 @@ public class TransferUpload extends Composite {
           LocaleInfo.getCurrentLocale().getLocaleName());
       }
     } else {
+      LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+      String details = selectedItems.getDetailsMessage();
+
       if (folderUUID == null) {
         // upload to root
-        ret = RestUtils.createFileUploadUri(aipId, representationUUID);
+        ret = RestUtils.createFileUploadUri(aipId, representationUUID, details);
       } else {
-        ret = RestUtils.createFileUploadUri(folderUUID);
+        ret = RestUtils.createFileUploadUri(folderUUID, details);
       }
     }
 

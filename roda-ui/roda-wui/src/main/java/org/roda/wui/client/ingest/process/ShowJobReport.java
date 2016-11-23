@@ -155,12 +155,15 @@ public class ShowJobReport extends Composite {
 
     boolean hasSource = true;
     if (!jobReport.getSourceObjectOriginalIds().isEmpty() || !jobReport.getSourceObjectId().isEmpty()) {
-      sourceObject.setText(!jobReport.getSourceObjectOriginalIds().isEmpty()
-        ? StringUtility.prettyPrint(jobReport.getSourceObjectOriginalIds()) : jobReport.getSourceObjectId());
+      String idText = !jobReport.getSourceObjectOriginalIds().isEmpty()
+        ? StringUtility.prettyPrint(jobReport.getSourceObjectOriginalIds()) : jobReport.getSourceObjectId();
+
+      sourceObject.setText(idText);
       if (!jobReport.getSourceObjectClass().isEmpty())
         sourceObject.setTitle(jobReport.getSourceObjectOriginalName());
 
       if (TransferredResource.class.getName().equals(jobReport.getSourceObjectClass())) {
+        sourceObject.setText(jobReport.getSourceObjectOriginalName() + " (" + idText + ")");
         sourceObject.setHref(Tools.createHistoryHashLink(IngestTransfer.RESOLVER, jobReport.getSourceObjectId()));
         sourceObjectLabel.setText(messages.showSIPExtended());
         outcomeObjectState.setVisible(true);

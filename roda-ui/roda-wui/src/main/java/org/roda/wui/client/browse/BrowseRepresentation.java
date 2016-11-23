@@ -503,7 +503,7 @@ public class BrowseRepresentation extends Composite {
 
                   @Override
                   public void onFailure(Throwable caught) {
-                    Toast.showInfo(messages.dialogFailure(), messages.renameFailed());
+                    Toast.showInfo(messages.dialogFailure(), messages.outcomeDetailFailed());
                   }
 
                   @Override
@@ -538,21 +538,33 @@ public class BrowseRepresentation extends Composite {
           @Override
           public void onSuccess(Boolean confirmed) {
             if (confirmed) {
-              BrowserService.Util.getInstance().deleteFile(selected, new AsyncCallback<Void>() {
+              Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
+                RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
 
-                @Override
-                public void onSuccess(Void result) {
-                  filesList.refresh();
-                  uploadFiles.setEnabled(true);
-                  createFolder.setEnabled(true);
-                  renameFolders.setEnabled(false);
-                }
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    Toast.showInfo(messages.dialogFailure(), messages.outcomeDetailFailed());
+                  }
 
-                @Override
-                public void onFailure(Throwable caught) {
-                  AsyncCallbackUtils.defaultFailureTreatment(caught);
-                }
-              });
+                  @Override
+                  public void onSuccess(final String details) {
+                    BrowserService.Util.getInstance().deleteFile(selected, details, new AsyncCallback<Void>() {
+
+                      @Override
+                      public void onSuccess(Void result) {
+                        filesList.refresh();
+                        uploadFiles.setEnabled(true);
+                        createFolder.setEnabled(true);
+                        renameFolders.setEnabled(false);
+                      }
+
+                      @Override
+                      public void onFailure(Throwable caught) {
+                        AsyncCallbackUtils.defaultFailureTreatment(caught);
+                      }
+                    });
+                  }
+                });
             }
           }
 
@@ -619,7 +631,7 @@ public class BrowseRepresentation extends Composite {
 
                 @Override
                 public void onFailure(Throwable caught) {
-                  Toast.showInfo(messages.dialogFailure(), messages.renameFailed());
+                  Toast.showInfo(messages.dialogFailure(), messages.outcomeDetailFailed());
                 }
 
                 @Override
@@ -663,7 +675,7 @@ public class BrowseRepresentation extends Composite {
 
               @Override
               public void onFailure(Throwable caught) {
-                Toast.showInfo(messages.dialogFailure(), messages.renameFailed());
+                Toast.showInfo(messages.dialogFailure(), messages.outcomeDetailFailed());
               }
 
               @Override
@@ -698,7 +710,21 @@ public class BrowseRepresentation extends Composite {
 
   @UiHandler("uploadFiles")
   void buttonUploadFilesHandler(ClickEvent e) {
-    Tools.newHistory(Browse.RESOLVER, TransferUpload.BROWSE_RESOLVER.getHistoryToken(), aipId, repId);
+    Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
+      RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          Toast.showInfo(messages.dialogFailure(), messages.outcomeDetailFailed());
+        }
+
+        @Override
+        public void onSuccess(String details) {
+          LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+          selectedItems.setDetailsMessage(details);
+          Tools.newHistory(Browse.RESOLVER, TransferUpload.BROWSE_RESOLVER.getHistoryToken(), aipId, repId);
+        }
+      });
   }
 
   @UiHandler("createFolder")
@@ -717,7 +743,7 @@ public class BrowseRepresentation extends Composite {
 
               @Override
               public void onFailure(Throwable caught) {
-                Toast.showInfo(messages.dialogFailure(), messages.renameFailed());
+                Toast.showInfo(messages.dialogFailure(), messages.outcomeDetailFailed());
               }
 
               @Override
@@ -796,7 +822,7 @@ public class BrowseRepresentation extends Composite {
 
               @Override
               public void onFailure(Throwable caught) {
-                Toast.showInfo(messages.dialogFailure(), messages.renameFailed());
+                Toast.showInfo(messages.dialogFailure(), messages.outcomeDetailFailed());
               }
 
               @Override

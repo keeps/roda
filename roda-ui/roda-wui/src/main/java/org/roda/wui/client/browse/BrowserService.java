@@ -97,7 +97,7 @@ public interface BrowserService extends RemoteService {
 
   List<SearchField> retrieveSearchFields(String className, String locale) throws GenericException;
 
-  IndexedAIP moveAIPInHierarchy(SelectedItems<IndexedAIP> selected, String parentId)
+  IndexedAIP moveAIPInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     AlreadyExistsException, ValidationException;
 
@@ -110,7 +110,7 @@ public interface BrowserService extends RemoteService {
   void deleteRepresentation(SelectedItems<IndexedRepresentation> representations, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
-  void deleteFile(SelectedItems<IndexedFile> files)
+  void deleteFile(SelectedItems<IndexedFile> files, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   void deleteDescriptiveMetadataFile(String aipId, String representationId, String descriptiveMetadataId)
@@ -201,7 +201,7 @@ public interface BrowserService extends RemoteService {
   <T extends IsIndexed> List<String> suggest(String classNameToReturn, String field, String query, boolean allowPartial)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
-  void updateAIPPermissions(List<IndexedAIP> aips, Permissions permissions, boolean recursive)
+  void updateAIPPermissions(List<IndexedAIP> aips, Permissions permissions, String details, boolean recursive)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
 
   void updateRisk(Risk risk)

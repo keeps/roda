@@ -295,25 +295,37 @@ public class Search extends Composite {
         final IndexedAIP parentAIP = event.getValue();
         final String parentId = (parentAIP != null) ? parentAIP.getId() : null;
 
-        BrowserService.Util.getInstance().moveAIPInHierarchy(selected, parentId,
-          new LoadingAsyncCallback<IndexedAIP>() {
+        Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
+          RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
 
             @Override
-            public void onSuccessImpl(IndexedAIP result) {
-              if (result != null) {
-                Tools.newHistory(Browse.RESOLVER, result.getId());
-              } else {
-                Tools.newHistory(Search.RESOLVER);
-              }
+            public void onFailure(Throwable caught) {
+              Toast.showInfo(messages.dialogFailure(), messages.renameFailed());
             }
 
             @Override
-            public void onFailureImpl(Throwable caught) {
-              if (caught instanceof NotFoundException) {
-                Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-              } else {
-                AsyncCallbackUtils.defaultFailureTreatment(caught);
-              }
+            public void onSuccess(final String details) {
+              BrowserService.Util.getInstance().moveAIPInHierarchy(selected, parentId, details,
+                new LoadingAsyncCallback<IndexedAIP>() {
+
+                  @Override
+                  public void onSuccessImpl(IndexedAIP result) {
+                    if (result != null) {
+                      Tools.newHistory(Browse.RESOLVER, result.getId());
+                    } else {
+                      Tools.newHistory(Search.RESOLVER);
+                    }
+                  }
+
+                  @Override
+                  public void onFailureImpl(Throwable caught) {
+                    if (caught instanceof NotFoundException) {
+                      Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+                    } else {
+                      AsyncCallbackUtils.defaultFailureTreatment(caught);
+                    }
+                  }
+                });
             }
           });
       }
@@ -334,34 +346,35 @@ public class Search extends Composite {
           @Override
           public void onSuccess(Boolean confirmed) {
             if (confirmed) {
-              if (IndexedAIP.class.getName().equals(selectedClass)) {
-                final SelectedItems<IndexedAIP> aips = (SelectedItems<IndexedAIP>) selected;
-                BrowserService.Util.getInstance().deleteAIP(aips, new LoadingAsyncCallback<String>() {
+              Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
+                RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
 
                   @Override
-                  public void onFailureImpl(Throwable caught) {
-                    AsyncCallbackUtils.defaultFailureTreatment(caught);
-                    mainSearch.refresh();
+                  public void onFailure(Throwable caught) {
+                    Toast.showInfo(messages.dialogFailure(), messages.renameFailed());
                   }
 
                   @Override
-                  public void onSuccessImpl(String parentId) {
-                    Toast.showInfo(messages.removeSuccessTitle(), messages.removeAllSuccessMessage());
-                    mainSearch.refresh();
-                  }
-                });
-              } else if (IndexedRepresentation.class.getName().equals(selectedClass)) {
-                final SelectedItems<IndexedRepresentation> reps = (SelectedItems<IndexedRepresentation>) selected;
-                Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
-                  RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
+                  public void onSuccess(final String details) {
+                    if (IndexedAIP.class.getName().equals(selectedClass)) {
+                      final SelectedItems<IndexedAIP> aips = (SelectedItems<IndexedAIP>) selected;
+                      BrowserService.Util.getInstance().deleteAIP(aips, new LoadingAsyncCallback<String>() {
 
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      Toast.showInfo(messages.dialogFailure(), messages.renameFailed());
-                    }
+                        @Override
+                        public void onFailureImpl(Throwable caught) {
+                          AsyncCallbackUtils.defaultFailureTreatment(caught);
+                          mainSearch.refresh();
+                        }
 
-                    @Override
-                    public void onSuccess(String details) {
+                        @Override
+                        public void onSuccessImpl(String parentId) {
+                          Toast.showInfo(messages.removeSuccessTitle(), messages.removeAllSuccessMessage());
+                          mainSearch.refresh();
+                        }
+                      });
+                    } else if (IndexedRepresentation.class.getName().equals(selectedClass)) {
+                      final SelectedItems<IndexedRepresentation> reps = (SelectedItems<IndexedRepresentation>) selected;
+
                       BrowserService.Util.getInstance().deleteRepresentation(reps, details,
                         new LoadingAsyncCallback<Void>() {
 
@@ -377,26 +390,27 @@ public class Search extends Composite {
                             mainSearch.refresh();
                           }
                         });
+
+                    } else if (IndexedFile.class.getName().equals(selectedClass)) {
+                      final SelectedItems<IndexedFile> files = (SelectedItems<IndexedFile>) selected;
+                      BrowserService.Util.getInstance().deleteFile(files, details, new LoadingAsyncCallback<Void>() {
+
+                        @Override
+                        public void onFailureImpl(Throwable caught) {
+                          AsyncCallbackUtils.defaultFailureTreatment(caught);
+                          mainSearch.refresh();
+                        }
+
+                        @Override
+                        public void onSuccessImpl(Void returned) {
+                          Toast.showInfo(messages.removeSuccessTitle(), messages.removeAllSuccessMessage());
+                          mainSearch.refresh();
+                        }
+                      });
                     }
-                  });
-
-              } else if (IndexedFile.class.getName().equals(selectedClass)) {
-                final SelectedItems<IndexedFile> files = (SelectedItems<IndexedFile>) selected;
-                BrowserService.Util.getInstance().deleteFile(files, new LoadingAsyncCallback<Void>() {
-
-                  @Override
-                  public void onFailureImpl(Throwable caught) {
-                    AsyncCallbackUtils.defaultFailureTreatment(caught);
-                    mainSearch.refresh();
                   }
 
-                  @Override
-                  public void onSuccessImpl(Void returned) {
-                    Toast.showInfo(messages.removeSuccessTitle(), messages.removeAllSuccessMessage());
-                    mainSearch.refresh();
-                  }
                 });
-              }
             }
           }
 

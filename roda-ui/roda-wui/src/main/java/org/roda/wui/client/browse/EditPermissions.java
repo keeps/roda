@@ -24,6 +24,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.user.RODAMember;
+import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
@@ -44,6 +45,7 @@ import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.event.logical.shared.AttachEvent.Handler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -362,17 +364,29 @@ public class EditPermissions extends Composite {
     return permissions;
   }
 
-  private void apply(boolean recursive) {
-    Permissions permissions = getPermissions();
+  private void apply(final boolean recursive) {
+    final Permissions permissions = getPermissions();
 
-    BrowserService.Util.getInstance().updateAIPPermissions(aips, permissions, recursive,
-      new LoadingAsyncCallback<Void>() {
+    Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
+      RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
 
         @Override
-        public void onSuccessImpl(Void result) {
-          Toast.showInfo(messages.dialogSuccess(), messages.permissionsChanged());
+        public void onFailure(Throwable caught) {
+          Toast.showInfo(messages.dialogFailure(), messages.outcomeDetailFailed());
         }
 
+        @Override
+        public void onSuccess(String details) {
+          BrowserService.Util.getInstance().updateAIPPermissions(aips, permissions, details, recursive,
+            new LoadingAsyncCallback<Void>() {
+
+              @Override
+              public void onSuccessImpl(Void result) {
+                Toast.showInfo(messages.dialogSuccess(), messages.permissionsChanged());
+              }
+
+            });
+        }
       });
   }
 

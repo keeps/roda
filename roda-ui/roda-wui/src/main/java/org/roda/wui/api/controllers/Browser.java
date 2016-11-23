@@ -726,8 +726,8 @@ public class Browser extends RodaWuiController {
    * ---------------------------------------------------------------------------
    */
 
-  public static IndexedAIP moveAIPInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, User user)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
+  public static IndexedAIP moveAIPInHierarchy(User user, SelectedItems<IndexedAIP> selected, String parentId,
+    String details) throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     AlreadyExistsException, ValidationException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -741,7 +741,7 @@ public class Browser extends RodaWuiController {
     }
 
     // delegate
-    IndexedAIP returnAIP = BrowserHelper.moveAIPInHierarchy(selected, parentId, user);
+    IndexedAIP returnAIP = BrowserHelper.moveAIPInHierarchy(user, selected, parentId, details);
 
     // register action
     controllerAssistant.registerAction(user, parentId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_SELECTED_PARAM,
@@ -867,7 +867,7 @@ public class Browser extends RodaWuiController {
       representations);
   }
 
-  public static void deleteFile(User user, SelectedItems<IndexedFile> files)
+  public static void deleteFile(User user, SelectedItems<IndexedFile> files, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -876,7 +876,7 @@ public class Browser extends RodaWuiController {
     UserUtility.checkFilePermissions(user, files, PermissionType.DELETE);
 
     // delegate
-    BrowserHelper.deleteFile(files, user);
+    BrowserHelper.deleteFile(files, user, details);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_SELECTED_PARAM, files);
@@ -1468,7 +1468,8 @@ public class Browser extends RodaWuiController {
       descriptiveMetadataId, RodaConstants.CONTROLLER_VERSION_ID_PARAM, versionId);
   }
 
-  public static void updateAIPPermissions(User user, List<IndexedAIP> aips, Permissions permissions, boolean recursive)
+  public static void updateAIPPermissions(User user, List<IndexedAIP> aips, Permissions permissions, String details,
+    boolean recursive)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1477,7 +1478,7 @@ public class Browser extends RodaWuiController {
 
     for (IndexedAIP aip : aips) {
       UserUtility.checkAIPPermissions(user, aip, PermissionType.UPDATE);
-      BrowserHelper.updateAIPPermissions(user, aip, permissions, recursive);
+      BrowserHelper.updateAIPPermissions(user, aip, permissions, details, recursive);
     }
 
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIPS_PARAM, aips,

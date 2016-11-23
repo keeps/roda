@@ -560,12 +560,22 @@ public class BrowseFile extends Composite {
     Video videoPlayer = Video.createIfSupported();
     if (videoPlayer != null) {
       videoPlayer.addSource(RestUtils.createRepresentationFileDownloadUri(file.getUUID()).asString(),
-        file.getFileFormat().getMimeType());
+        convertVideoMimetypes(file.getFileFormat().getMimeType()));
       videoPlayer.setControls(true);
       filePreview.add(videoPlayer);
       videoPlayer.addStyleName("viewRepresentationAudioFilePreview");
     } else {
       notSupportedPreview();
+    }
+  }
+
+  private String convertVideoMimetypes(String mimetype) {
+    if (mimetype.equals("application/mp4")) {
+      return "video/mp4";
+    } else if (mimetype.equals("application/ogg")) {
+      return "video/ogg";
+    } else {
+      return mimetype;
     }
   }
 
