@@ -36,6 +36,8 @@
 		<module>characterization/roda-plugin-characterization-jhove</module>
 		<module>characterization/roda-plugin-characterization-jpylyzer</module>
 		<module>characterization/roda-plugin-characterization-mediainfo</module>
+
+		<module>misc/roda-plugin-misc-missingformat</module>
 	</modules>
 	<dependencyManagement>
 		<dependencies>
