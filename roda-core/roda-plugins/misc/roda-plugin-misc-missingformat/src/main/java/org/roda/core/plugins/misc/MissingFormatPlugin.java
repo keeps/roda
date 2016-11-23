@@ -327,7 +327,7 @@ public class MissingFormatPlugin extends AbstractPlugin<File> {
    */
   private void createIncidence(final ModelService model, final File file, final String riskId, final Report report) {
     try {
-      final Risk risk = PluginHelper.createRiskIfNotExists(model, 0, riskId, getClass());
+      final Risk risk = PluginHelper.createRiskIfNotExists(model, 0, riskId, getClass().getClassLoader());
       final RiskIncidence incidence = new RiskIncidence();
       incidence.setDetectedOn(new Date());
       incidence.setDetectedBy(this.getName());
