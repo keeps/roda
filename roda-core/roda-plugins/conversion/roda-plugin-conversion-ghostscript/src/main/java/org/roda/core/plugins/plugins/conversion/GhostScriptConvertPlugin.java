@@ -15,7 +15,6 @@ import java.util.Map;
 
 import org.ghost4j.GhostscriptException;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -106,11 +105,6 @@ public class GhostScriptConvertPlugin<T extends IsRODAObject> extends CommandCon
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     // do nothing
     return null;
-  }
-
-  @Override
-  public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CONVERSION);
   }
 
   @Override

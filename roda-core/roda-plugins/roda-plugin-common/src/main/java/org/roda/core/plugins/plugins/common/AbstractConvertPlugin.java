@@ -935,4 +935,9 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
     return (List) list;
   }
 
+  @Override
+  public List<String> getCategories() {
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CONVERSION, RodaConstants.PLUGIN_CATEGORY_DISSEMINATION);
+  }
+
 }

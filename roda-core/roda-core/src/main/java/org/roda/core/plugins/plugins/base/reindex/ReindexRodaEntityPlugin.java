@@ -52,7 +52,7 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "Clear indexes", PluginParameterType.BOOLEAN,
-        "true", false, false, "Clear all indexes before reindexing them."));
+        "false", false, false, "Clear all indexes before reindexing them."));
   }
 
   @Override
@@ -70,7 +70,9 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
 
   @Override
   public String getDescription() {
-    return "Clears the index and recreates it from actual physical data that exists on the storage. This task aims to fix inconsistencies between what is shown in the graphical user interface of the repository and what is actually kept at the storage layer. Such inconsistencies may occur for various reasons, e.g. index corruption, ungraceful shutdown of the repository, etc.";
+    return "Clears the index and recreates it from actual physical data that exists on the storage. This task aims to fix inconsistencies between what is shown in "
+      + "the graphical user interface of the repository and what is actually kept at the storage layer. Such inconsistencies may occur for various reasons, e.g. "
+      + "index corruption, ungraceful shutdown of the repository, etc.";
   }
 
   @Override

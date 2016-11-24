@@ -2094,12 +2094,23 @@ public class ModelService extends ModelObservable {
 
   public DIP createDIP(DIP dip, boolean notify) throws GenericException, AuthorizationDeniedException {
     try {
-      Directory directory = storage
-        .createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DIP));
-      dip.setId(directory.getStoragePath().getName());
+      Directory directory;
+
+      if (StringUtils.isNotBlank(dip.getId())) {
+        try {
+          directory = storage
+            .createDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DIP, dip.getId()));
+        } catch (AlreadyExistsException | GenericException | AuthorizationDeniedException e) {
+          directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DIP));
+          dip.setId(directory.getStoragePath().getName());
+        }
+      } else {
+        directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DIP));
+        dip.setId(directory.getStoragePath().getName());
+      }
+
       dip.setDateCreated(new Date());
       dip.setLastModified(new Date());
-
       createDIPMetadata(dip, directory.getStoragePath());
 
       if (notify) {

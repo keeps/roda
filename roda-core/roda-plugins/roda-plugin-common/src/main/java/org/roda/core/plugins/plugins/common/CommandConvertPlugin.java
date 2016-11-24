@@ -27,7 +27,7 @@ public abstract class CommandConvertPlugin<T extends IsRODAObject> extends Abstr
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_COMMAND_ARGUMENTS,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_COMMAND_ARGUMENTS, "Command arguments",
         PluginParameterType.STRING, "", true, true,
-        "Command arguments that will be passed to the command of the tool (advanced users only!)"));
+        "Command arguments that will be passed to the command of the tool as configured (advanced users only!)"));
   }
 
   protected CommandConvertPlugin() {

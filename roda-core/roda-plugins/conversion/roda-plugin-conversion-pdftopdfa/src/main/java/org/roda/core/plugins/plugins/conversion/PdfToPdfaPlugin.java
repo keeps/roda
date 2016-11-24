@@ -162,11 +162,6 @@ public class PdfToPdfaPlugin<T extends IsRODAObject> extends AbstractConvertPlug
   }
 
   @Override
-  public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CONVERSION);
-  }
-
-  @Override
   public String getDIPTitle() {
     return "PdfToPdfa DIP title";
   }

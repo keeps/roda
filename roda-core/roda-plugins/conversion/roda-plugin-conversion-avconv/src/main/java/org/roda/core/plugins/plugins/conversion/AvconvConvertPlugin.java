@@ -47,9 +47,9 @@ public class AvconvConvertPlugin<T extends IsRODAObject> extends CommandConvertP
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OUTPUT_ARGUMENTS, new PluginParameter(
-      RodaConstants.PLUGIN_PARAMS_OUTPUT_ARGUMENTS, "Output command arguments", PluginParameterType.STRING, "", true,
-      true,
-      "Command arguments to modify the output type that will be passed to the command of the tool (advanced users only!)"));
+      RodaConstants.PLUGIN_PARAMS_OUTPUT_ARGUMENTS, "Avconv output command arguments", PluginParameterType.STRING, "",
+      true, true,
+      "Command arguments to modify the output type that will be passed to the command of the tool as configured (advanced users only!)"));
   }
 
   public AvconvConvertPlugin() {
@@ -72,7 +72,11 @@ public class AvconvConvertPlugin<T extends IsRODAObject> extends CommandConvertP
 
   @Override
   public String getDescription() {
-    return "avconv is a very fast video and audio converter. It can also convert between arbitrary sample rates and resize video on the fly with a high quality polyphase filter.\nThe results of conversion will be placed on a new representation under the same Archival Information Package (AIP) where the files were originally found. A PREMIS event is also recorded after the task is run.\nEach input or output file can in principle contain any number of streams of different types (video/audio/subtitle/attachment/data). Allowed number and/or types of streams can be limited by the container format. \nFor more information about this tool, please visit https://libav.org/documentation/avconv.html";
+    return "avconv is a very fast video and audio converter. It can also convert between arbitrary sample rates and resize video on the fly with a high quality polyphase "
+      + "filter.\nThe results of conversion will be placed on a new representation under the same Archival Information Package (AIP) where the files were originally found. "
+      + "A PREMIS event is also recorded after the task is run.\nEach input or output file can in principle contain any number of streams of different types "
+      + "(video/audio/subtitle/attachment/data). Allowed number and/or types of streams can be limited by the container format.\nFor more information about this tool, "
+      + "please visit https://libav.org/documentation/avconv.html";
   }
 
   @Override
@@ -158,11 +162,6 @@ public class AvconvConvertPlugin<T extends IsRODAObject> extends CommandConvertP
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     // do nothing
     return null;
-  }
-
-  @Override
-  public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CONVERSION);
   }
 
   @Override
