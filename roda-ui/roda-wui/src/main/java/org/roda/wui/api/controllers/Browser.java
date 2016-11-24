@@ -2063,7 +2063,7 @@ public class Browser extends RodaWuiController {
       incidence);
   }
 
-  public static Reports listReports(User user, String id, String resourceOrSip, String start, String limit,
+  public static Reports listReports(User user, String id, String resourceOrSip, int start, int limit,
     String acceptFormat)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -2083,6 +2083,9 @@ public class Browser extends RodaWuiController {
       if (RodaConstants.CONTROLLER_SIP_PARAM.equals(resourceOrSip)) {
         reportList = BrowserHelper.listTransferredResourcesReportsWithSIP(id, start, limit);
       } else {
+        if (RodaConstants.CONTROLLER_ID_OBJECT_RESOURCE_PATH.equals(resourceOrSip)) {
+          id = IdUtils.getTransferredResourceUUID(id);
+        }
         reportList = BrowserHelper.listTransferredResourcesReports(id, start, limit);
       }
     }
@@ -2106,27 +2109,25 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     // delegate
-    String start = "0";
-    String limit = "1";
     Reports reportList;
 
     if (id == null || resourceOrSip == null) {
-      reportList = BrowserHelper.listReports(start, limit);
+      reportList = BrowserHelper.listReports(0, 1);
     } else {
       if (RodaConstants.CONTROLLER_SIP_PARAM.equals(resourceOrSip)) {
-        reportList = BrowserHelper.listTransferredResourcesReportsWithSIP(id, start, limit);
+        reportList = BrowserHelper.listTransferredResourcesReportsWithSIP(id, 0, 1);
       } else {
         if (RodaConstants.CONTROLLER_ID_OBJECT_RESOURCE_PATH.equals(resourceOrSip)) {
           id = IdUtils.getTransferredResourceUUID(id);
         }
-        reportList = BrowserHelper.listTransferredResourcesReports(id, start, limit);
+        reportList = BrowserHelper.listTransferredResourcesReports(id, 0, 1);
       }
     }
 
     // register action
     controllerAssistant.registerAction(user, id, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_ID_PARAM, id,
-      RodaConstants.CONTROLLER_ID_OBJECT_PARAM, resourceOrSip, RodaConstants.CONTROLLER_START_PARAM, start,
-      RodaConstants.CONTROLLER_LIMIT_PARAM, limit);
+      RodaConstants.CONTROLLER_ID_OBJECT_PARAM, resourceOrSip, RodaConstants.CONTROLLER_START_PARAM, 0,
+      RodaConstants.CONTROLLER_LIMIT_PARAM, 1);
 
     if (reportList.getReports().isEmpty()) {
       throw new RODAException();

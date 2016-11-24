@@ -17,6 +17,7 @@ import javax.ws.rs.core.Response;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Reports;
 import org.roda.core.data.v2.user.User;
@@ -56,8 +57,12 @@ public class ReportsResource {
     // get user
     User user = UserUtility.getApiUser(request);
 
+    Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
+    int startInt = pagingParams.getFirst();
+    int limitInt = pagingParams.getSecond();
+
     // get job reports of a transferred resource or SIP or all
-    Reports reportList = Browser.listReports(user, id, resourceOrSip, start, limit, acceptFormat);
+    Reports reportList = Browser.listReports(user, id, resourceOrSip, startInt, limitInt, acceptFormat);
     return Response.ok(reportList, mediaType).build();
   }
 
