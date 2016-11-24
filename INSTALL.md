@@ -156,17 +156,6 @@ core.plugins.internal.virus_check.clamav.params = -m --fdpass
 core.plugins.internal.virus_check.clamav.get_version = clamdscan --version
 ```
 
-### Add risks based on Drambora (optional)
-
-
-Under the folder "$HOME/.roda/data/storage" run the following commands:
-
-```
-wget https://github.com/keeps/roda/archive/risks.zip; unzip risks.zip; mv roda-risks risk; rm risks.zip
-curl -X POST --header "Content-Type: application/json" --header "Accept: application/json" "http://localhost:8080/api/v1/management_tasks/index/reindex?entity=risk" -u USERNAME:PASSWORD
-```
-NOTE: On the last command change the "USERNAME" and "PASSWORD" to your admin credentials on RODA. Also update the URL if necessary. This will load the risks into the repository indexes.
-
 ### Configure Apache Solr (optional)
 
 TBD

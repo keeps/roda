@@ -750,11 +750,13 @@ public final class RodaConstants {
   public static final String RISK_PRE_MITIGATION_SEVERITY_LEVEL = "preMitigationSeverityLevel";
   public static final String RISK_PRE_MITIGATION_NOTES = "preMitigationNotes";
 
-  public static final String RISK_POS_MITIGATION_PROBABILITY = "posMitigationProbability";
-  public static final String RISK_POS_MITIGATION_IMPACT = "posMitigationImpact";
-  public static final String RISK_POS_MITIGATION_SEVERITY = "posMitigationSeverity";
-  public static final String RISK_POS_MITIGATION_SEVERITY_LEVEL = "posMitigationSeverityLevel";
-  public static final String RISK_POS_MITIGATION_NOTES = "posMitigationNotes";
+  public static final String RISK_POST_MITIGATION_PROBABILITY = "postMitigationProbability";
+  public static final String RISK_POST_MITIGATION_IMPACT = "postMitigationImpact";
+  public static final String RISK_POST_MITIGATION_SEVERITY = "postMitigationSeverity";
+  public static final String RISK_POST_MITIGATION_SEVERITY_LEVEL = "postMitigationSeverityLevel";
+  public static final String RISK_POST_MITIGATION_NOTES = "postMitigationNotes";
+  
+  public static final String RISK_CURRENT_SEVERITY_LEVEL = "currentSeverityLevel";
 
   public static final String RISK_MITIGATION_STRATEGY = "mitigationStrategy";
   public static final String RISK_MITIGATION_OWNER_TYPE = "mitigationOwnerType";

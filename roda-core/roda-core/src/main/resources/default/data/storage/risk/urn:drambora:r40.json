@@ -1,9 +1,9 @@
 
             {
-            
+
             
             "category": "Operations and service delivery; Hardware, software or communications equipment and facilities",
-            
+
                 
         "id": "urn:drambora:r40",
     
@@ -11,9 +11,9 @@
     
         "description": "Business activities are adversely affected by non-deliberate intervention, or intervention that was not intended to result in these outcomes. ",
     
-        "notes": "- Do repository systems permit members of staff to perform interactions that are contrary to agreed policies or procedures?\n- Are interactions reversible? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+        "notes": "\n- Do repository systems permit members of staff to perform interactions that are contrary to agreed policies or procedures?\n- Are interactions reversible? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
     
-        "preMitigationNotes": "- Staff member accidentally stops integral repository software services\n- Content is inadvertently deleted during its ingest ",
+        "preMitigationNotes": "\n- Staff member accidentally stops integral repository software services\n- Content is inadvertently deleted during its ingest ",
     
         "mitigationOwner": "Technical",
     
@@ -29,17 +29,9 @@
                 "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
                 "mitigationOwnerType": "Human",
                 "createdBy": "admin",
-                "createdOn": 1459465200000,    
+                "createdOn": 1459465200000,
                 "updatedBy": "admin",
                 "updatedOn": 1459465200000,
-                
-                "posMitigationProbability": 0,
-                "posMitigationImpact": 0,
-                "posMitigationSeverity": 12,  
-                "posMitigationSeverityLevel": "MODERATE",
-                
-                "identifiedOn": "1459465200000",
-                "mitigationRelatedEventIdentifierType": "",
-                "mitigationRelatedEventIdentifierValue": ""
+                "identifiedOn": "1459465200000"
             }
         

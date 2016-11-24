@@ -1,9 +1,9 @@
 
             {
-            
+
             
             "category": "Personnel, management and administration procedures; Operations and service delivery",
-            
+
                 
         "id": "urn:drambora:r68",
     
@@ -11,9 +11,9 @@
     
         "description": "Packages cannot be traced to corresponding packages or groups of packages from an earlier point within the repository’s information lifecycle. ",
     
-        "notes": "- Are mechanisms in place to record the origins and lifecycle of information packages and any transactions or interactions that they have been subject to? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+        "notes": "\n- Are mechanisms in place to record the origins and lifecycle of information packages and any transactions or interactions that they have been subject to? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
     
-        "preMitigationNotes": "- Repository fails to maintain appropriate documentation describing the origins and lifecycle of an archived package and any transactions or interactions to which it has been subject ",
+        "preMitigationNotes": "\n- Repository fails to maintain appropriate documentation describing the origins and lifecycle of an archived package and any transactions or interactions to which it has been subject ",
     
         "mitigationOwner": "Management",
     
@@ -29,17 +29,9 @@
                 "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
                 "mitigationOwnerType": "Human",
                 "createdBy": "admin",
-                "createdOn": 1459465200000,    
+                "createdOn": 1459465200000,
                 "updatedBy": "admin",
                 "updatedOn": 1459465200000,
-                
-                "posMitigationProbability": 0,
-                "posMitigationImpact": 0,
-                "posMitigationSeverity": 12,  
-                "posMitigationSeverityLevel": "MODERATE",
-                
-                "identifiedOn": "1459465200000",
-                "mitigationRelatedEventIdentifierType": "",
-                "mitigationRelatedEventIdentifierValue": ""
+                "identifiedOn": "1459465200000"
             }
         

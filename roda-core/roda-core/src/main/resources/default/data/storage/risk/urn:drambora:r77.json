@@ -1,9 +1,9 @@
 
             {
-            
+
             
             "category": "Personnel, management and administration procedures; Operations and service delivery; Hardware, software or communications equipment and facilities",
-            
+
                 
         "id": "urn:drambora:r77",
     
@@ -11,9 +11,9 @@
     
         "description": "Repository is incapable of effectively determining the extent to which its dissemination mechanisms are successful in terms of its overall business objectives. ",
     
-        "notes": "- Does the repository maintain policies and procedures to verify and record the integrity, authenticity, provenance and understandability of disseminated information?\n- Does the repository maintain policies and procedures to determine usage rights and limit inappropriate access?\n- Are mechanisms to determine the effectiveness of delivery operations exploited on a regular basis? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+        "notes": "\n- Does the repository maintain policies and procedures to verify and record the integrity, authenticity, provenance and understandability of disseminated information?\n- Does the repository maintain policies and procedures to determine usage rights and limit inappropriate access?\n- Are mechanisms to determine the effectiveness of delivery operations exploited on a regular basis? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
     
-        "preMitigationNotes": "- Repository end-user feedback questionnaires provide a non-exhaustive set of multi-choice responses that restrict the extent to which responses reflect the success of the dissemination ",
+        "preMitigationNotes": "\n- Repository end-user feedback questionnaires provide a non-exhaustive set of multi-choice responses that restrict the extent to which responses reflect the success of the dissemination ",
     
         "mitigationOwner": "Dissemination",
     
@@ -29,17 +29,9 @@
                 "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
                 "mitigationOwnerType": "Human",
                 "createdBy": "admin",
-                "createdOn": 1459465200000,    
+                "createdOn": 1459465200000,
                 "updatedBy": "admin",
                 "updatedOn": 1459465200000,
-                
-                "posMitigationProbability": 0,
-                "posMitigationImpact": 0,
-                "posMitigationSeverity": 12,  
-                "posMitigationSeverityLevel": "MODERATE",
-                
-                "identifiedOn": "1459465200000",
-                "mitigationRelatedEventIdentifierType": "",
-                "mitigationRelatedEventIdentifierValue": ""
+                "identifiedOn": "1459465200000"
             }
         

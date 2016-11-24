@@ -1,9 +1,9 @@
 
             {
-            
+
             
             "category": "Operations and service delivery",
-            
+
                 
         "id": "urn:drambora:r62",
     
@@ -11,9 +11,9 @@
     
         "description": "Repository is incapable of determining the parts of the archival object that will be subject to ongoing preservation. ",
     
-        "notes": "- Does repository define the scope and extent of its archival package format(s)?\n- Do policies and procedures exist to validate archival packages for completeness and correctness? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+        "notes": "\n- Does repository define the scope and extent of its archival package format(s)?\n- Do policies and procedures exist to validate archival packages for completeness and correctness? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
     
-        "preMitigationNotes": "- Repository fails to adequately define its archival package format ",
+        "preMitigationNotes": "\n- Repository fails to adequately define its archival package format ",
     
         "mitigationOwner": "Preservation",
     
@@ -29,17 +29,9 @@
                 "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
                 "mitigationOwnerType": "Human",
                 "createdBy": "admin",
-                "createdOn": 1459465200000,    
+                "createdOn": 1459465200000,
                 "updatedBy": "admin",
                 "updatedOn": 1459465200000,
-                
-                "posMitigationProbability": 0,
-                "posMitigationImpact": 0,
-                "posMitigationSeverity": 12,  
-                "posMitigationSeverityLevel": "MODERATE",
-                
-                "identifiedOn": "1459465200000",
-                "mitigationRelatedEventIdentifierType": "",
-                "mitigationRelatedEventIdentifierValue": ""
+                "identifiedOn": "1459465200000"
             }
         

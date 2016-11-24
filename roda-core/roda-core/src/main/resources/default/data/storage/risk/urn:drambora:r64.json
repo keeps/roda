@@ -1,9 +1,9 @@
 
             {
-            
+
             
             "category": "Operations and service delivery",
-            
+
                 
         "id": "urn:drambora:r64",
     
@@ -11,9 +11,9 @@
     
         "description": "Where identifiers are applied to information, the repository is incapableof locating the archival package that corresponds to a given ID. ",
     
-        "notes": "- Does repository apply or maintain existing persistent identifiers for information packages?\n- Is identifier potentially distinguishable from related information? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+        "notes": "\n- Does repository apply or maintain existing persistent identifiers for information packages?\n- Is identifier potentially distinguishable from related information? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
     
-        "preMitigationNotes": "- Repository maintains the use of the file path from the digital object’s original environment as the identifier for the archived object, resulting in two distinct objects that originated from different locations sharing the duplicate identifer “/Documents and Settings/John Smith/Document.pdf”\n- Identifiers generated at ingest consist of the timestamp at the point of ingest, but two ingest systems operate simultaneously and duplicate identifiers are consequently applied ",
+        "preMitigationNotes": "\n- Repository maintains the use of the file path from the digital object’s original environment as the identifier for the archived object, resulting in two distinct objects that originated from different locations sharing the duplicate identifer “/Documents and Settings/John Smith/Document.pdf”\n- Identifiers generated at ingest consist of the timestamp at the point of ingest, but two ingest systems operate simultaneously and duplicate identifiers are consequently applied ",
     
         "mitigationOwner": "Preservation",
     
@@ -29,17 +29,9 @@
                 "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
                 "mitigationOwnerType": "Human",
                 "createdBy": "admin",
-                "createdOn": 1459465200000,    
+                "createdOn": 1459465200000,
                 "updatedBy": "admin",
                 "updatedOn": 1459465200000,
-                
-                "posMitigationProbability": 0,
-                "posMitigationImpact": 0,
-                "posMitigationSeverity": 12,  
-                "posMitigationSeverityLevel": "MODERATE",
-                
-                "identifiedOn": "1459465200000",
-                "mitigationRelatedEventIdentifierType": "",
-                "mitigationRelatedEventIdentifierValue": ""
+                "identifiedOn": "1459465200000"
             }
         

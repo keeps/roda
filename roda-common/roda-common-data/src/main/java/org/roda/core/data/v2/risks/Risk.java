@@ -12,7 +12,6 @@ import java.util.Date;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.roda.core.data.v2.IsModelObject;
-import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.NamedIndexedModel;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -40,11 +39,11 @@ public class Risk extends NamedIndexedModel implements IsModelObject {
   private SEVERITY_LEVEL preMitigationSeverityLevel = null;
   private String preMitigationNotes = null;
 
-  private int posMitigationProbability = 0;
-  private int posMitigationImpact = 0;
-  private int posMitigationSeverity = 0;
-  private SEVERITY_LEVEL posMitigationSeverityLevel = null;
-  private String posMitigationNotes = null;
+  private int postMitigationProbability = 0;
+  private int postMitigationImpact = 0;
+  private int postMitigationSeverity = 0;
+  private SEVERITY_LEVEL postMitigationSeverityLevel = null;
+  private String postMitigationNotes = null;
 
   private String mitigationStrategy = null;
   private String mitigationOwnerType = null;
@@ -60,6 +59,8 @@ public class Risk extends NamedIndexedModel implements IsModelObject {
   public Risk() {
     super();
     this.identifiedOn = new Date();
+    this.createdOn = new Date();
+    this.updatedOn = new Date();
   }
 
   public Risk(Risk risk) {
@@ -76,11 +77,11 @@ public class Risk extends NamedIndexedModel implements IsModelObject {
     this.preMitigationSeverityLevel = risk.getPreMitigationSeverityLevel();
     this.preMitigationNotes = risk.getPreMitigationNotes();
 
-    this.posMitigationProbability = risk.getPosMitigationProbability();
-    this.posMitigationImpact = risk.getPosMitigationImpact();
-    this.posMitigationSeverity = risk.getPosMitigationSeverity();
-    this.posMitigationSeverityLevel = risk.getPosMitigationSeverityLevel();
-    this.posMitigationNotes = risk.getPosMitigationNotes();
+    this.postMitigationProbability = risk.getPostMitigationProbability();
+    this.postMitigationImpact = risk.getPostMitigationImpact();
+    this.postMitigationSeverity = risk.getPostMitigationSeverity();
+    this.postMitigationSeverityLevel = risk.getPostMitigationSeverityLevel();
+    this.postMitigationNotes = risk.getPostMitigationNotes();
 
     this.mitigationStrategy = risk.getMitigationStrategy();
     this.mitigationOwnerType = risk.getMitigationOwnerType();
@@ -179,48 +180,56 @@ public class Risk extends NamedIndexedModel implements IsModelObject {
     this.preMitigationNotes = preMitigationNotes;
   }
 
-  public int getPosMitigationProbability() {
-    return posMitigationProbability;
+  public int getPostMitigationProbability() {
+    return postMitigationProbability;
   }
 
-  public void setPosMitigationProbability(int posMitigationProbability) {
-    this.posMitigationProbability = posMitigationProbability;
+  public void setPostMitigationProbability(int postMitigationProbability) {
+    this.postMitigationProbability = postMitigationProbability;
   }
 
-  public int getPosMitigationImpact() {
-    return posMitigationImpact;
+  public int getPostMitigationImpact() {
+    return postMitigationImpact;
   }
 
-  public void setPosMitigationImpact(int posMitigationImpact) {
-    this.posMitigationImpact = posMitigationImpact;
+  public void setPostMitigationImpact(int postMitigationImpact) {
+    this.postMitigationImpact = postMitigationImpact;
   }
 
-  public int getPosMitigationSeverity() {
-    return posMitigationSeverity;
+  public int getPostMitigationSeverity() {
+    return postMitigationSeverity;
   }
 
-  public void setPosMitigationSeverity(int posMitigationSeverity) {
-    this.posMitigationSeverity = posMitigationSeverity;
+  public void setPostMitigationSeverity(int postMitigationSeverity) {
+    this.postMitigationSeverity = postMitigationSeverity;
   }
 
-  public SEVERITY_LEVEL getPosMitigationSeverityLevel() {
-    return posMitigationSeverityLevel;
+  public SEVERITY_LEVEL getPostMitigationSeverityLevel() {
+    return postMitigationSeverityLevel;
   }
 
-  public void setPosMitigationSeverityLevel(SEVERITY_LEVEL posMitigationSeverity) {
-    this.posMitigationSeverityLevel = posMitigationSeverity;
+  public void setPostMitigationSeverityLevel(SEVERITY_LEVEL postMitigationSeverity) {
+    this.postMitigationSeverityLevel = postMitigationSeverity;
   }
 
-  public void setPosMitigationSeverityLevel(String posMitigationSeverity) {
-    this.posMitigationSeverityLevel = Risk.SEVERITY_LEVEL.valueOf(posMitigationSeverity);
+  public void setPostMitigationSeverityLevel(String postMitigationSeverity) {
+    this.postMitigationSeverityLevel = Risk.SEVERITY_LEVEL.valueOf(postMitigationSeverity);
   }
 
-  public String getPosMitigationNotes() {
-    return posMitigationNotes;
+  public String getPostMitigationNotes() {
+    return postMitigationNotes;
   }
 
-  public void setPosMitigationNotes(String posMitigationNotes) {
-    this.posMitigationNotes = posMitigationNotes;
+  public void setPostMitigationNotes(String postMitigationNotes) {
+    this.postMitigationNotes = postMitigationNotes;
+  }
+
+  public SEVERITY_LEVEL getCurrentSeverityLevel() {
+    if (postMitigationSeverityLevel != null) {
+      return postMitigationSeverityLevel;
+    } else {
+      return preMitigationSeverityLevel;
+    }
   }
 
   public String getMitigationStrategy() {
@@ -301,8 +310,8 @@ public class Risk extends NamedIndexedModel implements IsModelObject {
       + identifiedOn + ", identifiedBy=" + identifiedBy + ", category=" + category + ", notes=" + notes
       + ", preMitigationProbability=" + preMitigationProbability + ", preMitigationImpact=" + preMitigationImpact
       + ", preMitigationSeverity=" + preMitigationSeverity + ", preMitigationNotes=" + preMitigationNotes
-      + ", posMitigationProbability=" + posMitigationProbability + ", posMitigationImpact=" + posMitigationImpact
-      + ", posMitigationSeverity=" + posMitigationSeverity + ", posMitigationNotes=" + posMitigationNotes
+      + ", postMitigationProbability=" + postMitigationProbability + ", postMitigationImpact=" + postMitigationImpact
+      + ", postMitigationSeverity=" + postMitigationSeverity + ", postMitigationNotes=" + postMitigationNotes
       + ", mitigationStrategy=" + mitigationStrategy + ", mitigationOwnerType=" + mitigationOwnerType
       + ", mitigationOwner=" + mitigationOwner + ", mitigationRelatedEventIdentifierType="
       + mitigationRelatedEventIdentifierType + ", mitigationRelatedEventIdentifierValue="

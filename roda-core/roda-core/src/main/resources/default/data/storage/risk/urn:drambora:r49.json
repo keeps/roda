@@ -1,9 +1,9 @@
 
             {
-            
+
             
             "category": "Operations and service delivery; Hardware, software or communications equipment and facilities",
-            
+
                 
         "id": "urn:drambora:r49",
     
@@ -11,9 +11,9 @@
     
         "description": "Received packages do not contain information that is necessary to facilitate their preservation. ",
     
-        "notes": "- Does repository define the structure that should be conformed to by submitted content?\n- Does repository stipulate metadata requirements for submitted content? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+        "notes": "\n- Does repository define the structure that should be conformed to by submitted content?\n- Does repository stipulate metadata requirements for submitted content? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
     
-        "preMitigationNotes": "- Submitted package lacks metadata information that, in accordance with contracts, must accompany all deposited content ",
+        "preMitigationNotes": "\n- Submitted package lacks metadata information that, in accordance with contracts, must accompany all deposited content ",
     
         "mitigationOwner": "Ingest",
     
@@ -29,17 +29,9 @@
                 "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
                 "mitigationOwnerType": "Human",
                 "createdBy": "admin",
-                "createdOn": 1459465200000,    
+                "createdOn": 1459465200000,
                 "updatedBy": "admin",
                 "updatedOn": 1459465200000,
-                
-                "posMitigationProbability": 0,
-                "posMitigationImpact": 0,
-                "posMitigationSeverity": 12,  
-                "posMitigationSeverityLevel": "MODERATE",
-                
-                "identifiedOn": "1459465200000",
-                "mitigationRelatedEventIdentifierType": "",
-                "mitigationRelatedEventIdentifierValue": ""
+                "identifiedOn": "1459465200000"
             }
         

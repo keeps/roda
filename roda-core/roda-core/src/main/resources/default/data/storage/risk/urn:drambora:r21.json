@@ -1,9 +1,9 @@
 
             {
-            
+
             
             "category": "Personnel, management and administration procedures",
-            
+
                 
         "id": "urn:drambora:r21",
     
@@ -11,9 +11,9 @@
     
         "description": "Individuals with roles, responsibilities or aptitudes vital to the achievement of business objectives part company with the repository, rendering the achievement of those objectives less straightforward. ",
     
-        "notes": "- Has the repository experienced significant staff turnover?\n- Is the status, expertise or knowledge of any individual staff member such that their loss would be of considerable detriment to the organisation's business objectives? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+        "notes": "\n- Has the repository experienced significant staff turnover?\n- Is the status, expertise or knowledge of any individual staff member such that their loss would be of considerable detriment to the organisation's business objectives? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
     
-        "preMitigationNotes": "- Repository’s head systems’ administrator, the sole individual with knowledge of the system’s root password, leaves the organisation to work within an alternative industry ",
+        "preMitigationNotes": "\n- Repository’s head systems’ administrator, the sole individual with knowledge of the system’s root password, leaves the organisation to work within an alternative industry ",
     
         "mitigationOwner": "Personnel",
     
@@ -29,17 +29,9 @@
                 "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
                 "mitigationOwnerType": "Human",
                 "createdBy": "admin",
-                "createdOn": 1459465200000,    
+                "createdOn": 1459465200000,
                 "updatedBy": "admin",
                 "updatedOn": 1459465200000,
-                
-                "posMitigationProbability": 0,
-                "posMitigationImpact": 0,
-                "posMitigationSeverity": 12,  
-                "posMitigationSeverityLevel": "MODERATE",
-                
-                "identifiedOn": "1459465200000",
-                "mitigationRelatedEventIdentifierType": "",
-                "mitigationRelatedEventIdentifierValue": ""
+                "identifiedOn": "1459465200000"
             }
         

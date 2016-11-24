@@ -1,9 +1,9 @@
 
             {
-            
+
             
             "category": "Physical environment",
-            
+
                 
         "id": "urn:drambora:r43",
     
@@ -11,9 +11,9 @@
     
         "description": "Key third-party, externally originating services suffer from temporary disruption, and are not available. ",
     
-        "notes": "- Does repository rely upon availability of externally provided utilities such as gas, electricity, network services or water? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+        "notes": "\n- Does repository rely upon availability of externally provided utilities such as gas, electricity, network services or water? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
     
-        "preMitigationNotes": "- Temporary disruption to repository's electrical supplies ",
+        "preMitigationNotes": "\n- Temporary disruption to repository's electrical supplies ",
     
         "mitigationOwner": "Management",
     
@@ -29,17 +29,9 @@
                 "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
                 "mitigationOwnerType": "Human",
                 "createdBy": "admin",
-                "createdOn": 1459465200000,    
+                "createdOn": 1459465200000,
                 "updatedBy": "admin",
                 "updatedOn": 1459465200000,
-                
-                "posMitigationProbability": 0,
-                "posMitigationImpact": 0,
-                "posMitigationSeverity": 12,  
-                "posMitigationSeverityLevel": "MODERATE",
-                
-                "identifiedOn": "1459465200000",
-                "mitigationRelatedEventIdentifierType": "",
-                "mitigationRelatedEventIdentifierValue": ""
+                "identifiedOn": "1459465200000"
             }
         

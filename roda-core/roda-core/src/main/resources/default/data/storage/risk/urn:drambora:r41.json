@@ -1,9 +1,9 @@
 
             {
-            
+
             
             "category": "Physical environment; Personnel, management and administration procedures; Operations and service delivery; Hardware, software or communications equipment andfacilities",
-            
+
                 
         "id": "urn:drambora:r41",
     
@@ -11,9 +11,9 @@
     
         "description": "Business activities are adversely affected by measures intended to havethese effects. ",
     
-        "notes": "- Is it conceivable that individuals may seek to maliciously damage repository content or systems?\n- To what extent are system interactions, or those undertaken by circumventing the system, reversible?\n- Are members of staff that leave the organisation accompanied off-site and stripped of system access and authorisations? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+        "notes": "\n- Is it conceivable that individuals may seek to maliciously damage repository content or systems?\n- To what extent are system interactions, or those undertaken by circumventing the system, reversible?\n- Are members of staff that leave the organisation accompanied off-site and stripped of system access and authorisations? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
     
-        "preMitigationNotes": "- e-Terrorism or physical (conventional) terrorism\n- Disaffected staff members maliciously vandalise systems ",
+        "preMitigationNotes": "\n- e-Terrorism or physical (conventional) terrorism\n- Disaffected staff members maliciously vandalise systems ",
     
         "mitigationOwner": "Technical",
     
@@ -29,17 +29,9 @@
                 "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
                 "mitigationOwnerType": "Human",
                 "createdBy": "admin",
-                "createdOn": 1459465200000,    
+                "createdOn": 1459465200000,
                 "updatedBy": "admin",
                 "updatedOn": 1459465200000,
-                
-                "posMitigationProbability": 0,
-                "posMitigationImpact": 0,
-                "posMitigationSeverity": 12,  
-                "posMitigationSeverityLevel": "MODERATE",
-                
-                "identifiedOn": "1459465200000",
-                "mitigationRelatedEventIdentifierType": "",
-                "mitigationRelatedEventIdentifierValue": ""
+                "identifiedOn": "1459465200000"
             }
         

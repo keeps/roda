@@ -385,17 +385,17 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     this.preMitigationSeverityValue
       .setHTML(HtmlSnippetUtils.getSeverityDefinition(preSeverity, severityLowLimit, severityHighLimit));
 
-    int probability = getIndex(risk.getPosMitigationProbability(), probabilitiesSize);
-    int impact = getIndex(risk.getPosMitigationImpact(), impactsSize);
+    int probability = getIndex(risk.getPostMitigationProbability(), probabilitiesSize);
+    int impact = getIndex(risk.getPostMitigationImpact(), impactsSize);
 
     this.posMitigationProbability.setSelectedIndex(probability);
     this.posMitigationImpact.setSelectedIndex(impact);
-    this.posMitigationNotes.setText(risk.getPosMitigationNotes());
+    this.posMitigationNotes.setText(risk.getPostMitigationNotes());
 
     if (probability != 0 || impact != 0) {
       this.posMitigationSeverityKey.setVisible(true);
       this.posMitigationSeverityValue.setVisible(true);
-      int posSeverity = risk.getPosMitigationSeverity();
+      int posSeverity = risk.getPostMitigationSeverity();
       this.posMitigationSeverityValue
         .setHTML(HtmlSnippetUtils.getSeverityDefinition(posSeverity, severityLowLimit, severityHighLimit));
     } else {
@@ -439,19 +439,19 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     int posProbability = getIndex(posMitigationProbability.getSelectedIndex(), probabilitiesSize);
     int posImpact = getIndex(posMitigationImpact.getSelectedIndex(), impactsSize);
 
-    risk.setPosMitigationProbability(posProbability);
-    risk.setPosMitigationImpact(posImpact);
+    risk.setPostMitigationProbability(posProbability);
+    risk.setPostMitigationImpact(posImpact);
     if (posProbability == 0 && posImpact == 0) {
-      risk.setPosMitigationSeverity(preSeverity);
-      risk.setPosMitigationSeverityLevel(
+      risk.setPostMitigationSeverity(preSeverity);
+      risk.setPostMitigationSeverityLevel(
         HtmlSnippetUtils.getSeverityLevel(preSeverity, severityLowLimit, severityHighLimit));
     } else {
       int posSeverity = posProbability * posImpact;
-      risk.setPosMitigationSeverity(posSeverity);
-      risk.setPosMitigationSeverityLevel(
+      risk.setPostMitigationSeverity(posSeverity);
+      risk.setPostMitigationSeverityLevel(
         HtmlSnippetUtils.getSeverityLevel(posSeverity, severityLowLimit, severityHighLimit));
     }
-    risk.setPosMitigationNotes(posMitigationNotes.getText());
+    risk.setPostMitigationNotes(posMitigationNotes.getText());
 
     risk.setMitigationStrategy(mitigationStrategy.getText());
     risk.setMitigationOwnerType(mitigationOwnerType.getText());

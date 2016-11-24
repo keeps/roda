@@ -1,19 +1,19 @@
 
             {
-            
+
             
             "category": "Operations and service delivery",
-            
+
                 
-        "id": "urn:drambora:r7",
+        "id": "urn:drambora:r07",
     
         "name": "Community requirements misunderstood or miscommunicated",
     
         "description": "Repository is incapable of determining the expectations of its stakeholder communities and therefore unable to tailor business activities appropriately. ",
     
-        "notes": "- Does the repository have mechanisms established to monitor the community's knowledge base, requirements or expectations?\n- Are community members consulted about the adequacy of available service levels? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+        "notes": "\n- Does the repository have mechanisms established to monitor the community's knowledge base, requirements or expectations?\n- Are community members consulted about the adequacy of available service levels? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
     
-        "preMitigationNotes": "- Repository fails to identify that its user communities require data to be delivered encoded as .abc files in order for them to be usable ",
+        "preMitigationNotes": "\n- Repository fails to identify that its user communities require data to be delivered encoded as .abc files in order for them to be usable ",
     
         "mitigationOwner": "Management",
     
@@ -29,17 +29,9 @@
                 "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
                 "mitigationOwnerType": "Human",
                 "createdBy": "admin",
-                "createdOn": 1459465200000,    
+                "createdOn": 1459465200000,
                 "updatedBy": "admin",
                 "updatedOn": 1459465200000,
-                
-                "posMitigationProbability": 0,
-                "posMitigationImpact": 0,
-                "posMitigationSeverity": 12,  
-                "posMitigationSeverityLevel": "MODERATE",
-                
-                "identifiedOn": "1459465200000",
-                "mitigationRelatedEventIdentifierType": "",
-                "mitigationRelatedEventIdentifierValue": ""
+                "identifiedOn": "1459465200000"
             }
         

@@ -609,11 +609,11 @@ public class IndexServiceTest {
       risk.setPreMitigationSeverityLevel(SEVERITY_LEVEL.HIGH);
       risk.setPreMitigationNotes("Pre Notes");
 
-      risk.setPosMitigationProbability(3);
-      risk.setPosMitigationImpact(2);
-      risk.setPosMitigationSeverity(6);
-      risk.setPosMitigationSeverityLevel(SEVERITY_LEVEL.MODERATE);
-      risk.setPosMitigationNotes("Pos Notes");
+      risk.setPostMitigationProbability(3);
+      risk.setPostMitigationImpact(2);
+      risk.setPostMitigationSeverity(6);
+      risk.setPostMitigationSeverityLevel(SEVERITY_LEVEL.MODERATE);
+      risk.setPostMitigationNotes("Pos Notes");
 
       risk.setMitigationStrategy("Mitigation Strategy");
       risk.setMitigationOwnerType("Owner type");

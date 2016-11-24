@@ -29,7 +29,7 @@
  http://wiki.apache.org/solr/SchemaXml
 -->
 
-<schema name="schema-version-1" version="1.5">
+<schema name="schema-version-2" version="1.5">
   <!-- attribute "name" is the name of this schema and is only used for display purposes.
        version="x.y" is Solr's version number for the schema syntax and 
        semantics.  It should not normally be changed by applications.
@@ -119,11 +119,13 @@
    <field name="preMitigationSeverityLevel" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="preMitigationNotes" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />
    
-   <field name="posMitigationProbability" type="int" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="posMitigationImpact" type="int" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="posMitigationSeverity" type="int" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="posMitigationSeverityLevel" type="string" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="posMitigationNotes" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="postMitigationProbability" type="int" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="postMitigationImpact" type="int" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="postMitigationSeverity" type="int" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="postMitigationSeverityLevel" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="postMitigationNotes" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />
+   
+   <field name="currentSeverityLevel" type="string" indexed="true" stored="false" required="true" multiValued="false" />
    
    <field name="mitigationStrategy" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="mitigationOwnerType" type="string" indexed="true" stored="true" required="false" multiValued="false" />
@@ -133,8 +135,8 @@
    
    <field name="createdOn" type="tdate" indexed="true" stored="true" required="true" multiValued="false" /> 
    <field name="createdBy" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
-   <field name="updatedOn" type="tdate" indexed="true" stored="true" required="true" multiValued="false" /> 
-   <field name="updatedBy" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
+   <field name="updatedOn" type="tdate" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="updatedBy" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
 
    <field name="objectsSize" type="int" indexed="true" stored="true" required="false" multiValued="false" />
    

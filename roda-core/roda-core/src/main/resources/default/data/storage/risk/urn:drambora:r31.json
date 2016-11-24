@@ -1,9 +1,9 @@
 
             {
-            
+
             
             "category": "Hardware, software or communications equipment and facilities",
-            
+
                 
         "id": "urn:drambora:r31",
     
@@ -11,9 +11,9 @@
     
         "description": "System software is rendered incapable of facilitating current business objectives. ",
     
-        "notes": "- Are policies and procedures in place to monitor the adequacy of software technologies amid changing community requirements and external influences?\n- What service level guarantees are offered from third-party software service providers?\n- Is a proportion of staff time allocated to determining the ongoing suitability and operational functionality of software? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+        "notes": "\n- Are policies and procedures in place to monitor the adequacy of software technologies amid changing community requirements and external influences?\n- What service level guarantees are offered from third-party software service providers?\n- Is a proportion of staff time allocated to determining the ongoing suitability and operational functionality of software? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
     
-        "preMitigationNotes": "- Software update breaks dependencies of other core software services ",
+        "preMitigationNotes": "\n- Software update breaks dependencies of other core software services ",
     
         "mitigationOwner": "Technical",
     
@@ -29,17 +29,9 @@
                 "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
                 "mitigationOwnerType": "Human",
                 "createdBy": "admin",
-                "createdOn": 1459465200000,    
+                "createdOn": 1459465200000,
                 "updatedBy": "admin",
                 "updatedOn": 1459465200000,
-                
-                "posMitigationProbability": 0,
-                "posMitigationImpact": 0,
-                "posMitigationSeverity": 12,  
-                "posMitigationSeverityLevel": "MODERATE",
-                
-                "identifiedOn": "1459465200000",
-                "mitigationRelatedEventIdentifierType": "",
-                "mitigationRelatedEventIdentifierValue": ""
+                "identifiedOn": "1459465200000"
             }
         

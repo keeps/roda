@@ -55,7 +55,7 @@ public class IndexedRisk extends Risk implements IsIndexed {
   public List<Object> toCsvValues() {
     return Arrays.asList(new Object[] {getId(), getName(), getDescription(), getIdentifiedOn(), getIdentifiedBy(),
       getCategory(), getNotes(), getPreMitigationProbability(), getPreMitigationImpact(), getPreMitigationSeverity(),
-      getPreMitigationNotes(), getPosMitigationProbability(), getPosMitigationImpact(), getPosMitigationSeverity(),
+      getPreMitigationNotes(), getPostMitigationProbability(), getPostMitigationImpact(), getPostMitigationSeverity(),
       getPreMitigationNotes(), getMitigationStrategy(), getMitigationOwnerType(), getMitigationOwner(),
       getMitigationRelatedEventIdentifierType(), getMitigationRelatedEventIdentifierValue(), getCreatedOn(),
       getCreatedBy(), getUpdatedOn(), getUpdatedBy(), objectsSize});

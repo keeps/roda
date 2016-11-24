@@ -1,0 +1,9905 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+
+<TaggedPDF-doc>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R01 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Management failure </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>One or more aspect of organisational management is unsuccessful, resulting in a failure to deliver an anticipated or required business outcome. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Is organisation subject to central management control? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository management fails to allocate sufficient resources to complete one or more business activities
+- Management’s adopted preservation strategies result in information loss </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD>
+   <Figure>
+
+<ImageData src="images/drambora-risks_img_1.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures</TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_2.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_3.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Conceive comprehensive management policies and procedures and establish mechanisms for their regular review
+- Establish benchmarks to determine effectiveness of management policies and procedures In the event of risk’s execution:
+- Establish continuity or recovery mechanisms to recover from effects </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÅÆR02 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_4.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R02 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Loss of trust or reputation </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>One or more stakeholder communities have doubts about the repository’s ability to achieve its business objectives. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does the organisation rely upon its reputation as a business asset?
+- Does the organisation rely upon its trustworthiness as a business asset?
+- Has the organisation identified a correlation between its business effectiveness and the reputation and level of trust it enjoys? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- An irrecoverable loss of digital objects provokes community concerns about the repository’s competence
+- A public statement announcing a cut in funding raises concerns that the repository will have insufficient resources to operate effectively </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_5.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_6.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Seek all available and relevant certifications to publicly demonstrate the repository’s operational effectiveness
+- Promote organisational transparency to reveal suitability and extent of coverage of policies and procedures
+- Aim for excellence in pursuit of organisational objectives
+- Establish outreach mechanisms to reflect where possible expectations of user communities </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÅÆR01 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_7.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R03 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Activity is overlooked or allocated insufficient resources </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>An integral business activity is mismanaged leading to its noncompletion. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Is repository responsible for budgetary development and allocation of resources? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository budgeting does not include a financial allocation for system security maintenance
+- A 0.5 FTE has sole responsibility to ingest 100 objects per day, although it takes on average 30 minutes for an individual to ingest a single object </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Derive activities, policies and procedures from fundamental repository objectives
+- Allocate resources to correspond with identified activities
+- Establish mechanisms to review and adjust resource allocations In the event of risk’s execution:
+- Maintain residual fund to facilitate subsequent resourcing of originally overlooked activity </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR* [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_8.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R04 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Business objectives not met </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>One or more integral business outcomes are not achieved, or are achieved inadequately. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does repository make a commitment to its stakeholder groups to achieve one or more stated objectives? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Business commits to delivering object x within 5 minutes of its request but on average delivery takes 15 minutes
+- Repository fails to adequately preserve identified significant properties of ingested materials </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Define activities, policies and procedures with strict reference to corresponding fundamental objectives
+- Secure and allocate resources based on business priorities
+- Establish mechanisms to regularly review and, if necessary, adjust policies and procedures in order to ensure objectives are realised In the event of risk’s execution:
+- Undertake appropriate internal enquiries to determine the shortcomings that led to failure and update policies accordingly </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_9.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R05 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Repository loses mandate </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Basis for repository’s existence is withdrawn or substantially altered, rendering it incompatible with business activities. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Is repository's mandate subject to ongoing review?
+- Is primary repository service contract subject to renewal or renegotiation? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Scope of repository responsibility is changed by legislative amendment
+- Repository obligations are altered within contract renegotiations </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_10.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_11.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_12.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Seek all available and relevant certifications to publicly demonstrate the repository’s operational effectiveness
+- Promote organisational transparency to reveal suitability and extent of coverage of policies and procedures
+- Aim for excellence in pursuit of organisational objectives In the event of risk’s execution:
+- Establish arrangements for succession
+- Establish contingency plans or escrow agreements
+- Establish exit strategy </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR08 [contagious] ÆR01 [contagious] ÆR02 [contagious] ÆR* [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_13.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R06 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Community requirements change substantially </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Community expectations or requirements are substantially altered, and no longer correspond to business activities. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Have user requirements been subject to change in the past?
+- Has the repository or have other external, comparable repositories experienced a change or evolution in the communities using or depositing content? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- User community adopts new software systems which provide no support for legacy data formats that were previously dominant
+- Community becomes increasingly unfamiliar with the semantics of a previously well-known and widely employed scientific markup language </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_14.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_15.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_16.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Monitor requirements, expectations and knowledge base of user community
+- Document and review organisational definition of understandability for each distinct user community In the event of risk’s execution:
+- Maintain flexible approach to operational objectives to react to emerging community requirements </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR11 [contagious] ÆR67 [contagious] ÆR74 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_17.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R07 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Community requirements misunderstood or miscommunicated </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository is incapable of determining the expectations of its stakeholder communities and therefore unable to tailor business activities appropriately. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does the repository have mechanisms established to monitor the community's knowledge base, requirements or expectations?
+- Are community members consulted about the adequacy of available service levels? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository fails to identify that its user communities require data to be delivered encoded as .abc files in order for them to be usable </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_18.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_19.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_20.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Establish appropriate technical mechanisms to facilitate monitoring of requirements, expectations and knowledge base of user community In the event of risk’s execution:
+- Maintain dialogue with community to ensure the continued correctness of understandability definition
+- Maintain flexibility within operational objectives to react to misunderstanding of requirements </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR11 [contagious] ÆR67 [contagious] ÆR74 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_21.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R08 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Enforced cessation of repository operations </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository is forced to cease its business activities. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does the mechanism responsible for the repository's establishment include a stated and finite period for its existence before renewal measures must be undertaken?
+- Are mechanisms available to counterbalance periods of financial loss or constraint?
+- Are significant aspects of business activities susceptible to legal challenge?
+- Is there evidence to suggest that the scale of the repository's user community is diminishing over time? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository’s responsibilities are withdrawn by legislative amendment
+- Repository fails secure renewal of its preservation contract with its primary client and/or funder
+- Repository goes bankrupt or is no longer financially sustainable
+- Repository loses its place in a competitive marketplace </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_22.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_23.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_24.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Seek all available and relevant certifications to demonstrate publicly the repository’s operational effectiveness
+- Promote organisational transparency to reveal suitability and extent of coverage of policies and procedures
+- Aim for excellence in pursuit of organisational objectivesIn the event of risk’s execution:
+- Establish arrangements for succession
+- Establish contingency plans or escrow agreements
+- Establish exit strategy </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_25.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R09 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Community feedback not received </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository fails to solicit responses from the community regarding its level of service, or fails to provide mechanisms for this. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does repository have mechanisms available to solicit feedback from community members?
+- Is a proportion of staff time allocated to the gathering or receipt of community feedback?
+- Are feedback mechanisms regularly tested to ensure they are functioning correctly? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository fails to identify that its user communities are increasingly incapable of using data encoded within the repository’s chosen formats with the software that they principally employ </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_26.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_27.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Maintain appropriate mechanisms for community to provide feedback, such as email, web-forms, telephone helpdesk and mail address
+- Actively solicit feedback, allocating a proportion of staff time to community engagement In the event of risk’s execution:
+- Identify reasons for communication failure and update policies and procedures accordingly </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR10 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_28.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R10 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Community feedback not acted upon </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Although feedback is received, it has no influence over repository’s business activities. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Is a proportion of staff time allocated to responding to community feedback, or reflecting it in changes to operational objectives?
+- Are policies and procedures in place to enable the repository to react within an appropriately timely fashion to the receipt of community feedback?
+- Are operational objectives adaptable to react to community feedback? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository fails to react to the fact that its user communities are increasingly incapable of using data encoded within the repository’s chosen formats with the software that they principally employ </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_29.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_30.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_31.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Establish policies to acknowledge and react to community feedback In the event of risk’s execution:
+- Acknowledge failure to act with community and retrospectively react to received feedback </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR11 [contagious] ÆR67 [contagious] ÆR74 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_32.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R11 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Business fails to preserve essential characteristics of digital information </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository’s preservation activities are insufficient to maintain the properties of its digital holdings that are of greatest significance to itsuser communities </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Are significant properties defined and documented for each class of object preserved within the repository?
+- Are members of the community consulted throughout the process of defining significant properties?
+- Are preservation policies and procedures sufficient to maintain defined properties? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository preserves transcribed text from digitised manuscripts within .txt files, although user communities are interested in looking at the original illuminations in subsequent research
+- Repository aims to preserve images of manuscript illuminations but chosen resolution is insufficient to display the level of detail required by user community </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_33.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_34.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_35.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies: 
+- Document significant properties of digital objects that will be maintained, based on community expectations and requirements In the event of risk’s execution:
+- Acknowledge organisational shortcoming and revise policies and significant properties definition accordingly </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR04 [contagious] ÆR67 [contagious] ÆR74 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_36.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R12 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Business policies and procedures are unknown </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Fundamentals of why and how repository’s business activities are conducted are undocumented and unknown, or known only by specific individuals. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Are policies and procedures comprehensively documented?
+- Is documentation widely accessible and understandable throughout the organisation?
+- Is the location of policy and procedure documentation recorded and well known? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Policies and procedures associated with each organisational facet are known only to the individuals responsible
+- Policies are documented in Microsoft Word files but stored only on an unshared partition of a workstation hard-disk </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_37.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_38.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_39.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Conceive and document comprehensive policies and procedures
+- Circulate documentation among repository staff and create multiple copies in alternative locations
+- Circulate details of documentation locations </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR04 [contagious] ÆR19 [contagious] ÆR* [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_40.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R13 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Business policies and procedures are inefficient </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Rationale and/or practical approach adopted for business fail to demonstrate optimal efficiency. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Do measurable aspects of performance compare favourably with those of similar organisations?
+- How does the repository's current operational efficiency compare with its peak level? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository makes objects available one hour after a dissemination request, but comparable organisations providing similar content are capable of doing so in just 30 minutes
+- Revised policies are demonstrably less efficient than those that preceded </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_41.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_42.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_43.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Expose policies and procedures to regular review to determine their efficiency and appropriateness with respect to organisational goals
+- Seek external validation of policies and procedures (e.g. accredited auditors or user communities) In the event of risk’s execution:
+- Identify those policies that are inefficient and revise them accordingly </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR* [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_44.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R14 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Business policies and procedures are inconsistent or contradictory </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Rationale and/or practical approach adopted for particular business objectives introduce obstacles to the successful completion of other business activities. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Are business policies and procedures conceived with consideration of the operations of the repository as a whole?
+- Are mechanisms in place to resolve conflicting policies and/or procedures? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository requires staff to undertake quality assurance procedures for each object ingested, which takes on average 10 minutes, although an additional policy states that ingest should be completed in 10 minutes </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_45.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_46.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_47.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Expose policies and procedures to regular review to determine their consistency with respect to organisational goals
+- Seek external validation of policies and procedures (e.g. accredited auditors or user communities) In the event of risk’s execution:
+- Identify those policies that are inconsistent and revise them accordingly </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR* [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_48.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R15 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Legal liability for IPR infringement </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository is legally accountable for a breach of copyright, patent infringement or other IPR-related misdemeanour as a direct result ofits business activities. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does the repository deal with content with specific associated intellectual property rights?
+- Does the repository consult with legal experts when determining the legality of their activities with respect to IPR restricted content?
+- Is there evidence of a high degree of litigiousness within the domain or jurisdiction within which the repository operates? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- As part of its preservation activities, the repository reverse engineers a software application, and in doing so contravenes a condition of its end user license agreement
+- An institutional repository disseminates e-journal content, and in doing so is guilty of copyright breach </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_49.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_50.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_51.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Legal </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Legal </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Assess preserved materials to determine those to which intellectual property restrictions may apply
+- Seek legal advice to determine legality of activities with respect to IPR restricted content In the event of risk’s execution:
+- Establish policies and procedures to follow in the event of IPR challenge </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR04 [contagious] ÆR14 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_52.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R16 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Legal liability for breach of contractual responsibilities </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository is legally accountable for either failing to fulfil responsibilities or acting beyond the scope of what is permissible, as detailed in stakeholder contracts. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does the repository engage in contractual relationships?
+- Does the repository consult with legal experts when determining the legality of their activities with respect to enforceable contracts that they are party to?
+- Is there evidence of a high degree of litigiousness within the domain or jurisdiction within which the repository operates? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository disseminates preserved content over the public Internet without restriction, although the corresponding deposit agreement stated that only a limited community should have access </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_53.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_54.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_55.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Legal </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Legal </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Monitor contracts and ensure that implemented policies correspond to their terms
+- Seek legal advice to determine legality of activities with respect to IPR restricted content In the event of risk’s execution:
+- Establish policies and procedures to follow in the event of contractual challenge </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR04 [contagious] ÆR14 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_56.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R17 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Legal liability for breach of legislative requirements </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository is legally accountable for either failing to fulfil responsibilities or acting beyond the scope of what is permissible, as detailed in legislative instruments. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Is the repository established within legislation?
+- Do any other legislative acts or statutory instruments establish restrictions or obligations related to repository activities?
+- Does the repository consult with legal experts when determining the legality of their activities with respect to relevant legislation?
+- Is there evidence of a high degree of litigiousness within the domain or jurisdiction within which the repository operates? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository fails to accept deposited materials in contravention of legal deposit laws established in local legislation </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_57.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_58.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_59.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Legal </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Legal </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Monitor legislation in order to ensure that policies and procedures correspond to intrinsic requirements and prohibitions
+- Seek legal advice to determine legality of activities with respect to legislation In the event of risk’s execution:
+- Establish policies and procedures to follow in the event of legislative challenge </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR04 [contagious] ÆR14 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_60.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R18 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Liability for regulatory non-compliance </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository is liable for failure to conduct its activities in accordance with industrial, business oriented or global regulation. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Do any regulations establish restrictions or obligations related to repository activities?
+- Does the repository consult with legal experts when determining the legality of their activities with respect to relevant regulations?
+- Is there evidence of a high degree of litigiousness within the domain or jurisdiction within which the repository operates? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository fails to conform to appropriate jurisdictional health and safety regulations for employees </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_61.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_62.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_63.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Legal </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Legal </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Monitor regulatory framework and ensure policies and procedures correspond to their requirements and prohibitions
+- Seek legal advice to determine legality of activities with respect to regulatory framework In the event of risk’s execution:
+- Establish policies and procedures to follow in the event of IPR challenge </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR04 [contagious] ÆR14 [contagious]] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_64.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R19 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Inability to evaluate repository's successfulness </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository is incapable of effectively determining the extent to which it has successfully achieved its business objectives. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does the repository maintain policies and procedures to verify and record the integrity, authenticity, provenance and understandability of archived information?
+- Does the repository maintain policies and procedures to evaluate and record the execution of repository processes and to check that their outputs are complete and correct?
+- Does the repository engage with user communities to determine their overall level of satisfaction?
+- Are mechanisms to determine the effectiveness of repository operations exploited on a regular basis? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository has no way of demonstrating that the integrity and authenticity of its archived materials have been maintained
+- Repository cannot demonstrate that submitted information has been ingested correctly and transformed into a corresponding complete and correct archival package </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_65.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_66.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_67.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Establish internal means of assessment including risk management
+- Seek relevant external certification in order to demonstrate competence </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_68.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R20 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>False perception of the extent of repository's success </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository’s assessments of success are flawed and indicate a level of performance inconsistent with reality. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Do the repository's various efforts to determine effectiveness result in inconsistent results?
+- Do repository's evaluation mechanisms offer comprehensive and reliable coverage? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Based on flawed end-user survey evidence solicited from just a small subsection of its user community, the repository is satisfied that its efforts are successful, although mechanisms in place are actually insufficient to maintain the understandability, integrity and authenticity of archived information </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_69.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_70.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_71.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Establish internal means of assessment including risk management
+- Seek relevant external certification in order to demonstrate competence </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR19 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_72.jpg"/>
+</Figure>
+
+<P>7.3.2 Staffing </P>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R21 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Loss of key member(s) of staff </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Individuals with roles, responsibilities or aptitudes vital to the achievement of business objectives part company with the repository, rendering the achievement of those objectives less straightforward. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Has the repository experienced significant staff turnover?
+- Is the status, expertise or knowledge of any individual staff member such that their loss would be of considerable detriment to the organisation's business objectives? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository’s head systems’ administrator, the sole individual with knowledge of the system’s root password, leaves the organisation to work within an alternative industry </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_73.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_74.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_75.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Personnel </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Personnel </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Offer favourable terms and conditions for staff In the event of risk’s execution:
+- Promote sharing of organisational responsibilities and duplication of skills in order to limit the impact of losing individual members of staff
+- Ensure policies and procedures are widely circulated and not known only to selected individuals </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR12 [contagious] ÆR* [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_76.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R22 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Staff suffer deterioration of skills </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Staff members demonstrate a diminishing level of skills over time. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Are staff members required to possess skills that are practically employed only on an infrequent basis?
+- Are skills refreshment opportunities available to staff? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository technical staff are rarely required to recover content from backups, and consequently suffer a deterioration of the appropriate skills to use backup retrieval mechanism </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_77.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_78.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_79.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Personnel </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Personnel </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Establish means for staff skills refreshment, and for staff to employ skills of limited frequent value in test environment
+- Implement staff performance reviews to regularly determine skill levels and training requirements In the event of risk’s execution:
+- Provide training facilities to reverse skills haemorrhage </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR* [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_80.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R23 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Staff skills become obsolete </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Staff members' skills stagnate and are no longer current. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does the repository's natural development presuppose that staff will develop new skills and abilities over time?
+- Are training and professional development opportunities made available to staff?
+- Are staff members required to identify and pursue appropriate training activities? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Staff are only capable of employing dated preservation strategies and are not trained in or exposed to emerging techniques or technologies </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_81.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_82.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_83.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Personnel </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Personnel </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Establish means for staff training, and for staff to employ skills of limited frequent value in test environment
+- Implement staff performance reviews to regularly determine skill levels and training requirements In the event of risk’s execution:
+- Provide training facilities to reverse obsolescence of skills </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR* [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_84.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R24 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Inability to evaluate staff effectiveness or suitability </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository is incapable of effectively determining the extent to which staff are capable of achieving business objectives. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does the repository maintain policies and procedures to review staff performance? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository has no record of performance levels of individuals within its staff or means to effectively identify training requirements </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_85.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_86.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_87.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Establish internal means of assessment including risk management
+- Seek relevant external certification in order to demonstrate staff competence
+- Undertake regular staff development reviews </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR19 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_88.jpg"/>
+</Figure>
+
+<P>7.3.3 Financial Management </P>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R25 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Finances insufficient to meet repository commitments </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Finances are insufficient to adequately resource each of the business’s integral activities. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does the repository undertake budgetary management?
+- Is financial investment necessary to achieve repository objectives?
+- Within its current business model, is the repository capable of self-sustainable income generation? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository operating on an annual loss
+- Insufficient resource to facilitate every intrinsic activity </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_89.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_90.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_91.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Budgeting </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Budgeting </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Develop self-sustainability with charged-for services
+- Seek assurances of level of budget In the event of risk’s execution:
+- Solicit additional funding to enable achievement of organisational objectives
+- Revise objectives if funding stream is insufficiently flexible
+- Maintain contingency fund where possible to meet shortfalls </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR* [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_92.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R26 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Misallocation of finances </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository allocates resources ill-advisedly, representing a poor investment, with benefits not proportional to expenditure. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Is budgetary management and expenditure within the responsibilities of the repository? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Management invest heavily in software that offers functionality far in excess of operational requirements, when cheaper alternatives with limited, but adequate features are available </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_93.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_94.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_95.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Budgeting </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Budgeting </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Establish policies and budgetary authorisation infrastructure to ensure appropriate use of repository funding In the event of risk’s execution:
+- Revise policies to limit likelihood of subsequent misallocation </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR25 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_96.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R27 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Liability for non-adherence to financial law or regulations </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository is liable for failing to fulfil its responsibilities with respect to jurisdictional financial responsibilities. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Is the repository subject to regulation that compels it to manage financial records in a particular fashion?
+- Does the repository solicit the advice of appropriate experts in order to fulfil its financial and accounting responsibilities? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Failure to address taxation requirements
+- Failure to conduct compulsory financial auditing </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_97.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_98.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_99.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Budgeting </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Budgeting </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Monitor financial legislation and regulations in order to ensure that policies and procedures correspond to intrinsic requirements and prohibitions
+- Seek legal and professional financial advice to ensure adequate fulfilment of responsibilities In the event of risk’s execution:
+- Establish policies and procedures to follow in the event of legislative challenge </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR04 [contagious] ÆR14 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_100.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R28 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Financial shortfalls or income restrictions </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Atypical operational circumstances result in budgetary shortfall or gap. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- To what extent is the repository's annual budgetary allocation assured?
+- Is the repository required to make any capital investments on a less than annual basis?
+- Is there a possibility of expenditure commitments arising without warning and with a requirement for immediate investment? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Unanticipated enforced expenditure, such as replacement of non-functioning technological assets
+- Expenditure on new server systems every four years, rendering investment during those budgeting periods far in excess of the other three-quarters of the time </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_101.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_102.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_103.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Budgeting </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Budgeting </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Manage budgetary allocations, bearing in mind commitments that are less than annual
+- Calculate replacement timescale for repository resources and aim to pre-empt hardware failure by reinvesting regularly In the event of risk’s execution:
+- Maintain residual emergency fund </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR25 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_104.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R29 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Budgetary reduction </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository’s operational budget is reduced. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- To what extent are the repository's funding streams assured?
+- What proportion of budget is controlled and allocated externally as opposed to self-generated? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Local recession provokes budgetary reduction of government financed repository </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_105.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_106.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_107.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Budgeting </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Budgeting </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Develop self-sustainability with charged-for services
+- Seek assurances of level of budget In the event of risk’s execution:
+- Solicit additional funding to enable achievement of organisational objectives
+- Revise objectives if funding stream is insufficiently flexible
+- Maintain residual fund where possible to meet shortfalls </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR02 [contagious] ÆR25 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_108.jpg"/>
+</Figure>
+
+<P>7.3.4 Technical Infrastructure and Security </P>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R30 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Hardware failure or incompatibility </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>System hardware is rendered incapable of facilitating current businessobjectives. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Are policies and procedures in place to monitor the adequacyof hardware technologies amid changing community requirements and external influences?
+- What service level guarantees are offered from third-party hardware service providers?
+- Is a proportion of staff time allocated to determining the ongoing suitability and operational functionality of hardware? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Server’s power supply burns out, rendering hardware unusable </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_109.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_110.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_111.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment andfacilities </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Technical </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Technical </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Allocate a proportion of staff time to monitoring the ongoingsuitability of repository hardware and assessing the potentialvalue of emerging technologies
+- Evaluate effects of system changes prior to their implementation
+- Pre-empt hardware failure with anticipatory investment In the event of risk’s execution:
+- Seek formal assurances or SLAs from hardware suppliers orproviders of third-party hardware services </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR32 [contagious] ÆR35 [contagious] ÆR52 – 79 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_112.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R31 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Software failure or incompatibility </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>System software is rendered incapable of facilitating current business objectives. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Are policies and procedures in place to monitor the adequacy of software technologies amid changing community requirements and external influences?
+- What service level guarantees are offered from third-party software service providers?
+- Is a proportion of staff time allocated to determining the ongoing suitability and operational functionality of software? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Software update breaks dependencies of other core software services </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_113.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_114.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_115.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Technical </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Technical </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Allocate a proportion of staff time to monitoring the ongoing suitability of repository software and assessing the potential value of emerging technologies
+- Evaluate effects of system changes prior to their implementation
+- Pre-empt software obsolescence with anticipatory investment In the event of risk’s execution:
+- Seek formal assurances or SLAs from software suppliers or providers of third-party software services </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR32 [contagious] ÆR35 [contagious] ÆR52 – 79 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_116.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R32 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Hardware or software incapable of supporting emerging repository aims </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Technical infrastructure, while adequate for meeting current aims, is incapable of meeting new requirements resulting from organisation’s natural evolution. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Are additional technical facilities required to facilitate the repository's anticipated development?
+- To what extent is the repository's current service level likely to increase over time? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Technical infrastructure is insufficiently scalable to handle an anticipated escalation in number of objects or requests
+- Hardware is incompatible with emerging operation systems </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_117.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_118.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_119.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Technical </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Technical </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Allocate a proportion of staff time to monitoring the scalability and compatibility of repository technologies with respect to emerging organisational aims </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR52 – 79 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_120.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R33 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Obsolescence of hardware or software </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Core technology is no longer current or is incongruent with that of most comparable organisations. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Do vendors of currently employed hardware and software technologies offer a guaranteed period of support?
+- Are hardware and software technologies employed widely within contemporary and comparable organisations?
+- What is the mean-time-between-failure associated with the repository's chosen technologies? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Operating systems no longer supported by vendor, and therefore security updates are no longer being made available. </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_121.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_122.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_123.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Technical </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Technical </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Allocate a proportion of staff time to monitoring the ongoing suitability of repository technologies and assessing the potential value of emerging technologies
+- Pre-empt technological obsolescence with anticipatory investment </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR52 – 79 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_124.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R34 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Media degradation or obsolescence </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Storage media deteriorates, limiting the extent to which it can be written to and read from.  </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does the repository preserve digital content on removable media such as tapes, optical disks and flash devices?
+- Are employed storage media formats used widely within contemporary and comparable organisations?
+- Is the mean lifetime of relied upon media technologies understood and documented? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Tape-stored content is inaccessible or corrupted due to physical deterioration of magnetic tape
+- Contemporary tape drives are incapable of reading dated storage media which is prolific throughout archive </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_125.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_126.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_127.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Technical </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Technical </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Allocate a proportion of staff time to monitoring the expected lifetime of storage media and assessing the potential value of emerging technologies
+- Pre-empt media obsolescence with anticipatory investment In the event of risk’s execution:
+- Maintain redundant copies of information objects
+- Establish policies and procedures to extract archived materials from degraded media </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR02 [contagious] ÆR52 – 79 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_128.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R35 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Exploitation of security vulnerability </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Shortcoming in repository’s security provisions is identified and used togain unauthorised access. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Are vulnerabilities conceivably evident within repository's physical and system security?
+- Is it possible that individuals internal or external to the repository might be motivated to compromise system security to acquire or vandalise materials?
+- Are archived materials stored on network accessible computers? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Unpatched software security loophole hack
+- Intruder gains physical access to repository through a security door that is wedged open </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_129.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_130.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment andfacilities </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Technical </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Technical </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Establish and regularly evaluate policies and procedures for physical and software security in accordance with relevant standards
+- Limit execution of non-essential services
+- Update software with latest security patches
+- Allocate staff time to analyse attempted security compromises and monitor security sources for details of known vulnerabilities
+- Compel users to change passwords frequently In the event of risk’s execution:
+- Rebuild system to ensure there are no residual effects of system compromise </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR36 [contagious] ÆR37 [contagious] ÆR38 [contagious] ÆR42 [contagious] ÆR46 [contagious ÆR52 – 79 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_131.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R36 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Unidentified security compromise, vulnerability or information degradation </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Security exploitation or vulnerability occurs and is not monitored or identified by repository staff. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Are mechanisms in place to identify all system access attempts?
+- Are mechanisms in place to determine when and how changes to stored content have taken place?
+- Are system logs regularly analysed to seek evidence of security breaches or attempted breaches? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- System is hacked and key logger installed without knowledge of systems staff </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_132.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_133.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Technical </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Technical </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Undertake appropriate measures to limit likelihood of system compromises, and implement monitoring to detect where attempts have taken place in accordance with relevant standards In the event of risk’s execution:
+- Allocate staff time to analyse system logs for details of security compromises
+- Rebuild system to ensure there are no residual effects </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR42 [contagious] ÆR46 [contagious ÆR52 – 79 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_134.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R37 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Physical intrusion of hardware storage space </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Intruder gains access to area within which repository technical hardware is physically located. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Are vulnerabilities conceivably evident within repository's physical security?
+- Is it possible that individuals internal or external to the repository might be motivated to compromise system security to acquire or vandalise materials? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Intruder breaks into repository, bypassing security measures </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_135.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_136.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_137.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Technical </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Technical </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Establish, test and regularly evaluate policies and procedures for physical security in accordance with relevant standards </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR42 [contagious] ÆR46 [contagious ÆR52 – 79 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_138.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R38 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Remote or local software intrusion </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository suffers software intrusion conducted either from onsite or from a remote location, by bypassing network security provisions. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Are vulnerabilities conceivably evident within repository's system security?
+- Is it possible that individuals internal or external to the repository might be motivated to compromise system security to acquire or vandalise materials?
+- Are archived materials stored on network accessible computers? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Hacker remotely exploits server software security via secure shell tunnelling, executing malicious code on the server </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_139.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_140.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_141.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Technical </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Technical </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>
+- Establish and regularly evaluate policies and procedures for software security in accordance with relevant standards
+- Limit execution of non-essential services
+- Update software with latest security patches
+- Allocate staff time to analyse attempted security compromises and monitor security sources for details of known vulnerabilities
+- Compel users to change passwords frequently In the event of risk’s execution:
+- Rebuild system to ensure there are no residual effects of system compromise </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR42 [contagious] ÆR46 [contagious ÆR52 – 79 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_142.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R39 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Local destructive or disruptive environmental phenomenon </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository business activities are affected by circumstances that originate externally to the repository, with localised consequences. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Is the repository likely to be exposed to adverse or extreme weather conditions?
+- Is the repository under threat from geological or man-made dangers (such as earthquakes, volcanoes, mining-related subsidence or coastal erosion)? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Hurricane, tornado or typhoon in nearby vicinity
+- Earthquake </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_143.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_144.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_145.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Technical </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Technical </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Monitor for likelihood of applicable environmental concerns
+- Take physical precautions against the most locally profound threats, such as installing hurricane-proof windows In the event of risk’s execution:
+- Establish redundant storage facilities at remote location </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR42 [contagious] ÆR46 [contagious] ÆR52 – 79 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_146.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R40 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Accidental system disruption </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Business activities are adversely affected by non-deliberate intervention, or intervention that was not intended to result in these outcomes. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Do repository systems permit members of staff to perform interactions that are contrary to agreed policies or procedures?
+- Are interactions reversible? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Staff member accidentally stops integral repository software services
+- Content is inadvertently deleted during its ingest </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_147.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_148.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Technical </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Technical </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Develop systems to limit extent to which non-valid interactions, or those that contradict policy can physically occur
+- Ensure staff are well trained in use of systems and informed of the importance of checking their interactions prior to execution In the event of risk’s execution:
+- Identify reason for accidental action and introduce measures to disallow or dissuade users from repeating the error </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR52 – 79 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_149.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R41 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Deliberate system sabotage </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Business activities are adversely affected by measures intended to havethese effects. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Is it conceivable that individuals may seek to maliciously damage repository content or systems?
+- To what extent are system interactions, or those undertaken by circumventing the system, reversible?
+- Are members of staff that leave the organisation accompanied off-site and stripped of system access and authorisations? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- e-Terrorism or physical (conventional) terrorism
+- Disaffected staff members maliciously vandalise systems </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment andfacilities </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Technical </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Technical </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Maintain, test and revise physical and software security in accordance with relevant standards
+- Monitor for suspicious network activity or physical activity that appears unusual
+- Remove staff members or ex-staff members that are likely to be disaffected and immediately revoke system privileges In the event of risk’s execution:
+- Ensure as far as possible that all system interactions are reversible
+- Ensure availability of redundant copies of system state and archived information at remote geographical location </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR42 [contagious] ÆR46 [contagious] ÆR52 – 79 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_150.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R42 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Destruction or non-availability of repository site </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository’s physical premises are destroyed or rendered permanently or temporarily unusable. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Are the repository's operational activities undertaken within a single physical building or group of buildings within a small geographical area?
+- Are redundant system and storage facilities established? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Fire damage
+- Asbestos found within building </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_151.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_152.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_153.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Technical </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Technical </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Maintain, test and revise physical and software system security policies in accordance with relevant standards In the event of risk’s execution:
+- Establish redundant storage facilities capable of becoming operational base </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR52 – 79 [contagious] ÆR52 – 79 [explosive] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_154.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R43 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Non-availability of core utilities </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Key third-party, externally originating services suffer from temporary disruption, and are not available. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does repository rely upon availability of externally provided utilities such as gas, electricity, network services or water? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Temporary disruption to repository's electrical supplies </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_155.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_156.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_157.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Establish service level agreements or service commitments with utility provider In the event of risk’s execution:
+- Establish internal means to nullify disruption wherever possible, such as installing a petrol electricity generator and UPS systems </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR42 [contagious] ÆR52 – 79 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_158.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R44 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Loss of other third-party services </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Other third-party services that the repository relies upon suffer disruption. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does the repository sub-contract any of its repository activities?
+- Does the repository rely upon any other third-party services such as cleaning or catering? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- The web hosting company serving the repository’s information dissemination systems goes out of business
+- Repository's catering company takes industrial action and staff are unable to receive meals </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_159.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Establish service level agreements or service commitments with third-party provider In the event of risk’s execution:
+- Establish internal means to nullify disruption wherever possible </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR42 [contagious] ÆR52 – 79 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_160.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R45 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Change of terms within third-party service contracts </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Conditions with which third-party services are delivered change substantially. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Are third-party service or utilities contracts subject to renewal or due to be renegotiated? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Electricity prices escalate
+- Web hosting service provider withdraws a relied-upon technology from its servers </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Establish lasting service level agreements with third-party provider with minimal scope for their subsequent renegotiation In the event of risk’s execution:
+- Implement policy to seek alternative service providers capable of offering more favourable terms </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR42 [contagious] ÆR52 – 79 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_161.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R46 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Destruction of primary documentation </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository documentation is partially or completed destroyed. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Is repository documentation maintained and stored within the principal repository site?
+- Are multiple copies of documentation maintained and stored? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Fire damage within repository’s administrative offices destroys contracts and policy documentation </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_162.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Maintain multiple electronic and hard copies of documentation stored in multiple locations </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR12 [contagious] ÆR52 – 79 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_163.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R47 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Inability to evaluate effectiveness of technical infrastructure and security </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository is incapable of effectively determining the extent to which its technical infrastructure and security provisions are capable of facilitating business objectives. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does the repository maintain policies and procedures to verify and record attempted security compromises?
+- Does the repository maintain policies and procedures to identify non-authorised or inappropriate system interactions?
+- Does the repository maintain policies and procedures to ensure the ongoing suitability and functionality of hardware and software technologies and storage media?
+- Are mechanisms to determine the effectiveness of technical and security provisions exploited on a regular basis? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository has no mechanisms to test security provisions or to evaluate the effectiveness of technological infrastructure </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_164.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_165.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Establish internal means of assessment including risk management
+- Seek relevant external certification in order to demonstrate competence </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR19 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_166.jpg"/>
+</Figure>
+
+<P>7.3.5 Acquisition and Ingest </P>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R48 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Structural non-validity or malformedness of received packages </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Received packages fail to correspond to what repository expects or is capable of preserving. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does repository define the structure that should be conformed to by submitted content?
+- Does repository stipulate acceptable formats? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Deposited content is encoded in a format that is unsupported by the repository
+- Deposited XML-encoded content does not validate against the schema provided by the repository </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_167.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_168.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_169.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Ingest </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Ingest </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Develop definition for submission package structure
+- Establish list of acceptable formats for submission
+- Communicate definition to depositors and producers In the event of risk’s execution:
+- Maintain policy and procedure to determine whether package is disposed of, returned or ingested </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR49 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_170.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R49 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Incompleteness of submitted packages </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Received packages do not contain information that is necessary to facilitate their preservation. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does repository define the structure that should be conformed to by submitted content?
+- Does repository stipulate metadata requirements for submitted content? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Submitted package lacks metadata information that, in accordance with contracts, must accompany all deposited content </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_171.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_172.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Ingest </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Ingest </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Develop definition for submission package structure
+- Establish list of acceptable formats for submission
+- Communicate definition to depositors and producers In the event of risk’s execution:
+- Maintain policy and procedure to determine whether package is disposed of, returned or ingested </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_173.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R50 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Externally motivated changes or maintenance to information during ingest </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Between the points of receipt and the creation of an archivable object the received package is subjected to changes that are not sanctioned or implemented by the repository. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does repository obtain full physical and intellectual control of submitted content? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- An intrinsic part of a submitted object is not included within the deposited package and instead is remotely referenced. During the process of ingest this remote object is subject to alteration by external actors </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_174.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_175.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_176.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Ingest </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Ingest </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Ensure that sole, complete physical and intellectual control is obtained over received object In the event of risk’s execution:
+- Maintain policy and procedure to determine whether package is disposed of, returned or ingested </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR52 – 79 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_177.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R51 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Archival information cannot be traced to a received package </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>An archival object cannot be traced to a corresponding received package or selection of packages. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Are policies and procedures in place to validate that archived content corresponds with what was originally submitted?
+- Is ingested content subject to transformation to an archival package? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository cannot identify the origins of an archived package in order to ensure that its integrity has been adequately preserved </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_178.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_179.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_180.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Ingest </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Ingest </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Record appropriate provenance information, detailing interactions undertaken during receipt and ingest process In the event of risk’s execution:
+- Maintain policy and procedure to determine whether package is disposed of, returned or retained </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR55 [contagious] ÆR60 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_181.jpg"/>
+</Figure>
+
+<P>7.3.6 Preservation and Storage </P>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R52 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Loss of confidentiality of information </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Information protected by confidentiality agreements is made available to communities, in contravention of those agreements. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Is repository bound by requirements to maintain information confidentiality? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository authorisation subsystems fail and commercially sensitive information is exposed to a community that is considerably wider than that to whom, according to the relevant deposit agreement, access may be legitimately afforded </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_182.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_183.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_184.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Preservation </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Preservation </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Ensure policies and procedures are conceived with due consideration of any confidentiality requirements that the repository is subject to
+- Ensure software and hardware systems and preservation strategies are capable of meeting requirements of policies In the event of risk’s execution:
+- Implement policy to withdraw availability of confidential materials and invoke treatment strategies to alleviate loss of reputation </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_185.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R53 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Loss of availability of information and/or service </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository is unable to provide a comprehensive range of services or access to all of its information holdings for which access ought to be available. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does repository commit to defined service levels?
+- Does repository provide assurances of information availability? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository’s servers fail, rendering a proportion of its collections inaccessible, although contracts stipulate that access should be afforded </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_186.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_187.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_188.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Preservation </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Preservation </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Ensure policies and procedures are conceived with due consideration of any service levels that the repository has committed to
+- Ensure software and hardware systems and preservation strategies are capable of meeting service levels In the event of risk’s execution:
+- Invoke treatment strategies to alleviate loss of reputation or trust </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_189.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R54 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Loss of authenticity of information </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository is incapable of demonstrating that information objects are what they purport to be. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does repository commit to the preservation of information authenticity? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository is unable to demonstrate the authenticity of preserved records that purport to describe government departmental expenditure </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_190.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_191.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_192.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Preservation </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Preservation </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Ensure policies and procedures are conceived with due consideration of authenticity requirements
+- Maintain and review policies and procedures to ensure adequate recording of provenance information to demonstrate that archived material represents authentic representation of what was initially deposited or received
+- Ensure software and hardware systems and preservation strategies are capable of preserving authenticity In the event of risk’s execution:
+- Invoke treatment strategies to alleviate loss of reputation or trust </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_193.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R55 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Loss of integrity of information </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository is incapable of demonstrating that the integrity of information has been maintained since its receipt, and that what is stored corresponds exactly with what was originally received. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does repository commit to preservation of information integrity? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Records documenting government expenditure have been subjected to unauthorised or unanticipated changes, rendering them no longer representative of originally deposited content </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_194.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_195.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_196.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Preservation </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Preservation </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Ensure policies and procedures are conceived with due consideration of integrity requirements
+- Maintain and review policies and procedures to ensure adequate recording and comparison of checksums to demonstrate that archived information has suffered no loss of integrity since its deposit or receipt
+- Ensure software and hardware systems and preservation strategies are capable of preserving information integrity In the event of risk’s execution:
+- Invoke treatment strategies to alleviate loss of reputation or trust </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_197.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R56 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Unidentified information change </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository is incapable of tracking or monitoring where one or more changes to archived information has taken place. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Are repository mechanisms available to identify where preserved information has been subject to interactions or change? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository has failed to record or maintain adequate checksum information to detect where changes have been made to archived information </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_198.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Preservation </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Preservation </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Implement policies and procedures to record, calculate and compare checksum values for archived information on a regular basis In the event of risk’s execution:
+- Implement policies and procedures to record, calculate and compare checksum values for archived information on a regular basis
+- Invoke treatment strategies to alleviate loss of reputation or trust </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_199.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R57 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Loss of non-repudiation of commitments </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository is incapable of ensuring that commitments cannot later be denied by either of the parties involved. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does repository engage in agreements where obligations are assumed by contracting parties? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository fails to record details of transactions with contractor who later denies that they have agreed to the information exchanged, and its implied obligations </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_200.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_201.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Preservation </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Preservation </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Maintain and review policies and procedures to ensure contractual commitments are communicated, understood, recorded and agreed upon by both parties. In the event of risk’s execution:
+- Implement policy to define appropriate procedural response, such as seeking legal advice to pursue enforcement of contract </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR16 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_202.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R58 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Loss of information reliability </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository is incapable of demonstrating the reliability of its information holdings. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does repository commit to preserve reliability of information? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Archived information within a meteorological data centre is regarded as being insufficiently reliable to form the basis for scientific research
+- A court of law refuses to admit archived information as evidence on the grounds that it is unreliable </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_203.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_204.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_205.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Preservation </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Preservation </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Ensure policies and procedures are conceived with due consideration of reliability requirements
+- Maintain and review policies and procedures to ensure adequate recording and comparison of checksums to demonstrate that archived information has suffered no loss of integrity since its deposit or receipt
+- Maintain and review policies and procedures to ensure adequate recording of provenance information to demonstrate that archived material represents authentic representation of what was initially deposited or received
+- Ensure software and hardware systems and preservation strategies are capable of preserving information reliability In the event of risk’s execution:
+- Invoke treatment strategies to alleviate loss of reputation or trust </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_206.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R59 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Loss of information provenance </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository is incapable of demonstrating the provenance of its information holdings, and their traceability from receipt and through each interaction that they have been subject to. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Are mechanisms in place to record the origins and lifecycle of an archived package and any transactions or interactions that it has been subject to? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository fails to document the preservation processes undertaken to convert a received Microsoft Word file into a plain text preservation master </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_207.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_208.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_209.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Preservation </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Preservation </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Ensure policies and procedures are conceived with due consideration of provenance requirements
+- Maintain and review policies and procedures to record the origins and lifecycle of archived packages and any transactions or interactions that they have been subject to
+- Ensure software and hardware systems and preservation strategies are capable of maintaining and recording provenance information In the event of risk’s execution:
+- Invoke treatment strategies to alleviate loss of reputation or trust </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR51 [contagious] ÆR69 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_210.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R60 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Loss or non-suitability of backups </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository is unable to retrieve content or system state information from backup mechanism. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does repository rely upon backups of its system or content to react to the loss or non-availability of primary digital resources?
+- Are backup systems built upon well-established and widely used technologies?
+- In the event of destruction or damage to the primary repository site, is the safety of backed-up materials also threatened? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Faced with the loss of primary archival information, the repository discovers that it is unable to restore content because backup tapes are irreparably corrupted </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_211.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_212.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Technical </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Technical </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Maintain multiple copies of backups
+- Store backed-up content in remote locations
+- Undertake regular ‘fire-drill’ tests to determine whether systems and data can be restored from backup In the event of risk’s execution:
+- Recover as much content as possible, exploiting techniques such as digital archaeology and digital forensics
+- Invoke treatment strategies to alleviate loss of reputation </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR52-69 [explosive] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_213.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R61 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Inconsistency between redundant copies </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Where repository maintains multiple copies of archived information, one or more differs from peers. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does repository maintain multiple redundant copies of archived content?
+- Does repository employ mechanisms to check for inconsistencies between multiple copies?
+- Are policies and procedures in place to react to the discovery of such inconsistencies? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository maintains three redundant copies of archived information, but random checksum comparisons reveal that one is different from its peers </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_214.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_215.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Preservation </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Preservation </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Record and compare checksum information corresponding to redundant packages on a regular basis
+- Maintain system technologies and security to limit likelihood of data corruption or malfeasance In the event of risk’s execution:
+- Conceive policies and procedures to react to the discovery of such inconsistencies – for instance, use an election system where the checksum values in the majority are assumed to be correct and the minority is/are disposed of and replaced </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR12 [explosive] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_216.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R62 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Extent of what is within the archival object is unclear </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository is incapable of determining the parts of the archival object that will be subject to ongoing preservation. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does repository define the scope and extent of its archival package format(s)?
+- Do policies and procedures exist to validate archival packages for completeness and correctness? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository fails to adequately define its archival package format </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_217.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_218.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_219.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Preservation </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Preservation </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Conceive definition for archival package In the event of risk’s execution:
+- Conceive policy to react to ambiguity surrounding archival object </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR12 [explosive] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_220.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R63 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Inability to validate effectiveness of ingest process </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository is incapable of asserting that integrity and authenticity were maintained during the process of ingesting digital information. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does the repository maintain policies and procedures to record and compare checksum values?
+- Does the repository maintain policies and procedures to evaluate and record the execution of repository processes and to check that their outputs are complete and correct?
+- Are mechanisms to determine the effectiveness of ingest procedures exploited on a regular basis? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository is unable to demonstrate that ingest procedures have resulted successfully in complete and correct archival packages </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_221.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_222.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Preservation </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Preservation </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Establish internal means of assessment including risk management
+- Seek relevant external certification in order to demonstrate effectiveness of ingest process </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR19 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_223.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R64 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Identifier to information referential integrity is compromised </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Where identifiers are applied to information, the repository is incapableof locating the archival package that corresponds to a given ID. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does repository apply or maintain existing persistent identifiers for information packages?
+- Is identifier potentially distinguishable from related information? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository maintains the use of the file path from the digital object’s original environment as the identifier for the archived object, resulting in two distinct objects that originated from different locations sharing the duplicate identifer “/Documents and Settings/John Smith/Document.pdf”
+- Identifiers generated at ingest consist of the timestamp at the point of ingest, but two ingest systems operate simultaneously and duplicate identifiers are consequently applied </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_224.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_225.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment andfacilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_226.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Preservation </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Preservation </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Define, document and review policies and procedures describing the means by which identifiers are associated with corresponding information packages and communicate this information widely within the organisation
+- Define and review policies and procedures describing the creation of identifiers to ensure their uniqueness, or mandating the adoption of third-party identifier technologies such as Handles, DOIs or PURLs In the event of risk’s execution:
+- Define policy to respond to fracturing of relationship between identifiers and information
+- Invoke treatment strategies to alleviate loss of reputation </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR12 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_227.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R65 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Preservation plans cannot be implemented </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository is incapable of executing in practice the preservation planning it has undertaken. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Is preservation planning undertaken within the repository with the anticipation that it will subsequently be implemented?
+- Does preservation planning reflect the extent of technological, financial and human resources available within the repository as well as its organisational objectives? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository’s planned emulation strategy requires technological expertise to implement that is unavailable within the staff, and insufficient resource exists to contract with third-party developers to undertake the work </TD>
+</TR>
+
+
+   
+   <TR>
+      <TH>Nature of Risk: </TH>
+      <TD>Physical environment </TD>
+      <TD>
+         <Figure>
+            <ImageData src="images/drambora-risks_img_228.jpg"/>
+         </Figure>
+      </TD>
+   </TR>
+
+   <TR>
+     <TD>Personnel, management and administration procedures </TD>
+     <TD>
+       <Figure>
+       <ImageData src="images/drambora-risks_img_229.jpg"/>
+       </Figure>
+     </TD>
+   </TR>
+
+
+
+   <TR>
+     <TD>Operations and service delivery </TD>
+     <TD>X </TD>
+   </TR>
+
+
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_230.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+   
+   
+   
+   
+   
+   
+<TH>Owner: </TH>
+
+<TD>Preservation </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Preservation </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Aim to reflect the extent of technological, financial and human resources available within the repository as well as its organisational objectives when conceiving preservation plans
+- Seek additional resources to facilitate original plans In the event of risk’s execution:
+- Implement policy to refine preservation plans to correspond more closely to that which is feasible within the organisation </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR67 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_231.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R66 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Preservation strategies result in information loss </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Exposure of an archived object to preservation plans results in loss or damage to one or more of its significant characteristics. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does repository offer a definition of acceptable loss that may result from preservation activities? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository’s proposed migration strategy results in loss of ‘look and feel’ of archived documents, regarded as essential properties by user community </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_232.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_233.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_234.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Preservation </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Preservation </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Evaluate preservation strategies in testbed environment prior to execution
+- Ensure procedures are reversible in the event of unexpected or inappropriate results In the event of risk’s execution:
+- Define policies to describe the acceptable levels of loss tolerated by the repository </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR52-R69 [contagious] ÆR61 [explosive] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_235.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R67 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Inability to validate effectiveness of preservation </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository is incapable of effectively determining the extent to which its preservation activities are successful in terms of its business objectives. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does repository maintain policies and procedures to verify the preservation of information understandability, authenticity and integrity? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository lacks means to demonstrate continued preservation, including understandability to the appropriate user communities, of its holdings over a number of years, given the age of the repository and its holdings </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_236.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_237.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_238.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Preservation </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Preservation </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Establish internal means of assessment including risk management
+- Seek relevant external certification in order to demonstrate competence </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR19 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_239.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R68 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Non-traceability of received, archived or disseminated package </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Packages cannot be traced to corresponding packages or groups of packages from an earlier point within the repository’s information lifecycle. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Are mechanisms in place to record the origins and lifecycle of information packages and any transactions or interactions that they have been subject to? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository fails to maintain appropriate documentation describing the origins and lifecycle of an archived package and any transactions or interactions to which it has been subject </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_240.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_241.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Management </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Record appropriate provenance information, detailing interactions undertaken during receipt, ingest, preservation and dissemination processes In the event of risk’s execution:
+- Define policy and procedures to determine whether package should be disposed of, returned or retained </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_242.jpg"/>
+</Figure>
+
+<P>7.3.7 Metadata Management </P>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R69 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Metadata to information referential integrity is compromised </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Associations between information packages and corresponding metadata are broken, and can no longer be traversed. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does repository maintain metadata records associated with archived information?
+- Is it conceivable that metadata records might become divorced from corresponding archived information?
+- How are associations defined and described? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Documentation describing the repository’s directory structure, which represents relationships between metadata and corresponding objects, is irretrievably lost </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_243.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_244.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Documentation </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Documentation </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Define, document and review policies and procedures describing the means by which metadata are associated with corresponding information packages and communicate this information widely within the organisation
+- Define and review policies and procedures describing the metadata schema that will be used within the repository’s activities In the event of risk’s execution:
+- Define policy to respond to fracturing of relationship between metadata and information
+- Invoke treatment strategies to alleviate loss of reputation </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR52 - 69[contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_245.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R70 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Documented change history incomplete or incorrect </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Metadata recording interactions, implemented preservation strategies or procedures undertaken with respect to information packages are undocumented, or only partially documented. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Are mechanisms in place to record the origins and lifecycle of an information package and any transactions or interactions that it has been subject to? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository fails to maintain appropriate documentation describing the origins and lifecycle of an archived package and any transactions or interactions that it has been subject to </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_246.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_247.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Documentation </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Documentation </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Ensure policies and procedures are conceived with due consideration of provenance requirements
+- Maintain and review policies and procedures to record the origins and lifecycle of archived packages and any transactions or interactions that it has been subject to
+- Ensure software and hardware systems and preservation strategies are capable of maintaining and recording provenance information In the event of risk’s execution:
+- Invoke treatment strategies to alleviate loss of reputation or trust </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR60 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_248.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R71 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Non-discoverability of information objects </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Metadata supporting information package discovery are insufficient. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does repository make discovery metadata available to a user community, however small that community may be?
+- What degree of flexibility is offered to the user with respect to discovering archived content?
+- What systems are integral to the discovery of information objects? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- A geophysical data centre records discovery metadata to facilitate searching only by name of data set, but researchers within the community wish to search based on the physical location where the data was acquired and the name of the instrument used </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_249.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_250.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Documentation </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Documentation </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Determine extent of discovery mechanisms and searchable fields in consultation with designated community
+- Communicate full range of available information discovery mechanisms to community In the event of risk’s execution:
+- Introduce alternative means for information discovery based on perceived shortcomings </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR75 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_251.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R72 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Ambiguity of understandability definition </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository is unable to describe what understandability means with reference to their stakeholder communities’ expectations or requirements. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does the repository define understandability with respect to its user communities’ expectations and requirements? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository preserves information and associated metadata based on a perception of what is required by user communities that is not necessarily representative </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_252.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_253.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Documentation </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Documentation </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Define and regularly review the concept of understandability with respect to community’s expectations, requirements and knowledge base
+- Make understandability definition available to community and solicit their feedback In the event of risk’s execution:
+- Retrospectively introduce policy detailing understandability definition </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_254.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R73 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Shortcomings in semantic or technical understandability of information </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository fails to maintain appropriately complete representation information to facilitate information understandability. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does repository record or refer to adequate representation information such as file format information?
+- Are understandability requirements referenced when determining minimal essential semantic or technical metadata? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository preserving social science data documents information about the SPSS format within which much of its content is encoded but fails to record the meaning of the acronyms used as field headings throughout these files </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_255.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_256.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_257.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Documentation </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Documentation </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Record or refer to appropriate representation information such as file format information, taking into account community understandability requirements
+- Solicit community feedback as to the extent to which preserved information remains understandable </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_258.jpg"/>
+</Figure>
+
+<P>7.3.8 Access and Dissemination </P>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R74 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Non-availability of information delivery services </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository is unable to provide access to information packages. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- What systems are required to provide dissemination services?
+- Does the repository offer a variety of alternative delivery services?
+- Do policies and procedures exist to describe the means by which information is disseminated? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Web server relied upon for dissemination of materials is off-line due to network services failure </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_259.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_260.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Dissemination </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Dissemination </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Define policies describing available information delivery services and communicate these to the user community
+- Implement appropriate systems to meet delivery policy requirements
+- Establish sufficiently robust technical infrastructure to satisfy demands of proposed delivery services </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR79 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_261.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R75 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Authentication subsystem fails </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Systems for limiting accessibility of information are insufficient, resulting in inappropriate accesses or failures to access. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Is repository compelled by contracts or mandate to establish and maintain a means of limiting end-user access to archived information?
+- What systems are necessary to maintain the operation of the repository's authentication controls? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Individuals who are not entitled to have access to the content can access it. Repository system relies upon IP-based authentication, but since all users within University x access the web via a web proxy the application perceives any access from that campus as coming from a single IP, and every resident user gains access. </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_262.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_263.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment andfacilities </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Dissemination </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Dissemination </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Define policies describing authentication requirements to correspond with conditions expressed in deposit agreements and other regulatory, legislative or contextual provisions
+- Implement appropriate systems to meet authentication policy requirements
+- Establish sufficiently robust technical infrastructure to satisfy demands of proposed authentication services In the event of risk’s execution:
+- Determine the shortcoming that led to authentication failure and subsequently remedy it
+- If system is self-aware of its failure, implement a policy to describe the appropriate reaction; for instance, upon failure refuse all access attempts </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR79 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_264.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R76 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Authorisation subsystem fails </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Systems to ensure appropriate allocation of system privileges are insufficient, resulting in incorrect rights allocations to users. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Is the repository compelled by contracts or mandate to define and control multiple levels of end-user access?
+- What systems are necessary to maintain the operation of the repository's authorisation controls? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Authorisation system which allocates privileges based on database username look-ups fails because two distinct users are permitted to share the same username string </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_265.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_266.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Dissemination </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Dissemination </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Define policies describing authorisation requirements to correspond with conditions expressed in deposit agreements and other regulatory, legislative or contextual provisions
+- Implement appropriate systems to meet authorisation policy requirements
+- Establish sufficiently robust technical infrastructure to satisfy demands of proposed authorisation services In the event of risk’s execution:
+- Determine the shortcoming that led to authorisation failure and subsequently remedy it
+- If system is self-aware of its failure, implement a policy to describe the appropriate reaction; e.g., upon failure restrict all user privileges </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR79 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_267.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R77 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Inability to validate effectiveness of dissemination mechanism </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository is incapable of effectively determining the extent to which its dissemination mechanisms are successful in terms of its overall business objectives. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does the repository maintain policies and procedures to verify and record the integrity, authenticity, provenance and understandability of disseminated information?
+- Does the repository maintain policies and procedures to determine usage rights and limit inappropriate access?
+- Are mechanisms to determine the effectiveness of delivery operations exploited on a regular basis? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository end-user feedback questionnaires provide a non-exhaustive set of multi-choice responses that restrict the extent to which responses reflect the success of the dissemination </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_268.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Dissemination </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Dissemination </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Establish internal means of assessment including risk management
+- Seek relevant external certification in order to demonstrate effectiveness of dissemination </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR19 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+<Figure>
+
+<ImageData src="images/drambora-risks_img_269.jpg"/>
+</Figure>
+
+<Table>
+<TR>
+<TH>Risk Identifier: </TH>
+
+<TH>R78 </TH>
+</TR>
+
+<TR>
+<TH>Risk Name: </TH>
+
+<TD>Loss of performance or service level </TD>
+</TR>
+
+<TR>
+<TH>Risk Description: </TH>
+
+<TD>Repository is incapable of meeting service level goals in accordance with its business objectives. </TD>
+</TR>
+
+<TR>
+<TH>Is this Risk Relevant?: </TH>
+
+<TD>
+- Does repository make a commitment to its stakeholder groups to offer a minimal level of service or performance? </TD>
+</TR>
+
+<TR>
+<TH>Example Risk Manifestation(s): </TH>
+
+<TD>
+- Repository aims to deliver each object in less than 5 minutes after the request but it consistently takes 10 minutes per object </TD>
+</TR>
+
+<TR>
+<TH>Nature of Risk: </TH>
+
+<TD>Physical environment </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_270.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TD>Personnel, management and administration procedures </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Operations and service delivery </TD>
+
+<TD>X </TD>
+</TR>
+
+<TR>
+<TD>Hardware, software or communications equipment and facilities </TD>
+
+<TD><Figure>
+
+<ImageData src="images/drambora-risks_img_271.jpg"/>
+</Figure>
+</TD>
+</TR>
+
+<TR>
+<TH>Owner: </TH>
+
+<TD>Dissemination </TD>
+</TR>
+
+<TR>
+<TH>Escalation Owner: </TH>
+
+<TD>Dissemination </TD>
+</TR>
+
+<TR>
+<TH>Stakeholders: </TH>
+
+<TD>Management; financiers; staff; depositors; users; producers </TD>
+</TR>
+
+<TR>
+<TH>Mitigation strategy(ies): </TH>
+
+<TD>Avoidance strategies:
+- Define realistic service levels and implement policies and procedures for their review and adjustment
+- Secure and allocate resources based on business priorities
+- Establish mechanisms to regularly review and if necessary adjust policies and procedures in order to ensure objectives are realised In the event of risk’s execution:
+- Undertake appropriate internal enquiries to determine the shortcomings that led to failure and update policies accordingly </TD>
+</TR>
+
+<TR>
+<TH>Risk Relationships: </TH>
+
+<TD>ÆR01 [contagious] ÆR02 [contagious] ÆR04 [contagious] </TD>
+</TR>
+
+<TR>
+<TH>Risk Probability: </TH>
+
+<TD>4 </TD>
+</TR>
+
+<TR>
+<TH>Risk Potential Impact: </TH>
+
+<TD>3 </TD>
+</TR>
+
+<TR>
+<TH>Risk Severity: </TH>
+
+<TD>12 </TD>
+</TR>
+</Table>
+</TaggedPDF-doc>

@@ -1,9 +1,9 @@
 
             {
-            
+
             
             "category": "Hardware, software or communications equipment and facilities",
-            
+
                 
         "id": "urn:drambora:r34",
     
@@ -11,9 +11,9 @@
     
         "description": "Storage media deteriorates, limiting the extent to which it can be written to and read from.  ",
     
-        "notes": "- Does the repository preserve digital content on removable media such as tapes, optical disks and flash devices?\n- Are employed storage media formats used widely within contemporary and comparable organisations?\n- Is the mean lifetime of relied upon media technologies understood and documented? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+        "notes": "\n- Does the repository preserve digital content on removable media such as tapes, optical disks and flash devices?\n- Are employed storage media formats used widely within contemporary and comparable organisations?\n- Is the mean lifetime of relied upon media technologies understood and documented? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
     
-        "preMitigationNotes": "- Tape-stored content is inaccessible or corrupted due to physical deterioration of magnetic tape\n- Contemporary tape drives are incapable of reading dated storage media which is prolific throughout archive ",
+        "preMitigationNotes": "\n- Tape-stored content is inaccessible or corrupted due to physical deterioration of magnetic tape\n- Contemporary tape drives are incapable of reading dated storage media which is prolific throughout archive ",
     
         "mitigationOwner": "Technical",
     
@@ -29,17 +29,9 @@
                 "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
                 "mitigationOwnerType": "Human",
                 "createdBy": "admin",
-                "createdOn": 1459465200000,    
+                "createdOn": 1459465200000,
                 "updatedBy": "admin",
                 "updatedOn": 1459465200000,
-                
-                "posMitigationProbability": 0,
-                "posMitigationImpact": 0,
-                "posMitigationSeverity": 12,  
-                "posMitigationSeverityLevel": "MODERATE",
-                
-                "identifiedOn": "1459465200000",
-                "mitigationRelatedEventIdentifierType": "",
-                "mitigationRelatedEventIdentifierValue": ""
+                "identifiedOn": "1459465200000"
             }
         

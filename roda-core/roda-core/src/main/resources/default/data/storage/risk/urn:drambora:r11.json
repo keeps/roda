@@ -1,9 +1,9 @@
 
             {
-            
+
             
             "category": "Operations and service delivery",
-            
+
                 
         "id": "urn:drambora:r11",
     
@@ -11,9 +11,9 @@
     
         "description": "Repository’s preservation activities are insufficient to maintain the properties of its digital holdings that are of greatest significance to itsuser communities ",
     
-        "notes": "- Are significant properties defined and documented for each class of object preserved within the repository?\n- Are members of the community consulted throughout the process of defining significant properties?\n- Are preservation policies and procedures sufficient to maintain defined properties? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+        "notes": "\n- Are significant properties defined and documented for each class of object preserved within the repository?\n- Are members of the community consulted throughout the process of defining significant properties?\n- Are preservation policies and procedures sufficient to maintain defined properties? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
     
-        "preMitigationNotes": "- Repository preserves transcribed text from digitised manuscripts within .txt files, although user communities are interested in looking at the original illuminations in subsequent research\n- Repository aims to preserve images of manuscript illuminations but chosen resolution is insufficient to display the level of detail required by user community ",
+        "preMitigationNotes": "\n- Repository preserves transcribed text from digitised manuscripts within .txt files, although user communities are interested in looking at the original illuminations in subsequent research\n- Repository aims to preserve images of manuscript illuminations but chosen resolution is insufficient to display the level of detail required by user community ",
     
         "mitigationOwner": "Management",
     
@@ -29,17 +29,9 @@
                 "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
                 "mitigationOwnerType": "Human",
                 "createdBy": "admin",
-                "createdOn": 1459465200000,    
+                "createdOn": 1459465200000,
                 "updatedBy": "admin",
                 "updatedOn": 1459465200000,
-                
-                "posMitigationProbability": 0,
-                "posMitigationImpact": 0,
-                "posMitigationSeverity": 12,  
-                "posMitigationSeverityLevel": "MODERATE",
-                
-                "identifiedOn": "1459465200000",
-                "mitigationRelatedEventIdentifierType": "",
-                "mitigationRelatedEventIdentifierValue": ""
+                "identifiedOn": "1459465200000"
             }
         

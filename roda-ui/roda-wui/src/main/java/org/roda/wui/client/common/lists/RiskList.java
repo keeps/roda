@@ -52,7 +52,7 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
   private TextColumn<IndexedRisk> categoryColumn;
   private TextColumn<IndexedRisk> ownerColumn;
   private Column<IndexedRisk, SafeHtml> severityColumn;
-  private TextColumn<IndexedRisk> objectCounterColumn;
+  private TextColumn<IndexedRisk> incidenceCounterColumn;
 
   public RiskList() {
     this(null, null, null, false);
@@ -108,14 +108,14 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
       public SafeHtml getValue(IndexedRisk risk) {
         SafeHtml ret = null;
         if (risk != null) {
-          ret = HtmlSnippetUtils.getSeverityDefinition(risk.getPosMitigationSeverityLevel());
+          ret = HtmlSnippetUtils.getSeverityDefinition(risk.getCurrentSeverityLevel());
         }
 
         return ret;
       }
     };
 
-    objectCounterColumn = new TextColumn<IndexedRisk>() {
+    incidenceCounterColumn = new TextColumn<IndexedRisk>() {
       @Override
       public String getValue(IndexedRisk risk) {
         return Integer.toString(risk.getObjectsSize());
@@ -127,14 +127,14 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
     categoryColumn.setSortable(true);
     ownerColumn.setSortable(true);
     severityColumn.setSortable(true);
-    objectCounterColumn.setSortable(true);
+    incidenceCounterColumn.setSortable(true);
 
     addColumn(nameColumn, messages.riskName(), false, false);
     addColumn(categoryColumn, messages.riskCategory(), false, false);
     addColumn(ownerColumn, messages.riskMitigationOwner(), false, false);
     addColumn(identifiedOnColumn, messages.riskIdentifiedOn(), false, false, 8);
     addColumn(severityColumn, messages.riskPostMitigationSeverity(), false, false, 7);
-    addColumn(objectCounterColumn, messages.riskObjects(), false, false, 6);
+    addColumn(incidenceCounterColumn, messages.riskIncidences(), false, false, 6);
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(severityColumn, false));
@@ -147,8 +147,8 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
     columnSortingKeyMap.put(identifiedOnColumn, Arrays.asList(RodaConstants.RISK_IDENTIFIED_ON));
     columnSortingKeyMap.put(categoryColumn, Arrays.asList(RodaConstants.RISK_CATEGORY));
     columnSortingKeyMap.put(ownerColumn, Arrays.asList(RodaConstants.RISK_MITIGATION_OWNER));
-    columnSortingKeyMap.put(severityColumn, Arrays.asList(RodaConstants.RISK_POS_MITIGATION_SEVERITY));
-    columnSortingKeyMap.put(objectCounterColumn, Arrays.asList(RodaConstants.RISK_OBJECTS_SIZE));
+    columnSortingKeyMap.put(severityColumn, Arrays.asList(RodaConstants.RISK_CURRENT_SEVERITY_LEVEL));
+    columnSortingKeyMap.put(incidenceCounterColumn, Arrays.asList(RodaConstants.RISK_OBJECTS_SIZE));
 
     return createSorter(columnSortList, columnSortingKeyMap);
   }

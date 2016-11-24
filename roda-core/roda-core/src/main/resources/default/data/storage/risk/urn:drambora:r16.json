@@ -1,9 +1,9 @@
 
             {
-            
+
             
             "category": "Personnel, management and administration procedures",
-            
+
                 
         "id": "urn:drambora:r16",
     
@@ -11,9 +11,9 @@
     
         "description": "Repository is legally accountable for either failing to fulfil responsibilities or acting beyond the scope of what is permissible, as detailed in stakeholder contracts. ",
     
-        "notes": "- Does the repository engage in contractual relationships?\n- Does the repository consult with legal experts when determining the legality of their activities with respect to enforceable contracts that they are party to?\n- Is there evidence of a high degree of litigiousness within the domain or jurisdiction within which the repository operates? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+        "notes": "\n- Does the repository engage in contractual relationships?\n- Does the repository consult with legal experts when determining the legality of their activities with respect to enforceable contracts that they are party to?\n- Is there evidence of a high degree of litigiousness within the domain or jurisdiction within which the repository operates? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
     
-        "preMitigationNotes": "- Repository disseminates preserved content over the public Internet without restriction, although the corresponding deposit agreement stated that only a limited community should have access ",
+        "preMitigationNotes": "\n- Repository disseminates preserved content over the public Internet without restriction, although the corresponding deposit agreement stated that only a limited community should have access ",
     
         "mitigationOwner": "Legal",
     
@@ -29,17 +29,9 @@
                 "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
                 "mitigationOwnerType": "Human",
                 "createdBy": "admin",
-                "createdOn": 1459465200000,    
+                "createdOn": 1459465200000,
                 "updatedBy": "admin",
                 "updatedOn": 1459465200000,
-                
-                "posMitigationProbability": 0,
-                "posMitigationImpact": 0,
-                "posMitigationSeverity": 12,  
-                "posMitigationSeverityLevel": "MODERATE",
-                
-                "identifiedOn": "1459465200000",
-                "mitigationRelatedEventIdentifierType": "",
-                "mitigationRelatedEventIdentifierValue": ""
+                "identifiedOn": "1459465200000"
             }
         

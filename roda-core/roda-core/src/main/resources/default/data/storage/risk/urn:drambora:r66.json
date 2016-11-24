@@ -1,9 +1,9 @@
 
             {
-            
+
             
             "category": "Operations and service delivery",
-            
+
                 
         "id": "urn:drambora:r66",
     
@@ -11,9 +11,9 @@
     
         "description": "Exposure of an archived object to preservation plans results in loss or damage to one or more of its significant characteristics. ",
     
-        "notes": "- Does repository offer a definition of acceptable loss that may result from preservation activities? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+        "notes": "\n- Does repository offer a definition of acceptable loss that may result from preservation activities? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
     
-        "preMitigationNotes": "- Repository’s proposed migration strategy results in loss of ‘look and feel’ of archived documents, regarded as essential properties by user community ",
+        "preMitigationNotes": "\n- Repository’s proposed migration strategy results in loss of ‘look and feel’ of archived documents, regarded as essential properties by user community ",
     
         "mitigationOwner": "Preservation",
     
@@ -29,17 +29,9 @@
                 "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
                 "mitigationOwnerType": "Human",
                 "createdBy": "admin",
-                "createdOn": 1459465200000,    
+                "createdOn": 1459465200000,
                 "updatedBy": "admin",
                 "updatedOn": 1459465200000,
-                
-                "posMitigationProbability": 0,
-                "posMitigationImpact": 0,
-                "posMitigationSeverity": 12,  
-                "posMitigationSeverityLevel": "MODERATE",
-                
-                "identifiedOn": "1459465200000",
-                "mitigationRelatedEventIdentifierType": "",
-                "mitigationRelatedEventIdentifierValue": ""
+                "identifiedOn": "1459465200000"
             }
         

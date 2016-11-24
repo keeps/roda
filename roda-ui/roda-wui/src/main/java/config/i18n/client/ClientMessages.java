@@ -1149,8 +1149,6 @@ public interface ClientMessages extends Messages {
 
   String riskIncidenceDetectedBy();
 
-  String riskObjects();
-
   String riskMitigationProbability(@Select String probability);
 
   String riskMitigationImpact(@Select String impact);

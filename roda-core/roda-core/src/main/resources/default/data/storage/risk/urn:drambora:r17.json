@@ -1,9 +1,9 @@
 
             {
-            
+
             
             "category": "Personnel, management and administration procedures",
-            
+
                 
         "id": "urn:drambora:r17",
     
@@ -11,9 +11,9 @@
     
         "description": "Repository is legally accountable for either failing to fulfil responsibilities or acting beyond the scope of what is permissible, as detailed in legislative instruments. ",
     
-        "notes": "- Is the repository established within legislation?\n- Do any other legislative acts or statutory instruments establish restrictions or obligations related to repository activities?\n- Does the repository consult with legal experts when determining the legality of their activities with respect to relevant legislation?\n- Is there evidence of a high degree of litigiousness within the domain or jurisdiction within which the repository operates? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+        "notes": "\n- Is the repository established within legislation?\n- Do any other legislative acts or statutory instruments establish restrictions or obligations related to repository activities?\n- Does the repository consult with legal experts when determining the legality of their activities with respect to relevant legislation?\n- Is there evidence of a high degree of litigiousness within the domain or jurisdiction within which the repository operates? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
     
-        "preMitigationNotes": "- Repository fails to accept deposited materials in contravention of legal deposit laws established in local legislation ",
+        "preMitigationNotes": "\n- Repository fails to accept deposited materials in contravention of legal deposit laws established in local legislation ",
     
         "mitigationOwner": "Legal",
     
@@ -29,17 +29,9 @@
                 "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
                 "mitigationOwnerType": "Human",
                 "createdBy": "admin",
-                "createdOn": 1459465200000,    
+                "createdOn": 1459465200000,
                 "updatedBy": "admin",
                 "updatedOn": 1459465200000,
-                
-                "posMitigationProbability": 0,
-                "posMitigationImpact": 0,
-                "posMitigationSeverity": 12,  
-                "posMitigationSeverityLevel": "MODERATE",
-                
-                "identifiedOn": "1459465200000",
-                "mitigationRelatedEventIdentifierType": "",
-                "mitigationRelatedEventIdentifierValue": ""
+                "identifiedOn": "1459465200000"
             }
         

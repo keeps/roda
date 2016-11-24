@@ -1,9 +1,9 @@
 
             {
-            
+
             
             "category": "Operations and service delivery",
-            
+
                 
         "id": "urn:drambora:r12",
     
@@ -11,9 +11,9 @@
     
         "description": "Fundamentals of why and how repository’s business activities are conducted are undocumented and unknown, or known only by specific individuals. ",
     
-        "notes": "- Are policies and procedures comprehensively documented?\n- Is documentation widely accessible and understandable throughout the organisation?\n- Is the location of policy and procedure documentation recorded and well known? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+        "notes": "\n- Are policies and procedures comprehensively documented?\n- Is documentation widely accessible and understandable throughout the organisation?\n- Is the location of policy and procedure documentation recorded and well known? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
     
-        "preMitigationNotes": "- Policies and procedures associated with each organisational facet are known only to the individuals responsible\n- Policies are documented in Microsoft Word files but stored only on an unshared partition of a workstation hard-disk ",
+        "preMitigationNotes": "\n- Policies and procedures associated with each organisational facet are known only to the individuals responsible\n- Policies are documented in Microsoft Word files but stored only on an unshared partition of a workstation hard-disk ",
     
         "mitigationOwner": "Management",
     
@@ -29,17 +29,9 @@
                 "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
                 "mitigationOwnerType": "Human",
                 "createdBy": "admin",
-                "createdOn": 1459465200000,    
+                "createdOn": 1459465200000,
                 "updatedBy": "admin",
                 "updatedOn": 1459465200000,
-                
-                "posMitigationProbability": 0,
-                "posMitigationImpact": 0,
-                "posMitigationSeverity": 12,  
-                "posMitigationSeverityLevel": "MODERATE",
-                
-                "identifiedOn": "1459465200000",
-                "mitigationRelatedEventIdentifierType": "",
-                "mitigationRelatedEventIdentifierValue": ""
+                "identifiedOn": "1459465200000"
             }
         

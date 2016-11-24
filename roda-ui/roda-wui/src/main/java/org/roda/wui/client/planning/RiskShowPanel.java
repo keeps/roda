@@ -211,9 +211,9 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
     final int preProbability = risk.getPreMitigationProbability();
     final int preImpact = risk.getPreMitigationImpact();
     final int preSeverity = risk.getPreMitigationSeverity();
-    final int posProbability = risk.getPosMitigationProbability();
-    final int posImpact = risk.getPosMitigationImpact();
-    final int posSeverity = risk.getPosMitigationSeverity();
+    final int posProbability = risk.getPostMitigationProbability();
+    final int posImpact = risk.getPostMitigationImpact();
+    final int posSeverity = risk.getPostMitigationSeverity();
 
     BrowserService.Util.getInstance().retrieveShowMitigationTerms(preProbability, preImpact, posProbability, posImpact,
       new AsyncCallback<RiskMitigationBundle>() {
@@ -256,8 +256,8 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
     riskPreMitigationNotesValue.setText(risk.getPreMitigationNotes());
     riskPreMitigationNotesKey.setVisible(StringUtils.isNotBlank(risk.getPreMitigationNotes()));
 
-    riskPosMitigationNotesValue.setText(risk.getPosMitigationNotes());
-    riskPosMitigationNotesKey.setVisible(StringUtils.isNotBlank(risk.getPosMitigationNotes()));
+    riskPosMitigationNotesValue.setText(risk.getPostMitigationNotes());
+    riskPosMitigationNotesKey.setVisible(StringUtils.isNotBlank(risk.getPostMitigationNotes()));
 
     int mitigationCounter = 0;
 

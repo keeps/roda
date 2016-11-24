@@ -1,9 +1,9 @@
 
             {
-            
+
             
             "category": "Personnel, management and administration procedures",
-            
+
                 
         "id": "urn:drambora:r19",
     
@@ -11,9 +11,9 @@
     
         "description": "Repository is incapable of effectively determining the extent to which it has successfully achieved its business objectives. ",
     
-        "notes": "- Does the repository maintain policies and procedures to verify and record the integrity, authenticity, provenance and understandability of archived information?\n- Does the repository maintain policies and procedures to evaluate and record the execution of repository processes and to check that their outputs are complete and correct?\n- Does the repository engage with user communities to determine their overall level of satisfaction?\n- Are mechanisms to determine the effectiveness of repository operations exploited on a regular basis? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+        "notes": "\n- Does the repository maintain policies and procedures to verify and record the integrity, authenticity, provenance and understandability of archived information?\n- Does the repository maintain policies and procedures to evaluate and record the execution of repository processes and to check that their outputs are complete and correct?\n- Does the repository engage with user communities to determine their overall level of satisfaction?\n- Are mechanisms to determine the effectiveness of repository operations exploited on a regular basis? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
     
-        "preMitigationNotes": "- Repository has no way of demonstrating that the integrity and authenticity of its archived materials have been maintained\n- Repository cannot demonstrate that submitted information has been ingested correctly and transformed into a corresponding complete and correct archival package ",
+        "preMitigationNotes": "\n- Repository has no way of demonstrating that the integrity and authenticity of its archived materials have been maintained\n- Repository cannot demonstrate that submitted information has been ingested correctly and transformed into a corresponding complete and correct archival package ",
     
         "mitigationOwner": "Management",
     
@@ -29,17 +29,9 @@
                 "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
                 "mitigationOwnerType": "Human",
                 "createdBy": "admin",
-                "createdOn": 1459465200000,    
+                "createdOn": 1459465200000,
                 "updatedBy": "admin",
                 "updatedOn": 1459465200000,
-                
-                "posMitigationProbability": 0,
-                "posMitigationImpact": 0,
-                "posMitigationSeverity": 12,  
-                "posMitigationSeverityLevel": "MODERATE",
-                
-                "identifiedOn": "1459465200000",
-                "mitigationRelatedEventIdentifierType": "",
-                "mitigationRelatedEventIdentifierValue": ""
+                "identifiedOn": "1459465200000"
             }
         

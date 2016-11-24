@@ -2303,52 +2303,41 @@ public class BrowserHelper {
   }
 
   public static void updateRiskCounters() throws GenericException, RequestNotValidException, NotFoundException {
-    IndexResult<RiskIncidence> find = RodaCoreFactory.getIndexService().find(RiskIncidence.class, Filter.ALL,
-      Sorter.NONE, new Sublist(0, 0), new Facets(new SimpleFacetParameter(RodaConstants.RISK_INCIDENCE_RISK_ID)));
 
-    boolean findFlag = true;
-    int initialIndex = 0, interval = 20;
-    List<String> allRisks = new ArrayList<String>();
-    Filter filter = new Filter(new NotSimpleFilterParameter(RodaConstants.RISK_OBJECTS_SIZE, "0"));
+    // get risks incidence count using facets
+    IndexService index = RodaCoreFactory.getIndexService();
+    IndexResult<RiskIncidence> find = index.find(RiskIncidence.class, Filter.ALL, Sorter.NONE, new Sublist(0, 0),
+      new Facets(new SimpleFacetParameter(RodaConstants.RISK_INCIDENCE_RISK_ID)));
 
-    while (findFlag) {
-      IndexResult<IndexedRisk> findAll = RodaCoreFactory.getIndexService().find(IndexedRisk.class, filter, Sorter.NONE,
-        new Sublist(initialIndex, initialIndex + interval));
+    Map<String, IndexedRisk> allRisks = new HashMap<String, IndexedRisk>();
 
-      for (IndexedRisk risk : findAll.getResults()) {
-        allRisks.add(risk.getId());
-      }
-
-      if (findAll.getResults().size() < interval) {
-        findFlag = false;
-      } else {
-        initialIndex += interval;
-      }
+    // retrieve risks and set default object count to zero
+    for (IndexedRisk indexedRisk : index.findAll(IndexedRisk.class, Filter.ALL)) {
+      indexedRisk.setObjectsSize(0);
+      allRisks.put(indexedRisk.getId(), indexedRisk);
     }
 
+    // update risks from facets
     for (FacetFieldResult fieldResult : find.getFacetResults()) {
       for (FacetValue facetValue : fieldResult.getValues()) {
         String riskId = facetValue.getValue();
         long counter = facetValue.getCount();
 
-        IndexedRisk risk = RodaCoreFactory.getIndexService().retrieve(IndexedRisk.class, riskId);
-        risk.setObjectsSize((int) counter);
-        RodaCoreFactory.getIndexService().reindexRisk(risk);
-
-        allRisks.remove(risk.getId());
+        IndexedRisk risk = allRisks.get(riskId);
+        if (risk != null) {
+          risk.setObjectsSize((int) counter);
+        } else {
+          LOGGER.warn("Updating risk counters found incidences pointing to non-existing risk: {}", riskId);
+        }
       }
     }
 
-    for (String riskId : allRisks) {
-      Filter riskFilter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_ID, riskId));
-      IndexResult<IndexedRisk> findAll = RodaCoreFactory.getIndexService().find(IndexedRisk.class, riskFilter,
-        Sorter.NONE, new Sublist(0, 1));
-      IndexedRisk risk = findAll.getResults().get(0);
-      risk.setObjectsSize(0);
-      RodaCoreFactory.getIndexService().reindexRisk(risk);
+    // update all in index
+    for (IndexedRisk risk : allRisks.values()) {
+      index.reindexRisk(risk);
     }
 
-    RodaCoreFactory.getIndexService().commit(IndexedRisk.class);
+    index.commit(IndexedRisk.class);
   }
 
   public static void appraisal(User user, SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)

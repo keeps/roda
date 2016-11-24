@@ -1,9 +1,9 @@
 
             {
-            
+
             
             "category": "Operations and service delivery",
-            
+
                 
         "id": "urn:drambora:r65",
     
@@ -11,9 +11,9 @@
     
         "description": "Repository is incapable of executing in practice the preservation planning it has undertaken. ",
     
-        "notes": "- Is preservation planning undertaken within the repository with the anticipation that it will subsequently be implemented?\n- Does preservation planning reflect the extent of technological, financial and human resources available within the repository as well as its organisational objectives? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+        "notes": "\n- Is preservation planning undertaken within the repository with the anticipation that it will subsequently be implemented?\n- Does preservation planning reflect the extent of technological, financial and human resources available within the repository as well as its organisational objectives? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
     
-        "preMitigationNotes": "- Repository’s planned emulation strategy requires technological expertise to implement that is unavailable within the staff, and insufficient resource exists to contract with third-party developers to undertake the work ",
+        "preMitigationNotes": "\n- Repository’s planned emulation strategy requires technological expertise to implement that is unavailable within the staff, and insufficient resource exists to contract with third-party developers to undertake the work ",
     
         "mitigationOwner": "Preservation",
     
@@ -29,17 +29,9 @@
                 "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
                 "mitigationOwnerType": "Human",
                 "createdBy": "admin",
-                "createdOn": 1459465200000,    
+                "createdOn": 1459465200000,
                 "updatedBy": "admin",
                 "updatedOn": 1459465200000,
-                
-                "posMitigationProbability": 0,
-                "posMitigationImpact": 0,
-                "posMitigationSeverity": 12,  
-                "posMitigationSeverityLevel": "MODERATE",
-                
-                "identifiedOn": "1459465200000",
-                "mitigationRelatedEventIdentifierType": "",
-                "mitigationRelatedEventIdentifierValue": ""
+                "identifiedOn": "1459465200000"
             }
         

@@ -1,9 +1,9 @@
 
             {
-            
+
             
             "category": "Hardware, software or communications equipment and facilities",
-            
+
                 
         "id": "urn:drambora:r33",
     
@@ -11,9 +11,9 @@
     
         "description": "Core technology is no longer current or is incongruent with that of most comparable organisations. ",
     
-        "notes": "- Do vendors of currently employed hardware and software technologies offer a guaranteed period of support?\n- Are hardware and software technologies employed widely within contemporary and comparable organisations?\n- What is the mean-time-between-failure associated with the repository's chosen technologies? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+        "notes": "\n- Do vendors of currently employed hardware and software technologies offer a guaranteed period of support?\n- Are hardware and software technologies employed widely within contemporary and comparable organisations?\n- What is the mean-time-between-failure associated with the repository's chosen technologies? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
     
-        "preMitigationNotes": "- Operating systems no longer supported by vendor, and therefore security updates are no longer being made available. ",
+        "preMitigationNotes": "\n- Operating systems no longer supported by vendor, and therefore security updates are no longer being made available. ",
     
         "mitigationOwner": "Technical",
     
@@ -29,17 +29,9 @@
                 "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
                 "mitigationOwnerType": "Human",
                 "createdBy": "admin",
-                "createdOn": 1459465200000,    
+                "createdOn": 1459465200000,
                 "updatedBy": "admin",
                 "updatedOn": 1459465200000,
-                
-                "posMitigationProbability": 0,
-                "posMitigationImpact": 0,
-                "posMitigationSeverity": 12,  
-                "posMitigationSeverityLevel": "MODERATE",
-                
-                "identifiedOn": "1459465200000",
-                "mitigationRelatedEventIdentifierType": "",
-                "mitigationRelatedEventIdentifierValue": ""
+                "identifiedOn": "1459465200000"
             }
         

@@ -1,19 +1,19 @@
 
             {
-            
+
             
             "category": "Personnel, management and administration procedures",
-            
+
                 
-        "id": "urn:drambora:r5",
+        "id": "urn:drambora:r05",
     
         "name": "Repository loses mandate",
     
         "description": "Basis for repository’s existence is withdrawn or substantially altered, rendering it incompatible with business activities. ",
     
-        "notes": "- Is repository's mandate subject to ongoing review?\n- Is primary repository service contract subject to renewal or renegotiation? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+        "notes": "\n- Is repository's mandate subject to ongoing review?\n- Is primary repository service contract subject to renewal or renegotiation? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
     
-        "preMitigationNotes": "- Scope of repository responsibility is changed by legislative amendment\n- Repository obligations are altered within contract renegotiations ",
+        "preMitigationNotes": "\n- Scope of repository responsibility is changed by legislative amendment\n- Repository obligations are altered within contract renegotiations ",
     
         "mitigationOwner": "Management",
     
@@ -29,17 +29,9 @@
                 "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
                 "mitigationOwnerType": "Human",
                 "createdBy": "admin",
-                "createdOn": 1459465200000,    
+                "createdOn": 1459465200000,
                 "updatedBy": "admin",
                 "updatedOn": 1459465200000,
-                
-                "posMitigationProbability": 0,
-                "posMitigationImpact": 0,
-                "posMitigationSeverity": 12,  
-                "posMitigationSeverityLevel": "MODERATE",
-                
-                "identifiedOn": "1459465200000",
-                "mitigationRelatedEventIdentifierType": "",
-                "mitigationRelatedEventIdentifierValue": ""
+                "identifiedOn": "1459465200000"
             }
         

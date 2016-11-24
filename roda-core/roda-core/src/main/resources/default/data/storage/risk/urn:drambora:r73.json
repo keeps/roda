@@ -1,9 +1,9 @@
 
             {
-            
+
             
             "category": "Operations and service delivery",
-            
+
                 
         "id": "urn:drambora:r73",
     
@@ -11,9 +11,9 @@
     
         "description": "Repository fails to maintain appropriately complete representation information to facilitate information understandability. ",
     
-        "notes": "- Does repository record or refer to adequate representation information such as file format information?\n- Are understandability requirements referenced when determining minimal essential semantic or technical metadata? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+        "notes": "\n- Does repository record or refer to adequate representation information such as file format information?\n- Are understandability requirements referenced when determining minimal essential semantic or technical metadata? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
     
-        "preMitigationNotes": "- Repository preserving social science data documents information about the SPSS format within which much of its content is encoded but fails to record the meaning of the acronyms used as field headings throughout these files ",
+        "preMitigationNotes": "\n- Repository preserving social science data documents information about the SPSS format within which much of its content is encoded but fails to record the meaning of the acronyms used as field headings throughout these files ",
     
         "mitigationOwner": "Documentation",
     
@@ -29,17 +29,9 @@
                 "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
                 "mitigationOwnerType": "Human",
                 "createdBy": "admin",
-                "createdOn": 1459465200000,    
+                "createdOn": 1459465200000,
                 "updatedBy": "admin",
                 "updatedOn": 1459465200000,
-                
-                "posMitigationProbability": 0,
-                "posMitigationImpact": 0,
-                "posMitigationSeverity": 12,  
-                "posMitigationSeverityLevel": "MODERATE",
-                
-                "identifiedOn": "1459465200000",
-                "mitigationRelatedEventIdentifierType": "",
-                "mitigationRelatedEventIdentifierValue": ""
+                "identifiedOn": "1459465200000"
             }
         

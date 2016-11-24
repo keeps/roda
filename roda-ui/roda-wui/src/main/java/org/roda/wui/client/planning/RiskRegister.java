@@ -158,7 +158,7 @@ public class RiskRegister extends Composite {
 
   public RiskRegister() {
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.RISK_CATEGORY),
-      new SimpleFacetParameter(RodaConstants.RISK_POS_MITIGATION_SEVERITY_LEVEL),
+      new SimpleFacetParameter(RodaConstants.RISK_CURRENT_SEVERITY_LEVEL),
       new SimpleFacetParameter(RodaConstants.RISK_MITIGATION_OWNER));
 
     riskList = new RiskList(Filter.NULL, facets, messages.risksTitle(), true);
@@ -173,7 +173,7 @@ public class RiskRegister extends Composite {
 
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
     facetPanels.put(RodaConstants.RISK_CATEGORY, facetCategories);
-    facetPanels.put(RodaConstants.RISK_POS_MITIGATION_SEVERITY_LEVEL, facetSeverities);
+    facetPanels.put(RodaConstants.RISK_CURRENT_SEVERITY_LEVEL, facetSeverities);
     facetPanels.put(RodaConstants.RISK_MITIGATION_OWNER, facetOwner);
     FacetUtils.bindFacets(riskList, facetPanels);
 
@@ -226,13 +226,13 @@ public class RiskRegister extends Composite {
     inputDateInitial.getElement().setPropertyString("placeholder", messages.sidebarFilterFromDatePlaceHolder());
     inputDateFinal.getElement().setPropertyString("placeholder", messages.sidebarFilterToDatePlaceHolder());
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();
     JavascriptUtils.stickSidebar();
   }
-  
+
   private void updateDateFilter() {
     Date dateInitial = inputDateInitial.getDatePicker().getValue();
     Date dateFinal = inputDateFinal.getDatePicker().getValue();

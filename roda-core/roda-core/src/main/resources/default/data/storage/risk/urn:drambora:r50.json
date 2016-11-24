@@ -1,9 +1,9 @@
 
             {
-            
+
             
             "category": "Operations and service delivery",
-            
+
                 
         "id": "urn:drambora:r50",
     
@@ -11,9 +11,9 @@
     
         "description": "Between the points of receipt and the creation of an archivable object the received package is subjected to changes that are not sanctioned or implemented by the repository. ",
     
-        "notes": "- Does repository obtain full physical and intellectual control of submitted content? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+        "notes": "\n- Does repository obtain full physical and intellectual control of submitted content? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
     
-        "preMitigationNotes": "- An intrinsic part of a submitted object is not included within the deposited package and instead is remotely referenced. During the process of ingest this remote object is subject to alteration by external actors ",
+        "preMitigationNotes": "\n- An intrinsic part of a submitted object is not included within the deposited package and instead is remotely referenced. During the process of ingest this remote object is subject to alteration by external actors ",
     
         "mitigationOwner": "Ingest",
     
@@ -29,17 +29,9 @@
                 "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
                 "mitigationOwnerType": "Human",
                 "createdBy": "admin",
-                "createdOn": 1459465200000,    
+                "createdOn": 1459465200000,
                 "updatedBy": "admin",
                 "updatedOn": 1459465200000,
-                
-                "posMitigationProbability": 0,
-                "posMitigationImpact": 0,
-                "posMitigationSeverity": 12,  
-                "posMitigationSeverityLevel": "MODERATE",
-                
-                "identifiedOn": "1459465200000",
-                "mitigationRelatedEventIdentifierType": "",
-                "mitigationRelatedEventIdentifierValue": ""
+                "identifiedOn": "1459465200000"
             }
         

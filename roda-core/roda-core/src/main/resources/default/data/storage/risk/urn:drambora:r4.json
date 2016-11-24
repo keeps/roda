@@ -1,19 +1,19 @@
 
             {
-            
+
             
             "category": "Physical environment; Personnel, management and administration procedures; Operations and service delivery; Hardware, software or communications equipment and facilities",
-            
+
                 
-        "id": "urn:drambora:r4",
+        "id": "urn:drambora:r04",
     
         "name": "Business objectives not met",
     
         "description": "One or more integral business outcomes are not achieved, or are achieved inadequately. ",
     
-        "notes": "- Does repository make a commitment to its stakeholder groups to achieve one or more stated objectives? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+        "notes": "\n- Does repository make a commitment to its stakeholder groups to achieve one or more stated objectives? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
     
-        "preMitigationNotes": "- Business commits to delivering object x within 5 minutes of its request but on average delivery takes 15 minutes\n- Repository fails to adequately preserve identified significant properties of ingested materials ",
+        "preMitigationNotes": "\n- Business commits to delivering object x within 5 minutes of its request but on average delivery takes 15 minutes\n- Repository fails to adequately preserve identified significant properties of ingested materials ",
     
         "mitigationOwner": "Management",
     
@@ -29,17 +29,9 @@
                 "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
                 "mitigationOwnerType": "Human",
                 "createdBy": "admin",
-                "createdOn": 1459465200000,    
+                "createdOn": 1459465200000,
                 "updatedBy": "admin",
                 "updatedOn": 1459465200000,
-                
-                "posMitigationProbability": 0,
-                "posMitigationImpact": 0,
-                "posMitigationSeverity": 12,  
-                "posMitigationSeverityLevel": "MODERATE",
-                
-                "identifiedOn": "1459465200000",
-                "mitigationRelatedEventIdentifierType": "",
-                "mitigationRelatedEventIdentifierValue": ""
+                "identifiedOn": "1459465200000"
             }
         

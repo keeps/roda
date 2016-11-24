@@ -1,9 +1,9 @@
 
             {
-            
+
             
             "category": "Physical environment; Operations and service delivery; Hardware, software or communications equipment and facilities",
-            
+
                 
         "id": "urn:drambora:r44",
     
@@ -11,9 +11,9 @@
     
         "description": "Other third-party services that the repository relies upon suffer disruption. ",
     
-        "notes": "- Does the repository sub-contract any of its repository activities?\n- Does the repository rely upon any other third-party services such as cleaning or catering? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
+        "notes": "\n- Does the repository sub-contract any of its repository activities?\n- Does the repository rely upon any other third-party services such as cleaning or catering? \n\nThe full description of this risk has been obtained from examples provided in DRAMBORA - Digital Repository Audit Method Based on Risk Assessment, March 2007, Digital Curation Centre (DCC) and Digital Preservation Europe (DPE), http://www.repositoryaudit.eu/",
     
-        "preMitigationNotes": "- The web hosting company serving the repository’s information dissemination systems goes out of business\n- Repository's catering company takes industrial action and staff are unable to receive meals ",
+        "preMitigationNotes": "\n- The web hosting company serving the repository’s information dissemination systems goes out of business\n- Repository's catering company takes industrial action and staff are unable to receive meals ",
     
         "mitigationOwner": "Management",
     
@@ -29,17 +29,9 @@
                 "identifiedBy":"DRAMBORA - Digital Repository Audit Method Based on Risk Assessment",
                 "mitigationOwnerType": "Human",
                 "createdBy": "admin",
-                "createdOn": 1459465200000,    
+                "createdOn": 1459465200000,
                 "updatedBy": "admin",
                 "updatedOn": 1459465200000,
-                
-                "posMitigationProbability": 0,
-                "posMitigationImpact": 0,
-                "posMitigationSeverity": 12,  
-                "posMitigationSeverityLevel": "MODERATE",
-                
-                "identifiedOn": "1459465200000",
-                "mitigationRelatedEventIdentifierType": "",
-                "mitigationRelatedEventIdentifierValue": ""
+                "identifiedOn": "1459465200000"
             }
         

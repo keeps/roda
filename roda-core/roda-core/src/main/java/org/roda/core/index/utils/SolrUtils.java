@@ -553,6 +553,26 @@ public class SolrUtils {
     return ret;
   }
 
+  private static <E extends Enum<E>> E objectToEnum(Object object, Class<E> enumeration, E defaultValue) {
+    E ret = defaultValue;
+    if (object != null) {
+      if (object instanceof String) {
+        String name = (String) object;
+        try {
+          ret = Enum.valueOf(enumeration, name);
+        } catch (IllegalArgumentException e) {
+          LOGGER.warn("Invalid name for enumeration: {}, name: {}", enumeration.getName(), name);
+        } catch (NullPointerException e) {
+          LOGGER.warn("Error parsing enumeration: {}, name: {}", enumeration.getName(), name);
+        }
+      } else {
+        LOGGER.warn("Could not convert Solr object to enumeration: {}, unsupported class: {}", enumeration.getName(),
+          object.getClass().getName());
+      }
+    }
+    return ret;
+  }
+
   /**
    * @deprecated use {@link #objectToString(Object, String)} instead
    */
@@ -1830,11 +1850,17 @@ public class SolrUtils {
     doc.addField(RodaConstants.RISK_PRE_MITIGATION_SEVERITY_LEVEL, risk.getPreMitigationSeverityLevel().toString());
     doc.addField(RodaConstants.RISK_PRE_MITIGATION_NOTES, risk.getPreMitigationNotes());
 
-    doc.addField(RodaConstants.RISK_POS_MITIGATION_PROBABILITY, risk.getPosMitigationProbability());
-    doc.addField(RodaConstants.RISK_POS_MITIGATION_IMPACT, risk.getPosMitigationImpact());
-    doc.addField(RodaConstants.RISK_POS_MITIGATION_SEVERITY, risk.getPosMitigationSeverity());
-    doc.addField(RodaConstants.RISK_POS_MITIGATION_SEVERITY_LEVEL, risk.getPosMitigationSeverityLevel().toString());
-    doc.addField(RodaConstants.RISK_POS_MITIGATION_NOTES, risk.getPosMitigationNotes());
+    doc.addField(RodaConstants.RISK_POST_MITIGATION_PROBABILITY, risk.getPostMitigationProbability());
+    doc.addField(RodaConstants.RISK_POST_MITIGATION_IMPACT, risk.getPostMitigationImpact());
+    doc.addField(RodaConstants.RISK_POST_MITIGATION_SEVERITY, risk.getPostMitigationSeverity());
+
+    if (risk.getPostMitigationSeverityLevel() != null) {
+      doc.addField(RodaConstants.RISK_POST_MITIGATION_SEVERITY_LEVEL, risk.getPostMitigationSeverityLevel().toString());
+    }
+
+    doc.addField(RodaConstants.RISK_CURRENT_SEVERITY_LEVEL, risk.getCurrentSeverityLevel());
+
+    doc.addField(RodaConstants.RISK_POST_MITIGATION_NOTES, risk.getPostMitigationNotes());
 
     doc.addField(RodaConstants.RISK_MITIGATION_STRATEGY, risk.getMitigationStrategy());
     doc.addField(RodaConstants.RISK_MITIGATION_OWNER_TYPE, risk.getMitigationOwnerType());
@@ -1861,40 +1887,40 @@ public class SolrUtils {
   public static IndexedRisk solrDocumentToRisk(SolrDocument doc) {
     IndexedRisk risk = new IndexedRisk();
 
-    risk.setId(objectToString(doc.get(RodaConstants.INDEX_UUID)));
-    risk.setName(objectToString(doc.get(RodaConstants.RISK_NAME)));
-    risk.setDescription(objectToString(doc.get(RodaConstants.RISK_DESCRIPTION)));
+    risk.setId(objectToString(doc.get(RodaConstants.INDEX_UUID), null));
+    risk.setName(objectToString(doc.get(RodaConstants.RISK_NAME), null));
+    risk.setDescription(objectToString(doc.get(RodaConstants.RISK_DESCRIPTION), null));
     risk.setIdentifiedOn(objectToDate(doc.get(RodaConstants.RISK_IDENTIFIED_ON)));
-    risk.setIdentifiedBy(objectToString(doc.get(RodaConstants.RISK_IDENTIFIED_BY)));
-    risk.setCategory(objectToString(doc.get(RodaConstants.RISK_CATEGORY)));
-    risk.setNotes(objectToString(doc.get(RodaConstants.RISK_NOTES)));
+    risk.setIdentifiedBy(objectToString(doc.get(RodaConstants.RISK_IDENTIFIED_BY), null));
+    risk.setCategory(objectToString(doc.get(RodaConstants.RISK_CATEGORY), null));
+    risk.setNotes(objectToString(doc.get(RodaConstants.RISK_NOTES), null));
 
     risk.setPreMitigationProbability(objectToInteger(doc.get(RodaConstants.RISK_PRE_MITIGATION_PROBABILITY), 0));
     risk.setPreMitigationImpact(objectToInteger(doc.get(RodaConstants.RISK_PRE_MITIGATION_IMPACT), 0));
     risk.setPreMitigationSeverity(objectToInteger(doc.get(RodaConstants.RISK_PRE_MITIGATION_SEVERITY), 0));
     risk.setPreMitigationSeverityLevel(
-      Risk.SEVERITY_LEVEL.valueOf(objectToString(doc.get(RodaConstants.RISK_PRE_MITIGATION_SEVERITY_LEVEL))));
-    risk.setPreMitigationNotes(objectToString(doc.get(RodaConstants.RISK_PRE_MITIGATION_NOTES)));
+      objectToEnum(doc.get(RodaConstants.RISK_PRE_MITIGATION_SEVERITY_LEVEL), Risk.SEVERITY_LEVEL.class, null));
+    risk.setPreMitigationNotes(objectToString(doc.get(RodaConstants.RISK_PRE_MITIGATION_NOTES), null));
 
-    risk.setPosMitigationProbability(objectToInteger(doc.get(RodaConstants.RISK_POS_MITIGATION_PROBABILITY), 0));
-    risk.setPosMitigationImpact(objectToInteger(doc.get(RodaConstants.RISK_POS_MITIGATION_IMPACT), 0));
-    risk.setPosMitigationSeverity(objectToInteger(doc.get(RodaConstants.RISK_POS_MITIGATION_SEVERITY), 0));
-    risk.setPosMitigationSeverityLevel(
-      Risk.SEVERITY_LEVEL.valueOf(objectToString(doc.get(RodaConstants.RISK_POS_MITIGATION_SEVERITY_LEVEL))));
-    risk.setPosMitigationNotes(objectToString(doc.get(RodaConstants.RISK_POS_MITIGATION_NOTES)));
+    risk.setPostMitigationProbability(objectToInteger(doc.get(RodaConstants.RISK_POST_MITIGATION_PROBABILITY), 0));
+    risk.setPostMitigationImpact(objectToInteger(doc.get(RodaConstants.RISK_POST_MITIGATION_IMPACT), 0));
+    risk.setPostMitigationSeverity(objectToInteger(doc.get(RodaConstants.RISK_POST_MITIGATION_SEVERITY), 0));
+    risk.setPostMitigationSeverityLevel(
+      objectToEnum(doc.get(RodaConstants.RISK_POST_MITIGATION_SEVERITY_LEVEL), Risk.SEVERITY_LEVEL.class, null));
+    risk.setPostMitigationNotes(objectToString(doc.get(RodaConstants.RISK_POST_MITIGATION_NOTES), null));
 
-    risk.setMitigationStrategy(objectToString(doc.get(RodaConstants.RISK_MITIGATION_STRATEGY)));
-    risk.setMitigationOwnerType(objectToString(doc.get(RodaConstants.RISK_MITIGATION_OWNER_TYPE)));
-    risk.setMitigationOwner(objectToString(doc.get(RodaConstants.RISK_MITIGATION_OWNER)));
+    risk.setMitigationStrategy(objectToString(doc.get(RodaConstants.RISK_MITIGATION_STRATEGY), null));
+    risk.setMitigationOwnerType(objectToString(doc.get(RodaConstants.RISK_MITIGATION_OWNER_TYPE), null));
+    risk.setMitigationOwner(objectToString(doc.get(RodaConstants.RISK_MITIGATION_OWNER), null));
     risk.setMitigationRelatedEventIdentifierType(
-      objectToString(doc.get(RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_TYPE)));
+      objectToString(doc.get(RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_TYPE), null));
     risk.setMitigationRelatedEventIdentifierValue(
-      objectToString(doc.get(RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_VALUE)));
+      objectToString(doc.get(RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_VALUE), null));
 
     risk.setCreatedOn(objectToDate(doc.get(RodaConstants.RISK_CREATED_ON)));
-    risk.setCreatedBy(objectToString(doc.get(RodaConstants.RISK_CREATED_BY)));
+    risk.setCreatedBy(objectToString(doc.get(RodaConstants.RISK_CREATED_BY), null));
     risk.setUpdatedOn(objectToDate(doc.get(RodaConstants.RISK_UPDATED_ON)));
-    risk.setUpdatedBy(objectToString(doc.get(RodaConstants.RISK_UPDATED_BY)));
+    risk.setUpdatedBy(objectToString(doc.get(RodaConstants.RISK_UPDATED_BY), null));
 
     risk.setObjectsSize(objectToInteger(doc.get(RodaConstants.RISK_OBJECTS_SIZE), 0));
     return risk;
