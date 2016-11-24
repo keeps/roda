@@ -144,7 +144,7 @@ public class EditRiskIncidence extends Composite {
 
     HtmlSnippetUtils.addRiskIncidenceObjectLinks(incidence, objectLabel, objectLink);
 
-    String riskId = incidence.getRiskId().replace("[", "").replace("]", "");
+    String riskId = incidence.getRiskId();
     riskLink.setText(riskId);
     riskLink.setHref(Tools.createHistoryHashLink(RiskRegister.RESOLVER, ShowRisk.RESOLVER.getHistoryToken(), riskId));
 
@@ -184,7 +184,7 @@ public class EditRiskIncidence extends Composite {
 
     severity.setSelectedIndex(selectedIndex - 1);
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();

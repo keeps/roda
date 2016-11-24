@@ -474,18 +474,23 @@ public final class PluginHelper {
 
     InputStream inputStream = RodaCoreFactory.getDefaultFileAsStream(defaultFile, pluginClassLoader);
 
+    if (inputStream == null) {
+      throw new GenericException("Could not create a default risk because resource was not found: " + defaultFile);
+    }
+
     Risk risk = null;
 
     try {
       risk = JsonUtils.getObjectFromJson(inputStream, Risk.class);
       risk.setId(riskId);
       model.createRisk(risk, false);
-      return risk;
     } catch (GenericException e) {
-      LOGGER.error("Could not create a default risk");
+      LOGGER.error("Could not create a default risk", e);
+      throw e;
+    } finally {
+      IOUtils.closeQuietly(inputStream);
     }
 
-    IOUtils.closeQuietly(inputStream);
     return risk;
   }
 

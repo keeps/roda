@@ -2014,22 +2014,25 @@ public class SolrUtils {
 
   public static RiskIncidence solrDocumentToRiskIncidence(SolrDocument doc) {
     RiskIncidence incidence = new RiskIncidence();
-    incidence.setId(objectToString(doc.get(RodaConstants.INDEX_UUID)));
-    incidence.setAipId(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_AIP_ID)));
-    incidence.setRepresentationId(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID)));
+    incidence.setId(objectToString(doc.get(RodaConstants.INDEX_UUID), null));
+    incidence.setAipId(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_AIP_ID), null));
+    incidence.setRepresentationId(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID), null));
     incidence.setFilePath(objectToListString(doc.get(RodaConstants.RISK_INCIDENCE_FILE_PATH)));
-    incidence.setFileId(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_FILE_ID)));
-    incidence.setObjectClass(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_OBJECT_CLASS)));
-    incidence.setRiskId(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_RISK_ID)));
-    incidence.setDescription(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_DESCRIPTION)));
+    incidence.setFileId(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_FILE_ID), null));
+    incidence.setObjectClass(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_OBJECT_CLASS), null));
+    incidence.setRiskId(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_RISK_ID), null));
+    incidence.setDescription(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_DESCRIPTION), null));
     incidence
-      .setStatus(RiskIncidence.INCIDENCE_STATUS.valueOf(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_STATUS))));
-    incidence.setSeverity(Risk.SEVERITY_LEVEL.valueOf(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_SEVERITY))));
+      .setStatus(RiskIncidence.INCIDENCE_STATUS.valueOf(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_STATUS),
+        RiskIncidence.INCIDENCE_STATUS.UNMITIGATED.toString())));
+    incidence.setSeverity(Risk.SEVERITY_LEVEL
+      .valueOf(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_SEVERITY), Risk.SEVERITY_LEVEL.HIGH.toString())));
     incidence.setDetectedOn(objectToDate(doc.get(RodaConstants.RISK_INCIDENCE_DETECTED_ON)));
-    incidence.setDetectedBy(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_DETECTED_BY)));
+    incidence.setDetectedBy(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_DETECTED_BY), null));
     incidence.setMitigatedOn(objectToDate(doc.get(RodaConstants.RISK_INCIDENCE_MITIGATED_ON)));
-    incidence.setMitigatedBy(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_MITIGATED_BY)));
-    incidence.setMitigatedDescription(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_MITIGATED_DESCRIPTION)));
+    incidence.setMitigatedBy(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_MITIGATED_BY), null));
+    incidence
+      .setMitigatedDescription(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_MITIGATED_DESCRIPTION), null));
     return incidence;
   }
 

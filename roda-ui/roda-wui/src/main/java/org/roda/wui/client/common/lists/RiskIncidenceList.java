@@ -88,7 +88,7 @@ public class RiskIncidenceList extends BasicAsyncTableCell<RiskIncidence> {
 
       @Override
       public String getValue(RiskIncidence incidence) {
-        return incidence.getRiskId().replace("[", "").replace("]", "");
+        return incidence.getRiskId();
       }
     };
 
