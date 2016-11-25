@@ -34,7 +34,7 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
 
   @Override
   public String getName() {
-    return "Configurable ingest workflow";
+    return "Default ingest workflow";
   }
 
   @Override

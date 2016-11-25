@@ -41,6 +41,7 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.select.SelectedItemsAll;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.index.sublist.Sublist;
@@ -54,6 +55,7 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.plugins.base.FixAncestorsPlugin;
+import org.roda.core.plugins.plugins.base.reindex.ReindexAIPPlugin;
 import org.roda.core.plugins.plugins.ingest.EARKSIPToAIPPlugin;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
@@ -228,10 +230,20 @@ public class EARKSIPPluginsTest {
       SelectedItemsList.create(TransferredResource.class, transferredResourcesIDs));
     index.commitAIPs();
 
-    TestsHelper.executeJob(FixAncestorsPlugin.class, parameters, PluginType.MISC, new SelectedItemsNone<>());
+    Map<String, String> fixAncestorsParameters = new HashMap<>();
+    fixAncestorsParameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
+    fixAncestorsParameters.put(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID, job.getId());
+    TestsHelper.executeJob(FixAncestorsPlugin.class, fixAncestorsParameters, PluginType.MISC,
+      new SelectedItemsNone<>());
 
     TestsHelper.getJobReports(index, job, true);
 
+    index.commitAIPs();
+
+    // FIXME 20161202 hsilva: somehow a reindex is needed for getting ancestors
+    // correctly calculated
+    TestsHelper.executeJob(ReindexAIPPlugin.class, fixAncestorsParameters, PluginType.MISC,
+      SelectedItemsAll.create(AIP.class));
     index.commitAIPs();
 
     IndexResult<IndexedAIP> findAllAIP = index.find(IndexedAIP.class, Filter.ALL, null, new Sublist(0, 12));

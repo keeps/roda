@@ -21,6 +21,7 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.roda.core.common.MetadataFileUtils;
@@ -97,10 +98,11 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<TransferredResource> list)
     throws PluginException {
     Report report = PluginHelper.initPluginReport(this);
-    String parentId = PluginHelper.computeParentId(this, index, null);
 
     try {
       String username = PluginHelper.getJobUsername(this, index);
+      String jobId = PluginHelper.getJobId(this);
+      Optional<String> computedSearchScope = PluginHelper.getSearchScopeFromParameters(this, model);
 
       for (TransferredResource transferredResource : list) {
         Report reportItem = PluginHelper.initPluginReportItem(this, transferredResource);
@@ -113,16 +115,18 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
 
           String jobUsername = PluginHelper.getJobUsername(this, index);
           Permissions permissions = new Permissions();
-          permissions.setUserPermissions(jobUsername,
-            new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
-              Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE, Permissions.PermissionType.GRANT)));
+          permissions
+            .setUserPermissions(jobUsername,
+              new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
+                Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE,
+                Permissions.PermissionType.GRANT)));
 
           boolean notifyCreatedAIP = false;
 
           String aipType = RodaConstants.AIP_TYPE_MIXED;
 
-          final AIP aip = model.createAIP(state, parentId, aipType, permissions,
-            Arrays.asList(transferredResource.getName()), reportItem.getJobId(), notifyCreatedAIP, username);
+          final AIP aip = model.createAIP(state, computedSearchScope.orElse(null), aipType, permissions,
+            Arrays.asList(transferredResource.getName()), jobId, notifyCreatedAIP, username);
 
           PluginHelper.createSubmission(model, createSubmission, transferredResourcePath, aip.getId());
 

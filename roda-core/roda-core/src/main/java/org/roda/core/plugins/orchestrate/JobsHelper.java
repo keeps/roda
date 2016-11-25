@@ -381,6 +381,7 @@ public final class JobsHelper {
         index.commit(IndexedAIP.class);
         // find all AIPs that should be removed
         Filter filter = new Filter();
+        // FIXME 20161128 hsilva: perhaps we should avoid ghosts???
         filter.add(new SimpleFilterParameter(RodaConstants.INGEST_JOB_ID, job.getId()));
         filter.add(new OneOfManyFilterParameter(RodaConstants.AIP_STATE,
           Arrays.asList(AIPState.CREATED.toString(), AIPState.INGEST_PROCESSING.toString())));

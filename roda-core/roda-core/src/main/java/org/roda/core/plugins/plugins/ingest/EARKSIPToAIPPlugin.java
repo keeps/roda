@@ -10,14 +10,12 @@ package org.roda.core.plugins.plugins.ingest;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -36,7 +34,6 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.validation.ValidationException;
@@ -77,7 +74,8 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
 
   @Override
   public String getDescription() {
-    return "E-ARK SIP as a zip file";
+    // return "E-ARK SIP as a zip file (with support for Update SIPs).";
+    return "E-ARK SIP as a zip file.";
   }
 
   @Override
@@ -106,8 +104,9 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
     throws PluginException {
     Report report = PluginHelper.initPluginReport(this);
     String jobId = PluginHelper.getJobId(this);
-    String parentIdFromParameters = PluginHelper.getParentIdFromParameters(this);
+    Optional<String> computedSearchScope = PluginHelper.getSearchScopeFromParameters(this, model);
     Path jobWorkingDirectory = PluginHelper.getJobWorkingDirectory(this);
+    boolean forceSearchScope = PluginHelper.getForceParentIdFromParameters(this);
 
     for (TransferredResource transferredResource : list) {
       Report reportItem = PluginHelper.initPluginReportItem(this, transferredResource);
@@ -116,7 +115,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
       LOGGER.debug("Converting {} to AIP", earkSIPPath);
 
       transformTransferredResourceIntoAnAIP(index, model, storage, transferredResource, earkSIPPath, createSubmission,
-        reportItem, jobId, parentIdFromParameters, jobWorkingDirectory);
+        reportItem, jobId, computedSearchScope, forceSearchScope, jobWorkingDirectory);
       report.addReport(reportItem);
 
       PluginHelper.createJobReport(this, model, reportItem);
@@ -127,21 +126,21 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
 
   private void transformTransferredResourceIntoAnAIP(IndexService index, ModelService model, StorageService storage,
     TransferredResource transferredResource, Path earkSIPPath, boolean createSubmission, Report reportItem,
-    String jobId, String parentIdFromParameters, Path jobWorkingDirectory) {
+    String jobId, Optional<String> computedSearchScope, boolean forceSearchScope, Path jobWorkingDirectory) {
     SIP sip = null;
+    AIP aip;
     try {
       sip = EARKSIP.parse(earkSIPPath, jobWorkingDirectory);
 
       reportItem.setSourceObjectOriginalIds(sip.getIds());
 
       if (sip.getValidationReport().isValid()) {
-        String sipParentId = createAncestors(sip, index, model, parentIdFromParameters, jobId);
-        String computedParentId = PluginHelper.computeParentId(this, index, sipParentId);
 
-        AIP aip;
+        Optional<String> parentId = PluginHelper.getComputedParent(model, index, sip.getAncestors(),
+          computedSearchScope, forceSearchScope, jobId);
 
         if (IPEnums.IPStatus.NEW == sip.getStatus()) {
-          aip = processNewSIP(index, model, storage, reportItem, sip, computedParentId);
+          aip = processNewSIP(index, model, storage, reportItem, sip, parentId);
         } else if (IPEnums.IPStatus.UPDATE == sip.getStatus()) {
           aip = processUpdateSIP(index, model, storage, sip);
         } else {
@@ -155,7 +154,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
         reportItem.setOutcomeObjectId(aip.getId()).setPluginState(PluginState.SUCCESS);
 
         if (sip.getAncestors() != null && !sip.getAncestors().isEmpty() && aip.getParentId() == null) {
-          reportItem.setPluginDetails(String.format("Parent with id '%s' not found", sipParentId));
+          reportItem.setPluginDetails(String.format("Parent with id '%s' not found", parentId));
         }
         createWellformedEventSuccess(model, index, transferredResource, aip);
         LOGGER.debug("Done with converting {} to AIP {}", earkSIPPath, aip.getId());
@@ -180,7 +179,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
   }
 
   private AIP processNewSIP(IndexService index, ModelService model, StorageService storage, Report reportItem, SIP sip,
-    String computedParentId) throws NotFoundException, GenericException, RequestNotValidException,
+    Optional<String> computedParentId) throws NotFoundException, GenericException, RequestNotValidException,
     AuthorizationDeniedException, AlreadyExistsException, ValidationException, IOException {
     String jobUsername = PluginHelper.getJobUsername(this, index);
     Permissions fullPermissions = new Permissions();
@@ -207,51 +206,19 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
       // Update the AIP
       aip = EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP.getId(), model, storage, jobUsername);
     } else {
-      // Fail to update since there's no AIP
-      throw new NotFoundException("Unable to find AIP created with SIP ID: " + sip.getId());
-    }
-    return aip;
-  }
-
-  private String createAncestors(SIP sip, IndexService index, ModelService model, String forcedParent, String jobId)
-    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException,
-    AlreadyExistsException, ValidationException {
-    List<String> ancestors = new ArrayList<>(sip.getAncestors());
-    if (ancestors.isEmpty())
-      return null;
-    // Reverse list so that the top ancestors come first
-    Collections.reverse(ancestors);
-    String parent = StringUtils.isBlank(forcedParent) ? null : forcedParent;
-
-    for (String ancestor : ancestors) {
-      try {
-        Filter ancestorFilter = new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_IDS, ancestor));
-        if (!StringUtils.isBlank(forcedParent)) {
-          ancestorFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, forcedParent));
-        }
-        IndexResult<IndexedAIP> result = index.find(IndexedAIP.class, ancestorFilter, Sorter.NONE, new Sublist(0, 1));
-        if (result.getTotalCount() >= 1) {
-          IndexedAIP indexedAIP = result.getResults().get(0);
-          parent = indexedAIP.getId();
-        } else {
-          IndexedAIP aip = index.retrieve(IndexedAIP.class, ancestor);
-          parent = aip.getId();
-        }
-      } catch (NotFoundException e) {
-        Job currentJob = PluginHelper.getJob(this, index);
-        String username = currentJob.getUsername();
-        Permissions permissions = new Permissions();
-
-        permissions.setUserPermissions(username,
-          new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
-            Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE, Permissions.PermissionType.GRANT)));
-        boolean isGhost = true;
-        AIP ghostAIP = model.createAIP(parent, "", permissions, Arrays.asList(ancestor), jobId, true, username,
-          isGhost);
-        parent = ghostAIP.getId();
+      result = index.find(IndexedAIP.class, new Filter(new SimpleFilterParameter(RodaConstants.AIP_ID, sip.getId())),
+        Sorter.NONE, new Sublist(0, 1));
+      if (result.getTotalCount() == 1) {
+        IndexedAIP indexedAIP = result.getResults().get(0);
+        String jobUsername = PluginHelper.getJobUsername(this, index);
+        // Update the AIP
+        aip = EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP.getId(), model, storage, jobUsername);
+      } else {
+        // Fail to update since there's no AIP
+        throw new NotFoundException("Unable to find AIP created with SIP ID: " + sip.getId());
       }
     }
-    return parent;
+    return aip;
   }
 
   @Override

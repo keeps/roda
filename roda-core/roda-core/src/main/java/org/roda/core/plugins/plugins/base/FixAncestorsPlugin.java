@@ -9,12 +9,14 @@ package org.roda.core.plugins.plugins.base;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -22,6 +24,7 @@ import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -35,8 +38,11 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// FIXME 20161202 hsilva: expose params PLUGIN_PARAMS_PARENT_ID & PLUGIN_PARAMS_OTHER_JOB_ID
 public class FixAncestorsPlugin extends AbstractPlugin<Void> {
   private static final Logger LOGGER = LoggerFactory.getLogger(FixAncestorsPlugin.class);
+
+  private String originalJobId;
 
   @Override
   public void init() throws PluginException {
@@ -72,6 +78,15 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
   }
 
   @Override
+  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
+    super.setParameterValues(parameters);
+
+    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID)) {
+      originalJobId = getParameterValues().get(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID);
+    }
+  }
+
+  @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<Void> list)
     throws PluginException {
     try {
@@ -88,9 +103,9 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
       jobPluginInfo.setSourceObjectsCount(counter);
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      // FIXME 20161109 hsilva: there should be a parameter to set jobId or
-      // empty for all
-      PluginHelper.fixParents(this, index, model, Optional.empty());
+      Optional<String> computedSearchScope = PluginHelper.getSearchScopeFromParameters(this, model);
+      Job originalJob = PluginHelper.getJob(originalJobId, model);
+      PluginHelper.fixParents(index, model, Optional.ofNullable(originalJob.getId()), computedSearchScope);
 
       jobPluginInfo.incrementObjectsProcessedWithSuccess(counter);
       jobPluginInfo.finalizeInfo();

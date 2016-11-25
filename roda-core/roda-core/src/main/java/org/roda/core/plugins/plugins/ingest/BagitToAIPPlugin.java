@@ -10,9 +10,12 @@ package org.roda.core.plugins.plugins.ingest;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
@@ -87,6 +90,9 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
 
     try {
       String username = PluginHelper.getJobUsername(this, index);
+      String jobId = PluginHelper.getJobId(this);
+      Optional<String> computedSearchScope = PluginHelper.getSearchScopeFromParameters(this, model);
+      boolean forceSearchScope = PluginHelper.getForceParentIdFromParameters(this);
 
       for (TransferredResource transferredResource : list) {
         Report reportItem = PluginHelper.initPluginReportItem(this, transferredResource);
@@ -98,10 +104,14 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
           Bag bag = bagFactory.createBag(bagitPath.toFile());
           SimpleResult result = bag.verifyPayloadManifests();
           if (result.isSuccess()) {
-            String parentId = PluginHelper.computeParentId(this, index, bag.getBagInfoTxt().get("parent"));
+            String parentIdFromBagit = bag.getBagInfoTxt().get("parent");
+            List<String> ancestors = StringUtils.isNotBlank(parentIdFromBagit) ? Arrays.asList(parentIdFromBagit)
+              : Collections.emptyList();
+            Optional<String> computedParentId = PluginHelper.getComputedParent(model, index, ancestors,
+              computedSearchScope, forceSearchScope, jobId);
 
             AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bag, bagitPath, model, "metadata.xml",
-              Arrays.asList(transferredResource.getName()), reportItem.getJobId(), parentId, username);
+              Arrays.asList(transferredResource.getName()), reportItem.getJobId(), computedParentId, username);
 
             PluginHelper.createSubmission(model, createSubmission, bagitPath, aipCreated.getId());
 
@@ -109,7 +119,7 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
             reportItem.setOutcomeObjectId(aipCreated.getId()).setPluginState(PluginState.SUCCESS);
 
             if (aipCreated.getParentId() == null) {
-              reportItem.setPluginDetails(String.format("Parent with id '%s' not found", parentId));
+              reportItem.setPluginDetails(String.format("Parent with id '%s' not found", computedParentId.get()));
             }
 
             createWellformedEventSuccess(model, index, transferredResource, aipCreated);

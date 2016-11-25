@@ -609,6 +609,7 @@ public final class RodaConstants {
 
   /* Plugins related parameters */
   public static final String PLUGIN_PARAMS_JOB_ID = "job.id";
+  public static final String PLUGIN_PARAMS_OTHER_JOB_ID = "other_job.id";
 
   public static final String PLUGIN_PARAMS_DO_FULLTEXT_EXTRACTION = "parameter.do_fulltext_extraction";
   public static final String PLUGIN_PARAMS_TOTAL_STEPS = "parameter.total_steps";
