@@ -1389,20 +1389,21 @@ public class RodaCoreFactory {
   }
 
   private static void printMainUsage() {
-    // System.err.println("WARNING: if using Apache Solr embedded, the index
-    // related commands");
-    // System.err.println("cannot be run with RODA running (i.e. deployed in
-    // Tomcat for example)");
-    // System.err.println("Syntax:");
-    // System.err.println(
-    // "java -jar x.jar index reindex
-    // aip|job|risk|agent|format|notification|transferred_resources|actionlogs|users_and_groups");
-    // System.err.println("java -jar x.jar index list
-    // users|groups|sips|file");
-    // System.err.println("java -jar x.jar orphans [newParentID]");
-    // System.err.println("java -jar x.jar fixity");
-    // System.err.println("java -jar x.jar antivirus");
-    // System.err.println("java -jar x.jar premisskeleton");
+    System.err.println("WARNING: if using Apache Solr embedded, the index related commands");
+    System.err.println("cannot be run while RODA is running (i.e. deployed in Tomcat for example).");
+    System.err.println("Stop RODA before running index commands.");
+    System.err.println();
+    System.err.println("Usage: java -jar roda-core.jar command [arguments]");
+    System.err.println("Available commands:");
+    System.err.println("\tindex");
+    System.err
+      .println("\t\treindex aip|job|risk|agent|format|notification|transferred_resources|actionlogs|users_and_groups");
+    System.err.println("\t\tlist users|groups|sips|file");
+    System.err.println("\torphans [newParentID]");
+    System.err.println("\tfixity");
+    System.err.println("\tantivirus");
+    System.err.println("\tpremisskeleton");
+    System.err.println("\treset admin");
   }
 
   private static void printResetUsage() {
