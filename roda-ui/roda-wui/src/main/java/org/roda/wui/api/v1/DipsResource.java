@@ -31,6 +31,7 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPs;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
@@ -73,10 +74,10 @@ public class DipsResource {
     // delegate action to controller
     boolean justActive = false;
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
-    IndexResult<DIP> result = Browser.find(DIP.class, Filter.NULL, Sorter.NONE,
+    IndexResult<IndexedDIP> result = Browser.find(IndexedDIP.class, Filter.NULL, Sorter.NONE,
       new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, user, justActive);
 
-    return Response.ok(ApiUtils.indexedResultToRODAObjectList(DIP.class, result), mediaType).build();
+    return Response.ok(ApiUtils.indexedResultToRODAObjectList(IndexedDIP.class, result), mediaType).build();
   }
 
   @GET
@@ -96,7 +97,7 @@ public class DipsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    DIP dip = Browser.retrieve(user, DIP.class, dipId);
+    DIP dip = Browser.retrieve(user, IndexedDIP.class, dipId);
     return Response.ok(dip, mediaType).build();
   }
 

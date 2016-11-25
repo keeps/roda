@@ -122,7 +122,6 @@ public class AvconvConvertPlugin<T extends IsRODAObject> extends CommandConvertP
   @Override
   public String executePlugin(Path inputPath, Path outputPath, String fileFormat)
     throws UnsupportedOperationException, IOException, CommandException {
-
     return AvconvConvertPluginUtils.executeAvconv(inputPath, outputPath, super.getCommandArguments(),
       getOutputArguments());
   }
@@ -164,13 +163,4 @@ public class AvconvConvertPlugin<T extends IsRODAObject> extends CommandConvertP
     return null;
   }
 
-  @Override
-  public String getDIPTitle() {
-    return "Avconv DIP title";
-  }
-
-  @Override
-  public String getDIPDescription() {
-    return "Avconv DIP description";
-  }
 }

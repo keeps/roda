@@ -16,6 +16,7 @@ import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
@@ -86,7 +87,7 @@ public class ListFactory {
       return new LogEntryList(filter, null, title, selectable, pageSize, incrementPage);
     } else if (actualClass.equals(RODAMember.class.getName())) {
       return new RodaMemberList(filter, null, title, selectable, pageSize, incrementPage);
-    } else if (actualClass.equals(DIP.class.getName())) {
+    } else if (actualClass.equals(DIP.class.getName()) || actualClass.equals(IndexedDIP.class.getName())) {
       return new DIPList(filter, null, title, selectable, pageSize, incrementPage);
     } else if (actualClass.equals(DIPFile.class.getName())) {
       return new DIPFileList(filter, null, title, selectable, pageSize, incrementPage);

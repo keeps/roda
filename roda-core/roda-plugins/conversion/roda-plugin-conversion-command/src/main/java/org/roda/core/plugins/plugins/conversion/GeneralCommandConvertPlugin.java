@@ -97,14 +97,4 @@ public class GeneralCommandConvertPlugin<T extends IsRODAObject> extends Command
       RodaConstants.PLUGIN_CATEGORY_DISSEMINATION);
   }
 
-  @Override
-  public String getDIPTitle() {
-    return "Command DIP title";
-  }
-
-  @Override
-  public String getDIPDescription() {
-    return "Command DIP description";
-  }
-
 }

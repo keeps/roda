@@ -36,6 +36,7 @@ import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
@@ -852,6 +853,8 @@ public final class ModelUtils {
       return (Class<T>) File.class;
     } else if (IndexedRisk.class.equals(inputClass)) {
       return (Class<T>) Risk.class;
+    } else if (IndexedDIP.class.equals(inputClass)) {
+      return (Class<T>) DIP.class;
     } else {
       return inputClass;
     }

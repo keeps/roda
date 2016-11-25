@@ -8,22 +8,22 @@
 package org.roda.core.data.v2.ip;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.roda.core.data.v2.IsModelObject;
-import org.roda.core.data.v2.index.IsIndexed;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @XmlRootElement(name = "dip")
-public class DIP implements IsModelObject, IsIndexed {
+public class DIP implements IsModelObject {
 
   private static final long serialVersionUID = -7335470043357396783L;
   public static int VERSION = 1;
@@ -31,13 +31,13 @@ public class DIP implements IsModelObject, IsIndexed {
   private String id;
   private String title;
   private String description;
+  private String type;
 
   private Date dateCreated;
   private Date lastModified;
   private Boolean isPermanent;
 
-  private String openExternalURL;
-  private String deleteExternalURL;
+  private Map<String, String> properties;
 
   private List<AIPLink> aipIds;
   private List<RepresentationLink> representationIds;
@@ -51,8 +51,8 @@ public class DIP implements IsModelObject, IsIndexed {
     this.id = UUID.randomUUID().toString();
     this.title = "";
     this.description = "";
-    this.openExternalURL = "";
-    this.deleteExternalURL = "";
+    this.type = "";
+    this.properties = new HashMap<String, String>();
     this.dateCreated = new Date();
     this.lastModified = new Date();
     this.aipIds = new ArrayList<AIPLink>();
@@ -61,24 +61,24 @@ public class DIP implements IsModelObject, IsIndexed {
   }
 
   public DIP(DIP other) {
-    this(other.getId(), other.getTitle(), other.getDescription(), other.getDateCreated(), other.getLastModified(),
-      other.getIsPermanent(), other.getOpenExternalURL(), other.getDeleteExternalURL(), other.getAipIds(),
+    this(other.getId(), other.getTitle(), other.getDescription(), other.getType(), other.getDateCreated(),
+      other.getLastModified(), other.getIsPermanent(), other.getProperties(), other.getAipIds(),
       other.getRepresentationIds(), other.getFileIds(), other.getPermissions());
   }
 
-  public DIP(String id, String title, String description, Date dateCreated, Date lastModified, Boolean isPermanent,
-    String openExternalURL, String deleteExternalURL, List<AIPLink> aipIds, List<RepresentationLink> representationIds,
-    List<FileLink> fileIds, Permissions permissions) {
+  public DIP(String id, String title, String description, String type, Date dateCreated, Date lastModified,
+    Boolean isPermanent, Map<String, String> properties, List<AIPLink> aipIds,
+    List<RepresentationLink> representationIds, List<FileLink> fileIds, Permissions permissions) {
     super();
 
     this.id = id;
     this.title = title;
     this.description = description;
+    this.type = type;
     this.dateCreated = dateCreated;
     this.lastModified = lastModified;
     this.isPermanent = isPermanent;
-    this.openExternalURL = openExternalURL;
-    this.deleteExternalURL = deleteExternalURL;
+    this.properties = properties;
     this.aipIds = aipIds;
     this.representationIds = representationIds;
     this.fileIds = fileIds;
@@ -95,12 +95,6 @@ public class DIP implements IsModelObject, IsIndexed {
 
   @JsonIgnore
   @Override
-  public String getUUID() {
-    return getId();
-  }
-
-  @JsonIgnore
-  @Override
   public int getClassVersion() {
     return VERSION;
   }
@@ -111,6 +105,14 @@ public class DIP implements IsModelObject, IsIndexed {
 
   public void setTitle(String title) {
     this.title = title;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
   }
 
   public Date getDateCreated() {
@@ -145,20 +147,12 @@ public class DIP implements IsModelObject, IsIndexed {
     this.isPermanent = isPermanent;
   }
 
-  public String getOpenExternalURL() {
-    return openExternalURL;
+  public Map<String, String> getProperties() {
+    return properties;
   }
 
-  public void setOpenExternalURL(String openExternalURL) {
-    this.openExternalURL = openExternalURL;
-  }
-
-  public String getDeleteExternalURL() {
-    return deleteExternalURL;
-  }
-
-  public void setDeleteExternalURL(String deleteExternalURL) {
-    this.deleteExternalURL = deleteExternalURL;
+  public void setProperties(Map<String, String> properties) {
+    this.properties = properties;
   }
 
   public List<AIPLink> getAipIds() {
@@ -229,9 +223,7 @@ public class DIP implements IsModelObject, IsIndexed {
       return false;
     if (isPermanent != null ? !isPermanent.equals(that.isPermanent) : that.isPermanent != null)
       return false;
-    if (openExternalURL != null ? !openExternalURL.equals(that.openExternalURL) : that.openExternalURL != null)
-      return false;
-    if (deleteExternalURL != null ? !deleteExternalURL.equals(that.deleteExternalURL) : that.deleteExternalURL != null)
+    if (properties != null ? !properties.equals(that.properties) : that.properties != null)
       return false;
     if (permissions != null ? !permissions.equals(that.permissions) : that.permissions != null)
       return false;
@@ -247,11 +239,11 @@ public class DIP implements IsModelObject, IsIndexed {
     int result = id != null ? id.hashCode() : 0;
     result = 31 * result + (title != null ? title.hashCode() : 0);
     result = 31 * result + (description != null ? description.hashCode() : 0);
+    result = 31 * result + (type != null ? type.hashCode() : 0);
     result = 31 * result + (dateCreated != null ? dateCreated.hashCode() : 0);
     result = 31 * result + (lastModified != null ? lastModified.hashCode() : 0);
     result = 31 * result + (isPermanent != null ? isPermanent.hashCode() : 0);
-    result = 31 * result + (openExternalURL != null ? openExternalURL.hashCode() : 0);
-    result = 31 * result + (deleteExternalURL != null ? deleteExternalURL.hashCode() : 0);
+    result = 31 * result + (properties != null ? properties.hashCode() : 0);
     result = 31 * result + (aipIds != null ? aipIds.hashCode() : 0);
     result = 31 * result + (representationIds != null ? representationIds.hashCode() : 0);
     result = 31 * result + (fileIds != null ? fileIds.hashCode() : 0);
@@ -261,22 +253,10 @@ public class DIP implements IsModelObject, IsIndexed {
 
   @Override
   public String toString() {
-    return "DIP [id=" + id + ", title=" + title + ", description=" + description + ", dateCreated=" + dateCreated
-      + ", lastModified=" + lastModified + ", isPermanent=" + isPermanent + ", openExternalURL=" + openExternalURL
-      + ", deleteExternalURL=" + deleteExternalURL + ", aipIds=" + aipIds + ", representationIds=" + representationIds
-      + ", fileIds=" + fileIds + ", permissions=" + permissions + "]";
-  }
-
-  @Override
-  public List<String> toCsvHeaders() {
-    return Arrays.asList("id", "title", "description", "dateCreated", "lastModified", "isPermanent", "openExternalURL",
-      "deleteExternalURL", "aipIds", "representationIds", "fileIds", "permissions");
-  }
-
-  @Override
-  public List<Object> toCsvValues() {
-    return Arrays.asList(id, title, description, dateCreated, lastModified, isPermanent, openExternalURL,
-      deleteExternalURL, aipIds, representationIds, fileIds, permissions);
+    return "DIP [id=" + id + ", title=" + title + ", description=" + description + ", type=" + type + ", dateCreated="
+      + dateCreated + ", lastModified=" + lastModified + ", isPermanent=" + isPermanent + ", properties=" + properties
+      + ", aipIds=" + aipIds + ", representationIds=" + representationIds + ", fileIds=" + fileIds + ", permissions="
+      + permissions + "]";
   }
 
 }

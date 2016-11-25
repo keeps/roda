@@ -78,6 +78,8 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
   private boolean ignoreFiles = true;
   private boolean createDIP = false;
   private boolean hasPartialSuccessOnOutcome = false;
+  private String dipTitle = "";
+  private String dipDescription = "";
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
@@ -97,9 +99,19 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
         "Do not process files that have a different format from the indicated."));
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP, new PluginParameter(
-      RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP, "Convert to a DIP", PluginParameterType.BOOLEAN, "true", false,
-      false,
-      "If this is selected then the plugin will convert the files to a new DIP. If not, a new representation will be created."));
+      RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP, "Create dissemination", PluginParameterType.BOOLEAN, "true",
+      false, false,
+      "If this is selected then the plugin will convert the files and create a new dissemination. If not, a new representation will be created."));
+
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_TITLE,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_TITLE, "Dissemination title",
+        PluginParameterType.STRING, "Dissemination title", false, false,
+        "If the 'create dissemination' option is checked, then this will be the respective dissemination title."));
+
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION, new PluginParameter(
+      RodaConstants.PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION, "Dissemination description", PluginParameterType.STRING,
+      "Dissemination description", false, false,
+      "If the 'create dissemination' option is checked, then this will be the respective dissemination description."));
   }
 
   protected AbstractConvertPlugin() {
@@ -160,6 +172,8 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_TITLE));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION));
     return parameters;
   }
 
@@ -183,6 +197,14 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP)) {
       createDIP = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP));
+    }
+
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_TITLE)) {
+      dipTitle = parameters.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_TITLE);
+    }
+
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION)) {
+      dipDescription = parameters.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION);
     }
 
     hasPartialSuccessOnOutcome = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("core", "tools",
@@ -274,47 +296,42 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                       Path pluginResult = Files.createTempFile("converted", "." + getOutputFormat());
                       String result = executePlugin(directAccess.getPath(), pluginResult, fileFormat);
 
+                      String newFileId = file.getId().replaceFirst("[.][^.]+$", "." + outputFormat);
                       ContentPayload payload = new FSPathContentPayload(pluginResult);
 
-                      // create a new representation if it does not exist
-                      if (!newRepresentations.contains(newRepresentationID)) {
-                        LOGGER.debug("Creating a new representation {} on AIP {}", newRepresentationID, aip.getId());
-                        boolean original = false;
-                        newRepresentations.add(newRepresentationID);
-                        // TODO the concrete plugin should define the
-                        // representation type
-                        if (createDIP) {
-                          FileLink fileLink = new FileLink(file.getAipId(), file.getRepresentationId(), file.getPath(),
-                            file.getId());
-                          List<FileLink> links = new ArrayList<>();
-                          links.add(fileLink);
-
-                          DIP dip = new DIP();
-                          dip.setFileIds(links);
-                          dip.setPermissions(aip.getPermissions());
-                          dip.setTitle(getDIPTitle());
-                          dip.setDescription(getDIPDescription());
-                          dip = model.createDIP(dip, false);
-                          newRepresentationID = dip.getId();
-                        } else {
-                          String newRepresentationType = representation.getType();
-                          model.createRepresentation(aip.getId(), newRepresentationID, original, newRepresentationType,
-                            notify);
-                          reportItem.setOutcomeObjectId(
-                            IdUtils.getRepresentationId(representation.getAipId(), newRepresentationID));
-                        }
-                      }
-
-                      String newFileId = file.getId().replaceFirst("[.][^.]+$", "." + outputFormat);
                       if (createDIP) {
+                        FileLink fileLink = new FileLink(file.getAipId(), file.getRepresentationId(), file.getPath(),
+                          file.getId());
+                        List<FileLink> links = new ArrayList<>();
+                        links.add(fileLink);
+
+                        DIP dip = new DIP();
+                        dip.setFileIds(links);
+                        dip.setPermissions(aip.getPermissions());
+                        dip.setTitle(dipTitle);
+                        dip.setDescription(dipDescription);
+                        dip.setType(RodaConstants.DIP_TYPE_CONVERSION);
+                        dip = model.createDIP(dip, true);
+                        newRepresentationID = dip.getId();
+
                         DIPFile f = model.createDIPFile(newRepresentationID, file.getPath(), newFileId,
                           directAccess.getPath().toFile().length(), payload, notify);
                         newDIPFiles.add(f);
-                      } else {
+                      } else if (!newRepresentations.contains(newRepresentationID)) {
+                        // create a new representation if it does not exist
+                        LOGGER.debug("Creating a new representation {} on AIP {}", newRepresentationID, aip.getId());
+                        boolean original = false;
+                        newRepresentations.add(newRepresentationID);
+                        String newRepresentationType = representation.getType();
+                        model.createRepresentation(aip.getId(), newRepresentationID, original, newRepresentationType,
+                          notify);
+                        reportItem.setOutcomeObjectId(
+                          IdUtils.getRepresentationId(representation.getAipId(), newRepresentationID));
                         File f = model.createFile(aip.getId(), newRepresentationID, file.getPath(), newFileId, payload,
                           notify);
                         newFiles.add(f);
                       }
+
                       alteredFiles.add(file);
                       IOUtils.closeQuietly(directAccess);
 
@@ -364,12 +381,8 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
             }
 
             // add unchanged files to the new representation if created
-            if (!alteredFiles.isEmpty()) {
-              if (createDIP) {
-                createNewFilesOnDIP(storage, model, unchangedFiles, newRepresentationID, notify);
-              } else {
-                createNewFilesOnRepresentation(storage, model, unchangedFiles, newRepresentationID, notify);
-              }
+            if (!alteredFiles.isEmpty() && !createDIP) {
+              createNewFilesOnRepresentation(storage, model, unchangedFiles, newRepresentationID, notify);
             }
 
           } catch (RuntimeException | NotFoundException | GenericException | RequestNotValidException
@@ -409,7 +422,9 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException e) {
+    } catch (
+
+    JobException e) {
       throw new PluginException("A job exception has occurred", e);
     }
 
@@ -499,8 +514,9 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                         DIP dip = new DIP();
                         dip.setFileIds(links);
                         dip.setPermissions(aip.getPermissions());
-                        dip.setTitle(getDIPTitle());
-                        dip.setDescription(getDIPDescription());
+                        dip.setTitle(dipTitle);
+                        dip.setDescription(dipDescription);
+                        dip.setType(RodaConstants.DIP_TYPE_CONVERSION);
                         dip = model.createDIP(dip, false);
                         newRepresentationID = dip.getId();
                       } else {
@@ -696,8 +712,9 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                   DIP dip = new DIP();
                   dip.setFileIds(links);
                   dip.setPermissions(aip.getPermissions());
-                  dip.setTitle(getDIPTitle());
-                  dip.setDescription(getDIPDescription());
+                  dip.setTitle(dipTitle);
+                  dip.setDescription(dipDescription);
+                  dip.setType(RodaConstants.DIP_TYPE_CONVERSION);
                   dip = model.createDIP(dip, false);
                   newRepresentationID = dip.getId();
                 } else {
@@ -921,10 +938,6 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
   public String getPreservationEventFailureMessage() {
     return "File conversion failed.";
   }
-
-  public abstract String getDIPTitle();
-
-  public abstract String getDIPDescription();
 
   @Override
   public List<Class<T>> getObjectClasses() {

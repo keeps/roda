@@ -107,14 +107,4 @@ public class ImageMagickConvertPlugin<T extends IsRODAObject> extends CommandCon
     return null;
   }
 
-  @Override
-  public String getDIPTitle() {
-    return "Imagemagick DIP title";
-  }
-
-  @Override
-  public String getDIPDescription() {
-    return "Imagemagick DIP description";
-  }
-
 }

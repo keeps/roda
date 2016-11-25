@@ -161,14 +161,4 @@ public class PdfToPdfaPlugin<T extends IsRODAObject> extends AbstractConvertPlug
     return null;
   }
 
-  @Override
-  public String getDIPTitle() {
-    return "PdfToPdfa DIP title";
-  }
-
-  @Override
-  public String getDIPDescription() {
-    return "PdfToPdfa DIP description";
-  }
-
 }

@@ -43,6 +43,7 @@ import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
@@ -243,7 +244,6 @@ public class IndexModelObserver implements ModelObserver {
   private Long indexFile(AIP aip, File file, List<String> ancestors, boolean recursive) {
 
     Long sizeInBytes = 0L;
-
     SolrInputDocument fileDocument = SolrUtils.fileToSolrDocument(aip, file, ancestors);
 
     // Add information from PREMIS
@@ -1021,7 +1021,12 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   public void dipCreated(DIP dip, boolean commit) {
-    addDocumentToIndex(DIP.class, dip);
+    SolrInputDocument dipDocument = SolrUtils.dipToSolrDocument(dip);
+    try {
+      index.add(RodaConstants.INDEX_DIP, dipDocument);
+    } catch (SolrServerException | IOException e) {
+      LOGGER.error("Could not index DIP");
+    }
 
     // index DIP Files
     try {
@@ -1042,7 +1047,7 @@ public class IndexModelObserver implements ModelObserver {
 
     if (commit) {
       try {
-        SolrUtils.commit(index, DIP.class);
+        SolrUtils.commit(index, IndexedDIP.class);
         SolrUtils.commit(index, DIPFile.class);
       } catch (GenericException e) {
         LOGGER.warn("Commit did not run as expected");
@@ -1056,12 +1061,12 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   public void dipDeleted(String dipId, boolean commit) {
-    deleteDocumentFromIndex(DIP.class, dipId);
+    deleteDocumentFromIndex(IndexedDIP.class, dipId);
     deleteDocumentsFromIndex(DIPFile.class, RodaConstants.DIP_FILE_DIP_ID, dipId);
 
     if (commit) {
       try {
-        SolrUtils.commit(index, DIP.class);
+        SolrUtils.commit(index, IndexedDIP.class);
         SolrUtils.commit(index, DIPFile.class);
       } catch (GenericException e) {
         LOGGER.warn("Commit did not run as expected");

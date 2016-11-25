@@ -34,8 +34,10 @@ import org.reflections.Reflections;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
@@ -380,6 +382,11 @@ public class PluginManager {
       objectClasses.add(IndexedRisk.class);
     } else if (objectClasses.contains(IndexedRisk.class)) {
       objectClasses.add(Risk.class);
+    }
+    if (objectClasses.contains(DIP.class)) {
+      objectClasses.add(IndexedDIP.class);
+    } else if (objectClasses.contains(IndexedDIP.class)) {
+      objectClasses.add(DIP.class);
     }
     pluginObjectClasses.put(plugin.getClass().getName(), objectClasses);
 

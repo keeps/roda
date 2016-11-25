@@ -103,14 +103,4 @@ public class UnoconvConvertPlugin<T extends IsRODAObject> extends CommandConvert
     return null;
   }
 
-  @Override
-  public String getDIPTitle() {
-    return "Unoconv DIP title";
-  }
-
-  @Override
-  public String getDIPDescription() {
-    return "Unoconv DIP description";
-  }
-
 }

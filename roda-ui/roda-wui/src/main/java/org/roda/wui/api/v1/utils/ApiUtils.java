@@ -25,7 +25,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import javax.xml.transform.TransformerException;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ConsumesOutputStream;
@@ -49,6 +48,7 @@ import org.roda.core.data.v2.ip.AIPs;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representations;
@@ -64,7 +64,6 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Directory;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
-import org.roda.wui.common.server.RodaStreamingOutput;
 
 /**
  * API Utils
@@ -162,11 +161,11 @@ public class ApiUtils {
   public static Response okResponse(StreamResponse streamResponse, CacheControl cacheControl, Date lastModifiedDate,
     boolean inline) {
     StreamingOutput so = new StreamingOutput() {
-      
+
       @Override
       public void write(OutputStream output) throws IOException, WebApplicationException {
         streamResponse.getStream().consumeOutputStream(output);
-        
+
       }
     };
     return Response.ok(so, streamResponse.getMediaType())
@@ -182,11 +181,11 @@ public class ApiUtils {
   public static Response okResponse(StreamResponse streamResponse, CacheControl cacheControl, EntityTag tag,
     boolean inline) {
     StreamingOutput so = new StreamingOutput() {
-      
+
       @Override
       public void write(OutputStream output) throws IOException, WebApplicationException {
         streamResponse.getStream().consumeOutputStream(output);
-        
+
       }
     };
     return Response.ok(so, streamResponse.getMediaType())
@@ -201,11 +200,11 @@ public class ApiUtils {
 
   public static Response okResponse(StreamResponse streamResponse, boolean inline) {
     StreamingOutput so = new StreamingOutput() {
-      
+
       @Override
       public void write(OutputStream output) throws IOException, WebApplicationException {
         streamResponse.getStream().consumeOutputStream(output);
-        
+
       }
     };
     return Response.ok(so, streamResponse.getMediaType())
@@ -287,8 +286,13 @@ public class ApiUtils {
       ret = new org.roda.core.data.v2.risks.RiskIncidences((List<RiskIncidence>) result.getResults());
     } else if (objectClass.equals(RODAMember.class)) {
       ret = new org.roda.core.data.v2.user.RODAMembers((List<RODAMember>) result.getResults());
-    } else if (objectClass.equals(DIP.class)) {
-      ret = new org.roda.core.data.v2.ip.DIPs((List<DIP>) result.getResults());
+    } else if (objectClass.equals(IndexedDIP.class)) {
+      List<DIP> dips = new ArrayList<DIP>();
+      for (T res : result.getResults()) {
+        IndexedDIP idip = (IndexedDIP) res;
+        dips.add(idip);
+      }
+      ret = new org.roda.core.data.v2.ip.DIPs(dips);
     } else if (objectClass.equals(DIPFile.class)) {
       ret = new org.roda.core.data.v2.ip.DIPFiles((List<DIPFile>) result.getResults());
     } else {

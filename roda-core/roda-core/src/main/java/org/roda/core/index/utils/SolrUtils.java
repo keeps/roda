@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -53,6 +54,7 @@ import org.roda.core.common.IdUtils;
 import org.roda.core.common.MetadataFileUtils;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.RodaUtils;
+import org.roda.core.common.dips.DIPUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.DateGranularity;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -94,6 +96,7 @@ import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.FileLink;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
@@ -294,8 +297,8 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToNotification(doc));
     } else if (resultClass.equals(RiskIncidence.class)) {
       ret = resultClass.cast(solrDocumentToRiskIncidence(doc));
-    } else if (resultClass.equals(DIP.class)) {
-      ret = resultClass.cast(solrDocumentToDIP(doc));
+    } else if (resultClass.equals(DIP.class) || resultClass.equals(IndexedDIP.class)) {
+      ret = resultClass.cast(solrDocumentToIndexedDIP(doc));
     } else if (resultClass.equals(DIPFile.class)) {
       ret = resultClass.cast(solrDocumentToDIPFile(doc));
     } else if (resultClass.equals(IndexedFile.class)) {
@@ -337,7 +340,7 @@ public class SolrUtils {
       ret = notificationToSolrDocument((Notification) object);
     } else if (resultClass.equals(RiskIncidence.class)) {
       ret = riskIncidenceToSolrDocument((RiskIncidence) object);
-    } else if (resultClass.equals(DIP.class)) {
+    } else if (resultClass.equals(DIP.class) || resultClass.equals(IndexedDIP.class)) {
       ret = dipToSolrDocument((DIP) object);
     } else if (resultClass.equals(DIPFile.class)) {
       ret = dipFileToSolrDocument((DIPFile) object);
@@ -394,7 +397,7 @@ public class SolrUtils {
       indexNames.add(RodaConstants.INDEX_NOTIFICATION);
     } else if (resultClass.equals(RiskIncidence.class)) {
       indexNames.add(RodaConstants.INDEX_RISK_INCIDENCE);
-    } else if (resultClass.equals(DIP.class)) {
+    } else if (resultClass.equals(DIP.class) || resultClass.equals(IndexedDIP.class)) {
       indexNames.add(RodaConstants.INDEX_DIP);
       indexNames.add(RodaConstants.INDEX_DIP_FILE);
     } else if (resultClass.equals(DIPFile.class)) {
@@ -2008,7 +2011,7 @@ public class SolrUtils {
     notification.setAcknowledgeToken(objectToString(doc.get(RodaConstants.NOTIFICATION_ACKNOWLEDGE_TOKEN), null));
     notification.setAcknowledged(objectToBoolean(doc.get(RodaConstants.NOTIFICATION_IS_ACKNOWLEDGED), Boolean.FALSE));
     notification.setAcknowledgedUsers(
-      JsonUtils.getMapFromJson(objectToString(doc.get(RodaConstants.NOTIFICATION_ACKNOWLEDGED_USERS), "")));
+      JsonUtils.getMapFromJson(objectToString(doc.get(RodaConstants.NOTIFICATION_ACKNOWLEDGED_USERS))));
 
     notification.setState(Notification.NOTIFICATION_STATE.valueOf(
       objectToString(doc.get(RodaConstants.NOTIFICATION_STATE), Notification.NOTIFICATION_STATE.COMPLETED.toString())));
@@ -2064,15 +2067,16 @@ public class SolrUtils {
 
   public static SolrInputDocument dipToSolrDocument(DIP dip) {
     SolrInputDocument doc = new SolrInputDocument();
-    doc.addField(RodaConstants.INDEX_UUID, dip.getUUID());
+    doc.addField(RodaConstants.INDEX_UUID, dip.getId());
     doc.addField(RodaConstants.DIP_ID, dip.getId());
     doc.addField(RodaConstants.DIP_TITLE, dip.getTitle());
     doc.addField(RodaConstants.DIP_DESCRIPTION, dip.getDescription());
+    doc.addField(RodaConstants.DIP_TYPE, dip.getType());
     doc.addField(RodaConstants.DIP_DATE_CREATED, dip.getDateCreated());
     doc.addField(RodaConstants.DIP_LAST_MODIFIED, dip.getLastModified());
     doc.addField(RodaConstants.DIP_IS_PERMANENT, dip.getIsPermanent());
-    doc.addField(RodaConstants.DIP_OPEN_EXTERNAL_URL, dip.getOpenExternalURL());
-    doc.addField(RodaConstants.DIP_DELETE_EXTERNAL_URL, dip.getDeleteExternalURL());
+    doc.addField(RodaConstants.DIP_PROPERTIES, JsonUtils.getJsonFromObject(dip.getProperties()));
+
     doc.addField(RodaConstants.DIP_AIP_IDS, JsonUtils.getJsonFromObject(dip.getAipIds()));
     doc.addField(RodaConstants.DIP_REPRESENTATION_IDS, JsonUtils.getJsonFromObject(dip.getRepresentationIds()));
     doc.addField(RodaConstants.DIP_FILE_IDS, JsonUtils.getJsonFromObject(dip.getFileIds()));
@@ -2119,35 +2123,41 @@ public class SolrUtils {
 
     setPermissions(dip.getPermissions(), doc);
 
+    Optional<String> openURL = DIPUtils.getCompleteOpenExternalURL(dip);
+    if (openURL.isPresent()) {
+      doc.addField(RodaConstants.DIP_OPEN_EXTERNAL_URL, openURL.get());
+    }
+
     return doc;
   }
 
-  public static DIP solrDocumentToDIP(SolrDocument doc) {
-    DIP dip = new DIP();
-    dip.setId(objectToString(doc.get(RodaConstants.INDEX_UUID)));
-    dip.setTitle(objectToString(doc.get(RodaConstants.DIP_TITLE)));
-    dip.setDescription(objectToString(doc.get(RodaConstants.DIP_DESCRIPTION)));
+  public static IndexedDIP solrDocumentToIndexedDIP(SolrDocument doc) {
+    IndexedDIP dip = new IndexedDIP();
+    dip.setId(objectToString(doc.get(RodaConstants.INDEX_UUID), null));
+    dip.setTitle(objectToString(doc.get(RodaConstants.DIP_TITLE), null));
+    dip.setDescription(objectToString(doc.get(RodaConstants.DIP_DESCRIPTION), null));
+    dip.setType(objectToString(doc.get(RodaConstants.DIP_TYPE), null));
     dip.setDateCreated(objectToDate(doc.get(RodaConstants.DIP_DATE_CREATED)));
     dip.setLastModified(objectToDate(doc.get(RodaConstants.DIP_LAST_MODIFIED)));
     dip.setIsPermanent(objectToBoolean(doc.get(RodaConstants.DIP_IS_PERMANENT), Boolean.FALSE));
-    dip.setOpenExternalURL(objectToString(doc.get(RodaConstants.DIP_OPEN_EXTERNAL_URL)));
-    dip.setDeleteExternalURL(objectToString(doc.get(RodaConstants.DIP_DELETE_EXTERNAL_URL)));
+    dip.setProperties(JsonUtils.getMapFromJson(objectToString(doc.get(RodaConstants.DIP_PROPERTIES))));
 
     try {
       String aipIds = objectToString(doc.get(RodaConstants.DIP_AIP_IDS));
       dip.setAipIds(JsonUtils.getListFromJson(aipIds == null ? "" : aipIds, AIPLink.class));
 
-      String representationIds = objectToString(doc.get(RodaConstants.DIP_REPRESENTATION_IDS));
+      String representationIds = objectToString(doc.get(RodaConstants.DIP_REPRESENTATION_IDS), null);
       dip.setRepresentationIds(
         JsonUtils.getListFromJson(representationIds == null ? "" : representationIds, RepresentationLink.class));
 
-      String fileIds = objectToString(doc.get(RodaConstants.DIP_FILE_IDS));
+      String fileIds = objectToString(doc.get(RodaConstants.DIP_FILE_IDS), null);
       dip.setFileIds(JsonUtils.getListFromJson(fileIds == null ? "" : fileIds, FileLink.class));
     } catch (GenericException e) {
       LOGGER.error("Error getting related ids from DIP index");
     }
 
     dip.setPermissions(getPermissions(doc));
+    dip.setOpenExternalURL(objectToString(doc.get(RodaConstants.DIP_OPEN_EXTERNAL_URL), null));
     return dip;
   }
 

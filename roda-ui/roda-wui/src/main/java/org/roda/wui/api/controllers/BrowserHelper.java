@@ -88,6 +88,7 @@ import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
@@ -2912,7 +2913,7 @@ public class BrowserHelper {
       index.commit(DIPFile.class);
       return IdUtils.getDIPFileId(newFolder);
     } else {
-      DIP dip = index.retrieve(DIP.class, folderUUID);
+      IndexedDIP dip = index.retrieve(IndexedDIP.class, folderUUID);
       DIPFile newFolder = model.createDIPFile(dip.getId(), null, null, newName, true);
       index.commit(DIPFile.class);
       return IdUtils.getDIPFileId(newFolder);

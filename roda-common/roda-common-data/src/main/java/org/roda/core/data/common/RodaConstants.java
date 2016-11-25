@@ -655,6 +655,8 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_HAS_COMPRESSION = "parameter.has_compression";
   public static final String PLUGIN_PARAMS_HAS_SINGLE_REQUEST = "parameter.has_single_request";
   public static final String PLUGIN_PARAMS_REPRESENTATION_OR_DIP = "parameter.representation_or_dip";
+  public static final String PLUGIN_PARAMS_DISSEMINATION_TITLE = "parameter.dissemination_title";
+  public static final String PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION = "parameter.dissemination_description";
 
   public static final String PLUGIN_CLASS_DIGITAL_SIGNATURE = "org.roda.core.plugins.plugins.validation.DigitalSignaturePlugin";
   public static final String PLUGIN_CLASS_VERAPDF = "org.roda.core.plugins.plugins.validation.VeraPDFPlugin";
@@ -840,11 +842,15 @@ public final class RodaConstants {
   public static final String DIP_ID = "id";
   public static final String DIP_TITLE = "title";
   public static final String DIP_DESCRIPTION = "description";
+  public static final String DIP_TYPE = "type";
   public static final String DIP_DATE_CREATED = "dateCreated";
   public static final String DIP_LAST_MODIFIED = "lastModified";
   public static final String DIP_IS_PERMANENT = "isPermanent";
   public static final String DIP_OPEN_EXTERNAL_URL = "openExternalURL";
   public static final String DIP_DELETE_EXTERNAL_URL = "deleteExternalURL";
+  public static final String DIP_PROPERTIES = "properties";
+  public static final String DIP_PERMISSIONS = "permissions";
+
   public static final String DIP_AIP_IDS = "aipIds";
   public static final String DIP_REPRESENTATION_IDS = "representationIds";
   public static final String DIP_FILE_IDS = "fileIds";
@@ -853,7 +859,6 @@ public final class RodaConstants {
   public static final String DIP_FILE_UUIDS = "fileUUIDs";
   public static final String DIP_ALL_AIP_UUIDS = "allAipUUIDs";
   public static final String DIP_ALL_REPRESENTATION_UUIDS = "allRepresentationUUIDs";
-  public static final String DIP_PERMISSIONS = "permissions";
 
   public static final String DIP_EXTENSION = ".json";
   public static final String DIP_SEARCH = "search";
@@ -1120,6 +1125,11 @@ public final class RodaConstants {
   public final static String HTTP_HEADERS_WWW_AUTHENTICATE = "WWW-Authenticate";
 
   public final static int STATUS_OK = 200;
+
+  /* DIP types */
+
+  public static final String DIP_TYPE_CONVERSION = "conversion";
+  public static final String DIP_TYPE_DIGITAL_SIGNATURE = "digital_signature";
 
   /** Private empty constructor */
   private RodaConstants() {

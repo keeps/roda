@@ -94,15 +94,18 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractP
 
   @Override
   public String getDescription() {
-    return "Creates a new Dissemination Information Package (DIP) for this AIP containing all the files in a given representation and appends a digital signature to each of these files.\nThe digital signature (in PKCS#7 format) is an external file with the same name as the original one but with a .p7s extension.\nDigital signatures are generated based on the digital certificate installed under “/config/certificates/”.";
+    return "Creates a new Dissemination Information Package (DIP) for this AIP containing all the files in a given representation and "
+      + "appends a digital signature to each of these files.\nThe digital signature (in PKCS#7 format) is an external file with the"
+      + " same name as the original one but with a .p7s extension.\nDigital signatures are generated based on the digital certificate "
+      + "installed under “/config/certificates/”.";
   }
 
   public String getDIPTitle() {
-    return "Digital Signature DIP title";
+    return "Digital signed dissemination";
   }
 
   public String getDIPDescription() {
-    return "Digital Signature DIP description";
+    return "Digital signed dissemination of a file, possibly embedded";
   }
 
   @Override
@@ -157,6 +160,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractP
                 dip.setPermissions(aip.getPermissions());
                 dip.setTitle(getDIPTitle());
                 dip.setDescription(getDIPDescription());
+                dip.setType(RodaConstants.DIP_TYPE_DIGITAL_SIGNATURE);
                 dip = model.createDIP(dip, false);
 
                 manageFileSigning(model, index, storage, file, dip.getId());
@@ -235,6 +239,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractP
               dip.setPermissions(aipPermissions);
               dip.setTitle(getDIPTitle());
               dip.setDescription(getDIPDescription());
+              dip.setType(RodaConstants.DIP_TYPE_DIGITAL_SIGNATURE);
               dip = model.createDIP(dip, false);
 
               manageFileSigning(model, index, storage, file, dip.getId());
@@ -288,6 +293,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractP
           dip.setPermissions(aipPermissions);
           dip.setTitle(getDIPTitle());
           dip.setDescription(getDIPDescription());
+          dip.setType(RodaConstants.DIP_TYPE_DIGITAL_SIGNATURE);
           dip = model.createDIP(dip, false);
 
           // FIXME 20160516 hsilva: see how to set initial

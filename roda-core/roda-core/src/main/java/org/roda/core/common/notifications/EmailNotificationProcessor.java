@@ -20,6 +20,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ConfigurableEmailUtility;
+import org.roda.core.common.HandlebarsUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.v2.notifications.Notification;
@@ -28,9 +29,6 @@ import org.roda.core.data.v2.user.User;
 import org.roda.core.model.ModelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.Template;
 
 public class EmailNotificationProcessor implements NotificationProcessor {
   private static final String FROM = "from";
@@ -81,7 +79,7 @@ public class EmailNotificationProcessor implements NotificationProcessor {
       } else {
         scope.put(RECIPIENT, RodaConstants.NOTIFICATION_VARIOUS_RECIPIENT_USERS);
       }
-      processedNotification.setBody(executeHandlebars(template, scope));
+      processedNotification.setBody(HandlebarsUtility.executeHandlebars(template, scope));
       scope.remove(RECIPIENT);
       ConfigurableEmailUtility emailUtility = new ConfigurableEmailUtility(processedNotification.getFromUser(),
         processedNotification.getSubject());
@@ -127,19 +125,7 @@ public class EmailNotificationProcessor implements NotificationProcessor {
       // do nothing
     }
 
-    return executeHandlebars(template, scopes);
-  }
-
-  private String executeHandlebars(String template, Map<String, Object> scopes) {
-    Handlebars handlebars = new Handlebars();
-    String result = "";
-    try {
-      Template templ = handlebars.compileInline(template);
-      result = templ.apply(scopes);
-    } catch (IOException e) {
-      LOGGER.error("Error executing handlebars", e);
-    }
-    return result;
+    return HandlebarsUtility.executeHandlebars(template, scopes);
   }
 
 }

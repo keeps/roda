@@ -50,6 +50,7 @@ import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
@@ -183,12 +184,12 @@ public class DigitalSignatureDIPTest {
       SelectedItemsAll.create(Representation.class));
 
     List<Report> jobReports = TestsHelper.getJobReports(index, job, true);
-    index.commit(DIP.class);
+    index.commit(IndexedDIP.class);
 
     for (Report report : jobReports) {
       if (report.getSourceObjectId().equals(aip.getRepresentations().get(0))) {
         String repUUID = IdUtils.getRepresentationId(rep);
-        IndexResult<DIP> dips = index.find(DIP.class,
+        IndexResult<IndexedDIP> dips = index.find(IndexedDIP.class,
           new Filter(new SimpleFilterParameter(RodaConstants.DIP_REPRESENTATION_UUIDS, repUUID)), Sorter.NONE,
           new Sublist(0, 1));
         DIP dip = dips.getResults().get(0);
