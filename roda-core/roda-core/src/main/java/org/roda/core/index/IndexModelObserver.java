@@ -665,7 +665,6 @@ public class IndexModelObserver implements ModelObserver {
   private void reindexAllMembers() {
     try {
       for (User user : model.listUsers()) {
-        LOGGER.debug("User to be indexed: {}", user);
         userUpdated(user);
       }
     } catch (GenericException e) {
@@ -673,7 +672,6 @@ public class IndexModelObserver implements ModelObserver {
     }
     try {
       for (Group group : model.listGroups()) {
-        LOGGER.debug("Group to be indexed: {}", group);
         deleteDocumentFromIndex(RODAMember.class, group.getId());
         addDocumentToIndex(RODAMember.class, group);
       }

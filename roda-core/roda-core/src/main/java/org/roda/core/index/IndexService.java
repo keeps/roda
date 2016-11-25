@@ -256,7 +256,7 @@ public class IndexService {
   }
 
   public void reindexDIP(DIP dip) {
-    observer.dipCreated(dip, true);
+    observer.dipCreated(dip, false);
   }
 
   public void reindexDIPFile(DIPFile file) {

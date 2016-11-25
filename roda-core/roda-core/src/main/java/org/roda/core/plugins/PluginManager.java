@@ -322,8 +322,8 @@ public class PluginManager {
                     Files.readAttributes(jarFile, BasicFileAttributes.class).lastModifiedTime().toMillis()));
                 }
               }
-            } catch (Exception e) {
-              LOGGER.error("Plugin failed to initialize", e);
+            } catch (Exception | LinkageError e) {
+              LOGGER.error("Plugin failed to initialize: {}", jarFile, e);
             }
           }
         }

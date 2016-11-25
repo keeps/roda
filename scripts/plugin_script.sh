@@ -2,8 +2,11 @@
 
 cd "$(dirname "$0")"
 
-JARS_WITH_DEPENDENCIES=(`find roda-core/roda-plugins/ -name roda-plugin-\*-jar-with-dependencies.jar`)
-ALL_JARS=(`find roda-core/roda-plugins/ -name roda-plugin-\*.jar`)
+PLUGINS_SRC_DIR="../roda-core/roda-plugins/"
+PLUGINS_DST_DIR="../jar_plugins/"
+
+JARS_WITH_DEPENDENCIES=(`find $PLUGINS_SRC_DIR -name roda-plugin-\*-jar-with-dependencies.jar`)
+ALL_JARS=(`find $PLUGINS_SRC_DIR -name roda-plugin-\*.jar`)
 
 JARS=("${ALL_JARS[@]}")
 
@@ -16,9 +19,9 @@ do :
 
 done
 
-mkdir -p jar_plugins
+mkdir -p "$PLUGINS_DST_DIR"
 
 for i in "${JARS[@]}"
 do :
-	cp -v -f  "$i" jar_plugins/
+	cp -v -f  "$i" "$PLUGINS_DST_DIR"
 done
