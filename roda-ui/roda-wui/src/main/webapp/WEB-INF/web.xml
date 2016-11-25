@@ -218,7 +218,8 @@
 	<servlet>
 		<servlet-name>UserManagementService</servlet-name>
 		<servlet-class>
-			org.roda.wui.server.management.UserManagementServiceImpl</servlet-class>
+			org.roda.wui.server.management.UserManagementServiceImpl
+		</servlet-class>
 	</servlet>
 	<servlet>
 		<servlet-name>UserLoginService</servlet-name>
@@ -272,6 +273,12 @@
 		<error-code>404</error-code>
 		<location>/error_404.html</location>
 	</error-page>
+
+	<error-page>
+		<exception-type>org.roda.wui.servlets.RodaCoreInstantiationException</exception-type>
+		<location>/error_core_inst.html</location>
+	</error-page>
+
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>Protected Context</web-resource-name>

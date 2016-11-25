@@ -93,7 +93,7 @@ public class Risk extends NamedIndexedModel implements IsModelObject {
   @JsonIgnore
   @Override
   public int getClassVersion() {
-    return 1;
+    return 2;
   }
 
   public String getDescription() {

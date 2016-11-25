@@ -26,6 +26,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.schema.SchemaRequest;
 import org.apache.solr.common.util.NamedList;
 import org.reflections.Reflections;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.XMLUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
@@ -34,6 +35,8 @@ import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.ModelInfo;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.migration.model.RiskToVersion2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,12 +53,9 @@ public class MigrationManager {
   }
 
   // 20161031 hsilva: this method is not invoked in the constructor as it might
-  // get very big & therefore
-  // should be done in a lazy fashion
+  // get very big & therefore should be done in a lazy fashion
   public void setupModelMigrations() throws GenericException {
-    // FIXME 20161031 hsilva: the following line is just an example and should
-    // be removed as soon as one real migration is configured
-    // addModelMigration(Job.class, 2, JobToVersion2.class);
+    addModelMigration(Risk.class, 2, RiskToVersion2.class);
   }
 
   private <T extends IsModelObject> void addModelMigration(final Class<T> clazz, final int toVersion,
@@ -194,7 +194,7 @@ public class MigrationManager {
         LOGGER.info("Migrating to version {} using class '{}'", toVersion, migrationClass.getName());
         try {
           // migrate
-          migrationClass.newInstance().migrate();
+          migrationClass.newInstance().migrate(RodaCoreFactory.getStorageService());
           LOGGER.info("Migrated with success to version {}", toVersion);
 
           // update class specific version after successful migration

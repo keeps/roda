@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.data.common.RodaConstants;
@@ -29,6 +30,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
 public final class JsonUtils {
@@ -162,6 +164,44 @@ public final class JsonUtils {
     } catch (IOException e) {
       throw new GenericException("Error while parsing JSON", e);
     }
+  }
+
+  public static JsonNode parseJson(InputStream json) throws GenericException {
+    try {
+      ObjectMapper mapper = new ObjectMapper(new JsonFactory());
+      return mapper.readTree(json);
+    } catch (IOException e) {
+      throw new GenericException("Error while parsing JSON", e);
+    } finally {
+      IOUtils.closeQuietly(json);
+    }
+  }
+
+  public static String getJsonFromNode(JsonNode node) {
+    String ret = null;
+    try {
+      ObjectMapper mapper = new ObjectMapper(new JsonFactory());
+      ret = mapper.writeValueAsString(node);
+    } catch (IOException e) {
+      LOGGER.error("Error transforming object '{}' to json string", node, e);
+    }
+    return ret;
+  }
+
+  public static ObjectNode refactor(ObjectNode obj, Map<String, String> mapping) {
+    for (Entry<String, String> entry : mapping.entrySet()) {
+      String oldName = entry.getKey();
+      String newName = entry.getValue();
+
+      JsonNode jsonNode = obj.get(oldName);
+
+      if (jsonNode != null) {
+        obj.set(newName, jsonNode);
+        obj.remove(oldName);
+      }
+    }
+
+    return obj;
   }
 
 }

@@ -28,7 +28,7 @@ public class RodaWuiServlet extends HttpServlet {
     if (!RodaCoreFactory.instantiatedWithoutErrors()) {
       LOGGER.error(
         "RODA Core didn't start because errors have occurred! Therefore, RODA WUI cannot be started. Please see RODA logs to understand why...");
-      throw new ServletException(
+      throw new RodaCoreInstantiationException(
         "RODA Core didn't start because errors have occurred! Please see RODA logs to understand why...");
     } else {
       LOGGER.info("RODA Core started with success!");
