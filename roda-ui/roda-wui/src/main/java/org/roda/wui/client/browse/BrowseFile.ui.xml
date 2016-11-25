@@ -15,60 +15,55 @@
 	}
 	</ui:style>
 
-	<g:FlowPanel styleName="viewRepresentation" addStyleNames="wrapper skip_padding">
-		<g:FlowPanel addStyleNames="row full_width skip_padding">
-			<g:FocusPanel ui:field="focusPanel" addStyleNames="focusPreviewPanel">
-				<g:HorizontalPanel ui:field="previewPanel">
-					<g:FlowPanel ui:field="filePreviewPanel">
-						<g:FlowPanel addStyleNames="filePreviewToolbar">
-							<m:BreadcrumbPanel ui:field="breadcrumb"
-								addStyleNames="viewRepresentationBreadcrumb" />
-							<g:FlowPanel addStyleNames="filePreviewToolbarIcons">
-								<g:FocusPanel ui:field="downloadDocumentationButton"
-									addStyleNames="toolbarLink">
-									<g:HTML>
-										<i class="fa fa-book"></i>
-									</g:HTML>
-								</g:FocusPanel>
-								<g:FocusPanel ui:field="downloadSchemasButton"
-									addStyleNames="toolbarLink">
-									<g:HTML>
-										<i class="fa fa-list-alt"></i>
-									</g:HTML>
-								</g:FocusPanel>
-								<g:FocusPanel ui:field="downloadFileButton"
-									addStyleNames="toolbarLink filePreviewToolbarDownloadIcon">
-									<g:HTML>
-										<i class="fa fa-download"></i>
-									</g:HTML>
-								</g:FocusPanel>
-								<g:FocusPanel ui:field="removeFileButton"
-									addStyleNames="toolbarLink filePreviewToolbarRemoveIcon">
-									<g:HTML>
-										<i class="fa fa-remove"></i>
-									</g:HTML>
-								</g:FocusPanel>
-								<g:FocusPanel ui:field="infoFileButton"
-									addStyleNames="toolbarLink filePreviewToolbarInfoIcon">
-									<g:HTML>
-										<i class="fa fa-info-circle"></i>
-									</g:HTML>
-								</g:FocusPanel>
-							</g:FlowPanel>
-						</g:FlowPanel>
-						<g:FlowPanel addStyleNames="col_10 content" ui:field="filePreview">
-						</g:FlowPanel>
-						<!-- INFO PANEL -->
-						<g:FlowPanel addStyleNames="infoFilePanel">
-							<g:Label styleName="h1" addStyleNames="infoFileTitle">
-								<ui:text from='{messages.viewRepresentationInfoTitle}' />
-							</g:Label>
-							<g:FlowPanel ui:field="infoFilePanel">
-							</g:FlowPanel>
-						</g:FlowPanel>
-					</g:FlowPanel>
-				</g:HorizontalPanel>
-			</g:FocusPanel>
+	<g:FlowPanel styleName="viewRepresentationFile"
+		addStyleNames="wrapper skip_padding">
+		<g:FlowPanel addStyleNames="filePreviewToolbar">
+			<m:BreadcrumbPanel ui:field="breadcrumb"
+				addStyleNames="viewRepresentationBreadcrumb" />
+			<g:FlowPanel addStyleNames="filePreviewToolbarIcons">
+				<g:FocusPanel ui:field="downloadDocumentationButton"
+					addStyleNames="toolbarLink">
+					<g:HTML>
+						<i class="fa fa-book"></i>
+					</g:HTML>
+				</g:FocusPanel>
+				<g:FocusPanel ui:field="downloadSchemasButton"
+					addStyleNames="toolbarLink">
+					<g:HTML>
+						<i class="fa fa-list-alt"></i>
+					</g:HTML>
+				</g:FocusPanel>
+				<g:FocusPanel ui:field="downloadFileButton"
+					addStyleNames="toolbarLink filePreviewToolbarDownloadIcon">
+					<g:HTML>
+						<i class="fa fa-download"></i>
+					</g:HTML>
+				</g:FocusPanel>
+				<g:FocusPanel ui:field="removeFileButton"
+					addStyleNames="toolbarLink filePreviewToolbarRemoveIcon">
+					<g:HTML>
+						<i class="fa fa-remove"></i>
+					</g:HTML>
+				</g:FocusPanel>
+				<g:FocusPanel ui:field="infoFileButton"
+					addStyleNames="toolbarLink filePreviewToolbarInfoIcon">
+					<g:HTML>
+						<i class="fa fa-info-circle"></i>
+					</g:HTML>
+				</g:FocusPanel>
+			</g:FlowPanel>
+		</g:FlowPanel>
+		<g:FlowPanel addStyleNames="viewRepresentationFile-center">
+			<g:FlowPanel addStyleNames="viewRepresentationFilePreview"
+				ui:field="filePreview" />
+			<!-- INFO PANEL -->
+			<g:FlowPanel addStyleNames="infoFilePanel">
+				<g:Label styleName="h1" addStyleNames="infoFileTitle">
+					<ui:text from='{messages.viewRepresentationInfoTitle}' />
+				</g:Label>
+				<g:FlowPanel ui:field="infoFilePanel">
+				</g:FlowPanel>
+			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>
 </ui:UiBinder>

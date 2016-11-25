@@ -3600,7 +3600,6 @@ td.datePickerMonth, td.datePickerYear {
     margin-bottom: 10px !important;
 }
 
-.viewRepresentationFocusPanel,
 .viewRepresentationPreviewPanel {
     width: 100%;
 }
@@ -3674,41 +3673,43 @@ td.datePickerMonth, td.datePickerYear {
     border: 2px solid #eee;
 }
 
-.viewRepresentationFilePreviewPanel {
+.viewRepresentationFile {
     width: 100%;
-    height: 705px;
 }
 
-.viewRepresentationFilePreviewPanel .filePreviewToolbar {
+.viewRepresentationFile .filePreviewToolbar {
     min-height: 35px;
     background-color: #eee;
     position: relative;
 }
 
-.viewRepresentationFilePreviewPanel .filePreviewToolbar .viewRepresentationBreadcrumb {
+.viewRepresentationFile .filePreviewToolbar .viewRepresentationBreadcrumb {
     padding: 5px 70px 5px 20px;
     margin: 0;
 }
 
-.viewRepresentationFilePreviewPanel.single .filePreviewToolbar .viewRepresentationBreadcrumb {
+.viewRepresentationFile.single .filePreviewToolbar .viewRepresentationBreadcrumb {
     margin-left: 35px;
 }
 
-.viewRepresentationFilePreviewPanel .filePreviewToolbar .filePreviewToolbarIcons {
+.viewRepresentationFile .filePreviewToolbar .filePreviewToolbarIcons {
     position: absolute;
     bottom: 0;
     right: 0;
 }
 
+.viewRepresentationFile-center {
+	width: 100%;
+	position: relative;
+}
+
 .viewRepresentationFilePreview {
-    padding: 40px !important;
-    /* height: 650px;*/
+    height: 670px;
     display: inline-block;
     vertical-align: top;
     width: 100%;
     text-align: center;
     padding-top: 0px !important;
-    margin-top: 20px;
 }
 
 .viewRepresentationImageFilePreview {
@@ -3719,11 +3720,12 @@ td.datePickerMonth, td.datePickerYear {
 
 .viewRepresentationPDFFilePreview {
     width: 100%;
-    /*height: 600px;*/
+    height: 670px;
 }
 
 .viewRepresentationTextFilePreview {
-    width: 100%;
+    width: 98%;
+    padding: 1%;
     text-align: left;
 }
 
@@ -3830,7 +3832,7 @@ td.datePickerMonth, td.datePickerYear {
     color: inherit;
 }
 
-.viewRepresentation .infoFilePanel {
+.viewRepresentationFile .infoFilePanel {
     height: 630px;
     width: 300px;
     background: #089de3;
@@ -3838,28 +3840,29 @@ td.datePickerMonth, td.datePickerYear {
     color: white;
     position: absolute;
     right: 0;
+    top: 0;
     padding: 20px;
     box-shadow: 0 0 0 0 transparent, 0 0 0 0 transparent, 0 0 0 0 transparent, -6px 0 15px -4px rgba(31, 73, 125, 0.8);
 }
 
-.viewRepresentation .infoFileTitle {
+.viewRepresentationFile .infoFileTitle {
     font-size: 3rem;
     margin-top: 1.2rem;
     margin-bottom: 2.5rem;
 }
 
-.viewRepresentation .infoFileEntry {
+.viewRepresentationFile .infoFileEntry {
     margin-bottom: 1em;
 }
 
-.viewRepresentation .infoFileEntryKey {
+.viewRepresentationFile .infoFileEntryKey {
     font-size: 1.3rem;
     line-height: 1.1em;
     color: rgba(255, 255, 255, 0.8);
     margin-bottom: 0.2em;
 }
 
-.viewRepresentation .infoFileEntryValue {
+.viewRepresentationFile .infoFileEntryValue {
     font-size: 1.3rem;
     word-break: break-all;
     line-height: 1.1em;

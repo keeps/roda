@@ -192,15 +192,6 @@ public class BrowseFile extends Composite {
   BreadcrumbPanel breadcrumb;
 
   @UiField
-  FocusPanel focusPanel;
-
-  @UiField
-  HorizontalPanel previewPanel;
-
-  @UiField
-  FlowPanel filePreviewPanel;
-
-  @UiField
   FlowPanel filePreview;
 
   @UiField
@@ -264,11 +255,7 @@ public class BrowseFile extends Composite {
     removeFileButton.setTitle(messages.viewRepresentationRemoveFileButton());
     infoFileButton.setTitle(messages.viewRepresentationInfoFileButton());
 
-    focusPanel.addStyleName("viewRepresentationFocusPanel");
-    previewPanel.addStyleName("viewRepresentationPreviewPanel");
-    filePreviewPanel.addStyleName("viewRepresentationFilePreviewPanel");
     filePreview.addStyleName("viewRepresentationFilePreview");
-    previewPanel.setCellWidth(filePreviewPanel, "100%");
 
     filePreview();
   }
