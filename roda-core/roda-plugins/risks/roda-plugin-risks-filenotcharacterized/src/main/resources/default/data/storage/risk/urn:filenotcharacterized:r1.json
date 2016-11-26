@@ -1,0 +1,17 @@
+{
+	"id": "urn:filenotcharacterized:r1",
+	"name": "File(s) not comprehensively characterized",
+	"description": "It is essential that all the content ingested in the repository be sufficiently well understood to allow it to be properly managed, preserved and accessed. In practice, this requires metadata describing the content of the files to be created in enough detail.\nFile formats evolve as users and developers identify and incorporate new functionality. New formats, or versions of formats, may introduce file format obsolescence as newer generations of software phase out support for older formats. When software does not provide for backwards compatibility with older file formats, data may become unusable. Both open source and commercial formats are vulnerable to obsolescence: vendors sometimes use planned obsolescence to entice customers to upgrade to new products while open source software communities may withdraw support for older formats if these are no longer generally needed by the community. Obsolescence can also be accidental: both businesses and open source communities can fail.\nFile format obsolescence is therefore a real risk that a repository needs to manage. Having a clear understanding about the file formats that exist in the repository is an essential task to be able the determine the level of risk associated with the repository and devise proper actions to mitigate it. Not knowing your collections in enough technical detail is a risk that should be avoided at all costs.",
+	"identifiedOn": 1468515641122,
+	"identifiedBy": "Risk automatically detected by the File Not Characterized risk assessment plugin \"org.roda.core.plugins.risks.FileNotCharacterizedRiskAssessmentPlugin\".",
+	"category": "Content characterization",
+	"notes": "The description of this risk has been partially obtained from the Digital Preservation Handbook (http://handbook.dpconline.org/technical-solutions-and-tools/file-formats-and-standards) published by the Digital Preservation Coalition (DPC).",
+	"preMitigationProbability": 4,
+	"preMitigationImpact": 3,
+	"preMitigationSeverity": 12,
+	"preMitigationSeverityLevel": "MODERATE",
+	"preMitigationNotes": "If no action is taken there is a high risk that the repository is unware of its contents and therefore unable to assess and mitigate potential obsolescence risks.",
+	"mitigationStrategy": "Run a content characterization process on the repository content that is not comprehensively characterized.",
+	"createdOn": 1468515641122,
+	"createdBy": "admin"
+}
