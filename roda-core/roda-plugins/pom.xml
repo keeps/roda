@@ -37,8 +37,6 @@
 		<module>characterization/roda-plugin-characterization-jpylyzer</module>
 		<module>characterization/roda-plugin-characterization-mediainfo</module>
 
-		<module>misc/roda-plugin-misc-unknownformat</module>
-
 		<module>risks/roda-plugin-risks-filenotcharacterized</module>
 	</modules>
 	<dependencyManagement>
