@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<name>roda-plugin-risks-formatmissingrepresentationinformation</name>
+	<artifactId>roda-plugin-risks-formatmissingrepresentationinformation</artifactId>
+	<packaging>jar</packaging>
+	<version>1.0.0</version>
+	<parent>
+		<groupId>org.roda-project</groupId>
+		<artifactId>roda-plugins</artifactId>
+		<version>2.0.0-SNAPSHOT</version>
+		<relativePath>../..</relativePath>
+	</parent>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+						</manifest>
+						<manifestEntries>
+							<RODA-Plugin>org.roda.core.plugins.risks.FormatMissingRepresentationInformationPlugin</RODA-Plugin>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	<dependencies>
+		<dependency>
+			<groupId>org.roda-project</groupId>
+			<artifactId>roda-plugin-common</artifactId>
+		</dependency>
+	</dependencies>
+</project>
