@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.misc;
+package org.roda.core.plugins.risks;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -22,7 +22,6 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
@@ -46,25 +45,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Plugin identifies risk of missing format information in files.
+ * Plugin identifies risk of a file not being characterized.
  * 
  * @author Rui Castro <rui.castro@gmail.com>
  */
-public class MissingFormatPlugin extends AbstractPlugin<File> {
+public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<File> {
   /** Logger. */
-  private static final Logger LOGGER = LoggerFactory.getLogger(MissingFormatPlugin.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(FileNotCharacterizedRiskAssessmentPlugin.class);
 
   /** Plugin version. */
   private static final String VERSION = "1.0";
 
-  /** <i>Unknown mimetype</i> risk ID. */
-  private static final String MISSING_MIMETYPE_RISK_ID = "urn:missingmimetype:r1";
-
-  /** <i>Unknown pronom PUID</i> risk ID. */
-  private static final String MISSING_PRONOM_RISK_ID = "urn:missingpronom:r1";
-
-  /** <i>Unknown format</i> risk ID. */
-  private static final String MISSING_FORMAT_RISK_ID = "urn:missingformat:r1";
+  /** <i>File not characterized</i> risk ID. */
+  private static final String FILE_NOT_CHARACTERIZED_RISK_ID = "urn:filenotcharacterized:r1";
 
   /** Plugin parameter value 'true'. */
   private static final String PARAM_VALUE_TRUE = "true";
@@ -90,7 +83,7 @@ public class MissingFormatPlugin extends AbstractPlugin<File> {
   /** Plugin parameter 'format'. */
   private static final PluginParameter PARAM_FORMAT_DESIGNATION = new PluginParameter(FORMAT_DESIGNATION,
     "Format designation", PluginParameter.PluginParameterType.BOOLEAN, PARAM_VALUE_TRUE, false, false,
-    "Check existence of a Format designation?");
+    "Check existence of a Format designation name and version?");
 
   @Override
   public void init() throws PluginException {
@@ -104,14 +97,13 @@ public class MissingFormatPlugin extends AbstractPlugin<File> {
 
   @Override
   public String getName() {
-    return "Missing format risk assessor";
+    return "File not characterized risk assessment";
   }
 
   @Override
   public String getDescription() {
     return "Check file format information (Mimetype, PRONOM and Format designation). "
-      + "If this information is missing, it creates a new risk called "
-      + "“<Mimetype/PRONOM/Format designation> information missing“ "
+      + "If this information is missing, it creates a new risk called “File(s) not comprehensively characterized“ "
       + "and assigns the file to that risk in the Risk register.";
   }
 
@@ -126,8 +118,8 @@ public class MissingFormatPlugin extends AbstractPlugin<File> {
 
     try {
       final Report report = PluginHelper.initPluginReport(this);
-      final SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
 
+      final SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       final Result result = new Result();
@@ -135,21 +127,21 @@ public class MissingFormatPlugin extends AbstractPlugin<File> {
         result.addResult(executeOnFile(file, index, model, jobPluginInfo, report));
       }
 
+      report.addPluginDetails(result.toString());
+
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      report.addPluginDetails(result.toString());
-
       return report;
 
-    } catch (final JobException e) {
+    } catch (final JobException | GenericException e) {
       throw new PluginException("A job exception has occurred", e);
     }
   }
 
   @Override
   public Plugin<File> cloneMe() {
-    return new MissingFormatPlugin();
+    return new FileNotCharacterizedRiskAssessmentPlugin();
   }
 
   @Override
@@ -174,17 +166,17 @@ public class MissingFormatPlugin extends AbstractPlugin<File> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Checked for the presence of format identification information.";
+    return getName();
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "File format information is present.";
+    return "File is comprehensively characterized.";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "File format information is missing.";
+    return "File is not comprehensively characterized.";
   }
 
   @Override
@@ -252,65 +244,90 @@ public class MissingFormatPlugin extends AbstractPlugin<File> {
    *          the {@link ModelService}.
    * @param jobPluginInfo
    *          the {@link JobPluginInfo}
-   * @param report
+   * @param jobReport
    *          the {@link Report}.
    * @return a {@link Result} with the number of missing attributes.
+   * @throws GenericException
+   *           if some error occurred.
    */
   private Result executeOnFile(final File file, final IndexService index, final ModelService model,
-    final JobPluginInfo jobPluginInfo, final Report report) {
+    final JobPluginInfo jobPluginInfo, final Report jobReport) throws GenericException {
     LOGGER.debug("Processing File {}", file.getId());
 
     final String fileUUID = IdUtils.getFileId(file);
-    final Report reportItem = PluginHelper.initPluginReportItem(this, fileUUID, File.class, AIPState.ACTIVE);
-    PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+    final Report fileReport = PluginHelper.initPluginReportItem(this, fileUUID, File.class);
 
-    final Result result = new Result();
+    Result result = new Result();
 
     try {
-      final FileFormat fileFormat = index.retrieve(IndexedFile.class, fileUUID).getFileFormat();
-      boolean fileOk = true;
+      result = assessRiskOnFileFormat(index.retrieve(IndexedFile.class, fileUUID).getFileFormat());
 
-      if (checkMimetype() && StringUtils.isBlank(fileFormat.getMimeType())) {
-        createIncidence(model, file, MISSING_MIMETYPE_RISK_ID, reportItem);
-        fileOk = false;
-        result.mimetype = 1;
-      }
-      if (checkPronom() && StringUtils.isBlank(fileFormat.getPronom())) {
-        createIncidence(model, file, MISSING_PRONOM_RISK_ID, reportItem);
-        fileOk = false;
-        result.pronom = 1;
-      }
-      if (checkFormatDesignation() && StringUtils.isBlank(fileFormat.getFormatDesignationName())) {
-        createIncidence(model, file, MISSING_FORMAT_RISK_ID, reportItem);
-        fileOk = false;
-        result.formatName = 1;
-      }
-
-      if (fileOk) {
+      if (result.isOk()) {
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        reportItem.setPluginState(PluginState.SUCCESS);
+        fileReport.setPluginState(PluginState.SUCCESS);
       } else {
         jobPluginInfo.incrementObjectsProcessedWithFailure();
-        reportItem.setPluginState(PluginState.FAILURE);
+        fileReport.setPluginState(PluginState.FAILURE);
+        createIncidence(model, file, FILE_NOT_CHARACTERIZED_RISK_ID, fileReport, result);
       }
 
+      addToReportDetails(fileReport, result.toString());
+
     } catch (final NotFoundException | GenericException e) {
-      LOGGER.debug(String.format("Error retrieving IndexedFile for File %s (%s)", file.getId(), fileUUID), e);
+      final String message = String.format("Error retrieving IndexedFile for File %s (%s)", file.getId(), fileUUID);
+      LOGGER.debug(message, e);
       jobPluginInfo.incrementObjectsProcessedWithFailure();
-      reportItem.setPluginState(PluginState.FAILURE);
+      fileReport.setPluginState(PluginState.FAILURE);
+      addToReportDetails(fileReport, message);
     }
 
+    createPreservationEvent(file, index, model, fileReport);
+
+    jobReport.addReport(fileReport);
+    PluginHelper.updatePartialJobReport(this, model, index, fileReport, true);
+    return result;
+  }
+
+  /**
+   * Assess the risk for the given {@link FileFormat}.
+   * 
+   * @param fileFormat
+   *          the {@link FileFormat}.
+   * @return the {@link Result} of the assessment.
+   */
+  private Result assessRiskOnFileFormat(final FileFormat fileFormat) {
+    final boolean missingFormat = checkFormatDesignation()
+      && (StringUtils.isBlank(fileFormat.getFormatDesignationName())
+        || StringUtils.isBlank(fileFormat.getFormatDesignationVersion()));
+    final boolean missingMimetype = checkMimetype() && StringUtils.isBlank(fileFormat.getMimeType());
+    final boolean missingPronom = checkPronom() && StringUtils.isBlank(fileFormat.getPronom());
+    return new Result(missingFormat, missingMimetype, missingPronom);
+  }
+
+  /**
+   * Create a preservation event associated with the specified {@link File}.
+   * 
+   * @param file
+   *          the {@link File}.
+   * @param index
+   *          the {@link IndexService}.
+   * @param model
+   *          the {@link ModelService}.
+   * @param report
+   *          the {@link File} {@link Report}.
+   */
+  private void createPreservationEvent(final File file, final IndexService index, final ModelService model,
+    final Report report) {
     try {
       PluginHelper.createPluginEvent(this, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
-        model, index, null, null, reportItem.getPluginState(), "", true);
+        model, index, null, null, report.getPluginState(), "", true);
     } catch (final RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | ValidationException | AlreadyExistsException e) {
-      LOGGER.error("Could not create plugin event for file " + file.getId(), e);
+      final String message = "Could not create plugin event for file " + file.getId();
+      addToReportDetails(report, message);
+      report.setPluginState(PluginState.FAILURE);
+      LOGGER.error(message, e);
     }
-
-    report.addReport(reportItem);
-    PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
-    return result;
   }
 
   /**
@@ -324,8 +341,11 @@ public class MissingFormatPlugin extends AbstractPlugin<File> {
    *          the risk ID.
    * @param report
    *          the {@link Report}.
+   * @param result
+   *          the execution {@link Result}.
    */
-  private void createIncidence(final ModelService model, final File file, final String riskId, final Report report) {
+  private void createIncidence(final ModelService model, final File file, final String riskId, final Report report,
+    final Result result) {
     try {
       final Risk risk = PluginHelper.createRiskIfNotExists(model, 0, riskId, getClass().getClassLoader());
       final RiskIncidence incidence = new RiskIncidence();
@@ -339,14 +359,33 @@ public class MissingFormatPlugin extends AbstractPlugin<File> {
       incidence.setObjectClass(File.class.getSimpleName());
       incidence.setStatus(RiskIncidence.INCIDENCE_STATUS.UNMITIGATED);
       incidence.setSeverity(risk.getPreMitigationSeverityLevel());
+      incidence.setDescription(result.toString());
       model.createRiskIncidence(incidence, false);
     } catch (final RequestNotValidException | AuthorizationDeniedException | AlreadyExistsException | NotFoundException
       | GenericException e) {
       final String message = String.format("Error creating risk %s incidence for File %s", riskId, file.getId());
-      report.setPluginState(PluginState.FAILURE).setPluginDetails(message);
+      addToReportDetails(report, message);
+      report.setPluginState(PluginState.FAILURE);
       LOGGER.error(message, e);
-
     }
+  }
+
+  /**
+   * Add a message to the {@link Report} details.
+   * 
+   * @param report
+   *          the {@link Report}.
+   * @param message
+   *          the message to add.
+   */
+  private void addToReportDetails(final Report report, final String message) {
+    final String pluginDetails;
+    if (StringUtils.isBlank(report.getPluginDetails())) {
+      pluginDetails = message;
+    } else {
+      pluginDetails = String.format("%n%n%s", message);
+    }
+    report.addPluginDetails(pluginDetails);
   }
 
   /**
@@ -354,9 +393,9 @@ public class MissingFormatPlugin extends AbstractPlugin<File> {
    */
   private class Result {
     /**
-     * Missing format name count.
+     * Missing format count.
      */
-    private int formatName;
+    private int format;
     /**
      * Missing mimetype count.
      */
@@ -365,6 +404,10 @@ public class MissingFormatPlugin extends AbstractPlugin<File> {
      * Missing pronom count.
      */
     private int pronom;
+    /**
+     * Number of results added to this {@link Result}.
+     */
+    private int count;
 
     /**
      * Constructor.
@@ -375,18 +418,43 @@ public class MissingFormatPlugin extends AbstractPlugin<File> {
 
     /**
      * Constructor.
+     *
+     * @param missingFormat
+     *          missing format?
+     * @param missingMimetype
+     *          missing mimetype?
+     * @param missingPronom
+     *          missing pronom?
+     */
+    Result(final boolean missingFormat, final boolean missingMimetype, final boolean missingPronom) {
+      this(missingFormat ? 1 : 0, missingMimetype ? 1 : 0, missingPronom ? 1 : 0);
+    }
+
+    /**
+     * Constructor.
      * 
-     * @param formatName
-     *          missing format name count.
+     * @param format
+     *          missing format count.
      * @param mimetype
-     *          missing mimetypecount.
+     *          missing mimetype count.
      * @param pronom
      *          missing pronom count.
      */
-    Result(final int formatName, final int mimetype, final int pronom) {
-      this.formatName = formatName;
+    Result(final int format, final int mimetype, final int pronom) {
+      this.format = format;
       this.mimetype = mimetype;
       this.pronom = pronom;
+      this.count = 0;
+    }
+
+    /**
+     * Is everything ok?
+     * 
+     * @return <code>true</code> if all checks were successful,
+     *         <code>false</code> otherwise.
+     */
+    boolean isOk() {
+      return this.format == 0 && this.mimetype == 0 && this.pronom == 0;
     }
 
     /**
@@ -396,15 +464,38 @@ public class MissingFormatPlugin extends AbstractPlugin<File> {
      *          the {@link Result} to add.
      */
     void addResult(final Result result) {
-      this.formatName += result.formatName;
+      this.format += result.format;
       this.mimetype += result.mimetype;
       this.pronom += result.pronom;
+      this.count++;
     }
 
     @Override
     public String toString() {
-      return String.format("Missing format names: %s%nMissing mimetypes: %s%nMissing PRONOM UIDs: %s%n",
-        this.formatName, this.mimetype, this.pronom);
+      final StringBuilder str = new StringBuilder();
+      if (isOk()) {
+        if (count > 0) {
+          str.append("Files are comprehensively characterized");
+        } else {
+          str.append("File is comprehensively characterized");
+        }
+      } else {
+        if (count > 0) {
+          str.append("Files are not comprehensively characterized.\n");
+        } else {
+          str.append("File is not comprehensively characterized.\n");
+        }
+        if (FileNotCharacterizedRiskAssessmentPlugin.this.checkFormatDesignation()) {
+          str.append(String.format("Missing format designation: %s%n", this.format));
+        }
+        if (FileNotCharacterizedRiskAssessmentPlugin.this.checkMimetype()) {
+          str.append(String.format("Missing mimetype: %s%n", this.mimetype));
+        }
+        if (FileNotCharacterizedRiskAssessmentPlugin.this.checkPronom()) {
+          str.append(String.format("Missing PRONOM UID: %s%n", this.pronom));
+        }
+      }
+      return str.toString();
     }
   }
 
