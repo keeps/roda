@@ -34,6 +34,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.UserUtility;
+import org.roda.core.common.dips.DIPUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.common.notifications.NotificationProcessor;
@@ -98,6 +99,7 @@ import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
+import org.roda.core.util.HTTPUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -2139,6 +2141,27 @@ public class ModelService extends ModelObservable {
 
   public void deleteDIP(String dipId) throws GenericException, NotFoundException, AuthorizationDeniedException {
     try {
+      // deleting external service if existing
+      DIP dip = retrieveDIP(dipId);
+      Optional<String> deleteURL = DIPUtils.getCompleteDeleteExternalURL(dip);
+      Optional<String> httpMethod = DIPUtils.getDeleteMethod(dip);
+      if (deleteURL.isPresent() && httpMethod.isPresent()) {
+        String method = httpMethod.get();
+        String url = deleteURL.get();
+
+        try {
+          if (method.equals("GET")) {
+            HTTPUtility.doGet(url);
+          } else if (method.equals("DELETE")) {
+            HTTPUtility.doDelete(url);
+          } else {
+            LOGGER.error("HTTP method of delete external service is not supported");
+          }
+        } catch (IOException e) {
+          LOGGER.error("Could not call delete external URL for DIP {}", dipId);
+        }
+      }
+
       StoragePath dipPath = ModelUtils.getDIPStoragePath(dipId);
       storage.deleteResource(dipPath);
       notifyDIPDeleted(dipId, false);

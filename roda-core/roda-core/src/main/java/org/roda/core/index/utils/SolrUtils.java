@@ -1801,8 +1801,8 @@ public class SolrUtils {
   private static Report solrDocumentToJobReport(SolrDocument doc) {
     Report jobReport = new Report();
 
-    jobReport.setId(objectToString(doc.get(RodaConstants.INDEX_UUID)));
-    jobReport.setJobId(objectToString(doc.get(RodaConstants.JOB_REPORT_JOB_ID)));
+    jobReport.setId(objectToString(doc.get(RodaConstants.INDEX_UUID), null));
+    jobReport.setJobId(objectToString(doc.get(RodaConstants.JOB_REPORT_JOB_ID), null));
     jobReport.setSourceObjectId(objectToString(doc.get(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID), ""));
     jobReport.setSourceObjectClass(objectToString(doc.get(RodaConstants.JOB_REPORT_SOURCE_OBJECT_CLASS), ""));
     jobReport
@@ -1813,17 +1813,17 @@ public class SolrUtils {
     jobReport.setOutcomeObjectClass(objectToString(doc.get(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_CLASS), ""));
     jobReport.setOutcomeObjectState(AIPState.valueOf(
       objectToString(doc.get(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_STATE), AIPState.getDefault().toString())));
-    jobReport.setTitle(objectToString(doc.get(RodaConstants.JOB_REPORT_TITLE)));
+    jobReport.setTitle(objectToString(doc.get(RodaConstants.JOB_REPORT_TITLE), null));
     jobReport.setDateCreated(objectToDate(doc.get(RodaConstants.JOB_REPORT_DATE_CREATED)));
     jobReport.setDateUpdated(objectToDate(doc.get(RodaConstants.JOB_REPORT_DATE_UPDATE)));
     jobReport.setCompletionPercentage(objectToInteger(doc.get(RodaConstants.JOB_REPORT_COMPLETION_PERCENTAGE), 0));
     jobReport.setStepsCompleted(objectToInteger(doc.get(RodaConstants.JOB_REPORT_STEPS_COMPLETED), 0));
     jobReport.setTotalSteps(objectToInteger(doc.get(RodaConstants.JOB_REPORT_TOTAL_STEPS), 0));
-    jobReport.setPlugin(objectToString(doc.get(RodaConstants.JOB_REPORT_PLUGIN)));
+    jobReport.setPlugin(objectToString(doc.get(RodaConstants.JOB_REPORT_PLUGIN), null));
     jobReport.setPluginName(objectToString(doc.get(RodaConstants.JOB_REPORT_PLUGIN_NAME), ""));
     jobReport.setPluginVersion(objectToString(doc.get(RodaConstants.JOB_REPORT_PLUGIN_VERSION), ""));
     jobReport.setPluginState(PluginState.valueOf(objectToString(doc.get(RodaConstants.JOB_REPORT_PLUGIN_STATE))));
-    jobReport.setPluginDetails(objectToString(doc.get(RodaConstants.JOB_REPORT_PLUGIN_DETAILS)));
+    jobReport.setPluginDetails(objectToString(doc.get(RodaConstants.JOB_REPORT_PLUGIN_DETAILS), null));
     jobReport.setHtmlPluginDetails(objectToBoolean(doc.get(RodaConstants.JOB_REPORT_HTML_PLUGIN_DETAILS), false));
     try {
       jobReport
@@ -1961,18 +1961,18 @@ public class SolrUtils {
   public static Format solrDocumentToFormat(SolrDocument doc) {
     Format format = new Format();
 
-    format.setId(objectToString(doc.get(RodaConstants.INDEX_UUID)));
-    format.setName(objectToString(doc.get(RodaConstants.FORMAT_NAME)));
-    format.setDefinition(objectToString(doc.get(RodaConstants.FORMAT_DEFINITION)));
+    format.setId(objectToString(doc.get(RodaConstants.INDEX_UUID), null));
+    format.setName(objectToString(doc.get(RodaConstants.FORMAT_NAME), null));
+    format.setDefinition(objectToString(doc.get(RodaConstants.FORMAT_DEFINITION), null));
     format.setCategories(objectToListString(doc.get(RodaConstants.FORMAT_CATEGORY)));
-    format.setLatestVersion(objectToString(doc.get(RodaConstants.FORMAT_LATEST_VERSION)));
+    format.setLatestVersion(objectToString(doc.get(RodaConstants.FORMAT_LATEST_VERSION), null));
     format.setPopularity(objectToInteger(doc.get(RodaConstants.FORMAT_POPULARITY), null));
-    format.setDeveloper(objectToString(doc.get(RodaConstants.FORMAT_DEVELOPER)));
+    format.setDeveloper(objectToString(doc.get(RodaConstants.FORMAT_DEVELOPER), null));
     format.setInitialRelease(objectToDate(doc.get(RodaConstants.FORMAT_INITIAL_RELEASE)));
-    format.setStandard(objectToString(doc.get(RodaConstants.FORMAT_STANDARD)));
+    format.setStandard(objectToString(doc.get(RodaConstants.FORMAT_STANDARD), null));
     format.setOpenFormat(objectToBoolean(doc.get(RodaConstants.FORMAT_IS_OPEN_FORMAT), Boolean.FALSE));
     format.setWebsites(objectToListString(doc.get(RodaConstants.FORMAT_WEBSITE)));
-    format.setProvenanceInformation(objectToString(doc.get(RodaConstants.FORMAT_PROVENANCE_INFORMATION)));
+    format.setProvenanceInformation(objectToString(doc.get(RodaConstants.FORMAT_PROVENANCE_INFORMATION), null));
     format.setExtensions(objectToListString(doc.get(RodaConstants.FORMAT_EXTENSIONS)));
     format.setMimetypes(objectToListString(doc.get(RodaConstants.FORMAT_MIMETYPES)));
     format.setPronoms(objectToListString(doc.get(RodaConstants.FORMAT_PRONOMS)));
@@ -2143,7 +2143,7 @@ public class SolrUtils {
     dip.setProperties(JsonUtils.getMapFromJson(objectToString(doc.get(RodaConstants.DIP_PROPERTIES))));
 
     try {
-      String aipIds = objectToString(doc.get(RodaConstants.DIP_AIP_IDS));
+      String aipIds = objectToString(doc.get(RodaConstants.DIP_AIP_IDS), null);
       dip.setAipIds(JsonUtils.getListFromJson(aipIds == null ? "" : aipIds, AIPLink.class));
 
       String representationIds = objectToString(doc.get(RodaConstants.DIP_REPRESENTATION_IDS), null);
@@ -2205,13 +2205,13 @@ public class SolrUtils {
 
   public static DIPFile solrDocumentToDIPFile(SolrDocument doc) {
     DIPFile file = new DIPFile();
-    file.setUUID(objectToString(doc.get(RodaConstants.INDEX_UUID)));
-    file.setId(objectToString(doc.get(RodaConstants.DIP_FILE_ID)));
-    file.setDipId(objectToString(doc.get(RodaConstants.DIP_FILE_DIP_ID)));
+    file.setUUID(objectToString(doc.get(RodaConstants.INDEX_UUID), null));
+    file.setId(objectToString(doc.get(RodaConstants.DIP_FILE_ID), null));
+    file.setDipId(objectToString(doc.get(RodaConstants.DIP_FILE_DIP_ID), null));
     file.setPath(objectToListString(doc.get(RodaConstants.DIP_FILE_PATH)));
     file.setAncestorsPath(objectToListString(doc.get(RodaConstants.FILE_ANCESTORS_PATH)));
     file.setDirectory(objectToBoolean(doc.get(RodaConstants.DIP_FILE_IS_DIRECTORY), Boolean.FALSE));
-    file.setStoragePath(objectToString(doc.get(RodaConstants.DIP_FILE_STORAGE_PATH)));
+    file.setStoragePath(objectToString(doc.get(RodaConstants.DIP_FILE_STORAGE_PATH), null));
     file.setSize(objectToLong(doc.get(RodaConstants.FILE_SIZE), 0L));
     return file;
   }

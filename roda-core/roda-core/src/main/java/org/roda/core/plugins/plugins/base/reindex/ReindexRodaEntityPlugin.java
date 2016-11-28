@@ -136,8 +136,6 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
 
     } catch (JobException e) {
       LOGGER.error("Error reindexing RODA entity", e);
-    } finally {
-
     }
 
     return pluginReport;

@@ -33,4 +33,17 @@ public class DIPUtils {
       return Optional.empty();
     }
   }
+
+  public static Optional<String> getDeleteMethod(DIP dip) {
+    if (StringUtils.isNotBlank(dip.getType())) {
+      String method = RodaCoreFactory.getRodaConfigurationAsString("dip", dip.getType(), "deleteExternalURL", "method");
+      if (StringUtils.isNotBlank(method)) {
+        return Optional.of(method);
+      } else {
+        return Optional.empty();
+      }
+    } else {
+      return Optional.empty();
+    }
+  }
 }

@@ -43,7 +43,30 @@ public final class HTTPUtility {
       is.close();
       res = response.toString();
     } else {
-      throw new GenericException("Unable to connect to siegfried server");
+      throw new GenericException("Unable to connect to server");
+    }
+    return res;
+  }
+
+  public static String doDelete(String url) throws IOException, GenericException {
+    String res = null;
+    URL obj = new URL(url);
+    HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+    con.setRequestMethod("DELETE");
+    int responseCode = con.getResponseCode();
+    if (responseCode == 200) {
+      InputStream is = con.getInputStream();
+      BufferedReader in = new BufferedReader(new InputStreamReader(is));
+      String inputLine;
+      StringBuffer response = new StringBuffer();
+      while ((inputLine = in.readLine()) != null) {
+        response.append(inputLine);
+      }
+      in.close();
+      is.close();
+      res = response.toString();
+    } else {
+      throw new GenericException("Unable to connect to server");
     }
     return res;
   }
