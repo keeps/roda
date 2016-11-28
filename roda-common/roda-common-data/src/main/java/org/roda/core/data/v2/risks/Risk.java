@@ -213,7 +213,8 @@ public class Risk extends NamedIndexedModel implements IsModelObject {
   }
 
   public void setPostMitigationSeverityLevel(String postMitigationSeverity) {
-    this.postMitigationSeverityLevel = Risk.SEVERITY_LEVEL.valueOf(postMitigationSeverity);
+    this.postMitigationSeverityLevel = postMitigationSeverity != null
+      ? Risk.SEVERITY_LEVEL.valueOf(postMitigationSeverity) : null;
   }
 
   public String getPostMitigationNotes() {
