@@ -224,6 +224,7 @@ public class Risk extends NamedIndexedModel implements IsModelObject {
     this.postMitigationNotes = postMitigationNotes;
   }
 
+  @JsonIgnore
   public SEVERITY_LEVEL getCurrentSeverityLevel() {
     if (postMitigationSeverityLevel != null) {
       return postMitigationSeverityLevel;
