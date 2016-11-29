@@ -2114,12 +2114,12 @@ public class SolrUtils {
       }
     }
 
-    doc.addField(RodaConstants.DIP_AIP_UUIDS, JsonUtils.getJsonFromObject(aipUUIDs));
-    doc.addField(RodaConstants.DIP_REPRESENTATION_UUIDS, JsonUtils.getJsonFromObject(representationUUIDs));
-    doc.addField(RodaConstants.DIP_FILE_UUIDS, JsonUtils.getJsonFromObject(fileUUIDs));
+    doc.addField(RodaConstants.DIP_AIP_UUIDS, aipUUIDs);
+    doc.addField(RodaConstants.DIP_REPRESENTATION_UUIDS, representationUUIDs);
+    doc.addField(RodaConstants.DIP_FILE_UUIDS, fileUUIDs);
 
-    doc.addField(RodaConstants.DIP_ALL_AIP_UUIDS, JsonUtils.getJsonFromObject(allAipUUIDs));
-    doc.addField(RodaConstants.DIP_ALL_REPRESENTATION_UUIDS, JsonUtils.getJsonFromObject(allRepresentationUUIDs));
+    doc.addField(RodaConstants.DIP_ALL_AIP_UUIDS, allAipUUIDs);
+    doc.addField(RodaConstants.DIP_ALL_REPRESENTATION_UUIDS, allRepresentationUUIDs);
 
     setPermissions(dip.getPermissions(), doc);
 

@@ -45,6 +45,12 @@
 						<i class="fa fa-remove"></i>
 					</g:HTML>
 				</g:FocusPanel>
+				<g:FocusPanel ui:field="disseminationsButton"
+					addStyleNames="toolbarLink filePreviewToolbarInfoIcon">
+					<g:HTML>
+						<i class="fa fa-play-circle-o"></i>
+					</g:HTML>
+				</g:FocusPanel>
 				<g:FocusPanel ui:field="infoFileButton"
 					addStyleNames="toolbarLink filePreviewToolbarInfoIcon">
 					<g:HTML>
@@ -62,6 +68,14 @@
 					<ui:text from='{messages.viewRepresentationInfoTitle}' />
 				</g:Label>
 				<g:FlowPanel ui:field="infoFilePanel">
+				</g:FlowPanel>
+			</g:FlowPanel>
+			<!-- DIP PANEL -->
+			<g:FlowPanel addStyleNames="dipFilePanel">
+				<g:Label styleName="h1" addStyleNames="fileDipTitle">
+					<ui:text from='{messages.viewRepresentationFileDisseminationTitle}' />
+				</g:Label>
+				<g:FlowPanel ui:field="dipFilePanel">
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>

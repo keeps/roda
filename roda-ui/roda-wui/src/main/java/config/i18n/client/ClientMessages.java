@@ -497,6 +497,8 @@ public interface ClientMessages extends Messages {
   String viewRepresentationSearchPlaceHolder();
 
   String viewRepresentationInfoTitle();
+  
+  String viewRepresentationFileDisseminationTitle();
 
   String viewRepresentationInfoFilename();
 

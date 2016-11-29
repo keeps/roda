@@ -286,7 +286,7 @@ public class BrowseRepresentation extends Composite {
     representationIconHtmlPanel.addStyleName("browseItemIcon-other");
     representationIcon.setWidget(representationIconHtmlPanel);
     representationType.setText(representation.getType() != null ? representation.getType() : representation.getId());
-    representationId.setText(repId);
+    representationId.setText(representation.getId());
 
     breadcrumb.updatePath(BreadcrumbUtils.getRepresentatioBreadcrumbs(itemBundle, aipId, repId));
     breadcrumb.setVisible(true);

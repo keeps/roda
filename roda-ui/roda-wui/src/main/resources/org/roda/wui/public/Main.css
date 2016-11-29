@@ -3832,7 +3832,7 @@ td.datePickerMonth, td.datePickerYear {
     color: inherit;
 }
 
-.viewRepresentationFile .infoFilePanel {
+.viewRepresentationFile .infoFilePanel, .viewRepresentationFile .dipFilePanel {
     height: 630px;
     width: 300px;
     background: #089de3;
@@ -3845,28 +3845,39 @@ td.datePickerMonth, td.datePickerYear {
     box-shadow: 0 0 0 0 transparent, 0 0 0 0 transparent, 0 0 0 0 transparent, -6px 0 15px -4px rgba(31, 73, 125, 0.8);
 }
 
-.viewRepresentationFile .infoFileTitle {
+.viewRepresentationFile .infoFileTitle, .viewRepresentationFile .fileDipTitle {
     font-size: 3rem;
     margin-top: 1.2rem;
     margin-bottom: 2.5rem;
 }
 
-.viewRepresentationFile .infoFileEntry {
+.viewRepresentationFile .infoFileEntry, .viewRepresentationFile .dip {
     margin-bottom: 1em;
 }
 
-.viewRepresentationFile .infoFileEntryKey {
+.viewRepresentationFile .infoFileEntryKey, .viewRepresentationFile .dipTitle {
     font-size: 1.3rem;
     line-height: 1.1em;
     color: rgba(255, 255, 255, 0.8);
     margin-bottom: 0.2em;
 }
 
-.viewRepresentationFile .infoFileEntryValue {
+.viewRepresentationFile .dip-focus .dipTitle {
+	text-decoration: underline;
+}
+
+.viewRepresentationFile .dip-focus {
+	cursor: pointer;
+	cursor: hand;
+}
+
+.viewRepresentationFile .infoFileEntryValue, .viewRepresentationFile .dipDescription {
     font-size: 1.3rem;
     word-break: break-all;
     line-height: 1.1em;
 }
+
+
 
 .my-files-table .file-path {
     color: #a7a9ac;

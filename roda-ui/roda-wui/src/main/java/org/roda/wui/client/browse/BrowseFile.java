@@ -15,6 +15,14 @@ import java.util.List;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.sort.SortParameter;
+import org.roda.core.data.v2.index.sort.Sorter;
+import org.roda.core.data.v2.index.sublist.Sublist;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
@@ -34,6 +42,7 @@ import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.ErrorEvent;
@@ -53,6 +62,7 @@ import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -61,7 +71,6 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
@@ -74,107 +83,10 @@ import config.i18n.client.ClientMessages;
  */
 public class BrowseFile extends Composite {
 
-  public static final HistoryResolver RESOLVER = new HistoryResolver() {
-
-    @Override
-    public void resolve(final List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      BrowserService.Util.getInstance().retrieveViewersProperties(new AsyncCallback<Viewers>() {
-
-        @Override
-        public void onSuccess(Viewers viewers) {
-          load(viewers, historyTokens, callback);
-        }
-
-        @Override
-        public void onFailure(Throwable caught) {
-          errorRedirect(callback);
-        }
-      });
-    }
-
-    @Override
-    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {Browse.RESOLVER}, false, callback);
-    }
-
-    public List<String> getHistoryPath() {
-      return Tools.concat(Browse.RESOLVER.getHistoryPath(), getHistoryToken());
-    }
-
-    public String getHistoryToken() {
-      return "file";
-    }
-
-    private void load(final Viewers viewers, final List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      if (historyTokens.size() > 2) {
-        final String aipId = historyTokens.get(0);
-        final String representationUUID = historyTokens.get(1);
-        final String fileUUID = historyTokens.get(2);
-
-        BrowserService.Util.getInstance().retrieveItemBundle(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
-          new AsyncCallback<BrowseItemBundle>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-              errorRedirect(callback);
-            }
-
-            @Override
-            public void onSuccess(final BrowseItemBundle itemBundle) {
-              if (itemBundle != null && verifyRepresentation(itemBundle.getRepresentations(), representationUUID)) {
-                BrowserService.Util.getInstance().retrieve(IndexedFile.class.getName(), fileUUID,
-                  new AsyncCallback<IndexedFile>() {
-
-                    @Override
-                    public void onSuccess(IndexedFile simpleFile) {
-                      BrowseFile view = new BrowseFile(viewers, aipId, itemBundle, representationUUID, fileUUID,
-                        simpleFile);
-                      callback.onSuccess(view);
-                    }
-
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
-                      errorRedirect(callback);
-                    }
-                  });
-              } else {
-                errorRedirect(callback);
-              }
-            }
-          });
-      } else {
-        errorRedirect(callback);
-      }
-    }
-
-    private boolean verifyRepresentation(List<IndexedRepresentation> representations, String representationUUID) {
-      boolean exist = false;
-      for (IndexedRepresentation representation : representations) {
-        if (representation.getUUID().equals(representationUUID)) {
-          exist = true;
-        }
-      }
-      return exist;
-    }
-
-    private void errorRedirect(AsyncCallback<Widget> callback) {
-      Tools.newHistory(Browse.RESOLVER);
-      callback.onSuccess(null);
-    }
-  };
-
-  public static void jumpTo(IndexedFile selected) {
-    Tools.newHistory(BrowseFile.RESOLVER, selected.getAipId(), selected.getRepresentationUUID(), selected.getUUID());
-  }
-
   interface MyUiBinder extends UiBinder<Widget, BrowseFile> {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
-  @SuppressWarnings("unused")
-  private ClientLogger logger = new ClientLogger(getClass().getName());
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -186,7 +98,11 @@ public class BrowseFile extends Composite {
   private String fileUUID;
   private IndexedFile file;
 
-  static final int WINDOW_WIDTH = 800;
+  private boolean infoPanelOpen = false;
+  private boolean disseminationsPanelOpen = false;
+
+  @SuppressWarnings("unused")
+  private ClientLogger logger = new ClientLogger(getClass().getName());
 
   @UiField
   BreadcrumbPanel breadcrumb;
@@ -201,10 +117,10 @@ public class BrowseFile extends Composite {
   FocusPanel removeFileButton;
 
   @UiField
-  FocusPanel infoFileButton;
+  FocusPanel infoFileButton, disseminationsButton;
 
   @UiField
-  FlowPanel infoFilePanel;
+  FlowPanel infoFilePanel, dipFilePanel;
 
   @UiField
   FocusPanel downloadDocumentationButton;
@@ -324,15 +240,54 @@ public class BrowseFile extends Composite {
 
   @UiHandler("infoFileButton")
   void buttonInfoFileButtonHandler(ClickEvent e) {
-    toggleRightPanel();
+    toggleInfoPanel();
   }
 
-  private void toggleRightPanel() {
-    infoFileButton.setStyleName(infoFileButton.getStyleName().contains(" active")
-      ? infoFileButton.getStyleName().replace(" active", "") : infoFileButton.getStyleName().concat(" active"));
+  @UiHandler("disseminationsButton")
+  void buttonDisseminationsButtonHandler(ClickEvent e) {
+    toggleDisseminationsPanel();
+  }
 
-    changeInfoFile();
+  private void toggleInfoPanel() {
+    infoPanelOpen = !infoPanelOpen;
+
+    updateInfoPanel();
+  }
+
+  private void updateInfoPanel() {
+    if (infoPanelOpen) {
+      infoFileButton.addStyleName("active");
+      updateInfoFile();
+
+      if (disseminationsPanelOpen) {
+        toggleDisseminationsPanel();
+      }
+    } else {
+      infoFileButton.removeStyleName("active");
+    }
+
     JavascriptUtils.toggleRightPanel(".infoFilePanel");
+  }
+
+  private void toggleDisseminationsPanel() {
+    disseminationsPanelOpen = !disseminationsPanelOpen;
+    updateDisseminationPanel();
+  }
+
+  private void updateDisseminationPanel() {
+    if (disseminationsPanelOpen) {
+      disseminationsButton.addStyleName("active");
+      updateDisseminations();
+
+      if (infoPanelOpen) {
+        toggleInfoPanel();
+      }
+
+    } else {
+      disseminationsButton.removeStyleName("active");
+    }
+
+    JavascriptUtils.toggleRightPanel(".dipFilePanel");
   }
 
   private void filePreview() {
@@ -341,7 +296,6 @@ public class BrowseFile extends Composite {
 
     if (file != null && !file.isDirectory()) {
       downloadFileButton.setVisible(true);
-      // removeFileButton.setVisible(true);
       infoFileButton.setVisible(true);
 
       String type = viewerType(file);
@@ -463,6 +417,13 @@ public class BrowseFile extends Composite {
     filePreview.add(downloadButton);
     html.setStyleName("viewRepresentationNotSupportedPreview");
     downloadButton.setStyleName("btn btn-download viewRepresentationNotSupportedDownloadButton");
+
+    Scheduler.get().scheduleDeferred(new Command() {
+      public void execute() {
+        toggleDisseminationsPanel();
+      }
+    });
+
   }
 
   private void imagePreview(IndexedFile file) {
@@ -570,7 +531,7 @@ public class BrowseFile extends Composite {
     return string.replace("?", "%3F").replace("=", "%3D");
   }
 
-  public void changeInfoFile() {
+  public void updateInfoFile() {
     HashMap<String, SafeHtml> values = new HashMap<String, SafeHtml>();
     infoFilePanel.clear();
 
@@ -614,7 +575,7 @@ public class BrowseFile extends Composite {
           SafeHtmlUtils.fromString(file.getDateCreatedByApplication()));
       }
 
-      if (file.getHash() != null && file.getHash().size() > 0) {
+      if (file.getHash() != null && !file.getHash().isEmpty()) {
         SafeHtmlBuilder b = new SafeHtmlBuilder();
         boolean first = true;
         for (String hash : file.getHash()) {
@@ -655,5 +616,161 @@ public class BrowseFile extends Composite {
       valueLabel.addStyleName("infoFileEntryValue");
       entry.addStyleName("infoFileEntry");
     }
+  }
+
+  private void updateDisseminations() {
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, fileUUID));
+    Sorter sorter = new Sorter(new SortParameter(RodaConstants.DIP_DATE_CREATED, true));
+    Sublist sublist = new Sublist(0, 100);
+    Facets facets = Facets.NONE;
+    String localeString = LocaleInfo.getCurrentLocale().getLocaleName();
+    boolean justActive = true;
+
+    BrowserService.Util.getInstance().find(IndexedDIP.class.getName(), filter, sorter, sublist, facets, localeString,
+      justActive, new AsyncCallback<IndexResult<IndexedDIP>>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
+
+        @Override
+        public void onSuccess(IndexResult<IndexedDIP> result) {
+          updateDisseminations(result.getResults());
+        }
+      });
+  }
+
+  private void updateDisseminations(List<IndexedDIP> dips) {
+    dipFilePanel.clear();
+    for (final IndexedDIP dip : dips) {
+
+      FlowPanel entry = new FlowPanel();
+      FocusPanel focus = new FocusPanel(entry);
+
+      Label titleLabel = new Label(dip.getTitle());
+      Label descriptionLabel = new Label(dip.getDescription());
+
+      entry.add(titleLabel);
+      entry.add(descriptionLabel);
+
+      dipFilePanel.add(focus);
+
+      titleLabel.addStyleName("dipTitle");
+      descriptionLabel.addStyleName("dipDescription");
+      entry.addStyleName("dip");
+      focus.addStyleName("dip-focus");
+
+      focus.addClickHandler(new ClickHandler() {
+
+        @Override
+        public void onClick(ClickEvent event) {
+          if (StringUtils.isNotBlank(dip.getOpenExternalURL())) {
+            Window.open(dip.getOpenExternalURL(), "_blank", "");
+            Toast.showInfo("Opened dissemination", dip.getOpenExternalURL());
+          } else {
+            Toast.showInfo("Feature not yet implemented", "Will open the DIP in a new panel");
+          }
+        }
+      });
+
+    }
+  }
+
+  public static final HistoryResolver RESOLVER = new HistoryResolver() {
+
+    @Override
+    public void resolve(final List<String> historyTokens, final AsyncCallback<Widget> callback) {
+      BrowserService.Util.getInstance().retrieveViewersProperties(new AsyncCallback<Viewers>() {
+
+        @Override
+        public void onSuccess(Viewers viewers) {
+          load(viewers, historyTokens, callback);
+        }
+
+        @Override
+        public void onFailure(Throwable caught) {
+          errorRedirect(callback);
+        }
+      });
+    }
+
+    @Override
+    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {Browse.RESOLVER}, false, callback);
+    }
+
+    @Override
+    public List<String> getHistoryPath() {
+      return Tools.concat(Browse.RESOLVER.getHistoryPath(), getHistoryToken());
+    }
+
+    @Override
+    public String getHistoryToken() {
+      return "file";
+    }
+
+    private void load(final Viewers viewers, final List<String> historyTokens, final AsyncCallback<Widget> callback) {
+      if (historyTokens.size() > 2) {
+        final String historyAipId = historyTokens.get(0);
+        final String historyRepresentationUUID = historyTokens.get(1);
+        final String historyFileUUID = historyTokens.get(2);
+
+        BrowserService.Util.getInstance().retrieveItemBundle(historyAipId,
+          LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<BrowseItemBundle>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+              errorRedirect(callback);
+            }
+
+            @Override
+            public void onSuccess(final BrowseItemBundle itemBundle) {
+              if (itemBundle != null
+                && verifyRepresentation(itemBundle.getRepresentations(), historyRepresentationUUID)) {
+                BrowserService.Util.getInstance().retrieve(IndexedFile.class.getName(), historyFileUUID,
+                  new AsyncCallback<IndexedFile>() {
+
+                    @Override
+                    public void onSuccess(IndexedFile simpleFile) {
+                      BrowseFile view = new BrowseFile(viewers, historyAipId, itemBundle, historyRepresentationUUID,
+                        historyFileUUID, simpleFile);
+                      callback.onSuccess(view);
+                    }
+
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
+                      errorRedirect(callback);
+                    }
+                  });
+              } else {
+                errorRedirect(callback);
+              }
+            }
+          });
+      } else {
+        errorRedirect(callback);
+      }
+    }
+
+    private boolean verifyRepresentation(List<IndexedRepresentation> representations, String representationUUID) {
+      boolean exist = false;
+      for (IndexedRepresentation representation : representations) {
+        if (representation.getUUID().equals(representationUUID)) {
+          exist = true;
+        }
+      }
+      return exist;
+    }
+
+    private void errorRedirect(AsyncCallback<Widget> callback) {
+      Tools.newHistory(Browse.RESOLVER);
+      callback.onSuccess(null);
+    }
+  };
+
+  public static void jumpTo(IndexedFile selected) {
+    Tools.newHistory(BrowseFile.RESOLVER, selected.getAipId(), selected.getRepresentationUUID(), selected.getUUID());
   }
 }
