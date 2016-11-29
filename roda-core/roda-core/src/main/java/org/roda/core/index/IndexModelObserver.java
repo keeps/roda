@@ -23,6 +23,7 @@ import org.apache.solr.common.SolrInputDocument;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.PremisV3Utils;
+import org.roda.core.common.ReturnWithExceptions;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -86,7 +87,6 @@ import org.xml.sax.SAXException;
 public class IndexModelObserver implements ModelObserver {
 
   private static final int TEN_MB_IN_BYTES = 10485760;
-
   private static final Logger LOGGER = LoggerFactory.getLogger(IndexModelObserver.class);
 
   private final SolrClient index;
@@ -99,31 +99,42 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   @Override
-  public void aipCreated(final AIP aip) {
+  public ReturnWithExceptions<Void> aipCreated(final AIP aip) {
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
     try {
       List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
-      indexAIP(aip, ancestors);
-      indexRepresentations(aip, ancestors);
-      indexPreservationsEvents(aip);
+      ReturnWithExceptions<Void> aipExceptions = indexAIP(aip, ancestors);
+      exceptions.addExceptions(aipExceptions.getExceptions());
+
+      ReturnWithExceptions<Void> repExceptions = indexRepresentations(aip, ancestors);
+      exceptions.addExceptions(repExceptions.getExceptions());
+
+      ReturnWithExceptions<Void> eventExceptions = indexPreservationsEvents(aip);
+      exceptions.addExceptions(eventExceptions.getExceptions());
+
       // indexOtherMetadata(aip);
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error getting ancestors when creating AIP");
+      exceptions.addException(e);
     }
+
+    return exceptions;
   }
 
-  private void indexAIP(final AIP aip, final List<String> ancestors) {
+  private ReturnWithExceptions<Void> indexAIP(final AIP aip, final List<String> ancestors) {
     boolean safemode = false;
-    indexAIP(aip, ancestors, safemode);
+    return indexAIP(aip, ancestors, safemode);
   }
 
-  private void indexAIP(final AIP aip, final List<String> ancestors, boolean safemode) {
+  private ReturnWithExceptions<Void> indexAIP(final AIP aip, final List<String> ancestors, boolean safemode) {
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
     try {
       SolrInputDocument aipDoc = SolrUtils.aipToSolrInputDocument(aip, ancestors, model, safemode);
       index.add(RodaConstants.INDEX_AIP, aipDoc);
-
       LOGGER.trace("Adding AIP: {}", aipDoc);
     } catch (SolrException | SolrServerException | IOException | RequestNotValidException | GenericException
       | NotFoundException | AuthorizationDeniedException e) {
+      exceptions.addException(e);
       if (!safemode) {
         LOGGER.error("Error indexing AIP, trying safe mode", e);
         safemode = true;
@@ -131,12 +142,13 @@ public class IndexModelObserver implements ModelObserver {
       } else {
         LOGGER.error("Cannot index created AIP", e);
       }
-
     }
+
+    return exceptions;
   }
 
-  private void indexPreservationsEvents(final AIP aip) {
-
+  private ReturnWithExceptions<Void> indexPreservationsEvents(final AIP aip) {
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
     CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadata = null;
     try {
       boolean includeRepresentations = true;
@@ -147,21 +159,25 @@ public class IndexModelObserver implements ModelObserver {
           if (pm.getType().equals(PreservationMetadataType.EVENT)) {
             try {
               indexPreservationEvent(pm);
-            } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException
-              | AuthorizationDeniedException e) {
+            } catch (SolrServerException | SolrException | IOException | RequestNotValidException | GenericException
+              | NotFoundException | AuthorizationDeniedException e) {
               LOGGER.error("Cannot index premis event", e);
+              exceptions.addException(e);
             }
           }
         } else {
           LOGGER.error("Cannot index premis event", opm.getCause());
+          exceptions.addException(opm.getCause());
         }
       }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Cannot index preservation events", e);
+      exceptions.addException(e);
     } finally {
       IOUtils.closeQuietly(preservationMetadata);
     }
 
+    return exceptions;
   }
 
   private void indexPreservationEvent(PreservationMetadata pm) throws RequestNotValidException, GenericException,
@@ -178,13 +194,18 @@ public class IndexModelObserver implements ModelObserver {
     // TODO index other metadata
   }
 
-  private void indexRepresentations(final AIP aip, final List<String> ancestors) {
+  private ReturnWithExceptions<Void> indexRepresentations(final AIP aip, final List<String> ancestors) {
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
     for (Representation representation : aip.getRepresentations()) {
-      indexRepresentation(aip, representation, ancestors);
+      ReturnWithExceptions<Void> repExceptions = indexRepresentation(aip, representation, ancestors);
+      exceptions.addExceptions(repExceptions.getExceptions());
     }
+    return exceptions;
   }
 
-  private void indexRepresentation(final AIP aip, final Representation representation, final List<String> ancestors) {
+  private ReturnWithExceptions<Void> indexRepresentation(final AIP aip, final Representation representation,
+    final List<String> ancestors) {
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
     CloseableIterable<OptionalWithCause<File>> allFiles = null;
     try {
       Long sizeInBytes = 0L;
@@ -195,9 +216,12 @@ public class IndexModelObserver implements ModelObserver {
       for (OptionalWithCause<File> file : allFiles) {
         if (file.isPresent()) {
           boolean recursiveIndexFile = false;
-          sizeInBytes += indexFile(aip, file.get(), ancestors, recursiveIndexFile);
+          ReturnWithExceptions<Long> ret = indexFile(aip, file.get(), ancestors, recursiveIndexFile);
+          sizeInBytes += ret.getRet();
+          exceptions.addExceptions(ret.getExceptions());
         } else {
           LOGGER.error("Cannot index representation file", file.getCause());
+          exceptions.addException(file.getCause());
         }
         numberOfDataFiles++;
       }
@@ -226,23 +250,19 @@ public class IndexModelObserver implements ModelObserver {
         sizeInBytes, numberOfDataFiles, numberOfDocumentationFiles, numberOfSchemaFiles, ancestors);
       index.add(RodaConstants.INDEX_REPRESENTATION, representationDocument);
 
-    } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException
-      | AuthorizationDeniedException e) {
+    } catch (SolrServerException | SolrException | IOException | RequestNotValidException | GenericException
+      | NotFoundException | AuthorizationDeniedException e) {
       LOGGER.error("Cannot index representation", e);
+      exceptions.addException(e);
     } finally {
       IOUtils.closeQuietly(allFiles);
     }
+
+    return exceptions;
   }
 
-  // private void indexFile(OptionalWithCause<AIP> aip, OptionalWithCause<File>
-  // file, boolean recursive) {
-  // if (aip.isPresent() && file.isPresent()) {
-  // indexFile(aip.get(), file.get(), recursive);
-  // }
-  // }
-
-  private Long indexFile(AIP aip, File file, List<String> ancestors, boolean recursive) {
-
+  private ReturnWithExceptions<Long> indexFile(AIP aip, File file, List<String> ancestors, boolean recursive) {
+    ReturnWithExceptions<Long> exceptions = new ReturnWithExceptions<Long>();
     Long sizeInBytes = 0L;
     SolrInputDocument fileDocument = SolrUtils.fileToSolrDocument(aip, file, ancestors);
 
@@ -257,6 +277,7 @@ public class IndexModelObserver implements ModelObserver {
         sizeInBytes = SolrUtils.objectToLong(premisSolrDoc.get(RodaConstants.FILE_SIZE).getValue(), 0L);
       } catch (GenericException e) {
         LOGGER.warn("Could not index file PREMIS information", e);
+        exceptions.addException(e);
       }
     }
 
@@ -269,9 +290,9 @@ public class IndexModelObserver implements ModelObserver {
 
     try {
       index.add(RodaConstants.INDEX_FILE, fileDocument);
-
-    } catch (SolrServerException | IOException e) {
+    } catch (SolrServerException | SolrException | IOException e) {
       LOGGER.error("Cannot index file: {}", file, e);
+      exceptions.addException(e);
     }
 
     if (recursive && file.isDirectory()) {
@@ -279,19 +300,24 @@ public class IndexModelObserver implements ModelObserver {
         CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(file, true);
         for (OptionalWithCause<File> subfile : allFiles) {
           if (subfile.isPresent()) {
-            sizeInBytes += indexFile(aip, subfile.get(), ancestors, false);
+            ReturnWithExceptions<Long> ret = indexFile(aip, subfile.get(), ancestors, false);
+            sizeInBytes += ret.getRet();
+            exceptions.addExceptions(ret.getExceptions());
           } else {
             LOGGER.error("Cannot index file", subfile.getCause());
+            exceptions.addException(subfile.getCause());
           }
         }
         IOUtils.closeQuietly(allFiles);
 
       } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
         LOGGER.error("Cannot index file sub-resources: {}", file, e);
+        exceptions.addException(e);
       }
     }
 
-    return sizeInBytes;
+    exceptions.setRet(sizeInBytes);
+    return exceptions;
   }
 
   private Binary getFilePremisFile(File file) {
@@ -523,7 +549,8 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   @Override
-  public void descriptiveMetadataCreated(DescriptiveMetadata descriptiveMetadata) {
+  public ReturnWithExceptions<Void> descriptiveMetadataCreated(DescriptiveMetadata descriptiveMetadata) {
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
     if (descriptiveMetadata.isFromAIP()) {
       try {
         AIP aip = model.retrieveAIP(descriptiveMetadata.getAipId());
@@ -533,6 +560,8 @@ public class IndexModelObserver implements ModelObserver {
         LOGGER.error("Error when descriptive metadata created on retrieving the full AIP", e);
       }
     }
+
+    return exceptions;
   }
 
   @Override
@@ -562,7 +591,8 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   @Override
-  public void representationCreated(Representation representation) {
+  public ReturnWithExceptions<Void> representationCreated(Representation representation) {
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
     try {
       AIP aip = model.retrieveAIP(representation.getAipId());
       List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
@@ -571,6 +601,7 @@ public class IndexModelObserver implements ModelObserver {
       LOGGER.error("Cannot index representation: {}", representation, e);
     }
 
+    return exceptions;
   }
 
   @Override
@@ -593,7 +624,8 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   @Override
-  public void fileCreated(File file) {
+  public ReturnWithExceptions<Void> fileCreated(File file) {
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
     boolean recursive = true;
     try {
       AIP aip = model.retrieveAIP(file.getAipId());
@@ -602,6 +634,8 @@ public class IndexModelObserver implements ModelObserver {
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error indexing file: {}", file, e);
     }
+
+    return exceptions;
   }
 
   @Override
@@ -623,8 +657,18 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   @Override
-  public void logEntryCreated(LogEntry entry) {
-    addDocumentToIndex(LogEntry.class, entry);
+  public ReturnWithExceptions<Void> logEntryCreated(LogEntry entry) {
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
+    SolrInputDocument logDoc = SolrUtils.logEntryToSolrDocument(entry);
+
+    try {
+      index.add(RodaConstants.INDEX_ACTION_LOG, logDoc);
+    } catch (SolrServerException | SolrException | IOException e) {
+      LOGGER.error("Log entry was not added to index");
+      exceptions.addException(e);
+    }
+
+    return exceptions;
   }
 
   @Override
@@ -646,20 +690,20 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public void groupCreated(Group group) {
     addDocumentToIndex(RODAMember.class, group);
-    reindexAllMembers();
+    // reindexAllMembers();
   }
 
   @Override
   public void groupUpdated(Group group) {
     deleteDocumentFromIndex(RODAMember.class, group.getId());
     addDocumentToIndex(RODAMember.class, group);
-    reindexAllMembers();
+    // reindexAllMembers();
   }
 
   @Override
   public void groupDeleted(String groupID) {
     deleteDocumentFromIndex(RODAMember.class, groupID);
-    reindexAllMembers();
+    // reindexAllMembers();
   }
 
   private void reindexAllMembers() {
@@ -681,7 +725,8 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   @Override
-  public void preservationMetadataCreated(PreservationMetadata pm) {
+  public ReturnWithExceptions<Void> preservationMetadataCreated(PreservationMetadata pm) {
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
     try {
       StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(pm);
       Binary binary = model.getStorage().getBinary(storagePath);
@@ -694,11 +739,12 @@ public class IndexModelObserver implements ModelObserver {
       } else if (PreservationMetadataType.AGENT.equals(type)) {
         index.add(RodaConstants.INDEX_PRESERVATION_AGENTS, premisFileDocument);
       }
-    } catch (IOException | SolrServerException | GenericException | RequestNotValidException | NotFoundException
-      | AuthorizationDeniedException e) {
+    } catch (IOException | SolrServerException | SolrException | GenericException | RequestNotValidException
+      | NotFoundException | AuthorizationDeniedException e) {
       LOGGER.error("Error when preservation metadata created on retrieving the full AIP", e);
+      exceptions.addException(e);
     }
-
+    return exceptions;
   }
 
   @Override
@@ -735,15 +781,27 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   @Override
-  public void jobCreatedOrUpdated(Job job, boolean reindexJobReports) {
-    addDocumentToIndex(Job.class, job);
+  public ReturnWithExceptions<Void> jobCreatedOrUpdated(Job job, boolean reindexJobReports) {
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
+    SolrInputDocument jobDoc = SolrUtils.jobToSolrDocument(job);
+
+    try {
+      index.add(RodaConstants.INDEX_JOB, jobDoc);
+    } catch (SolrServerException | SolrException | IOException e) {
+      LOGGER.error("Job document was not added to index");
+      exceptions.addException(e);
+    }
 
     if (reindexJobReports) {
-      indexJobReports(job);
+      ReturnWithExceptions<Void> subExceptions = indexJobReports(job);
+      exceptions.addExceptions(subExceptions.getExceptions());
     }
+
+    return exceptions;
   }
 
-  private void indexJobReports(Job job) {
+  private ReturnWithExceptions<Void> indexJobReports(Job job) {
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
     StorageService storage = RodaCoreFactory.getStorageService();
     CloseableIterable<Resource> listResourcesUnderDirectory = null;
     try {
@@ -759,10 +817,12 @@ public class IndexModelObserver implements ModelObserver {
               InputStream inputStream = binary.getContent().createInputStream();
               Report objectFromJson = JsonUtils.getObjectFromJson(inputStream, Report.class);
               IOUtils.closeQuietly(inputStream);
-              RodaCoreFactory.getIndexService().reindexJobReport(objectFromJson);
+              ReturnWithExceptions<Void> subExceptions = jobReportCreatedOrUpdated(objectFromJson);
+              exceptions.addExceptions(subExceptions.getExceptions());
             } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
               | IOException e) {
               LOGGER.error("Error getting report json from binary", e);
+              exceptions.addException(e);
             }
           }
         }
@@ -770,9 +830,12 @@ public class IndexModelObserver implements ModelObserver {
 
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
       LOGGER.error("Error reindexing job reports", e);
+      exceptions.addException(e);
     } finally {
       IOUtils.closeQuietly(listResourcesUnderDirectory);
     }
+
+    return exceptions;
   }
 
   @Override
@@ -806,8 +869,18 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   @Override
-  public void jobReportCreatedOrUpdated(Report jobReport) {
-    addDocumentToIndex(Report.class, jobReport);
+  public ReturnWithExceptions<Void> jobReportCreatedOrUpdated(Report jobReport) {
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
+    SolrInputDocument jobReportDoc = SolrUtils.jobReportToSolrDocument(jobReport);
+
+    try {
+      index.add(RodaConstants.INDEX_JOB_REPORT, jobReportDoc);
+    } catch (SolrServerException | SolrException | IOException e) {
+      LOGGER.error("Job report document was not added to index");
+      exceptions.addException(e);
+    }
+
+    return exceptions;
   }
 
   @Override
@@ -928,23 +1001,27 @@ public class IndexModelObserver implements ModelObserver {
     index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
   }
 
-  public void riskCreatedOrUpdated(Risk risk, boolean commit) {
+  public ReturnWithExceptions<Void> riskCreatedOrUpdated(Risk risk, boolean commit) {
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
     SolrInputDocument riskDoc = SolrUtils.riskToSolrDocument(risk);
 
     try {
       index.add(RodaConstants.INDEX_RISK, riskDoc);
-    } catch (SolrServerException | IOException e1) {
+    } catch (SolrServerException | SolrException | IOException e) {
       LOGGER.error("Risk document was not added to index");
+      exceptions.addException(e);
     }
 
     if (commit) {
       try {
         SolrUtils.commit(index, IndexedRisk.class);
-      } catch (GenericException e) {
+      } catch (GenericException | SolrException e) {
         LOGGER.warn("Commit did not run as expected");
+        exceptions.addException(e);
       }
     }
 
+    return exceptions;
   }
 
   public void riskDeleted(String riskId, boolean commit) {
@@ -959,16 +1036,27 @@ public class IndexModelObserver implements ModelObserver {
     }
   }
 
-  public void riskIncidenceCreatedOrUpdated(RiskIncidence riskIncidence, boolean commit) {
-    addDocumentToIndex(RiskIncidence.class, riskIncidence);
+  public ReturnWithExceptions<Void> riskIncidenceCreatedOrUpdated(RiskIncidence riskIncidence, boolean commit) {
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
+    SolrInputDocument incidenceDoc = SolrUtils.riskIncidenceToSolrDocument(riskIncidence);
+
+    try {
+      index.add(RodaConstants.INDEX_RISK_INCIDENCE, incidenceDoc);
+    } catch (SolrServerException | SolrException | IOException e) {
+      LOGGER.error("Risk incidence document was not added to index");
+      exceptions.addException(e);
+    }
 
     if (commit) {
       try {
         SolrUtils.commit(index, RiskIncidence.class);
-      } catch (GenericException e) {
+      } catch (GenericException | SolrException e) {
         LOGGER.warn("Commit did not run as expected");
+        exceptions.addException(e);
       }
     }
+
+    return exceptions;
   }
 
   public void riskIncidenceDeleted(String riskIncidenceId, boolean commit) {
@@ -983,16 +1071,27 @@ public class IndexModelObserver implements ModelObserver {
     }
   }
 
-  public void formatCreatedOrUpdated(Format format, boolean commit) {
-    addDocumentToIndex(Format.class, format);
+  public ReturnWithExceptions<Void> formatCreatedOrUpdated(Format format, boolean commit) {
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
+    SolrInputDocument formatDoc = SolrUtils.formatToSolrDocument(format);
+
+    try {
+      index.add(RodaConstants.INDEX_FORMAT, formatDoc);
+    } catch (SolrServerException | SolrException | IOException e) {
+      LOGGER.error("Format document was not added to index");
+      exceptions.addException(e);
+    }
 
     if (commit) {
       try {
         SolrUtils.commit(index, Format.class);
-      } catch (GenericException e) {
+      } catch (GenericException | SolrException e) {
         LOGGER.warn("Commit did not run as expected");
+        exceptions.addException(e);
       }
     }
+
+    return exceptions;
   }
 
   public void formatDeleted(String formatId, boolean commit) {
@@ -1012,20 +1111,32 @@ public class IndexModelObserver implements ModelObserver {
     deleteDocumentFromIndex(TransferredResource.class, transferredResourceID);
   }
 
-  public void notificationCreatedOrUpdated(Notification notification) {
-    addDocumentToIndex(Notification.class, notification);
+  public ReturnWithExceptions<Void> notificationCreatedOrUpdated(Notification notification) {
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
+    SolrInputDocument notificationDoc = SolrUtils.notificationToSolrDocument(notification);
+
+    try {
+      index.add(RodaConstants.INDEX_NOTIFICATION, notificationDoc);
+    } catch (SolrServerException | SolrException | IOException e) {
+      LOGGER.error("Notification document was not added to index");
+      exceptions.addException(e);
+    }
+
+    return exceptions;
   }
 
   public void notificationDeleted(String notificationId) {
     deleteDocumentFromIndex(Notification.class, notificationId);
   }
 
-  public void dipCreated(DIP dip, boolean commit) {
+  public ReturnWithExceptions<Void> dipCreated(DIP dip, boolean commit) {
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
     SolrInputDocument dipDocument = SolrUtils.dipToSolrDocument(dip);
     try {
       index.add(RodaConstants.INDEX_DIP, dipDocument);
-    } catch (SolrServerException | IOException e) {
+    } catch (SolrServerException | SolrException | IOException e) {
       LOGGER.error("Could not index DIP");
+      exceptions.addException(e);
     }
 
     // index DIP Files
@@ -1035,24 +1146,30 @@ public class IndexModelObserver implements ModelObserver {
       for (OptionalWithCause<DIPFile> file : allFiles) {
         if (file.isPresent()) {
           boolean recursiveIndexFile = false;
-          indexDIPFile(file.get(), recursiveIndexFile);
+          ReturnWithExceptions<Void> subExceptions = indexDIPFile(file.get(), recursiveIndexFile);
+          exceptions.addExceptions(subExceptions.getExceptions());
         } else {
           LOGGER.error("Cannot index DIP file", file.getCause());
+          exceptions.addException(file.getCause());
         }
       }
       IOUtils.closeQuietly(allFiles);
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e1) {
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
       LOGGER.error("Could not index DIP files");
+      exceptions.addException(e);
     }
 
     if (commit) {
       try {
         SolrUtils.commit(index, IndexedDIP.class);
         SolrUtils.commit(index, DIPFile.class);
-      } catch (GenericException e) {
+      } catch (GenericException | SolrException e) {
         LOGGER.warn("Commit did not run as expected");
+        exceptions.addException(e);
       }
     }
+
+    return exceptions;
   }
 
   public void dipUpdated(DIP dip, boolean commit) {
@@ -1074,13 +1191,15 @@ public class IndexModelObserver implements ModelObserver {
     }
   }
 
-  private void indexDIPFile(DIPFile file, boolean recursive) {
+  private ReturnWithExceptions<Void> indexDIPFile(DIPFile file, boolean recursive) {
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
     SolrInputDocument fileDocument = SolrUtils.dipFileToSolrDocument(file);
 
     try {
       index.add(RodaConstants.INDEX_DIP_FILE, fileDocument);
-    } catch (SolrServerException | IOException e) {
+    } catch (SolrServerException | SolrException | IOException e) {
       LOGGER.error("Cannot index DIP file: {}", file, e);
+      exceptions.addException(e);
     }
 
     if (recursive && file.isDirectory()) {
@@ -1088,23 +1207,28 @@ public class IndexModelObserver implements ModelObserver {
         CloseableIterable<OptionalWithCause<DIPFile>> allFiles = model.listDIPFilesUnder(file, true);
         for (OptionalWithCause<DIPFile> subfile : allFiles) {
           if (subfile.isPresent()) {
-            indexDIPFile(subfile.get(), false);
+            ReturnWithExceptions<Void> subExceptions = indexDIPFile(subfile.get(), false);
+            exceptions.addExceptions(subExceptions.getExceptions());
           } else {
             LOGGER.error("Cannot index DIP file", subfile.getCause());
+            exceptions.addException(subfile.getCause());
           }
         }
         IOUtils.closeQuietly(allFiles);
 
       } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
         LOGGER.error("Cannot index DIP file sub-resources: {}", file, e);
+        exceptions.addException(e);
       }
     }
+
+    return exceptions;
   }
 
   @Override
-  public void dipFileCreated(DIPFile file) {
+  public ReturnWithExceptions<Void> dipFileCreated(DIPFile file) {
     boolean recursive = true;
-    indexDIPFile(file, recursive);
+    return indexDIPFile(file, recursive);
   }
 
   @Override

@@ -9,6 +9,7 @@ package org.roda.core.model;
 
 import java.util.List;
 
+import org.roda.core.common.ReturnWithExceptions;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
@@ -29,7 +30,7 @@ import org.roda.core.data.v2.user.User;
 
 public interface ModelObserver {
 
-  public void aipCreated(AIP aip);
+  public ReturnWithExceptions<Void> aipCreated(AIP aip);
 
   public void aipUpdated(AIP aip);
 
@@ -39,26 +40,26 @@ public interface ModelObserver {
 
   public void aipDeleted(String aipId, boolean deleteIncidences);
 
-  public void descriptiveMetadataCreated(DescriptiveMetadata descriptiveMetadataBinary);
+  public ReturnWithExceptions<Void> descriptiveMetadataCreated(DescriptiveMetadata descriptiveMetadataBinary);
 
   public void descriptiveMetadataUpdated(DescriptiveMetadata descriptiveMetadataBinary);
 
   public void descriptiveMetadataDeleted(String aipId, String representationId, String descriptiveMetadataBinaryId);
 
-  public void representationCreated(Representation representation);
+  public ReturnWithExceptions<Void> representationCreated(Representation representation);
 
   public void representationUpdated(Representation representation);
 
   public void representationDeleted(String aipId, String representationId, boolean deleteIncidences);
 
-  public void fileCreated(File file);
+  public ReturnWithExceptions<Void> fileCreated(File file);
 
   public void fileUpdated(File file);
 
   public void fileDeleted(String aipId, String representationId, List<String> fileDirectoryPath, String fileId,
     boolean deleteIncidences);
 
-  public void logEntryCreated(LogEntry entry);
+  public ReturnWithExceptions<Void> logEntryCreated(LogEntry entry);
 
   public void userCreated(User user);
 
@@ -72,7 +73,7 @@ public interface ModelObserver {
 
   public void groupDeleted(String groupID);
 
-  public void preservationMetadataCreated(PreservationMetadata preservationMetadataBinary);
+  public ReturnWithExceptions<Void> preservationMetadataCreated(PreservationMetadata preservationMetadataBinary);
 
   public void preservationMetadataUpdated(PreservationMetadata preservationMetadataBinary);
 
@@ -80,11 +81,11 @@ public interface ModelObserver {
 
   public void otherMetadataCreated(OtherMetadata otherMetadataBinary);
 
-  public void jobCreatedOrUpdated(Job job, boolean reindexJobReports);
+  public ReturnWithExceptions<Void> jobCreatedOrUpdated(Job job, boolean reindexJobReports);
 
   public void jobDeleted(String jobId);
 
-  public void jobReportCreatedOrUpdated(Report jobReport);
+  public ReturnWithExceptions<Void> jobReportCreatedOrUpdated(Report jobReport);
 
   public void jobReportDeleted(String jobReportId);
 
@@ -92,29 +93,29 @@ public interface ModelObserver {
 
   public void transferredResourceDeleted(String transferredResourceID);
 
-  public void riskCreatedOrUpdated(Risk risk, boolean commit);
+  public ReturnWithExceptions<Void> riskCreatedOrUpdated(Risk risk, boolean commit);
 
   public void riskDeleted(String riskId, boolean commit);
 
-  public void riskIncidenceCreatedOrUpdated(RiskIncidence riskIncidence, boolean commit);
+  public ReturnWithExceptions<Void> riskIncidenceCreatedOrUpdated(RiskIncidence riskIncidence, boolean commit);
 
   public void riskIncidenceDeleted(String riskIncidenceId, boolean commit);
 
-  public void formatCreatedOrUpdated(Format format, boolean commit);
+  public ReturnWithExceptions<Void> formatCreatedOrUpdated(Format format, boolean commit);
 
   public void formatDeleted(String formatId, boolean commit);
 
-  public void notificationCreatedOrUpdated(Notification notification);
+  public ReturnWithExceptions<Void> notificationCreatedOrUpdated(Notification notification);
 
   public void notificationDeleted(String notificationId);
 
-  public void dipCreated(DIP dip, boolean commit);
+  public ReturnWithExceptions<Void> dipCreated(DIP dip, boolean commit);
 
   public void dipUpdated(DIP dip, boolean commit);
 
   public void dipDeleted(String dipId, boolean commit);
 
-  public void dipFileCreated(DIPFile file);
+  public ReturnWithExceptions<Void> dipFileCreated(DIPFile file);
 
   public void dipFileUpdated(DIPFile file);
 

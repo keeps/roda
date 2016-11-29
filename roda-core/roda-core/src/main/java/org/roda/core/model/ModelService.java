@@ -2150,9 +2150,9 @@ public class ModelService extends ModelObservable {
         String url = deleteURL.get();
 
         try {
-          if (method.equals("GET")) {
+          if (method.equalsIgnoreCase("GET")) {
             HTTPUtility.doGet(url);
-          } else if (method.equals("DELETE")) {
+          } else if (method.equalsIgnoreCase("DELETE")) {
             HTTPUtility.doDelete(url);
           } else {
             LOGGER.error("HTTP method of delete external service is not supported");

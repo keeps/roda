@@ -574,10 +574,8 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
     }
 
     try {
-      boolean notify = false;
       PluginHelper.createPluginEvent(this, aipId, representationId, filePath, fileId, model, index, sources, null,
-        pluginState, outcomeDetails, notify);
-      index.reindexAIP(model.retrieveAIP(aipId));
+        pluginState, outcomeDetails, true);
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
       | ValidationException | AlreadyExistsException e) {
       LOGGER.error("Error creating event: " + e.getMessage(), e);

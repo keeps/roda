@@ -584,7 +584,6 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
         PluginState reportState = PluginState.SUCCESS;
 
         try {
-
           if (!file.isDirectory()) {
             IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
             String fileMimetype = ifile.getFileFormat().getMimeType();
