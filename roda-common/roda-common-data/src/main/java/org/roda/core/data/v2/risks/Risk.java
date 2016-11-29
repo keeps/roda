@@ -169,7 +169,8 @@ public class Risk extends NamedIndexedModel implements IsModelObject {
   }
 
   public void setPreMitigationSeverityLevel(String preMitigationSeverity) {
-    this.preMitigationSeverityLevel = Risk.SEVERITY_LEVEL.valueOf(preMitigationSeverity);
+    this.preMitigationSeverityLevel = preMitigationSeverity != null ? Risk.SEVERITY_LEVEL.valueOf(preMitigationSeverity)
+      : null;
   }
 
   public String getPreMitigationNotes() {
