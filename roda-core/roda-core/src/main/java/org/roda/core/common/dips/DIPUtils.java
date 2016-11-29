@@ -8,42 +8,29 @@ import org.roda.core.common.HandlebarsUtility;
 import org.roda.core.data.v2.ip.DIP;
 
 public class DIPUtils {
+
   public static Optional<String> getCompleteOpenExternalURL(DIP dip) {
-    if (StringUtils.isNotBlank(dip.getType())) {
-      String config = RodaCoreFactory.getRodaConfigurationAsString("dip", dip.getType(), "openExternalURL");
-      if (StringUtils.isNotBlank(config)) {
-        return Optional.of(HandlebarsUtility.executeHandlebars(config, dip.getProperties()));
-      } else {
-        return Optional.empty();
-      }
-    } else {
-      return Optional.empty();
-    }
+    return getDIPProperty(dip, "dip", dip.getType(), "openExternalURL")
+      .map(value -> HandlebarsUtility.executeHandlebars(value, dip.getProperties()));
   }
 
   public static Optional<String> getCompleteDeleteExternalURL(DIP dip) {
-    if (StringUtils.isNotBlank(dip.getType())) {
-      String config = RodaCoreFactory.getRodaConfigurationAsString("dip", dip.getType(), "deleteExternalURL");
-      if (StringUtils.isNotBlank(config)) {
-        return Optional.of(HandlebarsUtility.executeHandlebars(config, dip.getProperties()));
-      } else {
-        return Optional.empty();
-      }
-    } else {
-      return Optional.empty();
-    }
+    return getDIPProperty(dip, "dip", dip.getType(), "deleteExternalURL")
+      .map(value -> HandlebarsUtility.executeHandlebars(value, dip.getProperties()));
   }
 
   public static Optional<String> getDeleteMethod(DIP dip) {
+    return getDIPProperty(dip, "dip", dip.getType(), "deleteExternalURL", "method");
+  }
+
+  private static Optional<String> getDIPProperty(DIP dip, String... property) {
+    Optional<String> ret = Optional.empty();
     if (StringUtils.isNotBlank(dip.getType())) {
-      String method = RodaCoreFactory.getRodaConfigurationAsString("dip", dip.getType(), "deleteExternalURL", "method");
+      String method = RodaCoreFactory.getRodaConfigurationAsString(property);
       if (StringUtils.isNotBlank(method)) {
-        return Optional.of(method);
-      } else {
-        return Optional.empty();
+        ret = Optional.of(method);
       }
-    } else {
-      return Optional.empty();
     }
+    return ret;
   }
 }

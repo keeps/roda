@@ -48,6 +48,7 @@ import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.SimpleFileList;
 import org.roda.wui.client.common.lists.SimpleJobReportList;
 import org.roda.wui.client.common.lists.TransferredResourceList;
+import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
@@ -285,7 +286,6 @@ public class ShowJob extends Composite {
     SelectedItems<?> selected = job.getSourceObjects();
 
     if (isIngest) {
-
       FacetUtils.bindFacets(ingestJobReports, facetPanels);
 
       ingestJobReports.addValueChangeHandler(new ValueChangeHandler<IndexResult<Report>>() {
@@ -312,7 +312,6 @@ public class ShowJob extends Composite {
       showIngestSourceObjects(selected);
 
     } else {
-
       FacetUtils.bindFacets(simpleJobReports, facetPanels);
 
       simpleJobReports.addValueChangeHandler(new ValueChangeHandler<IndexResult<Report>>() {
@@ -395,20 +394,27 @@ public class ShowJob extends Composite {
     return job != null && !job.isInFinalState();
   }
 
+  private boolean isJobInFinalState() {
+    return job != null && job.isInFinalState();
+  }
+
   private void showIngestSourceObjects(SelectedItems<?> selected) {
     if (selected != null) {
-      if (selected instanceof SelectedItemsList) {
+      selectedList.clear();
+      selectedListPanel.setVisible(true);
+
+      if (ClientSelectedItemsUtils.isEmpty(selected) && isJobInFinalState()) {
+        selectedListPanel.setVisible(false);
+      } else if (selected instanceof SelectedItemsList) {
         List<String> ids = ((SelectedItemsList<?>) selected).getIds();
         Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids));
         TransferredResourceList list = new TransferredResourceList(filter, null, messages.transferredResourcesTitle(),
           false, 10, 10);
-        selectedList.clear();
         selectedList.add(list);
       } else if (selected instanceof SelectedItemsFilter) {
         Filter filter = ((SelectedItemsFilter<?>) selected).getFilter();
         TransferredResourceList list = new TransferredResourceList(filter, null, messages.transferredResourcesTitle(),
           false, 10, 10);
-        selectedList.clear();
         selectedList.add(list);
       } else {
         selectedListPanel.setVisible(false);
