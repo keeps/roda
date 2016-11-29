@@ -508,6 +508,8 @@ public interface ClientMessages extends Messages {
 
   String viewRepresentationInfoFormat();
 
+  String viewRepresentationInfoFormatVersion();
+
   String viewRepresentationInfoPronom();
 
   String viewRepresentationInfoCreatedDate();

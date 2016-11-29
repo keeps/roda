@@ -554,6 +554,11 @@ public class BrowseFile extends Composite {
             SafeHtmlUtils.fromString(fileFormat.getFormatDesignationName()));
         }
 
+        if (StringUtils.isNotBlank(fileFormat.getFormatDesignationVersion())) {
+          values.put(messages.viewRepresentationInfoFormatVersion(),
+            SafeHtmlUtils.fromString(fileFormat.getFormatDesignationVersion()));
+        }
+
         if (StringUtils.isNotBlank(fileFormat.getPronom())) {
           values.put(messages.viewRepresentationInfoPronom(), SafeHtmlUtils.fromString(fileFormat.getPronom()));
         }
