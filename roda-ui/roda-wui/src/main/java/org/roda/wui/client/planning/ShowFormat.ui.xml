@@ -94,6 +94,12 @@
 							</g:FlowPanel>
 
 							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="formatAlternativesKey">
+									<ui:text from='{messages.formatAlternativeDesignations}' />
+								</g:Label>
+								<g:FlowPanel styleName="value" ui:field="formatAlternativesValue" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
 								<g:Label styleName="label" ui:field="formatExtensionsKey">
 									<ui:text from='{messages.formatExtensions}' />
 								</g:Label>
@@ -116,6 +122,12 @@
 									<ui:text from='{messages.formatUtis}' />
 								</g:Label>
 								<g:FlowPanel styleName="value" ui:field="formatUtisValue" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="formatVersionsKey">
+									<ui:text from='{messages.formatVersions}' />
+								</g:Label>
+								<g:FlowPanel styleName="value" ui:field="formatVersionsValue" />
 							</g:FlowPanel>
 						</g:FlowPanel>
 					</g:FlowPanel>

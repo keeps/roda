@@ -45,6 +45,8 @@
 				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatProvenanceInformation}' /></g:Label>
 				<g:TextArea ui:field="provenanceInformation" addStyleNames="form-textbox" />
 				
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatAlternativeDesignations}' /></g:Label>
+				<l:IncrementalList ui:field="alternatives"></l:IncrementalList>
 				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatExtensions}' /></g:Label>
 				<l:IncrementalList ui:field="extensions"></l:IncrementalList>
 				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatMimetypes}' /></g:Label>
@@ -53,6 +55,8 @@
 				<l:IncrementalList ui:field="pronoms"></l:IncrementalList>
 				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatUtis}' /></g:Label>
 				<l:IncrementalList ui:field="utis"></l:IncrementalList>
+				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatVersions}' /></g:Label>
+				<l:IncrementalList ui:field="versions"></l:IncrementalList>
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>

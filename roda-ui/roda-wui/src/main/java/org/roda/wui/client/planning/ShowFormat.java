@@ -148,6 +148,18 @@ public class ShowFormat extends Composite {
   FlowPanel formatUtisValue;
 
   @UiField
+  Label formatVersionsKey;
+
+  @UiField
+  FlowPanel formatVersionsValue;
+
+  @UiField
+  Label formatAlternativesKey;
+
+  @UiField
+  FlowPanel formatAlternativesValue;
+
+  @UiField
   Button buttonEdit;
 
   @UiField
@@ -276,6 +288,30 @@ public class ShowFormat extends Composite {
         HTML parPanel = new HTML();
         parPanel.setHTML(messages.formatListItems(uti));
         formatUtisValue.add(parPanel);
+      }
+    }
+
+    List<String> alternatives = format.getAlternativeDesignations();
+    formatAlternativesValue.setVisible(alternatives != null && !alternatives.isEmpty());
+    formatAlternativesKey.setVisible(alternatives != null && !alternatives.isEmpty());
+
+    if (alternatives != null) {
+      for (String alt : alternatives) {
+        HTML parPanel = new HTML();
+        parPanel.setHTML(messages.formatListItems(alt));
+        formatAlternativesValue.add(parPanel);
+      }
+    }
+
+    List<String> versions = format.getVersions();
+    formatVersionsValue.setVisible(versions != null && !versions.isEmpty());
+    formatVersionsKey.setVisible(versions != null && !versions.isEmpty());
+
+    if (versions != null) {
+      for (String version : versions) {
+        HTML parPanel = new HTML();
+        parPanel.setHTML(messages.formatListItems(version));
+        formatVersionsValue.add(parPanel);
       }
     }
   }

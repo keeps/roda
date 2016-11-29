@@ -1954,6 +1954,8 @@ public class SolrUtils {
     doc.addField(RodaConstants.FORMAT_MIMETYPES, format.getMimetypes());
     doc.addField(RodaConstants.FORMAT_PRONOMS, format.getPronoms());
     doc.addField(RodaConstants.FORMAT_UTIS, format.getUtis());
+    doc.addField(RodaConstants.FORMAT_ALTERNATIVE_DESIGNATIONS, format.getAlternativeDesignations());
+    doc.addField(RodaConstants.FORMAT_VERSIONS, format.getVersions());
 
     return doc;
   }
@@ -1977,6 +1979,8 @@ public class SolrUtils {
     format.setMimetypes(objectToListString(doc.get(RodaConstants.FORMAT_MIMETYPES)));
     format.setPronoms(objectToListString(doc.get(RodaConstants.FORMAT_PRONOMS)));
     format.setUtis(objectToListString(doc.get(RodaConstants.FORMAT_UTIS)));
+    format.setAlternativeDesignations(objectToListString(doc.get(RodaConstants.FORMAT_ALTERNATIVE_DESIGNATIONS)));
+    format.setVersions(objectToListString(doc.get(RodaConstants.FORMAT_VERSIONS)));
 
     return format;
   }

@@ -758,7 +758,7 @@ public final class RodaConstants {
   public static final String RISK_POST_MITIGATION_SEVERITY = "postMitigationSeverity";
   public static final String RISK_POST_MITIGATION_SEVERITY_LEVEL = "postMitigationSeverityLevel";
   public static final String RISK_POST_MITIGATION_NOTES = "postMitigationNotes";
-  
+
   public static final String RISK_CURRENT_SEVERITY_LEVEL = "currentSeverityLevel";
 
   public static final String RISK_MITIGATION_STRATEGY = "mitigationStrategy";
@@ -816,6 +816,8 @@ public final class RodaConstants {
   public static final String FORMAT_MIMETYPES = "mimetypes";
   public static final String FORMAT_PRONOMS = "pronoms";
   public static final String FORMAT_UTIS = "utis";
+  public static final String FORMAT_ALTERNATIVE_DESIGNATIONS = "alternativeDesignations";
+  public static final String FORMAT_VERSIONS = "versions";
 
   public static final String FORMAT_FILE_EXTENSION = ".json";
   public static final String FORMAT_SEARCH = "search";

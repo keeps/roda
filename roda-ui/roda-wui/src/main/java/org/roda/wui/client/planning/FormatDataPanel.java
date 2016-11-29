@@ -91,11 +91,16 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
   @UiField
   IncrementalList utis;
 
+  @UiField
+  IncrementalList versions;
+
+  @UiField
+  IncrementalList alternatives;
+
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   private boolean editmode;
-
   private boolean changed = false;
   private boolean checked = false;
 
@@ -154,7 +159,6 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
     developer.addChangeHandler(changeHandler);
 
     initialRelease.addValueChangeHandler(new ValueChangeHandler<Date>() {
-
       @Override
       public void onValueChange(ValueChangeEvent<Date> event) {
         onChange();
@@ -169,6 +173,8 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
     mimetypes.addChangeHandler(changeHandler);
     pronoms.addChangeHandler(changeHandler);
     utis.addChangeHandler(changeHandler);
+    alternatives.addChangeHandler(changeHandler);
+    versions.addChangeHandler(changeHandler);
 
     if (editmode) {
       setFormat(format);
@@ -206,10 +212,11 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
     this.mimetypes.setTextBoxList(format.getMimetypes());
     this.pronoms.setTextBoxList(format.getPronoms());
     this.utis.setTextBoxList(format.getUtis());
+    this.alternatives.setTextBoxList(format.getAlternativeDesignations());
+    this.versions.setTextBoxList(format.getVersions());
   }
 
   public Format getFormat() {
-
     Format format = new Format();
     format.setName(name.getText());
     format.setDefinition(definition.getText());
@@ -227,6 +234,8 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
     format.setMimetypes(mimetypes.getTextBoxesValue());
     format.setPronoms(pronoms.getTextBoxesValue());
     format.setUtis(utis.getTextBoxesValue());
+    format.setAlternativeDesignations(alternatives.getTextBoxesValue());
+    format.setVersions(versions.getTextBoxesValue());
 
     return format;
   }
@@ -246,6 +255,8 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
     mimetypes.clearTextBoxes();
     pronoms.clearTextBoxes();
     utis.clearTextBoxes();
+    alternatives.clearTextBoxes();
+    versions.clearTextBoxes();
   }
 
   /**

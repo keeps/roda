@@ -1213,6 +1213,10 @@ public interface ClientMessages extends Messages {
 
   String formatUtis();
 
+  String formatAlternativeDesignations();
+
+  String formatVersions();
+
   /****** Descriptive Metadata ****/
 
   String metadataType();

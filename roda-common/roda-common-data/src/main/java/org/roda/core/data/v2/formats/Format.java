@@ -43,6 +43,9 @@ public class Format extends NamedIndexedModel implements IsModelObject, IsIndexe
   private List<String> pronoms = new ArrayList<String>();
   private List<String> utis = new ArrayList<String>();
 
+  private List<String> alternativeDesignations = new ArrayList<String>();
+  private List<String> versions = new ArrayList<String>();
+
   public Format() {
     super();
   }
@@ -64,12 +67,14 @@ public class Format extends NamedIndexedModel implements IsModelObject, IsIndexe
     this.mimetypes = new ArrayList<String>(format.getMimetypes());
     this.pronoms = new ArrayList<String>(format.getPronoms());
     this.utis = new ArrayList<String>(format.getUtis());
+    this.alternativeDesignations = new ArrayList<String>(format.getAlternativeDesignations());
+    this.versions = new ArrayList<String>(format.getVersions());
   }
 
   @JsonIgnore
   @Override
   public int getClassVersion() {
-    return 1;
+    return 2;
   }
 
   public String getDefinition() {
@@ -136,6 +141,22 @@ public class Format extends NamedIndexedModel implements IsModelObject, IsIndexe
     this.provenanceInformation = provenanceInformation;
   }
 
+  public List<String> getCategories() {
+    return categories;
+  }
+
+  public void setCategories(List<String> categories) {
+    this.categories = categories;
+  }
+
+  public List<String> getWebsites() {
+    return websites;
+  }
+
+  public void setWebsites(List<String> websites) {
+    this.websites = websites;
+  }
+
   public List<String> getExtensions() {
     return extensions;
   }
@@ -168,42 +189,44 @@ public class Format extends NamedIndexedModel implements IsModelObject, IsIndexe
     this.utis = utis;
   }
 
+  public List<String> getAlternativeDesignations() {
+    return alternativeDesignations;
+  }
+
+  public void setAlternativeDesignations(List<String> alternativeDesignations) {
+    this.alternativeDesignations = alternativeDesignations;
+  }
+
+  public List<String> getVersions() {
+    return versions;
+  }
+
+  public void setVersions(List<String> versions) {
+    this.versions = versions;
+  }
+
   @Override
   public String toString() {
     return "Format [id=" + getId() + ", name=" + getName() + ", definition=" + definition + ", categories=" + categories
       + ", latestVersion=" + latestVersion + ", popularity=" + popularity + ", developer=" + developer
       + ", initialRelease=" + initialRelease + ", standard=" + standard + ", isOpenFormat=" + isOpenFormat
       + ", websites=" + websites + ", provenanceInformation=" + provenanceInformation + ", extensions=" + extensions
-      + ", mimetypes=" + mimetypes + ", pronoms=" + pronoms + ", utis=" + utis + "]";
+      + ", mimetypes=" + mimetypes + ", pronoms=" + pronoms + ", utis=" + utis + ", alternativeDesignations="
+      + alternativeDesignations + ", versions=" + versions + "]";
   }
 
   @Override
   public List<String> toCsvHeaders() {
     return Arrays.asList("id", "name", "definition", "categories", "latestVersion", "popularity", "developer",
       "initialRelease", "standard", "isOpenFormat", "websites", "provenanceInformation", "extensions", "mimetypes",
-      "pronoms", "utis");
+      "pronoms", "utis", "alternativeDesignations", "versions");
   }
 
   @Override
   public List<Object> toCsvValues() {
     return Arrays.asList(getId(), getName(), definition, categories, latestVersion, popularity, developer,
-      initialRelease, standard, isOpenFormat, websites, provenanceInformation, extensions, mimetypes, pronoms, utis);
-  }
-
-  public List<String> getCategories() {
-    return categories;
-  }
-
-  public void setCategories(List<String> categories) {
-    this.categories = categories;
-  }
-
-  public List<String> getWebsites() {
-    return websites;
-  }
-
-  public void setWebsites(List<String> websites) {
-    this.websites = websites;
+      initialRelease, standard, isOpenFormat, websites, provenanceInformation, extensions, mimetypes, pronoms, utis,
+      alternativeDesignations, versions);
   }
 
   @JsonIgnore

@@ -2,14 +2,12 @@ package org.roda.core.migration.model;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
-import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.formats.Format;
 import org.roda.core.migration.MigrationAction;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
@@ -22,35 +20,25 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class RiskToVersion2 implements MigrationAction<Risk> {
+public class FormatToVersion2 implements MigrationAction<Format> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(RiskToVersion2.class);
-
-  private static final Map<String, String> MAPPING = new HashMap<>();
-
-  static {
-    MAPPING.put("posMitigationProbability", "postMitigationProbability");
-    MAPPING.put("posMitigationImpact", "postMitigationImpact");
-    MAPPING.put("posMitigationSeverity", "postMitigationSeverity");
-    MAPPING.put("posMitigationSeverityLevel", "postMitigationSeverityLevel");
-    MAPPING.put("posMitigationNotes", "postMitigationNotes");
-  }
+  private static final Logger LOGGER = LoggerFactory.getLogger(FormatToVersion2.class);
 
   @Override
   public void migrate(StorageService storage) throws RODAException {
-    CloseableIterable<Resource> risks = null;
+    CloseableIterable<Resource> formats = null;
 
     try {
-      risks = storage.listResourcesUnderDirectory(ModelUtils.getRiskContainerPath(), false);
+      formats = storage.listResourcesUnderDirectory(ModelUtils.getFormatContainerPath(), false);
 
-      for (Resource resource : risks) {
+      for (Resource resource : formats) {
         if (!resource.isDirectory() && resource instanceof Binary) {
           Binary binary = (Binary) resource;
           migrate(storage, binary);
         }
       }
     } finally {
-      IOUtils.closeQuietly(risks);
+      IOUtils.closeQuietly(formats);
     }
   }
 
@@ -61,18 +49,18 @@ public class RiskToVersion2 implements MigrationAction<Risk> {
       JsonNode json = JsonUtils.parseJson(inputStream);
       if (json instanceof ObjectNode) {
         ObjectNode obj = (ObjectNode) json;
-        obj = JsonUtils.refactor(obj, MAPPING);
+        // obj = JsonUtils.refactor(obj, MAPPING);
 
         StringContentPayload payload = new StringContentPayload(JsonUtils.getJsonFromNode(obj));
         boolean asReference = false;
         boolean createIfNotExists = false;
         storage.updateBinaryContent(binary.getStoragePath(), payload, asReference, createIfNotExists);
       } else {
-        LOGGER.error("Could not migrate risk {} because the JSON is not an object node", binary.getStoragePath());
+        LOGGER.error("Could not migrate format {} because the JSON is not an object node", binary.getStoragePath());
       }
 
     } catch (IOException | RODAException e) {
-      LOGGER.error("Could not migrate risk {}", binary.getStoragePath(), e);
+      LOGGER.error("Could not migrate format {}", binary.getStoragePath(), e);
     } finally {
       IOUtils.closeQuietly(inputStream);
     }
