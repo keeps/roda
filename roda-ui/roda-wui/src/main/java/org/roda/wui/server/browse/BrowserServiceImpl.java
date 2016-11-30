@@ -283,7 +283,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
         if (fieldsValues != null) {
           Map<String, String> labels = messages.getTranslations(fieldI18NPrefix, String.class, false);
           Tree<String> terms = new Tree<String>(field, field);
-          terms.addChild("", "");
+          // terms.addChild("", "");
           for (String value : fieldsValues) {
             terms.addChild(labels.get(fieldI18NPrefix + "." + value), value);
           }

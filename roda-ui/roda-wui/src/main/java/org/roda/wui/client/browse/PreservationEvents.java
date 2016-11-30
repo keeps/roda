@@ -191,7 +191,8 @@ public class PreservationEvents extends Composite {
 
   public void viewAction() {
     IndexedAIP aip = itemBundle.getAip();
-    breadcrumb.updatePath(BreadcrumbUtils.getAipBreadcrumbs(itemBundle.getAIPAncestors(), aip));
+    boolean aipEvents = true;
+    breadcrumb.updatePath(BreadcrumbUtils.getAipBreadcrumbs(itemBundle.getAIPAncestors(), aip, aipEvents));
     breadcrumb.setVisible(true);
   }
 

@@ -20,6 +20,7 @@ import org.roda.wui.client.browse.BrowseFile;
 import org.roda.wui.client.browse.BrowseFolder;
 import org.roda.wui.client.browse.BrowseItemBundle;
 import org.roda.wui.client.browse.BrowseRepresentation;
+import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Tools;
@@ -38,6 +39,10 @@ public class BreadcrumbUtils {
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   public static List<BreadcrumbItem> getAipBreadcrumbs(List<IndexedAIP> aipAncestors, IndexedAIP aip) {
+    return getAipBreadcrumbs(aipAncestors, aip, false);
+  }
+
+  public static List<BreadcrumbItem> getAipBreadcrumbs(List<IndexedAIP> aipAncestors, IndexedAIP aip, boolean events) {
     List<BreadcrumbItem> breadcrumb = new ArrayList<>();
     breadcrumb
       .add(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), "", Browse.RESOLVER.getHistoryPath()));
@@ -47,8 +52,15 @@ public class BreadcrumbUtils {
         if (ancestor != null) {
           SafeHtml breadcrumbLabel = getBreadcrumbLabel(ancestor);
           String breadcrumbTitle = getBreadcrumbTitle(ancestor);
-          BreadcrumbItem ancestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel, breadcrumbTitle,
-            getViewItemHistoryToken(ancestor.getId()));
+          List<String> historyTokens = new ArrayList<String>();
+
+          if (events) {
+            historyTokens = getViewItemEventsHistoryToken(ancestor.getId());
+          } else {
+            historyTokens = getViewItemHistoryToken(ancestor.getId());
+          }
+
+          BreadcrumbItem ancestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel, breadcrumbTitle, historyTokens);
           breadcrumb.add(1, ancestorBreadcrumb);
         } else {
           SafeHtml breadcrumbLabel = DescriptionLevelUtils.getElementLevelIconSafeHtml(RodaConstants.AIP_GHOST, false);
@@ -237,6 +249,10 @@ public class BreadcrumbUtils {
     }
 
     return title;
+  }
+
+  private static final List<String> getViewItemEventsHistoryToken(String id) {
+    return Tools.concat(Browse.RESOLVER.getHistoryPath(), PreservationEvents.RESOLVER.getHistoryToken(), id);
   }
 
   private static final List<String> getViewItemHistoryToken(String id) {
