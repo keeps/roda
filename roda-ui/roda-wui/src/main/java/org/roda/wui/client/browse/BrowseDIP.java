@@ -273,8 +273,8 @@ public class BrowseDIP extends Composite {
         public void onSuccess(IndexResult<DIPFile> result) {
           if (!result.getResults().isEmpty()) {
             DIPFile firstDipFile = result.getResults().get(0);
-            HistoryUtils.newHistory(BrowseDIP.RESOLVER, dip.getUUID(), firstDipFile.getUUID());
-            callback.onSuccess(null);
+            BrowseDIP view = new BrowseDIP(viewers, dip, firstDipFile);
+            callback.onSuccess(view);
           } else {
             Toast.showError("No files in the DIP");
             // TODO better handle this case

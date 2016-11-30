@@ -152,7 +152,7 @@ public class BitstreamPreview extends Composite {
     }
 
     if (type == null && filename.lastIndexOf(".") != -1) {
-      String extension = filename.substring(filename.lastIndexOf("."));
+      String extension = filename.substring(filename.lastIndexOf(".")).toLowerCase();
       type = viewers.getExtensions().get(extension);
     }
 
