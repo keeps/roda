@@ -252,7 +252,7 @@ public class BreadcrumbUtils {
   }
 
   private static final List<String> getViewItemEventsHistoryToken(String id) {
-    return Tools.concat(Browse.RESOLVER.getHistoryPath(), PreservationEvents.RESOLVER.getHistoryToken(), id);
+    return ListUtils.concat(Browse.RESOLVER.getHistoryPath(), PreservationEvents.RESOLVER.getHistoryToken(), id);
   }
 
   private static final List<String> getViewItemHistoryToken(String id) {
