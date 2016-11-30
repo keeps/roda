@@ -12,9 +12,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
-
 import org.apache.commons.lang3.StringUtils;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -103,7 +102,7 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
   /**
    * String format for {@link Format} name and version.
    */
-  private static final String FORMAT_NAME_PATTERN = "%s, version %s";
+  private static final String FORMAT_NAME_PATTERN = "%1$s, version %2$s";
 
   @Override
   public void init() throws PluginException {
@@ -385,19 +384,18 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
     final List<FilterParameter> filterParams = new ArrayList<>();
 
     if (checkMimetype()) {
-      filterParams.add(new SimpleFilterParameter(RodaConstants.FORMAT_MIMETYPES,
-        Optional.ofNullable(fileFormat.getMimeType()).orElse("")));
+      filterParams.add(new SimpleFilterParameter(RodaConstants.FORMAT_MIMETYPES, fileFormat.getMimeType()));
     }
 
     if (checkPronom()) {
-      filterParams.add(new SimpleFilterParameter(RodaConstants.FORMAT_PRONOMS,
-        Optional.ofNullable(fileFormat.getPronom()).orElse("")));
+      filterParams.add(new SimpleFilterParameter(RodaConstants.FORMAT_PRONOMS, fileFormat.getPronom()));
     }
 
     if (checkFormatDesignation()) {
-      final String name = String.format(FORMAT_NAME_PATTERN,
-        Optional.ofNullable(fileFormat.getFormatDesignationName()).orElse(""),
-        Optional.ofNullable(fileFormat.getFormatDesignationVersion()).orElse(""));
+      final String formatNamePattern = RodaCoreFactory.getRodaConfiguration().getString(
+        "core.plugins.external.FormatMissingRepresentationInformation.format_name_pattern", FORMAT_NAME_PATTERN);
+      final String name = String.format(formatNamePattern, fileFormat.getFormatDesignationName(),
+        fileFormat.getFormatDesignationVersion());
       filterParams.add(new SimpleFilterParameter(RodaConstants.FORMAT_NAME, name));
     }
 
