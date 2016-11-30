@@ -13,7 +13,6 @@ package org.roda.wui.client.browse;
 import java.util.HashMap;
 import java.util.List;
 
-import org.apache.commons.httpclient.HttpStatus;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.Facets;
@@ -45,16 +44,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.ErrorEvent;
-import com.google.gwt.event.dom.client.ErrorHandler;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.RequestException;
-import com.google.gwt.http.client.Response;
 import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.media.client.Audio;
-import com.google.gwt.media.client.Video;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -65,13 +55,10 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
-import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -90,7 +77,6 @@ public class BrowseFile extends Composite {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private Viewers viewers;
   private String aipId;
   private BrowseItemBundle itemBundle;
   private String representationUUID;
@@ -107,8 +93,8 @@ public class BrowseFile extends Composite {
   @UiField
   BreadcrumbPanel breadcrumb;
 
-  @UiField
-  FlowPanel filePreview;
+  @UiField(provided = true)
+  IndexedFilePreview filePreview;
 
   @UiField
   FocusPanel downloadFileButton;
@@ -141,7 +127,6 @@ public class BrowseFile extends Composite {
    */
   public BrowseFile(Viewers viewers, String aipId, BrowseItemBundle itemBundle, String representationUUID,
     String fileUUID, IndexedFile file) {
-    this.viewers = viewers;
     this.aipId = aipId;
     this.itemBundle = itemBundle;
     this.representationUUID = representationUUID;
@@ -154,6 +139,19 @@ public class BrowseFile extends Composite {
         break;
       }
     }
+
+    filePreview = new IndexedFilePreview(viewers, file, new Command() {
+
+      @Override
+      public void execute() {
+        Scheduler.get().scheduleDeferred(new Command() {
+          @Override
+          public void execute() {
+            toggleDisseminationsPanel();
+          }
+        });
+      }
+    });
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -171,9 +169,13 @@ public class BrowseFile extends Composite {
     removeFileButton.setTitle(messages.viewRepresentationRemoveFileButton());
     infoFileButton.setTitle(messages.viewRepresentationInfoFileButton());
 
-    filePreview.addStyleName("viewRepresentationFilePreview");
+    // update breadcrumb
+    breadcrumb.updatePath(getBreadcrumbs());
 
-    filePreview();
+    // update visibles
+    downloadFileButton.setVisible(!file.isDirectory());
+    removeFileButton.setVisible(!file.isDirectory());
+    infoFileButton.setVisible(!file.isDirectory());
   }
 
   @UiHandler("downloadFileButton")
@@ -290,245 +292,8 @@ public class BrowseFile extends Composite {
     JavascriptUtils.toggleRightPanel(".dipFilePanel");
   }
 
-  private void filePreview() {
-    filePreview.clear();
-    breadcrumb.updatePath(getBreadcrumbs());
-
-    if (file != null && !file.isDirectory()) {
-      downloadFileButton.setVisible(true);
-      infoFileButton.setVisible(true);
-
-      String type = viewerType(file);
-      if (type != null) {
-        if (type.equals("image")) {
-          imagePreview(file);
-        } else if (type.equals("pdf")) {
-          pdfPreview(file);
-        } else if (type.equals("text")) {
-          textPreview(file);
-        } else if (type.equals("audio")) {
-          audioPreview(file);
-        } else if (type.equals("video")) {
-          videoPreview(file);
-        } else {
-          notSupportedPreview();
-        }
-      } else {
-        notSupportedPreview();
-      }
-    } else {
-      emptyPreview();
-    }
-  }
-
   private List<BreadcrumbItem> getBreadcrumbs() {
     return BreadcrumbUtils.getFileBreadcrumbs(itemBundle, aipId, representationUUID, file);
-  }
-
-  private String viewerType(IndexedFile file) {
-    String type = null;
-    if (file.getFileFormat() != null) {
-      if (file.getFileFormat().getPronom() != null) {
-        type = viewers.getPronoms().get(file.getFileFormat().getPronom());
-      }
-
-      if (file.getFileFormat().getMimeType() != null && type == null) {
-        type = viewers.getMimetypes().get(file.getFileFormat().getMimeType());
-      }
-    }
-
-    String fileName = file.getOriginalName() != null ? file.getOriginalName() : file.getId();
-
-    if (type == null && fileName.lastIndexOf(".") != -1) {
-      String extension = fileName.substring(fileName.lastIndexOf("."));
-      type = viewers.getExtensions().get(extension);
-    }
-
-    return type;
-  }
-
-  private void emptyPreview() {
-    HTML html = new HTML();
-    SafeHtmlBuilder b = new SafeHtmlBuilder();
-
-    b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-file fa-5'></i>"));
-    b.append(SafeHtmlUtils.fromSafeConstant("<h4 class='emptymessage'>"));
-    b.append(SafeHtmlUtils.fromString(messages.viewRepresentationEmptyPreview()));
-    b.append(SafeHtmlUtils.fromSafeConstant("</h4>"));
-
-    html.setHTML(b.toSafeHtml());
-    filePreview.add(html);
-    html.setStyleName("viewRepresentationEmptyPreview");
-
-    downloadFileButton.setVisible(false);
-    removeFileButton.setVisible(false);
-    infoFileButton.setVisible(false);
-  }
-
-  private void errorPreview() {
-    errorPreview(messages.viewRepresentationErrorPreview());
-  }
-
-  private void errorPreview(String errorPreview) {
-    HTML html = new HTML();
-    SafeHtmlBuilder b = new SafeHtmlBuilder();
-
-    b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-download fa-5'></i>"));
-    b.append(SafeHtmlUtils.fromSafeConstant("<h4 class='errormessage'>"));
-    b.append(SafeHtmlUtils.fromString(errorPreview));
-    b.append(SafeHtmlUtils.fromSafeConstant("</h4>"));
-
-    Button downloadButton = new Button(messages.viewRepresentationDownloadFileButton());
-    downloadButton.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        downloadFile();
-      }
-    });
-
-    html.setHTML(b.toSafeHtml());
-    filePreview.add(html);
-    filePreview.add(downloadButton);
-    html.setStyleName("viewRepresentationErrorPreview");
-    downloadButton.setStyleName("btn btn-donwload viewRepresentationNotSupportedDownloadButton");
-  }
-
-  private void notSupportedPreview() {
-    HTML html = new HTML();
-    SafeHtmlBuilder b = new SafeHtmlBuilder();
-
-    b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-picture-o fa-5'></i>"));
-    b.append(SafeHtmlUtils.fromSafeConstant("<h4 class='errormessage'>"));
-    b.append(SafeHtmlUtils.fromString(messages.viewRepresentationNotSupportedPreview()));
-    b.append(SafeHtmlUtils.fromSafeConstant("</h4>"));
-
-    Button downloadButton = new Button(messages.viewRepresentationDownloadFileButton());
-    downloadButton.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        downloadFile();
-      }
-    });
-
-    html.setHTML(b.toSafeHtml());
-    filePreview.add(html);
-    filePreview.add(downloadButton);
-    html.setStyleName("viewRepresentationNotSupportedPreview");
-    downloadButton.setStyleName("btn btn-download viewRepresentationNotSupportedDownloadButton");
-
-    Scheduler.get().scheduleDeferred(new Command() {
-      public void execute() {
-        toggleDisseminationsPanel();
-      }
-    });
-
-  }
-
-  private void imagePreview(IndexedFile file) {
-    Image image = new Image(RestUtils.createRepresentationFileDownloadUri(file.getUUID()));
-    image.addErrorHandler(new ErrorHandler() {
-
-      @Override
-      public void onError(ErrorEvent event) {
-        filePreview.clear();
-        errorPreview();
-      }
-    });
-    filePreview.add(image);
-    image.setStyleName("viewRepresentationImageFilePreview");
-  }
-
-  private void pdfPreview(IndexedFile file) {
-    String viewerHtml = GWT.getHostPageBaseURL() + "pdf/viewer.html?file="
-      + encode(GWT.getHostPageBaseURL() + RestUtils.createRepresentationFileDownloadUri(file.getUUID()).asString());
-
-    Frame frame = new Frame(viewerHtml);
-    filePreview.add(frame);
-    frame.setStyleName("viewRepresentationPDFFilePreview");
-  }
-
-  private void textPreview(IndexedFile file) {
-    if (StringUtils.isBlank(viewers.getTextLimit()) || file.getSize() <= Long.parseLong(viewers.getTextLimit())) {
-      RequestBuilder request = new RequestBuilder(RequestBuilder.GET,
-        RestUtils.createRepresentationFileDownloadUri(file.getUUID()).asString());
-      try {
-        request.sendRequest(null, new RequestCallback() {
-
-          @Override
-          public void onResponseReceived(Request request, Response response) {
-            if (response.getStatusCode() == HttpStatus.SC_OK) {
-              HTML html = new HTML("<pre><code>" + SafeHtmlUtils.htmlEscape(response.getText()) + "</code></pre>");
-              FlowPanel frame = new FlowPanel();
-              frame.add(html);
-
-              filePreview.add(frame);
-              frame.setStyleName("viewRepresentationTextFilePreview");
-              JavascriptUtils.runHighlighter(html.getElement());
-            } else {
-              errorPreview();
-            }
-          }
-
-          @Override
-          public void onError(Request request, Throwable exception) {
-            errorPreview();
-          }
-        });
-      } catch (RequestException e) {
-        errorPreview();
-      }
-    } else {
-      errorPreview(messages.viewRepresentationTooLargeErrorPreview());
-    }
-  }
-
-  private void audioPreview(IndexedFile file) {
-    Audio audioPlayer = Audio.createIfSupported();
-    if (audioPlayer != null) {
-      HTML html = new HTML();
-      SafeHtmlBuilder b = new SafeHtmlBuilder();
-      b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-headphones fa-5'></i>"));
-      html.setHTML(b.toSafeHtml());
-
-      audioPlayer.addSource(RestUtils.createRepresentationFileDownloadUri(file.getUUID()).asString(),
-        file.getFileFormat().getMimeType());
-      audioPlayer.setControls(true);
-      filePreview.add(html);
-      filePreview.add(audioPlayer);
-      audioPlayer.addStyleName("viewRepresentationAudioFilePreview");
-      html.addStyleName("viewRepresentationAudioFilePreviewHTML");
-    } else {
-      notSupportedPreview();
-    }
-  }
-
-  private void videoPreview(IndexedFile file) {
-    Video videoPlayer = Video.createIfSupported();
-    if (videoPlayer != null) {
-      videoPlayer.addSource(RestUtils.createRepresentationFileDownloadUri(file.getUUID()).asString(),
-        convertVideoMimetypes(file.getFileFormat().getMimeType()));
-      videoPlayer.setControls(true);
-      filePreview.add(videoPlayer);
-      videoPlayer.addStyleName("viewRepresentationAudioFilePreview");
-    } else {
-      notSupportedPreview();
-    }
-  }
-
-  private String convertVideoMimetypes(String mimetype) {
-    if (mimetype.equals("application/mp4")) {
-      return "video/mp4";
-    } else if (mimetype.equals("application/ogg")) {
-      return "video/ogg";
-    } else {
-      return mimetype;
-    }
-  }
-
-  private String encode(String string) {
-    return string.replace("?", "%3F").replace("=", "%3D");
   }
 
   public void updateInfoFile() {
