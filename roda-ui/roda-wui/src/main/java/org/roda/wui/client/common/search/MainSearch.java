@@ -36,7 +36,7 @@ import org.roda.wui.client.common.lists.SearchFileList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.common.client.tools.FacetUtils;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -275,7 +275,7 @@ public class MainSearch extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         IndexedAIP aip = itemsSearchResultPanel.getSelectionModel().getSelectedObject();
         if (aip != null) {
-          Tools.newHistory(Browse.RESOLVER, aip.getId());
+          HistoryUtils.newHistory(Browse.RESOLVER, aip.getId());
         }
       }
     });
@@ -306,7 +306,7 @@ public class MainSearch extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         IndexedRepresentation rep = representationsSearchResultPanel.getSelectionModel().getSelectedObject();
         if (rep != null) {
-          Tools.newHistory(BrowseRepresentation.RESOLVER, rep.getAipId(), rep.getUUID());
+          HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, rep.getAipId(), rep.getUUID());
         }
       }
     });

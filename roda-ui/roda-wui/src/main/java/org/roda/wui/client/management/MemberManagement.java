@@ -23,7 +23,8 @@ import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
@@ -57,7 +58,7 @@ public class MemberManagement extends Composite {
     }
 
     public List<String> getHistoryPath() {
-      return Tools.concat(Management.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(Management.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -144,7 +145,7 @@ public class MemberManagement extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         RODAMember selected = list.getSelectionModel().getSelectedObject();
         if (selected != null) {
-          Tools.newHistory(RESOLVER,
+          HistoryUtils.newHistory(RESOLVER,
             (selected.isUser() ? EditUser.RESOLVER.getHistoryToken() : EDIT_GROUP_HISTORY_TOKEN), selected.getId());
         }
       }
@@ -166,35 +167,35 @@ public class MemberManagement extends Composite {
       callback.onSuccess(this);
     } else if (historyTokens.size() == 1) {
       if (historyTokens.get(0).equals(CreateUser.RESOLVER.getHistoryToken())) {
-        CreateUser.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+        CreateUser.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(CreateGroup.RESOLVER.getHistoryToken())) {
-        CreateGroup.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+        CreateGroup.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else {
-        Tools.newHistory(RESOLVER);
+        HistoryUtils.newHistory(RESOLVER);
         callback.onSuccess(null);
       }
     } else if (historyTokens.size() == 2) {
       if (historyTokens.get(0).equals(EditUser.RESOLVER.getHistoryToken())) {
-        EditUser.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+        EditUser.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(EDIT_GROUP_HISTORY_TOKEN)) {
-        EditGroup.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+        EditGroup.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else {
-        Tools.newHistory(RESOLVER);
+        HistoryUtils.newHistory(RESOLVER);
         callback.onSuccess(null);
       }
     } else {
-      Tools.newHistory(RESOLVER);
+      HistoryUtils.newHistory(RESOLVER);
       callback.onSuccess(null);
     }
   }
 
   @UiHandler("buttonAddUser")
   void buttonAddUserHandler(ClickEvent e) {
-    Tools.newHistory(RESOLVER, "create_user");
+    HistoryUtils.newHistory(RESOLVER, "create_user");
   }
 
   @UiHandler("buttonAddGroup")
   void buttonAddGroupHandler(ClickEvent e) {
-    Tools.newHistory(RESOLVER, "create_group");
+    HistoryUtils.newHistory(RESOLVER, "create_group");
   }
 }

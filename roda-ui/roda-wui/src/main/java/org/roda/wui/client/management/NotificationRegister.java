@@ -28,7 +28,8 @@ import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
@@ -66,7 +67,7 @@ public class NotificationRegister extends Composite {
     }
 
     public List<String> getHistoryPath() {
-      return Tools.concat(Management.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(Management.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -151,7 +152,7 @@ public class NotificationRegister extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         Notification selected = notificationList.getSelectionModel().getSelectedObject();
         if (selected != null) {
-          Tools.newHistory(ShowNotification.RESOLVER, selected.getId());
+          HistoryUtils.newHistory(ShowNotification.RESOLVER, selected.getId());
         }
       }
     });
@@ -204,9 +205,9 @@ public class NotificationRegister extends Composite {
       notificationList.setFilter(Filter.ALL);
       callback.onSuccess(this);
     } else if (historyTokens.size() > 1 && ShowNotification.RESOLVER.getHistoryToken().equals(historyTokens.get(0))) {
-      ShowNotification.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      ShowNotification.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else {
-      Tools.newHistory(RESOLVER);
+      HistoryUtils.newHistory(RESOLVER);
       callback.onSuccess(null);
     }
   }

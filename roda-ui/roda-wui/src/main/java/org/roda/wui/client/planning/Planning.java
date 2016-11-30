@@ -16,7 +16,7 @@ import java.util.List;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -84,11 +84,11 @@ public class Planning {
       init();
       callback.onSuccess(page);
     } else if (historyTokens.get(0).equals(FormatRegister.RESOLVER.getHistoryToken())) {
-      FormatRegister.getInstance().resolve(Tools.tail(historyTokens), callback);
+      FormatRegister.getInstance().resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.get(0).equals(RiskRegister.RESOLVER.getHistoryToken())) {
-      RiskRegister.getInstance().resolve(Tools.tail(historyTokens), callback);
+      RiskRegister.getInstance().resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.get(0).equals(RiskIncidenceRegister.RESOLVER.getHistoryToken())) {
-      RiskIncidenceRegister.getInstance().resolve(Tools.tail(historyTokens), callback);
+      RiskIncidenceRegister.getInstance().resolve(HistoryUtils.tail(historyTokens), callback);
     }
   }
 }

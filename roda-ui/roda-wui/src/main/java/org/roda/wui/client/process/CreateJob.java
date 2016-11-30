@@ -31,7 +31,8 @@ import org.roda.wui.client.ingest.process.PluginOptionsPanel;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -73,11 +74,11 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
           CreateSearchActionJob createSearchActionJob = new CreateSearchActionJob(selectedItems.getSelectedItems());
           callback.onSuccess(createSearchActionJob);
         } else {
-          Tools.newHistory(CreateJob.RESOLVER);
+          HistoryUtils.newHistory(CreateJob.RESOLVER);
           callback.onSuccess(null);
         }
       } else {
-        Tools.newHistory(CreateJob.RESOLVER);
+        HistoryUtils.newHistory(CreateJob.RESOLVER);
         callback.onSuccess(null);
       }
     }
@@ -88,7 +89,7 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
     }
 
     public List<String> getHistoryPath() {
-      return Tools.concat(Process.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(Process.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -181,9 +182,9 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
     boolean isEmpty = updateObjectList();
 
     if (isEmpty && isIngest) {
-      Tools.newHistory(IngestTransfer.RESOLVER);
+      HistoryUtils.newHistory(IngestTransfer.RESOLVER);
     } else if (isEmpty && !isIngest) {
-      Tools.newHistory(Search.RESOLVER);
+      HistoryUtils.newHistory(Search.RESOLVER);
     }
 
     BrowserService.Util.getInstance().retrievePluginsInfo(pluginType, new AsyncCallback<List<PluginInfo>>() {

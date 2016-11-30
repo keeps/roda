@@ -35,7 +35,8 @@ import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -78,7 +79,7 @@ public class RiskIncidenceRegister extends Composite {
     }
 
     public List<String> getHistoryPath() {
-      return Tools.concat(Planning.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(Planning.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -165,7 +166,7 @@ public class RiskIncidenceRegister extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         final RiskIncidence selected = riskIncidenceList.getSelectionModel().getSelectedObject();
         if (selected != null) {
-          Tools.newHistory(RiskIncidenceRegister.RESOLVER, ShowRiskIncidence.RESOLVER.getHistoryToken(),
+          HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER, ShowRiskIncidence.RESOLVER.getHistoryToken(),
             selected.getId());
         }
       }
@@ -235,9 +236,9 @@ public class RiskIncidenceRegister extends Composite {
       riskIncidenceList.refresh();
       callback.onSuccess(this);
     } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(ShowRiskIncidence.RESOLVER.getHistoryToken())) {
-      ShowRiskIncidence.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      ShowRiskIncidence.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(EditRiskIncidence.RESOLVER.getHistoryToken())) {
-      EditRiskIncidence.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      EditRiskIncidence.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.size() == 1) {
       final String aipId = historyTokens.get(0);
       setAipId(aipId);
@@ -253,7 +254,7 @@ public class RiskIncidenceRegister extends Composite {
       riskIncidenceList.refresh();
       callback.onSuccess(this);
     } else {
-      Tools.newHistory(RESOLVER);
+      HistoryUtils.newHistory(RESOLVER);
       callback.onSuccess(null);
     }
   }

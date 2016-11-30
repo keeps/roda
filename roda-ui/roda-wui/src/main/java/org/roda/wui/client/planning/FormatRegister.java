@@ -32,7 +32,8 @@ import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.process.CreateJob;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -74,7 +75,7 @@ public class FormatRegister extends Composite {
     }
 
     public List<String> getHistoryPath() {
-      return Tools.concat(Planning.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(Planning.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -148,7 +149,7 @@ public class FormatRegister extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         Format selected = formatList.getSelectionModel().getSelectedObject();
         if (selected != null) {
-          Tools.newHistory(RESOLVER, ShowFormat.RESOLVER.getHistoryToken(), selected.getId());
+          HistoryUtils.newHistory(RESOLVER, ShowFormat.RESOLVER.getHistoryToken(), selected.getId());
         }
       }
     });
@@ -215,20 +216,20 @@ public class FormatRegister extends Composite {
       formatList.setFilter(Filter.ALL);
       callback.onSuccess(this);
     } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(ShowFormat.RESOLVER.getHistoryToken())) {
-      ShowFormat.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      ShowFormat.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.size() == 1 && historyTokens.get(0).equals(CreateFormat.RESOLVER.getHistoryToken())) {
-      CreateFormat.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      CreateFormat.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(EditFormat.RESOLVER.getHistoryToken())) {
-      EditFormat.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      EditFormat.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else {
-      Tools.newHistory(RESOLVER);
+      HistoryUtils.newHistory(RESOLVER);
       callback.onSuccess(null);
     }
   }
 
   @UiHandler("buttonAdd")
   void buttonAddFormatHandler(ClickEvent e) {
-    Tools.newHistory(RESOLVER, CreateFormat.RESOLVER.getHistoryToken());
+    HistoryUtils.newHistory(RESOLVER, CreateFormat.RESOLVER.getHistoryToken());
   }
 
   @UiHandler("buttonRemove")
@@ -282,6 +283,6 @@ public class FormatRegister extends Composite {
   void handleButtonProcess(ClickEvent e) {
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
     selectedItems.setSelectedItems(formatList.getSelected());
-    Tools.newHistory(CreateJob.RESOLVER, "action");
+    HistoryUtils.newHistory(CreateJob.RESOLVER, "action");
   }
 }

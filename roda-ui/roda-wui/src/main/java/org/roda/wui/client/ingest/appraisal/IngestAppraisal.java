@@ -32,7 +32,8 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -73,7 +74,7 @@ public class IngestAppraisal extends Composite {
 
     @Override
     public List<String> getHistoryPath() {
-      return Tools.concat(Ingest.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(Ingest.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     @Override
@@ -209,7 +210,7 @@ public class IngestAppraisal extends Composite {
         mainSearch.search();
         callback.onSuccess(this);
       } else {
-        Tools.newHistory(RESOLVER);
+        HistoryUtils.newHistory(RESOLVER);
         callback.onSuccess(null);
       }
     }

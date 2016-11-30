@@ -15,7 +15,8 @@ import java.util.List;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -48,7 +49,7 @@ public class Statistics {
 
     @Override
     public List<String> getHistoryPath() {
-      return Tools.concat(Management.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(Management.RESOLVER.getHistoryPath(), getHistoryToken());
     }
   };
 
@@ -99,7 +100,7 @@ public class Statistics {
       init();
       callback.onSuccess(layout);
     } else {
-      Tools.newHistory(Statistics.RESOLVER.getHistoryPath());
+      HistoryUtils.newHistory(Statistics.RESOLVER.getHistoryPath());
       callback.onSuccess(null);
     }
   }

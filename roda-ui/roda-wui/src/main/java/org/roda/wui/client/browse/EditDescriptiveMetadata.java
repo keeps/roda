@@ -23,7 +23,8 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -81,7 +82,7 @@ public class EditDescriptiveMetadata extends Composite {
             }
           });
       } else {
-        Tools.newHistory(Browse.RESOLVER);
+        HistoryUtils.newHistory(Browse.RESOLVER);
         callback.onSuccess(null);
       }
     }
@@ -93,7 +94,7 @@ public class EditDescriptiveMetadata extends Composite {
     }
 
     public List<String> getHistoryPath() {
-      return Tools.concat(Browse.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(Browse.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -458,9 +459,9 @@ public class EditDescriptiveMetadata extends Composite {
           errors.setVisible(false);
           Toast.showInfo(messages.dialogSuccess(), messages.metadataFileSaved());
           if (representationId == null) {
-            Tools.newHistory(Browse.RESOLVER, aipId);
+            HistoryUtils.newHistory(Browse.RESOLVER, aipId);
           } else {
-            Tools.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
+            HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
           }
         }
       });
@@ -494,9 +495,9 @@ public class EditDescriptiveMetadata extends Composite {
         public void onSuccess(Void result) {
           Toast.showInfo(messages.dialogSuccess(), messages.metadataFileRemoved());
           if (representationId == null) {
-            Tools.newHistory(Browse.RESOLVER, aipId);
+            HistoryUtils.newHistory(Browse.RESOLVER, aipId);
           } else {
-            Tools.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
+            HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
           }
         }
       });
@@ -509,9 +510,9 @@ public class EditDescriptiveMetadata extends Composite {
 
   private void cancel() {
     if (representationId == null) {
-      Tools.newHistory(Browse.RESOLVER, aipId);
+      HistoryUtils.newHistory(Browse.RESOLVER, aipId);
     } else {
-      Tools.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
+      HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
     }
   }
 

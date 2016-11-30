@@ -22,7 +22,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -72,7 +72,7 @@ public class Relation {
 
   public void resolve(final List<String> historyTokens, final AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 0) {
-      Tools.newHistory(Search.RESOLVER);
+      HistoryUtils.newHistory(Search.RESOLVER);
     } else {
       // #relation/TYPE/key/value/key/value
       List<FilterParameter> params = new ArrayList<>();
@@ -91,15 +91,15 @@ public class Relation {
 
           @Override
           public void onFailure(Throwable caught) {
-            Tools.newHistory(Search.RESOLVER);
+            HistoryUtils.newHistory(Search.RESOLVER);
           }
 
           @Override
           public void onSuccess(IndexResult<IndexedAIP> result) {
             if (result.getTotalCount() == 1) {
-              Tools.newHistory(Browse.RESOLVER, result.getResults().get(0).getUUID());
+              HistoryUtils.newHistory(Browse.RESOLVER, result.getResults().get(0).getUUID());
             } else {
-              Tools.newHistory(Search.RESOLVER, historyTokens);
+              HistoryUtils.newHistory(Search.RESOLVER, historyTokens);
             }
           }
         });

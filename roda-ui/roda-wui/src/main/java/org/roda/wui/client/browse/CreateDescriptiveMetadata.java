@@ -27,7 +27,8 @@ import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -86,7 +87,7 @@ public class CreateDescriptiveMetadata extends Composite {
 
         callback.onSuccess(create);
       } else {
-        Tools.newHistory(Browse.RESOLVER);
+        HistoryUtils.newHistory(Browse.RESOLVER);
         callback.onSuccess(null);
       }
     }
@@ -98,7 +99,7 @@ public class CreateDescriptiveMetadata extends Composite {
     }
 
     public List<String> getHistoryPath() {
-      return Tools.concat(Browse.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(Browse.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -358,9 +359,9 @@ public class CreateDescriptiveMetadata extends Composite {
             errors.setVisible(false);
             Toast.showInfo(messages.dialogSuccess(), messages.metadataFileCreated());
             if (representationId == null) {
-              Tools.newHistory(Browse.RESOLVER, aipId);
+              HistoryUtils.newHistory(Browse.RESOLVER, aipId);
             } else {
-              Tools.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
+              HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
             }
           }
         });
@@ -404,20 +405,20 @@ public class CreateDescriptiveMetadata extends Composite {
           @Override
           public void onSuccess(String parentId) {
             if (parentId != null) {
-              Tools.newHistory(Browse.RESOLVER, parentId);
+              HistoryUtils.newHistory(Browse.RESOLVER, parentId);
             } else {
-              Tools.newHistory(Browse.RESOLVER);
+              HistoryUtils.newHistory(Browse.RESOLVER);
             }
           }
         });
       } else {
-        Tools.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
+        HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
       }
     } else {
       if (representationId == null) {
-        Tools.newHistory(Browse.RESOLVER, aipId);
+        HistoryUtils.newHistory(Browse.RESOLVER, aipId);
       } else {
-        Tools.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
+        HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
       }
     }
   }

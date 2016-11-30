@@ -19,7 +19,8 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -58,7 +59,7 @@ public class ShowFormat extends Composite {
     }
 
     public List<String> getHistoryPath() {
-      return Tools.concat(FormatRegister.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(FormatRegister.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -346,14 +347,14 @@ public class ShowFormat extends Composite {
         }
       });
     } else {
-      Tools.newHistory(FormatRegister.RESOLVER);
+      HistoryUtils.newHistory(FormatRegister.RESOLVER);
       callback.onSuccess(null);
     }
   }
 
   @UiHandler("buttonEdit")
   void handleButtonEdit(ClickEvent e) {
-    Tools.newHistory(FormatRegister.RESOLVER, EditFormat.RESOLVER.getHistoryToken(), format.getId());
+    HistoryUtils.newHistory(FormatRegister.RESOLVER, EditFormat.RESOLVER.getHistoryToken(), format.getId());
   }
 
   @UiHandler("buttonCancel")
@@ -362,7 +363,7 @@ public class ShowFormat extends Composite {
   }
 
   private void cancel() {
-    Tools.newHistory(FormatRegister.RESOLVER);
+    HistoryUtils.newHistory(FormatRegister.RESOLVER);
   }
 
 }

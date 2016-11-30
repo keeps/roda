@@ -20,13 +20,14 @@ import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.management.RecoverLogin;
 import org.roda.wui.client.management.Register;
 import org.roda.wui.client.management.UserManagementService;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -138,7 +139,7 @@ public class Login extends Composite {
     password.setText("");
     error.setText("");
     resendEmail.setVisible(false);
-    service = Tools.join(historyTokens, Tools.HISTORY_SEP);
+    service = StringUtils.join(historyTokens, HistoryUtils.HISTORY_SEP);
     callback.onSuccess(this);
   }
 
@@ -149,12 +150,12 @@ public class Login extends Composite {
 
   @UiHandler("register")
   void handleRegister(ClickEvent e) {
-    Tools.newHistory(Register.RESOLVER);
+    HistoryUtils.newHistory(Register.RESOLVER);
   }
 
   @UiHandler("recover")
   void handleRecover(ClickEvent e) {
-    Tools.newHistory(RecoverLogin.RESOLVER);
+    HistoryUtils.newHistory(RecoverLogin.RESOLVER);
   }
 
   @UiHandler("username")
@@ -180,31 +181,31 @@ public class Login extends Composite {
               messages.loginResendEmailSuccessDialogMessage(), messages.loginResendEmailSuccessDialogButton(),
               new AsyncCallback<Void>() {
 
-              @Override
-              public void onSuccess(final Void result) {
-                Tools.newHistory(Login.RESOLVER);
-              }
+                @Override
+                public void onSuccess(final Void result) {
+                  HistoryUtils.newHistory(Login.RESOLVER);
+                }
 
-              @Override
-              public void onFailure(final Throwable caught) {
-                Tools.newHistory(Login.RESOLVER);
-              }
-            });
+                @Override
+                public void onFailure(final Throwable caught) {
+                  HistoryUtils.newHistory(Login.RESOLVER);
+                }
+              });
           } else {
             Dialogs.showInformationDialog(messages.loginResendEmailFailureDialogTitle(),
               messages.loginResendEmailFailureDialogMessage(), messages.loginResendEmailFailureDialogButton(),
               new AsyncCallback<Void>() {
 
-              @Override
-              public void onSuccess(final Void result) {
-                Tools.newHistory(Login.RESOLVER);
-              }
+                @Override
+                public void onSuccess(final Void result) {
+                  HistoryUtils.newHistory(Login.RESOLVER);
+                }
 
-              @Override
-              public void onFailure(final Throwable caught) {
-                Tools.newHistory(Login.RESOLVER);
-              }
-            });
+                @Override
+                public void onFailure(final Throwable caught) {
+                  HistoryUtils.newHistory(Login.RESOLVER);
+                }
+              });
           }
         }
 
@@ -252,7 +253,7 @@ public class Login extends Composite {
           if (service != null && service.length() > 0) {
             History.newItem(service);
           } else {
-            Tools.newHistory(Welcome.RESOLVER);
+            HistoryUtils.newHistory(Welcome.RESOLVER);
           }
         }
       });

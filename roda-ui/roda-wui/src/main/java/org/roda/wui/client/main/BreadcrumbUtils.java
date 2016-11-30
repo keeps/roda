@@ -23,7 +23,7 @@ import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -101,7 +101,7 @@ public class BreadcrumbUtils {
           SafeHtml breadcrumbLabel = getBreadcrumbLabel(ancestor);
           String breadcrumbTitle = getBreadcrumbTitle(ancestor);
           BreadcrumbItem ancestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel, breadcrumbTitle,
-            Tools.concat(Browse.RESOLVER.getHistoryPath(), ancestor.getId()));
+            ListUtils.concat(Browse.RESOLVER.getHistoryPath(), ancestor.getId()));
           breadcrumb.add(1, ancestorBreadcrumb);
         } else {
           SafeHtml breadcrumbLabel = DescriptionLevelUtils.getElementLevelIconSafeHtml(RodaConstants.AIP_GHOST, false);
@@ -120,12 +120,12 @@ public class BreadcrumbUtils {
 
     // AIP
     breadcrumb.add(new BreadcrumbItem(getBreadcrumbLabel(aip), getBreadcrumbTitle(aip),
-      Tools.concat(Browse.RESOLVER.getHistoryPath(), aipId)));
+      ListUtils.concat(Browse.RESOLVER.getHistoryPath(), aipId)));
 
     // Representation
     breadcrumb.add(new BreadcrumbItem(DescriptionLevelUtils.getRepresentationTypeIcon(representation.getType(), true),
       representation.getType(),
-      Tools.concat(BrowseRepresentation.RESOLVER.getHistoryPath(), aipId, representationUUID)));
+      ListUtils.concat(BrowseRepresentation.RESOLVER.getHistoryPath(), aipId, representationUUID)));
 
     return breadcrumb;
   }
@@ -141,7 +141,7 @@ public class BreadcrumbUtils {
 
     // AIP breadcrumb
     fullBreadcrumb.add(new BreadcrumbItem(getBreadcrumbLabel(aip), getBreadcrumbTitle(aip),
-      Tools.concat(Browse.RESOLVER.getHistoryPath(), aipId)));
+      ListUtils.concat(Browse.RESOLVER.getHistoryPath(), aipId)));
 
     if (file != null) {
       List<String> filePath = file.getPath();
@@ -154,7 +154,7 @@ public class BreadcrumbUtils {
 
           fileBreadcrumb
             .add(new BreadcrumbItem(getBreadcrumbLabel(folderName, RodaConstants.VIEW_REPRESENTATION_FOLDER),
-              folderName, Tools.concat(BrowseFolder.RESOLVER.getHistoryPath(), aipId, representationUUID, folderUUID)));
+              folderName, ListUtils.concat(BrowseFolder.RESOLVER.getHistoryPath(), aipId, representationUUID, folderUUID)));
         }
       }
 
@@ -163,13 +163,13 @@ public class BreadcrumbUtils {
       fileBreadcrumb.add(new BreadcrumbItem(
         file.isDirectory() ? getBreadcrumbLabel(fileLabel, RodaConstants.VIEW_REPRESENTATION_FOLDER)
           : getBreadcrumbLabel(fileLabel, RodaConstants.VIEW_REPRESENTATION_FILE),
-        fileLabel, Tools.concat(BrowseFile.RESOLVER.getHistoryPath(), aipId, representationUUID, file.getId())));
+        fileLabel, ListUtils.concat(BrowseFile.RESOLVER.getHistoryPath(), aipId, representationUUID, file.getId())));
     }
 
     // Representation breadcrumb
     fullBreadcrumb.add(new BreadcrumbItem(
       DescriptionLevelUtils.getRepresentationTypeIcon(representation.getType(), true), representation.getType(),
-      Tools.concat(BrowseRepresentation.RESOLVER.getHistoryPath(), aipId, representationUUID)));
+      ListUtils.concat(BrowseRepresentation.RESOLVER.getHistoryPath(), aipId, representationUUID)));
 
     fullBreadcrumb.addAll(fileBreadcrumb);
     return fullBreadcrumb;
@@ -256,6 +256,6 @@ public class BreadcrumbUtils {
   }
 
   private static final List<String> getViewItemHistoryToken(String id) {
-    return Tools.concat(Browse.RESOLVER.getHistoryPath(), id);
+    return ListUtils.concat(Browse.RESOLVER.getHistoryPath(), id);
   }
 }

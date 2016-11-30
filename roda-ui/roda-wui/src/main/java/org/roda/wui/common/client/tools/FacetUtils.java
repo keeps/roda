@@ -26,6 +26,10 @@ import com.google.gwt.user.client.ui.FlowPanel;
 
 public class FacetUtils {
 
+  private FacetUtils() {
+
+  }
+
   private static ClientLogger LOGGER = new ClientLogger(FacetUtils.class.getName());
 
   public static <T extends IsIndexed> void bindFacets(final AsyncTableCell<T, ?> list,

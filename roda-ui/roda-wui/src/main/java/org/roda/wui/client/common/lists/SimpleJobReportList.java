@@ -22,7 +22,7 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.TooltipTextColumn;
-import org.roda.wui.common.client.tools.StringUtility;
+import org.roda.wui.client.common.utils.StringUtils;
 
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.SafeHtmlCell;
@@ -98,7 +98,7 @@ public class SimpleJobReportList extends BasicAsyncTableCell<Report> {
         String value = "";
         if (report != null) {
           value = report.getSourceObjectOriginalIds().isEmpty() ? report.getSourceObjectId()
-            : StringUtility.prettyPrint(report.getSourceObjectOriginalIds());;
+            : StringUtils.prettyPrint(report.getSourceObjectOriginalIds());
         }
 
         sourceClass = report.getSourceObjectClass();

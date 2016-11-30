@@ -64,7 +64,8 @@ import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.Humanize.DHMSFormat;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -113,7 +114,7 @@ public class ShowJob extends Composite {
           public void onFailure(Throwable caught) {
             if (caught instanceof NotFoundException) {
               Toast.showError(messages.notFoundError(), messages.jobNotFound());
-              Tools.newHistory(Process.RESOLVER);
+              HistoryUtils.newHistory(Process.RESOLVER);
             } else {
               AsyncCallbackUtils.defaultFailureTreatment(caught);
             }
@@ -132,9 +133,9 @@ public class ShowJob extends Composite {
 
         });
       } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(ShowJobReport.RESOLVER.getHistoryToken())) {
-        ShowJobReport.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+        ShowJobReport.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else {
-        Tools.newHistory(Process.RESOLVER);
+        HistoryUtils.newHistory(Process.RESOLVER);
         callback.onSuccess(null);
       }
     }
@@ -147,7 +148,7 @@ public class ShowJob extends Composite {
 
     @Override
     public List<String> getHistoryPath() {
-      return Tools.concat(Process.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(Process.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     @Override
@@ -304,7 +305,7 @@ public class ShowJob extends Composite {
         public void onSelectionChange(SelectionChangeEvent event) {
           Report jobReport = ingestJobReports.getSelectionModel().getSelectedObject();
           GWT.log("new history: " + ShowJobReport.RESOLVER.getHistoryPath() + "/" + jobReport.getId());
-          Tools.newHistory(ShowJobReport.RESOLVER, jobReport.getId());
+          HistoryUtils.newHistory(ShowJobReport.RESOLVER, jobReport.getId());
         }
       });
 
@@ -330,7 +331,7 @@ public class ShowJob extends Composite {
         @Override
         public void onSelectionChange(SelectionChangeEvent event) {
           Report jobReport = simpleJobReports.getSelectionModel().getSelectedObject();
-          Tools.newHistory(ShowJobReport.RESOLVER, jobReport.getId());
+          HistoryUtils.newHistory(ShowJobReport.RESOLVER, jobReport.getId());
         }
       });
 
@@ -702,7 +703,7 @@ public class ShowJob extends Composite {
 
   @UiHandler("buttonAppraisal")
   void buttonAppraisalHandler(ClickEvent e) {
-    Tools.newHistory(IngestAppraisal.RESOLVER, RodaConstants.INGEST_JOB_ID, job.getId());
+    HistoryUtils.newHistory(IngestAppraisal.RESOLVER, RodaConstants.INGEST_JOB_ID, job.getId());
   }
 
   @UiHandler("buttonBack")
@@ -717,9 +718,9 @@ public class ShowJob extends Composite {
 
   private void cancel() {
     if (job.getPluginType().equals(PluginType.INGEST)) {
-      Tools.newHistory(IngestProcess.RESOLVER);
+      HistoryUtils.newHistory(IngestProcess.RESOLVER);
     } else {
-      Tools.newHistory(ActionProcess.RESOLVER);
+      HistoryUtils.newHistory(ActionProcess.RESOLVER);
     }
   }
 
@@ -754,7 +755,7 @@ public class ShowJob extends Composite {
   @UiHandler("buttonProcess")
   void buttonProcessHandler(ClickEvent e) {
     if (job != null) {
-      Tools.newHistory(Search.RESOLVER, "items", "ingestJobId", job.getId());
+      HistoryUtils.newHistory(Search.RESOLVER, "items", "ingestJobId", job.getId());
     }
   }
 }

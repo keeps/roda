@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.roda.core.common.UserUtility;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.welcome.Welcome;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +66,7 @@ public class InternalWebAuthFilter implements Filter {
       b.append("#login");
 
       if (StringUtils.isNotBlank(hash)) {
-        b.append(Tools.HISTORY_SEP).append(hash);
+        b.append(HistoryUtils.HISTORY_SEP).append(hash);
       }
 
       httpResponse.sendRedirect(b.toString());

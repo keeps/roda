@@ -30,7 +30,8 @@ import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.management.Management;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
@@ -78,7 +79,7 @@ public class ActionProcess extends Composite {
 
     @Override
     public List<String> getHistoryPath() {
-      return Tools.concat(Management.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(Management.RESOLVER.getHistoryPath(), getHistoryToken());
     }
   };
 
@@ -181,7 +182,7 @@ public class ActionProcess extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         Job job = jobList.getSelectionModel().getSelectedObject();
         if (job != null) {
-          Tools.newHistory(ShowJob.RESOLVER, job.getId());
+          HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
         }
       }
     });
@@ -210,7 +211,7 @@ public class ActionProcess extends Composite {
 
   @UiHandler("newJob")
   void handleNewJobAction(ClickEvent e) {
-    Tools.newHistory(CreateActionJob.RESOLVER);
+    HistoryUtils.newHistory(CreateActionJob.RESOLVER);
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
@@ -218,9 +219,9 @@ public class ActionProcess extends Composite {
       jobList.refresh();
       callback.onSuccess(this);
     } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(ShowJob.RESOLVER.getHistoryToken())) {
-      ShowJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      ShowJob.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else {
-      Tools.newHistory(RESOLVER);
+      HistoryUtils.newHistory(RESOLVER);
       callback.onSuccess(null);
     }
   }

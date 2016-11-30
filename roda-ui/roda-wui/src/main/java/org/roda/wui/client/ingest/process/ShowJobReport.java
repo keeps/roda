@@ -32,8 +32,8 @@ import org.roda.wui.client.process.IngestProcess;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.Humanize.DHMSFormat;
-import org.roda.wui.common.client.tools.StringUtility;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -80,7 +80,7 @@ public class ShowJobReport extends Composite {
           }
         });
       } else {
-        Tools.newHistory(IngestProcess.RESOLVER);
+        HistoryUtils.newHistory(IngestProcess.RESOLVER);
         callback.onSuccess(null);
       }
     }
@@ -92,7 +92,7 @@ public class ShowJobReport extends Composite {
     }
 
     public List<String> getHistoryPath() {
-      return Tools.concat(ShowJob.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(ShowJob.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -150,13 +150,13 @@ public class ShowJobReport extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
 
     job.setText(jobReport.getJobId());
-    job.setHref(Tools.createHistoryHashLink(ShowJob.RESOLVER, jobReport.getJobId()));
+    job.setHref(HistoryUtils.createHistoryHashLink(ShowJob.RESOLVER, jobReport.getJobId()));
     outcomeObjectState.setVisible(false);
 
     boolean hasSource = true;
     if (!jobReport.getSourceObjectOriginalIds().isEmpty() || !jobReport.getSourceObjectId().isEmpty()) {
       String idText = !jobReport.getSourceObjectOriginalIds().isEmpty()
-        ? StringUtility.prettyPrint(jobReport.getSourceObjectOriginalIds()) : jobReport.getSourceObjectId();
+        ? StringUtils.prettyPrint(jobReport.getSourceObjectOriginalIds()) : jobReport.getSourceObjectId();
 
       sourceObject.setText(idText);
       if (!jobReport.getSourceObjectClass().isEmpty())
@@ -164,12 +164,12 @@ public class ShowJobReport extends Composite {
 
       if (TransferredResource.class.getName().equals(jobReport.getSourceObjectClass())) {
         sourceObject.setText(jobReport.getSourceObjectOriginalName() + " (" + idText + ")");
-        sourceObject.setHref(Tools.createHistoryHashLink(IngestTransfer.RESOLVER, jobReport.getSourceObjectId()));
+        sourceObject.setHref(HistoryUtils.createHistoryHashLink(IngestTransfer.RESOLVER, jobReport.getSourceObjectId()));
         sourceObjectLabel.setText(messages.showSIPExtended());
         outcomeObjectState.setVisible(true);
 
       } else if (AIP.class.getName().equals(jobReport.getSourceObjectClass())) {
-        sourceObject.setHref(Tools.createHistoryHashLink(Browse.RESOLVER, sourceObject.getText()));
+        sourceObject.setHref(HistoryUtils.createHistoryHashLink(Browse.RESOLVER, sourceObject.getText()));
         sourceObjectLabel.setText(messages.showAIPExtended());
 
       } else if (Representation.class.getName().equals(jobReport.getSourceObjectClass())) {
@@ -185,7 +185,7 @@ public class ShowJobReport extends Composite {
             public void onSuccess(IndexedRepresentation result) {
               if (result != null) {
                 sourceObjectLabel.setText(messages.showRepresentationExtended());
-                sourceObject.setHref(Tools.createHistoryHashLink(Browse.RESOLVER,
+                sourceObject.setHref(HistoryUtils.createHistoryHashLink(Browse.RESOLVER,
                   org.roda.wui.client.browse.BrowseRepresentation.RESOLVER.getHistoryToken(), result.getAipId(),
                   result.getUUID()));
               }
@@ -205,7 +205,7 @@ public class ShowJobReport extends Composite {
             public void onSuccess(IndexedFile result) {
               if (result != null) {
                 sourceObjectLabel.setText(messages.showFileExtended());
-                sourceObject.setHref(Tools.createHistoryHashLink(Browse.RESOLVER, BrowseFile.RESOLVER.getHistoryToken(),
+                sourceObject.setHref(HistoryUtils.createHistoryHashLink(Browse.RESOLVER, BrowseFile.RESOLVER.getHistoryToken(),
                   result.getAipId(), result.getRepresentationUUID(), result.getUUID()));
               }
             }
@@ -226,7 +226,7 @@ public class ShowJobReport extends Composite {
       outcomeObjectState.setHTML(HtmlSnippetUtils.getAIPStateHTML(jobReport.getOutcomeObjectState()));
 
       if (AIP.class.getName().equals(jobReport.getOutcomeObjectClass())) {
-        outcomeObject.setHref(Tools.createHistoryHashLink(Browse.RESOLVER, jobReport.getOutcomeObjectId()));
+        outcomeObject.setHref(HistoryUtils.createHistoryHashLink(Browse.RESOLVER, jobReport.getOutcomeObjectId()));
         outcomeObjectLabel.setText(messages.showAIPExtended());
 
       } else if (Representation.class.getName().equals(jobReport.getOutcomeObjectClass())) {
@@ -242,7 +242,7 @@ public class ShowJobReport extends Composite {
             public void onSuccess(IndexedRepresentation result) {
               if (result != null) {
                 outcomeObjectLabel.setText(messages.showRepresentationExtended());
-                outcomeObject.setHref(Tools.createHistoryHashLink(Browse.RESOLVER,
+                outcomeObject.setHref(HistoryUtils.createHistoryHashLink(Browse.RESOLVER,
                   org.roda.wui.client.browse.BrowseRepresentation.RESOLVER.getHistoryToken(), result.getAipId(),
                   result.getUUID()));
               }
@@ -263,7 +263,7 @@ public class ShowJobReport extends Composite {
               if (result != null) {
                 outcomeObjectLabel.setText(messages.showFileExtended());
                 outcomeObject
-                  .setHref(Tools.createHistoryHashLink(Browse.RESOLVER, BrowseFile.RESOLVER.getHistoryToken(),
+                  .setHref(HistoryUtils.createHistoryHashLink(Browse.RESOLVER, BrowseFile.RESOLVER.getHistoryToken(),
                     result.getAipId(), result.getRepresentationUUID(), result.getUUID()));
               }
             }
@@ -359,7 +359,7 @@ public class ShowJobReport extends Composite {
   }
 
   private void cancel() {
-    Tools.newHistory(ShowJob.RESOLVER, jobReport.getJobId());
+    HistoryUtils.newHistory(ShowJob.RESOLVER, jobReport.getJobId());
   }
 
 }

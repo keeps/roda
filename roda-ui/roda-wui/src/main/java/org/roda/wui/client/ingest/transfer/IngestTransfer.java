@@ -43,8 +43,9 @@ import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Humanize;
+import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.RestUtils;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -100,7 +101,7 @@ public class IngestTransfer extends Composite {
 
     @Override
     public List<String> getHistoryPath() {
-      return Tools.concat(Ingest.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(Ingest.RESOLVER.getHistoryPath(), getHistoryToken());
     }
   };
 
@@ -213,7 +214,7 @@ public class IngestTransfer extends Composite {
         TransferredResource r = transferredResourceList.getSelectionModel().getSelectedObject();
         if (r != null) {
           searchPanel.clearSearchInputBox();
-          Tools.newHistory(RESOLVER, r.getUUID());
+          HistoryUtils.newHistory(RESOLVER, r.getUUID());
         }
       }
     });
@@ -333,7 +334,7 @@ public class IngestTransfer extends Composite {
       callback.onSuccess(this);
     } else if (historyTokens.size() >= 1
       && historyTokens.get(0).equals(TransferUpload.INGEST_RESOLVER.getHistoryToken())) {
-      TransferUpload.INGEST_RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      TransferUpload.INGEST_RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else {
       String transferredResourceUUID = historyTokens.get(0);
       if (transferredResourceUUID != null) {
@@ -354,12 +355,12 @@ public class IngestTransfer extends Composite {
 
                     @Override
                     public void onSuccess(Void result) {
-                      Tools.newHistory(IngestTransfer.RESOLVER);
+                      HistoryUtils.newHistory(IngestTransfer.RESOLVER);
                     }
                   });
               } else {
                 AsyncCallbackUtils.defaultFailureTreatment(caught);
-                Tools.newHistory(IngestTransfer.RESOLVER);
+                HistoryUtils.newHistory(IngestTransfer.RESOLVER);
               }
 
               callback.onSuccess(null);
@@ -422,9 +423,9 @@ public class IngestTransfer extends Composite {
   @UiHandler("uploadFiles")
   void buttonUploadFilesHandler(ClickEvent e) {
     if (resource != null) {
-      Tools.newHistory(TransferUpload.INGEST_RESOLVER, resource.getUUID());
+      HistoryUtils.newHistory(TransferUpload.INGEST_RESOLVER, resource.getUUID());
     } else {
-      Tools.newHistory(TransferUpload.INGEST_RESOLVER);
+      HistoryUtils.newHistory(TransferUpload.INGEST_RESOLVER);
     }
   }
 
@@ -451,7 +452,7 @@ public class IngestTransfer extends Composite {
 
               @Override
               public void onSuccess(String newResourceUUID) {
-                Tools.newHistory(RESOLVER, newResourceUUID);
+                HistoryUtils.newHistory(RESOLVER, newResourceUUID);
               }
             });
         }
@@ -491,7 +492,7 @@ public class IngestTransfer extends Composite {
                   @Override
                   public void onSuccess(Void result) {
                     Toast.showInfo(messages.removeSuccessTitle(), messages.removeSuccessMessage(1L));
-                    Tools.newHistory(RESOLVER, resource.getParentUUID());
+                    HistoryUtils.newHistory(RESOLVER, resource.getParentUUID());
                   }
                 });
               }
@@ -552,7 +553,7 @@ public class IngestTransfer extends Composite {
 
   @UiHandler("startIngest")
   void buttonStartIngestHandler(ClickEvent e) {
-    Tools.newHistory(CreateJob.RESOLVER, "ingest");
+    HistoryUtils.newHistory(CreateJob.RESOLVER, "ingest");
   }
 
   public SelectedItems getSelected() {
@@ -621,7 +622,7 @@ public class IngestTransfer extends Composite {
               @Override
               public void onSuccess(String result) {
                 Toast.showInfo(messages.dialogSuccess(), messages.renameSIPSuccessful());
-                Tools.newHistory(IngestTransfer.RESOLVER, result);
+                HistoryUtils.newHistory(IngestTransfer.RESOLVER, result);
               }
             });
         }
@@ -701,7 +702,7 @@ public class IngestTransfer extends Composite {
             public void onSuccess(String result) {
               Toast.showInfo(messages.dialogSuccess(), messages.moveSIPSuccessful());
               if (resource != null && resource.isFile()) {
-                Tools.newHistory(IngestTransfer.RESOLVER, result);
+                HistoryUtils.newHistory(IngestTransfer.RESOLVER, result);
               } else {
                 transferredResourceList.refresh();
               }

@@ -16,9 +16,9 @@ import java.util.Set;
 
 import org.roda.core.data.v2.user.Group;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
-import org.roda.wui.common.client.tools.StringUtility;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -155,7 +155,7 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
     this.group = group;
     this.groupname.setText(group.getName());
     this.fullname.setText(group.getFullName());
-    this.usersValue.setText(StringUtility.prettyPrint(group.getUsers()));
+    this.usersValue.setText(StringUtils.prettyPrint(group.getUsers()));
 
     this.setPermissions(group.getDirectRoles(), group.getAllRoles());
 
@@ -180,7 +180,7 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
       @Override
       public void onFailure(Throwable caught) {
         AsyncCallbackUtils.defaultFailureTreatment(caught);
-        Tools.newHistory(MemberManagement.RESOLVER);
+        HistoryUtils.newHistory(MemberManagement.RESOLVER);
       }
     });
   }

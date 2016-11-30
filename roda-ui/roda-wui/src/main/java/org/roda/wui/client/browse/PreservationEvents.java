@@ -25,8 +25,9 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.RestUtils;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -63,14 +64,14 @@ public class PreservationEvents extends Composite {
         callback.onSuccess(preservationEvents);
       } else if (historyTokens.size() > 1
         && historyTokens.get(0).equals(ShowPreservationEvent.RESOLVER.getHistoryToken())) {
-        ShowPreservationEvent.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+        ShowPreservationEvent.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.size() == 2) {
         final String aipId = historyTokens.get(0);
         final String repId = historyTokens.get(1);
         PreservationEvents preservationEvents = new PreservationEvents(aipId, repId);
         callback.onSuccess(preservationEvents);
       } else {
-        Tools.newHistory(Browse.RESOLVER);
+        HistoryUtils.newHistory(Browse.RESOLVER);
         callback.onSuccess(null);
       }
     }
@@ -81,7 +82,7 @@ public class PreservationEvents extends Composite {
     }
 
     public List<String> getHistoryPath() {
-      return Tools.concat(Browse.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(Browse.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -90,7 +91,7 @@ public class PreservationEvents extends Composite {
   };
 
   public static final List<String> getViewItemHistoryToken(String id) {
-    return Tools.concat(RESOLVER.getHistoryPath(), id);
+    return ListUtils.concat(RESOLVER.getHistoryPath(), id);
   }
 
   interface MyUiBinder extends UiBinder<Widget, PreservationEvents> {
@@ -158,9 +159,9 @@ public class PreservationEvents extends Composite {
         IndexedPreservationEvent selected = eventList.getSelectionModel().getSelectedObject();
         if (selected != null) {
           if (repId == null) {
-            Tools.newHistory(ShowPreservationEvent.RESOLVER, aipId, selected.getId());
+            HistoryUtils.newHistory(ShowPreservationEvent.RESOLVER, aipId, selected.getId());
           } else {
-            Tools.newHistory(ShowPreservationEvent.RESOLVER, aipId, repId, selected.getId());
+            HistoryUtils.newHistory(ShowPreservationEvent.RESOLVER, aipId, repId, selected.getId());
           }
         }
       }
@@ -172,7 +173,7 @@ public class PreservationEvents extends Composite {
         @Override
         public void onFailure(Throwable caught) {
           AsyncCallbackUtils.defaultFailureTreatment(caught);
-          Tools.newHistory(Browse.RESOLVER);
+          HistoryUtils.newHistory(Browse.RESOLVER);
         }
 
         @Override
@@ -207,9 +208,9 @@ public class PreservationEvents extends Composite {
   @UiHandler("backButton")
   void buttonBackHandler(ClickEvent e) {
     if (repId == null) {
-      Tools.newHistory(Tools.concat(Browse.RESOLVER.getHistoryPath(), aipId));
+      HistoryUtils.newHistory(ListUtils.concat(Browse.RESOLVER.getHistoryPath(), aipId));
     } else {
-      Tools.newHistory(Tools.concat(BrowseRepresentation.RESOLVER.getHistoryPath(), aipId, repId));
+      HistoryUtils.newHistory(ListUtils.concat(BrowseRepresentation.RESOLVER.getHistoryPath(), aipId, repId));
     }
   }
 }

@@ -21,8 +21,9 @@ import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.RestUtils;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -74,7 +75,7 @@ public class TransferUpload extends Composite {
 
     @Override
     public List<String> getHistoryPath() {
-      return Tools.concat(IngestTransfer.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(IngestTransfer.RESOLVER.getHistoryPath(), getHistoryToken());
     }
   };
 
@@ -97,7 +98,7 @@ public class TransferUpload extends Composite {
 
     @Override
     public List<String> getHistoryPath() {
-      return Tools.concat(BrowseFolder.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(BrowseFolder.RESOLVER.getHistoryPath(), getHistoryToken());
     }
   };
 
@@ -223,7 +224,7 @@ public class TransferUpload extends Composite {
 
           });
       } else {
-        Tools.newHistory(IngestTransfer.RESOLVER);
+        HistoryUtils.newHistory(IngestTransfer.RESOLVER);
         callback.onSuccess(null);
       }
     }
@@ -291,15 +292,15 @@ public class TransferUpload extends Composite {
   void historyBack() {
     if (isIngest) {
       if (resource != null) {
-        Tools.newHistory(IngestTransfer.RESOLVER, resource.getUUID());
+        HistoryUtils.newHistory(IngestTransfer.RESOLVER, resource.getUUID());
       } else {
-        Tools.newHistory(IngestTransfer.RESOLVER);
+        HistoryUtils.newHistory(IngestTransfer.RESOLVER);
       }
     } else {
       if (folderUUID != null) {
-        Tools.newHistory(BrowseFolder.RESOLVER, aipId, representationUUID, folderUUID);
+        HistoryUtils.newHistory(BrowseFolder.RESOLVER, aipId, representationUUID, folderUUID);
       } else {
-        Tools.newHistory(BrowseRepresentation.RESOLVER, aipId, representationUUID);
+        HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representationUUID);
       }
     }
   }

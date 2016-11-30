@@ -17,7 +17,7 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.common.client.BadHistoryTokenException;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -72,11 +72,11 @@ public class Process {
     if (historyTokens.size() == 0) {
       callback.onSuccess(page);
     } else if (historyTokens.get(0).equals(CreateJob.RESOLVER.getHistoryToken())) {
-      CreateJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      CreateJob.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.get(0).equals(ShowJob.RESOLVER.getHistoryToken())) {
-      ShowJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      ShowJob.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.size() == 1 && historyTokens.get(0).equals(CreateActionJob.RESOLVER.getHistoryToken())) {
-      CreateActionJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      CreateActionJob.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else {
       callback.onFailure(new BadHistoryTokenException(historyTokens.get(0)));
     }

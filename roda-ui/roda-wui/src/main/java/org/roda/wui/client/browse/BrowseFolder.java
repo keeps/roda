@@ -42,7 +42,8 @@ import org.roda.wui.client.process.CreateJob;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -144,11 +145,11 @@ public class BrowseFolder extends Composite {
 
     @Override
     public List<String> getHistoryPath() {
-      return Tools.concat(Browse.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(Browse.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     private void errorRedirect(AsyncCallback<Widget> callback) {
-      Tools.newHistory(Browse.RESOLVER);
+      HistoryUtils.newHistory(Browse.RESOLVER);
       callback.onSuccess(null);
     }
   };
@@ -213,10 +214,10 @@ public class BrowseFolder extends Composite {
         IndexedFile selected = filesList.getSelectionModel().getSelectedObject();
         if (selected != null) {
           if (selected.isDirectory()) {
-            Tools.newHistory(Browse.RESOLVER, BrowseFolder.RESOLVER.getHistoryToken(), aipId, repId,
+            HistoryUtils.newHistory(Browse.RESOLVER, BrowseFolder.RESOLVER.getHistoryToken(), aipId, repId,
               selected.getUUID());
           } else {
-            Tools.newHistory(Browse.RESOLVER, BrowseFile.RESOLVER.getHistoryToken(), aipId, repId, selected.getUUID());
+            HistoryUtils.newHistory(Browse.RESOLVER, BrowseFile.RESOLVER.getHistoryToken(), aipId, repId, selected.getUUID());
           }
         }
       }
@@ -333,7 +334,7 @@ public class BrowseFolder extends Composite {
                     @Override
                     public void onSuccessImpl(String newUUID) {
                       Toast.showInfo(messages.dialogSuccess(), messages.renameSuccessful());
-                      Tools.newHistory(BrowseFolder.RESOLVER, aipId, repId, newUUID);
+                      HistoryUtils.newHistory(BrowseFolder.RESOLVER, aipId, repId, newUUID);
                     }
                   });
               }
@@ -382,9 +383,9 @@ public class BrowseFolder extends Composite {
                   @Override
                   public void onSuccessImpl(String newUUID) {
                     if (newUUID != null) {
-                      Tools.newHistory(BrowseFolder.RESOLVER, aipId, repId, newUUID);
+                      HistoryUtils.newHistory(BrowseFolder.RESOLVER, aipId, repId, newUUID);
                     } else {
-                      Tools.newHistory(BrowseRepresentation.RESOLVER, aipId, repId);
+                      HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, repId);
                     }
                   }
 
@@ -418,7 +419,7 @@ public class BrowseFolder extends Composite {
         public void onSuccess(String details) {
           LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
           selectedItems.setDetailsMessage(details);
-          Tools.newHistory(Browse.RESOLVER, TransferUpload.BROWSE_RESOLVER.getHistoryToken(), aipId, repId, folderUUID);
+          HistoryUtils.newHistory(Browse.RESOLVER, TransferUpload.BROWSE_RESOLVER.getHistoryToken(), aipId, repId, folderUUID);
         }
 
       });
@@ -506,9 +507,9 @@ public class BrowseFolder extends Composite {
                       public void onSuccessImpl(Void returned) {
                         Toast.showInfo(messages.removeSuccessTitle(), messages.removeAllSuccessMessage());
                         if (folderParent == null) {
-                          Tools.newHistory(BrowseRepresentation.RESOLVER, aipId, repId);
+                          HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, repId);
                         } else {
-                          Tools.newHistory(BrowseFolder.RESOLVER, aipId, repId, folderParent);
+                          HistoryUtils.newHistory(BrowseFolder.RESOLVER, aipId, repId, folderParent);
                         }
                       }
                     });
@@ -577,7 +578,7 @@ public class BrowseFolder extends Composite {
 
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
     selectedItems.setSelectedItems(files);
-    Tools.newHistory(CreateJob.RESOLVER, "action");
+    HistoryUtils.newHistory(CreateJob.RESOLVER, "action");
   }
 
   @UiHandler("identifyFormats")

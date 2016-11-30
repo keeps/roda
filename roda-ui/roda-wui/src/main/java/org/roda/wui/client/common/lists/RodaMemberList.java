@@ -19,8 +19,8 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
-import org.roda.wui.common.client.tools.StringUtility;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
@@ -91,7 +91,7 @@ public class RodaMemberList extends BasicAsyncTableCell<RODAMember> {
       public String getValue(RODAMember member) {
         if (member instanceof User) {
           User user = (User) member;
-          return StringUtility.prettyPrint(user.getGroups());
+          return StringUtils.prettyPrint(user.getGroups());
         } else {
           return null;
         }

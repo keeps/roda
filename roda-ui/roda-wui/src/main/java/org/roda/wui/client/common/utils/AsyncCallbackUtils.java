@@ -14,7 +14,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;

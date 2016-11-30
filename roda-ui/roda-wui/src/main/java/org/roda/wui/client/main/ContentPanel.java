@@ -17,6 +17,7 @@ import java.util.Set;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.management.Management;
 import org.roda.wui.client.management.Profile;
@@ -33,7 +34,7 @@ import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.BadHistoryTokenException;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
@@ -132,7 +133,7 @@ public class ContentPanel extends SimplePanel {
             if (!permitted.booleanValue()) {
               UserLogin.getInstance().showSuggestLoginDialog();
             } else {
-              resolver.resolve(Tools.tail(historyTokens), new AsyncCallback<Widget>() {
+              resolver.resolve(HistoryUtils.tail(historyTokens), new AsyncCallback<Widget>() {
 
                 public void onFailure(Throwable caught) {
                   if (caught instanceof BadHistoryTokenException) {
@@ -142,7 +143,7 @@ public class ContentPanel extends SimplePanel {
                     // if (currWidget == null) {
                     // Tools.newHistory(Welcome.RESOLVER);
                     // }
-                    Tools.newHistory(Theme.RESOLVER, "Error404.html");
+                    HistoryUtils.newHistory(Theme.RESOLVER, "Error404.html");
                   } else {
                     AsyncCallbackUtils.defaultFailureTreatment(caught);
                   }
@@ -174,7 +175,7 @@ public class ContentPanel extends SimplePanel {
       // } else {
       // Tools.newHistory(currHistoryPath);
       // }
-      Tools.newHistory(Theme.RESOLVER, "Error404.html");
+      HistoryUtils.newHistory(Theme.RESOLVER, "Error404.html");
     }
 
   }
@@ -185,11 +186,11 @@ public class ContentPanel extends SimplePanel {
     List<String> tokens = historyTokens;
 
     while (!resolved && tokens.size() > 0) {
-      String token = Tools.join(tokens, "_");
+      String token = StringUtils.join(tokens, "_");
       tokenI18N = messages.title(token).toUpperCase();
 
       if (tokenI18N.isEmpty()) {
-        tokens = Tools.removeLast(tokens);
+        tokens = HistoryUtils.removeLast(tokens);
       } else {
         resolved = true;
       }

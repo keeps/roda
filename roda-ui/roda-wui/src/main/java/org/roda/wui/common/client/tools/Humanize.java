@@ -10,11 +10,16 @@ package org.roda.wui.common.client.tools;
 import java.util.Date;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 
 import config.i18n.client.ClientMessages;
 
 public class Humanize {
+
+  private Humanize() {
+
+  }
 
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
@@ -38,6 +43,12 @@ public class Humanize {
 
   protected static final NumberFormat SMALL_NUMBER_FORMAT = NumberFormat.getFormat("0.#");
   protected static final NumberFormat NUMBER_FORMAT = NumberFormat.getFormat("#");
+
+  public static final DateTimeFormat DATE_FORMAT = DateTimeFormat.getFormat("yyyy-MM-dd");
+
+  public static final DateTimeFormat DATE_TIME_FORMAT = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss");
+
+  public static final DateTimeFormat DATE_TIME_MS_FORMAT = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
   public static Long parseFileSize(String size, String unit) {
     Long ret = null;
@@ -131,7 +142,7 @@ public class Humanize {
       ret = messages.durationDHMSShortHours(hours, minutes, seconds);
     } else if (minutes > 0) {
       ret = messages.durationDHMSShortMinutes(minutes, seconds);
-    } else if(seconds > 0){
+    } else if (seconds > 0) {
       ret = messages.durationDHMSShortSeconds(seconds);
     } else {
       ret = messages.durationDHMSShortMillis(millis);
@@ -142,8 +153,8 @@ public class Humanize {
   }
 
   /**
-   * converts time (in milliseconds) to human-readable format
-   * "<w> days, <x> hours, <y> minutes and (z) seconds"
+   * converts time (in milliseconds) to human-readable format "<w> days, <x>
+   * hours, <y> minutes and (z) seconds"
    */
   public static String durationMillisToLongDHMS(long duration) {
     duration /= ONE_SECOND;
@@ -168,6 +179,46 @@ public class Humanize {
 
     return ret;
 
+  }
+
+  /**
+   * Format a value in milliseconds as a string
+   * 
+   * @param value
+   * @param showMillis
+   * @return a formatted string for time duration
+   */
+  public static String formatValueMilliseconds(long value, boolean showMillis) {
+    String ret;
+
+    long hours = value / 3600000;
+    long minutes = (value % 3600000) / 60000;
+    long seconds = ((value % 3600000) % 60000) / 1000;
+    long millis = value % 1000;
+
+    NumberFormat numberFormat = NumberFormat.getFormat("00");
+    NumberFormat millisFormat = NumberFormat.getFormat("000");
+
+    if (showMillis) {
+      ret = numberFormat.format(hours) + ":" + numberFormat.format(minutes) + ":" + numberFormat.format(seconds) + "."
+        + millisFormat.format(millis);
+    } else {
+      ret = numberFormat.format(hours) + ":" + numberFormat.format(minutes) + ":" + numberFormat.format(seconds);
+    }
+
+    return ret;
+  }
+
+  public static String formatDate(Date date) {
+    return DATE_FORMAT.format(date);
+  }
+
+  public static String formatDateTime(Date date) {
+    return DATE_TIME_FORMAT.format(date);
+  }
+
+  public static String formatDateTimeMs(Date date) {
+    return DATE_TIME_MS_FORMAT.format(date);
   }
 
 }

@@ -15,7 +15,7 @@ import java.util.List;
 
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -47,7 +47,7 @@ public class Theme extends Composite {
         Theme theme = new Theme(sb.toString());
         callback.onSuccess(theme);
       } else {
-        Tools.newHistory(Theme.RESOLVER);
+        HistoryUtils.newHistory(Theme.RESOLVER);
         callback.onSuccess(null);
       }
     }

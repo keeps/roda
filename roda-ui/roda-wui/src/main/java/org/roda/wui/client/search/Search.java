@@ -42,7 +42,7 @@ import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.process.CreateJob;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -229,7 +229,7 @@ public class Search extends Composite {
         mainSearch.search();
         callback.onSuccess(this);
       } else {
-        Tools.newHistory(RESOLVER);
+        HistoryUtils.newHistory(RESOLVER);
         callback.onSuccess(null);
       }
     }
@@ -239,7 +239,7 @@ public class Search extends Composite {
   void buttonStartHandler(ClickEvent e) {
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
     selectedItems.setSelectedItems(getSelected());
-    Tools.newHistory(CreateJob.RESOLVER, "action");
+    HistoryUtils.newHistory(CreateJob.RESOLVER, "action");
   }
 
   public void clearSelected() {
@@ -254,7 +254,7 @@ public class Search extends Composite {
   void buttonEditPermissionsHandler(ClickEvent e) {
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
     selectedItems.setSelectedItems(mainSearch.getSelected());
-    Tools.newHistory(Browse.RESOLVER, EditPermissions.RESOLVER.getHistoryToken());
+    HistoryUtils.newHistory(Browse.RESOLVER, EditPermissions.RESOLVER.getHistoryToken());
   }
 
   @UiHandler("moveItem")
@@ -311,9 +311,9 @@ public class Search extends Composite {
                   @Override
                   public void onSuccessImpl(IndexedAIP result) {
                     if (result != null) {
-                      Tools.newHistory(Browse.RESOLVER, result.getId());
+                      HistoryUtils.newHistory(Browse.RESOLVER, result.getId());
                     } else {
-                      Tools.newHistory(Search.RESOLVER);
+                      HistoryUtils.newHistory(Search.RESOLVER);
                     }
                   }
 

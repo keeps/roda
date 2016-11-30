@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:i="urn:import:config.i18n.client" xmlns:m="urn:import:org.roda.wui.client.main"
+	xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
+	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search"
+	xmlns:lists="urn:import:org.roda.wui.client.common.lists" xmlns:b="urn:import:org.roda.wui.client.browse">
+
+	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
+
+	<ui:style>
+	.searchlist-title {
+		position: absolute;
+	}
+	</ui:style>
+
+	<g:FlowPanel styleName="viewRepresentationFile"
+		addStyleNames="wrapper skip_padding">
+		<g:FlowPanel addStyleNames="filePreviewToolbar">
+			<m:BreadcrumbPanel ui:field="breadcrumb"
+				addStyleNames="viewRepresentationBreadcrumb" />
+			<g:FlowPanel addStyleNames="filePreviewToolbarIcons">
+				<g:FocusPanel ui:field="downloadButton"
+					addStyleNames="toolbarLink filePreviewToolbarDownloadIcon">
+					<g:HTML>
+						<i class="fa fa-download"></i>
+					</g:HTML>
+				</g:FocusPanel>
+				<g:FocusPanel ui:field="removeButton"
+					addStyleNames="toolbarLink filePreviewToolbarRemoveIcon">
+					<g:HTML>
+						<i class="fa fa-remove"></i>
+					</g:HTML>
+				</g:FocusPanel>
+			</g:FlowPanel>
+		</g:FlowPanel>
+		<g:FlowPanel addStyleNames="viewRepresentationFile-center">
+			<b:DipFilePreview addStyleNames="viewRepresentationFilePreview"
+				ui:field="dipFilePreview" />
+		</g:FlowPanel>
+	</g:FlowPanel>
+</ui:UiBinder>

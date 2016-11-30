@@ -18,7 +18,7 @@ import org.roda.wui.client.process.ActionProcess;
 import org.roda.wui.client.process.CreateJob;
 import org.roda.wui.common.client.BadHistoryTokenException;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -96,17 +96,17 @@ public class Management {
       callback.onSuccess(page);
     } else {
       if (historyTokens.get(0).equals(MemberManagement.RESOLVER.getHistoryToken())) {
-        MemberManagement.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+        MemberManagement.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(UserLog.RESOLVER.getHistoryToken())) {
-        UserLog.getInstance().resolve(Tools.tail(historyTokens), callback);
+        UserLog.getInstance().resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(NotificationRegister.RESOLVER.getHistoryToken())) {
-        NotificationRegister.getInstance().resolve(Tools.tail(historyTokens), callback);
+        NotificationRegister.getInstance().resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(ActionProcess.RESOLVER.getHistoryToken())) {
-        ActionProcess.getInstance().resolve(Tools.tail(historyTokens), callback);
+        ActionProcess.getInstance().resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(CreateJob.RESOLVER.getHistoryToken())) {
-        CreateJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+        CreateJob.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(Statistics.RESOLVER.getHistoryToken())) {
-        Statistics.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+        Statistics.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals("help")) {
         callback.onSuccess(getHelp());
       } else {

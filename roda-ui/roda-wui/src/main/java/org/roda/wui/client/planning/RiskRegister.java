@@ -37,7 +37,8 @@ import org.roda.wui.client.process.CreateJob;
 import org.roda.wui.client.process.CreateSearchActionJob;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -80,7 +81,7 @@ public class RiskRegister extends Composite {
     }
 
     public List<String> getHistoryPath() {
-      return Tools.concat(Planning.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(Planning.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -183,7 +184,7 @@ public class RiskRegister extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         IndexedRisk selected = riskList.getSelectionModel().getSelectedObject();
         if (selected != null) {
-          Tools.newHistory(RESOLVER, ShowRisk.RESOLVER.getHistoryToken(), selected.getId());
+          HistoryUtils.newHistory(RESOLVER, ShowRisk.RESOLVER.getHistoryToken(), selected.getId());
         }
       }
     });
@@ -249,25 +250,25 @@ public class RiskRegister extends Composite {
       riskList.refresh();
       callback.onSuccess(this);
     } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(ShowRisk.RESOLVER.getHistoryToken())) {
-      ShowRisk.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      ShowRisk.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.size() == 1 && historyTokens.get(0).equals(CreateRisk.RESOLVER.getHistoryToken())) {
-      CreateRisk.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      CreateRisk.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(EditRisk.RESOLVER.getHistoryToken())) {
-      EditRisk.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      EditRisk.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(RiskHistory.RESOLVER.getHistoryToken())) {
-      RiskHistory.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      RiskHistory.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.size() == 1
       && historyTokens.get(0).equals(CreateSearchActionJob.RESOLVER.getHistoryToken())) {
-      CreateSearchActionJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      CreateSearchActionJob.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else {
-      Tools.newHistory(RESOLVER);
+      HistoryUtils.newHistory(RESOLVER);
       callback.onSuccess(null);
     }
   }
 
   @UiHandler("buttonAdd")
   void buttonAddRiskHandler(ClickEvent e) {
-    Tools.newHistory(RESOLVER, CreateRisk.RESOLVER.getHistoryToken());
+    HistoryUtils.newHistory(RESOLVER, CreateRisk.RESOLVER.getHistoryToken());
   }
 
   @UiHandler("buttonRefresh")
@@ -339,7 +340,7 @@ public class RiskRegister extends Composite {
   void handleButtonProcess(ClickEvent e) {
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
     selectedItems.setSelectedItems(riskList.getSelected());
-    Tools.newHistory(CreateJob.RESOLVER, "action");
+    HistoryUtils.newHistory(CreateJob.RESOLVER, "action");
   }
 
 }

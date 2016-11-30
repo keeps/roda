@@ -19,7 +19,8 @@ import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -56,7 +57,7 @@ public class EditRisk extends Composite {
           }
         });
       } else {
-        Tools.newHistory(RiskRegister.RESOLVER);
+        HistoryUtils.newHistory(RiskRegister.RESOLVER);
         callback.onSuccess(null);
       }
     }
@@ -67,7 +68,7 @@ public class EditRisk extends Composite {
     }
 
     public List<String> getHistoryPath() {
-      return Tools.concat(RiskRegister.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(RiskRegister.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -127,7 +128,7 @@ public class EditRisk extends Composite {
 
           @Override
           public void onSuccess(Void result) {
-            Tools.newHistory(RiskRegister.RESOLVER);
+            HistoryUtils.newHistory(RiskRegister.RESOLVER);
           }
 
         });
@@ -141,7 +142,7 @@ public class EditRisk extends Composite {
   }
 
   private void cancel() {
-    Tools.newHistory(RiskRegister.RESOLVER);
+    HistoryUtils.newHistory(RiskRegister.RESOLVER);
   }
 
   private void errorMessage(Throwable caught) {

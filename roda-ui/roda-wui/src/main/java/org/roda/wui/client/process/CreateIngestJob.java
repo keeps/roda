@@ -28,7 +28,7 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.lists.TransferredResourceList;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -106,7 +106,7 @@ public class CreateIngestJob extends CreateJob<TransferredResource> {
           @Override
           public void onSuccess(Job result) {
             Toast.showInfo(messages.dialogDone(), messages.processCreated());
-            Tools.newHistory(IngestProcess.RESOLVER);
+            HistoryUtils.newHistory(IngestProcess.RESOLVER);
           }
         });
     } else {
@@ -137,6 +137,6 @@ public class CreateIngestJob extends CreateJob<TransferredResource> {
 
   @Override
   public void cancel() {
-    Tools.newHistory(IngestProcess.RESOLVER);
+    HistoryUtils.newHistory(IngestProcess.RESOLVER);
   }
 }

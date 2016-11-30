@@ -24,7 +24,7 @@ import org.roda.wui.client.management.recaptcha.RecaptchaWidget;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -71,7 +71,7 @@ public class RecoverLogin extends Composite {
           if (user.isGuest()) {
             callback.onSuccess(true);
           } else {
-            Tools.newHistory(Welcome.RESOLVER);
+            HistoryUtils.newHistory(Welcome.RESOLVER);
             callback.onSuccess(null);
           }
         }
@@ -133,7 +133,7 @@ public class RecoverLogin extends Composite {
 
       @Override
       public void onClick(ClickEvent event) {
-        Tools.newHistory(Login.RESOLVER);
+        HistoryUtils.newHistory(Login.RESOLVER);
       }
     });
 
@@ -223,12 +223,12 @@ public class RecoverLogin extends Composite {
 
               @Override
               public void onFailure(Throwable caught) {
-                Tools.newHistory(Login.RESOLVER);
+                HistoryUtils.newHistory(Login.RESOLVER);
               }
 
               @Override
               public void onSuccess(Void result) {
-                Tools.newHistory(Login.RESOLVER);
+                HistoryUtils.newHistory(Login.RESOLVER);
               }
             });
           }

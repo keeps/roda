@@ -2107,7 +2107,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static Report lastReport(User user, String id, String resourceOrSip, String acceptFormat)
-    throws RODAException {
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // validate input
@@ -2138,7 +2138,7 @@ public class Browser extends RodaWuiController {
       RodaConstants.CONTROLLER_LIMIT_PARAM, 1);
 
     if (reportList.getReports().isEmpty()) {
-      throw new RODAException();
+      throw new NotFoundException("Could not find report for id: " + id);
     } else {
       return reportList.getReports().get(0);
     }

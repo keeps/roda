@@ -46,7 +46,8 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.PluginUtils;
 import org.roda.wui.client.ingest.process.PluginOptionsPanel;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -87,7 +88,7 @@ public class CreateActionJob extends Composite {
         CreateActionJob createActionJob = new CreateActionJob();
         callback.onSuccess(createActionJob);
       } else {
-        Tools.newHistory(CreateActionJob.RESOLVER);
+        HistoryUtils.newHistory(CreateActionJob.RESOLVER);
         callback.onSuccess(null);
       }
     }
@@ -98,7 +99,7 @@ public class CreateActionJob extends Composite {
     }
 
     public List<String> getHistoryPath() {
-      return Tools.concat(Process.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(Process.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -502,7 +503,7 @@ public class CreateActionJob extends Composite {
         @Override
         public void onSuccess(Job result) {
           Toast.showInfo(messages.dialogDone(), messages.processCreated());
-          Tools.newHistory(ActionProcess.RESOLVER);
+          HistoryUtils.newHistory(ActionProcess.RESOLVER);
         }
       });
 
@@ -510,7 +511,7 @@ public class CreateActionJob extends Composite {
 
   @UiHandler("buttonCancel")
   public void cancel(ClickEvent e) {
-    Tools.newHistory(ActionProcess.RESOLVER);
+    HistoryUtils.newHistory(ActionProcess.RESOLVER);
   }
 
   public PluginInfo getSelectedPlugin() {

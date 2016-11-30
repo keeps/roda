@@ -32,7 +32,8 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
@@ -70,7 +71,7 @@ public class UserLog extends Composite {
     }
 
     public List<String> getHistoryPath() {
-      return Tools.concat(Management.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(Management.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -171,7 +172,7 @@ public class UserLog extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         LogEntry selected = logList.getSelectionModel().getSelectedObject();
         if (selected != null) {
-          Tools.newHistory(ShowLogEntry.RESOLVER, selected.getId());
+          HistoryUtils.newHistory(ShowLogEntry.RESOLVER, selected.getId());
         }
       }
     });
@@ -226,14 +227,14 @@ public class UserLog extends Composite {
       logList.refresh();
       callback.onSuccess(this);
     } else if (historyTokens.size() > 1 && ShowLogEntry.RESOLVER.getHistoryToken().equals(historyTokens.get(0))) {
-      ShowLogEntry.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      ShowLogEntry.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.size() == 1) {
       final String aipId = historyTokens.get(0);
       logList.setFilter(new Filter(new SimpleFilterParameter(RodaConstants.LOG_RELATED_OBJECT_ID, aipId)));
       logList.refresh();
       callback.onSuccess(this);
     } else {
-      Tools.newHistory(RESOLVER);
+      HistoryUtils.newHistory(RESOLVER);
       callback.onSuccess(null);
     }
   }

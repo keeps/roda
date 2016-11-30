@@ -15,8 +15,8 @@ import java.util.Stack;
 
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.LoginStatusListener;
-import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -205,7 +205,7 @@ public class BreadcrumbPanel extends FlowPanel {
     }
 
     protected String getTargetHistoryToken(String[] path) {
-      return Tools.join(path, ".");
+      return StringUtils.join(path, ".");
     }
 
   }

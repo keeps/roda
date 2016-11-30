@@ -26,7 +26,8 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.process.CreateJob;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -62,7 +63,7 @@ public class ShowRisk extends Composite {
     }
 
     public List<String> getHistoryPath() {
-      return Tools.concat(RiskRegister.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(RiskRegister.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -168,19 +169,19 @@ public class ShowRisk extends Composite {
         }
       });
     } else {
-      Tools.newHistory(RiskRegister.RESOLVER);
+      HistoryUtils.newHistory(RiskRegister.RESOLVER);
       callback.onSuccess(null);
     }
   }
 
   @UiHandler("buttonHistory")
   void handleButtonHistory(ClickEvent e) {
-    Tools.newHistory(RiskRegister.RESOLVER, RiskHistory.RESOLVER.getHistoryToken(), risk.getId());
+    HistoryUtils.newHistory(RiskRegister.RESOLVER, RiskHistory.RESOLVER.getHistoryToken(), risk.getId());
   }
 
   @UiHandler("buttonEdit")
   void handleButtonEdit(ClickEvent e) {
-    Tools.newHistory(RiskRegister.RESOLVER, EditRisk.RESOLVER.getHistoryToken(), risk.getId());
+    HistoryUtils.newHistory(RiskRegister.RESOLVER, EditRisk.RESOLVER.getHistoryToken(), risk.getId());
   }
 
   @UiHandler("buttonCancel")
@@ -211,7 +212,7 @@ public class ShowRisk extends Composite {
   void handleButtonProcess(ClickEvent e) {
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
     selectedItems.setSelectedItems(riskShowPanel.getSelectedIncidences());
-    Tools.newHistory(CreateJob.RESOLVER, "action");
+    HistoryUtils.newHistory(CreateJob.RESOLVER, "action");
   }
 
   @SuppressWarnings({"unchecked", "rawtypes"})
@@ -245,7 +246,7 @@ public class ShowRisk extends Composite {
   }
 
   private void cancel() {
-    Tools.newHistory(RiskRegister.RESOLVER);
+    HistoryUtils.newHistory(RiskRegister.RESOLVER);
   }
 
   public void enableProcessButton(boolean enable) {

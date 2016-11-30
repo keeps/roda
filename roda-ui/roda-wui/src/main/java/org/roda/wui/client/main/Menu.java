@@ -40,7 +40,7 @@ import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.LoginStatusListener;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
@@ -207,7 +207,7 @@ public class Menu extends Composite {
 
       @Override
       public void execute() {
-        Tools.newHistory(path);
+        HistoryUtils.newHistory(path);
       }
     };
   }

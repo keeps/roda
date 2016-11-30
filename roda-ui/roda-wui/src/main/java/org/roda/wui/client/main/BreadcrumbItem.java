@@ -9,7 +9,7 @@ package org.roda.wui.client.main;
 
 import java.util.List;
 
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -32,7 +32,7 @@ public class BreadcrumbItem {
 
       @Override
       public void execute() {
-        Tools.newHistory(path);
+        HistoryUtils.newHistory(path);
       }
     });
   }

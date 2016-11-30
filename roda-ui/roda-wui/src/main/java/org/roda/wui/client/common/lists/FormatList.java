@@ -18,7 +18,7 @@ import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
-import org.roda.wui.common.client.tools.StringUtility;
+import org.roda.wui.client.common.utils.StringUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.cellview.client.CellTable;
@@ -72,7 +72,7 @@ public class FormatList extends BasicAsyncTableCell<Format> {
 
       @Override
       public String getValue(Format format) {
-        return StringUtility.prettyPrint(format.getCategories());
+        return StringUtils.prettyPrint(format.getCategories());
       }
     };
 
@@ -80,7 +80,7 @@ public class FormatList extends BasicAsyncTableCell<Format> {
 
       @Override
       public String getValue(Format format) {
-        return StringUtility.prettyPrint(format.getMimetypes());
+        return StringUtils.prettyPrint(format.getMimetypes());
       }
     };
 
@@ -88,7 +88,7 @@ public class FormatList extends BasicAsyncTableCell<Format> {
 
       @Override
       public String getValue(Format format) {
-        return StringUtility.prettyPrint(format.getPronoms());
+        return StringUtils.prettyPrint(format.getPronoms());
       }
     };
 

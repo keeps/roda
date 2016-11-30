@@ -60,10 +60,10 @@ import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Humanize;
+import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.RestErrorOverlayType;
 import org.roda.wui.common.client.tools.RestUtils;
-import org.roda.wui.common.client.tools.StringUtility;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -338,7 +338,7 @@ public class Browse extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         IndexedRepresentation representation = representationsList.getSelectionModel().getSelectedObject();
         if (representation != null) {
-          Tools.newHistory(BrowseRepresentation.RESOLVER, aipId, representation.getUUID());
+          HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representation.getUUID());
         }
       }
     });
@@ -397,29 +397,31 @@ public class Browse extends Composite {
       callback.onSuccess(this);
     } else if (historyTokens.size() > 1
       && historyTokens.get(0).equals(EditDescriptiveMetadata.RESOLVER.getHistoryToken())) {
-      EditDescriptiveMetadata.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      EditDescriptiveMetadata.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.size() > 1
       && historyTokens.get(0).equals(CreateDescriptiveMetadata.RESOLVER.getHistoryToken())) {
-      CreateDescriptiveMetadata.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      CreateDescriptiveMetadata.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(BrowseFile.RESOLVER.getHistoryToken())) {
-      BrowseFile.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      BrowseFile.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+    } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(BrowseDIP.RESOLVER.getHistoryToken())) {
+      BrowseDIP.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(PreservationEvents.RESOLVER.getHistoryToken())) {
-      PreservationEvents.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      PreservationEvents.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.size() > 1
       && historyTokens.get(0).equals(DescriptiveMetadataHistory.RESOLVER.getHistoryToken())) {
-      DescriptiveMetadataHistory.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      DescriptiveMetadataHistory.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.size() >= 1 && historyTokens.get(0).equals(EditPermissions.RESOLVER.getHistoryToken())) {
-      EditPermissions.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      EditPermissions.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.size() > 1
       && historyTokens.get(0).equals(BrowseRepresentation.RESOLVER.getHistoryToken())) {
-      BrowseRepresentation.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      BrowseRepresentation.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(BrowseFolder.RESOLVER.getHistoryToken())) {
-      BrowseFolder.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      BrowseFolder.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.size() > 0
       && historyTokens.get(0).equals(TransferUpload.BROWSE_RESOLVER.getHistoryToken())) {
-      TransferUpload.BROWSE_RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      TransferUpload.BROWSE_RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else {
-      Tools.newHistory(RESOLVER);
+      HistoryUtils.newHistory(RESOLVER);
       callback.onSuccess(null);
     }
   }
@@ -574,7 +576,7 @@ public class Browse extends Composite {
       itemId.addStyleName("browseItemId");
 
       if (!aip.getIngestSIPIds().isEmpty()) {
-        sipId.setText(messages.sipIdMin(StringUtility.prettyPrint(aip.getIngestSIPIds())));
+        sipId.setText(messages.sipIdMin(StringUtils.prettyPrint(aip.getIngestSIPIds())));
         sipId.addStyleName("browseSipId");
       }
 
@@ -586,7 +588,7 @@ public class Browse extends Composite {
 
         Anchor anchor = new Anchor();
         anchor.setText(aip.getIngestJobId());
-        anchor.setHref(Tools.createHistoryHashLink(ShowJobReport.RESOLVER,
+        anchor.setHref(HistoryUtils.createHistoryHashLink(ShowJobReport.RESOLVER,
           ingestedAIP.getIngestJobId() + '-' + ingestedAIP.getId()));
 
         ingestJobId.add(html);
@@ -767,13 +769,13 @@ public class Browse extends Composite {
 
             if (bundle.hasHistory()) {
               // History link
-              String historyLink = Tools.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId, descId);
+              String historyLink = HistoryUtils.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId, descId);
               String historyLinkHtml = "<a href='" + historyLink
                 + "' class='toolbarLink'><i class='fa fa-history'></i></a>";
               b.append(SafeHtmlUtils.fromSafeConstant(historyLinkHtml));
             }
             // Edit link
-            String editLink = Tools.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, descId);
+            String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, descId);
             String editLinkHtml = "<a href='" + editLink + "' class='toolbarLink'><i class='fa fa-edit'></i></a>";
             b.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
 
@@ -806,14 +808,14 @@ public class Browse extends Composite {
 
             if (bundle.hasHistory()) {
               // History link
-              String historyLink = Tools.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId, descId);
+              String historyLink = HistoryUtils.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId, descId);
               String historyLinkHtml = "<a href='" + historyLink
                 + "' class='toolbarLink'><i class='fa fa-history'></i></a>";
               b.append(SafeHtmlUtils.fromSafeConstant(historyLinkHtml));
             }
 
             // Edit link
-            String editLink = Tools.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, descId);
+            String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, descId);
             String editLinkHtml = "<a href='" + editLink + "' class='toolbarLink'><i class='fa fa-edit'></i></a>";
             b.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
 
@@ -852,13 +854,13 @@ public class Browse extends Composite {
     if (id == null) {
       path = RESOLVER.getHistoryPath();
     } else {
-      path = Tools.concat(Browse.RESOLVER.getHistoryPath(), id);
+      path = ListUtils.concat(Browse.RESOLVER.getHistoryPath(), id);
     }
 
     if (path.equals(History.getToken())) {
       historyUpdated = false;
     } else {
-      Tools.newHistory(path);
+      HistoryUtils.newHistory(path);
       historyUpdated = true;
     }
     return historyUpdated;
@@ -872,7 +874,7 @@ public class Browse extends Composite {
   @UiHandler("preservationEvents")
   void buttonPreservationEventsHandler(ClickEvent e) {
     if (aipId != null) {
-      Tools.newHistory(RESOLVER, PreservationEvents.RESOLVER.getHistoryToken(), aipId);
+      HistoryUtils.newHistory(RESOLVER, PreservationEvents.RESOLVER.getHistoryToken(), aipId);
     }
   }
 
@@ -889,7 +891,7 @@ public class Browse extends Composite {
       @Override
       public void onSuccess(String itemAIPId) {
         view(itemAIPId);
-        Tools.newHistory(CreateDescriptiveMetadata.RESOLVER, "aip", itemAIPId, CreateDescriptiveMetadata.NEW);
+        HistoryUtils.newHistory(CreateDescriptiveMetadata.RESOLVER, "aip", itemAIPId, CreateDescriptiveMetadata.NEW);
       }
     });
   }
@@ -928,9 +930,9 @@ public class Browse extends Composite {
                     @Override
                     public void onSuccess(String parentId) {
                       if (parentId != null) {
-                        Tools.newHistory(Browse.RESOLVER, parentId);
+                        HistoryUtils.newHistory(Browse.RESOLVER, parentId);
                       } else {
-                        Tools.newHistory(Browse.RESOLVER);
+                        HistoryUtils.newHistory(Browse.RESOLVER);
                       }
                     }
                   });
@@ -1038,7 +1040,7 @@ public class Browse extends Composite {
 
   private void newDescriptiveMetadataRedirect() {
     if (aipId != null) {
-      Tools.newHistory(RESOLVER, CreateDescriptiveMetadata.RESOLVER.getHistoryToken(), "aip", aipId);
+      HistoryUtils.newHistory(RESOLVER, CreateDescriptiveMetadata.RESOLVER.getHistoryToken(), "aip", aipId);
     }
   }
 
@@ -1084,9 +1086,9 @@ public class Browse extends Composite {
                       @Override
                       public void onSuccess(IndexedAIP result) {
                         if (result != null) {
-                          Tools.newHistory(Browse.RESOLVER, result.getId());
+                          HistoryUtils.newHistory(Browse.RESOLVER, result.getId());
                         } else {
-                          Tools.newHistory(Browse.RESOLVER);
+                          HistoryUtils.newHistory(Browse.RESOLVER);
                         }
                       }
 
@@ -1161,9 +1163,9 @@ public class Browse extends Composite {
                     @Override
                     public void onSuccessImpl(IndexedAIP result) {
                       if (result != null) {
-                        Tools.newHistory(Browse.RESOLVER, result.getId());
+                        HistoryUtils.newHistory(Browse.RESOLVER, result.getId());
                       } else {
-                        Tools.newHistory(Browse.RESOLVER);
+                        HistoryUtils.newHistory(Browse.RESOLVER);
                       }
                     }
 
@@ -1191,12 +1193,12 @@ public class Browse extends Composite {
       if (aipId != null) {
         LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
         selectedItems.setSelectedItems(SelectedItemsList.create(IndexedAIP.class, aipId));
-        Tools.newHistory(CreateJob.RESOLVER, "action");
+        HistoryUtils.newHistory(CreateJob.RESOLVER, "action");
       }
     } else {
       LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
       selectedItems.setSelectedItems(selected);
-      Tools.newHistory(CreateJob.RESOLVER, "action");
+      HistoryUtils.newHistory(CreateJob.RESOLVER, "action");
     }
   }
 
@@ -1206,26 +1208,26 @@ public class Browse extends Composite {
 
     if (ClientSelectedItemsUtils.isEmpty(selected)) {
       if (aipId != null) {
-        Tools.newHistory(RESOLVER, EditPermissions.RESOLVER.getHistoryToken(), aipId);
+        HistoryUtils.newHistory(RESOLVER, EditPermissions.RESOLVER.getHistoryToken(), aipId);
       }
     } else {
       LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
       selectedItems.setSelectedItems(selected);
-      Tools.newHistory(RESOLVER, EditPermissions.RESOLVER.getHistoryToken());
+      HistoryUtils.newHistory(RESOLVER, EditPermissions.RESOLVER.getHistoryToken());
     }
   }
 
   @UiHandler("risks")
   void buttonRisksHandler(ClickEvent e) {
     if (aipId != null) {
-      Tools.newHistory(RiskIncidenceRegister.RESOLVER, aipId);
+      HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER, aipId);
     }
   }
 
   @UiHandler("logs")
   void buttonLogsHandler(ClickEvent e) {
     if (aipId != null) {
-      Tools.newHistory(UserLog.RESOLVER, aipId);
+      HistoryUtils.newHistory(UserLog.RESOLVER, aipId);
     }
   }
 
@@ -1272,7 +1274,7 @@ public class Browse extends Composite {
             @Override
             public void onSuccessImpl(Void result) {
               Toast.showInfo(messages.dialogDone(), messages.itemWasRejected());
-              Tools.newHistory(IngestAppraisal.RESOLVER);
+              HistoryUtils.newHistory(IngestAppraisal.RESOLVER);
             }
           });
         }
@@ -1281,12 +1283,12 @@ public class Browse extends Composite {
 
   @UiHandler("searchContext")
   void searchContextHandler(ClickEvent e) {
-    Tools.newHistory(Search.RESOLVER, RodaConstants.SEARCH_ITEMS, RodaConstants.AIP_ANCESTORS, aipId);
+    HistoryUtils.newHistory(Search.RESOLVER, RodaConstants.SEARCH_ITEMS, RodaConstants.AIP_ANCESTORS, aipId);
   }
 
   @UiHandler("searchAIP")
   void searchAIPHandler(ClickEvent e) {
-    Tools.newHistory(Search.RESOLVER, RodaConstants.SEARCH_REPRESENTATIONS, RodaConstants.AIP_AIP_ID, aipId);
+    HistoryUtils.newHistory(Search.RESOLVER, RodaConstants.SEARCH_REPRESENTATIONS, RodaConstants.AIP_AIP_ID, aipId);
   }
 
   @UiHandler("newRepresentation")
@@ -1305,7 +1307,7 @@ public class Browse extends Composite {
 
             @Override
             public void onSuccessImpl(String representationUUID) {
-              Tools.newHistory(BrowseRepresentation.RESOLVER, aipId, representationUUID);
+              HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representationUUID);
             }
           });
         }

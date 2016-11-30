@@ -20,7 +20,7 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -139,12 +139,12 @@ public class Profile extends Composite {
 
             public void onSuccess(Void result) {
               UserLogin.getInstance().updateLoggedUser(user);
-              Tools.newHistory(Welcome.RESOLVER);
+              HistoryUtils.newHistory(Welcome.RESOLVER);
             }
           });
       }
     } else {
-      Tools.newHistory(Welcome.RESOLVER);
+      HistoryUtils.newHistory(Welcome.RESOLVER);
     }
   }
 
@@ -154,7 +154,7 @@ public class Profile extends Composite {
   }
 
   private void cancel() {
-    Tools.newHistory(Welcome.RESOLVER);
+    HistoryUtils.newHistory(Welcome.RESOLVER);
   }
 
   private void errorMessage(Throwable caught) {

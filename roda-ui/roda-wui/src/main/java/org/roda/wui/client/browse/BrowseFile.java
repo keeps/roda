@@ -36,8 +36,9 @@ import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Humanize;
+import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.RestUtils;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -132,6 +133,8 @@ public class BrowseFile extends Composite {
     this.representationUUID = representationUUID;
     this.fileUUID = fileUUID;
     this.file = file;
+
+    // find representation (needed for later)
     IndexedRepresentation rep = null;
     for (IndexedRepresentation irep : itemBundle.getRepresentations()) {
       if (irep.getUUID().equals(representationUUID)) {
@@ -140,6 +143,7 @@ public class BrowseFile extends Composite {
       }
     }
 
+    // initialize preview
     filePreview = new IndexedFilePreview(viewers, file, new Command() {
 
       @Override
@@ -153,29 +157,25 @@ public class BrowseFile extends Composite {
       }
     });
 
+    // initialize widget
     initWidget(uiBinder.createAndBindUi(this));
 
+    // breadcrumb
     breadcrumb.updatePath(getBreadcrumbs());
     breadcrumb.setVisible(true);
 
-    downloadFileButton.setVisible(false);
-    removeFileButton.setVisible(false);
-    infoFileButton.setVisible(false);
-
-    downloadDocumentationButton.setVisible(rep.getNumberOfDocumentationFiles() > 0);
-    downloadSchemasButton.setVisible(rep.getNumberOfSchemaFiles() > 0);
-
+    // set title
     downloadFileButton.setTitle(messages.viewRepresentationDownloadFileButton());
     removeFileButton.setTitle(messages.viewRepresentationRemoveFileButton());
     infoFileButton.setTitle(messages.viewRepresentationInfoFileButton());
-
-    // update breadcrumb
-    breadcrumb.updatePath(getBreadcrumbs());
 
     // update visibles
     downloadFileButton.setVisible(!file.isDirectory());
     removeFileButton.setVisible(!file.isDirectory());
     infoFileButton.setVisible(!file.isDirectory());
+    downloadDocumentationButton.setVisible(rep.getNumberOfDocumentationFiles() > 0);
+    downloadSchemasButton.setVisible(rep.getNumberOfSchemaFiles() > 0);
+
   }
 
   @UiHandler("downloadFileButton")
@@ -413,37 +413,43 @@ public class BrowseFile extends Composite {
 
   private void updateDisseminations(List<IndexedDIP> dips) {
     dipFilePanel.clear();
-    for (final IndexedDIP dip : dips) {
 
-      FlowPanel entry = new FlowPanel();
-      FocusPanel focus = new FocusPanel(entry);
+    if (dips.isEmpty()) {
+      // TODO show message or hide
+      dipFilePanel.add(new Label("No entries"));
+    } else {
+      for (final IndexedDIP dip : dips) {
 
-      Label titleLabel = new Label(dip.getTitle());
-      Label descriptionLabel = new Label(dip.getDescription());
+        FlowPanel entry = new FlowPanel();
+        FocusPanel focus = new FocusPanel(entry);
 
-      entry.add(titleLabel);
-      entry.add(descriptionLabel);
+        Label titleLabel = new Label(dip.getTitle());
+        Label descriptionLabel = new Label(dip.getDescription());
 
-      dipFilePanel.add(focus);
+        entry.add(titleLabel);
+        entry.add(descriptionLabel);
 
-      titleLabel.addStyleName("dipTitle");
-      descriptionLabel.addStyleName("dipDescription");
-      entry.addStyleName("dip");
-      focus.addStyleName("dip-focus");
+        dipFilePanel.add(focus);
 
-      focus.addClickHandler(new ClickHandler() {
+        titleLabel.addStyleName("dipTitle");
+        descriptionLabel.addStyleName("dipDescription");
+        entry.addStyleName("dip");
+        focus.addStyleName("dip-focus");
 
-        @Override
-        public void onClick(ClickEvent event) {
-          if (StringUtils.isNotBlank(dip.getOpenExternalURL())) {
-            Window.open(dip.getOpenExternalURL(), "_blank", "");
-            Toast.showInfo("Opened dissemination", dip.getOpenExternalURL());
-          } else {
-            Toast.showInfo("Feature not yet implemented", "Will open the DIP in a new panel");
+        focus.addClickHandler(new ClickHandler() {
+
+          @Override
+          public void onClick(ClickEvent event) {
+            if (StringUtils.isNotBlank(dip.getOpenExternalURL())) {
+              Window.open(dip.getOpenExternalURL(), "_blank", "");
+              Toast.showInfo("Opened dissemination", dip.getOpenExternalURL());
+            } else {
+              HistoryUtils.newHistory(BrowseDIP.RESOLVER, dip.getUUID());
+            }
           }
-        }
-      });
+        });
 
+      }
     }
   }
 
@@ -472,7 +478,7 @@ public class BrowseFile extends Composite {
 
     @Override
     public List<String> getHistoryPath() {
-      return Tools.concat(Browse.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(Browse.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     @Override
@@ -535,12 +541,12 @@ public class BrowseFile extends Composite {
     }
 
     private void errorRedirect(AsyncCallback<Widget> callback) {
-      Tools.newHistory(Browse.RESOLVER);
+      HistoryUtils.newHistory(Browse.RESOLVER);
       callback.onSuccess(null);
     }
   };
 
   public static void jumpTo(IndexedFile selected) {
-    Tools.newHistory(BrowseFile.RESOLVER, selected.getAipId(), selected.getRepresentationUUID(), selected.getUUID());
+    HistoryUtils.newHistory(BrowseFile.RESOLVER, selected.getAipId(), selected.getRepresentationUUID(), selected.getUUID());
   }
 }

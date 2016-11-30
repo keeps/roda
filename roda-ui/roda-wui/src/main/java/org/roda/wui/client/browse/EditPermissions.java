@@ -33,7 +33,8 @@ import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -74,7 +75,7 @@ public class EditPermissions extends Composite {
 
           @Override
           public void onFailure(Throwable caught) {
-            Tools.newHistory(Browse.RESOLVER);
+            HistoryUtils.newHistory(Browse.RESOLVER);
             callback.onSuccess(null);
           }
 
@@ -95,7 +96,7 @@ public class EditPermissions extends Composite {
 
               @Override
               public void onFailure(Throwable caught) {
-                Tools.newHistory(Browse.RESOLVER);
+                HistoryUtils.newHistory(Browse.RESOLVER);
                 callback.onSuccess(null);
               }
 
@@ -107,7 +108,7 @@ public class EditPermissions extends Composite {
             });
         }
       } else {
-        Tools.newHistory(Search.RESOLVER);
+        HistoryUtils.newHistory(Search.RESOLVER);
         callback.onSuccess(null);
       }
     }
@@ -118,7 +119,7 @@ public class EditPermissions extends Composite {
     }
 
     public List<String> getHistoryPath() {
-      return Tools.concat(Browse.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(Browse.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -407,9 +408,9 @@ public class EditPermissions extends Composite {
 
   public void close() {
     if (aips.size() == 1) {
-      Tools.newHistory(Browse.RESOLVER, aips.get(0).getId());
+      HistoryUtils.newHistory(Browse.RESOLVER, aips.get(0).getId());
     } else {
-      Tools.newHistory(Browse.RESOLVER);
+      HistoryUtils.newHistory(Browse.RESOLVER);
     }
   }
 

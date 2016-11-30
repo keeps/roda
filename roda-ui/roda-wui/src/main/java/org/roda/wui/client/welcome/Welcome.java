@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -84,7 +84,7 @@ public class Welcome {
       init();
       callback.onSuccess(layout);
     } else {
-      Tools.newHistory(Welcome.RESOLVER);
+      HistoryUtils.newHistory(Welcome.RESOLVER);
       callback.onSuccess(null);
     }
   }

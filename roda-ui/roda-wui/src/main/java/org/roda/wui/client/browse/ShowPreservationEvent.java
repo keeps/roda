@@ -32,8 +32,9 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -72,7 +73,7 @@ public class ShowPreservationEvent extends Composite {
         ShowPreservationEvent preservationEvents = new ShowPreservationEvent(aipId, representationId, eventId);
         callback.onSuccess(preservationEvents);
       } else {
-        Tools.newHistory(Browse.RESOLVER);
+        HistoryUtils.newHistory(Browse.RESOLVER);
         callback.onSuccess(null);
       }
     }
@@ -83,7 +84,7 @@ public class ShowPreservationEvent extends Composite {
     }
 
     public List<String> getHistoryPath() {
-      return Tools.concat(PreservationEvents.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(PreservationEvents.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -92,7 +93,7 @@ public class ShowPreservationEvent extends Composite {
   };
 
   public static final List<String> getViewItemHistoryToken(String id) {
-    return Tools.concat(RESOLVER.getHistoryPath(), id);
+    return ListUtils.concat(RESOLVER.getHistoryPath(), id);
   }
 
   interface MyUiBinder extends UiBinder<Widget, ShowPreservationEvent> {
@@ -179,7 +180,7 @@ public class ShowPreservationEvent extends Composite {
         public void onFailure(Throwable caught) {
           if (caught instanceof NotFoundException) {
             Toast.showError(messages.notFoundError(), messages.couldNotFindPreservationEvent());
-            Tools.newHistory(Tools.concat(PreservationEvents.RESOLVER.getHistoryPath(), aipId));
+            HistoryUtils.newHistory(ListUtils.concat(PreservationEvents.RESOLVER.getHistoryPath(), aipId));
           } else {
             AsyncCallbackUtils.defaultFailureTreatment(caught);
           }
@@ -315,7 +316,7 @@ public class ShowPreservationEvent extends Composite {
       Label rolesLabel = new Label(messages.preservationEventAgentRoles());
       rolesLabel.addStyleName("label");
       // TODO humanize list
-      Label rolesValue = new Label(Tools.join(agentId.getRoles(), ", "));
+      Label rolesValue = new Label(StringUtils.join(agentId.getRoles(), ", "));
       rolesValue.addStyleName("value");
       body.add(rolesLabel);
       body.add(rolesValue);
@@ -415,7 +416,7 @@ public class ShowPreservationEvent extends Composite {
       layout.add(footer);
 
       Anchor link = new Anchor(messages.inspectIntellectualEntity(),
-        Tools.createHistoryHashLink(Browse.RESOLVER, iAIP.getId()));
+        HistoryUtils.createHistoryHashLink(Browse.RESOLVER, iAIP.getId()));
       footer.add(link);
 
       link.addStyleName("btn");
@@ -460,7 +461,7 @@ public class ShowPreservationEvent extends Composite {
       body.add(originalValue);
 
       Anchor link = new Anchor(messages.inspectRepresentation(),
-        Tools.createHistoryHashLink(BrowseRepresentation.RESOLVER, irep.getAipId(), irep.getUUID()));
+        HistoryUtils.createHistoryHashLink(BrowseRepresentation.RESOLVER, irep.getAipId(), irep.getUUID()));
 
       link.addStyleName("btn");
 
@@ -508,7 +509,7 @@ public class ShowPreservationEvent extends Composite {
       if (ifile.getPath() != null && !ifile.getPath().isEmpty()) {
         pathLabel = new Label(messages.filePath());
         pathLabel.addStyleName("label");
-        pathValue = new Label(Tools.join(ifile.getPath(), "/"));
+        pathValue = new Label(StringUtils.join(ifile.getPath(), "/"));
         pathValue.addStyleName("value");
       }
 
@@ -543,7 +544,7 @@ public class ShowPreservationEvent extends Composite {
       footer.addStyleName("panel-footer");
       layout.add(footer);
 
-      Anchor link = new Anchor(messages.inspectFile(), Tools.createHistoryHashLink(BrowseFile.RESOLVER,
+      Anchor link = new Anchor(messages.inspectFile(), HistoryUtils.createHistoryHashLink(BrowseFile.RESOLVER,
         ifile.getAipId(), ifile.getRepresentationUUID(), ifile.getUUID()));
 
       link.addStyleName("btn");
@@ -597,7 +598,7 @@ public class ShowPreservationEvent extends Composite {
       layout.add(footer);
 
       Anchor link = new Anchor(messages.inspectTransferredResource(),
-        Tools.createHistoryHashLink(IngestTransfer.RESOLVER, tr.getUUID()));
+        HistoryUtils.createHistoryHashLink(IngestTransfer.RESOLVER, tr.getUUID()));
       link.addStyleName("btn");
 
       footer.add(link);
@@ -617,9 +618,9 @@ public class ShowPreservationEvent extends Composite {
   @UiHandler("backButton")
   void buttonBackHandler(ClickEvent e) {
     if (representationId == null) {
-      Tools.newHistory(Tools.concat(PreservationEvents.RESOLVER.getHistoryPath(), aipId));
+      HistoryUtils.newHistory(PreservationEvents.RESOLVER, aipId);
     } else {
-      Tools.newHistory(Tools.concat(PreservationEvents.RESOLVER.getHistoryPath(), aipId, representationId));
+      HistoryUtils.newHistory(PreservationEvents.RESOLVER, aipId, representationId);
     }
   }
 }

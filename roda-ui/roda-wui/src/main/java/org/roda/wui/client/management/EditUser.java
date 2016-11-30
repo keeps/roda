@@ -18,7 +18,8 @@ import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -59,7 +60,7 @@ public class EditUser extends Composite {
           }
         });
       } else {
-        Tools.newHistory(MemberManagement.RESOLVER);
+        HistoryUtils.newHistory(MemberManagement.RESOLVER);
         callback.onSuccess(null);
       }
     }
@@ -70,7 +71,7 @@ public class EditUser extends Composite {
     }
 
     public List<String> getHistoryPath() {
-      return Tools.concat(MemberManagement.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(MemberManagement.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -145,12 +146,12 @@ public class EditUser extends Composite {
             }
 
             public void onSuccess(Void result) {
-              Tools.newHistory(MemberManagement.RESOLVER);
+              HistoryUtils.newHistory(MemberManagement.RESOLVER);
             }
           });
       }
     } else {
-      Tools.newHistory(MemberManagement.RESOLVER);
+      HistoryUtils.newHistory(MemberManagement.RESOLVER);
     }
   }
 
@@ -163,7 +164,7 @@ public class EditUser extends Composite {
 
         @Override
         public void onSuccess(Void result) {
-          Tools.newHistory(MemberManagement.RESOLVER);
+          HistoryUtils.newHistory(MemberManagement.RESOLVER);
         }
 
         @Override
@@ -180,7 +181,7 @@ public class EditUser extends Composite {
 
       @Override
       public void onSuccess(Void result) {
-        Tools.newHistory(MemberManagement.RESOLVER);
+        HistoryUtils.newHistory(MemberManagement.RESOLVER);
       }
 
       @Override
@@ -196,7 +197,7 @@ public class EditUser extends Composite {
   }
 
   private void cancel() {
-    Tools.newHistory(MemberManagement.RESOLVER);
+    HistoryUtils.newHistory(MemberManagement.RESOLVER);
   }
 
   private void errorMessage(Throwable caught, User modifiedUser) {

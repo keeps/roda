@@ -39,7 +39,7 @@ import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.PluginUtils;
 import org.roda.wui.client.search.Search;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -133,7 +133,7 @@ public class CreateSearchActionJob extends CreateJob<IsIndexed> {
         @Override
         public void onSuccess(Job result) {
           Toast.showInfo(messages.dialogDone(), messages.processCreated());
-          Tools.newHistory(ActionProcess.RESOLVER);
+          HistoryUtils.newHistory(ActionProcess.RESOLVER);
         }
       });
 
@@ -141,7 +141,7 @@ public class CreateSearchActionJob extends CreateJob<IsIndexed> {
 
   @Override
   public void cancel() {
-    Tools.newHistory(Search.RESOLVER);
+    HistoryUtils.newHistory(Search.RESOLVER);
   }
 
 }

@@ -20,7 +20,8 @@ import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -67,7 +68,7 @@ public class ShowLogEntry extends Composite {
         });
 
       } else {
-        Tools.newHistory(UserLog.RESOLVER);
+        HistoryUtils.newHistory(UserLog.RESOLVER);
         callback.onSuccess(null);
       }
     }
@@ -78,7 +79,7 @@ public class ShowLogEntry extends Composite {
     }
 
     public List<String> getHistoryPath() {
-      return Tools.concat(UserLog.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(UserLog.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -196,7 +197,7 @@ public class ShowLogEntry extends Composite {
   }
 
   private void cancel() {
-    Tools.newHistory(UserLog.RESOLVER);
+    HistoryUtils.newHistory(UserLog.RESOLVER);
   }
 
 }

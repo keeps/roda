@@ -20,7 +20,8 @@ import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -66,7 +67,7 @@ public class EditRiskIncidence extends Composite {
             }
           });
       } else {
-        Tools.newHistory(FormatRegister.RESOLVER);
+        HistoryUtils.newHistory(FormatRegister.RESOLVER);
         callback.onSuccess(null);
       }
     }
@@ -77,7 +78,7 @@ public class EditRiskIncidence extends Composite {
     }
 
     public List<String> getHistoryPath() {
-      return Tools.concat(RiskIncidenceRegister.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(RiskIncidenceRegister.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -146,7 +147,7 @@ public class EditRiskIncidence extends Composite {
 
     String riskId = incidence.getRiskId();
     riskLink.setText(riskId);
-    riskLink.setHref(Tools.createHistoryHashLink(RiskRegister.RESOLVER, ShowRisk.RESOLVER.getHistoryToken(), riskId));
+    riskLink.setHref(HistoryUtils.createHistoryHashLink(RiskRegister.RESOLVER, ShowRisk.RESOLVER.getHistoryToken(), riskId));
 
     detectedOn
       .setText(DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT).format(incidence.getDetectedOn()));
@@ -222,9 +223,9 @@ public class EditRiskIncidence extends Composite {
         String aipId = RiskIncidenceRegister.getInstance().getAipId();
 
         if (aipId == null) {
-          Tools.newHistory(RiskIncidenceRegister.RESOLVER);
+          HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER);
         } else {
-          Tools.newHistory(RiskIncidenceRegister.RESOLVER, incidence.getAipId());
+          HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER, incidence.getAipId());
         }
       }
 
@@ -237,7 +238,7 @@ public class EditRiskIncidence extends Composite {
   }
 
   private void cancel() {
-    Tools.newHistory(RiskIncidenceRegister.RESOLVER);
+    HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER);
   }
 
   private void errorMessage(Throwable caught) {

@@ -20,7 +20,7 @@ import org.roda.wui.client.process.IngestProcess;
 import org.roda.wui.common.client.BadHistoryTokenException;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.user.client.Window;
@@ -102,13 +102,13 @@ public class Ingest {
       callback.onSuccess(layout);
     } else {
       if (historyTokens.get(0).equals(PreIngest.RESOLVER.getHistoryToken())) {
-        PreIngest.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+        PreIngest.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(IngestTransfer.RESOLVER.getHistoryToken())) {
-        IngestTransfer.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+        IngestTransfer.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(IngestProcess.RESOLVER.getHistoryToken())) {
-        IngestProcess.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+        IngestProcess.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(IngestAppraisal.RESOLVER.getHistoryToken())) {
-        IngestAppraisal.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+        IngestAppraisal.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals("help")) {
         callback.onSuccess(getHelp());
       } else {

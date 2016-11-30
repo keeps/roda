@@ -25,7 +25,8 @@ import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -71,7 +72,7 @@ public class RiskHistory extends Composite {
         });
 
       } else {
-        Tools.newHistory(RiskRegister.RESOLVER);
+        HistoryUtils.newHistory(RiskRegister.RESOLVER);
         callback.onSuccess(null);
       }
     }
@@ -82,7 +83,7 @@ public class RiskHistory extends Composite {
     }
 
     public List<String> getHistoryPath() {
-      return Tools.concat(RiskRegister.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(RiskRegister.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -199,7 +200,7 @@ public class RiskHistory extends Composite {
       @Override
       public void onSuccess(Void result) {
         Toast.showInfo(messages.dialogDone(), messages.versionReverted());
-        Tools.newHistory(ShowRisk.RESOLVER, riskId);
+        HistoryUtils.newHistory(ShowRisk.RESOLVER, riskId);
       }
     });
   }
@@ -218,7 +219,7 @@ public class RiskHistory extends Composite {
         Toast.showInfo(messages.dialogDone(), messages.versionDeleted());
         refresh();
         if (bundle.getVersions().isEmpty()) {
-          Tools.newHistory(ShowRisk.RESOLVER, riskId);
+          HistoryUtils.newHistory(ShowRisk.RESOLVER, riskId);
         }
       }
     });
@@ -255,7 +256,7 @@ public class RiskHistory extends Composite {
   }
 
   private void cancel() {
-    Tools.newHistory(ShowRisk.RESOLVER, riskId);
+    HistoryUtils.newHistory(ShowRisk.RESOLVER, riskId);
   }
 
 }

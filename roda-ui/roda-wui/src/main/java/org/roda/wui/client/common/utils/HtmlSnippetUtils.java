@@ -29,7 +29,7 @@ import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.BrowseFile;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -223,7 +223,7 @@ public class HtmlSnippetUtils {
     final Anchor objectLink) {
     if (AIP.class.getSimpleName().equals(incidence.getObjectClass())) {
       objectLabel.setText(messages.showAIPExtended());
-      objectLink.setHref(Tools.createHistoryHashLink(Browse.RESOLVER, incidence.getAipId()));
+      objectLink.setHref(HistoryUtils.createHistoryHashLink(Browse.RESOLVER, incidence.getAipId()));
       objectLink.setText(incidence.getAipId());
 
     } else if (Representation.class.getSimpleName().equals(incidence.getObjectClass())) {
@@ -239,7 +239,7 @@ public class HtmlSnippetUtils {
           public void onSuccess(IndexedRepresentation result) {
             if (result != null) {
               objectLabel.setText(messages.showRepresentationExtended());
-              objectLink.setHref(Tools.createHistoryHashLink(Browse.RESOLVER,
+              objectLink.setHref(HistoryUtils.createHistoryHashLink(Browse.RESOLVER,
                 BrowseFile.RESOLVER.getHistoryToken(), result.getAipId(), result.getUUID()));
               objectLink.setText(result.getUUID());
             }
@@ -259,7 +259,7 @@ public class HtmlSnippetUtils {
           if (result != null) {
             objectLabel.setText(messages.showFileExtended());
             objectLink
-              .setHref(Tools.createHistoryHashLink(Browse.RESOLVER, BrowseFile.RESOLVER.getHistoryToken(),
+              .setHref(HistoryUtils.createHistoryHashLink(Browse.RESOLVER, BrowseFile.RESOLVER.getHistoryToken(),
                 result.getAipId(), result.getRepresentationUUID(), result.getUUID()));
             objectLink.setText(result.getUUID());
           }

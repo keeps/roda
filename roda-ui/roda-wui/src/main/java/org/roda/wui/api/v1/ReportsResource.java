@@ -16,7 +16,11 @@ import javax.ws.rs.core.Response;
 
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Reports;
@@ -76,20 +80,15 @@ public class ReportsResource {
     @ApiParam(value = "The ID of the existing transferred resource or SIP") @QueryParam(RodaConstants.API_QUERY_PARAM_ID) String id,
     @ApiParam(value = "Choose the ID related object", allowableValues = RodaConstants.API_GET_REPORTS_ID_OBJECT, defaultValue = RodaConstants.API_GET_REPORTS_ID_OBJECT_RESOURCE_PATH) @QueryParam(RodaConstants.API_QUERY_PARAM_TYPE) String resourceOrSip,
     @ApiParam(value = "Choose format in which to get the reports", allowableValues = RodaConstants.API_LIST_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
-    throws RODAException {
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
     User user = UserUtility.getApiUser(request);
 
     // get last job reports of a transferred resource or SIP or all
-    try {
-      Report lastReport = Browser.lastReport(user, id, resourceOrSip, acceptFormat);
-      return Response.ok(lastReport, mediaType).build();
-    } catch (RODAException e) {
-      return Response.ok(new ApiResponseMessage(ApiResponseMessage.ERROR, "Error getting the last report"), mediaType)
-        .build();
-    }
+    Report lastReport = Browser.lastReport(user, id, resourceOrSip, acceptFormat);
+    return Response.ok(lastReport, mediaType).build();
   }
 
 }

@@ -14,7 +14,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.wui.client.main.Theme;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.RestUtils;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -69,7 +69,7 @@ public class HTMLWidgetWrapper extends HTML {
             HTMLWidgetWrapper.this.setHTML(response.getText());
             callback.onSuccess(null);
           } else if (response.getStatusCode() == 404) {
-            Tools.newHistory(Theme.RESOLVER, "Error404.html");
+            HistoryUtils.newHistory(Theme.RESOLVER, "Error404.html");
           } else {
             logger.error("Error sending request");
             callback.onFailure(new GenericException("Error sending request"));

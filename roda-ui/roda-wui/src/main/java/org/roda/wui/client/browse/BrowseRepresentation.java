@@ -47,9 +47,10 @@ import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.client.process.CreateJob;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
+import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.RestErrorOverlayType;
 import org.roda.wui.common.client.tools.RestUtils;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -143,7 +144,7 @@ public class BrowseRepresentation extends Composite {
     }
 
     public List<String> getHistoryPath() {
-      return Tools.concat(Browse.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(Browse.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -151,13 +152,13 @@ public class BrowseRepresentation extends Composite {
     }
 
     private void errorRedirect(AsyncCallback<Widget> callback) {
-      Tools.newHistory(Browse.RESOLVER);
+      HistoryUtils.newHistory(Browse.RESOLVER);
       callback.onSuccess(null);
     }
   };
 
   public static final List<String> getViewItemHistoryToken(String id) {
-    return Tools.concat(RESOLVER.getHistoryPath(), id);
+    return ListUtils.concat(RESOLVER.getHistoryPath(), id);
   }
 
   interface MyUiBinder extends UiBinder<Widget, BrowseRepresentation> {
@@ -223,10 +224,10 @@ public class BrowseRepresentation extends Composite {
         IndexedFile selected = filesList.getSelectionModel().getSelectedObject();
         if (selected != null) {
           if (selected.isDirectory()) {
-            Tools.newHistory(Browse.RESOLVER, BrowseFolder.RESOLVER.getHistoryToken(), aipId, repId,
+            HistoryUtils.newHistory(Browse.RESOLVER, BrowseFolder.RESOLVER.getHistoryToken(), aipId, repId,
               selected.getUUID());
           } else {
-            Tools.newHistory(Browse.RESOLVER, BrowseFile.RESOLVER.getHistoryToken(), aipId, repId, selected.getUUID());
+            HistoryUtils.newHistory(Browse.RESOLVER, BrowseFile.RESOLVER.getHistoryToken(), aipId, repId, selected.getUUID());
           }
         }
       }
@@ -388,14 +389,14 @@ public class BrowseRepresentation extends Composite {
 
             if (bundle.hasHistory()) {
               // History link
-              String historyLink = Tools.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId, repId,
+              String historyLink = HistoryUtils.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId, repId,
                 descId);
               String historyLinkHtml = "<a href='" + historyLink
                 + "' class='toolbarLink'><i class='fa fa-history'></i></a>";
               b.append(SafeHtmlUtils.fromSafeConstant(historyLinkHtml));
             }
             // Edit link
-            String editLink = Tools.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, repId, descId);
+            String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, repId, descId);
             String editLinkHtml = "<a href='" + editLink + "' class='toolbarLink'><i class='fa fa-edit'></i></a>";
             b.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
 
@@ -428,7 +429,7 @@ public class BrowseRepresentation extends Composite {
 
             if (bundle.hasHistory()) {
               // History link
-              String historyLink = Tools.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId, repId,
+              String historyLink = HistoryUtils.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId, repId,
                 descId);
               String historyLinkHtml = "<a href='" + historyLink
                 + "' class='toolbarLink'><i class='fa fa-history'></i></a>";
@@ -436,7 +437,7 @@ public class BrowseRepresentation extends Composite {
             }
 
             // Edit link
-            String editLink = Tools.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, repId, descId);
+            String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, repId, descId);
             String editLinkHtml = "<a href='" + editLink + "' class='toolbarLink'><i class='fa fa-edit'></i></a>";
             b.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
 
@@ -465,7 +466,7 @@ public class BrowseRepresentation extends Composite {
   }
 
   private void newRepresentationDescriptiveMetadata() {
-    Tools.newHistory(CreateDescriptiveMetadata.RESOLVER, "representation", aipId, repId);
+    HistoryUtils.newHistory(CreateDescriptiveMetadata.RESOLVER, "representation", aipId, repId);
   }
 
   @UiHandler("newDescriptiveMetadata")
@@ -513,7 +514,7 @@ public class BrowseRepresentation extends Composite {
 
                         @Override
                         public void onSuccess(Void result) {
-                          Tools.newHistory(Browse.RESOLVER, aipId);
+                          HistoryUtils.newHistory(Browse.RESOLVER, aipId);
                         }
 
                         @Override
@@ -588,20 +589,20 @@ public class BrowseRepresentation extends Composite {
 
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
     selectedItems.setSelectedItems(selected);
-    Tools.newHistory(CreateJob.RESOLVER, "action");
+    HistoryUtils.newHistory(CreateJob.RESOLVER, "action");
   }
 
   @UiHandler("risks")
   void buttonRisksHandler(ClickEvent e) {
     if (aipId != null) {
-      Tools.newHistory(RiskIncidenceRegister.RESOLVER, aipId, representation.getId());
+      HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER, aipId, representation.getId());
     }
   }
 
   @UiHandler("preservationEvents")
   void buttonPreservationEventsHandler(ClickEvent e) {
     if (aipId != null) {
-      Tools.newHistory(PreservationEvents.RESOLVER, aipId, repId);
+      HistoryUtils.newHistory(PreservationEvents.RESOLVER, aipId, repId);
     }
   }
 
@@ -642,7 +643,7 @@ public class BrowseRepresentation extends Composite {
                       @Override
                       public void onSuccessImpl(String newUUID) {
                         Toast.showInfo(messages.dialogSuccess(), messages.renameSuccessful());
-                        Tools.newHistory(BrowseFolder.RESOLVER, aipId, repId, newUUID);
+                        HistoryUtils.newHistory(BrowseFolder.RESOLVER, aipId, repId, newUUID);
                       }
                     });
                 }
@@ -686,9 +687,9 @@ public class BrowseRepresentation extends Composite {
                     @Override
                     public void onSuccessImpl(String newUUID) {
                       if (newUUID != null) {
-                        Tools.newHistory(BrowseFolder.RESOLVER, aipId, repId, newUUID);
+                        HistoryUtils.newHistory(BrowseFolder.RESOLVER, aipId, repId, newUUID);
                       } else {
-                        Tools.newHistory(BrowseRepresentation.RESOLVER, aipId, repId);
+                        HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, repId);
                       }
                     }
 
@@ -722,7 +723,7 @@ public class BrowseRepresentation extends Composite {
         public void onSuccess(String details) {
           LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
           selectedItems.setDetailsMessage(details);
-          Tools.newHistory(Browse.RESOLVER, TransferUpload.BROWSE_RESOLVER.getHistoryToken(), aipId, repId);
+          HistoryUtils.newHistory(Browse.RESOLVER, TransferUpload.BROWSE_RESOLVER.getHistoryToken(), aipId, repId);
         }
       });
   }

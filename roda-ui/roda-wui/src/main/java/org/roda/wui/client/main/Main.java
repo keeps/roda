@@ -17,7 +17,7 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 
@@ -150,7 +150,7 @@ public class Main extends Composite implements EntryPoint {
     homeLinkArea.addClickHandler(new ClickHandler() {
 
       public void onClick(ClickEvent event) {
-        Tools.newHistory(Welcome.RESOLVER);
+        HistoryUtils.newHistory(Welcome.RESOLVER);
       }
     });
 
@@ -160,9 +160,9 @@ public class Main extends Composite implements EntryPoint {
   private void onHistoryChanged(String historyToken) {
     if (historyToken.length() == 0) {
       contentPanel.update(Welcome.RESOLVER.getHistoryPath());
-      Tools.newHistory(Welcome.RESOLVER);
+      HistoryUtils.newHistory(Welcome.RESOLVER);
     } else {
-      List<String> currentHistoryPath = Tools.getCurrentHistoryPath();
+      List<String> currentHistoryPath = HistoryUtils.getCurrentHistoryPath();
       contentPanel.update(currentHistoryPath);
       GAnalyticsTracker.track(historyToken);
     }

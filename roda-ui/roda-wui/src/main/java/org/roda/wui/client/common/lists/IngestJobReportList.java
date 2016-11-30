@@ -22,7 +22,7 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.TooltipTextColumn;
-import org.roda.wui.common.client.tools.StringUtility;
+import org.roda.wui.client.common.utils.StringUtils;
 
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.SafeHtmlCell;
@@ -81,7 +81,7 @@ public class IngestJobReportList extends BasicAsyncTableCell<Report> {
           if (report.getSourceObjectOriginalIds().isEmpty()) {
             value = report.getSourceObjectId();
           } else {
-            value = StringUtility.prettyPrint(report.getSourceObjectOriginalIds());
+            value = StringUtils.prettyPrint(report.getSourceObjectOriginalIds());
           }
 
           value = report.getSourceObjectOriginalName() + " (" + value + ")";

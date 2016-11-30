@@ -21,9 +21,10 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.RestErrorOverlayType;
 import org.roda.wui.common.client.tools.RestUtils;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -88,7 +89,7 @@ public class DescriptiveMetadataHistory extends Composite {
         });
 
       } else {
-        Tools.newHistory(Browse.RESOLVER);
+        HistoryUtils.newHistory(Browse.RESOLVER);
         callback.onSuccess(null);
       }
     }
@@ -100,7 +101,7 @@ public class DescriptiveMetadataHistory extends Composite {
     }
 
     public List<String> getHistoryPath() {
-      return Tools.concat(Browse.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(Browse.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -341,7 +342,7 @@ public class DescriptiveMetadataHistory extends Composite {
         @Override
         public void onSuccess(Void result) {
           Toast.showInfo(messages.dialogDone(), messages.versionReverted());
-          Tools.newHistory(Browse.RESOLVER, aipId);
+          HistoryUtils.newHistory(Browse.RESOLVER, aipId);
         }
       });
   }
@@ -361,7 +362,7 @@ public class DescriptiveMetadataHistory extends Composite {
           Toast.showInfo(messages.dialogDone(), messages.versionDeleted());
           refresh();
           if (bundle.getVersions().isEmpty()) {
-            Tools.newHistory(Browse.RESOLVER, aipId);
+            HistoryUtils.newHistory(Browse.RESOLVER, aipId);
           }
         }
       });
@@ -399,7 +400,7 @@ public class DescriptiveMetadataHistory extends Composite {
   }
 
   private void cancel() {
-    Tools.newHistory(Browse.RESOLVER, aipId);
+    HistoryUtils.newHistory(Browse.RESOLVER, aipId);
   }
 
 }

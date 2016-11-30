@@ -31,7 +31,8 @@ import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
@@ -79,7 +80,7 @@ public class IngestProcess extends Composite {
 
     @Override
     public List<String> getHistoryPath() {
-      return Tools.concat(Ingest.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(Ingest.RESOLVER.getHistoryPath(), getHistoryToken());
     }
   };
 
@@ -176,7 +177,7 @@ public class IngestProcess extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         Job job = jobList.getSelectionModel().getSelectedObject();
         if (job != null) {
-          Tools.newHistory(ShowJob.RESOLVER, job.getId());
+          HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
         }
       }
     });
@@ -205,7 +206,7 @@ public class IngestProcess extends Composite {
 
   @UiHandler("newJob")
   void handleNewJobAction(ClickEvent e) {
-    Tools.newHistory(IngestTransfer.RESOLVER);
+    HistoryUtils.newHistory(IngestTransfer.RESOLVER);
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
@@ -213,11 +214,11 @@ public class IngestProcess extends Composite {
       jobList.refresh();
       callback.onSuccess(this);
     } else if (historyTokens.size() == 1 && historyTokens.get(0).equals(CreateIngestJob.RESOLVER.getHistoryToken())) {
-      CreateIngestJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      CreateIngestJob.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(ShowJob.RESOLVER.getHistoryToken())) {
-      ShowJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      ShowJob.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else {
-      Tools.newHistory(RESOLVER);
+      HistoryUtils.newHistory(RESOLVER);
       callback.onSuccess(null);
     }
   }

@@ -24,7 +24,7 @@ import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
@@ -184,7 +184,7 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
       public void onSelectionChange(SelectionChangeEvent event) {
         final RiskIncidence selected = incidenceList.getSelectionModel().getSelectedObject();
         if (selected != null) {
-          Tools.newHistory(RiskIncidenceRegister.RESOLVER, ShowRiskIncidence.RESOLVER.getHistoryToken(),
+          HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER, ShowRiskIncidence.RESOLVER.getHistoryToken(),
             selected.getId());
         }
       }

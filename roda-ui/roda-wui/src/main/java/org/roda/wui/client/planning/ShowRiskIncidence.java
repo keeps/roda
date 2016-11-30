@@ -21,7 +21,8 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -58,7 +59,7 @@ public class ShowRiskIncidence extends Composite {
     }
 
     public List<String> getHistoryPath() {
-      return Tools.concat(RiskIncidenceRegister.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(RiskIncidenceRegister.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -146,7 +147,7 @@ public class ShowRiskIncidence extends Composite {
 
     String riskId = incidence.getRiskId();
     riskLink.setText(riskId);
-    riskLink.setHref(Tools.createHistoryHashLink(RiskRegister.RESOLVER, ShowRisk.RESOLVER.getHistoryToken(), riskId));
+    riskLink.setHref(HistoryUtils.createHistoryHashLink(RiskRegister.RESOLVER, ShowRisk.RESOLVER.getHistoryToken(), riskId));
 
     if (incidence.getDescription() != null) {
       descriptionKey.setVisible(true);
@@ -216,14 +217,14 @@ public class ShowRiskIncidence extends Composite {
           }
         });
     } else {
-      Tools.newHistory(RiskIncidenceRegister.RESOLVER);
+      HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER);
       callback.onSuccess(null);
     }
   }
 
   @UiHandler("buttonEdit")
   void handleButtonEdit(ClickEvent e) {
-    Tools.newHistory(RiskIncidenceRegister.RESOLVER, EditRiskIncidence.RESOLVER.getHistoryToken(), incidence.getId());
+    HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER, EditRiskIncidence.RESOLVER.getHistoryToken(), incidence.getId());
   }
 
   @UiHandler("buttonCancel")
@@ -232,7 +233,7 @@ public class ShowRiskIncidence extends Composite {
   }
 
   private void cancel() {
-    Tools.newHistory(RiskIncidenceRegister.RESOLVER);
+    HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER);
   }
 
 }

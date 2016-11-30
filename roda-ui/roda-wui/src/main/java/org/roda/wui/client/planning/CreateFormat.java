@@ -16,7 +16,8 @@ import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -45,7 +46,7 @@ public class CreateFormat extends Composite {
     }
 
     public List<String> getHistoryPath() {
-      return Tools.concat(FormatRegister.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(FormatRegister.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -98,7 +99,7 @@ public class CreateFormat extends Composite {
 
         @Override
         public void onSuccess(Format result) {
-          Tools.newHistory(FormatRegister.RESOLVER, result.getId());
+          HistoryUtils.newHistory(FormatRegister.RESOLVER, result.getId());
         }
 
       });
@@ -111,7 +112,7 @@ public class CreateFormat extends Composite {
   }
 
   private void cancel() {
-    Tools.newHistory(FormatRegister.RESOLVER);
+    HistoryUtils.newHistory(FormatRegister.RESOLVER);
   }
 
 }
