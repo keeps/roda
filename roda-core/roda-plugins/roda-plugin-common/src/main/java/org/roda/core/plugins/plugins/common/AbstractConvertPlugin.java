@@ -517,7 +517,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                         dip.setTitle(dipTitle);
                         dip.setDescription(dipDescription);
                         dip.setType(RodaConstants.DIP_TYPE_CONVERSION);
-                        dip = model.createDIP(dip, false);
+                        dip = model.createDIP(dip, true);
                         newRepresentationID = dip.getId();
                       } else {
                         // TODO the concrete plugin should define the
@@ -715,7 +715,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                   dip.setTitle(dipTitle);
                   dip.setDescription(dipDescription);
                   dip.setType(RodaConstants.DIP_TYPE_CONVERSION);
-                  dip = model.createDIP(dip, false);
+                  dip = model.createDIP(dip, true);
                   newRepresentationID = dip.getId();
                 } else {
                   // TODO the concrete plugin should define the
@@ -871,7 +871,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
       && (applicableTo.size() == 0 || (filePronom != null && pronomToExtension.containsKey(filePronom))
         || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype))
         || (applicableTo.contains(fileFormat)))
-      && (convertableTo.size() == 0 || convertableTo.contains(outputFormat)))
+      && (convertableTo.size() == 0 || convertableTo.contains(outputFormat.toLowerCase())))
       return true;
     else
       return false;
