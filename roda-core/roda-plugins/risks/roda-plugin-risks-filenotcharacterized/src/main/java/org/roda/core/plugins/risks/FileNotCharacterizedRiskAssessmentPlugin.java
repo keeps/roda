@@ -77,13 +77,21 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
     PluginParameter.PluginParameterType.BOOLEAN, PARAM_VALUE_TRUE, false, false,
     "Check existence of a PRONOM Unique Identifier (PUID)?");
 
-  /** Plugin parameter ID 'format'. */
-  private static final String FORMAT_DESIGNATION = "format";
+  /** Plugin parameter ID 'formatName'. */
+  private static final String FORMAT_DESIGNATION_NAME = "formatName";
 
-  /** Plugin parameter 'format'. */
-  private static final PluginParameter PARAM_FORMAT_DESIGNATION = new PluginParameter(FORMAT_DESIGNATION,
-    "Format designation", PluginParameter.PluginParameterType.BOOLEAN, PARAM_VALUE_TRUE, false, false,
-    "Check existence of a Format designation name and version?");
+  /** Plugin parameter 'formatName'. */
+  private static final PluginParameter PARAM_FORMAT_DESIGNATION_NAME = new PluginParameter(FORMAT_DESIGNATION_NAME,
+    "Format designation name", PluginParameter.PluginParameterType.BOOLEAN, PARAM_VALUE_TRUE, false, false,
+    "Check existence of a Format designation name?");
+
+  /** Plugin parameter ID 'formatVersion'. */
+  private static final String FORMAT_DESIGNATION_VERSION = "formatVersion";
+
+  /** Plugin parameter 'formatVersion'. */
+  private static final PluginParameter PARAM_FORMAT_DESIGNATION_VERSION = new PluginParameter(
+    FORMAT_DESIGNATION_VERSION, "Format designation version", PluginParameter.PluginParameterType.BOOLEAN,
+    PARAM_VALUE_TRUE, false, false, "Check existence of a Format designation version?");
 
   @Override
   public void init() throws PluginException {
@@ -102,7 +110,7 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
 
   @Override
   public String getDescription() {
-    return "Check file format information (Mimetype, PRONOM and Format designation). "
+    return "Check file formatName information (Mimetype, PRONOM and Format designation). "
       + "If this information is missing, it creates a new risk called “File(s) not comprehensively characterized“ "
       + "and assigns the file to that risk in the Risk register.";
   }
@@ -151,7 +159,7 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
 
   @Override
   public List<PluginParameter> getParameters() {
-    return Arrays.asList(PARAM_MIMETYPE, PARAM_PRONOM, PARAM_FORMAT_DESIGNATION);
+    return Arrays.asList(PARAM_MIMETYPE, PARAM_PRONOM, PARAM_FORMAT_DESIGNATION_NAME, PARAM_FORMAT_DESIGNATION_VERSION);
   }
 
   @Override
@@ -224,13 +232,23 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
   }
 
   /**
-   * Check existence of a Format?
+   * Check existence of a formatName designation name?
    *
    * @return <code>true</code> if plugin should check the existence of a Format
-   *         designation, <code>false</code> otherwise.
+   *         designation name, <code>false</code> otherwise.
    */
-  private boolean checkFormatDesignation() {
-    return PARAM_VALUE_TRUE.equalsIgnoreCase(getParameterValues().get(FORMAT_DESIGNATION));
+  private boolean checkFormatDesignationName() {
+    return PARAM_VALUE_TRUE.equalsIgnoreCase(getParameterValues().get(FORMAT_DESIGNATION_NAME));
+  }
+
+  /**
+   * Check existence of a formatName designation version?
+   *
+   * @return <code>true</code> if plugin should check the existence of a Format
+   *         designation version, <code>false</code> otherwise.
+   */
+  private boolean checkFormatDesignationVersion() {
+    return PARAM_VALUE_TRUE.equalsIgnoreCase(getParameterValues().get(FORMAT_DESIGNATION_VERSION));
   }
 
   /**
@@ -296,12 +314,13 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
    * @return the {@link Result} of the assessment.
    */
   private Result assessRiskOnFileFormat(final FileFormat fileFormat) {
-    final boolean missingFormat = checkFormatDesignation()
-      && (StringUtils.isBlank(fileFormat.getFormatDesignationName())
-        || StringUtils.isBlank(fileFormat.getFormatDesignationVersion()));
+    final boolean missingFormatName = checkFormatDesignationName()
+      && (StringUtils.isBlank(fileFormat.getFormatDesignationName()));
+    final boolean missingFormatVersion = checkFormatDesignationName()
+      && (StringUtils.isBlank(fileFormat.getFormatDesignationName()));
     final boolean missingMimetype = checkMimetype() && StringUtils.isBlank(fileFormat.getMimeType());
     final boolean missingPronom = checkPronom() && StringUtils.isBlank(fileFormat.getPronom());
-    return new Result(missingFormat, missingMimetype, missingPronom);
+    return new Result(missingFormatName, missingFormatVersion, missingMimetype, missingPronom);
   }
 
   /**
@@ -393,9 +412,13 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
    */
   private class Result {
     /**
-     * Missing format count.
+     * Missing formatName count.
      */
-    private int format;
+    private int formatName;
+    /**
+     * Missing formatVersion count.
+     */
+    private int formatVersion;
     /**
      * Missing mimetype count.
      */
@@ -413,35 +436,41 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
      * Constructor.
      */
     Result() {
-      this(0, 0, 0);
+      this(0, 0, 0, 0);
     }
 
     /**
      * Constructor.
      *
-     * @param missingFormat
-     *          missing format?
+     * @param missingFormatName
+     *          missing formatName name?
+     * @param missingFormatVersion
+     *          missing formatName version?
      * @param missingMimetype
      *          missing mimetype?
      * @param missingPronom
      *          missing pronom?
      */
-    Result(final boolean missingFormat, final boolean missingMimetype, final boolean missingPronom) {
-      this(missingFormat ? 1 : 0, missingMimetype ? 1 : 0, missingPronom ? 1 : 0);
+    Result(final boolean missingFormatName, final boolean missingFormatVersion, final boolean missingMimetype,
+      final boolean missingPronom) {
+      this(missingFormatName ? 1 : 0, missingFormatVersion ? 1 : 0, missingMimetype ? 1 : 0, missingPronom ? 1 : 0);
     }
 
     /**
      * Constructor.
      * 
-     * @param format
-     *          missing format count.
+     * @param formatName
+     *          missing formatName name count.
+     * @param formatVersion
+     *          missing formatName version count.
      * @param mimetype
      *          missing mimetype count.
      * @param pronom
      *          missing pronom count.
      */
-    Result(final int format, final int mimetype, final int pronom) {
-      this.format = format;
+    Result(final int formatName, final int formatVersion, final int mimetype, final int pronom) {
+      this.formatName = formatName;
+      this.formatVersion = formatVersion;
       this.mimetype = mimetype;
       this.pronom = pronom;
       this.count = 0;
@@ -454,7 +483,7 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
      *         <code>false</code> otherwise.
      */
     boolean isOk() {
-      return this.format == 0 && this.mimetype == 0 && this.pronom == 0;
+      return this.formatName == 0 && this.formatVersion == 0 && this.mimetype == 0 && this.pronom == 0;
     }
 
     /**
@@ -464,7 +493,8 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
      *          the {@link Result} to add.
      */
     void addResult(final Result result) {
-      this.format += result.format;
+      this.formatName += result.formatName;
+      this.formatVersion += result.formatVersion;
       this.mimetype += result.mimetype;
       this.pronom += result.pronom;
       this.count++;
@@ -475,9 +505,9 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
       final StringBuilder str = new StringBuilder();
       if (isOk()) {
         if (count > 0) {
-          str.append("Files are comprehensively characterized");
+          str.append("Files are comprehensively characterized.\n");
         } else {
-          str.append("File is comprehensively characterized");
+          str.append("File is comprehensively characterized.\n");
         }
       } else {
         if (count > 0) {
@@ -485,15 +515,18 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
         } else {
           str.append("File is not comprehensively characterized.\n");
         }
-        if (FileNotCharacterizedRiskAssessmentPlugin.this.checkFormatDesignation()) {
-          str.append(String.format("Missing format designation: %s%n", numberToHuman(this.format, count)));
-        }
-        if (FileNotCharacterizedRiskAssessmentPlugin.this.checkMimetype()) {
-          str.append(String.format("Missing mimetype: %s%n", numberToHuman(this.mimetype, count)));
-        }
-        if (FileNotCharacterizedRiskAssessmentPlugin.this.checkPronom()) {
-          str.append(String.format("Missing PRONOM UID: %s%n", numberToHuman(this.pronom, count)));
-        }
+      }
+      if (FileNotCharacterizedRiskAssessmentPlugin.this.checkFormatDesignationName()) {
+        str.append(String.format("Missing format designation name: %s.%n", numberToHuman(this.formatName, count)));
+      }
+      if (FileNotCharacterizedRiskAssessmentPlugin.this.checkFormatDesignationVersion()) {
+        str.append(String.format("Missing format designation version: %s.%n", numberToHuman(this.formatVersion, count)));
+      }
+      if (FileNotCharacterizedRiskAssessmentPlugin.this.checkMimetype()) {
+        str.append(String.format("Missing mimetype: %s.%n", numberToHuman(this.mimetype, count)));
+      }
+      if (FileNotCharacterizedRiskAssessmentPlugin.this.checkPronom()) {
+        str.append(String.format("Missing PRONOM UID: %s.%n", numberToHuman(this.pronom, count)));
       }
       return str.toString();
     }
