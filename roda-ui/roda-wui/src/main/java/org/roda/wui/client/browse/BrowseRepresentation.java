@@ -503,7 +503,7 @@ public class BrowseRepresentation extends Composite {
 
                   @Override
                   public void onFailure(Throwable caught) {
-                    Toast.showInfo(messages.dialogFailure(), messages.outcomeDetailFailed());
+                    // do nothing
                   }
 
                   @Override
@@ -543,7 +543,7 @@ public class BrowseRepresentation extends Composite {
 
                   @Override
                   public void onFailure(Throwable caught) {
-                    Toast.showInfo(messages.dialogFailure(), messages.outcomeDetailFailed());
+                    // do nothing
                   }
 
                   @Override
@@ -631,7 +631,7 @@ public class BrowseRepresentation extends Composite {
 
                 @Override
                 public void onFailure(Throwable caught) {
-                  Toast.showInfo(messages.dialogFailure(), messages.outcomeDetailFailed());
+                  // do nothing
                 }
 
                 @Override
@@ -675,7 +675,7 @@ public class BrowseRepresentation extends Composite {
 
               @Override
               public void onFailure(Throwable caught) {
-                Toast.showInfo(messages.dialogFailure(), messages.outcomeDetailFailed());
+                // do nothing
               }
 
               @Override
@@ -715,7 +715,7 @@ public class BrowseRepresentation extends Composite {
 
         @Override
         public void onFailure(Throwable caught) {
-          Toast.showInfo(messages.dialogFailure(), messages.outcomeDetailFailed());
+          // do nothing
         }
 
         @Override
@@ -743,11 +743,11 @@ public class BrowseRepresentation extends Composite {
 
               @Override
               public void onFailure(Throwable caught) {
-                Toast.showInfo(messages.dialogFailure(), messages.outcomeDetailFailed());
+                // do nothing
               }
 
               @Override
-              public void onSuccess(String details) {
+              public void onSuccess(final String details) {
                 BrowserService.Util.getInstance().createFolder(aipId, repId, null, newName, details,
                   new LoadingAsyncCallback<String>() {
 
@@ -822,7 +822,7 @@ public class BrowseRepresentation extends Composite {
 
               @Override
               public void onFailure(Throwable caught) {
-                Toast.showInfo(messages.dialogFailure(), messages.outcomeDetailFailed());
+                // do nothing
               }
 
               @Override

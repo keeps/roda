@@ -157,7 +157,11 @@ public class PreservationEvents extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         IndexedPreservationEvent selected = eventList.getSelectionModel().getSelectedObject();
         if (selected != null) {
-          Tools.newHistory(ShowPreservationEvent.RESOLVER, aipId, selected.getId());
+          if (repId == null) {
+            Tools.newHistory(ShowPreservationEvent.RESOLVER, aipId, selected.getId());
+          } else {
+            Tools.newHistory(ShowPreservationEvent.RESOLVER, aipId, repId, selected.getId());
+          }
         }
       }
     });

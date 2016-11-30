@@ -300,7 +300,7 @@ public class Search extends Composite {
 
             @Override
             public void onFailure(Throwable caught) {
-              Toast.showInfo(messages.dialogFailure(), messages.renameFailed());
+              // do nothing
             }
 
             @Override
@@ -351,7 +351,7 @@ public class Search extends Composite {
 
                   @Override
                   public void onFailure(Throwable caught) {
-                    Toast.showInfo(messages.dialogFailure(), messages.renameFailed());
+                    // do nothing
                   }
 
                   @Override

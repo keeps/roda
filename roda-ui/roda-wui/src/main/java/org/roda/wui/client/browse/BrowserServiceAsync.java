@@ -106,7 +106,7 @@ public interface BrowserServiceAsync {
 
   void retrieveViewersProperties(AsyncCallback<Viewers> callback);
 
-  void retrieveSupportedMetadata(String aipId, String locale,
+  void retrieveSupportedMetadata(String aipId, String representationUUID, String locale,
     AsyncCallback<List<SupportedMetadataTypeBundle>> callback);
 
   void isCookiesMessageActive(AsyncCallback<Boolean> callback);

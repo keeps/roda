@@ -24,7 +24,6 @@
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.metadataFilename}' />
 				</g:Label>
-
 				<g:TextBox ui:field="id" addStyleNames="form-textbox" />
 
 				<g:HTML visible="false" ui:field="idError" addStyleNames="error metadata-edit-errors" />

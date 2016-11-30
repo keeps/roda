@@ -24,9 +24,8 @@ import java.util.TreeSet;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.lang3.StringUtils;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.MetadataValue;
 import org.slf4j.Logger;
@@ -71,7 +70,6 @@ public class ServerTools {
 
     return locale;
   }
- 
 
   /**
    * Encode XML entities and unicode control chars
@@ -174,7 +172,7 @@ public class ServerTools {
     return values;
   }
 
-  public static String autoGenerateValue(IndexedAIP aip, User user, String generator) {
+  public static String autoGenerateAIPValue(IndexedAIP aip, User user, String generator) {
     String result = null;
     switch (generator) {
       case "now":
@@ -200,6 +198,21 @@ public class ServerTools {
         break;
       case "email":
         result = user.getEmail();
+      default:
+        break;
+    }
+    return result;
+  }
+
+  public static String autoGenerateRepresentationValue(IndexedRepresentation representation, User user,
+    String generator) {
+    String result = null;
+    switch (generator) {
+      case "now":
+        result = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        break;
+      case "id":
+        result = representation.getId();
       default:
         break;
     }

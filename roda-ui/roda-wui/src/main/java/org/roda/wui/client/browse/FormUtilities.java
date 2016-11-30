@@ -88,7 +88,6 @@ public class FormUtilities {
     String rawLabel = mv.get("label");
     if (rawLabel != null && rawLabel.length() > 0) {
       String loc = LocaleInfo.getCurrentLocale().getLocaleName();
-      GWT.log("LOC: "+loc);
       try {
         JSONObject jsonObject = JSONParser.parseLenient(rawLabel).isObject();
         JSONValue jsonValue = jsonObject.get(loc);
@@ -98,7 +97,7 @@ public class FormUtilities {
             result = jsonString.stringValue();
           }
         } else {
-          if(loc.contains("_")){
+          if (loc.contains("_")) {
             jsonValue = jsonObject.get(loc.split("_")[0]);
             if (jsonValue != null) {
               JSONString jsonString = jsonValue.isString();
@@ -232,7 +231,7 @@ public class FormUtilities {
 
     String list = mv.get("optionsLabels");
     mvList.addItem("");
-    
+
     if (list != null) {
       JSONArray jsonArray = JSONParser.parseLenient(list).isArray();
       if (jsonArray != null) {
@@ -249,9 +248,9 @@ public class FormUtilities {
         if (jsonObject != null) {
           String loc = LocaleInfo.getCurrentLocale().getLocaleName();
           int i = 0;
-          
-          if(optionsArray!=null){
-            for (int pos=0;pos<optionsArray.size();pos++) {
+
+          if (optionsArray != null) {
+            for (int pos = 0; pos < optionsArray.size(); pos++) {
               String key = optionsArray.get(pos).isString().stringValue();
               JSONValue entry = jsonObject.get(key);
               if (entry.isObject() != null) {
@@ -271,7 +270,7 @@ public class FormUtilities {
               }
               i++;
             }
-          }else{
+          } else {
             for (String key : jsonObject.keySet()) {
               JSONValue entry = jsonObject.get(key);
               if (entry.isObject() != null) {
@@ -294,10 +293,10 @@ public class FormUtilities {
           }
         }
       }
-    }else{
-      if(optionsArray!=null){
+    } else {
+      if (optionsArray != null) {
         int i = 0;
-        for (int pos=0;pos<optionsArray.size();pos++) {
+        for (int pos = 0; pos < optionsArray.size(); pos++) {
           String key = optionsArray.get(pos).isString().stringValue();
           if (key != null) {
             mvList.addItem(key, key);

@@ -372,7 +372,7 @@ public class EditPermissions extends Composite {
 
         @Override
         public void onFailure(Throwable caught) {
-          Toast.showInfo(messages.dialogFailure(), messages.outcomeDetailFailed());
+          // do nothing
         }
 
         @Override

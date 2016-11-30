@@ -64,10 +64,12 @@ public class ShowPreservationEvent extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      if (historyTokens.size() == 2) {
+      int size = historyTokens.size();
+      if (size == 2 || size == 3) {
         final String aipId = historyTokens.get(0);
-        final String eventId = historyTokens.get(1);
-        ShowPreservationEvent preservationEvents = new ShowPreservationEvent(aipId, eventId);
+        final String representationId = size == 3 ? historyTokens.get(1) : null;
+        final String eventId = historyTokens.get(historyTokens.size() - 1);
+        ShowPreservationEvent preservationEvents = new ShowPreservationEvent(aipId, representationId, eventId);
         callback.onSuccess(preservationEvents);
       } else {
         Tools.newHistory(Browse.RESOLVER);
@@ -150,7 +152,7 @@ public class ShowPreservationEvent extends Composite {
   Button backButton;
 
   private String aipId;
-  @SuppressWarnings("unused")
+  private String representationId;
   private String eventId;
 
   private PreservationEventViewBundle bundle;
@@ -163,8 +165,9 @@ public class ShowPreservationEvent extends Composite {
    * @param itemBundle
    * 
    */
-  public ShowPreservationEvent(final String aipId, final String eventId) {
+  public ShowPreservationEvent(final String aipId, final String representationId, final String eventId) {
     this.aipId = aipId;
+    this.representationId = representationId;
     this.eventId = eventId;
 
     initWidget(uiBinder.createAndBindUi(this));
@@ -613,6 +616,10 @@ public class ShowPreservationEvent extends Composite {
 
   @UiHandler("backButton")
   void buttonBackHandler(ClickEvent e) {
-    Tools.newHistory(Tools.concat(PreservationEvents.RESOLVER.getHistoryPath(), aipId));
+    if (representationId == null) {
+      Tools.newHistory(Tools.concat(PreservationEvents.RESOLVER.getHistoryPath(), aipId));
+    } else {
+      Tools.newHistory(Tools.concat(PreservationEvents.RESOLVER.getHistoryPath(), aipId, representationId));
+    }
   }
 }

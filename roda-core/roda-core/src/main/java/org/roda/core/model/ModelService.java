@@ -1052,7 +1052,8 @@ public class ModelService extends ModelObservable {
     try {
       StringBuilder builder = new StringBuilder(outcomeText);
       if (StringUtils.isNotBlank(outcomeDetail) && outcomeState.equals(PluginState.SUCCESS)) {
-        builder.append("\n").append("The following reason has been reported by the user: ").append(agentName);
+        builder.append("\n").append("The following reason has been reported by the user: ").append(agentName)
+          .append("\n").append(outcomeDetail);
       }
 
       createEvent(aipId, representationId, filePath, fileId, eventType, eventDescription, sources, targets,
@@ -1071,7 +1072,7 @@ public class ModelService extends ModelObservable {
 
     String id = IdUtils.createPreservationMetadataId(PreservationMetadataType.EVENT);
     ContentPayload premisEvent = PremisV3Utils.createPremisEventBinary(id, new Date(), eventType.toString(),
-      eventDescription, null, null, outcomeState.toString(), outcomeDetail, outcomeExtension, agentIds);
+      eventDescription, sources, targets, outcomeState.toString(), outcomeDetail, outcomeExtension, agentIds);
     createPreservationMetadata(PreservationMetadataType.EVENT, id, aipId, representationId, filePath, fileId,
       premisEvent, notify);
   }

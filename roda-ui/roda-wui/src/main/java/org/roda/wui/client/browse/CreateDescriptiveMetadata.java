@@ -66,10 +66,11 @@ public class CreateDescriptiveMetadata extends Composite {
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       GWT.log(historyTokens.toString());
-      if ((historyTokens.get(0).equals("aip") && (historyTokens.size() == 2 || historyTokens.size() == 3))
+      boolean isAIP = historyTokens.get(0).equals("aip");
+
+      if ((isAIP && (historyTokens.size() == 2 || historyTokens.size() == 3))
         || (historyTokens.get(0).equals("representation")
           && (historyTokens.size() == 3 || historyTokens.size() == 4))) {
-        boolean isAIP = historyTokens.get(0).equals("aip");
         final String aipId = historyTokens.get(1);
         boolean isNew;
         CreateDescriptiveMetadata create;
@@ -191,8 +192,8 @@ public class CreateDescriptiveMetadata extends Composite {
       }
     });
 
-    BrowserService.Util.getInstance().retrieveSupportedMetadata(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
-      new AsyncCallback<List<SupportedMetadataTypeBundle>>() {
+    BrowserService.Util.getInstance().retrieveSupportedMetadata(aipId, representationId,
+      LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<List<SupportedMetadataTypeBundle>>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -201,7 +202,6 @@ public class CreateDescriptiveMetadata extends Composite {
 
         @Override
         public void onSuccess(List<SupportedMetadataTypeBundle> metadataTypes) {
-
           CreateDescriptiveMetadata.this.metadataTypes = metadataTypes;
 
           for (SupportedMetadataTypeBundle b : metadataTypes) {
@@ -225,7 +225,7 @@ public class CreateDescriptiveMetadata extends Composite {
         }
       });
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();
@@ -357,7 +357,11 @@ public class CreateDescriptiveMetadata extends Composite {
             errors.setText("");
             errors.setVisible(false);
             Toast.showInfo(messages.dialogSuccess(), messages.metadataFileCreated());
-            Tools.newHistory(Browse.RESOLVER, aipId);
+            if (representationId == null) {
+              Tools.newHistory(Browse.RESOLVER, aipId);
+            } else {
+              Tools.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
+            }
           }
         });
     } else {
@@ -387,27 +391,34 @@ public class CreateDescriptiveMetadata extends Composite {
 
   private void cancel() {
     if (isNew) {
-      SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<IndexedAIP>(Arrays.asList(aipId),
-        IndexedAIP.class.getName());
-      BrowserService.Util.getInstance().deleteAIP(selected, new AsyncCallback<String>() {
+      if (representationId == null) {
+        SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<IndexedAIP>(Arrays.asList(aipId),
+          IndexedAIP.class.getName());
+        BrowserService.Util.getInstance().deleteAIP(selected, new AsyncCallback<String>() {
 
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
-
-        @Override
-        public void onSuccess(String parentId) {
-          if (parentId != null) {
-            Tools.newHistory(Browse.RESOLVER, parentId);
-          } else {
-            Tools.newHistory(Browse.RESOLVER);
+          @Override
+          public void onFailure(Throwable caught) {
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
           }
-        }
-      });
 
+          @Override
+          public void onSuccess(String parentId) {
+            if (parentId != null) {
+              Tools.newHistory(Browse.RESOLVER, parentId);
+            } else {
+              Tools.newHistory(Browse.RESOLVER);
+            }
+          }
+        });
+      } else {
+        Tools.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
+      }
     } else {
-      Tools.newHistory(Browse.RESOLVER, aipId);
+      if (representationId == null) {
+        Tools.newHistory(Browse.RESOLVER, aipId);
+      } else {
+        Tools.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
+      }
     }
   }
 

@@ -322,7 +322,7 @@ public class BrowseFolder extends Composite {
 
               @Override
               public void onFailure(Throwable caught) {
-                Toast.showInfo(messages.dialogFailure(), messages.outcomeDetailFailed());
+                // do nothing
               }
 
               @Override
@@ -363,7 +363,7 @@ public class BrowseFolder extends Composite {
 
             @Override
             public void onFailure(Throwable caught) {
-              Toast.showInfo(messages.dialogFailure(), messages.outcomeDetailFailed());
+              // do nothing
             }
 
             @Override
@@ -411,7 +411,7 @@ public class BrowseFolder extends Composite {
 
         @Override
         public void onFailure(Throwable caught) {
-          Toast.showInfo(messages.dialogFailure(), messages.renameFailed());
+          // do nothing
         }
 
         @Override
@@ -440,7 +440,7 @@ public class BrowseFolder extends Composite {
 
               @Override
               public void onFailure(Throwable caught) {
-                Toast.showInfo(messages.dialogFailure(), messages.outcomeDetailFailed());
+                // do nothing
               }
 
               @Override
@@ -490,7 +490,7 @@ public class BrowseFolder extends Composite {
 
                   @Override
                   public void onFailure(Throwable caught) {
-                    Toast.showInfo(messages.dialogFailure(), messages.outcomeDetailFailed());
+                    // do nothing
                   }
 
                   @Override
@@ -534,7 +534,7 @@ public class BrowseFolder extends Composite {
 
                   @Override
                   public void onFailure(Throwable caught) {
-                    Toast.showInfo(messages.dialogFailure(), messages.outcomeDetailFailed());
+                    // do nothing
                   }
 
                   @Override

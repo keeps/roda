@@ -152,7 +152,7 @@ public interface BrowserService extends RemoteService {
 
   Viewers retrieveViewersProperties() throws GenericException;
 
-  List<SupportedMetadataTypeBundle> retrieveSupportedMetadata(String aipId, String locale)
+  List<SupportedMetadataTypeBundle> retrieveSupportedMetadata(String aipId, String representationUUID, String locale)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
   boolean isCookiesMessageActive();

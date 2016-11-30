@@ -218,8 +218,8 @@ public class EditDescriptiveMetadata extends Composite {
       }
     });
 
-    BrowserService.Util.getInstance().retrieveSupportedMetadata(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
-      new AsyncCallback<List<SupportedMetadataTypeBundle>>() {
+    BrowserService.Util.getInstance().retrieveSupportedMetadata(aipId, representationId,
+      LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<List<SupportedMetadataTypeBundle>>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -277,7 +277,7 @@ public class EditDescriptiveMetadata extends Composite {
         }
       });
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();
@@ -493,7 +493,11 @@ public class EditDescriptiveMetadata extends Composite {
         @Override
         public void onSuccess(Void result) {
           Toast.showInfo(messages.dialogSuccess(), messages.metadataFileRemoved());
-          Tools.newHistory(Browse.RESOLVER, aipId);
+          if (representationId == null) {
+            Tools.newHistory(Browse.RESOLVER, aipId);
+          } else {
+            Tools.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
+          }
         }
       });
   }

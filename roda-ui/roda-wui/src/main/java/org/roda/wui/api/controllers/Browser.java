@@ -124,15 +124,16 @@ public class Browser extends RodaWuiController {
 
     UserUtility.checkAIPPermissions(user, aip, PermissionType.READ);
     String repUUID = representationId;
+    IndexedRepresentation rep = null;
 
     if (representationId != null) {
-      IndexedRepresentation rep = BrowserHelper.retrieve(IndexedRepresentation.class, representationId);
+      rep = BrowserHelper.retrieve(IndexedRepresentation.class, representationId);
       representationId = rep.getId();
     }
 
     // delegate
-    DescriptiveMetadataEditBundle bundle = BrowserHelper.retrieveDescriptiveMetadataEditBundle(user, aip,
-      representationId, metadataId, type, version, locale);
+    DescriptiveMetadataEditBundle bundle = BrowserHelper.retrieveDescriptiveMetadataEditBundle(user, aip, rep,
+      metadataId, type, version, locale);
 
     // register action
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIP_ID_PARAM,
@@ -154,15 +155,16 @@ public class Browser extends RodaWuiController {
 
     UserUtility.checkAIPPermissions(user, aip, PermissionType.READ);
     String repUUID = representationId;
+    IndexedRepresentation rep = null;
 
     if (representationId != null) {
-      IndexedRepresentation rep = BrowserHelper.retrieve(IndexedRepresentation.class, representationId);
+      rep = BrowserHelper.retrieve(IndexedRepresentation.class, representationId);
       representationId = rep.getId();
     }
 
     // delegate
-    DescriptiveMetadataEditBundle bundle = BrowserHelper.retrieveDescriptiveMetadataEditBundle(user, aip,
-      representationId, metadataId, locale);
+    DescriptiveMetadataEditBundle bundle = BrowserHelper.retrieveDescriptiveMetadataEditBundle(user, aip, rep,
+      metadataId, locale);
 
     // register action
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIP_ID_PARAM,
@@ -1350,20 +1352,26 @@ public class Browser extends RodaWuiController {
     FSUtils.deletePath(filePath);
   }
 
-  public static List<SupportedMetadataTypeBundle> retrieveSupportedMetadata(User user, String aipId, Locale locale)
-    throws AuthorizationDeniedException, GenericException, NotFoundException {
+  public static List<SupportedMetadataTypeBundle> retrieveSupportedMetadata(User user, String aipId,
+    String representationUUID, Locale locale) throws AuthorizationDeniedException, GenericException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check permissions
     controllerAssistant.checkRoles(user);
 
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
+    IndexedRepresentation rep = null;
+
+    if (representationUUID != null) {
+      rep = BrowserHelper.retrieve(IndexedRepresentation.class, representationUUID);
+    }
 
     // check object permissions
     UserUtility.checkAIPPermissions(user, aip, PermissionType.READ);
 
     // delegate
-    List<SupportedMetadataTypeBundle> supportedMetadata = BrowserHelper.retrieveSupportedMetadata(user, aip, locale);
+    List<SupportedMetadataTypeBundle> supportedMetadata = BrowserHelper.retrieveSupportedMetadata(user, aip, rep,
+      locale);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.LOCALE, locale);

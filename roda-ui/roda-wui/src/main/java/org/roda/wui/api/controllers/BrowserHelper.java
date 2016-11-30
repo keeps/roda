@@ -73,7 +73,6 @@ import org.roda.core.data.v2.index.facet.FacetValue;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -309,21 +308,24 @@ public class BrowserHelper {
   }
 
   public static DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(User user, IndexedAIP aip,
-    String representationId, String descriptiveMetadataId, final Locale locale)
+    IndexedRepresentation representation, String descriptiveMetadataId, final Locale locale)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    String representationId = representation != null ? representation.getId() : null;
 
     DescriptiveMetadata metadata = RodaCoreFactory.getModelService().retrieveDescriptiveMetadata(aip.getId(),
       representationId, descriptiveMetadataId);
-    return retrieveDescriptiveMetadataEditBundle(user, aip, representationId, descriptiveMetadataId, metadata.getType(),
+    return retrieveDescriptiveMetadataEditBundle(user, aip, representation, descriptiveMetadataId, metadata.getType(),
       metadata.getVersion(), locale);
   }
 
   public static DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(User user, IndexedAIP aip,
-    String representationId, String descriptiveMetadataId, String type, String version, final Locale locale)
+    IndexedRepresentation representation, String descriptiveMetadataId, String type, String version,
+    final Locale locale)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     DescriptiveMetadataEditBundle ret;
     InputStream inputStream = null;
     try {
+      String representationId = representation != null ? representation.getId() : null;
       Binary binary = RodaCoreFactory.getModelService().retrieveDescriptiveMetadataBinary(aip.getId(), representationId,
         descriptiveMetadataId);
       inputStream = binary.getContent().createInputStream();
@@ -333,7 +335,7 @@ public class BrowserHelper {
       // We need this to try to get get the values for the form
       SupportedMetadataTypeBundle metadataTypeBundle = null;
       List<SupportedMetadataTypeBundle> supportedMetadataTypeBundles = BrowserHelper.retrieveSupportedMetadata(user,
-        aip, locale);
+        aip, representation, locale);
       for (SupportedMetadataTypeBundle typeBundle : supportedMetadataTypeBundles) {
         if (typeBundle.getType() != null && typeBundle.getType().equalsIgnoreCase(type)) {
           if (typeBundle.getVersion() == version
@@ -1508,7 +1510,7 @@ public class BrowserHelper {
 
       List<LinkingIdentifier> targets = new ArrayList<LinkingIdentifier>();
       targets.add(PluginHelper.getLinkingIdentifier(aipId, representation.getId(),
-        RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+        RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
 
       String outcomeText = "The Representation '" + representation.getId() + "' has been manually created.";
       model.createUpdateAIPEvent(aipId, null, null, null, PreservationEventType.CREATION,
@@ -1547,8 +1549,8 @@ public class BrowserHelper {
       File file = model.createFile(aipId, representationId, directoryPath, fileId, content);
 
       List<LinkingIdentifier> targets = new ArrayList<LinkingIdentifier>();
-      targets.add(PluginHelper.getLinkingIdentifier(aipId, representationId, file.getPath(), file.getId(),
-        RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+      targets.add(PluginHelper.getLinkingIdentifier(aipId, file.getRepresentationId(), file.getPath(), file.getId(),
+        RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
 
       String outcomeText = "The File '" + file.getId() + "' has been manually created.";
       model.createUpdateAIPEvent(aipId, representationId, null, null, PreservationEventType.CREATION,
@@ -1739,8 +1741,8 @@ public class BrowserHelper {
 
   }
 
-  public static List<SupportedMetadataTypeBundle> retrieveSupportedMetadata(User user, IndexedAIP aip, Locale locale)
-    throws GenericException {
+  public static List<SupportedMetadataTypeBundle> retrieveSupportedMetadata(User user, IndexedAIP aip,
+    IndexedRepresentation representation, Locale locale) throws GenericException {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     List<String> types = RodaUtils
       .copyList(RodaCoreFactory.getRodaConfiguration().getList(RodaConstants.UI_BROWSER_METADATA_DESCRIPTIVE_TYPES));
@@ -1773,7 +1775,13 @@ public class BrowserHelper {
             for (MetadataValue mv : values) {
               String generator = mv.get("auto-generate");
               if (generator != null && generator.length() > 0) {
-                String value = ServerTools.autoGenerateValue(aip, user, generator);
+                String value = null;
+                if (representation != null) {
+                  value = ServerTools.autoGenerateRepresentationValue(representation, user, generator);
+                } else {
+                  value = ServerTools.autoGenerateAIPValue(aip, user, generator);
+                }
+
                 if (value != null) {
                   mv.set("value", value);
                 }
@@ -2569,13 +2577,16 @@ public class BrowserHelper {
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
     IndexedFile ifolder = index.retrieve(IndexedFile.class, folderUUID);
+    String oldName = ifolder.getId();
 
     try {
       File folder = model.retrieveFile(ifolder.getAipId(), ifolder.getRepresentationId(), ifolder.getPath(),
         ifolder.getId());
       File newFolder = model.renameFolder(folder, newName, true, true);
 
-      String outcomeText = "The folder '" + ifolder.getId() + "' has been manually renamed.";
+      String outcomeText = "The folder '" + ifolder.getId() + "' has been manually renamed from '" + oldName + "' to '"
+        + newName + "'.";
+
       model.createUpdateAIPEvent(ifolder.getAipId(), ifolder.getRepresentationId(), null, null,
         PreservationEventType.UPDATE, "The process of updating an object of the repository.", PluginState.SUCCESS,
         outcomeText, details, user.getName(), true);
@@ -2583,7 +2594,9 @@ public class BrowserHelper {
       index.commitAIPs();
       return IdUtils.getFileId(newFolder);
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      String outcomeText = "The folder '" + ifolder.getId() + "' has not been manually renamed.";
+      String outcomeText = "The folder '" + ifolder.getId() + "' has not been manually renamed from '" + oldName
+        + "' to '" + newName + "'.";
+
       model.createUpdateAIPEvent(ifolder.getAipId(), ifolder.getRepresentationId(), null, null,
         PreservationEventType.UPDATE, "The process of updating an object of the repository.", PluginState.FAILURE,
         outcomeText, details, user.getName(), true);
@@ -2701,7 +2714,7 @@ public class BrowserHelper {
 
       String outcomeText = "The folder '" + newName + "' has been manually created.";
       model.createUpdateAIPEvent(aipId, irep.getId(), null, null, PreservationEventType.CREATION,
-        "The process of creating an object of the repository.", PluginState.FAILURE, outcomeText, details,
+        "The process of creating an object of the repository.", PluginState.SUCCESS, outcomeText, details,
         user.getName(), true);
 
       index.commit(IndexedFile.class);
@@ -2969,17 +2982,22 @@ public class BrowserHelper {
       new Sublist(0, representationIds.size()));
 
     for (IndexedRepresentation irep : reps.getResults()) {
+      String oldType = irep.getType();
       try {
         Representation rep = model.retrieveRepresentation(irep.getAipId(), irep.getId());
         rep.setType(newType);
         model.updateRepresentationInfo(rep);
 
-        String outcomeText = "The representation '" + irep.getId() + "' has been manually updated.";
+        String outcomeText = "The representation '" + irep.getId() + "' changed its type from '" + oldType + "' to '"
+          + newType + "'.";
+
         model.createUpdateAIPEvent(irep.getAipId(), irep.getId(), null, null, PreservationEventType.UPDATE,
-          "The process of updating an object of the repository.", PluginState.FAILURE, outcomeText, details,
+          "The process of updating an object of the repository.", PluginState.SUCCESS, outcomeText, details,
           user.getName(), true);
       } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-        String outcomeText = "The representation '" + irep.getId() + "' has not been manually updated.";
+        String outcomeText = "The representation '" + irep.getId() + "' did not change its type from '" + oldType
+          + "' to '" + newType + "'.";
+
         model.createUpdateAIPEvent(irep.getAipId(), irep.getId(), null, null, PreservationEventType.UPDATE,
           "The process of updating an object of the repository.", PluginState.FAILURE, outcomeText, details,
           user.getName(), true);
