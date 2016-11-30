@@ -486,16 +486,37 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
           str.append("File is not comprehensively characterized.\n");
         }
         if (FileNotCharacterizedRiskAssessmentPlugin.this.checkFormatDesignation()) {
-          str.append(String.format("Missing format designation: %s%n", this.format));
+          str.append(String.format("Missing format designation: %s%n", numberToHuman(this.format, count)));
         }
         if (FileNotCharacterizedRiskAssessmentPlugin.this.checkMimetype()) {
-          str.append(String.format("Missing mimetype: %s%n", this.mimetype));
+          str.append(String.format("Missing mimetype: %s%n", numberToHuman(this.mimetype, count)));
         }
         if (FileNotCharacterizedRiskAssessmentPlugin.this.checkPronom()) {
-          str.append(String.format("Missing PRONOM UID: %s%n", this.pronom));
+          str.append(String.format("Missing PRONOM UID: %s%n", numberToHuman(this.pronom, count)));
         }
       }
       return str.toString();
+    }
+
+    /**
+     * Takes the <code>number</code> of missing items and the total result
+     * <code>count</code> and returns a human-friendly representation (yes/no).
+     * 
+     * @param number
+     *          the number of missing items.
+     * @param count
+     *          the total result count.
+     * @return a {@link String} with the human representation of number.
+     */
+    @SuppressWarnings("HiddenField")
+    private String numberToHuman(final int number, final int count) {
+      final String humanString;
+      if (count > 0) {
+        humanString = Integer.toString(number);
+      } else {
+        humanString = (number > 0) ? "yes" : "no";
+      }
+      return humanString;
     }
   }
 
