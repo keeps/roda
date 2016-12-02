@@ -16,7 +16,6 @@ package org.roda.core.plugins.plugins.conversion;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -47,8 +46,8 @@ public class AvconvConvertPlugin<T extends IsRODAObject> extends CommandConvertP
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OUTPUT_ARGUMENTS, new PluginParameter(
-      RodaConstants.PLUGIN_PARAMS_OUTPUT_ARGUMENTS, "Avconv output command arguments", PluginParameterType.STRING, "",
-      true, true,
+      RodaConstants.PLUGIN_PARAMS_OUTPUT_ARGUMENTS, "Avconv output command arguments", PluginParameterType.STRING,
+      "-c:v libx264 -crf 28 -c:a aac -b:a 128k -strict experimental", true, true,
       "Command arguments to modify the output type that will be passed to the command of the tool as configured (advanced users only!)"));
   }
 
@@ -96,10 +95,15 @@ public class AvconvConvertPlugin<T extends IsRODAObject> extends CommandConvertP
 
   @Override
   public List<PluginParameter> getParameters() {
-    List<PluginParameter> params = new ArrayList<PluginParameter>();
-    params.addAll(super.getParameters());
-    params.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_OUTPUT_ARGUMENTS));
-    return params;
+    Map<String, PluginParameter> parameters = super.getDefaultParameters();
+    parameters.get(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT).setDefaultValue("mp4");
+    parameters.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_TITLE).setDefaultValue("MP4 video");
+    parameters.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION)
+      .setDefaultValue("MP4 format for web visualization.");
+
+    List<PluginParameter> ret = super.orderParameters(parameters);
+    ret.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_OUTPUT_ARGUMENTS));
+    return ret;
   }
 
   @Override

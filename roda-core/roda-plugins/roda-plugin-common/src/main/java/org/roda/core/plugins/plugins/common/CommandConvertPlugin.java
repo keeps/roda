@@ -35,6 +35,12 @@ public abstract class CommandConvertPlugin<T extends IsRODAObject> extends Abstr
     commandArguments = "";
   }
 
+  protected Map<String, PluginParameter> getDefaultParameters() {
+    Map<String, PluginParameter> defaultParameters = super.getDefaultParameters();
+    defaultParameters.putAll(new HashMap<String, PluginParameter>(pluginParameters));
+    return defaultParameters;
+  }
+
   public String getCommandArguments() {
     return commandArguments;
   }

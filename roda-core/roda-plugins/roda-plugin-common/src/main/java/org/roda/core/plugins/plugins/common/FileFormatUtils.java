@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 
 public class FileFormatUtils {
@@ -34,9 +35,13 @@ public class FileFormatUtils {
     String inputFormatMimetypes = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", tool,
       "inputFormatMimetypes");
 
-    for (String mimetype : Arrays.asList(inputFormatMimetypes.split(" "))) {
-      String mimeExtensions = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "mimetype", mimetype);
-      map.put(mimetype, Arrays.asList(mimeExtensions.split(" ")));
+    if (StringUtils.isNotBlank(inputFormatMimetypes)) {
+      for (String mimetype : Arrays.asList(inputFormatMimetypes.split(" "))) {
+        String mimeExtensions = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "mimetype", mimetype);
+        if (StringUtils.isNotBlank(mimeExtensions)) {
+          map.put(mimetype, Arrays.asList(mimeExtensions.split(" ")));
+        }
+      }
     }
 
     return map;

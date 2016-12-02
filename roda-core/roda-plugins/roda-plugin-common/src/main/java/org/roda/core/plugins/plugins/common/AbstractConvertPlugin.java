@@ -120,6 +120,21 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
     outputFormat = "";
   }
 
+  protected Map<String, PluginParameter> getDefaultParameters() {
+    return new HashMap<String, PluginParameter>(pluginParameters);
+  }
+
+  protected List<PluginParameter> orderParameters(Map<String, PluginParameter> params) {
+    List<PluginParameter> orderedList = new ArrayList<PluginParameter>();
+    orderedList.add(params.get(RodaConstants.PLUGIN_PARAMS_INPUT_FORMAT));
+    orderedList.add(params.get(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT));
+    orderedList.add(params.get(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES));
+    orderedList.add(params.get(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP));
+    orderedList.add(params.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_TITLE));
+    orderedList.add(params.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION));
+    return orderedList;
+  }
+
   public void init() throws PluginException {
     // do nothing
   }
@@ -167,14 +182,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
   @Override
   public List<PluginParameter> getParameters() {
-    List<PluginParameter> parameters = new ArrayList<PluginParameter>();
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_INPUT_FORMAT));
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT));
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES));
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP));
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_TITLE));
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION));
-    return parameters;
+    return orderParameters(pluginParameters);
   }
 
   @Override
@@ -867,6 +875,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
   private boolean doPluginExecute(String fileFormat, String filePronom, String fileMimetype, List<String> applicableTo,
     List<String> convertableTo, Map<String, List<String>> pronomToExtension,
     Map<String, List<String>> mimetypeToExtension) {
+    LOGGER.info("Testing if input and output formats are correct");
     if (((!getInputFormat().isEmpty() && fileFormat.equalsIgnoreCase(getInputFormat())) || (getInputFormat().isEmpty()))
       && (applicableTo.size() == 0 || (filePronom != null && pronomToExtension.containsKey(filePronom))
         || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype))

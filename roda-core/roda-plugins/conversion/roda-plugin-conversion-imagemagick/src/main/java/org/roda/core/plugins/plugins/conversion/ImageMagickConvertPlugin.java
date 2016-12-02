@@ -14,7 +14,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -46,6 +48,18 @@ public class ImageMagickConvertPlugin<T extends IsRODAObject> extends CommandCon
       + "\nThe results of conversion will be placed on a new representation under the same Archival Information Package (AIP) where the files were originally found."
       + " A PREMIS event is also recorded after the task is run."
       + "\nFor a full list of supported formats, please visit http://www.imagemagick.org/script/formats.php ";
+  }
+
+  @Override
+  public List<PluginParameter> getParameters() {
+    Map<String, PluginParameter> parameters = super.getDefaultParameters();
+    parameters.get(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT).setDefaultValue("jpg");
+    parameters.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_TITLE).setDefaultValue("Low resolution image");
+    parameters.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION)
+      .setDefaultValue("JPEG format at 80% quality and a maximum of 1600 pixels.");
+    parameters.get(RodaConstants.PLUGIN_PARAMS_COMMAND_ARGUMENTS)
+      .setDefaultValue("-geometry 1600x1600\\> -quality 80 -strip");
+    return super.orderParameters(parameters);
   }
 
   @Override

@@ -14,7 +14,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -51,6 +53,16 @@ public class UnoconvConvertPlugin<T extends IsRODAObject> extends CommandConvert
       LoggerFactory.getLogger(UnoconvConvertPlugin.class).debug("Error getting unoconv version");
       return "1.0";
     }
+  }
+
+  @Override
+  public List<PluginParameter> getParameters() {
+    Map<String, PluginParameter> parameters = super.getDefaultParameters();
+    parameters.get(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT).setDefaultValue("PDF");
+    parameters.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_TITLE).setDefaultValue("PDF document");
+    parameters.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION)
+      .setDefaultValue("PDF document format for Web visualization.");
+    return super.orderParameters(parameters);
   }
 
   @Override

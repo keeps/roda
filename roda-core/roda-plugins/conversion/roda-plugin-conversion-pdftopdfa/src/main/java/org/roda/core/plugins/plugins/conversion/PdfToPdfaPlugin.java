@@ -51,6 +51,16 @@ public class PdfToPdfaPlugin<T extends IsRODAObject> extends AbstractConvertPlug
       RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP, "Convert to a DIP", PluginParameterType.BOOLEAN, "true", false,
       false,
       "If this is selected then the plugin will convert the files to a new DIP. If not, a new representation will be created."));
+
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_TITLE,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_TITLE, "Dissemination title",
+        PluginParameterType.STRING, "PDF/A document", false, false,
+        "If the 'create dissemination' option is checked, then this will be the respective dissemination title."));
+
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION, new PluginParameter(
+      RodaConstants.PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION, "Dissemination description", PluginParameterType.STRING,
+      "PDF/A document converted from PDF", false, false,
+      "If the 'create dissemination' option is checked, then this will be the respective dissemination description."));
   }
 
   public PdfToPdfaPlugin() {
@@ -65,6 +75,8 @@ public class PdfToPdfaPlugin<T extends IsRODAObject> extends AbstractConvertPlug
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_IGNORE_VERAPDF_VALIDATION));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_TITLE));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION));
     return parameters;
   }
 

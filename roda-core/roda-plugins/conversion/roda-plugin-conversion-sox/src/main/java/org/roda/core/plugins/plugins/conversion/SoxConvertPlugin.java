@@ -14,7 +14,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -54,6 +56,16 @@ public class SoxConvertPlugin<T extends IsRODAObject> extends CommandConvertPlug
   }
 
   @Override
+  public List<PluginParameter> getParameters() {
+    Map<String, PluginParameter> parameters = super.getDefaultParameters();
+    parameters.get(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT).setDefaultValue("mp3");
+    parameters.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_TITLE).setDefaultValue("MP3 audio");
+    parameters.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION)
+      .setDefaultValue("MP3 audio format for Web reproduction.");
+    return super.orderParameters(parameters);
+  }
+
+  @Override
   public Plugin<T> cloneMe() {
     return new SoxConvertPlugin<T>();
   }
@@ -61,7 +73,6 @@ public class SoxConvertPlugin<T extends IsRODAObject> extends CommandConvertPlug
   @Override
   public String executePlugin(Path inputPath, Path outputPath, String fileFormat)
     throws UnsupportedOperationException, IOException, CommandException {
-
     return SoxConvertPluginUtils.executeSox(inputPath, outputPath, super.getCommandArguments());
   }
 
