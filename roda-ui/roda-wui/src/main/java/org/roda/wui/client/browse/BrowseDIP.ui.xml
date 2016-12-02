@@ -24,13 +24,13 @@
 				<g:FocusPanel ui:field="previousButton"
 					addStyleNames="toolbarLink">
 					<g:HTML>
-						<i class="fa fa-step-backward"></i>
+						<i class="fa fa-chevron-left"></i>
 					</g:HTML>
 				</g:FocusPanel>
 				<g:FocusPanel ui:field="nextButton"
 					addStyleNames="toolbarLink">
 					<g:HTML>
-						<i class="fa fa-step-forward"></i>
+						<i class="fa fa-chevron-right"></i>
 					</g:HTML>
 				</g:FocusPanel>
 				<g:FocusPanel ui:field="downloadButton"
