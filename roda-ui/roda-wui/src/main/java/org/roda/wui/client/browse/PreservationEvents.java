@@ -18,6 +18,7 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.wui.client.browse.bundle.BrowseItemBundle;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.PreservationEventList;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;

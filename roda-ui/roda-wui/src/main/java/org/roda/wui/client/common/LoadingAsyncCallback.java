@@ -7,6 +7,7 @@
  */
 package org.roda.wui.client.common;
 
+import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;

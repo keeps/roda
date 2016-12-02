@@ -18,6 +18,7 @@ import java.util.Vector;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
+import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;

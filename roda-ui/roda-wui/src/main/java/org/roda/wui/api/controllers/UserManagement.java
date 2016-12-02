@@ -32,7 +32,7 @@ import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
-import org.roda.wui.client.browse.UserExtraBundle;
+import org.roda.wui.client.browse.bundle.UserExtraBundle;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
 import org.roda.wui.common.server.ServerTools;

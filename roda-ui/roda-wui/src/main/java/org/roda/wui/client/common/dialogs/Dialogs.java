@@ -5,8 +5,9 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.client.common;
+package org.roda.wui.client.common.dialogs;
 
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.search.SearchSuggestBox;
 
 import com.google.gwt.core.client.GWT;

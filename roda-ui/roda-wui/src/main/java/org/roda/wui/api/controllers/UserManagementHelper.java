@@ -34,7 +34,7 @@ import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.MetadataValue;
-import org.roda.wui.client.browse.UserExtraBundle;
+import org.roda.wui.client.browse.bundle.UserExtraBundle;
 import org.roda.wui.common.server.ServerTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

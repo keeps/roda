@@ -63,6 +63,7 @@ public class ImageMagickConvertPlugin<T extends IsRODAObject> extends CommandCon
     return new ImageMagickConvertPlugin<T>();
   }
 
+  @Override
   public String executePlugin(Path inputPath, Path outputPath, String fileFormat)
     throws UnsupportedOperationException, IOException, CommandException {
 

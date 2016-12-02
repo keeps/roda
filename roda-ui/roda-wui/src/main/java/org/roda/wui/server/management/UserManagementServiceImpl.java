@@ -24,7 +24,7 @@ import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.UserManagement;
-import org.roda.wui.client.browse.UserExtraBundle;
+import org.roda.wui.client.browse.bundle.UserExtraBundle;
 import org.roda.wui.client.management.UserManagementService;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
 import org.slf4j.Logger;

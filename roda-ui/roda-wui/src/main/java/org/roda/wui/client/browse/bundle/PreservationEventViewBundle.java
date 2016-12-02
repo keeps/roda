@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.client.browse;
+package org.roda.wui.client.browse.bundle;
 
 import java.io.Serializable;
 import java.util.Map;

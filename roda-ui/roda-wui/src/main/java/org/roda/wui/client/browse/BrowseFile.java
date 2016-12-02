@@ -25,8 +25,9 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
-import org.roda.wui.client.common.Dialogs;
+import org.roda.wui.client.browse.bundle.BrowseItemBundle;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
@@ -35,10 +36,10 @@ import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.RestUtils;
-import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -444,7 +445,8 @@ public class BrowseFile extends Composite {
               Window.open(dip.getOpenExternalURL(), "_blank", "");
               Toast.showInfo("Opened dissemination", dip.getOpenExternalURL());
             } else {
-              HistoryUtils.newHistory(BrowseDIP.RESOLVER, dip.getUUID());
+              HistoryUtils.newHistory(BrowseDIP.RESOLVER, dip.getUUID(), file.getAipId(), file.getRepresentationUUID(),
+                file.getUUID());
             }
           }
         });
@@ -547,6 +549,7 @@ public class BrowseFile extends Composite {
   };
 
   public static void jumpTo(IndexedFile selected) {
-    HistoryUtils.newHistory(BrowseFile.RESOLVER, selected.getAipId(), selected.getRepresentationUUID(), selected.getUUID());
+    HistoryUtils.newHistory(BrowseFile.RESOLVER, selected.getAipId(), selected.getRepresentationUUID(),
+      selected.getUUID());
   }
 }

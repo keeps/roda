@@ -27,10 +27,12 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.wui.client.common.Dialogs;
+import org.roda.wui.client.browse.bundle.BrowseItemBundle;
+import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectFileDialog;
 import org.roda.wui.client.common.lists.SearchFileList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
@@ -290,7 +292,7 @@ public class BrowseRepresentation extends Composite {
     representationType.setText(representation.getType() != null ? representation.getType() : representation.getId());
     representationId.setText(representation.getId());
 
-    breadcrumb.updatePath(BreadcrumbUtils.getRepresentatioBreadcrumbs(itemBundle, aipId, repId));
+    breadcrumb.updatePath(BreadcrumbUtils.getRepresentationBreadcrumbs(itemBundle, aipId, repId));
     breadcrumb.setVisible(true);
 
     final List<Pair<String, HTML>> descriptiveMetadataContainers = new ArrayList<Pair<String, HTML>>();

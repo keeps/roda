@@ -26,6 +26,7 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;

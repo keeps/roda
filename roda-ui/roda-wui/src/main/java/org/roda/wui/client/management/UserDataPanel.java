@@ -17,9 +17,9 @@ import java.util.Set;
 
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
-import org.roda.wui.client.browse.FormUtilities;
-import org.roda.wui.client.browse.UserExtraBundle;
+import org.roda.wui.client.browse.bundle.UserExtraBundle;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.FormUtilities;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.HistoryUtils;
 

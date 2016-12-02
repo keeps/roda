@@ -22,7 +22,7 @@ import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
-import org.roda.wui.client.browse.UserExtraBundle;
+import org.roda.wui.client.browse.bundle.UserExtraBundle;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
 
 import com.google.gwt.core.client.GWT;

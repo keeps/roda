@@ -761,7 +761,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                 reportItem.setPluginDetails("This file was ignored.");
               } else {
                 pluginResultState = PluginState.FAILURE;
-                reportItem.setPluginDetails("This file was not ignored.");
+                reportItem.setPluginDetails("This file was not ignored and it is not listed on the supported input file formats.");
               }
             }
           }

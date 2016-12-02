@@ -50,6 +50,7 @@ import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
@@ -69,13 +70,14 @@ import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StringContentPayload;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.controllers.Jobs;
-import org.roda.wui.client.browse.BrowseItemBundle;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
-import org.roda.wui.client.browse.DescriptiveMetadataVersionsBundle;
-import org.roda.wui.client.browse.PreservationEventViewBundle;
-import org.roda.wui.client.browse.SupportedMetadataTypeBundle;
 import org.roda.wui.client.browse.Viewers;
+import org.roda.wui.client.browse.bundle.BrowseItemBundle;
+import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
+import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
+import org.roda.wui.client.browse.bundle.DipBundle;
+import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
+import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
 import org.roda.wui.client.common.search.SearchField;
 import org.roda.wui.client.common.utils.Tree;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
@@ -837,6 +839,33 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     String details) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Browser.changeRepresentationType(user, selected, newType, details);
+  }
+
+  @Override
+  public DipBundle getDipBundle(String dipUUID, String aipUUID, String representationUUID, String fileUUID)
+    throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException {
+    DipBundle bundle = new DipBundle();
+    User user = UserUtility.getUser(getThreadLocalRequest());
+
+    if (dipUUID != null) {
+      bundle.setDip(Browser.retrieve(user, IndexedDIP.class, dipUUID));
+    } else {
+      throw new RequestNotValidException("DIP id must be defined in request and it was null");
+    }
+
+    if (aipUUID != null) {
+      bundle.setAip(Browser.retrieve(user, IndexedAIP.class, aipUUID));
+    }
+
+    if (representationUUID != null) {
+      bundle.setRepresentation(Browser.retrieve(user, IndexedRepresentation.class, representationUUID));
+    }
+
+    if (fileUUID != null) {
+      bundle.setFile(Browser.retrieve(user, IndexedFile.class, fileUUID));
+    }
+
+    return bundle;
   }
 
 }

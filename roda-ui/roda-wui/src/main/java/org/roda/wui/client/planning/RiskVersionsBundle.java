@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.roda.core.data.v2.risks.Risk;
-import org.roda.wui.client.browse.BinaryVersionBundle;
+import org.roda.wui.client.browse.bundle.BinaryVersionBundle;
 
 public class RiskVersionsBundle implements Serializable {
 

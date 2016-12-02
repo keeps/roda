@@ -17,6 +17,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.wui.client.browse.bundle.BinaryVersionBundle;
+import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;

@@ -18,8 +18,8 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.risks.Risk;
-import org.roda.wui.client.browse.BinaryVersionBundle;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.browse.bundle.BinaryVersionBundle;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;

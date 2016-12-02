@@ -19,17 +19,23 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
-import org.roda.wui.client.common.Dialogs;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.wui.client.browse.bundle.DipBundle;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
+import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.RestUtils;
-import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -60,11 +66,19 @@ public class BrowseDIP extends Composite {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private DIP dip;
+  // source
+  private IndexedAIP aip;
+  private IndexedRepresentation representation;
+  private IndexedFile file;
+
+  // target
+  private IndexedDIP dip;
   private DIPFile dipFile;
 
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
+
+  // interface
 
   @UiField
   BreadcrumbPanel breadcrumb;
@@ -75,8 +89,8 @@ public class BrowseDIP extends Composite {
   @UiField
   FocusPanel downloadButton;
 
-  @UiField
-  FocusPanel removeButton;
+  // @UiField
+  // FocusPanel removeButton;
 
   /**
    * Create a new panel to view a representation
@@ -89,32 +103,30 @@ public class BrowseDIP extends Composite {
    * @param file
    * 
    */
-  public BrowseDIP(Viewers viewers, DIP dip, DIPFile dipFile) {
+  public BrowseDIP(Viewers viewers, IndexedAIP aip, IndexedRepresentation representation, IndexedFile file,
+    IndexedDIP dip, DIPFile dipFile) {
+
+    this.aip = aip;
+    this.representation = representation;
+    this.file = file;
+
     this.dip = dip;
     this.dipFile = dipFile;
-
-    // IndexedRepresentation rep = null;
-    // for (IndexedRepresentation irep : itemBundle.getRepresentations()) {
-    // if (irep.getUUID().equals(representationUUID)) {
-    // rep = irep;
-    // break;
-    // }
-    // }
 
     dipFilePreview = new DipFilePreview(viewers, dipFile);
 
     initWidget(uiBinder.createAndBindUi(this));
 
     // update breadcrumb
-    // breadcrumb.updatePath(getBreadcrumbs());
-    // breadcrumb.setVisible(true);
+    breadcrumb.updatePath(getBreadcrumbs());
+    breadcrumb.setVisible(true);
 
     downloadButton.setTitle(messages.viewRepresentationDownloadFileButton());
-    removeButton.setTitle(messages.viewRepresentationRemoveFileButton());
+    // removeButton.setTitle(messages.viewRepresentationRemoveFileButton());
 
     // update visibles
     downloadButton.setVisible(!dipFile.isDirectory());
-    removeButton.setVisible(!dipFile.isDirectory());
+    // removeButton.setVisible(!dipFile.isDirectory());
   }
 
   @UiHandler("downloadButton")
@@ -132,7 +144,7 @@ public class BrowseDIP extends Composite {
     }
   }
 
-  @UiHandler("removeButton")
+  // @UiHandler("removeButton")
   void buttonRemoveFileButtonHandler(ClickEvent e) {
     Dialogs.showConfirmDialog(messages.viewRepresentationRemoveFileTitle(),
       messages.viewRepresentationRemoveFileMessage(), messages.dialogCancel(), messages.dialogYes(),
@@ -166,10 +178,9 @@ public class BrowseDIP extends Composite {
   }
 
   // TODO breadcrumbs
-  // private List<BreadcrumbItem> getBreadcrumbs() {
-  // return BreadcrumbUtils.getFileBreadcrumbs(itemBundle, aipId,
-  // representationUUID, file);
-  // }
+  private List<BreadcrumbItem> getBreadcrumbs() {
+    return BreadcrumbUtils.getDipBreadcrumbs(aip, representation, file, dip, dipFile);
+  }
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
@@ -206,42 +217,23 @@ public class BrowseDIP extends Composite {
 
     private void load(final Viewers viewers, final List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (!historyTokens.isEmpty()) {
-        final String historyDipId = historyTokens.get(0);
-        final String historyDipFileId = historyTokens.size() > 1 ? historyTokens.get(1) : null;
+        final String historyDipUUID = historyTokens.get(0);
+        final String historyAipUUID = historyTokens.size() > 1 ? historyTokens.get(1) : null;
+        final String historyRepresentationUUID = historyTokens.size() > 2 ? historyTokens.get(2) : null;
+        final String historyFileUUID = historyTokens.size() > 3 ? historyTokens.get(3) : null;
 
-        BrowserService.Util.getInstance().retrieve(IndexedDIP.class.getName(), historyDipId,
-          new AsyncCallback<IndexedDIP>() {
+        BrowserService.Util.getInstance().getDipBundle(historyDipUUID, historyAipUUID, historyRepresentationUUID,
+          historyFileUUID, new AsyncCallback<DipBundle>() {
 
             @Override
             public void onFailure(Throwable caught) {
-              errorRedirect(callback);
+              AsyncCallbackUtils.defaultFailureTreatment(caught);
             }
 
             @Override
-            public void onSuccess(final IndexedDIP dip) {
-              if (historyDipFileId != null) {
-                BrowserService.Util.getInstance().retrieve(DIPFile.class.getName(), historyDipFileId,
-                  new AsyncCallback<DIPFile>() {
-
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      errorRedirect(callback);
-                    }
-
-                    @Override
-                    public void onSuccess(DIPFile dipFile) {
-                      BrowseDIP view = new BrowseDIP(viewers, dip, dipFile);
-                      callback.onSuccess(view);
-                    }
-                  });
-
-              } else {
-                showFirst(viewers, callback, dip);
-
-              }
-
+            public void onSuccess(DipBundle dipBundle) {
+              showFirst(viewers, callback, dipBundle);
             }
-
           });
 
       } else {
@@ -253,9 +245,16 @@ public class BrowseDIP extends Composite {
       HistoryUtils.newHistory(Browse.RESOLVER);
       callback.onSuccess(null);
     }
+
   };
 
-  protected static void showFirst(final Viewers viewers, final AsyncCallback<Widget> callback, final IndexedDIP dip) {
+  protected static void showFirst(final Viewers viewers, final AsyncCallback<Widget> callback,
+    final DipBundle dipBundle) {
+    final IndexedDIP dip = dipBundle.getDip();
+    final IndexedAIP aip = dipBundle.getAip();
+    final IndexedRepresentation representation = dipBundle.getRepresentation();
+    final IndexedFile file = dipBundle.getFile();
+
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_DIP_ID, dip.getId()));
     Sublist sublist = new Sublist(0, 1);
     String localeString = LocaleInfo.getCurrentLocale().getLocaleName();
@@ -273,7 +272,7 @@ public class BrowseDIP extends Composite {
         public void onSuccess(IndexResult<DIPFile> result) {
           if (!result.getResults().isEmpty()) {
             DIPFile firstDipFile = result.getResults().get(0);
-            BrowseDIP view = new BrowseDIP(viewers, dip, firstDipFile);
+            BrowseDIP view = new BrowseDIP(viewers, aip, representation, file, dip, firstDipFile);
             callback.onSuccess(view);
           } else {
             Toast.showError("No files in the DIP");

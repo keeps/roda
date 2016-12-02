@@ -5,12 +5,14 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.client.browse;
+package org.roda.wui.client.common.utils;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+
+import org.roda.wui.client.browse.MetadataValue;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -38,6 +40,11 @@ import config.i18n.client.ClientMessages;
  * Created by adrapereira on 13-06-2016.
  */
 public class FormUtilities {
+
+  private FormUtilities() {
+
+  }
+
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   public static void create(FlowPanel panel, Set<MetadataValue> bundle, boolean addStyle) {

@@ -36,6 +36,12 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.wui.client.browse.bundle.BrowseItemBundle;
+import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
+import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
+import org.roda.wui.client.browse.bundle.DipBundle;
+import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
+import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
 import org.roda.wui.client.common.search.SearchField;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
@@ -213,5 +219,8 @@ public interface BrowserServiceAsync {
 
   void changeRepresentationType(SelectedItemsList<IndexedRepresentation> selectedRepresentation, String newType,
     String details, AsyncCallback<Void> loadingAsyncCallback);
+
+  void getDipBundle(String dipUUID, String aipUUID, String representationUUID, String fileUUID,
+    AsyncCallback<DipBundle> callback);
 
 }
