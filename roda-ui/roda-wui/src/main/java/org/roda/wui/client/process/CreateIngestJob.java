@@ -26,6 +26,7 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.Dialogs;
+import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.lists.TransferredResourceList;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -137,6 +138,11 @@ public class CreateIngestJob extends CreateJob<TransferredResource> {
 
   @Override
   public void cancel() {
-    HistoryUtils.newHistory(IngestProcess.RESOLVER);
+    LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+    if (selectedItems.getLastHistory().isEmpty()) {
+      HistoryUtils.newHistory(IngestProcess.RESOLVER);
+    } else {
+      HistoryUtils.newHistory(selectedItems.getLastHistory());
+    }
   }
 }

@@ -26,8 +26,8 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.process.CreateJob;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -212,6 +212,7 @@ public class ShowRisk extends Composite {
   void handleButtonProcess(ClickEvent e) {
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
     selectedItems.setSelectedItems(riskShowPanel.getSelectedIncidences());
+    selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
     HistoryUtils.newHistory(CreateJob.RESOLVER, "action");
   }
 
@@ -231,16 +232,16 @@ public class ShowRisk extends Composite {
           editDialog.getSeverity(), editDialog.getMitigatedOn(), editDialog.getMitigatedBy(),
           editDialog.getMitigatedDescription(), new LoadingAsyncCallback<Void>() {
 
-          @Override
-          public void onSuccessImpl(Void result) {
-            riskShowPanel.incidenceList.refresh();
-          }
+            @Override
+            public void onSuccessImpl(Void result) {
+              riskShowPanel.incidenceList.refresh();
+            }
 
-          @Override
-          public void onFailureImpl(Throwable caught) {
-            AsyncCallbackUtils.defaultFailureTreatment(caught);
-          }
-        });
+            @Override
+            public void onFailureImpl(Throwable caught) {
+              AsyncCallbackUtils.defaultFailureTreatment(caught);
+            }
+          });
       }
     });
   }

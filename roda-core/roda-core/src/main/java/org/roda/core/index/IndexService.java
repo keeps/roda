@@ -50,6 +50,7 @@ import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
@@ -62,6 +63,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.User;
@@ -434,7 +436,7 @@ public class IndexService {
       return reindexFormat(Format.class.cast(object));
     } else if (Notification.class.equals(objectClass)) {
       return reindexNotification(Notification.class.cast(object));
-    } else if (Risk.class.equals(objectClass)) {
+    } else if (Risk.class.equals(objectClass) || IndexedRisk.class.equals(objectClass)) {
       return reindexRisk(Risk.class.cast(object));
     } else if (RiskIncidence.class.equals(objectClass)) {
       return reindexRiskIncidence(RiskIncidence.class.cast(object));
@@ -446,7 +448,7 @@ public class IndexService {
       return reindexRepresentation(Representation.class.cast(object));
     } else if (File.class.equals(objectClass) || IndexedFile.class.equals(objectClass)) {
       return reindexFile(File.class.cast(object));
-    } else if (DIP.class.equals(objectClass)) {
+    } else if (DIP.class.equals(objectClass) || IndexedDIP.class.equals(objectClass)) {
       return reindexDIP(DIP.class.cast(object));
     } else if (DIPFile.class.equals(objectClass)) {
       return reindexDIPFile(DIPFile.class.cast(object));

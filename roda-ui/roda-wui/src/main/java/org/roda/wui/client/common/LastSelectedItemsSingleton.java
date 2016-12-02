@@ -7,6 +7,9 @@
  */
 package org.roda.wui.client.common;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.roda.core.data.v2.index.select.SelectedItems;
 
 public class LastSelectedItemsSingleton {
@@ -14,6 +17,7 @@ public class LastSelectedItemsSingleton {
   private static LastSelectedItemsSingleton singleton = null;
   private static SelectedItems<?> selected = null;
   private static String detailsMessage = "";
+  private static List<String> lastHistory = new ArrayList<String>();
 
   private LastSelectedItemsSingleton() {
   }
@@ -39,6 +43,14 @@ public class LastSelectedItemsSingleton {
 
   public void setDetailsMessage(String details) {
     detailsMessage = details;
+  }
+
+  public List<String> getLastHistory() {
+    return lastHistory;
+  }
+
+  public void setLastHistory(List<String> lastHistory) {
+    LastSelectedItemsSingleton.lastHistory = lastHistory;
   }
 
 }

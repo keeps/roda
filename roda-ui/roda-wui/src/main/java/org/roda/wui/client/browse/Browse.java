@@ -59,11 +59,11 @@ import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.FacetUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.RestErrorOverlayType;
 import org.roda.wui.common.client.tools.RestUtils;
-import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -769,7 +769,8 @@ public class Browse extends Composite {
 
             if (bundle.hasHistory()) {
               // History link
-              String historyLink = HistoryUtils.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId, descId);
+              String historyLink = HistoryUtils.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId,
+                descId);
               String historyLinkHtml = "<a href='" + historyLink
                 + "' class='toolbarLink'><i class='fa fa-history'></i></a>";
               b.append(SafeHtmlUtils.fromSafeConstant(historyLinkHtml));
@@ -808,7 +809,8 @@ public class Browse extends Composite {
 
             if (bundle.hasHistory()) {
               // History link
-              String historyLink = HistoryUtils.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId, descId);
+              String historyLink = HistoryUtils.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId,
+                descId);
               String historyLinkHtml = "<a href='" + historyLink
                 + "' class='toolbarLink'><i class='fa fa-history'></i></a>";
               b.append(SafeHtmlUtils.fromSafeConstant(historyLinkHtml));
@@ -1193,11 +1195,13 @@ public class Browse extends Composite {
       if (aipId != null) {
         LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
         selectedItems.setSelectedItems(SelectedItemsList.create(IndexedAIP.class, aipId));
+        selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
         HistoryUtils.newHistory(CreateJob.RESOLVER, "action");
       }
     } else {
       LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
       selectedItems.setSelectedItems(selected);
+      selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
       HistoryUtils.newHistory(CreateJob.RESOLVER, "action");
     }
   }

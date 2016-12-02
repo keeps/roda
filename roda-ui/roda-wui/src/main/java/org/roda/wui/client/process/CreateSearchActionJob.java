@@ -29,6 +29,7 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.FormatList;
 import org.roda.wui.client.common.lists.RepresentationList;
@@ -141,7 +142,12 @@ public class CreateSearchActionJob extends CreateJob<IsIndexed> {
 
   @Override
   public void cancel() {
-    HistoryUtils.newHistory(Search.RESOLVER);
+    LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+    if (selectedItems.getLastHistory().isEmpty()) {
+      HistoryUtils.newHistory(Search.RESOLVER);
+    } else {
+      HistoryUtils.newHistory(selectedItems.getLastHistory());
+    }
   }
 
 }
