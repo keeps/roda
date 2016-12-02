@@ -47,6 +47,7 @@ import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -82,7 +83,6 @@ public class BrowseFile extends Composite {
   private String aipId;
   private BrowseItemBundle itemBundle;
   private String representationUUID;
-  @SuppressWarnings("unused")
   private String fileUUID;
   private IndexedFile file;
 
@@ -219,18 +219,30 @@ public class BrowseFile extends Composite {
         @Override
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
-            BrowserService.Util.getInstance().deleteFile(file.getUUID(), new AsyncCallback<Void>() {
+            Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
+              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
 
-              @Override
-              public void onSuccess(Void result) {
-                // clean();
-              }
+                @Override
+                public void onFailure(Throwable caught) {
+                  // do nothing
+                }
 
-              @Override
-              public void onFailure(Throwable caught) {
-                AsyncCallbackUtils.defaultFailureTreatment(caught);
-              }
-            });
+                @Override
+                public void onSuccess(String details) {
+                  BrowserService.Util.getInstance().deleteFile(file.getUUID(), details, new AsyncCallback<Void>() {
+
+                    @Override
+                    public void onSuccess(Void result) {
+                      // clean();
+                    }
+
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      AsyncCallbackUtils.defaultFailureTreatment(caught);
+                    }
+                  });
+                }
+              });
           }
         }
 

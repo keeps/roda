@@ -277,7 +277,7 @@ public interface BrowserService extends RemoteService {
   List<TransferredResource> retrieveSelectedTransferredResource(SelectedItems<TransferredResource> selected)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException;
 
-  void deleteFile(String fileUUID)
+  void deleteFile(String fileUUID, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
   void updateRiskIncidence(RiskIncidence incidence) throws AuthorizationDeniedException, GenericException;

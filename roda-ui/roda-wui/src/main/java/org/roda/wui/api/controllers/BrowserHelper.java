@@ -1574,11 +1574,26 @@ public class BrowserHelper {
     return RodaCoreFactory.getModelService().updateFileInfo(file);
   }
 
-  public static void deleteRepresentationFile(String fileUUID)
+  public static void deleteRepresentationFile(User user, String fileUUID, String details)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     IndexedFile file = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class, fileUUID);
-    RodaCoreFactory.getModelService().deleteFile(file.getAipId(), file.getRepresentationId(), file.getPath(),
-      file.getId(), true);
+    ModelService model = RodaCoreFactory.getModelService();
+
+    try {
+      model.deleteFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), true);
+
+      String outcomeText = "The File '" + file.getId() + "' has been manually deleted.";
+      model.createUpdateAIPEvent(file.getAipId(), file.getRepresentationId(), null, null,
+        PreservationEventType.DELETION, "The process of deleting an object of the repository.", PluginState.SUCCESS,
+        outcomeText, details, user.getName(), true);
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+      String outcomeText = "The File '" + file.getId() + "' has not been manually deleted.";
+      model.createUpdateAIPEvent(file.getAipId(), file.getRepresentationId(), null, null,
+        PreservationEventType.DELETION, "The process of deleting an object of the repository.", PluginState.FAILURE,
+        outcomeText, details, user.getName(), true);
+
+      throw e;
+    }
   }
 
   public static EntityResponse retrieveAIPRepresentationFile(String fileUuid, String acceptFormat)

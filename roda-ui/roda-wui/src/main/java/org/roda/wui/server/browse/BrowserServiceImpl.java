@@ -789,10 +789,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void deleteFile(String fileUUID)
+  public void deleteFile(String fileUUID, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.deleteFile(user, fileUUID);
+    Browser.deleteFile(user, fileUUID, details);
   }
 
   @Override

@@ -19,8 +19,8 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -168,7 +168,7 @@ public class ShowNotification extends Composite {
     stateLabel.setVisible(notification.getState() != null);
     stateValue.setVisible(notification.getState() != null);
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();

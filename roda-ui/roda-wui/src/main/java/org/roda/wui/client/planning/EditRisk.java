@@ -19,8 +19,8 @@ import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -114,25 +114,25 @@ public class EditRisk extends Composite {
 
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
-    if (riskDataPanel.isChanged()) {
-      if (riskDataPanel.isValid()) {
-        String riskId = risk.getId();
-        risk = riskDataPanel.getRisk();
-        risk.setId(riskId);
-        BrowserService.Util.getInstance().updateRisk(risk, new AsyncCallback<Void>() {
+    if (riskDataPanel.isChanged() && riskDataPanel.isValid()) {
+      final String riskId = risk.getId();
+      risk = riskDataPanel.getRisk();
+      risk.setId(riskId);
+      BrowserService.Util.getInstance().updateRisk(risk, new AsyncCallback<Void>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            errorMessage(caught);
-          }
+        @Override
+        public void onFailure(Throwable caught) {
+          errorMessage(caught);
+        }
 
-          @Override
-          public void onSuccess(Void result) {
-            HistoryUtils.newHistory(RiskRegister.RESOLVER);
-          }
+        @Override
+        public void onSuccess(Void result) {
+          HistoryUtils.newHistory(ShowRisk.RESOLVER, riskId);
+        }
 
-        });
-      }
+      });
+    } else {
+      HistoryUtils.newHistory(ShowRisk.RESOLVER, risk.getId());
     }
   }
 
@@ -142,7 +142,7 @@ public class EditRisk extends Composite {
   }
 
   private void cancel() {
-    HistoryUtils.newHistory(RiskRegister.RESOLVER);
+    HistoryUtils.newHistory(ShowRisk.RESOLVER, risk.getId());
   }
 
   private void errorMessage(Throwable caught) {

@@ -200,7 +200,7 @@ public interface BrowserServiceAsync {
   void retrieveSelectedTransferredResource(SelectedItems<TransferredResource> selected,
     AsyncCallback<List<TransferredResource>> asyncCallback);
 
-  void deleteFile(String fileUUID, AsyncCallback<Void> callback);
+  void deleteFile(String fileUUID, String details, AsyncCallback<Void> callback);
 
   void updateRiskIncidence(RiskIncidence incidence, AsyncCallback<Void> asyncCallback);
 

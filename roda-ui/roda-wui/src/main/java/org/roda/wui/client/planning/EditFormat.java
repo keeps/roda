@@ -17,8 +17,8 @@ import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -102,7 +102,7 @@ public class EditFormat extends Composite {
     this.formatDataPanel = new FormatDataPanel(true, true, format);
     initWidget(uiBinder.createAndBindUi(this));
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();
@@ -111,25 +111,25 @@ public class EditFormat extends Composite {
 
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
-    if (formatDataPanel.isChanged()) {
-      if (formatDataPanel.isValid()) {
-        String formatId = format.getId();
-        format = formatDataPanel.getFormat();
-        format.setId(formatId);
-        BrowserService.Util.getInstance().updateFormat(format, new AsyncCallback<Void>() {
+    if (formatDataPanel.isChanged() && formatDataPanel.isValid()) {
+      String formatId = format.getId();
+      format = formatDataPanel.getFormat();
+      format.setId(formatId);
+      BrowserService.Util.getInstance().updateFormat(format, new AsyncCallback<Void>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            errorMessage(caught);
-          }
+        @Override
+        public void onFailure(Throwable caught) {
+          errorMessage(caught);
+        }
 
-          @Override
-          public void onSuccess(Void result) {
-            HistoryUtils.newHistory(FormatRegister.RESOLVER, format.getId());
-          }
+        @Override
+        public void onSuccess(Void result) {
+          HistoryUtils.newHistory(ShowFormat.RESOLVER, format.getId());
+        }
 
-        });
-      }
+      });
+    } else {
+      HistoryUtils.newHistory(ShowFormat.RESOLVER, format.getId());
     }
   }
 
@@ -139,7 +139,7 @@ public class EditFormat extends Composite {
   }
 
   private void cancel() {
-    HistoryUtils.newHistory(FormatRegister.RESOLVER);
+    HistoryUtils.newHistory(ShowFormat.RESOLVER, format.getId());
   }
 
   private void errorMessage(Throwable caught) {
@@ -151,4 +151,7 @@ public class EditFormat extends Composite {
     }
   }
 
+  protected void enableApplyButton(boolean enabled) {
+    buttonApply.setVisible(enabled);
+  }
 }

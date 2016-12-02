@@ -19,8 +19,8 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -330,7 +330,6 @@ public class ShowFormat extends Composite {
   }-*/;
 
   void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-
     if (historyTokens.size() == 1) {
       String formatId = historyTokens.get(0);
       BrowserService.Util.getInstance().retrieve(Format.class.getName(), formatId, new AsyncCallback<Format>() {

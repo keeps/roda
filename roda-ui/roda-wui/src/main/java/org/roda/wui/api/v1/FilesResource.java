@@ -181,15 +181,17 @@ public class FilesResource {
 
   public Response delete(
     @ApiParam(value = "The UUID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileUUID,
+    @ApiParam(value = "Reason to upload file") @QueryParam(RodaConstants.API_QUERY_PARAM_DETAILS) String details,
     @ApiParam(value = "Choose format in which to get the response", allowableValues = RodaConstants.API_DELETE_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
     User user = UserUtility.getApiUser(request);
+    details = details == null ? "" : details;
 
     // delegate action to controller
-    Browser.deleteRepresentationFile(user, fileUUID);
+    Browser.deleteFile(user, fileUUID, details);
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "File deleted"), mediaType).build();
   }
 

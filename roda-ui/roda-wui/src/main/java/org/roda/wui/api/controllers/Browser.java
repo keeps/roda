@@ -37,7 +37,6 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
@@ -1074,24 +1073,6 @@ public class Browser extends RodaWuiController {
       rep.getId());
   }
 
-  public static void deleteRepresentationFile(User user, String fileUUID)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-    IndexedFile file = BrowserHelper.retrieve(IndexedFile.class, fileUUID);
-    UserUtility.checkFilePermissions(user, file, PermissionType.DELETE);
-
-    // delegate
-    BrowserHelper.deleteRepresentationFile(fileUUID);
-
-    // register action
-    controllerAssistant.registerAction(user, file.getAipId(), LOG_ENTRY_STATE.SUCCESS, RodaConstants.FILE_AIP_ID,
-      file.getAipId(), RodaConstants.FILE_REPRESENTATION_ID, file.getRepresentationId(), RodaConstants.FILE_PATH,
-      file.getPath(), RodaConstants.FILE_FILE_ID, file.getId());
-  }
-
   public static EntityResponse retrieveAIPRepresentationFile(User user, String fileUuid, String acceptFormat)
     throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -2039,7 +2020,7 @@ public class Browser extends RodaWuiController {
     return updatedFile;
   }
 
-  public static void deleteFile(User user, String fileUUID)
+  public static void deleteFile(User user, String fileUUID, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -2049,7 +2030,7 @@ public class Browser extends RodaWuiController {
     UserUtility.checkFilePermissions(user, file, PermissionType.DELETE);
 
     // delegate
-    BrowserHelper.deleteRepresentationFile(fileUUID);
+    BrowserHelper.deleteRepresentationFile(user, fileUUID, details);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_FILE_UUID_PARAM,

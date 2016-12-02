@@ -58,7 +58,7 @@ public class UnoconvConvertPlugin<T extends IsRODAObject> extends CommandConvert
   @Override
   public List<PluginParameter> getParameters() {
     Map<String, PluginParameter> parameters = super.getDefaultParameters();
-    parameters.get(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT).setDefaultValue("PDF");
+    parameters.get(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT).setDefaultValue("pdf");
     parameters.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_TITLE).setDefaultValue("PDF document");
     parameters.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION)
       .setDefaultValue("PDF document format for Web visualization.");
