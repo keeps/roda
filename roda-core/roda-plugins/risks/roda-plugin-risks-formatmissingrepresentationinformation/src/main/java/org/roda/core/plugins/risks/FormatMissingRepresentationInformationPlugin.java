@@ -11,7 +11,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
@@ -71,24 +75,33 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
   /** Plugin parameter ID 'mimetype'. */
   private static final String MIMETYPE = "mimetype";
 
+  /** Plugin parameter name 'mimetype'. */
+  private static final String MIMETYPE_NAME = "Mimetype";
+
   /** Plugin parameter 'mimetype'. */
-  private static final PluginParameter PARAM_MIMETYPE = new PluginParameter(MIMETYPE, "Mimetype",
+  private static final PluginParameter PARAM_MIMETYPE = new PluginParameter(MIMETYPE, MIMETYPE_NAME,
     PluginParameter.PluginParameterType.BOOLEAN, PARAM_VALUE_TRUE, false, false, "Check Mimetype?");
 
   /** Plugin parameter ID 'pronom'. */
   private static final String PRONOM = "pronom";
 
+  /** Plugin parameter name 'pronom'. */
+  private static final String PRONOM_NAME = "PRONOM";
+
   /** Plugin parameter 'pronom'. */
-  private static final PluginParameter PARAM_PRONOM = new PluginParameter(PRONOM, "PRONOM",
+  private static final PluginParameter PARAM_PRONOM = new PluginParameter(PRONOM, PRONOM_NAME,
     PluginParameter.PluginParameterType.BOOLEAN, PARAM_VALUE_TRUE, false, false,
     "Check PRONOM Unique Identifier (PUID)?");
 
   /** Plugin parameter ID 'format'. */
   private static final String FORMAT_DESIGNATION = "format";
 
-  /** Plugin parameter 'format'. */
+  /** Plugin parameter name 'format'. */
+  private static final String FORMAT_DESIGNATION_NAME = "Format designation";
+
+  /** Plugin parameter 'fileFormat'. */
   private static final PluginParameter PARAM_FORMAT_DESIGNATION = new PluginParameter(FORMAT_DESIGNATION,
-    "Format designation", PluginParameter.PluginParameterType.BOOLEAN, PARAM_VALUE_TRUE, false, false,
+    FORMAT_DESIGNATION_NAME, PluginParameter.PluginParameterType.BOOLEAN, PARAM_VALUE_TRUE, false, false,
     "Check Format designation name and version?");
 
   /** Plugin parameter ID 'matchOne'. */
@@ -96,11 +109,11 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
 
   /** Plugin parameter 'matchOne'. */
   private static final PluginParameter PARAM_MATCH_ONE = new PluginParameter(MATCH_ONE,
-    "Match (at least) one format type", PluginParameter.PluginParameterType.BOOLEAN, "false", false, false,
-    "Don't create risk incidence(s) if at least one of the selected format types is found.");
+    "Match (at least) one Format type", PluginParameter.PluginParameterType.BOOLEAN, "false", false, false,
+    "Don't create risk incidence(s) if at least one of the selected fileFormat types is found.");
 
   /**
-   * String format for {@link Format} name and version.
+   * String fileFormat for {@link Format} name and version.
    */
   private static final String FORMAT_NAME_PATTERN = "%1$s, version %2$s";
 
@@ -121,7 +134,7 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
 
   @Override
   public String getDescription() {
-    return "Check file format (Mimetype, PRONOM and Format designation) in the Format Registry. "
+    return "Check file fileFormat (Mimetype, PRONOM and Format designation) in the Format Registry. "
       + "If File Format is not present in the Format Registry, it creates a new risk called "
       + "“Comprehensive representation information is missing for some files in the repository“ "
       + "and assigns the file to that risk in the Risk register.";
@@ -188,12 +201,12 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "File format has Representation information.";
+    return "File fileFormat has Representation information.";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "File format doesn't have Representation information.";
+    return "File fileFormat doesn't have Representation information.";
   }
 
   @Override
@@ -252,10 +265,11 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
   }
 
   /**
-   * Match at least one format type?
+   * Match at least one fileFormat type?
    *
    * @return <code>true</code> if plugin should not create a risk incidence if
-   *         at least one format type is found, <code>false</code> otherwise.
+   *         at least one fileFormat type is found, <code>false</code>
+   *         otherwise.
    */
   private boolean matchAtLeastOneFormatType() {
     return PARAM_VALUE_TRUE.equalsIgnoreCase(getParameterValues().get(MATCH_ONE));
@@ -285,17 +299,25 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
 
     try {
       final FileFormat fileFormat = index.retrieve(IndexedFile.class, fileUUID).getFileFormat();
+      final FileFormatResult result;
+      if (matchAtLeastOneFormatType()) {
+        result = new MatchOneResult(fileFormat, index);
+      } else {
+        result = new MatchAllResult(fileFormat, index);
+      }
 
-      if (isMissingAttributes(fileFormat) || isInRisk(fileFormat, index)) {
+      if (result.isMissingAttributes()) {
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         fileReport.setPluginState(PluginState.FAILURE);
-        addToReportDetails(fileReport, getPreservationEventFailureMessage());
+      } else if (result.isInRisk()) {
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
+        fileReport.setPluginState(PluginState.FAILURE);
         createIncidence(model, file, RISK_ID, fileReport);
       } else {
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
         fileReport.setPluginState(PluginState.SUCCESS);
-        addToReportDetails(fileReport, getPreservationEventSuccessMessage());
       }
+      addToReportDetails(fileReport, result.toString());
 
     } catch (final NotFoundException | GenericException e) {
       final String message = String.format("Error retrieving IndexedFile for File %s (%s)", file.getId(), fileUUID);
@@ -318,88 +340,6 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
 
     jobReport.addReport(fileReport);
     PluginHelper.updatePartialJobReport(this, model, index, fileReport, true);
-  }
-
-  /**
-   * Check if a {@link FileFormat} is in risk. A {@link FileFormat} is in risk
-   * if the Format registry doesn't have a {@link Format} with it's attributes
-   * (format designation, mimetype, pronom).
-   *
-   * @param fileFormat
-   *          the {@link FileFormat} to check.
-   * @param index
-   *          the {@link IndexService}.
-   * @return <code>true</code> if the {@link FileFormat} is in risk,
-   *         <code>false</code> otherwise.
-   */
-  private boolean isInRisk(final FileFormat fileFormat, final IndexService index) {
-
-    try {
-
-      final List<FilterParameter> filterParams = getFilterParameters(fileFormat);
-
-      if (matchAtLeastOneFormatType()) {
-        int matchCount = 0;
-        for (int i = 0; i < filterParams.size() && matchCount == 0; i++) {
-          matchCount += index.count(Format.class, new Filter(filterParams.get(i)));
-        }
-        return matchCount == 0;
-      } else {
-        return index.count(Format.class, new Filter(filterParams)) == 0;
-      }
-
-    } catch (final RequestNotValidException | GenericException e) {
-      LOGGER.error("Error searching for format in registry.", e);
-      return false;
-    }
-
-  }
-
-  /**
-   * Check if all needed attributes exist in {@link FileFormat}.
-   *
-   * @param fileFormat
-   *          the {@link FileFormat}.
-   * @return <code>true</code> if all attributes exist, <code>false</code>
-   *         otherwise.
-   */
-  private boolean isMissingAttributes(final FileFormat fileFormat) {
-    final boolean missingFormat = checkFormatDesignation()
-      && (StringUtils.isBlank(fileFormat.getFormatDesignationName())
-        || StringUtils.isBlank(fileFormat.getFormatDesignationVersion()));
-    final boolean missingMimetype = checkMimetype() && StringUtils.isBlank(fileFormat.getMimeType());
-    final boolean missingPronom = checkPronom() && StringUtils.isBlank(fileFormat.getPronom());
-    return missingFormat || missingMimetype || missingPronom;
-  }
-
-  /**
-   * Get the {@link FilterParameter}s for the specified {@link FileFormat}
-   * format type attributes.
-   * 
-   * @param fileFormat
-   *          the {@link FileFormat}.
-   * @return a {@link List<FilterParameter>}.
-   */
-  private List<FilterParameter> getFilterParameters(final FileFormat fileFormat) {
-    final List<FilterParameter> filterParams = new ArrayList<>();
-
-    if (checkMimetype()) {
-      filterParams.add(new SimpleFilterParameter(RodaConstants.FORMAT_MIMETYPES, fileFormat.getMimeType()));
-    }
-
-    if (checkPronom()) {
-      filterParams.add(new SimpleFilterParameter(RodaConstants.FORMAT_PRONOMS, fileFormat.getPronom()));
-    }
-
-    if (checkFormatDesignation()) {
-      final String formatNamePattern = RodaCoreFactory.getRodaConfiguration().getString(
-        "core.plugins.external.FormatMissingRepresentationInformation.format_name_pattern", FORMAT_NAME_PATTERN);
-      final String name = String.format(formatNamePattern, fileFormat.getFormatDesignationName(),
-        fileFormat.getFormatDesignationVersion());
-      filterParams.add(new SimpleFilterParameter(RodaConstants.FORMAT_NAME, name));
-    }
-
-    return filterParams;
   }
 
   /**
@@ -457,4 +397,351 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
     report.addPluginDetails(pluginDetails);
   }
 
+  /**
+   * This interface is a {@link FileFormat} risk assessment result.
+   */
+  interface FileFormatResult {
+    /**
+     * Check if all needed attributes exist in {@link FileFormat}.
+     *
+     * @return <code>true</code> if all attributes exist, <code>false</code>
+     *         otherwise.
+     */
+    boolean isMissingAttributes();
+
+    /**
+     * Check if a {@link FileFormat} is in risk. A {@link FileFormat} is in risk
+     * if the Format registry doesn't have a {@link Format} with it's attributes
+     * (fileFormat designation, mimetype, pronom).
+     *
+     * @return <code>true</code> if the {@link FileFormat} is in risk,
+     *         <code>false</code> otherwise.
+     */
+    boolean isInRisk();
+
+  }
+
+  /**
+   * This is an abstract implementation of a {@link FileFormatResult}.
+   * 
+   * @author Rui Castro <rui.castro@gmail.com>
+   */
+  abstract class AbstractResult implements FileFormatResult {
+    /**
+     * The {@link FileFormat}.
+     */
+    private final FileFormat fileFormat;
+
+    /**
+     * Constructor.
+     * 
+     * @param format
+     *          the {@link FileFormat}.
+     */
+    AbstractResult(final FileFormat format) {
+      this.fileFormat = format;
+    }
+
+    /**
+     * The {@link List} of {@link FormatResult} matching this
+     * {@link FileFormat}.
+     * 
+     * @return a {@link List<FormatResult>}.
+     */
+    abstract List<FormatResult> formatResults();
+
+    @Override
+    public boolean isMissingAttributes() {
+      final boolean missingFormat = checkFormatDesignation()
+        && (StringUtils.isBlank(this.fileFormat.getFormatDesignationName())
+          || StringUtils.isBlank(this.fileFormat.getFormatDesignationVersion()));
+      final boolean missingMimetype = checkMimetype() && StringUtils.isBlank(this.fileFormat.getMimeType());
+      final boolean missingPronom = checkPronom() && StringUtils.isBlank(this.fileFormat.getPronom());
+      return missingFormat || missingMimetype || missingPronom;
+    }
+
+    @Override
+    public boolean isInRisk() {
+      return this.formatResults().isEmpty();
+    }
+
+    @Override
+    public String toString() {
+      String str = "";
+      if (isMissingAttributes()) {
+        str = "File does not have required information (fileFormat designation, MIME type or PRONOM), "
+          + "to be able to find fileFormat representation information.";
+      } else if (formatResults().isEmpty()) {
+        str += getPreservationEventFailureMessage();
+      } else {
+        str += String.format("%s%n%n", getPreservationEventSuccessMessage());
+        for (FormatResult result : this.formatResults()) {
+          str += result.toString();
+        }
+      }
+      return str;
+    }
+
+    /**
+     * The {@link List} of {@link AttributeCheck} for this result.
+     *
+     * @return a {@link List<AttributeCheck>}.
+     */
+    List<AttributeCheck> attributeChecks() {
+      return attributeChecks(true);
+    }
+
+    /**
+     * The {@link List} of {@link AttributeCheck} for this result.
+     * 
+     * @param present
+     *          default value for present attribute.
+     * 
+     * @return a {@link List<AttributeCheck>}.
+     */
+    List<AttributeCheck> attributeChecks(final boolean present) {
+      final List<AttributeCheck> checks = new ArrayList<>();
+
+      if (checkMimetype()) {
+        checks.add(new AttributeCheck(MIMETYPE_NAME, present,
+          new SimpleFilterParameter(RodaConstants.FORMAT_MIMETYPES, fileFormat.getMimeType())));
+      }
+
+      if (checkPronom()) {
+        checks.add(new AttributeCheck(PRONOM_NAME, present,
+          new SimpleFilterParameter(RodaConstants.FORMAT_PRONOMS, fileFormat.getPronom())));
+      }
+
+      if (checkFormatDesignation()) {
+        final String formatNamePattern = RodaCoreFactory.getRodaConfiguration().getString(
+          "core.plugins.external.FormatMissingRepresentationInformation.format_name_pattern", FORMAT_NAME_PATTERN);
+        final String name = String.format(formatNamePattern, fileFormat.getFormatDesignationName(),
+          fileFormat.getFormatDesignationVersion());
+        checks.add(new AttributeCheck(FORMAT_DESIGNATION_NAME, present,
+          new SimpleFilterParameter(RodaConstants.FORMAT_NAME, name)));
+      }
+
+      return checks;
+    }
+  }
+
+  /**
+   * Implementation of {@link FileFormatResult} that has to match all
+   * attributes.
+   * 
+   * @author Rui Castro <rui.castro@gmail.com>
+   */
+  class MatchAllResult extends AbstractResult {
+    /**
+     * List of {@link FormatResult}.
+     */
+    private List<FormatResult> formatResults = null;
+    /**
+     * The {@link IndexService}.
+     */
+    private final IndexService indexService;
+
+    /**
+     * Constructor.
+     * 
+     * @param format
+     *          the {@link FileFormat}.
+     * @param indexService
+     *          the {@link IndexService}.
+     */
+    MatchAllResult(final FileFormat format, final IndexService indexService) {
+      super(format);
+      this.indexService = indexService;
+    }
+
+    @Override
+    List<FormatResult> formatResults() {
+      if (this.formatResults == null) {
+        this.formatResults = new ArrayList<>();
+        final List<AttributeCheck> checks = attributeChecks();
+        final List<FilterParameter> filterParams = new ArrayList<>();
+        checks.forEach(c -> filterParams.add(c.getFilterParameter()));
+        final Iterator<Format> formats = this.indexService.findAll(Format.class, new Filter(filterParams)).iterator();
+        while (formats.hasNext()) {
+          this.formatResults.add(new FormatResult(formats.next(), checks));
+        }
+      }
+      return this.formatResults;
+    }
+
+  }
+
+  /**
+   * Implementation of {@link FileFormatResult} that only needs to match one
+   * attribute.
+   *
+   * @author Rui Castro <rui.castro@gmail.com>
+   */
+  class MatchOneResult extends AbstractResult {
+    /**
+     * List of {@link FormatResult}.
+     */
+    private List<FormatResult> formatResults = null;
+
+    /**
+     * The {@link IndexService}.
+     */
+    private final IndexService indexService;
+
+    /**
+     * Constructor.
+     *
+     * @param format
+     *          the {@link FileFormat}.
+     * @param indexService
+     *          the {@link IndexService}.
+     */
+    MatchOneResult(final FileFormat format, final IndexService indexService) {
+      super(format);
+      this.indexService = indexService;
+    }
+
+    @Override
+    List<FormatResult> formatResults() {
+      if (this.formatResults == null) {
+        this.formatResults = new ArrayList<>();
+        final List<AttributeCheck> checks = attributeChecks(true);
+        for (AttributeCheck check : checks) {
+          final Iterator<Format> formats = this.indexService
+            .findAll(Format.class, new Filter(check.getFilterParameter())).iterator();
+          while (formats.hasNext()) {
+            this.formatResults.add(new FormatResult(formats.next(), Collections.singletonList(check)));
+          }
+        }
+        consolidateResults();
+      }
+      return this.formatResults;
+    }
+
+    /**
+     * Consolidate {@link List} of {@link FormatResult}. Merge repeated
+     * {@link FormatResult}s and set default {@link AttributeCheck} (with
+     * <code>present = false</code>) to all {@link FormatResult} and all
+     * attributes.
+     */
+    private void consolidateResults() {
+      final Map<String, FormatResult> map = new TreeMap<>();
+      for (FormatResult result : this.formatResults) {
+        if (!map.containsKey(result.id())) {
+          map.put(result.id(), new FormatResult(result.format, attributeChecks(false)));
+        }
+        map.get(result.id()).merge(result);
+      }
+      this.formatResults.clear();
+      this.formatResults.addAll(map.values());
+    }
+
+  }
+
+  /**
+   * This is a {@link FileFormat} match result.
+   * 
+   * @author Rui Castro <rui.castro@gmail.com>
+   */
+  class FormatResult {
+    /**
+     * The {@link Format}.
+     */
+    private final Format format;
+
+    /**
+     * The {@link Map} of {@link AttributeCheck} used to find the
+     * {@link Format}.
+     */
+    private final Map<String, AttributeCheck> checks;
+
+    /**
+     * Constructor.
+     * 
+     * @param format
+     *          the {@link Format}.
+     * @param checks
+     *          the {@link List<AttributeCheck>}.
+     */
+    FormatResult(final Format format, final List<AttributeCheck> checks) {
+      this.format = format;
+      this.checks = new TreeMap<>();
+      checks.forEach(c -> this.checks.put(c.name, c));
+    }
+
+    /**
+     * Return the unique identifier for this {@link FormatResult} which is the
+     * same as the inner {@link Format}.
+     * 
+     * @return a {@link String} with the unique identifier.
+     */
+    String id() {
+      return this.format.getId();
+    }
+
+    @Override
+    public String toString() {
+      String str = String.format("Format \"%s\"%n", this.format.getName());
+      for (Map.Entry<String, AttributeCheck> entry : this.checks.entrySet()) {
+        str += String.format("\t%s%n", entry.getValue());
+      }
+      return str;
+    }
+
+    /**
+     * Merge another {@link FormatResult} checks into this checks.
+     * 
+     * @param result
+     *          the {@link FormatResult} to merge.
+     */
+    void merge(final FormatResult result) {
+      this.checks.putAll(result.checks);
+    }
+  }
+
+  /**
+   * This is a attribute that was used to match a {@link Format}.
+   * 
+   * @author Rui Castro <rui.castro@gmail.com>
+   */
+  class AttributeCheck {
+    /**
+     * The name.
+     */
+    private final String name;
+    /**
+     * Is it present?
+     */
+    private final boolean present;
+    /**
+     * The {@link FilterParameter} corresponding to this check.
+     */
+    private final SimpleFilterParameter filterParameter;
+
+    /**
+     * Constructor.
+     * 
+     * @param name
+     *          The name.
+     * @param present
+     *          Is it present?
+     * @param filterParameter
+     *          The {@link FilterParameter} corresponding to this check.
+     */
+    AttributeCheck(final String name, final boolean present, final SimpleFilterParameter filterParameter) {
+      this.name = name;
+      this.present = present;
+      this.filterParameter = filterParameter;
+    }
+
+    FilterParameter getFilterParameter() {
+      return filterParameter;
+    }
+
+    @Override
+    public String toString() {
+      return String.format("%s %s \"%s\"", this.present ? "has" : "doest NOT have", this.name,
+        this.filterParameter.getValue());
+    }
+  }
 }
