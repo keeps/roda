@@ -48,6 +48,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -66,6 +67,9 @@ public class BrowseDIP extends Composite {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
+  // system
+  private final Viewers viewers;
+
   // source
   private IndexedAIP aip;
   private IndexedRepresentation representation;
@@ -83,8 +87,8 @@ public class BrowseDIP extends Composite {
   @UiField
   BreadcrumbPanel breadcrumb;
 
-  @UiField(provided = true)
-  DipFilePreview dipFilePreview;
+  @UiField
+  FlowPanel center;
 
   @UiField
   FocusPanel downloadButton;
@@ -104,29 +108,68 @@ public class BrowseDIP extends Composite {
    * 
    */
   public BrowseDIP(Viewers viewers, IndexedAIP aip, IndexedRepresentation representation, IndexedFile file,
-    IndexedDIP dip, DIPFile dipFile) {
+    IndexedDIP dip) {
+    this.viewers = viewers;
 
     this.aip = aip;
     this.representation = representation;
     this.file = file;
 
     this.dip = dip;
-    this.dipFile = dipFile;
-
-    dipFilePreview = new DipFilePreview(viewers, dipFile);
 
     initWidget(uiBinder.createAndBindUi(this));
+
+    downloadButton.setTitle(messages.viewRepresentationDownloadFileButton());
+    // removeButton.setTitle(messages.viewRepresentationRemoveFileButton());
+
+    showFirst();
+  }
+
+  private void update() {
+    center.clear();
+    if (dipFile != null) {
+      center.add(new DipFilePreview(viewers, dipFile));
+    } else {
+      // TODO prompt to select some file or that are no files
+    }
 
     // update breadcrumb
     breadcrumb.updatePath(getBreadcrumbs());
     breadcrumb.setVisible(true);
 
-    downloadButton.setTitle(messages.viewRepresentationDownloadFileButton());
-    // removeButton.setTitle(messages.viewRepresentationRemoveFileButton());
-
     // update visibles
-    downloadButton.setVisible(!dipFile.isDirectory());
-    // removeButton.setVisible(!dipFile.isDirectory());
+    downloadButton.setVisible(dipFile != null && !dipFile.isDirectory());
+    // removeButton.setVisible(dipFile != null && !dipFile.isDirectory());
+  }
+
+  public void showFirst() {
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_DIP_ID, dip.getId()));
+    Sublist sublist = new Sublist(0, 1);
+    String localeString = LocaleInfo.getCurrentLocale().getLocaleName();
+    boolean justActive = true;
+
+    BrowserService.Util.getInstance().find(DIPFile.class.getName(), filter, Sorter.NONE, sublist, Facets.NONE,
+      localeString, justActive, new AsyncCallback<IndexResult<DIPFile>>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
+
+        @Override
+        public void onSuccess(IndexResult<DIPFile> result) {
+          if (!result.getResults().isEmpty()) {
+            DIPFile firstDipFile = result.getResults().get(0);
+            dipFile = firstDipFile;
+
+            update();
+          } else {
+            Toast.showError("No files in the DIP");
+            // TODO better handle this case
+          }
+
+        }
+      });
   }
 
   @UiHandler("downloadButton")
@@ -232,7 +275,14 @@ public class BrowseDIP extends Composite {
 
             @Override
             public void onSuccess(DipBundle dipBundle) {
-              showFirst(viewers, callback, dipBundle);
+              IndexedDIP dip = dipBundle.getDip();
+              IndexedAIP aip = dipBundle.getAip();
+              IndexedRepresentation representation = dipBundle.getRepresentation();
+              IndexedFile file = dipBundle.getFile();
+
+              BrowseDIP view = new BrowseDIP(viewers, aip, representation, file, dip);
+              callback.onSuccess(view);
+
             }
           });
 
@@ -247,41 +297,6 @@ public class BrowseDIP extends Composite {
     }
 
   };
-
-  protected static void showFirst(final Viewers viewers, final AsyncCallback<Widget> callback,
-    final DipBundle dipBundle) {
-    final IndexedDIP dip = dipBundle.getDip();
-    final IndexedAIP aip = dipBundle.getAip();
-    final IndexedRepresentation representation = dipBundle.getRepresentation();
-    final IndexedFile file = dipBundle.getFile();
-
-    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_DIP_ID, dip.getId()));
-    Sublist sublist = new Sublist(0, 1);
-    String localeString = LocaleInfo.getCurrentLocale().getLocaleName();
-    boolean justActive = true;
-
-    BrowserService.Util.getInstance().find(DIPFile.class.getName(), filter, Sorter.NONE, sublist, Facets.NONE,
-      localeString, justActive, new AsyncCallback<IndexResult<DIPFile>>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          callback.onFailure(caught);
-        }
-
-        @Override
-        public void onSuccess(IndexResult<DIPFile> result) {
-          if (!result.getResults().isEmpty()) {
-            DIPFile firstDipFile = result.getResults().get(0);
-            BrowseDIP view = new BrowseDIP(viewers, aip, representation, file, dip, firstDipFile);
-            callback.onSuccess(view);
-          } else {
-            Toast.showError("No files in the DIP");
-            // TODO better handle this case
-          }
-
-        }
-      });
-  }
 
   public static void jumpTo(DIPFile selected) {
     HistoryUtils.newHistory(BrowseDIP.RESOLVER, selected.getUUID());
