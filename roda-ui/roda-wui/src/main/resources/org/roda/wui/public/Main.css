@@ -3716,6 +3716,7 @@ td.datePickerMonth, td.datePickerYear {
     max-width: 100%;
     max-height: 600px;
     margin: 0 auto;
+    display: block;
 }
 
 .viewRepresentationPDFFilePreview {

@@ -194,7 +194,7 @@ public class DigitalSignatureDIPTest {
           new Sublist(0, 1));
         DIP dip = dips.getResults().get(0);
         IndexResult<DIPFile> files = index.find(DIPFile.class,
-          new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_DIP_ID, dip.getId())), Sorter.NONE,
+          new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dip.getId())), Sorter.NONE,
           new Sublist(0, 1));
         DIPFile dipfile = files.getResults().get(0);
 

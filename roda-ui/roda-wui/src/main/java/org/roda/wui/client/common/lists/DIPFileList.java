@@ -96,8 +96,8 @@ public class DIPFileList extends BasicAsyncTableCell<DIPFile> {
   protected Sorter getSorter(ColumnSortList columnSortList) {
     Map<Column<DIPFile, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<DIPFile, ?>, List<String>>();
     // setting secondary sorter to title
-    columnSortingKeyMap.put(idColumn, Arrays.asList(RodaConstants.DIP_FILE_ID));
-    columnSortingKeyMap.put(sizeColumn, Arrays.asList(RodaConstants.DIP_FILE_SIZE));
+    columnSortingKeyMap.put(idColumn, Arrays.asList(RodaConstants.DIPFILE_ID));
+    columnSortingKeyMap.put(sizeColumn, Arrays.asList(RodaConstants.DIPFILE_SIZE));
     return createSorter(columnSortList, columnSortingKeyMap);
   }
 

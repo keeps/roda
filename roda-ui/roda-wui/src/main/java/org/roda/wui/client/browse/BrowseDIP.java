@@ -17,6 +17,7 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.DIPFile;
@@ -91,10 +92,13 @@ public class BrowseDIP extends Composite {
   FlowPanel center;
 
   @UiField
-  FocusPanel downloadButton;
+  FocusPanel previousButton, nextButton, downloadButton;
 
   // @UiField
   // FocusPanel removeButton;
+
+  // state
+  int index;
 
   /**
    * Create a new panel to view a representation
@@ -119,10 +123,12 @@ public class BrowseDIP extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
 
+    // TODO set title for previous and next button
     downloadButton.setTitle(messages.viewRepresentationDownloadFileButton());
     // removeButton.setTitle(messages.viewRepresentationRemoveFileButton());
 
-    showFirst();
+    index = 0;
+    show();
   }
 
   private void update() {
@@ -142,14 +148,15 @@ public class BrowseDIP extends Composite {
     // removeButton.setVisible(dipFile != null && !dipFile.isDirectory());
   }
 
-  public void showFirst() {
-    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_DIP_ID, dip.getId()));
-    Sublist sublist = new Sublist(0, 1);
+  public void show() {
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dip.getId()));
+    Sorter sorter = new Sorter(new SortParameter(RodaConstants.DIPFILE_ID, false));
+    Sublist sublist = new Sublist(index, 1);
     String localeString = LocaleInfo.getCurrentLocale().getLocaleName();
     boolean justActive = true;
 
-    BrowserService.Util.getInstance().find(DIPFile.class.getName(), filter, Sorter.NONE, sublist, Facets.NONE,
-      localeString, justActive, new AsyncCallback<IndexResult<DIPFile>>() {
+    BrowserService.Util.getInstance().find(DIPFile.class.getName(), filter, sorter, sublist, Facets.NONE, localeString,
+      justActive, new AsyncCallback<IndexResult<DIPFile>>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -168,8 +175,36 @@ public class BrowseDIP extends Composite {
             // TODO better handle this case
           }
 
+          updateVisibles(result.getTotalCount());
+
         }
       });
+
+  }
+
+  protected void updateVisibles(long totalCount) {
+    previousButton.setVisible(index > 0);
+    nextButton.setVisible(index < totalCount - 1);
+  }
+
+  @UiHandler("previousButton")
+  void previousButtonHandler(ClickEvent e) {
+    previous();
+  }
+
+  private void previous() {
+    index--;
+    show();
+  }
+
+  private void next() {
+    index++;
+    show();
+  }
+
+  @UiHandler("nextButton")
+  void nextButtonHandler(ClickEvent e) {
+    next();
   }
 
   @UiHandler("downloadButton")

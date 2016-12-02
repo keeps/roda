@@ -1179,7 +1179,7 @@ public class IndexModelObserver implements ModelObserver {
 
   public void dipDeleted(String dipId, boolean commit) {
     deleteDocumentFromIndex(IndexedDIP.class, dipId);
-    deleteDocumentsFromIndex(DIPFile.class, RodaConstants.DIP_FILE_DIP_ID, dipId);
+    deleteDocumentsFromIndex(DIPFile.class, RodaConstants.DIPFILE_DIP_ID, dipId);
 
     if (commit) {
       try {

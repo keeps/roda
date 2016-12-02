@@ -2169,22 +2169,22 @@ public class SolrUtils {
     SolrInputDocument doc = new SolrInputDocument();
     doc.addField(RodaConstants.INDEX_UUID, IdUtils.getDIPFileId(file));
     List<String> path = file.getPath();
-    doc.addField(RodaConstants.DIP_FILE_PATH, path);
+    doc.addField(RodaConstants.DIPFILE_PATH, path);
     if (path != null && !path.isEmpty()) {
       List<String> ancestorsPath = getDIPFileAncestorsPath(file.getDipId(), path);
       if (!ancestorsPath.isEmpty()) {
-        doc.addField(RodaConstants.DIP_FILE_ANCESTORS_PATH, ancestorsPath);
+        doc.addField(RodaConstants.DIPFILE_ANCESTORS_PATH, ancestorsPath);
       }
     }
-    doc.addField(RodaConstants.DIP_FILE_DIP_ID, file.getDipId());
-    doc.addField(RodaConstants.DIP_FILE_ID, file.getId());
-    doc.addField(RodaConstants.DIP_FILE_IS_DIRECTORY, file.isDirectory());
-    doc.addField(RodaConstants.DIP_FILE_SIZE, Long.toString(file.getSize()));
+    doc.addField(RodaConstants.DIPFILE_DIP_ID, file.getDipId());
+    doc.addField(RodaConstants.DIPFILE_ID, file.getId());
+    doc.addField(RodaConstants.DIPFILE_IS_DIRECTORY, file.isDirectory());
+    doc.addField(RodaConstants.DIPFILE_SIZE, Long.toString(file.getSize()));
 
     // extra-fields
     try {
       StoragePath filePath = ModelUtils.getDIPFileStoragePath(file);
-      doc.addField(RodaConstants.DIP_FILE_STORAGE_PATH, FSUtils.getStoragePathAsString(filePath, false));
+      doc.addField(RodaConstants.DIPFILE_STORAGE_PATH, FSUtils.getStoragePathAsString(filePath, false));
     } catch (RequestNotValidException e) {
       LOGGER.warn("Could not index DIP file storage path", e);
     }
@@ -2210,12 +2210,12 @@ public class SolrUtils {
   public static DIPFile solrDocumentToDIPFile(SolrDocument doc) {
     DIPFile file = new DIPFile();
     file.setUUID(objectToString(doc.get(RodaConstants.INDEX_UUID), null));
-    file.setId(objectToString(doc.get(RodaConstants.DIP_FILE_ID), null));
-    file.setDipId(objectToString(doc.get(RodaConstants.DIP_FILE_DIP_ID), null));
-    file.setPath(objectToListString(doc.get(RodaConstants.DIP_FILE_PATH)));
+    file.setId(objectToString(doc.get(RodaConstants.DIPFILE_ID), null));
+    file.setDipId(objectToString(doc.get(RodaConstants.DIPFILE_DIP_ID), null));
+    file.setPath(objectToListString(doc.get(RodaConstants.DIPFILE_PATH)));
     file.setAncestorsPath(objectToListString(doc.get(RodaConstants.FILE_ANCESTORS_PATH)));
-    file.setDirectory(objectToBoolean(doc.get(RodaConstants.DIP_FILE_IS_DIRECTORY), Boolean.FALSE));
-    file.setStoragePath(objectToString(doc.get(RodaConstants.DIP_FILE_STORAGE_PATH), null));
+    file.setDirectory(objectToBoolean(doc.get(RodaConstants.DIPFILE_IS_DIRECTORY), Boolean.FALSE));
+    file.setStoragePath(objectToString(doc.get(RodaConstants.DIPFILE_STORAGE_PATH), null));
     file.setSize(objectToLong(doc.get(RodaConstants.FILE_SIZE), 0L));
     return file;
   }

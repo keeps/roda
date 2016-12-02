@@ -60,7 +60,7 @@ public class BreadcrumbUtils {
       file.isDirectory() ? getBreadcrumbLabel(fileLabel, RodaConstants.VIEW_REPRESENTATION_FOLDER)
         : getBreadcrumbLabel(fileLabel, RodaConstants.VIEW_REPRESENTATION_FILE),
       fileLabel, ListUtils.concat(BrowseFile.RESOLVER.getHistoryPath(), file.getAipId(), file.getRepresentationUUID(),
-        file.getId()));
+        file.getUUID()));
   }
 
   public static List<BreadcrumbItem> getAipBreadcrumbs(List<IndexedAIP> aipAncestors, IndexedAIP aip) {
@@ -248,7 +248,7 @@ public class BreadcrumbUtils {
     }
 
     // DIP
-    ret.add(getBreadcrumbItem(dip));
+    ret.add(getBreadcrumbItem(dip, aip, representation, file));
 
     if (dipFile != null) {
       // TODO missing dipFile path
@@ -258,14 +258,29 @@ public class BreadcrumbUtils {
     return ret;
   }
 
-  private static BreadcrumbItem getBreadcrumbItem(IndexedDIP dip) {
+  private static BreadcrumbItem getBreadcrumbItem(IndexedDIP dip, IndexedAIP aip, IndexedRepresentation representation,
+    IndexedFile file) {
     SafeHtmlBuilder b = new SafeHtmlBuilder();
     // TODO get icon from config
     b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-play-circle-o'></i>"));
     b.append(SafeHtmlUtils.fromString(dip.getTitle()));
     SafeHtml label = b.toSafeHtml();
-    return new BreadcrumbItem(label, dip.getTitle(),
-      ListUtils.concat(BrowseDIP.RESOLVER.getHistoryPath(), dip.getUUID()));
+
+    List<String> history = ListUtils.concat(BrowseDIP.RESOLVER.getHistoryPath(), dip.getUUID());
+
+    if (aip != null) {
+      history.add(aip.getUUID());
+
+      if (representation != null) {
+        history.add(representation.getUUID());
+
+        if (file != null) {
+          history.add(file.getUUID());
+        }
+      }
+    }
+
+    return new BreadcrumbItem(label, dip.getTitle(), history);
   }
 
   private static BreadcrumbItem getBreadcrumbItem(DIPFile dipFile) {

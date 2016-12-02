@@ -45,7 +45,7 @@ public class ReindexDIPPlugin extends ReindexRodaEntityPlugin<DIP> {
   @Override
   public void clearSpecificIndexes(IndexService index, List<String> ids)
     throws GenericException, RequestNotValidException {
-    index.delete(DIPFile.class, new Filter(new OneOfManyFilterParameter(RodaConstants.DIP_FILE_DIP_ID, ids)));
+    index.delete(DIPFile.class, new Filter(new OneOfManyFilterParameter(RodaConstants.DIPFILE_DIP_ID, ids)));
   }
 
 }

@@ -152,11 +152,15 @@ public class BitstreamPreview extends Composite {
     }
 
     if (type == null && filename.lastIndexOf(".") != -1) {
-      String extension = filename.substring(filename.lastIndexOf(".")).toLowerCase();
+      String extension = getFileNameExtension();
       type = viewers.getExtensions().get(extension);
     }
 
     return type;
+  }
+
+  private String getFileNameExtension() {
+    return filename.substring(filename.lastIndexOf(".")).toLowerCase();
   }
 
   private void imagePreview() {
@@ -226,7 +230,7 @@ public class BitstreamPreview extends Composite {
 
       // TODO check if audio source type needs to be transformed
       // TODO check if audio player supports provided file format
-      audioPlayer.addSource(bitstreamDownloadUri.asString(), format.getMimeType());
+      audioPlayer.addSource(bitstreamDownloadUri.asString(), getAudioSourceType());
       audioPlayer.setControls(true);
       panel.add(html);
       panel.add(audioPlayer);
@@ -262,11 +266,41 @@ public class BitstreamPreview extends Composite {
         ret = mimetype;
       }
     } else {
-      // TODO infer video source type by file name extention
+
+      String extension = getFileNameExtension();
+
+      if (".mp4".equals(extension)) {
+        ret = "video/mp4";
+      } else if (".ogg".equals(extension)) {
+        ret = "video/ogg";
+      }
+
       ret = "video/mp4";
     }
 
     // TODO video player might not support provided file format
+    return ret;
+  }
+
+  private String getAudioSourceType() {
+    String ret;
+
+    if (format != null && StringUtils.isNotBlank(format.getMimeType())) {
+      String mimetype = format.getMimeType();
+      ret = mimetype;
+    } else {
+      String extension = getFileNameExtension();
+
+      if (".mp3".equals(extension)) {
+        ret = "audio/mpeg";
+      } else if (".ogg".equals(extension)) {
+        ret = "audio/ogg";
+      }
+
+      ret = "audio/mpeg";
+    }
+
+    // TODO audio player might not support provided file format
     return ret;
   }
 
