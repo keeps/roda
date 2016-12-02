@@ -99,6 +99,7 @@ public class BrowseDIP extends Composite {
 
   // state
   int index;
+  int totalCount = -1;
 
   /**
    * Create a new panel to view a representation
@@ -127,6 +128,9 @@ public class BrowseDIP extends Composite {
     downloadButton.setTitle(messages.viewRepresentationDownloadFileButton());
     // removeButton.setTitle(messages.viewRepresentationRemoveFileButton());
 
+    previousButton.setVisible(false);
+    nextButton.setVisible(false);
+    
     index = 0;
     show();
   }
@@ -168,6 +172,7 @@ public class BrowseDIP extends Composite {
           if (!result.getResults().isEmpty()) {
             DIPFile firstDipFile = result.getResults().get(0);
             dipFile = firstDipFile;
+            totalCount = (int) result.getTotalCount();
 
             update();
           } else {
@@ -175,14 +180,14 @@ public class BrowseDIP extends Composite {
             // TODO better handle this case
           }
 
-          updateVisibles(result.getTotalCount());
+          updateVisibles();
 
         }
       });
 
   }
 
-  protected void updateVisibles(long totalCount) {
+  protected void updateVisibles() {
     previousButton.setVisible(index > 0);
     nextButton.setVisible(index < totalCount - 1);
   }
@@ -193,12 +198,16 @@ public class BrowseDIP extends Composite {
   }
 
   private void previous() {
-    index--;
+    if (index > 0) {
+      index--;
+    }
     show();
   }
 
   private void next() {
-    index++;
+    if(index < totalCount-1) {
+      index++;  
+    }
     show();
   }
 

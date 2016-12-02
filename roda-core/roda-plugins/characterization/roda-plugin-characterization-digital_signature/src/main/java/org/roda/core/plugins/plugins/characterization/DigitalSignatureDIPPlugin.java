@@ -173,7 +173,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractP
 
             IOUtils.closeQuietly(allFiles);
 
-          } catch (Exception e) {
+          } catch (Exception | LinkageError e) {
             LOGGER.error("Error processing Representation " + representation.getId() + ": " + e.getMessage(), e);
             reportItem.setPluginDetails(e.getMessage());
             pluginState = PluginState.FAILURE;
@@ -254,7 +254,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractP
           reportItem.setPluginState(PluginState.SUCCESS);
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
 
-        } catch (Exception e) {
+        } catch (Exception | LinkageError e) {
           LOGGER.error("Error processing Representation " + representation.getId() + ": " + e.getMessage(), e);
           reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
           jobPluginInfo.incrementObjectsProcessedWithFailure();
@@ -316,7 +316,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractP
               }
             }
             jobPluginInfo.incrementObjectsProcessedWithSuccess();
-          } catch (Exception e) {
+          } catch (Exception | LinkageError e) {
             LOGGER.error("Error processing File " + file.getId() + ": " + e.getMessage(), e);
             reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
             jobPluginInfo.incrementObjectsProcessedWithFailure();
