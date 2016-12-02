@@ -50,7 +50,6 @@
 									<directory>src/main</directory>
 									<includes>
 										<include>gwt-unitCache/**</include>
-										<include>webapp/org.roda.disseminators.common.loading.Loading/**</include>
 										<include>webapp/org.roda.wui.RodaWUI/**</include>
 										<include>webapp/WEB-INF/deploy/**</include>
 										<include>webapp/WEB-INF/classes/**</include>
@@ -111,7 +110,6 @@
 									<directory>src/main</directory>
 									<includes>
 										<include>gwt-unitCache/**</include>
-										<include>webapp/org.roda.disseminators.common.loading.Loading/**</include>
 										<include>webapp/org.roda.wui.RodaWUI/**</include>
 										<include>webapp/WEB-INF/deploy/**</include>
 										<include>webapp/WEB-INF/classes/**</include>
