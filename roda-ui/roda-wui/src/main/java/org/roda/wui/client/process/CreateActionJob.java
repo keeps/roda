@@ -46,8 +46,8 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.PluginUtils;
 import org.roda.wui.client.ingest.process.PluginOptionsPanel;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -189,11 +189,9 @@ public class CreateActionJob extends Composite {
 
   public void init(List<PluginInfo> plugins) {
     this.plugins = plugins;
-
     name.setText(messages.processNewDefaultName(new Date()));
     workflowOptions.setPlugins(plugins);
     configurePlugins();
-
     workflowCategoryList.addStyleName("form-listbox-job");
   }
 
@@ -227,8 +225,8 @@ public class CreateActionJob extends Composite {
 
                     if (plugins != null) {
                       PluginUtils.sortByName(plugins);
+                      List<String> pluginsAdded = new ArrayList<String>();
 
-                      int pluginsAdded = 0;
                       for (int p = 0; p < plugins.size(); p++) {
                         PluginInfo pluginInfo = plugins.get(p);
                         if (pluginInfo != null) {
@@ -242,13 +240,14 @@ public class CreateActionJob extends Composite {
                                 noChecks = false;
 
                                 if (categories.contains(checkbox.getName())
-                                  && !categories.contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)) {
+                                  && !categories.contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)
+                                  && !pluginsAdded.contains(pluginInfo.getId())) {
                                   Widget pluginItem = addPluginItemWidgetToWorkflowList(pluginInfo);
-                                  if (pluginsAdded == 0) {
+                                  if (pluginsAdded.isEmpty()) {
                                     CreateActionJob.this.selectedPlugin = lookupPlugin(pluginInfo.getId());
                                     pluginItem.addStyleName("plugin-list-item-selected");
-                                    pluginsAdded++;
                                   }
+                                  pluginsAdded.add(pluginInfo.getId());
                                 }
                               }
                             }

@@ -32,8 +32,8 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -82,7 +82,7 @@ public class IngestAppraisal extends Composite {
       return "appraisal";
     }
   };
-  
+
   private static IngestAppraisal instance = null;
 
   public static IngestAppraisal getInstance() {
@@ -96,7 +96,6 @@ public class IngestAppraisal extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @SuppressWarnings("unused")
@@ -191,13 +190,13 @@ public class IngestAppraisal extends Composite {
     acceptButton.setEnabled(false);
     rejectButton.setEnabled(false);
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();
     JavascriptUtils.stickSidebar();
   }
-  
+
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     mainSearch.setDefaultFilters(BASE_FILTER);
     if (historyTokens.isEmpty()) {
@@ -230,6 +229,8 @@ public class IngestAppraisal extends Composite {
         public void onSuccessImpl(Void result) {
           Toast.showInfo(messages.dialogDone(), messages.allItemsWereAccepted());
           mainSearch.refresh();
+          acceptButton.setEnabled(false);
+          rejectButton.setEnabled(false);
         }
       });
   }
@@ -253,12 +254,14 @@ public class IngestAppraisal extends Composite {
           BrowserService.Util.getInstance().appraisal((SelectedItems<IndexedAIP>) selected, accept, rejectReason,
             new LoadingAsyncCallback<Void>() {
 
-            @Override
-            public void onSuccessImpl(Void result) {
-              Toast.showInfo(messages.dialogDone(), messages.allItemsWereAccepted());
-              mainSearch.refresh();
-            }
-          });
+              @Override
+              public void onSuccessImpl(Void result) {
+                Toast.showInfo(messages.dialogDone(), messages.allItemsWereRejected());
+                mainSearch.refresh();
+                acceptButton.setEnabled(false);
+                rejectButton.setEnabled(false);
+              }
+            });
         }
       });
   }

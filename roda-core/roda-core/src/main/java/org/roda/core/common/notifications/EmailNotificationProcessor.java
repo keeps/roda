@@ -79,7 +79,8 @@ public class EmailNotificationProcessor implements NotificationProcessor {
       } else {
         scope.put(RECIPIENT, RodaConstants.NOTIFICATION_VARIOUS_RECIPIENT_USERS);
       }
-      processedNotification.setBody(HandlebarsUtility.executeHandlebars(template, scope));
+      processedNotification.setBody(HandlebarsUtility
+        .executeHandlebars(template.replace("<a href=\"{{acknowledge}}\">", "").replace("</a>", ""), scope));
       scope.remove(RECIPIENT);
       ConfigurableEmailUtility emailUtility = new ConfigurableEmailUtility(processedNotification.getFromUser(),
         processedNotification.getSubject());

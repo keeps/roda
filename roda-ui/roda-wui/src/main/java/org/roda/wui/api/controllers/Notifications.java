@@ -95,8 +95,7 @@ public class Notifications extends RodaWuiController {
     RodaCoreFactory.getModelService().acknowledgeNotification(notificationId, token);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "notification_id", notificationId, "token",
-      token);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "notificationId", notificationId, "token", token);
   }
 
   /*

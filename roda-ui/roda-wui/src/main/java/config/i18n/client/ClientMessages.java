@@ -230,6 +230,8 @@ public interface ClientMessages extends Messages {
 
   String allItemsWereAccepted();
 
+  String allItemsWereRejected();
+
   String jobNotFound();
 
   String updateIsCurrentlyRunning();
@@ -497,7 +499,7 @@ public interface ClientMessages extends Messages {
   String viewRepresentationSearchPlaceHolder();
 
   String viewRepresentationInfoTitle();
-  
+
   String viewRepresentationFileDisseminationTitle();
 
   String viewRepresentationInfoFilename();
