@@ -57,6 +57,7 @@ import org.roda.core.plugins.plugins.ingest.TransferredResourceToAIPPlugin;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.Assert;
 import org.testng.AssertJUnit;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -177,7 +178,7 @@ public class ImageMagickTest {
     TestsHelper.getJobReports(index, job);
 
     aip = model.retrieveAIP(aip.getId());
-    AssertJUnit.assertEquals(2, aip.getRepresentations().size());
+    Assert.assertEquals(aip.getRepresentations().size(), 2);
 
     CloseableIterable<OptionalWithCause<File>> newAllFiles = model.listFilesUnder(aip.getId(),
       aip.getRepresentations().get(1).getId(), true);
@@ -185,7 +186,7 @@ public class ImageMagickTest {
     Iterables.addAll(newReusableAllFiles, Lists.newArrayList(newAllFiles).stream().filter(f -> f.isPresent())
       .map(f -> f.get()).collect(Collectors.toList()));
 
-    AssertJUnit.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
+    Assert.assertEquals(newReusableAllFiles.size(), numberOfConvertableFiles);
 
     int changedCounter = 0;
 
@@ -193,15 +194,14 @@ public class ImageMagickTest {
       if (f.getId().matches(".*[.](jpg|png)$")) {
         changedCounter++;
         String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
-        AssertJUnit.assertEquals(1,
-          newReusableAllFiles.stream().filter(o -> o.getId().equals(filename + ".tiff")).count());
+        Assert.assertEquals(newReusableAllFiles.stream().filter(o -> o.getId().equals(filename + ".tiff")).count(), 1);
       }
     }
 
     List<File> changedFiles = newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]tiff$"))
       .collect(Collectors.toList());
 
-    AssertJUnit.assertEquals(changedCounter, changedFiles.size());
+    Assert.assertEquals(changedFiles.size(), changedCounter);
   }
 
 }
