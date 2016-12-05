@@ -41,6 +41,12 @@ public abstract class CommandConvertPlugin<T extends IsRODAObject> extends Abstr
     return defaultParameters;
   }
 
+  protected List<PluginParameter> orderParameters(Map<String, PluginParameter> params) {
+    List<PluginParameter> orderedList = super.orderParameters(params);
+    orderedList.add(params.get(RodaConstants.PLUGIN_PARAMS_COMMAND_ARGUMENTS));
+    return orderedList;
+  }
+
   public String getCommandArguments() {
     return commandArguments;
   }

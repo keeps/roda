@@ -42,7 +42,10 @@ public class SoxConvertPlugin<T extends IsRODAObject> extends CommandConvertPlug
 
   @Override
   public String getDescription() {
-    return "SoX is a cross-platform utility that can convert various formats of computer audio files in to other formats. It can also apply various effects to these sound files (see the “Command arguments” setting).\nThe results of conversion will be placed on a new representation under the same Archival Information Package (AIP) where the files were originally found. A PREMIS event is also recorded after the task is run.\nFor a full list of supported audio formats and effects, please visit http://sox.sourceforge.net/Docs/Features ";
+    return "SoX is a cross-platform utility that can convert various formats of computer audio files in to other formats. It can also apply "
+      + "various effects to these sound files (see the “Command arguments” setting).\nThe results of conversion will be placed on a new "
+      + "representation under the same Archival Information Package (AIP) where the files were originally found. A PREMIS event is also recorded "
+      + "after the task is run.\nFor a full list of supported audio formats and effects, please visit http://sox.sourceforge.net/Docs/Features";
   }
 
   @Override

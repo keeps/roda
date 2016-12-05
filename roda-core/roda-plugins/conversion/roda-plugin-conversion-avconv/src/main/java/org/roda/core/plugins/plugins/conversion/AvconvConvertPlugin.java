@@ -45,9 +45,14 @@ public class AvconvConvertPlugin<T extends IsRODAObject> extends CommandConvertP
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_COMMAND_ARGUMENTS,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_COMMAND_ARGUMENTS, "Command arguments before input",
+        PluginParameterType.STRING, "", true, true,
+        "Command arguments that will be passed to the command of the tool as configured (advanced users only!)"));
+
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OUTPUT_ARGUMENTS, new PluginParameter(
-      RodaConstants.PLUGIN_PARAMS_OUTPUT_ARGUMENTS, "Avconv output command arguments", PluginParameterType.STRING,
-      "-c:v libx264 -crf 28 -c:a aac -b:a 128k -strict experimental", true, true,
+      RodaConstants.PLUGIN_PARAMS_OUTPUT_ARGUMENTS, "Command arguments between input and output",
+      PluginParameterType.STRING, "-c:v libx264 -crf 28 -c:a aac -b:a 128k -strict experimental", true, true,
       "Command arguments to modify the output type that will be passed to the command of the tool as configured (advanced users only!)"));
   }
 
@@ -101,7 +106,9 @@ public class AvconvConvertPlugin<T extends IsRODAObject> extends CommandConvertP
     parameters.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION)
       .setDefaultValue("MP4 format for web visualization.");
 
+    parameters.remove(RodaConstants.PLUGIN_PARAMS_COMMAND_ARGUMENTS);
     List<PluginParameter> ret = super.orderParameters(parameters);
+    ret.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_COMMAND_ARGUMENTS));
     ret.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_OUTPUT_ARGUMENTS));
     return ret;
   }
@@ -120,6 +127,10 @@ public class AvconvConvertPlugin<T extends IsRODAObject> extends CommandConvertP
     // avconv output command arguments
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_OUTPUT_ARGUMENTS)) {
       setOutputArguments(parameters.get(RodaConstants.PLUGIN_PARAMS_OUTPUT_ARGUMENTS));
+    }
+
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_COMMAND_ARGUMENTS)) {
+      super.setCommandArguments(parameters.get(RodaConstants.PLUGIN_PARAMS_COMMAND_ARGUMENTS));
     }
   }
 

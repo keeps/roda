@@ -42,7 +42,13 @@ public class UnoconvConvertPlugin<T extends IsRODAObject> extends CommandConvert
 
   @Override
   public String getDescription() {
-    return "Converts office files using the “unoconv” (Universal Office Converter). The results of conversion will be placed on a new representation under the same Archival Information Package (AIP) where the files were originally found. A PREMIS event is also recorded after the task is run.\n“unoconv” is a tool that converts between any document format that OpenOffice understands. It uses OpenOffice's UNO bindings for non-interactive conversion of documents. \nSupported document formats include Open Document Format (odt), MS Word (doc), MS Office Open/MS OOXML (ooxml), Portable Document Format (pdf), HTML (html), XHTML (xhtml), RTF (rtf), Docbook (docbook), and more.\nThe outcome of this task is the creation of a new OpenOffice (and thus unoconv) support various import and export formats. Not all formats that can be imported can be exported and vice versa. For a full list of supported formats, please visit - http://dag.wiee.rs/home-made/unoconv/";
+    return "Converts office files using the “unoconv” (Universal Office Converter). The results of conversion will be placed on a new representation "
+      + "under the same Archival Information Package (AIP) where the files were originally found. A PREMIS event is also recorded after the task is "
+      + "run.\n“unoconv” is a tool that converts between any document format that OpenOffice understands. It uses OpenOffice's UNO bindings for "
+      + "non-interactive conversion of documents. \nSupported document formats include Open Document Format (odt), MS Word (doc), MS Office Open/MS "
+      + "OOXML (ooxml), Portable Document Format (pdf), HTML (html), XHTML (xhtml), RTF (rtf), Docbook (docbook), and more.\nThe outcome of this task "
+      + "is the creation of a new OpenOffice (and thus unoconv) support various import and export formats. Not all formats that can be imported can be "
+      + "exported and vice versa. For a full list of supported formats, please visit - http://dag.wiee.rs/home-made/unoconv/";
   }
 
   @Override
@@ -73,7 +79,6 @@ public class UnoconvConvertPlugin<T extends IsRODAObject> extends CommandConvert
   @Override
   public String executePlugin(Path inputPath, Path outputPath, String fileFormat)
     throws UnsupportedOperationException, IOException, CommandException {
-
     return UnoconvConvertPluginUtils.executeUnoconvConvert(inputPath, outputPath, super.getOutputFormat(),
       super.getCommandArguments());
   }
