@@ -261,13 +261,16 @@ public class BrowserHelper {
 
     if (descriptiveMetadata.getType() != null) {
       try {
+        String labelWithoutVersion = messages.getTranslation(
+          RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX + descriptiveMetadata.getType().toLowerCase());
         if (descriptiveMetadata.getVersion() != null) {
-          bundle.setLabel(messages.getTranslation(
+          String labelWithVersion = messages.getTranslation(
             RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX + descriptiveMetadata.getType().toLowerCase()
-              + RodaConstants.METADATA_VERSION_SEPARATOR + descriptiveMetadata.getVersion().toLowerCase()));
+              + RodaConstants.METADATA_VERSION_SEPARATOR + descriptiveMetadata.getVersion().toLowerCase(),
+            labelWithoutVersion);
+          bundle.setLabel(labelWithVersion);
         } else {
-          bundle.setLabel(messages.getTranslation(RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX
-            + descriptiveMetadata.getType().toLowerCase()));
+          bundle.setLabel(labelWithoutVersion);
         }
 
       } catch (MissingResourceException e) {
