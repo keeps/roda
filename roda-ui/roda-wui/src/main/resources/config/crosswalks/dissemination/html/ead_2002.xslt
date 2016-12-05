@@ -229,13 +229,14 @@
 					</div>
 				</div>
 			</xsl:if>
-			<xsl:if test="//ead:physdesc/ead:p/text()">
+			<xsl:if test="//ead:physdesc/text()">
+			<!-- /*:ead/*:archdesc/*:did/*:physdesc/text() -->
 				<div class="field">
 					<div class="label">
 						<xsl:value-of select="$i18n.physicaldescription" />
 					</div>
 					<div class="value">
-						<xsl:value-of select="//ead:physdesc/ead:p/text()" />
+						<xsl:value-of select="//ead:physdesc/text()" />
 					</div>
 				</div>
 			</xsl:if>
@@ -533,12 +534,12 @@
 				</div>
 			</xsl:if>
 			<xsl:if
-				test="normalize-space(string-join(//ead:did/ead:langmaterial[not(*)]/text(),''))!=''">
+				test="normalize-space(string-join(//ead:did/ead:langmaterial/text(),''))!=''">
 				<div class="field">
 					<div class="label">
 						<xsl:value-of select="$i18n.languagesMaterial" />
 					</div>
-					<xsl:for-each select="//ead:did/ead:langmaterial[not(*)]">
+					<xsl:for-each select="//ead:did/ead:langmaterial">
 						<xsl:if test="normalize-space(string-join(text(),''))!=''">
 							<div class="value">
 								<xsl:value-of select="text()" />
