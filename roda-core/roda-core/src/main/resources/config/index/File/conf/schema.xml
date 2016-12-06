@@ -29,7 +29,7 @@
  http://wiki.apache.org/solr/SchemaXml
 -->
 
-<schema name="schema-version-3" version="1.5">
+<schema name="schema-version-4" version="1.5">
   <!--
     2 - removed field 'state' default value (it was leftovers from previous field definition);
   -->
@@ -151,6 +151,7 @@
    <copyField source="fileFormat" dest="fileFormat_txt"/>
    <copyField source="originalName" dest="search"/>
    <copyField source="extension" dest="search"/>
+   <copyField source="extension" dest="extension_txt"/>
    <copyField source="fulltext" dest="search"/>
    <copyField source="creatingApplicationName" dest="search"/>
    <copyField source="creatingApplicationVersion" dest="search"/>

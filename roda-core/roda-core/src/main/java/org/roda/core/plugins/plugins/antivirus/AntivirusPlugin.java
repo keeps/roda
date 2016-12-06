@@ -118,6 +118,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
           VirusCheckResult virusCheckResult = null;
           Exception exception = null;
           DirectResourceAccess directAccess = null;
+
           try {
             LOGGER.debug("Checking if AIP {} is clean of virus", aip.getId());
             StoragePath aipPath = ModelUtils.getAIPStoragePath(aip.getId());
@@ -130,28 +131,21 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
             LOGGER.debug("Done with checking if AIP {} has virus. Is clean of virus: {}", aip.getId(),
               virusCheckResult.isClean());
           } catch (RODAException | RuntimeException e) {
+            LOGGER.error("Error processing AIP " + aip.getId(), e);
             reportState = PluginState.FAILURE;
             reportItem.setPluginState(reportState).setPluginDetails(e.getMessage());
-            jobPluginInfo.incrementObjectsProcessedWithFailure();
-
             exception = e;
-            LOGGER.error("Error processing AIP " + aip.getId(), e);
           } finally {
             IOUtils.closeQuietly(directAccess);
-          }
-
-          // FIXME 20160314 hsilva: perhaps the following code should be put
-          // inside the above finally block, because if an error occurs the
-          // event
-          // creation will never happen
-          try {
             jobPluginInfo.incrementObjectsProcessed(reportState);
-            boolean notify = true;
-            createEvent(virusCheckResult, exception, reportItem.getPluginState(), aip, model, index, notify);
-            report.addReport(reportItem);
-            PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
-          } catch (PluginException | RuntimeException e) {
-            LOGGER.error("Error updating event and job", e);
+
+            try {
+              createEvent(virusCheckResult, exception, reportItem.getPluginState(), aip, model, index, true);
+              report.addReport(reportItem);
+              PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+            } catch (PluginException e) {
+              LOGGER.error("Error updating event and job", e);
+            }
           }
         }
       } catch (ClassCastException e) {
@@ -170,16 +164,15 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
 
   private void createEvent(VirusCheckResult virusCheckResult, Exception exception, PluginState state, AIP aip,
     ModelService model, IndexService index, boolean notify) throws PluginException {
-
     try {
-      StringBuilder outcomeDetailExtension = new StringBuilder(virusCheckResult.getReport());
+      StringBuilder outcomeDetailExtension = new StringBuilder();
+      outcomeDetailExtension.append(virusCheckResult == null ? "" : virusCheckResult.getReport());
       if (state != PluginState.SUCCESS && exception != null) {
         outcomeDetailExtension.append("\n").append(exception.getClass().getName()).append(": ")
           .append(exception.getMessage());
       }
 
       PluginHelper.createPluginEvent(this, aip.getId(), model, index, state, outcomeDetailExtension.toString(), notify);
-
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | ValidationException | AlreadyExistsException e) {
       throw new PluginException("Error while creating the event", e);

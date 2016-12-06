@@ -334,7 +334,6 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     List<String> aipIds = jobPluginInfo.getAipIds();
 
     LOGGER.debug("Getting AIPs: {}", aipIds);
-
     for (String aipId : aipIds) {
       try {
         aips.add(model.retrieveAIP(aipId));
@@ -345,9 +344,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     LOGGER.debug("Done retrieving AIPs");
 
     jobPluginInfo.updateCounters();
-
     return aips;
-
   }
 
   private void sendNotification(ModelService model)
