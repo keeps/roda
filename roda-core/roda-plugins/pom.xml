@@ -13,6 +13,7 @@
 	</parent>
 	<properties>
 		<tika.version>1.11</tika.version>
+		<verapdf.version>0.26.16</verapdf.version>
 	</properties>
 	<modules>
 		<module>roda-plugin-common</module>
@@ -39,6 +40,16 @@
 		<module>risks/roda-plugin-risks-filenotcharacterized</module>
 		<module>risks/roda-plugin-risks-formatmissingrepresentationinformation</module>
 	</modules>
+	<repositories>
+		<repository>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<id>vera-dev</id>
+			<name>Vera development</name>
+			<url>http://artifactory.opf-labs.org/artifactory/vera-dev</url>
+		</repository>
+	</repositories>
 	<dependencyManagement>
 		<dependencies>
 			<!-- FITS Plugin -->
@@ -78,7 +89,7 @@
 			<dependency>
 				<artifactId>gui</artifactId>
 				<groupId>org.verapdf</groupId>
-				<version>0.8.0</version>
+				<version>${verapdf.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.ghost4j</groupId>
