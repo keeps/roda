@@ -248,7 +248,7 @@ public class EditDescriptiveMetadata extends Composite {
             if (b.getType().toLowerCase().equals(lowerCaseType)) {
               String lowerCaseVersion = bundle.getVersion() != null ? bundle.getVersion().toLowerCase() : null;
               if (b.getVersion() != null && lowerCaseVersion != null) {
-                if (lowerCaseVersion != null && b.getVersion().equals(lowerCaseVersion)) {
+                if (lowerCaseVersion != null && b.getVersion().equalsIgnoreCase(lowerCaseVersion)) {
                   selected = index;
                 }
               } else if (b.getVersion() == null && lowerCaseVersion == null) {

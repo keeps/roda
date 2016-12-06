@@ -1777,7 +1777,7 @@ public class BrowserHelper {
         }
         String key = RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX + type;
         if (version != null) {
-          key += RodaConstants.METADATA_VERSION_SEPARATOR + version;
+          key += RodaConstants.METADATA_VERSION_SEPARATOR + version.toLowerCase();
         }
         String label = messages.getTranslation(key, type);
         InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(RodaConstants.METADATA_TEMPLATE_FOLDER
