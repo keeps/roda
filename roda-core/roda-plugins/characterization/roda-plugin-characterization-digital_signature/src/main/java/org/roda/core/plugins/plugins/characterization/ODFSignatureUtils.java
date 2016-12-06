@@ -97,6 +97,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.log.Logger;
 import com.itextpdf.text.log.LoggerFactory;
 
@@ -205,17 +206,19 @@ public final class ODFSignatureUtils {
   }
 
   public static Path runDigitalSignatureSign(Path input, String ks, String alias, String password, String fileFormat)
-    throws Exception {
+    throws IOException, GeneralSecurityException, DocumentException, FileNotFoundException {
 
     Security.addProvider(new BouncyCastleProvider());
     Path output = Files.createTempFile("odfsigned", "." + fileFormat);
 
     KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+
     InputStream storeStream = new FileInputStream(ks);
     keystore.load(storeStream, password.toCharArray());
+    IOUtils.closeQuietly(storeStream);
+
     X509Certificate certificate = (X509Certificate) keystore.getCertificate(keystore.aliases().nextElement());
     Key key = keystore.getKey(alias, password.toCharArray());
-    IOUtils.closeQuietly(storeStream);
 
     ByteArrayInputStream bais = createSignature(input.toString(), certificate, key);
     File file = output.toFile();

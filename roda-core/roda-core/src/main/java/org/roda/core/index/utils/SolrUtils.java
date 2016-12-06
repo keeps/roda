@@ -1325,6 +1325,12 @@ public class SolrUtils {
       LOGGER.warn("Could not index file storage path", e);
     }
 
+    String fileId = file.getId();
+    if (!fileId.startsWith(".")) {
+      String extension = fileId.substring(fileId.lastIndexOf('.') + 1);
+      doc.addField(RodaConstants.FILE_EXTENSION, extension);
+    }
+
     // indexing AIP inherited info
     doc.addField(RodaConstants.STATE, aip.getState().toString());
     doc.addField(RodaConstants.INGEST_SIP_IDS, aip.getIngestSIPIds());

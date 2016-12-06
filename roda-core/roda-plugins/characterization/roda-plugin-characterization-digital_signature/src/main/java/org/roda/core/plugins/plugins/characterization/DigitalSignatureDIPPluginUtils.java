@@ -9,12 +9,14 @@ package org.roda.core.plugins.plugins.characterization;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -25,11 +27,17 @@ import java.security.cert.CertificateException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.xml.crypto.MarshalException;
+import javax.xml.crypto.dsig.XMLSignatureException;
+
 import org.apache.commons.io.IOUtils;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.bouncycastle.cms.CMSException;
 import org.roda.core.RodaCoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.itextpdf.text.DocumentException;
 
 public class DigitalSignatureDIPPluginUtils {
 
@@ -45,6 +53,42 @@ public class DigitalSignatureDIPPluginUtils {
   public static void setKeystorePath(String path) {
     KEYSTORE_PATH = path;
   }
+
+  public static void addDetachedSignature(Path input)
+    throws IOException, GeneralSecurityException, DocumentException, CMSException, FileNotFoundException {
+    SignatureUtility signatureUtility = new SignatureUtility();
+    if (KEYSTORE_PATH != null) {
+      InputStream is = new FileInputStream(KEYSTORE_PATH);
+      signatureUtility.loadKeyStore(is, KEYSTORE_PASSWORD.toCharArray());
+    }
+    signatureUtility.initSign(KEYSTORE_ALIAS, KEYSTORE_PASSWORD.toCharArray());
+
+    File inputFile = input.toFile();
+    signatureUtility.sign(inputFile, input.getParent().resolve(inputFile.getName() + ".p7s").toFile());
+  }
+
+  public static Path addEmbeddedSignature(Path input, String fileFormat, String mimetype)
+    throws IOException, GeneralSecurityException, DocumentException, InvalidFormatException, XMLSignatureException,
+    MarshalException, FileNotFoundException {
+    String generalFileFormat = SignatureUtils.canHaveEmbeddedSignature(fileFormat, mimetype);
+    if (generalFileFormat.equals("pdf")) {
+      String reason = RodaCoreFactory.getRodaConfigurationAsString("core", "signature", "reason");
+      String location = RodaCoreFactory.getRodaConfigurationAsString("core", "signature", "location");
+      String contact = RodaCoreFactory.getRodaConfigurationAsString("core", "signature", "contact");
+      return PDFSignatureUtils.runDigitalSignatureSign(input, KEYSTORE_PATH, KEYSTORE_ALIAS, KEYSTORE_PASSWORD, reason,
+        location, contact);
+    } else if (generalFileFormat.equals("ooxml")) {
+      return OOXMLSignatureUtils.runDigitalSignatureSign(input, KEYSTORE_PATH, KEYSTORE_ALIAS, KEYSTORE_PASSWORD,
+        fileFormat);
+    } else if (generalFileFormat.equals("odf")) {
+      return ODFSignatureUtils.runDigitalSignatureSign(input, KEYSTORE_PATH, KEYSTORE_ALIAS, KEYSTORE_PASSWORD,
+        fileFormat);
+    }
+
+    return null;
+  }
+
+  /**** Digital signing with zip files ****/
 
   public static void addElementToRepresentationZip(ZipOutputStream zout, Path file, String name) throws IOException {
     ZipEntry entry = new ZipEntry(name);
@@ -107,48 +151,6 @@ public class DigitalSignatureDIPPluginUtils {
       LOGGER.error("Error running initSign of SignatureUtility", e);
     } catch (CertStoreException e) {
       LOGGER.error("Error retrieving certificate from store", e);
-    }
-
-    return null;
-  }
-
-  public static void addDetachedSignature(Path input) {
-    try {
-      SignatureUtility signatureUtility = new SignatureUtility();
-      if (KEYSTORE_PATH != null) {
-        InputStream is = new FileInputStream(KEYSTORE_PATH);
-        signatureUtility.loadKeyStore(is, KEYSTORE_PASSWORD.toCharArray());
-      }
-      signatureUtility.initSign(KEYSTORE_ALIAS, KEYSTORE_PASSWORD.toCharArray());
-
-      File inputFile = input.toFile();
-      signatureUtility.sign(inputFile, input.getParent().resolve(inputFile.getName() + ".p7s").toFile());
-    } catch (CertificateException | IOException e) {
-      LOGGER.error("Cannot load keystore " + KEYSTORE_PATH, e);
-    } catch (KeyStoreException | NoSuchAlgorithmException | NoSuchProviderException e) {
-      LOGGER.error("Error initializing SignatureUtility", e);
-    } catch (UnrecoverableKeyException | CMSException | InvalidAlgorithmParameterException e) {
-      LOGGER.error("Error running initSign of SignatureUtility", e);
-    } catch (CertStoreException e) {
-      LOGGER.error("Error retrieving certificate from store", e);
-    }
-  }
-
-  public static Path addEmbeddedSignature(Path input, String fileFormat, String mimetype) throws Exception {
-    String generalFileFormat = SignatureUtils.canHaveEmbeddedSignature(fileFormat, mimetype);
-    if (generalFileFormat.equals("pdf")) {
-      String reason = RodaCoreFactory.getRodaConfigurationAsString("core", "signature", "reason");
-      String location = RodaCoreFactory.getRodaConfigurationAsString("core", "signature", "location");
-      String contact = RodaCoreFactory.getRodaConfigurationAsString("core", "signature", "contact");
-
-      return PDFSignatureUtils.runDigitalSignatureSign(input, KEYSTORE_PATH, KEYSTORE_ALIAS, KEYSTORE_PASSWORD, reason,
-        location, contact);
-    } else if (generalFileFormat.equals("ooxml")) {
-      return OOXMLSignatureUtils.runDigitalSignatureSign(input, KEYSTORE_PATH, KEYSTORE_ALIAS, KEYSTORE_PASSWORD,
-        fileFormat);
-    } else if (generalFileFormat.equals("odf")) {
-      return ODFSignatureUtils.runDigitalSignatureSign(input, KEYSTORE_PATH, KEYSTORE_ALIAS, KEYSTORE_PASSWORD,
-        fileFormat);
     }
 
     return null;

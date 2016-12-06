@@ -8,6 +8,7 @@
 package org.roda.core.plugins.plugins.characterization;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -161,17 +162,20 @@ public final class PDFSignatureUtils {
   }
 
   public static Path runDigitalSignatureSign(Path input, String keystore, String alias, String password, String reason,
-    String location, String contact) throws IOException, GeneralSecurityException, DocumentException {
+    String location, String contact)
+    throws IOException, GeneralSecurityException, DocumentException, FileNotFoundException {
 
     Security.addProvider(new BouncyCastleProvider());
     Path signedPDF = Files.createTempFile("signed", ".pdf");
 
     KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+
     InputStream is = new FileInputStream(keystore);
     ks.load(is, password.toCharArray());
+    IOUtils.closeQuietly(is);
+
     PrivateKey pk = (PrivateKey) ks.getKey(alias, password.toCharArray());
     Certificate[] chain = ks.getCertificateChain(alias);
-    IOUtils.closeQuietly(is);
 
     PdfReader reader = new PdfReader(input.toString());
     FileOutputStream os = new FileOutputStream(signedPDF.toFile());

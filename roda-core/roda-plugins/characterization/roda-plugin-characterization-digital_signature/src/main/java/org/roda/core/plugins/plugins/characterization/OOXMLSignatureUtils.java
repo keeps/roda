@@ -8,6 +8,7 @@
 package org.roda.core.plugins.plugins.characterization;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.CopyOption;
@@ -16,13 +17,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.SignatureException;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
@@ -50,6 +47,8 @@ import org.apache.poi.openxml4j.opc.PackageRelationship;
 import org.apache.poi.poifs.crypt.dsig.SignatureConfig;
 import org.apache.poi.poifs.crypt.dsig.SignatureInfo;
 import org.apache.poi.poifs.crypt.dsig.SignatureInfo.SignaturePart;
+
+import com.itextpdf.text.DocumentException;
 
 public final class OOXMLSignatureUtils {
 
@@ -151,16 +150,18 @@ public final class OOXMLSignatureUtils {
   }
 
   public static Path runDigitalSignatureSign(Path input, String keystore, String alias, String password,
-    String fileFormat) throws CertificateException, IOException, KeyStoreException, NoSuchAlgorithmException,
-    UnrecoverableKeyException, InvalidFormatException, XMLSignatureException, MarshalException {
+    String fileFormat) throws IOException, GeneralSecurityException, DocumentException, InvalidFormatException,
+    XMLSignatureException, MarshalException, FileNotFoundException {
 
     Path output = Files.createTempFile("signed", "." + fileFormat);
     CopyOption[] copyOptions = new CopyOption[] {StandardCopyOption.REPLACE_EXISTING};
     Files.copy(input, output, copyOptions);
 
     KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+
     InputStream is = new FileInputStream(keystore);
     ks.load(is, password.toCharArray());
+    IOUtils.closeQuietly(is);
 
     PrivateKey pk = (PrivateKey) ks.getKey(alias, password.toCharArray());
     X509Certificate x509 = (X509Certificate) ks.getCertificate(alias);
@@ -177,8 +178,6 @@ public final class OOXMLSignatureUtils {
 
     // boolean b = si.verifySignature();
     pkg.close();
-    IOUtils.closeQuietly(is);
-
     return output;
   }
 }
