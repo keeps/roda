@@ -8,16 +8,11 @@
 package org.roda.core.plugins.plugins.characterization;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.xml.bind.JAXBException;
 
@@ -38,6 +33,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
@@ -61,10 +57,9 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
-import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.fs.FSPathContentPayload;
+import org.roda.core.storage.StringContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.verapdf.core.VeraPDFException;
@@ -178,7 +173,6 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
         boolean hasNonPdfFiles = false;
         List<File> resourceList = new ArrayList<File>();
         List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
-        StringBuilder details = new StringBuilder();
 
         for (Representation representation : aip.getRepresentations()) {
           // FIXME 20160516 hsilva: see how to set initial
@@ -207,23 +201,19 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
                     LOGGER.debug("Running veraPDF validator on {}", file.getId());
                     StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
                     DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
-                    Path veraPDFResult = VeraPDFPluginUtils.runVeraPDF(directAccess.getPath(), profile, hasFeatures);
+                    Pair<StringContentPayload, Boolean> veraPDFResult = VeraPDFPluginUtils
+                      .runVeraPDF(directAccess.getPath(), profile, hasFeatures);
                     sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), representation.getId(), file.getPath(),
                       file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
-                    if (veraPDFResult != null) {
-                      ContentPayload payload = new FSPathContentPayload(veraPDFResult);
-                      InputStream inputStream = payload.createInputStream();
-                      String xmlReport = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-                      IOUtils.closeQuietly(inputStream);
+                    if (veraPDFResult.getFirst() != null) {
+                      model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
+                        file.getId(), "xml", "VeraPDF", veraPDFResult.getFirst(), false);
 
-                      Pattern pattern = Pattern.compile("<validationReport.*?compliant=\"false\">");
-                      Matcher matcher = pattern.matcher(xmlReport);
-
-                      if (matcher.find()) {
+                      if (veraPDFResult.getSecond().booleanValue()) {
                         resourceList.add(file);
+                      } else {
                         pluginResultState = PluginState.PARTIAL_SUCCESS;
-                        details.append(xmlReport.substring(xmlReport.indexOf('\n') + 1));
                       }
 
                     } else {
@@ -268,7 +258,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
         }
 
         LOGGER.debug("Creating veraPDF event on AIP {}", aip.getId());
-        createEvent(model, index, aip.getId(), null, null, null, pluginResultState, details, resourceList, sources);
+        createEvent(model, index, aip.getId(), null, null, null, pluginResultState, "", resourceList, sources);
 
         jobPluginInfo.incrementObjectsProcessed(reportState);
         reportItem.setPluginState(reportState);
@@ -316,7 +306,6 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
         PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
         PluginState pluginResultState = PluginState.SUCCESS;
         PluginState reportState = PluginState.SUCCESS;
-        StringBuilder details = new StringBuilder();
         AIP aip = model.retrieveAIP(representation.getAipId());
         ValidationReport validationReport = new ValidationReport();
         boolean hasNonPdfFiles = false;
@@ -343,23 +332,19 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
                   LOGGER.debug("Running veraPDF validator on {}", file.getId());
                   StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
                   DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
-                  Path veraPDFResult = VeraPDFPluginUtils.runVeraPDF(directAccess.getPath(), profile, hasFeatures);
+                  Pair<StringContentPayload, Boolean> veraPDFResult = VeraPDFPluginUtils
+                    .runVeraPDF(directAccess.getPath(), profile, hasFeatures);
                   sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), representation.getId(), file.getPath(),
                     file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
-                  if (veraPDFResult != null) {
-                    ContentPayload payload = new FSPathContentPayload(veraPDFResult);
-                    InputStream inputStream = payload.createInputStream();
-                    String xmlReport = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-                    IOUtils.closeQuietly(inputStream);
+                  if (veraPDFResult.getFirst() != null) {
+                    model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
+                      "xml", "VeraPDF", veraPDFResult.getFirst(), false);
 
-                    Pattern pattern = Pattern.compile("<validationReport.*?compliant=\"false\">");
-                    Matcher matcher = pattern.matcher(xmlReport);
-
-                    if (matcher.find()) {
+                    if (veraPDFResult.getSecond().booleanValue()) {
                       resourceList.add(file);
+                    } else {
                       pluginResultState = PluginState.PARTIAL_SUCCESS;
-                      details.append(xmlReport.substring(xmlReport.indexOf('\n') + 1));
                     }
 
                   } else {
@@ -399,7 +384,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
           reportItem.setPluginDetails(e.getMessage());
         } finally {
           LOGGER.debug("Creating veraPDF event for the representation {}", representation.getId());
-          createEvent(model, index, aip.getId(), representation.getId(), null, null, pluginResultState, details,
+          createEvent(model, index, aip.getId(), representation.getId(), null, null, pluginResultState, "",
             resourceList, sources);
         }
 
@@ -452,7 +437,6 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
           // initialOutcomeObjectState
           PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
           PluginState pluginResultState = PluginState.SUCCESS;
-          StringBuilder details = new StringBuilder();
 
           LOGGER.debug("Processing file: {}", file);
           if (!file.isDirectory()) {
@@ -464,21 +448,17 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
               LOGGER.debug("Running veraPDF validator on {}", file.getId());
               StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
               DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
-              Path veraPDFResult = VeraPDFPluginUtils.runVeraPDF(directAccess.getPath(), profile, hasFeatures);
+              Pair<StringContentPayload, Boolean> veraPDFResult = VeraPDFPluginUtils.runVeraPDF(directAccess.getPath(),
+                profile, hasFeatures);
 
-              if (veraPDFResult != null) {
-                ContentPayload payload = new FSPathContentPayload(veraPDFResult);
-                InputStream inputStream = payload.createInputStream();
-                String xmlReport = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-                IOUtils.closeQuietly(inputStream);
+              if (veraPDFResult.getFirst() != null) {
+                model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
+                  "xml", "VeraPDF", veraPDFResult.getFirst(), false);
 
-                Pattern pattern = Pattern.compile("<validationReport.*?compliant=\"false\">");
-                Matcher matcher = pattern.matcher(xmlReport);
-
-                if (matcher.find()) {
+                if (veraPDFResult.getSecond().booleanValue()) {
                   resourceList.add(file);
+                } else {
                   pluginResultState = PluginState.PARTIAL_SUCCESS;
-                  details.append(xmlReport.substring(xmlReport.indexOf('\n') + 1));
                 }
 
                 if (!pluginResultState.equals(PluginState.SUCCESS)) {
@@ -508,7 +488,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
           }
 
           createEvent(model, index, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
-            pluginResultState, details, resourceList, null);
+            pluginResultState, "", resourceList, null);
           jobPluginInfo.incrementObjectsProcessed(reportState);
 
         } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
@@ -536,7 +516,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   }
 
   private void createEvent(ModelService model, IndexService index, String aipId, String representationId,
-    List<String> filePath, String fileId, PluginState pluginState, StringBuilder details, List<File> resourceList,
+    List<String> filePath, String fileId, PluginState pluginState, String details, List<File> resourceList,
     List<LinkingIdentifier> sources) throws PluginException {
     String outcomeDetails = null;
     try {

@@ -36,13 +36,9 @@
 								</transformer>
 							</transformers>
 							<relocations>
-	<!-- <relocation> -->
-	<!-- <pattern>org.bouncycastle</pattern> -->
-	<!-- <shadedPattern>org.bouncycastle_147</shadedPattern> -->
-	<!-- </relocation> -->
 								<relocation>
-									<pattern>com.itextpdf</pattern>
-									<shadedPattern>com.itextpdf_217</shadedPattern>
+									<pattern>org.apache.pdfbox</pattern>
+									<shadedPattern>org.apache.pdfbox_200</shadedPattern>
 								</relocation>
 							</relocations>
 							<filters>

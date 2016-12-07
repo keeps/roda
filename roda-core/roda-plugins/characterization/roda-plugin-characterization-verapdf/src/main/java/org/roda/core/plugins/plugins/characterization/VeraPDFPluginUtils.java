@@ -7,96 +7,69 @@
  */
 package org.roda.core.plugins.plugins.characterization;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.IOUtils;
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.common.Pair;
+import org.roda.core.storage.StringContentPayload;
 import org.verapdf.core.VeraPDFException;
-import org.verapdf.features.pb.PBFeatureParser;
-import org.verapdf.features.tools.FeaturesCollection;
-import org.verapdf.model.ModelParser;
-import org.verapdf.pdfa.PDFAValidator;
+import org.verapdf.features.FeatureExtractorConfig;
+import org.verapdf.features.FeatureFactory;
+import org.verapdf.metadata.fixer.FixerFactory;
+import org.verapdf.metadata.fixer.MetadataFixerConfig;
+import org.verapdf.pdfa.PdfBoxFoundryProvider;
 import org.verapdf.pdfa.flavours.PDFAFlavour;
-import org.verapdf.pdfa.results.ValidationResult;
-import org.verapdf.pdfa.validation.profiles.Profiles;
-import org.verapdf.pdfa.validation.profiles.ValidationProfile;
-import org.verapdf.pdfa.validators.Validators;
-import org.verapdf.report.MachineReadableReport;
+import org.verapdf.pdfa.validation.validators.ValidatorConfig;
+import org.verapdf.pdfa.validation.validators.ValidatorFactory;
+import org.verapdf.processor.ItemProcessor;
+import org.verapdf.processor.ProcessorFactory;
+import org.verapdf.processor.ProcessorResult;
+import org.verapdf.processor.TaskType;
 
 public class VeraPDFPluginUtils {
 
-  public static Path runVeraPDF(Path input, String profile, boolean hasFeatures)
-    throws IOException, JAXBException, IllegalArgumentException, VeraPDFException {
-    Path p = null;
+  public static Pair<StringContentPayload, Boolean> runVeraPDF(Path input, String profile, boolean hasFeatures)
+    throws VeraPDFException, IOException, JAXBException {
 
-    PDFAFlavour flavour = getFlavourFromProfileString(profile);
-    boolean reportPassedChecks = false;
-    long startTime = System.currentTimeMillis();
+    PdfBoxFoundryProvider.initialise();
+    PDFAFlavour flavour = PDFAFlavour.byFlavourId(profile);
 
-    InputStream streamPDF = new FileInputStream(input.toString());
-    ModelParser loader = new ModelParser(streamPDF);
+    ValidatorConfig validatorConfig = ValidatorFactory.createConfig(flavour, true, 10);
+    FeatureExtractorConfig featureConfig = FeatureFactory.defaultConfig();
+    MetadataFixerConfig fixerConfig = FixerFactory.defaultConfig();
+    EnumSet<TaskType> tasks = EnumSet.of(TaskType.VALIDATE);
 
-    // validation code
-    ValidationProfile validationProfile = Profiles.getVeraProfileDirectory().getValidationProfileByFlavour(flavour);
-    PDFAValidator validator = Validators.createValidator(validationProfile, true);
-    ValidationResult result = validator.validate(loader);
+    if (hasFeatures) {
+      tasks.add(TaskType.EXTRACT_FEATURES);
+    }
 
-    // features code
-    FeaturesCollection featuresCollection = null;
-    if (hasFeatures == true)
-      featuresCollection = PBFeatureParser.getFeaturesCollection(loader.getPDDocument());
+    ItemProcessor processor = ProcessorFactory
+      .createProcessor(ProcessorFactory.fromValues(validatorConfig, featureConfig, fixerConfig, tasks));
 
-    // create XML report file
-    p = Files.createTempFile("verapdf", ".xml");
-    OutputStream os = new FileOutputStream(p.toFile());
+    ProcessorResult result = processor.process(input.toFile());
+    ByteArrayOutputStream os = new ByteArrayOutputStream();
 
-    // create XML report
-    MachineReadableReport mrr = MachineReadableReport.fromValues(input.toFile().getName(), validationProfile, result,
-      reportPassedChecks, null, featuresCollection, System.currentTimeMillis() - startTime);
-    MachineReadableReport.toXml(mrr, os, Boolean.TRUE);
+    boolean prettyPrint = true;
+    ProcessorFactory.resultToXml(result, os, prettyPrint);
 
     IOUtils.closeQuietly(os);
-    IOUtils.closeQuietly(loader);
-    IOUtils.closeQuietly(streamPDF);
-
-    return p;
-  }
-
-  // function to transform profile arg string in a PDFA profile flavour
-  private static PDFAFlavour getFlavourFromProfileString(String profile) {
-    switch (profile) {
-      case "1a":
-        return PDFAFlavour.PDFA_1_A;
-      case "1b":
-        return PDFAFlavour.PDFA_1_B;
-      case "2a":
-        return PDFAFlavour.PDFA_2_A;
-      case "2b":
-        return PDFAFlavour.PDFA_2_B;
-      case "2u":
-        return PDFAFlavour.PDFA_2_U;
-      case "3a":
-        return PDFAFlavour.PDFA_3_A;
-      case "3b":
-        return PDFAFlavour.PDFA_3_B;
-      case "3u":
-        return PDFAFlavour.PDFA_3_U;
-      default:
-        return PDFAFlavour.PDFA_1_B;
-    }
+    StringContentPayload s = new StringContentPayload(os.toString(RodaConstants.DEFAULT_ENCODING));
+    return Pair.create(s, result.getValidationResult().isCompliant());
   }
 
   public static List<String> getProfileList() {
-    return Arrays.asList("1a", "1b", "2a", "2b", "2u", "3a", "3b", "3u");
+    List<String> ret = new ArrayList<>();
+    for (PDFAFlavour pdfaFlavour : PDFAFlavour.values()) {
+      ret.add(pdfaFlavour.getId());
+    }
+    return ret;
   }
-
 }

@@ -35,6 +35,20 @@
 									</manifestEntries>
 								</transformer>
 							</transformers>
+							<relocations>
+								<relocation>
+									<pattern>org.apache.pdfbox</pattern>
+									<shadedPattern>org.apache.pdfbox_1810</shadedPattern>
+								</relocation>
+								<relocation>
+									<pattern>com.adobe.xmp</pattern>
+									<shadedPattern>com.adobe.xmp_512</shadedPattern>
+								</relocation>
+								<relocation>
+									<pattern>org.apache.fontbox</pattern>
+									<shadedPattern>org.apache.fontbox_1810</shadedPattern>
+								</relocation>
+							</relocations>
 							<filters>
 								<filter>
 									<artifact>*:*</artifact>

@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.ghost4j.GhostscriptException;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.IsRODAObject;
@@ -30,7 +29,6 @@ import org.roda.core.plugins.plugins.common.AbstractConvertPlugin;
 import org.roda.core.plugins.plugins.common.FileFormatUtils;
 import org.roda.core.storage.StorageService;
 import org.roda.core.util.CommandException;
-import org.verapdf.core.VeraPDFException;
 
 public class PdfToPdfaPlugin<T extends IsRODAObject> extends AbstractConvertPlugin<T> {
   private static final String TOOLNAME = "pdftopdfa";
@@ -44,8 +42,9 @@ public class PdfToPdfaPlugin<T extends IsRODAObject> extends AbstractConvertPlug
         "Ignore files that are not identified as Portable Document Format (PDF)."));
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_IGNORE_VERAPDF_VALIDATION,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_IGNORE_VERAPDF_VALIDATION, "Use veraPDF validation",
-        PluginParameterType.BOOLEAN, "true", false, false, "Use veraPDF validation and metadata fixing."));
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_IGNORE_VERAPDF_VALIDATION, "Apply veraPDF metadata fixer",
+        PluginParameterType.BOOLEAN, "true", false, false,
+        "Apply veraPDF validation and metadata fixing on the document."));
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP, new PluginParameter(
       RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP, "Convert to a DIP", PluginParameterType.BOOLEAN, "true", false,
@@ -129,13 +128,7 @@ public class PdfToPdfaPlugin<T extends IsRODAObject> extends AbstractConvertPlug
   @Override
   public String executePlugin(Path inputPath, Path outputPath, String fileFormat)
     throws UnsupportedOperationException, IOException, CommandException {
-
-    try {
-      return PdfToPdfaPluginUtils.executePdfToPdfa(inputPath, outputPath, validatePDF);
-    } catch (VeraPDFException | GhostscriptException e) {
-      return null;
-    }
-
+    return PdfToPdfaPluginUtils.executePdfToPdfa(inputPath, outputPath, validatePDF);
   }
 
   @Override

@@ -7,73 +7,58 @@
  */
 package org.roda.core.plugins.plugins.conversion;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.EnumSet;
 
-import org.apache.commons.io.FileUtils;
 import org.ghost4j.Ghostscript;
 import org.ghost4j.GhostscriptException;
-import org.verapdf.core.ValidationException;
+import org.roda.core.util.CommandException;
 import org.verapdf.core.VeraPDFException;
-import org.verapdf.metadata.fixer.impl.MetadataFixerImpl;
-import org.verapdf.metadata.fixer.impl.pb.FixerConfigImpl;
-import org.verapdf.metadata.fixer.utils.FixerConfig;
-import org.verapdf.model.ModelParser;
-import org.verapdf.pdfa.PDFAValidator;
+import org.verapdf.features.FeatureExtractorConfig;
+import org.verapdf.features.FeatureFactory;
+import org.verapdf.metadata.fixer.FixerFactory;
+import org.verapdf.metadata.fixer.MetadataFixerConfig;
+import org.verapdf.pdfa.PdfBoxFoundryProvider;
 import org.verapdf.pdfa.flavours.PDFAFlavour;
-import org.verapdf.pdfa.results.ValidationResult;
-import org.verapdf.pdfa.validation.Profiles;
-import org.verapdf.pdfa.validation.ValidationProfile;
-import org.verapdf.pdfa.validators.Validators;
+import org.verapdf.pdfa.results.MetadataFixerResult.RepairStatus;
+import org.verapdf.pdfa.validation.validators.ValidatorConfig;
+import org.verapdf.pdfa.validation.validators.ValidatorFactory;
+import org.verapdf.processor.ItemProcessor;
+import org.verapdf.processor.ProcessorFactory;
+import org.verapdf.processor.ProcessorResult;
+import org.verapdf.processor.TaskType;
 
 public class PdfToPdfaPluginUtils {
 
-  public static String executePdfToPdfa(Path p, Path fixed, boolean validatePDF)
-    throws IOException, VeraPDFException, GhostscriptException {
-    // pdfa - file to save the GS output
-    // fixed - file to save the fixed representation
-    Path pdfa = null;
+  public static String executePdfToPdfa(Path input, Path fixed, boolean validatePDF)
+    throws IOException, CommandException {
+    try {
+      runGS(input, fixed);
 
-    if (validatePDF) {
-      pdfa = Files.createTempFile("pdfa", ".pdf");
-      runGS(p, pdfa);
-    } else {
-      runGS(p, fixed);
-      return "";
-    }
-
-    // metadata fixer transformation
-    InputStream is = new FileInputStream(pdfa.toString());
-
-    try (ModelParser loader = new ModelParser(is)) {
-
-      // validation code
-      ValidationProfile profile = Profiles.getVeraProfileDirectory()
-        .getValidationProfileByFlavour(PDFAFlavour.PDFA_1_B);
-      PDFAValidator validator = Validators.createValidator(profile, true);
-      ValidationResult result = validator.validate(loader);
-      is.close();
-
-      if (result.isCompliant()) {
-        FileUtils.copyFile(pdfa.toFile(), fixed.toFile());
-      } else {
-        // fixing metadata
-        OutputStream fixedOutputStream = new FileOutputStream(fixed.toString());
-        FixerConfig fconf = FixerConfigImpl.getFixerConfig(loader.getPDDocument(), result);
-        MetadataFixerImpl.fixMetadata(fixedOutputStream, fconf);
-        fixedOutputStream.close();
+      if (!validatePDF) {
+        return "";
       }
 
-      loader.close();
+      // metadata fixer transformation
+      PdfBoxFoundryProvider.initialise();
+      ValidatorConfig validatorConfig = ValidatorFactory.createConfig(PDFAFlavour.PDFA_1_B, true, 10);
+      FeatureExtractorConfig featureConfig = FeatureFactory.defaultConfig();
+      MetadataFixerConfig fixerConfig = FixerFactory.defaultConfig();
+      EnumSet<TaskType> tasks = EnumSet.of(TaskType.VALIDATE, TaskType.FIX_METADATA);
 
-    } catch (ValidationException | FileNotFoundException e) {
-      throw new VeraPDFException("Exception when fixing metadata: ", e);
+      ItemProcessor processor = ProcessorFactory
+        .createProcessor(ProcessorFactory.fromValues(validatorConfig, featureConfig, fixerConfig, tasks));
+
+      ProcessorResult result = processor.process(fixed.toFile());
+
+      RepairStatus fixStatus = result.getFixerResult().getRepairStatus();
+      if (fixStatus.equals(RepairStatus.WONT_FIX) || fixStatus.equals(RepairStatus.FIX_ERROR)) {
+        throw new CommandException("There were some metadata fixing errors on: " + input.toString());
+      }
+
+    } catch (GhostscriptException | VeraPDFException e) {
+      return e.getMessage();
     }
 
     return "";
