@@ -29,7 +29,7 @@
  http://wiki.apache.org/solr/SchemaXml
 -->
 
-<schema name="schema-version-2" version="1.5">
+<schema name="schema-version-3" version="1.5">
   <!-- attribute "name" is the name of this schema and is only used for display purposes.
        version="x.y" is Solr's version number for the schema syntax and 
        semantics.  It should not normally be changed by applications.
@@ -116,7 +116,7 @@
    <field name="lastModified" type="tdate" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="isPermanent" type="boolean" default="false" indexed="true" stored="true" required="true" multiValued="false" />
    
-   <field name="openExternalURL" type="string" indexed="true" stored="false" required="false" multiValued="false" />
+   <field name="openExternalURL" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="properties" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    
    <field name="aipUUIDs" type="string" indexed="true" stored="false" required="false" multiValued="true" /> 
