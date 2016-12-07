@@ -13,6 +13,7 @@ package org.roda.wui.client.management;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.gwt.user.client.ui.Button;
 import org.roda.core.data.exceptions.InvalidTokenException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.user.User;
@@ -130,7 +131,7 @@ public class ResetPassword extends Composite {
   TextBox passwordRepeat;
 
   @UiField
-  Label cancel;
+  Button cancel;
 
   private boolean checked = false;
 
