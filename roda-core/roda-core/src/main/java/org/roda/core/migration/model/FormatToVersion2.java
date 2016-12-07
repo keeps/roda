@@ -5,6 +5,7 @@ import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.common.iterables.CloseableIterable;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.formats.Format;
@@ -37,6 +38,8 @@ public class FormatToVersion2 implements MigrationAction<Format> {
           migrate(storage, binary);
         }
       }
+    } catch (NotFoundException e) {
+      LOGGER.warn("Could not find resource", e);
     } finally {
       IOUtils.closeQuietly(formats);
     }
