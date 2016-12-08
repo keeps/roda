@@ -99,7 +99,7 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
   /** Plugin parameter name 'format'. */
   private static final String FORMAT_DESIGNATION_NAME = "Format designation";
 
-  /** Plugin parameter 'fileFormat'. */
+  /** Plugin parameter 'format'. */
   private static final PluginParameter PARAM_FORMAT_DESIGNATION = new PluginParameter(FORMAT_DESIGNATION,
     FORMAT_DESIGNATION_NAME, PluginParameter.PluginParameterType.BOOLEAN, PARAM_VALUE_TRUE, false, false,
     "Check Format designation name and version?");
@@ -110,10 +110,10 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
   /** Plugin parameter 'matchOne'. */
   private static final PluginParameter PARAM_MATCH_ONE = new PluginParameter(MATCH_ONE,
     "Match (at least) one Format type", PluginParameter.PluginParameterType.BOOLEAN, "false", false, false,
-    "Don't create risk incidence(s) if at least one of the selected fileFormat types is found.");
+    "Don't create risk incidence(s) if at least one of the selected format types is found.");
 
   /**
-   * String fileFormat for {@link Format} name and version.
+   * String format for {@link Format} name and version.
    */
   private static final String FORMAT_NAME_PATTERN = "%1$s, version %2$s";
 
@@ -134,8 +134,8 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
 
   @Override
   public String getDescription() {
-    return "Check file fileFormat (Mimetype, PRONOM and Format designation) in the Format Registry. "
-      + "If File Format is not present in the Format Registry, it creates a new risk called "
+    return "Check file format (Mimetype, PRONOM and Format designation) in the Format Registry. "
+      + "If file format is not present in the Format Registry, it creates a new risk called "
       + "“Comprehensive representation information is missing for some files in the repository“ "
       + "and assigns the file to that risk in the Risk register.";
   }
@@ -201,12 +201,12 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "File fileFormat has Representation information.";
+    return "File format has Representation information.";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "File fileFormat doesn't have Representation information.";
+    return "File format doesn't have Representation information.";
   }
 
   @Override
@@ -265,10 +265,10 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
   }
 
   /**
-   * Match at least one fileFormat type?
+   * Match at least one format type?
    *
    * @return <code>true</code> if plugin should not create a risk incidence if
-   *         at least one fileFormat type is found, <code>false</code>
+   *         at least one format type is found, <code>false</code>
    *         otherwise.
    */
   private boolean matchAtLeastOneFormatType() {
@@ -412,7 +412,7 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
     /**
      * Check if a {@link FileFormat} is in risk. A {@link FileFormat} is in risk
      * if the Format registry doesn't have a {@link Format} with it's attributes
-     * (fileFormat designation, mimetype, pronom).
+     * (format designation, mimetype, pronom).
      *
      * @return <code>true</code> if the {@link FileFormat} is in risk,
      *         <code>false</code> otherwise.
@@ -469,8 +469,8 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
     public String toString() {
       String str = "";
       if (isMissingAttributes()) {
-        str = "File does not have required information (fileFormat designation, MIME type or PRONOM), "
-          + "to be able to find fileFormat representation information.";
+        str = "File does not have required information (Format designation, MIME type or PRONOM), "
+          + "to be able to find Format representation information.";
       } else if (formatResults().isEmpty()) {
         str += getPreservationEventFailureMessage();
       } else {
@@ -681,7 +681,7 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
 
     @Override
     public String toString() {
-      String str = String.format("Format \"%s\"%n", this.format.getName());
+      String str = String.format("Format \"%s\" (%s)%n", this.format.getName(), this.format.getId());
       for (Map.Entry<String, AttributeCheck> entry : this.checks.entrySet()) {
         str += String.format("\t%s%n", entry.getValue());
       }
@@ -740,7 +740,7 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
 
     @Override
     public String toString() {
-      return String.format("%s %s \"%s\"", this.present ? "has" : "doest NOT have", this.name,
+      return String.format("%s %s \"%s\"", this.present ? "has" : "does NOT have", this.name,
         this.filterParameter.getValue());
     }
   }
