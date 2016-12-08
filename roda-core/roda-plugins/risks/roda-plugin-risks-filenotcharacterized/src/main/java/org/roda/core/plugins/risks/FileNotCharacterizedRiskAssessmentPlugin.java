@@ -132,7 +132,9 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
 
       final Result result = new Result();
       for (File file : list) {
-        result.addResult(executeOnFile(file, index, model, jobPluginInfo, report));
+        if (!file.isDirectory()) {
+          result.addResult(executeOnFile(file, index, model, jobPluginInfo, report));
+        }
       }
 
       report.addPluginDetails(result.toString());
@@ -520,7 +522,8 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
         str.append(String.format("Missing format designation name: %s.%n", numberToHuman(this.formatName, count)));
       }
       if (FileNotCharacterizedRiskAssessmentPlugin.this.checkFormatDesignationVersion()) {
-        str.append(String.format("Missing format designation version: %s.%n", numberToHuman(this.formatVersion, count)));
+        str
+          .append(String.format("Missing format designation version: %s.%n", numberToHuman(this.formatVersion, count)));
       }
       if (FileNotCharacterizedRiskAssessmentPlugin.this.checkMimetype()) {
         str.append(String.format("Missing mimetype: %s.%n", numberToHuman(this.mimetype, count)));
