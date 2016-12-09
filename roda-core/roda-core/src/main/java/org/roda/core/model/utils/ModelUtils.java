@@ -625,7 +625,8 @@ public final class ModelUtils {
   }
 
   public static StoragePath getDIPStoragePath(String dipId) throws RequestNotValidException {
-    return DefaultStoragePath.parse(Arrays.asList(RodaConstants.STORAGE_CONTAINER_DIP, dipId));
+    return DefaultStoragePath
+      .parse(Arrays.asList(RodaConstants.STORAGE_CONTAINER_DIP, dipId, RodaConstants.STORAGE_DIP_METADATA_FILENAME));
   }
 
   public static StoragePath getOtherMetadataFolderStoragePath(String aipId, String representationId)

@@ -42,6 +42,7 @@ import org.roda.wui.common.client.widgets.Toast;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -94,8 +95,8 @@ public class BrowseDIP extends Composite {
   @UiField
   FocusPanel previousButton, nextButton, downloadButton;
 
-  // @UiField
-  // FocusPanel removeButton;
+  @UiField
+  FocusPanel removeButton;
 
   // state
   int index;
@@ -126,11 +127,11 @@ public class BrowseDIP extends Composite {
 
     // TODO set title for previous and next button
     downloadButton.setTitle(messages.viewRepresentationDownloadFileButton());
-    // removeButton.setTitle(messages.viewRepresentationRemoveFileButton());
+    removeButton.setTitle(messages.viewRepresentationRemoveFileButton());
 
     previousButton.setVisible(false);
     nextButton.setVisible(false);
-    
+
     index = 0;
     show();
   }
@@ -149,7 +150,7 @@ public class BrowseDIP extends Composite {
 
     // update visibles
     downloadButton.setVisible(dipFile != null && !dipFile.isDirectory());
-    // removeButton.setVisible(dipFile != null && !dipFile.isDirectory());
+    removeButton.setVisible(dipFile != null && !dipFile.isDirectory());
   }
 
   public void show() {
@@ -205,8 +206,8 @@ public class BrowseDIP extends Composite {
   }
 
   private void next() {
-    if(index < totalCount-1) {
-      index++;  
+    if (index < totalCount - 1) {
+      index++;
     }
     show();
   }
@@ -231,7 +232,7 @@ public class BrowseDIP extends Composite {
     }
   }
 
-  // @UiHandler("removeButton")
+  @UiHandler("removeButton")
   void buttonRemoveFileButtonHandler(ClickEvent e) {
     Dialogs.showConfirmDialog(messages.viewRepresentationRemoveFileTitle(),
       messages.viewRepresentationRemoveFileMessage(), messages.dialogCancel(), messages.dialogYes(),
@@ -240,20 +241,31 @@ public class BrowseDIP extends Composite {
         @Override
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
-            // BrowserService.Util.getInstance().deleteFile(file.getUUID(), new
-            // AsyncCallback<Void>() {
-            //
-            // @Override
-            // public void onSuccess(Void result) {
-            // // clean();
-            // }
-            //
-            // @Override
-            // public void onFailure(Throwable caught) {
-            // AsyncCallbackUtils.defaultFailureTreatment(caught);
-            // }
-            // });
-            // TODO remove DIP
+            Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
+              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
+
+                @Override
+                public void onFailure(Throwable caught) {
+                  // do nothing
+                }
+
+                @Override
+                public void onSuccess(String details) {
+
+                  BrowserService.Util.getInstance().deleteDIP(dipFile.getDipId(), details, new AsyncCallback<Void>() {
+
+                    @Override
+                    public void onSuccess(Void result) {
+                      // clean();
+                    }
+
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      AsyncCallbackUtils.defaultFailureTreatment(caught);
+                    }
+                  });
+                }
+              });
           }
         }
 
