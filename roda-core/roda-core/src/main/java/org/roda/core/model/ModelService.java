@@ -2177,7 +2177,7 @@ public class ModelService extends ModelObservable {
     InputStream inputStream = null;
     DIP ret;
     try {
-      StoragePath dipPath = ModelUtils.getDIPStoragePath(dipId);
+      StoragePath dipPath = ModelUtils.getDIPMetadataStoragePath(dipId);
       Binary binary = storage.getBinary(dipPath);
       inputStream = binary.getContent().createInputStream();
       ret = JsonUtils.getObjectFromJson(inputStream, DIP.class);
