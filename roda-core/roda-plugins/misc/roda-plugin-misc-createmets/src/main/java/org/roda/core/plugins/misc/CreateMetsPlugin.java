@@ -7,20 +7,25 @@
  */
 package org.roda.core.plugins.misc;
 
-import java.util.Arrays;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.JobException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
@@ -28,13 +33,17 @@ import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
-import org.roda_project.commons_ip.model.impl.eark.EARKMETSUtils;
+import org.roda.core.storage.fs.FSUtils;
+import org.roda_project.commons_ip.model.ParseException;
+import org.roda_project.commons_ip.model.impl.eark.EARKAIP;
+import org.roda_project.commons_ip.model.impl.roda.RodaFolderAIP;
+import org.roda_project.commons_ip.utils.IPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Plugin that generates the root "METS.xml" from the exiting AIP information in
- * the storage layer.
+ * Plugin that generates E-ARK AIP manifest files (METS.xml) from the exiting
+ * AIP information in the storage layer.
  * 
  * @author Rui Castro <rui.castro@gmail.com>
  */
@@ -44,10 +53,6 @@ public class CreateMetsPlugin extends AbstractPlugin<AIP> {
 
   /** Plugin version. */
   private static final String VERSION = "1.0";
-
-  /** Plugin parameter 'mimetype'. */
-  private static final PluginParameter PARAM_MIMETYPE = new PluginParameter("mimetype", "Mimetype",
-    PluginParameter.PluginParameterType.BOOLEAN, "true", false, false, "Check Mimetype?");
 
   @Override
   public void init() throws PluginException {
@@ -61,41 +66,18 @@ public class CreateMetsPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "Create METS";
+    return "Create E-ARK AIP manifest files (METS.xml)";
   }
 
   @Override
   public String getDescription() {
-    return "Plugin that generates the root \"METS.xml\" from the exiting AIP information in the storage layer.";
+    return "Plugin that generates E-ARK AIP manifest files (\"METS.xml\") from "
+      + "exiting AIP information in the storage layer.";
   }
 
   @Override
   public String getVersionImpl() {
     return VERSION;
-  }
-
-  @Override
-  public Report execute(final IndexService index, final ModelService model, final StorageService storage,
-    final List<AIP> list) throws PluginException {
-
-    try {
-      final Report report = PluginHelper.initPluginReport(this);
-      final SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
-
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-
-      for (AIP aip : list) {
-        executeOnAip(aip, index, model, storage, jobPluginInfo, report);
-      }
-
-      jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-
-      return report;
-
-    } catch (final JobException e) {
-      throw new PluginException("A job exception has occurred", e);
-    }
   }
 
   @Override
@@ -110,7 +92,7 @@ public class CreateMetsPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<PluginParameter> getParameters() {
-    return Arrays.asList(PARAM_MIMETYPE);
+    return new ArrayList<>();
   }
 
   @Override
@@ -162,6 +144,30 @@ public class CreateMetsPlugin extends AbstractPlugin<AIP> {
     return Collections.singletonList(AIP.class);
   }
 
+  @Override
+  public Report execute(final IndexService index, final ModelService model, final StorageService storage,
+    final List<AIP> list) throws PluginException {
+
+    try {
+      final Report report = PluginHelper.initPluginReport(this);
+      final SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
+
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+
+      for (AIP aip : list) {
+        executeOnAip(aip, index, model, storage, jobPluginInfo, report);
+      }
+
+      jobPluginInfo.finalizeInfo();
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+
+      return report;
+
+    } catch (final JobException e) {
+      throw new PluginException("A job exception has occurred", e);
+    }
+  }
+
   /**
    * Execute on a single {@link AIP}.
    * 
@@ -185,8 +191,24 @@ public class CreateMetsPlugin extends AbstractPlugin<AIP> {
     final Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
     PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
 
-    // Create METS
-    EARKMETSUtils earkmetsUtils;
+    try {
+      final Path aipPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(),
+        ModelUtils.getAIPStoragePath(aip.getId()));
+      LOGGER.debug(String.format("aipPath=%s", aipPath));
+
+      new EARKAIP(RodaFolderAIP.parse(aipPath)).build(aipPath.getParent(), true);
+
+      jobPluginInfo.incrementObjectsProcessedWithSuccess();
+      reportItem.setPluginState(PluginState.SUCCESS);
+
+    } catch (final RODAException | ParseException | IPException | InterruptedException e) {
+      final String message = String.format("Error creating manifest files for AIP %s. Cause: %s.", aip.getId(),
+        e.getMessage());
+      LOGGER.debug(message, e);
+      jobPluginInfo.incrementObjectsProcessedWithFailure();
+      reportItem.setPluginState(PluginState.FAILURE);
+      reportItem.setPluginDetails(message);
+    }
 
     report.addReport(reportItem);
     PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);

@@ -37,8 +37,8 @@
 		<module>characterization/roda-plugin-characterization-jhove</module>
 		<module>characterization/roda-plugin-characterization-jpylyzer</module>
 		<module>characterization/roda-plugin-characterization-mediainfo</module>
-        <module>risks/roda-plugin-risks-filenotcharacterized</module>
-        <module>risks/roda-plugin-risks-formatmissingrepresentationinformation</module>
+		<module>risks/roda-plugin-risks-filenotcharacterized</module>
+		<module>risks/roda-plugin-risks-formatmissingrepresentationinformation</module>
 
 		<module>misc/roda-plugin-misc-createmets</module>
 	</modules>
