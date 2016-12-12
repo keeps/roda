@@ -39,7 +39,7 @@
 						<i class="fa fa-download"></i>
 					</g:HTML>
 				</g:FocusPanel>
-				<g:FocusPanel ui:field="removeButton" addStyleNames="toolbarLink filePreviewToolbarRemoveIcon" visible="false">
+				<g:FocusPanel ui:field="removeButton" addStyleNames="toolbarLink filePreviewToolbarRemoveIcon">
 					<g:HTML>
 						<i class="fa fa-remove"></i>
 					</g:HTML>

@@ -147,10 +147,6 @@ public class BrowseDIP extends Composite {
     // update breadcrumb
     breadcrumb.updatePath(getBreadcrumbs());
     breadcrumb.setVisible(true);
-
-    // update visibles
-    downloadButton.setVisible(dipFile != null && !dipFile.isDirectory());
-    removeButton.setVisible(dipFile != null && !dipFile.isDirectory());
   }
 
   public void show() {
@@ -191,6 +187,8 @@ public class BrowseDIP extends Composite {
   protected void updateVisibles() {
     previousButton.setVisible(index > 0);
     nextButton.setVisible(index < totalCount - 1);
+    downloadButton.setVisible(dipFile != null && !dipFile.isDirectory());
+    removeButton.setVisible(dipFile != null && !dipFile.isDirectory());
   }
 
   @UiHandler("previousButton")
