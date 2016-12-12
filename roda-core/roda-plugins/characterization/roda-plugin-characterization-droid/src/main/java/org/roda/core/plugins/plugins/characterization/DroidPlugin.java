@@ -95,7 +95,6 @@ public class DroidPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
-
     Report report = PluginHelper.initPluginReport(this);
 
     try {
@@ -103,7 +102,6 @@ public class DroidPlugin extends AbstractPlugin<AIP> {
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       try {
-
         for (AIP aip : list) {
           LOGGER.debug("Processing AIP {}", aip.getId());
           boolean inotify = false;

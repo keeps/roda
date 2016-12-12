@@ -58,7 +58,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   }
 
   public static String getStaticName() {
-    return "AIP file format identification (Siegfried)";
+    return "File format identification (Siegfried)";
   }
 
   @Override

@@ -78,7 +78,7 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractPlugin<T
   }
 
   public static String getStaticName() {
-    return "AIP feature extraction (Apache Tika)";
+    return "Feature extraction (Apache Tika)";
   }
 
   @Override
@@ -87,7 +87,9 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractPlugin<T
   }
 
   public static String getStaticDescription() {
-    return "The Apache Tika tool extracts technical metadata and text from over a thousand different file types (such as PPT, XLS, and PDF). \nThe task updates PREMIS objects metadata in the Archival Information Package (AIP) to store the results of the characterization process. A PREMIS event is also recorded after the task is run.\nFor more information on this tool, please visit https://tika.apache.org";
+    return "The Apache Tika tool extracts technical metadata and text from over a thousand different file types (such as PPT, XLS, and PDF). \nThe task updates "
+      + "PREMIS objects metadata in the entity to store the results of the characterization process. A PREMIS event is also recorded "
+      + "after the task is run.\nFor more information on this tool, please visit https://tika.apache.org";
   }
 
   @Override
