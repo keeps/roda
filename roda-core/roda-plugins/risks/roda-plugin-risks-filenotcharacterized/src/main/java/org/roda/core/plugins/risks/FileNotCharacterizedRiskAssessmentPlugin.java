@@ -121,35 +121,6 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
   }
 
   @Override
-  public Report execute(final IndexService index, final ModelService model, final StorageService storage,
-    final List<File> list) throws PluginException {
-
-    try {
-      final Report report = PluginHelper.initPluginReport(this);
-
-      final SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-
-      final Result result = new Result();
-      for (File file : list) {
-        if (!file.isDirectory()) {
-          result.addResult(executeOnFile(file, index, model, jobPluginInfo, report));
-        }
-      }
-
-      report.addPluginDetails(result.toString());
-
-      jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-
-      return report;
-
-    } catch (final JobException | GenericException e) {
-      throw new PluginException("A job exception has occurred", e);
-    }
-  }
-
-  @Override
   public Plugin<File> cloneMe() {
     return new FileNotCharacterizedRiskAssessmentPlugin();
   }
@@ -253,6 +224,33 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
     return PARAM_VALUE_TRUE.equalsIgnoreCase(getParameterValues().get(FORMAT_DESIGNATION_VERSION));
   }
 
+  @Override
+  public Report execute(final IndexService index, final ModelService model, final StorageService storage,
+    final List<File> list) throws PluginException {
+
+    try {
+      final Report report = PluginHelper.initPluginReport(this);
+
+      final SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+
+      final Result result = new Result();
+      for (File file : list) {
+        result.addResult(executeOnFile(file, index, model, jobPluginInfo, report));
+      }
+
+      report.addPluginDetails(result.toString());
+
+      jobPluginInfo.finalizeInfo();
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+
+      return report;
+
+    } catch (final JobException | GenericException e) {
+      throw new PluginException("A job exception has occurred", e);
+    }
+  }
+
   /**
    * Execute verifications on a single {@link File}.
    *
@@ -280,9 +278,11 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
     Result result = new Result();
 
     try {
-      result = assessRiskOnFileFormat(index.retrieve(IndexedFile.class, fileUUID).getFileFormat());
+      if (!file.isDirectory()) {
+        result = assessRiskOnFileFormat(index.retrieve(IndexedFile.class, fileUUID).getFileFormat());
+      }
 
-      if (result.isOk()) {
+      if (file.isDirectory() || result.isOk()) {
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
         fileReport.setPluginState(PluginState.SUCCESS);
       } else {
