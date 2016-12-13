@@ -43,8 +43,8 @@ public class Ingest {
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRoles(
-        new HistoryResolver[] {PreIngest.RESOLVER, IngestTransfer.RESOLVER, IngestProcess.RESOLVER}, false, callback);
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {PreIngest.RESOLVER, IngestTransfer.RESOLVER,
+        IngestProcess.RESOLVER, IngestAppraisal.RESOLVER}, false, callback);
     }
 
     public List<String> getHistoryPath() {

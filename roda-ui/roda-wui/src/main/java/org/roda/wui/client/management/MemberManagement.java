@@ -23,8 +23,8 @@ import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
-import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
@@ -54,7 +54,7 @@ public class MemberManagement extends Composite {
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {MemberManagement.RESOLVER}, false, callback);
+      UserLogin.getInstance().checkRole(this, callback);
     }
 
     public List<String> getHistoryPath() {
@@ -151,7 +151,7 @@ public class MemberManagement extends Composite {
       }
     });
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();

@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
@@ -37,8 +36,8 @@ public class Planning {
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      // TODO define check roles
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {MemberManagement.RESOLVER}, false, callback);
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {RiskRegister.RESOLVER, FormatRegister.RESOLVER}, false,
+        callback);
     }
 
     public List<String> getHistoryPath() {

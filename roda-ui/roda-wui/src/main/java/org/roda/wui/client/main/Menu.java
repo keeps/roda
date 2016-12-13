@@ -241,11 +241,11 @@ public class Menu extends Composite {
     updateResolverSubItemVisibility(PreIngest.RESOLVER, ingest_pre);
     updateResolverSubItemVisibility(IngestTransfer.RESOLVER, ingest_transfer);
     updateResolverSubItemVisibility(IngestProcess.RESOLVER, ingest_list);
-    updateResolverSubItemVisibility(IngestProcess.RESOLVER, ingest_appraisal);
+    updateResolverSubItemVisibility(IngestAppraisal.RESOLVER, ingest_appraisal);
     updateResolverTopItemVisibility(Ingest.RESOLVER, new MenuItem(messages.title("ingest"), ingestMenu), 3);
 
     // Administration
-    updateResolverSubItemVisibility(Management.RESOLVER, administration_actions);
+    updateResolverSubItemVisibility(ActionProcess.RESOLVER, administration_actions);
     updateResolverSubItemVisibility(MemberManagement.RESOLVER, administration_user);
     updateResolverSubItemVisibility(UserLog.RESOLVER, administration_log);
     updateResolverSubItemVisibility(NotificationRegister.RESOLVER, administration_notifications);

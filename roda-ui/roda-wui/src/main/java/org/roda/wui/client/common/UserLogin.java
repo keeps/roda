@@ -374,7 +374,11 @@ public class UserLogin {
 
         @Override
         public void onSuccess(Boolean result) {
-          UserLogin.getInstance().login();
+          if (result) {
+            UserLogin.getInstance().login();
+          } else {
+            HistoryUtils.newHistory(Welcome.RESOLVER);
+          }
         }
 
         @Override

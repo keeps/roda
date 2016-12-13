@@ -14,8 +14,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.ingest.Ingest;
@@ -118,66 +120,92 @@ public class ContentPanel extends SimplePanel {
    *          the history tokens
    */
   public void update(final List<String> historyTokens) {
-    boolean foundit = false;
+    HistoryResolver foundResolver = null;
     for (final HistoryResolver resolver : resolvers) {
       if (historyTokens.get(0).equals(resolver.getHistoryToken())) {
-        foundit = true;
         currHistoryPath = historyTokens;
-        resolver.isCurrentUserPermitted(new AsyncCallback<Boolean>() {
-
-          public void onFailure(Throwable caught) {
-            AsyncCallbackUtils.defaultFailureTreatment(caught);
-          }
-
-          public void onSuccess(Boolean permitted) {
-            if (!permitted.booleanValue()) {
-              UserLogin.getInstance().showSuggestLoginDialog();
-            } else {
-              resolver.resolve(HistoryUtils.tail(historyTokens), new AsyncCallback<Widget>() {
-
-                public void onFailure(Throwable caught) {
-                  if (caught instanceof BadHistoryTokenException) {
-                    // Dialogs.showInformationDialog(messages.notFoundError(),
-                    // messages.pageNotFound(caught.getMessage()),
-                    // messages.dialogOk());
-                    // if (currWidget == null) {
-                    // Tools.newHistory(Welcome.RESOLVER);
-                    // }
-                    HistoryUtils.newHistory(Theme.RESOLVER, "Error404.html");
-                  } else {
-                    AsyncCallbackUtils.defaultFailureTreatment(caught);
-                  }
-                }
-
-                public void onSuccess(Widget widget) {
-                  if (widget != null) {
-                    if (widget != currWidget) {
-                      currWidget = widget;
-                      setWidget(widget);
-                    }
-                    setWindowTitle(historyTokens);
-                  }
-                }
-
-              });
-            }
-          }
-
-        });
+        foundResolver = resolver;
+        break;
       }
     }
-    if (!foundit) {
-      // Dialogs.showInformationDialog(messages.notFoundError(),
-      // messages.pageNotFound(historyTokens.get(0)),
-      // messages.dialogOk());
-      // if (currWidget == null) {
-      // Tools.newHistory(Welcome.RESOLVER);
-      // } else {
-      // Tools.newHistory(currHistoryPath);
-      // }
+
+    if (foundResolver != null) {
+      update(historyTokens, foundResolver);
+    } else {
       HistoryUtils.newHistory(Theme.RESOLVER, "Error404.html");
     }
+  }
 
+  private void update(final List<String> historyTokens, final HistoryResolver resolver) {
+    resolver.isCurrentUserPermitted(new AsyncCallback<Boolean>() {
+
+      public void onFailure(Throwable caught) {
+        AsyncCallbackUtils.defaultFailureTreatment(caught);
+      }
+
+      public void onSuccess(Boolean permitted) {
+        if (!permitted.booleanValue()) {
+          // UserLogin.getInstance().showSuggestLoginDialog();
+
+          UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<User>() {
+            @Override
+            public void onFailure(Throwable caught) {
+              UserLogin.getInstance().showSuggestLoginDialog();
+            }
+
+            @Override
+            public void onSuccess(User user) {
+              if (user.isGuest()) {
+                UserLogin.getInstance().showSuggestLoginDialog();
+              } else {
+                Dialogs.showInformationDialog(messages.authorizationDeniedAlert(),
+                  messages.authorizationDeniedAlertMessageExceptionSimple(), messages.dialogOk(),
+                  new AsyncCallback<Void>() {
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      HistoryUtils.newHistory(Welcome.RESOLVER);
+                    }
+
+                    @Override
+                    public void onSuccess(Void result) {
+                      HistoryUtils.newHistory(Welcome.RESOLVER);
+                    }
+                  });
+              }
+            }
+          });
+        } else {
+          resolver.resolve(HistoryUtils.tail(historyTokens), new AsyncCallback<Widget>() {
+
+            public void onFailure(Throwable caught) {
+              if (caught instanceof BadHistoryTokenException) {
+                // Dialogs.showInformationDialog(messages.notFoundError(),
+                // messages.pageNotFound(caught.getMessage()),
+                // messages.dialogOk());
+                // if (currWidget == null) {
+                // Tools.newHistory(Welcome.RESOLVER);
+                // }
+                HistoryUtils.newHistory(Theme.RESOLVER, "Error404.html");
+              } else {
+                AsyncCallbackUtils.defaultFailureTreatment(caught);
+              }
+            }
+
+            public void onSuccess(Widget widget) {
+              if (widget != null) {
+                if (widget != currWidget) {
+                  currWidget = widget;
+                  setWidget(widget);
+                }
+                setWindowTitle(historyTokens);
+              }
+            }
+
+          });
+        }
+      }
+
+    });
   }
 
   private void setWindowTitle(List<String> historyTokens) {

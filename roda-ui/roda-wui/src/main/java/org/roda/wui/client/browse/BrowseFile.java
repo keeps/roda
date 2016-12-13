@@ -509,7 +509,7 @@ public class BrowseFile extends Composite {
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {Browse.RESOLVER}, false, callback);
+      UserLogin.getInstance().checkRole(Browse.RESOLVER, callback);
     }
 
     @Override

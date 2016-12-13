@@ -1561,6 +1561,8 @@ public interface ClientMessages extends Messages {
 
   String authorizationDeniedAlertMessageException(String message);
 
+  String authorizationDeniedAlertMessageExceptionSimple();
+
   String casForwardWarning();
 
   // Cookies
