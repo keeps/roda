@@ -105,6 +105,9 @@ public final class RodaConstants {
   public static final String CORE_DIP_FOLDER = "dip";
   public static final String CORE_DIP_FILE_FOLDER = "dipfile";
 
+  public static final String CORE_I18N_CLIENT_FOLDER = "client";
+  public static final String CORE_I18_GWT_XML_FILE = "I18N.gwt.xml";
+
   public static final String CORE_CROSSWALKS_INGEST = "crosswalks/ingest/";
   public static final String CORE_CROSSWALKS_INGEST_OTHER = "crosswalks/ingest/other/";
 

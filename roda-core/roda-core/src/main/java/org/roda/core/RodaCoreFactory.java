@@ -453,7 +453,11 @@ public class RodaCoreFactory {
         Files.createDirectories(exampleConfigPath);
         copyFilesFromClasspath(RodaConstants.CORE_CONFIG_FOLDER + "/", exampleConfigPath, true,
           Arrays.asList(RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_LDAP_FOLDER,
-            RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER));
+            RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER,
+            RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_I18N_FOLDER + "/"
+              + RodaConstants.CORE_I18N_CLIENT_FOLDER,
+            RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_I18N_FOLDER + "/"
+              + RodaConstants.CORE_I18_GWT_XML_FILE));
       } catch (IOException e) {
         LOGGER.error("Unable to create " + exampleConfigPath, e);
         instantiatedWithoutErrors = false;
