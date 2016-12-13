@@ -49,6 +49,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.roda-project</groupId>
+			<artifactId>roda-core</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.roda-project</groupId>
 			<artifactId>roda-core-tests</artifactId>
 			<scope>test</scope>
 		</dependency>

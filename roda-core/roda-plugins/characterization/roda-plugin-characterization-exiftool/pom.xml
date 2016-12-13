@@ -31,9 +31,14 @@
 		</plugins>
 	</build>
 	<dependencies>
-	<dependency>
-		<groupId>org.roda-project</groupId>
-		<artifactId>roda-plugin-common</artifactId>
-	</dependency>
+		<dependency>
+			<groupId>org.roda-project</groupId>
+			<artifactId>roda-plugin-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.roda-project</groupId>
+			<artifactId>roda-core</artifactId>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 </project>

@@ -36,6 +36,11 @@
 			<artifactId>roda-plugin-common</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.roda-project</groupId>
+			<artifactId>roda-core</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.openpreservation.jhove</groupId>
 			<artifactId>jhove-core</artifactId>
 		</dependency>

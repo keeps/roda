@@ -14,7 +14,7 @@
 		<dependency>
 			<groupId>org.roda-project</groupId>
 			<artifactId>roda-core</artifactId>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 </project>
