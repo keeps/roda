@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.risks;
+package org.roda.core.plugins.plugins.risks;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,9 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
 import org.apache.commons.lang3.StringUtils;
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -30,6 +28,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
+import org.roda.core.data.v2.index.filter.OrFiltersParameters;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
@@ -635,12 +634,18 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
       }
 
       if (checkFormatDesignation()) {
-        final String formatNamePattern = RodaCoreFactory.getRodaConfiguration().getString(
-          "core.plugins.external.FormatMissingRepresentationInformation.format_name_pattern", FORMAT_NAME_PATTERN);
-        final String name = String.format(formatNamePattern, fileFormat.getFormatDesignationName(),
+
+        final FilterParameter mainName = new SimpleFilterParameter(RodaConstants.FORMAT_NAME,
+          fileFormat.getFormatDesignationName());
+        final FilterParameter alternativeName = new SimpleFilterParameter(RodaConstants.FORMAT_ALTERNATIVE_DESIGNATIONS,
+          fileFormat.getFormatDesignationName());
+        final FilterParameter name = new OrFiltersParameters("", Arrays.asList(mainName, alternativeName));
+        final FilterParameter vesion = new SimpleFilterParameter(RodaConstants.FORMAT_VERSIONS,
           fileFormat.getFormatDesignationVersion());
-        checks.add(new AttributeCheck(FORMAT_DESIGNATION_NAME, present,
-          new SimpleFilterParameter(RodaConstants.FORMAT_NAME, name)));
+        final FilterParameter nameAndVersion = new AndFilterParameter(name, version);
+        final FilterParameter nameVersionOrName = new OrFiltersParameters(nameAndVersion, name);
+
+        checks.add(new AttributeCheck(FORMAT_DESIGNATION_NAME, present, new SimpleFilterParameter()));
       }
 
       return checks;
@@ -680,13 +685,13 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
     List<FormatResult> formatResults() {
       if (this.formatResults == null) {
         this.formatResults = new ArrayList<>();
-        final List<AttributeCheck> checks = attributeChecks();
         final List<FilterParameter> filterParams = new ArrayList<>();
-        checks.forEach(c -> filterParams.add(c.getFilterParameter()));
+
+        final List<AttributeCheck> checks = attributeChecks();
+        checks.forEach(check -> filterParams.add(check.getFilterParameter()));
+
         final Iterator<Format> formats = this.indexService.findAll(Format.class, new Filter(filterParams)).iterator();
-        while (formats.hasNext()) {
-          this.formatResults.add(new FormatResult(formats.next(), checks));
-        }
+        formats.forEachRemaining(format -> this.formatResults.add(new FormatResult(format, checks)));
       }
       return this.formatResults;
     }
@@ -727,13 +732,11 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
     List<FormatResult> formatResults() {
       if (this.formatResults == null) {
         this.formatResults = new ArrayList<>();
-        final List<AttributeCheck> checks = attributeChecks(true);
-        for (AttributeCheck check : checks) {
+        for (AttributeCheck check : attributeChecks(true)) {
           final Iterator<Format> formats = this.indexService
             .findAll(Format.class, new Filter(check.getFilterParameter())).iterator();
-          while (formats.hasNext()) {
-            this.formatResults.add(new FormatResult(formats.next(), Collections.singletonList(check)));
-          }
+          formats.forEachRemaining(
+            format -> this.formatResults.add(new FormatResult(format, Collections.singletonList(check))));
         }
         consolidateResults();
       }
