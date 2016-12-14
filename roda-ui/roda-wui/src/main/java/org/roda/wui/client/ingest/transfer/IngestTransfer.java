@@ -609,7 +609,7 @@ public class IngestTransfer extends Composite {
 
         @Override
         public void onFailure(Throwable caught) {
-          Toast.showInfo(messages.dialogFailure(), messages.renameSIPFailed());
+          // do nothing
         }
 
         @Override

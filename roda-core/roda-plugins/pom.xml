@@ -39,6 +39,7 @@
 		<module>characterization/roda-plugin-characterization-mediainfo</module>
 		<module>risks/roda-plugin-risks-filenotcharacterized</module>
 		<module>risks/roda-plugin-risks-formatmissingrepresentationinformation</module>
+
 	</modules>
 	<repositories>
 		<repository>

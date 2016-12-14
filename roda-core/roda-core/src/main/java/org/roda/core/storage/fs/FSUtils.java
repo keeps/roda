@@ -105,6 +105,8 @@ public final class FSUtils {
     // ensure parent directory exists or can be created
     try {
       Files.createDirectories(targetPath.getParent());
+    } catch (FileAlreadyExistsException e) {
+      // do nothing
     } catch (IOException e) {
       throw new GenericException("Error while creating target directory parent folder", e);
     }
@@ -772,7 +774,7 @@ public final class FSUtils {
 
   public static CloseableIterable<BinaryVersion> listBinaryVersions(final Path historyDataPath,
     final Path historyMetadataPath, final StoragePath storagePath)
-      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     Path fauxPath = getEntityPath(historyDataPath, storagePath);
     final Path parent = fauxPath.getParent();
     final String baseName = fauxPath.getFileName().toString();
