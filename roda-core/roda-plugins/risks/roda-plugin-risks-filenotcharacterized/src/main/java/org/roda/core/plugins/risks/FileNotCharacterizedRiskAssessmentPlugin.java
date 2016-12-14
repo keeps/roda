@@ -519,17 +519,17 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
         }
       }
       if (FileNotCharacterizedRiskAssessmentPlugin.this.checkFormatDesignationName()) {
-        str.append(String.format("Missing format designation name: %s.%n", numberToHuman(this.formatName, count)));
+        str.append(String.format("Has format designation name: %s.%n", numberToHuman(this.formatName, count)));
       }
       if (FileNotCharacterizedRiskAssessmentPlugin.this.checkFormatDesignationVersion()) {
         str
-          .append(String.format("Missing format designation version: %s.%n", numberToHuman(this.formatVersion, count)));
+          .append(String.format("Has format designation version: %s.%n", numberToHuman(this.formatVersion, count)));
       }
       if (FileNotCharacterizedRiskAssessmentPlugin.this.checkMimetype()) {
-        str.append(String.format("Missing mimetype: %s.%n", numberToHuman(this.mimetype, count)));
+        str.append(String.format("Has mimetype: %s.%n", numberToHuman(this.mimetype, count)));
       }
       if (FileNotCharacterizedRiskAssessmentPlugin.this.checkPronom()) {
-        str.append(String.format("Missing PRONOM UID: %s.%n", numberToHuman(this.pronom, count)));
+        str.append(String.format("Has PRONOM UID: %s.%n", numberToHuman(this.pronom, count)));
       }
       return str.toString();
     }
@@ -550,7 +550,7 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
       if (count > 0) {
         humanString = Integer.toString(number);
       } else {
-        humanString = (number > 0) ? "yes" : "no";
+        humanString = (number > 0) ? "no" : "yes";
       }
       return humanString;
     }
