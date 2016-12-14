@@ -24,7 +24,7 @@
 							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
 						</manifest>
 						<manifestEntries>
-							<RODA-Plugin>org.roda.core.plugins.risks.FormatMissingRepresentationInformationPlugin</RODA-Plugin>
+							<RODA-Plugin>org.roda.core.plugins.plugins.risks.FormatMissingRepresentationInformationPlugin</RODA-Plugin>
 						</manifestEntries>
 					</archive>
 				</configuration>
