@@ -73,12 +73,14 @@ import org.roda.core.data.v2.index.facet.FacetParameter.SORT;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.facet.RangeFacetParameter;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
+import org.roda.core.data.v2.index.filter.AndFiltersParameters;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
 import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
+import org.roda.core.data.v2.index.filter.FiltersParameters;
 import org.roda.core.data.v2.index.filter.LongRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
@@ -748,9 +750,10 @@ public class SolrUtils {
       NotSimpleFilterParameter notSimplePar = (NotSimpleFilterParameter) parameter;
       appendNotExactMatch(ret, notSimplePar.getName(), notSimplePar.getValue(), true,
         prefixWithANDOperatorIfBuilderNotEmpty);
-    } else if (parameter instanceof OrFiltersParameters) {
-      OrFiltersParameters orFilters = (OrFiltersParameters) parameter;
-      appendFiltersWithOr(ret, orFilters.getName(), orFilters.getValues(), prefixWithANDOperatorIfBuilderNotEmpty);
+    } else if (parameter instanceof OrFiltersParameters || parameter instanceof AndFiltersParameters) {
+      FiltersParameters filters = (FiltersParameters) parameter;
+      appendFiltersWithOperator(ret, parameter instanceof OrFiltersParameters ? "OR" : "AND", filters.getValues(),
+        prefixWithANDOperatorIfBuilderNotEmpty);
     } else {
       LOGGER.error("Unsupported filter parameter class: {}", parameter.getClass().getName());
       throw new RequestNotValidException("Unsupported filter parameter class: " + parameter.getClass().getName());
@@ -815,7 +818,7 @@ public class SolrUtils {
     ret.append(key).append(":").append("(").append(value).append(")");
   }
 
-  private static void appendFiltersWithOr(StringBuilder ret, String key, List<FilterParameter> values,
+  private static void appendFiltersWithOperator(StringBuilder ret, String operator, List<FilterParameter> values,
     boolean prefixWithANDOperatorIfBuilderNotEmpty) throws RequestNotValidException {
     if (!values.isEmpty()) {
       appendANDOperator(ret, prefixWithANDOperatorIfBuilderNotEmpty);
@@ -823,7 +826,7 @@ public class SolrUtils {
       ret.append("(");
       for (int i = 0; i < values.size(); i++) {
         if (i != 0) {
-          ret.append(" OR ");
+          ret.append(" ").append(operator).append(" ");
         }
         parseFilterParameter(ret, values.get(i), false);
       }
