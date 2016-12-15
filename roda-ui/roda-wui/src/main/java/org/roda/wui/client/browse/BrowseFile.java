@@ -58,6 +58,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
@@ -432,39 +433,60 @@ public class BrowseFile extends Composite {
       dipFilePanel.add(new Label("No entries"));
     } else {
       for (final IndexedDIP dip : dips) {
-
-        FlowPanel entry = new FlowPanel();
-        FocusPanel focus = new FocusPanel(entry);
-
-        Label titleLabel = new Label(dip.getTitle());
-        Label descriptionLabel = new Label(dip.getDescription());
-
-        entry.add(titleLabel);
-        entry.add(descriptionLabel);
-
-        dipFilePanel.add(focus);
-
-        titleLabel.addStyleName("dipTitle");
-        descriptionLabel.addStyleName("dipDescription");
-        entry.addStyleName("dip");
-        focus.addStyleName("dip-focus");
-
-        focus.addClickHandler(new ClickHandler() {
-
-          @Override
-          public void onClick(ClickEvent event) {
-            if (StringUtils.isNotBlank(dip.getOpenExternalURL())) {
-              Window.open(dip.getOpenExternalURL(), "_blank", "");
-              Toast.showInfo("Opened dissemination", dip.getOpenExternalURL());
-            } else {
-              HistoryUtils.newHistory(BrowseDIP.RESOLVER, dip.getUUID(), file.getAipId(), file.getRepresentationUUID(),
-                file.getUUID());
-            }
-          }
-        });
+        createDipPanel(dip);
 
       }
     }
+  }
+
+  private void createDipPanel(final IndexedDIP dip) {
+    FlowPanel layout = new FlowPanel();
+
+    // open layout
+    FlowPanel leftLayout = new FlowPanel();
+    Label titleLabel = new Label(dip.getTitle());
+    Label descriptionLabel = new Label(dip.getDescription());
+
+    leftLayout.add(titleLabel);
+    leftLayout.add(descriptionLabel);
+
+    FocusPanel openFocus = new FocusPanel(leftLayout);
+    layout.add(openFocus);
+
+    // delete
+    Button deleteButton = new Button(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-ban'></i>"));
+    deleteButton.addStyleName("btn");
+
+    deleteButton.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        // BrowserService.Util.getInstance().delete
+      }
+    });
+
+    layout.add(deleteButton);
+
+    dipFilePanel.add(layout);
+
+    titleLabel.addStyleName("dipTitle");
+    descriptionLabel.addStyleName("dipDescription");
+    leftLayout.addStyleName("dip");
+    openFocus.addStyleName("dip-focus");
+
+    openFocus.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        if (StringUtils.isNotBlank(dip.getOpenExternalURL())) {
+          Window.open(dip.getOpenExternalURL(), "_blank", "");
+          Toast.showInfo("Opened dissemination", dip.getOpenExternalURL());
+        } else {
+          HistoryUtils.newHistory(BrowseDIP.RESOLVER, dip.getUUID(), file.getAipId(), file.getRepresentationUUID(),
+            file.getUUID());
+        }
+      }
+    });
   }
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
