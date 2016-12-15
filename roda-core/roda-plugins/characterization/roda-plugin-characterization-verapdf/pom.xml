@@ -40,6 +40,14 @@
 									<pattern>org.apache.pdfbox</pattern>
 									<shadedPattern>org.apache.pdfbox_verapdf</shadedPattern>
 								</relocation>
+								<relocation>
+										<pattern>org.bouncycastle</pattern> 
+										<shadedPattern>org.bouncycastle_verapdf</shadedPattern> 
+								</relocation>
+ 								<relocation>
+									<pattern>com.itextpdf</pattern>
+									<shadedPattern>com.itextpdf_verapdf</shadedPattern>
+								</relocation>	
 							</relocations>
 							<filters>
 								<filter>
