@@ -65,9 +65,6 @@ public class OnOffFilter implements Filter {
   @SuppressWarnings("checkstyle:hiddenfield")
   public void init(final FilterConfig filterConfig) throws ServletException {
     this.webXmlFilterConfig = filterConfig;
-    if (isConfigAvailable()) {
-      initInnerFilter();
-    }
   }
 
   @Override
@@ -93,7 +90,7 @@ public class OnOffFilter implements Filter {
    * @throws ServletException
    *           if some error occurs.
    */
-  private boolean isOn() throws ServletException {
+  private synchronized boolean isOn() throws ServletException {
     if (this.isOn == null && isConfigAvailable()) {
       initInnerFilter();
     }
@@ -124,17 +121,20 @@ public class OnOffFilter implements Filter {
     } else {
       final String innerFilterClass = this.webXmlFilterConfig.getInitParameter(PARAM_INNER_FILTER_CLASS);
       final String configPrefix = this.webXmlFilterConfig.getInitParameter(PARAM_CONFIG_PREFIX);
-      this.isOn = rodaConfig.getBoolean(configPrefix + ".enabled", false);
-      LOGGER.info(getFilterConfig().getFilterName() + " is " + (this.isOn ? "ON" : "OFF"));
-      if (this.isOn) {
+      if (rodaConfig.getBoolean(configPrefix + ".enabled", false)) {
         try {
           this.innerFilter = (Filter) Class.forName(innerFilterClass).newInstance();
           this.innerFilter.init(getFilterConfig());
+          this.isOn = true;
         } catch (final InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+          this.isOn = false;
           throw new ServletException("Error instantiating inner filter - " + e.getMessage(), e);
         }
+      } else {
+        this.isOn = false;
       }
     }
+    LOGGER.info(getFilterConfig().getFilterName() + " is " + (this.isOn ? "ON" : "OFF"));
   }
 
   /**
