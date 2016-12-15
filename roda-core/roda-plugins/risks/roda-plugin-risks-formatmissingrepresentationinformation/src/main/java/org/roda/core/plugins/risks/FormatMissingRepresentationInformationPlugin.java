@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.plugins.risks;
+package org.roda.core.plugins.risks;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -28,8 +27,10 @@ import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.formats.Format;
+import org.roda.core.data.v2.index.filter.AndFiltersParameters;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
+import org.roda.core.data.v2.index.filter.OrFiltersParameters;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
@@ -67,7 +68,7 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
   private static final Logger LOGGER = LoggerFactory.getLogger(FormatMissingRepresentationInformationPlugin.class);
 
   /** Plugin version. */
-  private static final String VERSION = "1.0";
+  private static final String VERSION = "1.1";
 
   /** Risk ID. */
   private static final String RISK_ID = "urn:FormatMissingRepresentationInformation:r1";
@@ -125,11 +126,6 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
     "Match (at least) one Format type", PluginParameter.PluginParameterType.BOOLEAN, "false", false, false,
     "Don't create risk incidence(s) if at least one of the selected format types is found.");
 
-  /**
-   * String format for {@link Format} name and version.
-   */
-  private static final String FORMAT_NAME_PATTERN = "%1$s, version %2$s";
-
   @Override
   public void init() throws PluginException {
     // do nothing
@@ -147,7 +143,7 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
 
   @Override
   public String getDescription() {
-    return "Check file format (Mimetype, PRONOM and Format designation) in the Format Registry. "
+    return "Check file format (Mimetype, PRONOM, Extension and Format designation) in the Format Registry. "
       + "If file format is not present in the Format Registry, it creates a new risk called "
       + "“Comprehensive representation information is missing for some files in the repository“ "
       + "and assigns the file to that risk in the Risk register.";
@@ -612,14 +608,14 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
     public String toString() {
       String str = "";
       if (isMissingAttributes()) {
-        str = "File does not have required information (Format designation, MIME type or PRONOM), "
+        str = "File does not have required information (Format designation, MIME type, PRONOM or Extension), "
           + "to be able to find Format representation information.";
       } else if (formatResults().isEmpty()) {
         str += getPreservationEventFailureMessage();
       } else {
         str += String.format("%s%n%n", getPreservationEventSuccessMessage());
         for (FormatResult result : this.formatResults()) {
-          str += result.toString();
+          str += String.format("%s%n", result);
         }
       }
       return str;
@@ -661,34 +657,23 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
       }
 
       if (checkFormatDesignation()) {
-        final String formatNamePattern = RodaCoreFactory.getRodaConfiguration().getString(
-          "core.plugins.external.FormatMissingRepresentationInformation.format_name_pattern", FORMAT_NAME_PATTERN);
-        final String name = String.format(formatNamePattern, fileFormat.getFormatDesignationName(),
-          fileFormat.getFormatDesignationVersion());
-        checks.add(new AttributeCheck(FORMAT_DESIGNATION_NAME, name, present,
-          new SimpleFilterParameter(RodaConstants.FORMAT_NAME, name)));
-      }
 
-      /*
-       * if (checkFormatDesignation()) {
-       * 
-       * final FilterParameter mainName = new
-       * SimpleFilterParameter(RodaConstants.FORMAT_NAME,
-       * fileFormat.getFormatDesignationName()); final FilterParameter
-       * alternativeName = new
-       * SimpleFilterParameter(RodaConstants.FORMAT_ALTERNATIVE_DESIGNATIONS,
-       * fileFormat.getFormatDesignationName()); final FilterParameter name =
-       * new OrFiltersParameters("", Arrays.asList(mainName, alternativeName));
-       * final FilterParameter vesion = new
-       * SimpleFilterParameter(RodaConstants.FORMAT_VERSIONS,
-       * fileFormat.getFormatDesignationVersion()); final FilterParameter
-       * nameAndVersion = new AndFilterParameter(name, version); final
-       * FilterParameter nameVersionOrName = new
-       * OrFiltersParameters(nameAndVersion, name);
-       * 
-       * checks.add(new AttributeCheck(FORMAT_DESIGNATION_NAME, present,
-       * nameVersionOrName)); }
-       */
+        final FilterParameter mainName = new SimpleFilterParameter(RodaConstants.FORMAT_NAME,
+          fileFormat.getFormatDesignationName());
+        final FilterParameter alternativeName = new SimpleFilterParameter(RodaConstants.FORMAT_ALTERNATIVE_DESIGNATIONS,
+          fileFormat.getFormatDesignationName());
+        final FilterParameter name = new OrFiltersParameters("name", Arrays.asList(mainName, alternativeName));
+        final FilterParameter version = new SimpleFilterParameter(RodaConstants.FORMAT_VERSIONS,
+          fileFormat.getFormatDesignationVersion());
+        final FilterParameter nameAndVersion = new AndFiltersParameters("nameAndVersion", Arrays.asList(name, version));
+        final FilterParameter nameAndVersionOrName = new OrFiltersParameters("nameVersionOrName",
+          Arrays.asList(nameAndVersion, name));
+
+        final String value = String.format("%s\", \"%s", fileFormat.getFormatDesignationName(),
+          fileFormat.getFormatDesignationVersion());
+
+        checks.add(new AttributeCheck(FORMAT_DESIGNATION_NAME, value, present, nameAndVersionOrName));
+      }
 
       return checks;
     }
