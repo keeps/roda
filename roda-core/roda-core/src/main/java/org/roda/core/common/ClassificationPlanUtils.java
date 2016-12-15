@@ -115,8 +115,11 @@ public class ClassificationPlanUtils {
     if (indexedAIP.getLevel() != null) {
       node = node.put("descriptionlevel", indexedAIP.getLevel());
     }
-
     AIP modelAIP = model.retrieveAIP(indexedAIP.getId());
+    
+    if(modelAIP.getType()!=null){
+      node = node.put("type", modelAIP.getType());
+    }
     if (modelAIP != null) {
       List<DescriptiveMetadata> descriptiveMetadata = modelAIP.getDescriptiveMetadata();
       if (descriptiveMetadata != null && !descriptiveMetadata.isEmpty()) {
@@ -137,6 +140,7 @@ public class ClassificationPlanUtils {
           dmNode = dmNode.put("content", new String(Base64.encodeBase64(IOUtils.toByteArray(is))));
           IOUtils.closeQuietly(is);
           dmNode = dmNode.put("contentEncoding", "Base64");
+
           metadata = metadata.add(dmNode);
         }
         node.set("metadata", metadata);
