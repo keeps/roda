@@ -81,7 +81,8 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticDescription() {
-    return "Checks if the descriptive and preservation metadata included in the Information Package is present, and if it is valid according to the XML Schemas installed in the repository. A validation report is generated indicating which AIPs have valid and invalid metadata.";
+    return "Checks if the descriptive and preservation metadata included in the Information Package is present, and if it is valid according to the "
+      + "XML Schemas installed in the repository. A validation report is generated indicating which AIPs have valid and invalid metadata.";
   }
 
   @Override

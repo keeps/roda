@@ -38,7 +38,7 @@
 							<relocations>
 								<relocation>
 									<pattern>org.apache.pdfbox</pattern>
-									<shadedPattern>org.apache.pdfbox_200</shadedPattern>
+									<shadedPattern>org.apache.pdfbox_verapdf</shadedPattern>
 								</relocation>
 							</relocations>
 							<filters>

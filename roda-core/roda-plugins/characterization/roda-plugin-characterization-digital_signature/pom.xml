@@ -38,11 +38,11 @@
 							<relocations>
 								<relocation>
 				                  <pattern>org.bouncycastle</pattern>
-				                  <shadedPattern>org.bouncycastle_147</shadedPattern>
+				                  <shadedPattern>org.bouncycastle_digital_signature</shadedPattern>
 				                </relocation>
 				                <relocation>
 				                  <pattern>com.itextpdf</pattern>
-				                  <shadedPattern>com.itextpdf_532</shadedPattern>
+				                  <shadedPattern>com.itextpdf_digital_signature</shadedPattern>
 				                </relocation>
 				            </relocations>
 							<filters>
