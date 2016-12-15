@@ -257,9 +257,9 @@ public class Menu extends Composite {
 
     // Planning
     // updateResolverSubItemVisibility(Planning.RESOLVER, planning_monitoring);
-    updateResolverSubItemVisibility(Planning.RESOLVER, planning_risk);
+    updateResolverSubItemVisibility(RiskRegister.RESOLVER, planning_risk);
     // updateResolverSubItemVisibility(Planning.RESOLVER, planning_agents);
-    updateResolverSubItemVisibility(Planning.RESOLVER, planning_format);
+    updateResolverSubItemVisibility(FormatRegister.RESOLVER, planning_format);
     updateResolverTopItemVisibility(Planning.RESOLVER, new MenuItem(messages.title("planning"), planningMenu), 5);
 
     // Help

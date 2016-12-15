@@ -54,16 +54,19 @@ public class AsyncCallbackUtils {
 
         @Override
         public void onSuccess(User user) {
-          if (user.isGuest() || authExp.getMissingRoles().isEmpty()) {
+          if (user.isGuest()) {
             UserLogin.getInstance().showSuggestLoginDialog();
           } else {
-            List<String> missingRolesTranslation = new ArrayList<>();
-            for (String missingRole : authExp.getMissingRoles()) {
-              missingRolesTranslation.add(messages.role(missingRole));
+            String message = messages.authorizationDeniedAlertMessageExceptionSimple();
+            if (!authExp.getMissingRoles().isEmpty()) {
+              List<String> missingRolesTranslation = new ArrayList<>();
+              for (String missingRole : authExp.getMissingRoles()) {
+                missingRolesTranslation.add(messages.role(missingRole));
+              }
+              message = messages.authorizationDeniedAlertMessageMissingRoles(missingRolesTranslation);
             }
 
-            Dialogs.showInformationDialog(messages.authorizationDeniedAlert(),
-              messages.authorizationDeniedAlertMessageMissingRoles(missingRolesTranslation), messages.dialogOk(),
+            Dialogs.showInformationDialog(messages.authorizationDeniedAlert(), message, messages.dialogOk(),
               new AsyncCallback<Void>() {
                 @Override
                 public void onFailure(Throwable caught) {
