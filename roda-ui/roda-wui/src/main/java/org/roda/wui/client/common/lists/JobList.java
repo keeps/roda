@@ -252,8 +252,8 @@ public class JobList extends BasicAsyncTableCell<Job> {
     columnSortingKeyMap.put(objectsTotalCountColumn, Arrays.asList(RodaConstants.JOB_SOURCE_OBJECTS_COUNT));
     columnSortingKeyMap.put(objectsSuccessCountColumn,
       Arrays.asList(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SUCCESS));
-    // columnSortingKeyMap.put(objectsFailureCountColumn,
-    // Arrays.asList(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_FAILURE));
+    columnSortingKeyMap.put(objectsFailureCountColumn,
+      Arrays.asList(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_FAILURE));
     // columnSortingKeyMap.put(objectsProcessingCountColumn,
     // Arrays.asList(RodaConstants.JOB_SOURCE_OBJECTS_BEING_PROCESSED));
     // columnSortingKeyMap.put(objectsWaitingCountColumn,
