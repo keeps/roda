@@ -28,7 +28,7 @@ public abstract class FiltersParameters extends FilterParameter {
    *          the {@link FiltersParameters} to clone.
    */
   public FiltersParameters(FiltersParameters filtersParameters) {
-    this(filtersParameters.getName(), filtersParameters.getValues());
+    this(filtersParameters.getValues());
   }
 
   /**
@@ -39,8 +39,8 @@ public abstract class FiltersParameters extends FilterParameter {
    * @param values
    *          the list of values for this filter.
    */
-  public FiltersParameters(String name, List<FilterParameter> values) {
-    setName(name);
+  public FiltersParameters(List<FilterParameter> values) {
+    setName("FiltersParameters");
     setValues(values);
   }
 

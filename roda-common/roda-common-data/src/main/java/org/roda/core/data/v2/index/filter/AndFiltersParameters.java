@@ -23,11 +23,11 @@ public class AndFiltersParameters extends FiltersParameters {
    * Constructs a {@link AndFiltersParameters} cloning an existing
    * {@link AndFiltersParameters}.
    * 
-   * @param orFiltersParameters
+   * @param andFiltersParameters
    *          the {@link AndFiltersParameters} to clone.
    */
-  public AndFiltersParameters(AndFiltersParameters orFiltersParameters) {
-    super(orFiltersParameters.getName(), orFiltersParameters.getValues());
+  public AndFiltersParameters(AndFiltersParameters andFiltersParameters) {
+    super(andFiltersParameters.getValues());
   }
 
   /**
@@ -38,8 +38,8 @@ public class AndFiltersParameters extends FiltersParameters {
    * @param values
    *          the list of values for this filter.
    */
-  public AndFiltersParameters(String name, List<FilterParameter> values) {
-    super(name, values);
+  public AndFiltersParameters(List<FilterParameter> values) {
+    super(values);
   }
 
   @Override

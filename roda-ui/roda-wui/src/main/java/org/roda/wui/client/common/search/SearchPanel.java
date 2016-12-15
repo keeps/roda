@@ -227,7 +227,7 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
               List<FilterParameter> filterParameters = new ArrayList<FilterParameter>();
               filterParameters.add(oldFilterParameter);
               filterParameters.add(filterParameter);
-              advancedSearchFilters.put(searchFieldId, new OrFiltersParameters(searchFieldId, filterParameters));
+              advancedSearchFilters.put(searchFieldId, new OrFiltersParameters(filterParameters));
             }
           } else {
             advancedSearchFilters.put(searchFieldId, filterParameter);

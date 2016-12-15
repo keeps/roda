@@ -27,7 +27,7 @@ public class OrFiltersParameters extends FiltersParameters {
    *          the {@link OrFiltersParameters} to clone.
    */
   public OrFiltersParameters(OrFiltersParameters orFiltersParameters) {
-    super(orFiltersParameters.getName(), orFiltersParameters.getValues());
+    super(orFiltersParameters.getValues());
   }
 
   /**
@@ -38,8 +38,8 @@ public class OrFiltersParameters extends FiltersParameters {
    * @param values
    *          the list of values for this filter.
    */
-  public OrFiltersParameters(String name, List<FilterParameter> values) {
-    super(name, values);
+  public OrFiltersParameters(List<FilterParameter> values) {
+    super(values);
   }
 
   @Override
