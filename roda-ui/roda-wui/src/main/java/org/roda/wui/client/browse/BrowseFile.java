@@ -454,14 +454,18 @@ public class BrowseFile extends Composite {
     layout.add(openFocus);
 
     // delete
-    Button deleteButton = new Button(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-ban'></i>"));
-    deleteButton.addStyleName("btn");
+    HTML deleteIcon = new HTML(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-ban'></i>"));
+    FocusPanel deleteButton = new FocusPanel(deleteIcon);
+    deleteButton.addStyleName("lightbtn");
+    deleteIcon.addStyleName("lightbtn-icon");
+    // TODO i18n
+    deleteButton.setTitle("Delete DIP");
 
     deleteButton.addClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
-        // BrowserService.Util.getInstance().delete
+        deleteDIP(dip);
       }
     });
 
@@ -471,8 +475,10 @@ public class BrowseFile extends Composite {
 
     titleLabel.addStyleName("dipTitle");
     descriptionLabel.addStyleName("dipDescription");
-    leftLayout.addStyleName("dip");
+    layout.addStyleName("dip");
+    leftLayout.addStyleName("dip-left");
     openFocus.addStyleName("dip-focus");
+    deleteButton.addStyleName("dip-delete");
 
     openFocus.addClickHandler(new ClickHandler() {
 
@@ -487,6 +493,49 @@ public class BrowseFile extends Composite {
         }
       }
     });
+  }
+
+  protected void deleteDIP(final IndexedDIP dip) {
+    Dialogs.showConfirmDialog(messages.viewRepresentationRemoveFileTitle(),
+      messages.viewRepresentationRemoveFileMessage(), messages.dialogCancel(), messages.dialogYes(),
+      new AsyncCallback<Boolean>() {
+
+        @Override
+        public void onSuccess(Boolean confirmed) {
+          if (confirmed) {
+            Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
+              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
+
+                @Override
+                public void onFailure(Throwable caught) {
+                  // do nothing
+                }
+
+                @Override
+                public void onSuccess(String details) {
+
+                  BrowserService.Util.getInstance().deleteDIP(dip.getId(), details, new AsyncCallback<Void>() {
+
+                    @Override
+                    public void onSuccess(Void result) {
+                      // clean();
+                    }
+
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      AsyncCallbackUtils.defaultFailureTreatment(caught);
+                    }
+                  });
+                }
+              });
+          }
+        }
+
+        @Override
+        public void onFailure(Throwable caught) {
+          // nothing to do
+        }
+      });
   }
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {

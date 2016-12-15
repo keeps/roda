@@ -727,6 +727,21 @@ pre code {
     /*padding: 3px 10px;*/
 }
 
+.lightbtn {
+	cursor: pointer;
+	cursor: hand;
+	display: inline-block;
+	opacity: 0.5;
+}
+
+.lightbtn:HOVER {
+	opacity: 1;
+}
+
+.lightbtn-icon {
+	display: inline-block;
+}
+
 .toolbarLink {
     display: inline-block;
     font-size: 20px;
@@ -3870,6 +3885,20 @@ td.datePickerMonth, td.datePickerYear {
 
 .viewRepresentationFile .dip-focus .dipTitle {
 	text-decoration: underline;
+}
+
+.viewRepresentationFile .dip {
+	position: relative;
+}
+
+.viewRepresentationFile .dip-left {
+	margin-right: 20px;
+}
+
+.viewRepresentationFile .dip-delete {
+	position: absolute;
+	top: 0;
+	right: 0;
 }
 
 .viewRepresentationFile .dip-focus {
