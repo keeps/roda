@@ -37,6 +37,7 @@ import org.roda.core.common.UserUtility;
 import org.roda.core.common.dips.DIPUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
+import org.roda.core.common.monitor.TransferredResourcesScanner;
 import org.roda.core.common.notifications.NotificationProcessor;
 import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.common.RodaConstants;
@@ -54,7 +55,9 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.utils.URNUtils;
+import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.ip.AIP;
@@ -2402,6 +2405,20 @@ public class ModelService extends ModelObservable {
       }
     });
 
+  }
+
+  public <T extends IsRODAObject> Optional<LiteRODAObject> retrieve(T object) {
+    return LiteRODAObjectFactory.get(object);
+  }
+
+  public <T extends IsModelObject> Optional<T> retrieve(LiteRODAObject liteRODAObject) {
+    return LiteRODAObjectFactory.get(this, liteRODAObject);
+  }
+
+  public TransferredResource retrieveTransferredResource(String fullPath) {
+    TransferredResourcesScanner transferredResourcesScanner = RodaCoreFactory.getTransferredResourcesScanner();
+    return transferredResourcesScanner.instantiateTransferredResource(Paths.get(fullPath),
+      transferredResourcesScanner.getBasePath());
   }
 
   @SuppressWarnings("unchecked")

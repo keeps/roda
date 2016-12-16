@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
@@ -31,6 +32,7 @@ import org.roda.core.data.exceptions.JobIsStoppingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -168,7 +170,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         if (indexObjects.size() == blockSize) {
           innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, modelClassToActOn, blockSize, jobActor);
           modelObjects = JobsHelper.getObjectsFromIndexObjects(model, index, modelClassToActOn, indexObjects);
-          jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, modelObjects), jobActor);
+          jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, processModelObjects(modelObjects)),
+            jobActor);
           indexObjects = new ArrayList<T1>();
         }
         indexObjects.add(findAllIterator.next());
@@ -178,7 +181,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, modelClassToActOn, indexObjects.size(),
           jobActor);
         modelObjects = JobsHelper.getObjectsFromIndexObjects(model, index, modelClassToActOn, indexObjects);
-        jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, modelObjects), jobActor);
+        jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, processModelObjects(modelObjects)),
+          jobActor);
       }
 
       jobStateInfoActor.tell(new Messages.JobInitEnded(), jobActor);
@@ -190,6 +194,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       JobsHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
     }
 
+  }
+
+  private <T extends IsRODAObject> List<LiteRODAObject> processModelObjects(List<T> modelObjects) {
+    return modelObjects.stream().map(o -> model.retrieve(o)).filter(o -> o.isPresent()).map(o -> o.get())
+      .collect(Collectors.toList());
   }
 
   @Override
@@ -210,7 +219,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       while (iter.hasNext()) {
         if (block.size() == blockSize) {
           innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, objectClass, blockSize, jobActor);
-          jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, block), jobActor);
+          jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, processModelObjects(block)),
+            jobActor);
           block = new ArrayList<>();
         }
         block.add(iter.next());
@@ -218,7 +228,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       if (!block.isEmpty()) {
         innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, objectClass, block.size(), jobActor);
-        jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, block), jobActor);
+        jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, processModelObjects(block)), jobActor);
       }
 
       jobStateInfoActor.tell(new Messages.JobInitEnded(), jobActor);
@@ -250,7 +260,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         if (block.size() == blockSize) {
 
           innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, objectClass, blockSize, jobActor);
-          jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, block), jobActor);
+          jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, processModelObjects(block)),
+            jobActor);
           block = new ArrayList<>();
         }
 
@@ -264,7 +275,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       if (!block.isEmpty()) {
         innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, objectClass, block.size(), jobActor);
-        jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, block), jobActor);
+        jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, processModelObjects(block)), jobActor);
       }
 
       jobStateInfoActor.tell(new Messages.JobInitEnded(), jobActor);

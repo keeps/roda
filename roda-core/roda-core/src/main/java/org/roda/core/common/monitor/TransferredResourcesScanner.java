@@ -135,43 +135,52 @@ public class TransferredResourcesScanner {
 
   protected static TransferredResource createTransferredResource(Path resourcePath, BasicFileAttributes attr, long size,
     Path basePath, Date lastScanDate) {
-    Path relativeToBase = basePath.relativize(resourcePath);
-    TransferredResource tr = new TransferredResource();
-
     Date d = new Date(attr.creationTime().toMillis());
-    tr.setCreationDate(d);
 
-    tr.setFile(!Files.isDirectory(resourcePath));
-    tr.setFullPath(resourcePath.toString());
-    String id = relativeToBase.toString();
-    tr.setId(id);
-    tr.setUUID(IdUtils.getTransferredResourceUUID(relativeToBase));
-    tr.setName(resourcePath.getFileName().toString());
-
-    tr.setRelativePath(relativeToBase.toString());
-    if (relativeToBase.getParent() != null) {
-      String parentId = relativeToBase.getParent().toString();
-      tr.setParentId(parentId);
-      tr.setParentUUID(UUID.nameUUIDFromBytes(parentId.getBytes()).toString());
-    }
+    TransferredResource tr = instantiateTransferredResource(resourcePath, basePath);
     tr.setSize(size);
-
-    List<String> ancestors = new ArrayList<String>();
-
-    // FIXME does this have to change ?
-    StringBuilder temp = new StringBuilder();
-    Iterator<Path> pathIterator = relativeToBase.iterator();
-    while (pathIterator.hasNext()) {
-      temp.append(pathIterator.next().toString());
-      ancestors.add(temp.toString());
-      temp.append("/");
-    }
-    ancestors.remove(ancestors.size() - 1);
-    tr.setAncestorsPaths(ancestors);
-
+    tr.setCreationDate(d);
     tr.setLastScanDate(lastScanDate);
 
     return tr;
+  }
+
+  public static TransferredResource instantiateTransferredResource(Path resourcePath, Path basePath) {
+    try {
+      Path relativeToBase = basePath.relativize(resourcePath);
+      TransferredResource tr = new TransferredResource();
+
+      tr.setFile(!Files.isDirectory(resourcePath));
+      tr.setFullPath(resourcePath.toString());
+      String id = relativeToBase.toString();
+      tr.setId(id);
+      tr.setUUID(IdUtils.getTransferredResourceUUID(relativeToBase));
+      tr.setName(resourcePath.getFileName().toString());
+
+      tr.setRelativePath(relativeToBase.toString());
+      if (relativeToBase.getParent() != null) {
+        String parentId = relativeToBase.getParent().toString();
+        tr.setParentId(parentId);
+        tr.setParentUUID(UUID.nameUUIDFromBytes(parentId.getBytes()).toString());
+      }
+
+      List<String> ancestors = new ArrayList<String>();
+
+      // FIXME does this have to change ?
+      StringBuilder temp = new StringBuilder();
+      Iterator<Path> pathIterator = relativeToBase.iterator();
+      while (pathIterator.hasNext()) {
+        temp.append(pathIterator.next().toString());
+        ancestors.add(temp.toString());
+        temp.append("/");
+      }
+      ancestors.remove(ancestors.size() - 1);
+      tr.setAncestorsPaths(ancestors);
+
+      return tr;
+    } catch (Throwable e) {
+      return null;
+    }
   }
 
   public void deleteTransferredResource(List<String> ids)

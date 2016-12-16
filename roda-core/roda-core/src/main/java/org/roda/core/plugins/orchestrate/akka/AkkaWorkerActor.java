@@ -7,6 +7,11 @@
  */
 package org.roda.core.plugins.orchestrate.akka;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
@@ -43,10 +48,13 @@ public class AkkaWorkerActor extends AkkaBaseActor {
 
   private void handlePluginExecuteIsReady(Object msg) {
     Messages.PluginExecuteIsReady message = (Messages.PluginExecuteIsReady) msg;
+    List<LiteRODAObject> messageObjects = message.getList();
+    List<IsRODAObject> objects = messageObjects.stream().map(obj -> getModel().retrieve(obj))
+      .filter(obj -> obj.isPresent()).map(obj -> obj.get()).collect(Collectors.toList());
     message.logProcessingStarted();
-    Plugin<?> plugin = message.getPlugin();
+    Plugin<IsRODAObject> plugin = message.getPlugin();
     try {
-      plugin.execute(index, model, storage, message.getList());
+      plugin.execute(index, model, storage, objects);
       getSender().tell(new Messages.PluginExecuteIsDone(plugin, false), getSelf());
     } catch (Exception e) {
       LOGGER.error("Error executing plugin.execute()", e);
