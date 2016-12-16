@@ -58,7 +58,6 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
@@ -486,6 +485,7 @@ public class BrowseFile extends Composite {
       public void onClick(ClickEvent event) {
         if (StringUtils.isNotBlank(dip.getOpenExternalURL())) {
           Window.open(dip.getOpenExternalURL(), "_blank", "");
+          // TODO i18n
           Toast.showInfo("Opened dissemination", dip.getOpenExternalURL());
         } else {
           HistoryUtils.newHistory(BrowseDIP.RESOLVER, dip.getUUID(), file.getAipId(), file.getRepresentationUUID(),
@@ -496,6 +496,7 @@ public class BrowseFile extends Composite {
   }
 
   protected void deleteDIP(final IndexedDIP dip) {
+    // TODO update messages
     Dialogs.showConfirmDialog(messages.viewRepresentationRemoveFileTitle(),
       messages.viewRepresentationRemoveFileMessage(), messages.dialogCancel(), messages.dialogYes(),
       new AsyncCallback<Boolean>() {
@@ -503,31 +504,19 @@ public class BrowseFile extends Composite {
         @Override
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
-            Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
-              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
+            BrowserService.Util.getInstance().deleteDIP(dip.getId(), new AsyncCallback<Void>() {
 
-                @Override
-                public void onFailure(Throwable caught) {
-                  // do nothing
-                }
+              @Override
+              public void onSuccess(Void result) {
+                updateDisseminations();
+              }
 
-                @Override
-                public void onSuccess(String details) {
+              @Override
+              public void onFailure(Throwable caught) {
+                AsyncCallbackUtils.defaultFailureTreatment(caught);
+              }
+            });
 
-                  BrowserService.Util.getInstance().deleteDIP(dip.getId(), details, new AsyncCallback<Void>() {
-
-                    @Override
-                    public void onSuccess(Void result) {
-                      // clean();
-                    }
-
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      AsyncCallbackUtils.defaultFailureTreatment(caught);
-                    }
-                  });
-                }
-              });
           }
         }
 

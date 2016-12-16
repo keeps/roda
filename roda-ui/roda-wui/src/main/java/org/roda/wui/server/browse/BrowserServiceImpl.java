@@ -869,7 +869,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void deleteDIP(String dipId, String details)
+  public void deleteDIP(String dipId)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Browser.deleteDIP(user, dipId);

@@ -223,5 +223,5 @@ public interface BrowserServiceAsync {
   void getDipBundle(String dipUUID, String aipUUID, String representationUUID, String fileUUID,
     AsyncCallback<DipBundle> callback);
 
-  void deleteDIP(String dipId, String details, AsyncCallback<Void> async);
+  void deleteDIP(String dipId, AsyncCallback<Void> async);
 }

@@ -2876,6 +2876,7 @@ public class BrowserHelper {
 
   public static void deleteDIP(String dipId) throws GenericException, AuthorizationDeniedException, NotFoundException {
     RodaCoreFactory.getModelService().deleteDIP(dipId);
+    RodaCoreFactory.getIndexService().commit(IndexedDIP.class);
   }
 
   public static EntityResponse retrieveDIPFile(String fileUuid, String acceptFormat)

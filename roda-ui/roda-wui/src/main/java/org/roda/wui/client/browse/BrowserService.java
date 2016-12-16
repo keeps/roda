@@ -313,6 +313,6 @@ public interface BrowserService extends RemoteService {
   DipBundle getDipBundle(String dipUUID, String aipUUID, String representationUUID, String fileUUID)
     throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException;
 
-  void deleteDIP(String dipId, String details)
+  void deleteDIP(String dipId)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 }

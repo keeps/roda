@@ -27,7 +27,6 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.bundle.DipBundle;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
@@ -42,7 +41,6 @@ import org.roda.wui.common.client.widgets.Toast;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -95,9 +93,6 @@ public class BrowseDIP extends Composite {
   @UiField
   FocusPanel previousButton, nextButton, downloadButton;
 
-  @UiField
-  FocusPanel removeButton;
-
   // state
   int index;
   int totalCount = -1;
@@ -127,7 +122,6 @@ public class BrowseDIP extends Composite {
 
     // TODO set title for previous and next button
     downloadButton.setTitle(messages.viewRepresentationDownloadFileButton());
-    removeButton.setTitle(messages.viewRepresentationRemoveFileButton());
 
     previousButton.setVisible(false);
     nextButton.setVisible(false);
@@ -188,7 +182,6 @@ public class BrowseDIP extends Composite {
     previousButton.setVisible(index > 0);
     nextButton.setVisible(index < totalCount - 1);
     downloadButton.setVisible(dipFile != null && !dipFile.isDirectory());
-    removeButton.setVisible(dipFile != null && !dipFile.isDirectory());
   }
 
   @UiHandler("previousButton")
@@ -228,50 +221,6 @@ public class BrowseDIP extends Composite {
     if (downloadUri != null) {
       Window.Location.assign(downloadUri.asString());
     }
-  }
-
-  @UiHandler("removeButton")
-  void buttonRemoveFileButtonHandler(ClickEvent e) {
-    Dialogs.showConfirmDialog(messages.viewRepresentationRemoveFileTitle(),
-      messages.viewRepresentationRemoveFileMessage(), messages.dialogCancel(), messages.dialogYes(),
-      new AsyncCallback<Boolean>() {
-
-        @Override
-        public void onSuccess(Boolean confirmed) {
-          if (confirmed) {
-            Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
-              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
-
-                @Override
-                public void onFailure(Throwable caught) {
-                  // do nothing
-                }
-
-                @Override
-                public void onSuccess(String details) {
-
-                  BrowserService.Util.getInstance().deleteDIP(dipFile.getDipId(), details, new AsyncCallback<Void>() {
-
-                    @Override
-                    public void onSuccess(Void result) {
-                      // clean();
-                    }
-
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      AsyncCallbackUtils.defaultFailureTreatment(caught);
-                    }
-                  });
-                }
-              });
-          }
-        }
-
-        @Override
-        public void onFailure(Throwable caught) {
-          // nothing to do
-        }
-      });
   }
 
   // TODO breadcrumbs
