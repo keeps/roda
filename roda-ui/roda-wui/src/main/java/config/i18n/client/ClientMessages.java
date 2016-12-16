@@ -2336,4 +2336,14 @@ public interface ClientMessages extends Messages {
   String versionAction(@Select String action);
 
   String versionActionBy(String message, String string);
+
+  String browseFileDipEmpty();
+
+  String browseFileDipDelete();
+
+  String browseFileDipOpenedExternalURL();
+
+  String browseFileDipRepresentationConfirmTitle();
+
+  String browseFileDipRepresentationConfirmMessage();
 }

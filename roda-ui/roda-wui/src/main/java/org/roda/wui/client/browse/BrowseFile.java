@@ -152,7 +152,23 @@ public class BrowseFile extends Composite {
         Scheduler.get().scheduleDeferred(new Command() {
           @Override
           public void execute() {
-            toggleDisseminationsPanel();
+            Filter filter = new Filter(
+              new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, BrowseFile.this.fileUUID));
+            BrowserService.Util.getInstance().count(IndexedDIP.class.getName(), filter, new AsyncCallback<Long>() {
+
+              @Override
+              public void onFailure(Throwable caught) {
+                AsyncCallbackUtils.defaultFailureTreatment(caught);
+              }
+
+              @Override
+              public void onSuccess(Long dipCount) {
+                if (dipCount > 0) {
+                  toggleDisseminationsPanel();
+                }
+              }
+            });
+
           }
         });
       }
@@ -233,7 +249,8 @@ public class BrowseFile extends Composite {
 
                     @Override
                     public void onSuccess(Void result) {
-                      // clean();
+                      HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, file.getAipId(),
+                        file.getRepresentationUUID());
                     }
 
                     @Override
@@ -301,7 +318,7 @@ public class BrowseFile extends Composite {
     } else {
       disseminationsButton.removeStyleName("active");
     }
-
+    
     JavascriptUtils.toggleRightPanel(".dipFilePanel");
   }
 
@@ -428,17 +445,17 @@ public class BrowseFile extends Composite {
     dipFilePanel.clear();
 
     if (dips.isEmpty()) {
-      // TODO show message or hide
-      dipFilePanel.add(new Label("No entries"));
+      Label dipEmpty = new Label(messages.browseFileDipEmpty());
+      dipFilePanel.add(dipEmpty);
+      dipEmpty.addStyleName("dip-empty");
     } else {
       for (final IndexedDIP dip : dips) {
-        createDipPanel(dip);
-
+        dipFilePanel.add(createDipPanel(dip));
       }
     }
   }
 
-  private void createDipPanel(final IndexedDIP dip) {
+  private FlowPanel createDipPanel(final IndexedDIP dip) {
     FlowPanel layout = new FlowPanel();
 
     // open layout
@@ -457,8 +474,7 @@ public class BrowseFile extends Composite {
     FocusPanel deleteButton = new FocusPanel(deleteIcon);
     deleteButton.addStyleName("lightbtn");
     deleteIcon.addStyleName("lightbtn-icon");
-    // TODO i18n
-    deleteButton.setTitle("Delete DIP");
+    deleteButton.setTitle(messages.browseFileDipDelete());
 
     deleteButton.addClickHandler(new ClickHandler() {
 
@@ -469,8 +485,6 @@ public class BrowseFile extends Composite {
     });
 
     layout.add(deleteButton);
-
-    dipFilePanel.add(layout);
 
     titleLabel.addStyleName("dipTitle");
     descriptionLabel.addStyleName("dipDescription");
@@ -485,20 +499,20 @@ public class BrowseFile extends Composite {
       public void onClick(ClickEvent event) {
         if (StringUtils.isNotBlank(dip.getOpenExternalURL())) {
           Window.open(dip.getOpenExternalURL(), "_blank", "");
-          // TODO i18n
-          Toast.showInfo("Opened dissemination", dip.getOpenExternalURL());
+          Toast.showInfo(messages.browseFileDipOpenedExternalURL(), dip.getOpenExternalURL());
         } else {
           HistoryUtils.newHistory(BrowseDIP.RESOLVER, dip.getUUID(), file.getAipId(), file.getRepresentationUUID(),
             file.getUUID());
         }
       }
     });
+
+    return layout;
   }
 
   protected void deleteDIP(final IndexedDIP dip) {
-    // TODO update messages
-    Dialogs.showConfirmDialog(messages.viewRepresentationRemoveFileTitle(),
-      messages.viewRepresentationRemoveFileMessage(), messages.dialogCancel(), messages.dialogYes(),
+    Dialogs.showConfirmDialog(messages.browseFileDipRepresentationConfirmTitle(),
+      messages.browseFileDipRepresentationConfirmMessage(), messages.dialogCancel(), messages.dialogYes(),
       new AsyncCallback<Boolean>() {
 
         @Override
