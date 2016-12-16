@@ -36,7 +36,6 @@ import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda_project.commons_ip.model.ParseException;
 import org.roda_project.commons_ip.model.impl.eark.EARKAIP;
-import org.roda_project.commons_ip.model.impl.roda.RodaFolderAIP;
 import org.roda_project.commons_ip.utils.IPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
