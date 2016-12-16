@@ -135,11 +135,19 @@ public class TransferredResourcesScanner {
 
   protected static TransferredResource createTransferredResource(Path resourcePath, BasicFileAttributes attr, long size,
     Path basePath, Date lastScanDate) {
+    Date d = new Date(attr.creationTime().toMillis());
+
+    TransferredResource tr = instantiateTransferredResource(resourcePath, basePath);
+    tr.setSize(size);
+    tr.setCreationDate(d);
+    tr.setLastScanDate(lastScanDate);
+
+    return tr;
+  }
+
+  public static TransferredResource instantiateTransferredResource(Path resourcePath, Path basePath) {
     Path relativeToBase = basePath.relativize(resourcePath);
     TransferredResource tr = new TransferredResource();
-
-    Date d = new Date(attr.creationTime().toMillis());
-    tr.setCreationDate(d);
 
     tr.setFile(!Files.isDirectory(resourcePath));
     tr.setFullPath(resourcePath.toString());
@@ -154,7 +162,6 @@ public class TransferredResourcesScanner {
       tr.setParentId(parentId);
       tr.setParentUUID(UUID.nameUUIDFromBytes(parentId.getBytes()).toString());
     }
-    tr.setSize(size);
 
     List<String> ancestors = new ArrayList<String>();
 
@@ -168,8 +175,6 @@ public class TransferredResourcesScanner {
     }
     ancestors.remove(ancestors.size() - 1);
     tr.setAncestorsPaths(ancestors);
-
-    tr.setLastScanDate(lastScanDate);
 
     return tr;
   }

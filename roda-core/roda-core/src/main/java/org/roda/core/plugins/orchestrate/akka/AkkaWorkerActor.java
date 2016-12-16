@@ -7,6 +7,11 @@
  */
 package org.roda.core.plugins.orchestrate.akka;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
@@ -43,14 +48,17 @@ public class AkkaWorkerActor extends AkkaBaseActor {
 
   private void handlePluginExecuteIsReady(Object msg) {
     Messages.PluginExecuteIsReady message = (Messages.PluginExecuteIsReady) msg;
+    List<LiteRODAObject> messageObjects = message.getList();
+    List<IsRODAObject> objectsToBeProcessed = messageObjects.stream().map(obj -> getModel().retrieveObjectFromLite(obj))
+      .filter(obj -> obj.isPresent()).map(obj -> obj.get()).collect(Collectors.toList());
     message.logProcessingStarted();
-    Plugin<?> plugin = message.getPlugin();
+    Plugin<IsRODAObject> messagePlugin = message.getPlugin();
     try {
-      plugin.execute(index, model, storage, message.getList());
-      getSender().tell(new Messages.PluginExecuteIsDone(plugin, false), getSelf());
+      messagePlugin.execute(index, model, storage, objectsToBeProcessed);
+      getSender().tell(new Messages.PluginExecuteIsDone(messagePlugin, false), getSelf());
     } catch (Exception e) {
       LOGGER.error("Error executing plugin.execute()", e);
-      getSender().tell(new Messages.PluginExecuteIsDone(plugin, true), getSelf());
+      getSender().tell(new Messages.PluginExecuteIsDone(messagePlugin, true), getSelf());
     }
     message.logProcessingEnded();
   }
