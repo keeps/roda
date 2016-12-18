@@ -22,6 +22,11 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.sort.SortParameter;
+import org.roda.core.data.v2.index.sort.Sorter;
+import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
@@ -285,10 +290,11 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
       if (file.isDirectory() || result.isOk()) {
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
         fileReport.setPluginState(PluginState.SUCCESS);
+        mitigateRisk(file, fileReport, index, model);
       } else {
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         fileReport.setPluginState(PluginState.FAILURE);
-        createIncidence(model, file, FILE_NOT_CHARACTERIZED_RISK_ID, fileReport, result);
+        openRisk(file, fileReport, result, index, model);
       }
 
       addToReportDetails(fileReport, result.toString());
@@ -306,6 +312,133 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
     jobReport.addReport(fileReport);
     PluginHelper.updatePartialJobReport(this, model, index, fileReport, true);
     return result;
+  }
+
+  /**
+   * Mitigate risk.
+   * 
+   * @param file
+   *          the {@link File}.
+   * @param fileReport
+   *          the {@link File} {@link Report}.
+   * @param index
+   *          the {@link IndexService}.
+   * @param model
+   *          the {@link ModelService}.
+   */
+  private void mitigateRisk(final File file, final Report fileReport, final IndexService index,
+    final ModelService model) {
+    try {
+
+      final RiskIncidence incidence = findUnmitigatedIncidence(file, index);
+      incidence.setStatus(RiskIncidence.INCIDENCE_STATUS.MITIGATED);
+      model.updateRiskIncidence(incidence, true);
+      final String message = String.format("Incidence of risk \"%s\" mitigated for File \"%s\"",
+        FILE_NOT_CHARACTERIZED_RISK_ID, file.getId());
+      addToReportDetails(fileReport, message);
+      LOGGER.info(message);
+
+    } catch (final NotFoundException e) {
+
+      LOGGER.trace(e.getMessage(), e);
+      final String message = String.format(
+        "File \"%s\" doesn't have an unmitigated incidence of risk \"%s\". Nothing to mitigate.", file.getId(),
+        FILE_NOT_CHARACTERIZED_RISK_ID);
+      LOGGER.info(message);
+
+    } catch (final GenericException e) {
+
+      final String message = String.format(
+        "An internal error occurred searching incidence of risk \"%s\" for File \"%s\". (Technical details: %s).",
+        FILE_NOT_CHARACTERIZED_RISK_ID, file, e.getMessage());
+      LOGGER.warn(message, e);
+      addToReportDetails(fileReport, message);
+      fileReport.setPluginState(PluginState.PARTIAL_SUCCESS);
+
+    }
+  }
+
+  /**
+   * Open (unmitigated) risk incidence.
+   * 
+   * @param file
+   *          the {@link File} with the risk.
+   * @param fileReport
+   *          the {@link File} {@link Report}.
+   * @param result
+   *          the {@link File} {@link Result}.
+   * @param index
+   *          the {@link IndexService}.
+   * @param model
+   *          the {@link ModelService}.
+   */
+  private void openRisk(final File file, final Report fileReport, final Result result, final IndexService index,
+    final ModelService model) {
+    try {
+
+      final RiskIncidence incidence = findUnmitigatedIncidence(file, index);
+      model.updateRiskIncidence(incidence, true);
+      final String message = String.format(
+        "Unmitigated incidence of risk \"%s\" already exists for File \"%s\". Refreshing it.",
+        FILE_NOT_CHARACTERIZED_RISK_ID, file.getId());
+      LOGGER.info(message);
+
+    } catch (final NotFoundException e) {
+      LOGGER.trace(e.getMessage(), e);
+
+      createRiskIncidence(file, fileReport, result, model);
+      final String message = String.format("Unmitigated incidence of risk \"%s\" created for File \"%s\".",
+        FILE_NOT_CHARACTERIZED_RISK_ID, file.getId());
+      addToReportDetails(fileReport, message);
+      LOGGER.info(message);
+
+    } catch (final GenericException e) {
+
+      final String message = String.format(
+        "An internal error occurred searching incidence of risk \"%s\" for File \"%s\". (Technical details: %s).",
+        FILE_NOT_CHARACTERIZED_RISK_ID, file.getId(), e.getMessage());
+      LOGGER.warn(message, e);
+      addToReportDetails(fileReport, message);
+      fileReport.setPluginState(PluginState.PARTIAL_SUCCESS);
+
+    }
+  }
+
+  /**
+   * Find an unmitigated {@link RiskIncidence} for the specified {@link File}.
+   * 
+   * @param file
+   *          the {@link File}.
+   * @param index
+   *          the {@link IndexService}.
+   * @return the {@link RiskIncidence}.
+   * @throws NotFoundException
+   *           if an unmitigated risk incidence doesn't exist.
+   * @throws GenericException
+   *           if some error occurred.
+   */
+  private RiskIncidence findUnmitigatedIncidence(final File file, final IndexService index)
+    throws NotFoundException, GenericException {
+    final Filter filter = new Filter(
+      Arrays.asList(new SimpleFilterParameter("status", RiskIncidence.INCIDENCE_STATUS.UNMITIGATED.toString()),
+        new SimpleFilterParameter("riskId", FILE_NOT_CHARACTERIZED_RISK_ID),
+        new SimpleFilterParameter("aipId", file.getAipId()),
+        new SimpleFilterParameter("representationId", file.getRepresentationId()),
+        new SimpleFilterParameter("fileId", file.getId())));
+    // new SimpleFilterParameter("filePath", file.getPath())
+
+    try {
+      final List<RiskIncidence> results = index
+        .find(RiskIncidence.class, filter, new Sorter(new SortParameter("detectedOn", true)), new Sublist(0, 1))
+        .getResults();
+      if (results.isEmpty()) {
+        throw new NotFoundException("Couldn't find RiskIncidence matching filter " + filter);
+      } else {
+        return results.get(0);
+      }
+    } catch (final RequestNotValidException e) {
+      throw new GenericException(e.getMessage(), e);
+    }
   }
 
   /**
@@ -354,25 +487,23 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
   /**
    * Create a {@link RiskIncidence}.
    * 
-   * @param model
-   *          the {@link ModelService}.
    * @param file
    *          the {@link File}.
-   * @param riskId
-   *          the risk ID.
    * @param report
    *          the {@link Report}.
    * @param result
    *          the execution {@link Result}.
+   * @param model
+   *          the {@link ModelService}.
    */
-  private void createIncidence(final ModelService model, final File file, final String riskId, final Report report,
-    final Result result) {
+  private void createRiskIncidence(final File file, final Report report, final Result result, final ModelService model) {
     try {
-      final Risk risk = PluginHelper.createRiskIfNotExists(model, 0, riskId, getClass().getClassLoader());
+      final Risk risk = PluginHelper.createRiskIfNotExists(model, 0, FILE_NOT_CHARACTERIZED_RISK_ID,
+        getClass().getClassLoader());
       final RiskIncidence incidence = new RiskIncidence();
       incidence.setDetectedOn(new Date());
       incidence.setDetectedBy(this.getName());
-      incidence.setRiskId(riskId);
+      incidence.setRiskId(FILE_NOT_CHARACTERIZED_RISK_ID);
       incidence.setAipId(file.getAipId());
       incidence.setRepresentationId(file.getRepresentationId());
       incidence.setFilePath(file.getPath());
@@ -384,7 +515,8 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
       model.createRiskIncidence(incidence, false);
     } catch (final RequestNotValidException | AuthorizationDeniedException | AlreadyExistsException | NotFoundException
       | GenericException e) {
-      final String message = String.format("Error creating risk %s incidence for File %s", riskId, file.getId());
+      final String message = String.format("Error creating risk %s incidence for File %s",
+        FILE_NOT_CHARACTERIZED_RISK_ID, file.getId());
       addToReportDetails(report, message);
       report.setPluginState(PluginState.FAILURE);
       LOGGER.error(message, e);
