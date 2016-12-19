@@ -136,13 +136,14 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
 
       if (sip.getValidationReport().isValid()) {
 
-        Optional<String> parentId = PluginHelper.getComputedParent(model, index, sip.getAncestors(),
-          computedSearchScope, forceSearchScope, jobId);
+        Optional<String> parentId = Optional.empty();
 
         if (IPEnums.IPStatus.NEW == sip.getStatus()) {
+          parentId = PluginHelper.getComputedParent(model, index, sip.getAncestors(), computedSearchScope,
+            forceSearchScope, jobId);
           aip = processNewSIP(index, model, storage, reportItem, sip, parentId);
         } else if (IPEnums.IPStatus.UPDATE == sip.getStatus()) {
-          aip = processUpdateSIP(index, model, storage, sip);
+          aip = processUpdateSIP(index, model, storage, sip, computedSearchScope);
         } else {
           throw new GenericException("Unknown IP Status: " + sip.getStatus());
         }
@@ -193,21 +194,27 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
       reportItem.getJobId(), computedParentId);
   }
 
-  private AIP processUpdateSIP(IndexService index, ModelService model, StorageService storage, SIP sip)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException,
-    AlreadyExistsException, ValidationException {
+  private AIP processUpdateSIP(IndexService index, ModelService model, StorageService storage, SIP sip,
+    Optional<String> searchScope) throws GenericException, RequestNotValidException, NotFoundException,
+    AuthorizationDeniedException, AlreadyExistsException, ValidationException {
     AIP aip;
-    IndexResult<IndexedAIP> result = index.find(IndexedAIP.class,
-      new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_IDS, sip.getId())), Sorter.NONE, new Sublist(0, 1));
+    String searchScopeString = searchScope.orElse(null);
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_IDS, sip.getId()));
+    if (searchScopeString != null) {
+      filter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, searchScopeString));
+    }
+    IndexResult<IndexedAIP> result = index.find(IndexedAIP.class, filter, Sorter.NONE, new Sublist(0, 1));
     if (result.getTotalCount() == 1) {
       IndexedAIP indexedAIP = result.getResults().get(0);
-
       String jobUsername = PluginHelper.getJobUsername(this, index);
       // Update the AIP
       aip = EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP.getId(), model, storage, jobUsername);
     } else {
-      result = index.find(IndexedAIP.class, new Filter(new SimpleFilterParameter(RodaConstants.AIP_ID, sip.getId())),
-        Sorter.NONE, new Sublist(0, 1));
+      filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ID, sip.getId()));
+      if (searchScopeString != null) {
+        filter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, searchScopeString));
+      }
+      result = index.find(IndexedAIP.class, filter, Sorter.NONE, new Sublist(0, 1));
       if (result.getTotalCount() == 1) {
         IndexedAIP indexedAIP = result.getResults().get(0);
         String jobUsername = PluginHelper.getJobUsername(this, index);
