@@ -688,8 +688,6 @@ public final class RodaConstants {
   public static final String PLUGIN_CATEGORY_EXPERIMENTAL = "experimental";
   public static final String PLUGIN_CATEGORY_NOT_LISTABLE = "not_listable";
 
-  public static final String PLUGIN_CATEGORY_EUPO = "eupo";
-
   public static final String PLUGIN_SELECT_ALL_RODA_OBJECTS = "All";
 
   /* Job Report */

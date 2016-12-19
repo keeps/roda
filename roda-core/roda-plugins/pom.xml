@@ -13,7 +13,7 @@
 	</parent>
 	<properties>
 		<tika.version>1.11</tika.version>
-		<verapdf.version>0.27.31</verapdf.version>
+		<verapdf.version>0.27.84</verapdf.version>
 	</properties>
 	<modules>
 		<module>roda-plugin-common</module>

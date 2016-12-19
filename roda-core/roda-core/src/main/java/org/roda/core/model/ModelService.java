@@ -972,11 +972,6 @@ public class ModelService extends ModelObservable {
     return file;
   }
 
-  public void updateFile(File file) {
-    // TODO
-    notifyFileUpdated(file);
-  }
-
   public void deleteFile(String aipId, String representationId, List<String> directoryPath, String fileId,
     boolean notify) throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
 
@@ -986,7 +981,6 @@ public class ModelService extends ModelObservable {
     if (notify) {
       notifyFileDeleted(aipId, representationId, directoryPath, fileId);
     }
-
   }
 
   public File renameFolder(File folder, String newName, boolean replaceExisting, boolean reindexResources)

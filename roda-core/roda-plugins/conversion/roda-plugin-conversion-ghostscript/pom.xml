@@ -87,10 +87,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<artifactId>gui</artifactId>
-			<groupId>org.verapdf</groupId>
-		</dependency>
-		<dependency>
 			<groupId>org.ghost4j</groupId>
 			<artifactId>ghost4j</artifactId>
 		</dependency>

@@ -208,24 +208,16 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
                     if (veraPDFResult.getFirst() != null) {
                       model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
-                        file.getId(), "xml", "VeraPDF", veraPDFResult.getFirst(), false);
-
-                      if (veraPDFResult.getSecond().booleanValue()) {
-                        resourceList.add(file);
-                      } else {
-                        pluginResultState = PluginState.PARTIAL_SUCCESS;
-                      }
-
-                    } else {
-                      pluginResultState = PluginState.PARTIAL_SUCCESS;
+                        file.getId(), ".xml", "VeraPDF", veraPDFResult.getFirst(), false);
                     }
 
-                    IOUtils.closeQuietly(directAccess);
-
-                    if (!pluginResultState.equals(PluginState.SUCCESS)) {
+                    if (veraPDFResult.getFirst() == null || !veraPDFResult.getSecond().booleanValue()) {
+                      resourceList.add(file);
+                      pluginResultState = PluginState.PARTIAL_SUCCESS;
                       reportItem.addPluginDetails(
                         "VeraPDF validation failed on " + fileInfoPath.replace("//", "/").replace("/[]/", "/") + ".\n");
                     }
+
                   } else {
                     if (ignoreFiles) {
                       ValidationIssue issue = new ValidationIssue(
@@ -339,24 +331,18 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
                   if (veraPDFResult.getFirst() != null) {
                     model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
-                      "xml", "VeraPDF", veraPDFResult.getFirst(), false);
+                      ".xml", "VeraPDF", veraPDFResult.getFirst(), false);
+                  }
 
-                    if (veraPDFResult.getSecond().booleanValue()) {
-                      resourceList.add(file);
-                    } else {
-                      pluginResultState = PluginState.PARTIAL_SUCCESS;
-                    }
-
-                  } else {
+                  if (veraPDFResult.getFirst() == null || !veraPDFResult.getSecond().booleanValue()) {
+                    resourceList.add(file);
                     pluginResultState = PluginState.PARTIAL_SUCCESS;
+                    reportItem.addPluginDetails(
+                      "VeraPDF validation failed on " + fileInfoPath.replace("//", "/").replace("/[]/", "/") + ".\n");
                   }
 
                   IOUtils.closeQuietly(directAccess);
 
-                  if (!pluginResultState.equals(PluginState.SUCCESS)) {
-                    reportItem.addPluginDetails(
-                      "VeraPDF validation failed on " + fileInfoPath.replace("//", "/").replace("/[]/", "/") + ".\n");
-                  }
                 } else {
                   if (ignoreFiles) {
                     validationReport.addIssue(new ValidationIssue(file.getId()));
@@ -430,6 +416,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
         Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class,
           AIPState.INGEST_PROCESSING);
         PluginState reportState = PluginState.SUCCESS;
+        String details = "";
 
         try {
           List<File> resourceList = new ArrayList<File>();
@@ -453,21 +440,19 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
               if (veraPDFResult.getFirst() != null) {
                 model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
-                  "xml", "VeraPDF", veraPDFResult.getFirst(), false);
+                  ".xml", "VeraPDF", veraPDFResult.getFirst(), false);
 
-                if (veraPDFResult.getSecond().booleanValue()) {
+                if (!veraPDFResult.getSecond().booleanValue()) {
                   resourceList.add(file);
-                } else {
                   pluginResultState = PluginState.PARTIAL_SUCCESS;
-                }
-
-                if (!pluginResultState.equals(PluginState.SUCCESS)) {
                   reportItem
                     .addPluginDetails("VeraPDF validation failed on " + file.getId().replace("//", "/") + ".\n");
+                  details = veraPDFResult.getFirst().toString();
                 }
 
               } else {
                 pluginResultState = PluginState.PARTIAL_SUCCESS;
+                reportItem.addPluginDetails("VeraPDF validation failed on " + file.getId().replace("//", "/") + ".\n");
               }
 
               IOUtils.closeQuietly(directAccess);
@@ -477,7 +462,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
                   reportItem.setPluginDetails("This file was ignored.");
                 } else {
                   pluginResultState = PluginState.FAILURE;
-                  reportItem.setPluginDetails("This file was not ignored.");
+                  reportItem.setPluginDetails("This file format is not supported.");
                 }
               }
             }
@@ -488,7 +473,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
           }
 
           createEvent(model, index, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
-            pluginResultState, "", resourceList, null);
+            pluginResultState, details, resourceList, null);
           jobPluginInfo.incrementObjectsProcessed(reportState);
 
         } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
@@ -522,18 +507,21 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
     try {
       // building the detail extension for the plugin event
       StringBuilder noteStringBuilder = new StringBuilder();
-      StringBuilder detailsStringBuilder = new StringBuilder();
       noteStringBuilder.append("The following files did not pass veraPDF's validation with success: ");
-      detailsStringBuilder.append("\n\n<reportWrapper>");
 
       for (File file : resourceList) {
         noteStringBuilder.append(file.getId() + ", ");
       }
 
       noteStringBuilder.setLength(noteStringBuilder.length() - 2);
-      detailsStringBuilder.append(details);
-      detailsStringBuilder.append("</reportWrapper>");
-      noteStringBuilder.append(detailsStringBuilder);
+
+      if (StringUtils.isNotBlank(details)) {
+        StringBuilder detailsStringBuilder = new StringBuilder();
+        detailsStringBuilder.append("\n\n<reportWrapper>");
+        detailsStringBuilder.append(details);
+        detailsStringBuilder.append("</reportWrapper>");
+        noteStringBuilder.append(detailsStringBuilder);
+      }
 
       // all file have passed the validation
       if (pluginState == PluginState.SUCCESS)

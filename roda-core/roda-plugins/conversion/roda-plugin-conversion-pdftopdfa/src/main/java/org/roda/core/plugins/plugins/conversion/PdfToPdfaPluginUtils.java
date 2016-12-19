@@ -54,7 +54,8 @@ public class PdfToPdfaPluginUtils {
 
       RepairStatus fixStatus = result.getFixerResult().getRepairStatus();
       if (fixStatus.equals(RepairStatus.WONT_FIX) || fixStatus.equals(RepairStatus.FIX_ERROR)) {
-        throw new CommandException("There were some metadata fixing errors on: " + input.toString());
+        throw new CommandException(
+          "There were some metadata fixing errors detected by VeraPDF on: " + input.toString());
       }
 
     } catch (GhostscriptException | VeraPDFException e) {
