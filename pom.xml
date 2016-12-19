@@ -222,12 +222,19 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.7.4.201502262128</version>
+				<version>0.7.8</version>
 				<executions>
 					<execution>
 						<id>default-prepare-agent</id>
 						<goals>
 							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
 						</goals>
 					</execution>
 				</executions>
@@ -429,7 +436,7 @@
 						<!-- this is false by default, forces the plugin to generate the file -->
 						<generateGitPropertiesFile>true</generateGitPropertiesFile>
 
-						<!-- The path for the properties file to be generated. See Super Pom 
+						<!-- The path for the properties file to be generated. See Super Pom
 							for default variable reference https://maven.apache.org/guides/introduction/introduction-to-the-pom.html -->
 						<generateGitPropertiesFilename>
 							${project.build.directory}/${project.build.finalName}/version.json
@@ -791,7 +798,7 @@
 			<dependency>
 				<groupId>org.apache.directory.server</groupId>
 				<artifactId>apacheds-all</artifactId>
-				<!-- 20160818 hsilva: versions M22 & M23 don't work properly with RODA 
+				<!-- 20160818 hsilva: versions M22 & M23 don't work properly with RODA
 					code base -->
 				<version>2.0.0-M21</version>
 			</dependency>
