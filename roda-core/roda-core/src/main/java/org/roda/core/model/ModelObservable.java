@@ -44,237 +44,237 @@ public abstract class ModelObservable {
     observers.remove(observer);
   }
 
-  protected void notifyAipCreated(AIP aip) {
+  public void notifyAipCreated(AIP aip) {
     for (ModelObserver observer : observers) {
       observer.aipCreated(aip);
     }
   }
 
-  protected void notifyAipUpdated(AIP aip) {
+  public void notifyAipUpdated(AIP aip) {
     for (ModelObserver observer : observers) {
       observer.aipUpdated(aip);
     }
   }
 
-  protected void notifyAipMoved(AIP aip, String oldParentId, String newParentId) {
+  public void notifyAipMoved(AIP aip, String oldParentId, String newParentId) {
     for (ModelObserver observer : observers) {
       observer.aipMoved(aip, oldParentId, newParentId);
     }
   }
 
-  protected void notifyAipStateUpdated(AIP aip) {
+  public void notifyAipStateUpdated(AIP aip) {
     for (ModelObserver observer : observers) {
       observer.aipStateUpdated(aip);
     }
   }
 
-  protected void notifyAipDeleted(String aipId) {
+  public void notifyAipDeleted(String aipId) {
     for (ModelObserver observer : observers) {
       observer.aipDeleted(aipId, true);
     }
   }
 
-  protected void notifyDescriptiveMetadataCreated(DescriptiveMetadata descriptiveMetadata) {
+  public void notifyDescriptiveMetadataCreated(DescriptiveMetadata descriptiveMetadata) {
     for (ModelObserver observer : observers) {
       observer.descriptiveMetadataCreated(descriptiveMetadata);
     }
   }
 
-  protected void notifyDescriptiveMetadataUpdated(DescriptiveMetadata descriptiveMetadata) {
+  public void notifyDescriptiveMetadataUpdated(DescriptiveMetadata descriptiveMetadata) {
     for (ModelObserver observer : observers) {
       observer.descriptiveMetadataUpdated(descriptiveMetadata);
     }
   }
 
-  protected void notifyDescriptiveMetadataDeleted(String aipId, String representationId,
+  public void notifyDescriptiveMetadataDeleted(String aipId, String representationId,
     String descriptiveMetadataBinaryId) {
     for (ModelObserver observer : observers) {
       observer.descriptiveMetadataDeleted(aipId, representationId, descriptiveMetadataBinaryId);
     }
   }
 
-  protected void notifyRepresentationCreated(Representation representation) {
+  public void notifyRepresentationCreated(Representation representation) {
     for (ModelObserver observer : observers) {
       observer.representationCreated(representation);
     }
   }
 
-  protected void notifyRepresentationUpdated(Representation representation) {
+  public void notifyRepresentationUpdated(Representation representation) {
     for (ModelObserver observer : observers) {
       observer.representationUpdated(representation);
     }
   }
 
-  protected void notifyRepresentationDeleted(String aipId, String representationId) {
+  public void notifyRepresentationDeleted(String aipId, String representationId) {
     for (ModelObserver observer : observers) {
       observer.representationDeleted(aipId, representationId, true);
     }
   }
 
-  protected void notifyFileCreated(File file) {
+  public void notifyFileCreated(File file) {
     for (ModelObserver observer : observers) {
       observer.fileCreated(file);
     }
   }
 
-  protected void notifyFileUpdated(File file) {
+  public void notifyFileUpdated(File file) {
     for (ModelObserver observer : observers) {
       observer.fileUpdated(file);
     }
   }
 
-  protected void notifyFileDeleted(String aipId, String representationId, List<String> fileDirectoryPath,
+  public void notifyFileDeleted(String aipId, String representationId, List<String> fileDirectoryPath,
     String fileId) {
     for (ModelObserver observer : observers) {
       observer.fileDeleted(aipId, representationId, fileDirectoryPath, fileId, true);
     }
   }
 
-  protected void notifyLogEntryCreated(LogEntry entry) {
+  public void notifyLogEntryCreated(LogEntry entry) {
     for (ModelObserver observer : observers) {
       observer.logEntryCreated(entry);
     }
   }
 
-  protected void notifyUserCreated(User user) {
+  public void notifyUserCreated(User user) {
     for (ModelObserver observer : observers) {
       observer.userCreated(user);
     }
   }
 
-  protected void notifyUserUpdated(User user) {
+  public void notifyUserUpdated(User user) {
     for (ModelObserver observer : observers) {
       observer.userUpdated(user);
     }
   }
 
-  protected void notifyUserDeleted(String userID) {
+  public void notifyUserDeleted(String userID) {
     for (ModelObserver observer : observers) {
       observer.userDeleted(userID);
     }
   }
 
-  protected void notifyGroupCreated(Group group) {
+  public void notifyGroupCreated(Group group) {
     for (ModelObserver observer : observers) {
       observer.groupCreated(group);
     }
   }
 
-  protected void notifyGroupUpdated(Group group) {
+  public void notifyGroupUpdated(Group group) {
     for (ModelObserver observer : observers) {
       observer.groupUpdated(group);
     }
   }
 
-  protected void notifyGroupDeleted(String groupID) {
+  public void notifyGroupDeleted(String groupID) {
     for (ModelObserver observer : observers) {
       observer.groupDeleted(groupID);
     }
   }
 
-  protected void notifyPreservationMetadataCreated(PreservationMetadata preservationMetadataBinary) {
+  public void notifyPreservationMetadataCreated(PreservationMetadata preservationMetadataBinary) {
     for (ModelObserver observer : observers) {
       observer.preservationMetadataCreated(preservationMetadataBinary);
     }
   }
 
-  protected void notifyPreservationMetadataUpdated(PreservationMetadata preservationMetadataBinary) {
+  public void notifyPreservationMetadataUpdated(PreservationMetadata preservationMetadataBinary) {
     for (ModelObserver observer : observers) {
       observer.preservationMetadataUpdated(preservationMetadataBinary);
     }
   }
 
-  protected void notifyPreservationMetadataDeleted(PreservationMetadata pm) {
+  public void notifyPreservationMetadataDeleted(PreservationMetadata pm) {
     for (ModelObserver observer : observers) {
       observer.preservationMetadataDeleted(pm);
     }
   }
 
-  protected void notifyOtherMetadataCreated(OtherMetadata otherMetadataBinary) {
+  public void notifyOtherMetadataCreated(OtherMetadata otherMetadataBinary) {
     for (ModelObserver observer : observers) {
       observer.otherMetadataCreated(otherMetadataBinary);
     }
   }
 
-  protected void notifyJobCreatedOrUpdated(Job job, boolean reindexJobReports) {
+  public void notifyJobCreatedOrUpdated(Job job, boolean reindexJobReports) {
     for (ModelObserver observer : observers) {
       observer.jobCreatedOrUpdated(job, reindexJobReports);
     }
   }
 
-  protected void notifyJobDeleted(String jobId) {
+  public void notifyJobDeleted(String jobId) {
     for (ModelObserver observer : observers) {
       observer.jobDeleted(jobId);
     }
   }
 
-  protected void notifyJobReportCreatedOrUpdated(Report jobReport) {
+  public void notifyJobReportCreatedOrUpdated(Report jobReport) {
     for (ModelObserver observer : observers) {
       observer.jobReportCreatedOrUpdated(jobReport);
     }
   }
 
-  protected void notifyJobReportDeleted(String jobReportId) {
+  public void notifyJobReportDeleted(String jobReportId) {
     for (ModelObserver observer : observers) {
       observer.jobReportDeleted(jobReportId);
     }
   }
 
-  protected void notifyAipPermissionsUpdated(AIP aip) {
+  public void notifyAipPermissionsUpdated(AIP aip) {
     for (ModelObserver observer : observers) {
       observer.aipPermissionsUpdated(aip);
     }
   }
 
-  protected void notifyTransferredResourceDeleted(String transferredResourceID) {
+  public void notifyTransferredResourceDeleted(String transferredResourceID) {
     for (ModelObserver observer : observers) {
       observer.transferredResourceDeleted(transferredResourceID);
     }
   }
 
-  protected void notifyRiskCreatedOrUpdated(Risk risk, boolean commit) {
+  public void notifyRiskCreatedOrUpdated(Risk risk, boolean commit) {
     for (ModelObserver observer : observers) {
       observer.riskCreatedOrUpdated(risk, commit);
     }
   }
 
-  protected void notifyRiskDeleted(String riskId, boolean commit) {
+  public void notifyRiskDeleted(String riskId, boolean commit) {
     for (ModelObserver observer : observers) {
       observer.riskDeleted(riskId, commit);
     }
   }
 
-  protected void notifyRiskIncidenceCreatedOrUpdated(RiskIncidence riskIncidence, boolean commit) {
+  public void notifyRiskIncidenceCreatedOrUpdated(RiskIncidence riskIncidence, boolean commit) {
     for (ModelObserver observer : observers) {
       observer.riskIncidenceCreatedOrUpdated(riskIncidence, commit);
     }
   }
 
-  protected void notifyRiskIncidenceDeleted(String riskIncidenceId, boolean commit) {
+  public void notifyRiskIncidenceDeleted(String riskIncidenceId, boolean commit) {
     for (ModelObserver observer : observers) {
       observer.riskIncidenceDeleted(riskIncidenceId, commit);
     }
   }
 
-  protected void notifyFormatCreatedOrUpdated(Format format, boolean commit) {
+  public void notifyFormatCreatedOrUpdated(Format format, boolean commit) {
     for (ModelObserver observer : observers) {
       observer.formatCreatedOrUpdated(format, commit);
     }
   }
 
-  protected void notifyFormatDeleted(String formatId, boolean commit) {
+  public void notifyFormatDeleted(String formatId, boolean commit) {
     for (ModelObserver observer : observers) {
       observer.formatDeleted(formatId, commit);
     }
   }
 
-  protected void notifyNotificationCreatedOrUpdated(Notification notification) {
+  public void notifyNotificationCreatedOrUpdated(Notification notification) {
     for (ModelObserver observer : observers) {
       observer.notificationCreatedOrUpdated(notification);
     }
   }
 
-  protected void notifyNotificationDeleted(String notificationId) {
+  public void notifyNotificationDeleted(String notificationId) {
     for (ModelObserver observer : observers) {
       observer.notificationDeleted(notificationId);
     }
@@ -286,31 +286,31 @@ public abstract class ModelObservable {
     }
   }
 
-  protected void notifyDIPUpdated(DIP dip, boolean commit) {
+  public void notifyDIPUpdated(DIP dip, boolean commit) {
     for (ModelObserver observer : observers) {
       observer.dipUpdated(dip, commit);
     }
   }
 
-  protected void notifyDIPDeleted(String dipId, boolean commit) {
+  public void notifyDIPDeleted(String dipId, boolean commit) {
     for (ModelObserver observer : observers) {
       observer.dipDeleted(dipId, commit);
     }
   }
 
-  protected void notifyDIPFileCreated(DIPFile file) {
+  public void notifyDIPFileCreated(DIPFile file) {
     for (ModelObserver observer : observers) {
       observer.dipFileCreated(file);
     }
   }
 
-  protected void notifyDIPFileUpdated(DIPFile file) {
+  public void notifyDIPFileUpdated(DIPFile file) {
     for (ModelObserver observer : observers) {
       observer.dipFileUpdated(file);
     }
   }
 
-  protected void notifyDIPFileDeleted(String dipId, List<String> path, String fileId) {
+  public void notifyDIPFileDeleted(String dipId, List<String> path, String fileId) {
     for (ModelObserver observer : observers) {
       observer.dipFileDeleted(dipId, path, fileId);
     }

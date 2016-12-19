@@ -2001,8 +2001,8 @@ public class Browser extends RodaWuiController {
     return updatedFile;
   }
 
-  public static File updateFile(User user, File file) throws AuthorizationDeniedException, GenericException,
-    RequestNotValidException, NotFoundException, AlreadyExistsException {
+  public static File updateFile(User user, File file, InputStream is, boolean createIfNotExists, boolean notify) throws AuthorizationDeniedException, GenericException,
+    RequestNotValidException, NotFoundException, AlreadyExistsException, IOException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -2011,7 +2011,10 @@ public class Browser extends RodaWuiController {
     UserUtility.checkAIPPermissions(user, aip, PermissionType.UPDATE);
 
     // delegate
-    File updatedFile = BrowserHelper.updateFile(user, file);
+    Path temp = Files.createTempFile("descriptive", ".tmp");
+    Files.copy(is, temp, StandardCopyOption.REPLACE_EXISTING);
+    ContentPayload payload = new FSPathContentPayload(temp);
+    File updatedFile = BrowserHelper.updateFile(user, file,payload,createIfNotExists,notify);
 
     // register action
     controllerAssistant.registerAction(user, file.getAipId(), LOG_ENTRY_STATE.SUCCESS,

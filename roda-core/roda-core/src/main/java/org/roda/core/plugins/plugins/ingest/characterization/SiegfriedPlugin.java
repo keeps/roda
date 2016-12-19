@@ -237,7 +237,6 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
         try {
           // FIXME 20161117 nvieira this should be done with a single file
           sources.addAll(SiegfriedPluginUtils.runSiegfriedOnFile(this, model, file));
-          model.updateFileInfo(file);
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
           reportItem.setPluginState(PluginState.SUCCESS);
         } catch (PluginException | NotFoundException | GenericException | RequestNotValidException

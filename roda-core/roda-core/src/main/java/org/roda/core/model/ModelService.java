@@ -828,10 +828,6 @@ public class ModelService extends ModelObservable {
     return representation;
   }
 
-  public void notifyRepresentationUpdated(Representation representation) {
-    super.notifyRepresentationUpdated(representation);
-  }
-
   public void deleteRepresentation(String aipId, String representationId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     StoragePath representationPath = ModelUtils.getRepresentationStoragePath(aipId, representationId);
@@ -947,13 +943,8 @@ public class ModelService extends ModelObservable {
     return file;
   }
 
-  public File updateFileInfo(File file) {
-    notifyFileUpdated(file);
-    return file;
-  }
-
   public File updateFile(String aipId, String representationId, List<String> directoryPath, String fileId,
-    Binary binary, boolean createIfNotExists, boolean notify)
+    ContentPayload contentPayload, boolean createIfNotExists, boolean notify)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     File file = null;
     // FIXME how to set this?
@@ -961,7 +952,7 @@ public class ModelService extends ModelObservable {
 
     StoragePath filePath = ModelUtils.getFileStoragePath(aipId, representationId, directoryPath, fileId);
 
-    storage.updateBinaryContent(filePath, binary.getContent(), asReference, createIfNotExists);
+    storage.updateBinaryContent(filePath, contentPayload, asReference, createIfNotExists);
     Binary binaryUpdated = storage.getBinary(filePath);
     file = ResourceParseUtils.convertResourceToFile(binaryUpdated);
 
@@ -970,6 +961,12 @@ public class ModelService extends ModelObservable {
     }
 
     return file;
+  }
+
+  public File updateFile(File file, ContentPayload contentPayload, boolean createIfNotExists, boolean notify)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    return updateFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), contentPayload,
+      createIfNotExists, notify);
   }
 
   public void deleteFile(String aipId, String representationId, List<String> directoryPath, String fileId,
@@ -1163,10 +1160,6 @@ public class ModelService extends ModelObservable {
       notifyPreservationMetadataCreated(pm);
     }
     return pm;
-  }
-
-  public void notifyPreservationMetadataCreated(PreservationMetadata preservationMetadata) {
-    super.notifyPreservationMetadataCreated(preservationMetadata);
   }
 
   public PreservationMetadata updatePreservationMetadata(String id, PreservationMetadataType type, String aipId,
@@ -1536,10 +1529,6 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  public void notifyUserUpdated(User user) {
-    super.notifyUserUpdated(user);
-  }
-
   public List<User> listUsers() throws GenericException {
     return UserUtility.getLdapUtility().getUsers();
   }
@@ -1579,10 +1568,6 @@ public class ModelService extends ModelObservable {
     } catch (IllegalOperationException e) {
       throw new AuthorizationDeniedException("Illegal operation", e);
     }
-  }
-
-  public void notifyGroupUpdated(Group group) {
-    super.notifyGroupUpdated(group);
   }
 
   public List<Group> listGroups() throws GenericException {

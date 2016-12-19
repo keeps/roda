@@ -123,6 +123,8 @@ public class FilesResource {
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response update(org.roda.core.data.v2.ip.File file,
+    @FormDataParam(RodaConstants.API_PARAM_UPLOAD) InputStream inputStream,
+    @FormDataParam(RodaConstants.API_PARAM_UPLOAD) FormDataContentDisposition fileDetail,
     @ApiParam(value = "Choose format in which to get the file", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
@@ -131,8 +133,14 @@ public class FilesResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    org.roda.core.data.v2.ip.File updatedFile = Browser.updateFile(user, file);
-    return Response.ok(updatedFile, mediaType).build();
+    try{
+      boolean createIfNotExists = true;
+      boolean notify = true;
+      org.roda.core.data.v2.ip.File updatedFile = Browser.updateFile(user, file, inputStream, createIfNotExists,notify);
+      return Response.ok(updatedFile, mediaType).build();
+    } catch (IOException e) {
+      return ApiUtils.errorResponse(new TransformerException(e.getMessage()));
+    }
   }
 
   @POST

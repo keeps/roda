@@ -107,6 +107,7 @@ public class PremisSkeletonPluginUtils {
       representation);
   }
 
+  
   public static void createPremisSkeletonOnFile(ModelService model, String aipId, String representationId, File file,
     Collection<String> fixityAlgorithms, gov.loc.premis.v3.Representation representation)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, NotFoundException,
@@ -125,17 +126,21 @@ public class PremisSkeletonPluginUtils {
           PreservationMetadata pm = model.createPreservationMetadata(PreservationMetadataType.FILE, aipId,
             representationId, file.getPath(), file.getId(), filePreservation, notifyInSteps);
           pmId = pm.getId();
+          model.notifyFileCreated(file);
         } catch (AlreadyExistsException e2) {
           pmId = IdUtils.getPreservationId(PreservationMetadataType.FILE, aipId, representationId, file.getPath(),
             file.getId());
           model.updatePreservationMetadata(pmId, PreservationMetadataType.FILE, aipId, representationId, file.getPath(),
             file.getId(), filePreservation, notifyInSteps);
+          model.notifyFileUpdated(file);
+
         }
 
         PremisV3Utils.linkFileToRepresentation(pmId, RodaConstants.PREMIS_RELATIONSHIP_TYPE_STRUCTURAL,
           RodaConstants.PREMIS_RELATIONSHIP_SUBTYPE_HASPART, representation);
       }
     }
+
   }
 
 }

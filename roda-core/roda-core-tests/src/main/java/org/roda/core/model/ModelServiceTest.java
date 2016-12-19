@@ -753,7 +753,7 @@ public class ModelServiceTest {
     final boolean createIfNotExists = false;
     final boolean notify = false;
     File createdFile = model.updateFile(aipId, CorporaConstants.REPRESENTATION_1_ID,
-      CorporaConstants.REPRESENTATION_1_FILE_1_PATH, CorporaConstants.REPRESENTATION_1_FILE_1_ID, binary,
+      CorporaConstants.REPRESENTATION_1_FILE_1_PATH, CorporaConstants.REPRESENTATION_1_FILE_1_ID, binary.getContent(),
       createIfNotExists, notify);
 
     // check if it is connected

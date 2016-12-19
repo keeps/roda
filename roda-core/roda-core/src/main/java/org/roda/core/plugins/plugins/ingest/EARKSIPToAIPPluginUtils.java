@@ -249,9 +249,7 @@ public class EARKSIPToAIPPluginUtils {
         model.createFile(aipId, representation.getId(), directoryPath, fileId, payload, notify);
       } catch (AlreadyExistsException e) {
         if (update) {
-          StoragePath filePath = ModelUtils.getFileStoragePath(aipId, representation.getId(), directoryPath, fileId);
-          final Binary binary = storage.getBinary(filePath);
-          model.updateFile(aipId, representation.getId(), directoryPath, fileId, binary, true, notify);
+          model.updateFile(aipId, representation.getId(), directoryPath, fileId, payload, true, notify);
         } else
           throw e;
       }

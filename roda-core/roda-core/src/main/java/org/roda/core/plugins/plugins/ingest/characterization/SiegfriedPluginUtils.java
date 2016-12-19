@@ -38,6 +38,7 @@ import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StringContentPayload;
+import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.util.Base64;
 import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
@@ -124,6 +125,10 @@ public class SiegfriedPluginUtils {
       file.getRepresentationId(), file.getPath(), file.getId(), filePath);
 
     IOUtils.closeQuietly(directAccess);
+    
+    boolean createIfNotExists = true;
+    boolean notify = true;
+    model.updateFile(file, new FSPathContentPayload(filePath), createIfNotExists, notify);
     return sources;
   }
 

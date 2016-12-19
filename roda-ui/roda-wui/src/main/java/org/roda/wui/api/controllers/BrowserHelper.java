@@ -1572,9 +1572,10 @@ public class BrowserHelper {
     }
   }
 
-  public static File updateFile(User user, File file) throws GenericException, AuthorizationDeniedException,
+  public static File updateFile(User user, File file,ContentPayload contentPayload, boolean createIfNotExists, boolean notify) throws GenericException, AuthorizationDeniedException,
     RequestNotValidException, NotFoundException, AlreadyExistsException {
-    return RodaCoreFactory.getModelService().updateFileInfo(file);
+    RodaCoreFactory.getModelService().updateFile(file,contentPayload,createIfNotExists,notify);
+    return file;
   }
 
   public static void deleteRepresentationFile(User user, String fileUUID, String details)
