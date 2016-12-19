@@ -662,12 +662,11 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
           fileFormat.getFormatDesignationName());
         final FilterParameter alternativeName = new SimpleFilterParameter(RodaConstants.FORMAT_ALTERNATIVE_DESIGNATIONS,
           fileFormat.getFormatDesignationName());
-        final FilterParameter name = new OrFiltersParameters("name", Arrays.asList(mainName, alternativeName));
+        final FilterParameter name = new OrFiltersParameters(Arrays.asList(mainName, alternativeName));
         final FilterParameter version = new SimpleFilterParameter(RodaConstants.FORMAT_VERSIONS,
           fileFormat.getFormatDesignationVersion());
-        final FilterParameter nameAndVersion = new AndFiltersParameters("nameAndVersion", Arrays.asList(name, version));
-        final FilterParameter nameAndVersionOrName = new OrFiltersParameters("nameVersionOrName",
-          Arrays.asList(nameAndVersion, name));
+        final FilterParameter nameAndVersion = new AndFiltersParameters(Arrays.asList(name, version));
+        final FilterParameter nameAndVersionOrName = new OrFiltersParameters(Arrays.asList(nameAndVersion, name));
 
         final String value = String.format("%s\", \"%s", fileFormat.getFormatDesignationName(),
           fileFormat.getFormatDesignationVersion());
