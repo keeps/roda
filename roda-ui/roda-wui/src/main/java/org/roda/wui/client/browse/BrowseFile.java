@@ -10,6 +10,7 @@
  */
 package org.roda.wui.client.browse;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -18,6 +19,8 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
@@ -26,14 +29,17 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.wui.client.browse.bundle.BrowseItemBundle;
+import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
+import org.roda.wui.client.process.CreateJob;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -58,6 +64,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
@@ -88,6 +95,7 @@ public class BrowseFile extends Composite {
 
   private boolean infoPanelOpen = false;
   private boolean disseminationsPanelOpen = false;
+  private boolean optionsPanelOpen = false;
 
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
@@ -99,22 +107,19 @@ public class BrowseFile extends Composite {
   IndexedFilePreview filePreview;
 
   @UiField
-  FocusPanel downloadFileButton;
+  FocusPanel optionsButton, infoFileButton, disseminationsButton;
 
   @UiField
-  FocusPanel removeFileButton;
-
-  @UiField
-  FocusPanel infoFileButton, disseminationsButton;
-
-  @UiField
-  FlowPanel infoFilePanel, dipFilePanel;
+  FlowPanel infoFilePanel, dipFilePanel, optionsPanel;
 
   @UiField
   FocusPanel downloadDocumentationButton;
 
   @UiField
   FocusPanel downloadSchemasButton;
+
+  @UiField
+  Button optionDownload, optionNewProcess, optionRemove;
 
   /**
    * Create a new panel to view a representation
@@ -182,20 +187,17 @@ public class BrowseFile extends Composite {
     breadcrumb.setVisible(true);
 
     // set title
-    downloadFileButton.setTitle(messages.viewRepresentationDownloadFileButton());
-    removeFileButton.setTitle(messages.viewRepresentationRemoveFileButton());
+
     infoFileButton.setTitle(messages.viewRepresentationInfoFileButton());
 
     // update visibles
-    downloadFileButton.setVisible(!file.isDirectory());
-    removeFileButton.setVisible(!file.isDirectory());
+    optionDownload.setEnabled(!file.isDirectory());
     infoFileButton.setVisible(!file.isDirectory());
     downloadDocumentationButton.setVisible(rep.getNumberOfDocumentationFiles() > 0);
     downloadSchemasButton.setVisible(rep.getNumberOfSchemaFiles() > 0);
-
   }
 
-  @UiHandler("downloadFileButton")
+  @UiHandler("optionDownload")
   void buttonDownloadFileButtonHandler(ClickEvent e) {
     downloadFile();
   }
@@ -226,7 +228,19 @@ public class BrowseFile extends Composite {
     Window.Location.assign(downloadUri.asString());
   }
 
-  @UiHandler("removeFileButton")
+  @UiHandler("optionNewProcess")
+  void buttonNewProcessButtonHandler(ClickEvent e) {
+    SelectedItems<IndexedFile> selected = new SelectedItemsList<IndexedFile>(Arrays.asList(fileUUID),
+      IndexedFile.class.getName());
+
+    LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+    selectedItems.setSelectedItems(selected);
+    selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
+    HistoryUtils.newHistory(CreateJob.RESOLVER, "action");
+
+  }
+
+  @UiHandler("optionRemove")
   void buttonRemoveFileButtonHandler(ClickEvent e) {
     Dialogs.showConfirmDialog(messages.viewRepresentationRemoveFileTitle(),
       messages.viewRepresentationRemoveFileMessage(), messages.dialogCancel(), messages.dialogYes(),
@@ -280,6 +294,11 @@ public class BrowseFile extends Composite {
     toggleDisseminationsPanel();
   }
 
+  @UiHandler("optionsButton")
+  void buttonOptionsButtonHandler(ClickEvent e) {
+    toggleOptionsPanel();
+  }
+
   private void toggleInfoPanel() {
     infoPanelOpen = !infoPanelOpen;
 
@@ -294,6 +313,11 @@ public class BrowseFile extends Composite {
       if (disseminationsPanelOpen) {
         toggleDisseminationsPanel();
       }
+
+      if (optionsPanelOpen) {
+        toggleOptionsPanel();
+      }
+
     } else {
       infoFileButton.removeStyleName("active");
     }
@@ -315,11 +339,40 @@ public class BrowseFile extends Composite {
         toggleInfoPanel();
       }
 
+      if (optionsPanelOpen) {
+        toggleOptionsPanel();
+      }
+
     } else {
       disseminationsButton.removeStyleName("active");
     }
-    
+
     JavascriptUtils.toggleRightPanel(".dipFilePanel");
+  }
+
+  private void toggleOptionsPanel() {
+    optionsPanelOpen = !optionsPanelOpen;
+    updateOptionsPanel();
+  }
+
+  private void updateOptionsPanel() {
+    if (optionsPanelOpen) {
+      optionsButton.addStyleName("active");
+      updateDisseminations();
+
+      if (infoPanelOpen) {
+        toggleInfoPanel();
+      }
+
+      if (disseminationsPanelOpen) {
+        toggleDisseminationsPanel();
+      }
+
+    } else {
+      optionsButton.removeStyleName("active");
+    }
+
+    JavascriptUtils.toggleRightPanel(".optionsFilePanel");
   }
 
   private List<BreadcrumbItem> getBreadcrumbs() {

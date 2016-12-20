@@ -483,6 +483,8 @@ public interface ClientMessages extends Messages {
   String viewRepresentationPreviousFileButton();
 
   String viewRepresentationDownloadFileButton();
+  
+  String viewRepresentationNewProcessButton();
 
   String viewRepresentationRemoveFileButton();
 
@@ -501,6 +503,8 @@ public interface ClientMessages extends Messages {
   String viewRepresentationInfoTitle();
 
   String viewRepresentationFileDisseminationTitle();
+  
+  String viewRepresentationFileOptionsTitle();
 
   String viewRepresentationInfoFilename();
 

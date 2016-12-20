@@ -33,16 +33,10 @@
 						<i class="fa fa-list-alt"></i>
 					</g:HTML>
 				</g:FocusPanel>
-				<g:FocusPanel ui:field="downloadFileButton"
-					addStyleNames="toolbarLink filePreviewToolbarDownloadIcon">
+				<g:FocusPanel ui:field="optionsButton"
+					addStyleNames="toolbarLink filePreviewToolbarOptionsIcon">
 					<g:HTML>
-						<i class="fa fa-download"></i>
-					</g:HTML>
-				</g:FocusPanel>
-				<g:FocusPanel ui:field="removeFileButton"
-					addStyleNames="toolbarLink filePreviewToolbarRemoveIcon">
-					<g:HTML>
-						<i class="fa fa-remove"></i>
+						<i class="fa fa-cog"></i>
 					</g:HTML>
 				</g:FocusPanel>
 				<g:FocusPanel ui:field="disseminationsButton"
@@ -63,7 +57,7 @@
 			<b:IndexedFilePreview addStyleNames="viewRepresentationFilePreview"
 				ui:field="filePreview"></b:IndexedFilePreview>
 			<!-- INFO PANEL -->
-			<g:FlowPanel addStyleNames="infoFilePanel">
+			<g:FlowPanel addStyleNames="infoFilePanel blueSlider">
 				<g:Label styleName="h1" addStyleNames="infoFileTitle">
 					<ui:text from='{messages.viewRepresentationInfoTitle}' />
 				</g:Label>
@@ -71,11 +65,28 @@
 				</g:FlowPanel>
 			</g:FlowPanel>
 			<!-- DIP PANEL -->
-			<g:FlowPanel addStyleNames="dipFilePanel">
+			<g:FlowPanel addStyleNames="dipFilePanel blueSlider">
 				<g:Label styleName="h1" addStyleNames="fileDipTitle">
 					<ui:text from='{messages.viewRepresentationFileDisseminationTitle}' />
 				</g:Label>
 				<g:FlowPanel ui:field="dipFilePanel">
+				</g:FlowPanel>
+			</g:FlowPanel>
+			<!-- OPTIONS PANEL -->
+			<g:FlowPanel addStyleNames="optionsFilePanel blueSlider">
+				<g:Label styleName="h1" addStyleNames="optionsFileTitle ">
+					<ui:text from='{messages.viewRepresentationFileOptionsTitle}' />
+				</g:Label>
+				<g:FlowPanel ui:field="optionsPanel">
+					<g:Button ui:field="optionDownload" addStyleNames="btn btn-block btn-default btn-download">
+						<ui:text from='{messages.viewRepresentationDownloadFileButton}' />
+					</g:Button>
+					<g:Button ui:field="optionNewProcess" addStyleNames="btn btn-block btn-default btn-play">
+						<ui:text from='{messages.viewRepresentationNewProcessButton}' />
+					</g:Button>
+					<g:Button ui:field="optionRemove" addStyleNames="btn btn-block btn-danger btn-ban">
+						<ui:text from='{messages.viewRepresentationRemoveFileButton}' />
+					</g:Button>
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>

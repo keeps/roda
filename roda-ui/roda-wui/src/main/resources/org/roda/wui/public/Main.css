@@ -565,6 +565,14 @@ pre code {
     text-overflow: ellipsis;
 }
 
+.btn-block {
+	width: 100%;
+}
+
+.btn-block + .btn-block {
+	margin-top: 10px;
+}
+
 .btn:hover {
     background-color: #2988c0;
     cursor: pointer;
@@ -3699,7 +3707,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .viewRepresentationFile .filePreviewToolbar .viewRepresentationBreadcrumb {
-    padding: 5px 70px 5px 20px;
+    padding: 5px 100px 4px 20px;
     margin: 0;
 }
 
@@ -3853,7 +3861,7 @@ td.datePickerMonth, td.datePickerYear {
     color: inherit;
 }
 
-.viewRepresentationFile .infoFilePanel, .viewRepresentationFile .dipFilePanel {
+.viewRepresentationFile .blueSlider {
     height: 630px;
     width: 300px;
     background: #089de3;
@@ -3866,7 +3874,7 @@ td.datePickerMonth, td.datePickerYear {
     box-shadow: 0 0 0 0 transparent, 0 0 0 0 transparent, 0 0 0 0 transparent, -6px 0 15px -4px rgba(31, 73, 125, 0.8);
 }
 
-.viewRepresentationFile .infoFileTitle, .viewRepresentationFile .fileDipTitle {
+.viewRepresentationFile .blueSlider .h1 {
     font-size: 3rem;
     margin-top: 1.2rem;
     margin-bottom: 2.5rem;
