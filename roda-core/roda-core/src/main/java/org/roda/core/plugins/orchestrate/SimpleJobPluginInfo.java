@@ -30,7 +30,7 @@ public class SimpleJobPluginInfo extends JobPluginInfo {
 
   @Override
   public <T extends IsRODAObject> JobPluginInfo processJobPluginInformation(Plugin<T> plugin, JobInfo jobInfo) {
-    Map<Plugin<?>, JobPluginInfo> jobInfos = jobInfo.getJobInfo();
+    Map<Integer, JobPluginInfo> jobInfos = jobInfo.getJobInfo();
     // update information in the map<plugin, pluginInfo>
     // FIXME/INFO 20160601 hsilva: the following code would be necessary in a
     // distributed architecture

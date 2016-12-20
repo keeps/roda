@@ -82,7 +82,7 @@ public class IngestJobPluginInfo extends JobPluginInfo {
 
   public <T extends IsRODAObject> JobPluginInfo processJobPluginInformation(Plugin<T> plugin, JobInfo jobInfo) {
     int taskObjectsCount = jobInfo.getObjectsCount();
-    Map<Plugin<?>, JobPluginInfo> jobInfos = jobInfo.getJobInfo();
+    Map<Integer, JobPluginInfo> jobInfos = jobInfo.getJobInfo();
     // update information in the map<plugin, pluginInfo>
     // FIXME/INFO 20160601 hsilva: the following code would be necessary in a
     // distributed architecture
@@ -198,6 +198,10 @@ public class IngestJobPluginInfo extends JobPluginInfo {
     // set the success counter
     setSourceObjectsProcessedWithSuccess(getSourceObjectsCount() - getSourceObjectsProcessedWithFailure());
     setStepsCompleted(getTotalSteps());
+
+    // 20161220 hsilva: preparing maps for garbage collection
+    allReports = null;
+    reportsFromBeingProcessed = null;
   }
 
   public <T extends IsRODAObject> void failOtherTransferredResourceAIPs(Plugin<T> plugin, ModelService model,
