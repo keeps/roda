@@ -143,7 +143,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
             forceSearchScope, jobId);
           aip = processNewSIP(index, model, storage, reportItem, sip, parentId);
         } else if (IPEnums.IPStatus.UPDATE == sip.getStatus()) {
-          aip = processUpdateSIP(index, model, storage, sip, computedSearchScope);
+          aip = processUpdateSIP(index, model, storage, sip, computedSearchScope,forceSearchScope);
         } else {
           throw new GenericException("Unknown IP Status: " + sip.getStatus());
         }
@@ -195,7 +195,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
   }
 
   private AIP processUpdateSIP(IndexService index, ModelService model, StorageService storage, SIP sip,
-    Optional<String> searchScope) throws GenericException, RequestNotValidException, NotFoundException,
+    Optional<String> searchScope, boolean forceSearchScope) throws GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException, AlreadyExistsException, ValidationException {
     AIP aip;
     String searchScopeString = searchScope.orElse(null);
@@ -222,7 +222,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
         aip = EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP.getId(), model, storage, jobUsername);
       } else {
         // Fail to update since there's no AIP
-        throw new NotFoundException("Unable to find AIP created with SIP ID: " + sip.getId());
+        throw new NotFoundException("Unable to find AIP created with SIP ID or AIP ID " + sip.getId()+(searchScopeString!=null?" under AIP "+searchScopeString:""));
       }
     }
     return aip;
