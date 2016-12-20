@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.WeakHashMap;
 
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.plugins.Plugin;
@@ -18,13 +19,17 @@ import org.roda.core.plugins.Plugin;
 public class JobInfo implements Serializable {
   private static final long serialVersionUID = 5962481824986980596L;
 
-  private Map<Plugin<?>, JobPluginInfo> pluginsInfo;
-  private Map<Plugin<?>, Boolean> pluginsDone;
+  private int mappingNumber;
+  private Map<Plugin<?>, Integer> mapping;
+  private Map<Integer, JobPluginInfo> pluginsInfo;
+  private Map<Integer, Boolean> pluginsDone;
   private int objectsCount;
   private boolean initEnded;
   private boolean done;
 
   public JobInfo() {
+    mappingNumber = 1;
+    mapping = new WeakHashMap<>();
     pluginsInfo = new HashMap<>();
     pluginsDone = new HashMap<>();
     objectsCount = 0;
@@ -32,11 +37,11 @@ public class JobInfo implements Serializable {
     done = false;
   }
 
-  public Map<Plugin<?>, JobPluginInfo> getJobInfo() {
+  public Map<Integer, JobPluginInfo> getJobInfo() {
     return pluginsInfo;
   }
 
-  public void setJobInfo(Map<Plugin<?>, JobPluginInfo> jobInfo) {
+  public void setJobInfo(Map<Integer, JobPluginInfo> jobInfo) {
     this.pluginsInfo = jobInfo;
   }
 
@@ -58,7 +63,7 @@ public class JobInfo implements Serializable {
 
   public boolean isDone() {
     boolean isDone = true;
-    for (Entry<Plugin<?>, Boolean> entry : pluginsDone.entrySet()) {
+    for (Entry<Integer, Boolean> entry : pluginsDone.entrySet()) {
       if (!entry.getValue()) {
         isDone = false;
         break;
@@ -68,16 +73,28 @@ public class JobInfo implements Serializable {
     return done;
   }
 
+  private <T extends IsRODAObject> Integer getId(Plugin<T> innerPlugin) {
+    Integer ret = mapping.get(innerPlugin);
+    if (ret == null) {
+      ret = mappingNumber;
+      mapping.put(innerPlugin, mappingNumber);
+      mappingNumber++;
+    }
+    return ret;
+  }
+
   public <T extends IsRODAObject> void put(Plugin<T> innerPlugin, JobPluginInfo jobPluginInfo) {
-    pluginsInfo.put(innerPlugin, jobPluginInfo);
+    pluginsInfo.put(getId(innerPlugin), jobPluginInfo);
   }
 
   public <T extends IsRODAObject> void setStarted(Plugin<T> innerPlugin) {
-    pluginsDone.put(innerPlugin, false);
+    pluginsDone.put(getId(innerPlugin), false);
   }
 
   public <T extends IsRODAObject> void setDone(Plugin<T> innerPlugin) {
-    pluginsDone.put(innerPlugin, true);
+    pluginsDone.put(getId(innerPlugin), true);
+    // 20161220 hsilva: remove so it can be garbage collected
+    mapping.remove(innerPlugin);
   }
 
   @Override
