@@ -123,10 +123,10 @@
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.searchTitle}' />
 							</g:Label>
-							<g:Button addStyleNames="btn btn-search" ui:field="searchContext">
+							<g:Button addStyleNames="btn btn-default btn-search" ui:field="searchContext">
 								<ui:text from='{messages.searchContext}' />
 							</g:Button>
-							<g:Button addStyleNames="btn btn-search" ui:field="searchAIP">
+							<g:Button addStyleNames="btn btn-default btn-search" ui:field="searchAIP">
 								<ui:text from='{messages.searchAIP}' />
 							</g:Button>
 						</g:FlowPanel>

@@ -588,6 +588,15 @@ pre code {
     background-color: #666;
 }
 
+.btn-default-alt {
+    background-color: rgba(0,0,0,0.3);
+}
+
+.btn-default-alt:hover {
+    background-color: rgba(0,0,0,0.4);
+}
+
+
 .btn-danger {
     background-color: #d9534f;
 }
@@ -1663,6 +1672,10 @@ td.datePickerMonth, td.datePickerYear {
     width: 100%;
     margin-right: 10px;
     margin-bottom: 7px;
+}
+
+.sidebar .btn.separator {
+	margin-bottom: 14px;
 }
 
 .sidebar .h1, .sidebar .h2, .sidebar .h3, .sidebar .h4, .sidebar .h5,

@@ -78,10 +78,10 @@
 					<ui:text from='{messages.viewRepresentationFileOptionsTitle}' />
 				</g:Label>
 				<g:FlowPanel ui:field="optionsPanel">
-					<g:Button ui:field="optionDownload" addStyleNames="btn btn-block btn-default btn-download">
+					<g:Button ui:field="optionDownload" addStyleNames="btn btn-block btn-default-alt btn-download">
 						<ui:text from='{messages.viewRepresentationDownloadFileButton}' />
 					</g:Button>
-					<g:Button ui:field="optionNewProcess" addStyleNames="btn btn-block btn-default btn-play">
+					<g:Button ui:field="optionNewProcess" addStyleNames="btn btn-block btn-default-alt btn-play">
 						<ui:text from='{messages.viewRepresentationNewProcessButton}' />
 					</g:Button>
 					<g:Button ui:field="optionRemove" addStyleNames="btn btn-block btn-danger btn-ban">
