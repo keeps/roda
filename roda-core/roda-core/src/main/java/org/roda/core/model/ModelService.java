@@ -461,11 +461,8 @@ public class ModelService extends ModelObservable {
     if (aipId.equals(parentId)) {
       throw new RequestNotValidException("Cannot set itself as its parent: " + aipId);
     }
-    IndexedAIP parentAIP = RodaCoreFactory.getIndexService().retrieve(IndexedAIP.class, parentId);
-    if (parentAIP.getAncestors().contains(aipId)) {
-      throw new RequestNotValidException("Cannot move an AIP under one of his children.");
-    }
-    
+
+    //TODO ADD RESTRICTIONS
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
     String oldParentId = aip.getParentId();
     aip.setParentId(parentId);
