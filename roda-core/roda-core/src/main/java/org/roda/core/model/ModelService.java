@@ -65,6 +65,7 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
@@ -460,7 +461,11 @@ public class ModelService extends ModelObservable {
     if (aipId.equals(parentId)) {
       throw new RequestNotValidException("Cannot set itself as its parent: " + aipId);
     }
-
+    IndexedAIP parentAIP = RodaCoreFactory.getIndexService().retrieve(IndexedAIP.class, parentId);
+    if (parentAIP.getAncestors().contains(aipId)) {
+      throw new RequestNotValidException("Cannot move an AIP under one of his children.");
+    }
+    
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
     String oldParentId = aip.getParentId();
     aip.setParentId(parentId);

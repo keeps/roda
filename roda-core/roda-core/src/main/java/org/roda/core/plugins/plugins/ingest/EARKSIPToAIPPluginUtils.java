@@ -21,6 +21,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
@@ -81,20 +82,19 @@ public class EARKSIPToAIPPluginUtils {
 
   }
 
-  public static AIP earkSIPToAIPUpdate(SIP sip, String aipId, ModelService model, StorageService storage,
-    String username) throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
-    AuthorizationDeniedException, ValidationException {
+  public static AIP earkSIPToAIPUpdate(SIP sip, IndexedAIP indexedAIP, ModelService model, StorageService storage,
+    String username) throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException, ValidationException{
     boolean notify = false;
 
     // process IP information
-    processIPInformation(model, sip, aipId, notify, true);
+    processIPInformation(model, sip, indexedAIP.getId(), notify, true);
 
     // process IPRepresentation information
     for (IPRepresentation representation : sip.getRepresentations()) {
-      processIPRepresentationInformation(model, representation, aipId, storage, notify, true);
+      processIPRepresentationInformation(model, representation, indexedAIP.getId(), storage, notify, true);
     }
 
-    AIP aip = model.retrieveAIP(aipId);
+    AIP aip = model.retrieveAIP(indexedAIP.getId());
     aip.setGhost(false);
     model.updateAIP(aip, username);
 
