@@ -83,7 +83,7 @@ public class EARKSIPToAIPPluginUtils {
   }
 
   public static AIP earkSIPToAIPUpdate(SIP sip, IndexedAIP indexedAIP, ModelService model, StorageService storage,
-    String username) throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException, ValidationException{
+    String username, String newParentID) throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException, ValidationException{
     boolean notify = false;
 
     // process IP information
@@ -96,6 +96,9 @@ public class EARKSIPToAIPPluginUtils {
 
     AIP aip = model.retrieveAIP(indexedAIP.getId());
     aip.setGhost(false);
+    if(newParentID!=null){
+      aip.setParentId(newParentID);
+    }
     model.updateAIP(aip, username);
 
     return aip;
@@ -132,6 +135,8 @@ public class EARKSIPToAIPPluginUtils {
       try {
         model.createDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, payload, metadataType,
           metadataVersion, notify);
+      } catch(GenericException e){
+        throw(e);
       } catch (AlreadyExistsException e) {
         if (update) {
           Map<String, String> properties = new HashMap<String, String>();
@@ -142,7 +147,7 @@ public class EARKSIPToAIPPluginUtils {
         } else {
           throw e;
         }
-      }
+      } 
     }
   }
 

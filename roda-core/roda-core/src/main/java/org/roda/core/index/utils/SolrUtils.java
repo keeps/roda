@@ -2406,6 +2406,9 @@ public class SolrUtils {
     while (nextAncestorId != null) {
       try {
         AIP nextAncestor = model.retrieveAIP(nextAncestorId);
+        if(ancestors.contains(nextAncestorId)){
+          break;
+        }
         ancestors.add(nextAncestorId);
         nextAncestorId = nextAncestor.getParentId();
       } catch (NotFoundException e) {
