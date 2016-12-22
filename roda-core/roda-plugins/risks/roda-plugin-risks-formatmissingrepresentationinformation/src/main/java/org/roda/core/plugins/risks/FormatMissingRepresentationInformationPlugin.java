@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -28,8 +27,10 @@ import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.formats.Format;
+import org.roda.core.data.v2.index.filter.AndFiltersParameters;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
+import org.roda.core.data.v2.index.filter.OrFiltersParameters;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
@@ -64,7 +65,7 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
   private static final Logger LOGGER = LoggerFactory.getLogger(FormatMissingRepresentationInformationPlugin.class);
 
   /** Plugin version. */
-  private static final String VERSION = "1.0";
+  private static final String VERSION = "1.1";
 
   /** Risk ID. */
   private static final String RISK_ID = "urn:FormatMissingRepresentationInformation:r1";
@@ -104,6 +105,16 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
     FORMAT_DESIGNATION_NAME, PluginParameter.PluginParameterType.BOOLEAN, PARAM_VALUE_TRUE, false, false,
     "Check Format designation name and version?");
 
+  /** Plugin parameter ID 'extension'. */
+  private static final String EXTENSION = "extension";
+
+  /** Plugin parameter name 'extension'. */
+  private static final String EXTENSION_NAME = "Extension";
+
+  /** Plugin parameter 'extension'. */
+  private static final PluginParameter PARAM_EXTENSION = new PluginParameter(EXTENSION, EXTENSION_NAME,
+    PluginParameter.PluginParameterType.BOOLEAN, PARAM_VALUE_TRUE, false, false, "Check extension?");
+
   /** Plugin parameter ID 'matchOne'. */
   private static final String MATCH_ONE = "matchOne";
 
@@ -111,11 +122,6 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
   private static final PluginParameter PARAM_MATCH_ONE = new PluginParameter(MATCH_ONE,
     "Match (at least) one Format type", PluginParameter.PluginParameterType.BOOLEAN, "false", false, false,
     "Don't create risk incidence(s) if at least one of the selected format types is found.");
-
-  /**
-   * String format for {@link Format} name and version.
-   */
-  private static final String FORMAT_NAME_PATTERN = "%1$s, version %2$s";
 
   @Override
   public void init() throws PluginException {
@@ -134,7 +140,7 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
 
   @Override
   public String getDescription() {
-    return "Check file format (Mimetype, PRONOM and Format designation) in the Format Registry. "
+    return "Check file format (Mimetype, PRONOM, Extension and Format designation) in the Format Registry. "
       + "If file format is not present in the Format Registry, it creates a new risk called "
       + "“Comprehensive representation information is missing for some files in the repository“ "
       + "and assigns the file to that risk in the Risk register.";
@@ -181,7 +187,7 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
 
   @Override
   public List<PluginParameter> getParameters() {
-    return Arrays.asList(PARAM_MIMETYPE, PARAM_PRONOM, PARAM_FORMAT_DESIGNATION, PARAM_MATCH_ONE);
+    return Arrays.asList(PARAM_MIMETYPE, PARAM_PRONOM, PARAM_FORMAT_DESIGNATION, PARAM_EXTENSION, PARAM_MATCH_ONE);
   }
 
   @Override
@@ -255,21 +261,30 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
   }
 
   /**
-   * Check existence of a Format?
+   * Check the format designation?
    *
-   * @return <code>true</code> if plugin should check the existence of a Format
-   *         designation, <code>false</code> otherwise.
+   * @return <code>true</code> if plugin should search for the format
+   *         designation in the Format Registry, <code>false</code> otherwise.
    */
   private boolean checkFormatDesignation() {
     return PARAM_VALUE_TRUE.equalsIgnoreCase(getParameterValues().get(FORMAT_DESIGNATION));
   }
 
   /**
+   * Check the extension?
+   *
+   * @return <code>true</code> if plugin should search for the extension in the
+   *         Format Registry, <code>false</code> otherwise.
+   */
+  private boolean checkExtension() {
+    return PARAM_VALUE_TRUE.equalsIgnoreCase(getParameterValues().get(EXTENSION));
+  }
+
+  /**
    * Match at least one format type?
    *
    * @return <code>true</code> if plugin should not create a risk incidence if
-   *         at least one format type is found, <code>false</code>
-   *         otherwise.
+   *         at least one format type is found, <code>false</code> otherwise.
    */
   private boolean matchAtLeastOneFormatType() {
     return PARAM_VALUE_TRUE.equalsIgnoreCase(getParameterValues().get(MATCH_ONE));
@@ -293,12 +308,12 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
     final JobPluginInfo jobPluginInfo, final Report jobReport) {
     LOGGER.debug("Processing File {}", file.getId());
 
-    final String fileUUID = IdUtils.getFileId(file);
-    final Report fileReport = PluginHelper.initPluginReportItem(this, fileUUID, File.class, AIPState.ACTIVE);
+    final String fileId = IdUtils.getFileId(file);
+    final Report fileReport = PluginHelper.initPluginReportItem(this, fileId, File.class, AIPState.ACTIVE);
     PluginHelper.updatePartialJobReport(this, model, index, fileReport, false);
 
     try {
-      final FileFormat fileFormat = index.retrieve(IndexedFile.class, fileUUID).getFileFormat();
+      final FileFormat fileFormat = index.retrieve(IndexedFile.class, fileId).getFileFormat();
       final FileFormatResult result;
       if (matchAtLeastOneFormatType()) {
         result = new MatchOneResult(fileFormat, index);
@@ -320,7 +335,7 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
       addToReportDetails(fileReport, result.toString());
 
     } catch (final NotFoundException | GenericException e) {
-      final String message = String.format("Error retrieving IndexedFile for File %s (%s)", file.getId(), fileUUID);
+      final String message = String.format("Error retrieving IndexedFile for File %s (%s)", file.getId(), fileId);
       LOGGER.debug(message, e);
       jobPluginInfo.incrementObjectsProcessedWithFailure();
       fileReport.setPluginState(PluginState.FAILURE);
@@ -457,7 +472,8 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
           || StringUtils.isBlank(this.fileFormat.getFormatDesignationVersion()));
       final boolean missingMimetype = checkMimetype() && StringUtils.isBlank(this.fileFormat.getMimeType());
       final boolean missingPronom = checkPronom() && StringUtils.isBlank(this.fileFormat.getPronom());
-      return missingFormat || missingMimetype || missingPronom;
+      final boolean missingExtension = checkExtension() && StringUtils.isBlank(this.fileFormat.getExtension());
+      return missingFormat || missingMimetype || missingPronom || missingExtension;
     }
 
     @Override
@@ -469,14 +485,14 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
     public String toString() {
       String str = "";
       if (isMissingAttributes()) {
-        str = "File does not have required information (Format designation, MIME type or PRONOM), "
+        str = "File does not have required information (Format designation, MIME type, PRONOM or Extension), "
           + "to be able to find Format representation information.";
       } else if (formatResults().isEmpty()) {
         str += getPreservationEventFailureMessage();
       } else {
         str += String.format("%s%n%n", getPreservationEventSuccessMessage());
         for (FormatResult result : this.formatResults()) {
-          str += result.toString();
+          str += String.format("%s%n", result);
         }
       }
       return str;
@@ -503,22 +519,37 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
       final List<AttributeCheck> checks = new ArrayList<>();
 
       if (checkMimetype()) {
-        checks.add(new AttributeCheck(MIMETYPE_NAME, present,
+        checks.add(new AttributeCheck(MIMETYPE_NAME, fileFormat.getMimeType(), present,
           new SimpleFilterParameter(RodaConstants.FORMAT_MIMETYPES, fileFormat.getMimeType())));
       }
 
       if (checkPronom()) {
-        checks.add(new AttributeCheck(PRONOM_NAME, present,
+        checks.add(new AttributeCheck(PRONOM_NAME, fileFormat.getPronom(), present,
           new SimpleFilterParameter(RodaConstants.FORMAT_PRONOMS, fileFormat.getPronom())));
       }
 
+      if (checkExtension()) {
+        checks.add(new AttributeCheck(EXTENSION_NAME, fileFormat.getExtension(), present,
+          new SimpleFilterParameter(RodaConstants.FORMAT_EXTENSIONS, fileFormat.getExtension())));
+      }
+
       if (checkFormatDesignation()) {
-        final String formatNamePattern = RodaCoreFactory.getRodaConfiguration().getString(
-          "core.plugins.external.FormatMissingRepresentationInformation.format_name_pattern", FORMAT_NAME_PATTERN);
-        final String name = String.format(formatNamePattern, fileFormat.getFormatDesignationName(),
+
+        final FilterParameter mainName = new SimpleFilterParameter(RodaConstants.FORMAT_NAME,
+          fileFormat.getFormatDesignationName());
+        final FilterParameter alternativeName = new SimpleFilterParameter(RodaConstants.FORMAT_ALTERNATIVE_DESIGNATIONS,
+          fileFormat.getFormatDesignationName());
+        final FilterParameter name = new OrFiltersParameters("name", Arrays.asList(mainName, alternativeName));
+        final FilterParameter version = new SimpleFilterParameter(RodaConstants.FORMAT_VERSIONS,
           fileFormat.getFormatDesignationVersion());
-        checks.add(new AttributeCheck(FORMAT_DESIGNATION_NAME, present,
-          new SimpleFilterParameter(RodaConstants.FORMAT_NAME, name)));
+        final FilterParameter nameAndVersion = new AndFiltersParameters("nameAndVersion", Arrays.asList(name, version));
+        final FilterParameter nameAndVersionOrName = new OrFiltersParameters("nameVersionOrName",
+          Arrays.asList(nameAndVersion, name));
+
+        final String value = String.format("%s\", \"%s", fileFormat.getFormatDesignationName(),
+          fileFormat.getFormatDesignationVersion());
+
+        checks.add(new AttributeCheck(FORMAT_DESIGNATION_NAME, value, present, nameAndVersionOrName));
       }
 
       return checks;
@@ -558,13 +589,13 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
     List<FormatResult> formatResults() {
       if (this.formatResults == null) {
         this.formatResults = new ArrayList<>();
-        final List<AttributeCheck> checks = attributeChecks();
         final List<FilterParameter> filterParams = new ArrayList<>();
-        checks.forEach(c -> filterParams.add(c.getFilterParameter()));
+
+        final List<AttributeCheck> checks = attributeChecks();
+        checks.forEach(check -> filterParams.add(check.getFilterParameter()));
+
         final Iterator<Format> formats = this.indexService.findAll(Format.class, new Filter(filterParams)).iterator();
-        while (formats.hasNext()) {
-          this.formatResults.add(new FormatResult(formats.next(), checks));
-        }
+        formats.forEachRemaining(format -> this.formatResults.add(new FormatResult(format, checks)));
       }
       return this.formatResults;
     }
@@ -605,13 +636,11 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
     List<FormatResult> formatResults() {
       if (this.formatResults == null) {
         this.formatResults = new ArrayList<>();
-        final List<AttributeCheck> checks = attributeChecks(true);
-        for (AttributeCheck check : checks) {
+        for (AttributeCheck check : attributeChecks(true)) {
           final Iterator<Format> formats = this.indexService
             .findAll(Format.class, new Filter(check.getFilterParameter())).iterator();
-          while (formats.hasNext()) {
-            this.formatResults.add(new FormatResult(formats.next(), Collections.singletonList(check)));
-          }
+          formats.forEachRemaining(
+            format -> this.formatResults.add(new FormatResult(format, Collections.singletonList(check))));
         }
         consolidateResults();
       }
@@ -710,26 +739,34 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
      */
     private final String name;
     /**
+     * The value.
+     */
+    private final String value;
+    /**
      * Is it present?
      */
     private final boolean present;
     /**
      * The {@link FilterParameter} corresponding to this check.
      */
-    private final SimpleFilterParameter filterParameter;
+    private final FilterParameter filterParameter;
 
     /**
      * Constructor.
      * 
      * @param name
      *          The name.
+     * @param value
+     *          The value.
      * @param present
      *          Is it present?
      * @param filterParameter
      *          The {@link FilterParameter} corresponding to this check.
      */
-    AttributeCheck(final String name, final boolean present, final SimpleFilterParameter filterParameter) {
+    AttributeCheck(final String name, final String value, final boolean present,
+      final FilterParameter filterParameter) {
       this.name = name;
+      this.value = value;
       this.present = present;
       this.filterParameter = filterParameter;
     }
@@ -740,8 +777,7 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
 
     @Override
     public String toString() {
-      return String.format("%s %s \"%s\"", this.present ? "has" : "does NOT have", this.name,
-        this.filterParameter.getValue());
+      return String.format("%s %s \"%s\"", this.present ? "has" : "does NOT have", this.name, this.value);
     }
   }
 }
