@@ -7,10 +7,11 @@
  */
 package org.roda.core.data.v2.ip.metadata;
 
-import java.io.Serializable;
 import java.util.List;
 
-public class OtherMetadata implements Serializable {
+import org.roda.core.data.v2.IsRODAObject;
+
+public class OtherMetadata implements IsRODAObject {
 
   private static final long serialVersionUID = 7643339238489130326L;
 

@@ -52,4 +52,8 @@ public class OptionalWithCause<T> {
     return new OptionalWithCause<>(Optional.of(value), null);
   }
 
+  public static <T> OptionalWithCause<T> of(Optional<T> value) {
+    return new OptionalWithCause<>(value, null);
+  }
+
 }

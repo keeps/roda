@@ -13,7 +13,9 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
@@ -27,6 +29,8 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.utils.URNUtils;
+import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
@@ -38,6 +42,7 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.DefaultBinary;
 import org.roda.core.storage.DefaultDirectory;
@@ -225,7 +230,7 @@ public class ResourceParseUtils {
     return ret;
   }
 
-  public static <T extends Serializable> OptionalWithCause<T> convertResourceTo(StorageService storage,
+  public static <T extends IsRODAObject> OptionalWithCause<T> convertResourceTo(StorageService storage,
     Resource resource, Class<T> classToReturn) {
     OptionalWithCause<T> ret;
 
@@ -251,6 +256,48 @@ public class ResourceParseUtils {
       ret = OptionalWithCause.empty(e);
     } catch (IOException e) {
       ret = OptionalWithCause.empty(new RequestNotValidException(e));
+    }
+
+    return ret;
+  }
+
+  public static <T extends IsRODAObject> OptionalWithCause<LiteRODAObject> convertResourceToLite(StorageService storage,
+    Resource resource, Class<T> classToReturn) {
+    OptionalWithCause<LiteRODAObject> ret;
+
+    if (classToReturn.equals(AIP.class)) {
+      ret = OptionalWithCause.of(LiteRODAObjectFactory.get(AIP.class, resource.getStoragePath().getName()));
+    } else if (classToReturn.equals(Representation.class)) {
+      StoragePath storagePath = resource.getStoragePath();
+      String aipId = ModelUtils.extractAipId(storagePath);
+      String representationId = ModelUtils.extractRepresentationId(storagePath);
+
+      ret = OptionalWithCause.of(LiteRODAObjectFactory.get(Representation.class, aipId, representationId));
+    } else if (classToReturn.equals(File.class)) {
+      // TODO ret =
+      // OptionalWithCause.of(classToReturn.cast(convertResourceToFile(resource)));
+      ret = OptionalWithCause.empty(new RequestNotValidException("Not yet supported"));
+    } else if (classToReturn.equals(PreservationMetadata.class)) {
+      // TODO ret =
+      // OptionalWithCause.of(classToReturn.cast(convertResourceToPreservationMetadata(resource)));
+      ret = OptionalWithCause.empty(new RequestNotValidException("Not yet supported"));
+    } else if (classToReturn.equals(OtherMetadata.class)) {
+      // TODO ret =
+      // OptionalWithCause.of(classToReturn.cast(convertResourceToOtherMetadata(resource)));
+      ret = OptionalWithCause.empty(new RequestNotValidException("Not yet supported"));
+    } else if (classToReturn.equals(DIP.class)) {
+      // TODO ret =
+      // OptionalWithCause.of(classToReturn.cast(getDIPMetadata(storage,
+      // resource.getStoragePath())));
+      ret = OptionalWithCause.empty(new RequestNotValidException("Not yet supported"));
+    } else if (classToReturn.equals(DIPFile.class)) {
+      // TODO ret =
+      // OptionalWithCause.of(classToReturn.cast(convertResourceToDIPFile(resource)));
+      ret = OptionalWithCause.empty(new RequestNotValidException("Not yet supported"));
+    } else {
+      // TODO ret = OptionalWithCause.of(convertResourceToObject(resource,
+      // classToReturn));
+      ret = OptionalWithCause.empty(new RequestNotValidException("Not yet supported"));
     }
 
     return ret;
@@ -327,8 +374,32 @@ public class ResourceParseUtils {
       || classToReturn.equals(DIPFile.class) || classToReturn.equals(DIP.class);
   }
 
-  public static <T extends Serializable> CloseableIterable<OptionalWithCause<T>> convert(final StorageService storage,
+  @FunctionalInterface
+  interface ResourceParser<T extends IsRODAObject, R extends Serializable> {
+
+    OptionalWithCause<R> parse(StorageService storage, Resource resource, Class<T> classToReturn);
+
+    default <V extends IsRODAObject> ResourceParser<T, V> andThen(
+      Function<OptionalWithCause<R>, OptionalWithCause<V>> after) {
+      Objects.requireNonNull(after);
+      return (StorageService storage, Resource resource, Class<T> classToReturn) -> after
+        .apply(parse(storage, resource, classToReturn));
+    }
+  }
+
+  public static <T extends IsRODAObject> CloseableIterable<OptionalWithCause<T>> convert(final StorageService storage,
     final CloseableIterable<Resource> iterable, final Class<T> classToReturn) {
+    return convert(storage, iterable, classToReturn, (s, r, c) -> ResourceParseUtils.convertResourceTo(s, r, c));
+  }
+
+  public static <T extends IsRODAObject> CloseableIterable<OptionalWithCause<LiteRODAObject>> convertLite(
+    StorageService storage, CloseableIterable<Resource> iterable, Class<T> classToReturn) {
+    return convert(storage, iterable, classToReturn, (s, r, c) -> ResourceParseUtils.convertResourceToLite(s, r, c));
+  }
+
+  private static <T extends IsRODAObject, R extends Serializable> CloseableIterable<OptionalWithCause<R>> convert(
+    final StorageService storage, final CloseableIterable<Resource> iterable, final Class<T> classToReturn,
+    ResourceParser<T, R> parser) {
 
     final CloseableIterable<Resource> filtered;
     if (isDirectoryAcceptable(classToReturn)) {
@@ -337,14 +408,14 @@ public class ResourceParseUtils {
       filtered = CloseableIterables.filter(iterable, p -> !p.isDirectory());
     }
 
-    CloseableIterable<OptionalWithCause<T>> it = null;
+    CloseableIterable<OptionalWithCause<R>> it = null;
 
     final Iterator<Resource> iterator = filtered.iterator();
-    it = new CloseableIterable<OptionalWithCause<T>>() {
+    it = new CloseableIterable<OptionalWithCause<R>>() {
 
       @Override
-      public Iterator<OptionalWithCause<T>> iterator() {
-        return new Iterator<OptionalWithCause<T>>() {
+      public Iterator<OptionalWithCause<R>> iterator() {
+        return new Iterator<OptionalWithCause<R>>() {
 
           @Override
           public boolean hasNext() {
@@ -355,8 +426,8 @@ public class ResourceParseUtils {
           }
 
           @Override
-          public OptionalWithCause<T> next() {
-            return ResourceParseUtils.convertResourceTo(storage, iterator.next(), classToReturn);
+          public OptionalWithCause<R> next() {
+            return parser.parse(storage, iterator.next(), classToReturn);
           }
 
           @Override

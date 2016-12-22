@@ -7,17 +7,22 @@
  */
 package org.roda.core.model;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteRODAObject;
+import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
@@ -33,6 +38,7 @@ import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.storage.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,6 +115,10 @@ public final class LiteRODAObjectFactory {
 
   public static <T extends IsRODAObject> Optional<LiteRODAObject> get(Class<T> objectClass, List<String> ids) {
     return get(objectClass, ids, true);
+  }
+
+  public static <T extends IsRODAObject> Optional<LiteRODAObject> get(Class<T> objectClass, String... ids) {
+    return get(objectClass, Arrays.asList(ids), true);
   }
 
   private static <T extends IsRODAObject> Optional<LiteRODAObject> get(Class<T> objectClass, List<String> ids,
@@ -326,6 +336,57 @@ public final class LiteRODAObjectFactory {
     }
 
     return Optional.ofNullable(ret);
+  }
+
+  public static <T extends IsRODAObject> List<LiteRODAObject> transformIntoLite(ModelService model,
+    List<T> modelObjects) {
+    return modelObjects.stream().map(o -> model.retrieveLiteFromObject(o)).filter(o -> o.isPresent()).map(o -> o.get())
+      .collect(Collectors.toList());
+  }
+
+  public static <T extends IsRODAObject> CloseableIterable<OptionalWithCause<LiteRODAObject>> transformIntoLite(
+    final CloseableIterable<OptionalWithCause<T>> list) {
+    CloseableIterable<OptionalWithCause<LiteRODAObject>> it = null;
+
+    final Iterator<OptionalWithCause<T>> iterator = list.iterator();
+    it = new CloseableIterable<OptionalWithCause<LiteRODAObject>>() {
+
+      @Override
+      public Iterator<OptionalWithCause<LiteRODAObject>> iterator() {
+        return new Iterator<OptionalWithCause<LiteRODAObject>>() {
+
+          @Override
+          public boolean hasNext() {
+            if (iterator == null) {
+              return true;
+            }
+            return iterator.hasNext();
+          }
+
+          @Override
+          public OptionalWithCause<LiteRODAObject> next() {
+            OptionalWithCause<T> next = iterator.next();
+            if (next.isPresent()) {
+              return OptionalWithCause.of(get(next.get()));
+            } else {
+              return OptionalWithCause.empty(next.getCause());
+            }
+          }
+
+          @Override
+          public void remove() {
+            throw new UnsupportedOperationException();
+          }
+        };
+      }
+
+      @Override
+      public void close() throws IOException {
+        list.close();
+      }
+    };
+
+    return it;
   }
 
 }

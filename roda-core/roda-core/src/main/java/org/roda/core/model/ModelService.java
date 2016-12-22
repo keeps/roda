@@ -2429,6 +2429,37 @@ public class ModelService extends ModelObservable {
     return (CloseableIterable<OptionalWithCause<T>>) ret;
   }
 
+  public <T extends IsRODAObject> CloseableIterable<OptionalWithCause<LiteRODAObject>> listLite(Class<T> objectClass)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    CloseableIterable<OptionalWithCause<LiteRODAObject>> ret;
+
+    if (Representation.class.equals(objectClass)) {
+      // TODO enhance
+      ret = LiteRODAObjectFactory.transformIntoLite(listRepresentations());
+    } else if (File.class.equals(objectClass)) {
+      // TODO enhance
+      ret = LiteRODAObjectFactory.transformIntoLite(listFiles());
+    } else if (TransferredResource.class.equals(objectClass)) {
+      // FIXME 20160930 it uses index but it should not(?)
+      ret = LiteRODAObjectFactory.transformIntoLite(RodaCoreFactory.getIndexService().list(TransferredResource.class));
+    } else if (RODAMember.class.equals(objectClass)) {
+      // FIXME 20160930 it uses index but it should not(?)
+      ret = LiteRODAObjectFactory.transformIntoLite(RodaCoreFactory.getIndexService().list(RODAMember.class));
+    } else if (LogEntry.class.equals(objectClass)) {
+      // FIXME 20160930 it uses index but it should not(?)
+      ret = LiteRODAObjectFactory.transformIntoLite(RodaCoreFactory.getIndexService().list(LogEntry.class));
+    } else if (DIPFile.class.equals(objectClass)) {
+      // TODO enhance
+      ret = LiteRODAObjectFactory.transformIntoLite(listDIPFiles());
+    } else {
+      StoragePath containerPath = ModelUtils.getContainerPath(objectClass);
+      final CloseableIterable<Resource> resourcesIterable = storage.listResourcesUnderContainer(containerPath, false);
+      ret = ResourceParseUtils.convertLite(getStorage(), resourcesIterable, objectClass);
+    }
+
+    return ret;
+  }
+
   public boolean hasObjects(Class<? extends IsRODAObject> objectClass) {
     try {
       if (LogEntry.class.equals(objectClass) || RODAMember.class.equals(objectClass)
