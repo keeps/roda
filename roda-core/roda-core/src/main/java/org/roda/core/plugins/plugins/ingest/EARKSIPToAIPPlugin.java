@@ -130,7 +130,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
     SIP sip = null;
     AIP aip;
     try {
-      sip = EARKSIP.parse(earkSIPPath, jobWorkingDirectory);
+      sip = EARKSIP.parse(earkSIPPath, FSUtils.createRandomDirectory(jobWorkingDirectory));
 
       reportItem.setSourceObjectOriginalIds(sip.getIds());
 
