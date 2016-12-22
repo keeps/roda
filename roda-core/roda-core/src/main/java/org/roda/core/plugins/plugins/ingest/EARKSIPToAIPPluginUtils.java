@@ -81,6 +81,12 @@ public class EARKSIPToAIPPluginUtils {
   }
 
   public static AIP earkSIPToAIPUpdate(SIP sip, IndexedAIP indexedAIP, ModelService model, StorageService storage,
+    String username) throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException, ValidationException {
+    return earkSIPToAIPUpdate(sip, indexedAIP, model, storage, username, Optional.empty());
+  }
+
+  public static AIP earkSIPToAIPUpdate(SIP sip, IndexedAIP indexedAIP, ModelService model, StorageService storage,
     String username, Optional<String> searchScope) throws RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, ValidationException {
     boolean notify = false;
