@@ -24,12 +24,9 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
-import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
@@ -57,7 +54,8 @@ public class EARKSIPToAIPPluginUtils {
 
     String aipType = IngestHelper.getType(sip);
 
-    AIP aip = model.createAIP(state, parentId.orElse(null), aipType, permissions, ingestSIPIds, ingestJobId, notify, username);
+    AIP aip = model.createAIP(state, parentId.orElse(null), aipType, permissions, ingestSIPIds, ingestJobId, notify,
+      username);
 
     // process IP information
     processIPInformation(model, sip, aip.getId(), notify, false);
@@ -83,7 +81,8 @@ public class EARKSIPToAIPPluginUtils {
   }
 
   public static AIP earkSIPToAIPUpdate(SIP sip, IndexedAIP indexedAIP, ModelService model, StorageService storage,
-    String username, String newParentID) throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException, ValidationException{
+    String username, String newParentID) throws RequestNotValidException, NotFoundException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException, ValidationException {
     boolean notify = false;
 
     // process IP information
@@ -96,7 +95,7 @@ public class EARKSIPToAIPPluginUtils {
 
     AIP aip = model.retrieveAIP(indexedAIP.getId());
     aip.setGhost(false);
-    if(newParentID!=null){
+    if (newParentID != null) {
       aip.setParentId(newParentID);
     }
     model.updateAIP(aip, username);
@@ -135,19 +134,17 @@ public class EARKSIPToAIPPluginUtils {
       try {
         model.createDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, payload, metadataType,
           metadataVersion, notify);
-      } catch(GenericException e){
-        throw(e);
       } catch (AlreadyExistsException e) {
         if (update) {
           Map<String, String> properties = new HashMap<String, String>();
           properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATE_FROM_SIP.toString());
-          
+
           model.updateDescriptiveMetadata(aipId, descriptiveMetadataId, payload, metadataType, metadataVersion,
             properties);
         } else {
           throw e;
         }
-      } 
+      }
     }
   }
 
