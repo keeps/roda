@@ -158,8 +158,7 @@ public final class LiteRODAObjectFactory {
 
     if (object instanceof AIP || object instanceof DIP || object instanceof Format || object instanceof Job
       || object instanceof Notification || object instanceof Risk || object instanceof RiskIncidence) {
-      IsRODAObject o = (IsRODAObject) object;
-      ret = get(object.getClass(), Arrays.asList(o.getId()), false);
+      ret = get(object.getClass(), Arrays.asList(object.getId()), false);
     } else if (object instanceof DescriptiveMetadata) {
       ret = getDescriptiveMetadata(object);
     } else if (object instanceof DIPFile) {
