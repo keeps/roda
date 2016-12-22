@@ -264,6 +264,7 @@ public final class LiteRODAObjectFactory {
       return Optional.ofNullable(ret);
 
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+      LOGGER.error("Unable to create object from {}", liteRODAObject, e);
       return Optional.empty();
     }
   }
