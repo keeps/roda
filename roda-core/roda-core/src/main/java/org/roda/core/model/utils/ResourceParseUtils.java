@@ -271,7 +271,6 @@ public class ResourceParseUtils {
       StoragePath storagePath = resource.getStoragePath();
       String aipId = ModelUtils.extractAipId(storagePath);
       String representationId = ModelUtils.extractRepresentationId(storagePath);
-
       ret = OptionalWithCause.of(LiteRODAObjectFactory.get(Representation.class, aipId, representationId));
     } else if (classToReturn.equals(File.class)) {
       // TODO ret =

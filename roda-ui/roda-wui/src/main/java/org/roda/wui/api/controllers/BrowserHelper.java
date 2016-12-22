@@ -1572,9 +1572,10 @@ public class BrowserHelper {
     }
   }
 
-  public static File updateFile(User user, File file,ContentPayload contentPayload, boolean createIfNotExists, boolean notify) throws GenericException, AuthorizationDeniedException,
-    RequestNotValidException, NotFoundException, AlreadyExistsException {
-    RodaCoreFactory.getModelService().updateFile(file,contentPayload,createIfNotExists,notify);
+  public static File updateFile(User user, File file, ContentPayload contentPayload, boolean createIfNotExists,
+    boolean notify) throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
+    AlreadyExistsException {
+    RodaCoreFactory.getModelService().updateFile(file, contentPayload, createIfNotExists, notify);
     return file;
   }
 

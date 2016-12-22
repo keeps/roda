@@ -7,8 +7,10 @@
  */
 package org.roda.core.model;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -2373,17 +2375,18 @@ public class ModelService extends ModelObservable {
     CloseableIterable<OptionalWithCause<DIP>> dips = list(DIP.class);
 
     return CloseableIterables.concat(dips, odip -> {
+      CloseableIterable<?> dipFiles = CloseableIterables.empty();
+
       if (odip.isPresent()) {
+        DIP dip = odip.get();
         try {
-          DIP dip = odip.get();
-          return listDIPFilesUnder(dip.getId(), true);
+          dipFiles = listDIPFilesUnder(dip.getId(), true);
         } catch (RODAException e) {
-          // TODO log
-          return CloseableIterables.empty();
+          LOGGER.error("Error getting DIP files under a DIP " + dip.getId());
         }
-      } else {
-        return CloseableIterables.empty();
       }
+
+      return (CloseableIterable<OptionalWithCause<DIPFile>>) dipFiles;
     });
 
   }
@@ -2415,11 +2418,9 @@ public class ModelService extends ModelObservable {
       // FIXME 20160930 it uses index but it should not(?)
       ret = RodaCoreFactory.getIndexService().list(TransferredResource.class);
     } else if (RODAMember.class.equals(objectClass)) {
-      // FIXME 20160930 it uses index but it should not(?)
-      ret = RodaCoreFactory.getIndexService().list(RODAMember.class);
+      ret = listMembers();
     } else if (LogEntry.class.equals(objectClass)) {
-      // FIXME 20160930 it uses index but it should not(?)
-      ret = RodaCoreFactory.getIndexService().list(LogEntry.class);
+      ret = listLogEntries();
     } else if (DIPFile.class.equals(objectClass)) {
       ret = listDIPFiles();
     } else {
@@ -2446,10 +2447,10 @@ public class ModelService extends ModelObservable {
       ret = LiteRODAObjectFactory.transformIntoLite(RodaCoreFactory.getIndexService().list(TransferredResource.class));
     } else if (RODAMember.class.equals(objectClass)) {
       // FIXME 20160930 it uses index but it should not(?)
-      ret = LiteRODAObjectFactory.transformIntoLite(RodaCoreFactory.getIndexService().list(RODAMember.class));
+      ret = LiteRODAObjectFactory.transformIntoLite(listMembers());
     } else if (LogEntry.class.equals(objectClass)) {
-      // FIXME 20160930 it uses index but it should not(?)
-      ret = LiteRODAObjectFactory.transformIntoLite(RodaCoreFactory.getIndexService().list(LogEntry.class));
+      // TODO enhance
+      ret = LiteRODAObjectFactory.transformIntoLite(listLogEntries());
     } else if (DIPFile.class.equals(objectClass)) {
       // TODO enhance
       ret = LiteRODAObjectFactory.transformIntoLite(listDIPFiles());
@@ -2460,6 +2461,87 @@ public class ModelService extends ModelObservable {
     }
 
     return ret;
+  }
+
+  private CloseableIterable<OptionalWithCause<RODAMember>> listMembers() {
+    List<OptionalWithCause<RODAMember>> members = new ArrayList<>();
+
+    try {
+      List<OptionalWithCause<RODAMember>> users = listUsers().stream()
+        .map(user -> OptionalWithCause.of((RODAMember) user)).collect(Collectors.toList());
+      members.addAll(users);
+
+      List<OptionalWithCause<RODAMember>> groups = listGroups().stream()
+        .map(group -> OptionalWithCause.of((RODAMember) group)).collect(Collectors.toList());
+      members.addAll(groups);
+    } catch (GenericException e) {
+      LOGGER.error("Error getting user and/or groups list");
+    }
+
+    return CloseableIterables.fromList(members);
+  }
+
+  private CloseableIterable<OptionalWithCause<LogEntry>> listLogEntries() {
+    boolean recursive = false;
+    List<OptionalWithCause<LogEntry>> entries = new ArrayList<>();
+    CloseableIterable<Resource> actionLogs = null;
+
+    // Logs in storage
+    try {
+      actionLogs = getStorage()
+        .listResourcesUnderContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG), recursive);
+
+      for (Resource resource : actionLogs) {
+        if (resource instanceof Binary) {
+          Binary b = (Binary) resource;
+          BufferedReader br = null;
+          try {
+            br = new BufferedReader(new InputStreamReader(b.getContent().createInputStream()));
+            String line;
+            while ((line = br.readLine()) != null) {
+              LogEntry entry = JsonUtils.getObjectFromJson(line, LogEntry.class);
+              entries.add(OptionalWithCause.of(entry));
+            }
+          } catch (IOException | GenericException e) {
+            LOGGER.error("Error while trying to getting action log '" + resource.getStoragePath() + "' from storage",
+              e);
+          } finally {
+            IOUtils.closeQuietly(br);
+          }
+        }
+      }
+    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
+      LOGGER.error("Error getting action log from storage", e);
+    } finally {
+      IOUtils.closeQuietly(actionLogs);
+    }
+
+    // Logs not in storage
+    Path logFilesDirectory = RodaCoreFactory.getLogPath();
+    try {
+      BufferedReader br = null;
+      InputStream logFileInputStream;
+      for (Path logFile : Files.newDirectoryStream(logFilesDirectory)) {
+        LOGGER.debug("Going to reindex '{}'", logFile);
+        try {
+          logFileInputStream = Files.newInputStream(logFile);
+          br = new BufferedReader(new InputStreamReader(logFileInputStream));
+          String line;
+          while ((line = br.readLine()) != null) {
+            LogEntry entry = JsonUtils.getObjectFromJson(line, LogEntry.class);
+            entries.add(OptionalWithCause.of(entry));
+          }
+        } catch (IOException | GenericException e) {
+          LOGGER.error("Error getting action log not in storage", e);
+        } finally {
+          IOUtils.closeQuietly(br);
+        }
+      }
+    } catch (IOException e) {
+      LOGGER.error("Error getting action log not in storage", e);
+    }
+
+    return CloseableIterables.fromList(entries);
   }
 
   public boolean hasObjects(Class<? extends IsRODAObject> objectClass) {
