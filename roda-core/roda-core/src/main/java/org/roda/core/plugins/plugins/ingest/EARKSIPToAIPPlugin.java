@@ -225,7 +225,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
       String jobUsername = PluginHelper.getJobUsername(this, index);
       // Update the AIP
       aip = EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP, model, storage, jobUsername,
-        forceSearchScope ? searchScopeString : null);
+        searchScope);
     }
     return aip;
   }

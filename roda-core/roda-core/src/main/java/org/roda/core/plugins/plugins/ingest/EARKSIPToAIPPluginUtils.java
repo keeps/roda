@@ -81,7 +81,7 @@ public class EARKSIPToAIPPluginUtils {
   }
 
   public static AIP earkSIPToAIPUpdate(SIP sip, IndexedAIP indexedAIP, ModelService model, StorageService storage,
-    String username, String newParentID) throws RequestNotValidException, NotFoundException, GenericException,
+    String username, Optional<String> searchScope) throws RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, ValidationException {
     boolean notify = false;
 
@@ -95,8 +95,8 @@ public class EARKSIPToAIPPluginUtils {
 
     AIP aip = model.retrieveAIP(indexedAIP.getId());
     aip.setGhost(false);
-    if (newParentID != null) {
-      aip.setParentId(newParentID);
+    if (searchScope.isPresent()) {
+      aip.setParentId(searchScope.get());
     }
     model.updateAIP(aip, username);
 
