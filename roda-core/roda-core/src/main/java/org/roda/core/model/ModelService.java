@@ -2423,6 +2423,10 @@ public class ModelService extends ModelObservable {
       ret = listLogEntries();
     } else if (DIPFile.class.equals(objectClass)) {
       ret = listDIPFiles();
+      // } else if (PreservationMetadata.class.equals(objectClass)) {
+      // ret = listPreservationMetadata();
+      // } else if (OtherMetadata.class.equals(objectClass)) {
+      // ret = listOtherMetadata();
     } else {
       StoragePath containerPath = ModelUtils.getContainerPath(objectClass);
       final CloseableIterable<Resource> resourcesIterable = storage.listResourcesUnderContainer(containerPath, false);
@@ -2444,9 +2448,9 @@ public class ModelService extends ModelObservable {
       ret = LiteRODAObjectFactory.transformIntoLite(listFiles());
     } else if (TransferredResource.class.equals(objectClass)) {
       // FIXME 20160930 it uses index but it should not(?)
-      ret = LiteRODAObjectFactory.transformIntoLite(RodaCoreFactory.getIndexService().list(TransferredResource.class));
+      ret = LiteRODAObjectFactory
+        .transformIntoLite(RodaCoreFactory.getTransferredResourcesScanner().listTransferredResources());
     } else if (RODAMember.class.equals(objectClass)) {
-      // FIXME 20160930 it uses index but it should not(?)
       ret = LiteRODAObjectFactory.transformIntoLite(listMembers());
     } else if (LogEntry.class.equals(objectClass)) {
       // TODO enhance
@@ -2454,6 +2458,13 @@ public class ModelService extends ModelObservable {
     } else if (DIPFile.class.equals(objectClass)) {
       // TODO enhance
       ret = LiteRODAObjectFactory.transformIntoLite(listDIPFiles());
+      // } else if (PreservationMetadata.class.equals(objectClass)) {
+      // // TODO enhance
+      // ret =
+      // LiteRODAObjectFactory.transformIntoLite(listPreservationMetadata());
+      // } else if (OtherMetadata.class.equals(objectClass)) {
+      // // TODO enhance
+      // ret = LiteRODAObjectFactory.transformIntoLite(listOtherMetadata());
     } else {
       StoragePath containerPath = ModelUtils.getContainerPath(objectClass);
       final CloseableIterable<Resource> resourcesIterable = storage.listResourcesUnderContainer(containerPath, false);
@@ -2483,65 +2494,158 @@ public class ModelService extends ModelObservable {
 
   private CloseableIterable<OptionalWithCause<LogEntry>> listLogEntries() {
     boolean recursive = false;
-    List<OptionalWithCause<LogEntry>> entries = new ArrayList<>();
-    CloseableIterable<Resource> actionLogs = null;
+    CloseableIterable<OptionalWithCause<LogEntry>> inStorage = null;
+    CloseableIterable<OptionalWithCause<LogEntry>> notStorage = null;
 
-    // Logs in storage
     try {
-      actionLogs = getStorage()
+      final CloseableIterable<Resource> actionLogs = getStorage()
         .listResourcesUnderContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG), recursive);
 
-      for (Resource resource : actionLogs) {
-        if (resource instanceof Binary) {
-          Binary b = (Binary) resource;
-          BufferedReader br = null;
-          try {
-            br = new BufferedReader(new InputStreamReader(b.getContent().createInputStream()));
-            String line;
-            while ((line = br.readLine()) != null) {
-              LogEntry entry = JsonUtils.getObjectFromJson(line, LogEntry.class);
-              entries.add(OptionalWithCause.of(entry));
-            }
-          } catch (IOException | GenericException e) {
-            LOGGER.error("Error while trying to getting action log '" + resource.getStoragePath() + "' from storage",
-              e);
-          } finally {
-            IOUtils.closeQuietly(br);
-          }
+      inStorage = new CloseableIterable<OptionalWithCause<LogEntry>>() {
+        @Override
+        public void close() throws IOException {
+          actionLogs.close();
         }
-      }
+
+        @Override
+        public Iterator<OptionalWithCause<LogEntry>> iterator() {
+          Iterator<Resource> resources = actionLogs.iterator();
+
+          return new Iterator<OptionalWithCause<LogEntry>>() {
+            LogEntry nextLogEntry = null;
+            BufferedReader br = null;
+
+            @Override
+            public boolean hasNext() {
+              try {
+                if (br == null) {
+                  while (resources.hasNext()) {
+                    Resource resource = resources.next();
+                    if (resource instanceof Binary) {
+                      Binary b = (Binary) resource;
+                      br = new BufferedReader(new InputStreamReader(b.getContent().createInputStream()));
+                      String nextLine = null;
+                      if ((nextLine = br.readLine()) == null) {
+                        nextLogEntry = JsonUtils.getObjectFromJson(nextLine, LogEntry.class);
+                      }
+                      break;
+                    }
+                  }
+                }
+              } catch (GenericException | IOException e) {
+                return false;
+              }
+
+              return nextLogEntry != null;
+            }
+
+            @Override
+            public OptionalWithCause<LogEntry> next() {
+              OptionalWithCause<LogEntry> entry = OptionalWithCause.of(nextLogEntry);
+
+              try {
+                String nextLine = null;
+
+                if ((nextLine = br.readLine()) == null) {
+                  IOUtils.closeQuietly(br);
+                  while (resources.hasNext()) {
+                    Resource resource = resources.next();
+                    if (resource instanceof Binary) {
+                      Binary b = (Binary) resource;
+                      br = new BufferedReader(new InputStreamReader(b.getContent().createInputStream()));
+                      if ((nextLine = br.readLine()) == null) {
+                        nextLogEntry = JsonUtils.getObjectFromJson(nextLine, LogEntry.class);
+                      }
+                      break;
+                    }
+                  }
+                } else {
+                  nextLogEntry = JsonUtils.getObjectFromJson(nextLine, LogEntry.class);
+                }
+              } catch (GenericException | IOException e) {
+                nextLogEntry = null;
+              }
+
+              return entry;
+            }
+          };
+        }
+      };
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
       LOGGER.error("Error getting action log from storage", e);
-    } finally {
-      IOUtils.closeQuietly(actionLogs);
     }
 
-    // Logs not in storage
-    Path logFilesDirectory = RodaCoreFactory.getLogPath();
     try {
-      BufferedReader br = null;
-      InputStream logFileInputStream;
-      for (Path logFile : Files.newDirectoryStream(logFilesDirectory)) {
-        LOGGER.debug("Going to reindex '{}'", logFile);
-        try {
-          logFileInputStream = Files.newInputStream(logFile);
-          br = new BufferedReader(new InputStreamReader(logFileInputStream));
-          String line;
-          while ((line = br.readLine()) != null) {
-            LogEntry entry = JsonUtils.getObjectFromJson(line, LogEntry.class);
-            entries.add(OptionalWithCause.of(entry));
-          }
-        } catch (IOException | GenericException e) {
-          LOGGER.error("Error getting action log not in storage", e);
-        } finally {
-          IOUtils.closeQuietly(br);
+      DirectoryStream<Path> directoryStream = Files.newDirectoryStream(RodaCoreFactory.getLogPath());
+
+      notStorage = new CloseableIterable<OptionalWithCause<LogEntry>>() {
+
+        @Override
+        public void close() throws IOException {
+          directoryStream.close();
         }
-      }
+
+        @Override
+        public Iterator<OptionalWithCause<LogEntry>> iterator() {
+          Iterator<Path> paths = directoryStream.iterator();
+
+          return new Iterator<OptionalWithCause<LogEntry>>() {
+            LogEntry nextLogEntry = null;
+            BufferedReader br = null;
+
+            @Override
+            public boolean hasNext() {
+              try {
+                if (br == null) {
+                  if (paths.hasNext()) {
+                    Path logFile = paths.next();
+                    br = new BufferedReader(new InputStreamReader(Files.newInputStream(logFile)));
+                    String nextLine = null;
+                    if ((nextLine = br.readLine()) == null) {
+                      nextLogEntry = JsonUtils.getObjectFromJson(nextLine, LogEntry.class);
+                    }
+                  }
+                }
+              } catch (GenericException | IOException e) {
+                return false;
+              }
+
+              return nextLogEntry != null;
+            }
+
+            @Override
+            public OptionalWithCause<LogEntry> next() {
+              OptionalWithCause<LogEntry> entry = OptionalWithCause.of(nextLogEntry);
+
+              try {
+                String nextLine = null;
+
+                if ((nextLine = br.readLine()) == null) {
+                  IOUtils.closeQuietly(br);
+                  if (paths.hasNext()) {
+                    Path logFile = paths.next();
+                    br = new BufferedReader(new InputStreamReader(Files.newInputStream(logFile)));
+                    if ((nextLine = br.readLine()) == null) {
+                      nextLogEntry = JsonUtils.getObjectFromJson(nextLine, LogEntry.class);
+                    }
+                  }
+                } else {
+                  nextLogEntry = JsonUtils.getObjectFromJson(nextLine, LogEntry.class);
+                }
+              } catch (GenericException | IOException e) {
+                nextLogEntry = null;
+              }
+
+              return entry;
+            }
+          };
+        }
+      };
     } catch (IOException e) {
-      LOGGER.error("Error getting action log not in storage", e);
+      LOGGER.error("Error getting action log from storage", e);
     }
 
-    return CloseableIterables.fromList(entries);
+    return CloseableIterables.concat(inStorage, notStorage);
   }
 
   public boolean hasObjects(Class<? extends IsRODAObject> objectClass) {

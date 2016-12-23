@@ -263,42 +263,9 @@ public class ResourceParseUtils {
 
   public static <T extends IsRODAObject> OptionalWithCause<LiteRODAObject> convertResourceToLite(StorageService storage,
     Resource resource, Class<T> classToReturn) {
-    OptionalWithCause<LiteRODAObject> ret;
-
-    if (classToReturn.equals(AIP.class)) {
-      ret = OptionalWithCause.of(LiteRODAObjectFactory.get(AIP.class, resource.getStoragePath().getName()));
-    } else if (classToReturn.equals(Representation.class)) {
-      StoragePath storagePath = resource.getStoragePath();
-      String aipId = ModelUtils.extractAipId(storagePath);
-      String representationId = ModelUtils.extractRepresentationId(storagePath);
-      ret = OptionalWithCause.of(LiteRODAObjectFactory.get(Representation.class, aipId, representationId));
-    } else if (classToReturn.equals(File.class)) {
-      // TODO ret =
-      // OptionalWithCause.of(classToReturn.cast(convertResourceToFile(resource)));
-      ret = OptionalWithCause.empty(new RequestNotValidException("Not yet supported"));
-    } else if (classToReturn.equals(PreservationMetadata.class)) {
-      // TODO ret =
-      // OptionalWithCause.of(classToReturn.cast(convertResourceToPreservationMetadata(resource)));
-      ret = OptionalWithCause.empty(new RequestNotValidException("Not yet supported"));
-    } else if (classToReturn.equals(OtherMetadata.class)) {
-      // TODO ret =
-      // OptionalWithCause.of(classToReturn.cast(convertResourceToOtherMetadata(resource)));
-      ret = OptionalWithCause.empty(new RequestNotValidException("Not yet supported"));
-    } else if (classToReturn.equals(DIP.class)) {
-      // TODO ret =
-      // OptionalWithCause.of(classToReturn.cast(getDIPMetadata(storage,
-      // resource.getStoragePath())));
-      ret = OptionalWithCause.empty(new RequestNotValidException("Not yet supported"));
-    } else if (classToReturn.equals(DIPFile.class)) {
-      // TODO ret =
-      // OptionalWithCause.of(classToReturn.cast(convertResourceToDIPFile(resource)));
-      ret = OptionalWithCause.empty(new RequestNotValidException("Not yet supported"));
-    } else {
-      // TODO ret = OptionalWithCause.of(convertResourceToObject(resource,
-      // classToReturn));
-      ret = OptionalWithCause.empty(new RequestNotValidException("Not yet supported"));
-    }
-
+    String fileName = resource.getStoragePath().getName();
+    OptionalWithCause<LiteRODAObject> ret = OptionalWithCause
+      .of(LiteRODAObjectFactory.get(classToReturn, fileName.substring(0, fileName.lastIndexOf('.'))));
     return ret;
   }
 

@@ -28,12 +28,14 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.TransferredResource;
@@ -350,6 +352,53 @@ public class TransferredResourcesScanner {
     } catch (RequestNotValidException e) {
       LOGGER.error("Could not delete old transferred resources");
     }
+  }
+
+  public CloseableIterable<OptionalWithCause<TransferredResource>> listTransferredResources() {
+    CloseableIterable<OptionalWithCause<TransferredResource>> resources = null;
+
+    final ListTransferredResourcesRunnable listRunnable = new ListTransferredResourcesRunnable(basePath);
+    final Thread listThread = new Thread(listRunnable, "ListThread");
+    listThread.start();
+
+    resources = new CloseableIterable<OptionalWithCause<TransferredResource>>() {
+      @Override
+      public void close() throws IOException {
+        listThread.interrupt();
+      }
+
+      @Override
+      public Iterator<OptionalWithCause<TransferredResource>> iterator() {
+
+        return new Iterator<OptionalWithCause<TransferredResource>>() {
+
+          @Override
+          public boolean hasNext() {
+            while (!(listThread.getState().equals(Thread.State.WAITING)
+              || listThread.getState().equals(Thread.State.TERMINATED)
+              || listThread.getState().equals(Thread.State.BLOCKED))) {
+              try {
+                Thread.sleep(100);
+              } catch (InterruptedException e) {
+                // do nothing
+              }
+            }
+            return listRunnable.getNextResource() != null;
+          }
+
+          @Override
+          public OptionalWithCause<TransferredResource> next() {
+            TransferredResource resource = listRunnable.getNextResource();
+            synchronized (listRunnable) {
+              listRunnable.notifyRunnable();
+            }
+            return OptionalWithCause.of(resource);
+          }
+        };
+      }
+    };
+
+    return resources;
   }
 
 }

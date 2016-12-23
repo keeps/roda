@@ -38,7 +38,6 @@ import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.core.storage.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,9 +124,8 @@ public final class LiteRODAObjectFactory {
     boolean logIfReturningEmpty) {
     Optional<LiteRODAObject> ret = Optional.empty();
 
-    if (objectClass == AIP.class || objectClass == TransferredResource.class || objectClass == DIP.class
-      || objectClass == Format.class || objectClass == Job.class || objectClass == Notification.class
-      || objectClass == Risk.class || objectClass == RiskIncidence.class) {
+    if (objectClass == AIP.class || objectClass == DIP.class || objectClass == Format.class || objectClass == Job.class
+      || objectClass == Notification.class || objectClass == Risk.class || objectClass == RiskIncidence.class) {
       ret = create(objectClass, 1, ids);
     } else if (objectClass == DescriptiveMetadata.class) {
       if (ids.size() == 2 || ids.size() == 3) {
@@ -143,6 +141,8 @@ public final class LiteRODAObjectFactory {
       }
     } else if (objectClass == Report.class || objectClass == Representation.class) {
       ret = create(objectClass, 2, ids);
+    } else if (objectClass == TransferredResource.class) {
+      ret = create(objectClass, ids.size(), ids);
     }
 
     if (logIfReturningEmpty && !ret.isPresent()) {

@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -41,17 +42,20 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
+import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
@@ -105,6 +109,7 @@ public class ModelServiceTest {
   private static Path corporaPath;
   private static StorageService corporaService;
   private static String aipCreator = "admin";
+  private static int fileCounter = 0;
 
   @BeforeClass
   public static void setUp() throws IOException, URISyntaxException, GenericException {
@@ -121,7 +126,7 @@ public class ModelServiceTest {
 
     boolean deploySolr = false;
     boolean deployLdap = true;
-    boolean deployFolderMonitor = false;
+    boolean deployFolderMonitor = true;
     boolean deployOrchestrator = false;
     boolean deployPluginManager = false;
     boolean deployDefaultResources = false;
@@ -939,6 +944,69 @@ public class ModelServiceTest {
     MatcherAssert.assertThat(retrievedUser2.getAllRoles(), Matchers.containsInAnyOrder(ROLE2));
     MatcherAssert.assertThat(retrievedUser2.getAllRoles(), Matchers.not(Matchers.containsInAnyOrder(ROLE1)));
 
+  }
+
+  @Test
+  public void testListing() throws RODAException, IOException {
+    populate(RodaCoreFactory.getTransferredResourcesScanner().getBasePath());
+    CloseableIterable<OptionalWithCause<LiteRODAObject>> list = model.listLite(TransferredResource.class);
+    for (OptionalWithCause<LiteRODAObject> lite : list) {
+      System.err.println(lite.get().getInfo());
+    }
+
+    int size = CloseableIterables.size(list);
+    assertEquals(fileCounter, size);
+  }
+
+  private static void populate(Path basePath) throws IOException {
+    Random randomno = new Random();
+    int numberOfItemsByLevel = nextIntInRange(2, 3, randomno);
+    int numberOfLevels = nextIntInRange(2, 3, randomno);
+    populate(basePath, numberOfItemsByLevel, numberOfLevels, 0, randomno);
+  }
+
+  private static void populate(Path path, int numberOfItemsByLevel, int numberOfLevels, int currentLevel,
+    Random randomno) throws IOException {
+    currentLevel++;
+    for (int i = 0; i < numberOfItemsByLevel; i++) {
+      Path p = null;
+      if (i % 2 == 0) {
+        if (currentLevel > 1) {
+          p = Files.createFile(path.resolve(UUID.randomUUID().toString() + ".txt"));
+          Files.write(p, "NUNCAMAISACABA".getBytes());
+          fileCounter++;
+        }
+      } else {
+        p = Files.createDirectory(path.resolve(UUID.randomUUID().toString()));
+        fileCounter++;
+        if (currentLevel <= numberOfLevels) {
+          populate(p, numberOfItemsByLevel, numberOfLevels, currentLevel, randomno);
+        } else {
+          if (currentLevel > 1) {
+            for (int j = 0; j < numberOfItemsByLevel; j++) {
+              Path temp = Files.createFile(p.resolve(UUID.randomUUID().toString() + ".txt"));
+              Files.write(temp, "NUNCAMAISACABA".getBytes());
+              fileCounter++;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  static int nextIntInRange(int min, int max, Random rng) {
+    if (min > max) {
+      throw new IllegalArgumentException("Cannot draw random int from invalid range [" + min + ", " + max + "].");
+    }
+    int diff = max - min;
+    if (diff >= 0 && diff != Integer.MAX_VALUE) {
+      return (min + rng.nextInt(diff + 1));
+    }
+    int i;
+    do {
+      i = rng.nextInt();
+    } while (i < min || i > max);
+    return i;
   }
 
 }
