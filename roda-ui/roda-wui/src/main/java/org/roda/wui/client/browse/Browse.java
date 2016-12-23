@@ -32,7 +32,7 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.user.User;
-import org.roda.wui.client.browse.bundle.BrowseItemBundle;
+import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.LoadingAsyncCallback;
@@ -166,7 +166,7 @@ public class Browse extends Composite {
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   private String aipId;
-  private BrowseItemBundle itemBundle;
+  private BrowseAIPBundle itemBundle;
 
   @UiField
   Label browseTitle;
@@ -341,7 +341,7 @@ public class Browse extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         IndexedRepresentation representation = representationsList.getSelectionModel().getSelectedObject();
         if (representation != null) {
-          HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representation.getUUID());
+          HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, representation.getAipId(), representation.getId());
         }
       }
     });
@@ -449,8 +449,8 @@ public class Browse extends Composite {
       viewAction();
     } else {
       aipId = id;
-      BrowserService.Util.getInstance().retrieveItemBundle(id, LocaleInfo.getCurrentLocale().getLocaleName(),
-        new AsyncCallback<BrowseItemBundle>() {
+      BrowserService.Util.getInstance().retrieveBrowseAIPBundle(id, LocaleInfo.getCurrentLocale().getLocaleName(),
+        new AsyncCallback<BrowseAIPBundle>() {
 
           @Override
           public void onFailure(Throwable caught) {
@@ -460,7 +460,7 @@ public class Browse extends Composite {
           }
 
           @Override
-          public void onSuccess(BrowseItemBundle itemBundle) {
+          public void onSuccess(BrowseAIPBundle itemBundle) {
             viewAction(itemBundle);
           }
         });
@@ -553,7 +553,7 @@ public class Browse extends Composite {
     itemMetadata.setVisible(true);
   }
 
-  protected void viewAction(BrowseItemBundle itemBundle) {
+  protected void viewAction(BrowseAIPBundle itemBundle) {
     if (itemBundle != null) {
       this.itemBundle = itemBundle;
 
@@ -1313,8 +1313,8 @@ public class Browse extends Composite {
           BrowserService.Util.getInstance().createRepresentation(aipId, details, new LoadingAsyncCallback<String>() {
 
             @Override
-            public void onSuccessImpl(String representationUUID) {
-              HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representationUUID);
+            public void onSuccessImpl(String representationId) {
+              HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
             }
           });
         }

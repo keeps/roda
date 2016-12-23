@@ -26,13 +26,11 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
-import org.roda.wui.client.browse.bundle.BrowseItemBundle;
+import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
@@ -87,11 +85,7 @@ public class BrowseFile extends Composite {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private String aipId;
-  private BrowseItemBundle itemBundle;
-  private String representationUUID;
-  private String fileUUID;
-  private IndexedFile file;
+  private BrowseFileBundle bundle;
 
   private boolean infoPanelOpen = false;
   private boolean disseminationsPanelOpen = false;
@@ -132,25 +126,11 @@ public class BrowseFile extends Composite {
    * @param file
    * 
    */
-  public BrowseFile(Viewers viewers, String aipId, BrowseItemBundle itemBundle, String representationUUID,
-    String fileUUID, IndexedFile file) {
-    this.aipId = aipId;
-    this.itemBundle = itemBundle;
-    this.representationUUID = representationUUID;
-    this.fileUUID = fileUUID;
-    this.file = file;
-
-    // find representation (needed for later)
-    IndexedRepresentation rep = null;
-    for (IndexedRepresentation irep : itemBundle.getRepresentations()) {
-      if (irep.getUUID().equals(representationUUID)) {
-        rep = irep;
-        break;
-      }
-    }
+  public BrowseFile(Viewers viewers, final BrowseFileBundle bundle) {
+    this.bundle = bundle;
 
     // initialize preview
-    filePreview = new IndexedFilePreview(viewers, file, new Command() {
+    filePreview = new IndexedFilePreview(viewers, bundle.getFile(), new Command() {
 
       @Override
       public void execute() {
@@ -158,7 +138,7 @@ public class BrowseFile extends Composite {
           @Override
           public void execute() {
             Filter filter = new Filter(
-              new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, BrowseFile.this.fileUUID));
+              new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, bundle.getFile().getUUID()));
             BrowserService.Util.getInstance().count(IndexedDIP.class.getName(), filter, new AsyncCallback<Long>() {
 
               @Override
@@ -191,10 +171,10 @@ public class BrowseFile extends Composite {
     infoFileButton.setTitle(messages.viewRepresentationInfoFileButton());
 
     // update visibles
-    optionDownload.setEnabled(!file.isDirectory());
-    infoFileButton.setVisible(!file.isDirectory());
-    downloadDocumentationButton.setVisible(rep.getNumberOfDocumentationFiles() > 0);
-    downloadSchemasButton.setVisible(rep.getNumberOfSchemaFiles() > 0);
+    optionDownload.setEnabled(!bundle.getFile().isDirectory());
+    infoFileButton.setVisible(!bundle.getFile().isDirectory());
+    downloadDocumentationButton.setVisible(bundle.getRepresentation().getNumberOfDocumentationFiles() > 0);
+    downloadSchemasButton.setVisible(bundle.getRepresentation().getNumberOfSchemaFiles() > 0);
   }
 
   @UiHandler("optionDownload")
@@ -204,33 +184,17 @@ public class BrowseFile extends Composite {
 
   private void downloadFile() {
     SafeUri downloadUri = null;
-    if (file != null) {
-      downloadUri = RestUtils.createRepresentationFileDownloadUri(file.getUUID());
+    if (bundle.getFile() != null) {
+      downloadUri = RestUtils.createRepresentationFileDownloadUri(bundle.getFile().getUUID());
     }
     if (downloadUri != null) {
       Window.Location.assign(downloadUri.asString());
     }
   }
 
-  @UiHandler("downloadDocumentationButton")
-  void buttonDownloadDocumentationButtonHandler(ClickEvent e) {
-    SafeUri downloadUri = null;
-    downloadUri = RestUtils.createRepresentationPartDownloadUri(representationUUID,
-      RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
-    Window.Location.assign(downloadUri.asString());
-  }
-
-  @UiHandler("downloadSchemasButton")
-  void buttonDownloadSchemasButtonHandler(ClickEvent e) {
-    SafeUri downloadUri = null;
-    downloadUri = RestUtils.createRepresentationPartDownloadUri(representationUUID,
-      RodaConstants.STORAGE_DIRECTORY_SCHEMAS);
-    Window.Location.assign(downloadUri.asString());
-  }
-
   @UiHandler("optionNewProcess")
   void buttonNewProcessButtonHandler(ClickEvent e) {
-    SelectedItems<IndexedFile> selected = new SelectedItemsList<IndexedFile>(Arrays.asList(fileUUID),
+    SelectedItems<IndexedFile> selected = new SelectedItemsList<IndexedFile>(Arrays.asList(bundle.getFile().getUUID()),
       IndexedFile.class.getName());
 
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
@@ -259,19 +223,20 @@ public class BrowseFile extends Composite {
 
                 @Override
                 public void onSuccess(String details) {
-                  BrowserService.Util.getInstance().deleteFile(file.getUUID(), details, new AsyncCallback<Void>() {
+                  BrowserService.Util.getInstance().deleteFile(bundle.getFile().getUUID(), details,
+                    new AsyncCallback<Void>() {
 
-                    @Override
-                    public void onSuccess(Void result) {
-                      HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, file.getAipId(),
-                        file.getRepresentationUUID());
-                    }
+                      @Override
+                      public void onSuccess(Void result) {
+                        HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, bundle.getFile().getAipId(),
+                          bundle.getFile().getRepresentationId());
+                      }
 
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      AsyncCallbackUtils.defaultFailureTreatment(caught);
-                    }
-                  });
+                      @Override
+                      public void onFailure(Throwable caught) {
+                        AsyncCallbackUtils.defaultFailureTreatment(caught);
+                      }
+                    });
                 }
               });
           }
@@ -376,12 +341,13 @@ public class BrowseFile extends Composite {
   }
 
   private List<BreadcrumbItem> getBreadcrumbs() {
-    return BreadcrumbUtils.getFileBreadcrumbs(itemBundle, aipId, representationUUID, file);
+    return BreadcrumbUtils.getFileBreadcrumbs(bundle);
   }
 
   public void updateInfoFile() {
     HashMap<String, SafeHtml> values = new HashMap<String, SafeHtml>();
     infoFilePanel.clear();
+    IndexedFile file = bundle.getFile();
 
     if (file != null) {
       String fileName = file.getOriginalName() != null ? file.getOriginalName() : file.getId();
@@ -472,7 +438,7 @@ public class BrowseFile extends Composite {
   }
 
   private void updateDisseminations() {
-    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, fileUUID));
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, bundle.getFile().getUUID()));
     Sorter sorter = new Sorter(new SortParameter(RodaConstants.DIP_DATE_CREATED, true));
     Sublist sublist = new Sublist(0, 100);
     Facets facets = Facets.NONE;
@@ -554,6 +520,7 @@ public class BrowseFile extends Composite {
           Window.open(dip.getOpenExternalURL(), "_blank", "");
           Toast.showInfo(messages.browseFileDipOpenedExternalURL(), dip.getOpenExternalURL());
         } else {
+          IndexedFile file = bundle.getFile();
           HistoryUtils.newHistory(BrowseDIP.RESOLVER, dip.getUUID(), file.getAipId(), file.getRepresentationUUID(),
             file.getUUID());
         }
@@ -630,11 +597,13 @@ public class BrowseFile extends Composite {
     private void load(final Viewers viewers, final List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() > 2) {
         final String historyAipId = historyTokens.get(0);
-        final String historyRepresentationUUID = historyTokens.get(1);
-        final String historyFileUUID = historyTokens.get(2);
+        final String historyRepresentationId = historyTokens.get(1);
+        final List<String> historyFilePath = historyTokens.subList(2, historyTokens.size() - 1);
+        final String historyFileId = historyTokens.get(historyTokens.size() - 1);
 
-        BrowserService.Util.getInstance().retrieveItemBundle(historyAipId,
-          LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<BrowseItemBundle>() {
+        BrowserService.Util.getInstance().retrieveBrowseFileBundle(historyAipId, historyRepresentationId,
+          historyFilePath, historyFileId, LocaleInfo.getCurrentLocale().getLocaleName(),
+          new AsyncCallback<BrowseFileBundle>() {
 
             @Override
             public void onFailure(Throwable caught) {
@@ -642,43 +611,13 @@ public class BrowseFile extends Composite {
             }
 
             @Override
-            public void onSuccess(final BrowseItemBundle itemBundle) {
-              if (itemBundle != null
-                && verifyRepresentation(itemBundle.getRepresentations(), historyRepresentationUUID)) {
-                BrowserService.Util.getInstance().retrieve(IndexedFile.class.getName(), historyFileUUID,
-                  new AsyncCallback<IndexedFile>() {
-
-                    @Override
-                    public void onSuccess(IndexedFile simpleFile) {
-                      BrowseFile view = new BrowseFile(viewers, historyAipId, itemBundle, historyRepresentationUUID,
-                        historyFileUUID, simpleFile);
-                      callback.onSuccess(view);
-                    }
-
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
-                      errorRedirect(callback);
-                    }
-                  });
-              } else {
-                errorRedirect(callback);
-              }
+            public void onSuccess(final BrowseFileBundle bundle) {
+              callback.onSuccess(new BrowseFile(viewers, bundle));
             }
           });
       } else {
         errorRedirect(callback);
       }
-    }
-
-    private boolean verifyRepresentation(List<IndexedRepresentation> representations, String representationUUID) {
-      boolean exist = false;
-      for (IndexedRepresentation representation : representations) {
-        if (representation.getUUID().equals(representationUUID)) {
-          exist = true;
-        }
-      }
-      return exist;
     }
 
     private void errorRedirect(AsyncCallback<Widget> callback) {

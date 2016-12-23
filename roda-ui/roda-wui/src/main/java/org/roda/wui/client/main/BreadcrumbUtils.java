@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
@@ -24,10 +23,11 @@ import org.roda.wui.client.browse.BrowseFile;
 import org.roda.wui.client.browse.BrowseFolder;
 import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.PreservationEvents;
-import org.roda.wui.client.browse.bundle.BrowseItemBundle;
+import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
+import org.roda.wui.client.browse.bundle.BrowseFileBundle;
+import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
-import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -36,7 +36,6 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Command;
-import com.hp.hpl.jena.reasoner.rulesys.impl.SafeGraph;
 
 import config.i18n.client.ClientMessages;
 
@@ -108,13 +107,10 @@ public class BreadcrumbUtils {
     return breadcrumb;
   }
 
-  public static List<BreadcrumbItem> getRepresentationBreadcrumbs(BrowseItemBundle itemBundle, String aipId,
-    String representationUUID) {
-
-    List<IndexedAIP> aipAncestors = itemBundle.getAIPAncestors();
-    IndexedAIP aip = itemBundle.getAip();
-    List<IndexedRepresentation> representations = itemBundle.getRepresentations();
-    IndexedRepresentation representation = selectRepresentation(representations, representationUUID);
+  public static List<BreadcrumbItem> getRepresentationBreadcrumbs(BrowseRepresentationBundle bundle) {
+    List<IndexedAIP> aipAncestors = bundle.getAipAncestors();
+    IndexedAIP aip = bundle.getAip();
+    IndexedRepresentation representation = bundle.getRepresentation();
 
     return getRepresentationBreadcrumbs(aipAncestors, aip, representation);
   }
@@ -158,12 +154,11 @@ public class BreadcrumbUtils {
     return breadcrumb;
   }
 
-  public static List<BreadcrumbItem> getFileBreadcrumbs(BrowseItemBundle itemBundle, String aipId,
-    String representationUUID, IndexedFile file) {
+  public static List<BreadcrumbItem> getFileBreadcrumbs(BrowseFileBundle bundle) {
 
-    IndexedAIP aip = itemBundle.getAip();
-    List<IndexedRepresentation> representations = itemBundle.getRepresentations();
-    IndexedRepresentation representation = selectRepresentation(representations, representationUUID);
+    IndexedAIP aip = bundle.getAip();
+    IndexedRepresentation representation = bundle.getRepresentation();
+    IndexedFile file = bundle.getFile();
     return getFileBreadcrumbs(aip, representation, file);
 
   }
@@ -295,10 +290,10 @@ public class BreadcrumbUtils {
   }
 
   private static IndexedRepresentation selectRepresentation(List<IndexedRepresentation> representations,
-    String representationUUID) {
+    String representationId) {
     IndexedRepresentation rep = null;
     for (IndexedRepresentation representation : representations) {
-      if (representation.getUUID().equals(representationUUID)) {
+      if (representation.getId().equals(representationId)) {
         rep = representation;
       }
     }

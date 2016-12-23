@@ -27,7 +27,7 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.wui.client.browse.bundle.BrowseItemBundle;
+import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.LoadingAsyncCallback;
@@ -35,8 +35,8 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectFileDialog;
 import org.roda.wui.client.common.lists.SearchFileList;
-import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
+import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.search.SearchSuggestBox;
@@ -104,10 +104,10 @@ public class BrowseRepresentation extends Composite {
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 2) {
         final String aipId = historyTokens.get(0);
-        final String representationUUID = historyTokens.get(1);
+        final String representationId = historyTokens.get(1);
 
-        BrowserService.Util.getInstance().retrieveItemBundle(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
-          new AsyncCallback<BrowseItemBundle>() {
+        BrowserService.Util.getInstance().retrieveBrowseRepresentationBundle(aipId, representationId,
+          LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<BrowseRepresentationBundle>() {
 
             @Override
             public void onFailure(Throwable caught) {
@@ -116,22 +116,8 @@ public class BrowseRepresentation extends Composite {
             }
 
             @Override
-            public void onSuccess(final BrowseItemBundle itemBundle) {
-              BrowserService.Util.getInstance().retrieve(IndexedRepresentation.class.getName(), representationUUID,
-                new AsyncCallback<IndexedRepresentation>() {
-
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
-                    errorRedirect(callback);
-                  }
-
-                  @Override
-                  public void onSuccess(IndexedRepresentation indexedRepresentation) {
-                    BrowseRepresentation representation = new BrowseRepresentation(itemBundle, indexedRepresentation);
-                    callback.onSuccess(representation);
-                  }
-                });
+            public void onSuccess(final BrowseRepresentationBundle representationBundle) {
+              callback.onSuccess(new BrowseRepresentation(representationBundle));
             }
           });
 
@@ -201,16 +187,13 @@ public class BrowseRepresentation extends Composite {
   private IndexedRepresentation representation;
   private String aipId;
   private String repId;
-  private List<DescriptiveMetadataViewBundle> representationDescriptiveMetadata;
 
   private static final String ALL_FILTER = SearchFilters.allFilter(IndexedFile.class.getName());
 
-  public BrowseRepresentation(BrowseItemBundle itemBundle, IndexedRepresentation representation) {
-    this.representation = representation;
+  public BrowseRepresentation(BrowseRepresentationBundle bundle) {
+    this.representation = bundle.getRepresentation();
     this.aipId = representation.getAipId();
     this.repId = representation.getUUID();
-    this.representationDescriptiveMetadata = itemBundle.getRepresentationsDescriptiveMetadata()
-      .get(representation.getUUID());
 
     handlers = new ArrayList<HandlerRegistration>();
     String summary = messages.representationListOfFiles();
@@ -292,18 +275,18 @@ public class BrowseRepresentation extends Composite {
     representationType.setText(representation.getType() != null ? representation.getType() : representation.getId());
     representationId.setText(representation.getId());
 
-    breadcrumb.updatePath(BreadcrumbUtils.getRepresentationBreadcrumbs(itemBundle, aipId, repId));
+    breadcrumb.updatePath(BreadcrumbUtils.getRepresentationBreadcrumbs(bundle));
     breadcrumb.setVisible(true);
 
     final List<Pair<String, HTML>> descriptiveMetadataContainers = new ArrayList<Pair<String, HTML>>();
     final Map<String, DescriptiveMetadataViewBundle> bundles = new HashMap<>();
-    for (DescriptiveMetadataViewBundle bundle : representationDescriptiveMetadata) {
-      String title = bundle.getLabel() != null ? bundle.getLabel() : bundle.getId();
+    for (DescriptiveMetadataViewBundle descMetadataBundle : bundle.getRepresentationDescriptiveMetadata()) {
+      String title = descMetadataBundle.getLabel() != null ? descMetadataBundle.getLabel() : descMetadataBundle.getId();
       HTML container = new HTML();
       container.addStyleName("metadataContent");
       itemMetadata.add(container, title);
-      descriptiveMetadataContainers.add(Pair.create(bundle.getId(), container));
-      bundles.put(bundle.getId(), bundle);
+      descriptiveMetadataContainers.add(Pair.create(descMetadataBundle.getId(), container));
+      bundles.put(descMetadataBundle.getId(), descMetadataBundle);
     }
 
     HandlerRegistration tabHandler = itemMetadata.addSelectionHandler(new SelectionHandler<Integer>() {
@@ -353,7 +336,7 @@ public class BrowseRepresentation extends Composite {
     handlers.add(tabHandler);
     handlers.add(addTabHandler);
 
-    if (!representationDescriptiveMetadata.isEmpty()) {
+    if (!bundle.getRepresentationDescriptiveMetadata().isEmpty()) {
       newDescriptiveMetadata.setVisible(false);
       itemMetadata.setVisible(true);
       itemMetadata.selectTab(0);
@@ -688,12 +671,12 @@ public class BrowseRepresentation extends Composite {
               @Override
               public void onSuccess(String details) {
                 BrowserService.Util.getInstance().moveFiles(aipId, repId, selected, toFolder, details,
-                  new LoadingAsyncCallback<String>() {
+                  new LoadingAsyncCallback<Void>() {
 
                     @Override
-                    public void onSuccessImpl(String newUUID) {
-                      if (newUUID != null) {
-                        HistoryUtils.newHistory(BrowseFolder.RESOLVER, aipId, repId, newUUID);
+                    public void onSuccessImpl(Void nothing) {
+                      if (toFolder != null) {
+                        HistoryUtils.newHistory(BrowseFolder.RESOLVER, aipId, repId, toFolder.getUUID());
                       } else {
                         HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, repId);
                       }
@@ -781,10 +764,10 @@ public class BrowseRepresentation extends Composite {
 
   @UiHandler("identifyFormats")
   void buttonIdentifyFormatsHandler(ClickEvent e) {
-    SelectedItems selected = (SelectedItems) filesList.getSelected();
+    SelectedItems<?> selected = filesList.getSelected();
 
     if (ClientSelectedItemsUtils.isEmpty(selected)) {
-      selected = new SelectedItemsList<IndexedRepresentation>(Arrays.asList(repId),
+      selected = new SelectedItemsList<IndexedRepresentation>(Arrays.asList(representation.getUUID()),
         IndexedRepresentation.class.getName());
     }
 
@@ -809,7 +792,7 @@ public class BrowseRepresentation extends Composite {
   @UiHandler("changeType")
   void buttonChangeTypeHandler(ClickEvent e) {
     final SelectedItemsList<IndexedRepresentation> selectedRepresentation = new SelectedItemsList<IndexedRepresentation>(
-      Arrays.asList(repId), IndexedRepresentation.class.getName());
+      Arrays.asList(representation.getUUID()), IndexedRepresentation.class.getName());
 
     SearchSuggestBox<IndexedRepresentation> suggestBox = new SearchSuggestBox<IndexedRepresentation>(
       IndexedRepresentation.class, RodaConstants.REPRESENTATION_TYPE, true);

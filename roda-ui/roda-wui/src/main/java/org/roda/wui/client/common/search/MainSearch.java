@@ -306,7 +306,7 @@ public class MainSearch extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         IndexedRepresentation rep = representationsSearchResultPanel.getSelectionModel().getSelectedObject();
         if (rep != null) {
-          HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, rep.getAipId(), rep.getUUID());
+          HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, rep.getAipId(), rep.getId());
         }
       }
     });

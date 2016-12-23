@@ -18,7 +18,7 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
-import org.roda.wui.client.browse.bundle.BrowseItemBundle;
+import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.PreservationEventList;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -122,7 +122,7 @@ public class PreservationEvents extends Composite {
 
   private String aipId;
   private String repId;
-  private BrowseItemBundle itemBundle;
+  private BrowseAIPBundle itemBundle;
 
   /**
    * Create a new panel to edit a user
@@ -168,8 +168,8 @@ public class PreservationEvents extends Composite {
       }
     });
 
-    BrowserService.Util.getInstance().retrieveItemBundle(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
-      new AsyncCallback<BrowseItemBundle>() {
+    BrowserService.Util.getInstance().retrieveBrowseAIPBundle(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
+      new AsyncCallback<BrowseAIPBundle>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -178,7 +178,7 @@ public class PreservationEvents extends Composite {
         }
 
         @Override
-        public void onSuccess(BrowseItemBundle itemBundle) {
+        public void onSuccess(BrowseAIPBundle itemBundle) {
           PreservationEvents.this.itemBundle = itemBundle;
           viewAction();
         }

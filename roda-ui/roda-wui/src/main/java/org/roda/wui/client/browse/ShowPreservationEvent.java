@@ -462,7 +462,7 @@ public class ShowPreservationEvent extends Composite {
       body.add(originalValue);
 
       Anchor link = new Anchor(messages.inspectRepresentation(),
-        HistoryUtils.createHistoryHashLink(BrowseRepresentation.RESOLVER, irep.getAipId(), irep.getUUID()));
+        HistoryUtils.createHistoryHashLink(BrowseRepresentation.RESOLVER, irep.getAipId(), irep.getId()));
 
       link.addStyleName("btn");
 

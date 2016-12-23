@@ -14,7 +14,7 @@ import java.util.Map;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 
-public class BrowseItemBundle implements Serializable {
+public class BrowseAIPBundle implements Serializable {
 
   private static final long serialVersionUID = 7901536603462531124L;
 
@@ -24,11 +24,11 @@ public class BrowseItemBundle implements Serializable {
   private List<IndexedRepresentation> representations;
   private Map<String, List<DescriptiveMetadataViewBundle>> representationsDescriptiveMetadata;
 
-  public BrowseItemBundle() {
+  public BrowseAIPBundle() {
     super();
   }
 
-  public BrowseItemBundle(IndexedAIP aip, List<IndexedAIP> aipAncestors,
+  public BrowseAIPBundle(IndexedAIP aip, List<IndexedAIP> aipAncestors,
     List<DescriptiveMetadataViewBundle> descriptiveMetadata, List<IndexedRepresentation> representations,
     Map<String, List<DescriptiveMetadataViewBundle>> representationsDescriptiveMetadata) {
     super();

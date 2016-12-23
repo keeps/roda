@@ -164,7 +164,8 @@ public class ShowJobReport extends Composite {
 
       if (TransferredResource.class.getName().equals(jobReport.getSourceObjectClass())) {
         sourceObject.setText(jobReport.getSourceObjectOriginalName() + " (" + idText + ")");
-        sourceObject.setHref(HistoryUtils.createHistoryHashLink(IngestTransfer.RESOLVER, jobReport.getSourceObjectId()));
+        sourceObject
+          .setHref(HistoryUtils.createHistoryHashLink(IngestTransfer.RESOLVER, jobReport.getSourceObjectId()));
         sourceObjectLabel.setText(messages.showSIPExtended());
         outcomeObjectState.setVisible(true);
 
@@ -182,12 +183,12 @@ public class ShowJobReport extends Composite {
             }
 
             @Override
-            public void onSuccess(IndexedRepresentation result) {
-              if (result != null) {
+            public void onSuccess(IndexedRepresentation representation) {
+              if (representation != null) {
                 sourceObjectLabel.setText(messages.showRepresentationExtended());
                 sourceObject.setHref(HistoryUtils.createHistoryHashLink(Browse.RESOLVER,
-                  org.roda.wui.client.browse.BrowseRepresentation.RESOLVER.getHistoryToken(), result.getAipId(),
-                  result.getUUID()));
+                  org.roda.wui.client.browse.BrowseRepresentation.RESOLVER.getHistoryToken(), representation.getAipId(),
+                  representation.getId()));
               }
             }
           });
@@ -205,8 +206,9 @@ public class ShowJobReport extends Composite {
             public void onSuccess(IndexedFile result) {
               if (result != null) {
                 sourceObjectLabel.setText(messages.showFileExtended());
-                sourceObject.setHref(HistoryUtils.createHistoryHashLink(Browse.RESOLVER, BrowseFile.RESOLVER.getHistoryToken(),
-                  result.getAipId(), result.getRepresentationUUID(), result.getUUID()));
+                sourceObject
+                  .setHref(HistoryUtils.createHistoryHashLink(Browse.RESOLVER, BrowseFile.RESOLVER.getHistoryToken(),
+                    result.getAipId(), result.getRepresentationUUID(), result.getUUID()));
               }
             }
           });

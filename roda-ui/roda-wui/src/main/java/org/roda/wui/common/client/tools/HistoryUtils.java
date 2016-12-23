@@ -14,6 +14,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.wui.client.browse.Browse;
+import org.roda.wui.client.browse.BrowseFile;
+import org.roda.wui.client.browse.BrowseFolder;
 import org.roda.wui.common.client.HistoryResolver;
 
 import com.google.gwt.http.client.URL;
@@ -128,6 +132,18 @@ public class HistoryUtils {
   public static String createHistoryHashLink(HistoryResolver resolver, List<String> extrapath) {
     List<String> path = ListUtils.concat(resolver.getHistoryPath(), extrapath);
     return createHistoryHashLink(path);
+  }
+
+  public static void open(IndexedFile selected) {
+    List<String> history = new ArrayList<>();
+    history
+      .add(selected.isDirectory() ? BrowseFolder.RESOLVER.getHistoryToken() : BrowseFile.RESOLVER.getHistoryToken());
+    history.add(selected.getAipId());
+    history.add(selected.getRepresentationId());
+    history.addAll(selected.getPath());
+    history.add(selected.getId());
+
+    HistoryUtils.newHistory(Browse.RESOLVER, history);
   }
 
 }

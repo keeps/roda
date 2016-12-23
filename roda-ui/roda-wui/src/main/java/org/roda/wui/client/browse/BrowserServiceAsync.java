@@ -36,7 +36,9 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.wui.client.browse.bundle.BrowseItemBundle;
+import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
+import org.roda.wui.client.browse.bundle.BrowseFileBundle;
+import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.bundle.DipBundle;
@@ -57,7 +59,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  */
 public interface BrowserServiceAsync {
 
-  void retrieveItemBundle(String aipId, String localeString, AsyncCallback<BrowseItemBundle> callback);
+  void retrieveBrowseAIPBundle(String aipId, String localeString, AsyncCallback<BrowseAIPBundle> callback);
 
   void retrieveDescriptiveMetadataEditBundle(String aipId, String representationId, String descId, String type,
     String version, String localeString, AsyncCallback<DescriptiveMetadataEditBundle> callback);
@@ -207,12 +209,12 @@ public interface BrowserServiceAsync {
   void updateMultipleIncidences(SelectedItems<RiskIncidence> selected, String status, String severity, Date mitigatedOn,
     String mitigatedBy, String mitigatedDescription, AsyncCallback<Void> loadingAsyncCallback);
 
-  void renameFolder(String folderUUID, String newName, String details, AsyncCallback<String> asyncCallback);
+  void renameFolder(String folderUUID, String newName, String details, AsyncCallback<IndexedFile> asyncCallback);
 
-  void moveFiles(String aipId, String representationUUID, SelectedItems<IndexedFile> selectedFiles,
-    IndexedFile toFolder, String details, AsyncCallback<String> asyncCallback);
+  void moveFiles(String aipId, String representationId, SelectedItems<IndexedFile> selectedFiles, IndexedFile toFolder,
+    String details, AsyncCallback<Void> asyncCallback);
 
-  void createFolder(String aipId, String representationUUID, String folderUUID, String newName, String details,
+  void createFolder(String aipId, String representationId, String folderUUID, String newName, String details,
     AsyncCallback<String> asyncCallback);
 
   void createFormatIdentificationJob(SelectedItems selected, AsyncCallback<Void> loadingAsyncCallback);
@@ -224,4 +226,11 @@ public interface BrowserServiceAsync {
     AsyncCallback<DipBundle> callback);
 
   void deleteDIP(String dipId, AsyncCallback<Void> async);
+
+  void retrieveBrowseRepresentationBundle(String aipId, String representationId, String localeString,
+    AsyncCallback<BrowseRepresentationBundle> callback);
+  
+  void retrieveBrowseFileBundle(String historyAipId, String historyRepresentationId, List<String> historyFilePath,
+    String historyFileId, String localeName, AsyncCallback<BrowseFileBundle> asyncCallback);
+
 }

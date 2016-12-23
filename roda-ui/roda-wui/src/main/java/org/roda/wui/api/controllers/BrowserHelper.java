@@ -136,7 +136,9 @@ import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.ObjectResponse;
 import org.roda.wui.client.browse.MetadataValue;
 import org.roda.wui.client.browse.bundle.BinaryVersionBundle;
-import org.roda.wui.client.browse.bundle.BrowseItemBundle;
+import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
+import org.roda.wui.client.browse.bundle.BrowseFileBundle;
+import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
@@ -164,25 +166,25 @@ public class BrowserHelper {
   private static final int BUNDLE_MAX_REPRESENTATION_COUNT = 10;
   private static final int BUNDLE_MAX_ADDED_ORIGINAL_REPRESENTATION_COUNT = 1;
 
-  protected static BrowseItemBundle retrieveItemBundle(String aipId, Locale locale)
+  protected static BrowseAIPBundle retrieveBrowseAipBundle(IndexedAIP aip, Locale locale)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
-    BrowseItemBundle itemBundle = new BrowseItemBundle();
+    BrowseAIPBundle bundle = new BrowseAIPBundle();
 
     // set aip
-    IndexedAIP aip = retrieve(IndexedAIP.class, aipId);
-    itemBundle.setAIP(aip);
+    bundle.setAIP(aip);
+    String aipId = aip.getId();
 
     // set aip ancestors
     try {
-      itemBundle.setAIPAncestors(retrieveAncestors(aip));
+      bundle.setAIPAncestors(retrieveAncestors(aip));
     } catch (NotFoundException e) {
-      LOGGER.warn("Found an item with invalid ancestors: {}", aipId, e);
+      LOGGER.warn("Found an item with invalid ancestors: {}", aip.getId(), e);
     }
 
     // set descriptive metadata
     try {
       List<DescriptiveMetadataViewBundle> descriptiveMetadataList = retrieveDescriptiveMetadataBundles(aipId, locale);
-      itemBundle.setDescriptiveMetadata(descriptiveMetadataList);
+      bundle.setDescriptiveMetadata(descriptiveMetadataList);
     } catch (NotFoundException e) {
       // do nothing
     }
@@ -205,7 +207,7 @@ public class BrowserHelper {
       }
     }
 
-    itemBundle.setRepresentations(representations);
+    bundle.setRepresentations(representations);
 
     Map<String, List<DescriptiveMetadataViewBundle>> representationsDescriptiveMetadata = new HashMap<>();
     for (IndexedRepresentation representation : representations) {
@@ -217,9 +219,54 @@ public class BrowserHelper {
         // do nothing
       }
     }
-    itemBundle.setRepresentationsDescriptiveMetadata(representationsDescriptiveMetadata);
+    bundle.setRepresentationsDescriptiveMetadata(representationsDescriptiveMetadata);
 
-    return itemBundle;
+    return bundle;
+  }
+
+  public static BrowseRepresentationBundle retrieveBrowseRepresentationBundle(IndexedAIP aip,
+    IndexedRepresentation representation, Locale locale)
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+    BrowseRepresentationBundle bundle = new BrowseRepresentationBundle();
+
+    bundle.setAip(aip);
+    bundle.setRepresentation(representation);
+
+    // set aip ancestors
+    try {
+      bundle.setAipAncestors(retrieveAncestors(aip));
+    } catch (NotFoundException e) {
+      LOGGER.warn("Found an item with invalid ancestors: {}", aip.getId(), e);
+    }
+
+    // set representation desc. metadata
+    try {
+      bundle.setRepresentationDescriptiveMetadata(
+        retrieveDescriptiveMetadataBundles(aip.getId(), representation.getId(), locale));
+    } catch (NotFoundException e) {
+      // do nothing
+    }
+
+    return bundle;
+  }
+
+  public static BrowseFileBundle retrieveBrowseFileBundle(IndexedAIP aip, String representationId,
+    List<String> filePath, String fileId, Locale locale) throws NotFoundException, GenericException {
+    BrowseFileBundle bundle = new BrowseFileBundle();
+
+    bundle.setAip(aip);
+    bundle.setRepresentation(
+      retrieve(IndexedRepresentation.class, IdUtils.getRepresentationId(aip.getId(), representationId)));
+    bundle.setFile(retrieve(IndexedFile.class, IdUtils.getFileId(aip.getId(), representationId, filePath, fileId)));
+
+    // set aip ancestors
+    try {
+      bundle.setAipAncestors(retrieveAncestors(aip));
+    } catch (NotFoundException e) {
+      LOGGER.warn("Found an item with invalid ancestors: {}", aip.getId(), e);
+    }
+
+    return bundle;
   }
 
   private static List<DescriptiveMetadataViewBundle> retrieveDescriptiveMetadataBundles(String aipId, Locale locale)
@@ -2591,7 +2638,7 @@ public class BrowserHelper {
     }
   }
 
-  public static String renameFolder(User user, String folderUUID, String newName, String details)
+  public static IndexedFile renameFolder(User user, String folderUUID, String newName, String details)
     throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
     AuthorizationDeniedException {
     ModelService model = RodaCoreFactory.getModelService();
@@ -2612,7 +2659,8 @@ public class BrowserHelper {
         outcomeText, details, user.getName(), true);
 
       index.commitAIPs();
-      return IdUtils.getFileId(newFolder);
+
+      return index.retrieve(IndexedFile.class, IdUtils.getFileId(newFolder));
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       String outcomeText = "The folder '" + ifolder.getId() + "' has not been manually renamed from '" + oldName
         + "' to '" + newName + "'.";
@@ -2625,13 +2673,17 @@ public class BrowserHelper {
     }
   }
 
-  public static String moveFiles(User user, String aipId, String representationUUID,
+  public static void moveFiles(User user, String aipId, String representationId,
     SelectedItems<IndexedFile> selectedFiles, IndexedFile toFolder, String details) throws GenericException,
     RequestNotValidException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
-    List<File> files = new ArrayList<File>();
     IndexResult<IndexedFile> findResult = new IndexResult<IndexedFile>();
+
+    if (toFolder != null && !toFolder.getAipId().equals(aipId)
+      || !toFolder.getRepresentationId().equals(representationId)) {
+      throw new RequestNotValidException("Cannot move to a file outside defined representation");
+    }
 
     if (selectedFiles instanceof SelectedItemsList) {
       SelectedItemsList<IndexedFile> selectedList = (SelectedItemsList<IndexedFile>) selectedFiles;
@@ -2643,39 +2695,48 @@ public class BrowserHelper {
       findResult = index.find(IndexedFile.class, selectedFilter.getFilter(), Sorter.NONE, new Sublist(0, findCounter));
     }
 
-    for (IndexedFile ifile : findResult.getResults()) {
-      files.add(model.retrieveFile(ifile.getAipId(), ifile.getRepresentationId(), ifile.getPath(), ifile.getId()));
-    }
-
-    if (!files.isEmpty()) {
-      String representationId = files.get(0).getRepresentationId();
+    if (!findResult.getResults().isEmpty()) {
       String storagePath = toFolder != null ? toFolder.getStoragePath()
         : ModelUtils.getRepresentationDataStoragePath(aipId, representationId).toString();
-      for (File file : files) {
+      StringBuilder outcomeText = new StringBuilder();
+
+      for (IndexedFile ifile : findResult.getResults()) {
+
+        if (ifile != null && !ifile.getAipId().equals(aipId) || !ifile.getRepresentationId().equals(representationId)) {
+          throw new RequestNotValidException("Cannot move from a file outside defined representation");
+        }
+
+        File file = model.retrieveFile(ifile.getAipId(), ifile.getRepresentationId(), ifile.getPath(), ifile.getId());
         try {
           File movedFile = model.moveFile(aipId, representationId, file, storagePath, true, true);
 
-          String outcomeText = "The file '" + file.getId() + "' has been manually moved.";
-          model.createUpdateAIPEvent(file.getAipId(), file.getRepresentationId(), null, null,
-            PreservationEventType.UPDATE, "The process of updating an object of the repository.", PluginState.SUCCESS,
-            outcomeText, details, user.getName(), true);
+          outcomeText.append("The file '" + file.getPath() + "/" + file.getId() + "' has been manually moved to '"
+            + movedFile.getPath() + "/" + movedFile.getId() + "'.\n");
+
+        } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+
+          // failure
+          outcomeText.append("The file '" + file.getId() + "' has not been manually moved: ["
+            + e.getClass().getSimpleName() + "] " + e.getMessage());
+
+          model.createUpdateAIPEvent(aipId, representationId, null, null, PreservationEventType.UPDATE,
+            "The process of updating an object of the repository.", PluginState.FAILURE, outcomeText.toString(),
+            details, user.getName(), true);
 
           index.commitAIPs();
-          return IdUtils.getFileId(movedFile);
-        } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-          String outcomeText = "The file '" + file.getId() + "' has not been manually moved.";
-          model.createUpdateAIPEvent(file.getAipId(), file.getRepresentationId(), null, null,
-            PreservationEventType.UPDATE, "The process of updating an object of the repository.", PluginState.FAILURE,
-            outcomeText, details, user.getName(), true);
 
           throw e;
         }
       }
 
-      index.commitAIPs();
-    }
+      // success
+      model.createUpdateAIPEvent(aipId, representationId, null, null, PreservationEventType.UPDATE,
+        "The process of updating an object of the repository.", PluginState.SUCCESS, outcomeText.toString(), details,
+        user.getName(), true);
 
-    return toFolder != null ? toFolder.getUUID() : null;
+      index.commitAIPs();
+
+    }
   }
 
   public static String moveTransferredResource(SelectedItems selected, TransferredResource transferredResource)
@@ -2715,13 +2776,14 @@ public class BrowserHelper {
 
   }
 
-  public static String createFolder(User user, String aipId, String representationUUID, String folderUUID,
-    String newName, String details) throws GenericException, RequestNotValidException, AlreadyExistsException,
-    NotFoundException, AuthorizationDeniedException {
+  public static String createFolder(User user, String aipId, String representationId, String folderUUID, String newName,
+    String details) throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
+    AuthorizationDeniedException {
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
     File newFolder;
-    IndexedRepresentation irep = index.retrieve(IndexedRepresentation.class, representationUUID);
+    IndexedRepresentation irep = index.retrieve(IndexedRepresentation.class,
+      IdUtils.getRepresentationId(aipId, representationId));
 
     try {
       if (folderUUID != null) {
@@ -3029,4 +3091,5 @@ public class BrowserHelper {
 
     index.commit(IndexedRepresentation.class);
   }
+
 }

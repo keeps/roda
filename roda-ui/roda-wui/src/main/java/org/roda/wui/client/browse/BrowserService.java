@@ -43,7 +43,9 @@ import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.validation.ValidationException;
-import org.roda.wui.client.browse.bundle.BrowseItemBundle;
+import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
+import org.roda.wui.client.browse.bundle.BrowseFileBundle;
+import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.bundle.DipBundle;
@@ -90,8 +92,16 @@ public interface BrowserService extends RemoteService {
     }
   }
 
-  BrowseItemBundle retrieveItemBundle(String aipId, String localeString)
+  BrowseAIPBundle retrieveBrowseAIPBundle(String aipId, String localeString)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
+
+  BrowseRepresentationBundle retrieveBrowseRepresentationBundle(String aipId, String representationId,
+    String localeString)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
+
+  BrowseFileBundle retrieveBrowseFileBundle(String historyAipId, String historyRepresentationId,
+    List<String> historyFilePath, String historyFileId, String localeName)
+    throws AuthorizationDeniedException, GenericException, NotFoundException;
 
   DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String representationId,
     String descId, String type, String version, String localeString)
@@ -293,14 +303,14 @@ public interface BrowserService extends RemoteService {
   String createRepresentation(String aipId, String details) throws AuthorizationDeniedException, GenericException,
     NotFoundException, RequestNotValidException, AlreadyExistsException;
 
-  String renameFolder(String folderUUID, String newName, String details) throws AuthorizationDeniedException,
+  IndexedFile renameFolder(String folderUUID, String newName, String details) throws AuthorizationDeniedException,
     GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException;
 
-  String moveFiles(String aipId, String representationUUID, SelectedItems<IndexedFile> selectedFiles,
-    IndexedFile toFolder, String details) throws AuthorizationDeniedException, GenericException,
-    RequestNotValidException, AlreadyExistsException, NotFoundException;
+  void moveFiles(String aipId, String representationId, SelectedItems<IndexedFile> selectedFiles, IndexedFile toFolder,
+    String details) throws AuthorizationDeniedException, GenericException, RequestNotValidException,
+    AlreadyExistsException, NotFoundException;
 
-  String createFolder(String aipId, String representationUUID, String folderUUID, String newName, String details)
+  String createFolder(String aipId, String representationId, String folderUUID, String newName, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, AlreadyExistsException,
     NotFoundException;
 
@@ -315,4 +325,5 @@ public interface BrowserService extends RemoteService {
 
   void deleteDIP(String dipId)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
+
 }

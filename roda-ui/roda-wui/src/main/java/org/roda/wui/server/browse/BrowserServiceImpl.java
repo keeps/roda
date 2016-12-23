@@ -72,7 +72,9 @@ import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.controllers.Jobs;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.Viewers;
-import org.roda.wui.client.browse.bundle.BrowseItemBundle;
+import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
+import org.roda.wui.client.browse.bundle.BrowseFileBundle;
+import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.bundle.DipBundle;
@@ -152,11 +154,28 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public BrowseItemBundle retrieveItemBundle(String aipId, String localeString)
+  public BrowseAIPBundle retrieveBrowseAIPBundle(String aipId, String localeString)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Locale locale = ServerTools.parseLocale(localeString);
-    return Browser.retrieveItemBundle(user, aipId, locale);
+    return Browser.retrieveBrowseAipBundle(user, aipId, locale);
+  }
+
+  @Override
+  public BrowseRepresentationBundle retrieveBrowseRepresentationBundle(String aipId, String representationId,
+    String localeString)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Locale locale = ServerTools.parseLocale(localeString);
+    return Browser.retrieveBrowseRepresentationBundle(user, aipId, representationId, locale);
+  }
+
+  @Override
+  public BrowseFileBundle retrieveBrowseFileBundle(String aipId, String representationId, List<String> filePath,
+    String fileId, String localeString) throws AuthorizationDeniedException, GenericException, NotFoundException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Locale locale = ServerTools.parseLocale(localeString);
+    return Browser.retrieveBrowseFileBundle(user, aipId, representationId, filePath, fileId, locale);
   }
 
   @Override
@@ -751,26 +770,26 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public String renameFolder(String folderUUID, String newName, String details) throws AuthorizationDeniedException,
+  public IndexedFile renameFolder(String folderUUID, String newName, String details) throws AuthorizationDeniedException,
     GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.renameFolder(user, folderUUID, newName, details);
   }
 
   @Override
-  public String moveFiles(String aipId, String representationUUID, SelectedItems<IndexedFile> selectedFiles,
+  public void moveFiles(String aipId, String representationId, SelectedItems<IndexedFile> selectedFiles,
     IndexedFile toFolder, String details) throws AuthorizationDeniedException, GenericException,
     RequestNotValidException, AlreadyExistsException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.moveFiles(user, aipId, representationUUID, selectedFiles, toFolder, details);
+    Browser.moveFiles(user, aipId, representationId, selectedFiles, toFolder, details);
   }
 
   @Override
-  public String createFolder(String aipId, String representationUUID, String folderUUID, String newName, String details)
+  public String createFolder(String aipId, String representationId, String folderUUID, String newName, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, AlreadyExistsException,
     NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.createFolder(user, aipId, representationUUID, folderUUID, newName, details);
+    return Browser.createFolder(user, aipId, representationId, folderUUID, newName, details);
   }
 
   @Override
@@ -824,7 +843,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     String representationId = UUID.randomUUID().toString();
     Browser.createRepresentation(user, aipId, representationId, RepresentationContentType.getMIXED().asString(),
       details);
-    return IdUtils.getRepresentationId(aipId, representationId);
+    return representationId;
   }
 
   @Override

@@ -144,7 +144,7 @@ public class TransferUpload extends Composite {
   private TransferredResource resource;
 
   private String folderUUID;
-  private String representationUUID;
+  private String representationId;
   private String aipId;
 
   private boolean isIngest = true;
@@ -181,7 +181,7 @@ public class TransferUpload extends Composite {
 
       if (folderUUID == null) {
         // upload to root
-        ret = RestUtils.createFileUploadUri(aipId, representationUUID, details);
+        ret = RestUtils.createFileUploadUri(aipId, representationId, details);
       } else {
         ret = RestUtils.createFileUploadUri(folderUUID, details);
       }
@@ -235,7 +235,7 @@ public class TransferUpload extends Composite {
 
     if (historyTokens.size() == 2 || historyTokens.size() == 3) {
       aipId = historyTokens.get(0);
-      representationUUID = historyTokens.get(1);
+      representationId = historyTokens.get(1);
       folderUUID = historyTokens.size() == 3 ? historyTokens.get(2) : null;
       callback.onSuccess(TransferUpload.this);
       updateUploadForm();
@@ -298,9 +298,9 @@ public class TransferUpload extends Composite {
       }
     } else {
       if (folderUUID != null) {
-        HistoryUtils.newHistory(BrowseFolder.RESOLVER, aipId, representationUUID, folderUUID);
+        HistoryUtils.newHistory(BrowseFolder.RESOLVER, aipId, representationId, folderUUID);
       } else {
-        HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representationUUID);
+        HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
       }
     }
   }
