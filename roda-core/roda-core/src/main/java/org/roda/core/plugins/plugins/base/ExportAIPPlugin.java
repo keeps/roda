@@ -32,6 +32,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.StoragePath;
@@ -138,12 +139,14 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> aips)
-    throws PluginException {
+  public Report execute(IndexService index, ModelService model, StorageService storage,
+    List<LiteOptionalWithCause> liteList) throws PluginException {
     Report report = PluginHelper.initPluginReport(this);
     try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, aips.size());
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
+
+      List<AIP> aips = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo, liteList);
 
       Path outputPath = Paths.get(outputFolder);
       String error = null;

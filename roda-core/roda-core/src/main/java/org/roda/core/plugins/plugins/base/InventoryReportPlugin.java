@@ -32,6 +32,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobException;
+import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
@@ -198,16 +199,19 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
-    throws PluginException {
-    String firstAIPId = list.get(0).getId();
+  public Report execute(IndexService index, ModelService model, StorageService storage,
+    List<LiteOptionalWithCause> liteList) throws PluginException {
+    String firstAIPId = "";
     // LOGGER.debug("(1st: {}) Exporting to CSV a total of {} files",
     // firstAIPId, list.size());
     BufferedWriter fileWriter = null;
     CSVPrinter csvFilePrinter = null;
     try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
+
+      List<AIP> list = PluginHelper.transformLitesIntoObjects(model, index, this, null, jobPluginInfo, liteList);
+
       Path jobCSVTempFolder = getJobCSVTempFolder();
       Path csvTempFile = jobCSVTempFolder.resolve(UUID.randomUUID().toString() + ".csv");
 
@@ -215,6 +219,9 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
       fileWriter = Files.newBufferedWriter(csvTempFile);
       csvFilePrinter = new CSVPrinter(fileWriter, csvFileFormat);
       for (AIP aip : list) {
+        if (StringUtils.isNotBlank(firstAIPId)) {
+          firstAIPId = aip.getId();
+        }
         if (outputDataInformation && aip.getRepresentations() != null) {
           List<List<String>> dataInformation = InventoryReportPluginUtils.getDataInformation(fields, aip, model,
             storage);

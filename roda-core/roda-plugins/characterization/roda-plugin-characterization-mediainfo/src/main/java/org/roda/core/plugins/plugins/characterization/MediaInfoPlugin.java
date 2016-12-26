@@ -42,6 +42,7 @@ import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Representation;
@@ -92,7 +93,11 @@ public class MediaInfoPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getDescription() {
-    return "MediaInfo extracts technical and tag data for video and audio files.\nMediaInfo supports popular video formats (e.g. AVI, WMV, QuickTime, Real, DivX, XviD) as well as lesser known or emerging formats such as MKV including WebM.\nMediaInfo reveals information such as: Title, author, director, album, track number, date, duration, codec, aspect ratio, framerate, bitrate, Audio codec, sample rate, channels, language, bitrate, subtitle language, etc.\nThe task updates PREMIS objects metadata in the Archival Information Package (AIP) to store the results of the characterization process. A PREMIS event is also recorded after the task is run.";
+    return "MediaInfo extracts technical and tag data for video and audio files.\nMediaInfo supports popular video formats (e.g. AVI, WMV, "
+      + "QuickTime, Real, DivX, XviD) as well as lesser known or emerging formats such as MKV including WebM.\nMediaInfo reveals information "
+      + "such as: Title, author, director, album, track number, date, duration, codec, aspect ratio, framerate, bitrate, Audio codec, sample "
+      + "rate, channels, language, bitrate, subtitle language, etc.\nThe task updates PREMIS objects metadata in the Archival Information "
+      + "Package (AIP) to store the results of the characterization process. A PREMIS event is also recorded after the task is run.";
   }
 
   @Override
@@ -101,14 +106,16 @@ public class MediaInfoPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
-    throws PluginException {
+  public Report execute(IndexService index, ModelService model, StorageService storage,
+    List<LiteOptionalWithCause> liteList) throws PluginException {
 
     Report report = PluginHelper.initPluginReport(this);
 
     try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
+
+      List<AIP> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo, liteList);
 
       try {
         for (AIP aip : list) {

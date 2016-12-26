@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
-import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -64,9 +64,11 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<TransferredResource> list)
-    throws PluginException {
+  public Report execute(IndexService index, ModelService model, StorageService storage,
+    List<LiteOptionalWithCause> liteList) throws PluginException {
     Report report = PluginHelper.initPluginReport(this);
+
+    List<TransferredResource> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, null, liteList);
 
     for (TransferredResource transferredResource : list) {
       Report reportItem = PluginHelper.initPluginReportItem(this, transferredResource);

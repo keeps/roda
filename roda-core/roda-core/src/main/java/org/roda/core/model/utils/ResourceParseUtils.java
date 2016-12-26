@@ -49,15 +49,10 @@ import org.roda.core.storage.DefaultDirectory;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ResourceParseUtils {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ResourceParseUtils.class);
-
   private ResourceParseUtils() {
-
   }
 
   public static File convertResourceToFile(Resource resource)
@@ -264,8 +259,10 @@ public class ResourceParseUtils {
   public static <T extends IsRODAObject> OptionalWithCause<LiteRODAObject> convertResourceToLite(StorageService storage,
     Resource resource, Class<T> classToReturn) {
     String fileName = resource.getStoragePath().getName();
-    OptionalWithCause<LiteRODAObject> ret = OptionalWithCause
-      .of(LiteRODAObjectFactory.get(classToReturn, fileName.substring(0, fileName.lastIndexOf('.'))));
+    if (fileName.lastIndexOf('.') > 0) {
+      fileName = fileName.substring(0, fileName.lastIndexOf('.'));
+    }
+    OptionalWithCause<LiteRODAObject> ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, fileName));
     return ret;
   }
 

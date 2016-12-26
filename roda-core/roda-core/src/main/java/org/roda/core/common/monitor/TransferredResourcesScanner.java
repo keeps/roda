@@ -10,6 +10,7 @@ package org.roda.core.common.monitor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,6 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
@@ -357,46 +359,38 @@ public class TransferredResourcesScanner {
   public CloseableIterable<OptionalWithCause<TransferredResource>> listTransferredResources() {
     CloseableIterable<OptionalWithCause<TransferredResource>> resources = null;
 
-    final ListTransferredResourcesRunnable listRunnable = new ListTransferredResourcesRunnable(basePath);
-    final Thread listThread = new Thread(listRunnable, "ListThread");
-    listThread.start();
+    try {
+      final Stream<Path> files = Files.walk(basePath, FileVisitOption.FOLLOW_LINKS)
+        .filter(path -> !path.equals(basePath));
+      final Iterator<Path> fileIterator = files.iterator();
 
-    resources = new CloseableIterable<OptionalWithCause<TransferredResource>>() {
-      @Override
-      public void close() throws IOException {
-        listThread.interrupt();
-      }
+      resources = new CloseableIterable<OptionalWithCause<TransferredResource>>() {
+        @Override
+        public void close() throws IOException {
+          files.close();
+        }
 
-      @Override
-      public Iterator<OptionalWithCause<TransferredResource>> iterator() {
+        @Override
+        public Iterator<OptionalWithCause<TransferredResource>> iterator() {
 
-        return new Iterator<OptionalWithCause<TransferredResource>>() {
-
-          @Override
-          public boolean hasNext() {
-            while (!(listThread.getState().equals(Thread.State.WAITING)
-              || listThread.getState().equals(Thread.State.TERMINATED)
-              || listThread.getState().equals(Thread.State.BLOCKED))) {
-              try {
-                Thread.sleep(100);
-              } catch (InterruptedException e) {
-                // do nothing
-              }
+          return new Iterator<OptionalWithCause<TransferredResource>>() {
+            @Override
+            public boolean hasNext() {
+              return fileIterator.hasNext();
             }
-            return listRunnable.getNextResource() != null;
-          }
 
-          @Override
-          public OptionalWithCause<TransferredResource> next() {
-            TransferredResource resource = listRunnable.getNextResource();
-            synchronized (listRunnable) {
-              listRunnable.notifyRunnable();
+            @Override
+            public OptionalWithCause<TransferredResource> next() {
+              Path file = fileIterator.next();
+              TransferredResource resource = instantiateTransferredResource(file, basePath);
+              return OptionalWithCause.of(resource);
             }
-            return OptionalWithCause.of(resource);
-          }
-        };
-      }
-    };
+          };
+        }
+      };
+    } catch (IOException e) {
+      LOGGER.error("Errored when file walking to list transferred resources");
+    }
 
     return resources;
   }

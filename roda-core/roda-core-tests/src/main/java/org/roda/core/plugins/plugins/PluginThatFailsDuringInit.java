@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -98,8 +99,8 @@ public class PluginThatFailsDuringInit extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<Void> list)
-    throws PluginException {
+  public Report execute(IndexService index, ModelService model, StorageService storage,
+    List<LiteOptionalWithCause> list) throws PluginException {
     LOGGER.info("Doing nothing during execute");
     return null;
   }

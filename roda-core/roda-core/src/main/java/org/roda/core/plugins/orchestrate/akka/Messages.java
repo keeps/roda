@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.roda.core.data.v2.IsRODAObject;
-import org.roda.core.data.v2.LiteRODAObject;
+import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
@@ -294,15 +294,15 @@ public class Messages {
   public static class PluginExecuteIsReady<T extends IsRODAObject> extends PluginMethodIsReady<T> {
     private static final long serialVersionUID = 1821489252490235130L;
 
-    private List<LiteRODAObject> list;
+    private List<LiteOptionalWithCause> list;
     private boolean hasBeenForwarded = false;
 
-    public PluginExecuteIsReady(Plugin<T> plugin, List<LiteRODAObject> list) {
+    public PluginExecuteIsReady(Plugin<T> plugin, List<LiteOptionalWithCause> list) {
       super(plugin);
       this.list = list;
     }
 
-    public List<LiteRODAObject> getList() {
+    public List<LiteOptionalWithCause> getList() {
       return list;
     }
 

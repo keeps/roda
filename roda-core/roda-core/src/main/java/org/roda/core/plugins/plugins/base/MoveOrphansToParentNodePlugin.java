@@ -9,10 +9,17 @@ package org.roda.core.plugins.plugins.base;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
+import org.roda.core.data.v2.index.sort.Sorter;
+import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -27,7 +34,7 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MoveOrphansToParentNodePlugin extends AbstractPlugin<IndexedAIP> {
+public class MoveOrphansToParentNodePlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(MoveOrphansToParentNodePlugin.class);
   private AIP newParent;
 
@@ -48,7 +55,9 @@ public class MoveOrphansToParentNodePlugin extends AbstractPlugin<IndexedAIP> {
 
   @Override
   public String getDescription() {
-    return "Moves selected AIP(s) that are also orphans, i.e. AIPs whose direct ancestor in the catalogue hierarchy does not exist (except root level nodes) to a new parent node defined by the user.\nThis task aims to fix problems that may occur when SIPs are ingested but not all the necessary items to construct the catalogue hierarchy have been received or properly ingested.";
+    return "Moves selected AIP(s) that are also orphans, i.e. AIPs whose direct ancestor in the catalogue hierarchy does not exist "
+      + "(except root level nodes) to a new parent node defined by the user.\nThis task aims to fix problems that may occur when SIPs are "
+      + "ingested but not all the necessary items to construct the catalogue hierarchy have been received or properly ingested.";
   }
 
   @Override
@@ -65,13 +74,20 @@ public class MoveOrphansToParentNodePlugin extends AbstractPlugin<IndexedAIP> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<IndexedAIP> list)
-    throws PluginException {
+  public Report execute(IndexService index, ModelService model, StorageService storage,
+    List<LiteOptionalWithCause> liteList) throws PluginException {
 
     try {
       String username = PluginHelper.getJobUsername(this, index);
 
-      for (IndexedAIP indexedAIP : list) {
+      List<AIP> aipList = PluginHelper.transformLitesIntoObjects(model, index, this, null, null, liteList);
+      List<String> aipIds = aipList.stream().map(aip -> aip.getId()).collect(Collectors.toList());
+
+      IndexResult<IndexedAIP> indexResults = index.find(IndexedAIP.class,
+        new Filter(new OneOfManyFilterParameter(RodaConstants.AIP_AIP_ID, aipIds)), Sorter.NONE,
+        new Sublist(0, aipIds.size()));
+
+      for (IndexedAIP indexedAIP : indexResults.getResults()) {
         try {
           LOGGER.debug("Processing AIP {}", indexedAIP.getId());
           if (indexedAIP.getLevel() == null || !indexedAIP.getLevel().trim().equalsIgnoreCase("fonds")) {
@@ -105,7 +121,7 @@ public class MoveOrphansToParentNodePlugin extends AbstractPlugin<IndexedAIP> {
   }
 
   @Override
-  public Plugin<IndexedAIP> cloneMe() {
+  public Plugin<AIP> cloneMe() {
     return new MoveOrphansToParentNodePlugin();
   }
 
@@ -146,8 +162,8 @@ public class MoveOrphansToParentNodePlugin extends AbstractPlugin<IndexedAIP> {
   }
 
   @Override
-  public List<Class<IndexedAIP>> getObjectClasses() {
-    return Arrays.asList(IndexedAIP.class);
+  public List<Class<AIP>> getObjectClasses() {
+    return Arrays.asList(AIP.class);
   }
 
 }

@@ -16,6 +16,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -107,8 +108,8 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
-    throws PluginException {
+  public Report execute(IndexService index, ModelService model, StorageService storage,
+    List<LiteOptionalWithCause> liteList) throws PluginException {
 
     boolean validateDescriptiveMetadata = PluginHelper.getBooleanFromParameters(this,
       PARAMETER_VALIDATE_DESCRIPTIVE_METADATA);
@@ -122,8 +123,11 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
     List<ValidationReport> reports = new ArrayList<ValidationReport>();
 
     try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
+
+      List<AIP> list = PluginHelper.transformLitesIntoObjects(model, index, this, pluginReport, jobPluginInfo,
+        liteList);
 
       try {
         for (AIP aip : list) {

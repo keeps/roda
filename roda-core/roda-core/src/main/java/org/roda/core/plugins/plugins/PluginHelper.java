@@ -41,6 +41,9 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LinkingObjectUtils;
+import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.LiteRODAObject;
+import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -1024,5 +1027,43 @@ public final class PluginHelper {
     } else {
       throw new NotFoundException("No reindex plugin available");
     }
+  }
+
+  public static <T extends IsRODAObject> List<T> transformLitesIntoObjects(ModelService model, IndexService index,
+    Plugin<T> plugin, Report report, JobPluginInfo pluginInfo, List<LiteOptionalWithCause> lites) {
+    List<T> finalObjects = new ArrayList<>();
+
+    for (LiteOptionalWithCause lite : lites) {
+      String failureMessage = "";
+
+      if (lite.isPresent()) {
+        OptionalWithCause<T> retrievedObject = (OptionalWithCause<T>) model
+          .retrieveObjectFromLite(lite.getLite().get());
+        if (retrievedObject.isPresent()) {
+          finalObjects.add(retrievedObject.get());
+        } else {
+          RODAException exception = retrievedObject.getCause();
+          failureMessage = "RODA object conversion from lite throwed an error: [" + exception.getClass().getName()
+            + "] " + exception.getMessage();
+        }
+      } else {
+        failureMessage = "Lite object has an error: [" + lite.getExceptionClass() + "] " + lite.getExceptionMessage();
+      }
+
+      if (StringUtils.isNotBlank(failureMessage)) {
+        if (pluginInfo != null) {
+          pluginInfo.incrementObjectsProcessedWithFailure();
+        }
+
+        if (report != null) {
+          Report reportItem = PluginHelper.initPluginReportItem(plugin, "teste", LiteRODAObject.class);
+          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(failureMessage);
+          report.addReport(reportItem);
+          PluginHelper.updatePartialJobReport(plugin, model, index, reportItem, true);
+        }
+      }
+    }
+
+    return finalObjects;
   }
 }

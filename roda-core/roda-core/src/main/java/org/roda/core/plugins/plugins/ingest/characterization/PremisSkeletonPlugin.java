@@ -27,6 +27,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
@@ -90,173 +91,151 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractPlugin
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<T> list)
-    throws PluginException {
-
-    if (!list.isEmpty()) {
-      if (list.get(0) instanceof AIP) {
-        return executeOnAIP(index, model, storage, (List<AIP>) list);
-      } else if (list.get(0) instanceof Representation) {
-        return executeOnRepresentation(index, model, storage, (List<Representation>) list);
-      } else if (list.get(0) instanceof File) {
-        return executeOnFile(index, model, storage, (List<File>) list);
-      }
-    }
-
-    return new Report();
-  }
-
-  public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, List<AIP> list)
-    throws PluginException {
+  public Report execute(IndexService index, ModelService model, StorageService storage,
+    List<LiteOptionalWithCause> liteList) throws PluginException {
     Report report = PluginHelper.initPluginReport(this);
 
     try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
+
+      List<T> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo, liteList);
+
+      if (!list.isEmpty()) {
+        if (list.get(0) instanceof AIP) {
+          report = executeOnAIP(index, model, storage, report, jobPluginInfo, (List<AIP>) list);
+        } else if (list.get(0) instanceof Representation) {
+          report = executeOnRepresentation(index, model, storage, report, jobPluginInfo, (List<Representation>) list);
+        } else if (list.get(0) instanceof File) {
+          report = executeOnFile(index, model, storage, report, jobPluginInfo, (List<File>) list);
+        }
+      }
+
+      jobPluginInfo.finalizeInfo();
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+    } catch (JobException e) {
+      throw new PluginException("A job exception has occurred", e);
+    }
+
+    return report;
+  }
+
+  public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
+    SimpleJobPluginInfo jobPluginInfo, List<AIP> list) throws PluginException {
+
+    try {
+      for (AIP aip : list) {
+        LOGGER.debug("Processing AIP {}", aip.getId());
+        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+
+        try {
+          for (Representation representation : aip.getRepresentations()) {
+            LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
+            List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
+            PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aip.getId(), representation.getId(),
+              algorithms);
+            model.notifyRepresentationUpdated(representation);
+          }
+
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+          reportItem.setPluginState(PluginState.SUCCESS);
+        } catch (RODAException | XmlException | IOException e) {
+          LOGGER.error("Error processing AIP " + aip.getId(), e);
+
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
+        }
+
+        try {
+          boolean notify = true;
+          PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(), "", notify);
+        } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
+          | AuthorizationDeniedException | AlreadyExistsException e) {
+          LOGGER.error("Error creating event: " + e.getMessage(), e);
+        }
+
+        report.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+      }
+    } catch (ClassCastException e) {
+      LOGGER.error("Trying to execute an AIP-only plugin with other objects");
+      jobPluginInfo.incrementObjectsProcessedWithFailure(list.size());
+    }
+
+    return report;
+  }
+
+  public Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage, Report report,
+    SimpleJobPluginInfo jobPluginInfo, List<Representation> list) throws PluginException {
+
+    for (Representation representation : list) {
+      LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), representation.getAipId());
+      Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
+        Representation.class, AIPState.ACTIVE);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+      reportItem.setPluginState(PluginState.SUCCESS);
 
       try {
-        for (AIP aip : list) {
-          LOGGER.debug("Processing AIP {}", aip.getId());
-          Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class,
-            AIPState.INGEST_PROCESSING);
-          PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
-
-          try {
-            for (Representation representation : aip.getRepresentations()) {
-              LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
-              List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
-              PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aip.getId(), representation.getId(),
-                algorithms);
-              model.notifyRepresentationUpdated(representation);
-            }
-
-            jobPluginInfo.incrementObjectsProcessedWithSuccess();
-            reportItem.setPluginState(PluginState.SUCCESS);
-          } catch (RODAException | XmlException | IOException e) {
-            LOGGER.error("Error processing AIP " + aip.getId(), e);
-
-            jobPluginInfo.incrementObjectsProcessedWithFailure();
-            reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
-          }
-
-          try {
-            boolean notify = true;
-            PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(), "", notify);
-          } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
-            | AuthorizationDeniedException | AlreadyExistsException e) {
-            LOGGER.error("Error creating event: " + e.getMessage(), e);
-          }
-
-          report.addReport(reportItem);
-          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
-        }
-      } catch (ClassCastException e) {
-        LOGGER.error("Trying to execute an AIP-only plugin with other objects");
-        jobPluginInfo.incrementObjectsProcessedWithFailure(list.size());
+        List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
+        PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, representation.getAipId(),
+          representation.getId(), algorithms);
+        model.notifyRepresentationUpdated(representation);
+        jobPluginInfo.incrementObjectsProcessedWithSuccess();
+      } catch (RODAException | XmlException | IOException e) {
+        LOGGER.error("Error processing representation " + representation.getId(), e);
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
+        reportItem.setPluginState(PluginState.FAILURE).addPluginDetails(e.getMessage() + "\n");
       }
 
-      jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException e) {
-      throw new PluginException("A job exception has occurred", e);
+      try {
+        boolean notify = true;
+        PluginHelper.createPluginEvent(this, representation.getAipId(), representation.getId(), model, index, null,
+          null, reportItem.getPluginState(), "", notify);
+      } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
+        | AuthorizationDeniedException | AlreadyExistsException e) {
+        LOGGER.error("Error creating event: " + e.getMessage(), e);
+      }
+
+      report.addReport(reportItem);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
     }
 
     return report;
   }
 
-  public Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage,
-    List<Representation> list) throws PluginException {
-    Report report = PluginHelper.initPluginReport(this);
+  public Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
+    SimpleJobPluginInfo jobPluginInfo, List<File> list) throws PluginException {
 
-    try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
+    for (File file : list) {
+      LOGGER.debug("Processing file {} from representation {} from AIP {}", file.getId(), file.getRepresentationId(),
+        file.getAipId());
+      Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class, AIPState.ACTIVE);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+      reportItem.setPluginState(PluginState.SUCCESS);
 
-      for (Representation representation : list) {
-        LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), representation.getAipId());
-        Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
-          Representation.class, AIPState.ACTIVE);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
-        reportItem.setPluginState(PluginState.SUCCESS);
-
-        try {
-          List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
-          PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, representation.getAipId(),
-            representation.getId(), algorithms);
-          model.notifyRepresentationUpdated(representation);
-          jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        } catch (RODAException | XmlException | IOException e) {
-          LOGGER.error("Error processing representation " + representation.getId(), e);
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
-          reportItem.setPluginState(PluginState.FAILURE).addPluginDetails(e.getMessage() + "\n");
-        }
-
-        try {
-          boolean notify = true;
-          PluginHelper.createPluginEvent(this, representation.getAipId(), representation.getId(), model, index, null,
-            null, reportItem.getPluginState(), "", notify);
-        } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
-          | AuthorizationDeniedException | AlreadyExistsException e) {
-          LOGGER.error("Error creating event: " + e.getMessage(), e);
-        }
-
-        report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+      try {
+        List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
+        PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, file.getAipId(), file.getRepresentationId(), file,
+          algorithms);
+        jobPluginInfo.incrementObjectsProcessedWithSuccess();
+      } catch (RODAException | XmlException | IOException e) {
+        LOGGER.error("Error processing file " + file.getId(), e);
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
+        reportItem.setPluginState(PluginState.FAILURE).addPluginDetails(e.getMessage() + "\n");
       }
 
-      jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException e) {
-      throw new PluginException("A job exception has occurred", e);
-    }
-
-    return report;
-  }
-
-  public Report executeOnFile(IndexService index, ModelService model, StorageService storage, List<File> list)
-    throws PluginException {
-    Report report = PluginHelper.initPluginReport(this);
-
-    try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-
-      for (File file : list) {
-        LOGGER.debug("Processing file {} from representation {} from AIP {}", file.getId(), file.getRepresentationId(),
-          file.getAipId());
-        Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class,
-          AIPState.ACTIVE);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
-        reportItem.setPluginState(PluginState.SUCCESS);
-
-        try {
-          List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
-          PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, file.getAipId(), file.getRepresentationId(), file,
-            algorithms);
-          jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        } catch (RODAException | XmlException | IOException e) {
-          LOGGER.error("Error processing file " + file.getId(), e);
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
-          reportItem.setPluginState(PluginState.FAILURE).addPluginDetails(e.getMessage() + "\n");
-        }
-
-        try {
-          boolean notify = true;
-          PluginHelper.createPluginEvent(this, file.getAipId(), file.getRepresentationId(), file.getPath(),
-            file.getId(), model, index, null, null, reportItem.getPluginState(), "", notify);
-        } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
-          | AuthorizationDeniedException | AlreadyExistsException e) {
-          LOGGER.error("Error creating event: " + e.getMessage(), e);
-        }
-
-        report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+      try {
+        boolean notify = true;
+        PluginHelper.createPluginEvent(this, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
+          model, index, null, null, reportItem.getPluginState(), "", notify);
+      } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
+        | AuthorizationDeniedException | AlreadyExistsException e) {
+        LOGGER.error("Error creating event: " + e.getMessage(), e);
       }
 
-      jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException e) {
-      throw new PluginException("A job exception has occurred", e);
+      report.addReport(reportItem);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
     }
 
     return report;

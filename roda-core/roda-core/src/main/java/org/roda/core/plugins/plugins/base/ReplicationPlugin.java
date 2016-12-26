@@ -15,6 +15,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -69,7 +70,10 @@ public class ReplicationPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticDescription() {
-    return "Copies AIPs and all its files to a secondary RODA instance for redundancy purposes (e.g. Active-passive high-availability architecture). This task makes use of “rsync” to synchronize AIP folders between two servers (storage level replication) and calls the secondary API to re-index the replicated AIPs (index level replication). The task can only be used if the appropriate configuration settings are defined in the “roda-core.properties”.";
+    return "Copies AIPs and all its files to a secondary RODA instance for redundancy purposes (e.g. Active-passive high-availability architecture)."
+      + " This task makes use of “rsync” to synchronize AIP folders between two servers (storage level replication) and calls the secondary API to "
+      + "re-index the replicated AIPs (index level replication). The task can only be used if the appropriate configuration settings are defined in "
+      + "the “roda-core.properties”.";
   }
 
   @Override
@@ -100,14 +104,17 @@ public class ReplicationPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
-    throws PluginException {
+  public Report execute(IndexService index, ModelService model, StorageService storage,
+    List<LiteOptionalWithCause> liteList) throws PluginException {
     Report report = PluginHelper.initPluginReport(this);
     Map<String, Report> reports = new HashMap<>();
 
     try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
+
+      List<AIP> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo, liteList);
+
       PluginState pluginState = PluginState.SUCCESS;
       try {
         for (AIP aip : list) {

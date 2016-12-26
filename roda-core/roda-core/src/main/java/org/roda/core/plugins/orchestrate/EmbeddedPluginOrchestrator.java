@@ -18,6 +18,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -103,7 +104,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
     }
   }
 
-  private <T extends IsRODAObject> void submitPlugin(List<T> list, Plugin<T> plugin) {
+  private <T extends IsRODAObject> void submitPlugin(List<LiteOptionalWithCause> list, Plugin<T> plugin) {
     executorService.submit(new Runnable() {
 
       @Override

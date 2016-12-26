@@ -950,10 +950,6 @@ public class ModelServiceTest {
   public void testListing() throws RODAException, IOException {
     populate(RodaCoreFactory.getTransferredResourcesScanner().getBasePath());
     CloseableIterable<OptionalWithCause<LiteRODAObject>> list = model.listLite(TransferredResource.class);
-    for (OptionalWithCause<LiteRODAObject> lite : list) {
-      System.err.println(lite.get().getInfo());
-    }
-
     int size = CloseableIterables.size(list);
     assertEquals(fileCounter, size);
   }

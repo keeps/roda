@@ -25,6 +25,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -100,9 +101,12 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<TransferredResource> list)
-    throws PluginException {
+  public Report execute(IndexService index, ModelService model, StorageService storage,
+    List<LiteOptionalWithCause> liteList) throws PluginException {
     Report report = PluginHelper.initPluginReport(this);
+
+    List<TransferredResource> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, null, liteList);
+
     String jobId = PluginHelper.getJobId(this);
     Optional<String> computedSearchScope = PluginHelper.getSearchScopeFromParameters(this, model);
     Path jobWorkingDirectory = PluginHelper.getJobWorkingDirectory(this);
@@ -224,8 +228,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
     if (indexedAIP != null) {
       String jobUsername = PluginHelper.getJobUsername(this, index);
       // Update the AIP
-      aip = EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP, model, storage, jobUsername,
-        searchScope);
+      aip = EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP, model, storage, jobUsername, searchScope);
     }
     return aip;
   }

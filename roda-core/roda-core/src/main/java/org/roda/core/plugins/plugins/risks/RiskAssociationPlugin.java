@@ -26,6 +26,7 @@ import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
@@ -137,30 +138,16 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<T> resources)
-    throws PluginException {
-    return executePlugin(index, model, storage, resources);
-  }
-
-  @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    try {
-      index.commit(RiskIncidence.class);
-    } catch (GenericException e) {
-      LOGGER.error("Error commiting risk incidences to index");
-    }
-    return new Report();
-  }
-
-  public <T extends Serializable> Report executePlugin(IndexService index, ModelService model, StorageService storage,
-    List<T> list) throws PluginException {
-
+  public Report execute(IndexService index, ModelService model, StorageService storage,
+    List<LiteOptionalWithCause> liteList) throws PluginException {
     LOGGER.debug("Creating risk incidences");
     Report pluginReport = PluginHelper.initPluginReport(this);
 
     try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
+
+      List<T> list = PluginHelper.transformLitesIntoObjects(model, index, this, pluginReport, jobPluginInfo, liteList);
 
       String jobId = PluginHelper.getJobId(this);
       Job job = index.retrieve(Job.class, jobId);
@@ -191,6 +178,16 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
     }
 
     return pluginReport;
+  }
+
+  @Override
+  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+    try {
+      index.commit(RiskIncidence.class);
+    } catch (GenericException e) {
+      LOGGER.error("Error commiting risk incidences to index");
+    }
+    return new Report();
   }
 
   private <T extends Serializable> Pair<SimpleJobPluginInfo, Report> addIncidenceToAIPList(ModelService model,

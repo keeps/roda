@@ -67,7 +67,6 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
@@ -464,7 +463,7 @@ public class ModelService extends ModelObservable {
       throw new RequestNotValidException("Cannot set itself as its parent: " + aipId);
     }
 
-    //TODO ADD RESTRICTIONS
+    // TODO ADD RESTRICTIONS
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
     String oldParentId = aip.getParentId();
     aip.setParentId(parentId);
@@ -2395,7 +2394,7 @@ public class ModelService extends ModelObservable {
     return LiteRODAObjectFactory.get(object);
   }
 
-  public <T extends IsModelObject> Optional<T> retrieveObjectFromLite(LiteRODAObject liteRODAObject) {
+  public <T extends IsModelObject> OptionalWithCause<T> retrieveObjectFromLite(LiteRODAObject liteRODAObject) {
     return LiteRODAObjectFactory.get(this, liteRODAObject);
   }
 
@@ -2415,8 +2414,7 @@ public class ModelService extends ModelObservable {
     } else if (File.class.equals(objectClass)) {
       ret = listFiles();
     } else if (TransferredResource.class.equals(objectClass)) {
-      // FIXME 20160930 it uses index but it should not(?)
-      ret = RodaCoreFactory.getIndexService().list(TransferredResource.class);
+      ret = RodaCoreFactory.getTransferredResourcesScanner().listTransferredResources();
     } else if (RODAMember.class.equals(objectClass)) {
       ret = listMembers();
     } else if (LogEntry.class.equals(objectClass)) {
@@ -2490,6 +2488,72 @@ public class ModelService extends ModelObservable {
     }
 
     return CloseableIterables.fromList(members);
+  }
+
+  public OptionalWithCause<LogEntry> retrieveLogEntry(String logEntryId) {
+    boolean recursive = false;
+    LogEntry nextLogEntry = null;
+
+    try {
+      final CloseableIterable<Resource> actionLogs = getStorage()
+        .listResourcesUnderContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG), recursive);
+      Iterator<Resource> resources = actionLogs.iterator();
+      boolean flag = true;
+
+      while (resources.hasNext() && flag) {
+        Resource resource = resources.next();
+        if (resource instanceof Binary) {
+          Binary b = (Binary) resource;
+          try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(b.getContent().createInputStream()));
+            String nextLine = null;
+            while ((nextLine = br.readLine()) == null && flag) {
+              nextLogEntry = JsonUtils.getObjectFromJson(nextLine, LogEntry.class);
+              if (nextLogEntry.getId().equals(logEntryId)) {
+                flag = false;
+              }
+            }
+          } catch (IOException | GenericException e) {
+            // do nothing
+          }
+        }
+      }
+    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
+      LOGGER.error("Error getting action log from storage", e);
+    }
+
+    if (nextLogEntry == null) {
+      try {
+        DirectoryStream<Path> directoryStream = Files.newDirectoryStream(RodaCoreFactory.getLogPath());
+        Iterator<Path> paths = directoryStream.iterator();
+        boolean flag = true;
+
+        while (paths.hasNext() && flag) {
+          Path logFile = paths.next();
+          try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(Files.newInputStream(logFile)));
+            String nextLine = null;
+            while ((nextLine = br.readLine()) == null && flag) {
+              nextLogEntry = JsonUtils.getObjectFromJson(nextLine, LogEntry.class);
+              if (nextLogEntry.getId().equals(logEntryId)) {
+                flag = false;
+              }
+            }
+          } catch (IOException | GenericException e) {
+            // do nothing
+          }
+        }
+      } catch (IOException e) {
+        LOGGER.error("Error getting action log from storage", e);
+        return OptionalWithCause.empty(new RODAException(e));
+      }
+    }
+
+    if (nextLogEntry == null) {
+      return OptionalWithCause.empty(new RODAException(new NotFoundException()));
+    }
+
+    return OptionalWithCause.of(nextLogEntry);
   }
 
   private CloseableIterable<OptionalWithCause<LogEntry>> listLogEntries() {
@@ -2668,4 +2732,18 @@ public class ModelService extends ModelObservable {
     }
   }
 
+  public RODAMember retrieveRODAMember(String name) throws GenericException {
+    RODAMember member = null;
+    try {
+      member = UserUtility.getLdapUtility().getUser(name);
+    } catch (GenericException e) {
+      try {
+        member = UserUtility.getLdapUtility().getGroup(name);
+      } catch (GenericException | NotFoundException e1) {
+        LOGGER.error("Could not retrieve any user or group with name: {}", name);
+        throw e;
+      }
+    }
+    return member;
+  }
 }

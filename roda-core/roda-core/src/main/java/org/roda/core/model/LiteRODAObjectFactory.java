@@ -21,6 +21,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
@@ -28,6 +29,9 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
@@ -38,6 +42,7 @@ import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.data.v2.user.RODAMember;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -120,12 +125,50 @@ public final class LiteRODAObjectFactory {
     return get(objectClass, Arrays.asList(ids), true);
   }
 
+  public static <T extends IsRODAObject> Optional<LiteRODAObject> get(T object) {
+    Optional<LiteRODAObject> ret = Optional.empty();
+
+    if (object instanceof AIP || object instanceof IndexedAIP || object instanceof DIP || object instanceof Format
+      || object instanceof Job || object instanceof Notification || object instanceof Risk
+      || object instanceof RiskIncidence || object instanceof LogEntry) {
+      ret = get(object.getClass(), Arrays.asList(object.getId()), false);
+    } else if (object instanceof DescriptiveMetadata) {
+      ret = getDescriptiveMetadata(object);
+    } else if (object instanceof DIPFile) {
+      ret = getDIPFile(object);
+    } else if (object instanceof File) {
+      ret = getFile(object);
+    } else if (object instanceof IndexedFile) {
+      ret = getFileFromIndex(object);
+    } else if (object instanceof TransferredResource) {
+      TransferredResource o = (TransferredResource) object;
+      ret = get(TransferredResource.class, Arrays.asList(o.getFullPath()), false);
+    } else if (object instanceof Report) {
+      Report o = (Report) object;
+      ret = get(Report.class, Arrays.asList(o.getJobId(), o.getId()), false);
+    } else if (object instanceof Representation || object instanceof IndexedRepresentation) {
+      Representation o = (Representation) object;
+      ret = get(Representation.class, Arrays.asList(o.getAipId(), o.getId()), false);
+    } else if (object instanceof RODAMember) {
+      RODAMember o = (RODAMember) object;
+      ret = get(RODAMember.class, Arrays.asList(o.getName()), false);
+    }
+
+    if (!ret.isPresent()) {
+      LOGGER.error("Unable to create {} from object with class '{}' & id '{}'", LiteRODAObject.class.getSimpleName(),
+        object.getClass().getName(), object.getId());
+    }
+
+    return ret;
+  }
+
   private static <T extends IsRODAObject> Optional<LiteRODAObject> get(Class<T> objectClass, List<String> ids,
     boolean logIfReturningEmpty) {
     Optional<LiteRODAObject> ret = Optional.empty();
 
     if (objectClass == AIP.class || objectClass == DIP.class || objectClass == Format.class || objectClass == Job.class
-      || objectClass == Notification.class || objectClass == Risk.class || objectClass == RiskIncidence.class) {
+      || objectClass == Notification.class || objectClass == Risk.class || objectClass == RiskIncidence.class
+      || objectClass == RODAMember.class || objectClass == LogEntry.class) {
       ret = create(objectClass, 1, ids);
     } else if (objectClass == DescriptiveMetadata.class) {
       if (ids.size() == 2 || ids.size() == 3) {
@@ -148,37 +191,6 @@ public final class LiteRODAObjectFactory {
     if (logIfReturningEmpty && !ret.isPresent()) {
       LOGGER.error("Unable to create {} from objectClass '{}' with ids '{}'", LiteRODAObject.class.getSimpleName(),
         objectClass.getName(), ids);
-    }
-
-    return ret;
-  }
-
-  public static <T extends IsRODAObject> Optional<LiteRODAObject> get(T object) {
-    Optional<LiteRODAObject> ret = Optional.empty();
-
-    if (object instanceof AIP || object instanceof DIP || object instanceof Format || object instanceof Job
-      || object instanceof Notification || object instanceof Risk || object instanceof RiskIncidence) {
-      ret = get(object.getClass(), Arrays.asList(object.getId()), false);
-    } else if (object instanceof DescriptiveMetadata) {
-      ret = getDescriptiveMetadata(object);
-    } else if (object instanceof DIPFile) {
-      ret = getDIPFile(object);
-    } else if (object instanceof File) {
-      ret = getFile(object);
-    } else if (object instanceof TransferredResource) {
-      TransferredResource o = (TransferredResource) object;
-      ret = get(TransferredResource.class, Arrays.asList(o.getFullPath()), false);
-    } else if (object instanceof Report) {
-      Report o = (Report) object;
-      ret = get(Report.class, Arrays.asList(o.getJobId(), o.getId()), false);
-    } else if (object instanceof Representation) {
-      Representation o = (Representation) object;
-      ret = get(Representation.class, Arrays.asList(o.getAipId(), o.getId()), false);
-    }
-
-    if (!ret.isPresent()) {
-      LOGGER.error("Unable to create {} from object with class '{}' & id '{}'", LiteRODAObject.class.getSimpleName(),
-        object.getClass().getName(), object.getId());
     }
 
     return ret;
@@ -216,14 +228,24 @@ public final class LiteRODAObjectFactory {
     return get(File.class, list, false);
   }
 
-  public static <T extends IsRODAObject> Optional<T> get(ModelService model, LiteRODAObject liteRODAObject) {
+  private static <T extends IsRODAObject> Optional<LiteRODAObject> getFileFromIndex(T object) {
+    IndexedFile o = (IndexedFile) object;
+    List<String> list = new ArrayList<>();
+    list.add(o.getAipId());
+    list.add(o.getRepresentationId());
+    list.addAll(o.getPath());
+    list.add(o.getId());
+    return get(File.class, list, false);
+  }
+
+  public static <T extends IsRODAObject> OptionalWithCause<T> get(ModelService model, LiteRODAObject liteRODAObject) {
     try {
       T ret = null;
 
       String[] split = liteRODAObject.getInfo().split(SEPARATOR_REGEX);
       if (split.length >= 2) {
         String clazz = split[0];
-        if (AIP.class.getName().equals(clazz)) {
+        if (AIP.class.getName().equals(clazz) || IndexedAIP.class.getName().equals(clazz)) {
           ret = (T) model.retrieveAIP(split[1]);
         } else if (DescriptiveMetadata.class.getName().equals(clazz)) {
           ret = getDescriptiveMetadata(model, split);
@@ -231,15 +253,14 @@ public final class LiteRODAObjectFactory {
           ret = (T) model.retrieveDIP(split[1]);
         } else if (DIPFile.class.getName().equals(clazz)) {
           ret = getDIPFile(model, split);
-        } else if (File.class.getName().equals(clazz)) {
+        } else if (File.class.getName().equals(clazz) || IndexedFile.class.getName().equals(clazz)) {
           ret = getFile(model, split);
         } else if (Format.class.getName().equals(clazz)) {
           ret = (T) model.retrieveFormat(split[1]);
         } else if (Job.class.getName().equals(clazz)) {
           ret = (T) model.retrieveJob(split[1]);
         } else if (LogEntry.class.getName().equals(clazz)) {
-          // FIXME 20161221 hsilva: to implement whenever model has methods for
-          // LogEntry
+          ret = (T) model.retrieveLogEntry(split[1]);
         } else if (Notification.class.getName().equals(clazz)) {
           ret = (T) model.retrieveNotification(split[1]);
         } else if (PreservationMetadata.class.getName().equals(clazz)) {
@@ -252,20 +273,23 @@ public final class LiteRODAObjectFactory {
           ret = (T) model.retrieveRisk(split[1]);
         } else if (RiskIncidence.class.getName().equals(clazz)) {
           ret = (T) model.retrieveRiskIncidence(split[1]);
-        } else if (Representation.class.getName().equals(clazz)) {
+        } else if (Representation.class.getName().equals(clazz)
+          || IndexedRepresentation.class.getName().equals(clazz)) {
           if (split.length == 3) {
             ret = (T) model.retrieveRepresentation(split[1], split[2]);
           }
         } else if (TransferredResource.class.getName().equals(clazz)) {
           ret = (T) model.retrieveTransferredResource(split[1]);
+        } else if (RODAMember.class.getName().equals(clazz)) {
+          ret = (T) model.retrieveRODAMember(split[1]);
         }
       }
 
-      return Optional.ofNullable(ret);
+      return OptionalWithCause.of(ret);
 
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Unable to create object from {}", liteRODAObject, e);
-      return Optional.empty();
+      return OptionalWithCause.empty(e);
     }
   }
 
@@ -342,6 +366,12 @@ public final class LiteRODAObjectFactory {
     List<T> modelObjects) {
     return modelObjects.stream().map(o -> model.retrieveLiteFromObject(o)).filter(o -> o.isPresent()).map(o -> o.get())
       .collect(Collectors.toList());
+  }
+
+  public static <T extends IsRODAObject> List<LiteOptionalWithCause> transformIntoLiteWithCause(ModelService model,
+    List<T> modelObjects) {
+    return modelObjects.stream().map(o -> model.retrieveLiteFromObject(o)).filter(o -> o.isPresent())
+      .map(o -> LiteOptionalWithCause.of(o.get())).collect(Collectors.toList());
   }
 
   public static <T extends IsRODAObject> CloseableIterable<OptionalWithCause<LiteRODAObject>> transformIntoLite(

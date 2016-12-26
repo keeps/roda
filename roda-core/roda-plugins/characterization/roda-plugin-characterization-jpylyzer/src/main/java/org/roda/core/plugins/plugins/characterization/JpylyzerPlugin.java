@@ -23,6 +23,7 @@ import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
@@ -70,7 +71,11 @@ public class JpylyzerPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getDescription() {
-    return "Jpylyzer is a validator and feature extractor for JP2 images. JP2 is the still image format that is defined by Part 1 of the JPEG 2000 image compression standard (ISO/IEC 15444-1).\nJpylyzer tells you if a JP2 image really conforms to the format’s specifications (validation). It also reports the image’s technical characteristics (feature extraction).\nThe task stores the output of the tool and stores it under the metadata/other folder of the Archival Information Package. \nNOTE: This task doesn’t create PREMIS events. This is still an experimental task.\nFor more information on this tool, please visit http://jpylyzer.openpreservation.org";
+    return "Jpylyzer is a validator and feature extractor for JP2 images. JP2 is the still image format that is defined by Part 1 of the JPEG 2000 "
+      + "image compression standard (ISO/IEC 15444-1).\nJpylyzer tells you if a JP2 image really conforms to the format’s specifications (validation). "
+      + "It also reports the image’s technical characteristics (feature extraction).\nThe task stores the output of the tool and stores it under the"
+      + " metadata/other folder of the Archival Information Package. \nNOTE: This task doesn’t create PREMIS events. This is still an experimental "
+      + "task.\nFor more information on this tool, please visit http://jpylyzer.openpreservation.org";
   }
 
   @Override
@@ -79,14 +84,16 @@ public class JpylyzerPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
-    throws PluginException {
+  public Report execute(IndexService index, ModelService model, StorageService storage,
+    List<LiteOptionalWithCause> liteList) throws PluginException {
 
     Report report = PluginHelper.initPluginReport(this);
 
     try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
+
+      List<AIP> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo, liteList);
 
       try {
         for (AIP aip : list) {

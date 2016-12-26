@@ -30,6 +30,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.TransferredResource;
@@ -43,6 +44,7 @@ import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
+import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
@@ -122,7 +124,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
-    List<TransferredResource> resources) throws PluginException {
+    List<LiteOptionalWithCause> liteList) throws PluginException {
     try {
       Date startDate = new Date();
       Report report = PluginHelper.initPluginReport(this);
@@ -130,6 +132,9 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
       final IngestJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, IngestJobPluginInfo.class);
       PluginHelper.updateJobInformation(this, jobPluginInfo.setTotalSteps(getTotalSteps()));
+
+      List<TransferredResource> resources = PluginHelper.transformLitesIntoObjects(model, index, this, report,
+        jobPluginInfo, liteList);
 
       // 0) process "parent id" and "force parent id" info. (because we might
       // need to fallback to default values)
@@ -303,7 +308,9 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       TransferredResource.class);
     try {
       plugin.setParameterValues(getParameterValues());
-      report = plugin.execute(index, model, storage, transferredResources);
+      List<LiteOptionalWithCause> lites = LiteRODAObjectFactory.transformIntoLiteWithCause(model,
+        transferredResources);
+      report = plugin.execute(index, model, storage, lites);
     } catch (PluginException | InvalidParameterException e) {
       // FIXME handle failure
       LOGGER.error("Error executing plugin", e);
@@ -593,7 +600,8 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
     try {
       plugin.setParameterValues(mergedParams);
-      report = plugin.execute(index, model, storage, aips);
+      List<LiteOptionalWithCause> lites = LiteRODAObjectFactory.transformIntoLiteWithCause(model, aips);
+      report = plugin.execute(index, model, storage, lites);
     } catch (InvalidParameterException | PluginException | RuntimeException e) {
       LOGGER.error("Error executing plugin", e);
     }

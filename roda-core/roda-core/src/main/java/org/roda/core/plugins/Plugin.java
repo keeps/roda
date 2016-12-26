@@ -14,6 +14,7 @@ import org.roda.core.data.common.RodaConstants.PreservationAgentType;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -188,8 +189,8 @@ public interface Plugin<T extends IsRODAObject> {
    * 
    * @throws PluginException
    */
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<T> list)
-    throws PluginException;
+  public Report execute(IndexService index, ModelService model, StorageService storage,
+    List<LiteOptionalWithCause> list) throws PluginException;
 
   /**
    * Method executed by {@link PluginOrchestrator} after all workers have

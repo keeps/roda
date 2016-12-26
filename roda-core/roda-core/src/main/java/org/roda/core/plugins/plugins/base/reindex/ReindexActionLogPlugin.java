@@ -35,6 +35,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
@@ -90,7 +91,9 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getDescription() {
-    return "Clears the index and recreates it from actual physical data that exists on the storage. This task aims to fix inconsistencies between what is shown in the graphical user interface of the repository and what is actually kept at the storage layer. Such inconsistencies may occur for various reasons, e.g. index corruption, ungraceful shutdown of the repository, etc.";
+    return "Clears the index and recreates it from actual physical data that exists on the storage. This task aims to fix inconsistencies between"
+      + " what is shown in the graphical user interface of the repository and what is actually kept at the storage layer. Such inconsistencies may"
+      + " occur for various reasons, e.g. index corruption, ungraceful shutdown of the repository, etc.";
   }
 
   @Override
@@ -126,8 +129,8 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<Void> list)
-    throws PluginException {
+  public Report execute(IndexService index, ModelService model, StorageService storage,
+    List<LiteOptionalWithCause> list) throws PluginException {
 
     Report pluginReport = PluginHelper.initPluginReport(this);
 

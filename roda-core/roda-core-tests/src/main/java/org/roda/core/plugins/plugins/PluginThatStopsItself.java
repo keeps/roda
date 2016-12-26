@@ -18,7 +18,8 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -34,7 +35,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
-public class PluginThatStopsItself extends AbstractPlugin<AIP> {
+public class PluginThatStopsItself extends AbstractPlugin<Void> {
   private static final Logger LOGGER = LoggerFactory.getLogger(PluginThatStopsItself.class);
 
   @Override
@@ -78,7 +79,7 @@ public class PluginThatStopsItself extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Plugin<AIP> cloneMe() {
+  public Plugin<Void> cloneMe() {
     return new PluginThatStopsItself();
   }
 
@@ -93,8 +94,8 @@ public class PluginThatStopsItself extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public List<Class<AIP>> getObjectClasses() {
-    return Arrays.asList(AIP.class);
+  public List<Class<Void>> getObjectClasses() {
+    return Arrays.asList(Void.class);
   }
 
   @Override
@@ -105,8 +106,8 @@ public class PluginThatStopsItself extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
-    throws PluginException {
+  public Report execute(IndexService index, ModelService model, StorageService storage,
+    List<LiteOptionalWithCause> list) throws PluginException {
     long sleepTime = ThreadLocalRandom.current().nextLong(1, 3 + 1) * 1000;
     LOGGER.info("Going to request to stop job executing me (after sleeping for {} miliseconds)", sleepTime);
     try {

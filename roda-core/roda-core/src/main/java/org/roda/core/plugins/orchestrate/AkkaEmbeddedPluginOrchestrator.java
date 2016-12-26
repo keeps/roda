@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
@@ -32,6 +31,7 @@ import org.roda.core.data.exceptions.JobIsStoppingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -166,13 +166,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         .findAll(classToActOn, filter, new Sorter(new SortParameter(RodaConstants.INDEX_UUID, true))).iterator();
 
       List<T1> indexObjects = new ArrayList<T1>();
-      List<T> modelObjects;
       while (findAllIterator.hasNext()) {
         if (indexObjects.size() == blockSize) {
           innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, modelClassToActOn, blockSize, jobActor);
-          modelObjects = JobsHelper.getObjectsFromIndexObjects(model, index, modelClassToActOn, indexObjects);
           jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin,
-            LiteRODAObjectFactory.transformIntoLite(model, modelObjects)), jobActor);
+            LiteRODAObjectFactory.transformIntoLiteWithCause(model, indexObjects)), jobActor);
           indexObjects = new ArrayList<T1>();
         }
         indexObjects.add(findAllIterator.next());
@@ -181,9 +179,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       if (!indexObjects.isEmpty()) {
         innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, modelClassToActOn, indexObjects.size(),
           jobActor);
-        modelObjects = JobsHelper.getObjectsFromIndexObjects(model, index, modelClassToActOn, indexObjects);
         jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin,
-          LiteRODAObjectFactory.transformIntoLite(model, modelObjects)), jobActor);
+          LiteRODAObjectFactory.transformIntoLiteWithCause(model, indexObjects)), jobActor);
       }
 
       jobStateInfoActor.tell(new Messages.JobInitEnded(), jobActor);
@@ -216,7 +213,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         if (block.size() == blockSize) {
           innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, objectClass, blockSize, jobActor);
           jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin,
-            LiteRODAObjectFactory.transformIntoLite(model, block)), jobActor);
+            LiteRODAObjectFactory.transformIntoLiteWithCause(model, block)), jobActor);
           block = new ArrayList<>();
         }
         block.add(iter.next());
@@ -225,7 +222,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       if (!block.isEmpty()) {
         innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, objectClass, block.size(), jobActor);
         jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin,
-          LiteRODAObjectFactory.transformIntoLite(model, block)), jobActor);
+          LiteRODAObjectFactory.transformIntoLiteWithCause(model, block)), jobActor);
       }
 
       jobStateInfoActor.tell(new Messages.JobInitEnded(), jobActor);
@@ -252,10 +249,9 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       jobStateInfoActor.tell(new Messages.PluginBeforeAllExecuteIsReady<>(plugin), jobActor);
 
-      List<LiteRODAObject> block = new ArrayList<>();
+      List<LiteOptionalWithCause> block = new ArrayList<>();
       while (iter.hasNext()) {
         if (block.size() == blockSize) {
-
           innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, objectClass, blockSize, jobActor);
           jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin, block), jobActor);
           block = new ArrayList<>();
@@ -263,7 +259,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
         OptionalWithCause<LiteRODAObject> nextObject = iter.next();
         if (nextObject.isPresent()) {
-          block.add(nextObject.get());
+          block.add(LiteOptionalWithCause.of(nextObject.get()));
         } else {
           LOGGER.error("Cannot process object", nextObject.getCause());
         }

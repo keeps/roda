@@ -20,6 +20,7 @@ import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.select.SelectedItemsAll;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
@@ -62,7 +63,9 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getDescription() {
-    return "Clears all indexes and recreates them from actual physical data that exists on the storage. This task aims to fix inconsistencies between what is shown in the graphical user interface of the repository and what is actually kept at the storage layer. Such inconsistencies may occur for various reasons, e.g. index corruption, ungraceful shutdown of the repository, etc.";
+    return "Clears all indexes and recreates them from actual physical data that exists on the storage. This task aims to fix inconsistencies between what "
+      + "is shown in the graphical user interface of the repository and what is actually kept at the storage layer. Such inconsistencies may occur for "
+      + "various reasons, e.g. index corruption, ungraceful shutdown of the repository, etc.";
   }
 
   @Override
@@ -76,8 +79,8 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<Void> list)
-    throws PluginException {
+  public Report execute(IndexService index, ModelService model, StorageService storage,
+    List<LiteOptionalWithCause> list) throws PluginException {
     Report pluginReport = PluginHelper.initPluginReport(this);
 
     try {

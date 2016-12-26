@@ -28,6 +28,7 @@ import org.roda.core.common.MetadataFileUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions;
@@ -95,11 +96,14 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<TransferredResource> list)
-    throws PluginException {
+  public Report execute(IndexService index, ModelService model, StorageService storage,
+    List<LiteOptionalWithCause> liteList) throws PluginException {
     Report report = PluginHelper.initPluginReport(this);
 
     try {
+      List<TransferredResource> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, null,
+        liteList);
+
       String username = PluginHelper.getJobUsername(this, index);
       String jobId = PluginHelper.getJobId(this);
       Optional<String> computedSearchScope = PluginHelper.getSearchScopeFromParameters(this, model);

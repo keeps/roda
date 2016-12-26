@@ -34,6 +34,7 @@ import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
@@ -120,125 +121,48 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractP
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<T> list)
-    throws PluginException {
-
-    if (!list.isEmpty()) {
-      if (list.get(0) instanceof AIP) {
-        return executeOnAIP(index, model, storage, (List<AIP>) list);
-      } else if (list.get(0) instanceof Representation) {
-        return executeOnRepresentation(index, model, storage, (List<Representation>) list);
-      } else if (list.get(0) instanceof File) {
-        return executeOnFile(index, model, storage, (List<File>) list);
-      }
-    }
-
-    return new Report();
-  }
-
-  public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, List<AIP> list)
-    throws PluginException {
+  public Report execute(IndexService index, ModelService model, StorageService storage,
+    List<LiteOptionalWithCause> liteList) throws PluginException {
     Report report = PluginHelper.initPluginReport(this);
 
     try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      for (AIP aip : list) {
-        // FIXME 20160516 hsilva: see how to set initial
-        // initialOutcomeObjectState
-        PluginState pluginState = PluginState.SUCCESS;
-        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
+      List<T> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo, liteList);
 
-        for (Representation representation : aip.getRepresentations()) {
-          String dipId = "";
-
-          try {
-            LOGGER.debug("Processing representation {}", representation);
-            boolean recursive = true;
-            CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(representation.getAipId(),
-              representation.getId(), recursive);
-
-            for (OptionalWithCause<File> oFile : allFiles) {
-              if (oFile.isPresent()) {
-                File file = oFile.get();
-                dipId = UUID.randomUUID().toString();
-
-                FileLink fileLink = new FileLink(representation.getAipId(), representation.getId(), file.getPath(),
-                  file.getId());
-                List<FileLink> links = new ArrayList<FileLink>();
-                links.add(fileLink);
-
-                DIP dip = new DIP();
-                dip.setId(dipId);
-                dip.setFileIds(links);
-                dip.setPermissions(aip.getPermissions());
-                dip.setTitle(getDIPTitle());
-                dip.setDescription(getDIPDescription());
-                dip.setType(RodaConstants.DIP_TYPE_DIGITAL_SIGNATURE);
-                dip = model.createDIP(dip, false);
-
-                manageFileSigning(model, index, storage, file, dip.getId());
-
-                model.notifyDIPCreated(dip, true);
-              } else {
-                LOGGER.error("Cannot process representation file", oFile.getCause());
-              }
-            }
-
-            IOUtils.closeQuietly(allFiles);
-
-          } catch (Throwable e) {
-            LOGGER.error("Error processing Representation " + representation.getId() + ": " + e.getMessage(), e);
-            reportItem.setPluginDetails(e.getMessage());
-            pluginState = PluginState.FAILURE;
-            try {
-              model.deleteDIP(dipId);
-            } catch (GenericException | NotFoundException | AuthorizationDeniedException e1) {
-              // do nothing
-            }
-          } finally {
-            report.addReport(reportItem);
-            PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
-          }
+      if (!list.isEmpty()) {
+        if (list.get(0) instanceof AIP) {
+          report = executeOnAIP(index, model, storage, report, jobPluginInfo, (List<AIP>) list);
+        } else if (list.get(0) instanceof Representation) {
+          report = executeOnRepresentation(index, model, storage, report, jobPluginInfo, (List<Representation>) list);
+        } else if (list.get(0) instanceof File) {
+          report = executeOnFile(index, model, storage, report, jobPluginInfo, (List<File>) list);
         }
-
-        if (pluginState.equals(PluginState.SUCCESS)) {
-          jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        } else {
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
-        }
-
-        reportItem.setPluginState(pluginState);
-        report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
       }
 
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
     } catch (JobException e) {
-      LOGGER.error("Could not update Job information");
+      throw new PluginException("A job exception has occurred", e);
     }
 
     return report;
   }
 
-  public Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage,
-    List<Representation> list) throws PluginException {
-    Report report = PluginHelper.initPluginReport(this);
+  public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
+    SimpleJobPluginInfo jobPluginInfo, List<AIP> list) throws PluginException {
 
-    try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
+    for (AIP aip : list) {
+      // FIXME 20160516 hsilva: see how to set initial
+      // initialOutcomeObjectState
+      PluginState pluginState = PluginState.SUCCESS;
+      Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
 
-      for (Representation representation : list) {
-        Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
-          Representation.class);
+      for (Representation representation : aip.getRepresentations()) {
         String dipId = "";
 
         try {
-          // FIXME 20160516 hsilva: see how to set initial
-          // initialOutcomeObjectState
           LOGGER.debug("Processing representation {}", representation);
           boolean recursive = true;
           CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(representation.getAipId(),
@@ -249,8 +173,6 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractP
               File file = oFile.get();
               dipId = UUID.randomUUID().toString();
 
-              Permissions aipPermissions = model.retrieveAIP(representation.getAipId()).getPermissions();
-
               FileLink fileLink = new FileLink(representation.getAipId(), representation.getId(), file.getPath(),
                 file.getId());
               List<FileLink> links = new ArrayList<FileLink>();
@@ -259,7 +181,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractP
               DIP dip = new DIP();
               dip.setId(dipId);
               dip.setFileIds(links);
-              dip.setPermissions(aipPermissions);
+              dip.setPermissions(aip.getPermissions());
               dip.setTitle(getDIPTitle());
               dip.setDescription(getDIPDescription());
               dip.setType(RodaConstants.DIP_TYPE_DIGITAL_SIGNATURE);
@@ -274,13 +196,11 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractP
           }
 
           IOUtils.closeQuietly(allFiles);
-          reportItem.setPluginState(PluginState.SUCCESS);
-          jobPluginInfo.incrementObjectsProcessedWithSuccess();
 
-        } catch (Exception | LinkageError e) {
+        } catch (Throwable e) {
           LOGGER.error("Error processing Representation " + representation.getId() + ": " + e.getMessage(), e);
-          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
+          reportItem.setPluginDetails(e.getMessage());
+          pluginState = PluginState.FAILURE;
           try {
             model.deleteDIP(dipId);
           } catch (GenericException | NotFoundException | AuthorizationDeniedException e1) {
@@ -292,80 +212,141 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractP
         }
       }
 
-      jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException e) {
-      LOGGER.error("Could not update Job information");
+      if (pluginState.equals(PluginState.SUCCESS)) {
+        jobPluginInfo.incrementObjectsProcessedWithSuccess();
+      } else {
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
+      }
+
+      reportItem.setPluginState(pluginState);
+      report.addReport(reportItem);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
     }
 
     return report;
   }
 
-  public Report executeOnFile(IndexService index, ModelService model, StorageService storage, List<File> list)
-    throws PluginException {
-    Report report = PluginHelper.initPluginReport(this);
+  public Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage, Report report,
+    SimpleJobPluginInfo jobPluginInfo, List<Representation> list) throws PluginException {
 
-    try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
+    for (Representation representation : list) {
+      Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
+        Representation.class);
+      String dipId = "";
 
-      for (File file : list) {
-        String dipId = UUID.randomUUID().toString();
+      try {
+        // FIXME 20160516 hsilva: see how to set initial
+        // initialOutcomeObjectState
+        LOGGER.debug("Processing representation {}", representation);
+        boolean recursive = true;
+        CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(representation.getAipId(),
+          representation.getId(), recursive);
+
+        for (OptionalWithCause<File> oFile : allFiles) {
+          if (oFile.isPresent()) {
+            File file = oFile.get();
+            dipId = UUID.randomUUID().toString();
+
+            Permissions aipPermissions = model.retrieveAIP(representation.getAipId()).getPermissions();
+
+            FileLink fileLink = new FileLink(representation.getAipId(), representation.getId(), file.getPath(),
+              file.getId());
+            List<FileLink> links = new ArrayList<FileLink>();
+            links.add(fileLink);
+
+            DIP dip = new DIP();
+            dip.setId(dipId);
+            dip.setFileIds(links);
+            dip.setPermissions(aipPermissions);
+            dip.setTitle(getDIPTitle());
+            dip.setDescription(getDIPDescription());
+            dip.setType(RodaConstants.DIP_TYPE_DIGITAL_SIGNATURE);
+            dip = model.createDIP(dip, false);
+
+            manageFileSigning(model, index, storage, file, dip.getId());
+
+            model.notifyDIPCreated(dip, true);
+          } else {
+            LOGGER.error("Cannot process representation file", oFile.getCause());
+          }
+        }
+
+        IOUtils.closeQuietly(allFiles);
+        reportItem.setPluginState(PluginState.SUCCESS);
+        jobPluginInfo.incrementObjectsProcessedWithSuccess();
+
+      } catch (Exception | LinkageError e) {
+        LOGGER.error("Error processing Representation " + representation.getId() + ": " + e.getMessage(), e);
+        reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
+        try {
+          model.deleteDIP(dipId);
+        } catch (GenericException | NotFoundException | AuthorizationDeniedException e1) {
+          // do nothing
+        }
+      } finally {
+        report.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+      }
+    }
+
+    return report;
+  }
+
+  public Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
+    SimpleJobPluginInfo jobPluginInfo, List<File> list) throws PluginException {
+
+    for (File file : list) {
+      String dipId = UUID.randomUUID().toString();
+
+      try {
+        Permissions aipPermissions = model.retrieveAIP(file.getAipId()).getPermissions();
+        FileLink fileLink = new FileLink(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId());
+        List<FileLink> links = new ArrayList<>();
+        links.add(fileLink);
+
+        DIP dip = new DIP();
+        dip.setId(dipId);
+        dip.setFileIds(links);
+        dip.setPermissions(aipPermissions);
+        dip.setTitle(getDIPTitle());
+        dip.setDescription(getDIPDescription());
+        dip.setType(RodaConstants.DIP_TYPE_DIGITAL_SIGNATURE);
+        dip = model.createDIP(dip, false);
+
+        // FIXME 20160516 hsilva: see how to set initial
+        // initialOutcomeObjectState
+        Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class);
+        reportItem.setOutcomeObjectId(dip.getId()).setOutcomeObjectClass(DIP.class.getName());
+        reportItem.setPluginState(PluginState.SUCCESS);
 
         try {
-          Permissions aipPermissions = model.retrieveAIP(file.getAipId()).getPermissions();
-          FileLink fileLink = new FileLink(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId());
-          List<FileLink> links = new ArrayList<>();
-          links.add(fileLink);
-
-          DIP dip = new DIP();
-          dip.setId(dipId);
-          dip.setFileIds(links);
-          dip.setPermissions(aipPermissions);
-          dip.setTitle(getDIPTitle());
-          dip.setDescription(getDIPDescription());
-          dip.setType(RodaConstants.DIP_TYPE_DIGITAL_SIGNATURE);
-          dip = model.createDIP(dip, false);
-
-          // FIXME 20160516 hsilva: see how to set initial
-          // initialOutcomeObjectState
-          Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class);
-          reportItem.setOutcomeObjectId(dip.getId()).setOutcomeObjectClass(DIP.class.getName());
-          reportItem.setPluginState(PluginState.SUCCESS);
-
-          try {
-            if (!file.isDirectory()) {
-              manageFileSigning(model, index, storage, file, dip.getId());
-            } else {
-              CloseableIterable<OptionalWithCause<File>> fileIterable = model.listFilesUnder(file.getAipId(),
-                file.getRepresentationId(), file.getPath(), file.getId(), true);
-              for (OptionalWithCause<File> ofileUnder : fileIterable) {
-                if (ofileUnder.isPresent()) {
-                  File fileUnder = ofileUnder.get();
-                  manageFileSigning(model, index, storage, fileUnder, dip.getId());
-                }
+          if (!file.isDirectory()) {
+            manageFileSigning(model, index, storage, file, dip.getId());
+          } else {
+            CloseableIterable<OptionalWithCause<File>> fileIterable = model.listFilesUnder(file.getAipId(),
+              file.getRepresentationId(), file.getPath(), file.getId(), true);
+            for (OptionalWithCause<File> ofileUnder : fileIterable) {
+              if (ofileUnder.isPresent()) {
+                File fileUnder = ofileUnder.get();
+                manageFileSigning(model, index, storage, fileUnder, dip.getId());
               }
             }
-            jobPluginInfo.incrementObjectsProcessedWithSuccess();
-            model.notifyDIPCreated(dip, true);
-          } catch (Exception | LinkageError e) {
-            LOGGER.error("Error processing File " + file.getId() + ": " + e.getMessage(), e);
-            reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
-            jobPluginInfo.incrementObjectsProcessedWithFailure();
-            model.deleteDIP(dipId);
-          } finally {
-            report.addReport(reportItem);
-            PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
           }
-        } catch (GenericException | AuthorizationDeniedException | RequestNotValidException | NotFoundException e1) {
-          LOGGER.error("Error creating DIP for file " + file.getId());
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+          model.notifyDIPCreated(dip, true);
+        } catch (Exception | LinkageError e) {
+          LOGGER.error("Error processing File " + file.getId() + ": " + e.getMessage(), e);
+          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+          model.deleteDIP(dipId);
+        } finally {
+          report.addReport(reportItem);
+          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
         }
+      } catch (GenericException | AuthorizationDeniedException | RequestNotValidException | NotFoundException e1) {
+        LOGGER.error("Error creating DIP for file " + file.getId());
       }
-
-      jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException e) {
-      LOGGER.error("Could not update Job information");
     }
 
     return report;
