@@ -273,7 +273,7 @@ public interface StorageService {
    */
   public Binary updateBinaryContent(StoragePath storagePath, ContentPayload payload, boolean asReference,
     boolean createIfNotExists)
-      throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException;
+    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException;
 
   /**
    * Delete an existing resource, being it a container or a binary. If it is a

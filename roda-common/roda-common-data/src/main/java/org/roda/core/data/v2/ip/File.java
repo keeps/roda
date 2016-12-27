@@ -12,7 +12,6 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.roda.core.data.v2.IsModelObject;
-import org.roda.core.data.v2.IsRODAObject;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;

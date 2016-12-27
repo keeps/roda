@@ -49,7 +49,7 @@ public class OptionalWithCause<T> {
   }
 
   public static <T> OptionalWithCause<T> of(T value) {
-    return new OptionalWithCause<>(Optional.of(value), null);
+    return new OptionalWithCause<>(Optional.ofNullable(value), null);
   }
 
   public static <T> OptionalWithCause<T> of(Optional<T> value) {

@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.IdUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -36,6 +38,7 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
@@ -43,6 +46,7 @@ import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RODAMember;
+import org.roda.core.index.IndexService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,6 +105,14 @@ import org.slf4j.LoggerFactory;
  * <td>org.roda.core.data.v2.ip.DescriptiveMetadata|aipId|representationId|
  * descriptiveMetadataId</td>
  * </tr>
+ * <tr>
+ * <td>LogEntry</td>
+ * <td>org.roda.core.data.v2.log.LogEntry|logId</td>
+ * </tr>
+ * <tr>
+ * <td>RODAMember</td>
+ * <td>org.roda.core.data.v2.user.RODAMember|username</td>
+ * </tr>
  * </table>
  * 
  * 
@@ -111,7 +123,7 @@ public final class LiteRODAObjectFactory {
   private static final Logger LOGGER = LoggerFactory.getLogger(LiteRODAObjectFactory.class);
 
   private static final String SEPARATOR = "|";
-  private static final String SEPARATOR_REGEX = "\\|";
+  public static final String SEPARATOR_REGEX = "\\|";
 
   private LiteRODAObjectFactory() {
     // do nothing
@@ -134,6 +146,8 @@ public final class LiteRODAObjectFactory {
       ret = get(object.getClass(), Arrays.asList(object.getId()), false);
     } else if (object instanceof DescriptiveMetadata) {
       ret = getDescriptiveMetadata(object);
+    } else if (object instanceof PreservationMetadata) {
+      ret = getPreservationMetadata(object);
     } else if (object instanceof DIPFile) {
       ret = getDIPFile(object);
     } else if (object instanceof File) {
@@ -162,7 +176,7 @@ public final class LiteRODAObjectFactory {
     return ret;
   }
 
-  private static <T extends IsRODAObject> Optional<LiteRODAObject> get(Class<T> objectClass, List<String> ids,
+  public static <T extends IsRODAObject> Optional<LiteRODAObject> get(Class<T> objectClass, List<String> ids,
     boolean logIfReturningEmpty) {
     Optional<LiteRODAObject> ret = Optional.empty();
 
@@ -186,6 +200,8 @@ public final class LiteRODAObjectFactory {
       ret = create(objectClass, 2, ids);
     } else if (objectClass == TransferredResource.class) {
       ret = create(objectClass, ids.size(), ids);
+    } else if (objectClass == PreservationMetadata.class) {
+      ret = create(objectClass, ids.size(), ids);
     }
 
     if (logIfReturningEmpty && !ret.isPresent()) {
@@ -204,6 +220,29 @@ public final class LiteRODAObjectFactory {
       ret = get(DescriptiveMetadata.class, Arrays.asList(o.getAipId(), o.getId()), false);
     } else {
       ret = get(DescriptiveMetadata.class, Arrays.asList(o.getAipId(), o.getRepresentationId(), o.getId()), false);
+    }
+
+    return ret;
+  }
+
+  private static <T extends IsRODAObject> Optional<LiteRODAObject> getPreservationMetadata(T object) {
+    Optional<LiteRODAObject> ret;
+
+    PreservationMetadata o = (PreservationMetadata) object;
+    if (o.getAipId() == null) {
+      ret = get(PreservationMetadata.class, Arrays.asList(o.getId()), false);
+    } else if (o.getRepresentationId() == null) {
+      ret = get(PreservationMetadata.class, Arrays.asList(o.getAipId(), o.getId()), false);
+    } else if (o.getFileId() == null) {
+      ret = get(PreservationMetadata.class, Arrays.asList(o.getAipId(), o.getRepresentationId(), o.getId()), false);
+    } else {
+      List<String> list = new ArrayList<>();
+      list.add(o.getAipId());
+      list.add(o.getRepresentationId());
+      list.addAll(o.getFileDirectoryPath());
+      list.add(o.getFileId());
+      list.add(o.getId());
+      ret = get(DIPFile.class, list, false);
     }
 
     return ret;
@@ -260,14 +299,15 @@ public final class LiteRODAObjectFactory {
         } else if (Job.class.getName().equals(clazz)) {
           ret = (T) model.retrieveJob(split[1]);
         } else if (LogEntry.class.getName().equals(clazz)) {
-          ret = (T) model.retrieveLogEntry(split[1]);
+          // XXX It uses index because using model is too complex
+          ret = (T) RodaCoreFactory.getIndexService().retrieve(LogEntry.class, split[1]);
         } else if (Notification.class.getName().equals(clazz)) {
           ret = (T) model.retrieveNotification(split[1]);
         } else if (PreservationMetadata.class.getName().equals(clazz)) {
-          // FIXME 20161221 hsilva: how to?
+          ret = getPreservationMetadata(model, split);
         } else if (Report.class.getName().equals(clazz)) {
           if (split.length == 3) {
-            ret = (T) model.retrieveJobReport(split[1], split[2]);
+            ret = (T) model.retrieveJobReport(split[1], split[2], false);
           }
         } else if (Risk.class.getName().equals(clazz)) {
           ret = (T) model.retrieveRisk(split[1]);
@@ -286,7 +326,6 @@ public final class LiteRODAObjectFactory {
       }
 
       return OptionalWithCause.of(ret);
-
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Unable to create object from {}", liteRODAObject, e);
       return OptionalWithCause.empty(e);
@@ -301,6 +340,34 @@ public final class LiteRODAObjectFactory {
       ret = (T) model.retrieveDescriptiveMetadata(split[1], split[2]);
     } else if (split.length == 4) {
       ret = (T) model.retrieveDescriptiveMetadata(split[1], split[2], split[3]);
+    }
+
+    return ret;
+  }
+
+  private static <T extends IsRODAObject> T getPreservationMetadata(ModelService model, String[] split)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    T ret = null;
+    int size = split.length;
+    PreservationMetadataType type = IdUtils.getPreservationTypeFromId(split[size - 1]);
+
+    if (split.length == 2) {
+      ret = (T) model.retrievePreservationMetadata(null, null, null, null, type);
+    } else if (split.length == 3) {
+      ret = (T) model.retrievePreservationMetadata(split[1], null, null, null, type);
+    } else if (split.length == 4) {
+      ret = (T) model.retrievePreservationMetadata(split[1], split[2], null, null, type);
+    } else if (split.length > 4) {
+      List<String> directoryPath = new ArrayList<>();
+      String fileId = null;
+      for (int i = 2; i < split.length - 1; i++) {
+        if (i + 1 == split.length) {
+          fileId = split[i];
+        } else {
+          directoryPath.add(split[i]);
+        }
+      }
+      ret = (T) model.retrievePreservationMetadata(split[1], split[2], directoryPath, fileId, type);
     }
 
     return ret;
@@ -398,6 +465,51 @@ public final class LiteRODAObjectFactory {
             OptionalWithCause<T> next = iterator.next();
             if (next.isPresent()) {
               return OptionalWithCause.of(get(next.get()));
+            } else {
+              return OptionalWithCause.empty(next.getCause());
+            }
+          }
+
+          @Override
+          public void remove() {
+            throw new UnsupportedOperationException();
+          }
+        };
+      }
+
+      @Override
+      public void close() throws IOException {
+        list.close();
+      }
+    };
+
+    return it;
+  }
+
+  public static <T extends IsRODAObject> CloseableIterable<OptionalWithCause<T>> transformFromLite(ModelService model,
+    IndexService index, final CloseableIterable<OptionalWithCause<LiteRODAObject>> list) {
+    CloseableIterable<OptionalWithCause<T>> it = null;
+
+    final Iterator<OptionalWithCause<LiteRODAObject>> iterator = list.iterator();
+    it = new CloseableIterable<OptionalWithCause<T>>() {
+
+      @Override
+      public Iterator<OptionalWithCause<T>> iterator() {
+        return new Iterator<OptionalWithCause<T>>() {
+
+          @Override
+          public boolean hasNext() {
+            if (iterator == null) {
+              return true;
+            }
+            return iterator.hasNext();
+          }
+
+          @Override
+          public OptionalWithCause<T> next() {
+            OptionalWithCause<LiteRODAObject> next = iterator.next();
+            if (next.isPresent()) {
+              return get(model, next.get());
             } else {
               return OptionalWithCause.empty(next.getCause());
             }

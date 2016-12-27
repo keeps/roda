@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -32,6 +33,7 @@ import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
+import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
@@ -39,9 +41,15 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.DefaultBinary;
@@ -92,7 +100,6 @@ public class ResourceParseUtils {
     }
 
     StoragePath resourcePath = resource.getStoragePath();
-
     String id = resourcePath.getName();
     String dipId = ModelUtils.extractDipId(resourcePath);
     List<String> filePath = ModelUtils.extractFilePathFromDIPData(resourcePath);
@@ -104,7 +111,8 @@ public class ResourceParseUtils {
       boolean isDirectory = true;
       ret = new DIPFile(id, dipId, filePath, isDirectory);
     } else {
-      throw new GenericException("Error while trying to convert something that is not a Binary into a DIP file");
+      throw new GenericException(
+        "Error while trying to convert something that is not a Binary or Directory into a DIP file");
     }
 
     return ret;
@@ -118,7 +126,6 @@ public class ResourceParseUtils {
     }
 
     StoragePath resourcePath = resource.getStoragePath();
-
     String filename = resourcePath.getName();
 
     PreservationMetadata pm = new PreservationMetadata();
@@ -258,11 +265,68 @@ public class ResourceParseUtils {
 
   public static <T extends IsRODAObject> OptionalWithCause<LiteRODAObject> convertResourceToLite(StorageService storage,
     Resource resource, Class<T> classToReturn) {
+    OptionalWithCause<LiteRODAObject> ret;
+    StoragePath storagePath = resource.getStoragePath();
     String fileName = resource.getStoragePath().getName();
-    if (fileName.lastIndexOf('.') > 0) {
-      fileName = fileName.substring(0, fileName.lastIndexOf('.'));
+
+    if (classToReturn.equals(AIP.class)) {
+      ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, fileName));
+    } else if (classToReturn.equals(Representation.class)) {
+      String aipId = ModelUtils.extractAipId(storagePath);
+      String repId = ModelUtils.extractRepresentationId(storagePath);
+      ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, aipId, repId));
+    } else if (classToReturn.equals(File.class)) {
+      List<String> ids = new ArrayList<String>();
+      ids.add(ModelUtils.extractAipId(storagePath));
+      ids.add(ModelUtils.extractRepresentationId(storagePath));
+      ids.addAll(ModelUtils.extractFilePathFromRepresentationData(storagePath));
+      ids.add(fileName);
+      ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ids));
+    } else if (classToReturn.equals(DIP.class)) {
+      ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, fileName));
+    } else if (classToReturn.equals(DIPFile.class)) {
+      List<String> ids = new ArrayList<String>();
+      ids.add(ModelUtils.extractDipId(storagePath));
+      ids.addAll(ModelUtils.extractFilePathFromDIPData(storagePath));
+      ids.add(fileName);
+      ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ids));
+    } else if (classToReturn.equals(Risk.class)) {
+      ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ModelUtils.getRiskId(storagePath)));
+    } else if (classToReturn.equals(RiskIncidence.class)) {
+      ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ModelUtils.getRiskIncidenceId(storagePath)));
+    } else if (classToReturn.equals(Format.class)) {
+      ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ModelUtils.getFormatId(storagePath)));
+    } else if (classToReturn.equals(Notification.class)) {
+      ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ModelUtils.getNotificationId(storagePath)));
+    } else if (classToReturn.equals(Job.class)) {
+      ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ModelUtils.getJobId(storagePath)));
+    } else if (classToReturn.equals(Report.class)) {
+      ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ModelUtils.getJobAndReportIds(storagePath)));
+    } else if (classToReturn.equals(DescriptiveMetadata.class)) {
+      List<String> ids = new ArrayList<String>();
+      ids.add(ModelUtils.extractAipId(storagePath));
+      String representationId = ModelUtils.extractRepresentationId(storagePath);
+      if (representationId != null) {
+        ids.add(representationId);
+      }
+      ids.add(fileName);
+      ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ids));
+    } else if (classToReturn.equals(PreservationMetadata.class)) {
+      List<String> ids = new ArrayList<String>();
+      String aipId = ModelUtils.extractAipId(storagePath);
+      if (aipId != null) {
+        ids.add(aipId);
+      }
+      String representationId = ModelUtils.extractRepresentationId(storagePath);
+      if (representationId != null) {
+        ids.add(representationId);
+      }
+      ids.add(fileName.replace(RodaConstants.PREMIS_SUFFIX, ""));
+      ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ids));
+    } else {
+      ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, fileName));
     }
-    OptionalWithCause<LiteRODAObject> ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, fileName));
+
     return ret;
   }
 

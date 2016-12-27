@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -37,11 +38,13 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.index.IndexService;
+import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
@@ -356,34 +359,37 @@ public class TransferredResourcesScanner {
     }
   }
 
-  public CloseableIterable<OptionalWithCause<TransferredResource>> listTransferredResources() {
-    CloseableIterable<OptionalWithCause<TransferredResource>> resources = null;
+  public CloseableIterable<OptionalWithCause<LiteRODAObject>> listTransferredResources() {
+    CloseableIterable<OptionalWithCause<LiteRODAObject>> resources = null;
 
     try {
       final Stream<Path> files = Files.walk(basePath, FileVisitOption.FOLLOW_LINKS)
         .filter(path -> !path.equals(basePath));
       final Iterator<Path> fileIterator = files.iterator();
 
-      resources = new CloseableIterable<OptionalWithCause<TransferredResource>>() {
+      resources = new CloseableIterable<OptionalWithCause<LiteRODAObject>>() {
         @Override
         public void close() throws IOException {
           files.close();
         }
 
         @Override
-        public Iterator<OptionalWithCause<TransferredResource>> iterator() {
+        public Iterator<OptionalWithCause<LiteRODAObject>> iterator() {
 
-          return new Iterator<OptionalWithCause<TransferredResource>>() {
+          return new Iterator<OptionalWithCause<LiteRODAObject>>() {
             @Override
             public boolean hasNext() {
               return fileIterator.hasNext();
             }
 
             @Override
-            public OptionalWithCause<TransferredResource> next() {
+            public OptionalWithCause<LiteRODAObject> next() {
               Path file = fileIterator.next();
-              TransferredResource resource = instantiateTransferredResource(file, basePath);
-              return OptionalWithCause.of(resource);
+              Optional<LiteRODAObject> liteResource = LiteRODAObjectFactory.get(TransferredResource.class,
+                Arrays.asList(file.toString()), false);
+              // TransferredResource resource =
+              // instantiateTransferredResource(file, basePath);
+              return OptionalWithCause.of(liteResource);
             }
           };
         }

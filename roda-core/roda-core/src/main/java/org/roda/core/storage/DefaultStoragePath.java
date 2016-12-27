@@ -32,9 +32,11 @@ public class DefaultStoragePath implements StoragePath {
     }
   }
 
-  public static DefaultStoragePath parse(StoragePath base, String resourceName) throws RequestNotValidException {
+  public static DefaultStoragePath parse(StoragePath base, String... resourceNames) throws RequestNotValidException {
     List<String> pathPartials = new ArrayList<>(base.asList());
-    pathPartials.add(resourceName);
+    for (String resourceName : resourceNames) {
+      pathPartials.add(resourceName);
+    }
     return parse(pathPartials);
   }
 

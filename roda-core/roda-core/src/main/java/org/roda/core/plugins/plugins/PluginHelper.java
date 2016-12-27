@@ -77,6 +77,7 @@ import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
+import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.IngestJobPluginInfo;
@@ -199,7 +200,7 @@ public final class PluginHelper {
     AIPState newState) {
     try {
       String jobId = getJobId(plugin);
-      Report jobReport = model.retrieveJobReport(jobId, aipId);
+      Report jobReport = model.retrieveJobReport(jobId, aipId, true);
       jobReport.setOutcomeObjectState(newState);
       model.createOrUpdateJobReport(jobReport);
     } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
@@ -214,7 +215,7 @@ public final class PluginHelper {
     try {
       Report jobReport;
       try {
-        jobReport = model.retrieveJobReport(jobId, reportItem.getOutcomeObjectId());
+        jobReport = model.retrieveJobReport(jobId, reportItem.getOutcomeObjectId(), true);
       } catch (NotFoundException e) {
         jobReport = initPluginReportItem(plugin, reportItem.getOutcomeObjectId(), reportItem.getSourceObjectId())
           .setSourceObjectClass(reportItem.getSourceObjectClass())
@@ -1043,8 +1044,12 @@ public final class PluginHelper {
           finalObjects.add(retrievedObject.get());
         } else {
           RODAException exception = retrievedObject.getCause();
-          failureMessage = "RODA object conversion from lite throwed an error: [" + exception.getClass().getName()
-            + "] " + exception.getMessage();
+          if (exception != null) {
+            failureMessage = "RODA object conversion from lite throwed an error: [" + exception.getClass().getName()
+              + "] " + exception.getMessage();
+          } else {
+            failureMessage = "RODA object conversion from lite throwed an error.";
+          }
         }
       } else {
         failureMessage = "Lite object has an error: [" + lite.getExceptionClass() + "] " + lite.getExceptionMessage();
@@ -1056,7 +1061,13 @@ public final class PluginHelper {
         }
 
         if (report != null) {
-          Report reportItem = PluginHelper.initPluginReportItem(plugin, "teste", LiteRODAObject.class);
+          String id = lite.toString();
+          if (lite.getLite().isPresent()) {
+            String[] split = lite.getLite().get().getInfo().split(LiteRODAObjectFactory.SEPARATOR_REGEX);
+            id = split[1];
+          }
+
+          Report reportItem = PluginHelper.initPluginReportItem(plugin, id, LiteRODAObject.class);
           reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(failureMessage);
           report.addReport(reportItem);
           PluginHelper.updatePartialJobReport(plugin, model, index, reportItem, true);

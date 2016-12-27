@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.plugins.base;
+package org.roda.core.plugins.plugins.dummies;
 
 import java.util.Arrays;
 import java.util.List;

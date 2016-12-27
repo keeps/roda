@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.common.iterables.CloseableIterable;
+import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -22,8 +24,8 @@ import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
-import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
+import org.roda.core.data.v2.common.OptionalWithCause;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -44,7 +46,6 @@ public class ReindexPreservationAgentPlugin extends AbstractPlugin<Void> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ReindexPreservationAgentPlugin.class);
   private boolean clearIndexes = false;
-  private int agentCounter = 0;
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
@@ -106,9 +107,12 @@ public class ReindexPreservationAgentPlugin extends AbstractPlugin<Void> {
       PluginHelper.updateJobInformation(this, jobPluginInfo);
       pluginReport.setPluginState(PluginState.SUCCESS);
 
+      CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = model.listPreservationAgents();
+      int agentCounter = CloseableIterables.size(iterable);
       jobPluginInfo.setSourceObjectsCount(agentCounter);
+
       try {
-        index.reindexPreservationAgents();
+        index.reindexPreservationAgents(iterable);
         jobPluginInfo.incrementObjectsProcessedWithSuccess(agentCounter);
       } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
         LOGGER.error("Error updating preservation agents");
@@ -117,8 +121,9 @@ public class ReindexPreservationAgentPlugin extends AbstractPlugin<Void> {
 
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException e) {
+    } catch (JobException | RequestNotValidException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error reindexing RODA entity", e);
+      pluginReport.setPluginState(PluginState.FAILURE).setPluginDetails("Could not list preservation agents");
     }
 
     return pluginReport;
@@ -127,13 +132,6 @@ public class ReindexPreservationAgentPlugin extends AbstractPlugin<Void> {
   @Override
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
-
-    try {
-      agentCounter = index.count(IndexedPreservationAgent.class, Filter.ALL).intValue();
-    } catch (GenericException | RequestNotValidException e) {
-      // do nothing
-    }
-
     if (clearIndexes) {
       LOGGER.debug("Clearing indexes");
       try {

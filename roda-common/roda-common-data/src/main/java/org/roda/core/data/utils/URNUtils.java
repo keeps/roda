@@ -7,6 +7,9 @@
  */
 package org.roda.core.data.utils;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.RODA_TYPE;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
@@ -62,6 +65,11 @@ public final class URNUtils {
     sb.append(type);
     sb.append(RodaConstants.URN_SEPARATOR);
     return sb.toString().toLowerCase();
+  }
+
+  public static PreservationMetadataType getPreservationMetadataFromId(String id) {
+    List<String> fields = Arrays.asList(id.split(RodaConstants.URN_SEPARATOR));
+    return PreservationMetadataType.valueOf(fields.get(3).toUpperCase());
   }
 
   public static RODA_TYPE getRodaType(String value) {

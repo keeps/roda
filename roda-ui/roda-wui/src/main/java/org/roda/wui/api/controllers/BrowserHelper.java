@@ -2429,7 +2429,7 @@ public class BrowserHelper {
       }
 
       // create job report
-      Report report = model.retrieveJobReport(jobId, aipId);
+      Report report = model.retrieveJobReport(jobId, aipId, true);
 
       Report reportItem = new Report();
       reportItem.setTitle("Manual appraisal");

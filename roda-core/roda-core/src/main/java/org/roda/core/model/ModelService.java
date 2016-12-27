@@ -90,6 +90,7 @@ import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.model.utils.ResourceListUtils;
 import org.roda.core.model.utils.ResourceParseUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryVersion;
@@ -725,6 +726,98 @@ public class ModelService extends ModelObservable {
     return currentVersion;
   }
 
+  public CloseableIterable<OptionalWithCause<DescriptiveMetadata>> listDescriptiveMetadata()
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    List<CloseableIterable<OptionalWithCause<DescriptiveMetadata>>> list = new ArrayList<>();
+
+    CloseableIterable<OptionalWithCause<AIP>> aips = listAIPs();
+
+    for (OptionalWithCause<AIP> oaip : aips) {
+      if (oaip.isPresent()) {
+        AIP aip = oaip.get();
+        StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aip.getId(), null);
+
+        CloseableIterable<OptionalWithCause<DescriptiveMetadata>> aipDescriptiveMetadata;
+        try {
+          boolean recursive = true;
+          CloseableIterable<Resource> resources = storage.listResourcesUnderDirectory(storagePath, recursive);
+          aipDescriptiveMetadata = ResourceParseUtils.convert(getStorage(), resources, DescriptiveMetadata.class);
+        } catch (NotFoundException e) {
+          // check if AIP exists
+          storage.getDirectory(ModelUtils.getAIPStoragePath(aip.getId()));
+          // if no exception was sent by above method, return empty list
+          aipDescriptiveMetadata = new EmptyClosableIterable<OptionalWithCause<DescriptiveMetadata>>();
+        }
+
+        list.add(aipDescriptiveMetadata);
+
+        // list from all representations
+        for (Representation representation : aip.getRepresentations()) {
+          CloseableIterable<OptionalWithCause<DescriptiveMetadata>> rpm = listDescriptiveMetadata(aip.getId(),
+            representation.getId());
+          list.add(rpm);
+        }
+      }
+    }
+
+    return CloseableIterables.concat(list);
+  }
+
+  public CloseableIterable<OptionalWithCause<DescriptiveMetadata>> listDescriptiveMetadata(String aipId,
+    boolean includeRepresentations)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, null);
+
+    CloseableIterable<OptionalWithCause<DescriptiveMetadata>> aipDescriptiveMetadata;
+    try {
+      boolean recursive = true;
+      CloseableIterable<Resource> resources = storage.listResourcesUnderDirectory(storagePath, recursive);
+      aipDescriptiveMetadata = ResourceParseUtils.convert(getStorage(), resources, DescriptiveMetadata.class);
+    } catch (NotFoundException e) {
+      // check if AIP exists
+      storage.getDirectory(ModelUtils.getAIPStoragePath(aipId));
+      // if no exception was sent by above method, return empty list
+      aipDescriptiveMetadata = new EmptyClosableIterable<OptionalWithCause<DescriptiveMetadata>>();
+    }
+
+    if (includeRepresentations) {
+      List<CloseableIterable<OptionalWithCause<DescriptiveMetadata>>> list = new ArrayList<>();
+      list.add(aipDescriptiveMetadata);
+
+      // list from all representations
+      AIP aip = retrieveAIP(aipId);
+      for (Representation representation : aip.getRepresentations()) {
+        CloseableIterable<OptionalWithCause<DescriptiveMetadata>> rpm = listDescriptiveMetadata(aipId,
+          representation.getId());
+        list.add(rpm);
+      }
+      return CloseableIterables.concat(list);
+    } else {
+      return aipDescriptiveMetadata;
+    }
+
+  }
+
+  public CloseableIterable<OptionalWithCause<DescriptiveMetadata>> listDescriptiveMetadata(String aipId,
+    String representationId)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId, null);
+
+    boolean recursive = true;
+    CloseableIterable<OptionalWithCause<DescriptiveMetadata>> ret;
+    try {
+      CloseableIterable<Resource> resources = storage.listResourcesUnderDirectory(storagePath, recursive);
+      ret = ResourceParseUtils.convert(getStorage(), resources, DescriptiveMetadata.class);
+    } catch (NotFoundException e) {
+      // check if Representation exists
+      storage.getDirectory(ModelUtils.getRepresentationStoragePath(aipId, representationId));
+      // if no exception was sent by above method, return empty list
+      ret = new EmptyClosableIterable<OptionalWithCause<DescriptiveMetadata>>();
+    }
+
+    return ret;
+  }
+
   /***************** Representation related *****************/
   /**********************************************************/
 
@@ -1074,6 +1167,18 @@ public class ModelService extends ModelObservable {
       premisEvent, notify);
   }
 
+  public PreservationMetadata retrievePreservationMetadata(String aipId, String representationId,
+    List<String> fileDirectoryPath, String fileId, PreservationMetadataType type) {
+    PreservationMetadata pm = new PreservationMetadata();
+    pm.setId(IdUtils.getPreservationId(type, aipId, representationId, fileDirectoryPath, fileId));
+    pm.setAipId(aipId);
+    pm.setRepresentationId(representationId);
+    pm.setFileDirectoryPath(fileDirectoryPath);
+    pm.setFileId(fileId);
+    pm.setType(type);
+    return pm;
+  }
+
   public Binary retrievePreservationRepresentation(String aipId, String representationId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     String urn = IdUtils.getPreservationId(PreservationMetadataType.REPRESENTATION, aipId, representationId, null,
@@ -1085,7 +1190,6 @@ public class ModelService extends ModelObservable {
 
   public Binary retrievePreservationFile(String aipId, String representationId, List<String> fileDirectoryPath,
     String fileId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-
     return retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId, PreservationMetadataType.FILE);
   }
 
@@ -1203,6 +1307,43 @@ public class ModelService extends ModelObservable {
     if (notify) {
       notifyPreservationMetadataDeleted(pm);
     }
+  }
+
+  public CloseableIterable<OptionalWithCause<PreservationMetadata>> listPreservationMetadata()
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    List<CloseableIterable<OptionalWithCause<PreservationMetadata>>> list = new ArrayList<>();
+
+    CloseableIterable<OptionalWithCause<AIP>> aips = listAIPs();
+
+    for (OptionalWithCause<AIP> oaip : aips) {
+      if (oaip.isPresent()) {
+        AIP aip = oaip.get();
+        StoragePath storagePath = ModelUtils.getAIPPreservationMetadataStoragePath(aip.getId());
+
+        CloseableIterable<OptionalWithCause<PreservationMetadata>> aipPreservationMetadata;
+        try {
+          boolean recursive = true;
+          CloseableIterable<Resource> resources = storage.listResourcesUnderDirectory(storagePath, recursive);
+          aipPreservationMetadata = ResourceParseUtils.convert(getStorage(), resources, PreservationMetadata.class);
+        } catch (NotFoundException e) {
+          // check if AIP exists
+          storage.getDirectory(ModelUtils.getAIPStoragePath(aip.getId()));
+          // if no exception was sent by above method, return empty list
+          aipPreservationMetadata = new EmptyClosableIterable<OptionalWithCause<PreservationMetadata>>();
+        }
+
+        list.add(aipPreservationMetadata);
+
+        // list from all representations
+        for (Representation representation : aip.getRepresentations()) {
+          CloseableIterable<OptionalWithCause<PreservationMetadata>> rpm = listPreservationMetadata(aip.getId(),
+            representation.getId());
+          list.add(rpm);
+        }
+      }
+    }
+
+    return CloseableIterables.concat(list);
   }
 
   public CloseableIterable<OptionalWithCause<PreservationMetadata>> listPreservationMetadata(String aipId,
@@ -1675,9 +1816,12 @@ public class ModelService extends ModelObservable {
     notifyJobDeleted(jobId);
   }
 
-  public Report retrieveJobReport(String jobId, String aipId)
+  public Report retrieveJobReport(String jobId, String id, boolean generateId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    StoragePath jobReportPath = ModelUtils.getJobReportStoragePath(jobId, IdUtils.getJobReportId(jobId, aipId));
+    if (generateId) {
+      id = IdUtils.getJobReportId(jobId, id);
+    }
+    StoragePath jobReportPath = ModelUtils.getJobReportStoragePath(jobId, id);
     Binary binary = storage.getBinary(jobReportPath);
     Report ret;
     InputStream inputStream = null;
@@ -2266,6 +2410,7 @@ public class ModelService extends ModelObservable {
   /**
    * 
    */
+
   public Directory getSubmissionDirectory(String aipId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     return storage.getDirectory(ModelUtils.getSubmissionStoragePath(aipId));
@@ -2355,11 +2500,11 @@ public class ModelService extends ModelObservable {
 
     return CloseableIterables.concat(representations, rep -> {
       if (rep.isPresent()) {
+        Representation representation = rep.get();
         try {
-          Representation representation = rep.get();
           return listFilesUnder(representation.getAipId(), representation.getId(), true);
         } catch (RODAException e) {
-          // TODO log
+          LOGGER.error("Error listing files under representation: {}", representation.getId(), e);
           return CloseableIterables.empty();
         }
       } else {
@@ -2369,8 +2514,7 @@ public class ModelService extends ModelObservable {
 
   }
 
-  private CloseableIterable<OptionalWithCause<DIPFile>> listDIPFiles()
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+  private CloseableIterable<OptionalWithCause<DIPFile>> listDIPFiles() throws RODAException {
     CloseableIterable<OptionalWithCause<DIP>> dips = list(DIP.class);
 
     return CloseableIterables.concat(dips, odip -> {
@@ -2406,7 +2550,7 @@ public class ModelService extends ModelObservable {
 
   @SuppressWarnings("unchecked")
   public <T extends IsRODAObject> CloseableIterable<OptionalWithCause<T>> list(Class<T> objectClass)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    throws RODAException {
     CloseableIterable<? extends OptionalWithCause<?>> ret;
 
     if (Representation.class.equals(objectClass)) {
@@ -2414,17 +2558,20 @@ public class ModelService extends ModelObservable {
     } else if (File.class.equals(objectClass)) {
       ret = listFiles();
     } else if (TransferredResource.class.equals(objectClass)) {
-      ret = RodaCoreFactory.getTransferredResourcesScanner().listTransferredResources();
+      ret = LiteRODAObjectFactory.transformFromLite(this, null,
+        RodaCoreFactory.getTransferredResourcesScanner().listTransferredResources());
     } else if (RODAMember.class.equals(objectClass)) {
       ret = listMembers();
     } else if (LogEntry.class.equals(objectClass)) {
       ret = listLogEntries();
     } else if (DIPFile.class.equals(objectClass)) {
       ret = listDIPFiles();
-      // } else if (PreservationMetadata.class.equals(objectClass)) {
-      // ret = listPreservationMetadata();
-      // } else if (OtherMetadata.class.equals(objectClass)) {
-      // ret = listOtherMetadata();
+    } else if (PreservationMetadata.class.equals(objectClass)) {
+      ret = listPreservationMetadata();
+    } else if (DescriptiveMetadata.class.equals(objectClass)) {
+      ret = listDescriptiveMetadata();
+    } else if (Report.class.equals(objectClass)) {
+      ret = ResourceParseUtils.convert(getStorage(), listReportResources(), objectClass);
     } else {
       StoragePath containerPath = ModelUtils.getContainerPath(objectClass);
       final CloseableIterable<Resource> resourcesIterable = storage.listResourcesUnderContainer(containerPath, false);
@@ -2435,34 +2582,30 @@ public class ModelService extends ModelObservable {
   }
 
   public <T extends IsRODAObject> CloseableIterable<OptionalWithCause<LiteRODAObject>> listLite(Class<T> objectClass)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    throws RODAException {
     CloseableIterable<OptionalWithCause<LiteRODAObject>> ret;
 
     if (Representation.class.equals(objectClass)) {
-      // TODO enhance
-      ret = LiteRODAObjectFactory.transformIntoLite(listRepresentations());
+      ret = ResourceParseUtils.convertLite(getStorage(), ResourceListUtils.listRepresentationResources(storage),
+        objectClass);
     } else if (File.class.equals(objectClass)) {
-      // TODO enhance
-      ret = LiteRODAObjectFactory.transformIntoLite(listFiles());
+      ret = ResourceParseUtils.convertLite(getStorage(), ResourceListUtils.listFileResources(storage), objectClass);
     } else if (TransferredResource.class.equals(objectClass)) {
-      // FIXME 20160930 it uses index but it should not(?)
-      ret = LiteRODAObjectFactory
-        .transformIntoLite(RodaCoreFactory.getTransferredResourcesScanner().listTransferredResources());
+      ret = RodaCoreFactory.getTransferredResourcesScanner().listTransferredResources();
     } else if (RODAMember.class.equals(objectClass)) {
       ret = LiteRODAObjectFactory.transformIntoLite(listMembers());
     } else if (LogEntry.class.equals(objectClass)) {
-      // TODO enhance
       ret = LiteRODAObjectFactory.transformIntoLite(listLogEntries());
     } else if (DIPFile.class.equals(objectClass)) {
-      // TODO enhance
-      ret = LiteRODAObjectFactory.transformIntoLite(listDIPFiles());
-      // } else if (PreservationMetadata.class.equals(objectClass)) {
-      // // TODO enhance
-      // ret =
-      // LiteRODAObjectFactory.transformIntoLite(listPreservationMetadata());
-      // } else if (OtherMetadata.class.equals(objectClass)) {
-      // // TODO enhance
-      // ret = LiteRODAObjectFactory.transformIntoLite(listOtherMetadata());
+      ret = ResourceParseUtils.convertLite(getStorage(), ResourceListUtils.listDIPFileResources(storage), objectClass);
+    } else if (PreservationMetadata.class.equals(objectClass)) {
+      ret = ResourceParseUtils.convertLite(getStorage(), ResourceListUtils.listPreservationMetadataResources(storage),
+        objectClass);
+    } else if (DescriptiveMetadata.class.equals(objectClass)) {
+      ret = ResourceParseUtils.convertLite(getStorage(), ResourceListUtils.listDescriptiveMetadataResources(storage),
+        objectClass);
+    } else if (Report.class.equals(objectClass)) {
+      ret = ResourceParseUtils.convertLite(getStorage(), listReportResources(), objectClass);
     } else {
       StoragePath containerPath = ModelUtils.getContainerPath(objectClass);
       final CloseableIterable<Resource> resourcesIterable = storage.listResourcesUnderContainer(containerPath, false);
@@ -2470,6 +2613,12 @@ public class ModelService extends ModelObservable {
     }
 
     return ret;
+  }
+
+  private CloseableIterable<Resource> listReportResources() throws RODAException {
+    CloseableIterable<Resource> resources = storage
+      .listResourcesUnderContainer(ModelUtils.getContainerPath(Report.class), true);
+    return CloseableIterables.filter(resources, resource -> !(resource instanceof Directory));
   }
 
   private CloseableIterable<OptionalWithCause<RODAMember>> listMembers() {
@@ -2488,72 +2637,6 @@ public class ModelService extends ModelObservable {
     }
 
     return CloseableIterables.fromList(members);
-  }
-
-  public OptionalWithCause<LogEntry> retrieveLogEntry(String logEntryId) {
-    boolean recursive = false;
-    LogEntry nextLogEntry = null;
-
-    try {
-      final CloseableIterable<Resource> actionLogs = getStorage()
-        .listResourcesUnderContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG), recursive);
-      Iterator<Resource> resources = actionLogs.iterator();
-      boolean flag = true;
-
-      while (resources.hasNext() && flag) {
-        Resource resource = resources.next();
-        if (resource instanceof Binary) {
-          Binary b = (Binary) resource;
-          try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(b.getContent().createInputStream()));
-            String nextLine = null;
-            while ((nextLine = br.readLine()) == null && flag) {
-              nextLogEntry = JsonUtils.getObjectFromJson(nextLine, LogEntry.class);
-              if (nextLogEntry.getId().equals(logEntryId)) {
-                flag = false;
-              }
-            }
-          } catch (IOException | GenericException e) {
-            // do nothing
-          }
-        }
-      }
-    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
-      LOGGER.error("Error getting action log from storage", e);
-    }
-
-    if (nextLogEntry == null) {
-      try {
-        DirectoryStream<Path> directoryStream = Files.newDirectoryStream(RodaCoreFactory.getLogPath());
-        Iterator<Path> paths = directoryStream.iterator();
-        boolean flag = true;
-
-        while (paths.hasNext() && flag) {
-          Path logFile = paths.next();
-          try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(Files.newInputStream(logFile)));
-            String nextLine = null;
-            while ((nextLine = br.readLine()) == null && flag) {
-              nextLogEntry = JsonUtils.getObjectFromJson(nextLine, LogEntry.class);
-              if (nextLogEntry.getId().equals(logEntryId)) {
-                flag = false;
-              }
-            }
-          } catch (IOException | GenericException e) {
-            // do nothing
-          }
-        }
-      } catch (IOException e) {
-        LOGGER.error("Error getting action log from storage", e);
-        return OptionalWithCause.empty(new RODAException(e));
-      }
-    }
-
-    if (nextLogEntry == null) {
-      return OptionalWithCause.empty(new RODAException(new NotFoundException()));
-    }
-
-    return OptionalWithCause.of(nextLogEntry);
   }
 
   private CloseableIterable<OptionalWithCause<LogEntry>> listLogEntries() {
@@ -2581,23 +2664,23 @@ public class ModelService extends ModelObservable {
 
             @Override
             public boolean hasNext() {
-              try {
-                if (br == null) {
-                  while (resources.hasNext()) {
+              if (nextLogEntry == null) {
+                while (resources.hasNext()) {
+                  try {
                     Resource resource = resources.next();
                     if (resource instanceof Binary) {
                       Binary b = (Binary) resource;
                       br = new BufferedReader(new InputStreamReader(b.getContent().createInputStream()));
                       String nextLine = null;
-                      if ((nextLine = br.readLine()) == null) {
+                      if ((nextLine = br.readLine()) != null) {
                         nextLogEntry = JsonUtils.getObjectFromJson(nextLine, LogEntry.class);
+                        break;
                       }
-                      break;
                     }
+                  } catch (GenericException | IOException e) {
+                    // do nothing
                   }
                 }
-              } catch (GenericException | IOException e) {
-                return false;
               }
 
               return nextLogEntry != null;
@@ -2613,14 +2696,18 @@ public class ModelService extends ModelObservable {
                 if ((nextLine = br.readLine()) == null) {
                   IOUtils.closeQuietly(br);
                   while (resources.hasNext()) {
-                    Resource resource = resources.next();
-                    if (resource instanceof Binary) {
-                      Binary b = (Binary) resource;
-                      br = new BufferedReader(new InputStreamReader(b.getContent().createInputStream()));
-                      if ((nextLine = br.readLine()) == null) {
-                        nextLogEntry = JsonUtils.getObjectFromJson(nextLine, LogEntry.class);
+                    try {
+                      Resource resource = resources.next();
+                      if (resource instanceof Binary) {
+                        Binary b = (Binary) resource;
+                        br = new BufferedReader(new InputStreamReader(b.getContent().createInputStream()));
+                        if ((nextLine = br.readLine()) != null) {
+                          nextLogEntry = JsonUtils.getObjectFromJson(nextLine, LogEntry.class);
+                          break;
+                        }
                       }
-                      break;
+                    } catch (GenericException | IOException e) {
+                      // do nothing
                     }
                   }
                 } else {
@@ -2659,19 +2746,20 @@ public class ModelService extends ModelObservable {
 
             @Override
             public boolean hasNext() {
-              try {
-                if (br == null) {
-                  if (paths.hasNext()) {
+              if (nextLogEntry == null) {
+                while (paths.hasNext()) {
+                  try {
                     Path logFile = paths.next();
                     br = new BufferedReader(new InputStreamReader(Files.newInputStream(logFile)));
                     String nextLine = null;
-                    if ((nextLine = br.readLine()) == null) {
+                    if ((nextLine = br.readLine()) != null) {
                       nextLogEntry = JsonUtils.getObjectFromJson(nextLine, LogEntry.class);
+                      break;
                     }
+                  } catch (GenericException | IOException e) {
+                    // do nothing
                   }
                 }
-              } catch (GenericException | IOException e) {
-                return false;
               }
 
               return nextLogEntry != null;
@@ -2686,11 +2774,16 @@ public class ModelService extends ModelObservable {
 
                 if ((nextLine = br.readLine()) == null) {
                   IOUtils.closeQuietly(br);
-                  if (paths.hasNext()) {
-                    Path logFile = paths.next();
-                    br = new BufferedReader(new InputStreamReader(Files.newInputStream(logFile)));
-                    if ((nextLine = br.readLine()) == null) {
-                      nextLogEntry = JsonUtils.getObjectFromJson(nextLine, LogEntry.class);
+                  while (paths.hasNext()) {
+                    try {
+                      Path logFile = paths.next();
+                      br = new BufferedReader(new InputStreamReader(Files.newInputStream(logFile)));
+                      if ((nextLine = br.readLine()) != null) {
+                        nextLogEntry = JsonUtils.getObjectFromJson(nextLine, LogEntry.class);
+                        break;
+                      }
+                    } catch (GenericException | IOException e) {
+                      // do nothing
                     }
                   }
                 } else {

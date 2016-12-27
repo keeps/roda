@@ -103,7 +103,6 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       List<T> list = PluginHelper.transformLitesIntoObjects(model, index, this, pluginReport, jobPluginInfo, liteList);
-
       pluginReport.setPluginState(PluginState.SUCCESS);
 
       // clearing specific indexes from a id list

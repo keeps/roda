@@ -270,6 +270,11 @@ public class IndexService {
   public void reindexPreservationAgents()
     throws RequestNotValidException, GenericException, AuthorizationDeniedException {
     CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = model.listPreservationAgents();
+    reindexPreservationAgents(iterable);
+  }
+
+  public void reindexPreservationAgents(CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable)
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
     for (OptionalWithCause<PreservationMetadata> opm : iterable) {
       observer.preservationMetadataCreated(opm.get());
     }

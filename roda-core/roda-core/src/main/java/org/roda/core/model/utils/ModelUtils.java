@@ -206,7 +206,10 @@ public final class ModelUtils {
   public static StoragePath getDescriptiveMetadataStoragePath(String aipId, String representationId,
     String descriptiveMetadataBinaryId) throws RequestNotValidException {
     List<String> path = build(getRepresentationPath(aipId, representationId), RodaConstants.STORAGE_DIRECTORY_METADATA,
-      RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE, descriptiveMetadataBinaryId);
+      RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE);
+    if (descriptiveMetadataBinaryId != null) {
+      path.add(descriptiveMetadataBinaryId);
+    }
     return DefaultStoragePath.parse(path);
   }
 
@@ -572,6 +575,10 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_JOB, jobId + RodaConstants.JOB_FILE_EXTENSION);
   }
 
+  public static String getJobId(StoragePath jobPath) {
+    return jobPath.getName().replace(RodaConstants.JOB_FILE_EXTENSION, "");
+  }
+
   public static StoragePath getJobReportContainerPath() throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_JOB_REPORT);
   }
@@ -585,12 +592,22 @@ public final class ModelUtils {
       jobReportId + RodaConstants.JOB_REPORT_FILE_EXTENSION);
   }
 
+  public static List<String> getJobAndReportIds(StoragePath jobReportPath) {
+    String reportId = jobReportPath.getName().replace(RodaConstants.JOB_REPORT_FILE_EXTENSION, "");
+    String jobId = jobReportPath.getDirectoryPath().get(0);
+    return Arrays.asList(jobId, reportId);
+  }
+
   public static StoragePath getRiskContainerPath() throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_RISK);
   }
 
   public static StoragePath getRiskStoragePath(String riskId) throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_RISK, riskId + RodaConstants.RISK_FILE_EXTENSION);
+  }
+
+  public static String getRiskId(StoragePath riskPath) {
+    return riskPath.getName().replace(RodaConstants.RISK_FILE_EXTENSION, "");
   }
 
   public static StoragePath getRiskIncidenceContainerPath() throws RequestNotValidException {
@@ -602,6 +619,10 @@ public final class ModelUtils {
       riskIncidenceId + RodaConstants.RISK_INCIDENCE_FILE_EXTENSION);
   }
 
+  public static String getRiskIncidenceId(StoragePath incidencePath) {
+    return incidencePath.getName().replace(RodaConstants.RISK_INCIDENCE_FILE_EXTENSION, "");
+  }
+
   public static StoragePath getFormatContainerPath() throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_FORMAT);
   }
@@ -611,6 +632,10 @@ public final class ModelUtils {
       formatId + RodaConstants.FORMAT_FILE_EXTENSION);
   }
 
+  public static String getFormatId(StoragePath formatPath) {
+    return formatPath.getName().replace(RodaConstants.FORMAT_FILE_EXTENSION, "");
+  }
+
   public static StoragePath getNotificationContainerPath() throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_NOTIFICATION);
   }
@@ -618,6 +643,10 @@ public final class ModelUtils {
   public static StoragePath getNotificationStoragePath(String notificationId) throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_NOTIFICATION,
       notificationId + RodaConstants.NOTIFICATION_FILE_EXTENSION);
+  }
+
+  public static String getNotificationId(StoragePath notificationPath) {
+    return notificationPath.getName().replace(RodaConstants.NOTIFICATION_FILE_EXTENSION, "");
   }
 
   public static StoragePath getDIPContainerPath() throws RequestNotValidException {

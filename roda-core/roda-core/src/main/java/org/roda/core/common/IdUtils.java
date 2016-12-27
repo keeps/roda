@@ -159,6 +159,10 @@ public final class IdUtils {
         .toString());
   }
 
+  public static PreservationMetadataType getPreservationTypeFromId(String id) {
+    return URNUtils.getPreservationMetadataFromId(id);
+  }
+
   public static String getTransferredResourceUUID(Path relativeToBase) {
     return getTransferredResourceUUID(relativeToBase.toString());
   }
