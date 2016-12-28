@@ -1759,7 +1759,8 @@ public class ModelService extends ModelObservable {
 
   /***************** Jobs related *****************/
   /************************************************/
-  public void createJob(Job job) throws GenericException {
+  public void createJob(Job job)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     createOrUpdateJob(job);
 
     // try to create directory for this job in job report container
@@ -1773,15 +1774,12 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  public void createOrUpdateJob(Job job) {
+  public void createOrUpdateJob(Job job)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     // create or update job in storage
-    try {
-      String jobAsJson = JsonUtils.getJsonFromObject(job);
-      StoragePath jobPath = ModelUtils.getJobStoragePath(job.getId());
-      storage.updateBinaryContent(jobPath, new StringContentPayload(jobAsJson), false, true);
-    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
-      LOGGER.error("Error creating/updating job in storage", e);
-    }
+    String jobAsJson = JsonUtils.getJsonFromObject(job);
+    StoragePath jobPath = ModelUtils.getJobStoragePath(job.getId());
+    storage.updateBinaryContent(jobPath, new StringContentPayload(jobAsJson), false, true);
 
     // index it
     notifyJobCreatedOrUpdated(job, false);

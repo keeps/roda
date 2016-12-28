@@ -7,6 +7,7 @@
  */
 package org.roda.core.plugins.orchestrate.akka;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -32,7 +33,7 @@ public class AkkaJobsManager extends AkkaBaseActor {
 
   // state
   private int maxNumberOfJobsInParallel;
-  private Queue<Job> jobsWaiting;
+  private Queue<JobWaiting> jobsWaiting;
   private Map<String, ActorRef> jobsWaitingCreators;
   private ActorRef jobsRouter;
 
@@ -42,11 +43,12 @@ public class AkkaJobsManager extends AkkaBaseActor {
   private Counter ticksWaitingToBeProcessed;
   private Histogram jobsBeingExecutedHisto;
   private Histogram jobsWaitingToBeExecutedHisto;
+  private Histogram jobsTimeInTheQueueInMilis;
 
   public AkkaJobsManager(int maxNumberOfJobsInParallel) {
     super();
     this.maxNumberOfJobsInParallel = maxNumberOfJobsInParallel;
-    this.jobsWaiting = new LinkedList<Job>();
+    this.jobsWaiting = new LinkedList<>();
     this.jobsWaitingCreators = new HashMap<>();
 
     Props jobsProps = new RoundRobinPool(maxNumberOfJobsInParallel).props(Props.create(AkkaJobActor.class, getSelf()));
@@ -100,6 +102,7 @@ public class AkkaJobsManager extends AkkaBaseActor {
 
   private void sendJobForExecution(Object msg, Job job) {
     updateJobsBeingExecuted(true);
+    jobsTimeInTheQueueInMilis.update(0);
     jobsRouter.tell(msg, getSender());
     log("Will execute job", job.getId());
   }
@@ -123,14 +126,16 @@ public class AkkaJobsManager extends AkkaBaseActor {
   }
 
   private void queueJob(Job job, ActorRef sender) {
-    jobsWaiting.offer(job);
+    jobsWaiting.offer(new JobWaiting(job));
     jobsWaitingCreators.put(job.getId(), sender);
     updateJobsWaitingToBeExecuted(true);
     log("Queued job", job.getId());
   }
 
   private Job dequeueJob() {
-    Job job = jobsWaiting.remove();
+    JobWaiting jobWaiting = jobsWaiting.remove();
+    jobsTimeInTheQueueInMilis.update(jobWaiting.timeInQueue());
+    Job job = jobWaiting.job;
     ActorRef jobCreator = jobsWaitingCreators.remove(job.getId());
     jobsRouter.tell(job, jobCreator);
     updateJobsBeingExecuted(true);
@@ -156,6 +161,23 @@ public class AkkaJobsManager extends AkkaBaseActor {
     jobsBeingExecutedHisto = metrics.histogram(MetricRegistry.name(AkkaJobsManager.class, "jobsBeingExecutedHisto"));
     jobsWaitingToBeExecutedHisto = metrics
       .histogram(MetricRegistry.name(AkkaJobsManager.class, "jobsWaitingToBeExecutedHisto"));
+    jobsTimeInTheQueueInMilis = metrics
+      .histogram(MetricRegistry.name(AkkaJobsManager.class, "jobsTimeInTheQueueInMilis"));
+  }
+
+  private class JobWaiting {
+    public Job job;
+    private long queuedIn;
+
+    public JobWaiting(Job job) {
+      this.job = job;
+      this.queuedIn = new Date().getTime();
+    }
+
+    /** Time in miliseconds */
+    public long timeInQueue() {
+      return new Date().getTime() - queuedIn;
+    }
   }
 
 }

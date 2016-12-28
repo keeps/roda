@@ -59,52 +59,52 @@ import org.slf4j.LoggerFactory;
  * <table>
  * <tr>
  * <td>AIP</td>
- * <td>org.roda.core.data.v2.ip.AIP|aipId</td>
+ * <td>org.roda.core.data.v2.ip.AIP | aipId</td>
  * </tr>
  * <tr>
  * <td>DIP</td>
- * <td>org.roda.core.data.v2.ip.DIP|dipId</td>
+ * <td>org.roda.core.data.v2.ip.DIP | dipId</td>
  * </tr>
  * <tr>
  * <td>Format</td>
- * <td>org.roda.core.data.v2.formats.Format|formatId</td>
+ * <td>org.roda.core.data.v2.formats.Format | formatId</td>
  * </tr>
  * <tr>
  * <td>Job</td>
- * <td>org.roda.core.data.v2.jobs.Job|jobId</td>
+ * <td>org.roda.core.data.v2.jobs.Job | jobId</td>
  * </tr>
  * <tr>
  * <td>Report</td>
- * <td>org.roda.core.data.v2.jobs.Report|jobId|reportId</td>
+ * <td>org.roda.core.data.v2.jobs.Report | jobId | reportId</td>
  * </tr>
  * <tr>
  * <td>Notification</td>
- * <td>org.roda.core.data.v2.notifications.Notification|notificationId</td>
+ * <td>org.roda.core.data.v2.notifications.Notification | notificationId</td>
  * </tr>
  * <tr>
  * <td>Risk</td>
- * <td>org.roda.core.data.v2.risks.Risk|riskId</td>
+ * <td>org.roda.core.data.v2.risks.Risk | riskId</td>
  * </tr>
  * <tr>
  * <td>RiskIncidence</td>
- * <td>org.roda.core.data.v2.risks.RiskIncidence|riskincidenceId</td>
+ * <td>org.roda.core.data.v2.risks.RiskIncidence | riskincidenceId</td>
  * </tr>
  * <tr>
  * <td>Representation</td>
- * <td>org.roda.core.data.v2.ip.Representation|aipId|representationId</td>
+ * <td>org.roda.core.data.v2.ip.Representation | aipId | representationId</td>
  * </tr>
  * <tr>
  * <td>TransferredResource</td>
- * <td>org.roda.core.data.v2.ip.TransferredResource|fullPath</td>
+ * <td>org.roda.core.data.v2.ip.TransferredResource | fullPath</td>
  * </tr>
  * <tr>
  * <td>DescriptiveMetadata</td>
- * <td>org.roda.core.data.v2.ip.DescriptiveMetadata|aipId|descriptiveMetadataId
- * </td>
+ * <td>org.roda.core.data.v2.ip.DescriptiveMetadata | aipId |
+ * descriptiveMetadataId</td>
  * </tr>
  * <tr>
  * <td>DescriptiveMetadata</td>
- * <td>org.roda.core.data.v2.ip.DescriptiveMetadata|aipId|representationId|
+ * <td>org.roda.core.data.v2.ip.DescriptiveMetadata | aipId | representationId |
  * descriptiveMetadataId</td>
  * </tr>
  * <tr>

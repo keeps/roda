@@ -2977,8 +2977,8 @@ public class BrowserHelper {
     RodaCoreFactory.getIndexService().commit(DIPFile.class);
   }
 
-  public static void createFormatIdentificationJob(User user, SelectedItems selected)
-    throws GenericException, JobAlreadyStartedException {
+  public static void createFormatIdentificationJob(User user, SelectedItems selected) throws GenericException,
+    JobAlreadyStartedException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     Job job = new Job();
     job.setId(UUID.randomUUID().toString());
     job.setName("Format identification using Siegfried");

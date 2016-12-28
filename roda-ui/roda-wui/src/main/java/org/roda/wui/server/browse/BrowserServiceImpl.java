@@ -828,8 +828,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void createFormatIdentificationJob(SelectedItems selected)
-    throws GenericException, AuthorizationDeniedException, JobAlreadyStartedException {
+  public void createFormatIdentificationJob(SelectedItems selected) throws GenericException,
+    AuthorizationDeniedException, JobAlreadyStartedException, RequestNotValidException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Browser.createFormatIdentificationJob(user, selected);
   }

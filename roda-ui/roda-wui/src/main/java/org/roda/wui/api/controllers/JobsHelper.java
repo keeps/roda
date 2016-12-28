@@ -97,7 +97,8 @@ public class JobsHelper {
     }
   }
 
-  protected static Job createJob(Job job) throws NotFoundException, GenericException, JobAlreadyStartedException {
+  protected static Job createJob(Job job) throws NotFoundException, GenericException, JobAlreadyStartedException,
+    RequestNotValidException, AuthorizationDeniedException {
     Job updatedJob = new Job(job);
 
     // serialize job to file & index it
