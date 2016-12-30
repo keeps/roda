@@ -37,7 +37,7 @@ public class IndexedAIP implements IsIndexed {
   private String parentID = null;
   private List<String> ancestors;
 
-  private Permissions permissions = new Permissions();
+  private Permissions permissions;
 
   private Long numberOfSubmissionFiles;
   private Long numberOfDocumentationFiles;
@@ -393,6 +393,6 @@ public class IndexedAIP implements IsIndexed {
 
   @Override
   public List<String> liteFields() {
-    return Arrays.asList(RodaConstants.AIP_ID);
+    return Arrays.asList(RodaConstants.INDEX_UUID);
   }
 }

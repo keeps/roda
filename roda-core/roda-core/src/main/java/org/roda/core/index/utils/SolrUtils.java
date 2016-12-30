@@ -155,7 +155,7 @@ public class SolrUtils {
   private static final Set<String> NON_REPEATABLE_FIELDS = new HashSet<>(Arrays.asList(RodaConstants.AIP_TITLE,
     RodaConstants.AIP_LEVEL, RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_DATE_FINAL));
 
-  private static Map<String, List<String>> liteFieldsForEachClass = new HashMap<>();
+  private static Map<String, String[]> liteFieldsForEachClass = new HashMap<>();
 
   /** Private empty constructor */
   private SolrUtils() {
@@ -231,20 +231,7 @@ public class SolrUtils {
     query.setStart(sublist.getFirstElementIndex());
     query.setRows(sublist.getMaximumElementCount());
     if (filter != null && filter.isReturnLite()) {
-      List<String> fields = new ArrayList<>();
-
-      if (liteFieldsForEachClass.containsKey(classToRetrieve.getName())) {
-        fields = liteFieldsForEachClass.get(classToRetrieve.getName());
-      } else {
-        try {
-          fields = ((T) classToRetrieve.newInstance()).liteFields();
-          liteFieldsForEachClass.put(classToRetrieve.getName(), fields);
-        } catch (InstantiationException | IllegalAccessException e) {
-          LOGGER.error("Error instantiating object of type {}", classToRetrieve.getName(), e);
-        }
-      }
-
-      query.setFields(fields.toArray(new String[fields.size()]));
+      query.setFields(getClassLiteFields(classToRetrieve));
       returnLite = true;
     }
     parseAndConfigureFacets(facets, query);
@@ -259,10 +246,27 @@ public class SolrUtils {
     return ret;
   }
 
+  private static <T extends IsIndexed> String[] getClassLiteFields(Class<T> classToRetrieve) {
+    String[] ret;
+    if (liteFieldsForEachClass.containsKey(classToRetrieve.getName())) {
+      ret = liteFieldsForEachClass.get(classToRetrieve.getName());
+    } else {
+      try {
+        List<String> fields = ((T) classToRetrieve.newInstance()).liteFields();
+        ret = fields.toArray(new String[fields.size()]);
+        liteFieldsForEachClass.put(classToRetrieve.getName(), ret);
+      } catch (InstantiationException | IllegalAccessException e) {
+        LOGGER.error("Error instantiating object of type {}", classToRetrieve.getName(), e);
+        ret = new String[0];
+      }
+    }
+    return ret;
+  }
+
   public static <T extends IsIndexed> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve, Filter filter,
     Sorter sorter, Sublist sublist, Facets facets, User user, boolean justActive)
     throws GenericException, RequestNotValidException {
-
+    boolean returnLite = false;
     IndexResult<T> ret;
     SolrQuery query = new SolrQuery();
     query.setParam("q.op", DEFAULT_QUERY_PARSER_OPERATOR);
@@ -270,9 +274,9 @@ public class SolrUtils {
     query.setSorts(parseSorter(sorter));
     query.setStart(sublist.getFirstElementIndex());
     query.setRows(sublist.getMaximumElementCount());
-    if (filter.isReturnLite()) {
-      List<String> fields = classToRetrieve.cast(null).liteFields();
-      query.setFields(fields.toArray(new String[fields.size()]));
+    if (filter != null && filter.isReturnLite()) {
+      query.setFields(getClassLiteFields(classToRetrieve));
+      returnLite = true;
     }
     parseAndConfigureFacets(facets, query);
     if (hasPermissionFilters(classToRetrieve)) {
@@ -281,7 +285,7 @@ public class SolrUtils {
 
     try {
       QueryResponse response = index.query(getIndexName(classToRetrieve).get(0), query);
-      ret = queryResponseToIndexResult(response, classToRetrieve, facets, filter.isReturnLite());
+      ret = queryResponseToIndexResult(response, classToRetrieve, facets, returnLite);
     } catch (SolrServerException | IOException e) {
       throw new GenericException("Could not query index", e);
     } catch (SolrException e) {
