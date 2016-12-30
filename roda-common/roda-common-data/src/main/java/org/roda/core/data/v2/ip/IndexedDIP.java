@@ -10,6 +10,7 @@ package org.roda.core.data.v2.ip;
 import java.util.Arrays;
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -58,6 +59,11 @@ public class IndexedDIP extends DIP implements IsIndexed {
     return Arrays.asList(super.getId(), super.getTitle(), super.getDescription(), super.getType(),
       super.getDateCreated(), super.getLastModified(), super.getIsPermanent(), super.getProperties(), super.getAipIds(),
       super.getRepresentationIds(), super.getFileIds(), super.getPermissions(), openExternalURL);
+  }
+
+  @Override
+  public List<String> liteFields() {
+    return Arrays.asList(RodaConstants.DIP_ID);
   }
 
 }

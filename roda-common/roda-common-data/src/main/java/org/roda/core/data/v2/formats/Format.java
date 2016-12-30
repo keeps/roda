@@ -14,6 +14,7 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.NamedIndexedModel;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -233,6 +234,11 @@ public class Format extends NamedIndexedModel implements IsModelObject, IsIndexe
   @Override
   public String getUUID() {
     return getId();
+  }
+
+  @Override
+  public List<String> liteFields() {
+    return Arrays.asList(RodaConstants.FORMAT_ID);
   }
 
 }

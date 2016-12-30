@@ -10,6 +10,7 @@ package org.roda.core.data.v2.ip;
 import java.util.Arrays;
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 
 public class IndexedRepresentation extends Representation implements IsIndexed {
@@ -144,6 +145,11 @@ public class IndexedRepresentation extends Representation implements IsIndexed {
   public List<Object> toCsvValues() {
     return Arrays.asList(uuid, sizeInBytes, numberOfDataFiles, numberOfDocumentationFiles, numberOfSchemaFiles,
       ancestors);
+  }
+
+  @Override
+  public List<String> liteFields() {
+    return Arrays.asList(RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ID);
   }
 
 }

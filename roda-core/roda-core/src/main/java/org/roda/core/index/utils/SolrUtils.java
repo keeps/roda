@@ -185,7 +185,7 @@ public class SolrUtils {
     try {
       SolrDocument doc = index.getById(getIndexName(classToRetrieve).get(0), id);
       if (doc != null) {
-        ret = solrDocumentTo(classToRetrieve, doc);
+        ret = solrDocumentTo(classToRetrieve, doc, false);
       } else {
         throw new NotFoundException("Could not find document " + id);
       }
@@ -204,7 +204,7 @@ public class SolrUtils {
         List<String> subList = id.subList(i, (i + block <= id.size() ? i + block : id.size()));
         SolrDocumentList docs = index.getById(getIndexName(classToRetrieve).get(0), subList);
         for (SolrDocument doc : docs) {
-          ret.add(solrDocumentTo(classToRetrieve, doc));
+          ret.add(solrDocumentTo(classToRetrieve, doc, false));
         }
       }
     } catch (SolrServerException | IOException e) {
@@ -227,11 +227,15 @@ public class SolrUtils {
     query.setSorts(parseSorter(sorter));
     query.setStart(sublist.getFirstElementIndex());
     query.setRows(sublist.getMaximumElementCount());
+    if (filter.isReturnLite()) {
+      List<String> fields = classToRetrieve.cast(null).liteFields();
+      query.setFields(fields.toArray(new String[fields.size()]));
+    }
     parseAndConfigureFacets(facets, query);
 
     try {
       QueryResponse response = index.query(getIndexName(classToRetrieve).get(0), query);
-      ret = queryResponseToIndexResult(response, classToRetrieve, facets);
+      ret = queryResponseToIndexResult(response, classToRetrieve, facets, filter.isReturnLite());
     } catch (SolrServerException | IOException e) {
       throw new GenericException("Could not query index", e);
     }
@@ -250,6 +254,10 @@ public class SolrUtils {
     query.setSorts(parseSorter(sorter));
     query.setStart(sublist.getFirstElementIndex());
     query.setRows(sublist.getMaximumElementCount());
+    if (filter.isReturnLite()) {
+      List<String> fields = classToRetrieve.cast(null).liteFields();
+      query.setFields(fields.toArray(new String[fields.size()]));
+    }
     parseAndConfigureFacets(facets, query);
     if (hasPermissionFilters(classToRetrieve)) {
       query.addFilterQuery(getFilterQueries(user, justActive));
@@ -257,7 +265,7 @@ public class SolrUtils {
 
     try {
       QueryResponse response = index.query(getIndexName(classToRetrieve).get(0), query);
-      ret = queryResponseToIndexResult(response, classToRetrieve, facets);
+      ret = queryResponseToIndexResult(response, classToRetrieve, facets, filter.isReturnLite());
     } catch (SolrServerException | IOException e) {
       throw new GenericException("Could not query index", e);
     } catch (SolrException e) {
@@ -274,41 +282,42 @@ public class SolrUtils {
    * ____________________________________________________________________________________________________________________
    */
 
-  private static <T> T solrDocumentTo(Class<T> resultClass, SolrDocument doc) throws GenericException {
+  private static <T> T solrDocumentTo(Class<T> resultClass, SolrDocument doc, boolean returnLite)
+    throws GenericException {
     T ret;
     if (resultClass.equals(IndexedAIP.class)) {
-      ret = resultClass.cast(solrDocumentToIndexedAIP(doc));
+      ret = resultClass.cast(solrDocumentToIndexedAIP(doc, returnLite));
     } else if (resultClass.equals(IndexedRepresentation.class) || resultClass.equals(Representation.class)) {
-      ret = resultClass.cast(solrDocumentToRepresentation(doc));
+      ret = resultClass.cast(solrDocumentToRepresentation(doc, returnLite));
     } else if (resultClass.equals(LogEntry.class)) {
-      ret = resultClass.cast(solrDocumentToLogEntry(doc));
+      ret = resultClass.cast(solrDocumentToLogEntry(doc, returnLite));
     } else if (resultClass.equals(Report.class)) {
-      ret = resultClass.cast(solrDocumentToJobReport(doc));
+      ret = resultClass.cast(solrDocumentToJobReport(doc, returnLite));
     } else if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class)
       || resultClass.equals(Group.class)) {
-      ret = resultClass.cast(solrDocumentToRodaMember(doc));
+      ret = resultClass.cast(solrDocumentToRodaMember(doc, returnLite));
     } else if (resultClass.equals(TransferredResource.class)) {
-      ret = resultClass.cast(solrDocumentToTransferredResource(doc));
+      ret = resultClass.cast(solrDocumentToTransferredResource(doc, returnLite));
     } else if (resultClass.equals(Job.class)) {
-      ret = resultClass.cast(solrDocumentToJob(doc));
+      ret = resultClass.cast(solrDocumentToJob(doc, returnLite));
     } else if (resultClass.equals(Risk.class) || resultClass.equals(IndexedRisk.class)) {
-      ret = resultClass.cast(solrDocumentToRisk(doc));
+      ret = resultClass.cast(solrDocumentToRisk(doc, returnLite));
     } else if (resultClass.equals(Format.class)) {
-      ret = resultClass.cast(solrDocumentToFormat(doc));
+      ret = resultClass.cast(solrDocumentToFormat(doc, returnLite));
     } else if (resultClass.equals(Notification.class)) {
-      ret = resultClass.cast(solrDocumentToNotification(doc));
+      ret = resultClass.cast(solrDocumentToNotification(doc, returnLite));
     } else if (resultClass.equals(RiskIncidence.class)) {
-      ret = resultClass.cast(solrDocumentToRiskIncidence(doc));
+      ret = resultClass.cast(solrDocumentToRiskIncidence(doc, returnLite));
     } else if (resultClass.equals(DIP.class) || resultClass.equals(IndexedDIP.class)) {
-      ret = resultClass.cast(solrDocumentToIndexedDIP(doc));
+      ret = resultClass.cast(solrDocumentToIndexedDIP(doc, returnLite));
     } else if (resultClass.equals(DIPFile.class)) {
-      ret = resultClass.cast(solrDocumentToDIPFile(doc));
+      ret = resultClass.cast(solrDocumentToDIPFile(doc, returnLite));
     } else if (resultClass.equals(IndexedFile.class)) {
-      ret = resultClass.cast(solrDocumentToIndexedFile(doc));
+      ret = resultClass.cast(solrDocumentToIndexedFile(doc, returnLite));
     } else if (resultClass.equals(IndexedPreservationEvent.class)) {
-      ret = resultClass.cast(solrDocumentToIndexedPreservationEvent(doc));
+      ret = resultClass.cast(solrDocumentToIndexedPreservationEvent(doc, returnLite));
     } else if (resultClass.equals(IndexedPreservationAgent.class)) {
-      ret = resultClass.cast(solrDocumentToIndexedPreservationAgent(doc));
+      ret = resultClass.cast(solrDocumentToIndexedPreservationAgent(doc, returnLite));
     } else {
       throw new GenericException("Cannot find class index name: " + resultClass.getName());
     }
@@ -595,7 +604,7 @@ public class SolrUtils {
   }
 
   private static <T extends Serializable> IndexResult<T> queryResponseToIndexResult(QueryResponse response,
-    Class<T> responseClass, Facets facets) throws GenericException {
+    Class<T> responseClass, Facets facets, boolean returnLite) throws GenericException {
     final SolrDocumentList docList = response.getResults();
     final List<FacetFieldResult> facetResults = processFacetFields(facets, response.getFacetFields());
     final long offset = docList.getStart();
@@ -604,7 +613,7 @@ public class SolrUtils {
     final List<T> docs = new ArrayList<T>();
 
     for (SolrDocument doc : docList) {
-      T result = solrDocumentTo(responseClass, doc);
+      T result = solrDocumentTo(responseClass, doc, returnLite);
       docs.add(result);
     }
 
@@ -1133,8 +1142,13 @@ public class SolrUtils {
    * ____________________________________________________________________________________________________________________
    */
 
-  public static IndexedAIP solrDocumentToIndexedAIP(SolrDocument doc) {
+  public static IndexedAIP solrDocumentToIndexedAIP(SolrDocument doc, boolean returnLite) {
     final String id = objectToString(doc.get(RodaConstants.INDEX_UUID), null);
+    if (returnLite) {
+      IndexedAIP aip = new IndexedAIP();
+      aip.setId(id);
+      return aip;
+    }
     final AIPState state = AIPState
       .valueOf(objectToString(doc.get(RodaConstants.STATE), AIPState.getDefault().toString()));
     final String parentId = objectToString(doc.get(RodaConstants.AIP_PARENT_ID), null);
@@ -1257,10 +1271,16 @@ public class SolrUtils {
     return ret;
   }
 
-  public static IndexedRepresentation solrDocumentToRepresentation(SolrDocument doc) {
+  public static IndexedRepresentation solrDocumentToRepresentation(SolrDocument doc, boolean returnLite) {
     final String uuid = objectToString(doc.get(RodaConstants.INDEX_UUID));
     final String id = objectToString(doc.get(RodaConstants.REPRESENTATION_ID));
     final String aipId = objectToString(doc.get(RodaConstants.REPRESENTATION_AIP_ID));
+    if (returnLite) {
+      IndexedRepresentation rep = new IndexedRepresentation();
+      rep.setId(id);
+      rep.setAipId(aipId);
+      return rep;
+    }
     final Boolean original = objectToBoolean(doc.get(RodaConstants.REPRESENTATION_ORIGINAL), Boolean.FALSE);
     final String type = objectToString(doc.get(RodaConstants.REPRESENTATION_TYPE));
 
@@ -1360,15 +1380,25 @@ public class SolrUtils {
     return ancestorsPath;
   }
 
-  public static IndexedFile solrDocumentToIndexedFile(SolrDocument doc) {
-    IndexedFile file = null;
+  public static IndexedFile solrDocumentToIndexedFile(SolrDocument doc, boolean returnLite) {
     String uuid = objectToString(doc.get(RodaConstants.INDEX_UUID));
-    String parentUUID = objectToString(doc.get(RodaConstants.FILE_PARENT_UUID));
     String aipId = objectToString(doc.get(RodaConstants.FILE_AIP_ID));
     String representationId = objectToString(doc.get(RodaConstants.FILE_REPRESENTATION_ID));
-    String representationUUID = objectToString(doc.get(RodaConstants.FILE_REPRESENTATION_UUID));
     String fileId = objectToString(doc.get(RodaConstants.FILE_FILE_ID));
     List<String> path = objectToListString(doc.get(RodaConstants.FILE_PATH));
+
+    if (returnLite) {
+      IndexedFile file = new IndexedFile();
+      file.setUUID(uuid);
+      file.setAipId(aipId);
+      file.setRepresentationId(representationId);
+      file.setId(fileId);
+      file.setPath(path);
+      return file;
+    }
+
+    String representationUUID = objectToString(doc.get(RodaConstants.FILE_REPRESENTATION_UUID));
+    String parentUUID = objectToString(doc.get(RodaConstants.FILE_PARENT_UUID));
     List<String> ancestorsPath = objectToListString(doc.get(RodaConstants.FILE_ANCESTORS_PATH));
     // boolean entryPoint =
     // objectToBoolean(doc.get(RodaConstants.FILE_ISENTRYPOINT));
@@ -1408,11 +1438,9 @@ public class SolrUtils {
     FileFormat fileFormat = new FileFormat(formatDesignationName, formatDesignationVersion, mimetype, pronom, extension,
       formatRegistries);
 
-    file = new IndexedFile(uuid, parentUUID, aipId, representationId, representationUUID, path, ancestorsPath, fileId,
+    return new IndexedFile(uuid, parentUUID, aipId, representationId, representationUUID, path, ancestorsPath, fileId,
       false, fileFormat, originalName, size, isDirectory, creatingApplicationName, creatingApplicationVersion,
       dateCreatedByApplication, hash, storagePath, ancestors, otherProperties);
-
-    return file;
   }
 
   public static SolrInputDocument addOtherPropertiesToIndexedFile(String prefix, OtherMetadata otherMetadataBinary,
@@ -1433,25 +1461,31 @@ public class SolrUtils {
 
   }
 
-  private static LogEntry solrDocumentToLogEntry(SolrDocument doc) {
+  private static LogEntry solrDocumentToLogEntry(SolrDocument doc, boolean returnLite) {
+    final String id = objectToString(doc.get(RodaConstants.LOG_ID));
+    LogEntry entry = new LogEntry();
+    entry.setId(id);
+    if (returnLite) {
+      return entry;
+    }
+
     final String actionComponent = objectToString(doc.get(RodaConstants.LOG_ACTION_COMPONENT));
     final String actionMethod = objectToString(doc.get(RodaConstants.LOG_ACTION_METHOD));
     final String address = objectToString(doc.get(RodaConstants.LOG_ADDRESS));
     final Date datetime = objectToDate(doc.get(RodaConstants.LOG_DATETIME));
     final long duration = objectToLong(doc.get(RodaConstants.LOG_DURATION), 0L);
-    final String id = objectToString(doc.get(RodaConstants.LOG_ID));
+
     final String parameters = objectToString(doc.get(RodaConstants.LOG_PARAMETERS));
     final String relatedObjectId = objectToString(doc.get(RodaConstants.LOG_RELATED_OBJECT_ID));
     final String username = objectToString(doc.get(RodaConstants.LOG_USERNAME));
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE
       .valueOf(objectToString(doc.get(RodaConstants.LOG_STATE), LOG_ENTRY_STATE.UNKNOWN.toString()));
-    LogEntry entry = new LogEntry();
+
     entry.setActionComponent(actionComponent);
     entry.setActionMethod(actionMethod);
     entry.setAddress(address);
     entry.setDatetime(datetime);
     entry.setDuration(duration);
-    entry.setId(id);
     entry.setState(state);
     try {
       entry.setParameters(JsonUtils.getListFromJson(parameters == null ? "" : parameters, LogEntryParameter.class));
@@ -1521,11 +1555,12 @@ public class SolrUtils {
     return doc;
   }
 
-  private static RODAMember solrDocumentToRodaMember(SolrDocument doc) {
+  private static RODAMember solrDocumentToRodaMember(SolrDocument doc, boolean returnLite) {
     final String id = objectToString(doc.get(RodaConstants.INDEX_UUID), null);
+    final String name = objectToString(doc.get(RodaConstants.MEMBERS_NAME), null);
+
     final boolean isActive = objectToBoolean(doc.get(RodaConstants.MEMBERS_IS_ACTIVE), Boolean.FALSE);
     final boolean isUser = objectToBoolean(doc.get(RodaConstants.MEMBERS_IS_USER), Boolean.FALSE);
-    final String name = objectToString(doc.get(RodaConstants.MEMBERS_NAME), null);
     final String fullName = objectToString(doc.get(RodaConstants.MEMBERS_FULLNAME), null);
 
     final String email = objectToString(doc.get(RodaConstants.MEMBERS_EMAIL), null);
@@ -1537,8 +1572,12 @@ public class SolrUtils {
     if (isUser) {
       User user = new User();
       user.setId(id);
-      user.setActive(isActive);
       user.setName(name);
+      if (returnLite) {
+        return user;
+      }
+
+      user.setActive(isActive);
       user.setFullName(fullName);
       user.setDirectRoles(directRoles);
       user.setAllRoles(allRoles);
@@ -1550,8 +1589,12 @@ public class SolrUtils {
     } else {
       Group group = new Group();
       group.setId(id);
-      group.setActive(isActive);
       group.setName(name);
+      if (returnLite) {
+        return group;
+      }
+
+      group.setActive(isActive);
       group.setFullName(fullName);
       group.setDirectRoles(directRoles);
       group.setAllRoles(allRoles);
@@ -1562,29 +1605,37 @@ public class SolrUtils {
     }
   }
 
-  private static IndexedPreservationEvent solrDocumentToIndexedPreservationEvent(SolrDocument doc) {
+  private static IndexedPreservationEvent solrDocumentToIndexedPreservationEvent(SolrDocument doc, boolean returnLite) {
     final String id = objectToString(doc.get(RodaConstants.INDEX_UUID));
-    final String aipID = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_AIP_ID));
-    final String representationID = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_ID));
-    final String fileID = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_FILE_ID));
-    final Date eventDateTime = objectToDate(doc.get(RodaConstants.PRESERVATION_EVENT_DATETIME));
-    final String eventDetail = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_DETAIL));
-    final String eventType = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_TYPE));
-    final String eventOutcome = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_OUTCOME));
-    final String eventOutcomeDetailExtension = objectToString(
-      doc.get(RodaConstants.PRESERVATION_EVENT_OUTCOME_DETAIL_EXTENSION));
+    final String aipID = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_AIP_ID), null);
+    final String representationID = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_ID), null);
+    final String fileID = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_FILE_ID), null);
 
-    final String eventOutcomeDetailNote = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_OUTCOME_DETAIL_NOTE));
-    final List<String> agents = objectToListString(doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER));
-    final List<String> outcomes = objectToListString(
-      doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_OUTCOME_OBJECT_IDENTIFIER));
-    final List<String> sources = objectToListString(
-      doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER));
     IndexedPreservationEvent ipe = new IndexedPreservationEvent();
     ipe.setId(id);
     ipe.setAipId(aipID);
     ipe.setRepresentationId(representationID);
     ipe.setFileId(fileID);
+
+    if (returnLite) {
+      return ipe;
+    }
+
+    final Date eventDateTime = objectToDate(doc.get(RodaConstants.PRESERVATION_EVENT_DATETIME));
+    final String eventDetail = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_DETAIL), null);
+    final String eventType = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_TYPE), null);
+    final String eventOutcome = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_OUTCOME), null);
+    final String eventOutcomeDetailExtension = objectToString(
+      doc.get(RodaConstants.PRESERVATION_EVENT_OUTCOME_DETAIL_EXTENSION), null);
+
+    final String eventOutcomeDetailNote = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_OUTCOME_DETAIL_NOTE),
+      null);
+    final List<String> agents = objectToListString(doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER));
+    final List<String> outcomes = objectToListString(
+      doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_OUTCOME_OBJECT_IDENTIFIER));
+    final List<String> sources = objectToListString(
+      doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER));
+
     ipe.setEventDateTime(eventDateTime);
     ipe.setEventDetail(eventDetail);
     ipe.setEventType(eventType);
@@ -1621,16 +1672,22 @@ public class SolrUtils {
     return ipe;
   }
 
-  private static IndexedPreservationAgent solrDocumentToIndexedPreservationAgent(SolrDocument doc) {
+  private static IndexedPreservationAgent solrDocumentToIndexedPreservationAgent(SolrDocument doc, boolean returnLite) {
     final String id = objectToString(doc.get(RodaConstants.INDEX_UUID));
+    IndexedPreservationAgent ipa = new IndexedPreservationAgent();
+    ipa.setId(id);
+
+    if (returnLite) {
+      return ipa;
+    }
+
     final String name = objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_NAME));
     final String type = objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_TYPE));
     final String extension = objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_EXTENSION));
     final String version = objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_VERSION));
     final String note = objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_NOTE));
     final List<String> roles = objectToListString(doc.get(RodaConstants.PRESERVATION_AGENT_ROLES));
-    IndexedPreservationAgent ipa = new IndexedPreservationAgent();
-    ipa.setId(id);
+
     ipa.setName(name);
     ipa.setType(type);
     ipa.setExtension(extension);
@@ -1640,11 +1697,17 @@ public class SolrUtils {
     return ipa;
   }
 
-  private static TransferredResource solrDocumentToTransferredResource(SolrDocument doc) {
+  private static TransferredResource solrDocumentToTransferredResource(SolrDocument doc, boolean returnLite) {
     TransferredResource tr = new TransferredResource();
     String uuid = objectToString(doc.get(RodaConstants.INDEX_UUID));
-    String id = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_ID));
     String fullPath = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_FULLPATH));
+    tr.setUUID(uuid);
+    tr.setFullPath(fullPath);
+    if (returnLite) {
+      return tr;
+    }
+
+    String id = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_ID));
     String parentId = null;
     String parentUUID = null;
     if (doc.containsKey(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID)) {
@@ -1668,9 +1731,7 @@ public class SolrUtils {
     Date lastScanDate = objectToDate(doc.get(RodaConstants.TRANSFERRED_RESOURCE_LAST_SCAN_DATE));
 
     tr.setId(id);
-    tr.setUUID(uuid);
     tr.setCreationDate(d);
-    tr.setFullPath(fullPath);
     tr.setName(name);
     tr.setRelativePath(relativePath);
     tr.setSize(size);
@@ -1740,10 +1801,13 @@ public class SolrUtils {
     return doc;
   }
 
-  public static Job solrDocumentToJob(SolrDocument doc) {
+  public static Job solrDocumentToJob(SolrDocument doc, boolean returnLite) {
     Job job = new Job();
 
     job.setId(objectToString(doc.get(RodaConstants.INDEX_UUID)));
+    if (returnLite) {
+      return job;
+    }
     job.setName(objectToString(doc.get(RodaConstants.JOB_NAME)));
     job.setUsername(objectToString(doc.get(RodaConstants.JOB_USERNAME)));
     job.setStartDate(objectToDate(doc.get(RodaConstants.JOB_START_DATE)));
@@ -1807,11 +1871,13 @@ public class SolrUtils {
     return doc;
   }
 
-  private static Report solrDocumentToJobReport(SolrDocument doc) {
+  private static Report solrDocumentToJobReport(SolrDocument doc, boolean returnLite) {
     Report jobReport = new Report();
-
     jobReport.setId(objectToString(doc.get(RodaConstants.INDEX_UUID), null));
     jobReport.setJobId(objectToString(doc.get(RodaConstants.JOB_REPORT_JOB_ID), null));
+    if (returnLite) {
+      return jobReport;
+    }
     jobReport.setSourceObjectId(objectToString(doc.get(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID), ""));
     jobReport.setSourceObjectClass(objectToString(doc.get(RodaConstants.JOB_REPORT_SOURCE_OBJECT_CLASS), ""));
     jobReport
@@ -1896,10 +1962,13 @@ public class SolrUtils {
     return doc;
   }
 
-  public static IndexedRisk solrDocumentToRisk(SolrDocument doc) {
+  public static IndexedRisk solrDocumentToRisk(SolrDocument doc, boolean returnLite) {
     IndexedRisk risk = new IndexedRisk();
 
     risk.setId(objectToString(doc.get(RodaConstants.INDEX_UUID), null));
+    if (returnLite) {
+      return risk;
+    }
     risk.setName(objectToString(doc.get(RodaConstants.RISK_NAME), null));
     risk.setDescription(objectToString(doc.get(RodaConstants.RISK_DESCRIPTION), null));
     risk.setIdentifiedOn(objectToDate(doc.get(RodaConstants.RISK_IDENTIFIED_ON)));
@@ -1969,10 +2038,13 @@ public class SolrUtils {
     return doc;
   }
 
-  public static Format solrDocumentToFormat(SolrDocument doc) {
+  public static Format solrDocumentToFormat(SolrDocument doc, boolean returnLite) {
     Format format = new Format();
 
     format.setId(objectToString(doc.get(RodaConstants.INDEX_UUID), null));
+    if (returnLite) {
+      return format;
+    }
     format.setName(objectToString(doc.get(RodaConstants.FORMAT_NAME), null));
     format.setDefinition(objectToString(doc.get(RodaConstants.FORMAT_DEFINITION), null));
     format.setCategories(objectToListString(doc.get(RodaConstants.FORMAT_CATEGORY)));
@@ -2012,10 +2084,13 @@ public class SolrUtils {
     return doc;
   }
 
-  public static Notification solrDocumentToNotification(SolrDocument doc) {
+  public static Notification solrDocumentToNotification(SolrDocument doc, boolean returnLite) {
     Notification notification = new Notification();
 
     notification.setId(objectToString(doc.get(RodaConstants.INDEX_UUID), null));
+    if (returnLite) {
+      return notification;
+    }
     notification.setSubject(objectToString(doc.get(RodaConstants.NOTIFICATION_SUBJECT), null));
     notification.setBody(objectToString(doc.get(RodaConstants.NOTIFICATION_BODY), null));
     notification.setSentOn(objectToDate(doc.get(RodaConstants.NOTIFICATION_SENT_ON)));
@@ -2054,9 +2129,12 @@ public class SolrUtils {
     return doc;
   }
 
-  public static RiskIncidence solrDocumentToRiskIncidence(SolrDocument doc) {
+  public static RiskIncidence solrDocumentToRiskIncidence(SolrDocument doc, boolean returnLite) {
     RiskIncidence incidence = new RiskIncidence();
     incidence.setId(objectToString(doc.get(RodaConstants.INDEX_UUID), null));
+    if (returnLite) {
+      return incidence;
+    }
     incidence.setAipId(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_AIP_ID), null));
     incidence.setRepresentationId(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID), null));
     incidence.setFilePath(objectToListString(doc.get(RodaConstants.RISK_INCIDENCE_FILE_PATH)));
@@ -2144,9 +2222,12 @@ public class SolrUtils {
     return doc;
   }
 
-  public static IndexedDIP solrDocumentToIndexedDIP(SolrDocument doc) {
+  public static IndexedDIP solrDocumentToIndexedDIP(SolrDocument doc, boolean returnLite) {
     IndexedDIP dip = new IndexedDIP();
     dip.setId(objectToString(doc.get(RodaConstants.INDEX_UUID), null));
+    if (returnLite) {
+      return dip;
+    }
     dip.setTitle(objectToString(doc.get(RodaConstants.DIP_TITLE), null));
     dip.setDescription(objectToString(doc.get(RodaConstants.DIP_DESCRIPTION), null));
     dip.setType(objectToString(doc.get(RodaConstants.DIP_TYPE), null));
@@ -2216,11 +2297,14 @@ public class SolrUtils {
     return ancestorsPath;
   }
 
-  public static DIPFile solrDocumentToDIPFile(SolrDocument doc) {
+  public static DIPFile solrDocumentToDIPFile(SolrDocument doc, boolean returnLite) {
     DIPFile file = new DIPFile();
     file.setUUID(objectToString(doc.get(RodaConstants.INDEX_UUID), null));
     file.setId(objectToString(doc.get(RodaConstants.DIPFILE_ID), null));
     file.setDipId(objectToString(doc.get(RodaConstants.DIPFILE_DIP_ID), null));
+    if (returnLite) {
+      return file;
+    }
     file.setPath(objectToListString(doc.get(RodaConstants.DIPFILE_PATH)));
     file.setAncestorsPath(objectToListString(doc.get(RodaConstants.FILE_ANCESTORS_PATH)));
     file.setDirectory(objectToBoolean(doc.get(RodaConstants.DIPFILE_IS_DIRECTORY), Boolean.FALSE));
@@ -2406,7 +2490,7 @@ public class SolrUtils {
     while (nextAncestorId != null) {
       try {
         AIP nextAncestor = model.retrieveAIP(nextAncestorId);
-        if(ancestors.contains(nextAncestorId)){
+        if (ancestors.contains(nextAncestorId)) {
           break;
         }
         ancestors.add(nextAncestorId);

@@ -16,6 +16,7 @@ import java.util.Map;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -243,6 +244,11 @@ public class Job implements IsModelObject, IsIndexed {
   @Override
   public String getUUID() {
     return getId();
+  }
+
+  @Override
+  public List<String> liteFields() {
+    return Arrays.asList(RodaConstants.JOB_ID);
   }
 
 }

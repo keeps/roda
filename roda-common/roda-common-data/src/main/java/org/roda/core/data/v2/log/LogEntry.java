@@ -13,6 +13,7 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.index.IsIndexed;
 
@@ -336,6 +337,11 @@ public class LogEntry implements IsModelObject, IsIndexed {
 
   public void setState(LOG_ENTRY_STATE state) {
     this.state = state;
+  }
+
+  @Override
+  public List<String> liteFields() {
+    return Arrays.asList(RodaConstants.LOG_ID);
   }
 
 }

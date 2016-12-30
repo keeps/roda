@@ -7,10 +7,11 @@
  */
 package org.roda.core.data.v2.risks;
 
-import org.roda.core.data.v2.index.IsIndexed;
-
 import java.util.Arrays;
 import java.util.List;
+
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.IsIndexed;
 
 public class IndexedRisk extends Risk implements IsIndexed {
 
@@ -59,6 +60,11 @@ public class IndexedRisk extends Risk implements IsIndexed {
       getPreMitigationNotes(), getMitigationStrategy(), getMitigationOwnerType(), getMitigationOwner(),
       getMitigationRelatedEventIdentifierType(), getMitigationRelatedEventIdentifierValue(), getCreatedOn(),
       getCreatedBy(), getUpdatedOn(), getUpdatedBy(), objectsSize});
+  }
+
+  @Override
+  public List<String> liteFields() {
+    return Arrays.asList(RodaConstants.RISK_ID);
   }
 
 }

@@ -28,7 +28,6 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
@@ -165,7 +164,7 @@ public class DummyListPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
     list.add(Format.class);
     list.add(RiskIncidence.class);
     list.add(RODAMember.class);
-    list.add(LogEntry.class);
+    // list.add(LogEntry.class);
     list.add(PreservationMetadata.class);
     list.add(DescriptiveMetadata.class);
     list.add(DIP.class);

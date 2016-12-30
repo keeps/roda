@@ -15,6 +15,7 @@ import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.index.IsIndexed;
 
@@ -175,5 +176,10 @@ public class Notification implements IsModelObject, IsIndexed {
   public List<Object> toCsvValues() {
     return Arrays.asList(id, subject, body, sentOn, fromUser, recipientUsers, acknowledgeToken, isAcknowledged,
       acknowledgedUsers, state);
+  }
+
+  @Override
+  public List<String> liteFields() {
+    return Arrays.asList(RodaConstants.NOTIFICATION_ID);
   }
 }

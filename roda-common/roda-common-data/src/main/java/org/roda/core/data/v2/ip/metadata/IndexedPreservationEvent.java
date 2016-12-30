@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 
 public class IndexedPreservationEvent implements IsIndexed {
@@ -158,6 +159,12 @@ public class IndexedPreservationEvent implements IsIndexed {
   @Override
   public String getUUID() {
     return getId();
+  }
+
+  @Override
+  public List<String> liteFields() {
+    return Arrays.asList(RodaConstants.PRESERVATION_EVENT_AIP_ID, RodaConstants.PRESERVATION_EVENT_REPRESENTATION_ID,
+      RodaConstants.PRESERVATION_EVENT_FILE_ID, RodaConstants.PRESERVATION_EVENT_ID);
   }
 
 }

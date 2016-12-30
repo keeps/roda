@@ -29,4 +29,11 @@ public interface IsIndexed extends IsRODAObject {
    */
   List<Object> toCsvValues();
 
+  /**
+   * Return the fields to create lite
+   *
+   * @return a {@link List} of {@link String} with the fields.
+   */
+  List<String> liteFields();
+
 }

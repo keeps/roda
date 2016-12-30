@@ -10,6 +10,7 @@ package org.roda.core.data.v2.ip.metadata;
 import java.util.Arrays;
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 
 public class IndexedPreservationAgent implements IsIndexed {
@@ -101,6 +102,11 @@ public class IndexedPreservationAgent implements IsIndexed {
   @Override
   public String getUUID() {
     return getId();
+  }
+
+  @Override
+  public List<String> liteFields() {
+    return Arrays.asList(RodaConstants.PRESERVATION_AGENT_ID);
   }
 
 }

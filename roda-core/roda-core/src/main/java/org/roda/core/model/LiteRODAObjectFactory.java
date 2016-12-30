@@ -31,6 +31,7 @@ import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
@@ -42,10 +43,12 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.index.IndexService;
+import org.roda.core.model.utils.ModelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -139,10 +142,10 @@ public final class LiteRODAObjectFactory {
   public static <T extends IsRODAObject> Optional<LiteRODAObject> get(T object) {
     Optional<LiteRODAObject> ret = Optional.empty();
 
-    if (object instanceof AIP || object instanceof IndexedAIP || object instanceof DIP || object instanceof Format
-      || object instanceof Job || object instanceof Notification || object instanceof Risk
-      || object instanceof RiskIncidence || object instanceof LogEntry) {
-      ret = get(object.getClass(), Arrays.asList(object.getId()), false);
+    if (object instanceof AIP || object instanceof IndexedAIP || object instanceof DIP || object instanceof IndexedDIP
+      || object instanceof Format || object instanceof Job || object instanceof Notification || object instanceof Risk
+      || object instanceof IndexedRisk || object instanceof RiskIncidence || object instanceof LogEntry) {
+      ret = get(ModelUtils.giveRespectiveModelClass(object.getClass()), Arrays.asList(object.getId()), false);
     } else if (object instanceof DescriptiveMetadata) {
       ret = getDescriptiveMetadata(object);
     } else if (object instanceof PreservationMetadata) {
@@ -179,9 +182,10 @@ public final class LiteRODAObjectFactory {
     boolean logIfReturningEmpty) {
     Optional<LiteRODAObject> ret = Optional.empty();
 
-    if (objectClass == AIP.class || objectClass == DIP.class || objectClass == Format.class || objectClass == Job.class
-      || objectClass == Notification.class || objectClass == Risk.class || objectClass == RiskIncidence.class
-      || objectClass == RODAMember.class || objectClass == LogEntry.class) {
+    if (objectClass == AIP.class || objectClass == IndexedAIP.class || objectClass == DIP.class
+      || objectClass == Format.class || objectClass == Job.class || objectClass == Notification.class
+      || objectClass == Risk.class || objectClass == RiskIncidence.class || objectClass == RODAMember.class
+      || objectClass == LogEntry.class) {
       ret = create(objectClass, 1, ids);
     } else if (objectClass == DescriptiveMetadata.class) {
       if (ids.size() == 2 || ids.size() == 3) {
@@ -287,7 +291,7 @@ public final class LiteRODAObjectFactory {
           ret = (T) model.retrieveAIP(split[1]);
         } else if (DescriptiveMetadata.class.getName().equals(clazz)) {
           ret = getDescriptiveMetadata(model, split);
-        } else if (DIP.class.getName().equals(clazz)) {
+        } else if (DIP.class.getName().equals(clazz) || IndexedDIP.class.getName().equals(clazz)) {
           ret = (T) model.retrieveDIP(split[1]);
         } else if (DIPFile.class.getName().equals(clazz)) {
           ret = getDIPFile(model, split);
@@ -308,7 +312,7 @@ public final class LiteRODAObjectFactory {
           if (split.length == 3) {
             ret = (T) model.retrieveJobReport(split[1], split[2], false);
           }
-        } else if (Risk.class.getName().equals(clazz)) {
+        } else if (Risk.class.getName().equals(clazz) || IndexedRisk.class.getName().equals(clazz)) {
           ret = (T) model.retrieveRisk(split[1]);
         } else if (RiskIncidence.class.getName().equals(clazz)) {
           ret = (T) model.retrieveRiskIncidence(split[1]);

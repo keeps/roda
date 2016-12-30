@@ -13,6 +13,7 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.index.IsIndexed;
 
@@ -256,5 +257,10 @@ public class TransferredResource implements IsModelObject, IsIndexed {
   public List<Object> toCsvValues() {
     return Arrays.asList(uuid, id, fullPath, relativePath, parentId, parentUUID, ancestorsPaths, size, creationDate,
       lastScanDate, name, file);
+  }
+
+  @Override
+  public List<String> liteFields() {
+    return Arrays.asList(RodaConstants.TRANSFERRED_RESOURCE_FULLPATH);
   }
 }

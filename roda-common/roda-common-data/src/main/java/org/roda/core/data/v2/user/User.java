@@ -7,8 +7,12 @@
  */
 package org.roda.core.data.v2.user;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import org.roda.core.data.common.RodaConstants;
 
 /**
  * This is a user of RODA.
@@ -353,6 +357,11 @@ public class User extends RodaPrincipal {
     }
     builder.append("]");
     return builder.toString();
+  }
+
+  @Override
+  public List<String> liteFields() {
+    return Arrays.asList(RodaConstants.MEMBERS_NAME);
   }
 
 }

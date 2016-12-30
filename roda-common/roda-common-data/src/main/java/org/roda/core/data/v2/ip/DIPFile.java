@@ -12,6 +12,7 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.index.IsIndexed;
 
@@ -197,5 +198,10 @@ public class DIPFile implements IsModelObject, IsIndexed {
   @Override
   public List<Object> toCsvValues() {
     return Arrays.asList(uuid, id, dipId, path, ancestorsPath, size, storagePath, isDirectory);
+  }
+
+  @Override
+  public List<String> liteFields() {
+    return Arrays.asList(RodaConstants.DIPFILE_DIP_ID, RodaConstants.DIPFILE_ID);
   }
 }

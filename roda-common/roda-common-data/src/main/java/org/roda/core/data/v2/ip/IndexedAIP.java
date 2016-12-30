@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.descriptionLevels.DescriptionLevel;
 import org.roda.core.data.v2.index.IsIndexed;
 
@@ -390,4 +391,8 @@ public class IndexedAIP implements IsIndexed {
     return getId();
   }
 
+  @Override
+  public List<String> liteFields() {
+    return Arrays.asList(RodaConstants.AIP_ID);
+  }
 }

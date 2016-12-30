@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 
@@ -370,6 +371,12 @@ public class IndexedFile implements IsIndexed {
     return Arrays.asList(uuid, parentUUID, aipId, representationId, representationUUID, path, ancestorsPath, id,
       fileFormat, originalName, size, isDirectory, creatingApplicationName, creatingApplicationVersion,
       dateCreatedByApplication, hash, storagePath, ancestors, otherProperties);
+  }
+
+  @Override
+  public List<String> liteFields() {
+    return Arrays.asList(RodaConstants.FILE_AIP_ID, RodaConstants.FILE_REPRESENTATION_ID, RodaConstants.FILE_PATH,
+      RodaConstants.FILE_ID);
   }
 
 }

@@ -14,6 +14,7 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
@@ -223,6 +224,11 @@ public class RiskIncidence implements IsModelObject, IsIndexed {
   @Override
   public String getUUID() {
     return getId();
+  }
+
+  @Override
+  public List<String> liteFields() {
+    return Arrays.asList(RodaConstants.RISK_INCIDENCE_ID);
   }
 
 }

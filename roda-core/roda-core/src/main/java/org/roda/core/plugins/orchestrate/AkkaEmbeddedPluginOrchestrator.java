@@ -162,8 +162,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       jobStateInfoActor.tell(new Messages.PluginBeforeAllExecuteIsReady<>(plugin), jobActor);
 
-      Iterator<T1> findAllIterator = RodaCoreFactory.getIndexService()
-        .findAll(classToActOn, filter, new Sorter(new SortParameter(RodaConstants.INDEX_UUID, true))).iterator();
+      Iterator<T1> findAllIterator = RodaCoreFactory.getIndexService().findAll(classToActOn, filter.setReturnLite(true),
+        new Sorter(new SortParameter(RodaConstants.INDEX_UUID, true))).iterator();
 
       List<T1> indexObjects = new ArrayList<T1>();
       while (findAllIterator.hasNext()) {
