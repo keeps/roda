@@ -261,6 +261,6 @@ public class TransferredResource implements IsModelObject, IsIndexed {
 
   @Override
   public List<String> liteFields() {
-    return Arrays.asList(RodaConstants.TRANSFERRED_RESOURCE_FULLPATH);
+    return Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.TRANSFERRED_RESOURCE_FULLPATH);
   }
 }

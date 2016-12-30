@@ -238,7 +238,7 @@ public class Format extends NamedIndexedModel implements IsModelObject, IsIndexe
 
   @Override
   public List<String> liteFields() {
-    return Arrays.asList(RodaConstants.FORMAT_ID);
+    return Arrays.asList(RodaConstants.INDEX_UUID);
   }
 
 }

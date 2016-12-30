@@ -361,7 +361,6 @@ public class User extends RodaPrincipal {
 
   @Override
   public List<String> liteFields() {
-    return Arrays.asList(RodaConstants.MEMBERS_NAME);
+    return Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.MEMBERS_NAME);
   }
-
 }

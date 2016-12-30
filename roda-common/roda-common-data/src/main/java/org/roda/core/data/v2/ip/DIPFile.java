@@ -202,6 +202,6 @@ public class DIPFile implements IsModelObject, IsIndexed {
 
   @Override
   public List<String> liteFields() {
-    return Arrays.asList(RodaConstants.DIPFILE_DIP_ID, RodaConstants.DIPFILE_ID);
+    return Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIPFILE_DIP_ID, RodaConstants.DIPFILE_ID);
   }
 }

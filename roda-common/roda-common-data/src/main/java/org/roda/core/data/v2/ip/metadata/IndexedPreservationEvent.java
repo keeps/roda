@@ -164,7 +164,7 @@ public class IndexedPreservationEvent implements IsIndexed {
   @Override
   public List<String> liteFields() {
     return Arrays.asList(RodaConstants.PRESERVATION_EVENT_AIP_ID, RodaConstants.PRESERVATION_EVENT_REPRESENTATION_ID,
-      RodaConstants.PRESERVATION_EVENT_FILE_ID, RodaConstants.PRESERVATION_EVENT_ID);
+      RodaConstants.PRESERVATION_EVENT_FILE_ID, RodaConstants.INDEX_UUID);
   }
 
 }

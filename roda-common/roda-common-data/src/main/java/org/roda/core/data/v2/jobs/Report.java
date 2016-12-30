@@ -368,6 +368,6 @@ public class Report implements IsModelObject, IsIndexed {
 
   @Override
   public List<String> liteFields() {
-    return Arrays.asList(RodaConstants.JOB_REPORT_JOB_ID, RodaConstants.JOB_REPORT_ID);
+    return Arrays.asList(RodaConstants.JOB_REPORT_JOB_ID, RodaConstants.INDEX_UUID);
   }
 }

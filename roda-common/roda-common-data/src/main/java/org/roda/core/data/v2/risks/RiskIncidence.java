@@ -228,7 +228,7 @@ public class RiskIncidence implements IsModelObject, IsIndexed {
 
   @Override
   public List<String> liteFields() {
-    return Arrays.asList(RodaConstants.RISK_INCIDENCE_ID);
+    return Arrays.asList(RodaConstants.INDEX_UUID);
   }
 
 }

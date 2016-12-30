@@ -149,7 +149,8 @@ public class IndexedRepresentation extends Representation implements IsIndexed {
 
   @Override
   public List<String> liteFields() {
-    return Arrays.asList(RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ID);
+    return Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.REPRESENTATION_AIP_ID,
+      RodaConstants.REPRESENTATION_ID);
   }
 
 }

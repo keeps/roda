@@ -375,8 +375,8 @@ public class IndexedFile implements IsIndexed {
 
   @Override
   public List<String> liteFields() {
-    return Arrays.asList(RodaConstants.FILE_AIP_ID, RodaConstants.FILE_REPRESENTATION_ID, RodaConstants.FILE_PATH,
-      RodaConstants.FILE_ID);
+    return Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.FILE_AIP_ID, RodaConstants.FILE_REPRESENTATION_ID,
+      RodaConstants.FILE_PATH, RodaConstants.FILE_FILE_ID);
   }
 
 }

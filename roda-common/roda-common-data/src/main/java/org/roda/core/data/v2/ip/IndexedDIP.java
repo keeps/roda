@@ -63,7 +63,7 @@ public class IndexedDIP extends DIP implements IsIndexed {
 
   @Override
   public List<String> liteFields() {
-    return Arrays.asList(RodaConstants.DIP_ID);
+    return Arrays.asList(RodaConstants.INDEX_UUID);
   }
 
 }

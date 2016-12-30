@@ -106,7 +106,7 @@ public class IndexedPreservationAgent implements IsIndexed {
 
   @Override
   public List<String> liteFields() {
-    return Arrays.asList(RodaConstants.PRESERVATION_AGENT_ID);
+    return Arrays.asList(RodaConstants.INDEX_UUID);
   }
 
 }

@@ -248,7 +248,7 @@ public class Job implements IsModelObject, IsIndexed {
 
   @Override
   public List<String> liteFields() {
-    return Arrays.asList(RodaConstants.JOB_ID);
+    return Arrays.asList(RodaConstants.INDEX_UUID);
   }
 
 }

@@ -180,6 +180,6 @@ public class Notification implements IsModelObject, IsIndexed {
 
   @Override
   public List<String> liteFields() {
-    return Arrays.asList(RodaConstants.NOTIFICATION_ID);
+    return Arrays.asList(RodaConstants.INDEX_UUID);
   }
 }

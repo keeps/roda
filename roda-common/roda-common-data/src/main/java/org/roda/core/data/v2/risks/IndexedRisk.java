@@ -64,7 +64,7 @@ public class IndexedRisk extends Risk implements IsIndexed {
 
   @Override
   public List<String> liteFields() {
-    return Arrays.asList(RodaConstants.RISK_ID);
+    return Arrays.asList(RodaConstants.INDEX_UUID);
   }
 
 }
