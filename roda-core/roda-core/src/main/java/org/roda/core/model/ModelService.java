@@ -801,7 +801,7 @@ public class ModelService extends ModelObservable {
   public CloseableIterable<OptionalWithCause<DescriptiveMetadata>> listDescriptiveMetadata(String aipId,
     String representationId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId, null);
+    StoragePath storagePath = ModelUtils.getDescriptiveMetadataDirectoryStoragePath(aipId, representationId);
 
     boolean recursive = true;
     CloseableIterable<OptionalWithCause<DescriptiveMetadata>> ret;

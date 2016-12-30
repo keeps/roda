@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -299,8 +298,8 @@ public final class LiteRODAObjectFactory {
         } else if (Job.class.getName().equals(clazz)) {
           ret = (T) model.retrieveJob(split[1]);
         } else if (LogEntry.class.getName().equals(clazz)) {
-          // XXX It uses index because using model is too complex
-          ret = (T) RodaCoreFactory.getIndexService().retrieve(LogEntry.class, split[1]);
+          // XXX 20161229 nvieira It is too complex to use model/storage and
+          // using index creates a circular dependency
         } else if (Notification.class.getName().equals(clazz)) {
           ret = (T) model.retrieveNotification(split[1]);
         } else if (PreservationMetadata.class.getName().equals(clazz)) {

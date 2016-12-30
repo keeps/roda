@@ -22,6 +22,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.SortParameter;
@@ -231,13 +232,16 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
 
   @Override
   public Report execute(final IndexService index, final ModelService model, final StorageService storage,
-    final List<File> list) throws PluginException {
+    List<LiteOptionalWithCause> liteList) throws PluginException {
 
     try {
       final Report report = PluginHelper.initPluginReport(this);
 
-      final SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
+      final SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
+
+      final List<File> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo,
+        liteList);
 
       final Result result = new Result();
       for (File file : list) {
@@ -496,7 +500,8 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
    * @param model
    *          the {@link ModelService}.
    */
-  private void createRiskIncidence(final File file, final Report report, final Result result, final ModelService model) {
+  private void createRiskIncidence(final File file, final Report report, final Result result,
+    final ModelService model) {
     try {
       final Risk risk = PluginHelper.createRiskIfNotExists(model, 0, FILE_NOT_CHARACTERIZED_RISK_ID,
         getClass().getClassLoader());
@@ -654,8 +659,7 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
         str.append(String.format("Has format designation name: %s.%n", numberToHuman(this.formatName, count)));
       }
       if (FileNotCharacterizedRiskAssessmentPlugin.this.checkFormatDesignationVersion()) {
-        str
-          .append(String.format("Has format designation version: %s.%n", numberToHuman(this.formatVersion, count)));
+        str.append(String.format("Has format designation version: %s.%n", numberToHuman(this.formatVersion, count)));
       }
       if (FileNotCharacterizedRiskAssessmentPlugin.this.checkMimetype()) {
         str.append(String.format("Has mimetype: %s.%n", numberToHuman(this.mimetype, count)));

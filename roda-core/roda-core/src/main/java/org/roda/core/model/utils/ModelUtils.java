@@ -206,10 +206,14 @@ public final class ModelUtils {
   public static StoragePath getDescriptiveMetadataStoragePath(String aipId, String representationId,
     String descriptiveMetadataBinaryId) throws RequestNotValidException {
     List<String> path = build(getRepresentationPath(aipId, representationId), RodaConstants.STORAGE_DIRECTORY_METADATA,
+      RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE, descriptiveMetadataBinaryId);
+    return DefaultStoragePath.parse(path);
+  }
+
+  public static StoragePath getDescriptiveMetadataDirectoryStoragePath(String aipId, String representationId)
+    throws RequestNotValidException {
+    List<String> path = build(getRepresentationPath(aipId, representationId), RodaConstants.STORAGE_DIRECTORY_METADATA,
       RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE);
-    if (descriptiveMetadataBinaryId != null) {
-      path.add(descriptiveMetadataBinaryId);
-    }
     return DefaultStoragePath.parse(path);
   }
 

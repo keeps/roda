@@ -26,6 +26,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.filter.AndFiltersParameters;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -156,13 +157,16 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
 
   @Override
   public Report execute(final IndexService index, final ModelService model, final StorageService storage,
-    final List<File> list) throws PluginException {
+    List<LiteOptionalWithCause> liteList) throws PluginException {
 
     try {
       final Report report = PluginHelper.initPluginReport(this);
 
-      final SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
+      final SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
+
+      final List<File> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo,
+        liteList);
 
       for (File file : list) {
         executeOnFile(file, index, model, jobPluginInfo, report);
@@ -581,8 +585,8 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
     }
 
     /**
-     * The {@link List} of {@link FormatResult} matching this
-     * {@link FileFormat}.
+     * The {@link List} of {@link FormatResult} matching this {@link FileFormat}
+     * .
      * 
      * @return a {@link List<FormatResult>}.
      */
@@ -801,8 +805,8 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
     private final Format format;
 
     /**
-     * The {@link Map} of {@link AttributeCheck} used to find the
-     * {@link Format}.
+     * The {@link Map} of {@link AttributeCheck} used to find the {@link Format}
+     * .
      */
     private final Map<String, AttributeCheck> checks;
 

@@ -387,8 +387,6 @@ public class TransferredResourcesScanner {
               Path file = fileIterator.next();
               Optional<LiteRODAObject> liteResource = LiteRODAObjectFactory.get(TransferredResource.class,
                 Arrays.asList(file.toString()), false);
-              // TransferredResource resource =
-              // instantiateTransferredResource(file, basePath);
               return OptionalWithCause.of(liteResource);
             }
           };

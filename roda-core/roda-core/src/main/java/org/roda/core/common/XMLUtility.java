@@ -58,9 +58,7 @@ public final class XMLUtility {
       XPath xPath = xPathfactory.newXPath();
       XPathExpression expr = xPath.compile(xpath);
       ret = (String) expr.evaluate(doc, XPathConstants.STRING);
-    } catch (SAXException | ParserConfigurationException | XPathExpressionException e) {
-      // do nothing and return already defined OTHER
-    } catch (IOException e) {
+    } catch (SAXException | ParserConfigurationException | XPathExpressionException | IOException e) {
       // do nothing and return already defined OTHER
     } finally {
       IOUtils.closeQuietly(inputStream);
