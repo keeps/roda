@@ -220,6 +220,7 @@ public class SolrUtils {
 
   public static <T extends IsIndexed> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve, Filter filter,
     Sorter sorter, Sublist sublist, Facets facets) throws GenericException, RequestNotValidException {
+    boolean returnLite = false;
     IndexResult<T> ret;
     SolrQuery query = new SolrQuery();
     query.setParam("q.op", DEFAULT_QUERY_PARSER_OPERATOR);
@@ -227,15 +228,16 @@ public class SolrUtils {
     query.setSorts(parseSorter(sorter));
     query.setStart(sublist.getFirstElementIndex());
     query.setRows(sublist.getMaximumElementCount());
-    if (filter.isReturnLite()) {
+    if (filter != null && filter.isReturnLite()) {
       List<String> fields = classToRetrieve.cast(null).liteFields();
       query.setFields(fields.toArray(new String[fields.size()]));
+      returnLite = true;
     }
     parseAndConfigureFacets(facets, query);
 
     try {
       QueryResponse response = index.query(getIndexName(classToRetrieve).get(0), query);
-      ret = queryResponseToIndexResult(response, classToRetrieve, facets, filter.isReturnLite());
+      ret = queryResponseToIndexResult(response, classToRetrieve, facets, returnLite);
     } catch (SolrServerException | IOException e) {
       throw new GenericException("Could not query index", e);
     }
