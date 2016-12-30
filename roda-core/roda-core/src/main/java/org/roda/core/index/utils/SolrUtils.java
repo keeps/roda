@@ -155,6 +155,8 @@ public class SolrUtils {
   private static final Set<String> NON_REPEATABLE_FIELDS = new HashSet<>(Arrays.asList(RodaConstants.AIP_TITLE,
     RodaConstants.AIP_LEVEL, RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_DATE_FINAL));
 
+  private static Map<String, List<String>> liteFieldsForEachClass = new HashMap<>();
+
   /** Private empty constructor */
   private SolrUtils() {
 
@@ -229,7 +231,19 @@ public class SolrUtils {
     query.setStart(sublist.getFirstElementIndex());
     query.setRows(sublist.getMaximumElementCount());
     if (filter != null && filter.isReturnLite()) {
-      List<String> fields = classToRetrieve.cast(null).liteFields();
+      List<String> fields = new ArrayList<>();
+
+      if (liteFieldsForEachClass.containsKey(classToRetrieve.getName())) {
+        fields = liteFieldsForEachClass.get(classToRetrieve.getName());
+      } else {
+        try {
+          fields = ((T) classToRetrieve.newInstance()).liteFields();
+          liteFieldsForEachClass.put(classToRetrieve.getName(), fields);
+        } catch (InstantiationException | IllegalAccessException e) {
+          LOGGER.error("Error instantiating object of type {}", classToRetrieve.getName(), e);
+        }
+      }
+
       query.setFields(fields.toArray(new String[fields.size()]));
       returnLite = true;
     }
