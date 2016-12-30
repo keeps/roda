@@ -11,6 +11,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * This is a filter of data. It's used by some service methods that deal with
  * sets or lists, to filter the elements in the set or list.
@@ -18,6 +20,7 @@ import java.util.List;
  * @author Rui Castro
  * @author Luis Faria <lfaria@keep.pt>
  */
+@JsonIgnoreProperties({"returnLite"})
 public class Filter implements Serializable {
   private static final long serialVersionUID = -5544859696646804386L;
 
