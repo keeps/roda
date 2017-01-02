@@ -170,7 +170,7 @@ public class ShowJobReport extends Composite {
         outcomeObjectState.setVisible(true);
 
       } else if (AIP.class.getName().equals(jobReport.getSourceObjectClass())) {
-        sourceObject.setHref(HistoryUtils.createHistoryHashLink(Browse.RESOLVER, sourceObject.getText()));
+        sourceObject.setHref(HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(sourceObject.getText())));
         sourceObjectLabel.setText(messages.showAIPExtended());
 
       } else if (Representation.class.getName().equals(jobReport.getSourceObjectClass())) {
@@ -186,9 +186,8 @@ public class ShowJobReport extends Composite {
             public void onSuccess(IndexedRepresentation representation) {
               if (representation != null) {
                 sourceObjectLabel.setText(messages.showRepresentationExtended());
-                sourceObject.setHref(HistoryUtils.createHistoryHashLink(Browse.RESOLVER,
-                  org.roda.wui.client.browse.BrowseRepresentation.RESOLVER.getHistoryToken(), representation.getAipId(),
-                  representation.getId()));
+                sourceObject.setHref(HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(representation)));
+                sourceObject.setText(representation.getId());
               }
             }
           });
@@ -203,12 +202,11 @@ public class ShowJobReport extends Composite {
             }
 
             @Override
-            public void onSuccess(IndexedFile result) {
-              if (result != null) {
+            public void onSuccess(IndexedFile file) {
+              if (file != null) {
                 sourceObjectLabel.setText(messages.showFileExtended());
-                sourceObject
-                  .setHref(HistoryUtils.createHistoryHashLink(Browse.RESOLVER, BrowseFile.RESOLVER.getHistoryToken(),
-                    result.getAipId(), result.getRepresentationUUID(), result.getUUID()));
+                sourceObject.setHref(HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(file)));
+                sourceObject.setText(file.getId());
               }
             }
           });
@@ -241,12 +239,12 @@ public class ShowJobReport extends Composite {
             }
 
             @Override
-            public void onSuccess(IndexedRepresentation result) {
-              if (result != null) {
+            public void onSuccess(IndexedRepresentation representation) {
+              if (representation != null) {
                 outcomeObjectLabel.setText(messages.showRepresentationExtended());
-                outcomeObject.setHref(HistoryUtils.createHistoryHashLink(Browse.RESOLVER,
-                  org.roda.wui.client.browse.BrowseRepresentation.RESOLVER.getHistoryToken(), result.getAipId(),
-                  result.getUUID()));
+                outcomeObject
+                  .setHref(HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(representation)));
+                outcomeObject.setText(representation.getId());
               }
             }
           });
@@ -261,12 +259,11 @@ public class ShowJobReport extends Composite {
             }
 
             @Override
-            public void onSuccess(IndexedFile result) {
-              if (result != null) {
+            public void onSuccess(IndexedFile file) {
+              if (file != null) {
                 outcomeObjectLabel.setText(messages.showFileExtended());
-                outcomeObject
-                  .setHref(HistoryUtils.createHistoryHashLink(Browse.RESOLVER, BrowseFile.RESOLVER.getHistoryToken(),
-                    result.getAipId(), result.getRepresentationUUID(), result.getUUID()));
+                outcomeObject.setHref(HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(file)));
+                outcomeObject.setText(file.getId());
               }
             }
           });
