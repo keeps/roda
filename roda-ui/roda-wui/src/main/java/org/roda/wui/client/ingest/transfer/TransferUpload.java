@@ -10,20 +10,20 @@
  */
 package org.roda.wui.client.ingest.transfer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.BrowseFolder;
-import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.RestUtils;
-import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -141,11 +141,14 @@ public class TransferUpload extends Composite {
   @UiField
   HTML uploadList;
 
+  // INGEST TRANSFER
   private TransferredResource resource;
 
-  private String folderUUID;
-  private String representationId;
+  // BROWSE UPLOAD
   private String aipId;
+  private String representationId;
+  private List<String> folderPath;
+  private String folderId;
 
   private boolean isIngest = true;
 
@@ -179,12 +182,16 @@ public class TransferUpload extends Composite {
       LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
       String details = selectedItems.getDetailsMessage();
 
-      if (folderUUID == null) {
-        // upload to root
-        ret = RestUtils.createFileUploadUri(aipId, representationId, details);
-      } else {
-        ret = RestUtils.createFileUploadUri(folderUUID, details);
+      List<String> directory = new ArrayList<String>();
+      if (folderPath != null) {
+        directory.addAll(folderPath);
       }
+      if (folderId != null) {
+        directory.add(folderId);
+      }
+
+      ret = RestUtils.createFileUploadUri(aipId, representationId, directory, details);
+
     }
 
     return ret;
@@ -233,10 +240,14 @@ public class TransferUpload extends Composite {
   protected void browseResolve(final List<String> historyTokens, final AsyncCallback<Widget> callback) {
     isIngest = false;
 
-    if (historyTokens.size() == 2 || historyTokens.size() == 3) {
+    if (historyTokens.size() >= 2) {
       aipId = historyTokens.get(0);
       representationId = historyTokens.get(1);
-      folderUUID = historyTokens.size() == 3 ? historyTokens.get(2) : null;
+      if (historyTokens.size() >= 3) {
+        folderPath = new ArrayList<>(historyTokens.subList(2, historyTokens.size() - 1));
+        folderId = historyTokens.get(historyTokens.size() - 1);
+      }
+
       callback.onSuccess(TransferUpload.this);
       updateUploadForm();
     }
@@ -297,10 +308,11 @@ public class TransferUpload extends Composite {
         HistoryUtils.newHistory(IngestTransfer.RESOLVER);
       }
     } else {
-      if (folderUUID != null) {
-        HistoryUtils.newHistory(BrowseFolder.RESOLVER, aipId, representationId, folderUUID);
+
+      if (folderId != null) {
+        HistoryUtils.openBrowse(aipId, representationId, folderPath, folderId, true);
       } else {
-        HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
+        HistoryUtils.openBrowse(aipId, representationId);
       }
     }
   }

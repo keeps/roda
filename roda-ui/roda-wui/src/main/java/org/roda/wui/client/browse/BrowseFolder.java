@@ -23,8 +23,6 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.LoadingAsyncCallback;
@@ -38,7 +36,6 @@ import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.ingest.transfer.TransferUpload;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.client.process.CreateJob;
@@ -81,10 +78,37 @@ public class BrowseFolder extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      if (historyTokens.size() > 2) {
+      if (historyTokens.size() == 1) {
+        final String historyFileUUID = historyTokens.get(0);
+
+        BrowserService.Util.getInstance().retrieveBrowseFileBundle(historyFileUUID,
+          LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<BrowseFileBundle>() {
+
+            @Override
+            public void onSuccess(final BrowseFileBundle bundle) {
+              if (bundle.getFile().isDirectory()) {
+                callback.onSuccess(new BrowseFolder(bundle));
+              } else {
+                // TODO i18n
+                Toast.showError("Trying to open a file as a folder");
+                HistoryUtils.newHistory(Browse.RESOLVER);
+                callback.onSuccess(null);
+              }
+            }
+
+            @Override
+            public void onFailure(Throwable caught) {
+              if (!AsyncCallbackUtils.treatCommonFailures(caught, Browse.RESOLVER.getHistoryPath())) {
+                Toast.showError(caught);
+              }
+              callback.onSuccess(null);
+            }
+          });
+
+      } else if (historyTokens.size() > 2) {
         final String historyAipId = historyTokens.get(0);
         final String historyRepresentationId = historyTokens.get(1);
-        final List<String> historyFilePath = historyTokens.subList(2, historyTokens.size() - 1);
+        final List<String> historyFilePath = new ArrayList<String>(historyTokens.subList(2, historyTokens.size() - 1));
         final String historyFileId = historyTokens.get(historyTokens.size() - 1);
 
         BrowserService.Util.getInstance().retrieveBrowseFileBundle(historyAipId, historyRepresentationId,
@@ -105,7 +129,9 @@ public class BrowseFolder extends Composite {
 
             @Override
             public void onFailure(Throwable caught) {
-              AsyncCallbackUtils.treatCommonFailures(caught, Browse.RESOLVER.getHistoryPath());
+              if (!AsyncCallbackUtils.treatCommonFailures(caught, Browse.RESOLVER.getHistoryPath())) {
+                Toast.showError(caught);
+              }
               callback.onSuccess(null);
             }
           });
@@ -174,8 +200,8 @@ public class BrowseFolder extends Composite {
     String summary = messages.representationListOfFiles();
     boolean selectable = true;
 
-    IndexedFile folder = bundle.getFile();
-    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_PARENT_UUID, folder.getUUID()));
+    final IndexedFile folder = bundle.getFile();
+    final Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_PARENT_UUID, folder.getUUID()));
     filesList = new SearchFileList(filter, true, Facets.NONE, summary, selectable);
 
     filesList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
@@ -183,7 +209,7 @@ public class BrowseFolder extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         IndexedFile selected = filesList.getSelectionModel().getSelectedObject();
         if (selected != null) {
-          HistoryUtils.open(selected);
+          HistoryUtils.openBrowse(selected);
         }
       }
     });
@@ -299,7 +325,7 @@ public class BrowseFolder extends Composite {
                     @Override
                     public void onSuccessImpl(IndexedFile newFolder) {
                       Toast.showInfo(messages.dialogSuccess(), messages.renameSuccessful());
-                      HistoryUtils.open(newFolder);
+                      HistoryUtils.openBrowse(newFolder);
                     }
                   });
               }
@@ -343,9 +369,9 @@ public class BrowseFolder extends Composite {
               }
 
               final SelectedItems<IndexedFile> selectedItems = selected;
+              final String aipId = bundle.getFile().getAipId();
+              final String repId = bundle.getFile().getRepresentationId();
 
-              String aipId = bundle.getFile().getAipId();
-              String repId = bundle.getFile().getRepresentationId();
               BrowserService.Util.getInstance().moveFiles(aipId, repId, selectedItems, toFolder, details,
                 new LoadingAsyncCallback<Void>() {
 
@@ -388,8 +414,7 @@ public class BrowseFolder extends Composite {
         public void onSuccess(String details) {
           LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
           selectedItems.setDetailsMessage(details);
-          HistoryUtils.newHistory(Browse.RESOLVER, TransferUpload.BROWSE_RESOLVER.getHistoryToken(), aipId, repId,
-            folderUUID);
+          HistoryUtils.openUpload(bundle.getFile());
         }
 
       });
@@ -416,6 +441,10 @@ public class BrowseFolder extends Composite {
 
               @Override
               public void onSuccess(String details) {
+                IndexedFile folder = bundle.getFile();
+                String aipId = folder.getAipId();
+                String repId = folder.getRepresentationId();
+                String folderUUID = folder.getUUID();
                 BrowserService.Util.getInstance().createFolder(aipId, repId, folderUUID, newName, details,
                   new LoadingAsyncCallback<String>() {
 
@@ -444,10 +473,13 @@ public class BrowseFolder extends Composite {
   void buttonRemoveHandler(ClickEvent e) {
     final SelectedItems<IndexedFile> files = (SelectedItems<IndexedFile>) filesList.getSelected();
     final boolean deleteItself = ClientSelectedItemsUtils.isEmpty(files);
+    final IndexedFile folder = bundle.getFile();
+    final String aipId = folder.getAipId();
+    final String repId = folder.getRepresentationId();
     final String folderParent = folder.getParentUUID();
 
     if (deleteItself) {
-      final SelectedItems<IndexedFile> file = new SelectedItemsList<IndexedFile>(Arrays.asList(folderUUID),
+      final SelectedItems<IndexedFile> file = new SelectedItemsList<IndexedFile>(Arrays.asList(folder.getUUID()),
         IndexedFile.class.getName());
 
       Dialogs.showConfirmDialog(messages.fileRemoveTitle(), messages.folderRemoveMessage(), messages.dialogCancel(),
@@ -476,6 +508,7 @@ public class BrowseFolder extends Composite {
                       @Override
                       public void onSuccessImpl(Void returned) {
                         Toast.showInfo(messages.removeSuccessTitle(), messages.removeAllSuccessMessage());
+
                         if (folderParent == null) {
                           HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, repId);
                         } else {
@@ -543,7 +576,8 @@ public class BrowseFolder extends Composite {
     SelectedItems<IndexedFile> files = (SelectedItems<IndexedFile>) filesList.getSelected();
 
     if (ClientSelectedItemsUtils.isEmpty(files)) {
-      files = new SelectedItemsList<IndexedFile>(Arrays.asList(folderUUID), IndexedFile.class.getName());
+      files = new SelectedItemsList<IndexedFile>(Arrays.asList(bundle.getFile().getUUID()),
+        IndexedFile.class.getName());
     }
 
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
@@ -557,7 +591,8 @@ public class BrowseFolder extends Composite {
     SelectedItems<IndexedFile> selected = (SelectedItems<IndexedFile>) filesList.getSelected();
 
     if (ClientSelectedItemsUtils.isEmpty(selected)) {
-      Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_ANCESTORS_PATH, folderUUID));
+      Filter filter = new Filter(
+        new SimpleFilterParameter(RodaConstants.FILE_ANCESTORS_PATH, bundle.getFile().getUUID()));
       selected = new SelectedItemsFilter<IndexedFile>(filter, IndexedFile.class.getName(), false);
     }
 

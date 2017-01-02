@@ -166,6 +166,7 @@ public final class RodaConstants {
   public static final String API_PATH_PARAM_REPRESENTATION_UUID = "representation_uuid";
   public static final String API_PATH_PARAM_FILE_ID = "file_id";
   public static final String API_PATH_PARAM_FILE_UUID = "file_uuid";
+  public static final String API_PATH_PARAM_FOLDER = "folder";
   public static final String API_PATH_PARAM_METADATA_ID = "metadata_id";
   public static final String API_PATH_PARAM_TRANSFERRED_RESOURCE_ID = "transferred_resource_id";
   public static final String API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID = "transferred_resource_uuid";

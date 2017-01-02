@@ -24,6 +24,7 @@ import java.util.Optional;
 
 import javax.xml.transform.TransformerException;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ConsumesOutputStream;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.common.IdUtils;
@@ -134,6 +135,15 @@ public class Browser extends RodaWuiController {
       aipId, RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId);
 
     return browseRepresentationBundle;
+  }
+
+  public static BrowseFileBundle retrieveBrowseFileBundle(User user, String fileUUID, Locale locale)
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
+
+    IndexedFile file = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class, fileUUID);
+    return retrieveBrowseFileBundle(user, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
+      locale);
+
   }
 
   public static BrowseFileBundle retrieveBrowseFileBundle(User user, String aipId, String representationId,
@@ -1988,7 +1998,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static File createFile(User user, String aipId, String representationUUID, List<String> directoryPath,
+  public static File createFile(User user, String aipId, String representationId, List<String> directoryPath,
     String fileId, InputStream is, String details) throws AuthorizationDeniedException, GenericException,
     RequestNotValidException, NotFoundException, AlreadyExistsException, IOException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -1996,7 +2006,8 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    IndexedRepresentation rep = BrowserHelper.retrieve(IndexedRepresentation.class, representationUUID);
+    IndexedRepresentation rep = BrowserHelper.retrieve(IndexedRepresentation.class,
+      IdUtils.getRepresentationId(aipId, representationId));
     UserUtility.checkAIPPermissions(user, aip, PermissionType.CREATE);
 
     // delegate
@@ -2009,37 +2020,8 @@ public class Browser extends RodaWuiController {
 
     // register action
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIP_ID_PARAM,
-      aipId, RodaConstants.CONTROLLER_REPRESENTATION_UUID_PARAM, representationUUID,
+      aipId, RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId,
       RodaConstants.CONTROLLER_DIRECTORY_PATH_PARAM, directoryPath, RodaConstants.CONTROLLER_FILE_ID_PARAM, fileId);
-
-    return updatedFile;
-  }
-
-  public static File createFileWithUUID(User user, String fileUUID, String filename, InputStream is, String details)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException,
-    AlreadyExistsException, IOException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-    IndexedFile ifile = BrowserHelper.retrieve(IndexedFile.class, fileUUID);
-    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, ifile.getAipId());
-    UserUtility.checkAIPPermissions(user, aip, PermissionType.CREATE);
-
-    // delegate
-    Path file = Files.createTempFile("descriptive", ".tmp");
-    Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
-    ContentPayload payload = new FSPathContentPayload(file);
-    List<String> newFileDirectoryPath = ifile.getPath();
-    newFileDirectoryPath.add(ifile.getId());
-
-    File updatedFile = BrowserHelper.createFile(user, ifile.getAipId(), ifile.getRepresentationId(),
-      newFileDirectoryPath, filename, payload, details);
-    BrowserHelper.commit(IndexedFile.class);
-
-    // register action
-    controllerAssistant.registerAction(user, aip.getId(), LOG_ENTRY_STATE.SUCCESS,
-      RodaConstants.CONTROLLER_FILE_UUID_PARAM, fileUUID, RodaConstants.CONTROLLER_FILENAME_PARAM, filename);
 
     return updatedFile;
   }

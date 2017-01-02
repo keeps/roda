@@ -10,6 +10,7 @@
  */
 package org.roda.wui.client.browse;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -77,6 +78,72 @@ import config.i18n.client.ClientMessages;
  * 
  */
 public class BrowseFile extends Composite {
+
+  public static final HistoryResolver RESOLVER = new HistoryResolver() {
+
+    @Override
+    public void resolve(final List<String> historyTokens, final AsyncCallback<Widget> callback) {
+      BrowserService.Util.getInstance().retrieveViewersProperties(new AsyncCallback<Viewers>() {
+
+        @Override
+        public void onSuccess(Viewers viewers) {
+          load(viewers, historyTokens, callback);
+        }
+
+        @Override
+        public void onFailure(Throwable caught) {
+          Toast.showError(caught);
+          errorRedirect(callback);
+        }
+      });
+    }
+
+    @Override
+    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+      UserLogin.getInstance().checkRole(Browse.RESOLVER, callback);
+    }
+
+    @Override
+    public List<String> getHistoryPath() {
+      return ListUtils.concat(Browse.RESOLVER.getHistoryPath(), getHistoryToken());
+    }
+
+    @Override
+    public String getHistoryToken() {
+      return "file";
+    }
+
+    private void load(final Viewers viewers, final List<String> historyTokens, final AsyncCallback<Widget> callback) {
+      if (historyTokens.size() > 2) {
+        final String historyAipId = historyTokens.get(0);
+        final String historyRepresentationId = historyTokens.get(1);
+        final List<String> historyFilePath = new ArrayList<String>(historyTokens.subList(2, historyTokens.size() - 1));
+        final String historyFileId = historyTokens.get(historyTokens.size() - 1);
+
+        BrowserService.Util.getInstance().retrieveBrowseFileBundle(historyAipId, historyRepresentationId,
+          historyFilePath, historyFileId, LocaleInfo.getCurrentLocale().getLocaleName(),
+          new AsyncCallback<BrowseFileBundle>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+              AsyncCallbackUtils.defaultFailureTreatment(caught);
+            }
+
+            @Override
+            public void onSuccess(final BrowseFileBundle bundle) {
+              callback.onSuccess(new BrowseFile(viewers, bundle));
+            }
+          });
+      } else {
+        errorRedirect(callback);
+      }
+    }
+
+    private void errorRedirect(AsyncCallback<Widget> callback) {
+      // HistoryUtils.newHistory(Browse.RESOLVER);
+      callback.onSuccess(null);
+    }
+  };
 
   interface MyUiBinder extends UiBinder<Widget, BrowseFile> {
   }
@@ -559,75 +626,5 @@ public class BrowseFile extends Composite {
           // nothing to do
         }
       });
-  }
-
-  public static final HistoryResolver RESOLVER = new HistoryResolver() {
-
-    @Override
-    public void resolve(final List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      BrowserService.Util.getInstance().retrieveViewersProperties(new AsyncCallback<Viewers>() {
-
-        @Override
-        public void onSuccess(Viewers viewers) {
-          load(viewers, historyTokens, callback);
-        }
-
-        @Override
-        public void onFailure(Throwable caught) {
-          errorRedirect(callback);
-        }
-      });
-    }
-
-    @Override
-    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRole(Browse.RESOLVER, callback);
-    }
-
-    @Override
-    public List<String> getHistoryPath() {
-      return ListUtils.concat(Browse.RESOLVER.getHistoryPath(), getHistoryToken());
-    }
-
-    @Override
-    public String getHistoryToken() {
-      return "file";
-    }
-
-    private void load(final Viewers viewers, final List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      if (historyTokens.size() > 2) {
-        final String historyAipId = historyTokens.get(0);
-        final String historyRepresentationId = historyTokens.get(1);
-        final List<String> historyFilePath = historyTokens.subList(2, historyTokens.size() - 1);
-        final String historyFileId = historyTokens.get(historyTokens.size() - 1);
-
-        BrowserService.Util.getInstance().retrieveBrowseFileBundle(historyAipId, historyRepresentationId,
-          historyFilePath, historyFileId, LocaleInfo.getCurrentLocale().getLocaleName(),
-          new AsyncCallback<BrowseFileBundle>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-              errorRedirect(callback);
-            }
-
-            @Override
-            public void onSuccess(final BrowseFileBundle bundle) {
-              callback.onSuccess(new BrowseFile(viewers, bundle));
-            }
-          });
-      } else {
-        errorRedirect(callback);
-      }
-    }
-
-    private void errorRedirect(AsyncCallback<Widget> callback) {
-      HistoryUtils.newHistory(Browse.RESOLVER);
-      callback.onSuccess(null);
-    }
-  };
-
-  public static void jumpTo(IndexedFile selected) {
-    HistoryUtils.newHistory(BrowseFile.RESOLVER, selected.getAipId(), selected.getRepresentationUUID(),
-      selected.getUUID());
   }
 }

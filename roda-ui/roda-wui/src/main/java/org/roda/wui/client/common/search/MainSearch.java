@@ -275,7 +275,7 @@ public class MainSearch extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         IndexedAIP aip = itemsSearchResultPanel.getSelectionModel().getSelectedObject();
         if (aip != null) {
-          HistoryUtils.newHistory(Browse.RESOLVER, aip.getId());
+          HistoryUtils.openBrowse(aip);
         }
       }
     });
@@ -306,7 +306,7 @@ public class MainSearch extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         IndexedRepresentation rep = representationsSearchResultPanel.getSelectionModel().getSelectedObject();
         if (rep != null) {
-          HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, rep.getAipId(), rep.getId());
+          HistoryUtils.openBrowse(rep);
         }
       }
     });
@@ -338,7 +338,7 @@ public class MainSearch extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         IndexedFile file = filesSearchResultPanel.getSelectionModel().getSelectedObject();
         if (file != null) {
-          BrowseFile.jumpTo(file);
+          HistoryUtils.openBrowse(file);
         }
       }
     });

@@ -7,6 +7,9 @@
  */
 package org.roda.wui.common.client.tools;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -14,6 +17,7 @@ import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
+import org.roda.core.data.v2.ip.IndexedFile;
 
 import com.github.nmorel.gwtjackson.client.ObjectMapper;
 import com.google.gwt.core.client.GWT;
@@ -293,30 +297,35 @@ public class RestUtils {
     return b.toString();
   }
 
-  public static String createFileUploadUri(String parentUUID, String details) {
-    // api/v1/files?file_uuid={fileUUID}
-    StringBuilder b = new StringBuilder();
+  public static String createFileUploadUri(IndexedFile folder, String details) {
+    // api/v1/files?aipId={aipId}&representationId={representationdId}&folder={folder[0]}&folder={folder[1]}&details={details}
 
-    // base uri
-    b.append(RodaConstants.API_REST_V1_FILES).append(RodaConstants.API_QUERY_START)
-      .append(RodaConstants.API_PATH_PARAM_FILE_UUID).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
-      .append(UriUtils.encode(parentUUID)).append(RodaConstants.API_QUERY_SEP)
-      .append(RodaConstants.API_QUERY_PARAM_DETAILS).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(details);
-
-    return b.toString();
+    List<String> directory = new ArrayList<String>(folder.getPath());
+    directory.add(folder.getId());
+    return createFileUploadUri(folder.getAipId(), folder.getRepresentationId(), directory, details);
   }
 
-  public static String createFileUploadUri(String aipId, String representationUUID, String details) {
-    // api/v1/files?aip_id={aipId}&representation_uuid={representationUUID}
+  public static String createFileUploadUri(String aipId, String representationId, List<String> directory,
+    String details) {
+    // api/v1/files?aipId={aipId}&representationId={representationdId}&folder={folder[0]}&folder={folder[1]}&details={details}
+
     StringBuilder b = new StringBuilder();
 
     // base uri
-    b.append(RodaConstants.API_REST_V1_FILES).append(RodaConstants.API_QUERY_START)
-      .append(RodaConstants.API_PATH_PARAM_AIP_ID).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
-      .append(UriUtils.encode(aipId)).append(RodaConstants.API_QUERY_SEP)
-      .append(RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
-      .append(UriUtils.encode(representationUUID)).append(RodaConstants.API_QUERY_SEP)
-      .append(RodaConstants.API_QUERY_PARAM_DETAILS).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(details);
+    b.append(RodaConstants.API_REST_V1_FILES).append(RodaConstants.API_QUERY_START);
+    b.append(RodaConstants.API_PATH_PARAM_AIP_ID).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
+      .append(UriUtils.encode(aipId));
+    b.append(RodaConstants.API_QUERY_SEP);
+    b.append(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
+      .append(UriUtils.encode(representationId));
+    b.append(RodaConstants.API_QUERY_SEP);
+
+    for (String folderPath : directory) {
+      b.append(RodaConstants.API_PATH_PARAM_FOLDER).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
+        .append(UriUtils.encode(folderPath));
+      b.append(RodaConstants.API_QUERY_SEP);
+    }
+    b.append(RodaConstants.API_QUERY_PARAM_DETAILS).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(details);
 
     return b.toString();
   }

@@ -179,6 +179,14 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
+  public BrowseFileBundle retrieveBrowseFileBundle(String fileUUID, String localeString)
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Locale locale = ServerTools.parseLocale(localeString);
+    return Browser.retrieveBrowseFileBundle(user, fileUUID, locale);
+  }
+
+  @Override
   public DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String representationId,
     String descId, String type, String version, String localeString)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
@@ -770,8 +778,9 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public IndexedFile renameFolder(String folderUUID, String newName, String details) throws AuthorizationDeniedException,
-    GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException {
+  public IndexedFile renameFolder(String folderUUID, String newName, String details)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, AlreadyExistsException,
+    NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.renameFolder(user, folderUUID, newName, details);
   }

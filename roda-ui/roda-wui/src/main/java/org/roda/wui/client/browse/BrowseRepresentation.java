@@ -208,13 +208,7 @@ public class BrowseRepresentation extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         IndexedFile selected = filesList.getSelectionModel().getSelectedObject();
         if (selected != null) {
-          if (selected.isDirectory()) {
-            HistoryUtils.newHistory(Browse.RESOLVER, BrowseFolder.RESOLVER.getHistoryToken(), aipId, repId,
-              selected.getUUID());
-          } else {
-            HistoryUtils.newHistory(Browse.RESOLVER, BrowseFile.RESOLVER.getHistoryToken(), aipId, repId,
-              selected.getUUID());
-          }
+          HistoryUtils.openBrowse(selected);
         }
       }
     });
@@ -627,12 +621,12 @@ public class BrowseRepresentation extends Composite {
                 @Override
                 public void onSuccess(String details) {
                   BrowserService.Util.getInstance().renameFolder(folderUUID, newName, details,
-                    new LoadingAsyncCallback<String>() {
+                    new LoadingAsyncCallback<IndexedFile>() {
 
                       @Override
-                      public void onSuccessImpl(String newUUID) {
+                      public void onSuccessImpl(IndexedFile newFile) {
                         Toast.showInfo(messages.dialogSuccess(), messages.renameSuccessful());
-                        HistoryUtils.newHistory(BrowseFolder.RESOLVER, aipId, repId, newUUID);
+                        HistoryUtils.openBrowse(newFile);
                       }
                     });
                 }

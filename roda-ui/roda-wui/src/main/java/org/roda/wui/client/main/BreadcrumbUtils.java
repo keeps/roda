@@ -28,6 +28,7 @@ import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -49,17 +50,14 @@ public class BreadcrumbUtils {
 
   private static BreadcrumbItem getBreadcrumbItem(IndexedRepresentation representation) {
     return new BreadcrumbItem(DescriptionLevelUtils.getRepresentationTypeIcon(representation.getType(), true),
-      representation.getType(), ListUtils.concat(BrowseRepresentation.RESOLVER.getHistoryPath(),
-        representation.getAipId(), representation.getUUID()));
+      representation.getType(), HistoryUtils.getHistoryBrowse(representation));
   }
 
   private static BreadcrumbItem getBreadcrumbItem(IndexedFile file) {
     String fileLabel = file.getOriginalName() != null ? file.getOriginalName() : file.getId();
-    return new BreadcrumbItem(
-      file.isDirectory() ? getBreadcrumbLabel(fileLabel, RodaConstants.VIEW_REPRESENTATION_FOLDER)
-        : getBreadcrumbLabel(fileLabel, RodaConstants.VIEW_REPRESENTATION_FILE),
-      fileLabel, ListUtils.concat(BrowseFile.RESOLVER.getHistoryPath(), file.getAipId(), file.getRepresentationUUID(),
-        file.getUUID()));
+    SafeHtml breadcrumbLabel = getBreadcrumbLabel(fileLabel,
+      file.isDirectory() ? RodaConstants.VIEW_REPRESENTATION_FOLDER : RodaConstants.VIEW_REPRESENTATION_FILE);
+    return new BreadcrumbItem(breadcrumbLabel, fileLabel, HistoryUtils.getHistoryBrowse(file));
   }
 
   public static List<BreadcrumbItem> getAipBreadcrumbs(List<IndexedAIP> aipAncestors, IndexedAIP aip) {
@@ -166,9 +164,6 @@ public class BreadcrumbUtils {
   public static List<BreadcrumbItem> getFileBreadcrumbs(IndexedAIP aip, IndexedRepresentation representation,
     IndexedFile file) {
 
-    String aipId = aip.getId();
-    String representationUUID = representation.getUUID();
-
     List<BreadcrumbItem> fullBreadcrumb = new ArrayList<>();
     List<BreadcrumbItem> fileBreadcrumb = new ArrayList<>();
 
@@ -188,9 +183,9 @@ public class BreadcrumbUtils {
           String folderName = filePath.get(i);
           String folderUUID = fileAncestorsPath.get(i);
 
-          fileBreadcrumb.add(
-            new BreadcrumbItem(getBreadcrumbLabel(folderName, RodaConstants.VIEW_REPRESENTATION_FOLDER), folderName,
-              ListUtils.concat(BrowseFolder.RESOLVER.getHistoryPath(), aipId, representationUUID, folderUUID)));
+          SafeHtml breadcrumbLabel = getBreadcrumbLabel(folderName, RodaConstants.VIEW_REPRESENTATION_FOLDER);
+          fileBreadcrumb.add(new BreadcrumbItem(breadcrumbLabel, folderName,
+            ListUtils.concat(BrowseFolder.RESOLVER.getHistoryPath(), folderUUID)));
         }
       }
 

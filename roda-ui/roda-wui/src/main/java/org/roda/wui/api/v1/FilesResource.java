@@ -10,6 +10,7 @@ package org.roda.wui.api.v1;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -26,12 +27,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.transform.TransformerException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.common.StreamResponse;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
@@ -48,7 +51,6 @@ import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.ExtraMediaType;
 import org.roda.wui.api.v1.utils.ObjectResponse;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -133,10 +135,11 @@ public class FilesResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    try{
+    try {
       boolean createIfNotExists = true;
       boolean notify = true;
-      org.roda.core.data.v2.ip.File updatedFile = Browser.updateFile(user, file, inputStream, createIfNotExists,notify);
+      org.roda.core.data.v2.ip.File updatedFile = Browser.updateFile(user, file, inputStream, createIfNotExists,
+        notify);
       return Response.ok(updatedFile, mediaType).build();
     } catch (IOException e) {
       return ApiUtils.errorResponse(new TransformerException(e.getMessage()));
@@ -150,8 +153,8 @@ public class FilesResource {
 
   public Response createRepresentationFile(
     @ApiParam(value = "The AIP ID of the new file") @QueryParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
-    @ApiParam(value = "The representation UUID of the new file") @QueryParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID) String representationUUID,
-    @ApiParam(value = "The UUID of the parent folder") @QueryParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileUUID,
+    @ApiParam(value = "The representation ID of the new file") @QueryParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
+    @ApiParam(value = "The directory path of the parent folder") @QueryParam(RodaConstants.API_PATH_PARAM_FOLDER) List<String> folderPath,
     @FormDataParam(RodaConstants.API_PARAM_UPLOAD) InputStream inputStream,
     @FormDataParam(RodaConstants.API_PARAM_UPLOAD) FormDataContentDisposition fileDetail,
     @ApiParam(value = "A new filename to this file") @QueryParam(RodaConstants.API_QUERY_KEY_FILENAME) String filename,
@@ -167,17 +170,13 @@ public class FilesResource {
     try {
       org.roda.core.data.v2.ip.File file;
       String name = filename == null ? fileDetail.getFileName() : filename;
-      details = details == null ? "" : details;
 
-      if (fileUUID == null) {
-        file = Browser.createFile(user, aipId, representationUUID, new ArrayList<>(), name, inputStream, details);
-      } else {
-        file = Browser.createFileWithUUID(user, fileUUID, name, inputStream, details);
-      }
+      file = Browser.createFile(user, aipId, representationId, folderPath, name, inputStream,
+        details != null ? details : "");
 
       return Response.ok(file, mediaType).build();
     } catch (IOException e) {
-      return ApiUtils.errorResponse(new TransformerException(e.getMessage()));
+      throw new GenericException(e);
     }
   }
 

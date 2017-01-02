@@ -14,10 +14,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowseFile;
 import org.roda.wui.client.browse.BrowseFolder;
+import org.roda.wui.client.browse.BrowseRepresentation;
+import org.roda.wui.client.ingest.transfer.TransferUpload;
 import org.roda.wui.common.client.HistoryResolver;
 
 import com.google.gwt.http.client.URL;
@@ -134,16 +138,87 @@ public class HistoryUtils {
     return createHistoryHashLink(path);
   }
 
-  public static void open(IndexedFile selected) {
+  public static List<String> getHistoryBrowse(String aipId) {
     List<String> history = new ArrayList<>();
-    history
-      .add(selected.isDirectory() ? BrowseFolder.RESOLVER.getHistoryToken() : BrowseFile.RESOLVER.getHistoryToken());
-    history.add(selected.getAipId());
-    history.add(selected.getRepresentationId());
-    history.addAll(selected.getPath());
-    history.add(selected.getId());
+    history.addAll(Browse.RESOLVER.getHistoryPath());
+    history.add(aipId);
 
-    HistoryUtils.newHistory(Browse.RESOLVER, history);
+    return history;
+  }
+
+  public static void openBrowse(String aipId) {
+    HistoryUtils.newHistory(getHistoryBrowse(aipId));
+  }
+
+  public static void openBrowse(IndexedAIP aip) {
+    openBrowse(aip.getId());
+  }
+
+  public static List<String> getHistoryBrowse(String aipId, String representationId) {
+    List<String> history = new ArrayList<>();
+    history.addAll(Browse.RESOLVER.getHistoryPath());
+    history.add(BrowseRepresentation.RESOLVER.getHistoryToken());
+    history.add(aipId);
+    history.add(representationId);
+
+    return history;
+  }
+
+  public static List<String> getHistoryBrowse(IndexedRepresentation representation) {
+    return getHistoryBrowse(representation.getAipId(), representation.getId());
+  }
+
+  public static void openBrowse(String aipId, String representationId) {
+    HistoryUtils.newHistory(getHistoryBrowse(aipId, representationId));
+  }
+
+  public static void openBrowse(IndexedRepresentation representation) {
+    openBrowse(representation.getAipId(), representation.getId());
+  }
+
+  public static List<String> getHistoryBrowse(String aipId, String representationId, List<String> filePath,
+    String fileId, boolean isDirectory) {
+    List<String> history = new ArrayList<>();
+    history.addAll(Browse.RESOLVER.getHistoryPath());
+    history.add(isDirectory ? BrowseFolder.RESOLVER.getHistoryToken() : BrowseFile.RESOLVER.getHistoryToken());
+    history.add(aipId);
+    history.add(representationId);
+    history.addAll(filePath);
+    history.add(fileId);
+
+    return history;
+  }
+
+  public static List<String> getHistoryBrowse(IndexedFile file) {
+    return getHistoryBrowse(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
+      file.isDirectory());
+  }
+
+  public static void openBrowse(String aipId, String representationId, List<String> filePath, String fileId,
+    boolean isDirectory) {
+    HistoryUtils.newHistory(getHistoryBrowse(aipId, representationId, filePath, fileId, isDirectory));
+  }
+
+  public static void openBrowse(IndexedFile file) {
+    openBrowse(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), file.isDirectory());
+  }
+
+  public static List<String> getHistoryUpload(IndexedFile folder) {
+    List<String> history = new ArrayList<>();
+    history.addAll(Browse.RESOLVER.getHistoryPath());
+    history.add(TransferUpload.BROWSE_RESOLVER.getHistoryToken());
+    history.add(folder.getAipId());
+    history.add(folder.getRepresentationId());
+    history.addAll(folder.getPath());
+    history.add(folder.getId());
+
+    return history;
+  }
+
+  public static void openUpload(IndexedFile folder) {
+    if (folder.isDirectory()) {
+      HistoryUtils.newHistory(getHistoryUpload(folder));
+    }
   }
 
 }
