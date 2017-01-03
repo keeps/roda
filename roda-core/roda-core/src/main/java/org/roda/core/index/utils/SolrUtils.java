@@ -63,6 +63,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.NotSupportedException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
@@ -2234,9 +2235,11 @@ public class SolrUtils {
 
     setPermissions(dip.getPermissions(), doc);
 
-    Optional<String> openURL = DIPUtils.getCompleteOpenExternalURL(dip);
+    OptionalWithCause<String> openURL = DIPUtils.getCompleteOpenExternalURL(dip);
     if (openURL.isPresent()) {
       doc.addField(RodaConstants.DIP_OPEN_EXTERNAL_URL, openURL.get());
+    } else {
+      LOGGER.error("Error indexing DIP open external URL", openURL.getCause());
     }
 
     return doc;

@@ -79,8 +79,14 @@ public class EmailNotificationProcessor implements NotificationProcessor {
       } else {
         scope.put(RECIPIENT, RodaConstants.NOTIFICATION_VARIOUS_RECIPIENT_USERS);
       }
-      processedNotification.setBody(HandlebarsUtility
-        .executeHandlebars(template.replace("<a href=\"{{acknowledge}}\">", "").replace("</a>", ""), scope));
+
+      String strippedTemplate = template.replace("<a href=\"{{acknowledge}}\">", "").replace("</a>", "");
+      try {
+        processedNotification.setBody(HandlebarsUtility.executeHandlebars(strippedTemplate, scope));
+      } catch (GenericException e) {
+        LOGGER.error("Error processing notification body", e);
+        processedNotification.setBody(strippedTemplate);
+      }
       scope.remove(RECIPIENT);
       ConfigurableEmailUtility emailUtility = new ConfigurableEmailUtility(processedNotification.getFromUser(),
         processedNotification.getSubject());
@@ -97,7 +103,7 @@ public class EmailNotificationProcessor implements NotificationProcessor {
           LOGGER.debug("SMTP not defined, cannot send emails");
         }
       }
-    } catch (IOException | MessagingException e) {
+    } catch (IOException | MessagingException | GenericException e) {
       processedNotification.setState(NOTIFICATION_STATE.FAILED);
       LOGGER.debug("Error sending e-mail: {}", e.getMessage());
     }
@@ -105,7 +111,7 @@ public class EmailNotificationProcessor implements NotificationProcessor {
   }
 
   private String getUpdatedMessageBody(ModelService model, Notification notification, String recipient, String template,
-    Map<String, Object> scopes) {
+    Map<String, Object> scopes) throws GenericException {
 
     // update body message with the recipient user and acknowledge URL
     String userUUID = UUID.nameUUIDFromBytes(recipient.getBytes()).toString();

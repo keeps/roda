@@ -2272,7 +2272,7 @@ public class ModelService extends ModelObservable {
     try {
       // deleting external service if existing
       DIP dip = retrieveDIP(dipId);
-      Optional<String> deleteURL = DIPUtils.getCompleteDeleteExternalURL(dip);
+      OptionalWithCause<String> deleteURL = DIPUtils.getCompleteDeleteExternalURL(dip);
       Optional<String> httpMethod = DIPUtils.getDeleteMethod(dip);
       if (deleteURL.isPresent() && httpMethod.isPresent()) {
         String method = httpMethod.get();

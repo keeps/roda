@@ -556,19 +556,19 @@ public class Browse extends Composite {
     itemMetadata.setVisible(true);
   }
 
-  protected void viewAction(BrowseAIPBundle itemBundle) {
-    if (itemBundle != null) {
-      this.itemBundle = itemBundle;
+  protected void viewAction(BrowseAIPBundle bundle) {
+    if (bundle != null) {
+      this.itemBundle = bundle;
 
       viewingTop = false;
-      this.justActive = AIPState.ACTIVE.equals(itemBundle.getAip().getState());
+      this.justActive = AIPState.ACTIVE.equals(bundle.getAip().getState());
 
-      IndexedAIP aip = itemBundle.getAip();
-      List<DescriptiveMetadataViewBundle> descMetadata = itemBundle.getDescriptiveMetadata();
+      IndexedAIP aip = bundle.getAip();
+      List<DescriptiveMetadataViewBundle> descMetadata = bundle.getDescriptiveMetadata();
 
       browseItemHeader.setVisible(true);
 
-      breadcrumb.updatePath(BreadcrumbUtils.getAipBreadcrumbs(itemBundle.getAIPAncestors(), aip));
+      breadcrumb.updatePath(BreadcrumbUtils.getAipBreadcrumbs(bundle.getAIPAncestors(), aip));
       breadcrumb.setVisible(true);
       newRepresentation.setVisible(true);
 
@@ -605,13 +605,13 @@ public class Browse extends Composite {
       final List<Pair<String, HTML>> descriptiveMetadataContainers = new ArrayList<Pair<String, HTML>>();
       final Map<String, DescriptiveMetadataViewBundle> bundles = new HashMap<>();
       if (descMetadata != null) {
-        for (DescriptiveMetadataViewBundle bundle : descMetadata) {
-          String title = bundle.getLabel() != null ? bundle.getLabel() : bundle.getId();
+        for (DescriptiveMetadataViewBundle descMetadatum : descMetadata) {
+          String title = descMetadatum.getLabel() != null ? descMetadatum.getLabel() : descMetadatum.getId();
           HTML container = new HTML();
           container.addStyleName("metadataContent");
           itemMetadata.add(container, title);
-          descriptiveMetadataContainers.add(Pair.create(bundle.getId(), container));
-          bundles.put(bundle.getId(), bundle);
+          descriptiveMetadataContainers.add(Pair.create(descMetadatum.getId(), container));
+          bundles.put(descMetadatum.getId(), descMetadatum);
         }
       }
 
@@ -669,7 +669,7 @@ public class Browse extends Composite {
         newDescriptiveMetadata.setVisible(true);
       }
 
-      if (itemBundle.getRepresentations().size() > 0) {
+      if (bundle.getRepresentationCount() > 0) {
         Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aip.getId()));
         representationsSearchPanel.setDefaultFilter(filter);
         representationsSearchPanel.clearSearchInputBox();

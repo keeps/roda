@@ -36,6 +36,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ClassificationPlanUtils;
 import org.roda.core.common.ConsumesOutputStream;
 import org.roda.core.common.EntityResponse;
+import org.roda.core.common.HandlebarsUtility;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.Messages;
 import org.roda.core.common.PremisV3Utils;
@@ -163,9 +164,6 @@ import com.github.jknack.handlebars.Template;
 public class BrowserHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(BrowserHelper.class);
 
-  private static final int BUNDLE_MAX_REPRESENTATION_COUNT = 10;
-  private static final int BUNDLE_MAX_ADDED_ORIGINAL_REPRESENTATION_COUNT = 1;
-
   protected static BrowseAIPBundle retrieveBrowseAipBundle(IndexedAIP aip, Locale locale)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     BrowseAIPBundle bundle = new BrowseAIPBundle();
@@ -189,37 +187,15 @@ public class BrowserHelper {
       // do nothing
     }
 
-    // set representations
-    // getting the last [BUNDLE_MAX_REPRESENTATION_COUNT] representations
-    Sorter sorter = new Sorter(new SortParameter(RodaConstants.REPRESENTATION_ORIGINAL, true));
-    IndexResult<IndexedRepresentation> findRepresentations = findRepresentations(aipId, sorter,
-      new Sublist(0, BUNDLE_MAX_REPRESENTATION_COUNT));
-    List<IndexedRepresentation> representations = findRepresentations.getResults();
+    // Count representations
+    Filter repFilter = new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aipId));
+    Long repCount = RodaCoreFactory.getIndexService().count(IndexedRepresentation.class, repFilter);
+    bundle.setRepresentationCount(repCount);
 
-    // if there are more representations ensure one original is there
-    if (findRepresentations.getTotalCount() > findRepresentations.getLimit()) {
-      boolean hasOriginals = findRepresentations.getResults().stream().anyMatch(x -> x.isOriginal());
-      if (!hasOriginals) {
-        boolean onlyOriginals = true;
-        IndexResult<IndexedRepresentation> findOriginalRepresentations = findRepresentations(aipId, onlyOriginals,
-          sorter, new Sublist(0, BUNDLE_MAX_ADDED_ORIGINAL_REPRESENTATION_COUNT));
-        representations.addAll(findOriginalRepresentations.getResults());
-      }
-    }
-
-    bundle.setRepresentations(representations);
-
-    Map<String, List<DescriptiveMetadataViewBundle>> representationsDescriptiveMetadata = new HashMap<>();
-    for (IndexedRepresentation representation : representations) {
-      try {
-        List<DescriptiveMetadataViewBundle> descriptiveMetadataList = retrieveDescriptiveMetadataBundles(aipId,
-          representation.getId(), locale);
-        representationsDescriptiveMetadata.put(representation.getUUID(), descriptiveMetadataList);
-      } catch (NotFoundException e) {
-        // do nothing
-      }
-    }
-    bundle.setRepresentationsDescriptiveMetadata(representationsDescriptiveMetadata);
+    // Count DIPs
+    Filter dipsFilter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_IDS, aip.getId()));
+    Long dipCount = RodaCoreFactory.getIndexService().count(IndexedDIP.class, dipsFilter);
+    bundle.setDipCount(dipCount);
 
     return bundle;
   }
@@ -349,12 +325,6 @@ public class BrowserHelper {
     DescriptiveMetadata descriptiveMetadata = model.retrieveDescriptiveMetadata(aipId, representationId,
       descriptiveMetadataId);
     return retrieveDescriptiveMetadataBundle(aipId, representationId, descriptiveMetadata, locale);
-  }
-
-  private static DescriptiveMetadataViewBundle retrieveDescriptiveMetadataBundle(String aipId,
-    DescriptiveMetadata descriptiveMetadata, Locale locale)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    return retrieveDescriptiveMetadataBundle(aipId, null, descriptiveMetadata, locale);
   }
 
   public static DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(User user, IndexedAIP aip,
@@ -507,24 +477,6 @@ public class BrowserHelper {
     return RodaCoreFactory.getIndexService().suggest(returnClass, field, query, user, allowPartial, justActive);
   }
 
-  private static IndexResult<IndexedRepresentation> findRepresentations(String aipId, Sorter sorter, Sublist sublist)
-    throws GenericException, RequestNotValidException {
-    return findRepresentations(aipId, false, sorter, sublist);
-  }
-
-  private static IndexResult<IndexedRepresentation> findRepresentations(String aipId, boolean onlyOriginals,
-    Sorter sorter, Sublist sublist) throws GenericException, RequestNotValidException {
-    Filter filter = new Filter();
-    filter.add(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aipId));
-    if (onlyOriginals) {
-      filter.add(new SimpleFilterParameter(RodaConstants.REPRESENTATION_ORIGINAL, Boolean.TRUE.toString()));
-    }
-    Facets facets = null;
-
-    return RodaCoreFactory.getIndexService().find(IndexedRepresentation.class, filter, sorter, sublist, facets);
-
-  }
-
   public static void validateGetFileParams(String acceptFormat) throws RequestNotValidException {
     if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)
       && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
@@ -646,7 +598,7 @@ public class BrowserHelper {
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
       int endInt = limitInt == -1 ? metadata.size() : (limitInt > metadata.size() ? metadata.size() : limitInt);
       DescriptiveMetadataList list = new DescriptiveMetadataList(metadata.subList(startInt, endInt));
-      return new ObjectResponse(acceptFormat, list);
+      return new ObjectResponse<DescriptiveMetadataList>(acceptFormat, list);
     }
 
     return null;
@@ -1068,7 +1020,7 @@ public class BrowserHelper {
       }
 
       IOUtils.closeQuietly(preservationFiles);
-      return new ObjectResponse(acceptFormat, metadataList);
+      return new ObjectResponse<PreservationMetadataList>(acceptFormat, metadataList);
     } else {
       throw new GenericException("Unsupported accept format: " + acceptFormat);
     }
@@ -1150,7 +1102,7 @@ public class BrowserHelper {
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP.equals(acceptFormat)) {
       return createZipStreamResponse(zipEntries, aipId + "_" + representationId);
     } else {
-      return new ObjectResponse(acceptFormat, pms);
+      return new ObjectResponse<PreservationMetadataList>(acceptFormat, pms);
     }
   }
 
@@ -1692,7 +1644,7 @@ public class BrowserHelper {
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
       File file = RodaCoreFactory.getModelService().retrieveFile(iFile.getAipId(), iFile.getRepresentationId(),
         iFile.getPath(), iFile.getId());
-      return new ObjectResponse(acceptFormat, file);
+      return new ObjectResponse<File>(acceptFormat, file);
     } else {
       throw new GenericException("Unsupported accept format: " + acceptFormat);
     }
@@ -1942,7 +1894,7 @@ public class BrowserHelper {
         stream);
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
-      return new ObjectResponse(acceptFormat, transferredResource);
+      return new ObjectResponse<TransferredResource>(acceptFormat, transferredResource);
     } else {
       throw new GenericException("Unsupported accept format: " + acceptFormat);
     }
@@ -2565,59 +2517,24 @@ public class BrowserHelper {
     String rawTemplate = bundle.getTemplate();
     String result;
     if (StringUtils.isNotBlank(rawTemplate)) {
-      try {
-        Handlebars handlebars = new Handlebars();
-        Map<String, String> data = new HashMap<>();
-        handlebars.registerHelper("field", (o, options) -> {
-          return options.fn();
-        });
-        handlebars.registerHelper("ifCond", (context, options) -> {
-          // the first parameter of ifCond is placed in the context field by the
-          // parser
-          String condition = (context == null) ? "||" : context.toString();
-          List<Object> values = Arrays.asList(options.params);
-          boolean display;
-          if (condition.equals("||")) {
-            display = false;
-            for (Object value : values) {
-              if (value != null) {
-                display = true;
-                break;
-              }
+
+      Map<String, String> data = new HashMap<>();
+      Set<MetadataValue> values = bundle.getValues();
+      if (values != null) {
+        values.forEach(metadataValue -> {
+          String val = metadataValue.get("value");
+          if (val != null) {
+            val = val.replaceAll("\\s", "");
+            if (!"".equals(val)) {
+              data.put(metadataValue.get("name"), metadataValue.get("value"));
             }
-          } else if (condition.equals("&&")) {
-            display = true;
-            for (Object value : values) {
-              if (value == null) {
-                display = false;
-                break;
-              }
-            }
-          } else {
-            display = false;
           }
-          return display ? options.fn() : options.inverse();
         });
-
-        Template tmpl = handlebars.compileInline(rawTemplate);
-
-        Set<MetadataValue> values = bundle.getValues();
-        if (values != null) {
-          values.forEach(metadataValue -> {
-            String val = metadataValue.get("value");
-            if (val != null) {
-              val = val.replaceAll("\\s", "");
-              if (!"".equals(val)) {
-                data.put(metadataValue.get("name"), metadataValue.get("value"));
-              }
-            }
-          });
-        }
-        result = tmpl.apply(data);
-        // result = RodaUtils.indentXML(result);
-      } catch (IOException e) {
-        throw new GenericException(e);
       }
+
+      result = HandlebarsUtility.executeHandlebars(rawTemplate, data);
+      // result = RodaUtils.indentXML(result);
+
     } else {
       result = rawTemplate;
     }
@@ -2631,7 +2548,7 @@ public class BrowserHelper {
       filter, Sorter.NONE, new Sublist(0, 1));
 
     if (!resources.getResults().isEmpty()) {
-      TransferredResource resource = (TransferredResource) resources.getResults().get(0);
+      TransferredResource resource = resources.getResults().get(0);
       return RodaCoreFactory.getTransferredResourcesScanner().renameTransferredResource(resource, newName, true, true);
     } else {
       return transferredResourceId;
@@ -2739,20 +2656,20 @@ public class BrowserHelper {
     }
   }
 
-  public static String moveTransferredResource(SelectedItems selected, TransferredResource transferredResource)
-    throws GenericException, RequestNotValidException, AlreadyExistsException, IsStillUpdatingException,
-    NotFoundException {
+  public static String moveTransferredResource(SelectedItems<TransferredResource> selected,
+    TransferredResource transferredResource) throws GenericException, RequestNotValidException, AlreadyExistsException,
+    IsStillUpdatingException, NotFoundException {
 
     String resourceRelativePath = "";
     Filter filter = new Filter();
     int counter = 1;
 
     if (selected instanceof SelectedItemsList) {
-      SelectedItemsList selectedList = (SelectedItemsList) selected;
+      SelectedItemsList<TransferredResource> selectedList = (SelectedItemsList<TransferredResource>) selected;
       filter.add(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, selectedList.getIds()));
       counter = selectedList.getIds().size();
     } else if (selected instanceof SelectedItemsFilter) {
-      SelectedItemsFilter selectedFilter = (SelectedItemsFilter) selected;
+      SelectedItemsFilter<TransferredResource> selectedFilter = (SelectedItemsFilter<TransferredResource>) selected;
       filter = selectedFilter.getFilter();
       counter = RodaCoreFactory.getIndexService().count(TransferredResource.class, filter).intValue();
     }
@@ -2986,7 +2903,7 @@ public class BrowserHelper {
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
       DIPFile file = RodaCoreFactory.getModelService().retrieveDIPFile(iFile.getDipId(), iFile.getPath(),
         iFile.getId());
-      return new ObjectResponse(acceptFormat, file);
+      return new ObjectResponse<DIPFile>(acceptFormat, file);
     } else {
       throw new GenericException("Unsupported accept format: " + acceptFormat);
     }

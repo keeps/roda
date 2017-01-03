@@ -9,10 +9,8 @@ package org.roda.wui.client.browse.bundle;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
 
 public class BrowseAIPBundle implements Serializable {
 
@@ -21,22 +19,21 @@ public class BrowseAIPBundle implements Serializable {
   private IndexedAIP aip;
   private List<IndexedAIP> aipAncestors;
   private List<DescriptiveMetadataViewBundle> descriptiveMetadata;
-  private List<IndexedRepresentation> representations;
-  private Map<String, List<DescriptiveMetadataViewBundle>> representationsDescriptiveMetadata;
+  private Long representationCount;
+  private Long dipCount;
 
   public BrowseAIPBundle() {
     super();
   }
 
   public BrowseAIPBundle(IndexedAIP aip, List<IndexedAIP> aipAncestors,
-    List<DescriptiveMetadataViewBundle> descriptiveMetadata, List<IndexedRepresentation> representations,
-    Map<String, List<DescriptiveMetadataViewBundle>> representationsDescriptiveMetadata) {
+    List<DescriptiveMetadataViewBundle> descriptiveMetadata, Long representationCount, Long dipCount) {
     super();
     this.aip = aip;
     this.setAIPAncestors(aipAncestors);
     this.descriptiveMetadata = descriptiveMetadata;
-    this.representations = representations;
-    this.representationsDescriptiveMetadata = representationsDescriptiveMetadata;
+    this.representationCount = representationCount;
+    this.dipCount = dipCount;
   }
 
   public IndexedAIP getAip() {
@@ -55,14 +52,6 @@ public class BrowseAIPBundle implements Serializable {
     this.descriptiveMetadata = descriptiveMetadata;
   }
 
-  public List<IndexedRepresentation> getRepresentations() {
-    return representations;
-  }
-
-  public void setRepresentations(List<IndexedRepresentation> representations) {
-    this.representations = representations;
-  }
-
   public List<IndexedAIP> getAIPAncestors() {
     return aipAncestors;
   }
@@ -70,13 +59,21 @@ public class BrowseAIPBundle implements Serializable {
   public void setAIPAncestors(List<IndexedAIP> aipAncestors) {
     this.aipAncestors = aipAncestors;
   }
-  
-  public Map<String, List<DescriptiveMetadataViewBundle>> getRepresentationsDescriptiveMetadata() {
-    return representationsDescriptiveMetadata;
+
+  public Long getRepresentationCount() {
+    return representationCount;
   }
 
-  public void setRepresentationsDescriptiveMetadata(
-    Map<String, List<DescriptiveMetadataViewBundle>> representationsDescriptiveMetadata) {
-    this.representationsDescriptiveMetadata = representationsDescriptiveMetadata;
+  public void setRepresentationCount(Long representationCount) {
+    this.representationCount = representationCount;
   }
+
+  public Long getDipCount() {
+    return dipCount;
+  }
+
+  public void setDipCount(Long dipCount) {
+    this.dipCount = dipCount;
+  }
+
 }
