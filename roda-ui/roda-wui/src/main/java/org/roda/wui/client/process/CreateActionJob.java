@@ -29,9 +29,11 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.browse.BrowserService;
@@ -422,6 +424,8 @@ public class CreateActionJob extends Composite {
         objectList = addIfNotExists(objectList, Risk.class.getName());
       } else if (IndexedDIP.class.getName().equals(objectClass)) {
         objectList = addIfNotExists(objectList, DIP.class.getName());
+      } else if (IndexedReport.class.getName().equals(objectClass)) {
+        objectList = addIfNotExists(objectList, Report.class.getName());
       } else {
         objectList = addIfNotExists(objectList, objectClass);
       }

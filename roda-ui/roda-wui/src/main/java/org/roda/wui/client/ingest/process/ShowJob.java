@@ -33,6 +33,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -289,9 +290,9 @@ public class ShowJob extends Composite {
     if (isIngest) {
       FacetUtils.bindFacets(ingestJobReports, facetPanels);
 
-      ingestJobReports.addValueChangeHandler(new ValueChangeHandler<IndexResult<Report>>() {
+      ingestJobReports.addValueChangeHandler(new ValueChangeHandler<IndexResult<IndexedReport>>() {
         @Override
-        public void onValueChange(ValueChangeEvent<IndexResult<Report>> event) {
+        public void onValueChange(ValueChangeEvent<IndexResult<IndexedReport>> event) {
           reportListPanel.setVisible(event.getValue().getTotalCount() > 0);
         }
       });
@@ -315,10 +316,10 @@ public class ShowJob extends Composite {
     } else {
       FacetUtils.bindFacets(simpleJobReports, facetPanels);
 
-      simpleJobReports.addValueChangeHandler(new ValueChangeHandler<IndexResult<Report>>() {
+      simpleJobReports.addValueChangeHandler(new ValueChangeHandler<IndexResult<IndexedReport>>() {
 
         @Override
-        public void onValueChange(ValueChangeEvent<IndexResult<Report>> event) {
+        public void onValueChange(ValueChangeEvent<IndexResult<IndexedReport>> event) {
           reportListPanel.setVisible(event.getValue().getTotalCount() > 0);
         }
       });

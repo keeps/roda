@@ -8,12 +8,12 @@
 package org.roda.core.common;
 
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.IsRODAObject;
 
 public class SelectedItemsUtils {
 
   @SuppressWarnings("unchecked")
-  public static <T extends IsIndexed> Class<T> parseClass(String classNameToReturn) throws GenericException {
+  public static <T extends IsRODAObject> Class<T> parseClass(String classNameToReturn) throws GenericException {
     Class<T> classToReturn;
     try {
       classToReturn = (Class<T>) Class.forName(classNameToReturn);

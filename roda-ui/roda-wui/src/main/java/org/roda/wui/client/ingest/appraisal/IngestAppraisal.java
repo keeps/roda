@@ -39,6 +39,7 @@ import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -223,7 +224,7 @@ public class IngestAppraisal extends Composite {
     String rejectReason = null;
     // not supporting accept of reps and files for now
     BrowserService.Util.getInstance().appraisal((SelectedItems<IndexedAIP>) selected, accept, rejectReason,
-      new LoadingAsyncCallback<Void>() {
+      LocaleInfo.getCurrentLocale().getLocaleName(), new LoadingAsyncCallback<Void>() {
 
         @Override
         public void onSuccessImpl(Void result) {
@@ -252,7 +253,7 @@ public class IngestAppraisal extends Composite {
         public void onSuccess(final String rejectReason) {
           // TODO support accept of reps and files
           BrowserService.Util.getInstance().appraisal((SelectedItems<IndexedAIP>) selected, accept, rejectReason,
-            new LoadingAsyncCallback<Void>() {
+            LocaleInfo.getCurrentLocale().getLocaleName(), new LoadingAsyncCallback<Void>() {
 
               @Override
               public void onSuccessImpl(Void result) {

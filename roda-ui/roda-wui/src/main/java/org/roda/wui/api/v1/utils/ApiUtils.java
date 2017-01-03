@@ -11,9 +11,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
@@ -54,6 +54,8 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representations;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.IndexedReport;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.IndexedRisk;
@@ -268,11 +270,7 @@ public class ApiUtils {
       }
       ret = files;
     } else if (objectClass.equals(IndexedRisk.class)) {
-      List<Risk> risks = new ArrayList<Risk>();
-      for (T res : result.getResults()) {
-        IndexedRisk irisk = (IndexedRisk) res;
-        risks.add(irisk);
-      }
+      List<Risk> risks = result.getResults().stream().map(risk -> (Risk) risk).collect(Collectors.toList());
       ret = new org.roda.core.data.v2.risks.Risks(risks);
     } else if (objectClass.equals(TransferredResource.class)) {
       ret = new org.roda.core.data.v2.ip.TransferredResources((List<TransferredResource>) result.getResults());
@@ -287,14 +285,13 @@ public class ApiUtils {
     } else if (objectClass.equals(RODAMember.class)) {
       ret = new org.roda.core.data.v2.user.RODAMembers((List<RODAMember>) result.getResults());
     } else if (objectClass.equals(IndexedDIP.class)) {
-      List<DIP> dips = new ArrayList<DIP>();
-      for (T res : result.getResults()) {
-        IndexedDIP idip = (IndexedDIP) res;
-        dips.add(idip);
-      }
+      List<DIP> dips = result.getResults().stream().map(dip -> (DIP) dip).collect(Collectors.toList());
       ret = new org.roda.core.data.v2.ip.DIPs(dips);
     } else if (objectClass.equals(DIPFile.class)) {
       ret = new org.roda.core.data.v2.ip.DIPFiles((List<DIPFile>) result.getResults());
+    } else if (objectClass.equals(IndexedReport.class)) {
+      List<Report> reports = result.getResults().stream().map(report -> (Report) report).collect(Collectors.toList());
+      ret = new org.roda.core.data.v2.jobs.Reports(reports);
     } else {
       throw new GenericException("Unsupported object class: " + objectClass);
     }

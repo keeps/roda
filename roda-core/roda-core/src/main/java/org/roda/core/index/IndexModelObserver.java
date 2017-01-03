@@ -57,6 +57,7 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
@@ -817,7 +818,7 @@ public class IndexModelObserver implements ModelObserver {
               InputStream inputStream = binary.getContent().createInputStream();
               Report objectFromJson = JsonUtils.getObjectFromJson(inputStream, Report.class);
               IOUtils.closeQuietly(inputStream);
-              ReturnWithExceptions<Void> subExceptions = jobReportCreatedOrUpdated(objectFromJson);
+              ReturnWithExceptions<Void> subExceptions = jobReportCreatedOrUpdated(objectFromJson, job);
               exceptions.addExceptions(subExceptions.getExceptions());
             } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
               | IOException e) {
@@ -869,9 +870,9 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   @Override
-  public ReturnWithExceptions<Void> jobReportCreatedOrUpdated(Report jobReport) {
+  public ReturnWithExceptions<Void> jobReportCreatedOrUpdated(Report jobReport, Job job) {
     ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
-    SolrInputDocument jobReportDoc = SolrUtils.jobReportToSolrDocument(jobReport);
+    SolrInputDocument jobReportDoc = SolrUtils.jobReportToSolrDocument(jobReport, job, index);
 
     try {
       index.add(RodaConstants.INDEX_JOB_REPORT, jobReportDoc);
@@ -885,7 +886,7 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void jobReportDeleted(String jobReportId) {
-    deleteDocumentFromIndex(Report.class, jobReportId);
+    deleteDocumentFromIndex(IndexedReport.class, jobReportId);
   }
 
   @Override

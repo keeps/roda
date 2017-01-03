@@ -103,9 +103,6 @@ public interface BrowserService extends RemoteService {
     List<String> historyFilePath, String historyFileId, String localeName)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
-  BrowseFileBundle retrieveBrowseFileBundle(String fileUUID, String localeString)
-    throws AuthorizationDeniedException, GenericException, NotFoundException;
-
   DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String representationId,
     String descId, String type, String version, String localeString)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
@@ -270,7 +267,7 @@ public interface BrowserService extends RemoteService {
   void updateRiskCounters()
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
-  void appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
+  void appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason, String localeString)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
 
   IndexedRepresentation retrieveRepresentationById(String representationId)
@@ -328,5 +325,8 @@ public interface BrowserService extends RemoteService {
 
   void deleteDIP(String dipId)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
+
+  <T extends IsIndexed> T retrieveFromModel(String classNameToReturn, String id)
+    throws AuthorizationDeniedException, GenericException, NotFoundException;
 
 }

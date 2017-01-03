@@ -41,8 +41,10 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.util.ClassLoaderUtility;
@@ -387,6 +389,11 @@ public class PluginManager {
       objectClasses.add(IndexedDIP.class);
     } else if (objectClasses.contains(IndexedDIP.class)) {
       objectClasses.add(DIP.class);
+    }
+    if (objectClasses.contains(Report.class)) {
+      objectClasses.add(IndexedReport.class);
+    } else if (objectClasses.contains(IndexedReport.class)) {
+      objectClasses.add(Report.class);
     }
     pluginObjectClasses.put(plugin.getClass().getName(), objectClasses);
 

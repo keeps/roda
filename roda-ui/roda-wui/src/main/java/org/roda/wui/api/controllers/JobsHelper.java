@@ -28,8 +28,8 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
+import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.jobs.Reports;
 import org.roda.core.data.v2.user.User;
@@ -170,12 +170,12 @@ public class JobsHelper {
     Sublist sublist = new Sublist(0, RodaConstants.DEFAULT_PAGINATION_VALUE);
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
-    Long jobReportsCount = index.count(Report.class, filter);
+    Long jobReportsCount = index.count(IndexedReport.class, filter);
 
     for (int i = 0; i < jobReportsCount; i += RodaConstants.DEFAULT_PAGINATION_VALUE) {
       sublist.setFirstElementIndex(i);
-      IndexResult<Report> jobReports = index.find(Report.class, filter, null, sublist);
-      for (Report report : jobReports.getResults()) {
+      IndexResult<IndexedReport> jobReports = index.find(IndexedReport.class, filter, null, sublist);
+      for (IndexedReport report : jobReports.getResults()) {
         try {
           model.deleteJobReport(report.getJobId(), report.getId());
         } catch (NotFoundException | AuthorizationDeniedException e) {
@@ -197,12 +197,12 @@ public class JobsHelper {
     if (justFailed) {
       filter.add(new SimpleFilterParameter(RodaConstants.JOB_REPORT_PLUGIN_STATE, PluginState.FAILURE.toString()));
     }
-    IndexResult<Report> listJobReportsIndexResult = org.roda.wui.api.controllers.Browser.find(Report.class, filter,
-      Sorter.NONE, new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())), Facets.NONE, user,
-      justActive);
+    IndexResult<IndexedReport> listJobReportsIndexResult = org.roda.wui.api.controllers.Browser.find(
+      IndexedReport.class, filter, Sorter.NONE,
+      new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())), Facets.NONE, user, justActive);
 
-    for (Report report : listJobReportsIndexResult.getResults()) {
-      reports.addReport(report);
+    for (IndexedReport report : listJobReportsIndexResult.getResults()) {
+      reports.addObject(report);
     }
 
     return reports;

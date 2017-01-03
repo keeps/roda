@@ -22,7 +22,6 @@ import java.util.UUID;
 
 import org.apache.commons.configuration.Configuration;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.IdUtils;
 import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.SelectedItemsUtils;
@@ -36,6 +35,7 @@ import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.formats.Format;
@@ -65,6 +65,7 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
+import org.roda.core.index.utils.IndexUtils;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StringContentPayload;
@@ -176,14 +177,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     User user = UserUtility.getUser(getThreadLocalRequest());
     Locale locale = ServerTools.parseLocale(localeString);
     return Browser.retrieveBrowseFileBundle(user, aipId, representationId, filePath, fileId, locale);
-  }
-
-  @Override
-  public BrowseFileBundle retrieveBrowseFileBundle(String fileUUID, String localeString)
-    throws AuthorizationDeniedException, GenericException, NotFoundException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    Locale locale = ServerTools.parseLocale(localeString);
-    return Browser.retrieveBrowseFileBundle(user, fileUUID, locale);
   }
 
   @Override
@@ -749,10 +742,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
+  public void appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason, String localeString)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.appraisal(user, selected, accept, rejectReason);
+    Browser.appraisal(user, selected, accept, rejectReason, ServerTools.parseLocale(localeString));
   }
 
   @Override
@@ -901,6 +894,15 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Browser.deleteDIP(user, dipId);
+  }
+
+  @Override
+  public <T extends IsIndexed> T retrieveFromModel(String classNameToReturn, String id)
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Class<? extends IsRODAObject> classToReturn = SelectedItemsUtils.parseClass(classNameToReturn);
+    Class<T> indexedClassToReturn = IndexUtils.giveRespectiveIndexClass(classToReturn);
+    return Browser.retrieve(user, indexedClassToReturn, id);
   }
 
 }

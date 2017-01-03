@@ -24,7 +24,6 @@ import java.util.Optional;
 
 import javax.xml.transform.TransformerException;
 
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ConsumesOutputStream;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.common.IdUtils;
@@ -135,15 +134,6 @@ public class Browser extends RodaWuiController {
       aipId, RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId);
 
     return browseRepresentationBundle;
-  }
-
-  public static BrowseFileBundle retrieveBrowseFileBundle(User user, String fileUUID, Locale locale)
-    throws AuthorizationDeniedException, GenericException, NotFoundException {
-
-    IndexedFile file = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class, fileUUID);
-    return retrieveBrowseFileBundle(user, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
-      locale);
-
   }
 
   public static BrowseFileBundle retrieveBrowseFileBundle(User user, String aipId, String representationId,
@@ -332,10 +322,7 @@ public class Browser extends RodaWuiController {
     UserUtility.checkObjectPermissions(user, ret, PermissionType.READ);
 
     // register action
-    String aipId = null;
-    if (classToReturn.equals(IndexedAIP.class)) {
-      aipId = id;
-    }
+    String aipId = classToReturn.equals(IndexedAIP.class) ? id : null;
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_CLASS_PARAM,
       classToReturn.getSimpleName());
 
@@ -1825,8 +1812,8 @@ public class Browser extends RodaWuiController {
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
   }
 
-  public static void appraisal(User user, SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+  public static void appraisal(User user, SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason,
+    Locale locale) throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -1834,7 +1821,7 @@ public class Browser extends RodaWuiController {
     UserUtility.checkAIPPermissions(user, selected, PermissionType.UPDATE);
 
     // delegate
-    BrowserHelper.appraisal(user, selected, accept, rejectReason);
+    BrowserHelper.appraisal(user, selected, accept, rejectReason, locale);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_SELECTED_PARAM, selected,
@@ -2147,10 +2134,10 @@ public class Browser extends RodaWuiController {
       RodaConstants.CONTROLLER_ID_OBJECT_PARAM, resourceOrSip, RodaConstants.CONTROLLER_START_PARAM, 0,
       RodaConstants.CONTROLLER_LIMIT_PARAM, 1);
 
-    if (reportList.getReports().isEmpty()) {
+    if (reportList.getObjects().isEmpty()) {
       throw new NotFoundException("Could not find report for id: " + id);
     } else {
-      return reportList.getReports().get(0);
+      return reportList.getObjects().get(0);
     }
   }
 

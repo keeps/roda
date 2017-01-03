@@ -17,8 +17,8 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
+import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.PluginInfo;
-import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.TooltipTextColumn;
@@ -44,18 +44,18 @@ import config.i18n.client.ClientMessages;
  * @author Luis Faria <lfaria@keep.pt>
  *
  */
-public class SimpleJobReportList extends BasicAsyncTableCell<Report> {
+public class SimpleJobReportList extends BasicAsyncTableCell<IndexedReport> {
 
   // private final ClientLogger logger = new ClientLogger(getClass().getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   // private Column<Report, SafeHtml> objectIdColumn;
-  private TooltipTextColumn<Report> sourceColumn;
-  private TooltipTextColumn<Report> outcomeColumn;
-  private Column<Report, Date> updatedDateColumn;
-  private TextColumn<Report> lastPluginRunColumn;
-  private Column<Report, SafeHtml> lastPluginRunStateColumn;
-  private TextColumn<Report> completionStatusColumn;
+  private TooltipTextColumn<IndexedReport> sourceColumn;
+  private TooltipTextColumn<IndexedReport> outcomeColumn;
+  private Column<IndexedReport, Date> updatedDateColumn;
+  private TextColumn<IndexedReport> lastPluginRunColumn;
+  private Column<IndexedReport, SafeHtml> lastPluginRunStateColumn;
+  private TextColumn<IndexedReport> completionStatusColumn;
 
   private final Map<String, PluginInfo> pluginsInfo;
   @SuppressWarnings("unused")
@@ -78,23 +78,23 @@ public class SimpleJobReportList extends BasicAsyncTableCell<Report> {
 
   public SimpleJobReportList(Filter filter, Facets facets, String summary, Map<String, PluginInfo> pluginsInfo,
     boolean selectable) {
-    super(Report.class, filter, facets, summary, selectable);
+    super(IndexedReport.class, filter, facets, summary, selectable);
     this.pluginsInfo = pluginsInfo;
   }
 
   public SimpleJobReportList(Filter filter, Facets facets, String summary, Map<String, PluginInfo> pluginsInfo,
     boolean selectable, int pageSize, int incrementPage) {
-    super(Report.class, filter, facets, summary, selectable, pageSize, incrementPage);
+    super(IndexedReport.class, filter, facets, summary, selectable, pageSize, incrementPage);
     this.pluginsInfo = pluginsInfo;
   }
 
   @Override
-  protected void configureDisplay(CellTable<Report> display) {
+  protected void configureDisplay(CellTable<IndexedReport> display) {
 
-    sourceColumn = new TooltipTextColumn<Report>() {
+    sourceColumn = new TooltipTextColumn<IndexedReport>() {
 
       @Override
-      public String getValue(Report report) {
+      public String getValue(IndexedReport report) {
         String value = "";
         if (report != null) {
           value = report.getSourceObjectOriginalIds().isEmpty() ? report.getSourceObjectId()
@@ -106,30 +106,34 @@ public class SimpleJobReportList extends BasicAsyncTableCell<Report> {
       }
     };
 
-    outcomeColumn = new TooltipTextColumn<Report>() {
+    outcomeColumn = new TooltipTextColumn<IndexedReport>() {
 
       @Override
-      public String getValue(Report report) {
+      public String getValue(IndexedReport report) {
         String value = "";
         if (report != null) {
-          value = report.getOutcomeObjectId();
+          if (StringUtils.isNotBlank(report.getOutcomeObjectLabel())) {
+            value = report.getOutcomeObjectLabel() + " (" + report.getOutcomeObjectId() + ")";
+          } else {
+            value = report.getOutcomeObjectId();
+          }
         }
         return value;
       }
     };
 
-    updatedDateColumn = new Column<Report, Date>(
+    updatedDateColumn = new Column<IndexedReport, Date>(
       new DateCell(DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT))) {
       @Override
-      public Date getValue(Report job) {
+      public Date getValue(IndexedReport job) {
         return job != null ? job.getDateUpdated() : null;
       }
     };
 
-    lastPluginRunColumn = new TextColumn<Report>() {
+    lastPluginRunColumn = new TextColumn<IndexedReport>() {
 
       @Override
-      public String getValue(Report job) {
+      public String getValue(IndexedReport job) {
         String value = null;
         if (job != null) {
           if (job.getPlugin() != null) {
@@ -148,9 +152,9 @@ public class SimpleJobReportList extends BasicAsyncTableCell<Report> {
       }
     };
 
-    lastPluginRunStateColumn = new Column<Report, SafeHtml>(new SafeHtmlCell()) {
+    lastPluginRunStateColumn = new Column<IndexedReport, SafeHtml>(new SafeHtmlCell()) {
       @Override
-      public SafeHtml getValue(Report report) {
+      public SafeHtml getValue(IndexedReport report) {
         SafeHtml ret = null;
         if (report != null) {
 
@@ -174,10 +178,10 @@ public class SimpleJobReportList extends BasicAsyncTableCell<Report> {
       }
     };
 
-    completionStatusColumn = new TextColumn<Report>() {
+    completionStatusColumn = new TextColumn<IndexedReport>() {
 
       @Override
-      public String getValue(Report report) {
+      public String getValue(IndexedReport report) {
         String value = "";
         if (report != null) {
           value = report.getStepsCompleted() + " " + messages.of() + " " + report.getTotalSteps() + " ("
@@ -215,7 +219,7 @@ public class SimpleJobReportList extends BasicAsyncTableCell<Report> {
 
   @Override
   protected Sorter getSorter(ColumnSortList columnSortList) {
-    Map<Column<Report, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<Report, ?>, List<String>>();
+    Map<Column<IndexedReport, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedReport, ?>, List<String>>();
     columnSortingKeyMap.put(sourceColumn, Arrays.asList(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID));
     columnSortingKeyMap.put(outcomeColumn, Arrays.asList(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID));
     columnSortingKeyMap.put(updatedDateColumn, Arrays.asList(RodaConstants.JOB_REPORT_DATE_UPDATE));

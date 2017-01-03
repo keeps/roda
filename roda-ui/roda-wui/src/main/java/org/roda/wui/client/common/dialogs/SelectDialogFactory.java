@@ -18,6 +18,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
@@ -50,7 +51,7 @@ public class SelectDialogFactory {
       return new SelectRiskDialog(title, filter, selectable);
     } else if (actualClass.equals(Job.class.getName())) {
       return new SelectJobDialog(title, filter, selectable);
-    } else if (actualClass.equals(Report.class.getName())) {
+    } else if (actualClass.equals(Report.class.getName()) || actualClass.equals(IndexedReport.class.getName())) {
       return new SelectReportDialog(title, filter, selectable);
     } else if (actualClass.equals(TransferredResource.class.getName())) {
       return new SelectTransferResourceDialog(title, filter, selectable);

@@ -19,7 +19,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -115,6 +114,7 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.JobStats;
@@ -312,7 +312,7 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToRepresentation(doc, returnLite));
     } else if (resultClass.equals(LogEntry.class)) {
       ret = resultClass.cast(solrDocumentToLogEntry(doc, returnLite));
-    } else if (resultClass.equals(Report.class)) {
+    } else if (resultClass.equals(Report.class) || resultClass.equals(IndexedReport.class)) {
       ret = resultClass.cast(solrDocumentToJobReport(doc, returnLite));
     } else if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class)
       || resultClass.equals(Group.class)) {
@@ -355,8 +355,8 @@ public class SolrUtils {
       throw new NotSupportedException();
     } else if (resultClass.equals(LogEntry.class)) {
       ret = logEntryToSolrDocument((LogEntry) object);
-    } else if (resultClass.equals(Report.class)) {
-      ret = jobReportToSolrDocument((Report) object);
+    } else if (resultClass.equals(Report.class) || resultClass.equals(IndexedReport.class)) {
+      throw new NotSupportedException();
     } else if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class)
       || resultClass.equals(Group.class)) {
       ret = rodaMemberToSolrDocument((RODAMember) object);
@@ -406,7 +406,7 @@ public class SolrUtils {
       indexNames.add(RodaConstants.INDEX_PRESERVATION_AGENTS);
     } else if (resultClass.equals(LogEntry.class)) {
       indexNames.add(RodaConstants.INDEX_ACTION_LOG);
-    } else if (resultClass.equals(Report.class)) {
+    } else if (resultClass.equals(Report.class) || resultClass.equals(IndexedReport.class)) {
       indexNames.add(RodaConstants.INDEX_JOB_REPORT);
     } else if (resultClass.equals(User.class)) {
       indexNames.add(RodaConstants.INDEX_MEMBERS);
@@ -1862,7 +1862,8 @@ public class SolrUtils {
     return job;
   }
 
-  public static SolrInputDocument jobReportToSolrDocument(Report jobReport) {
+  public static <T extends Serializable> SolrInputDocument jobReportToSolrDocument(Report jobReport, Job job,
+    SolrClient index) {
     SolrInputDocument doc = new SolrInputDocument();
 
     doc.addField(RodaConstants.INDEX_UUID, jobReport.getId());
@@ -1888,12 +1889,49 @@ public class SolrUtils {
     doc.addField(RodaConstants.JOB_REPORT_REPORTS, JsonUtils.getJsonFromObject(jobReport.getReports()));
     doc.addField(RodaConstants.JOB_REPORT_SOURCE_OBJECT_CLASS, jobReport.getSourceObjectClass());
     doc.addField(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_CLASS, jobReport.getOutcomeObjectClass());
+    doc.addField(RodaConstants.JOB_REPORT_JOB_NAME, job.getName());
+
+    doc.addField(RodaConstants.JOB_REPORT_SOURCE_OBJECT_LABEL,
+      getObjectLabel(index, jobReport.getSourceObjectClass(), jobReport.getSourceObjectId()));
+    doc.addField(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_LABEL,
+      getObjectLabel(index, jobReport.getOutcomeObjectClass(), jobReport.getOutcomeObjectId()));
 
     return doc;
   }
 
-  private static Report solrDocumentToJobReport(SolrDocument doc, boolean returnLite) {
-    Report jobReport = new Report();
+  private static <T extends Serializable> String getObjectLabel(SolrClient index, String className, String id) {
+    if (className != null && id != null) {
+      try {
+        Class<T> objectClass = (Class<T>) Class.forName(className);
+        String field = getIndexName(objectClass).get(0);
+        SolrDocument doc = index.getById(field, id);
+        if (doc != null) {
+          if (objectClass.equals(AIP.class)) {
+            return objectToString(doc.get(RodaConstants.AIP_TITLE), null);
+          } else if (objectClass.equals(Representation.class)) {
+            return objectToString(doc.get(RodaConstants.REPRESENTATION_ID), null);
+          } else if (objectClass.equals(File.class)) {
+            return objectToString(doc.get(RodaConstants.FILE_FILE_ID), null);
+          } else if (objectClass.equals(TransferredResource.class)) {
+            return objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_ID), null);
+          } else if (objectClass.equals(DIP.class)) {
+            return objectToString(doc.get(RodaConstants.DIP_TITLE), null);
+          } else if (objectClass.equals(DIPFile.class)) {
+            return objectToString(doc.get(RodaConstants.DIPFILE_ID), null);
+          } else {
+            return objectToString(doc.get(RodaConstants.INDEX_UUID), null);
+          }
+        }
+      } catch (ClassNotFoundException | GenericException | SolrServerException | IOException e) {
+        LOGGER.error("Could not return object label of {} {}", className, id, e);
+      }
+    }
+
+    return null;
+  }
+
+  private static IndexedReport solrDocumentToJobReport(SolrDocument doc, boolean returnLite) {
+    IndexedReport jobReport = new IndexedReport();
     jobReport.setId(objectToString(doc.get(RodaConstants.INDEX_UUID), null));
     jobReport.setJobId(objectToString(doc.get(RodaConstants.JOB_REPORT_JOB_ID), null));
     if (returnLite) {
@@ -1927,6 +1965,10 @@ public class SolrUtils {
     } catch (GenericException e) {
       LOGGER.error("Error parsing report in job report", e);
     }
+
+    jobReport.setJobName(objectToString(doc.get(RodaConstants.JOB_REPORT_JOB_NAME), null));
+    jobReport.setSourceObjectLabel(objectToString(doc.get(RodaConstants.JOB_REPORT_SOURCE_OBJECT_LABEL), null));
+    jobReport.setOutcomeObjectLabel(objectToString(doc.get(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_LABEL), null));
 
     return jobReport;
   }

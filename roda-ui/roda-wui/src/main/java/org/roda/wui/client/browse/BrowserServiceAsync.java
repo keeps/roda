@@ -188,7 +188,8 @@ public interface BrowserServiceAsync {
 
   void updateRiskCounters(AsyncCallback<Void> asyncCallback);
 
-  void appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason, AsyncCallback<Void> callback);
+  void appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason, String localeString,
+    AsyncCallback<Void> callback);
 
   void retrieveRepresentationById(String representationId, AsyncCallback<IndexedRepresentation> asyncCallback);
 
@@ -229,10 +230,10 @@ public interface BrowserServiceAsync {
 
   void retrieveBrowseRepresentationBundle(String aipId, String representationId, String localeString,
     AsyncCallback<BrowseRepresentationBundle> callback);
-  
+
   void retrieveBrowseFileBundle(String historyAipId, String historyRepresentationId, List<String> historyFilePath,
     String historyFileId, String localeName, AsyncCallback<BrowseFileBundle> asyncCallback);
 
-  void retrieveBrowseFileBundle(String fileUUID, String localeString, AsyncCallback<BrowseFileBundle> callback);
+  void retrieveFromModel(String objectClass, String objectUUID, AsyncCallback<IsIndexed> asyncCallback);
 
 }

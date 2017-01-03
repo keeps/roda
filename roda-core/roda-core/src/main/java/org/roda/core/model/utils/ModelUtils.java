@@ -45,6 +45,7 @@ import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
@@ -892,6 +893,8 @@ public final class ModelUtils {
       return (Class<T>) Risk.class;
     } else if (IndexedDIP.class.equals(inputClass)) {
       return (Class<T>) DIP.class;
+    } else if (IndexedReport.class.equals(inputClass)) {
+      return (Class<T>) Report.class;
     } else {
       return inputClass;
     }

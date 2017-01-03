@@ -15,8 +15,12 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.index.IndexService;
@@ -219,8 +223,9 @@ public class IngestJobPluginInfo extends JobPluginInfo {
         report.setPluginState(PluginState.FAILURE);
 
         try {
-          model.createOrUpdateJobReport(report);
-        } catch (GenericException e) {
+          Job job = model.retrieveJob(report.getJobId());
+          model.createOrUpdateJobReport(report, job);
+        } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
           LOGGER.error("Error updating last job report indicating other AIP failure.");
         }
 

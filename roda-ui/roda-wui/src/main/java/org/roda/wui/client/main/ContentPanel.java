@@ -111,6 +111,9 @@ public class ContentPanel extends SimplePanel {
 
     // Help
     resolvers.add(Help.RESOLVER);
+
+    // UUID resolver
+    resolvers.add(HistoryUtils.UUID_RESOLVER);
   }
 
   /**

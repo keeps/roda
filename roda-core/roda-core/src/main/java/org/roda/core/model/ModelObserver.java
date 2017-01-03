@@ -85,7 +85,7 @@ public interface ModelObserver {
 
   public void jobDeleted(String jobId);
 
-  public ReturnWithExceptions<Void> jobReportCreatedOrUpdated(Report jobReport);
+  public ReturnWithExceptions<Void> jobReportCreatedOrUpdated(Report jobReport, Job job);
 
   public void jobReportDeleted(String jobReportId);
 

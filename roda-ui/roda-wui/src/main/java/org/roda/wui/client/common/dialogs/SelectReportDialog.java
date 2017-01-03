@@ -9,13 +9,13 @@ package org.roda.wui.client.common.dialogs;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.wui.client.common.lists.SimpleJobReportList;
 import org.roda.wui.client.common.search.SearchFilters;
 
-public class SelectReportDialog extends DefaultSelectDialog<Report, Void> {
+public class SelectReportDialog extends DefaultSelectDialog<IndexedReport, Void> {
 
-  private static final Filter DEFAULT_FILTER_REPORT = SearchFilters.defaultFilter(Report.class.getName());
+  private static final Filter DEFAULT_FILTER_REPORT = SearchFilters.defaultFilter(IndexedReport.class.getName());
 
   public SelectReportDialog(String title) {
     this(title, DEFAULT_FILTER_REPORT);

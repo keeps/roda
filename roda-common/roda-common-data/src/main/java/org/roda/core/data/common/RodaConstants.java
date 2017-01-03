@@ -61,6 +61,7 @@ public final class RodaConstants {
   public static final String I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX = "ui.browse.metadata.descriptive.type.";
   public static final String I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX = "crosswalks.dissemination.html.";
   public static final String I18N_UI_FACETS_PREFIX = "ui.facets.";
+  public static final String I18N_UI_APPRAISAL = "ui.appraisal";
 
   /*
    * Installation (and most probably classpath as well) related variables
@@ -714,6 +715,9 @@ public final class RodaConstants {
   public static final String JOB_REPORT_PLUGIN_DETAILS = "pluginDetails";
   public static final String JOB_REPORT_HTML_PLUGIN_DETAILS = "htmlPluginDetails";
   public static final String JOB_REPORT_REPORTS = "reports";
+  public static final String JOB_REPORT_JOB_NAME = "jobName";
+  public static final String JOB_REPORT_SOURCE_OBJECT_LABEL = "sourceObjectLabel";
+  public static final String JOB_REPORT_OUTCOME_OBJECT_LABEL = "outcomeObjectLabel";
   public static final String JOB_REPORT_FILE_EXTENSION = ".json";
   public static final String JOB_REPORT_SEARCH = "search";
 

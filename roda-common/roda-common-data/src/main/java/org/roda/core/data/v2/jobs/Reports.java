@@ -13,6 +13,8 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.v2.common.RODAObjectList;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -21,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 @XmlRootElement(name = "reports")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Reports {
+public class Reports implements RODAObjectList<Report> {
   private List<Report> reports;
 
   public Reports() {
@@ -36,15 +38,17 @@ public class Reports {
 
   @JsonProperty(value = "reports")
   @XmlElement(name = "report")
-  public List<Report> getReports() {
+  public List<Report> getObjects() {
     return reports;
   }
 
-  public void setReports(List<Report> reports) {
+  @Override
+  public void setObjects(List<Report> reports) {
     this.reports = reports;
   }
 
-  public void addReport(Report report) {
+  @Override
+  public void addObject(Report report) {
     this.reports.add(report);
   }
 

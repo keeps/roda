@@ -19,11 +19,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowseDIP;
-import org.roda.wui.client.browse.BrowseFile;
-import org.roda.wui.client.browse.BrowseFolder;
-import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.PreservationEvents;
-import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
@@ -180,12 +176,17 @@ public class BreadcrumbUtils {
 
       if (filePath != null && fileAncestorsPath != null && filePath.size() == fileAncestorsPath.size()) {
         for (int i = 0; i < filePath.size(); i++) {
-          String folderName = filePath.get(i);
-          String folderUUID = fileAncestorsPath.get(i);
+          final String folderName = filePath.get(i);
+          final String folderUUID = fileAncestorsPath.get(i);
 
           SafeHtml breadcrumbLabel = getBreadcrumbLabel(folderName, RodaConstants.VIEW_REPRESENTATION_FOLDER);
-          fileBreadcrumb.add(new BreadcrumbItem(breadcrumbLabel, folderName,
-            ListUtils.concat(BrowseFolder.RESOLVER.getHistoryPath(), folderUUID)));
+          fileBreadcrumb.add(new BreadcrumbItem(breadcrumbLabel, folderName, new Command() {
+
+            @Override
+            public void execute() {
+              HistoryUtils.resolve(IndexedFile.class.getName(), folderUUID);
+            }
+          }));
         }
       }
 

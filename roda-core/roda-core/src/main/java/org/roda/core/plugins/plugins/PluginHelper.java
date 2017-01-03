@@ -190,8 +190,9 @@ public final class PluginHelper {
     report.addReport(reportItem);
 
     try {
-      model.createOrUpdateJobReport(report);
-    } catch (GenericException e) {
+      Job job = model.retrieveJob(jobId);
+      model.createOrUpdateJobReport(report, job);
+    } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
       LOGGER.error("Error creating Job Report", e);
     }
   }
@@ -202,7 +203,8 @@ public final class PluginHelper {
       String jobId = getJobId(plugin);
       Report jobReport = model.retrieveJobReport(jobId, aipId, true);
       jobReport.setOutcomeObjectState(newState);
-      model.createOrUpdateJobReport(jobReport);
+      Job job = model.retrieveJob(jobId);
+      model.createOrUpdateJobReport(jobReport, job);
     } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
       LOGGER.error("Error while updating Job Report", e);
     }
@@ -240,16 +242,18 @@ public final class PluginHelper {
         }
       }
 
-      model.createOrUpdateJobReport(jobReport);
-    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      Job job = model.retrieveJob(jobId);
+      model.createOrUpdateJobReport(jobReport, job);
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
       LOGGER.error("Error while updating Job Report", e);
     }
   }
 
   private static <T extends IsRODAObject> void updateJobReport(ModelService model, Report report) {
     try {
-      model.createOrUpdateJobReport(report);
-    } catch (GenericException e) {
+      Job job = model.retrieveJob(report.getJobId());
+      model.createOrUpdateJobReport(report, job);
+    } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
       LOGGER.error("Error while updating Job Report", e);
     }
   }

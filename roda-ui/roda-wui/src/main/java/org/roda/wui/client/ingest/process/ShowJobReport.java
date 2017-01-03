@@ -13,27 +13,19 @@ package org.roda.wui.client.ingest.process;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.wui.client.browse.Browse;
-import org.roda.wui.client.browse.BrowseFile;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
-import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.process.IngestProcess;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.Humanize.DHMSFormat;
 import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -65,20 +57,21 @@ public class ShowJobReport extends Composite {
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
         String jobReportId = historyTokens.get(0);
-        BrowserService.Util.getInstance().retrieve(Report.class.getName(), jobReportId, new AsyncCallback<Report>() {
+        BrowserService.Util.getInstance().retrieve(IndexedReport.class.getName(), jobReportId,
+          new AsyncCallback<IndexedReport>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            callback.onFailure(caught);
-          }
+            @Override
+            public void onFailure(Throwable caught) {
+              callback.onFailure(caught);
+            }
 
-          @Override
-          public void onSuccess(Report jobReport) {
-            ShowJobReport showJob = new ShowJobReport(jobReport);
-            callback.onSuccess(showJob);
-            JavascriptUtils.scrollToHeader();
-          }
-        });
+            @Override
+            public void onSuccess(IndexedReport jobReport) {
+              ShowJobReport showJob = new ShowJobReport(jobReport);
+              callback.onSuccess(showJob);
+              JavascriptUtils.scrollToHeader();
+            }
+          });
       } else {
         HistoryUtils.newHistory(IngestProcess.RESOLVER);
         callback.onSuccess(null);
@@ -107,9 +100,7 @@ public class ShowJobReport extends Composite {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  // private ClientLogger logger = new ClientLogger(getClass().getName());
-
-  private final Report jobReport;
+  private final IndexedReport jobReport;
   // private final Map<String, PluginInfo> pluginsInfo;
 
   @UiField
@@ -144,139 +135,62 @@ public class ShowJobReport extends Composite {
   @UiField
   Button buttonBack;
 
-  public ShowJobReport(Report jobReport) {
+  public ShowJobReport(IndexedReport jobReport) {
     this.jobReport = jobReport;
 
     initWidget(uiBinder.createAndBindUi(this));
 
-    job.setText(jobReport.getJobId());
+    job.setText(jobReport.getJobName());
     job.setHref(HistoryUtils.createHistoryHashLink(ShowJob.RESOLVER, jobReport.getJobId()));
     outcomeObjectState.setVisible(false);
 
-    boolean hasSource = true;
-    if (!jobReport.getSourceObjectOriginalIds().isEmpty() || !jobReport.getSourceObjectId().isEmpty()) {
+    boolean hasSource = !jobReport.getSourceObjectOriginalIds().isEmpty() || !jobReport.getSourceObjectId().isEmpty();
+
+    if (hasSource) {
       String idText = !jobReport.getSourceObjectOriginalIds().isEmpty()
-        ? StringUtils.prettyPrint(jobReport.getSourceObjectOriginalIds()) : jobReport.getSourceObjectId();
+        ? " (" + StringUtils.prettyPrint(jobReport.getSourceObjectOriginalIds()) + ")" : "";
 
-      sourceObject.setText(idText);
-      if (!jobReport.getSourceObjectClass().isEmpty())
-        sourceObject.setTitle(jobReport.getSourceObjectOriginalName());
-
-      if (TransferredResource.class.getName().equals(jobReport.getSourceObjectClass())) {
-        sourceObject.setText(jobReport.getSourceObjectOriginalName() + " (" + idText + ")");
-        sourceObject
-          .setHref(HistoryUtils.createHistoryHashLink(IngestTransfer.RESOLVER, jobReport.getSourceObjectId()));
-        sourceObjectLabel.setText(messages.showSIPExtended());
-        outcomeObjectState.setVisible(true);
-
-      } else if (AIP.class.getName().equals(jobReport.getSourceObjectClass())) {
-        sourceObject.setHref(HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(sourceObject.getText())));
-        sourceObjectLabel.setText(messages.showAIPExtended());
-
-      } else if (Representation.class.getName().equals(jobReport.getSourceObjectClass())) {
-        BrowserService.Util.getInstance().retrieve(IndexedRepresentation.class.getName(), sourceObject.getText(),
-          new AsyncCallback<IndexedRepresentation>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-              // do nothing
-            }
-
-            @Override
-            public void onSuccess(IndexedRepresentation representation) {
-              if (representation != null) {
-                sourceObjectLabel.setText(messages.showRepresentationExtended());
-                sourceObject.setHref(HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(representation)));
-                sourceObject.setText(representation.getId());
-              }
-            }
-          });
-
-      } else if (File.class.getName().equals(jobReport.getSourceObjectClass())) {
-        BrowserService.Util.getInstance().retrieve(IndexedFile.class.getName(), sourceObject.getText(),
-          new AsyncCallback<IndexedFile>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-              // do nothing
-            }
-
-            @Override
-            public void onSuccess(IndexedFile file) {
-              if (file != null) {
-                sourceObjectLabel.setText(messages.showFileExtended());
-                sourceObject.setHref(HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(file)));
-                sourceObject.setText(file.getId());
-              }
-            }
-          });
+      if (StringUtils.isNotBlank(jobReport.getSourceObjectOriginalName())) {
+        sourceObject.setText(jobReport.getSourceObjectOriginalName() + idText);
+      } else if (StringUtils.isNotBlank(jobReport.getSourceObjectLabel())) {
+        sourceObject.setText(jobReport.getSourceObjectLabel() + idText);
+      } else if (StringUtils.isNotBlank(jobReport.getSourceObjectId())) {
+        sourceObject.setText(jobReport.getSourceObjectId() + idText);
+      } else {
+        hasSource = false;
       }
-    } else {
-      hasSource = false;
+
+      // sourceObject.setTitle(jobReport.getSourceObjectOriginalName());
+      sourceObject.setHref(HistoryUtils.createHistoryHashLink(
+        HistoryUtils.getHistoryUuidResolver(jobReport.getSourceObjectClass(), jobReport.getSourceObjectId())));
+      sourceObjectLabel.setText(messages.jobReportSource(jobReport.getSourceObjectClass()));
     }
 
     sourceObjectLabel.setVisible(hasSource);
     sourceObject.setVisible(hasSource);
 
-    if (StringUtils.isNotBlank(jobReport.getOutcomeObjectId())
-      && !(jobReport.getOutcomeObjectId().equals(jobReport.getSourceObjectId())
-        && jobReport.getOutcomeObjectClass().equals(jobReport.getSourceObjectClass()))) {
+    boolean hasOutcome = StringUtils.isNotBlank(jobReport.getOutcomeObjectId())
+      && !jobReport.getOutcomeObjectId().equals(jobReport.getSourceObjectId());
 
-      outcomeObject.setText(jobReport.getOutcomeObjectId());
-      outcomeObjectState.setHTML(HtmlSnippetUtils.getAIPStateHTML(jobReport.getOutcomeObjectState()));
-
-      if (AIP.class.getName().equals(jobReport.getOutcomeObjectClass())) {
-        outcomeObject.setHref(HistoryUtils.createHistoryHashLink(Browse.RESOLVER, jobReport.getOutcomeObjectId()));
-        outcomeObjectLabel.setText(messages.showAIPExtended());
-
-      } else if (Representation.class.getName().equals(jobReport.getOutcomeObjectClass())) {
-        BrowserService.Util.getInstance().retrieve(IndexedRepresentation.class.getName(),
-          jobReport.getOutcomeObjectId(), new AsyncCallback<IndexedRepresentation>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-              // do nothing
-            }
-
-            @Override
-            public void onSuccess(IndexedRepresentation representation) {
-              if (representation != null) {
-                outcomeObjectLabel.setText(messages.showRepresentationExtended());
-                outcomeObject
-                  .setHref(HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(representation)));
-                outcomeObject.setText(representation.getId());
-              }
-            }
-          });
-
-      } else if (File.class.getName().equals(jobReport.getOutcomeObjectClass())) {
-        BrowserService.Util.getInstance().retrieve(IndexedFile.class.getName(), jobReport.getOutcomeObjectId(),
-          new AsyncCallback<IndexedFile>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-              // do nothing
-            }
-
-            @Override
-            public void onSuccess(IndexedFile file) {
-              if (file != null) {
-                outcomeObjectLabel.setText(messages.showFileExtended());
-                outcomeObject.setHref(HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(file)));
-                outcomeObject.setText(file.getId());
-              }
-            }
-          });
+    if (hasOutcome) {
+      if (jobReport.getOutcomeObjectLabel() != null) {
+        outcomeObject.setText(jobReport.getOutcomeObjectLabel());
+      } else if (jobReport.getOutcomeObjectId() != null) {
+        outcomeObject.setText(jobReport.getOutcomeObjectId());
       } else {
-        outcomeObject.setVisible(false);
-        outcomeObjectState.setVisible(false);
-        outcomeObjectLabel.setVisible(false);
+        hasOutcome = false;
       }
-    } else {
-      outcomeObject.setVisible(false);
-      outcomeObjectState.setVisible(false);
-      outcomeObjectLabel.setVisible(false);
+
+      // outcomeObject.setTitle(jobReport.getSourceObjectOriginalName());
+      outcomeObject.setHref(HistoryUtils.createHistoryHashLink(
+        HistoryUtils.getHistoryUuidResolver(jobReport.getOutcomeObjectClass(), jobReport.getOutcomeObjectId())));
+      outcomeObjectLabel.setText(messages.jobReportOutcome(jobReport.getOutcomeObjectClass()));
+      outcomeObjectState.setHTML(HtmlSnippetUtils.getAIPStateHTML(jobReport.getOutcomeObjectState()));
     }
+
+    outcomeObject.setVisible(hasOutcome);
+    outcomeObjectState.setVisible(hasOutcome);
+    outcomeObjectLabel.setVisible(hasOutcome);
 
     DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT);
     dateCreated.setText(dateTimeFormat.format(jobReport.getDateCreated()));

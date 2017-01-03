@@ -285,8 +285,8 @@ public class IndexService {
     return observer.jobCreatedOrUpdated(job, true);
   }
 
-  public ReturnWithExceptions<Void> reindexJobReport(Report jobReport) {
-    return observer.jobReportCreatedOrUpdated(jobReport);
+  public ReturnWithExceptions<Void> reindexJobReport(Report jobReport, Job job) {
+    return observer.jobReportCreatedOrUpdated(jobReport, job);
   }
 
   public ReturnWithExceptions<Void> reindexRisk(Risk risk) {

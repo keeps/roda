@@ -78,34 +78,7 @@ public class BrowseFolder extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      if (historyTokens.size() == 1) {
-        final String historyFileUUID = historyTokens.get(0);
-
-        BrowserService.Util.getInstance().retrieveBrowseFileBundle(historyFileUUID,
-          LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<BrowseFileBundle>() {
-
-            @Override
-            public void onSuccess(final BrowseFileBundle bundle) {
-              if (bundle.getFile().isDirectory()) {
-                callback.onSuccess(new BrowseFolder(bundle));
-              } else {
-                // TODO i18n
-                Toast.showError("Trying to open a file as a folder");
-                HistoryUtils.newHistory(Browse.RESOLVER);
-                callback.onSuccess(null);
-              }
-            }
-
-            @Override
-            public void onFailure(Throwable caught) {
-              if (!AsyncCallbackUtils.treatCommonFailures(caught, Browse.RESOLVER.getHistoryPath())) {
-                Toast.showError(caught);
-              }
-              callback.onSuccess(null);
-            }
-          });
-
-      } else if (historyTokens.size() > 2) {
+      if (historyTokens.size() > 2) {
         final String historyAipId = historyTokens.get(0);
         final String historyRepresentationId = historyTokens.get(1);
         final List<String> historyFilePath = new ArrayList<String>(historyTokens.subList(2, historyTokens.size() - 1));

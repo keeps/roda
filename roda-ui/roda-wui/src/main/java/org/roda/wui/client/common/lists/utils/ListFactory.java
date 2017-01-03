@@ -21,6 +21,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
@@ -77,7 +78,7 @@ public class ListFactory {
       return new RiskIncidenceList(filter, null, title, selectable, pageSize, incrementPage);
     } else if (actualClass.equals(Job.class.getName())) {
       return new JobList(filter, null, title, selectable, pageSize, incrementPage);
-    } else if (actualClass.equals(Report.class.getName())) {
+    } else if (actualClass.equals(Report.class.getName()) || actualClass.equals(IndexedReport.class.getName())) {
       return new SimpleJobReportList(filter, null, title, selectable, pageSize, incrementPage);
     } else if (actualClass.equals(TransferredResource.class.getName())) {
       return new TransferredResourceList(filter, null, title, selectable, pageSize, incrementPage);

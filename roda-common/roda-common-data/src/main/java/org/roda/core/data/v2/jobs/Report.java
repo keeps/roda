@@ -8,15 +8,12 @@
 package org.roda.core.data.v2.jobs;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
-import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIPState;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -26,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @XmlRootElement(name = "report")
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Report implements IsModelObject, IsIndexed {
+public class Report implements IsModelObject {
   private static final long serialVersionUID = 4316398565678538090L;
 
   public enum PluginState {
@@ -345,29 +342,4 @@ public class Report implements IsModelObject, IsIndexed {
       + ", pluginDetails=" + pluginDetails + ", htmlPluginDetails=" + htmlPluginDetails + ", reports=" + reports + "]";
   }
 
-  @Override
-  public List<String> toCsvHeaders() {
-    return Arrays.asList("id", "jobId", "sourceObjectId", "sourceObjectClass", "sourceObjectOriginalIds",
-      "outcomeObjectId", "outcomeObjectClass", "outcomeObjectState", "title", "dateCreated", "dateUpdated",
-      "completionPercentage", "stepsCompleted", "totalSteps", "plugin", "pluginName", "pluginVersion", "pluginState",
-      "pluginDetails", "htmlPluginDetails", "reports");
-  }
-
-  @Override
-  public List<Object> toCsvValues() {
-    return Arrays.asList(id, jobId, sourceObjectId, sourceObjectClass, sourceObjectOriginalIds, outcomeObjectId,
-      outcomeObjectClass, outcomeObjectState, title, dateCreated, dateUpdated, completionPercentage, stepsCompleted,
-      totalSteps, plugin, pluginName, pluginVersion, pluginState, pluginDetails, htmlPluginDetails, reports);
-  }
-
-  @JsonIgnore
-  @Override
-  public String getUUID() {
-    return getId();
-  }
-
-  @Override
-  public List<String> liteFields() {
-    return Arrays.asList(RodaConstants.JOB_REPORT_JOB_ID, RodaConstants.INDEX_UUID);
-  }
 }

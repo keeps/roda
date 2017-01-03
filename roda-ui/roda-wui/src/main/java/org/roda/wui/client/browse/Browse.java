@@ -1229,16 +1229,17 @@ public class Browse extends Composite {
     final boolean accept = true;
     final SelectedItems<IndexedAIP> selected = SelectedItemsList.create(IndexedAIP.class, aipId);
     String rejectReason = null;
-    BrowserService.Util.getInstance().appraisal(selected, accept, rejectReason, new LoadingAsyncCallback<Void>() {
+    BrowserService.Util.getInstance().appraisal(selected, accept, rejectReason,
+      LocaleInfo.getCurrentLocale().getLocaleName(), new LoadingAsyncCallback<Void>() {
 
-      @Override
-      public void onSuccessImpl(Void result) {
-        Toast.showInfo(messages.dialogDone(), messages.itemWasAccepted());
-        // reload
-        clear();
-        viewAction(aipId);
-      }
-    });
+        @Override
+        public void onSuccessImpl(Void result) {
+          Toast.showInfo(messages.dialogDone(), messages.itemWasAccepted());
+          // reload
+          clear();
+          viewAction(aipId);
+        }
+      });
   }
 
   @UiHandler("appraisalReject")
@@ -1255,14 +1256,15 @@ public class Browse extends Composite {
 
         @Override
         public void onSuccess(final String rejectReason) {
-          BrowserService.Util.getInstance().appraisal(selected, accept, rejectReason, new LoadingAsyncCallback<Void>() {
+          BrowserService.Util.getInstance().appraisal(selected, accept, rejectReason,
+            LocaleInfo.getCurrentLocale().getLocaleName(), new LoadingAsyncCallback<Void>() {
 
-            @Override
-            public void onSuccessImpl(Void result) {
-              Toast.showInfo(messages.dialogDone(), messages.itemWasRejected());
-              HistoryUtils.newHistory(IngestAppraisal.RESOLVER);
-            }
-          });
+              @Override
+              public void onSuccessImpl(Void result) {
+                Toast.showInfo(messages.dialogDone(), messages.itemWasRejected());
+                HistoryUtils.newHistory(IngestAppraisal.RESOLVER);
+              }
+            });
         }
       });
   }

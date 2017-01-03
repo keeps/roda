@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.Is;
@@ -31,6 +32,7 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
+import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -117,15 +119,16 @@ public final class TestsHelper {
   public static List<Report> getJobReports(IndexService index, Job job, boolean failIfReportNotSucceeded)
     throws GenericException, RequestNotValidException {
 
-    index.commit(Job.class, Report.class);
+    index.commit(Job.class, IndexedReport.class);
 
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId()));
 
-    Long counter = index.count(Report.class, filter);
-    IndexResult<Report> indexReports = index.find(Report.class, filter, Sorter.NONE,
+    Long counter = index.count(IndexedReport.class, filter);
+    IndexResult<IndexedReport> indexReports = index.find(IndexedReport.class, filter, Sorter.NONE,
       new Sublist(0, counter.intValue()));
 
-    List<Report> reports = indexReports.getResults();
+    List<Report> reports = indexReports.getResults().stream().map(ireport -> (Report) ireport)
+      .collect(Collectors.toList());
 
     if (failIfReportNotSucceeded) {
       ReportAssertUtils.assertReports(reports);

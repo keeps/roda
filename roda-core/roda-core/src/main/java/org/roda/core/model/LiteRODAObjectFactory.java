@@ -39,6 +39,7 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
@@ -159,7 +160,7 @@ public final class LiteRODAObjectFactory {
     } else if (object instanceof TransferredResource) {
       TransferredResource o = (TransferredResource) object;
       ret = get(TransferredResource.class, Arrays.asList(o.getFullPath()), false);
-    } else if (object instanceof Report) {
+    } else if (object instanceof Report || object instanceof IndexedReport) {
       Report o = (Report) object;
       ret = get(Report.class, Arrays.asList(o.getJobId(), o.getId()), false);
     } else if (object instanceof Representation || object instanceof IndexedRepresentation) {
@@ -308,7 +309,7 @@ public final class LiteRODAObjectFactory {
           ret = (T) model.retrieveNotification(split[1]);
         } else if (PreservationMetadata.class.getName().equals(clazz)) {
           ret = getPreservationMetadata(model, split);
-        } else if (Report.class.getName().equals(clazz)) {
+        } else if (Report.class.getName().equals(clazz) || IndexedReport.class.getName().equals(clazz)) {
           if (split.length == 3) {
             ret = (T) model.retrieveJobReport(split[1], split[2], false);
           }

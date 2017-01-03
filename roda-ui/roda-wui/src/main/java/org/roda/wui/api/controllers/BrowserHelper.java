@@ -104,6 +104,7 @@ import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadataList;
+import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -2373,8 +2374,8 @@ public class BrowserHelper {
     index.commit(IndexedRisk.class);
   }
 
-  public static void appraisal(User user, SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+  public static void appraisal(User user, SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason,
+    Locale locale) throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     List<String> listOfIds = consolidate(user, IndexedAIP.class, selected);
 
     ModelService model = RodaCoreFactory.getModelService();
@@ -2433,10 +2434,12 @@ public class BrowserHelper {
       }
 
       // create job report
+      Job job = model.retrieveJob(jobId);
       Report report = model.retrieveJobReport(jobId, aipId, true);
 
       Report reportItem = new Report();
-      reportItem.setTitle("Manual appraisal");
+      Messages messages = RodaCoreFactory.getI18NMessages(locale);
+      reportItem.setTitle(messages.getTranslation(RodaConstants.I18N_UI_APPRAISAL));
       reportItem.setPlugin(user.getName());
       reportItem.setPluginDetails(rejectReason);
       reportItem.setPluginState(accept ? PluginState.SUCCESS : PluginState.FAILURE);
@@ -2444,7 +2447,7 @@ public class BrowserHelper {
       reportItem.setDateCreated(now);
       report.addReport(reportItem);
 
-      model.createOrUpdateJobReport(report);
+      model.createOrUpdateJobReport(report, job);
 
       // save job state
       Pair<Integer, Integer> pair = jobState.get(jobId);
@@ -2489,7 +2492,8 @@ public class BrowserHelper {
 
     }
 
-    RodaCoreFactory.getIndexService().commit(IndexedAIP.class, Job.class, Report.class, IndexedPreservationEvent.class);
+    RodaCoreFactory.getIndexService().commit(IndexedAIP.class, Job.class, IndexedReport.class,
+      IndexedPreservationEvent.class);
   }
 
   public static IndexedRepresentation retrieveRepresentationById(User user, String representationId)
@@ -2761,9 +2765,11 @@ public class BrowserHelper {
   protected static Reports listReports(int start, int limit)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     Sorter sorter = new Sorter(new SortParameter(RodaConstants.JOB_REPORT_DATE_UPDATE, true));
-    IndexResult<Report> indexReports = RodaCoreFactory.getIndexService().find(Report.class, Filter.ALL, sorter,
-      new Sublist(start, limit));
-    return new Reports(indexReports.getResults());
+    IndexResult<IndexedReport> indexReports = RodaCoreFactory.getIndexService().find(IndexedReport.class, Filter.ALL,
+      sorter, new Sublist(start, limit));
+    List<Report> results = indexReports.getResults().stream().map(ireport -> (Report) ireport)
+      .collect(Collectors.toList());
+    return new Reports(results);
   }
 
   protected static Reports listTransferredResourcesReports(String resourceId, int start, int limit)
@@ -2776,9 +2782,10 @@ public class BrowserHelper {
       Arrays.asList(AIP.class.getName(), IndexedAIP.class.getName())));
 
     Sorter sorter = new Sorter(new SortParameter(RodaConstants.JOB_REPORT_DATE_UPDATE, true));
-    IndexResult<Report> reports = RodaCoreFactory.getIndexService().find(Report.class, filter, sorter,
+    IndexResult<IndexedReport> reports = RodaCoreFactory.getIndexService().find(IndexedReport.class, filter, sorter,
       new Sublist(start, limit));
-    return new Reports(reports.getResults());
+    List<Report> results = reports.getResults().stream().map(ireport -> (Report) ireport).collect(Collectors.toList());
+    return new Reports(results);
   }
 
   protected static Reports listTransferredResourcesReportsWithSIP(String sipId, int start, int limit)
@@ -2789,9 +2796,11 @@ public class BrowserHelper {
     filter.add(new SimpleFilterParameter(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ORIGINAL_IDS, sipId));
 
     Sorter sorter = new Sorter(new SortParameter(RodaConstants.JOB_REPORT_DATE_UPDATE, true));
-    IndexResult<Report> indexReports = RodaCoreFactory.getIndexService().find(Report.class, filter, sorter,
-      new Sublist(start, limit));
-    return new Reports(indexReports.getResults());
+    IndexResult<IndexedReport> indexReports = RodaCoreFactory.getIndexService().find(IndexedReport.class, filter,
+      sorter, new Sublist(start, limit));
+    List<Report> results = indexReports.getResults().stream().map(ireport -> (Report) ireport)
+      .collect(Collectors.toList());
+    return new Reports(results);
   }
 
   public static void deleteRiskIncidences(User user, SelectedItems<RiskIncidence> selected)

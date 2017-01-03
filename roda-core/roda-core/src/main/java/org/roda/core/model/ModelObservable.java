@@ -123,8 +123,7 @@ public abstract class ModelObservable {
     }
   }
 
-  public void notifyFileDeleted(String aipId, String representationId, List<String> fileDirectoryPath,
-    String fileId) {
+  public void notifyFileDeleted(String aipId, String representationId, List<String> fileDirectoryPath, String fileId) {
     for (ModelObserver observer : observers) {
       observer.fileDeleted(aipId, representationId, fileDirectoryPath, fileId, true);
     }
@@ -208,9 +207,9 @@ public abstract class ModelObservable {
     }
   }
 
-  public void notifyJobReportCreatedOrUpdated(Report jobReport) {
+  public void notifyJobReportCreatedOrUpdated(Report jobReport, Job job) {
     for (ModelObserver observer : observers) {
-      observer.jobReportCreatedOrUpdated(jobReport);
+      observer.jobReportCreatedOrUpdated(jobReport, job);
     }
   }
 

@@ -1834,7 +1834,7 @@ public class ModelService extends ModelObservable {
     return ret;
   }
 
-  public void createOrUpdateJobReport(Report jobReport) throws GenericException {
+  public void createOrUpdateJobReport(Report jobReport, Job job) throws GenericException {
     // create job report in storage
     try {
       String jobReportAsJson = JsonUtils.getJsonFromObject(jobReport);
@@ -1845,7 +1845,7 @@ public class ModelService extends ModelObservable {
     }
 
     // index it
-    notifyJobReportCreatedOrUpdated(jobReport);
+    notifyJobReportCreatedOrUpdated(jobReport, job);
   }
 
   public void deleteJobReport(String jobId, String jobReportId)

@@ -18,6 +18,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
@@ -44,7 +45,7 @@ public class SearchFilters {
       return new Filter(new BasicSearchFilterParameter(RodaConstants.RISK_INCIDENCE_SEARCH, "*"));
     } else if (actualClass.equals(Job.class.getName())) {
       return new Filter(new BasicSearchFilterParameter(RodaConstants.JOB_SEARCH, "*"));
-    } else if (actualClass.equals(Report.class.getName())) {
+    } else if (actualClass.equals(Report.class.getName()) || actualClass.equals(IndexedReport.class.getName())) {
       return new Filter(new BasicSearchFilterParameter(RodaConstants.JOB_REPORT_SEARCH, "*"));
     } else if (actualClass.equals(TransferredResource.class.getName())) {
       return new Filter(new BasicSearchFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_SEARCH, "*"));
@@ -75,7 +76,7 @@ public class SearchFilters {
       return RodaConstants.RISK_INCIDENCE_SEARCH;
     } else if (actualClass.equals(Job.class.getName())) {
       return RodaConstants.JOB_SEARCH;
-    } else if (actualClass.equals(Report.class.getName())) {
+    } else if (actualClass.equals(Report.class.getName()) || actualClass.equals(IndexedReport.class.getName())) {
       return RodaConstants.JOB_REPORT_SEARCH;
     } else if (actualClass.equals(TransferredResource.class.getName())) {
       return RodaConstants.TRANSFERRED_RESOURCE_SEARCH;
